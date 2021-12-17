@@ -20,6 +20,35 @@ FactoryBot.define do
       end
     end
 
+    trait :with_creation_state do
+      transient do
+        can_edit_claimed { true }
+        creation_state_is_pos { false }
+        creation_state_pos_kind { "" }
+        creation_state_bulk_import { nil }
+        creation_state_registration_info { nil }
+      end
+      after(:create) do |bike, evaluator|
+        # Have to create here so created_at matches
+        if bike.creation_organization_id.present?
+          BikeOrganization.create(bike_id: bike.id,
+                                  organization_id: bike.creation_organization_id,
+                                  can_edit_claimed: evaluator.can_edit_claimed,
+                                  created_at: bike.created_at)
+        end
+        create(:creation_state, creator: bike.creator,
+                                bike: bike,
+                                created_at: bike.created_at,
+                                organization: bike.creation_organization,
+                                can_edit_claimed: evaluator.can_edit_claimed,
+                                is_pos: evaluator.creation_state_is_pos,
+                                pos_kind: evaluator.creation_state_pos_kind,
+                                bulk_import: evaluator.creation_state_bulk_import,
+                                registration_info: evaluator.creation_state_registration_info)
+        bike.reload # reflexively sets bike.current_creation_state
+      end
+    end
+
     trait :with_ownership do
       transient do
         user { nil }
@@ -122,62 +151,26 @@ FactoryBot.define do
       end
     end
 
-    trait :organized_bikes do # don't use this trait, use the factories it's included with
+    factory :bike_organized, traits: [:with_creation_state] do
       transient do
+        # TODO: remove this (we should only reference creation_organization) - requires updating a bunch of specs
         organization { FactoryBot.create(:organization) }
-        can_edit_claimed { true }
       end
-      creation_organization { organization }
-    end
 
-    factory :bike_organized, traits: [:organized_bikes] do
-      after(:create) do |bike, evaluator|
-        create(:bike_organization, organization: bike.creation_organization,
-                                   bike: bike,
-                                   created_at: bike.created_at,
-                                   can_edit_claimed: evaluator.can_edit_claimed)
-        bike.reload
-      end
+      creation_organization { organization }
 
       factory :bike_lightspeed_pos do
-        after(:create) do |bike, _evaluator|
-          create(:creation_state, creator: bike.creator,
-                                  bike: bike,
-                                  created_at: bike.created_at,
-                                  is_pos: true,
-                                  pos_kind: "lightspeed_pos",
-                                  organization: bike.creation_organization)
-          bike.reload # reflexively sets bike.current_creation_state
-        end
+        creation_state_is_pos { true }
+        creation_state_pos_kind { "lightspeed_pos" }
       end
 
       factory :bike_ascend_pos do
         transient do
-          bulk_import { FactoryBot.create(:bulk_import_ascend, organization: organization) }
+          bulk_import { FactoryBot.create(:bulk_import_ascend, organization: creation_organization) }
         end
-        after(:create) do |bike, evaluator|
-          create(:creation_state, creator: bike.creator,
-                                  bike: bike,
-                                  created_at: bike.created_at,
-                                  is_pos: true,
-                                  pos_kind: "ascend_pos",
-                                  bulk_import: evaluator.bulk_import,
-                                  organization: bike.creation_organization)
-          bike.reload # reflexively sets bike.current_creation_state
-        end
-      end
-    end
-
-    # Generally, you should use the bike_organized factory, not this one
-    factory :creation_organization_bike, traits: [:organized_bikes] do
-      after(:create) do |bike, evaluator|
-        create(:creation_state, creator: bike.creator,
-                                organization: bike.creation_organization,
-                                bike: bike,
-                                created_at: bike.created_at,
-                                can_edit_claimed: evaluator.can_edit_claimed)
-        bike.save
-        bike.reload
+        creation_state_is_pos { true }
+        creation_state_pos_kind { "ascend_pos" }
+        creation_state_bulk_import { bulk_import }
       end
     end
 

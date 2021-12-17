@@ -245,7 +245,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
       context "if the matching bike is unclaimed" do
         it "updates if the submitting org is the creation org" do
-          bike = FactoryBot.create(:creation_organization_bike)
+          bike = FactoryBot.create(:bike_organized)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
           FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization)
 
@@ -265,7 +265,7 @@ RSpec.describe "Bikes API V3", type: :request do
         end
 
         it "creates a new record if the submitting org isn't the creation org" do
-          bike = FactoryBot.create(:creation_organization_bike)
+          bike = FactoryBot.create(:bike_organized)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
           FactoryBot.create(:membership_claimed, user: user)
 
@@ -287,7 +287,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
       context "if the matching bike is claimed" do
         let(:can_edit_claimed) { true }
-        let(:bike) { FactoryBot.create(:creation_organization_bike, can_edit_claimed: can_edit_claimed) }
+        let(:bike) { FactoryBot.create(:bike_organized, can_edit_claimed: can_edit_claimed) }
         let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike) }
         let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do

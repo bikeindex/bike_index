@@ -129,8 +129,35 @@ RSpec.describe CreationState, type: :model do
         expect(bike.bike_organizations.first.organization).to eq organization
       end
     end
-    context "parent organization" do
+    context "child organization" do
+      let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
+      let(:creation_state) { FactoryBot.build(:creation_state, organization: organization_child, bike: bike, can_edit_claimed: can_edit_claimed) }
+      let(:can_edit_claimed) { false }
       it "creates the bike_organization for both" do
+        bike.reload
+        expect(bike.creation_states.count).to eq 0
+        expect(bike.bike_organizations.count).to eq 0
+        creation_state.save
+        expect(bike.reload.creation_states.count).to eq 1
+        expect(bike.bike_organizations.count).to eq 2
+        expect(creation_state.organization_id).to eq organization_child.id
+        expect(bike.organizations.pluck(:id)).to match_array([organization_child.id, organization.id])
+        expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([])
+      end
+      context "can_edit_claimed true, bike organization exists" do
+        let(:can_edit_claimed) { true }
+        let!(:bike_organization) { BikeOrganization.create(bike: bike, organization: organization_child, can_edit_claimed: true) }
+        it "creates bike_organizations for both" do
+          bike.reload
+          expect(bike.creation_states.count).to eq 0
+          expect(bike.bike_organizations.count).to eq 1
+          creation_state.save
+          expect(bike.reload.creation_states.count).to eq 1
+          expect(bike.bike_organizations.count).to eq 2
+          expect(creation_state.organization_id).to eq organization_child.id
+          expect(bike.organizations.pluck(:id)).to match_array([organization_child.id, organization.id])
+          expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([organization_child.id, organization.id])
+        end
       end
     end
     context "already existing bike_organization" do

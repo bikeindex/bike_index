@@ -116,7 +116,7 @@ class OrganizationExportWorker < ApplicationWorker
     return @export_headers if defined?(@export_headers)
     @export_headers = @export.headers
     if @export_headers.include?("address")
-      # Remove address and readd, because we want to keep them in line
+      # Remove address and re-add, because we want to keep them in line
       @export_headers = (@export_headers - ["address"]) + %w[address city state zipcode]
     end
     @export_headers += ["partial_registration"] if @export.partial_registrations.present?

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
-    let(:bike) { FactoryBot.create(:creation_organization_bike) }
+    let(:bike) { FactoryBot.create(:bike_organized) }
     let(:target_origin) { "<span title=\"Registered with self registration process\">web</span>" }
     let(:target_text) do
       "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">#{target_origin}</small></span>"

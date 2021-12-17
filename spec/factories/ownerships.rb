@@ -20,7 +20,7 @@ FactoryBot.define do
       end
       creator { FactoryBot.create(:organization_member, organization: organization) }
       bike do
-        FactoryBot.create(:creation_organization_bike,
+        FactoryBot.create(:bike_organized,
           organization: organization,
           can_edit_claimed: can_edit_claimed,
           owner_email: owner_email)

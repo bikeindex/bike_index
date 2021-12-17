@@ -7,7 +7,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
   let(:organization) { export.organization }
   let(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
   let(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
-  let(:bike) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+  let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
   let(:bike_values) do
     [
       "http://test.host/bikes/#{bike.id}",
@@ -49,17 +49,34 @@ RSpec.describe OrganizationExportWorker, type: :job do
       context "avery export" do
         let(:user) { FactoryBot.create(:admin) }
         let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
-        let(:bike_for_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
-        let!(:b_param) do
-          FactoryBot.create(:b_param, created_bike_id: bike_for_avery.id,
-                                      params: {bike: {address: "102 Washington Pl, State College",
-                                                      user_name: "Maya Skripal"}})
+        let(:bike_for_avery_og) do
+          FactoryBot.create(:bike_organized,
+            :with_creation_state,
+            manufacturer: trek,
+            primary_frame_color: black,
+            organization: organization,
+            creation_state_registration_info: {
+              street: "102 Washington Pl",
+              city: "State College",
+              state: "PA",
+              zipcode: "16801",
+              user_name: "Maya Skripal"
+            })
         end
-        let(:bike_not_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
-        let!(:b_param_partial) do
-          FactoryBot.create(:b_param, created_bike_id: bike_not_avery.id,
-                                      params: {bike: {address: "State College, PA",
-                                                      user_name: "George Washington"}})
+        # Force unmemoize - TODO: might not be necessary
+        let!(:bike_for_avery) { Bike.find(bike_for_avery_og.id) }
+        let!(:bike_not_avery) do
+          FactoryBot.create(:bike_organized,
+            manufacturer: trek,
+            primary_frame_color: black,
+            organization: organization,
+            creation_state_registration_info: {
+              street: "",
+              city: "State College",
+              state: "PA",
+              zipcode: "16801",
+              user_name: "George Washington"
+            })
         end
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
@@ -72,6 +89,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA", country: Country.united_states) }
         include_context :geocoder_real
         it "exports only bike with name, email and address" do
+          bike.reload
           expect(bike_sticker.claimed?).to be_falsey
           export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
           expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
@@ -79,12 +97,13 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(export.avery_export?).to be_truthy
           expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
+            expect(bike_for_avery.registration_address_source).to eq "initial_creation_state"
             bike_for_avery.update(updated_at: Time.current)
             expect(bike_for_avery.reload.avery_exportable?).to be_truthy
-            expect(bike_for_avery.address_hash).to eq bike_for_avery.registration_address
+            expect(bike_for_avery.address_hash.except("country", "latitude", "longitude")).to eq bike_for_avery.registration_address
             # We need to be exporting via registration_address - NOT address_hash - so manually blank it, just to make sure
             bike_for_avery.update_column :street, nil
-            expect(bike_for_avery.address_hash).to eq bike_for_avery.registration_address.merge(street: nil)
+            expect(bike_for_avery.address_hash.except("country", "latitude", "longitude")).to eq bike_for_avery.registration_address.merge(street: nil)
             bike_for_avery
             instance.perform(export.id)
             # Check this in here so the vcr geocoder records at the correct place
@@ -143,7 +162,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:secondary_color) { FactoryBot.create(:color) }
       let(:email) { "testly@bikeindex.org" }
       let(:bike) do
-        FactoryBot.create(:creation_organization_bike,
+        FactoryBot.create(:bike_organized,
           organization: organization,
           manufacturer: Manufacturer.other,
           frame_model: '",,,\"<script>XSSSSS</script>',
@@ -191,12 +210,19 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member", student_id: "XX9999"}} }
-      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, extra_registration_number: "cool extra serial") }
+      let(:registration_info) do
+        {street: "717 Market St",
+         zipcode: "94103",
+         city: "San Francisco",
+         state: "CA",
+         phone: "717.742.3423",
+         organization_affiliation: "community_member",
+         student_id: "XX9999"}
+      end
+      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, extra_registration_number: "cool extra serial", creation_state_registration_info: registration_info) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
-      let(:target_address) { {street: "717 Market St", city: "San Francisco", state: "CA", zipcode: "94103", country: "US", latitude: 37.7870205, longitude: -122.403928}.as_json }
+      let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).as_json }
       include_context :geocoder_real
 
       context "assigning stickers" do
@@ -213,7 +239,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike.organization_affiliation).to eq "community_member"
             expect(export.assign_bike_codes?).to be_truthy
 
-            expect(bike.registration_address).to eq target_address
+            expect(bike.registration_address(true)).to eq target_address
             instance.perform(export.id)
           end
           export.reload
@@ -257,7 +283,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         it "returns the expected values" do
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_falsey
-          expect(b_param.student_id).to eq "XX9999"
+          expect(bike.student_id).to eq "XX9999"
           VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
             instance.perform(export.id)
             export.reload
@@ -313,8 +339,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike.phone).to eq "7177423423"
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
-            expect(bike.registration_address).to eq target_address
-            expect(bike.registration_address_source).to eq "initial_creation"
+            expect(bike.registration_address(true)).to eq target_address
+            expect(bike.registration_address_source).to eq "initial_creation_state"
             instance.perform(export.id)
           end
           export.reload
@@ -413,8 +439,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
           it "returns expected values" do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
               bike.reload
-              expect(bike.registration_address_source).to eq "initial_creation"
-              expect(bike.registration_address(true)).to eq target_address
+              expect(bike.registration_address_source).to eq "initial_creation_state"
+              expect(bike.registration_address(true).except("latitude", "longitude")).to eq target_address
               expect(bike.registration_address).to eq target_address
             end
             instance.perform(export.id)

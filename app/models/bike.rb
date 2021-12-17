@@ -450,7 +450,7 @@ class Bike < ApplicationRecord
     return user.name if user&.name.present?
     # Only look deeper for the name if it's the first owner - or if no owner, which means testing probably
     return nil unless current_ownership.blank? || current_ownership&.first?
-    oname = b_params.map(&:user_name).reject(&:blank?).first
+    oname = registration_info["user_name"]
     return oname if oname.present?
     # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
     return nil if creation_organization.present? && owner&.member_of?(creation_organization)
@@ -560,8 +560,8 @@ class Bike < ApplicationRecord
     # use @phone because attr_accessor
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
-    # Only grab the phone number from b_params if this is the first_ownership
-    @phone ||= b_params.map(&:phone).reject(&:blank?).first if first_ownership?
+    # Only grab the phone number from b_params if this is the first_ownership (otherwise it should be user, etc)
+    @phone ||= registration_info["phone"] if first_ownership?
     @phone
   end
 
@@ -797,7 +797,7 @@ class Bike < ApplicationRecord
     paint.name.titleize if paint.present?
   end
 
-  # THIS IS FUCKING ABNOXIOUS.
+  # THIS IS FUCKING OBNOXIOUS.
   # Somehow we need to get rid of needing to have this method. country should default to optional
   def address
     Geocodeable.address(self, country: [:optional])
@@ -819,7 +819,7 @@ class Bike < ApplicationRecord
       "bike_update"
     elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation, post #2035
       "initial_creation_state"
-    elsif b_params_address.present?
+    elsif b_params_address.present? # REMOVE THISSSSSSSS
       "initial_creation"
     end
   end
@@ -867,13 +867,7 @@ class Bike < ApplicationRecord
   end
 
   def organization_affiliation
-    o_affiliation = conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
-    return o_affiliation if o_affiliation.present?
-    # TODO: remove this b_params stuff, post #2035 update
-    previous_o_affiliation = b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
-    return "" unless previous_o_affiliation.present?
-    update(organization_affiliation: previous_o_affiliation)
-    previous_o_affiliation
+    conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
   end
 
   def student_id=(val)
@@ -881,13 +875,7 @@ class Bike < ApplicationRecord
   end
 
   def student_id
-    s_id = conditional_information["student_id"] || registration_info["student_id"]
-    return s_id if s_id.present?
-    # TODO: remove this b_params stuff, post #2035 update
-    previous_s_id = b_params.map { |bp| bp.student_id }.compact.join(", ")
-    return "" unless previous_s_id.present?
-    update(student_id: previous_s_id)
-    previous_s_id
+    conditional_information["student_id"] || registration_info["student_id"]
   end
 
   def external_image_urls
@@ -1007,17 +995,6 @@ class Bike < ApplicationRecord
     return "status_stolen" if current_stolen_record.present?
 
     "status_with_owner"
-  end
-
-  # TODO post handling of #2035 - not sure this should still exist. Useful for testing - but BikeCreator handles for real
-  # NOTE: 2021-8-2 - after shipping #2035 - there were 35 bikes without creation state, I used fetch_current_creation_state to create
-  def fetch_current_creation_state
-    return current_creation_state if current_creation_state.present?
-    self.current_creation_state = creation_states.first || creation_states.build
-    # Pull in information from b_params. Should probably be done somewhere else?
-    r_info = b_params.map { |b| b.registration_info_attrs }.reject(&:blank?)
-    current_creation_state.registration_info = r_info.inject(&:merge) if r_info.present?
-    current_creation_state
   end
 
   private

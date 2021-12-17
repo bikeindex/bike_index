@@ -83,7 +83,7 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "with organization" do
-      let!(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, created_at: created_at) }
+      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, created_at: created_at) }
       let(:created_at) { Time.current - 20.days }
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
       let(:creation_state) { bike.current_creation_state }

@@ -55,6 +55,7 @@ class CreationState < ApplicationRecord
     else
       origin
     end
+    self.registration_info = cleaned_registration_info
     self.pos_kind ||= calculated_pos_kind
     # Hack, only set on create. TODO: should be passed from pos integration
     # currently, lightspeed is using API v1, so that's where this needs to come from
@@ -94,5 +95,11 @@ class CreationState < ApplicationRecord
     else
       "no_pos"
     end
+  end
+
+  def cleaned_registration_info
+    return nil unless registration_info.present?
+    registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
+    registration_info.reject { |k, v| v.blank? }
   end
 end

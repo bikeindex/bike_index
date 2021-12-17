@@ -101,22 +101,23 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org") }
     let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
     let!(:country) { Country.united_states }
-    let!(:b_param) do
-      FactoryBot.create(:b_param,
-        created_bike_id: bike.id,
-        creator: bike.creator,
-        params: {bike: {address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333"}})
-    end
-    let(:ownership) { FactoryBot.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
     let(:target_address_hash) { {street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348} }
-    let!(:bike) { ownership.bike }
+    let(:bike) do
+      FactoryBot.create(:bike,
+        :with_ownership_claimed,
+        :with_creation_state,
+        owner_email: "aftercreate@bikeindex.org",
+        user: user,
+        creation_state_registration_info: {phone: "(111) 222-3333"}.merge(target_address_hash))
+    end
     include_context :geocoder_real
     it "assigns the extra user attributes" do
       VCR.use_cassette("after_user_create_worker-import_user_attributes") do
         expect(user).to be_present
-        bike.reload
-        bike.update_attributes(updated_at: Time.current)
-        expect_hashes_to_match(bike.send("location_record_address_hash"), target_address_hash.merge(skip_geocoding: true))
+        bike.reload.update_attributes(updated_at: Time.current)
+        expect(bike.reload.registration_address_source).to eq "initial_creation_state"
+        expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
+        expect_hashes_to_match(bike.send("location_record_address_hash"), target_address_hash.except(:latitude, :longitude).merge(skip_geocoding: false))
 
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
         user.reload

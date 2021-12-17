@@ -177,6 +177,8 @@ RSpec.describe BulkImportWorker, type: :job do
           allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
           expect {
             instance.perform(bulk_import.id)
+            # This test is being flaky! Add debug printout #2101 (actually after, but still...)
+            pp bulk_import.import_errors if bulk_import.reload.blocking_error?
           }.to change(Bike, :count).by 2
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
@@ -200,6 +202,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.phone).to eq("8887776666")
           # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
           expect(bike1.registration_address).to eq({"street" => default_location[:address]})
+          expect(bike1.registration_address_source).to eq "initial_creation_state"
           target_address_hash = default_location.slice(:latitude, :longitude).merge(street: default_location[:address])
           expect(bike1.address_hash.reject { |_k, v| v.blank? }.to_h).to eq target_address_hash.as_json
           expect(bike1.extra_registration_number).to be_nil
