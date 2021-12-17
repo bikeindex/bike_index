@@ -210,8 +210,6 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
-      # let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      # let(:b_param_params) { {bike: {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "community_member", student_id: "XX9999"}} }
       let(:registration_info) do
         {street: "717 Market St",
          zipcode: "94103",

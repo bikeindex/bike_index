@@ -105,7 +105,7 @@ class Bike < ApplicationRecord
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
   scope :without_creation_state, -> { includes(:creation_states).where(creation_states: {id: nil}) }
-  scope :lightspeed_pos, -> { left_joins(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
+  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
   scope :pos_not_lightspeed_ascend, -> { includes(:creation_states).where.not(creation_states: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
@@ -996,17 +996,6 @@ class Bike < ApplicationRecord
 
     "status_with_owner"
   end
-
-  # TODO post handling of #2035 - not sure this should still exist. Useful for testing - but BikeCreator handles for real
-  # NOTE: 2021-8-2 - after shipping #2035 - there were 35 bikes without creation state, I used fetch_current_creation_state to create
-  # def fetch_current_creation_state
-  #   return current_creation_state if current_creation_state.present?
-  #   self.current_creation_state = creation_states.first || creation_states.build
-  #   # Pull in information from b_params. Should probably be done somewhere else?
-  #   r_info = b_params.map { |b| b.registration_info_attrs }.reject(&:blank?)
-  #   current_creation_state.registration_info = r_info.inject(&:merge) if r_info.present?
-  #   current_creation_state
-  # end
 
   private
 
