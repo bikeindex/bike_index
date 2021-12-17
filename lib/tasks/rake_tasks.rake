@@ -72,12 +72,10 @@ end
 
 desc "Provide DB vacuum for production environment"
 task database_vacuum: :environment do
-  begin
-    tables = ActiveRecord::Base.connection.tables
-    tables.each do |table|
-      ActiveRecord::Base.connection.execute("VACUUM FULL ANALYZE #{table};")
-    end
-  rescue Exception => exc
-    Rails.logger.error("Database VACUUM error: #{exc.message}")
+  tables = ActiveRecord::Base.connection.tables
+  tables.each do |table|
+    ActiveRecord::Base.connection.execute("VACUUM FULL ANALYZE #{table};")
   end
+rescue Exception => exc
+  Rails.logger.error("Database VACUUM error: #{exc.message}")
 end
