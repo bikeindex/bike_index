@@ -31,8 +31,8 @@ module Organized
           @impound_claim.update(permitted_update_params.merge(skip_update: true))
           @impound_claim.skip_update = false
           impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
-                                                                               kind: update_status,
-                                                                               impound_claim: @impound_claim)
+            kind: update_status,
+            impound_claim: @impound_claim)
           if impound_record_update.save
             flash[:success] = impound_record_update.kind_humanized
           else

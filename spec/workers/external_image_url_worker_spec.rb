@@ -9,7 +9,7 @@ RSpec.describe ExternalImageUrlStoreWorker, type: :job do
     let(:public_image) do
       # Use the email logo url - since that file it should never be removed
       PublicImage.create(imageable: bike,
-                         external_image_url: "https://files.bikeindex.org/email_assets/logo.png")
+        external_image_url: "https://files.bikeindex.org/email_assets/logo.png")
     end
     it "downloads and processes the image" do
       expect(public_image.id).to be_present

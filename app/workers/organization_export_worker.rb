@@ -158,9 +158,9 @@ class OrganizationExportWorker < ApplicationWorker
     code = @bike_sticker.code
     pretty_code = @bike_sticker.pretty_code
     @bike_sticker.claim(user: @export.user,
-                        bike: bike,
-                        organization: @export.organization,
-                        export_id: @export.id)
+      bike: bike,
+      organization: @export.organization,
+      export_id: @export.id)
     @bike_stickers << code
     @bike_sticker = @bike_sticker.next_unclaimed_code
     pretty_code

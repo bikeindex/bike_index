@@ -6,9 +6,9 @@ class ProcessParkingNotificationWorker < ApplicationWorker
 
     if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
       impound_record = ImpoundRecord.create!(bike_id: parking_notification.bike_id,
-                                             user_id: parking_notification.user_id,
-                                             organization_id: parking_notification.organization_id,
-                                             skip_update: true)
+        user_id: parking_notification.user_id,
+        organization_id: parking_notification.organization_id,
+        skip_update: true)
       parking_notification.resolved_at ||= Time.current
       parking_notification.update_attributes(impound_record_id: impound_record.id)
       ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
@@ -26,7 +26,7 @@ class ProcessParkingNotificationWorker < ApplicationWorker
         # Add a note about it though, to document it
         notes = [notification.internal_notes, "resolved by parking notification ##{parking_notification.id}"]
         notification.update_attributes(resolved_at: parking_notification.resolved_at,
-                                       internal_notes: notes.join(", "))
+          internal_notes: notes.join(", "))
       end
     end
 

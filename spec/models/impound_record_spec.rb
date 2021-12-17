@@ -144,7 +144,7 @@ RSpec.describe ImpoundRecord, type: :model do
           let(:bike_submitting) { impound_claim.bike_submitting }
           let(:impound_record_update_approved) do
             impound_record.impound_record_updates.create(user: user2,
-                                                         kind: "claim_approved", impound_claim: impound_claim)
+              kind: "claim_approved", impound_claim: impound_claim)
           end
           let(:valid_multi_update_claim_kinds) { %w[note claim_approved claim_denied] }
           it "associates with the approved claim" do

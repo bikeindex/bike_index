@@ -423,7 +423,7 @@ RSpec.describe Organization, type: :model do
 
     it "doesn't xss" do
       org = Organization.new(name: "<script>alert(document.cookie)</script>",
-                             website: "<script>alert(document.cookie)</script>")
+        website: "<script>alert(document.cookie)</script>")
       org.set_calculated_attributes
       expect(org.name).to match(/stop messing about/i)
       expect(org.website).to eq("http://<script>alert(document.cookie)</script>")

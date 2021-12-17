@@ -32,9 +32,9 @@ FactoryBot.define do
         # Have to create here so created_at matches
         if bike.creation_organization_id.present?
           BikeOrganization.create(bike_id: bike.id,
-                                  organization_id: bike.creation_organization_id,
-                                  can_edit_claimed: evaluator.can_edit_claimed,
-                                  created_at: bike.created_at)
+            organization_id: bike.creation_organization_id,
+            can_edit_claimed: evaluator.can_edit_claimed,
+            created_at: bike.created_at)
         end
         create(:creation_state, creator: bike.creator,
                                 bike: bike,

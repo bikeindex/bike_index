@@ -15,8 +15,8 @@ class TwilioIntegration
 
   def send_message(to:, body:)
     client.messages.create(body: body,
-                           from: OUTGOING_NUMBER,
-                           to: self.class.twilio_formatted(to))
+      from: OUTGOING_NUMBER,
+      to: self.class.twilio_formatted(to))
   end
 
   def get_message(sid)

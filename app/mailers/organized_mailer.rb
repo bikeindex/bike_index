@@ -2,7 +2,7 @@
 # but they aren't necessarily
 class OrganizedMailer < ApplicationMailer
   default content_type: "multipart/alternative",
-          parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
+    parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
   helper :organized
   helper :money # Required to render currency for bike recoveries
@@ -63,8 +63,8 @@ class OrganizedMailer < ApplicationMailer
 
     I18n.with_locale(@sender&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,
-           to: @parking_notification.email,
-           subject: @parking_notification.subject) do |format|
+        to: @parking_notification.email,
+        subject: @parking_notification.subject) do |format|
         format.html { render "parking_notification" }
         format.text { render "parking_notification" }
       end
@@ -99,25 +99,25 @@ class OrganizedMailer < ApplicationMailer
     end
 
     mail(reply_to: reply_to,
-         to: direct_to,
-         bcc: recipient_emails,
-         subject: @hot_sheet.subject)
+      to: direct_to,
+      bcc: recipient_emails,
+      subject: @hot_sheet.subject)
   end
 
   def impound_claim_submitted(impound_claim)
     @impound_claim = impound_claim
     set_impound_claim_ivars
     mail(reply_to: "contact@bikeindex.org",
-         to: @impound_claim.impound_record_email,
-         subject: "New impound claim submitted")
+      to: @impound_claim.impound_record_email,
+      subject: "New impound claim submitted")
   end
 
   def impound_claim_approved_or_denied(impound_claim)
     @impound_claim = impound_claim
     set_impound_claim_ivars
     mail(reply_to: impound_claim.impound_record_email,
-         to: @impound_claim.user.email,
-         subject: "Your impound claim was #{@impound_claim.status_humanized}")
+      to: @impound_claim.user.email,
+      subject: "Your impound claim was #{@impound_claim.status_humanized}")
   end
 
   private

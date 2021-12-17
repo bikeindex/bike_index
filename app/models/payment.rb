@@ -129,7 +129,7 @@ class Payment < ApplicationRecord
   def update_from_stripe_session
     return unless incomplete? && stripe_session.payment_status == "paid"
     update(first_payment_date: Time.current,
-           amount_cents: stripe_session.amount_total)
+      amount_cents: stripe_session.amount_total)
     # Update email if we can
     return unless stripe_customer.present?
     update(email: stripe_customer.email)

@@ -470,9 +470,9 @@ class BParam < ApplicationRecord
       .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
         :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
     attrs.merge(organization_id: creation_organization_id,
-                user_id: creator_id,
-                bike_id: created_bike_id,
-                use_entered_address: ParamsNormalizer.boolean(attrs[:use_entered_address]))
+      user_id: creator_id,
+      bike_id: created_bike_id,
+      use_entered_address: ParamsNormalizer.boolean(attrs[:use_entered_address]))
   end
 
   # Below here is revised setup
@@ -499,9 +499,9 @@ class BParam < ApplicationRecord
       .select { |_k, v| v.present? }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
-             "b_param_id_token" => id_token,
-             "creator_id" => creator_id,
-             "updator_id" => creator_id)
+        "b_param_id_token" => id_token,
+        "creator_id" => creator_id,
+        "updator_id" => creator_id)
       .merge(address_hash)
   end
 

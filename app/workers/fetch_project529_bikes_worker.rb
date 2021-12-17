@@ -11,8 +11,8 @@ class FetchProject529BikesWorker < ScheduledWorker
     client = ExternalRegistryClient::Project529Client.new
 
     created_bikes = client.bikes(per_page: 100,
-                                 page: page,
-                                 updated_at: updated_since)
+      page: page,
+      updated_at: updated_since)
 
     return if created_bikes.empty?
 

@@ -101,7 +101,7 @@ class AfterUserCreateWorker < ApplicationWorker
     return false unless matching_organization.present?
     return false if user.memberships.pluck(:organization_id).include?(matching_organization.id)
     Membership.create_passwordless(organization_id: matching_organization.id,
-                                   invited_email: user.email)
+      invited_email: user.email)
     user.reload
   end
 end

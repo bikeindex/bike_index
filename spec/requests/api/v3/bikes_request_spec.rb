@@ -445,14 +445,14 @@ RSpec.describe "Bikes API V3", type: :request do
         }
       ]
       bike_attrs.merge!(components: components,
-                        front_gear_type_slug: front_gear_type.slug,
-                        handlebar_type_slug: handlebar_type_slug,
-                        is_for_sale: true,
-                        is_bulk: true,
-                        is_new: true,
-                        is_pos: true,
-                        external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
-                        description: "<svg/onload=alert(document.cookie)>")
+        front_gear_type_slug: front_gear_type.slug,
+        handlebar_type_slug: handlebar_type_slug,
+        is_for_sale: true,
+        is_bulk: true,
+        is_new: true,
+        is_pos: true,
+        external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
+        description: "<svg/onload=alert(document.cookie)>")
       expect {
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)

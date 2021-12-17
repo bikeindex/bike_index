@@ -49,8 +49,8 @@ class BulkImportWorker < ApplicationWorker
   def register_bike(b_param_hash)
     return nil if b_param_hash.blank?
     b_param = BParam.create(creator_id: creator_id,
-                            params: b_param_hash,
-                            origin: "bulk_import_worker")
+      params: b_param_hash,
+      origin: "bulk_import_worker")
     BikeCreator.new(b_param).create_bike
   end
 

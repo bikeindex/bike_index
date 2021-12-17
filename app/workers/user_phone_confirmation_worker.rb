@@ -4,9 +4,9 @@ class UserPhoneConfirmationWorker < ApplicationWorker
   def perform(user_phone_id, skip_user_update = false)
     user_phone = UserPhone.find(user_phone_id)
     notification = Notification.create(user: user_phone.user,
-                                       kind: "phone_verification",
-                                       message_channel: "text",
-                                       notifiable: user_phone)
+      kind: "phone_verification",
+      message_channel: "text",
+      notifiable: user_phone)
 
     TwilioIntegration.new.send_notification(notification,
       to: user_phone.phone,

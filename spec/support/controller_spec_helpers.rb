@@ -54,7 +54,7 @@ module ControllerSpecHelpers
     # Partner Doorkeeper app looked up by ID
     let(:bikehub_doorkeeper_app) do
       doorkeeper_app.update(id: 264,
-                            redirect_uri: "https://parkit.bikehub.com/users/auth/bike_index/callback\r\nhttps://staging.bikehub.com/users/auth/bike_index/callback\r\n")
+        redirect_uri: "https://parkit.bikehub.com/users/auth/bike_index/callback\r\nhttps://staging.bikehub.com/users/auth/bike_index/callback\r\n")
       doorkeeper_app
     end
 

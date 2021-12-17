@@ -14,8 +14,8 @@ FactoryBot.define do
 
       after(:create) do |parking_notification, evaluator|
         parking_notification.mark_retrieved!(retrieved_by_id: evaluator.retrieved_by_id,
-                                             retrieved_kind: evaluator.retrieved_kind,
-                                             resolved_at: evaluator.resolved_at)
+          retrieved_kind: evaluator.retrieved_kind,
+          resolved_at: evaluator.resolved_at)
       end
     end
 
