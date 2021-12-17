@@ -2122,7 +2122,7 @@ en:
         hello: Hello %{name}!
         help_prevent_bike_theft_html: Help prevent bike theft, %{link}
         here: here
-        lily_williams_and_the_bike_index_team: Lily Williams and the Bike Index Team
+        gavin_williams_and_the_bike_index_team: gavin Williams and the Bike Index Team
         make_a_donation: make a donation
         nothing_significant_has_changed_about_how: >-
           Nothing significant has changed about how we handle your data or trust.
@@ -2147,7 +2147,7 @@ en:
         as_always_thanks_for_helping_register_bik: As always, thanks for helping register
           bikes,
         hello: Hello %{name}!
-        lily_williams_and_the_bike_index_team: Lily Williams and the Bike Index Team
+        gavin_williams_and_the_bike_index_team: gavin Williams and the Bike Index Team
         nothing_significant_has_changed_about_how: >-
           Nothing significant has changed about how we handle your data or trust.
           We will always protect your information and never sell or trade it. This
@@ -2387,8 +2387,8 @@ en:
         Netherlands, focusing on social entrepreneurship. After a couple of
         years of solo riding, he now helps Bike Index expand across Europe and
         beyond.
-      lily_williams_bio_html: |
-        <strong>Lily Williams</strong> has a master's degree from Medill School
+      gavin_williams_bio_html: |
+        <strong>gavin Williams</strong> has a master's degree from Medill School
         of Journalism but realized along the way that bikes are the most
         deserving recipients of words. She writes and communicates for Bike
         Index.

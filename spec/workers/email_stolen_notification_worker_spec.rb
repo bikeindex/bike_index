@@ -22,7 +22,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
     expect(mail.subject).to eq("Stolen bike contact")
     expect(mail.to).to eq([override_email || owner_email])
     expect(mail.reply_to).to eq([sender_email])
-    expect(mail.cc).to eq(["bryan@bikeindex.org", "lily@bikeindex.org"])
+    expect(mail.cc).to eq(["bryan@bikeindex.org", "gavin@bikeindex.org"])
   end
 
   def expect_notification_blocked(_sender_email)

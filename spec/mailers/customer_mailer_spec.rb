@@ -159,7 +159,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.body.encoded).to match(stolen_notification.message)
       expect(mail.body.encoded).to match(stolen_notification.reference_url)
       expect(mail.reply_to).to eq(["party@example.com"])
-      expect(mail.cc).to eq(["bryan@bikeindex.org", "lily@bikeindex.org"])
+      expect(mail.cc).to eq(["bryan@bikeindex.org", "gavin@bikeindex.org"])
       stolen_notification.reload
       expect(stolen_notification.send_dates).to be_present
       expect(stolen_notification.send_dates[0]).to be_within(1).of(stolen_notification.updated_at.to_i)
@@ -177,7 +177,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       mail = CustomerMailer.updated_terms_email(user)
       expect(mail.subject).to eq "Bike Index Terms and Privacy Policy Update"
       expect(mail.from.count).to eq(1)
-      expect(mail.from.first).to eq("lily@bikeindex.org")
+      expect(mail.from.first).to eq("gavin@bikeindex.org")
       expect(mail.body.encoded).to_not match "vendor terms"
     end
   end

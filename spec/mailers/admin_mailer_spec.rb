@@ -21,7 +21,7 @@ RSpec.describe AdminMailer, type: :mailer do
       it "sends a recovery email" do
         mail = AdminMailer.feedback_notification_email(feedback)
         expect(mail.subject).to eq("New Feedback Submitted")
-        expect(mail.to).to eq(["contact@bikeindex.org", "bryan@bikeindex.org", "lily@bikeindex.org"])
+        expect(mail.to).to eq(["contact@bikeindex.org", "bryan@bikeindex.org", "gavin@bikeindex.org"])
         expect(mail.reply_to).to eq([feedback.email])
       end
     end
@@ -56,7 +56,7 @@ RSpec.describe AdminMailer, type: :mailer do
       let(:feedback) { FactoryBot.create(:feedback, feedback_type: "organization_created", feedback_hash: {organization_id: organization.id}) }
       it "sends a new org email" do
         mail = AdminMailer.feedback_notification_email(feedback)
-        expect(mail.to).to eq(["lily@bikeindex.org", "craig@bikeindex.org"])
+        expect(mail.to).to eq(["gavin@bikeindex.org", "craig@bikeindex.org"])
         expect(mail.reply_to).to eq([feedback.email])
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe AdminMailer, type: :mailer do
     let(:mail) { AdminMailer.unknown_organization_for_ascend_import(bulk_import) }
 
     it "renders email" do
-      expect(mail.to).to eq(["lily@bikeindex.org", "craig@bikeindex.org"])
+      expect(mail.to).to eq(["gavin@bikeindex.org", "craig@bikeindex.org"])
       expect(mail.subject).to match("Unknown organization for ascend import")
     end
   end

@@ -152,7 +152,7 @@ RSpec.describe Blog, type: :model do
         end
       end
       context "https" do
-        let(:canonical_url) { "https://www.usacycling.org/article/in-our-own-words-lily-williams-olympic-postponement" }
+        let(:canonical_url) { "https://www.usacycling.org/article/in-our-own-words-gavin-williams-olympic-postponement" }
         it "is valid" do
           expect(blog).to be_valid
           expect(blog.canonical_url).to eq canonical_url

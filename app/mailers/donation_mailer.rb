@@ -6,8 +6,8 @@ class DonationMailer < ActionMailer::Base
 
   def donation_email(notification_kind, payment)
     mail(to: payment.email,
-      bcc: "lily+review@bikeindex.org",
-      from: '"Lily Williams" <lily@bikeindex.org>',
+      bcc: "gavin+review@bikeindex.org",
+      from: '"gavin Williams" <gavin@bikeindex.org>',
       subject: "Thank you for donating to Bike Index",
       template_name: notification_kind)
   end
