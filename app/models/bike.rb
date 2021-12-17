@@ -817,7 +817,7 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation, post #2035
+    elsif current_creation_state&.address_hash.present?
       "initial_creation"
     end
   end
