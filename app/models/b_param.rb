@@ -477,22 +477,6 @@ class BParam < ApplicationRecord
 
   # Below here is revised setup
 
-  def fetch_formatted_address
-    return {} unless bike["street"].present? || bike["address"].present?
-    return params["formatted_address"] if params["formatted_address"].present?
-    if address("city").present?
-      formatted_address = {street: address("street"), city: address("city"), state: address("state"), zipcode: address("zipcode")}.as_json
-    else # We're dealing with legacy data in the b_param
-      fallback_address = address("street")
-      formatted_address = Geohelper.formatted_address_hash(fallback_address)
-      # return at least something from legacy entries that don't have enough info to guess address
-      formatted_address = {street: fallback_address} if formatted_address.blank? && fallback_address.present?
-    end
-    return {} unless formatted_address.present?
-    update_attribute :params, params.merge(formatted_address: formatted_address)
-    formatted_address
-  end
-
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     bike.merge(status: status).merge(new_attrs.as_json)

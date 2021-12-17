@@ -263,7 +263,7 @@ RSpec.describe BParam, type: :model do
       expect(b_param.address("address_zipcode")).to eq "11111"
       expect(b_param.address("state")).to eq "CA"
 
-      expect(b_param.fetch_formatted_address).to eq target_address
+      expect(b_param.address_hash).to eq target_address
       expect(b_param.bike_sticker_code).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"

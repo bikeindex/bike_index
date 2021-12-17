@@ -819,8 +819,6 @@ class Bike < ApplicationRecord
       "bike_update"
     elsif current_creation_state&.address_hash.present? # TODO: replace initial_creation, post #2035
       "initial_creation_state"
-    elsif b_params_address.present? # REMOVE THISSSSSSSS
-      "initial_creation"
     end
   end
 
@@ -830,7 +828,6 @@ class Bike < ApplicationRecord
     @registration_address = case registration_address_source
     when "user" then user&.address_hash
     when "bike_update" then address_hash
-    when "initial_creation" then b_params_address
     when "initial_creation_state" then current_creation_state.address_hash
     else
       {}
@@ -1018,15 +1015,6 @@ class Bike < ApplicationRecord
     return {} unless l_hash.present?
     # If the location record has coordinates, skip geocoding
     l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
-  end
-
-  def b_params_address
-    bp_address = {}
-    b_params.each do |b_param|
-      bp_address = b_param.fetch_formatted_address
-      break if bp_address.present?
-    end
-    bp_address
   end
 
   def fetch_current_impound_record
