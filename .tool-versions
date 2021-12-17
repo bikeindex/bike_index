@@ -1,2 +1,2 @@
-ruby 2.7.3
+ruby 3.0.2
 nodejs 16.13.1 # Also update in Dockerfile if changed

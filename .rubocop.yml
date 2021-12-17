@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.7.3
+  TargetRubyVersion: 3.0.2
   NewCops: enable
   Exclude:
     - "bin/**/*"

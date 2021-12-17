@@ -1,4 +1,4 @@
-FROM ruby:2.7.3
+FROM ruby:3.0.2
 WORKDIR /src
 
 RUN apt-get update -yq \
