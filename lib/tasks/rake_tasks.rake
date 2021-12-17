@@ -71,7 +71,7 @@ task database_size: :environment do
 end
 
 desc "Provide DB vacuum for production environment"
-task vacuum: :environment do
+task database_vacuum: :environment do
   begin
     tables = ActiveRecord::Base.connection.tables
     tables.each do |table|
