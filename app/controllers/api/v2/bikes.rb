@@ -84,8 +84,8 @@ module API
         # Search for a bike matching the provided serial number / owner email
         def find_owned_bike
           BikeFinder.find_matching(serial: params[:serial],
-                                   owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
-                                   phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil)
+            owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
+            phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil)
         end
 
         def created_bike_serialized(bike, include_claim_token)
@@ -325,8 +325,8 @@ module API
           # Unless application is authorized....
           authorize_bike_for_user(" (this application is not approved to send notifications)")
           StolenNotification.create(bike_id: params[:id],
-                                    message: params[:message],
-                                    sender: current_user)
+            message: params[:message],
+            sender: current_user)
         end
       end
     end

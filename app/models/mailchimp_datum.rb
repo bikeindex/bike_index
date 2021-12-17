@@ -126,7 +126,7 @@ class MailchimpDatum < ApplicationRecord
   def mailchimp_interests(list)
     interest_slugs = interests.dup.map { |t| MailchimpValue.interest.friendly_find(t, list: list)&.slug }.compact
     MailchimpValue.interest.where(list: list).order(:name).map do |mailchimp_value|
-      [mailchimp_value.mailchimp_id, interest_slugs.include?(mailchimp_value.slug) ? true : false]
+      [mailchimp_value.mailchimp_id, interest_slugs.include?(mailchimp_value.slug)]
     end.compact.to_h
   end
 

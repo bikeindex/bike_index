@@ -42,9 +42,9 @@ class ProcessMembershipWorker < ApplicationWorker
       membership.user.blank?
     password = SecurityTokenizer.new_password_token
     user = User.new(skip_update: true,
-                    email: membership.invited_email,
-                    password: password,
-                    password_confirmation: password)
+      email: membership.invited_email,
+      password: password,
+      password_confirmation: password)
     user.save!
     user.confirm(user.confirmation_token)
     # We don't want to send users emails in this situation.

@@ -30,9 +30,9 @@ RSpec.describe ApplicationHelper, type: :helper do
   describe "#show_twitter_and_website" do
     it "combines twitter and website" do
       user = User.new(show_website: true,
-                      website: "website",
-                      show_twitter: true,
-                      twitter: "twitter")
+        website: "website",
+        show_twitter: true,
+        twitter: "twitter")
       html = show_twitter_and_website(user)
       expect(html).to eq("<a href=\"https://twitter.com/twitter\">Twitter</a> and <a href=\"website\">Website</a>")
     end

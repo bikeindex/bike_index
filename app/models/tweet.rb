@@ -175,20 +175,18 @@ class Tweet < ApplicationRecord
   end
 
   def details_hash
-    @details_hash ||= begin
-      {}.tap do |details|
-        details[:notification_type] = "stolen_twitter_alerter"
-        details[:bike_id] = bike&.id
-        details[:tweet_id] = twitter_id
-        details[:tweet_string] = body_html
-        details[:tweet_account_screen_name] = tweetor
-        details[:tweet_account_name] = twitter_account&.account_info_name
-        details[:tweet_account_image] = twitter_account&.account_info_image
-        details[:retweet_screen_names] = retweets.map(&:tweetor)
+    @details_hash ||= {}.tap do |details|
+      details[:notification_type] = "stolen_twitter_alerter"
+      details[:bike_id] = bike&.id
+      details[:tweet_id] = twitter_id
+      details[:tweet_string] = body_html
+      details[:tweet_account_screen_name] = tweetor
+      details[:tweet_account_name] = twitter_account&.account_info_name
+      details[:tweet_account_image] = twitter_account&.account_info_image
+      details[:retweet_screen_names] = retweets.map(&:tweetor)
 
-        if !twitter_account&.national? && twitter_account&.address_string.present?
-          details[:location] = twitter_account.address_string.split(",").first.strip
-        end
+      if !twitter_account&.national? && twitter_account&.address_string.present?
+        details[:location] = twitter_account.address_string.split(",").first.strip
       end
     end
   end

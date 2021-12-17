@@ -78,8 +78,9 @@
                   %small.less-strong.d-none.d-lg-inline
                     = link_to bike.paint_description, edit_admin_paint_url(bike.paint)
                 - if bike.status_stolen?
-                  %span.text-danger.less-strong-right
-                    stolen
+                  %span.text-danger.less-strong-right stolen
+                - if bike.user_hidden
+                  %span.small.text-warning.less-strong-right user hidden
             %td.admin-bike-table-serial-cell
               %small.less-strong
                 = bike.serial_number

@@ -201,10 +201,10 @@ RSpec.describe StolenRecord, type: :model do
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
     it "creates an address" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",
-                                       city: "Chicago",
-                                       state_id: state.id,
-                                       zipcode: "60647",
-                                       country_id: country.id)
+        city: "Chicago",
+        state_id: state.id,
+        zipcode: "60647",
+        country_id: country.id)
       expect(stolen_record.address).to eq("Chicago, XXX 60647, NEVVVV")
       expect(stolen_record.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
       expect(stolen_record.address).to eq("Chicago, XXX 60647, NEVVVV")
@@ -212,8 +212,8 @@ RSpec.describe StolenRecord, type: :model do
     end
     it "is ok with missing information" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",
-                                       zipcode: "60647",
-                                       country_id: country.id)
+        zipcode: "60647",
+        country_id: country.id)
       expect(stolen_record.address).to eq("60647, NEVVVV")
       expect(stolen_record.without_location?).to be_falsey
       expect(stolen_record.address).to eq("60647, NEVVVV")

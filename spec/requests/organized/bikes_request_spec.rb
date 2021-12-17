@@ -170,12 +170,12 @@ RSpec.describe Organized::BikesController, type: :request do
         let!(:impound_configuration) { FactoryBot.create(:impound_configuration, organization_id: current_organization.id, public_view: true) }
         let(:parking_notification_abandoned) do
           parking_notification.merge(use_entered_address: "1",
-                                     kind: "impound_notification",
-                                     street: "10544 82 Ave NW",
-                                     city: "Edmonton",
-                                     country_id: Country.canada.id,
-                                     zipcode: "T6E 2A4",
-                                     internal_notes: "Impounded it!")
+            kind: "impound_notification",
+            street: "10544 82 Ave NW",
+            city: "Edmonton",
+            country_id: Country.canada.id,
+            zipcode: "T6E 2A4",
+            internal_notes: "Impounded it!")
         end
         include_context :geocoder_real
         it "creates a new ownership, parking_notification, impound_record" do

@@ -2,7 +2,7 @@ class AdminMailer < ApplicationMailer
   helper LocalizationHelper
 
   default content_type: "multipart/alternative",
-          parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
+    parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
   default to: "contact@bikeindex.org"
 
   def feedback_notification_email(feedback)

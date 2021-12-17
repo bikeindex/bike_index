@@ -39,9 +39,11 @@
                   %td ID
                   %td
                     %code= bike.id
-                    %small.ml-2
+                    %span.ml-2
                       status:
                       %code= bike.status&.gsub("status_", "")
+                    - if bike.user_hidden
+                      %small.text-warning.ml-2 user hidden
 
               %tr
                 %td

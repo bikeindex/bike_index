@@ -115,7 +115,7 @@ class BikesController < Bikes::BaseController
         @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
       end
       @b_param.update_attributes(params: permitted_bparams,
-                                 origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
+        origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
       @bike = BikeCreator.new(@b_param, location: request.safe_location).create_bike
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence

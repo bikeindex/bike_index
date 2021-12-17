@@ -48,9 +48,9 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       let(:stolen_record) { StolenRecord.new(bike: bike, city: "Oakland") }
       let(:theft_alert) do
         TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
-                       stolen_record: stolen_record,
-                       latitude: 37.8297171, longitude: -122.2803456,
-                       facebook_data: {campaign_id: campaign_id, adset_id: adset_id})
+          stolen_record: stolen_record,
+          latitude: 37.8297171, longitude: -122.2803456,
+          facebook_data: {campaign_id: campaign_id, adset_id: adset_id})
       end
       before do
         # Required because default scope override in theft_alert
@@ -119,9 +119,9 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
         let(:theft_alert) do
           # id: 1633
           TheftAlert.create(theft_alert_plan: theft_alert_plan,
-                            stolen_record: stolen_record,
-                            user: bike.user,
-                            facebook_data: facebook_data)
+            stolen_record: stolen_record,
+            user: bike.user,
+            facebook_data: facebook_data)
         end
         let(:target_engagement) { {post: "2", comment: "1", link_click: "4", post_reaction: "1", unique_clicks: "16", page_engagement: "8", post_engagement: "8", landing_page_view: "2"} }
         it "updates and sets the data" do

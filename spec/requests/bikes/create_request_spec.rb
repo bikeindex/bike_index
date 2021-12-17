@@ -348,10 +348,10 @@ RSpec.describe "BikesController#create", type: :request do
   context "existing b_param, no bike" do
     let(:bike_params) do
       basic_bike_params.merge(cycle_type: "cargo-rear",
-                              serial_number: "example serial",
-                              secondary_frame_color_id: "",
-                              tertiary_frame_color_id: "",
-                              owner_email: "something@stuff.com")
+        serial_number: "example serial",
+        secondary_frame_color_id: "",
+        tertiary_frame_color_id: "",
+        owner_email: "something@stuff.com")
     end
     let(:target_address) { {street: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "US", latitude: 40.7143528, longitude: -74.0059731} }
     let(:b_param) { BParam.create(params: {"bike" => bike_params.as_json}, origin: "embed_partial") }

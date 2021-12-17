@@ -1,6 +1,6 @@
 class CustomerMailer < ApplicationMailer
   default content_type: "multipart/alternative",
-          parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
+    parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
   def welcome_email(user)
     @user = user
@@ -141,7 +141,7 @@ class CustomerMailer < ApplicationMailer
 
     I18n.with_locale(@user&.preferred_language || I18n.default_locale) do
       mail(to: @bike.owner_email,
-           subject: "We may have found your stolen #{@bike.title_string}")
+        subject: "We may have found your stolen #{@bike.title_string}")
     end
   end
 

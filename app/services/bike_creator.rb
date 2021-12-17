@@ -265,9 +265,9 @@ class BikeCreator
   def create_parking_notification(b_param, bike)
     parking_notification_attrs = b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
     parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
-                                      bike_id: bike.id,
-                                      user_id: bike.creator.id,
-                                      organization_id: b_param.creation_organization_id)
+      bike_id: bike.id,
+      user_id: bike.creator.id,
+      organization_id: b_param.creation_organization_id)
     ParkingNotification.create(parking_notification_attrs)
   end
 

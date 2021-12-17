@@ -55,13 +55,13 @@ class CustomerContact < ApplicationRecord
   #
   def self.build_bike_possibly_found_notification(bike, match)
     new(bike: bike,
-        kind: "bike_possibly_found",
-        info_hash: {
-          stolen_record_id: bike&.current_stolen_record&.id.to_s,
-          match_type: match.class.to_s,
-          match_id: match.id.to_s,
-          match: match.as_json
-        })
+      kind: "bike_possibly_found",
+      info_hash: {
+        stolen_record_id: bike&.current_stolen_record&.id.to_s,
+        match_type: match.class.to_s,
+        match_id: match.id.to_s,
+        match: match.as_json
+      })
   end
 
   def receives_stolen_bike_notifications?

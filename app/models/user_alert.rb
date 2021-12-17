@@ -83,7 +83,7 @@ class UserAlert < ApplicationRecord
   def self.update_theft_alert_without_photo(user:, theft_alert:)
     # scope to just active, to alert if the theft alert once again has no image
     user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
-                                                   user_id: user.id, theft_alert_id: theft_alert.id)
+      user_id: user.id, theft_alert_id: theft_alert.id)
     if theft_alert.missing_photo?
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
@@ -94,7 +94,7 @@ class UserAlert < ApplicationRecord
 
   def self.update_stolen_bike_without_location(user:, bike:)
     user_alert = UserAlert.find_or_build_by(kind: "stolen_bike_without_location",
-                                            user_id: user.id, bike_id: bike.id)
+      user_id: user.id, bike_id: bike.id)
     if bike.current_stolen_record&.without_location?
       user_alert.save
     else # Don't create just to resolve
@@ -104,7 +104,7 @@ class UserAlert < ApplicationRecord
 
   def self.update_unassigned_bike_org(user:, organization:, bike:)
     user_alert = UserAlert.find_or_build_by(kind: "unassigned_bike_org",
-                                            user_id: user.id, organization_id: organization.id, bike_id: bike.id)
+      user_id: user.id, organization_id: organization.id, bike_id: bike.id)
     if bike.organizations.where(id: organization.id).none?
       user_alert.save
     else
@@ -115,7 +115,7 @@ class UserAlert < ApplicationRecord
 
   def self.update_phone_waiting_confirmation(user:, user_phone:)
     user_alert = UserAlert.find_or_build_by(kind: "phone_waiting_confirmation",
-                                            user_id: user.id, user_phone_id: user_phone.id)
+      user_id: user.id, user_phone_id: user_phone.id)
     if user_phone.confirmed?
       # Don't create if phone is already confirmed
       user_alert.id.blank? ? true : user_alert.resolve!

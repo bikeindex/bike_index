@@ -25,14 +25,14 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
     impound_record.impound_record_updates.unprocessed.each do |impound_record_update|
       if impound_record_update.kind == "transferred_to_new_owner"
         bike.update(status: "status_with_owner",
-                    owner_email: impound_record_update.transfer_email,
-                    is_for_sale: false,
-                    address_set_manually: false,
-                    hidden: false)
+          owner_email: impound_record_update.transfer_email,
+          is_for_sale: false,
+          address_set_manually: false,
+          hidden: false)
         ownership = bike.ownerships.create!(owner_email: impound_record_update.transfer_email,
-                                            impound_record_id: impound_record.id,
-                                            creator_id: impound_record_update.user_id,
-                                            current: true)
+          impound_record_id: impound_record.id,
+          creator_id: impound_record_update.user_id,
+          current: true)
         bike.ownerships.current.where.not(id: ownership.id).each { |o| o.update(current: false) }
       elsif impound_record_update.kind == "removed_from_bike_index"
         impound_record.bike.destroy
@@ -65,9 +65,9 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
     # Mark the stolen record as recovered
     unless impound_claim.stolen_record.recovered?
       impound_claim.stolen_record.add_recovery_information(recovering_user_id: impound_record.user_id,
-                                                           recovered_description: "Recovered from impounding",
-                                                           index_helped_recovery: true,
-                                                           can_share_recovery: true)
+        recovered_description: "Recovered from impounding",
+        index_helped_recovery: true,
+        can_share_recovery: true)
     end
     # TODO: make this actually merge attributes in from the bike, rather than just delete it?
     impound_record.parking_notification.bike&.delete

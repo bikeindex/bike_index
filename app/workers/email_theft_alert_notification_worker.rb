@@ -6,10 +6,10 @@ class EmailTheftAlertNotificationWorker < ApplicationWorker
 
     notification = theft_alert.notifications.where(kind: kind).first
     notification ||= Notification.create(user: theft_alert.user,
-                                         kind: kind,
-                                         message_channel: "email",
-                                         notifiable: theft_alert,
-                                         bike: theft_alert.bike)
+      kind: kind,
+      message_channel: "email",
+      notifiable: theft_alert,
+      bike: theft_alert.bike)
     return true if notification.delivered?
 
     if kind == "theft_alert_recovered"

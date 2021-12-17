@@ -167,8 +167,8 @@ class BikeSticker < ApplicationRecord
     claiming_bike = claiming_bike_for_args(args)
     claiming_organization = claiming_organization_for_args(args)
     bike_sticker_update = BikeStickerUpdate.new(bike_sticker_id: id, user: args[:user],
-                                                organization: claiming_organization, bike: claiming_bike,
-                                                safe_assign_creator_kind: args[:creator_kind], export_id: args[:export_id])
+      organization: claiming_organization, bike: claiming_bike,
+      safe_assign_creator_kind: args[:creator_kind], export_id: args[:export_id])
     if claiming_bike.blank? && args[:bike].is_a?(String) && args[:bike].length > 0
       not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
       errors.add(:bike, "\"#{args[:bike]}\" #{not_found}")
@@ -193,10 +193,10 @@ class BikeSticker < ApplicationRecord
     return claim(args) if claimable_by?(args[:user], args[:organization])
     errors.add(:user, args[:user].present? ? :unauthorized_to_claim : :not_found)
     BikeStickerUpdate.create(bike_sticker_id: id,
-                             user: args[:user],
-                             organization: args[:organization],
-                             bike: claiming_bike_for_args(args),
-                             failed_claim_errors: errors.full_messages.join(", "))
+      user: args[:user],
+      organization: args[:organization],
+      bike: claiming_bike_for_args(args),
+      failed_claim_errors: errors.full_messages.join(", "))
     self
   end
 
