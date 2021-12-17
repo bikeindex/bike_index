@@ -80,7 +80,7 @@ class CreationState < ApplicationRecord
   end
 
   def address_hash
-    (registration_info || {}).slice("street", "city", "state", "zipcode", "state", "country")
+    (registration_info || {}).slice("address", "street", "city", "state", "zipcode", "state", "country")
       .with_indifferent_access
   end
 
