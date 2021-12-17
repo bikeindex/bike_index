@@ -2804,7 +2804,6 @@ nl:
         hello: Hallo %{name}!
         help_prevent_bike_theft_html: Help fietsdiefstal te voorkomen, %{link}
         here: hier
-        lily_williams_and_the_bike_index_team: Lily Williams en het Bike Index Team
         make_a_donation: doe een gift
         nothing_significant_has_changed_about_how: Er is niets belangrijks veranderd
           aan de manier waarop we omgaan met uw gegevens of vertrouwen. We zullen
@@ -2824,12 +2823,12 @@ nl:
           kunt meer lezen %{link}.
         you_may_not_know_but_bike_index_recently_: Je weet het misschien niet, maar
           Bike Index is onlangs een 501 (c) (3) non-profit geworden.
+        gavin_hoover_and_the_bike_index_team: Gavin Hoover en het Bike Index-team
       subject: Bike Index Voorwaarden en Privacybeleid Update
       text:
         as_always_thanks_for_helping_register_bik: Zoals altijd, bedankt voor het
           helpen met het registreren van fietsen,
         hello: Hallo %{name}!
-        lily_williams_and_the_bike_index_team: Lily Williams en het Bike Index Team
         nothing_significant_has_changed_about_how: Er is niets belangrijks veranderd
           aan de manier waarop we omgaan met uw gegevens of vertrouwen. We zullen
           uw informatie altijd beschermen en nooit verkopen of verhandelen. Dit is
@@ -2849,6 +2848,7 @@ nl:
           komen. Je kunt meer lezen op %{url}
         you_may_not_know_but_bike_index_recently_: Je weet het misschien niet, maar
           Bike Index is onlangs een 501 (c) (3) non-profit geworden.
+        gavin_hoover_and_the_bike_index_team: Gavin Hoover en het Bike Index-team
     welcome_email:
       html:
         add_some_information_about_your_bikes_whe: Voeg wat informatie over je fietsen
