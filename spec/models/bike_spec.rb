@@ -1242,12 +1242,16 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "address_source" do
-    let(:bike) { FactoryBot.create(:bike) }
-    it "returns nil" do
-      expect(bike.registration_address_source).to be_blank
+    let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+    let(:registration_info) { {street: "2864 Milwaukee Ave"} }
+    context "no address" do
+      it "returns nil" do
+        expect(Bike.new.registration_address_source).to be_blank
+      end
     end
     context "address set on bike" do
       it "returns bike_update" do
+        expect(bike.reload.registration_address_source).to eq "initial_creation"
         bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
         expect(bike.registration_address_source).to eq "bike_update"
         expect(bike.latitude).to eq 43.9
@@ -1255,11 +1259,11 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "b_param" do
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:b_param_params) { {bike: {street: "2864 Milwaukee Ave"}} }
+      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: {bike: registration_info}) }
       it "returns creation_information" do
         bike.reload
         expect(bike.registration_address_source).to eq "initial_creation"
+        expect(bike.registration_info).to eq registration_info.as_json
       end
       context "user with address address_set_manually" do
         let(:user) { FactoryBot.create(:user, :in_vancouver, address_set_manually: true) }
@@ -1273,9 +1277,9 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "with stolen record" do
-        let(:bike) { FactoryBot.create(:stolen_bike) }
+        let(:bike) { FactoryBot.create(:stolen_bike, :with_creation_state, creation_state_registration_info: registration_info) }
         it "returns initial_creation" do
-          expect(bike.registration_address_source).to eq "initial_creation"
+          expect(bike.reload.registration_address_source).to eq "initial_creation"
         end
       end
     end
@@ -1285,17 +1289,16 @@ RSpec.describe Bike, type: :model do
     context "unclaimed bike, with owner email" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:user_confirmed, name: "some name") }
-      let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
-      let(:b_param) do
-        FactoryBot.create(:b_param, created_bike_id: bike.id,
-                                    params: {bike: {address: "102 Washington Pl, State College"}})
+      let(:bike) do
+        FactoryBot.create(:bike_organized,
+          organization: organization,
+          creation_state_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
       let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
       include_context :geocoder_real
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
         VCR.use_cassette("organization_export_worker-avery") do
-          expect(b_param).to be_present
           ownership.reload
           bike.save
           bike.reload
@@ -1341,72 +1344,6 @@ RSpec.describe Bike, type: :model do
           expect(bike.user).to_not eq user
           expect(bike.registration_address_source).to be_blank
           expect(bike.registration_address.values.compact).to eq([])
-        end
-      end
-    end
-    context "with registration_address" do
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:bike) { FactoryBot.create(:bike) }
-      let(:b_param_params) { {bike: {street: "2864 Milwaukee Ave"}} }
-      let(:target) { {street: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "US", latitude: 41.933238, longitude: -87.71476299999999} }
-      include_context :geocoder_real
-      it "returns the fetched address" do
-        FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: Country.united_states)
-        bike.reload
-        b_param.reload
-        expect(bike.b_params.pluck(:id)).to eq([b_param.id])
-        bike.reload
-        VCR.use_cassette("bike-fetch_formatted_address") do
-          expect(bike.registration_address_source).to eq "initial_creation"
-          expect(bike.registration_address(true)).to eq target.as_json
-          bike.update_attributes(updated_at: Time.current) # To bump address
-
-          bike.reload
-          b_param.reload
-          # Just check that we stored it, since lazily not testing this anywhere else
-          expect(b_param.params["formatted_address"]).to eq target.as_json
-          expect(bike.registration_address).to eq target.as_json
-          # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
-          expect(bike.address_hash.except(:latitude, :longitude)).to eq target.merge(country: "US").except(:latitude, :longitude).as_json
-          expect(bike.latitude).to be_within(0.1).of target[:latitude]
-          expect(bike.longitude).to be_within(0.1).of target[:longitude]
-        end
-      end
-      context "legacy address (street -> address)" do
-        let(:b_param_params) { {bike: {address: "2864 Milwaukee Ave"}} }
-        it "returns the fetched address" do
-          bike.reload
-          expect(bike.b_params.pluck(:id)).to eq([b_param.id])
-          bike.reload
-          VCR.use_cassette("bike-fetch_formatted_address") do
-            expect(bike.registration_address(true)).to eq target.as_json
-          end
-          b_param.reload
-          # Just check that we stored it, since lazily not testing this anywhere else
-          expect(b_param.params["formatted_address"]).to eq target.as_json
-        end
-      end
-      context "with multiple b_params" do
-        let!(:b_param_params) { {formatted_address: target, bike: {address: "2864 Milwaukee Ave"}} }
-        let!(:b_param2) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: {bike: {address: ""}}) }
-        it "gets the one that has an address, doesn't lookup if formatted_address stored" do
-          bike.reload
-          expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
-          expect(bike.registration_address_source).to eq "initial_creation"
-          expect(bike.registration_address(true)).to eq target.as_json
-        end
-        context "with address_set_manually" do
-          let(:target) { {street: "1313 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "66666", country: "US", latitude: 43.9, longitude: -88.7} }
-          it "returns address set" do
-            FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: Country.united_states)
-            bike.update(target.merge(address_set_manually: true))
-            bike.reload
-            expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
-            expect(bike.registration_address_source).to eq "bike_update"
-            expect(bike.address_hash).to eq target.as_json
-            expect(bike.registration_address(true)).to eq target.as_json
-            expect(bike.address_set_manually).to be_truthy
-          end
         end
       end
     end
@@ -1906,7 +1843,7 @@ RSpec.describe Bike, type: :model do
         expect(creation_state).to be_present
         expect(bike.reload.current_creation_state_id).to eq creation_state.id
         expect(bike.current_creation_state.address_hash[:latitude]).to be_blank
-        expect(bike.registration_address_source).to eq "initial_creation_state"
+        expect(bike.registration_address_source).to eq "initial_creation"
         expect(bike.registration_address(true)["zipcode"]).to eq "99999"
 
         bike.reload
