@@ -1591,13 +1591,13 @@ RSpec.describe Bike, type: :model do
     let(:target_cached_string) { "#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
     it "caches all the bike parts" do
       bike.update_attributes(year: 1999, frame_material: "steel",
-                             secondary_frame_color_id: bike.primary_frame_color_id,
-                             tertiary_frame_color_id: bike.primary_frame_color_id,
-                             handlebar_type: "bmx",
-                             propulsion_type: "sail",
-                             cycle_type: "unicycle",
-                             frame_size: "56", frame_size_unit: "foo",
-                             frame_model: "Some model")
+        secondary_frame_color_id: bike.primary_frame_color_id,
+        tertiary_frame_color_id: bike.primary_frame_color_id,
+        handlebar_type: "bmx",
+        propulsion_type: "sail",
+        cycle_type: "unicycle",
+        frame_size: "56", frame_size_unit: "foo",
+        frame_model: "Some model")
       bike.reload
       expect(bike.cached_data).to eq target_cached_string
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)

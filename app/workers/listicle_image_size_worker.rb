@@ -5,7 +5,7 @@ class ListicleImageSizeWorker < ApplicationWorker
     listicle = Listicle.find(id)
     return true unless listicle.image.present?
     unless listicle.image_width.present?
-      width, height = `identify -format "%wx%h" #{listicle.image_url}`.split(/x/)
+      width, height = `identify -format "%wx%h" #{listicle.image_url}`.split("x")
       listicle.image_width = width.gsub(/\D/, "").to_i
       listicle.image_height = height.gsub(/\D/, "").to_i
     end

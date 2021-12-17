@@ -219,8 +219,8 @@ RSpec.describe MailchimpDatum, type: :model do
         let!(:location) { FactoryBot.create(:location_chicago, organization: organization) }
         let(:lightspeed_merge_fields) do
           target_merge_fields.merge(organization_country: "US",
-                                    organization_city: "Chicago",
-                                    organization_state: "IL")
+            organization_city: "Chicago",
+            organization_state: "IL")
         end
 
         it "responds with lightspeed" do
@@ -291,7 +291,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.managed_merge_fields.as_json).to eq combined_merge_fields.as_json
           expect(mailchimp_datum.lists).to eq(["organization"])
           target_combined = target.merge(interests: %w[bike_shop donors],
-                                         merge_fields: combined_merge_fields.except(:recovered_bike_at, :phone_number))
+            merge_fields: combined_merge_fields.except(:recovered_bike_at, :phone_number))
           expect(mailchimp_datum.calculated_data.as_json).to eq target_combined.as_json
         end
       end
@@ -329,7 +329,7 @@ RSpec.describe MailchimpDatum, type: :model do
         before { bike.fetch_current_stolen_record.add_recovery_information(recovered_at: recovery_time.to_s, index_helped_recovery: we_helped) }
         let(:target_merge_fields_recovered) do
           target_merge_fields.merge(:most_recent_donation_at => nil, "bikes" => 1,
-                                    :number_of_donations => 0, :recovered_bike_at => recovery_time.to_date.to_s)
+            :number_of_donations => 0, :recovered_bike_at => recovery_time.to_date.to_s)
         end
         it "is recovered and we helped" do
           expect(bike.reload.stolen_recovery?).to be_truthy

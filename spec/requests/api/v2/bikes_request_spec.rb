@@ -119,12 +119,12 @@ RSpec.describe "Bikes API V2", type: :request do
         }
       ]
       bike_attrs.merge!(components: components,
-                        front_gear_type_slug: front_gear_type.slug,
-                        handlebar_type_slug: handlebar_type_slug,
-                        is_for_sale: true,
-                        is_bulk: true,
-                        is_new: true,
-                        is_pos: true)
+        front_gear_type_slug: front_gear_type.slug,
+        handlebar_type_slug: handlebar_type_slug,
+        is_for_sale: true,
+        is_bulk: true,
+        is_new: true,
+        is_pos: true)
       ActionMailer::Base.deliveries = []
       post "/api/v2/bikes?access_token=#{token.token}",
         params: bike_attrs.to_json,

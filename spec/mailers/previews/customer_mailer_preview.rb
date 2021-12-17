@@ -56,9 +56,9 @@ class CustomerMailerPreview < ActionMailer::Preview
     theft_alert = TheftAlert.reorder(:created_at).last
     notification = theft_alert.notifications.where(kind: "theft_alert_posted").first
     notification ||= Notification.new(user: theft_alert.user,
-                                      kind: "theft_alert_posted",
-                                      message_channel: "email",
-                                      notifiable: theft_alert)
+      kind: "theft_alert_posted",
+      message_channel: "email",
+      notifiable: theft_alert)
 
     CustomerMailer.theft_alert_email(theft_alert, notification)
   end

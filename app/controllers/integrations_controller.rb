@@ -4,8 +4,8 @@ class IntegrationsController < ApplicationController
 
   def create
     @integration = Integration.new(information: request.env["omniauth.auth"],
-                                   access_token: request.env["omniauth.auth"]["credentials"]["token"],
-                                   provider_name: request.env["omniauth.auth"]["provider"])
+      access_token: request.env["omniauth.auth"]["credentials"]["token"],
+      provider_name: request.env["omniauth.auth"]["provider"])
     @integration.save
     if @integration.valid? && @integration.user.present?
       @user = @integration.user

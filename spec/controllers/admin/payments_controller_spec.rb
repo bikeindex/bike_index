@@ -136,8 +136,8 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         it "creates" do
           payment_attrs =
             params.merge(payment_method: "check",
-                         organization_id: "",
-                         invoice_id: "Invoice ##{invoice.id}")
+              organization_id: "",
+              invoice_id: "Invoice ##{invoice.id}")
           expect {
             post :create, params: {payment: payment_attrs}
           }.to change(Payment, :count).by 1

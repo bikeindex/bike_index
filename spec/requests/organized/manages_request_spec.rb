@@ -275,10 +275,10 @@ RSpec.describe Organized::ManagesController, type: :request do
             let(:blocked_destroy_params) do
               # Only pass one location, and keep it default impound location
               update_attributes.merge(kind: "bike_shop",
-                                      short_name: "cool other name",
-                                      locations_attributes: {
-                                        "0" => update_attributes[:locations_attributes]["0"].merge(default_impound_location: "1")
-                                      })
+                short_name: "cool other name",
+                locations_attributes: {
+                  "0" => update_attributes[:locations_attributes]["0"].merge(default_impound_location: "1")
+                })
             end
             it "does not remove" do
               UpdateOrganizationAssociationsWorker.new.perform(location1.organization_id)

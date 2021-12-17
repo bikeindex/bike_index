@@ -210,7 +210,7 @@ class Invoice < ApplicationRecord
     return nil unless active? || was_active? || future?
     return following_invoice if following_invoice.present?
     new_invoice = organization.invoices.create(start_at: subscription_end_at,
-                                               first_invoice_id: subscription_first_invoice_id)
+      first_invoice_id: subscription_first_invoice_id)
     new_invoice.organization_feature_ids = organization_features.recurring.pluck(:id)
     new_invoice.reload
     new_invoice.update_attributes(child_enabled_feature_slugs: child_enabled_feature_slugs)

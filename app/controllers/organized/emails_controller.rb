@@ -129,9 +129,9 @@ module Organized
       @parking_notification ||= parking_notifications.where(kind: @kind).last
       unless @parking_notification.present?
         @parking_notification = parking_notifications.build(bike: current_organization.bikes.last,
-                                                            kind: @kind,
-                                                            user: current_user,
-                                                            created_at: Time.current - 1.hour)
+          kind: @kind,
+          user: current_user,
+          created_at: Time.current - 1.hour)
         @parking_notification.set_location_from_organization
       end
       @bike = @parking_notification.bike

@@ -24,7 +24,7 @@ class Integration < ApplicationRecord
       update_or_create_user(email: information["info"]["email"], name: information["info"]["name"])
     elsif provider_name == "globalid"
       update_or_create_user(email: self.class.email_from_globalid_pii(information),
-                            name: information["info"]["name"])
+        name: information["info"]["name"])
     end
   end
 
@@ -43,9 +43,9 @@ class Integration < ApplicationRecord
   def create_user(email:, name:)
     password = SecurityTokenizer.new_password_token
     i_user = User.new(email: email,
-                      name: name,
-                      password: password,
-                      password_confirmation: password)
+      name: name,
+      password: password,
+      password_confirmation: password)
     if i_user.save!
       i_user.confirm(i_user.confirmation_token)
     else

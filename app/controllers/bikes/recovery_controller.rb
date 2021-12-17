@@ -33,7 +33,7 @@ class Bikes::RecoveryController < Bikes::BaseController
 
   def ensure_token_match!
     @stolen_record = StolenRecord.find_matching_token(bike_id: @bike&.id,
-                                                      recovery_link_token: params[:token])
+      recovery_link_token: params[:token])
     if @stolen_record.present?
       return true if @bike.status_stolen?
       flash[:info] = translation(:already_recovered)

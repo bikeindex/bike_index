@@ -63,8 +63,8 @@ RSpec.describe OrganizationsController, type: :controller do
       expect(Organization.count).to eq(0)
       post :create, params: {
         organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
-                                      website: "<script>alert(document.cookie)</script>",
-                                      kind: "cooooooolll_software")
+          website: "<script>alert(document.cookie)</script>",
+          kind: "cooooooolll_software")
       }
       expect(Organization.count).to eq(1)
       user.reload

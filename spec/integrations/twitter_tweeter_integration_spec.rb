@@ -131,7 +131,7 @@ RSpec.describe TwitterTweeterIntegration do
     let!(:national) { FactoryBot.create(:twitter_account_1, :national, :active, :default, country: Country.united_states) }
     let(:stolen_bike_bay_area) do
       Bike.new(manual_csr: true,
-               current_stolen_record: StolenRecord.new(latitude: 37.8390534, longitude: -122.3114197, country: Country.united_states))
+        current_stolen_record: StolenRecord.new(latitude: 37.8390534, longitude: -122.3114197, country: Country.united_states))
     end
     let(:twitter_tweeter_integration) { TwitterTweeterIntegration.new(stolen_bike_bay_area) }
     it "returns empty if no location" do

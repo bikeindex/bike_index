@@ -131,11 +131,11 @@ RSpec.describe CustomerMailer, type: :mailer do
     let(:user) { FactoryBot.create(:admin, email: "something@stuff.com") }
     let(:customer_contact) do
       CustomerContact.create(user_email: bike.owner_email,
-                             creator_email: user.email,
-                             body: "some message",
-                             kind: :stolen_contact,
-                             bike_id: bike.id,
-                             title: "some title")
+        creator_email: user.email,
+        body: "some message",
+        kind: :stolen_contact,
+        bike_id: bike.id,
+        title: "some title")
     end
     it "renders email" do
       mail = CustomerMailer.admin_contact_stolen_email(customer_contact)

@@ -9,12 +9,12 @@ module Api
         if params[:notification_hash][:notification_type].to_s.match("stolen_twitter_alerter").present?
           if bike.fetch_current_stolen_record.present?
             customer_contact = CustomerContact.new(body: "EMPTY",
-                                                   bike_id: bike.id,
-                                                   kind: :stolen_twitter_alerter,
-                                                   title: title_tag(bike),
-                                                   user_email: bike.owner_email,
-                                                   creator_email: "bryan@bikeindex.org",
-                                                   info_hash: params[:notification_hash])
+              bike_id: bike.id,
+              kind: :stolen_twitter_alerter,
+              title: title_tag(bike),
+              user_email: bike.owner_email,
+              creator_email: "bryan@bikeindex.org",
+              info_hash: params[:notification_hash])
             if customer_contact.save
               EmailStolenBikeAlertWorker.perform_async(customer_contact.id)
               render(json: {success: true}) && return

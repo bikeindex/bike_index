@@ -41,7 +41,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
   context "validates unqiueness of ambassador scoped to the user" do
     it "is valid if the task assignment is unique per-user" do
       assignment = described_class.new(ambassador: ambassador,
-                                       ambassador_task: ambassador_task)
+        ambassador_task: ambassador_task)
       expect(assignment).to be_valid
     end
 

@@ -99,7 +99,7 @@ class Admin::BikesController < Admin::BaseController
 
   def unrecover
     stolen_record = StolenRecord.unscoped.where(bike_id: params[:bike_id],
-                                                id: params[:stolen_record_id]).first
+      id: params[:stolen_record_id]).first
     if stolen_record.present?
       flash[:success] = "Marked unrecovered!"
       stolen_record.update_attributes(recovered_at: nil, current: true, recovery_link_token: nil)
