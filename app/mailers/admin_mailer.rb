@@ -10,9 +10,9 @@ class AdminMailer < ApplicationMailer
     send_to = "contact@bikeindex.org"
     if @feedback.feedback_type.present?
       if @feedback.feedback_type.match?(/organization_created/) || @feedback.lead_type
-        send_to = "lily@bikeindex.org, craig@bikeindex.org"
+        send_to = "gavin@bikeindex.org, craig@bikeindex.org"
       elsif @feedback.feedback_type.match?(/bike_recovery/)
-        send_to += ", bryan@bikeindex.org, lily@bikeindex.org"
+        send_to += ", bryan@bikeindex.org, gavin@bikeindex.org"
       elsif @feedback.feedback_type.match?(/stolen_information/)
         send_to = "bryan@bikeindex.org"
       end
@@ -32,7 +32,7 @@ class AdminMailer < ApplicationMailer
 
   def unknown_organization_for_ascend_import(bulk_import)
     @bulk_import = bulk_import
-    mail(to: ["lily@bikeindex.org", "craig@bikeindex.org"], subject: "Unknown organization for ascend import")
+    mail(to: ["gavin@bikeindex.org", "craig@bikeindex.org"], subject: "Unknown organization for ascend import")
   end
 
   def lightspeed_notification_email(organization, api_key)

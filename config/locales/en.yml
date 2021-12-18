@@ -2119,10 +2119,10 @@ en:
         bike_index_vendor_terms_of_service: Bike Index Vendor Terms of Service
         check_link_to_see_more_html: Check %{link} to see more of what we’ve been
           up to.
+        gavin_hoover_and_the_bike_index_team: Gavin Hoover and the Bike Index Team
         hello: Hello %{name}!
         help_prevent_bike_theft_html: Help prevent bike theft, %{link}
         here: here
-        lily_williams_and_the_bike_index_team: Lily Williams and the Bike Index Team
         make_a_donation: make a donation
         nothing_significant_has_changed_about_how: >-
           Nothing significant has changed about how we handle your data or trust.
@@ -2146,8 +2146,8 @@ en:
       text:
         as_always_thanks_for_helping_register_bik: As always, thanks for helping register
           bikes,
+        gavin_hoover_and_the_bike_index_team: Gavin Hoover and the Bike Index Team
         hello: Hello %{name}!
-        lily_williams_and_the_bike_index_team: Lily Williams and the Bike Index Team
         nothing_significant_has_changed_about_how: >-
           Nothing significant has changed about how we handle your data or trust.
           We will always protect your information and never sell or trade it. This

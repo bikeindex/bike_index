@@ -110,7 +110,7 @@ class CustomerMailer < ApplicationMailer
     I18n.with_locale(@user&.preferred_language) do
       mail(
         to: @stolen_notification.receiver_email,
-        cc: ["bryan@bikeindex.org", "lily@bikeindex.org"],
+        cc: ["bryan@bikeindex.org", "gavin@bikeindex.org"],
         reply_to: @stolen_notification.sender.email,
         from: "bryan@bikeindex.org",
         subject: @stolen_notification.subject || default_i18n_subject
@@ -165,7 +165,7 @@ class CustomerMailer < ApplicationMailer
     @_action_has_layout = false # layout is manually included here
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, from: '"Lily Williams" <lily@bikeindex.org>')
+      mail(to: @user.email, from: '"Gavin Hoover" <gavin@bikeindex.org>')
     end
   end
 end
