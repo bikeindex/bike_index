@@ -52,6 +52,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       UpdateExchangeRatesWorker,
       UpdateTheftAlertFacebookWorker,
       CleanBulkImportWorker,
+      CleanBParamsWorker,
       self
     ]
   end
