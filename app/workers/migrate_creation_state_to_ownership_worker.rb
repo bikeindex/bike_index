@@ -11,7 +11,7 @@
 # add_column :ownerships, :registration_info, :jsonb, default: {}
 
 class MigrateCreationStateToOwnershipWorker < ApplicationWorker
-  sidekiq_options queue: "low_priority"
+  sidekiq_options queue: "low_priority", retry: false
   # This timestamp is when the migration started - so any creation_state with an updated_at *after* this timestamp
   # is assumed to be correct
   END_TIMESTAMP = 1640033379
@@ -26,11 +26,11 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
     bike = Bike.unscoped.find_by_id(creation_state.bike_id)
     # Break if this isn't as expected, until we have logic to handle it!
     raise if CreationState.where(bike_id: bike.id).count != 1
-    raise if Ownership.where(bike_id: bike.id).count != 1
+
     ownership = if ownership_id.present?
       Ownership.find(ownership_id)
     else
-      bike.current_ownership
+      bike.ownerships.first
     end
     registration_info = creation_state.registration_info || {}
     ownership.attributes = {
@@ -45,5 +45,6 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
     ownership.origin = "api_v1" if ownership.lightspeed_pos?
     ownership.organization_pre_registration = ownership.send("calculated_organization_pre_registration?")
     ownership.save
+    creation_state.touch # To make sure it no longer is valid for migrate?
   end
 end

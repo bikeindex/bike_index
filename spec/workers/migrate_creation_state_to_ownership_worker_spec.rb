@@ -16,7 +16,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
       creation_state.reload
       ownership.reload
       expect(ownership.updated_at.to_i).to be > MigrateCreationStateToOwnershipWorker::END_TIMESTAMP
-      expect(described_class.migrate?(ownership, creation_state)).to be_falsey
+      expect(described_class.migrate?(creation_state, ownership)).to be_falsey
     end
     context "before time" do
       it "is truthy" do
@@ -24,7 +24,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         ownership.update_column :updated_at, before_migrate_time
         creation_state.reload
         ownership.reload
-        expect(described_class.migrate?(ownership, creation_state)).to be_truthy
+        expect(described_class.migrate?(creation_state, ownership)).to be_truthy
       end
     end
   end
@@ -44,7 +44,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
       it "sets all the things" do
         expect(ownership.registration_info).to eq({})
         expect(bike.soon_current_ownership_id).to be_blank
-        expect(described_class.migrate?(ownership, creation_state)).to be_truthy
+        expect(described_class.migrate?(creation_state, ownership)).to be_truthy
         expect(creation_state.bulk_import_id).to be_present
         expect(creation_state.organization_id).to be_present
         expect(creation_state.status).to eq "status_with_owner"
@@ -61,7 +61,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         expect(ownership.bulk_import_id).to eq creation_state.bulk_import.id
         expect(ownership.organization_id).to eq creation_state.organization.id
         expect(ownership.registration_info).to eq({})
-        expect(described_class.migrate?(ownership, creation_state)).to be_falsey
+        expect(described_class.migrate?(creation_state, ownership)).to be_falsey
       end
     end
     context "lightspeed pos" do
@@ -71,7 +71,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
       it "sets all the things" do
         expect(ownership.registration_info).to eq({})
         expect(bike.soon_current_ownership_id).to be_blank
-        expect(described_class.migrate?(ownership, creation_state)).to be_truthy
+        expect(described_class.migrate?(creation_state, ownership)).to be_truthy
         expect(creation_state.bulk_import_id).to be_blank
         expect(creation_state.organization_id).to be_present
         expect(creation_state.status).to eq "status_with_owner"
@@ -88,7 +88,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         # Extra check to make sure not nil
         expect(ownership.organization_id).to eq creation_state.organization.id
         expect(ownership.registration_info).to eq({})
-        expect(described_class.migrate?(ownership, creation_state)).to be_falsey
+        expect(described_class.migrate?(creation_state, ownership)).to be_falsey
       end
     end
     context "registration_info" do
@@ -97,7 +97,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
       let(:registration_info) { {zipcode: "99999", country: "US", city: "New City", street: "main main street"} }
       let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, registration_info: registration_info) }
       it "includes the registration_info" do
-        expect(described_class.migrate?(ownership, creation_state)).to be_truthy
+        expect(described_class.migrate?(creation_state, ownership)).to be_truthy
         expect(bike.reload.registration_info).to eq registration_info.as_json
         expect(ownership.registration_info).to eq({})
 
@@ -105,7 +105,30 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         ownership.reload
         creation_state.reload
         expect(ownership.registration_info).to eq registration_info.as_json
-        expect(described_class.migrate?(ownership, creation_state)).to be_falsey
+        expect(described_class.migrate?(creation_state, ownership)).to be_falsey
+      end
+      context "with multiple ownerships" do
+        let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: ownership.creator) }
+        it "only updates the first ownership" do
+          ownership2.reload
+          ownership.update_column :updated_at, before_migrate_time
+          ownership2.update_column :updated_at, before_migrate_time
+          expect(ownership2.reload.current?).to be_truthy
+          expect(ownership2.registration_info).to eq({})
+          expect(ownership.reload.current?).to be_falsey
+
+          expect(described_class.migrate?(creation_state, ownership)).to be_truthy
+          expect(described_class.migrate?(creation_state, ownership2)).to be_truthy
+          expect(bike.reload.registration_info).to eq registration_info.as_json
+          expect(ownership.registration_info).to eq({})
+
+          subject.perform(creation_state.id)
+          ownership.reload
+          creation_state.reload
+          expect(ownership.registration_info).to eq registration_info.as_json
+          expect(described_class.migrate?(creation_state, ownership)).to be_falsey
+          expect(described_class.migrate?(creation_state, ownership2)).to be_falsey
+        end
       end
     end
   end
