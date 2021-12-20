@@ -92,7 +92,21 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
       end
     end
     context "registration_info" do
-      it "includes the registration_info"
+      let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+      let!(:ownership) { bike.current_ownership }
+      let(:registration_info) { {zipcode: "99999", country: "US", city: "New City", street: "main main street"} }
+      let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, registration_info: registration_info) }
+      it "includes the registration_info" do
+        expect(described_class.migrate?(ownership, creation_state)).to be_truthy
+        expect(bike.reload.registration_info).to eq registration_info.as_json
+        expect(ownership.registration_info).to eq({})
+
+        subject.perform(creation_state.id)
+        ownership.reload
+        creation_state.reload
+        expect(ownership.registration_info).to eq registration_info.as_json
+        expect(described_class.migrate?(ownership, creation_state)).to be_falsey
+      end
     end
   end
 end
