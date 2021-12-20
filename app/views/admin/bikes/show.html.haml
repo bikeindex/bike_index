@@ -4,7 +4,7 @@
   = @active_tab.titleize
 
 - if @active_tab == "ownerships"
-  = render partial: "/admin/ownerships/table", ownerships: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
+  = render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
 
 - elsif @active_tab == "stickers"
   = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @bike.bike_stickers}
