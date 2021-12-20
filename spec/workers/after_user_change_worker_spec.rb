@@ -197,4 +197,37 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(user.alert_slugs).to eq([])
     end
   end
+
+  describe "ownerships" do
+    let(:user) { FactoryBot.create(:user, name: "Old name") }
+    let(:new_name) { "A Name For a User" }
+    let(:ownership1) { FactoryBot.create(:ownership_claimed, user: user) }
+    let(:ownership2) { FactoryBot.create(:ownership_claimed, user: user) }
+    let!(:bike1) { ownership1.bike }
+    let!(:bike2) { ownership2.bike }
+    it "updates user_name on the ownerships" do
+      expect(ownership1.reload.user_id).to eq user.id
+      expect(ownership1.claimed?).to be_truthy
+      expect(ownership1.owner_name).to eq "Old name"
+      expect(bike1.reload.owner_email).to eq user.email
+      expect(bike1.owner_name).to eq "Old name"
+      expect(ownership2.reload.owner_email).to eq user.email
+      expect(ownership2.owner_name).to eq "Old name"
+      expect(ownership2.reload.owner_email).to eq user.email
+      expect(bike2.reload.owner_email).to eq user.email
+      expect(bike2.user&.id).to eq user.id
+      expect(bike2.soon_current_ownership_id).to_not eq ownership2.id
+
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        user.update(name: new_name, skip_update: false)
+      end
+
+      expect(ownership1.reload.owner_name).to eq new_name
+      expect(bike1.reload.owner_name).to eq new_name
+      expect(ownership2.reload.owner_name).to eq new_name
+      expect(bike2.reload.owner_name).to eq new_name
+      expect(bike2.soon_current_ownership_id).to eq ownership2.id
+    end
+  end
 end

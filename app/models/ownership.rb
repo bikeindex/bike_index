@@ -20,8 +20,8 @@ class Ownership < ApplicationRecord
     format: {with: /\A.+@.+\..+\z/, message: "invalid format"},
     unless: :phone_registration?
 
-  belongs_to :bike, touch: true
-  belongs_to :user, touch: true
+  belongs_to :bike
+  belongs_to :user
   belongs_to :creator, class_name: "User"
   belongs_to :impound_record
   belongs_to :organization
@@ -124,11 +124,15 @@ class Ownership < ApplicationRecord
     if id.blank? # Some things to set only on create
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
-      self.organization_pre_registration ||= calculated_organization_pre_registration?
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
+      self.organization_pre_registration ||= calculated_organization_pre_registration?
     end
-    self.claimed_at ||= Time.current if claimed?
+    if claimed?
+      self.claimed_at ||= Time.current
+      # Update owner name always! Keep it in track
+      self.owner_name = user.name if user.present?
+    end
   end
 
   def prior_ownerships

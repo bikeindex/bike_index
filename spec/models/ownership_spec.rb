@@ -323,6 +323,26 @@ RSpec.describe Ownership, type: :model do
             expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
           end
         end
+        context "not first" do
+          let(:bike) { ownership.bike }
+          let(:ownership2) { FactoryBot.create(:ownership, bike: bike, organization: organization, creator: creator, owner_email: owner_email) }
+          it "is falsey" do
+            ownership.reload
+            expect(ownership.send("calculated_organization_pre_registration?")).to be_truthy
+            expect(User.fuzzy_email_find(owner_email)&.id).to eq creator.id
+            ownership2.reload
+            expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
+            expect(ownership2.previous_ownership_id).to eq ownership.id
+            expect(ownership2.organization_id).to eq organization.id
+            expect(ownership2.creator_id).to eq organization.auto_user_id
+            expect(ownership2.user_id).to eq creator.id
+            expect(ownership2.self_made?).to be_truthy
+            expect(ownership2.claimed?).to be_truthy
+            expect(ownership2.send("calculated_organization_pre_registration?")).to be_truthy
+            bike.reload
+            expect(bike.current_ownership&.id).to eq ownership2.id
+          end
+        end
       end
     end
   end

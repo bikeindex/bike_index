@@ -7,7 +7,7 @@ class AfterBikeSaveWorker < ApplicationWorker
   POST_URL = ENV["BIKE_WEBHOOK_URL"]
   AUTH_TOKEN = ENV["BIKE_WEBHOOK_AUTH_TOKEN"]
 
-  def perform(bike_id)
+  def perform(bike_id, skip_user_update = false)
     bike = Bike.unscoped.where(id: bike_id).first
     return true unless bike.present?
     bike.load_external_images
@@ -16,8 +16,11 @@ class AfterBikeSaveWorker < ApplicationWorker
     if bike.present? && bike.listing_order != bike.calculated_listing_order
       bike.update_attribute :listing_order, bike.calculated_listing_order
     end
-    # Update the user to update any user alerts relevant to bikes
-    AfterUserChangeWorker.new.perform(bike.owner.id, bike.owner.reload) if bike.owner.present?
+    update_ownership(bike)
+    unless skip_user_update
+      # Update the user to update any user alerts relevant to bikes
+      AfterUserChangeWorker.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
+    end
     return true unless bike.status_stolen? # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
   end
@@ -61,5 +64,12 @@ class AfterBikeSaveWorker < ApplicationWorker
         bike.bike_organizations.create(organization_id: matching_b_param.organization_id)
       end
     end
+  end
+
+  def update_ownership(bike)
+    if bike.soon_current_ownership_id != bike.current_ownership&.id
+      bike.update_attribute :soon_current_ownership_id, bike.current_ownership&.id
+    end
+    bike.soon_current_ownership&.update(updated_at: Time.current)
   end
 end

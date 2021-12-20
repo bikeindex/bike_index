@@ -29,6 +29,7 @@ class Bike < ApplicationRecord
   belongs_to :current_creation_state, class_name: "CreationState"
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :current_impound_record, class_name: "ImpoundRecord"
+  belongs_to :soon_current_ownership, class_name: "Ownership" # TODO: part of #2110 - migrate to be current_ownership after
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
 
