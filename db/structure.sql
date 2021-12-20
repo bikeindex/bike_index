@@ -433,7 +433,8 @@ CREATE TABLE public.bikes (
     address_set_manually boolean DEFAULT false,
     is_phone boolean DEFAULT false,
     conditional_information jsonb DEFAULT '{}'::jsonb,
-    current_impound_record_id bigint
+    current_impound_record_id bigint,
+    soon_current_ownership_id bigint
 );
 
 
@@ -2238,9 +2239,11 @@ CREATE TABLE public.ownerships (
     is_phone boolean DEFAULT false,
     token text,
     previous_ownership_id bigint,
+    organization_id bigint,
     bulk_import_id bigint,
     origin integer,
     status integer,
+    organization_pre_registration boolean DEFAULT false,
     owner_name character varying,
     registration_info jsonb DEFAULT '{}'::jsonb
 );
@@ -4474,6 +4477,13 @@ CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree
 
 
 --
+-- Name: index_bikes_on_soon_current_ownership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_soon_current_ownership_id ON public.bikes USING btree (soon_current_ownership_id);
+
+
+--
 -- Name: index_bikes_on_state_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5017,6 +5027,13 @@ CREATE INDEX index_ownerships_on_creator_id ON public.ownerships USING btree (cr
 --
 
 CREATE INDEX index_ownerships_on_impound_record_id ON public.ownerships USING btree (impound_record_id);
+
+
+--
+-- Name: index_ownerships_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_organization_id ON public.ownerships USING btree (organization_id);
 
 
 --
