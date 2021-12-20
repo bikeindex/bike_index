@@ -2237,7 +2237,12 @@ CREATE TABLE public.ownerships (
     claimed_at timestamp without time zone,
     is_phone boolean DEFAULT false,
     token text,
-    previous_ownership_id bigint
+    previous_ownership_id bigint,
+    bulk_import_id bigint,
+    origin integer,
+    status integer,
+    owner_name character varying,
+    registration_info jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -4991,6 +4996,13 @@ CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING bt
 --
 
 CREATE INDEX index_ownerships_on_bike_id ON public.ownerships USING btree (bike_id);
+
+
+--
+-- Name: index_ownerships_on_bulk_import_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_bulk_import_id ON public.ownerships USING btree (bulk_import_id);
 
 
 --
