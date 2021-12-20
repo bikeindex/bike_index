@@ -45,7 +45,7 @@ class Ownership < ApplicationRecord
     # If this was first registered to an organization and is now being transferred
     # (either because it was pre-registered or an unregistered impounded bike)
     # it counts as a new registration
-    second? && organization.present?
+    second? && calculated_organization.present?
   end
 
   def phone_registration?
@@ -73,7 +73,7 @@ class Ownership < ApplicationRecord
     passed_user == User.fuzzy_email_find(owner_email) || passed_user == user
   end
 
-  def organization
+  def calculated_organization
     # If this is the first ownership, use the creation organization
     return bike.creation_organization if first?
     # Some organizations pre-register bikes and then transfer them. Handle that
@@ -93,8 +93,8 @@ class Ownership < ApplicationRecord
     return false if !send_email || bike.blank? || phone_registration? || bike.example?
     return false if spam_risky_email?
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
-    return true unless organization.present?
-    !organization.enabled?("skip_ownership_email")
+    return true unless calculated_organization.present?
+    !calculated_organization.enabled?("skip_ownership_email")
   end
 
   def set_calculated_attributes
