@@ -6,6 +6,7 @@ class AddCreationStateAttrsToOwnership < ActiveRecord::Migration[5.2]
     add_column :ownerships, :origin, :integer
     add_column :ownerships, :status, :integer
     # Extra stuff
+    # add_column :ownerships, :organization_pre_registration, :boolean, default: false
     add_column :ownerships, :owner_name, :string
     add_column :ownerships, :registration_info, :jsonb, default: {}
   end

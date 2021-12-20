@@ -172,7 +172,7 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
 
       new_ownership = bike.current_ownership
       expect(new_ownership.impound_record).to eq impound_record
-      expect(new_ownership.organization).to eq impound_record.organization
+      expect(new_ownership.calculated_organization).to eq impound_record.organization
       expect(new_ownership.current).to be_truthy
       expect(new_ownership.creator).to eq impound_record_update.user
 
