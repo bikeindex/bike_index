@@ -288,19 +288,24 @@ RSpec.describe Ownership, type: :model do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:creator) { FactoryBot.create(:organization_member, organization: organization) }
       let(:owner_email) { creator.email }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, creator: creator, owner_email: owner_email) }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, creator: creator, owner_email: owner_email) }
       it "is falsey" do
         ownership.reload
-        expect(organization.auto_user_id).to_not eq creator.id
+        expect(ownership.organization_id).to eq organization.id
+        expect(ownership.creator_id).to_not eq organization.auto_user_id
         expect(ownership.self_made?).to be_truthy
         expect(ownership.claimed?).to be_truthy
         expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
       end
       context "auto user" do
         let(:creator) { organization.auto_user }
+        before { creator.confirm(creator.confirmation_token) }
         it "is truthy" do
+          expect(User.fuzzy_email_find(owner_email)&.id).to eq creator.id
           ownership.reload
-          expect(organization.auto_user_id).to eq creator.id
+          expect(ownership.organization_id).to eq organization.id
+          expect(ownership.creator_id).to eq organization.auto_user_id
+          expect(ownership.user_id).to eq creator.id
           expect(ownership.self_made?).to be_truthy
           expect(ownership.claimed?).to be_truthy
           expect(ownership.send("calculated_organization_pre_registration?")).to be_truthy
@@ -310,7 +315,9 @@ RSpec.describe Ownership, type: :model do
           let(:owner_email) { member.email }
           it "is falsey" do
             ownership.reload
-            expect(organization.auto_user_id).to eq creator.id
+            expect(User.fuzzy_email_find(owner_email)&.id).to_not eq creator.id
+            expect(ownership.creator_id).to eq organization.auto_user_id
+            expect(ownership.user_id).to_not eq creator.id
             expect(ownership.self_made?).to be_falsey
             expect(ownership.claimed?).to be_falsey
             expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey

@@ -1,5 +1,17 @@
 class Ownership < ApplicationRecord
-  attr_accessor :creator_email, :user_email
+  ORIGIN_ENUM = {
+    web: 0,
+    embed: 1,
+    embed_extended: 2,
+    embed_partial: 3,
+    api_v1: 4,
+    api_v2: 5,
+    bulk_import_worker: 6,
+    organization_form: 7,
+    creator_unregistered_parking_notification: 8,
+    impound_import: 9,
+    transferred: 10
+  }.freeze
 
   validates_presence_of :owner_email
   validates_presence_of :creator_id
@@ -16,6 +28,10 @@ class Ownership < ApplicationRecord
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
 
+  enum status: Bike::STATUS_ENUM
+  enum pos_kind: Organization::POS_KIND_ENUM
+  enum origin_enum: ORIGIN_ENUM
+
   default_scope { order(:id) }
   scope :current, -> { where(current: true) }
   scope :claimed, -> { where(claimed: true) }
@@ -24,6 +40,8 @@ class Ownership < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
+
+  attr_accessor :creator_email, :user_email
 
   def first?
     # If the ownership is created, use the id created in set_calculated_attributes
@@ -79,7 +97,8 @@ class Ownership < ApplicationRecord
     return organization if organization.present?
     # If this is the first ownership, use the creation organization
     return bike.creation_organization if first?
-    # Some organizations pre-register bikes and then transfer them. Handle that
+    # TODO: part of #2110 - switch to referencing previous ownership.organization_pre_registration
+    # Some organizations pre-register bikes and then transfer them.
     if second? && creator&.member_of?(bike.creation_organization)
       return bike.creation_organization
     end
@@ -142,8 +161,11 @@ class Ownership < ApplicationRecord
     %w[lightspeed_pos ascend_pos].include?(bike.current_creation_state.pos_kind)
   end
 
+  # Some organizations pre-register bikes and then transfer them.
+  # This may be more complicated in the future! For now, calling this good enough.
   def calculated_organization_pre_registration?
-    organization_id.present? && self_made? && creator_id == organization.auto_user_id
-
+    return false if organization_id.blank?
+    return true if creator_unregistered_parking_notification?
+    self_made? && creator_id == organization.auto_user_id
   end
 end

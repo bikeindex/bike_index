@@ -2245,7 +2245,8 @@ CREATE TABLE public.ownerships (
     status integer,
     organization_pre_registration boolean DEFAULT false,
     owner_name character varying,
-    registration_info jsonb DEFAULT '{}'::jsonb
+    registration_info jsonb DEFAULT '{}'::jsonb,
+    kind integer
 );
 
 
@@ -5933,6 +5934,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210820220126'),
 ('20210921181852'),
 ('20211215163717'),
-('20211220183631');
+('20211220183631'),
+('20211220193440');
 
 

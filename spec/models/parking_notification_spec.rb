@@ -78,6 +78,9 @@ RSpec.describe ParkingNotification, type: :model do
       parking_notification.reload
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(parking_notification.bike.creator_unregistered_parking_notification?).to be_truthy
+      # expect(parking_notification.bike.current_ownership.creator_unregistered_parking_notification?).to be_truthy
+      # expect(parking_notification.bike.current_ownership.send("calculated_organization_pre_registration?")).to be_truthy
+      # expect(parking_notification.bike.current_ownership.organization_pre_registration?).to be_truthy
       expect(parking_notification.unregistered_bike).to be_truthy
       expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
