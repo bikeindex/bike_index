@@ -12,6 +12,8 @@ class Ownership < ApplicationRecord
   belongs_to :user, touch: true
   belongs_to :creator, class_name: "User"
   belongs_to :impound_record
+  belongs_to :organization
+  belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
 
   default_scope { order(:id) }
@@ -74,6 +76,7 @@ class Ownership < ApplicationRecord
   end
 
   def calculated_organization
+    return organization if organization.present?
     # If this is the first ownership, use the creation organization
     return bike.creation_organization if first?
     # Some organizations pre-register bikes and then transfer them. Handle that
@@ -102,6 +105,7 @@ class Ownership < ApplicationRecord
     if id.blank? # Some things to set only on create
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
+      self.organization_pre_registration ||= calculated_organization_pre_registration?
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
     end
@@ -136,5 +140,10 @@ class Ownership < ApplicationRecord
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
     return false unless bike.current_creation_state.present?
     %w[lightspeed_pos ascend_pos].include?(bike.current_creation_state.pos_kind)
+  end
+
+  def calculated_organization_pre_registration?
+    organization_id.present? && self_made? && creator_id == organization.auto_user_id
+
   end
 end

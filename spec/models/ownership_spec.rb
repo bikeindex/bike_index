@@ -278,4 +278,45 @@ RSpec.describe Ownership, type: :model do
       end
     end
   end
+
+  describe "calculated_organization_pre_registration?" do
+    let(:ownership) { Ownership.new }
+    it "is false" do
+      expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
+    end
+    context "organization registration" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+      let(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:owner_email) { creator.email }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, creator: creator, owner_email: owner_email) }
+      it "is falsey" do
+        ownership.reload
+        expect(organization.auto_user_id).to_not eq creator.id
+        expect(ownership.self_made?).to be_truthy
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
+      end
+      context "auto user" do
+        let(:creator) { organization.auto_user }
+        it "is truthy" do
+          ownership.reload
+          expect(organization.auto_user_id).to eq creator.id
+          expect(ownership.self_made?).to be_truthy
+          expect(ownership.claimed?).to be_truthy
+          expect(ownership.send("calculated_organization_pre_registration?")).to be_truthy
+        end
+        context "not self made" do
+          let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:owner_email) { member.email }
+          it "is falsey" do
+            ownership.reload
+            expect(organization.auto_user_id).to eq creator.id
+            expect(ownership.self_made?).to be_falsey
+            expect(ownership.claimed?).to be_falsey
+            expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
+          end
+        end
+      end
+    end
+  end
 end

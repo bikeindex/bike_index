@@ -15,10 +15,11 @@ FactoryBot.define do
     factory :ownership_claimed, traits: [:claimed]
     factory :ownership_organization_bike do
       transient do
-        organization { FactoryBot.create(:organization) }
         can_edit_claimed { true }
       end
+      organization { FactoryBot.create(:organization) }
       creator { FactoryBot.create(:organization_member, organization: organization) }
+
       bike do
         FactoryBot.create(:bike_organized,
           organization: organization,
