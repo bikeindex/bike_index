@@ -48,7 +48,7 @@ class Admin::OwnershipsController < Admin::BaseController
   end
 
   def matching_ownerships
-    ownerships = Ownership
+    ownerships = Ownership.unscoped
     @search_initialness = if %w[only_initial only_transferred].include?(params[:search_initialness])
       if params[:search_initialness] == "only_initial"
         ownerships = ownerships.initial
