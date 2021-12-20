@@ -42,9 +42,7 @@ end
 
 task migrate_creation_states: :environment do
   # Get CreationStates that haven't been updated since the updated timestamp
-  # And update 2000 of them!
-  migrate_before = Time.at(MigrateCreationStateToOwnershipWorker::END_TIMESTAMP)
-  CreationState.where("updated_at < ?", migrate_before).order(updated_at: :desc).limit(2000)
+  MigrateCreationStateToOwnershipWorker.limit(5000)
     .pluck(:id).each { |id| MigrateCreationStateToOwnershipWorker.perform_async(id) }
 end
 

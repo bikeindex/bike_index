@@ -1,20 +1,13 @@
-# add_reference :ownerships, :organization, index: true
-# add_reference :ownerships, :bulk_import, index: true
-# add_reference :bikes, :soon_current_ownership, index: true # Rename in future migration!
-# Enums
-# add_column :ownerships, :origin, :integer
-# add_column :ownerships, :status, :integer
-# add_column :ownerships, :pos_kind, :integer
-# Extra stuff
-# add_column :ownerships, :organization_pre_registration, :boolean, default: false
-# add_column :ownerships, :owner_name, :string
-# add_column :ownerships, :registration_info, :jsonb, default: {}
-
 class MigrateCreationStateToOwnershipWorker < ApplicationWorker
   sidekiq_options queue: "low_priority", retry: false
   # This timestamp is when the migration started - so any creation_state with an updated_at *after* this timestamp
   # is assumed to be correct
   END_TIMESTAMP = 1640033379
+
+  def self.creation_states
+    CreationState.where("updated_at < ?", Time.at(END_TIMESTAMP))
+      .order(updated_at: :desc)
+  end
 
   def self.migrate?(creation_state, ownership)
     creation_state.updated_at.to_i < END_TIMESTAMP &&
