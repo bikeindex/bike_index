@@ -30,7 +30,7 @@ class Ownership < ApplicationRecord
 
   enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM
-  enum origin_enum: ORIGIN_ENUM
+  enum origin: ORIGIN_ENUM
 
   default_scope { order(:id) }
   scope :current, -> { where(current: true) }

@@ -10,7 +10,8 @@ class CreationState < ApplicationRecord
     bulk_import_worker: 6,
     organization_form: 7,
     creator_unregistered_parking_notification: 8,
-    impound_import: 9
+    impound_import: 9,
+    transferred: 10
   }.freeze
 
   belongs_to :bike
@@ -35,7 +36,7 @@ class CreationState < ApplicationRecord
   end
 
   def creation_description
-    if is_pos
+    if is_pos || pos_kind.present? && pos_kind != "no_pos"
       pos_kind.to_s.gsub("_pos", "").humanize
     elsif is_bulk
       "bulk import"
@@ -50,13 +51,13 @@ class CreationState < ApplicationRecord
   def set_calculated_attributes
     self.origin = "web" unless self.class.origins.include?(origin)
     self.status ||= bike&.status
+    self.pos_kind ||= calculated_pos_kind
     self.origin_enum ||= if status == "unregistered_parking_notification" || origin == "unregistered_parking_notification"
       "creator_unregistered_parking_notification"
     else
       origin
     end
     self.registration_info = cleaned_registration_info
-    self.pos_kind ||= calculated_pos_kind
     # Hack, only set on create. TODO: should be passed from pos integration
     # currently, lightspeed is using API v1, so that's where this needs to come from
     self.is_new = pos_kind != "no_pos" if id.blank?

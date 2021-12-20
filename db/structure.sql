@@ -2246,7 +2246,7 @@ CREATE TABLE public.ownerships (
     organization_pre_registration boolean DEFAULT false,
     owner_name character varying,
     registration_info jsonb DEFAULT '{}'::jsonb,
-    kind integer
+    pos_kind integer
 );
 
 
