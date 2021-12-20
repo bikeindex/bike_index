@@ -1,0 +1,31 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Ownerships
+  .col-md-7
+    %ul
+      %li.nav-item.dropdown
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_initialness != "all" ? "active" : "") }
+          #{@search_initialness.titleize}
+        .dropdown-menu
+          = link_to "All kinds", url_for(sortable_search_params.merge(search_initialness: nil)), class: "dropdown-item #{@search_initialness == 'all' ? 'active' : '' }"
+          = link_to "Only initial", url_for(sortable_search_params.merge(search_initialness: "only_initial")), class: "dropdown-item #{@search_initialness == 'only_initial' ? 'active' : '' }"
+          = link_to "Only transferred", url_for(sortable_search_params.merge(search_initialness: "only_transferred")), class: "dropdown-item #{@search_initialness == 'only_transferred' ? 'active' : '' }"
+      %li.nav-item
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Ownerships" }
+
+
+= render partial: "/shared/period_select"
+
+.row.mb-4.mt-4
+  .col-sm-6.col-lg-4.mt-4
+    = admin_number_display(matching_ownerships.count)
+    = "matching Ownerships".pluralize(matching_ownerships.count)
+    %em
+      = humanized_time_range_column(@time_range_column)
+      = humanized_time_range(@time_range)
+  .col-lg-4
+    = paginate @ownerships, views_prefix: "admin"
+
+= render partial: "/admin/ownerships/table", locals: { ownerships: @ownerships, render_sortable: true }
