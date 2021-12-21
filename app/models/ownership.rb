@@ -196,7 +196,7 @@ class Ownership < ApplicationRecord
   end
 
   def cleaned_registration_info
-    return nil unless registration_info.present?
+    return {} unless registration_info.present?
     self.owner_name ||= registration_info["user_name"]
     registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
     registration_info.reject { |k, v| v.blank? }
