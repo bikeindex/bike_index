@@ -115,7 +115,9 @@
       - emails = @organization.users.pluck(:email)
       - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
       .form-group.fancy-select.unfancy
-        = f.label :embedable_user_email
+        = f.label :embedable_user_email do
+          Auto user email
+          %small.less-strong embed registration email
         = f.select :embedable_user_email, emails, { prompt: "Select email", selected: @embedable_email }, class: "form-control"
         %small.less-strong
           - if @organization.memberships.count == 0

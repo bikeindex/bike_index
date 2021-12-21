@@ -33,18 +33,20 @@ RSpec.describe BikeUpdator do
       bike = FactoryBot.create(:bike)
       user = FactoryBot.create(:user)
       expect(bike.updator_id).to be_nil
+      expect(Ownership.count).to eq 0
       update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}}.as_json, user: user)
-      expect_any_instance_of(OwnershipCreator).to receive(:create_ownership)
       update_bike.update_ownership
       bike.reload
       expect(bike.updator).to eq(user)
+      expect(Ownership.count).to eq 1
     end
 
     it "does not call create_ownership if the email hasn't changed" do
       bike = FactoryBot.create(:bike, owner_email: "another@email.co")
-      update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}}.as_json)
-      expect_any_instance_of(OwnershipCreator).not_to receive(:create_ownership)
+      update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json)
+      expect(Ownership.count).to eq 0
       update_bike.update_ownership
+      expect(Ownership.count).to eq 0
     end
   end
 

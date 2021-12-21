@@ -10,15 +10,17 @@ FactoryBot.define do
     trait :claimed do
       claimed { true }
       user { creator } # Reduce the number of things added to the database
+      owner_email { user.email }
       claimed_at { Time.current - 1.hour }
     end
     factory :ownership_claimed, traits: [:claimed]
     factory :ownership_organization_bike do
       transient do
-        organization { FactoryBot.create(:organization) }
         can_edit_claimed { true }
       end
+      organization { FactoryBot.create(:organization) }
       creator { FactoryBot.create(:organization_member, organization: organization) }
+
       bike do
         FactoryBot.create(:bike_organized,
           organization: organization,

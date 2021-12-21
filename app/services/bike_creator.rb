@@ -82,6 +82,11 @@ class BikeCreator
     }.merge(registration_info: @b_param.registration_info_attrs)
   end
 
+  def ownership_creation_attributes
+    creation_state_attributes.except(:is_bulk, :is_pos)
+      .merge(pos_kind: @b_param.pos_kind)
+  end
+
   # Previously all of this stuff was public.
   # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
 
@@ -149,7 +154,7 @@ class BikeCreator
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
     if @bike.present? && @bike.id.present? && @bike.current_creation_state.blank?
       # Only place creation_state should be created (except in testing)
-      @bike.creation_states.create(creation_state_attributes)
+      @bike.creation_states.create(creation_state_attributes.merge(ownership_id: @bike.current_ownership&.id))
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker_code.present? && @bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: @bike.creation_organization.id)
@@ -251,6 +256,8 @@ class BikeCreator
       attach_photo(bike)
       attach_photos(bike)
       bike.reload.save
+      # TODO: post #2110 - remove ComponentsCreatorError and ownership raise,
+      # I think we don't need to rescue anymore
     rescue => e
       bike.errors.add(:association_error, e.message)
     end
@@ -258,8 +265,15 @@ class BikeCreator
   end
 
   def create_ownership(bike)
-    OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: !@b_param.skip_owner_email?)
-      .create_ownership
+    ownership = bike.ownerships.new(creator: @b_param.creator, skip_email: @b_param.skip_email?)
+    ownership.attributes = ownership_creation_attributes
+    unless ownership.save
+      ownership.errors.messages.each do |message|
+        bike.errors.add(message[0], message[1][0])
+      end
+      raise "Ownership wasn't saved. Are you sure the bike was created?"
+    end
+    ownership
   end
 
   def create_parking_notification(b_param, bike)

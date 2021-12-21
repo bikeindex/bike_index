@@ -40,6 +40,12 @@ task exchange_rates_update: :environment do
   print is_success ? "done.\n" : "failed.\n"
 end
 
+task migrate_creation_states: :environment do
+  # Get CreationStates that haven't been updated since the updated timestamp
+  MigrateCreationStateToOwnershipWorker.creation_states.limit(5000)
+    .pluck(:id).each { |id| MigrateCreationStateToOwnershipWorker.perform_async(id) }
+end
+
 task database_size: :environment do
   database_name = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
   sql = "SELECT pg_size_pretty(pg_database_size('#{database_name}'));"

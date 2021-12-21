@@ -1,0 +1,67 @@
+- render_sortable ||= false
+- skip_bike ||= false
+
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        %small= sortable "updated_at", render_sortable: render_sortable
+      - unless skip_bike
+        %th
+          %small Bike
+      %th
+        Creator
+      %th
+        = sortable "owner_email", render_sortable: render_sortable
+      %th
+        = sortable "organization_id", render_sortable: render_sortable
+      %th
+        %small Current?
+      %th
+        %small Claimed?
+      %th.d-none.d-md-table-cell
+        %small User&nbsp;hidden
+    %tbody
+      - ownerships.each do |ownership|
+        %tr
+          %td
+            .less-strong-hold
+              %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
+                = l ownership.created_at, format: :convert_time
+              - if display_dev_info?
+                &nbsp;
+                %span.less-strong-right.d-none.d-md-block.only-dev-visible
+                  = ownership.id
+          %td
+            %small.convertTime
+              = l ownership.updated_at, format: :convert_time
+          - unless skip_bike
+            %td
+              - if ownership.bike.present?
+                %small
+                  = link_to bike_title_html(ownership.bike), admin_bike_path(ownership.bike)
+              - else
+                %small.text-danger Missing Bike ##{ownership.bike_id}
+          %td
+            - creator = ownership.creator
+            - if creator.blank?
+              %em.text-warning user deleted
+              - if display_dev_info?
+                %span.only-dev-visible
+                  \##{ownership.creator_id}
+            - elsif creator.name.present?
+              = creator.name
+            - else
+              = creator.email
+          %td
+            = ownership.owner_email
+          %td
+            = ownership.organization&.name
+          %td.table-cell-check
+            = check_mark if ownership.current
+          %td.table-cell-check
+            = check_mark if ownership.claimed
+          %td.table-cell-check.d-none.d-md-table-cell
+            = check_mark if ownership.user_hidden

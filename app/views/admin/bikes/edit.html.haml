@@ -179,7 +179,7 @@
     .col.text-right
       = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
-#BParamsView.mt-4.collapse
+#BParamsView.mt-4.collapse{class: (display_dev_info? ? "show in" : "")}
   %hr
   .row
     .col-md-6.mt-2
@@ -217,6 +217,57 @@
               %td Edit claimed?
               %td= bike_organization.can_edit_claimed
   .row
+    - @bike.ownerships.each do |ownership|
+      .col-md-6.mt-2
+        %table.table-list
+          %tbody
+            %tr
+              %td Kind
+              %td
+                Ownership
+                - if @bike.soon_current_ownership_id == ownership.id
+                  %span.text-success Current
+                - elsif ownership.current?
+                  %small.less-strong Current but not set on Bike
+                - else
+                  %span.text-info transferred
+            %tr
+              %td
+                Created
+              %td
+                %span.convertTime
+                  = l ownership.created_at, format: :convert_time
+                - if display_dev_info?
+                  %code.only-dev-visible.small.ml-2
+                    ID: #{ownership.id}
+            %tr
+              %td
+                Updated
+              %td
+                %span.convertTime
+                  = l ownership.updated_at, format: :convert_time
+            %tr
+              %td
+                Organization
+              %td
+                - if ownership.organization_id.present?
+                  - org_display_name = Organization.unscoped.find(ownership.organization_id)&.name || ownership.organization_id
+                  = link_to org_display_name, admin_organization_path(ownership.organization_id)
+            %tr
+              %td
+                Creator
+              %td
+                - if ownership.creator_id.present?
+                  - creator_display_name = ownership.creator&.display_name || ownership.creator_id
+                  = link_to creator_display_name, admin_user_path(ownership.creator_id)
+            - if ownership.registration_info.present?
+              - ownership.registration_info.each do |k, v|
+                %tr
+                  %td= k
+                  %td= v
+      .col-md-6.mt-2
+        = pretty_print_json(ownership.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at", "token"))
+  .row.mt-2
     - @bike.creation_states.each do |creation_state|
       .col-md-6.mt-2
         %table.table-list
@@ -296,7 +347,9 @@
     %p
       No <code>BParams</code> exist
 
-.mt-4
-  %a.gray-link{ href: "#BParamsView", data: { toggle: "collapse", target: "#BParamsView" } }
-    Creation data & developer information
+-# If display_dev_info, the creation data always shows up
+- unless display_dev_info?
+  .mt-4
+    %a.gray-link{ href: "#BParamsView", data: { toggle: "collapse", target: "#BParamsView" } }
+      Creation data & developer information
 

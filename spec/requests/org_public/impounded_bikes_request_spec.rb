@@ -48,7 +48,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   context "organization has impound_bikes" do
     let(:impound_configuration) { FactoryBot.create(:impound_configuration, public_view: true) }
     let(:current_organization) { impound_configuration.organization }
-    let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification, organization: current_organization) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, organization: current_organization) }
     let!(:bike) { parking_notification.bike }
     it "renders, shows impounded bike" do
       expect(current_organization.public_impound_bikes?).to be_truthy

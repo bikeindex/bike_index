@@ -1,26 +1,14 @@
 # ONLY created in BikeCreator in production
 class CreationState < ApplicationRecord
-  ORIGIN_ENUM = {
-    web: 0,
-    embed: 1,
-    embed_extended: 2,
-    embed_partial: 3,
-    api_v1: 4,
-    api_v2: 5,
-    bulk_import_worker: 6,
-    organization_form: 7,
-    creator_unregistered_parking_notification: 8,
-    impound_import: 9
-  }.freeze
-
   belongs_to :bike
   belongs_to :organization # Duplicates Bike#creation_organization_id - generally, use the creation_state organization
   belongs_to :creator, class_name: "User"
   belongs_to :bulk_import
+  belongs_to :ownership
 
   enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM
-  enum origin_enum: ORIGIN_ENUM
+  enum origin_enum: Ownership::ORIGIN_ENUM
 
   before_validation :set_calculated_attributes
   after_create :create_bike_organization
@@ -35,7 +23,7 @@ class CreationState < ApplicationRecord
   end
 
   def creation_description
-    if is_pos
+    if is_pos || pos_kind.present? && pos_kind != "no_pos"
       pos_kind.to_s.gsub("_pos", "").humanize
     elsif is_bulk
       "bulk import"
@@ -50,13 +38,13 @@ class CreationState < ApplicationRecord
   def set_calculated_attributes
     self.origin = "web" unless self.class.origins.include?(origin)
     self.status ||= bike&.status
+    self.pos_kind ||= calculated_pos_kind
     self.origin_enum ||= if status == "unregistered_parking_notification" || origin == "unregistered_parking_notification"
       "creator_unregistered_parking_notification"
     else
       origin
     end
     self.registration_info = cleaned_registration_info
-    self.pos_kind ||= calculated_pos_kind
     # Hack, only set on create. TODO: should be passed from pos integration
     # currently, lightspeed is using API v1, so that's where this needs to come from
     self.is_new = pos_kind != "no_pos" if id.blank?

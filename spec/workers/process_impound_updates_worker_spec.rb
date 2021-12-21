@@ -28,7 +28,7 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
 
   context "unregistered_parking_notification" do
     let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours, status: "unregistered_parking_notification") }
-    let!(:parking_notification) { FactoryBot.create(:unregistered_parking_notification, kind: "impound_notification", bike: bike) }
+    let!(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, kind: "impound_notification", bike: bike) }
     it "marks the bike not hidden" do
       impound_record.update(parking_notification: parking_notification)
       impound_record.reload
@@ -171,7 +171,7 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
       expect(bike.owner_email).to eq "something@party.com"
 
       new_ownership = bike.current_ownership
-      expect(new_ownership.impound_record).to eq impound_record
+      expect(new_ownership.impound_record_id).to eq impound_record.id
       expect(new_ownership.calculated_organization).to eq impound_record.organization
       expect(new_ownership.current).to be_truthy
       expect(new_ownership.creator).to eq impound_record_update.user

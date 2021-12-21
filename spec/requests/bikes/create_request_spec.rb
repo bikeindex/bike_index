@@ -173,7 +173,7 @@ RSpec.describe "BikesController#create", type: :request do
 
           ownership = new_bike.current_ownership
           expect(ownership.claimed?).to be_truthy
-          expect(ownership.send_email?).to be_falsey
+          expect(ownership.send_email).to be_falsey
           expect(ownership.self_made?).to be_truthy
           expect(ownership.impound_record_id).to eq impound_record.id
         end

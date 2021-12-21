@@ -227,7 +227,7 @@ RSpec.describe "BikesController#show", type: :request do
     let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
     let(:parking_notification) do
       current_organization.update_attributes(auto_user: auto_user)
-      FactoryBot.create(:unregistered_parking_notification, organization: current_organization, user: current_organization.auto_user)
+      FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_organization.auto_user)
     end
     let!(:bike) { parking_notification.bike }
 

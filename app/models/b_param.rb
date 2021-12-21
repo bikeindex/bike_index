@@ -217,6 +217,15 @@ class BParam < ApplicationRecord
     bike["is_new"] || false
   end
 
+  def bulk_import
+    BulkImport.find_by_id(params["bulk_import_id"])
+  end
+
+  def pos_kind
+    return "lightspeed_pos" if is_pos
+    bulk_import&.ascend? ? "ascend_pos" : "no_pos"
+  end
+
   def is_bulk
     bike["is_bulk"] || false
   end
@@ -265,7 +274,7 @@ class BParam < ApplicationRecord
     bike && bike["owner_email"]
   end
 
-  def skip_owner_email?
+  def skip_email?
     return true if status_impounded? || unregistered_parking_notification?
     send_email = params.dig("bike", "send_email").to_s
     send_email.present? && !ParamsNormalizer.boolean(send_email)

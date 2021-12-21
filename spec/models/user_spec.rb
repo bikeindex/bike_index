@@ -358,30 +358,36 @@ RSpec.describe User, type: :model do
   end
 
   describe "bikes" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
     it "returns nil if the user has no bikes" do
-      user = FactoryBot.create(:user)
       expect(user.bikes).to be_empty
     end
     it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
-      user = FactoryBot.create(:user)
-      o = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id)
-      o2 = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id)
-      o2.bike.update_attribute :hidden, true
-      expect(user.bike_ids.include?(o.bike.id)).to be_truthy
-      expect(user.bike_ids.include?(o2.bike.id)).not_to be_truthy
-      expect(user.bike_ids.count).to eq(1)
-    end
-    it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
-      user = FactoryBot.create(:user)
-      ownership = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
-      ownership.bike.update_attribute :hidden, true
-      expect(user.bike_ids.include?(ownership.bike.id)).to be_truthy
-    end
-    it "returns the user's bikes without hidden bikes if user_hidden" do
-      user = FactoryBot.create(:user)
-      ownership = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
-      ownership.bike.update_attribute :hidden, true
-      expect(user.bike_ids(false).include?(ownership.bike.id)).to be_falsey
+      ownership1 = FactoryBot.create(:ownership, owner_email: user.email, creator: user)
+      bike1_id = ownership1.bike_id
+      expect(ownership1.reload.self_made?).to be_truthy
+      expect(ownership1.claimed?).to be_truthy
+      ownership2 = FactoryBot.create(:ownership, owner_email: user.email, creator: user)
+      bike2_id = ownership2.bike_id
+      bike_example = FactoryBot.create(:bike, owner_email: user.email, example: true, creator: user)
+      FactoryBot.create(:ownership, owner_email: user.email, example: true, bike: bike_example, creator: user)
+
+      expect(user.bike_ids.include?(ownership1.bike.id)).to be_truthy
+      expect(user.bike_ids.include?(ownership2.bike.id)).to be_truthy
+
+      ownership1.bike.update(marked_user_hidden: true)
+      expect(ownership1.reload.claimed?).to be_truthy
+      expect(ownership1.user_hidden?).to be_truthy
+      expect(ownership1.bike.hidden?).to be_truthy
+
+      expect(user.reload.bike_ids).to match_array([bike1_id, bike2_id])
+      expect(user.bike_ids(false)).to eq([bike2_id])
+
+      # And if the bike is destroyed - it doesn't get returned ever!
+      ownership1.bike.destroy
+      ownership2.bike.destroy
+      expect(user.reload.bike_ids).to eq([])
+      expect(user.bike_ids(false)).to eq([])
     end
   end
 

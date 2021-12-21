@@ -11,6 +11,37 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
+  describe "send_notification_and_update_other_ownerships" do
+    let(:ownership1) { FactoryBot.create(:ownership) }
+    let(:bike) { ownership1.bike }
+    let!(:ownership2) { FactoryBot.create(:ownership, bike: bike) }
+    it "marks existing ownerships as not current" do
+      ownership2.reload
+      Sidekiq::Worker.clear_all
+      expect {
+        bike.ownerships.create(creator: ownership2.creator,
+          owner_email: "s@s.com")
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      expect(bike.ownerships.count).to eq 3
+      expect(bike.reload.send("calculated_current_ownership")&.id).to be > ownership2.id
+      expect(ownership1.reload.current).to be_falsey
+      expect(ownership2.reload.current).to be_falsey
+    end
+  end
+
+  describe "phone registration" do
+    let(:bike) { FactoryBot.create(:bike, :phone_registration) }
+    it "adds as a phone registration" do
+      expect(bike.phone).to be_present
+      ownership = bike.ownerships.new
+      expect(ownership).to be_valid
+      expect(ownership.save).to be_truthy
+      expect(ownership.calculated_send_email).to be_falsey
+      expect(ownership.phone_registration?).to be_truthy
+      expect(ownership.owner_email).to eq bike.phone
+    end
+  end
+
   describe "claim_message" do
     let(:email) { "joe@example.com" }
     let(:ownership) { Ownership.new(current: true) }
@@ -192,13 +223,16 @@ RSpec.describe Ownership, type: :model do
   end
 
   describe "calculated_send_email" do
-    let(:bike) { Bike.new }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:ownership) { Ownership.new(bike: bike) }
     it "is true" do
-      expect(Ownership.new(bike: bike).calculated_send_email).to be_truthy
+      expect(ownership.send(:spam_risky_email?)).to be_falsey
+      expect(ownership.calculated_send_email).to be_truthy
     end
     context "send email is false" do
+      let(:ownership) { Ownership.new(send_email: false, bike: bike) }
       it "is false" do
-        expect(Ownership.new(send_email: false, bike: bike).calculated_send_email).to be_falsey
+        expect(ownership.calculated_send_email).to be_falsey
       end
     end
     context "example bike" do
@@ -230,9 +264,8 @@ RSpec.describe Ownership, type: :model do
   describe "spam_risky_email?" do
     # hotmail and yahoo have been delaying our emails. In an effort to ensure delivery of really important emails (e.g. password resets)
     # skip sending ownership invitations for POS registrations, just in case
-    let(:bike) { Bike.new(owner_email: email, current_creation_state: creation_state) }
-    let(:ownership) { Ownership.new(bike: bike, owner_email: email) }
-    let(:creation_state) { CreationState.new(pos_kind: pos_kind) }
+    let(:bike) { FactoryBot.create(:bike, owner_email: email) }
+    let(:ownership) { Ownership.new(bike: bike, owner_email: email, pos_kind: pos_kind) }
     let(:pos_kind) { "lightspeed_pos" }
     context "gmail email" do
       let(:email) { "test@gmail.com" }
@@ -272,8 +305,80 @@ RSpec.describe Ownership, type: :model do
       context "not pos registration" do
         let(:pos_kind) { "no_pos" }
         it "sends" do
+          expect(bike).to be_present
+          expect(ownership.bike).to be_present
+          expect(ownership.bike.example?).to be_falsey
+          expect(ownership.phone_registration?).to be_falsey
           expect(ownership.send(:spam_risky_email?)).to be_falsey
           expect(ownership.calculated_send_email).to be_truthy
+        end
+      end
+    end
+  end
+
+  describe "calculated_organization_pre_registration?" do
+    let(:ownership) { Ownership.new }
+    it "is false" do
+      expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
+    end
+    context "organization registration" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+      let(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:owner_email) { creator.email }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, creator: creator, owner_email: owner_email) }
+      it "is falsey" do
+        ownership.reload
+        expect(ownership.organization_id).to eq organization.id
+        expect(ownership.creator_id).to_not eq organization.auto_user_id
+        expect(ownership.self_made?).to be_truthy
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
+      end
+      context "auto user" do
+        let(:creator) { organization.auto_user }
+        before { creator.confirm(creator.confirmation_token) }
+        it "is truthy" do
+          expect(User.fuzzy_email_find(owner_email)&.id).to eq creator.id
+          ownership.reload
+          expect(ownership.organization_id).to eq organization.id
+          expect(ownership.creator_id).to eq organization.auto_user_id
+          expect(ownership.user_id).to eq creator.id
+          expect(ownership.self_made?).to be_truthy
+          expect(ownership.claimed?).to be_truthy
+          expect(ownership.send("calculated_organization_pre_registration?")).to be_truthy
+        end
+        context "not self made" do
+          let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:owner_email) { member.email }
+          it "is falsey" do
+            ownership.reload
+            expect(User.fuzzy_email_find(owner_email)&.id).to_not eq creator.id
+            expect(ownership.creator_id).to eq organization.auto_user_id
+            expect(ownership.user_id).to_not eq creator.id
+            expect(ownership.self_made?).to be_falsey
+            expect(ownership.claimed?).to be_falsey
+            expect(ownership.send("calculated_organization_pre_registration?")).to be_falsey
+          end
+        end
+        context "not first" do
+          let(:bike) { ownership.bike }
+          let(:ownership2) { FactoryBot.create(:ownership, bike: bike, organization: organization, creator: creator, owner_email: owner_email) }
+          it "is falsey" do
+            ownership.reload
+            expect(ownership.send("calculated_organization_pre_registration?")).to be_truthy
+            expect(User.fuzzy_email_find(owner_email)&.id).to eq creator.id
+            ownership2.reload
+            expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
+            expect(ownership2.previous_ownership_id).to eq ownership.id
+            expect(ownership2.organization_id).to eq organization.id
+            expect(ownership2.creator_id).to eq organization.auto_user_id
+            expect(ownership2.user_id).to eq creator.id
+            expect(ownership2.self_made?).to be_truthy
+            expect(ownership2.claimed?).to be_truthy
+            expect(ownership2.send("calculated_organization_pre_registration?")).to be_truthy
+            bike.reload
+            expect(bike.current_ownership&.id).to eq ownership2.id
+          end
         end
       end
     end

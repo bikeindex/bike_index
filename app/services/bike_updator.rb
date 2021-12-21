@@ -27,12 +27,9 @@ class BikeUpdator
     # Since we've deleted the owner_email from the update hash, we have to assign it here
     # This is required because ownership_creator uses it :/ - not a big fan of this side effect though
     @bike.owner_email = new_owner_email
-    # This is what we should've been doing a long time ago - we should migrate send_email to skip_email everywhere :/
-    skip_email = ParamsNormalizer.boolean(@bike_params.dig("bike", "skip_email"))
-    OwnershipCreator.new(owner_email: new_owner_email,
-      bike: @bike,
+    @bike.ownerships.create(owner_email: new_owner_email,
       creator: @user,
-      send_email: !skip_email).create_ownership
+      skip_email: @bike_params.dig("bike", "skip_email"))
     # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
     @bike.update(status: "status_with_owner", marked_user_unhidden: true) if @bike.unregistered_parking_notification?
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner

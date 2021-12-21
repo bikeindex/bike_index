@@ -29,6 +29,7 @@ class Bike < ApplicationRecord
   belongs_to :current_creation_state, class_name: "CreationState"
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :current_impound_record, class_name: "ImpoundRecord"
+  belongs_to :soon_current_ownership, class_name: "Ownership" # TODO: part of #2110 - migrate to be current_ownership after
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
 
@@ -910,6 +911,7 @@ class Bike < ApplicationRecord
   def set_calculated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     fetch_current_impound_record # Used by a bunch of things, but this method is private
+    self.soon_current_ownership = calculated_current_ownership
     set_location_info
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
@@ -1024,5 +1026,9 @@ class Bike < ApplicationRecord
   def authorization_requires_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
+  end
+
+  def calculated_current_ownership
+    ownerships.order(:id).last
   end
 end
