@@ -51,7 +51,10 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         expect(creation_state.pos_kind).to eq "ascend_pos"
         expect(creation_state.origin_enum).to eq "bulk_import_worker"
 
+        Sidekiq::Worker.clear_all
         subject.perform(creation_state.id)
+        pp Sidekiq::Worker.jobs
+        expect(AfterBikeSaveWorker.jobs.count).to eq 0
         ownership.reload
         creation_state.reload
         expect(creation_state.ownership_id).to eq ownership.id
