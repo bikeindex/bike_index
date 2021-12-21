@@ -34,6 +34,8 @@ class Ownership < ApplicationRecord
 
   default_scope { order(:id) }
   scope :current, -> { where(current: true) }
+  scope :user_hidden, -> { where(user_hidden: true) }
+  scope :not_user_hidden, -> { where(user_hidden: false) }
   scope :claimed, -> { where(claimed: true) }
   scope :initial, -> { where(previous_ownership_id: nil) }
   scope :transferred, -> { where.not(previous_ownership_id: nil) }
@@ -46,6 +48,10 @@ class Ownership < ApplicationRecord
   def bike
     # Get it unscoped, because example/hidden/deleted
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+  end
+
+  def bike_scoped
+    Bike.find_by_id(bike_id)
   end
 
   def first?

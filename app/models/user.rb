@@ -322,13 +322,12 @@ class User < ApplicationRecord
   end
 
   def bike_ids(user_hidden = true)
-    ows = ownerships.includes(:bike).where(example: false, current: true)
-    ows = if user_hidden
-      ows.map { |o| o.bike_id if o.user_hidden || o.bike }
-    else
-      ows.map { |o| o.bike_id if o.bike }
-    end
-    ows.reject(&:blank?)
+    owns = ownerships.where(example: false, current: true)
+    owns = owns.not_user_hidden unless user_hidden
+
+    # TODO: This isn't great - but it's better than before #2110
+    owns_bike_ids = owns.pluck(:bike_id)
+    owns_bike_ids - Bike.unscoped.deleted.where(id: owns_bike_ids).pluck(:id)
   end
 
   # Just check a couple, so we don't move too slowly
