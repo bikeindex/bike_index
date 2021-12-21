@@ -14,9 +14,14 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
       ownership.created_at.to_i < END_TIMESTAMP
   end
 
+  def self.creation_states_with_earlier
+    CreationState.where("updated_at > ?", Time.at(END_TIMESTAMP))
+      .where(ownership_id: nil)
+  end
+
   def perform(creation_state_id, ownership_id = nil)
     creation_state = CreationState.find(creation_state_id)
-    handle_duplicate_creation_states(creation_state)
+    return if earlier_duplicate_creation_states?(creation_state)
 
     bike = Bike.unscoped.find_by_id(creation_state.bike_id)
 
@@ -34,7 +39,7 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
     end
   end
 
-  def handle_duplicate_creation_states(creation_state)
+  def earlier_duplicate_creation_states?(creation_state)
     # Handle duplicate creation states
     other_creation_states = CreationState.where(bike_id: creation_state.bike_id).where.not(id: creation_state.id)
     matching_creation_states = other_creation_states.select do |ocs|
@@ -45,9 +50,12 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
       creation_state.update(registration_info: creation_state.registration_info.merge("deleted_creation_states" => matching_ids))
       matching_creation_states.map(&:destroy)
     end
-    earlier_creation_states = other_creation_states.where.not(id: matching_ids).where("id < ?", creation_state.id)
-    return true unless earlier_creation_states.any?
-    raise "Earlier Creation State - Bike: #{creation_state.bike_id}"
+    # Exit this method if there are no earlier creation states
+    if other_creation_states.where.not(id: matching_ids).where("id < ?", creation_state.id).none?
+      return false
+    end
+    creation_state.touch
+    true
   end
 
   def migrate(creation_state, ownership, bike)

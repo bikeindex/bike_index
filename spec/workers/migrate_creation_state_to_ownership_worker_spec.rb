@@ -176,9 +176,11 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
           expect(described_class.migrate?(creation_state, ownership)).to be_falsey
           expect(creation_state.registration_info["deleted_creation_states"]).to be_blank
 
-          expect {
-            subject.perform(creation_state2.id)
-          }.to raise_error
+          ownership_updated_at = ownership.updated_at
+          subject.perform(creation_state2.id)
+          # It shouldn't have updated the ownership!
+          expect(ownership.reload.updated_at).to eq ownership_updated_at
+          expect(MigrateCreationStateToOwnershipWorker.creation_states_with_earlier.pluck(:id)).to eq([creation_state2.id])
         end
       end
     end
