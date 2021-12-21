@@ -72,18 +72,10 @@
       .form-group
         = f.label :frame_model
         = f.text_field :frame_model, class: "form-control"
-    .col-md-4.col-lg-3
+    .col-md-4.col-lg-6
       .form-group
         = f.label :description
         = f.text_area :description, class: "form-control"
-    .col-md-4.col-lg-3
-      %span.less-strong.d-inline-block
-        = f.label :hidden do
-          = f.check_box :hidden
-          - if @bike.user_hidden
-            User hidden
-          - else
-            Hidden (oldskool fake delete)
   .row.mt-2
     .col-md-4.col-lg-6
       .form-group
