@@ -246,7 +246,9 @@ RSpec.describe BikeCreator do
             rear_wheel_size_id: wheel_size.id,
             primary_frame_color_id: color.id,
             handlebar_type: "bmx",
-            owner_email: "stuff@stuff.com"
+            owner_email: "stuff@stuff.com",
+            user_name: "Sally",
+            street: "Somewhere Ville"
           }
         })
         instance = subject.new(b_param)
@@ -256,6 +258,17 @@ RSpec.describe BikeCreator do
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.bike_organizations.count).to eq 1
         expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+        expect(bike.registration_address).to eq({"street" => "Somewhere Ville"})
+        expect(bike.owner_name).to eq "Sally"
+
+        # And then test ownership
+        expect(bike.ownerships.count).to eq 1
+        ownership = bike.ownerships.first
+        expect(bike.soon_current_ownership_id).to eq ownership.id
+        expect(ownership.organization_id).to eq organization.id
+        expect(ownership.owner_email).to eq "stuff@stuff.com"
+        expect(ownership.owner_name).to eq "Sally"
+        expect(ownership.address_hash).to eq({"street" => "Somewhere Ville"})
       end
     end
 
@@ -265,6 +278,11 @@ RSpec.describe BikeCreator do
       expect(instance).to receive(:find_or_build_bike).and_return(bike)
       response = instance.create_bike
       expect(response.errors[:errory]).to eq(["something"])
+    end
+
+    context "with registration_info" do
+      it "saves registration_info on ownership" do
+      end
     end
   end
 
@@ -562,25 +580,6 @@ RSpec.describe BikeCreator do
   end
 
   # Old BikeCreatorAssociator specs
-  describe "create_ownership" do
-    it "calls create ownership" do
-      bike = Bike.new
-      allow(b_param).to receive(:params).and_return({bike: bike}.as_json)
-      allow(b_param).to receive(:creator).and_return("creator")
-      expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
-      subject.new(b_param).send("create_ownership", bike)
-      expect(b_param.skip_owner_email?).to be_falsey
-    end
-    it "calls create ownership with send_email false if b_param has that" do
-      bike = Bike.new
-      allow(b_param).to receive(:params).and_return({bike: {send_email: false}}.as_json)
-      allow(b_param).to receive(:creator).and_return("creator")
-      expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
-      subject.new(b_param).send("create_ownership", bike)
-      expect(b_param.skip_owner_email?).to be_truthy
-    end
-  end
-
   describe "attach_photo" do
     it "creates public images for the attached image" do
       bike = FactoryBot.create(:bike)

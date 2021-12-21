@@ -2232,7 +2232,7 @@ CREATE TABLE public.ownerships (
     current boolean DEFAULT false,
     claimed boolean,
     example boolean DEFAULT false NOT NULL,
-    send_email boolean DEFAULT true,
+    legacy_send_email boolean DEFAULT true,
     user_hidden boolean DEFAULT false NOT NULL,
     impound_record_id bigint,
     claimed_at timestamp without time zone,
@@ -2246,7 +2246,9 @@ CREATE TABLE public.ownerships (
     organization_pre_registration boolean DEFAULT false,
     owner_name character varying,
     registration_info jsonb DEFAULT '{}'::jsonb,
-    pos_kind integer
+    pos_kind integer,
+    is_new boolean DEFAULT false,
+    skip_email boolean DEFAULT false
 );
 
 
@@ -5935,6 +5937,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210921181852'),
 ('20211215163717'),
 ('20211220183631'),
-('20211220193440');
+('20211220193440'),
+('20211221010148');
 
 

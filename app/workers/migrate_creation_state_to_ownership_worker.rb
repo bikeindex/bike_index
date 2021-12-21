@@ -33,6 +33,7 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
       origin: creation_state.origin_enum,
       status: creation_state.status,
       pos_kind: creation_state.pos_kind,
+      is_new: creation_state.is_new,
       owner_name: registration_info["user_name"]
     }
     ownership.origin = "api_v1" if ownership.lightspeed_pos?

@@ -911,6 +911,7 @@ class Bike < ApplicationRecord
   def set_calculated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     fetch_current_impound_record # Used by a bunch of things, but this method is private
+    self.soon_current_ownership = calculated_current_ownership
     set_location_info
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
@@ -1025,5 +1026,9 @@ class Bike < ApplicationRecord
   def authorization_requires_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
+  end
+
+  def calculated_current_ownership
+    ownerships.order(:id).last
   end
 end

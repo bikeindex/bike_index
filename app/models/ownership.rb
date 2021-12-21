@@ -41,7 +41,12 @@ class Ownership < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
 
-  attr_accessor :creator_email, :user_email
+  attr_accessor :creator_email, :user_email, :can_edit_claimed
+
+  def bike
+    # Get it unscoped, because example/hidden/deleted
+    @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+  end
 
   def first?
     # If the ownership is created, use the id created in set_calculated_attributes
@@ -82,6 +87,14 @@ class Ownership < ApplicationRecord
     end
   end
 
+  def send_email=(val)
+    self.skip_email = !val
+  end
+
+  def send_email
+    !skip_email
+  end
+
   def mark_claimed
     self.claimed = true
     self.token = nil
@@ -112,22 +125,33 @@ class Ownership < ApplicationRecord
   end
 
   def calculated_send_email
-    return false if !send_email || bike.blank? || phone_registration? || bike.example?
+    return false if skip_email || bike.blank? || phone_registration? || bike.example?
     return false if spam_risky_email?
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     return true unless calculated_organization.present?
     !calculated_organization.enabled?("skip_ownership_email")
   end
 
+  # This got a little unwieldy in #2110 - but, it's still going on, so let it go
   def set_calculated_attributes
+    self.owner_email ||= bike.owner_email
     self.owner_email = EmailNormalizer.normalize(owner_email)
     if id.blank? # Some things to set only on create
+      self.current = true
+      if bike.present?
+        self.example = bike.example
+        self.is_phone = bike.phone_registration?
+        # Calculate current_impound_record
+        self.impound_record_id = bike.impound_records.current.last&.id
+      end
+      # Previous attrs to #2110
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
       self.claimed ||= self_made?
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_pre_registration ||= calculated_organization_pre_registration?
     end
+    self.registration_info = cleaned_registration_info
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track
@@ -142,6 +166,11 @@ class Ownership < ApplicationRecord
     ownerships.reorder(:id)
   end
 
+  def address_hash
+    (registration_info || {}).slice("street", "city", "state", "zipcode", "state", "country")
+      .with_indifferent_access
+  end
+
   def send_notification_and_update_other_ownerships
     prior_ownerships.current.each { |o| o.update(current: false) }
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
@@ -153,7 +182,7 @@ class Ownership < ApplicationRecord
     return true unless phone_registration? && current
     update(claimed: true, user_id: user.id)
     bike.update(owner_email: user.email, is_phone: false)
-    bike.ownerships.create(send_email: false, owner_email: user.email, creator_id: user.id)
+    bike.ownerships.create(skip_email: true, owner_email: user.email, creator_id: user.id)
   end
 
   private
@@ -161,8 +190,14 @@ class Ownership < ApplicationRecord
   def spam_risky_email?
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
-    return false unless bike.current_creation_state.present?
-    %w[lightspeed_pos ascend_pos].include?(bike.current_creation_state.pos_kind)
+    %w[lightspeed_pos ascend_pos].include?(pos_kind)
+  end
+
+  def cleaned_registration_info
+    return nil unless registration_info.present?
+    self.owner_name ||= registration_info["user_name"]
+    registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
+    registration_info.reject { |k, v| v.blank? }
   end
 
   # Some organizations pre-register bikes and then transfer them.

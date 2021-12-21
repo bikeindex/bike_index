@@ -11,6 +11,53 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
+  describe "send_notification_and_update_other_ownerships" do
+    let(:ownership1) { FactoryBot.create(:ownership) }
+    let(:bike) { ownership1.bike }
+    let!(:ownership2) { FactoryBot.create(:ownership, bike: bike) }
+    it "marks existing ownerships as not current" do
+      ownership2.reload
+      Sidekiq::Worker.clear_all
+      expect {
+        bike.ownerships.create(creator: ownership2.creator,
+          owner_email: "s@s.com")
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      expect(bike.ownerships.count).to eq 3
+      expect(bike.reload.send("calculated_current_ownership")&.id).to be > ownership2.id
+      expect(ownership1.reload.current).to be_falsey
+      expect(ownership2.reload.current).to be_falsey
+    end
+  end
+
+  # TODO: Finish these specs
+  # describe "current_is_hidden" do
+  #   it "returns true if existing ownerships is user hidden" do
+  #     ownership = FactoryBot.create(:ownership, user_hidden: true)
+  #     bike = ownership.bike
+  #     bike.update_attribute :hidden, true
+  #     ownership_creator = OwnershipCreator.new(bike: bike)
+  #     expect(ownership_creator.send("current_is_hidden")).to be_truthy
+  #     expect(ownership.phone_registration?).to be_falsey
+  #   end
+  #   it "returns false" do
+  #     bike = Bike.new
+  #     ownership_creator = OwnershipCreator.new(bike: bike)
+  #     expect(ownership_creator.send("current_is_hidden")).to be_falsey
+  #   end
+  # end
+
+  # describe "phone registration" do
+  #   let(:bike) { FactoryBot.create(:bike, :phone_registration) }
+  #   let(:ownership_creator) { OwnershipCreator.new(bike: bike, send_email: false) }
+  #   it "adds as a phone registration" do
+  #     expect(bike.phone).to be_present
+  #     ownership = ownership_creator.create_ownership
+  #     expect(ownership.calculated_send_email).to be_falsey
+  #     expect(ownership.phone_registration?).to be_truthy
+  #     expect(ownership.owner_email).to eq bike.phone
+  #   end
+  # end
+
   describe "claim_message" do
     let(:email) { "joe@example.com" }
     let(:ownership) { Ownership.new(current: true) }
@@ -192,13 +239,16 @@ RSpec.describe Ownership, type: :model do
   end
 
   describe "calculated_send_email" do
-    let(:bike) { Bike.new }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:ownership) { Ownership.new(bike: bike) }
     it "is true" do
-      expect(Ownership.new(bike: bike).calculated_send_email).to be_truthy
+      expect(ownership.send(:spam_risky_email?)).to be_falsey
+      expect(ownership.calculated_send_email).to be_truthy
     end
     context "send email is false" do
+      let(:ownership) { Ownership.new(send_email: false, bike: bike) }
       it "is false" do
-        expect(Ownership.new(send_email: false, bike: bike).calculated_send_email).to be_falsey
+        expect(ownership.calculated_send_email).to be_falsey
       end
     end
     context "example bike" do
@@ -230,9 +280,8 @@ RSpec.describe Ownership, type: :model do
   describe "spam_risky_email?" do
     # hotmail and yahoo have been delaying our emails. In an effort to ensure delivery of really important emails (e.g. password resets)
     # skip sending ownership invitations for POS registrations, just in case
-    let(:bike) { Bike.new(owner_email: email, current_creation_state: creation_state) }
-    let(:ownership) { Ownership.new(bike: bike, owner_email: email) }
-    let(:creation_state) { CreationState.new(pos_kind: pos_kind) }
+    let(:bike) { FactoryBot.create(:bike, owner_email: email) }
+    let(:ownership) { Ownership.new(bike: bike, owner_email: email, pos_kind: pos_kind) }
     let(:pos_kind) { "lightspeed_pos" }
     context "gmail email" do
       let(:email) { "test@gmail.com" }
@@ -272,6 +321,10 @@ RSpec.describe Ownership, type: :model do
       context "not pos registration" do
         let(:pos_kind) { "no_pos" }
         it "sends" do
+          expect(bike).to be_present
+          expect(ownership.bike).to be_present
+          expect(ownership.bike.example?).to be_falsey
+          expect(ownership.phone_registration?).to be_falsey
           expect(ownership.send(:spam_risky_email?)).to be_falsey
           expect(ownership.calculated_send_email).to be_truthy
         end

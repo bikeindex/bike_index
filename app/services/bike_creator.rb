@@ -258,8 +258,14 @@ class BikeCreator
   end
 
   def create_ownership(bike)
-    OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: !@b_param.skip_owner_email?)
-      .create_ownership
+    ownership = bike.ownerships.new(creator: @b_param.creator, send_email: !@b_param.skip_owner_email?)
+    ownership.attributes = creation_state_attributes.except(:is_bulk, :is_pos)
+    unless ownership.save
+      ownership.errors.messages.each do |message|
+        bike.errors.add(message[0], message[1][0])
+      end
+    end
+    ownership
   end
 
   def create_parking_notification(b_param, bike)
