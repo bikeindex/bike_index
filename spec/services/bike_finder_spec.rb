@@ -32,14 +32,18 @@ RSpec.describe BikeFinder do
     end
 
     it "returns match when the target email is present on a user_email record and the serial matches" do
-      bike = FactoryBot.create(:ownership).bike
-      User.first.update(email: "new-email@example.com")
-      expect(User.exists?(email: bike.creator.email)).to eq(false)
-      expect(UserEmail.exists?(email: bike.creator.email)).to eq(true)
+      expect(User.count).to eq 0
+      user = FactoryBot.create(:user_confirmed, email: "cool@email.com")
+      bike = FactoryBot.create(:ownership, creator: user).bike
+      user.additional_emails = "new-email@example.com"
+      expect(user.reload.user_emails.pluck(:email)).to match_array(["cool@email.com", "new-email@example.com"])
+
+      expect(User.exists?(email: "new-email@example.com")).to eq(false)
+      expect(UserEmail.exists?(email: "new-email@example.com")).to eq(true)
 
       result = BikeFinder.find_matching(
         serial: bike.serial_number,
-        owner_email: bike.creator.email
+        owner_email: "new-email@example.com"
       )
 
       expect(result).to eq(bike)

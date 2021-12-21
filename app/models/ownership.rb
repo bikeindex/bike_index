@@ -134,6 +134,8 @@ class Ownership < ApplicationRecord
 
   # This got a little unwieldy in #2110 - but, it's still going on, so let it go
   def set_calculated_attributes
+    # Gotta assign this before checking email, in case it's a phone reg
+    self.is_phone ||= bike.phone_registration? if id.blank? && bike.present?
     self.owner_email ||= bike.owner_email
     self.owner_email = EmailNormalizer.normalize(owner_email)
     if id.blank? # Some things to set only on create
@@ -141,7 +143,6 @@ class Ownership < ApplicationRecord
       if bike.present?
         self.creator_id ||= bike.creator_id
         self.example = bike.example
-        self.is_phone = bike.phone_registration?
         # Calculate current_impound_record
         self.impound_record_id = bike.impound_records.current.last&.id
       end

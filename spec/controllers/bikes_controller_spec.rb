@@ -1163,7 +1163,8 @@ RSpec.describe BikesController, type: :controller do
                 expect(current_stolen_record.receive_notifications).to be_falsey
                 expect(current_stolen_record.estimated_value).to eq 5200
                 expect(current_stolen_record.state_id).to be_blank # Ensure we don't do this accidentally, like we were
-                expect(current_stolen_record.to_coordinates).to eq([49.1573024, -123.9664322])
+                expect(current_stolen_record.latitude).to be_within(0.001).of(49.1573)
+                expect(current_stolen_record.longitude).to be_within(0.001).of(-123.9664322)
                 stolen_attrs.except(:state_id, *skipped_attrs).each do |key, value|
                   pp key unless current_stolen_record.send(key) == value
                   expect(current_stolen_record.send(key)).to eq value
