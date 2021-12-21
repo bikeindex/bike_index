@@ -54,6 +54,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         subject.perform(creation_state.id)
         ownership.reload
         creation_state.reload
+        expect(creation_state.ownership_id).to eq ownership.id
         expect(ownership.pos_kind).to eq "ascend_pos"
         expect(ownership.origin).to eq "bulk_import_worker"
         expect(ownership.status).to eq "status_with_owner"
@@ -83,6 +84,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         subject.perform(creation_state.id)
         ownership.reload
         creation_state.reload
+        expect(creation_state.ownership_id).to eq ownership.id
         expect(ownership.pos_kind).to eq "lightspeed_pos"
         expect(ownership.origin).to eq "api_v1"
         expect(ownership.status).to eq "status_with_owner"
@@ -106,6 +108,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         subject.perform(creation_state.id)
         ownership.reload
         creation_state.reload
+        expect(creation_state.ownership_id).to eq ownership.id
         expect(ownership.is_new).to be_falsey
         expect(ownership.registration_info).to eq registration_info.as_json
         expect(described_class.migrate?(creation_state, ownership)).to be_falsey
@@ -128,6 +131,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
           subject.perform(creation_state.id)
           ownership.reload
           creation_state.reload
+          expect(creation_state.ownership_id).to eq ownership.id
           expect(ownership.registration_info).to eq registration_info.as_json
           expect(described_class.migrate?(creation_state, ownership)).to be_falsey
           expect(described_class.migrate?(creation_state, ownership2)).to be_falsey

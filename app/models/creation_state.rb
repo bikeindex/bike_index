@@ -18,6 +18,7 @@ class CreationState < ApplicationRecord
   belongs_to :organization # Duplicates Bike#creation_organization_id - generally, use the creation_state organization
   belongs_to :creator, class_name: "User"
   belongs_to :bulk_import
+  belongs_to :ownership
 
   enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM

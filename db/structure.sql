@@ -770,7 +770,8 @@ CREATE TABLE public.creation_states (
     pos_kind integer,
     status integer,
     origin_enum integer,
-    registration_info jsonb
+    registration_info jsonb,
+    ownership_id integer
 );
 
 

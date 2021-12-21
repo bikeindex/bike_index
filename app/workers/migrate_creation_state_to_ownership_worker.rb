@@ -39,6 +39,6 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
     ownership.origin = "api_v1" if ownership.lightspeed_pos?
     ownership.organization_pre_registration = ownership.send("calculated_organization_pre_registration?")
     ownership.save
-    creation_state.touch # To make sure it no longer is valid for migrate?
+    creation_state.update(ownership_id: ownership.id)
   end
 end
