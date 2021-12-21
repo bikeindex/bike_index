@@ -41,11 +41,14 @@ task exchange_rates_update: :environment do
 end
 
 task migrate_creation_states: :environment do
-  MigrateCreationStateToOwnershipWorker.enqueue
-  sleep(20)
-  MigrateCreationStateToOwnershipWorker.enqueue
-  sleep(20)
-  MigrateCreationStateToOwnershipWorker.enqueue
+  # Make it possible to stop job
+  if MigrateCreationStateToOwnershipWorker::TO_ENQUEUE > 10
+    MigrateCreationStateToOwnershipWorker.enqueue
+    sleep(20)
+    MigrateCreationStateToOwnershipWorker.enqueue
+    sleep(20)
+    MigrateCreationStateToOwnershipWorker.enqueue
+  end
 end
 
 task database_size: :environment do
