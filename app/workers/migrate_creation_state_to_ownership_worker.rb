@@ -20,7 +20,8 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
   end
 
   def perform(creation_state_id, ownership_id = nil)
-    creation_state = CreationState.find(creation_state_id)
+    creation_state = CreationState.find_by_id(creation_state_id)
+    return if creation_state.blank?
     return if earlier_duplicate_creation_states?(creation_state)
 
     bike = Bike.unscoped.find_by_id(creation_state.bike_id)
