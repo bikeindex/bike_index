@@ -143,8 +143,8 @@ class Ownership < ApplicationRecord
       if bike.present?
         self.creator_id ||= bike.creator_id
         self.example = bike.example
-        # Calculate current_impound_record
-        self.impound_record_id = bike.impound_records.current.last&.id
+        # Calculate current_impound_record, if it isn't assigned
+        self.impound_record_id ||= bike.impound_records.current.last&.id
       end
       # Previous attrs to #2110
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id

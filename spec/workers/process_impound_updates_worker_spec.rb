@@ -171,7 +171,7 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
       expect(bike.owner_email).to eq "something@party.com"
 
       new_ownership = bike.current_ownership
-      expect(new_ownership.impound_record).to eq impound_record
+      expect(new_ownership.impound_record_id).to eq impound_record.id
       expect(new_ownership.calculated_organization).to eq impound_record.organization
       expect(new_ownership.current).to be_truthy
       expect(new_ownership.creator).to eq impound_record_update.user
