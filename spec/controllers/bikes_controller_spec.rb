@@ -522,14 +522,19 @@ RSpec.describe BikesController, type: :controller do
         include_context :test_csrf_token
         it "permits" do
           expect(user).to be_present
+          Sidekiq::Worker.clear_all
           expect {
             post :create, params: {bike: bike_params}
           }.to change(Ownership, :count).by 1
+          Sidekiq::Worker.drain_all
+          expect(ActionMailer::Base.deliveries.count).to eq 1
           bike = Bike.reorder(:created_at).last
           expect(bike.country.name).to eq("United States")
           expect(bike.current_ownership.origin).to eq "embed"
           expect(bike.current_ownership.organization).to eq organization
           expect(bike.current_ownership.creator).to eq organization.auto_user
+          expect(bike.soon_current_ownership_id).to eq bike.current_ownership.id
+          expect(bike.current_creation_state.ownership_id).to eq bike.current_ownership.id
         end
       end
       context "non-stolen" do

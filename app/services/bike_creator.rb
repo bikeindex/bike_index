@@ -154,7 +154,7 @@ class BikeCreator
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
     if @bike.present? && @bike.id.present? && @bike.current_creation_state.blank?
       # Only place creation_state should be created (except in testing)
-      @bike.creation_states.create(creation_state_attributes)
+      @bike.creation_states.create(creation_state_attributes.merge(ownership_id: @bike.current_ownership&.id))
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker_code.present? && @bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: @bike.creation_organization.id)
