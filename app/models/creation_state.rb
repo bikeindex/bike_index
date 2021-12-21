@@ -63,7 +63,6 @@ class CreationState < ApplicationRecord
   def set_reflexive_association
     # TODO: stop doing this, it was suppose to be temporary, to make migration easier
     b = Bike.unscoped.where(id: bike_id).first
-    pp "here"
     # return true if b.creation_state
     b.update(current_creation_state_id: id) if b.present? && b&.current_creation_state_id.blank?
     true

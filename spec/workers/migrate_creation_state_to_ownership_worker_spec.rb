@@ -53,7 +53,6 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
 
         Sidekiq::Worker.clear_all
         subject.perform(creation_state.id)
-        pp Sidekiq::Worker.jobs
         expect(AfterBikeSaveWorker.jobs.count).to eq 0
         ownership.reload
         creation_state.reload
