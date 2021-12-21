@@ -256,6 +256,8 @@ class BikeCreator
       attach_photo(bike)
       attach_photos(bike)
       bike.reload.save
+      # TODO: post #2110 - remove ComponentsCreatorError and ownership raise,
+      # I think we don't need to rescue anymore
     rescue => e
       bike.errors.add(:association_error, e.message)
     end
@@ -269,6 +271,7 @@ class BikeCreator
       ownership.errors.messages.each do |message|
         bike.errors.add(message[0], message[1][0])
       end
+      raise "Ownership wasn't saved. Are you sure the bike was created?"
     end
     ownership
   end

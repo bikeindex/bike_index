@@ -138,7 +138,7 @@ RSpec.describe "BikesController#update", type: :request do
       let!(:user_phone_confirmed) { FactoryBot.create(:user_phone_confirmed, user: current_user, phone: phone) }
       it "marks the bike stolen, doesn't set a location, blanks bike location" do
         expect(current_user.reload.phone).to eq "2221114444"
-        bike.update_attributes(location_attrs)
+        bike.update_attributes(location_attrs.merge(skip_geocoding: true))
         bike.reload
         expect(bike.address_set_manually).to be_truthy
         expect(bike.status_stolen?).to be_falsey
