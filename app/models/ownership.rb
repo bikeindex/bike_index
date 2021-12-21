@@ -83,6 +83,24 @@ class Ownership < ApplicationRecord
     is_phone
   end
 
+  def bulk?
+    bulk_import_id.present?
+  end
+
+  # TODO: part of #2110 - remove, temporarily added for parity with creation_state
+  def is_bulk
+    bulk?
+  end
+
+  def pos?
+    Organization.pos?(pos_kind)
+  end
+
+  # TODO: part of #2110 - remove, temporarily added for parity with creation_state
+  def is_pos
+    pos?
+  end
+
   def owner
     if claimed? && user.present?
       user
