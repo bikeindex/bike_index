@@ -131,12 +131,11 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(ownership.send_email).to be_falsey
         expect(ownership.owner_email).to eq auto_user.email
 
-        creation_state = bike.current_ownership
-        expect(creation_state.organization).to eq current_organization
-        expect(creation_state.creator).to eq bike.creator
-        expect(creation_state.status).to eq "unregistered_parking_notification"
-        expect(creation_state.origin).to eq "organization_form" # Might need to deal with this differently
-        expect(creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
+        ownership = bike.current_ownership
+        expect(ownership.organization).to eq current_organization
+        expect(ownership.creator).to eq bike.creator
+        expect(ownership.status).to eq "unregistered_parking_notification"
+        expect(ownership.origin).to eq "creator_unregistered_parking_notification"
 
         expect(bike.parking_notifications.count).to eq 1
         parking_notification = bike.parking_notifications.first
@@ -220,12 +219,11 @@ RSpec.describe Organized::BikesController, type: :request do
           # expect(ownership.claimed?).to be_truthy
           expect(ownership.owner_email).to eq auto_user.email
 
-          creation_state = bike.current_ownership
-          expect(creation_state.organization).to eq current_organization
-          expect(creation_state.creator).to eq bike.creator
-          expect(creation_state.status).to eq "unregistered_parking_notification"
-          expect(creation_state.origin).to eq "organization_form"
-          expect(creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
+          ownership = bike.current_ownership
+          expect(ownership.organization).to eq current_organization
+          expect(ownership.creator).to eq bike.creator
+          expect(ownership.status).to eq "unregistered_parking_notification"
+          expect(ownership.origin).to eq "creator_unregistered_parking_notification"
 
           expect(ParkingNotification.where(bike_id: bike.id).count).to eq 1
           parking_notification = ParkingNotification.where(bike_id: bike.id).first

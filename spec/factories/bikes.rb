@@ -47,7 +47,17 @@ FactoryBot.define do
                                 pos_kind: evaluator.creation_state_pos_kind,
                                 bulk_import: evaluator.creation_state_bulk_import,
                                 registration_info: evaluator.creation_state_registration_info)
-        bike.reload # reflexively sets bike.current_creation_state
+        # TODO: part of #2110 - migrate to be current_ownership after
+        create(:ownership, creator: bike.creator,
+                                bike: bike,
+                                created_at: bike.created_at,
+                                organization: bike.creation_organization,
+                                can_edit_claimed: evaluator.can_edit_claimed,
+                                origin: evaluator.creation_state_origin,
+                                pos_kind: evaluator.creation_state_pos_kind,
+                                bulk_import: evaluator.creation_state_bulk_import,
+                                registration_info: evaluator.creation_state_registration_info)
+        bike.reload # reflexively sets bike.current_ownership
       end
     end
 

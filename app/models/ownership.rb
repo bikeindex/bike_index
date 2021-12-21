@@ -176,7 +176,6 @@ class Ownership < ApplicationRecord
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_pre_registration ||= calculated_organization_pre_registration?
-      self.origin = "creator_unregistered_parking_notification" if unregistered_parking_notification?
     end
     self.registration_info = cleaned_registration_info
     if claimed?
@@ -222,13 +221,14 @@ class Ownership < ApplicationRecord
     return {} unless registration_info.present?
     self.owner_name ||= registration_info["user_name"]
     registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
-    registration_info.reject { |k, v| v.blank? }
+    registration_info.reject { |_k, v| v.blank? }
   end
 
   # Some organizations pre-register bikes and then transfer them.
   # This may be more complicated in the future! For now, calling this good enough.
   def calculated_organization_pre_registration?
     return false if organization_id.blank?
+    self.origin = "creator_unregistered_parking_notification" if status == "unregistered_parking_notification"
     return true if creator_unregistered_parking_notification?
     self_made? && creator_id == organization&.auto_user_id
   end

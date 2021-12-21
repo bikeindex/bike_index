@@ -470,9 +470,9 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
-      creation_state = bike.current_ownership
-      expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
-      # expect(creation_state.origin).to eq 'api_v3'
+      ownership = bike.current_ownership
+      expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([true, true, false])
+      # expect(ownership.origin).to eq 'api_v3'
 
       # We return things will alert if they're written directly to the dom - worth noting, since it might be a problem
       expect(result["description"]).to eq "<svg/onload=alert(document.cookie)>"
