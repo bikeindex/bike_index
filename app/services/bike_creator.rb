@@ -73,7 +73,7 @@ class BikeCreator
       is_bulk: @b_param.is_bulk,
       is_pos: @b_param.is_pos,
       is_new: @b_param.is_new,
-      origin: @b_param.origin || "web",
+      origin: @b_param.origin,
       status: @b_param.status,
       bulk_import_id: @b_param.params["bulk_import_id"],
       creator_id: @b_param.creator_id,

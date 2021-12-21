@@ -295,7 +295,7 @@ RSpec.describe Bike, type: :model do
 
     describe "registration_info and conditional_information" do
       describe "organization_affiliation" do
-        let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: registration_info) }
         let(:registration_info) { {} }
         it "sets if searched" do
           expect(bike.organization_affiliation).to be_blank
@@ -325,7 +325,7 @@ RSpec.describe Bike, type: :model do
       end
 
       describe "student_id" do
-        let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: registration_info) }
         let(:registration_info) { {} }
         it "sets if searched" do
           expect(bike.student_id).to be_blank
@@ -341,7 +341,7 @@ RSpec.describe Bike, type: :model do
           let(:registration_info) { {street: "717 Market St, SF", phone: "7177423423", student_id: "CCCIIIIBBBBB"} }
           it "uses correct value" do
             bike.reload
-            expect(bike.current_creation_state_id).to be_present
+            expect(bike.current_ownership_id).to be_present
             bike.reload
             expect(bike.conditional_information).to eq({})
             expect(bike.registration_info).to eq registration_info.as_json
@@ -640,13 +640,12 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "authorize_and_claim_for_user, authorized?" do
-    let(:bike) { ownership.bike }
-    let(:creator) { ownership.creator }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership)}
+    let(:creator) { bike.creator }
     let(:user) { FactoryBot.create(:user) }
     let(:superuser) { User.new(superuser: true) }
 
     context "un-organized" do
-      let(:ownership) { FactoryBot.create(:ownership) }
       context "no user" do
         it "returns false" do
           expect(bike.authorized?(nil)).to be_falsey
@@ -667,8 +666,8 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "claimed" do
-        let(:ownership) { FactoryBot.create(:ownership_claimed, user: FactoryBot.create(:user_confirmed)) }
-        let(:user) { ownership.user }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+        let(:user) { FactoryBot.create(:user_confirmed) }
         it "returns true for user, not creator" do
           expect(bike.claimed?).to be_truthy
           expect(bike.authorized?(creator)).to be_falsey
@@ -684,7 +683,7 @@ RSpec.describe Bike, type: :model do
       end
       context "claimed" do
         let(:superuser) { FactoryBot.create(:admin) }
-        let(:ownership) { FactoryBot.create(:ownership_claimed, user: superuser) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: superuser) }
         it "returns true for user, not creator" do
           expect(bike.claimed?).to be_truthy
           expect(bike.authorized?(creator)).to be_falsey
@@ -698,7 +697,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "claimable_by?" do
-        let(:ownership) { FactoryBot.create(:ownership, user: user) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, user: user) }
         it "marks claimed and returns true" do
           expect(ownership.claimed?).to be_falsey
           expect(bike.claimed?).to be_falsey
@@ -718,10 +717,10 @@ RSpec.describe Bike, type: :model do
       let(:owner) { FactoryBot.create(:organization_member) }
       let(:organization) { owner.organizations.first }
       let(:can_edit_claimed) { false }
-      let(:ownership) do
-        FactoryBot.create(:ownership_organization_bike,
+      let(:bike) do
+        FactoryBot.create(:bike_organized,
           user: owner,
-          organization: organization,
+          creation_organization: organization,
           can_edit_claimed: can_edit_claimed)
       end
       let(:member) { FactoryBot.create(:organization_member, organization: organization) }
@@ -907,8 +906,7 @@ RSpec.describe Bike, type: :model do
     let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
     let(:organization_membership2) { FactoryBot.create(:membership, user: organization_member) }
     let!(:organization2) { organization_membership2.organization }
-    let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization, can_edit_claimed: false) }
-    let(:bike) { ownership.bike }
+    let(:bike) { FactoryBot.create(:bike_organized, user: user, claimed: true, creation_organization: organization, can_edit_claimed: false) }
     let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, can_edit_claimed: true, organization: organization2) }
     it "checks the passed organization" do
       bike.reload
@@ -1242,7 +1240,7 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "address_source" do
-    let(:bike) { FactoryBot.create(:bike, :with_creation_state, creation_state_registration_info: registration_info) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: registration_info) }
     let(:registration_info) { {street: "2864 Milwaukee Ave"} }
     context "no address" do
       it "returns nil" do
@@ -1277,7 +1275,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "with stolen record" do
-        let(:bike) { FactoryBot.create(:stolen_bike, :with_creation_state, creation_state_registration_info: registration_info) }
+        let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creation_state_registration_info: registration_info) }
         it "returns initial_creation" do
           expect(bike.reload.registration_address_source).to eq "initial_creation"
         end
@@ -1364,9 +1362,10 @@ RSpec.describe Bike, type: :model do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:user_confirmed, name: "Stephanie Example") }
       let(:new_owner) { FactoryBot.create(:user, name: "Sally Stuff", email: "sally@example.com") }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, claimed: false, user: nil, creator: user, organization: organization, owner_email: "sally@example.com") }
-      let(:bike) { ownership.bike }
+      let(:bike) { FactoryBot.create(:bike_organized, claimed: false, user: nil, creator: user, creation_organization: organization, owner_email: "sally@example.com") }
+      let(:ownership) { bike.ownerships.first }
       it "falls back to creator" do
+        expect(bike.reload.ownerships.count).to eq 1
         ownership.reload
         expect(ownership.claimed?).to be_falsey
         expect(bike.user).to be_blank
@@ -1415,16 +1414,15 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "b_param" do
-      let(:ownership) { Ownership.new }
-      let(:creation_state) { CreationState.new(registration_info: {phone: "888.888.8888"}) }
+      let(:ownership) { Ownership.new(registration_info: {phone: "888.888.8888"}) }
       before do
         allow(bike).to receive(:current_ownership) { ownership }
-        allow(bike).to receive(:current_creation_state) { creation_state }
       end
       it "returns the phone" do
         allow(bike).to receive(:first_ownership) { ownership }
         expect(bike.phone).to eq "888.888.8888"
       end
+      # TODO: part of #2110 - it's ok to keep using ownerships!
       context "not first ownerships" do
         it "is the users " do
           allow(bike).to receive(:first_ownership) { Ownership.new } # A different ownership
@@ -1833,16 +1831,16 @@ RSpec.describe Bike, type: :model do
       let(:city) { "New York" }
       let(:zipcode) { "10011" }
       let(:user) { FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city) }
-      let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user) }
+      let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"}) }
       let(:bike) { ownership.bike }
-      let(:creation_state) { FactoryBot.create(:creation_state, bike: bike, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"}) }
       it "takes location from the creation state" do
+        bike.update(updated_at: Time.current)
+        bike.reload # Set soon_current_ownership_id
         expect(user.reload.street).to be_blank
         expect(user.address_set_manually).to be_falsey
         expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
-        expect(creation_state).to be_present
-        expect(bike.reload.current_creation_state_id).to eq creation_state.id
-        expect(bike.current_creation_state.address_hash[:latitude]).to be_blank
+        expect(bike.reload.soon_current_ownership_id).to eq ownership.id
+        expect(bike.current_ownership.address_hash[:latitude]).to be_blank
         expect(bike.registration_address_source).to eq "initial_creation"
         expect(bike.registration_address(true)["zipcode"]).to eq "99999"
 
@@ -1859,11 +1857,12 @@ RSpec.describe Bike, type: :model do
       context "user street is present" do
         let(:user) { FactoryBot.create(:user_confirmed, :in_nyc) }
         it "uses user address" do
+          bike.update(updated_at: Time.current)
+          bike.reload
           expect(user.reload.street).to be_present
           expect(user.address_set_manually).to be_truthy
           expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
-          expect(creation_state).to be_present
-          expect(bike.reload.current_creation_state_id).to eq creation_state.id
+          expect(bike.reload.soon_current_ownership_id).to eq ownership.id
           expect(bike.registration_address_source).to eq "user"
 
           bike.reload

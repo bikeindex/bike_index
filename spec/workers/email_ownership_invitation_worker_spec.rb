@@ -29,8 +29,8 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
   end
   context "creation organization has skip_email" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["skip_ownership_email"]) }
-    let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
-    let(:bike) { ownership.bike }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:ownership) { bike.ownerships.first }
     it "doesn't send email, updates to be send_email false, sends email to the second ownership" do
       ActionMailer::Base.deliveries = []
       expect(ownership.send_email).to be_truthy

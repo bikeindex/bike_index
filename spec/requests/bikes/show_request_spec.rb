@@ -109,7 +109,7 @@ RSpec.describe "BikesController#show", type: :request do
   context "organized user and bike" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
-    let(:ownership) { FactoryBot.create(:ownership_organization_bike, :claimed, organization: organization, can_edit_claimed: false) }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, can_edit_claimed: false) }
     let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
     let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: organization2) }
     it "includes passive organization, even when redirected from sticker from other org" do
@@ -188,10 +188,10 @@ RSpec.describe "BikesController#show", type: :request do
     end
     context "organization viewing" do
       let(:can_edit_claimed) { false }
-      let(:ownership) do
-        FactoryBot.create(:ownership_organization_bike,
-          :claimed,
-          organization: organization,
+      let(:bike) do
+        FactoryBot.create(:bike_organized,
+          :with_ownership_claimed,
+          creation_organization: organization,
           can_edit_claimed: can_edit_claimed,
           user: FactoryBot.create(:user))
       end
@@ -243,9 +243,9 @@ RSpec.describe "BikesController#show", type: :request do
         expect(bike.owner).to_not eq current_user
         expect(bike.b_params.count).to eq 0
         expect(bike.status).to eq "unregistered_parking_notification"
-        expect(bike.current_creation_state).to be_present
-        expect(bike.current_creation_state.status).to eq "unregistered_parking_notification"
-        expect(bike.current_creation_state.origin_enum).to eq "creator_unregistered_parking_notification"
+        expect(bike.current_ownership).to be_present
+        expect(bike.current_ownership.status).to eq "unregistered_parking_notification"
+        expect(bike.current_ownership.origin_enum).to eq "creator_unregistered_parking_notification"
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
         expect(assigns(:bike)).to eq bike

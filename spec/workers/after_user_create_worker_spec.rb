@@ -105,7 +105,6 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     let(:bike) do
       FactoryBot.create(:bike,
         :with_ownership_claimed,
-        :with_creation_state,
         owner_email: "aftercreate@bikeindex.org",
         user: user,
         creation_state_registration_info: {phone: "(111) 222-3333"}.merge(target_address_hash))

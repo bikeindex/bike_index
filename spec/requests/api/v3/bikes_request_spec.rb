@@ -853,7 +853,9 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "organization bike" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+      let(:og_creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creator: og_creator) }
+      let(:ownership) { bike.ownerships.first }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:params) { {year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"]} }
       let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
@@ -884,15 +886,16 @@ RSpec.describe "Bikes API V3", type: :request do
           Sidekiq::Testing.inline!
         end
         after { Sidekiq::Testing.fake! }
-        let(:og_creator) { ownership.creator }
         let(:new_email) { "newuser@example.com" }
         let(:bike_organization) { bike.bike_organizations.first }
         it "creates a new ownership, emails owner, permits organization editing until has been claimed" do
           expect(og_creator.reload.authorized?(organization)).to be_truthy
           expect(user.reload.authorized?(organization)).to be_truthy
+          expect(og_creator.id).to_not eq user.id
           bike.reload
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.public_images.count).to eq 0
+          expect(bike.user).to be_blank
           expect(bike.owner).to_not eq(user)
           expect(bike.authorized_by_organization?(u: user)).to be_truthy
           expect(bike.authorized?(user)).to be_truthy

@@ -1185,8 +1185,8 @@ RSpec.describe BikesController, type: :controller do
     end
     context "owner present (who is allowed to edit)" do
       let(:user) { FactoryBot.create(:user_confirmed) }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, owner_email: user.email) }
-      let(:bike) { ownership.bike }
+      let(:ownership) { bike.ownerships.first }
+      let(:bike) { FactoryBot.create(:bike_organized, owner_email: user.email) }
       let(:organization) { bike.organizations.first }
       let(:organization2) { FactoryBot.create(:organization) }
       let(:allowed_attributes) do
@@ -1268,7 +1268,7 @@ RSpec.describe BikesController, type: :controller do
       let(:organization) { FactoryBot.create(:organization) }
       let(:can_edit_claimed) { false }
       let(:claimed) { false }
-      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       before { set_current_user(user) }
       it "updates the bike" do

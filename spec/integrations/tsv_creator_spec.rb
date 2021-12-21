@@ -11,10 +11,10 @@ RSpec.describe TsvCreator do
 
   describe "create_organization_count" do
     it "creates tsv with output bikes" do
-      ownership = FactoryBot.create(:ownership_organization_bike)
-      organization = ownership.bike.creation_organization
+      bike = FactoryBot.create(:bike_organized)
+      organization = bike.creation_organization
       creator = TsvCreator.new
-      target = "#{creator.org_counts_header}#{creator.org_count_row(ownership.bike)}"
+      target = "#{creator.org_counts_header}#{creator.org_count_row(bike)}"
       expect_any_instance_of(TsvUploader).to receive(:store!)
       output = creator.create_org_count(organization)
       expect(File.read(output)).to eq(target)

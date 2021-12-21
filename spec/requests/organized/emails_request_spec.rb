@@ -3,9 +3,8 @@ require "rails_helper"
 RSpec.describe Organized::EmailsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/emails" }
   # we need a default organized bike to render emails, so build one
-  let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: current_organization) }
+  let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
   let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes] }
-  let!(:bike) { ownership.bike }
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member

@@ -51,7 +51,6 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
         let(:bike_for_avery_og) do
           FactoryBot.create(:bike_organized,
-            :with_creation_state,
             manufacturer: trek,
             primary_frame_color: black,
             organization: organization,

@@ -78,33 +78,33 @@ RSpec.describe CredibilityScorer do
       let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
       it "returns with created_at_point_of_sale" do
-        expect(subject.creation_badges(bike_lightspeed_pos.current_creation_state)).to include(:created_at_point_of_sale)
-        expect(subject.creation_badges(bike_ascend_pos.current_creation_state)).to match_array([:created_at_point_of_sale])
+        expect(subject.creation_badges(bike_lightspeed_pos.current_ownership)).to include(:created_at_point_of_sale)
+        expect(subject.creation_badges(bike_ascend_pos.current_ownership)).to match_array([:created_at_point_of_sale])
       end
     end
     context "with organization" do
       let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, created_at: created_at) }
       let(:created_at) { Time.current - 20.days }
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
-      let(:creation_state) { bike.current_creation_state }
+      let(:ownership) { bike.current_ownership }
       it "returns created this month" do
-        expect(creation_state).to be_present
-        expect(subject.creation_badges(creation_state)).to eq([:created_this_month])
+        expect(ownership).to be_present
+        expect(subject.creation_badges(ownership)).to eq([:created_this_month])
       end
       context "bike shop with does_not_need_pos" do
         let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "does_not_need_pos") }
         it "returns with trusted organization" do
-          expect(subject.creation_badges(creation_state)).to match_array([:created_at_point_of_sale])
+          expect(subject.creation_badges(ownership)).to match_array([:created_at_point_of_sale])
         end
       end
       context "paid organization" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         it "returns with trusted organization" do
           expect(organization.is_paid).to be_truthy
-          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_trusted, :created_this_month])
+          expect(subject.creation_badges(ownership)).to match_array([:creation_organization_trusted, :created_this_month])
           # It doesn't return anything but created_at_point_of_sale
-          creation_state.update(is_pos: true)
-          expect(subject.creation_badges(creation_state)).to eq([:created_at_point_of_sale])
+          ownership.update(is_pos: true)
+          expect(subject.creation_badges(ownership)).to eq([:created_at_point_of_sale])
           expect(instance.badges).to eq([:created_at_point_of_sale])
           expect(instance.score).to eq 100
         end
@@ -113,33 +113,33 @@ RSpec.describe CredibilityScorer do
         let(:created_at) { Time.current - 366.days }
         it "returns with creation_organization_suspiscious" do
           organization.destroy
-          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
+          expect(subject.creation_badges(ownership)).to match_array([:creation_organization_suspicious, :long_time_registration])
           organization.really_destroy! # Check this too, just in case
-          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious, :long_time_registration])
+          expect(subject.creation_badges(ownership)).to match_array([:creation_organization_suspicious, :long_time_registration])
         end
       end
       context "unapproved organization, 6 months ago" do
         let(:created_at) { Time.current - 6.months }
         let(:organization) { FactoryBot.create(:organization, approved: false) } # Organizations are verified by default
         it "returns with creation_organization_suspiscious" do
-          expect(subject.creation_age_badge(creation_state)).to eq nil
-          expect(subject.creation_badges(creation_state)).to match_array([:creation_organization_suspicious])
+          expect(subject.creation_age_badge(ownership)).to eq nil
+          expect(subject.creation_badges(ownership)).to match_array([:creation_organization_suspicious])
         end
       end
     end
     context "registered 2 years ago" do
-      let!(:creation_state) { FactoryBot.create(:creation_state, created_at: Time.current - 1.day - 2.years, bike: bike) }
+      let!(:ownership) { FactoryBot.create(:ownership, created_at: Time.current - 1.day - 2.years, bike: bike) }
       it "returns long_time_registration" do
         bike.reload
-        expect(subject.creation_age_badge(creation_state)).to eq :long_time_registration
-        expect(subject.creation_badges(creation_state)).to eq([:long_time_registration])
+        expect(subject.creation_age_badge(ownership)).to eq :long_time_registration
+        expect(subject.creation_badges(ownership)).to eq([:long_time_registration])
         expect(instance.score).to eq(60)
       end
     end
   end
 
   describe "ownership_badges" do
-    let!(:creation_state) { FactoryBot.create(:creation_state, bike: bike, created_at: ownership1.created_at, creator: ownership1.creator) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: bike, created_at: ownership1.created_at, creator: ownership1.creator) }
     let!(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: Time.current - 400.days, creator: bike.creator) }
     it "returns claimed" do
       bike.reload
@@ -165,10 +165,10 @@ RSpec.describe CredibilityScorer do
   describe "bike_user_badges" do
     let!(:bike) { FactoryBot.create(:bike, creator: user) }
     let(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: Time.current - 6.years, creator: bike.creator) }
-    let!(:creation_state) { FactoryBot.create(:creation_state, creator: user, bike: bike, created_at: ownership1.created_at) }
+    let!(:ownership) { FactoryBot.create(:ownership, creator: user, bike: bike, created_at: ownership1.created_at) }
     let(:user) { FactoryBot.create(:user) }
     let(:banned_user) { FactoryBot.create(:user, banned: true) }
-    before { bike.reload } # Because current_creation_state
+    before { bike.reload } # Because current_ownership
     it "returns []" do
       expect(subject.bike_user_badges(bike)).to eq([])
     end

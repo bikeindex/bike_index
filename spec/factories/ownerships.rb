@@ -14,22 +14,22 @@ FactoryBot.define do
       claimed_at { Time.current - 1.hour }
     end
     factory :ownership_claimed, traits: [:claimed]
-    factory :ownership_organization_bike do
-      transient do
-        can_edit_claimed { true }
-      end
-      organization { FactoryBot.create(:organization) }
-      creator { FactoryBot.create(:organization_member, organization: organization) }
+  #   factory :ownership_organization_bike do
+  #     transient do
+  #       can_edit_claimed { true }
+  #     end
+  #     organization { FactoryBot.create(:organization) }
+  #     creator { FactoryBot.create(:organization_member, organization: organization) }
 
-      bike do
-        FactoryBot.create(:bike_organized,
-          organization: organization,
-          can_edit_claimed: can_edit_claimed,
-          owner_email: owner_email)
-      end
-    end
-    factory :ownership_stolen do
-      bike { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
-    end
+  #     bike do
+  #       FactoryBot.create(:bike_organized,
+  #         organization: organization,
+  #         can_edit_claimed: can_edit_claimed,
+  #         owner_email: owner_email)
+  #     end
+  #   end
+    # factory :ownership_stolen do
+    #   bike { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
+    # end
   end
 end

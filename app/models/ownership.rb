@@ -162,6 +162,7 @@ class Ownership < ApplicationRecord
     self.is_phone ||= bike.phone_registration? if id.blank? && bike.present?
     self.owner_email ||= bike.owner_email
     self.owner_email = EmailNormalizer.normalize(owner_email)
+    self.status ||= bike&.status
     if id.blank? # Some things to set only on create
       self.current = true
       if bike.present?
@@ -178,6 +179,8 @@ class Ownership < ApplicationRecord
       self.organization_pre_registration ||= calculated_organization_pre_registration?
     end
     self.registration_info = cleaned_registration_info
+    # Would this be better in BikeCreator? Maybe, but specs depend on this
+    self.origin ||= "web"
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track
