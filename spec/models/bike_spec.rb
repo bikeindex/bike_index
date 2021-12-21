@@ -284,8 +284,8 @@ RSpec.describe Bike, type: :model do
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
       it "scopes correctly" do
         # There was a factory bug where it was creating multiple creation_states
-        expect(CreationState.where(bike_id: bike_lightspeed_pos.id).count).to eq 1
-        expect(CreationState.count).to eq 2
+        expect(Ownership.where(bike_id: bike_lightspeed_pos.id).count).to eq 1
+        expect(Ownership.count).to eq 2
         expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
         expect(bike_ascend_pos.pos_kind).to eq "ascend_pos"
         expect(Bike.lightspeed_pos.pluck(:id)).to eq([bike_lightspeed_pos.id])
@@ -341,7 +341,7 @@ RSpec.describe Bike, type: :model do
           let(:registration_info) { {street: "717 Market St, SF", phone: "7177423423", student_id: "CCCIIIIBBBBB"} }
           it "uses correct value" do
             bike.reload
-            expect(bike.current_ownership_id).to be_present
+            expect(bike.current_ownership&.id).to be_present
             bike.reload
             expect(bike.conditional_information).to eq({})
             expect(bike.registration_info).to eq registration_info.as_json
@@ -640,7 +640,7 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "authorize_and_claim_for_user, authorized?" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership)}
+    let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:creator) { bike.creator }
     let(:user) { FactoryBot.create(:user) }
     let(:superuser) { User.new(superuser: true) }
@@ -666,7 +666,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "claimed" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creator: FactoryBot.create(:user_confirmed)) }
         let(:user) { FactoryBot.create(:user_confirmed) }
         it "returns true for user, not creator" do
           expect(bike.claimed?).to be_truthy
@@ -683,8 +683,10 @@ RSpec.describe Bike, type: :model do
       end
       context "claimed" do
         let(:superuser) { FactoryBot.create(:admin) }
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: superuser) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: superuser, creator: FactoryBot.create(:user_confirmed)) }
         it "returns true for user, not creator" do
+          expect(bike.reload.current_ownership.creator_id).to_not eq superuser.id
+          expect(bike.current_ownership.user_id).to eq superuser.id
           expect(bike.claimed?).to be_truthy
           expect(bike.authorized?(creator)).to be_falsey
           expect(bike.authorized?(superuser)).to be_truthy
@@ -699,16 +701,15 @@ RSpec.describe Bike, type: :model do
       context "claimable_by?" do
         let(:bike) { FactoryBot.create(:bike, :with_ownership, user: user) }
         it "marks claimed and returns true" do
-          expect(ownership.claimed?).to be_falsey
           expect(bike.claimed?).to be_falsey
-          expect(ownership.owner).to eq creator
+          expect(bike.owner).to eq creator
           expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
           expect(bike.authorized?(user)).to be_truthy
           expect(bike.authorize_and_claim_for_user(user)).to be_truthy
           expect(bike.claimed?).to be_truthy
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
-          ownership.reload
-          expect(ownership.owner).to eq user
+          bike.reload
+          expect(bike.owner).to eq user
           expect(bike.ownerships.count).to eq 1
         end
       end
@@ -717,11 +718,13 @@ RSpec.describe Bike, type: :model do
       let(:owner) { FactoryBot.create(:organization_member) }
       let(:organization) { owner.organizations.first }
       let(:can_edit_claimed) { false }
+      let(:claimed) { false }
       let(:bike) do
         FactoryBot.create(:bike_organized,
           user: owner,
           creation_organization: organization,
-          can_edit_claimed: can_edit_claimed)
+          can_edit_claimed: can_edit_claimed,
+          claimed: claimed)
       end
       let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
@@ -761,8 +764,8 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Also doesn't work for user if bike is claimed
       end
       context "claimed" do
+        let(:claimed) { true }
         before do
-          ownership.mark_claimed
           bike.reload
           expect(bike.claimed?).to be_truthy
         end
@@ -820,7 +823,7 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "impound_record" do
-      let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
       let(:impound_record) { FactoryBot.create(:impound_record, bike: bike, user: user) }
       it "returns truthy if impound_record is current unless user is organization_member" do
         expect(impound_record.bike_id).to eq bike.id
@@ -829,8 +832,6 @@ RSpec.describe Bike, type: :model do
         expect(bike.current_impound_record_id).to eq impound_record.id
         expect(impound_record.reload.active?).to be_truthy
         expect(impound_record.user_id).to eq user.id
-        expect(ownership.reload.claimed?).to be_truthy
-        expect(ownership.owner&.id).to eq user.id
         expect(bike.status).to eq "status_impounded"
         expect(bike.status_humanized).to eq "found"
         expect(bike.status_humanized_translated).to eq "found"
@@ -839,14 +840,14 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "impound_record with organization" do
-      let(:ownership) { FactoryBot.create(:ownership, user: user) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, user: user, claimed: claimed) }
+      let(:claimed) { false }
       let(:impound_record) { FactoryBot.build(:impound_record_with_organization, bike: bike) }
       let(:organization) { impound_record.organization }
       let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
       it "returns falsey if impound record is current unless user is organization_member" do
-        expect(ownership.claimed?).to be_falsey
-        expect(bike.claimed?).to be_falsey
-        expect(ownership.owner).to eq creator
+        expect(bike.reload.claimed?).to be_falsey
+        expect(bike.owner).to eq creator
         expect(bike.claimable_by?(user)).to be_truthy
         expect(bike.editable_organizations.pluck(:id)).to eq([])
         Sidekiq::Worker.clear_all
@@ -871,9 +872,9 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized?(superuser)).to be_truthy
       end
       context "ownership claimed" do
-        let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
+        let(:claimed) { true }
         it "returns falsey" do
-          expect(bike.claimed?).to be_truthy
+          expect(bike.reload.claimed?).to be_truthy
           expect(bike.authorized?(creator)).to be_falsey
           expect(bike.authorized?(user)).to be_truthy
           expect(bike.editable_organizations.pluck(:id)).to eq([])
@@ -1030,10 +1031,10 @@ RSpec.describe Bike, type: :model do
   describe "bike_sticker and no_bike_sticker" do
     let(:organization1) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
-    let(:bike1) { FactoryBot.create(:bike_organized, organization: organization1) }
-    let(:bike2) { FactoryBot.create(:bike_organized, organization: organization1) }
-    let!(:bike3) { FactoryBot.create(:bike_organized, organization: organization1) }
-    let!(:bike4) { FactoryBot.create(:bike_organized, organization: organization2) }
+    let(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization1) }
+    let(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization1) }
+    let!(:bike3) { FactoryBot.create(:bike_organized, creation_organization: organization1) }
+    let!(:bike4) { FactoryBot.create(:bike_organized, creation_organization: organization2) }
     let!(:bike_sticker1) { FactoryBot.create(:bike_sticker_claimed, bike: bike1, organization: organization1) }
     let!(:bike_sticker2) { FactoryBot.create(:bike_sticker_claimed, bike: bike2, organization: nil) }
     it "returns appropriately" do
@@ -1289,18 +1290,20 @@ RSpec.describe Bike, type: :model do
       let(:user) { FactoryBot.create(:user_confirmed, name: "some name") }
       let(:bike) do
         FactoryBot.create(:bike_organized,
-          organization: organization,
+          creation_organization: organization,
+          creator: user,
           creation_state_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
-      let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
+      # let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
       include_context :geocoder_real
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
         VCR.use_cassette("organization_export_worker-avery") do
-          ownership.reload
-          bike.save
+          bike.reload.update(updated_at: Time.current)
           bike.reload
           # We test that the bike has a location saved
+          expect(bike.registration_address_source).to eq "initial_creation"
+          expect(bike.registration_address(true)).to eq({street: "102 Washington Pl", city: "State College"}.as_json)
           expect(bike.latitude).to be_present
           expect(bike.longitude).to be_present
           expect(bike.owner_name).to eq "some name"

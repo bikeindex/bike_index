@@ -820,6 +820,8 @@ class Bike < ApplicationRecord
       "bike_update"
     elsif current_ownership&.address_hash.present?
       "initial_creation"
+    elsif current_creation_state&.address_hash.present?
+      "initial_creation_state"
     end
   end
 
