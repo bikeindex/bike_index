@@ -42,7 +42,7 @@ end
 
 task migrate_creation_states: :environment do
   # Get CreationStates that haven't been updated since the updated timestamp
-  MigrateCreationStateToOwnershipWorker.limit(5000)
+  MigrateCreationStateToOwnershipWorker.creation_states.limit(5000)
     .pluck(:id).each { |id| MigrateCreationStateToOwnershipWorker.perform_async(id) }
 end
 
