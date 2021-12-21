@@ -139,6 +139,7 @@ class Ownership < ApplicationRecord
     if id.blank? # Some things to set only on create
       self.current = true
       if bike.present?
+        self.creator_id ||= bike.creator_id
         self.example = bike.example
         self.is_phone = bike.phone_registration?
         # Calculate current_impound_record

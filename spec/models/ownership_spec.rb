@@ -29,34 +29,18 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
-  # TODO: Finish these specs
-  # describe "current_is_hidden" do
-  #   it "returns true if existing ownerships is user hidden" do
-  #     ownership = FactoryBot.create(:ownership, user_hidden: true)
-  #     bike = ownership.bike
-  #     bike.update_attribute :hidden, true
-  #     ownership_creator = OwnershipCreator.new(bike: bike)
-  #     expect(ownership_creator.send("current_is_hidden")).to be_truthy
-  #     expect(ownership.phone_registration?).to be_falsey
-  #   end
-  #   it "returns false" do
-  #     bike = Bike.new
-  #     ownership_creator = OwnershipCreator.new(bike: bike)
-  #     expect(ownership_creator.send("current_is_hidden")).to be_falsey
-  #   end
-  # end
-
-  # describe "phone registration" do
-  #   let(:bike) { FactoryBot.create(:bike, :phone_registration) }
-  #   let(:ownership_creator) { OwnershipCreator.new(bike: bike, send_email: false) }
-  #   it "adds as a phone registration" do
-  #     expect(bike.phone).to be_present
-  #     ownership = ownership_creator.create_ownership
-  #     expect(ownership.calculated_send_email).to be_falsey
-  #     expect(ownership.phone_registration?).to be_truthy
-  #     expect(ownership.owner_email).to eq bike.phone
-  #   end
-  # end
+  describe "phone registration" do
+    let(:bike) { FactoryBot.create(:bike, :phone_registration) }
+    it "adds as a phone registration" do
+      expect(bike.phone).to be_present
+      ownership = bike.ownerships.new
+      expect(ownership).to be_valid
+      expect(ownership.save).to be_truthy
+      expect(ownership.calculated_send_email).to be_falsey
+      expect(ownership.phone_registration?).to be_truthy
+      expect(ownership.owner_email).to eq bike.phone
+    end
+  end
 
   describe "claim_message" do
     let(:email) { "joe@example.com" }

@@ -217,6 +217,15 @@ class BParam < ApplicationRecord
     bike["is_new"] || false
   end
 
+  def bulk_import
+    BulkImport.find_by_id(params["bulk_import_id"])
+  end
+
+  def pos_kind
+    return "lightspeed_pos" if is_pos
+    bulk_import&.ascend? ? "ascend_pos" : "no_pos"
+  end
+
   def is_bulk
     bike["is_bulk"] || false
   end
