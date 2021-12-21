@@ -264,7 +264,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     end
     context "unregistered_parking_notification" do
       let(:parking_notification) do
-        pn = FactoryBot.create(:unregistered_parking_notification,
+        pn = FactoryBot.create(:parking_notification_unregistered,
           created_at: Time.current - 1.hour,
           organization: current_organization,
           user: current_user,

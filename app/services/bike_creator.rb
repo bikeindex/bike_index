@@ -265,7 +265,7 @@ class BikeCreator
   end
 
   def create_ownership(bike)
-    ownership = bike.ownerships.new(creator: @b_param.creator, send_email: !@b_param.skip_owner_email?)
+    ownership = bike.ownerships.new(creator: @b_param.creator, skip_email: @b_param.skip_email?)
     ownership.attributes = ownership_creation_attributes
     unless ownership.save
       ownership.errors.messages.each do |message|

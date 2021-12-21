@@ -201,7 +201,7 @@ RSpec.describe BikeCreator do
         expect {
           instance.send(:save_bike, new_bike)
         }.to change(Bike, :count).by(1)
-        expect(b_param.skip_owner_email?).to be_falsey
+        expect(b_param.skip_email?).to be_falsey
       end
     end
 
@@ -253,7 +253,7 @@ RSpec.describe BikeCreator do
         })
         instance = subject.new(b_param)
         expect { instance.create_bike }.to change(Bike, :count).by(1)
-        expect(b_param.skip_owner_email?).to be_falsey
+        expect(b_param.skip_email?).to be_falsey
         bike = Bike.last
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.bike_organizations.count).to eq 1
@@ -331,7 +331,7 @@ RSpec.describe BikeCreator do
         expect(bike.errors).to_not be_present
         b_param.reload
         expect(b_param.created_bike_id).to eq bike.id
-        expect(b_param.skip_owner_email?).to be_truthy
+        expect(b_param.skip_email?).to be_truthy
 
         bike.reload
         expect(bike.creation_organization_id).to eq organization.id
@@ -453,7 +453,7 @@ RSpec.describe BikeCreator do
       expect(b_param.status).to eq "status_impounded"
       bike = instance.create_bike
       expect(b_param.bike_errors).to be_blank
-      expect(b_param.skip_owner_email?).to be_truthy
+      expect(b_param.skip_email?).to be_truthy
       expect(bike.id).to be_present
       expect_attrs_to_match_hash(bike, bike_params)
       expect(bike.status).to eq "status_impounded"

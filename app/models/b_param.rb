@@ -274,7 +274,7 @@ class BParam < ApplicationRecord
     bike && bike["owner_email"]
   end
 
-  def skip_owner_email?
+  def skip_email?
     return true if status_impounded? || unregistered_parking_notification?
     send_email = params.dig("bike", "send_email").to_s
     send_email.present? && !ParamsNormalizer.boolean(send_email)

@@ -168,10 +168,8 @@ class Ownership < ApplicationRecord
   end
 
   def prior_ownerships
-    return Ownership.none unless bike.present?
-    ownerships = bike.ownerships
-    ownerships = ownerships.where("id < ?", id) if id.present?
-    ownerships.reorder(:id)
+    ownerships = Ownership.where(bike_id: bike_id)
+    id.present? ? ownerships.where("id < ?", id) : ownerships
   end
 
   def address_hash

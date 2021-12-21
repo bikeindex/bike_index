@@ -77,7 +77,7 @@ RSpec.describe ImpoundRecord, type: :model do
       end
       context "unregistered_parking_notification" do
         let(:parking_notification) do
-          pn = FactoryBot.create(:unregistered_parking_notification,
+          pn = FactoryBot.create(:parking_notification_unregistered,
             created_at: Time.current - 1.hour,
             organization: organization,
             user: user2,

@@ -1,19 +1,5 @@
 # ONLY created in BikeCreator in production
 class CreationState < ApplicationRecord
-  ORIGIN_ENUM = {
-    web: 0,
-    embed: 1,
-    embed_extended: 2,
-    embed_partial: 3,
-    api_v1: 4,
-    api_v2: 5,
-    bulk_import_worker: 6,
-    organization_form: 7,
-    creator_unregistered_parking_notification: 8,
-    impound_import: 9,
-    transferred: 10
-  }.freeze
-
   belongs_to :bike
   belongs_to :organization # Duplicates Bike#creation_organization_id - generally, use the creation_state organization
   belongs_to :creator, class_name: "User"
@@ -22,7 +8,7 @@ class CreationState < ApplicationRecord
 
   enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM
-  enum origin_enum: ORIGIN_ENUM
+  enum origin_enum: Ownership::ORIGIN_ENUM
 
   before_validation :set_calculated_attributes
   after_create :create_bike_organization

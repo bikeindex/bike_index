@@ -248,7 +248,7 @@ RSpec.describe "BikesController#edit", type: :request do
   end
 
   context "impounded unregistered_parking_notification by current_user" do
-    let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification, kind: "impound_notification") }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, kind: "impound_notification") }
     let(:bike) { parking_notification.bike }
     let(:current_organization) { parking_notification.organization }
     let(:current_user) { parking_notification.user }

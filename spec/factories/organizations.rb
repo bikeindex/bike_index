@@ -64,10 +64,8 @@ FactoryBot.define do
     end
 
     trait :with_auto_user do
-      transient do
-        # passing in user DOESN'T ACTUALLY WORK!! TODO: make it work
-        user { FactoryBot.create(:user) }
-      end
+      # passing in user DOESN'T ACTUALLY WORK!! TODO: make it work
+      transient { user { FactoryBot.create(:user) } }
 
       after(:create) do |organization, evaluator|
         FactoryBot.create(:membership_claimed, user: evaluator.user, organization: organization)

@@ -70,7 +70,7 @@ RSpec.describe ParkingNotification, type: :model do
   end
 
   describe "unregistered" do
-    let(:parking_notification) { FactoryBot.create(:unregistered_parking_notification) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
     let(:organization) { parking_notification.organization }
     let(:bike) { parking_notification.bike }
     it "is unregistered" do
@@ -78,6 +78,7 @@ RSpec.describe ParkingNotification, type: :model do
       parking_notification.reload
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(parking_notification.bike.creator_unregistered_parking_notification?).to be_truthy
+      # TODO: part of #2110 uncomment these
       # expect(parking_notification.bike.current_ownership.creator_unregistered_parking_notification?).to be_truthy
       # expect(parking_notification.bike.current_ownership.send("calculated_organization_pre_registration?")).to be_truthy
       # expect(parking_notification.bike.current_ownership.organization_pre_registration?).to be_truthy
@@ -168,7 +169,7 @@ RSpec.describe ParkingNotification, type: :model do
   end
 
   describe "calculated_unregistered_parking_notification" do
-    let(:parking_notification1) { FactoryBot.create(:unregistered_parking_notification, kind: "parked_incorrectly_notification") }
+    let(:parking_notification1) { FactoryBot.create(:parking_notification_unregistered, kind: "parked_incorrectly_notification") }
     let(:organization) { parking_notification1.organization }
     let!(:bike) { parking_notification1.bike }
     it "sets the impound record" do
