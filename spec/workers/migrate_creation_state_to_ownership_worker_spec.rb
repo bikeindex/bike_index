@@ -21,7 +21,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
     context "before time" do
       it "is truthy" do
         creation_state.update_column :updated_at, before_migrate_time
-        ownership.update_column :updated_at, before_migrate_time
+        ownership.update_column :created_at, before_migrate_time
         creation_state.reload
         ownership.reload
         expect(described_class.migrate?(creation_state, ownership)).to be_truthy
@@ -33,7 +33,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
     before do
       # Update the updated_at to be older
       creation_state.update_column :updated_at, before_migrate_time
-      ownership.update_column :updated_at, before_migrate_time
+      ownership.update_column :created_at, before_migrate_time
       ownership.reload
       creation_state.reload
     end
@@ -117,8 +117,7 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
         let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: ownership.creator) }
         it "only updates the first ownership" do
           ownership2.reload
-          ownership.update_column :updated_at, before_migrate_time
-          ownership2.update_column :updated_at, before_migrate_time
+          ownership2.update_column :created_at, before_migrate_time
           expect(ownership2.reload.current?).to be_truthy
           expect(ownership2.registration_info).to eq({})
           expect(ownership.reload.current?).to be_falsey
@@ -135,6 +134,51 @@ RSpec.describe MigrateCreationStateToOwnershipWorker, type: :job do
           expect(ownership.registration_info).to eq registration_info.as_json
           expect(described_class.migrate?(creation_state, ownership)).to be_falsey
           expect(described_class.migrate?(creation_state, ownership2)).to be_falsey
+        end
+      end
+      context "with multiple of the same creation_state" do
+        let!(:creation_state2) { FactoryBot.create(:creation_state, bike: bike, registration_info: registration_info, creator: creation_state.creator) }
+        it "deletes the extra" do
+          creation_state2.reload
+          creation_state2.update_column :updated_at, before_migrate_time
+          expect(CreationState.where(id: creation_state2.id).count).to eq 1
+          expect(described_class.migrate?(creation_state, ownership)).to be_truthy
+          expect(described_class.migrate?(creation_state2, ownership)).to be_truthy
+          expect(bike.reload.registration_info).to eq registration_info.as_json
+          expect(bike.current_creation_state&.id).to eq creation_state.id
+          expect(ownership.registration_info).to eq({})
+
+          subject.perform(creation_state.id)
+          ownership.reload
+          creation_state.reload
+          expect(CreationState.where(id: creation_state2.id).count).to eq 0
+          expect(creation_state.ownership_id).to eq ownership.id
+          expect(ownership.registration_info).to eq registration_info.as_json
+          expect(described_class.migrate?(creation_state, ownership)).to be_falsey
+          expect(creation_state.registration_info["deleted_creation_states"]).to eq([creation_state2.id])
+        end
+      end
+      context "with different creation states" do
+        let!(:creation_state2) { FactoryBot.create(:creation_state, bike: bike) }
+        it "errors for the second" do
+          creation_state2.reload
+          creation_state2.update_column :updated_at, before_migrate_time
+          expect(CreationState.where(id: creation_state2.id).count).to eq 1
+          expect(described_class.migrate?(creation_state, ownership)).to be_truthy
+          expect(described_class.migrate?(creation_state2, ownership)).to be_truthy
+          expect(ownership.registration_info).to eq({})
+
+          subject.perform(creation_state.id)
+          ownership.reload
+          creation_state.reload
+          expect(creation_state.ownership_id).to eq ownership.id
+          expect(ownership.registration_info).to eq registration_info.as_json
+          expect(described_class.migrate?(creation_state, ownership)).to be_falsey
+          expect(creation_state.registration_info["deleted_creation_states"]).to be_blank
+
+          expect {
+            subject.perform(creation_state2.id)
+          }.to raise_error
         end
       end
     end

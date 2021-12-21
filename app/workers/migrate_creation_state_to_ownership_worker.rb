@@ -11,22 +11,48 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
 
   def self.migrate?(creation_state, ownership)
     creation_state.updated_at.to_i < END_TIMESTAMP &&
-      ownership.updated_at.to_i < END_TIMESTAMP
+      ownership.created_at.to_i < END_TIMESTAMP
   end
 
   def perform(creation_state_id, ownership_id = nil)
     creation_state = CreationState.find(creation_state_id)
+    handle_duplicate_creation_states(creation_state)
+
     bike = Bike.unscoped.find_by_id(creation_state.bike_id)
-    # Break if this isn't as expected, until we have logic to handle it!
-    raise "Multiple Creation States - Bike: #{bike.id}" if CreationState.where(bike_id: bike.id).count != 1
 
     ownership = if ownership_id.present?
       Ownership.find(ownership_id)
     else
       bike.ownerships.first
     end
-    raise "No Ownership - Bike: #{bike.id}" if CreationState.where(bike_id: bike.id).count != 1
+
+    if ownership.blank?
+      # We want to update if possible - even if the bike is deleted, so don't check deleted before now
+      raise "No Ownership - Bike: #{bike.id}" unless bike.deleted?
+    else
+      migrate(creation_state, ownership, bike)
+    end
+  end
+
+  def handle_duplicate_creation_states(creation_state)
+    # Handle duplicate creation states
+    other_creation_states = CreationState.where(bike_id: creation_state.bike_id).where.not(id: creation_state.id)
+    matching_creation_states = other_creation_states.select do |ocs|
+      ocs.attributes.except("id", "created_at", "updated_at") == creation_state.attributes.except("id", "created_at", "updated_at")
+    end
+    matching_ids = matching_creation_states.map(&:id)
+    if matching_creation_states.any?
+      creation_state.update(registration_info: creation_state.registration_info.merge("deleted_creation_states" => matching_ids))
+      matching_creation_states.map(&:destroy)
+    end
+    earlier_creation_states = other_creation_states.where.not(id: matching_ids).where("id < ?", creation_state.id)
+    return true unless earlier_creation_states.any?
+    raise "Earlier Creation State - Bike: #{creation_state.bike_id}"
+  end
+
+  def migrate(creation_state, ownership, bike)
     registration_info = creation_state.registration_info || {}
+    registration_info = registration_info.except("deleted_creation_states")
     ownership.attributes = {
       organization_id: creation_state.organization_id,
       bulk_import_id: creation_state.bulk_import_id,
