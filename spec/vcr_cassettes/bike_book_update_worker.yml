@@ -37,7 +37,7 @@ http_interactions:
       Server:
       - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
       Date:
-      - Fri, 11 Jun 2021 18:40:45 GMT
+      - Tue, 21 Dec 2021 03:16:50 GMT
       Via:
       - 1.1 vegur
     body:
@@ -59,6 +59,6 @@ http_interactions:
         Racing Mushroom Wing Grip w/ SE Rubber End Plugs","cgroup":"Additional parts"},{"component_type":"saddle","description":"SE
         Classic w/ Bottle Opener","cgroup":"Additional parts"},{"component_type":"seatpost","description":"SE
         Straight Post, 27.2mm","cgroup":"Additional parts"}]}'
-    http_version:
-  recorded_at: Fri, 11 Jun 2021 18:40:45 GMT
+    http_version: 
+  recorded_at: Tue, 21 Dec 2021 03:16:50 GMT
 recorded_with: VCR 5.0.0
