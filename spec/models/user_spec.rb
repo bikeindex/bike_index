@@ -380,7 +380,6 @@ RSpec.describe User, type: :model do
       expect(ownership1.user_hidden?).to be_truthy
       expect(ownership1.bike.hidden?).to be_truthy
 
-      # user_again = User.find(user.id)
       expect(user.reload.bike_ids).to match_array([bike1_id, bike2_id])
       expect(user.bike_ids(false)).to eq([bike2_id])
 
