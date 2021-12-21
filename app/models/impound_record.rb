@@ -275,6 +275,6 @@ class ImpoundRecord < ApplicationRecord
     end
     return true if id.blank? && b_created_at > Time.current - 1.hour
     return false unless (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
-    bike&.current_creation_state&.status == "status_impounded" || false
+    bike&.current_ownership&.status == "status_impounded" || false
   end
 end

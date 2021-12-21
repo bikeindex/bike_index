@@ -470,7 +470,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
-      creation_state = bike.current_creation_state
+      creation_state = bike.current_ownership
       expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
       # expect(creation_state.origin).to eq 'api_v3'
 
@@ -497,7 +497,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result["id"])
-      # expect(bike.current_creation_state.origin).to eq 'api_v3'
+      # expect(bike.current_ownership.origin).to eq 'api_v3'
       expect(bike.example).to be_truthy
       expect(bike.is_for_sale).to be_falsey
     end
@@ -537,8 +537,8 @@ RSpec.describe "Bikes API V3", type: :request do
       bike_organization = bike.bike_organizations.first
       expect(bike_organization.organization_id).to eq organization.id
       expect(bike_organization.can_edit_claimed).to be_truthy
-      expect(bike.current_creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
-      expect(bike.current_creation_state.organization).to eq organization
+      expect(bike.current_ownership.origin).to eq "api_v2" # Because it just inherits v2 :/
+      expect(bike.current_ownership.organization).to eq organization
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
@@ -560,7 +560,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to be_within(1).of Time.current.to_i
       bike = Bike.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to be_blank
-      expect(bike.current_creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
+      expect(bike.current_ownership.origin).to eq "api_v2" # Because it just inherits v2 :/
       expect(bike.status_stolen?).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to be_nil
@@ -645,8 +645,8 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(bike.front_wheel_size.iso_bsd).to eq 559
             expect(bike.rear_tire_narrow).to be_truthy
             expect(bike.front_tire_narrow).to be_truthy
-            # expect(bike.current_creation_state.origin).to eq 'api_v3'
-            expect(bike.current_creation_state.organization).to eq organization
+            # expect(bike.current_ownership.origin).to eq 'api_v3'
+            expect(bike.current_ownership.organization).to eq organization
             EmailOwnershipInvitationWorker.drain
             expect(ActionMailer::Base.deliveries).to be_empty
           end

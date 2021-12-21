@@ -176,6 +176,7 @@ class Ownership < ApplicationRecord
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_pre_registration ||= calculated_organization_pre_registration?
+      self.origin = "creator_unregistered_parking_notification" if unregistered_parking_notification?
     end
     self.registration_info = cleaned_registration_info
     if claimed?

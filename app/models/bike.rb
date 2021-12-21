@@ -106,11 +106,11 @@ class Bike < ApplicationRecord
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
   scope :without_creation_state, -> { includes(:creation_states).where(creation_states: {id: nil}) }
-  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
-  scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
-  scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
-  scope :pos_not_lightspeed_ascend, -> { includes(:creation_states).where.not(creation_states: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
-  scope :no_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "no_pos"}) }
+  scope :lightspeed_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "lightspeed_pos"}) }
+  scope :ascend_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "ascend_pos"}) }
+  scope :any_pos, -> { includes(:ownerships).where.not(ownerships: {pos_kind: "no_pos"}) }
+  scope :pos_not_lightspeed_ascend, -> { includes(:ownerships).where.not(ownerships: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
+  scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
 
@@ -296,30 +296,30 @@ class Bike < ApplicationRecord
   end
 
   def creation_description
-    current_creation_state&.creation_description
+    current_ownership&.creation_description
   end
 
   def bulk_import
-    current_creation_state&.bulk_import
+    current_ownership&.bulk_import
   end
 
   def pos_kind
-    current_creation_state&.pos_kind
+    current_ownership&.pos_kind
   end
 
   def registration_info
-    current_creation_state&.registration_info || {}
+    current_ownership&.registration_info || {}
   end
 
   def creator_unregistered_parking_notification?
-    current_creation_state&.creator_unregistered_parking_notification?
+    current_ownership&.creator_unregistered_parking_notification?
   end
 
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
-    return false if current_creation_state.blank?
-    %w[unregistered_parking_notification impound_import].include?(current_creation_state.origin) ||
-      current_creation_state.status == "status_impounded"
+    return false if current_ownership.blank?
+    %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
+      current_ownership.status == "status_impounded"
   end
 
   def pos?
@@ -818,7 +818,7 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_creation_state&.address_hash.present?
+    elsif current_ownership&.address_hash.present?
       "initial_creation"
     end
   end
@@ -829,7 +829,7 @@ class Bike < ApplicationRecord
     @registration_address = case registration_address_source
     when "user" then user&.address_hash
     when "bike_update" then address_hash
-    when "initial_creation" then current_creation_state.address_hash
+    when "initial_creation" then current_ownership.address_hash
     else
       {}
     end.with_indifferent_access
