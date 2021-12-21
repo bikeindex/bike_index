@@ -19,26 +19,26 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
 
   def perform(creation_state_id, ownership_id = nil)
     creation_state = CreationState.find_by_id(creation_state_id)
-    if creation_state.present? && no_earlier_duplicate_creation_states?(creation_state)
+    return if creation_state.blank?
+    return if earlier_duplicate_creation_states?(creation_state)
 
-      bike = Bike.unscoped.find_by_id(creation_state.bike_id)
+    bike = Bike.unscoped.find_by_id(creation_state.bike_id)
 
-      ownership = if ownership_id.present?
-        Ownership.find(ownership_id)
-      else
-        bike.ownerships.first
-      end
+    ownership = if ownership_id.present?
+      Ownership.find(ownership_id)
+    else
+      bike.ownerships.first
+    end
 
-      if ownership.blank?
-        # We want to update if possible - even if the bike is deleted, so don't check deleted before now
-        raise "No Ownership - Bike: #{bike.id}" unless bike.deleted?
-      else
-        migrate(creation_state, ownership, bike)
-      end
+    if ownership.blank?
+      # We want to update if possible - even if the bike is deleted, so don't check deleted before now
+      raise "No Ownership - Bike: #{bike.id}" unless bike.deleted?
+    else
+      migrate(creation_state, ownership, bike)
     end
   end
 
-  def no_earlier_duplicate_creation_states?(creation_state)
+  def earlier_duplicate_creation_states?(creation_state)
     # Handle duplicate creation states
     other_creation_states = CreationState.where(bike_id: creation_state.bike_id).where.not(id: creation_state.id)
     matching_creation_states = other_creation_states.select do |ocs|
@@ -51,10 +51,10 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
     end
     # Exit this method if there are no earlier creation states
     if other_creation_states.where.not(id: matching_ids).where("id < ?", creation_state.id).none?
-      return true
+      return false
     end
     creation_state.touch
-    false
+    true
   end
 
   def migrate(creation_state, ownership, bike)

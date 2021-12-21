@@ -41,10 +41,12 @@ task exchange_rates_update: :environment do
 end
 
 task migrate_creation_states: :environment do
-  return true if ScheduledWorker.enqueued? # Queue is probably overflowing
-  # Get CreationStates that haven't been updated since the updated timestamp
-  MigrateCreationStateToOwnershipWorker.creation_states.limit(3000)
-    .pluck(:id).each { |id| MigrateCreationStateToOwnershipWorker.perform_async(id) }
+  # Skip if we're backing the queue up
+  unless ScheduledWorker.enqueued? # Queue is probably overflowing
+    # Get CreationStates that haven't been updated since the updated timestamp
+    MigrateCreationStateToOwnershipWorker.creation_states.limit(2500)
+      .pluck(:id).each { |id| MigrateCreationStateToOwnershipWorker.perform_async(id) }
+  end
 end
 
 task database_size: :environment do
