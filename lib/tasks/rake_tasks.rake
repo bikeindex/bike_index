@@ -42,7 +42,9 @@ end
 
 task migrate_creation_states: :environment do
   MigrateCreationStateToOwnershipWorker.enqueue
-  sleep(30)
+  sleep(20)
+  MigrateCreationStateToOwnershipWorker.enqueue
+  sleep(20)
   MigrateCreationStateToOwnershipWorker.enqueue
 end
 
