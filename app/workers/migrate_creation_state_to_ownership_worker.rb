@@ -3,6 +3,7 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
   # This timestamp is when the migration started - so any ownership created *after* this timestamp
   # is assumed to be correct
   END_TIMESTAMP = 1640109567
+  TO_ENQUEUE = (ENV["MIGRATE_CREATION_QUEUE"] || 2500).to_i
 
   def self.creation_states
     CreationState.where("updated_at < ?", Time.at(END_TIMESTAMP)).order(updated_at: :desc)
@@ -15,6 +16,13 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
   def self.migrate?(creation_state, ownership)
     creation_state.updated_at.to_i < END_TIMESTAMP &&
       ownership.created_at.to_i < END_TIMESTAMP
+  end
+
+  def self.enqueue
+    # Skip if the queue is backing up
+    return if ScheduledWorker.enqueued?
+    creation_states.limit(TO_ENQUEUE)
+      .pluck(:id).each { |id| MigrateCreationStateToOwnershipWorker.perform_async(id) }
   end
 
   def perform(creation_state_id, ownership_id = nil)
@@ -41,6 +49,7 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
   def earlier_duplicate_creation_states?(creation_state)
     # Handle duplicate creation states
     other_creation_states = CreationState.where(bike_id: creation_state.bike_id).where.not(id: creation_state.id)
+    return false if other_creation_states.none?
     matching_creation_states = other_creation_states.select do |ocs|
       ocs.attributes.except("id", "created_at", "updated_at") == creation_state.attributes.except("id", "created_at", "updated_at")
     end
