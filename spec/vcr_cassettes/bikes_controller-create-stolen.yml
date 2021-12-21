@@ -108,7 +108,7 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version:
+    http_version: 
   recorded_at: Wed, 09 Jan 2019 22:26:56 GMT
 - request:
     method: get
@@ -679,7 +679,7 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version:
+    http_version: 
   recorded_at: Fri, 06 Sep 2019 19:41:06 GMT
 - request:
     method: get
@@ -799,6 +799,121 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version:
+    http_version: 
   recorded_at: Fri, 30 Jul 2021 23:01:13 GMT
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=66666666%20foo%20street,%20Chicago,%20IL%2060647,%20US&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Tue, 21 Dec 2021 01:37:07 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - Chicago, IL
+      Server:
+      - mafe
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=548
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443";
+        ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "60647",
+                       "short_name" : "60647",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Chicago, IL 60647, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 41.9334571,
+                          "lng" : -87.673963
+                       },
+                       "southwest" : {
+                          "lat" : 41.9081301,
+                          "lng" : -87.726979
+                       }
+                    },
+                    "location" : {
+                       "lat" : 41.9215421,
+                       "lng" : -87.70248169999999
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9334571,
+                          "lng" : -87.673963
+                       },
+                       "southwest" : {
+                          "lat" : 41.9081301,
+                          "lng" : -87.726979
+                       }
+                    }
+                 },
+                 "partial_match" : true,
+                 "place_id" : "ChIJ3fO3tQjND4gR1psfMQ0T28k",
+                 "types" : [ "postal_code" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version: 
+  recorded_at: Tue, 21 Dec 2021 01:37:07 GMT
 recorded_with: VCR 5.0.0

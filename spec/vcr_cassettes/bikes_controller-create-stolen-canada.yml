@@ -115,7 +115,7 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version:
+    http_version: 
   recorded_at: Thu, 16 Apr 2020 21:13:42 GMT
 - request:
     method: get
@@ -785,7 +785,7 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version:
+    http_version: 
   recorded_at: Thu, 16 Apr 2020 21:13:42 GMT
 - request:
     method: get
@@ -915,6 +915,135 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version:
+    http_version: 
   recorded_at: Fri, 30 Jul 2021 23:01:14 GMT
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=2222%20Cambridge%20St.,%20Vancouver,%20V5L1E6,%20CA&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Tue, 21 Dec 2021 01:37:08 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - Vancouver
+      Server:
+      - mafe
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=403
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443";
+        ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "2222",
+                       "short_name" : "2222",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "Cambridge Street",
+                       "short_name" : "Cambridge St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Grandview-Woodland",
+                       "short_name" : "Grandview-Woodland",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Vancouver",
+                       "short_name" : "Vancouver",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Metro Vancouver",
+                       "short_name" : "Metro Vancouver",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "British Columbia",
+                       "short_name" : "BC",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "Canada",
+                       "short_name" : "CA",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "V5L 1E6",
+                       "short_name" : "V5L 1E6",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "2222 Cambridge St, Vancouver, BC V5L 1E6, Canada",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 49.2864874,
+                          "lng" : -123.0587732
+                       },
+                       "southwest" : {
+                          "lat" : 49.2862635,
+                          "lng" : -123.0594706
+                       }
+                    },
+                    "location" : {
+                       "lat" : 49.2863705,
+                       "lng" : -123.0590796
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 49.2877244302915,
+                          "lng" : -123.0577729197085
+                       },
+                       "southwest" : {
+                          "lat" : 49.2850264697085,
+                          "lng" : -123.0604708802915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJEWqSAxxxhlQRhktxA4NB8DQ",
+                 "types" : [ "premise" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version: 
+  recorded_at: Tue, 21 Dec 2021 01:37:08 GMT
 recorded_with: VCR 5.0.0
