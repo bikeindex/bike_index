@@ -27,20 +27,19 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
 
   def perform(creation_state_id, ownership_id = nil)
     creation_state = CreationState.find_by_id(creation_state_id)
-    return if creation_state.blank?
-    return if earlier_duplicate_creation_states?(creation_state)
+    return if creation_state.blank? || earlier_duplicate_creation_states?(creation_state)
 
     bike = Bike.unscoped.find_by_id(creation_state.bike_id)
 
     ownership = if ownership_id.present?
       Ownership.find(ownership_id)
-    else
+    elsif bike.present?
       bike.ownerships.first
     end
 
     if ownership.blank?
-      # We want to update if possible - even if the bike is deleted, so don't check deleted before now
-      raise "No Ownership - Bike: #{bike.id}" unless bike.deleted?
+      # Update creation_state so that it doesn't get looked up again
+      return creation_state.update(updated_at: Time.current)
     else
       migrate(creation_state, ownership, bike)
     end
