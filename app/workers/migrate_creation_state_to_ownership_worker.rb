@@ -2,7 +2,7 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
   sidekiq_options queue: "low_priority", retry: false
   # This timestamp is when the migration started - so any creation_state with an updated_at *after* this timestamp
   # is assumed to be correct
-  END_TIMESTAMP = ENV["CREATION_STATE_TIMESTAMP"] || 1640033379
+  END_TIMESTAMP = 1640109567
 
   def self.creation_states
     CreationState.where("updated_at < ?", Time.at(END_TIMESTAMP))
