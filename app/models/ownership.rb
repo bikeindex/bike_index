@@ -211,6 +211,6 @@ class Ownership < ApplicationRecord
   def calculated_organization_pre_registration?
     return false if organization_id.blank?
     return true if creator_unregistered_parking_notification?
-    self_made? && creator_id == organization.auto_user_id
+    self_made? && creator_id == organization&.auto_user_id
   end
 end

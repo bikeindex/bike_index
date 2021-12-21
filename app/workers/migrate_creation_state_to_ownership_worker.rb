@@ -18,13 +18,14 @@ class MigrateCreationStateToOwnershipWorker < ApplicationWorker
     creation_state = CreationState.find(creation_state_id)
     bike = Bike.unscoped.find_by_id(creation_state.bike_id)
     # Break if this isn't as expected, until we have logic to handle it!
-    raise if CreationState.where(bike_id: bike.id).count != 1
+    raise "Multiple Creation States - Bike: #{bike.id}" if CreationState.where(bike_id: bike.id).count != 1
 
     ownership = if ownership_id.present?
       Ownership.find(ownership_id)
     else
       bike.ownerships.first
     end
+    raise "No Ownership - Bike: #{bike.id}" if CreationState.where(bike_id: bike.id).count != 1
     registration_info = creation_state.registration_info || {}
     ownership.attributes = {
       organization_id: creation_state.organization_id,
