@@ -55,6 +55,22 @@ module Organized
       current_organization.parking_notifications
     end
 
+    # What if they don't have any bikes! return something
+    def default_bike
+      bike = current_organization.bikes.last
+      return bike if bike.present?
+      bike = Bike.new(id: 42,
+        creation_organization: current_organization,
+        owner_email: current_user.email,
+        creator: current_user,
+        manufacturer: Manufacturer.other,
+        frame_model: "Example bike",
+        primary_frame_color: Color.black)
+      ownership = bike.ownerships.build(owner_email: bike.owner_email, creator: current_user, id: 420)
+      bike.soon_current_ownership = ownership
+      bike
+    end
+
     def viewable_email_kinds
       return @viewable_email_kinds if defined?(@viewable_email_kinds)
       viewable_email_kinds = ["finished_registration"]
@@ -87,8 +103,8 @@ module Organized
     end
 
     def build_finished_email
-      @bike = @organization.bikes.last
-      @ownership = @bike.current_ownership
+      @bike = default_bike
+      @ownership = @bike.soon_current_ownership
       @user = @ownership.owner
       @vars = {
         new_bike: @ownership.new_registration?,
@@ -102,10 +118,9 @@ module Organized
       graduated_notifications = @organization.graduated_notifications
       @graduated_notification = graduated_notifications.find(params[:graduated_notification_id]) if params[:graduated_notification_id].present?
       @graduated_notification ||= graduated_notifications.last
-      @graduated_notification ||= GraduatedNotification.new(organization_id: current_organization.id, bike: current_organization.bikes.last)
-      @bike = @graduated_notification.bike
+      @graduated_notification ||= GraduatedNotification.new(organization_id: current_organization.id, bike: default_bike)
+      @bike = @graduated_notification.bike || default_bike
       @retrieval_link_url = "#"
-      @bike ||= current_organization.bikes.last
       @graduated_notification
     end
 
@@ -128,13 +143,13 @@ module Organized
       @parking_notification = parking_notifications.find(params[:parking_notification_id]) if params[:parking_notification_id].present?
       @parking_notification ||= parking_notifications.where(kind: @kind).last
       unless @parking_notification.present?
-        @parking_notification = parking_notifications.build(bike: current_organization.bikes.last,
+        @parking_notification = parking_notifications.build(bike: default_bike,
           kind: @kind,
           user: current_user,
           created_at: Time.current - 1.hour)
         @parking_notification.set_location_from_organization
       end
-      @bike = @parking_notification.bike
+      @bike = @parking_notification.bike || default_bike
       @retrieval_link_url = "#"
       @parking_notification
     end

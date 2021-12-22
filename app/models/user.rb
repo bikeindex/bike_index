@@ -311,9 +311,7 @@ class User < ApplicationRecord
   end
 
   def bikes(user_hidden = true)
-    Bike.unscoped
-      .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-      .where(id: bike_ids(user_hidden)).reorder(:created_at)
+    Bike.unscoped.default_includes.where(id: bike_ids(user_hidden)).reorder(:created_at)
   end
 
   # Rough fix for users with large numbers of bikes

@@ -2,6 +2,7 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include Geocodeable
+  include PgSearch::Model
 
   acts_as_paranoid without_default_scope: true
 
@@ -87,12 +88,6 @@ class Bike < ApplicationRecord
   enum propulsion_type: PropulsionType::SLUGS
   enum status: STATUS_ENUM
 
-  default_scope do
-    includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-      .current
-      .order(listing_order: :desc)
-  end
-
   scope :without_location, -> { where(latitude: nil) }
   scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
@@ -113,10 +108,12 @@ class Bike < ApplicationRecord
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
+  scope :default_includes, -> { includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record) }
+
+  default_scope -> { default_includes.current.order(listing_order: :desc) }
 
   before_validation :set_calculated_attributes
 
-  include PgSearch::Model
   pg_search_scope :pg_search, against: {
     serial_number: "A",
     cached_data: "B",

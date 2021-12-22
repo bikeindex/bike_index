@@ -6,7 +6,7 @@ class MyAccountsController < ApplicationController
     @locks_active_tab = params[:active_tab] == "locks"
     @per_page = params[:per_page] || 20
     # If there are over 100 bikes created by the user, we'll have problems loading and sorting them
-    @bikes = if current_user.creation_states.limit(101).count > 100
+    @bikes = if current_user.ownerships.current.limit(101).count > 100
       current_user.rough_approx_bikes.reorder(updated_at: :desc).page(page).per(@per_page)
     else
       Kaminari.paginate_array(current_user.bikes).page(page).per(@per_page)

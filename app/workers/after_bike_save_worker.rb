@@ -57,7 +57,7 @@ class AfterBikeSaveWorker < ApplicationWorker
     ownership = bike.current_ownership
     if ownership.present? && ownership.origin == "web" && ownership.organization_id.blank?
       ownership.organization_id = matching_b_param.organization_id
-      ownership.origin = matching_b_param.origin if (Ownership.origins - ["web"]).include?(matching_b_param.origin)
+      ownership.origin = matching_b_param.origin if (Ownership.origins.keys - ["web"]).include?(matching_b_param.origin)
       ownership.save
       if matching_b_param.organization_id.present?
         bike.update(creation_organization_id: matching_b_param.organization_id)
