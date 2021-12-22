@@ -185,10 +185,11 @@ RSpec.describe "BikesController#update", type: :request do
       FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_organization.auto_user)
     end
     let!(:bike) { parking_notification.bike }
+    let(:ownership1) { bike.ownerships.first }
     let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
     it "updates email and marks not user hidden" do
       bike.reload
-      expect(bike.claimed?).to be_falsey
+      expect(bike.claimed?).to be_truthy
       expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
       expect(bike.creator_unregistered_parking_notification?).to be_truthy
       expect(bike.unregistered_parking_notification?).to be_truthy
@@ -197,6 +198,11 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.ownerships.count).to eq 1
       expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
       expect(bike.stolen_records.count).to eq 0
+      expect(ownership1.user_hidden).to be_truthy
+      expect(ownership1.current).to be_truthy
+      expect(ownership1.organization_pre_registration).to be_truthy
+      expect(ownership1.status).to eq "unregistered_parking_notification"
+      expect(ownership1.origin).to eq "creator_unregistered_parking_notification"
       Sidekiq::Worker.clear_all
       expect {
         patch base_url, params: {
@@ -204,25 +210,44 @@ RSpec.describe "BikesController#update", type: :request do
         }
         expect(flash[:success]).to be_present
       }.to change(Ownership, :count).by 1
-      bike.reload
+      Sidekiq::Worker.drain_all
+      expect(bike.reload.ownerships.count).to eq 2
+      expect(ownership1.reload.user_hidden).to be_falsey # Meh, maybe not ideal? But convenient
+      expect(ownership1.current).to be_falsey
+      expect(ownership1.organization_pre_registration).to be_truthy
+      expect(ownership1.status).to eq "unregistered_parking_notification"
+      expect(ownership1.origin).to eq "creator_unregistered_parking_notification"
+      ownership2 = bike.ownerships.last
+      expect(ownership2.user_hidden).to be_falsey
+      expect(ownership2.current).to be_truthy
+      expect(ownership2.organization_pre_registration).to be_falsey
+      expect(ownership2.new_registration?).to be_truthy
+      expect(ownership2.status).to eq "status_with_owner"
+      expect(ownership2.origin).to eq "transferred_ownership"
+
       expect(bike.claimed?).to be_falsey
       expect(bike.current_ownership.user_id).to be_blank
+      expect(bike.soon_current_ownership_id).to eq ownership2.id
       expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
-      expect(bike.creator_unregistered_parking_notification?).to be_truthy
+      expect(bike.creator_unregistered_parking_notification?).to be_falsey
       expect(bike.stolen_records.count).to eq 0
       expect(bike.status).to eq "status_with_owner"
       expect(bike.user_hidden).to be_falsey
       expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
       expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
-      expect(bike.creator_unregistered_parking_notification?).to be_truthy
     end
     context "add extra information" do
       let(:auto_user) { current_user }
       it "updates, doesn't change status" do
-        bike.current_ownership.update(owner_email: current_user.email) # Can't figure out how to set this in the factory :(
-        bike.reload
-        expect(bike.claimed?).to be_falsey
-        expect(bike.claimable_by?(current_user)).to be_truthy
+        expect(bike.reload.current_ownership.owner_email).to eq current_user.email
+        expect(ownership1.reload.user_hidden).to be_truthy
+        expect(ownership1.current).to be_truthy
+        expect(ownership1.organization_pre_registration).to be_truthy
+        expect(ownership1.status).to eq "unregistered_parking_notification"
+        expect(ownership1.origin).to eq "creator_unregistered_parking_notification"
+        # bike.current_ownership.update(owner_email: current_user.email) # Can't figure out how to set this in the factory :(
+        expect(bike.claimed?).to be_truthy
+        expect(bike.authorized?(current_user)).to be_truthy
         expect(bike.creator_unregistered_parking_notification?).to be_truthy
         expect(bike.unregistered_parking_notification?).to be_truthy
         expect(bike.user_hidden).to be_truthy

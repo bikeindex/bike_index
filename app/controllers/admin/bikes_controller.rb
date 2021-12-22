@@ -6,7 +6,7 @@ class Admin::BikesController < Admin::BaseController
   def index
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = available_bikes.includes(:creation_organization, :creation_states, :paint)
+    @bikes = available_bikes.includes(:creation_organization, :soon_current_ownership, :paint)
       .reorder("bikes.#{sort_column} #{sort_direction}")
       .page(@page).per(per_page)
   end

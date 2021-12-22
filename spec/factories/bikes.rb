@@ -51,6 +51,7 @@ FactoryBot.define do
             owner_email: bike.owner_email,
             user: evaluator.user,
             claimed: evaluator.claimed,
+            claimed_at: evaluator.claimed_at,
             created_at: bike.created_at,
             organization_id: bike.creation_organization_id,
             can_edit_claimed: evaluator.can_edit_claimed,

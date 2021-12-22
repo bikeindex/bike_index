@@ -66,8 +66,8 @@ module Organized
         manufacturer: Manufacturer.other,
         frame_model: "Example bike",
         primary_frame_color: Color.black)
-      ownership = bike.ownerships.build(owner_email: bike.owner_email, creator: current_user, id: 420)
-      bike.soon_current_ownership = ownership
+      @ownership = bike.ownerships.build(owner_email: bike.owner_email, creator: current_user, id: 420)
+      bike.soon_current_ownership = @ownership
       bike
     end
 
@@ -104,7 +104,7 @@ module Organized
 
     def build_finished_email
       @bike = default_bike
-      @ownership = @bike.soon_current_ownership
+      @ownership ||= @bike.current_ownership # Gross things to make default_bike work
       @user = @ownership.owner
       @vars = {
         new_bike: @ownership.new_registration?,

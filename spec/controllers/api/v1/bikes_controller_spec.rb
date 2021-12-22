@@ -105,7 +105,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(created_bike.frame_size_unit).to eq "cm"
         expect(created_bike.primary_frame_color).to eq black
         expect(created_bike.paint_description).to eq "Black/Red"
-        expect(created_bike.creation_states.count).to eq 1
+        expect(created_bike.ownerships.count).to eq 1
         ownership = created_bike.current_ownership
         expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([true, true, false])
         expect(ownership.organization).to eq organization
@@ -131,7 +131,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
         bike.reload
         expect(bike.current_ownership).to eq og_ownership
-        expect(bike.creation_states.count).to eq 1
+        expect(bike.ownerships.count).to eq 1
 
         Sidekiq::Worker.drain_all # Not wrapping both in drain_all, because
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -323,11 +323,11 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
         expect(bike.handlebar_type).to eq bike_attrs[:handlebar_type_slug]
-        creation_state = bike.current_ownership
-        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([false, false, false])
-        expect(creation_state.organization).to eq @organization
-        expect(creation_state.creator).to eq bike.creator
-        expect(creation_state.origin).to eq "api_v1"
+        ownership = bike.current_ownership
+        expect([ownership.pos?, ownership.is_new, ownership.is_bulk]).to eq([false, false, false])
+        expect(ownership.organization).to eq @organization
+        expect(ownership.creator).to eq bike.creator
+        expect(ownership.origin).to eq "api_v1"
       end
 
       it "creates a photos even if one fails" do
