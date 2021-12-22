@@ -283,7 +283,7 @@ RSpec.describe Bike, type: :model do
       let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
       it "scopes correctly" do
-        # There was a factory bug where it was creating multiple creation_states
+        # There was a factory bug where it was creating multiple ownerships
         expect(Ownership.where(bike_id: bike_lightspeed_pos.id).count).to eq 1
         expect(Ownership.count).to eq 2
         expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
@@ -307,7 +307,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.registration_info).to eq({})
           expect(bike.organization_affiliation).to eq "community_member"
         end
-        context "with creation_state" do
+        context "other info" do
           let(:registration_info) { {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"} }
           let(:target_registration_info) { registration_info.as_json.merge("phone" => "7177423423") }
           it "uses correct value" do
@@ -337,7 +337,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.registration_info).to eq({})
           expect(bike.student_id).to eq "424242"
         end
-        context "with creation_state value" do
+        context "with creation value" do
           let(:registration_info) { {street: "717 Market St, SF", phone: "7177423423", student_id: "CCCIIIIBBBBB"} }
           it "uses correct value" do
             bike.reload

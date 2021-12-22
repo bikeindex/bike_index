@@ -40,17 +40,6 @@ task exchange_rates_update: :environment do
   print is_success ? "done.\n" : "failed.\n"
 end
 
-task migrate_creation_states: :environment do
-  # Make it possible to stop job
-  if MigrateCreationStateToOwnershipWorker::TO_ENQUEUE > 10
-    MigrateCreationStateToOwnershipWorker.enqueue
-    sleep(20)
-    MigrateCreationStateToOwnershipWorker.enqueue
-    sleep(20)
-    MigrateCreationStateToOwnershipWorker.enqueue
-  end
-end
-
 task database_size: :environment do
   database_name = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
   sql = "SELECT pg_size_pretty(pg_database_size('#{database_name}'));"

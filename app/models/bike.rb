@@ -27,7 +27,6 @@ class Bike < ApplicationRecord
   belongs_to :front_gear_type
   belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: "User"
-  belongs_to :current_creation_state, class_name: "CreationState"
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :current_impound_record, class_name: "ImpoundRecord"
   belongs_to :soon_current_ownership, class_name: "Ownership" # TODO: part of #2110 - migrate to be current_ownership after
@@ -38,9 +37,8 @@ class Bike < ApplicationRecord
   has_many :organizations, through: :bike_organizations
   has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
   has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization
-  has_many :creation_states
-  # delegate :creator, to: :creation_state, source: :creator
-  # has_one :creation_organization, through: :creation_state, source: :organization
+  # delegate :creator, to: :ownership, source: :creator
+  # has_one :creation_organization, through: :ownership, source: :organization
   has_many :stolen_notifications
   has_many :stolen_records, -> { current_and_not }
   has_many :impound_claims_submitting, through: :stolen_records, source: :impound_claims
@@ -63,7 +61,6 @@ class Bike < ApplicationRecord
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records
-  accepts_nested_attributes_for :current_creation_state
   accepts_nested_attributes_for :components, allow_destroy: true
 
   validates_presence_of :serial_number
@@ -100,7 +97,6 @@ class Bike < ApplicationRecord
   scope :unorganized, -> { where(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
-  scope :without_creation_state, -> { includes(:creation_states).where(creation_states: {id: nil}) }
   scope :lightspeed_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "lightspeed_pos"}) }
   scope :ascend_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "ascend_pos"}) }
   scope :any_pos, -> { includes(:ownerships).where.not(ownerships: {pos_kind: "no_pos"}) }
@@ -809,8 +805,6 @@ class Bike < ApplicationRecord
       "bike_update"
     elsif current_ownership&.address_hash.present?
       "initial_creation"
-    elsif current_creation_state&.address_hash.present?
-      "initial_creation_state"
     end
   end
 

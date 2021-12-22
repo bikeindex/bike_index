@@ -752,49 +752,6 @@ ALTER SEQUENCE public.countries_id_seq OWNED BY public.countries.id;
 
 
 --
--- Name: creation_states; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.creation_states (
-    id integer NOT NULL,
-    bike_id integer,
-    organization_id integer,
-    origin character varying,
-    is_bulk boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    is_pos boolean DEFAULT false NOT NULL,
-    is_new boolean DEFAULT false NOT NULL,
-    creator_id integer,
-    bulk_import_id integer,
-    pos_kind integer,
-    status integer,
-    origin_enum integer,
-    registration_info jsonb,
-    ownership_id integer
-);
-
-
---
--- Name: creation_states_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.creation_states_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: creation_states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.creation_states_id_seq OWNED BY public.creation_states.id;
-
-
---
 -- Name: ctypes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3242,13 +3199,6 @@ ALTER TABLE ONLY public.countries ALTER COLUMN id SET DEFAULT nextval('public.co
 
 
 --
--- Name: creation_states id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.creation_states ALTER COLUMN id SET DEFAULT nextval('public.creation_states_id_seq'::regclass);
-
-
---
 -- Name: ctypes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3797,14 +3747,6 @@ ALTER TABLE ONLY public.content_tags
 
 ALTER TABLE ONLY public.countries
     ADD CONSTRAINT countries_pkey PRIMARY KEY (id);
-
-
---
--- Name: creation_states creation_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.creation_states
-    ADD CONSTRAINT creation_states_pkey PRIMARY KEY (id);
 
 
 --
@@ -4534,27 +4476,6 @@ CREATE INDEX index_components_on_bike_id ON public.components USING btree (bike_
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
-
-
---
--- Name: index_creation_states_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_creation_states_on_bike_id ON public.creation_states USING btree (bike_id);
-
-
---
--- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_creation_states_on_creator_id ON public.creation_states USING btree (creator_id);
-
-
---
--- Name: index_creation_states_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_creation_states_on_organization_id ON public.creation_states USING btree (organization_id);
 
 
 --
@@ -5939,6 +5860,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211215163717'),
 ('20211220183631'),
 ('20211220193440'),
-('20211221010148');
+('20211221010148'),
+('20211222230922');
 
 

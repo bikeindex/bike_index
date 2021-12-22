@@ -258,56 +258,8 @@
       .col-md-6.mt-2
         - ownership_attrs = ownership.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at", "token", "id")
         = pretty_print_json(ownership_attrs, true)
-  .row.mt-2
-    - @bike.creation_states.each do |creation_state|
-      .col-md-6.mt-2
-        %table.table-list
-          %tbody
-            %tr
-              %td Kind
-              %td
-                CreationState
-                - if @bike.current_creation_state_id == creation_state.id
-                  %span.text-success Current creation state
-                - else
-                  %span.text-danger NOT CURRENT!
-            %tr
-              %td
-                Created
-              %td
-                %span.convertTime
-                  = l creation_state.created_at, format: :convert_time
-                - if display_dev_info?
-                  %code.only-dev-visible.small.ml-2
-                    ID: #{creation_state.id}
-            %tr
-              %td
-                Updated
-              %td
-                %span.convertTime
-                  = l creation_state.updated_at, format: :convert_time
-            %tr
-              %td
-                Organization
-              %td
-                - if creation_state.organization_id.present?
-                  - org_display_name = Organization.unscoped.find(creation_state.organization_id)&.name || creation_state.organization_id
-                  = link_to org_display_name, admin_organization_path(creation_state.organization_id)
-            %tr
-              %td
-                Creator
-              %td
-                - if creation_state.creator_id.present?
-                  - creator_display_name = creation_state.creator&.display_name || creation_state.creator_id
-                  = link_to creator_display_name, admin_user_path(creation_state.creator_id)
-            - if creation_state.registration_info.present?
-              - creation_state.registration_info.each do |k, v|
-                %tr
-                  %td= k
-                  %td= v
-      .col-md-6.mt-2
-        = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"), true)
 
+  .row.mt-2
   - if @bike.b_params.any?
     .row
       - @bike.b_params.each do |b_param|

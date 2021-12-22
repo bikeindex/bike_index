@@ -30,7 +30,6 @@ class User < ApplicationRecord
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
 
   has_many :integrations, dependent: :destroy
-  has_many :creation_states, inverse_of: :creator, foreign_key: :creator_id
   has_many :impound_claims
   has_many :impound_records
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
