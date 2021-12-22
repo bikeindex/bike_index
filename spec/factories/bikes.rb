@@ -1,6 +1,5 @@
 # Warning: BikeCreator forces every bike to have an ownership
 # ... But this factory allows creating bikes without ownerships
-# ** recently added the :with_ownership trait which should be used **
 FactoryBot.define do
   factory :bike do
     creator { FactoryBot.create(:user) }
@@ -25,36 +24,42 @@ FactoryBot.define do
         user { nil }
         claimed { false }
         claimed_at { nil }
-        # FYI: Added in #2110 -
+        # Creation State
         can_edit_claimed { true }
-        creation_state_is_pos { false }
         creation_state_pos_kind { "" }
         creation_state_origin { "" }
         creation_state_bulk_import { nil }
         creation_state_registration_info { nil }
       end
+      soon_current_ownership_id { 0 }
+
       after(:create) do |bike, evaluator|
-        # Have to create here so created_at matches
-        if bike.creation_organization_id.present?
-          BikeOrganization.create(bike_id: bike.id,
+        # Sometimes multiple things include with_ownership, this can get called multiple times
+        # Make sure we only do it once
+        if bike.ownerships.count == 0
+          if bike.creation_organization_id.present?
+            BikeOrganization.create(bike_id: bike.id,
+              organization_id: bike.creation_organization_id,
+              can_edit_claimed: evaluator.can_edit_claimed,
+              created_at: bike.created_at)
+          end
+
+          FactoryBot.create(:ownership,
+            bike: bike,
+            creator: bike.creator,
+            owner_email: bike.owner_email,
+            user: evaluator.user,
+            claimed: evaluator.claimed,
+            created_at: bike.created_at,
             organization_id: bike.creation_organization_id,
             can_edit_claimed: evaluator.can_edit_claimed,
-            created_at: bike.created_at)
-        end
+            origin: evaluator.creation_state_origin,
+            pos_kind: evaluator.creation_state_pos_kind,
+            bulk_import: evaluator.creation_state_bulk_import,
+            registration_info: evaluator.creation_state_registration_info)
 
-        create(:ownership,
-          bike: bike,
-          creator: bike.creator,
-          owner_email: bike.owner_email,
-          user: evaluator.user,
-          claimed: evaluator.claimed,
-          created_at: bike.created_at,
-          organization_id: bike.creation_organization_id,
-          can_edit_claimed: evaluator.can_edit_claimed,
-          origin: evaluator.creation_state_origin,
-          pos_kind: evaluator.creation_state_pos_kind,
-          bulk_import: evaluator.creation_state_bulk_import,
-          registration_info: evaluator.creation_state_registration_info)
+          bike.reload
+        end
       end
     end
 
@@ -141,7 +146,6 @@ FactoryBot.define do
       creation_organization { FactoryBot.create(:organization) }
 
       factory :bike_lightspeed_pos do
-        creation_state_is_pos { true }
         creation_state_origin { "api_v1" }
         creation_state_pos_kind { "lightspeed_pos" }
       end
@@ -150,7 +154,6 @@ FactoryBot.define do
         transient do
           bulk_import { FactoryBot.create(:bulk_import_ascend, organization: creation_organization) }
         end
-        creation_state_is_pos { true }
         creation_state_origin { "bulk_import_worker" }
         creation_state_pos_kind { "ascend_pos" }
         creation_state_bulk_import { bulk_import }

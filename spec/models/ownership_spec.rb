@@ -1,6 +1,44 @@
 require "rails_helper"
 
 RSpec.describe Ownership, type: :model do
+  describe "factories" do
+    let(:ownership) { FactoryBot.create(:ownership) }
+    it "creates" do
+      expect(ownership).to be_valid
+    end
+    describe "bike with_ownership_claimed" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      it "creates" do
+        expect(bike.reload.ownerships.count).to eq 1
+        expect(Ownership.count).to eq 1
+        ownership = bike.current_ownership
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.organization_id).to be_blank
+        expect(ownership.owner_email).to eq bike.owner_email
+        expect(ownership.creator).to eq bike.creator
+      end
+      context "bike_organized" do
+        let(:time) { Time.current - 5.weeks }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, created_at: time) }
+        it "creates" do
+          expect(bike.reload.created_at).to be_within(1).of time
+          expect(bike.ownerships.count).to eq 1
+          ownership = bike.current_ownership
+          expect(ownership.claimed?).to be_truthy
+          expect(ownership.organization_id).to eq bike.creation_organization_id
+          expect(ownership.owner_email).to eq bike.owner_email
+          expect(ownership.creator).to eq bike.creator
+          expect(ownership.created_at).to be_within(1).of time
+          expect(bike.bike_organizations.count).to eq 1
+          bike_organization = bike.bike_organizations.first
+          expect(bike_organization.can_edit_claimed).to be_falsey
+          expect(bike_organization.created_at).to be_within(1).of time
+          expect(bike_organization.organization_id).to eq bike.creation_organization_id
+        end
+      end
+    end
+  end
+
   describe "set_calculated_attributes" do
     it "removes leading and trailing whitespace and downcase email" do
       ownership = Ownership.new(owner_email: "   SomE@dd.com ")

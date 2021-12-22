@@ -33,7 +33,7 @@ class Bike < ApplicationRecord
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
 
-  has_many :bike_organizations, dependent: :destroy
+  has_many :bike_organizations
   has_many :organizations, through: :bike_organizations
   has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
   has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization
@@ -47,7 +47,7 @@ class Bike < ApplicationRecord
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
   has_many :public_images, as: :imageable, dependent: :destroy
-  has_many :components, dependent: :destroy
+  has_many :components
   has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
