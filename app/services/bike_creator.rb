@@ -120,6 +120,7 @@ class BikeCreator
       @bike.errors.add(message[0], message[1][0])
     end
     bike.ownerships.destroy_all
+    bike.bike_organizations.destroy_all
     bike.impound_records.destroy_all
     bike.parking_notifications.destroy_all
     bike.destroy
@@ -241,6 +242,7 @@ class BikeCreator
         create_impound_record(@b_param, bike)
       end
       ownership = create_ownership(bike)
+      create_bike_organizations(ownership)
       ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
       bike.create_normalized_serial_segments
       assign_user_attributes(bike, ownership&.user)
@@ -266,6 +268,17 @@ class BikeCreator
       raise "Ownership wasn't saved. Are you sure the bike was created?"
     end
     ownership
+  end
+
+  def create_bike_organizations(ownership)
+    organization = ownership.organization
+    return true unless organization.present?
+    unless BikeOrganization.where(bike_id: ownership.bike_id, organization_id: organization.id).present?
+      BikeOrganization.create(bike_id: ownership.bike_id, organization_id: organization.id, can_edit_claimed: ownership.can_edit_claimed)
+    end
+    if organization.parent_organization.present? && BikeOrganization.where(bike_id: ownership.bike_id, organization_id: organization.parent_organization_id).blank?
+      BikeOrganization.create(bike_id: ownership.bike_id, organization_id: organization.parent_organization_id, can_edit_claimed: ownership.can_edit_claimed)
+    end
   end
 
   def create_parking_notification(b_param, bike)

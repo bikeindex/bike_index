@@ -475,7 +475,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike.frame_model).to eq "Midnight Special"
 
           creation_state = bike.current_ownership
-          expect(creation_state.is_bulk).to be_truthy
+          expect(creation_state.bulk?).to be_truthy
           expect(creation_state.origin).to eq "bulk_import_worker"
           expect(creation_state.organization).to eq organization
           expect(bike.creation_organization).to eq organization
