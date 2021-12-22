@@ -1291,6 +1291,7 @@ RSpec.describe Bike, type: :model do
       let(:bike) do
         FactoryBot.create(:bike_organized,
           creation_organization: organization,
+          owner_email: user.email,
           creator: user,
           creation_state_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
@@ -1300,7 +1301,7 @@ RSpec.describe Bike, type: :model do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
         VCR.use_cassette("organization_export_worker-avery") do
           bike.reload.update(updated_at: Time.current)
-          bike.reload
+          expect(bike.reload.user&.id).to eq user.id
           # We test that the bike has a location saved
           expect(bike.registration_address_source).to eq "initial_creation"
           expect(bike.registration_address(true)).to eq({street: "102 Washington Pl", city: "State College"}.as_json)
@@ -1351,14 +1352,18 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "owner_name" do
-    let(:bike) { Bike.new }
-    let(:user) { User.new(name: "Fun McGee") }
-    context "user" do
-      let(:ownership) { Ownership.new(user: user) }
-      it "returns users name" do
-        allow(bike).to receive(:current_ownership) { ownership }
-        expect(ownership.first?).to be_truthy
-        expect(bike.owner_name).to eq "Fun McGee"
+    context "registration_info" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: {user_name: "Cool Name"}) }
+      let(:user) { FactoryBot.create(:user_confirmed, name: "New name", email: bike.owner_email) }
+      it "is registration_info" do
+        expect(bike.reload.user&.id).to be_blank
+        expect(bike.current_ownership.owner_name).to eq "Cool Name"
+        expect(bike.owner_name).to eq "Cool Name"
+        expect(user).to be_present
+        bike.current_ownership.mark_claimed
+        expect(bike.reload.user&.id).to eq user.id
+        expect(bike.current_ownership.owner_name).to eq "New name"
+        expect(bike.owner_name).to eq "New name"
       end
     end
     context "creator" do
@@ -1367,12 +1372,12 @@ RSpec.describe Bike, type: :model do
       let(:new_owner) { FactoryBot.create(:user, name: "Sally Stuff", email: "sally@example.com") }
       let(:bike) { FactoryBot.create(:bike_organized, claimed: false, user: nil, creator: user, creation_organization: organization, owner_email: "sally@example.com") }
       let(:ownership) { bike.ownerships.first }
-      it "falls back to creator" do
+      it "does not fall back to creator" do
         expect(bike.reload.ownerships.count).to eq 1
         ownership.reload
         expect(ownership.claimed?).to be_falsey
         expect(bike.user).to be_blank
-        expect(bike.owner_name).to eq "Stephanie Example"
+        expect(bike.owner_name).to be_blank
         ownership.user = new_owner
         # Creator name is a fallback, if the bike is claimed we want to use the person who has claimed it
         ownership.mark_claimed
@@ -1381,25 +1386,6 @@ RSpec.describe Bike, type: :model do
         expect(ownership.claimed?).to be_truthy
         expect(ownership.user).to eq new_owner
         expect(bike.owner_name).to eq "Sally Stuff"
-      end
-      context "creator is member of creation organization" do
-        # PSU students keep creating accounts that use a different email from their school email, and then sending bikes to their school email
-        # which means the bike isn't claimed, because it's been sent to their school account rather than their correct email account.
-        # Basically, they're behaving in a way that breaks our existing email flow
-        # For other bikes, e.g. POS integration bikes, we don't want to display the creator
-        # If the creator is a member of the organization, we assume it was not the actual user who created the bike
-        let(:user) { FactoryBot.create(:organization_member, organization: organization, name: "Stephanie Example") }
-        it "is nil" do
-          ownership.reload
-          expect(ownership.claimed?).to be_falsey
-          expect(bike.owner_name).to be_blank
-          expect(bike.user).to be_blank
-          ownership.user = new_owner
-          ownership.mark_claimed
-          bike.reload
-          expect(bike.user).to eq new_owner
-          expect(bike.owner_name).to eq "Sally Stuff"
-        end
       end
     end
   end

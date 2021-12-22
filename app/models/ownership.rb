@@ -230,6 +230,7 @@ class Ownership < ApplicationRecord
 
   def cleaned_registration_info
     return {} unless registration_info.present?
+    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
     self.owner_name ||= registration_info["user_name"]
     registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
     registration_info.reject { |_k, v| v.blank? }

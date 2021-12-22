@@ -445,17 +445,9 @@ class Bike < ApplicationRecord
     made_without_serial? || serial_unknown?
   end
 
-  # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
-  # User - not ownership, because we don't want registrar
+  # This is actually user.name - because user can be nil
   def owner_name
-    return user.name if user&.name.present?
-    # Only look deeper for the name if it's the first owner - or if no owner, which means testing probably
-    return nil unless current_ownership.blank? || current_ownership&.first?
-    oname = registration_info["user_name"]
-    return oname if oname.present?
-    # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
-    return nil if creation_organization.present? && owner&.member_of?(creation_organization)
-    owner&.name
+    current_ownership.owner_name
   end
 
   def first_ownership

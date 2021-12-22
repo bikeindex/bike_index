@@ -53,7 +53,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           FactoryBot.create(:bike_organized,
             manufacturer: trek,
             primary_frame_color: black,
-            organization: organization,
+            creation_organization: organization,
             creation_state_registration_info: {
               street: "102 Washington Pl",
               city: "State College",
@@ -68,7 +68,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           FactoryBot.create(:bike_organized,
             manufacturer: trek,
             primary_frame_color: black,
-            organization: organization,
+            creation_organization: organization,
             creation_state_registration_info: {
               street: "",
               city: "State College",
@@ -162,7 +162,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:email) { "testly@bikeindex.org" }
       let(:bike) do
         FactoryBot.create(:bike_organized,
-          organization: organization,
+          creation_organization: organization,
           manufacturer: Manufacturer.other,
           frame_model: '",,,\"<script>XSSSSS</script>',
           year: 2001,
@@ -315,7 +315,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             extra_registration_number: "cool extra serial",
             registered_by: nil,
             owner_email: bike.owner_email,
-            owner_name: nil,
+            owner_name: user.name,
             organization_affiliation: "community_member",
             phone: "7177423423",
             bike_sticker: "FF 333 333",
@@ -335,6 +335,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike_sticker.user).to eq user
             expect(export.assign_bike_codes?).to be_falsey
             expect(export.headers).to eq Export.permitted_headers("include_paid")
+            expect(bike.reload.user&.id).to be_blank
+            expect(bike.owner_name).to eq nil
             expect(bike.phone).to eq "7177423423"
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
@@ -349,6 +351,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           generated_csv_string = export.file.read
           bike_line = generated_csv_string.split("\n").last
           expect(bike_line.split(",").count).to eq target_row.keys.count
+          pp "", bike_line, instance.comma_wrapped_string(target_row.values).strip
           expect(bike_line).to eq instance.comma_wrapped_string(target_row.values).strip
         end
       end

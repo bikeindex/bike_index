@@ -25,7 +25,8 @@ FactoryBot.define do
         claimed { false }
         claimed_at { nil }
         can_edit_claimed { true }
-        # Previous Creation State attributes, kept prefix
+        # Previous Creation State attributes
+        # TODO: part of #2110 - remove prefix
         creation_state_pos_kind { "" }
         creation_state_origin { "" }
         creation_state_bulk_import { nil }

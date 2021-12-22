@@ -11,7 +11,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
 
   describe "perform" do
     let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
-    let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, organization: organization) }
+    let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization) }
     it "schedules all the workers" do
       organization.reload
       pos_bike.reload
@@ -25,7 +25,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
       expect(organization.pos_kind).to eq "ascend_pos"
     end
     context "broken ascend" do
-      let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, organization: organization, created_at: Time.current - 1.month) }
+      let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: Time.current - 1.month) }
       it "updates to broken" do
         organization.reload
         pos_bike.reload
@@ -38,7 +38,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
       end
     end
     context "broken lightspeed" do
-      let!(:pos_bike) { FactoryBot.create(:bike_lightspeed_pos, organization: organization, created_at: Time.current - 1.month) }
+      let!(:pos_bike) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: organization, created_at: Time.current - 1.month) }
       it "updates to broken" do
         organization.reload
         pos_bike.reload
@@ -55,7 +55,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
   describe "organization calculated_pos_kind" do
     context "organization with pos bike and non pos bike" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
-      let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, organization: organization) }
+      let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: organization) }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       it "returns pos type" do
         organization.reload
