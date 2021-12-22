@@ -115,8 +115,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           organization: organization,
           body: "<p>SECURITYXSNIPPET</p>")
       end
-      let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
-
+      let!(:ownership) { bike.ownerships.first }
       before do
         expect([header_mail_snippet, welcome_mail_snippet, security_mail_snippet]).to be_present
         expect(organization.mail_snippets.count).to eq 3
@@ -124,7 +123,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       context "new non-stolen bike" do
         let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
         it "renders email and includes the snippets" do
-          expect(ownership.bike.ownerships.count).to eq 1
+          expect(bike.reload.ownerships.count).to eq 1
           expect(mail.subject).to eq("Confirm your #{organization.short_name} Bike Index registration")
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.body.encoded).to match welcome_mail_snippet.body
@@ -133,9 +132,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
         end
       end
       context "new stolen registration" do
-        let(:bike) { FactoryBot.create(:stolen_bike, creation_organization: organization) }
+        let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creation_organization: organization) }
         it "renders and includes the org name in the title" do
-          expect(ownership.bike.ownerships.count).to eq 1
+          expect(bike.reload.ownerships.count).to eq 1
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.body.encoded).to match welcome_mail_snippet.body
           expect(mail.body.encoded).to match security_mail_snippet.body
@@ -144,12 +143,17 @@ RSpec.describe OrganizedMailer, type: :mailer do
         end
       end
       context "non-new (pre-existing ownership)" do
-        let(:bike) { FactoryBot.create(:bike, creation_organization: organization) }
-        let!(:pre_existing_ownership) { FactoryBot.create(:ownership, bike: bike, created_at: Time.current - 1.minute) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+        let(:previous_ownership) { bike.ownerships.first }
+        let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
         it "renders email and doesn't include the snippets or org name" do
-          expect(ownership.bike.ownerships.count).to eq 2
-          expect(bike.ownerships.first).to eq pre_existing_ownership
+          expect(bike.reload.ownerships.count).to eq 2
+          expect(bike.ownerships.first).to eq previous_ownership
+          expect(previous_ownership.reload.current).to be_falsey
+          expect(previous_ownership.organization_pre_registration).to be_falsey
           expect(bike.current_ownership).to eq ownership
+          expect(ownership.reload.new_registration?).to be_falsey
+          expect(ownership.organization).to be_blank
           expect(mail.body.encoded).to_not match header_mail_snippet.body
           expect(mail.body.encoded).to_not match welcome_mail_snippet.body
           expect(mail.body.encoded).to_not match security_mail_snippet.body

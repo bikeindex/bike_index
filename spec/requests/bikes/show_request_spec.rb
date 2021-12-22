@@ -52,7 +52,7 @@ RSpec.describe "BikesController#show", type: :request do
   context "second ownership, from organization, with claim token" do
     let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "new_user@stuff.com", creator: organization.auto_user) }
-    let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator) }
+    let!(:ownership1) { bike.ownerships.first }
     let!(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: bike.owner_email) }
     let(:current_user) { nil }
     it "renders claim_message" do
@@ -245,7 +245,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(bike.status).to eq "unregistered_parking_notification"
         expect(bike.current_ownership).to be_present
         expect(bike.current_ownership.status).to eq "unregistered_parking_notification"
-        expect(bike.current_ownership.origin_enum).to eq "creator_unregistered_parking_notification"
+        expect(bike.current_ownership.origin).to eq "creator_unregistered_parking_notification"
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
         expect(assigns(:bike)).to eq bike
