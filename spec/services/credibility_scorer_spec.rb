@@ -84,7 +84,7 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "with organization" do
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, created_at: created_at) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: created_at) }
       let(:created_at) { Time.current - 20.days }
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
       let(:ownership) { bike.current_ownership }
@@ -104,7 +104,7 @@ RSpec.describe CredibilityScorer do
           expect(organization.is_paid).to be_truthy
           expect(subject.creation_badges(ownership)).to match_array([:creation_organization_trusted, :created_this_month])
           # It doesn't return anything but created_at_point_of_sale
-          ownership.update(is_pos: true)
+          ownership.update(pos_kind: "other_pos")
           expect(subject.creation_badges(ownership)).to eq([:created_at_point_of_sale])
           expect(instance.badges).to eq([:created_at_point_of_sale])
           expect(instance.score).to eq 100
@@ -129,7 +129,8 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "registered 2 years ago" do
-      let!(:ownership) { FactoryBot.create(:ownership, created_at: Time.current - 1.day - 2.years, bike: bike) }
+      let(:created_at) { Time.current - 1.day - 2.years }
+      let!(:ownership) { FactoryBot.create(:ownership, created_at: created_at, bike: bike) }
       it "returns long_time_registration" do
         bike.reload
         expect(subject.creation_age_badge(ownership)).to eq :long_time_registration

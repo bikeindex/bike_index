@@ -291,7 +291,7 @@ class MailchimpDatum < ApplicationRecord
       unless mailchimp_organization_membership.organization_creator?
         updated_tags << "not_org_creator"
       end
-      if %w[lightspeed_pos ascend_pos].include?(mailchimp_organization.pos_kind)
+      if mailchimp_organization.pos?
         updated_tags << mailchimp_organization.pos_kind.gsub("_pos", "")
         updated_tags << "pos_approved"
       end

@@ -225,7 +225,7 @@ class Organization < ApplicationRecord
     self.class.broken_pos_kinds.include?(pos_kind)
   end
 
-  def any_pos?
+  def pos?
     self.class.pos?(pos_kind)
   end
 
