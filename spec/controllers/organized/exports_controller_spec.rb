@@ -322,7 +322,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
     describe "update bike_codes_removed" do
       let(:export) { FactoryBot.build(:export_avery, progress: "pending", file: nil, bike_code_start: "z ", organization: organization, user: user) }
       let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, creation_organization: organization, code: "z") }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "z") }
       it "removes the bike codes" do
         export.options = export.options.merge(bike_codes_assigned: ["Z"])
         bike_sticker.claim(user: user, bike: bike)

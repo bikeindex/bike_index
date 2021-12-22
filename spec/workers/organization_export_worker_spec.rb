@@ -160,8 +160,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: Export::PERMITTED_HEADERS, bike_code_start: "fff"}) }
       let(:secondary_color) { FactoryBot.create(:color) }
       let(:email) { "testly@bikeindex.org" }
-      let(:bike) do
+      let!(:bike) do
         FactoryBot.create(:bike_organized,
+          :with_ownership_claimed,
           creation_organization: organization,
           manufacturer: Manufacturer.other,
           frame_model: '",,,\"<script>XSSSSS</script>',
@@ -170,9 +171,11 @@ RSpec.describe OrganizationExportWorker, type: :job do
           primary_frame_color: Color.black,
           extra_registration_number: "cool extra serial",
           secondary_frame_color: secondary_color,
+          creator: FactoryBot.create(:user_confirmed, name: "other person"),
+          user: FactoryBot.create(:user, name: "George Smith", email: email),
           owner_email: email)
       end
-      let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
+      # let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
       let(:bike_values) do
         [
           "http://test.host/bikes/#{bike.id}",
@@ -193,6 +196,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       end
       let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
+        expect(bike.reload.owner_name).to eq "George Smith"
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"

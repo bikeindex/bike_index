@@ -161,7 +161,7 @@ class Ownership < ApplicationRecord
     !calculated_organization.enabled?("skip_ownership_email")
   end
 
-  # This got a little unwieldy in #2110 - but, it's still going on, so let it go
+  # This got a little unwieldy in #2110 - TODO, maybe - clean up
   def set_calculated_attributes
     # Gotta assign this before checking email, in case it's a phone reg
     self.is_phone ||= bike.phone_registration? if id.blank? && bike.present?
@@ -182,11 +182,9 @@ class Ownership < ApplicationRecord
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_pre_registration ||= calculated_organization_pre_registration?
-      # Explained in specs
-      self.owner_name ||= creator.name unless organization_pre_registration
     end
     self.registration_info = cleaned_registration_info
-    # Would this be better in BikeCreator? Maybe, but specs depend on this
+    # Would this be better in BikeCreator? Maybe, but specs depend on this always being set
     self.origin ||= "web"
     if claimed?
       self.claimed_at ||= Time.current
