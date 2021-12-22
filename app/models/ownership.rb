@@ -42,6 +42,7 @@ class Ownership < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
+  after_create :create_bike_organizations
 
   attr_accessor :creator_email, :user_email, :can_edit_claimed
 
@@ -208,6 +209,17 @@ class Ownership < ApplicationRecord
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
     EmailOwnershipInvitationWorker.perform_in(2.seconds, id)
+  end
+
+  # TODO: part of #2110 - remove, added to replicate CreationState
+  def create_bike_organizations
+    return true unless organization.present?
+    unless BikeOrganization.where(bike_id: bike_id, organization_id: organization_id).present?
+      BikeOrganization.create(bike_id: bike_id, organization_id: organization_id, can_edit_claimed: can_edit_claimed)
+    end
+    if organization.parent_organization.present? && BikeOrganization.where(bike_id: bike_id, organization_id: organization.parent_organization_id).blank?
+      BikeOrganization.create(bike_id: bike_id, organization_id: organization.parent_organization_id, can_edit_claimed: can_edit_claimed)
+    end
   end
 
   def create_user_registration_for_phone_registration!(user)
