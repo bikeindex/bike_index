@@ -108,7 +108,7 @@ class Bike < ApplicationRecord
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
-  scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :soon_current_ownership, :current_stolen_record) }
+  scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record) }
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
