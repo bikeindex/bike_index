@@ -472,4 +472,68 @@ RSpec.describe Ownership, type: :model do
       end
     end
   end
+
+  describe "owner_name" do
+    context "registration_info" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: {user_name: "Cool Name"}) }
+      let(:user) { FactoryBot.create(:user_confirmed, name: "New name", email: bike.owner_email) }
+      it "is registration_info" do
+        expect(bike.reload.user&.id).to be_blank
+        expect(bike.current_ownership.owner_name).to eq "Cool Name"
+        expect(bike.owner_name).to eq "Cool Name"
+        expect(user).to be_present
+        bike.current_ownership.mark_claimed
+        expect(bike.reload.user&.id).to eq user.id
+        expect(bike.current_ownership.owner_name).to eq "New name"
+        expect(bike.owner_name).to eq "New name"
+      end
+    end
+    context "with creator" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:creator) { FactoryBot.create(:user_confirmed, name: "Stephanie Example") }
+      let(:new_owner) { FactoryBot.create(:user, name: "Sally Stuff", email: "sally@example.com") }
+      let(:bike) { FactoryBot.create(:bike_organized, claimed: false, user: nil, creator: creator, creation_organization: organization, owner_email: "sally@example.com") }
+      let(:ownership) { bike.ownerships.first }
+      it "uses creator" do
+        expect(bike.reload.ownerships.count).to eq 1
+        ownership.reload
+        expect(ownership.claimed?).to be_falsey
+        expect(ownership.organization_pre_registration?).to be_falsey
+        expect(ownership.owner_name).to eq "Stephanie Example"
+        expect(bike.owner_name).to eq "Stephanie Example"
+        ownership.user = new_owner
+        # Creator name is a fallback, if the bike is claimed we want to use the person who has claimed it
+        ownership.mark_claimed
+        bike.reload
+        ownership.reload
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.user).to eq new_owner
+        expect(bike.owner_name).to eq "Sally Stuff"
+      end
+      context "creator auto user" do
+        # PSU students keep creating accounts that use a different email from their school email, and then sending bikes to their school email
+        # which means the bike isn't claimed, because it's been sent to their school account rather than their correct email account.
+        # Basically, they're behaving in a way that breaks our existing email flow
+        # For other bikes, e.g. POS integration bikes, we don't want to display the creator
+        # If the creator is a member of the organization, we assume it was not the actual user who created the bike
+        let(:organization) { FactoryBot.create(:organization_with_auto_user, user: creator) }
+        it "does not use creator" do
+          expect(organization.reload.auto_user_id).to eq creator.id
+          expect(bike.reload.ownerships.count).to eq 1
+          ownership.reload
+          expect(ownership.claimed?).to be_falsey
+          expect(ownership.organization_pre_registration?).to be_truthy
+          expect(ownership.owner_name).to be_blank
+          expect(bike.owner_name).to be_blank
+          ownership.user = new_owner
+          ownership.mark_claimed
+          bike.reload
+          ownership.reload
+          expect(ownership.claimed?).to be_truthy
+          expect(ownership.user).to eq new_owner
+          expect(bike.owner_name).to eq "Sally Stuff"
+        end
+      end
+    end
+  end
 end

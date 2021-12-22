@@ -315,7 +315,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             extra_registration_number: "cool extra serial",
             registered_by: nil,
             owner_email: bike.owner_email,
-            owner_name: user.name,
+            owner_name: nil,
             organization_affiliation: "community_member",
             phone: "7177423423",
             bike_sticker: "FF 333 333",
@@ -351,7 +351,6 @@ RSpec.describe OrganizationExportWorker, type: :job do
           generated_csv_string = export.file.read
           bike_line = generated_csv_string.split("\n").last
           expect(bike_line.split(",").count).to eq target_row.keys.count
-          pp "", bike_line, instance.comma_wrapped_string(target_row.values).strip
           expect(bike_line).to eq instance.comma_wrapped_string(target_row.values).strip
         end
       end

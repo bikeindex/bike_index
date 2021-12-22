@@ -73,9 +73,6 @@ class Ownership < ApplicationRecord
 
   def new_registration?
     return true if first?
-    # If this was first registered to an organization and is now being transferred
-    # (either because it was pre-registered or an unregistered impounded bike)
-    # it counts as a new registration
     second? && calculated_organization.present?
   end
 
@@ -185,6 +182,8 @@ class Ownership < ApplicationRecord
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_pre_registration ||= calculated_organization_pre_registration?
+      # Explained in specs
+      self.owner_name ||= creator.name unless organization_pre_registration
     end
     self.registration_info = cleaned_registration_info
     # Would this be better in BikeCreator? Maybe, but specs depend on this

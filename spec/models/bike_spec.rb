@@ -1351,45 +1351,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "owner_name" do
-    context "registration_info" do
-      let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: {user_name: "Cool Name"}) }
-      let(:user) { FactoryBot.create(:user_confirmed, name: "New name", email: bike.owner_email) }
-      it "is registration_info" do
-        expect(bike.reload.user&.id).to be_blank
-        expect(bike.current_ownership.owner_name).to eq "Cool Name"
-        expect(bike.owner_name).to eq "Cool Name"
-        expect(user).to be_present
-        bike.current_ownership.mark_claimed
-        expect(bike.reload.user&.id).to eq user.id
-        expect(bike.current_ownership.owner_name).to eq "New name"
-        expect(bike.owner_name).to eq "New name"
-      end
-    end
-    context "creator" do
-      let(:organization) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:user_confirmed, name: "Stephanie Example") }
-      let(:new_owner) { FactoryBot.create(:user, name: "Sally Stuff", email: "sally@example.com") }
-      let(:bike) { FactoryBot.create(:bike_organized, claimed: false, user: nil, creator: user, creation_organization: organization, owner_email: "sally@example.com") }
-      let(:ownership) { bike.ownerships.first }
-      it "does not fall back to creator" do
-        expect(bike.reload.ownerships.count).to eq 1
-        ownership.reload
-        expect(ownership.claimed?).to be_falsey
-        expect(bike.user).to be_blank
-        expect(bike.owner_name).to be_blank
-        ownership.user = new_owner
-        # Creator name is a fallback, if the bike is claimed we want to use the person who has claimed it
-        ownership.mark_claimed
-        bike.reload
-        ownership.reload
-        expect(ownership.claimed?).to be_truthy
-        expect(ownership.user).to eq new_owner
-        expect(bike.owner_name).to eq "Sally Stuff"
-      end
-    end
-  end
-
   describe "phone" do
     let(:bike) { Bike.new }
     let(:user) { FactoryBot.create(:user, phone: "765.987.1234") }
