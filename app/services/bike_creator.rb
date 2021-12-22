@@ -153,7 +153,7 @@ class BikeCreator
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
     if @bike.present? && @bike.id.present? && @bike.current_creation_state.blank?
-      # Only place creation_state should be created (except in testing)
+      # TODO: part of #2110 - remove after shipping updated migration. Don't want to do it yet!
       @bike.creation_states.create(creation_state_attributes.merge(ownership_id: @bike.current_ownership&.id))
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker_code.present? && @bike.creation_organization.present?
