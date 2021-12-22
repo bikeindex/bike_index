@@ -226,9 +226,15 @@ module ApplicationHelper
     end
   end
 
-  def pretty_print_json(data)
+  def pretty_print_json(data, no_blank = false)
     require "coderay"
-    CodeRay.scan(JSON.pretty_generate(data), :json).div.html_safe
+    cleaned_data = if no_blank
+      # Show false values, just not empty or nil things
+      data.select { |k, v| (v.present? || v == false) ? [k, v] : nil }.compact.to_h
+    else
+      data
+    end
+    CodeRay.scan(JSON.pretty_generate(cleaned_data), :json).div.html_safe
   end
 
   def bike_placeholder_image_path

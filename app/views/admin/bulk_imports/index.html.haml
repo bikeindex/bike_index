@@ -90,5 +90,5 @@
                 - else
                   = bulk_import.file_filename
             %td
-              = bulk_import.creation_states.count # Don't need to do bikes through creation states
+              = admin_number_display bulk_import.ownerships.count # Don't need to do bikes through creation states
 = paginate @bulk_imports, views_prefix: 'admin'

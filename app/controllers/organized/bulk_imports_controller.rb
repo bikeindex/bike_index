@@ -10,7 +10,7 @@ module Organized
     def index
       page = params[:page] || 1
       per_page = params[:per_page] || 25
-      @bulk_imports = available_bulk_imports.includes(:creation_states)
+      @bulk_imports = available_bulk_imports.includes(:ownerships)
         .reorder("bulk_imports.#{sort_column} #{sort_direction}")
         .page(page).per(per_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1

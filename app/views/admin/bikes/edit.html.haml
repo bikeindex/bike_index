@@ -256,7 +256,8 @@
                   %td= k
                   %td= v
       .col-md-6.mt-2
-        = pretty_print_json(ownership.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at", "token"))
+        - ownership_attrs = ownership.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at", "token", "id")
+        = pretty_print_json(ownership_attrs, true)
   .row.mt-2
     - @bike.creation_states.each do |creation_state|
       .col-md-6.mt-2
@@ -305,7 +306,7 @@
                   %td= k
                   %td= v
       .col-md-6.mt-2
-        = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"))
+        = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"), true)
 
   - if @bike.b_params.any?
     .row
@@ -332,7 +333,7 @@
                   %span.convertTime
                     = l b_param.updated_at, format: :convert_time
         .col-md-6.mt-2
-          = pretty_print_json(b_param.params)
+          = pretty_print_json(b_param.params, true)
   - else
     %p
       No <code>BParams</code> exist

@@ -6,7 +6,7 @@ class Admin::BulkImportsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 10
-    @bulk_imports = matching_bulk_imports.includes(:organization, :user, :creation_states)
+    @bulk_imports = matching_bulk_imports.includes(:organization, :user, :ownerships)
       .reorder(sort_column + " " + sort_direction)
       .page(page).per(per_page)
   end

@@ -70,7 +70,7 @@
         %td
           = bulk_import.user.display_name if bulk_import.user_id.present?
         %td
-          = bulk_import.creation_states.count # Don't need to do bikes through creation states
+          = bulk_import.ownerships.count # Don't need to do bikes through creation states
 
 .paginate-container.paginate-container-bottom
   = paginate @bulk_imports

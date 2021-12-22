@@ -82,7 +82,7 @@ class Admin::GraphsController < Admin::BaseController
       Ownership.origins.keys.map do |origin|
         {
           name: origin.humanize,
-          data: helpers.time_range_counts(collection: bikes.includes(:creation_states).where(creation_states: {origin: origin}))
+          data: helpers.time_range_counts(collection: bikes.includes(:ownerships).where(ownerships: {origin: origin}))
         }
       end
     elsif @bike_graph_kind == "pos"

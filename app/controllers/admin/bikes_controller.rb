@@ -160,13 +160,13 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.non_example if params[:search_example] == "non_example_only"
     if current_organization.present?
       bikes = if ParamsNormalizer.boolean(params[:search_only_creation_organization])
-        bikes.includes(:creation_states).where(creation_states: {organization_id: current_organization.id})
+        bikes.includes(:ownerships).where(ownerships: {organization_id: current_organization.id})
       else
         bikes.organization(current_organization)
       end
     elsif params[:organization_id] == "false"
       # Have to include deleted_at or else we get nil
-      bikes = bikes.includes(:creation_states).where(deleted_at: nil, creation_states: {organization_id: nil})
+      bikes = bikes.includes(:ownerships).where(deleted_at: nil, ownerships: {organization_id: nil})
     end
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
     if params[:search_stolen].present?
@@ -176,7 +176,7 @@ class Admin::BikesController < Admin::BaseController
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
-    bikes = bikes.includes(:creation_states).where(creation_states: {origin: @origin_search_type}) if @origin_search_type.present?
+    bikes = bikes.includes(:ownerships).where(ownerships: {origin: @origin_search_type}) if @origin_search_type.present?
     bikes
   end
 
