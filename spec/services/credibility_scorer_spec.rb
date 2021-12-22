@@ -3,7 +3,8 @@ require "rails_helper"
 RSpec.describe CredibilityScorer do
   let(:subject) { described_class }
   let(:instance) { subject.new(bike) }
-  let(:bike) { FactoryBot.create(:bike) }
+  let(:created_at) { Time.current - 1.day }
+  let(:bike) { FactoryBot.create(:bike, created_at: created_at) }
 
   describe "all_badges" do
     it "is a one dimensional hash" do
@@ -139,8 +140,8 @@ RSpec.describe CredibilityScorer do
   end
 
   describe "ownership_badges" do
-    let!(:ownership) { FactoryBot.create(:ownership, bike: bike, created_at: ownership1.created_at, creator: ownership1.creator) }
-    let!(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: Time.current - 400.days, creator: bike.creator) }
+    let(:created_at) { Time.current - 400.days }
+    let!(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: created_at, creator: bike.creator) }
     it "returns claimed" do
       bike.reload
       expect(subject.ownership_badges(bike)).to eq([:current_ownership_claimed])
@@ -153,6 +154,7 @@ RSpec.describe CredibilityScorer do
         bike.reload
         ownership1.reload
         ownership2.reload
+        expect(bike.ownerships.count).to eq 2
         expect(bike.current_ownership).to eq ownership2
         expect(ownership1.current?).to be_falsey
         expect(subject.ownership_badges(bike)).to eq([:multiple_ownerships])
@@ -163,9 +165,8 @@ RSpec.describe CredibilityScorer do
   end
 
   describe "bike_user_badges" do
-    let!(:bike) { FactoryBot.create(:bike, creator: user) }
-    let(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: Time.current - 6.years, creator: bike.creator) }
-    let!(:ownership) { FactoryBot.create(:ownership, creator: user, bike: bike, created_at: ownership1.created_at) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user, created_at: Time.current - 6.years) }
+    let(:ownership1) { bike.reload.ownerships.first }
     let(:user) { FactoryBot.create(:user) }
     let(:banned_user) { FactoryBot.create(:user, banned: true) }
     before { bike.reload } # Because current_ownership

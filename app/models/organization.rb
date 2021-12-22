@@ -121,8 +121,8 @@ class Organization < ApplicationRecord
     %w[no_pos does_not_need_pos]
   end
 
-  def self.pos?(kind)
-    !no_pos_kinds.include?(kind)
+  def self.pos?(kind = nil)
+    kind.present? && !no_pos_kinds.include?(kind)
   end
 
   def self.admin_required_kinds
