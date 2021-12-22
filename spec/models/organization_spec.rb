@@ -19,17 +19,17 @@ RSpec.describe Organization, type: :model do
     it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1, skip_geocoding: true, address_set_manually: true)
+      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, creation_organization: nyc_org1, skip_geocoding: true, address_set_manually: true)
 
       # a chicago-org bike in nyc
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org, skip_geocoding: true, address_set_manually: true)
+      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: chi_org, skip_geocoding: true, address_set_manually: true)
 
       nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2, skip_geocoding: true, address_set_manually: true)
+      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: nyc_org2, skip_geocoding: true, address_set_manually: true)
 
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3, skip_geocoding: true, address_set_manually: true)
+      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: nyc_org3, skip_geocoding: true, address_set_manually: true)
 
       nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
 
@@ -329,7 +329,7 @@ RSpec.describe Organization, type: :model do
     context "regional bike_stickers" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: regional_child) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: regional_child) }
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)

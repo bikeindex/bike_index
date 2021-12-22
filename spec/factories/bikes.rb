@@ -24,8 +24,8 @@ FactoryBot.define do
         user { nil }
         claimed { false }
         claimed_at { nil }
-        # Creation State
         can_edit_claimed { true }
+        # Previous Creation State attributes, kept prefix
         creation_state_pos_kind { "" }
         creation_state_origin { "" }
         creation_state_bulk_import { nil }

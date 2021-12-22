@@ -7,7 +7,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
   let(:organization) { export.organization }
   let(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
   let(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
-  let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
+  let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, creation_organization: organization) }
   let(:bike_values) do
     [
       "http://test.host/bikes/#{bike.id}",
@@ -218,7 +218,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
          organization_affiliation: "community_member",
          student_id: "XX9999"}
       end
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, extra_registration_number: "cool extra serial", creation_state_registration_info: registration_info) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_state_registration_info: registration_info) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
       let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).as_json }

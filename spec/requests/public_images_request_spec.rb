@@ -21,7 +21,7 @@ RSpec.describe PublicImagesController, type: :request do
       context "org authorized" do
         let(:current_organization) { FactoryBot.create(:organization) }
         let!(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
-        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: current_organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: current_organization) }
         it "creates an image" do
           bike.reload
           expect(bike.can_edit_claimed_organizations.pluck(:id)).to eq([current_organization.id])

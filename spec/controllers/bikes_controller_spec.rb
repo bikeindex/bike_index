@@ -244,7 +244,7 @@ RSpec.describe BikesController, type: :controller do
       # This is mostly legacy - really we don't care about creation organization
       # Leaving this in just for better test coverage
       context "bike created by organization" do
-        let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
         it "renders" do
           expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
           get :show, params: {id: bike.id}
@@ -257,7 +257,7 @@ RSpec.describe BikesController, type: :controller do
         end
       end
       context "bike owned by organization" do
-        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
         it "renders" do
           expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
           get :show, params: {id: bike.id}
@@ -270,7 +270,7 @@ RSpec.describe BikesController, type: :controller do
         end
       end
       context "bike owned by organization, without can_edit_claimed" do
-        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, creation_organization: organization) }
         it "renders" do
           expect(bike.editable_organizations.pluck(:id)).to eq([])
           get :show, params: {id: bike.id}
@@ -534,7 +534,6 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.current_ownership.organization).to eq organization
           expect(bike.current_ownership.creator).to eq organization.auto_user
           expect(bike.soon_current_ownership_id).to eq bike.current_ownership.id
-          expect(bike.current_ownership.ownership_id).to eq bike.current_ownership.id
         end
       end
       context "non-stolen" do

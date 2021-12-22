@@ -56,7 +56,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
     context "organization with pos bike and non pos bike" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
       let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, organization: organization) }
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       it "returns pos type" do
         organization.reload
         expect(organization.pos_kind).to eq "no_pos"
@@ -102,7 +102,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
       it "no_pos, does_not_need_pos if older organization" do
         organization.reload
         expect(organization.calculated_pos_kind).to eq "no_pos"
-        3.times { FactoryBot.create(:bike_organized, organization: organization) }
+        3.times { FactoryBot.create(:bike_organized, creation_organization: organization) }
         organization.reload
         expect(organization.calculated_pos_kind).to eq "no_pos"
         organization.update_attribute :created_at, Time.current - 2.weeks

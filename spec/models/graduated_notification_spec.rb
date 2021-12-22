@@ -168,7 +168,7 @@ RSpec.describe GraduatedNotification, type: :model do
       let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: user) }
       let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_ownership_claimed, creation_organization: organization, user: user) }
       it "finds the first bike" do
-        _bike3 = FactoryBot.create(:bike_organized, :with_ownership, organization: organization) # Test to ensure that we aren't grabbing bikes that aren't due notification
+        _bike3 = FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization) # Test to ensure that we aren't grabbing bikes that aren't due notification
         expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike1.id, bike2.id])
         expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to match_array([])
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike1.id, bike2.id])
@@ -488,7 +488,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.active?).to be_truthy
 
         # And then we create another bike after the notification has been processed - it's no longer added in there
-        _bike3 = FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, organization: organization)
+        _bike3 = FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization)
         graduated_notification1.reload
         graduated_notification2.reload
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])

@@ -51,7 +51,7 @@ RSpec.describe "BikesController#show", type: :request do
   end
   context "second ownership, from organization, with claim token" do
     let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
-    let(:bike) { FactoryBot.create(:bike_organized, organization: organization, owner_email: "new_user@stuff.com", creator: organization.auto_user) }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "new_user@stuff.com", creator: organization.auto_user) }
     let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator) }
     let!(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: bike.owner_email) }
     let(:current_user) { nil }
