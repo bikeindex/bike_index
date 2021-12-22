@@ -56,7 +56,7 @@
                 %th Kind
                 %th Bikes
               %tbody
-                - CreationState.origins.each do |origin|
+                - Ownership.origins.keys.each do |origin|
                   %tr
                     %td.text-left= origin.humanize
                     %td.text-right= admin_number_display(matching_bikes.includes(:creation_states).where(creation_states: {origin: origin}).count)

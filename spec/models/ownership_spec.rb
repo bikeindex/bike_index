@@ -73,7 +73,7 @@ RSpec.describe Ownership, type: :model do
     end
     context "organization" do
       let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
-      let(:bike) { FactoryBot.create(:bike_organized, organization: organization, owner_email: email, creator: organization.auto_user) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, creator: organization.auto_user) }
       let(:ownership) { bike.ownerships.first }
       it "returns new_registration" do
         ownership.reload
@@ -379,6 +379,58 @@ RSpec.describe Ownership, type: :model do
             expect(bike.current_ownership&.id).to eq ownership2.id
           end
         end
+      end
+    end
+  end
+
+  describe "creation_description" do
+    let(:ownership) { Ownership.new(organization_id: 1, creator_id: 1) }
+    it "returns nil" do
+      expect(ownership.creation_description).to be_nil
+    end
+    context "bulk" do
+      let(:ownership) { Ownership.new(bulk_import_id: 12, origin: "api_v2") }
+      it "returns bulk reg" do
+        expect(ownership.creation_description).to eq "bulk import"
+        expect(ownership.pos?).to be_falsey
+      end
+    end
+    context "pos" do
+      let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos", origin: "embed_extended") }
+      before { ownership.set_calculated_attributes }
+      it "returns pos reg" do
+        expect(ownership.creation_description).to eq "Lightspeed"
+      end
+      context "ascend" do
+        let(:bulk_import) { BulkImport.new(kind: "ascend") }
+        let(:ownership) { Ownership.new(pos_kind: "ascend_pos", bulk_import: bulk_import) }
+        it "returns pos reg" do
+          expect(ownership.creation_description).to eq "Ascend"
+        end
+      end
+    end
+    context "web" do
+      let(:ownership) { Ownership.new(origin: "web") }
+      it "returns web" do
+        expect(ownership.creation_description).to eq "web"
+      end
+    end
+    context "embed_extended" do
+      let(:ownership) { Ownership.new(origin: "embed_extended") }
+      it "returns org internal" do
+        expect(ownership.creation_description).to eq "org reg"
+      end
+    end
+    context "organization_form" do
+      let(:ownership) { Ownership.new(origin: "organization_form") }
+      it "returns org internal" do
+        expect(ownership.creation_description).to eq "org reg"
+      end
+    end
+    context "embed_partial" do
+      let(:ownership) { Ownership.new(origin: "embed_partial") }
+      it "returns landing page" do
+        expect(ownership.creation_description).to eq "landing page"
       end
     end
   end

@@ -16,7 +16,7 @@ FactoryBot.define do
     bike do
       FactoryBot.create(:bike_organized,
         :with_ownership, # Or else we can't send email
-        organization: organization,
+        creation_organization: organization,
         created_at: bike_created_at)
     end
 
@@ -25,7 +25,7 @@ FactoryBot.define do
       bike do
         FactoryBot.create(:bike_organized,
           :with_ownership_claimed,
-          organization: organization,
+          creation_organization: organization,
           created_at: bike_created_at,
           user: user)
       end

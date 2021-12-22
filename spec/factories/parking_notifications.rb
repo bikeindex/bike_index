@@ -29,7 +29,7 @@ FactoryBot.define do
             creator: user,
             owner_email: user.email,
             can_edit_claimed: true,
-            organization: organization,
+            creation_organization: organization,
             status: "unregistered_parking_notification")
         end
         after(:create) do |parking_notification, _evaluator|

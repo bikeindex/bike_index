@@ -49,7 +49,7 @@ FactoryBot.define do
           user: evaluator.user,
           claimed: evaluator.claimed,
           created_at: bike.created_at,
-          organization: bike.creation_organization,
+          organization_id: bike.creation_organization_id,
           can_edit_claimed: evaluator.can_edit_claimed,
           origin: evaluator.creation_state_origin,
           pos_kind: evaluator.creation_state_pos_kind,

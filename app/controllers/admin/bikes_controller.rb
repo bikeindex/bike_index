@@ -175,7 +175,7 @@ class Admin::BikesController < Admin::BaseController
     end
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
-    @origin_search_type = CreationState.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
+    @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
     bikes = bikes.includes(:creation_states).where(creation_states: {origin: @origin_search_type}) if @origin_search_type.present?
     bikes
   end

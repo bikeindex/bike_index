@@ -96,9 +96,17 @@ class Ownership < ApplicationRecord
     Organization.pos?(pos_kind)
   end
 
-  # TODO: part of #2110 - remove, temporarily added for parity with creation_state
-  def is_pos
-    pos?
+  def creation_description
+    if pos?
+      pos_kind.to_s.gsub("_pos", "").humanize
+    elsif bulk?
+      "bulk import"
+    elsif origin.present?
+      return "org reg" if %w[embed_extended organization_form].include?(origin)
+      return "landing page" if origin == "embed_partial"
+      return "parking notification" if origin == "unregistered_parking_notification"
+      origin.humanize.downcase
+    end
   end
 
   def owner
@@ -160,7 +168,7 @@ class Ownership < ApplicationRecord
   def set_calculated_attributes
     # Gotta assign this before checking email, in case it's a phone reg
     self.is_phone ||= bike.phone_registration? if id.blank? && bike.present?
-    self.owner_email ||= bike.owner_email
+    self.owner_email ||= bike&.owner_email
     self.owner_email = EmailNormalizer.normalize(owner_email)
     self.status ||= bike&.status
     if id.blank? # Some things to set only on create
