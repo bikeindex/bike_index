@@ -64,13 +64,13 @@ class CredibilityScorer
     permitted_badges_hash(badges_array).map { |badge, value| value }.sum
   end
 
-  def self.creation_badges(creation_state = nil)
-    return [] unless creation_state.present?
-    return [:created_at_point_of_sale] if creation_state.is_pos
-    c_badges = [creation_age_badge(creation_state)].compact
-    c_badges << :no_creator if creation_state.creator.blank?
-    if creation_state.organization_id.present?
-      organization = Organization.unscoped.find_by_id(creation_state.organization_id)
+  def self.creation_badges(ownership = nil, bike = nil)
+    return [] unless ownership.present?
+    return [:created_at_point_of_sale] if ownership.pos?
+    c_badges = [creation_age_badge(bike || ownership.bike)].compact
+    c_badges << :no_creator if ownership.creator.blank?
+    if ownership.organization_id.present?
+      organization = Organization.unscoped.find_by_id(ownership.organization_id)
       return [:created_at_point_of_sale] if organization&.does_not_need_pos?
       c_badges << :creation_organization_suspicious if organization_suspicious?(organization)
       c_badges << :creation_organization_trusted if organization_trusted?(organization)
@@ -172,7 +172,7 @@ class CredibilityScorer
   private
 
   def calculated_badges
-    self.class.creation_badges(@bike.current_creation_state) +
+    self.class.creation_badges(@bike.current_ownership, @bike) +
       self.class.ownership_badges(@bike) +
       self.class.bike_user_badges(@bike) +
       self.class.bike_badges(@bike)

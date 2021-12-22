@@ -160,22 +160,21 @@ RSpec.describe User, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
-    let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
-    let(:bike) { ownership.bike }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
     let(:admin) { User.new(superuser: true) }
     it "returns expected values" do
       expect(user.authorized?(bike)).to be_falsey
       expect(user.authorized?(organization)).to be_falsey
       expect(admin.authorized?(bike)).to be_truthy
       expect(admin.authorized?(organization)).to be_truthy
-      expect(ownership.creator.authorized?(bike)).to be_truthy
+      expect(bike.ownerships.first.creator.authorized?(bike)).to be_truthy
       expect(organization_member.authorized?(bike)).to be_truthy
       expect(organization_member.authorized?(organization)).to be_truthy
     end
     context "bike_sticker" do
       let(:organization2) { FactoryBot.create(:organization) }
       let(:organization2_member) { FactoryBot.create(:organization_member, organization: organization2) }
-      let(:owner) { ownership.creator }
+      let(:owner) { bike.creator }
       let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization2, can_edit_claimed: true) }
       let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike) }
       it "is truthy for admins and org members and code claimer" do

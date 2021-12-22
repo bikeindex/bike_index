@@ -3,9 +3,8 @@ require "rails_helper"
 RSpec.describe Organized::EmailsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/emails" }
   # we need a default organized bike to render emails, so build one
-  let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: current_organization) }
+  let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
   let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes] }
-  let!(:bike) { ownership.bike }
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member
@@ -63,7 +62,9 @@ RSpec.describe Organized::EmailsController, type: :request do
     describe "show" do
       context "appears_abandoned_notification" do
         it "renders" do
+          expect(bike).to be_present
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
+          expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
           get "#{base_url}/appears_abandoned_notification"
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/parking_notification")
@@ -92,6 +93,21 @@ RSpec.describe Organized::EmailsController, type: :request do
               get "#{base_url}/appears_abandoned_notification", params: {parking_notification_id: parking_notification.id}
             }.to raise_error(ActiveRecord::RecordNotFound)
           end
+        end
+      end
+      context "no bikes" do
+        it "renders" do
+          expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
+          expect(current_organization.bikes.pluck(:id)).to eq([])
+          get "#{base_url}/appears_abandoned_notification"
+          expect(response.status).to eq(200)
+          expect(response).to render_template("organized_mailer/parking_notification")
+          expect(assigns(:parking_notification).is_a?(ParkingNotification)).to be_truthy
+          expect(assigns(:parking_notification).retrieval_link_token).to be_blank
+          expect(assigns(:retrieval_link_url)).to eq "#"
+          expect(assigns(:kind)).to eq "appears_abandoned_notification"
+          current_organization.reload
+          expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
         end
       end
       context "graduated_notification passed id" do

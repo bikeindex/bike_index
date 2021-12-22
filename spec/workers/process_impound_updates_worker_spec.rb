@@ -27,7 +27,7 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
   end
 
   context "unregistered_parking_notification" do
-    let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours, status: "unregistered_parking_notification") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: Time.current - 2.hours, status: "unregistered_parking_notification") }
     let!(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, kind: "impound_notification", bike: bike) }
     it "marks the bike not hidden" do
       impound_record.update(parking_notification: parking_notification)

@@ -35,7 +35,7 @@
         .dropdown-menu
           = link_to "Any Origin", admin_bikes_path(sortable_search_params.merge(search_origin: nil)), class: "dropdown-item #{any_origin_active ? 'active' : ''}"
           .dropdown-divider
-          - CreationState.origins.each do |origin|
+          - Ownership.origins.keys.each do |origin|
             - origin_active = @origin_search_type == origin
             = link_to origin.humanize, admin_bikes_path(sortable_search_params.merge(search_origin: origin_active ? nil : origin)), class: "dropdown-item #{origin_active ? 'active' : ''}"
       %li.nav-item

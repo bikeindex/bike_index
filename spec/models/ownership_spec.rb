@@ -1,6 +1,44 @@
 require "rails_helper"
 
 RSpec.describe Ownership, type: :model do
+  describe "factories" do
+    let(:ownership) { FactoryBot.create(:ownership) }
+    it "creates" do
+      expect(ownership).to be_valid
+    end
+    describe "bike with_ownership_claimed" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      it "creates" do
+        expect(bike.reload.ownerships.count).to eq 1
+        expect(Ownership.count).to eq 1
+        ownership = bike.current_ownership
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.organization_id).to be_blank
+        expect(ownership.owner_email).to eq bike.owner_email
+        expect(ownership.creator).to eq bike.creator
+      end
+      context "bike_organized" do
+        let(:time) { Time.current - 5.weeks }
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, created_at: time) }
+        it "creates" do
+          expect(bike.reload.created_at).to be_within(1).of time
+          expect(bike.ownerships.count).to eq 1
+          ownership = bike.current_ownership
+          expect(ownership.claimed?).to be_truthy
+          expect(ownership.organization_id).to eq bike.creation_organization_id
+          expect(ownership.owner_email).to eq bike.owner_email
+          expect(ownership.creator).to eq bike.creator
+          expect(ownership.created_at).to be_within(1).of time
+          expect(bike.bike_organizations.count).to eq 1
+          bike_organization = bike.bike_organizations.first
+          expect(bike_organization.can_edit_claimed).to be_falsey
+          expect(bike_organization.created_at).to be_within(1).of time
+          expect(bike_organization.organization_id).to eq bike.creation_organization_id
+        end
+      end
+    end
+  end
+
   describe "set_calculated_attributes" do
     it "removes leading and trailing whitespace and downcase email" do
       ownership = Ownership.new(owner_email: "   SomE@dd.com ")
@@ -51,7 +89,7 @@ RSpec.describe Ownership, type: :model do
     end
     context "transferred ownership" do
       let(:bike) { FactoryBot.create(:bike_organized, owner_email: email) }
-      let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator) }
+      let!(:ownership1) { bike.ownerships.first }
       let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
       it "returns transferred_ownership" do
         ownership2.reload
@@ -73,8 +111,8 @@ RSpec.describe Ownership, type: :model do
     end
     context "organization" do
       let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
-      let(:bike) { FactoryBot.create(:bike_organized, organization: organization, owner_email: email, creator: organization.auto_user) }
-      let(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: bike.owner_email) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, creator: organization.auto_user) }
+      let(:ownership) { bike.ownerships.first }
       it "returns new_registration" do
         ownership.reload
         expect(ownership.calculated_organization).to eq organization
@@ -84,27 +122,26 @@ RSpec.describe Ownership, type: :model do
       end
       context "transfer from organization to new user" do
         let(:membership) { FactoryBot.create(:membership, organization: organization) }
-        let!(:ownership1) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: membership.invited_email) }
         let(:ownership2) { FactoryBot.build(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
         it "returns new_registration" do
           # Before save, still works
           expect(ownership2.current).to be_truthy
-          expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
+          expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
           expect(ownership2.first?).to be_falsey
           expect(ownership2.second?).to be_truthy
           ownership2.save
           ownership2.reload
-          ownership1.reload
-          expect(ownership1.current?).to be_falsey
-          expect(ownership1.calculated_organization&.id).to eq organization.id
-          expect(ownership1.first?).to be_truthy
-          expect(ownership1.previous_ownership_id).to be_blank
+          ownership.reload
+          expect(ownership.current?).to be_falsey
+          expect(ownership.calculated_organization&.id).to eq organization.id
+          expect(ownership.first?).to be_truthy
+          expect(ownership.previous_ownership_id).to be_blank
           expect(ownership2.current?).to be_truthy
           expect(ownership2.first?).to be_falsey
           expect(ownership2.second?).to be_truthy
           expect(ownership2.calculated_organization&.id).to eq organization.id
-          expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
-          expect(ownership2.previous_ownership_id).to eq ownership1.id
+          expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
+          expect(ownership2.previous_ownership_id).to eq ownership.id
           # Registrations that were initially from an organization member, then transferred outside of the organization,
           # count as "new" - because some organizations pre-register bikes
           expect(ownership2.new_registration?).to be_truthy
@@ -244,8 +281,8 @@ RSpec.describe Ownership, type: :model do
     end
     context "organization with organization feature of skip_ownership_email" do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["skip_ownership_email"]) }
-      let!(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
-      let(:bike) { ownership.bike }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let(:ownership) { bike.ownerships.first }
       it "returns false" do
         # There was some trouble with CI on this, so now we're just updating a bunch
         ownership.update(updated_at: Time.current)
@@ -325,7 +362,8 @@ RSpec.describe Ownership, type: :model do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:creator) { FactoryBot.create(:organization_member, organization: organization) }
       let(:owner_email) { creator.email }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, creator: creator, owner_email: owner_email) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creator: creator, owner_email: owner_email) }
+      let(:ownership) { bike.ownerships.first }
       it "is falsey" do
         ownership.reload
         expect(ownership.organization_id).to eq organization.id
@@ -361,7 +399,6 @@ RSpec.describe Ownership, type: :model do
           end
         end
         context "not first" do
-          let(:bike) { ownership.bike }
           let(:ownership2) { FactoryBot.create(:ownership, bike: bike, organization: organization, creator: creator, owner_email: owner_email) }
           it "is falsey" do
             ownership.reload
@@ -380,6 +417,98 @@ RSpec.describe Ownership, type: :model do
             expect(bike.current_ownership&.id).to eq ownership2.id
           end
         end
+      end
+    end
+  end
+
+  describe "creation_description" do
+    let(:ownership) { Ownership.new(organization_id: 1, creator_id: 1) }
+    it "returns nil" do
+      expect(ownership.creation_description).to be_nil
+    end
+    context "bulk" do
+      let(:ownership) { Ownership.new(bulk_import_id: 12, origin: "api_v2") }
+      it "returns bulk reg" do
+        expect(ownership.creation_description).to eq "bulk import"
+        expect(ownership.pos?).to be_falsey
+      end
+    end
+    context "pos" do
+      let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos", origin: "embed_extended") }
+      before { ownership.set_calculated_attributes }
+      it "returns pos reg" do
+        expect(ownership.creation_description).to eq "Lightspeed"
+      end
+      context "ascend" do
+        let(:bulk_import) { BulkImport.new(kind: "ascend") }
+        let(:ownership) { Ownership.new(pos_kind: "ascend_pos", bulk_import: bulk_import) }
+        it "returns pos reg" do
+          expect(ownership.creation_description).to eq "Ascend"
+        end
+      end
+    end
+    context "web" do
+      let(:ownership) { Ownership.new(origin: "web") }
+      it "returns web" do
+        expect(ownership.creation_description).to eq "web"
+      end
+    end
+    context "embed_extended" do
+      let(:ownership) { Ownership.new(origin: "embed_extended") }
+      it "returns org internal" do
+        expect(ownership.creation_description).to eq "org reg"
+      end
+    end
+    context "organization_form" do
+      let(:ownership) { Ownership.new(origin: "organization_form") }
+      it "returns org internal" do
+        expect(ownership.creation_description).to eq "org reg"
+      end
+    end
+    context "embed_partial" do
+      let(:ownership) { Ownership.new(origin: "embed_partial") }
+      it "returns landing page" do
+        expect(ownership.creation_description).to eq "landing page"
+      end
+    end
+  end
+
+  describe "owner_name" do
+    context "registration_info" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: {user_name: "Cool Name"}) }
+      let(:user) { FactoryBot.create(:user_confirmed, name: "New name", email: bike.owner_email) }
+      it "is registration_info" do
+        expect(bike.reload.user&.id).to be_blank
+        expect(bike.current_ownership.owner_name).to eq "Cool Name"
+        expect(bike.owner_name).to eq "Cool Name"
+        expect(user).to be_present
+        bike.current_ownership.mark_claimed
+        expect(bike.reload.user&.id).to eq user.id
+        expect(bike.current_ownership.owner_name).to eq "New name"
+        expect(bike.owner_name).to eq "New name"
+      end
+    end
+    context "with creator" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:creator) { FactoryBot.create(:user_confirmed, name: "Stephanie Example") }
+      let(:new_owner) { FactoryBot.create(:user, name: "Sally Stuff", email: "sally@example.com") }
+      let(:bike) { FactoryBot.create(:bike_organized, claimed: false, user: nil, creator: creator, creation_organization: organization, owner_email: "sally@example.com") }
+      let(:ownership) { bike.ownerships.first }
+      it "does not use creator" do
+        expect(bike.reload.ownerships.count).to eq 1
+        ownership.reload
+        expect(ownership.claimed?).to be_falsey
+        expect(ownership.organization_pre_registration?).to be_falsey
+        expect(ownership.owner_name).to be_blank
+        expect(bike.owner_name).to be_blank
+        ownership.user = new_owner
+        # Creator name is a fallback, if the bike is claimed we want to use the person who has claimed it
+        ownership.mark_claimed
+        bike.reload
+        ownership.reload
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.user).to eq new_owner
+        expect(bike.owner_name).to eq "Sally Stuff"
       end
     end
   end

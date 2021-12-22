@@ -6,7 +6,7 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
 
   let(:earliest_time) { Time.current - 2.years } # Have to set this for organization creation, or the org time_range is just the past year
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year.to_i, created_at: earliest_time) }
-  let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, organization: current_organization, serial_number: "sameserialnumber12111", owner_email: "testly@university.edu", created_at: earliest_time) }
+  let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: current_organization, serial_number: "sameserialnumber12111", owner_email: "testly@university.edu", created_at: earliest_time) }
 
   describe "index" do
     let!(:graduated_notification_pending) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }

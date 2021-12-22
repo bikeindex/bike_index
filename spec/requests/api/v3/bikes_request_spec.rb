@@ -470,9 +470,9 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
-      creation_state = bike.current_creation_state
-      expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
-      # expect(creation_state.origin).to eq 'api_v3'
+      ownership = bike.current_ownership
+      expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([true, true, false])
+      # expect(ownership.origin).to eq 'api_v3'
 
       # We return things will alert if they're written directly to the dom - worth noting, since it might be a problem
       expect(result["description"]).to eq "<svg/onload=alert(document.cookie)>"
@@ -497,7 +497,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result["id"])
-      # expect(bike.current_creation_state.origin).to eq 'api_v3'
+      # expect(bike.current_ownership.origin).to eq 'api_v3'
       expect(bike.example).to be_truthy
       expect(bike.is_for_sale).to be_falsey
     end
@@ -537,8 +537,8 @@ RSpec.describe "Bikes API V3", type: :request do
       bike_organization = bike.bike_organizations.first
       expect(bike_organization.organization_id).to eq organization.id
       expect(bike_organization.can_edit_claimed).to be_truthy
-      expect(bike.current_creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
-      expect(bike.current_creation_state.organization).to eq organization
+      expect(bike.current_ownership.origin).to eq "api_v2" # Because it just inherits v2 :/
+      expect(bike.current_ownership.organization).to eq organization
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
@@ -560,7 +560,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to be_within(1).of Time.current.to_i
       bike = Bike.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to be_blank
-      expect(bike.current_creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
+      expect(bike.current_ownership.origin).to eq "api_v2" # Because it just inherits v2 :/
       expect(bike.status_stolen?).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to be_nil
@@ -645,8 +645,8 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(bike.front_wheel_size.iso_bsd).to eq 559
             expect(bike.rear_tire_narrow).to be_truthy
             expect(bike.front_tire_narrow).to be_truthy
-            # expect(bike.current_creation_state.origin).to eq 'api_v3'
-            expect(bike.current_creation_state.organization).to eq organization
+            # expect(bike.current_ownership.origin).to eq 'api_v3'
+            expect(bike.current_ownership.organization).to eq organization
             EmailOwnershipInvitationWorker.drain
             expect(ActionMailer::Base.deliveries).to be_empty
           end
@@ -853,7 +853,9 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "organization bike" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+      let(:og_creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creator: og_creator) }
+      let(:ownership) { bike.ownerships.first }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:params) { {year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"]} }
       let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
@@ -884,15 +886,16 @@ RSpec.describe "Bikes API V3", type: :request do
           Sidekiq::Testing.inline!
         end
         after { Sidekiq::Testing.fake! }
-        let(:og_creator) { ownership.creator }
         let(:new_email) { "newuser@example.com" }
         let(:bike_organization) { bike.bike_organizations.first }
         it "creates a new ownership, emails owner, permits organization editing until has been claimed" do
           expect(og_creator.reload.authorized?(organization)).to be_truthy
           expect(user.reload.authorized?(organization)).to be_truthy
+          expect(og_creator.id).to_not eq user.id
           bike.reload
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.public_images.count).to eq 0
+          expect(bike.user).to be_blank
           expect(bike.owner).to_not eq(user)
           expect(bike.authorized_by_organization?(u: user)).to be_truthy
           expect(bike.authorized?(user)).to be_truthy

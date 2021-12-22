@@ -87,14 +87,18 @@ RSpec.describe Feedback, type: :model do
     end
   end
   describe "delete bike" do
-    let(:bike) { FactoryBot.create(:bike) }
+    let(:bike) { FactoryBot.create(:bike_organized) }
     let!(:feedback) { FactoryBot.build(:feedback_bike_delete_request, bike: bike) }
     it "deletes the bike" do
+      expect(bike.ownerships.count).to eq 1
+      expect(bike.bike_organizations.count).to eq 1
       expect(bike.paranoia_destroyed?).to be_falsey
       feedback.save
       bike.reload
       expect(bike.deleted_at).to be_present
       expect(bike.paranoia_destroyed?).to be_truthy
+      expect(bike.ownerships.count).to eq 1
+      expect(bike.bike_organizations.count).to eq 1
     end
     context "bike is impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }

@@ -10,7 +10,7 @@ class Ownership < ApplicationRecord
     organization_form: 7,
     creator_unregistered_parking_notification: 8,
     impound_import: 9,
-    transferred: 10
+    transferred_ownership: 10
   }.freeze
 
   validates_presence_of :owner_email
@@ -73,14 +73,37 @@ class Ownership < ApplicationRecord
 
   def new_registration?
     return true if first?
-    # If this was first registered to an organization and is now being transferred
-    # (either because it was pre-registered or an unregistered impounded bike)
-    # it counts as a new registration
     second? && calculated_organization.present?
   end
 
   def phone_registration?
     is_phone
+  end
+
+  def bulk?
+    bulk_import_id.present?
+  end
+
+  # TODO: part of #2110 - remove, temporarily added for parity with creation_state
+  def is_bulk
+    bulk?
+  end
+
+  def pos?
+    Organization.pos?(pos_kind)
+  end
+
+  def creation_description
+    if pos?
+      pos_kind.to_s.gsub("_pos", "").humanize
+    elsif bulk?
+      "bulk import"
+    elsif origin.present?
+      return "org reg" if %w[embed_extended organization_form].include?(origin)
+      return "landing page" if origin == "embed_partial"
+      return "parking notification" if origin == "unregistered_parking_notification"
+      origin.humanize.downcase
+    end
   end
 
   def owner
@@ -138,12 +161,13 @@ class Ownership < ApplicationRecord
     !calculated_organization.enabled?("skip_ownership_email")
   end
 
-  # This got a little unwieldy in #2110 - but, it's still going on, so let it go
+  # This got a little unwieldy in #2110 - TODO, maybe - clean up
   def set_calculated_attributes
     # Gotta assign this before checking email, in case it's a phone reg
     self.is_phone ||= bike.phone_registration? if id.blank? && bike.present?
-    self.owner_email ||= bike.owner_email
+    self.owner_email ||= bike&.owner_email
     self.owner_email = EmailNormalizer.normalize(owner_email)
+    self.status ||= bike&.status
     if id.blank? # Some things to set only on create
       self.current = true
       if bike.present?
@@ -160,6 +184,8 @@ class Ownership < ApplicationRecord
       self.organization_pre_registration ||= calculated_organization_pre_registration?
     end
     self.registration_info = cleaned_registration_info
+    # Would this be better in BikeCreator? Maybe, but specs depend on this always being set
+    self.origin ||= "web"
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track
@@ -196,20 +222,22 @@ class Ownership < ApplicationRecord
   def spam_risky_email?
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
-    %w[lightspeed_pos ascend_pos].include?(pos_kind)
+    pos?
   end
 
   def cleaned_registration_info
     return {} unless registration_info.present?
+    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
     self.owner_name ||= registration_info["user_name"]
     registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
-    registration_info.reject { |k, v| v.blank? }
+    registration_info.reject { |_k, v| v.blank? }
   end
 
   # Some organizations pre-register bikes and then transfer them.
   # This may be more complicated in the future! For now, calling this good enough.
   def calculated_organization_pre_registration?
     return false if organization_id.blank?
+    self.origin = "creator_unregistered_parking_notification" if status == "unregistered_parking_notification"
     return true if creator_unregistered_parking_notification?
     self_made? && creator_id == organization&.auto_user_id
   end

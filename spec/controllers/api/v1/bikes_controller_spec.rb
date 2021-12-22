@@ -87,7 +87,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             description: "Diverge Elite DSW (58)",
             is_pos: true,
             is_new: true,
-            is_bulk: true
+            is_bulk: false
           }
         }
       end
@@ -105,14 +105,14 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(created_bike.frame_size_unit).to eq "cm"
         expect(created_bike.primary_frame_color).to eq black
         expect(created_bike.paint_description).to eq "Black/Red"
-        expect(created_bike.creation_states.count).to eq 1
-        creation_state = created_bike.current_creation_state
-        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
-        expect(creation_state.organization).to eq organization
-        expect(creation_state.creator).to eq created_bike.creator
-        expect(creation_state.origin).to eq "api_v1"
-        expect(creation_state.pos_kind).to eq "lightspeed_pos"
-        expect(creation_state.is_new).to be_truthy
+        expect(created_bike.ownerships.count).to eq 1
+        ownership = created_bike.current_ownership
+        expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([true, true, false])
+        expect(ownership.organization).to eq organization
+        expect(ownership.creator).to eq created_bike.creator
+        expect(ownership.origin).to eq "api_v1"
+        expect(ownership.pos_kind).to eq "lightspeed_pos"
+        expect(ownership.is_new).to be_truthy
       end
 
       it "creates a bike and does not duplicate" do
@@ -131,7 +131,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
         bike.reload
         expect(bike.current_ownership).to eq og_ownership
-        expect(bike.creation_states.count).to eq 1
+        expect(bike.ownerships.count).to eq 1
 
         Sidekiq::Worker.drain_all # Not wrapping both in drain_all, because
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -303,7 +303,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(bike.creation_organization_id).to eq(@organization.id)
         expect(bike.year).to eq(1969)
         expect(bike.components.count).to eq(3)
-        expect(bike.current_creation_state.organization).to eq @organization
+        expect(bike.current_ownership.organization).to eq @organization
         component = bike.components.where(serial_number: "69").first
         expect(component.description).to eq("yeah yay!")
         expect(component.ctype.slug).to eq("headset")
@@ -323,11 +323,11 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
         expect(bike.handlebar_type).to eq bike_attrs[:handlebar_type_slug]
-        creation_state = bike.current_creation_state
-        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([false, false, false])
-        expect(creation_state.organization).to eq @organization
-        expect(creation_state.creator).to eq bike.creator
-        expect(creation_state.origin).to eq "api_v1"
+        ownership = bike.current_ownership
+        expect([ownership.pos?, ownership.is_new, ownership.is_bulk]).to eq([false, false, false])
+        expect(ownership.organization).to eq @organization
+        expect(ownership.creator).to eq bike.creator
+        expect(ownership.origin).to eq "api_v1"
       end
 
       it "creates a photos even if one fails" do
@@ -353,9 +353,9 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         bike = Bike.unscoped.where(serial_number: "69 photo-test").first
         expect(bike.example).to be_falsey
         expect(bike.public_images.count).to eq(1)
-        expect(bike.current_creation_state.origin).to eq "api_v1"
-        expect(bike.current_creation_state.creator).to eq bike.creator
-        expect(bike.current_creation_state.organization).to eq @organization
+        expect(bike.current_ownership.origin).to eq "api_v1"
+        expect(bike.current_ownership.creator).to eq bike.creator
+        expect(bike.current_ownership.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
 
@@ -396,9 +396,9 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           expect(response.code).to eq("200")
           bike = Bike.unscoped.where(serial_number: "69 stolen bike").first
           expect(bike.example).to be_falsey
-          expect(bike.current_creation_state.origin).to eq "api_v1"
-          expect(bike.current_creation_state.creator).to eq bike.creator
-          expect(bike.current_creation_state.organization).to eq @organization
+          expect(bike.current_ownership.origin).to eq "api_v1"
+          expect(bike.current_ownership.creator).to eq bike.creator
+          expect(bike.current_ownership.organization).to eq @organization
           expect(bike.rear_wheel_size.iso_bsd).to eq 559
           csr = bike.fetch_current_stolen_record
           expect(csr.address).to be_present
@@ -439,8 +439,8 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 example bikez").first
-        expect(bike.current_creation_state.origin).to eq "api_v1"
-        expect(bike.current_creation_state.organization).to eq org
+        expect(bike.current_ownership.origin).to eq "api_v1"
+        expect(bike.current_ownership.organization).to eq org
         expect(bike.example).to be_truthy
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         expect(bike.paint.name).to eq("grazeen")
@@ -473,8 +473,8 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first
-        expect(bike.current_creation_state.origin).to eq "api_v1"
-        expect(bike.current_creation_state.organization).to eq @organization
+        expect(bike.current_ownership.origin).to eq "api_v1"
+        expect(bike.current_ownership.organization).to eq @organization
       end
 
       it "does not send an ownership email if it has no_email set" do
@@ -499,8 +499,8 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(ActionMailer::Base.deliveries.count).to eq(0)
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first
-        expect(bike.current_creation_state.origin).to eq "api_v1"
-        expect(bike.current_creation_state.organization).to eq @organization
+        expect(bike.current_ownership.origin).to eq "api_v1"
+        expect(bike.current_ownership.organization).to eq @organization
       end
     end
   end

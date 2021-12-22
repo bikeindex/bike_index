@@ -41,7 +41,7 @@ RSpec.describe Organized::BaseController, type: :request do
 
   describe "/dashboard" do
     include_context :request_spec_logged_in_as_organization_member
-    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership, organization: current_organization, created_at: Time.current - 2.days) }
+    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: current_organization, created_at: Time.current - 2.days) }
     # Test the different organizations that have overview_dashboard? truthy
     context "organization with regional_bike_counts" do
       let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["regional_bike_counts"]) }
@@ -55,7 +55,7 @@ RSpec.describe Organized::BaseController, type: :request do
     context "organization regional parent" do
       let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 50) }
       let!(:organization_child1) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: current_organization) }
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization_child1) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization_child1) }
       it "does not rendern" do
         current_organization.update(updated_at: Time.current)
         current_organization.reload
@@ -72,7 +72,7 @@ RSpec.describe Organized::BaseController, type: :request do
     context "organization with claimed_ownerships" do
       let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["claimed_ownerships"], created_at: Time.current - 2.years) }
       let(:claimed_at) { Time.current - 13.months }
-      let!(:bike_claimed) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: current_organization, claimed_at: claimed_at, created_at: Time.current - 16.months) }
+      let!(:bike_claimed) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: current_organization, claimed_at: claimed_at, created_at: Time.current - 16.months) }
       it "renders" do
         bike_claimed.reload
         expect(bike_claimed.created_at).to be_within(5).of Time.current - 16.months

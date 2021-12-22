@@ -51,7 +51,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.claimed?).to be_truthy
       expect(new_bike.no_serial?).to be_truthy
       expect(new_bike.made_without_serial?).to be_falsey
-      expect(new_bike.current_creation_state.origin).to eq "web"
+      expect(new_bike.current_ownership.origin).to eq "web"
       expect(new_bike.serial_unknown?).to be_truthy
       expect(new_bike.serial_number).to eq "unknown"
       expect(new_bike.normalized_serial_segments).to eq([])
@@ -120,7 +120,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(bike_user.phone).to eq "3123799513"
           expect(bike.frame_model).to eq extra_long_string # People seem to like putting extra long strings into the frame_model field, so deal with it
           expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
-          expect(bike.current_creation_state.status).to eq "status_stolen"
+          expect(bike.current_ownership.status).to eq "status_stolen"
           stolen_record = bike.current_stolen_record
           chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
         end
@@ -155,12 +155,12 @@ RSpec.describe "BikesController#create", type: :request do
           new_bike = Bike.last
           expect(new_bike).to be_present
           expect(new_bike.authorized?(current_user)).to be_truthy
-          expect(new_bike.current_creation_state.origin).to eq "web"
-          expect(new_bike.current_creation_state.organization&.id).to be_blank
-          expect(new_bike.current_creation_state.creator&.id).to eq current_user.id
+          expect(new_bike.current_ownership.origin).to eq "web"
+          expect(new_bike.current_ownership.organization&.id).to be_blank
+          expect(new_bike.current_ownership.creator&.id).to eq current_user.id
           expect(new_bike.status).to eq "status_impounded"
           expect(new_bike.status_humanized).to eq "found"
-          expect(new_bike.current_creation_state.status).to eq "status_impounded" # Make sure this status matches
+          expect(new_bike.current_ownership.status).to eq "status_impounded" # Make sure this status matches
           expect_attrs_to_match_hash(new_bike, testable_bike_params)
           expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
           impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
@@ -252,11 +252,11 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.ownerships.count).to eq 1
         expect(new_bike.current_ownership.self_made?).to be_truthy
 
-        creation_state = new_bike.current_creation_state
-        expect(creation_state.origin).to eq "web"
-        expect(creation_state.creator_id).to eq current_user.id
+        ownership = new_bike.current_ownership
+        expect(ownership.origin).to eq "web"
+        expect(ownership.creator_id).to eq current_user.id
         reg_hash = bike_params_with_address.slice(:organization_affiliation, :street, :city, :zipcode, :state)
-        expect_hashes_to_match(creation_state.registration_info, reg_hash)
+        expect_hashes_to_match(ownership.registration_info, reg_hash)
 
         expect_hashes_to_match(new_bike.registration_address, reg_hash.except(:organization_affiliation))
         expect(new_bike.address).to eq "1400 32nd St, Oakland, CA 94608, US"
@@ -282,10 +282,10 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.ownerships.count).to eq 1
         expect(new_bike.current_ownership.self_made?).to be_truthy
 
-        creation_state = new_bike.current_creation_state
-        expect(creation_state.origin).to eq "web"
-        expect(creation_state.creator_id).to eq current_user.id
-        expect(creation_state.registration_info).to eq({"organization_affiliation" => "community_member"})
+        ownership = new_bike.current_ownership
+        expect(ownership.origin).to eq "web"
+        expect(ownership.creator_id).to eq current_user.id
+        expect(ownership.registration_info).to eq({"organization_affiliation" => "community_member"})
         # It doesn't have a registration address! But it does have an address - which is just the organization
         expect(new_bike.registration_address).to be_blank
         expect(new_bike.address).to be_present
@@ -336,8 +336,8 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.phone).to eq "3123799513"
       expect(new_bike.student_id).to eq nil
 
-      expect(new_bike.current_creation_state.organization&.id).to eq organization.id
-      expect(new_bike.current_creation_state.origin).to eq "embed_extended"
+      expect(new_bike.current_ownership.organization&.id).to eq organization.id
+      expect(new_bike.current_ownership.origin).to eq "embed_extended"
 
       expect(new_bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
       expect(bike_sticker.reload.claimed?).to be_truthy
@@ -385,8 +385,8 @@ RSpec.describe "BikesController#create", type: :request do
       expect(b_param.phone).to eq "18887776666"
       expect_attrs_to_match_hash(new_bike, testable_bike_params)
       expect(new_bike.manufacturer).to eq manufacturer
-      expect(new_bike.current_creation_state.origin).to eq "embed_partial"
-      expect(new_bike.current_creation_state.creator).to eq new_bike.creator
+      expect(new_bike.current_ownership.origin).to eq "embed_partial"
+      expect(new_bike.current_ownership.creator).to eq new_bike.creator
       expect(new_bike.registration_address).to eq({"street" => default_location[:formatted_address_no_country]})
       expect(new_bike.address).to eq default_location[:formatted_address_no_country]
       expect(new_bike.latitude).to eq target_address[:latitude]
@@ -424,8 +424,8 @@ RSpec.describe "BikesController#create", type: :request do
         expect(b_param.created_bike_id).to eq new_bike.id
         expect_attrs_to_match_hash(new_bike, testable_bike_params)
         expect(new_bike.manufacturer).to eq manufacturer
-        expect(new_bike.current_creation_state.origin).to eq "embed_partial"
-        expect(new_bike.current_creation_state.creator).to eq new_bike.creator
+        expect(new_bike.current_ownership.origin).to eq "embed_partial"
+        expect(new_bike.current_ownership.creator).to eq new_bike.creator
         expect(new_bike.registration_address).to eq target_address.as_json
         expect(new_bike.state.name).to eq "Illinois"
         expect(new_bike.extra_registration_number).to be_blank
@@ -460,8 +460,8 @@ RSpec.describe "BikesController#create", type: :request do
           expect(b_param.created_bike_id).to eq new_bike.id
           expect_attrs_to_match_hash(new_bike, testable_bike_params)
           expect(new_bike.manufacturer).to eq manufacturer
-          expect(new_bike.current_creation_state.origin).to eq "embed_partial"
-          expect(new_bike.current_creation_state.creator).to eq new_bike.creator
+          expect(new_bike.current_ownership.origin).to eq "embed_partial"
+          expect(new_bike.current_ownership.creator).to eq new_bike.creator
           expect(new_bike.registration_address).to eq target_address.as_json
           expect(new_bike.state.abbreviation).to eq "IL"
           expect(new_bike.extra_registration_number).to be_blank

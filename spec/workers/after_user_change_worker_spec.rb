@@ -104,7 +104,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     let(:feature_slugs) { %w[regional_bike_counts no_address] }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
     let(:user) { FactoryBot.create(:user_confirmed) }
-    let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization, user: user) }
+    let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: user) }
     let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
     it "does not add alert" do
       expect(organization.reload.paid?).to be_truthy

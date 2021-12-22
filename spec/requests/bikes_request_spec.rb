@@ -104,7 +104,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "with associated_notifications" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification) } # so that it isn't processed prior to second creation
-        let(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, organization: organization, owner_email: bike.owner_email, created_at: bike.created_at + 1.hour) }
+        let(:bike2) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, owner_email: bike.owner_email, created_at: bike.created_at + 1.hour) }
         let!(:graduated_notification2) { FactoryBot.create(:graduated_notification, bike: bike2, organization: organization) }
         it "marks both bikes remaining" do
           graduated_notification.process_notification

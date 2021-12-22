@@ -171,43 +171,41 @@
     .col.text-right
       = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
-#BParamsView.mt-4.collapse{class: (display_dev_info? ? "show in" : "")}
-  %hr
-  .row
-    .col-md-6.mt-2
-      %table.table-list
-        %tbody
-          %tr
-            %td Coordinates
-            %td
-              %code
-                = @bike.to_coordinates
-          %tr
-            %td
-              Address
-            %td
-              = pretty_print_json(@bike.address_hash)
-    .col-md-6.mt-2
-      %h4 Organizations
-      - @bike.bike_organizations.each do |bike_organization|
-        %table.table-list
-          %tbody
-            %tr
-              %td Organization
-              %td
-                = link_to bike_organization.organization&.short_name, admin_organization_path(bike_organization.organization_id)
-            %tr
-              %td
-                Created
-              %td
-                %span.convertTime
-                  = l bike_organization.created_at, format: :convert_time
-                - if display_dev_info?
-                  %code.only-dev-visible.small.ml-2
-                    ID: #{bike_organization.id}
-            %tr
-              %td Edit claimed?
-              %td= bike_organization.can_edit_claimed
+.mt-5
+  %table.table.table-striped.table-bordered.table-sm
+    %thead
+      %th
+        Organizations
+      %td
+        Created
+      %td
+        Edit claimed?
+      %td
+        Deleted
+    %tbody
+      - bike_organizations = BikeOrganization.unscoped.where(bike_id: @bike.id).order(:id)
+      - if bike_organizations.none?
+        %tr
+          %td{colspan: 4}
+            %em.less-strong No organizations
+      - bike_organizations.each do |bike_organization|
+        %tr
+          %td
+            = link_to bike_organization.organization&.short_name, admin_organization_path(bike_organization.organization_id)
+          %td
+            %span.convertTime
+              = l bike_organization.created_at, format: :convert_time
+            - if display_dev_info?
+              %code.only-dev-visible.small.ml-2
+                ID: #{bike_organization.id}
+          %td
+            = check_mark if bike_organization.can_edit_claimed
+          %td
+            - if bike_organization.deleted_at.present?
+              %span.convertTime.text-danger
+                = l bike_organization.deleted_at, format: :convert_time
+
+#BParamsView.mt-5.collapse{class: (display_dev_info? ? "show in" : "")}
   .row
     - @bike.ownerships.each do |ownership|
       .col-md-6.mt-2
@@ -258,7 +256,8 @@
                   %td= k
                   %td= v
       .col-md-6.mt-2
-        = pretty_print_json(ownership.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at", "token"))
+        - ownership_attrs = ownership.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at", "token", "id")
+        = pretty_print_json(ownership_attrs, true)
   .row.mt-2
     - @bike.creation_states.each do |creation_state|
       .col-md-6.mt-2
@@ -307,7 +306,7 @@
                   %td= k
                   %td= v
       .col-md-6.mt-2
-        = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"))
+        = pretty_print_json(creation_state.attributes.except("creator_id", "bike_id", "organization_id", "created_at", "updated_at"), true)
 
   - if @bike.b_params.any?
     .row
@@ -334,7 +333,7 @@
                   %span.convertTime
                     = l b_param.updated_at, format: :convert_time
         .col-md-6.mt-2
-          = pretty_print_json(b_param.params)
+          = pretty_print_json(b_param.params, true)
   - else
     %p
       No <code>BParams</code> exist

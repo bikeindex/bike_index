@@ -24,14 +24,16 @@ FactoryBot.define do
       user { FactoryBot.create(:organization_member, organization: organization) }
 
       factory :parking_notification_unregistered do
-        transient do
-          ownership { FactoryBot.create(:ownership, creator: user, bike: bike) }
+        bike do
+          FactoryBot.create(:bike_organized,
+            creator: user,
+            owner_email: user.email,
+            can_edit_claimed: true,
+            creation_organization: organization,
+            status: "unregistered_parking_notification")
         end
-        bike { FactoryBot.create(:bike_organized, creator: user, can_edit_claimed: true, organization: organization, status: "unregistered_parking_notification") }
-        after(:create) do |parking_notification, evaluator|
-          evaluator.ownership.save
-          # I'm not in love with this, but...  we need creation_state to get creator_unregistered_parking_notification
-          evaluator.bike.creation_states.create if evaluator.bike.creation_states.none?
+        after(:create) do |parking_notification, _evaluator|
+          # I'm not in love with this, but...  we need to mark this hidden
           parking_notification.bike.update_attributes(marked_user_hidden: true)
         end
       end

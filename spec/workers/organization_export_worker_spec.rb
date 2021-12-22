@@ -7,7 +7,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
   let(:organization) { export.organization }
   let(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
   let(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
-  let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, organization: organization) }
+  let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, creation_organization: organization) }
   let(:bike_values) do
     [
       "http://test.host/bikes/#{bike.id}",
@@ -51,10 +51,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
         let(:bike_for_avery_og) do
           FactoryBot.create(:bike_organized,
-            :with_creation_state,
             manufacturer: trek,
             primary_frame_color: black,
-            organization: organization,
+            creation_organization: organization,
             creation_state_registration_info: {
               street: "102 Washington Pl",
               city: "State College",
@@ -69,7 +68,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           FactoryBot.create(:bike_organized,
             manufacturer: trek,
             primary_frame_color: black,
-            organization: organization,
+            creation_organization: organization,
             creation_state_registration_info: {
               street: "",
               city: "State College",
@@ -161,9 +160,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: Export::PERMITTED_HEADERS, bike_code_start: "fff"}) }
       let(:secondary_color) { FactoryBot.create(:color) }
       let(:email) { "testly@bikeindex.org" }
-      let(:bike) do
+      let!(:bike) do
         FactoryBot.create(:bike_organized,
-          organization: organization,
+          :with_ownership_claimed,
+          creation_organization: organization,
           manufacturer: Manufacturer.other,
           frame_model: '",,,\"<script>XSSSSS</script>',
           year: 2001,
@@ -171,9 +171,11 @@ RSpec.describe OrganizationExportWorker, type: :job do
           primary_frame_color: Color.black,
           extra_registration_number: "cool extra serial",
           secondary_frame_color: secondary_color,
+          creator: FactoryBot.create(:user_confirmed, name: "other person"),
+          user: FactoryBot.create(:user, name: "George Smith", email: email),
           owner_email: email)
       end
-      let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
+      # let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
       let(:bike_values) do
         [
           "http://test.host/bikes/#{bike.id}",
@@ -194,6 +196,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       end
       let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
+        expect(bike.reload.owner_name).to eq "George Smith"
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
@@ -219,7 +222,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
          organization_affiliation: "community_member",
          student_id: "XX9999"}
       end
-      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization, extra_registration_number: "cool extra serial", creation_state_registration_info: registration_info) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_state_registration_info: registration_info) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
       let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).as_json }
@@ -336,6 +339,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
             expect(bike_sticker.user).to eq user
             expect(export.assign_bike_codes?).to be_falsey
             expect(export.headers).to eq Export.permitted_headers("include_paid")
+            expect(bike.reload.user&.id).to be_blank
+            expect(bike.owner_name).to eq nil
             expect(bike.phone).to eq "7177423423"
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"

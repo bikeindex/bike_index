@@ -79,10 +79,10 @@ class Admin::GraphsController < Admin::BaseController
           data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
         }]
     elsif @bike_graph_kind == "origin"
-      CreationState.origins.map do |origin|
+      Ownership.origins.keys.map do |origin|
         {
           name: origin.humanize,
-          data: helpers.time_range_counts(collection: bikes.includes(:creation_states).where(creation_states: {origin: origin}))
+          data: helpers.time_range_counts(collection: bikes.includes(:ownerships).where(ownerships: {origin: origin}))
         }
       end
     elsif @bike_graph_kind == "pos"

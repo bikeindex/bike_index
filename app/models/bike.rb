@@ -2,6 +2,7 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include Geocodeable
+  include PgSearch::Model
 
   acts_as_paranoid without_default_scope: true
 
@@ -33,7 +34,7 @@ class Bike < ApplicationRecord
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
 
-  has_many :bike_organizations, dependent: :destroy
+  has_many :bike_organizations
   has_many :organizations, through: :bike_organizations
   has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
   has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization
@@ -47,7 +48,7 @@ class Bike < ApplicationRecord
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
   has_many :public_images, as: :imageable, dependent: :destroy
-  has_many :components, dependent: :destroy
+  has_many :components
   has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
@@ -87,12 +88,6 @@ class Bike < ApplicationRecord
   enum propulsion_type: PropulsionType::SLUGS
   enum status: STATUS_ENUM
 
-  default_scope do
-    includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-      .current
-      .order(listing_order: :desc)
-  end
-
   scope :without_location, -> { where(latitude: nil) }
   scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
@@ -106,17 +101,19 @@ class Bike < ApplicationRecord
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: {resolved_at: nil}).where.not(impound_records: {id: nil}) }
   scope :without_creation_state, -> { includes(:creation_states).where(creation_states: {id: nil}) }
-  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "lightspeed_pos"}) }
-  scope :ascend_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "ascend_pos"}) }
-  scope :any_pos, -> { includes(:creation_states).where.not(creation_states: {pos_kind: "no_pos"}) }
-  scope :pos_not_lightspeed_ascend, -> { includes(:creation_states).where.not(creation_states: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
-  scope :no_pos, -> { includes(:creation_states).where(creation_states: {pos_kind: "no_pos"}) }
+  scope :lightspeed_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "lightspeed_pos"}) }
+  scope :ascend_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "ascend_pos"}) }
+  scope :any_pos, -> { includes(:ownerships).where.not(ownerships: {pos_kind: "no_pos"}) }
+  scope :pos_not_lightspeed_ascend, -> { includes(:ownerships).where.not(ownerships: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
+  scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
+  scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record) }
+
+  default_scope -> { default_includes.current.order(listing_order: :desc) }
 
   before_validation :set_calculated_attributes
 
-  include PgSearch::Model
   pg_search_scope :pg_search, against: {
     serial_number: "A",
     cached_data: "B",
@@ -296,30 +293,30 @@ class Bike < ApplicationRecord
   end
 
   def creation_description
-    current_creation_state&.creation_description
+    current_ownership&.creation_description
   end
 
   def bulk_import
-    current_creation_state&.bulk_import
+    current_ownership&.bulk_import
   end
 
   def pos_kind
-    current_creation_state&.pos_kind
+    current_ownership&.pos_kind
   end
 
   def registration_info
-    current_creation_state&.registration_info || {}
+    current_ownership&.registration_info || {}
   end
 
   def creator_unregistered_parking_notification?
-    current_creation_state&.creator_unregistered_parking_notification?
+    current_ownership&.creator_unregistered_parking_notification?
   end
 
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
-    return false if current_creation_state.blank?
-    %w[unregistered_parking_notification impound_import].include?(current_creation_state.origin) ||
-      current_creation_state.status == "status_impounded"
+    return false if current_ownership.blank?
+    %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
+      current_ownership.status == "status_impounded"
   end
 
   def pos?
@@ -445,17 +442,9 @@ class Bike < ApplicationRecord
     made_without_serial? || serial_unknown?
   end
 
-  # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
-  # User - not ownership, because we don't want registrar
+  # This is actually user.name - because user can be nil
   def owner_name
-    return user.name if user&.name.present?
-    # Only look deeper for the name if it's the first owner - or if no owner, which means testing probably
-    return nil unless current_ownership.blank? || current_ownership&.first?
-    oname = registration_info["user_name"]
-    return oname if oname.present?
-    # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
-    return nil if creation_organization.present? && owner&.member_of?(creation_organization)
-    owner&.name
+    current_ownership.owner_name
   end
 
   def first_ownership
@@ -818,8 +807,10 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_creation_state&.address_hash.present?
+    elsif current_ownership&.address_hash.present?
       "initial_creation"
+    elsif current_creation_state&.address_hash.present?
+      "initial_creation_state"
     end
   end
 
@@ -829,7 +820,7 @@ class Bike < ApplicationRecord
     @registration_address = case registration_address_source
     when "user" then user&.address_hash
     when "bike_update" then address_hash
-    when "initial_creation" then current_creation_state.address_hash
+    when "initial_creation" then current_ownership.address_hash
     else
       {}
     end.with_indifferent_access

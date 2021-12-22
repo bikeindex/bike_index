@@ -3,9 +3,8 @@ require "rails_helper"
 RSpec.describe "BikesController#edit", type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bikes/#{bike.to_param}/edit" }
-  let(:ownership) { FactoryBot.create(:ownership_claimed) }
-  let(:current_user) { ownership.creator }
-  let(:bike) { ownership.bike }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+  let(:current_user) { bike.creator }
 
   let(:edit_templates) do
     {
@@ -50,12 +49,14 @@ RSpec.describe "BikesController#edit", type: :request do
       expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
     end
     context "current_user present but hasn't claimed the bike" do
-      let(:ownership) { FactoryBot.create(:ownership, user_id: current_user.id) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, user: current_user) }
       it "claims and renders" do
-        expect(bike.owner).to_not eq current_user
+        expect(bike.ownerships.count).to eq 1
         expect(bike.claimed?).to be_falsey
+        expect(bike.claimable_by?(current_user)).to be_truthy
         get base_url
         bike.reload
+        expect(bike.claimed?).to be_truthy
         expect(bike.user_id).to eq current_user.id
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq "bike_details"
@@ -64,7 +65,7 @@ RSpec.describe "BikesController#edit", type: :request do
     end
   end
   context "not-creator but member of creation_organization" do
-    let(:ownership) { FactoryBot.create(:ownership_organization_bike) }
+    let(:bike) { FactoryBot.create(:bike_organized) }
     let(:organization) { bike.creation_organization }
     let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
     it "renders" do
@@ -91,7 +92,6 @@ RSpec.describe "BikesController#edit", type: :request do
   end
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
-    let(:ownership) { bike.current_ownership }
     it "renders" do
       get base_url
       expect(flash).to be_blank
@@ -252,13 +252,16 @@ RSpec.describe "BikesController#edit", type: :request do
     let(:bike) { parking_notification.bike }
     let(:current_organization) { parking_notification.organization }
     let(:current_user) { parking_notification.user }
-    let!(:ownership) { FactoryBot.create(:ownership_organization_bike, :claimed, bike: bike, user: current_user, organization: current_organization) }
     before { ProcessParkingNotificationWorker.new.perform(parking_notification.id) }
     it "renders" do
       parking_notification.reload
       impound_record = parking_notification.impound_record
       expect(impound_record).to be_present
-      bike.reload
+      expect(bike.reload.ownerships.count).to eq 1
+      ownership = bike.ownerships.first
+      expect(ownership.self_made?).to be_truthy
+      expect(ownership.user_id).to eq current_user.id
+      expect(ownership.creator_unregistered_parking_notification?).to be_truthy
       expect(bike.current_impound_record&.id).to eq impound_record.id
       expect(bike.user).to eq current_user
       expect(bike.claimed?).to be_truthy

@@ -41,8 +41,8 @@ class Organization < ApplicationRecord
   has_many :admin_memberships, -> { admin }, class_name: "Membership"
   has_many :admins, through: :admin_memberships, source: :user
 
-  has_many :creation_states
-  has_many :created_bikes, through: :creation_states, source: :bike
+  has_many :ownerships
+  has_many :created_bikes, through: :ownerships, source: :bike
 
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :mail_snippets
@@ -119,6 +119,10 @@ class Organization < ApplicationRecord
 
   def self.no_pos_kinds
     %w[no_pos does_not_need_pos]
+  end
+
+  def self.pos?(kind = nil)
+    kind.present? && !no_pos_kinds.include?(kind)
   end
 
   def self.admin_required_kinds
@@ -221,8 +225,8 @@ class Organization < ApplicationRecord
     self.class.broken_pos_kinds.include?(pos_kind)
   end
 
-  def any_pos?
-    !self.class.no_pos_kinds.include?(pos_kind)
+  def pos?
+    self.class.pos?(pos_kind)
   end
 
   def allowed_show?

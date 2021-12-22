@@ -1,6 +1,5 @@
 # Warning: BikeCreator forces every bike to have an ownership
 # ... But this factory allows creating bikes without ownerships
-# ** recently added the :with_ownership trait which should be used **
 FactoryBot.define do
   factory :bike do
     creator { FactoryBot.create(:user) }
@@ -20,70 +19,62 @@ FactoryBot.define do
       end
     end
 
-    trait :with_creation_state do
+    trait :with_ownership do
       transient do
+        user { nil }
+        claimed { false }
+        claimed_at { nil }
         can_edit_claimed { true }
-        creation_state_is_pos { false }
+        # Previous Creation State attributes
+        # TODO: part of #2110 - remove prefix
         creation_state_pos_kind { "" }
         creation_state_origin { "" }
         creation_state_bulk_import { nil }
         creation_state_registration_info { nil }
       end
+      soon_current_ownership_id { 0 }
+
       after(:create) do |bike, evaluator|
-        # Have to create here so created_at matches
-        if bike.creation_organization_id.present?
-          BikeOrganization.create(bike_id: bike.id,
+        # Sometimes multiple things include with_ownership, this can get called multiple times
+        # Make sure we only do it once
+        if bike.ownerships.count == 0
+          if bike.creation_organization_id.present?
+            BikeOrganization.create(bike_id: bike.id,
+              organization_id: bike.creation_organization_id,
+              can_edit_claimed: evaluator.can_edit_claimed,
+              created_at: bike.created_at)
+          end
+
+          FactoryBot.create(:ownership,
+            bike: bike,
+            creator: bike.creator,
+            owner_email: bike.owner_email,
+            user: evaluator.user,
+            claimed: evaluator.claimed,
+            claimed_at: evaluator.claimed_at,
+            created_at: bike.created_at,
             organization_id: bike.creation_organization_id,
             can_edit_claimed: evaluator.can_edit_claimed,
-            created_at: bike.created_at)
-        end
-        create(:creation_state, creator: bike.creator,
-                                bike: bike,
-                                created_at: bike.created_at,
-                                organization: bike.creation_organization,
-                                can_edit_claimed: evaluator.can_edit_claimed,
-                                origin: evaluator.creation_state_origin,
-                                is_pos: evaluator.creation_state_is_pos,
-                                pos_kind: evaluator.creation_state_pos_kind,
-                                bulk_import: evaluator.creation_state_bulk_import,
-                                registration_info: evaluator.creation_state_registration_info)
-        bike.reload # reflexively sets bike.current_creation_state
-      end
-    end
+            origin: evaluator.creation_state_origin,
+            pos_kind: evaluator.creation_state_pos_kind,
+            bulk_import: evaluator.creation_state_bulk_import,
+            registration_info: evaluator.creation_state_registration_info)
 
-    trait :with_ownership do
-      transient do
-        user { nil }
-        claimed { false }
-      end
-      after(:create) do |bike, evaluator|
-        create(:ownership,
-          bike: bike,
-          creator: bike.creator,
-          owner_email: bike.owner_email,
-          user: evaluator.user,
-          claimed: evaluator.claimed)
-        bike.reload
+          bike.reload
+        end
       end
     end
 
     trait :with_ownership_claimed do
+      with_ownership
       transient do
         user { FactoryBot.create(:user) }
         claimed_at { Time.current - 1.day }
+        claimed { true }
       end
       creator { user }
       owner_email { user.email }
       created_at { claimed_at }
-      after(:create) do |bike, evaluator|
-        create(:ownership_claimed,
-          bike: bike,
-          creator: bike.creator,
-          owner_email: bike.owner_email,
-          user: evaluator.user,
-          claimed_at: evaluator.claimed_at)
-        bike.reload
-      end
     end
 
     trait :phone_registration do
@@ -153,16 +144,10 @@ FactoryBot.define do
       end
     end
 
-    factory :bike_organized, traits: [:with_creation_state] do
-      transient do
-        # TODO: remove this (we should only reference creation_organization) - requires updating a bunch of specs
-        organization { FactoryBot.create(:organization) }
-      end
-
-      creation_organization { organization }
+    factory :bike_organized, traits: [:with_ownership] do
+      creation_organization { FactoryBot.create(:organization) }
 
       factory :bike_lightspeed_pos do
-        creation_state_is_pos { true }
         creation_state_origin { "api_v1" }
         creation_state_pos_kind { "lightspeed_pos" }
       end
@@ -171,7 +156,6 @@ FactoryBot.define do
         transient do
           bulk_import { FactoryBot.create(:bulk_import_ascend, organization: creation_organization) }
         end
-        creation_state_is_pos { true }
         creation_state_origin { "bulk_import_worker" }
         creation_state_pos_kind { "ascend_pos" }
         creation_state_bulk_import { bulk_import }

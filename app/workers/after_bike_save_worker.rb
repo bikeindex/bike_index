@@ -53,12 +53,12 @@ class AfterBikeSaveWorker < ApplicationWorker
     matching_b_param = matches.last # Because we want the last created
     return true unless matching_b_param.present?
     matching_b_param.update_attributes(created_bike_id: bike.id)
-    # Only set creation_state
-    creation_state = bike.current_creation_state
-    if creation_state.present? && creation_state.origin == "web" && creation_state.organization_id.blank?
-      creation_state.organization_id = matching_b_param.organization_id
-      creation_state.origin = matching_b_param.origin if (CreationState.origins - ["web"]).include?(matching_b_param.origin)
-      creation_state.save
+    # Only set ownership
+    ownership = bike.current_ownership
+    if ownership.present? && ownership.origin == "web" && ownership.organization_id.blank?
+      ownership.organization_id = matching_b_param.organization_id
+      ownership.origin = matching_b_param.origin if (Ownership.origins.keys - ["web"]).include?(matching_b_param.origin)
+      ownership.save
       if matching_b_param.organization_id.present?
         bike.update(creation_organization_id: matching_b_param.organization_id)
         bike.bike_organizations.create(organization_id: matching_b_param.organization_id)

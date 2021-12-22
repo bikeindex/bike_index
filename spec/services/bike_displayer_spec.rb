@@ -141,7 +141,7 @@ RSpec.describe BikeDisplayer do
       let!(:organization_regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let(:enabled_feature_slugs) { %w[regional_bike_counts bike_stickers] }
       let!(:organization_regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
-      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, organization: organization_regional_child, can_edit_claimed: false) }
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization_regional_child, can_edit_claimed: false) }
       let(:owner) { bike.owner }
       let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner) }
       let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed) }
@@ -335,7 +335,7 @@ RSpec.describe BikeDisplayer do
     end
     context "organized bike" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, organization: organization) }
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization) }
       let(:organization_member) { FactoryBot.create(:user, :with_organization, organization: organization) }
       it "is truthy" do
         expect(bike.authorized?(user)).to be_truthy

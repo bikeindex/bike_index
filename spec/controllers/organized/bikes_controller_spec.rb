@@ -121,7 +121,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.manufacturer_id).to eq manufacturer.id
-        expect(bike.current_creation_state.origin).to eq "organization_form"
+        expect(bike.current_ownership.origin).to eq "organization_form"
         expect(bike.primary_frame_color_id).to eq color.id
         expect(bike.secondary_frame_color_id).to be_blank
         expect(bike.tertiary_frame_color_id).to be_blank
@@ -165,7 +165,7 @@ RSpec.describe Organized::BikesController, type: :controller do
           end
         end
         context "with search_stickers" do
-          let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, organization: organization) }
+          let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: organization) }
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
             expect(bike_with_sticker.bike_sticker?).to be_truthy
