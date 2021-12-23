@@ -34,7 +34,7 @@ FactoryBot.define do
         end
         after(:create) do |parking_notification, _evaluator|
           # I'm not in love with this, but...  we need to mark this hidden
-          parking_notification.bike.update_attributes(marked_user_hidden: true)
+          parking_notification.bike.update(marked_user_hidden: true)
         end
       end
     end

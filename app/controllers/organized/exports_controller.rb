@@ -25,7 +25,7 @@ module Organized
         @export = Export.new(permitted_parameters)
         @export.options[:partial_registrations] = partial_registration_params
       end
-      if flash[:error].blank? && @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
+      if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportWorker.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
           flash[:success] = translation(:with_avery_redirect)

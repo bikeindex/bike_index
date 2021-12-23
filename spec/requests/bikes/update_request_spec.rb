@@ -19,11 +19,11 @@ RSpec.describe "BikesController#update", type: :request do
   context "setting address for bike" do
     let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
-    let(:update_attributes) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
+    let(:update) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
-      bike.update_attributes(updated_at: Time.current)
+      bike.update(updated_at: Time.current)
       bike.reload
       expect(bike.current_ownership.claimed?).to be_truthy
       expect(bike.user&.id).to eq current_user.id
@@ -35,7 +35,7 @@ RSpec.describe "BikesController#update", type: :request do
       VCR.use_cassette("bike_request-set_manual_address") do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          patch base_url, params: {bike: update_attributes}
+          patch base_url, params: {bike: update}
         end
       end
       bike.reload
@@ -46,7 +46,7 @@ RSpec.describe "BikesController#update", type: :request do
       let!(:current_user) { FactoryBot.create(:user_confirmed) }
       it "sets the passed address" do
         expect(current_user.to_coordinates).to eq([nil, nil])
-        bike.update_attributes(updated_at: Time.current)
+        bike.update(updated_at: Time.current)
         bike.reload
         expect(current_user.authorized?(bike)).to be_truthy
         expect(current_user.address_set_manually).to be_falsey
@@ -58,7 +58,7 @@ RSpec.describe "BikesController#update", type: :request do
         VCR.use_cassette("bike_request-set_manual_address") do
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            patch base_url, params: {bike: update_attributes}
+            patch base_url, params: {bike: update}
           end
         end
         bike.reload
@@ -138,7 +138,7 @@ RSpec.describe "BikesController#update", type: :request do
       let!(:user_phone_confirmed) { FactoryBot.create(:user_phone_confirmed, user: current_user, phone: phone) }
       it "marks the bike stolen, doesn't set a location, blanks bike location" do
         expect(current_user.reload.phone).to eq "2221114444"
-        bike.update_attributes(location_attrs.merge(skip_geocoding: true))
+        bike.update(location_attrs.merge(skip_geocoding: true))
         bike.reload
         expect(bike.address_set_manually).to be_truthy
         expect(bike.status_stolen?).to be_falsey
@@ -181,7 +181,7 @@ RSpec.describe "BikesController#update", type: :request do
     let(:current_organization) { FactoryBot.create(:organization) }
     let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
     let(:parking_notification) do
-      current_organization.update_attributes(auto_user: auto_user)
+      current_organization.update(auto_user: auto_user)
       FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_organization.auto_user)
     end
     let!(:bike) { parking_notification.bike }

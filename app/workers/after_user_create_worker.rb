@@ -56,7 +56,7 @@ class AfterUserCreateWorker < ApplicationWorker
 
   def associate_ownerships(user, email)
     Ownership.where(owner_email: email).each do |ownership|
-      ownership.update_attributes(user_id: user.id)
+      ownership.update(user_id: user.id)
     end
   end
 

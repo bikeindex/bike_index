@@ -26,7 +26,7 @@ class Admin::OwnershipsController < Admin::BaseController
         error_message << "No confirmed user with creator email!" unless params[:ownership][:creator_id].present?
       end
     end
-    if error_message.blank? && params[:ownership].present? && @ownership.update_attributes(permitted_parameters)
+    if error_message.blank? && params[:ownership].present? && @ownership.update(permitted_parameters)
       flash[:success] = "Ownership Saved!"
       redirect_to edit_admin_ownership_url(@ownership.id)
     else

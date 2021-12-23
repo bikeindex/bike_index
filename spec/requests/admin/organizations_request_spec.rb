@@ -80,7 +80,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     let(:country) { state.country }
     let(:parent_organization) { FactoryBot.create(:organization) }
     let(:location1) { FactoryBot.create(:location, organization: organization, street: "old street", name: "cool name") }
-    let(:update_attributes) do
+    let(:update) do
       {
         name: "new name thing stuff",
         show_on_map: true,
@@ -135,13 +135,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(location1).to be_present
       Sidekiq::Worker.clear_all
       expect {
-        put "#{base_url}/#{organization.to_param}", params: {organization_id: organization.to_param, organization: update_attributes}
+        put "#{base_url}/#{organization.to_param}", params: {organization_id: organization.to_param, organization: update}
       }.to change(Location, :count).by 1
       expect(UpdateOrganizationPosKindWorker.jobs.count).to eq 1
       UpdateOrganizationPosKindWorker.drain # Run the jobs in the queue
       organization.reload
       expect(organization.parent_organization).to eq parent_organization
-      expect(organization.name).to eq update_attributes[:name]
+      expect(organization.name).to eq update[:name]
       expect(organization.ascend_name).to eq "party on"
       expect(organization.previous_slug).to eq "partied-on"
       expect(organization.manual_pos_kind).to eq "lightspeed_pos"
@@ -151,13 +151,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization
-      location1_update_attributes = update_attributes[:locations_attributes]["0"]
-      expect_attrs_to_match_hash(location1, location1_update_attributes.except(:latitude, :longitude, :organization_id, :created_at, :_destroy))
+      location1_update = update[:locations_attributes]["0"]
+      expect_attrs_to_match_hash(location1, location1_update.except(:latitude, :longitude, :organization_id, :created_at, :_destroy))
 
       # still existing location
       location2 = organization.locations.last
-      location2_update_attributes = update_attributes[:locations_attributes][update_attributes[:locations_attributes].keys.last]
-      expect_attrs_to_match_hash(location2, location2_update_attributes.except(:latitude, :longitude, :organization_id, :created_at))
+      location2_update = update[:locations_attributes][update[:locations_attributes].keys.last]
+      expect_attrs_to_match_hash(location2, location2_update.except(:latitude, :longitude, :organization_id, :created_at))
     end
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }

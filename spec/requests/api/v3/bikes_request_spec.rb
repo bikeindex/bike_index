@@ -697,7 +697,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     it "doesn't update if user doesn't own the bike" do
       other_user = FactoryBot.create(:user)
-      bike.current_ownership.update_attributes(user_id: other_user.id, claimed: true)
+      bike.current_ownership.update(user_id: other_user.id, claimed: true)
       allow_any_instance_of(Bike).to receive(:type).and_return("unicorn")
 
       put url, params: params.to_json, headers: json_headers
@@ -1059,7 +1059,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "fails if the bike isn't owned by the access token user" do
-      bike.current_ownership.update_attributes(user_id: FactoryBot.create(:user).id, claimed: true)
+      bike.current_ownership.update(user_id: FactoryBot.create(:user).id, claimed: true)
       post url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("403")
       expect(response.body.match("application is not approved")).to be_present

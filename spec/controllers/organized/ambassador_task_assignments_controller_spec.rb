@@ -44,7 +44,7 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller
     context "given a failed update" do
       it "sets the flash error message" do
         assignment = FactoryBot.create(:ambassador_task_assignment)
-        allow(assignment).to receive(:update_attributes).and_return(false)
+        allow(assignment).to receive(:update).and_return(false)
         allow(AmbassadorTaskAssignment).to receive(:find).and_return(assignment)
 
         patch :update,

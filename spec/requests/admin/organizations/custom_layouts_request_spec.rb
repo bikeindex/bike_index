@@ -54,13 +54,13 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "organization update" do
       context "landing_page" do
-        let(:update_attributes) { {landing_html: "<p>html for the landing page</p>"} }
+        let(:update) { {landing_html: "<p>html for the landing page</p>"} }
         it "updates and redirects to the landing_page edit" do
-          put "#{base_url}/landing_page", params: {organization: update_attributes}
+          put "#{base_url}/landing_page", params: {organization: update}
           target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: "landing_page")
           expect(response).to redirect_to target
           organization.reload
-          expect(organization.landing_html).to eq update_attributes[:landing_html]
+          expect(organization.landing_html).to eq update[:landing_html]
         end
       end
       context "mail_snippet" do
@@ -71,7 +71,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
             kind: snippet_kind,
             is_enabled: false)
         end
-        let(:update_attributes) do
+        let(:update) do
           {
             mail_snippets_attributes: {
               "0" => {
@@ -86,7 +86,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
         it "updates the mail snippets" do
           expect(mail_snippet.is_enabled).to be_falsey
           expect {
-            put "#{base_url}/#{snippet_kind}", params: {organization: update_attributes}
+            put "#{base_url}/#{snippet_kind}", params: {organization: update}
           }.to change(MailSnippet, :count).by 0
           target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: snippet_kind)
           expect(response).to redirect_to target

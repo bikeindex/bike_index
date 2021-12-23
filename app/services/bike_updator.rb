@@ -65,7 +65,7 @@ class BikeUpdator
     if update_attrs.slice("street", "city", "zipcode").values.reject(&:blank?).any?
       @bike.address_set_manually = true
     end
-    if @bike.update_attributes(update_attrs)
+    if @bike.update(update_attrs)
       update_stolen_record
       update_impound_record
     end

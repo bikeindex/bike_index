@@ -91,7 +91,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           }
         end
         let(:user2) { FactoryBot.create(:organization_member, organization: current_organization) }
-        let(:update_attributes) do
+        let(:update) do
           {
             # slug: 'short_name',
             slug: "cool name and stuffffff",
@@ -115,15 +115,15 @@ RSpec.describe Organized::ManagesController, type: :request do
         let(:permitted_update_keys) { [:kind, :auto_user_id, :embedable_user_email, :name, :website] }
         before do
           expect(user2).to be_present
-          current_organization.update_attributes(org_attributes)
+          current_organization.update(org_attributes)
         end
         it "updates, sends message about maps" do
-          put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes}
+          put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: update}
           expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect_attrs_to_match_hash(current_organization, update_attributes.slice(:name))
+          expect_attrs_to_match_hash(current_organization, update.slice(:name))
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")
@@ -137,7 +137,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         let(:state) { FactoryBot.create(:state) }
         let(:country) { state.country }
         let(:location1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name") }
-        let(:update_attributes) do
+        let(:update) do
           {
             name: current_organization.name,
             show_on_map: true,
@@ -185,7 +185,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           }
         end
         before do
-          expect(update_attributes).to be_present
+          expect(update).to be_present
           expect(current_organization.show_on_map).to be_falsey
           expect(current_organization.lock_show_on_map).to be_falsey
         end
@@ -193,7 +193,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           it "updates and adds the locations and shows on map" do
             expect(current_organization.kind).to_not eq "ambassador"
             expect {
-              put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: update_attributes}
+              put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: update}
             }.to change(Location, :count).by 1
             current_organization.reload
             expect(current_organization.show_on_map).to be_truthy
@@ -203,23 +203,23 @@ RSpec.describe Organized::ManagesController, type: :request do
             location1.reload
             expect(location1.organization).to eq current_organization
             skipped_location_attrs = %i[latitude longitude shown organization_id created_at _destroy publicly_visible impound_location default_impound_location]
-            expect_attrs_to_match_hash(location1, update_attributes[:locations_attributes]["0"].except(*skipped_location_attrs))
+            expect_attrs_to_match_hash(location1, update[:locations_attributes]["0"].except(*skipped_location_attrs))
             expect(location1.publicly_visible).to be_truthy
             expect(location1.impound_location).to be_falsey
             # ensure we are not permitting crazy assignment for first location
-            update_attributes[:locations_attributes]["0"].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
+            update[:locations_attributes]["0"].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
               expect(location1.send(k)).to_not eq v
             end
 
             # second location
             location2 = current_organization.locations.last
-            key = update_attributes[:locations_attributes].keys.last
-            expect_attrs_to_match_hash(location2, update_attributes[:locations_attributes][key].except(*skipped_location_attrs))
+            key = update[:locations_attributes].keys.last
+            expect_attrs_to_match_hash(location2, update[:locations_attributes][key].except(*skipped_location_attrs))
             expect(location2.publicly_visible).to be_falsey
             expect(location2.impound_location).to be_truthy
             expect(location2.default_impound_location).to be_falsey
             # ensure we are not permitting crazy assignment for created location
-            update_attributes[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
+            update[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
               expect(location1.send(k)).to_not eq v
             end
           end
@@ -243,7 +243,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         end
 
         context "removing a location" do
-          before { update_attributes[:locations_attributes]["0"][:_destroy] = 1 }
+          before { update[:locations_attributes]["0"][:_destroy] = 1 }
           it "removes the location" do
             expect(location1).to be_present
             expect(current_organization.locations.count).to eq 1
@@ -253,7 +253,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 params: {
                   organization_id: current_organization.to_param,
                   id: current_organization.to_param,
-                  organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                  organization: update.merge(kind: "bike_shop", short_name: "cool other name")
                 }
               # Because we added 1 location and deleted 1 location
             }.to change(Location, :count).by 0
@@ -274,10 +274,10 @@ RSpec.describe Organized::ManagesController, type: :request do
             let(:location1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name", impound_location: true) }
             let(:blocked_destroy_params) do
               # Only pass one location, and keep it default impound location
-              update_attributes.merge(kind: "bike_shop",
+              update.merge(kind: "bike_shop",
                 short_name: "cool other name",
                 locations_attributes: {
-                  "0" => update_attributes[:locations_attributes]["0"].merge(default_impound_location: "1")
+                  "0" => update[:locations_attributes]["0"].merge(default_impound_location: "1")
                 })
             end
             it "does not remove" do
@@ -306,7 +306,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         end
 
         context "only updating location" do
-          let(:update_attributes) do
+          let(:update) do
             {
               created_at: Time.current.to_f.to_s,
               name: "new shop",
@@ -337,7 +337,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                     params: {
                       organization_id: current_organization.to_param,
                       id: current_organization.to_param,
-                      organization: {locations_attributes: {Time.current.to_i.to_s => update_attributes}}
+                      organization: {locations_attributes: {Time.current.to_i.to_s => update}}
                     }
                 }.to change(Location, :count).by 1
               end
@@ -347,7 +347,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.locations.count).to eq 1
             location = current_organization.locations.first
 
-            expect_attrs_to_match_hash(location, update_attributes.except(:created_at, :organization_id))
+            expect_attrs_to_match_hash(location, update.except(:created_at, :organization_id))
             expect(location.latitude).to be_within(0.1).of(41.8)
             expect(location.longitude).to be_within(0.1).of(-87.6)
 

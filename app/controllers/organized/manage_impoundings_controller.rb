@@ -13,7 +13,7 @@ module Organized
     end
 
     def update
-      if @impound_configuration.update_attributes(permitted_parameters)
+      if @impound_configuration.update(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
         redirect_back(fallback_location: edit_organization_manage_impounding_path(organization_id: current_organization.to_param))
       else

@@ -15,7 +15,7 @@ class Admin::TwitterAccountsController < Admin::BaseController
   end
 
   def update
-    if @twitter_account.update_attributes(permitted_parameters)
+    if @twitter_account.update(permitted_parameters)
       if ParamsNormalizer.boolean(params[:check_credentials])
         @twitter_account.reload
         @twitter_account.check_credentials

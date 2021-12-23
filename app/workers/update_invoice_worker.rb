@@ -7,6 +7,6 @@ class UpdateInvoiceWorker < ScheduledWorker
 
   def perform
     Invoice.should_activate.or(Invoice.should_expire)
-      .each { |invoice| invoice.update_attributes(updated_at: Time.current) }
+      .each { |invoice| invoice.update(updated_at: Time.current) }
   end
 end

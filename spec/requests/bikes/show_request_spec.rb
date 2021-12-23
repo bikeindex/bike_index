@@ -9,7 +9,7 @@ RSpec.describe "BikesController#show", type: :request do
 
   context "example bike" do
     it "shows the bike" do
-      ownership.bike.update_attributes(example: true)
+      ownership.bike.update(example: true)
       get "#{base_url}/#{bike.id}"
       expect(response).to render_template(:show)
       expect(assigns(:bike).id).to eq bike.id
@@ -42,7 +42,7 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
   context "admin hidden (fake delete)" do
-    before { ownership.bike.update_attributes(hidden: true) }
+    before { ownership.bike.update(hidden: true) }
     it "404s" do
       expect {
         get "#{base_url}/#{bike.id}"
@@ -138,7 +138,7 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
   context "user hidden bike" do
-    before { bike.update_attributes(marked_user_hidden: "true") }
+    before { bike.update(marked_user_hidden: "true") }
     context "owner of bike viewing" do
       it "responds with success" do
         get "#{base_url}/#{bike.id}"
@@ -226,7 +226,7 @@ RSpec.describe "BikesController#show", type: :request do
     let(:current_organization) { FactoryBot.create(:organization) }
     let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
     let(:parking_notification) do
-      current_organization.update_attributes(auto_user: auto_user)
+      current_organization.update(auto_user: auto_user)
       FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_organization.auto_user)
     end
     let!(:bike) { parking_notification.bike }

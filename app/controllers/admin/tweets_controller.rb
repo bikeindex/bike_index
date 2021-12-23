@@ -28,7 +28,7 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def update
-    if @tweet.update_attributes(permitted_parameters)
+    if @tweet.update(permitted_parameters)
       flash[:notice] = "Tweet saved!"
       redirect_to edit_admin_tweet_url
     else

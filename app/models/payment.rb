@@ -156,7 +156,7 @@ class Payment < ApplicationRecord
       EmailReceiptWorker.perform_async(id)
     end
     return true unless invoice.present?
-    invoice.update_attributes(updated_at: Time.current) # Manually trigger invoice update
+    invoice.update(updated_at: Time.current) # Manually trigger invoice update
   end
 
   private

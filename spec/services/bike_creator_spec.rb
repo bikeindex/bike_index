@@ -124,7 +124,7 @@ RSpec.describe BikeCreator do
       allow(b_param).to receive(:id).and_return(42)
       allow(bike).to receive(:id).and_return(69)
       allow(bike).to receive(:errors).and_return(nil)
-      expect(b_param).to receive(:update_attributes).with(created_bike_id: 69, bike_errors: nil)
+      expect(b_param).to receive(:update).with(created_bike_id: 69, bike_errors: nil)
       instance.send(:validate_record, bike)
     end
 

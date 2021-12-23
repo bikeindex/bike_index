@@ -62,6 +62,6 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def update_associations
-    stolen_record&.update_attributes(updated_at: Time.current)
+    stolen_record&.update(updated_at: Time.current)
   end
 end

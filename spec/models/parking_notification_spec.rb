@@ -134,7 +134,7 @@ RSpec.describe ParkingNotification, type: :model do
           expect(parking_notification.initial_record).to eq parking_notification_initial
           expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id])
 
-          parking_notification_initial.update_attributes(impound_record: impound_record)
+          parking_notification_initial.update(impound_record: impound_record)
           parking_notification_initial.reload
           parking_notification.reload
           expect(parking_notification_initial.repeat_records.pluck(:id)).to match_array([parking_notification.id])
@@ -299,7 +299,7 @@ RSpec.describe ParkingNotification, type: :model do
       context "use_entered_address and lat/long set" do
         it "uses address" do
           VCR.use_cassette("parking_notification-address_lookup") do
-            parking_notification.update_attributes(use_entered_address: true, latitude: 34.05223, longitude: -118.24368)
+            parking_notification.update(use_entered_address: true, latitude: 34.05223, longitude: -118.24368)
             expect(parking_notification.latitude).to eq latitude
             expect(parking_notification.longitude).to eq longitude
             expect(parking_notification.valid?).to be_truthy

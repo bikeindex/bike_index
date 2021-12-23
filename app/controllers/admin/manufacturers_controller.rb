@@ -18,7 +18,7 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   def update
-    if @manufacturer.update_attributes(permitted_parameters)
+    if @manufacturer.update(permitted_parameters)
       flash[:success] = "Manufacturer Saved!"
       AutocompleteLoaderWorker.perform_async("reset")
       redirect_to admin_manufacturer_url(@manufacturer)

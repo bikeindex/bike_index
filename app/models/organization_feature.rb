@@ -112,6 +112,6 @@ class OrganizationFeature < ApplicationRecord
 
   # Trigger an update to invoices which will, in turn, update the associated organizations
   def update_invoices
-    invoices.each { |i| i.update_attributes(updated_at: Time.current) }
+    invoices.each { |i| i.update(updated_at: Time.current) }
   end
 end

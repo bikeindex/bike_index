@@ -140,7 +140,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.current - 2.years, force_active: true) }
       it "creates following invoice" do
         invoice.organization_feature_ids = [organization_feature1.id, organization_feature2.id]
-        invoice.update_attributes(child_enabled_feature_slugs: ["passwordless_users"])
+        invoice.update(child_enabled_feature_slugs: ["passwordless_users"])
         invoice.reload
         expect(invoice.child_enabled_feature_slugs).to eq(["passwordless_users"])
         expect {

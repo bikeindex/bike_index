@@ -140,7 +140,7 @@ RSpec.describe Organization, type: :model do
         expect(org.enabled?("unstolen_notifications")).to be_falsey
         expect(org.enabled_feature_slugs).to eq([])
 
-        org.update_attributes(kind: :ambassador)
+        org.update(kind: :ambassador)
 
         org.reload
         expect(org).to_not be_show_on_map
@@ -261,11 +261,11 @@ RSpec.describe Organization, type: :model do
       it "is the locations coordinates for the first publicly_visible location, falls back to the first location if neither publicly_visible" do
         expect(organization.default_location).to eq location
         expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
-        location.update_attributes(publicly_visible: false, skip_update: false)
+        location.update(publicly_visible: false, skip_update: false)
         organization.reload
         expect(organization.default_location.id).to eq location2.id
         expect(organization.map_focus_coordinates).to eq(latitude: 12, longitude: -111)
-        location2.update_attributes(not_publicly_visible: true, skip_geocoding: true, skip_update: false)
+        location2.update(not_publicly_visible: true, skip_geocoding: true, skip_update: false)
         organization.reload
         # Now get the first location
         expect(organization.default_location).to eq location
@@ -304,8 +304,8 @@ RSpec.describe Organization, type: :model do
     let(:organization_child) { FactoryBot.create(:organization) }
     it "uses associations to determine is_paid" do
       expect(organization.enabled?("csv_exports")).to be_falsey
-      invoice.update_attributes(organization_feature_ids: [organization_feature.id])
-      invoice.update_attributes(child_enabled_feature_slugs_string: "csv_exports")
+      invoice.update(organization_feature_ids: [organization_feature.id])
+      invoice.update(child_enabled_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(%w[child_organizations csv_exports])
 
       expect { organization.save }.to change { UpdateOrganizationAssociationsWorker.jobs.count }.by(1)
@@ -315,7 +315,7 @@ RSpec.describe Organization, type: :model do
       expect(organization.enabled?("csv_exports")).to be_truthy
       expect(organization_child.is_paid).to be_falsey
 
-      organization_child.update_attributes(parent_organization: organization)
+      organization_child.update(parent_organization: organization)
       organization.save
 
       expect(organization.parent?).to be_truthy
@@ -332,7 +332,7 @@ RSpec.describe Organization, type: :model do
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: regional_child) }
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
-        regional_parent.update_attributes(updated_at: Time.current)
+        regional_parent.update(updated_at: Time.current)
         expect(regional_parent.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])

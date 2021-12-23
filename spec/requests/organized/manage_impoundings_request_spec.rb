@@ -57,7 +57,7 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
     end
 
     describe "update" do
-      let(:update_attributes) do
+      let(:update) do
         {
           display_id_prefix: "xXx3",
           public_view: true,
@@ -69,23 +69,23 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
         patch base_url, params: {
           organization_id: current_organization.to_param,
           id: current_organization.to_param,
-          impound_configuration: update_attributes
+          impound_configuration: update
         }
         expect(response).to redirect_to edit_organization_manage_impounding_path(organization_id: current_organization.to_param)
         expect(flash[:success]).to be_present
-        expect_attrs_to_match_hash(impound_configuration.reload, update_attributes.except(:display_id_next_integer))
+        expect_attrs_to_match_hash(impound_configuration.reload, update.except(:display_id_next_integer))
         # TODO: this should be updateable for organizations in the future. But skipping for now,
         # to be able to enable, we need to add validations that check that the display_id_next_integer
         expect(impound_configuration.display_id_next_integer).to eq nil
       end
       context "other update" do
         let(:impound_configuration) { FactoryBot.create(:impound_configuration, public_view: true, email: "something@stuff.com") }
-        let(:update_attributes) { {public_view: "0", display_id_prefix: "1", email: " "} }
+        let(:update) { {public_view: "0", display_id_prefix: "1", email: " "} }
         it "updates" do
           patch base_url, params: {
             organization_id: current_organization.to_param,
             id: current_organization.to_param,
-            impound_configuration: update_attributes
+            impound_configuration: update
           }
           expect(response).to redirect_to edit_organization_manage_impounding_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present

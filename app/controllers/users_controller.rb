@@ -83,7 +83,7 @@ class UsersController < ApplicationController
   end
 
   def update_password_with_reset_token
-    if @user.present? && @user.update_attributes(permitted_password_reset_parameters)
+    if @user.present? && @user.update(permitted_password_reset_parameters)
       flash[:success] = translation(:password_reset_successfully)
       # They got the password reset email, which counts as confirming their email
       @user.confirm(@user.confirmation_token) if @user.unconfirmed?
@@ -128,7 +128,7 @@ class UsersController < ApplicationController
     end
     unless @user.errors.any?
       successfully_updated = update_hot_sheet_notifications
-      if params[:user].present? && @user.update_attributes(permitted_update_parameters)
+      if params[:user].present? && @user.update(permitted_update_parameters)
         successfully_updated = true
         if params.dig(:user, :terms_of_service).present?
           if ParamsNormalizer.boolean(params.dig(:user, :terms_of_service))
@@ -142,7 +142,7 @@ class UsersController < ApplicationController
           end
         elsif params.dig(:user, :vendor_terms_of_service).present?
           if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
-            @user.update_attributes(accepted_vendor_terms_of_service: true)
+            @user.update(accepted_vendor_terms_of_service: true)
             flash[:success] = if @user.memberships.any?
               translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
             else

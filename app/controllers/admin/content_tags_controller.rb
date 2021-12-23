@@ -23,7 +23,7 @@ class Admin::ContentTagsController < Admin::BaseController
   end
 
   def update
-    @content_tag.update_attributes(permitted_parameters)
+    @content_tag.update(permitted_parameters)
     flash[:success] = "Tag updated" unless flash[:error].present?
     redirect_to admin_content_tags_path
   end

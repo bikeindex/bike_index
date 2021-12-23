@@ -11,7 +11,7 @@ module Organized
     end
 
     def update
-      if @organization.update_attributes(permitted_parameters)
+      if @organization.update(permitted_parameters)
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
         redirect_back(fallback_location: current_root_path)
       else

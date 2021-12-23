@@ -26,7 +26,7 @@ class Admin::BikesController < Admin::BaseController
     if params[:manufacturer_id].present? && params[:bikes_selected].present?
       manufacturer_id = params[:manufacturer_id]
       params[:bikes_selected].keys.each do |bid|
-        Bike.find(bid).update_attributes(manufacturer_id: manufacturer_id, manufacturer_other: nil)
+        Bike.find(bid).update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
       flash[:success] = "Success. Bikes updated"
       redirect_back(fallback_location: root_url) && return
@@ -87,7 +87,7 @@ class Admin::BikesController < Admin::BaseController
         recovering_user_id: current_user.id
       )
     end
-    if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
+    if @bike.update(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments
       return if return_to_if_present
       flash[:success] = "Bike was successfully updated."
@@ -102,7 +102,7 @@ class Admin::BikesController < Admin::BaseController
       id: params[:stolen_record_id]).first
     if stolen_record.present?
       flash[:success] = "Marked unrecovered!"
-      stolen_record.update_attributes(recovered_at: nil, current: true, recovery_link_token: nil)
+      stolen_record.update(recovered_at: nil, current: true, recovery_link_token: nil)
     else
       flash[:error] = "Stolen record not found! Contact a developer"
     end

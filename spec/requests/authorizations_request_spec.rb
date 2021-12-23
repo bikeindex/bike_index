@@ -66,7 +66,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
     end
 
     context "internal app" do
-      before { doorkeeper_app.update_attributes(is_internal: true) }
+      before { doorkeeper_app.update(is_internal: true) }
       it "redirects to redirect uri" do
         expect(doorkeeper_app.is_internal).to be_truthy
         get authorization_url

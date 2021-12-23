@@ -51,7 +51,7 @@ FactoryBot.define do
       after(:create) do |organization, evaluator|
         Sidekiq::Testing.inline! do
           invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
-          invoice.update_attributes(organization_feature_ids: [evaluator.organization_feature.id])
+          invoice.update(organization_feature_ids: [evaluator.organization_feature.id])
           organization.reload
         end
       end
@@ -69,7 +69,7 @@ FactoryBot.define do
 
       after(:create) do |organization, evaluator|
         FactoryBot.create(:membership_claimed, user: evaluator.user, organization: organization)
-        organization.update_attributes(auto_user: evaluator.user)
+        organization.update(auto_user: evaluator.user)
       end
     end
 

@@ -52,7 +52,7 @@ class BikeCreator
     # There could be errors during the build - or during the save
     save_bike(@bike) if @bike.errors.none?
     return @bike if @bike.errors.none?
-    @b_param&.update_attributes(bike_errors: @bike.cleaned_error_messages)
+    @b_param&.update(bike_errors: @bike.cleaned_error_messages)
     @bike
   end
 
@@ -62,7 +62,7 @@ class BikeCreator
     public_image = PublicImage.new(image: @b_param.image)
     public_image.imageable = bike
     public_image.save
-    @b_param.update_attributes(image_processed: true)
+    @b_param.update(image_processed: true)
     bike.reload
   end
 
@@ -134,7 +134,7 @@ class BikeCreator
       clear_bike(bike)
       @bike = @b_param.created_bike
     elsif @b_param.id.present? # Only update b_param if it exists
-      @b_param.update_attributes(created_bike_id: bike.id, bike_errors: nil)
+      @b_param.update(created_bike_id: bike.id, bike_errors: nil)
     end
     @bike
   end

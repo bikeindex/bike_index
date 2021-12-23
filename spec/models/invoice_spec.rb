@@ -84,7 +84,7 @@ RSpec.describe Invoice, type: :model do
       let(:organization_feature_one_time) { FactoryBot.create(:organization_feature_one_time) }
       it "returns invoice" do
         expect(organization.enabled_feature_slugs).to eq([])
-        invoice.update_attributes(organization_feature_ids: [organization_feature.id, organization_feature_one_time.id])
+        invoice.update(organization_feature_ids: [organization_feature.id, organization_feature_one_time.id])
         expect(invoice.organization_features.pluck(:id)).to match_array([organization_feature.id, organization_feature_one_time.id])
         invoice2 = invoice.create_following_invoice
         expect(invoice2.is_a?(Invoice)).to be_truthy
@@ -102,7 +102,7 @@ RSpec.describe Invoice, type: :model do
   describe "child_enabled_feature_slugs" do
     let(:invoice) { FactoryBot.create(:invoice) }
     it "rejects unmatching feature slugs" do
-      invoice.update_attributes(child_enabled_feature_slugs_string: ["passwordless_users"])
+      invoice.update(child_enabled_feature_slugs_string: ["passwordless_users"])
       expect(invoice.child_enabled_feature_slugs).to eq([])
     end
     context "with organization features" do
@@ -112,10 +112,10 @@ RSpec.describe Invoice, type: :model do
         invoice.reload
         expect(invoice.feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
         expect(invoice.child_enabled_feature_slugs).to be_blank
-        invoice.update_attributes(child_enabled_feature_slugs_string: %w[passwordless_users reg_phone reg_address])
+        invoice.update(child_enabled_feature_slugs_string: %w[passwordless_users reg_phone reg_address])
         invoice.reload
         expect(invoice.child_enabled_feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
-        invoice.update_attributes(child_enabled_feature_slugs_string: "stuff, passwordless_users, reg_address, show_partial_registrations, reg_address, \n")
+        invoice.update(child_enabled_feature_slugs_string: "stuff, passwordless_users, reg_address, show_partial_registrations, reg_address, \n")
         expect(invoice.child_enabled_feature_slugs).to eq(%w[passwordless_users reg_address])
       end
     end
@@ -129,12 +129,12 @@ RSpec.describe Invoice, type: :model do
     it "adds the organization feature ids and updates amount_due_cents" do
       expect(invoice.amount_due_cents).to be_nil
 
-      invoice.update_attributes(organization_feature_ids: organization_feature.id, amount_due_cents: 0)
+      invoice.update(organization_feature_ids: organization_feature.id, amount_due_cents: 0)
       expect(invoice.paid_in_full?).to be_truthy # Because it was just overridden
       expect(invoice.active?).to be_truthy
       expect(invoice.organization_features.pluck(:id)).to eq([organization_feature.id])
 
-      invoice.update_attributes(organization_feature_ids: " #{organization_feature.id}, #{organization_feature_one_time.id}, #{organization_feature_one_time.id}, xxxxx,#{organization_feature.id}")
+      invoice.update(organization_feature_ids: " #{organization_feature.id}, #{organization_feature_one_time.id}, #{organization_feature_one_time.id}, xxxxx,#{organization_feature.id}")
       expect(invoice.organization_features.pluck(:id)).to match_array([organization_feature.id, organization_feature_one_time.id] * 2)
 
       invoice.organization_feature_ids = [organization_feature_one_time.id, organization_feature2.id, "xxxxx"]
@@ -152,7 +152,7 @@ RSpec.describe Invoice, type: :model do
     let(:organization) { invoice1.organization }
     let(:invoice2) { FactoryBot.create(:invoice_with_payment, amount_due_cents: 10000, subscription_start_at: Time.current - 1.day, organization: organization) }
     it "adds the organization features" do
-      invoice1.update_attributes(organization_feature_ids: [organization_feature1.id])
+      invoice1.update(organization_feature_ids: [organization_feature1.id])
       expect(invoice1.paid_in_full?).to be_truthy
       expect(invoice1.paid_money_in_full?).to be_falsey
 
@@ -162,7 +162,7 @@ RSpec.describe Invoice, type: :model do
       expect(organization.paid?).to be_truthy
       expect(organization.paid_money?).to be_falsey
 
-      invoice2.update_attributes(organization_feature_ids: [organization_feature2.id])
+      invoice2.update(organization_feature_ids: [organization_feature2.id])
       invoice2.reload
       expect(invoice2.amount_due_cents).to eq 10000
       expect(invoice2.payments.count).to eq 1
@@ -171,7 +171,7 @@ RSpec.describe Invoice, type: :model do
       expect(invoice2.paid_in_full?).to be_truthy
       expect(invoice2.paid_money_in_full?).to be_truthy
 
-      organization.update_attributes(updated_at: Time.current)
+      organization.update(updated_at: Time.current)
       organization.reload
       expect(organization.enabled_feature_slugs).to match_array %w[bike_search extra_registration_number]
       expect(organization.paid?).to be_truthy

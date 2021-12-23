@@ -22,7 +22,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def update
-    if @membership.update_attributes(permitted_parameters)
+    if @membership.update(permitted_parameters)
       flash[:success] = "Membership Saved!"
       redirect_to admin_membership_url(@membership)
     else

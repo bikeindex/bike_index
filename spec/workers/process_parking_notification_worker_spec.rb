@@ -17,7 +17,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
       let(:parking_notification3) { FactoryBot.build(:parking_notification, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
       it "updates the other parking_notifications, creates the impound record" do
         initial.reload
-        initial.update_attributes(updated_at: Time.current) # Because of calculated_status
+        initial.update(updated_at: Time.current) # Because of calculated_status
         initial.reload
         parking_notification2.reload
         bike.reload
@@ -69,7 +69,7 @@ RSpec.describe ProcessParkingNotificationWorker, type: :job do
     context "retrieved" do
       it "updates the other parking_notifications" do
         initial.reload
-        initial.update_attributes(updated_at: Time.current) # Because of calculated_status
+        initial.update(updated_at: Time.current) # Because of calculated_status
         initial.reload
         parking_notification2.reload
         bike.reload

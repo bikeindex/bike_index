@@ -213,7 +213,7 @@ class ParkingNotification < ActiveRecord::Base
     end
     self.retrieved_kind = passed_args[:retrieved_kind]
     # Assign status here because of calculated_status
-    update_attributes!(status: "retrieved",
+    update!(status: "retrieved",
       retrieved_by_id: passed_args[:retrieved_by_id],
       resolved_at: passed_args[:resolved_at] || Time.current)
     self

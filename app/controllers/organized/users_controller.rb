@@ -19,7 +19,7 @@ module Organized
     end
 
     def update
-      @membership.update_attributes(permitted_update_params)
+      @membership.update(permitted_update_params)
       flash[:success] = translation(:updated_membership, user_email: @membership.user&.email)
       redirect_to current_root_path
     end

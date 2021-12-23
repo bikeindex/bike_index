@@ -1020,7 +1020,7 @@ RSpec.describe Bike, type: :model do
     context "already user hidden" do
       let(:ownership) { FactoryBot.create(:ownership, user_hidden: true) }
       it "unmarks user hidden, saves ownership and marks self unhidden on save" do
-        bike.update_attributes(hidden: true, marked_user_unhidden: true)
+        bike.update(hidden: true, marked_user_unhidden: true)
         bike.reload
         expect(bike.hidden).to be_falsey
         expect(ownership.reload.user_hidden).to be_falsey
@@ -1475,7 +1475,7 @@ RSpec.describe Bike, type: :model do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
     let(:target_cached_string) { "#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
     it "caches all the bike parts" do
-      bike.update_attributes(year: 1999, frame_material: "steel",
+      bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: bike.primary_frame_color_id,
         tertiary_frame_color_id: bike.primary_frame_color_id,
         handlebar_type: "bmx",

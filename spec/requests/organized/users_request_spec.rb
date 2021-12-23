@@ -287,7 +287,7 @@ RSpec.describe Organized::UsersController, type: :request do
             UpdateMailchimpDatumWorker.new # So that it's present post stubbing
             stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
             Sidekiq::Testing.inline! do
-              invoice.update_attributes(organization_feature_ids: [organization_feature.id])
+              invoice.update(organization_feature_ids: [organization_feature.id])
               expect(current_organization.reload.enabled_feature_slugs).to eq(["passwordless_users"])
 
               ActionMailer::Base.deliveries = []

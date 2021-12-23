@@ -34,7 +34,7 @@ RSpec.describe OrganizationFeature, type: :model do
     context "with child_enabled_feature_slugs" do
       it "inherits from the parent organization, not other way around" do
         Sidekiq::Testing.inline! do
-          invoice.update_attributes(child_enabled_feature_slugs_string: "bike_stickers")
+          invoice.update(child_enabled_feature_slugs_string: "bike_stickers")
 
           expect(organization.enabled_feature_slugs).to eq(%w[bike_stickers child_organizations reg_bike_sticker])
           expect(organization_child.current_invoices.pluck(:id)).to match_array([organization_child.invoices.first.id])

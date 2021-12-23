@@ -14,7 +14,7 @@ class Admin::AdsController < Admin::BaseController
   end
 
   def update
-    if @ad.update_attributes(permitted_parameters)
+    if @ad.update(permitted_parameters)
       flash[:success] = "Ad Saved!"
       redirect_to admin_ad_url(@ad)
     else

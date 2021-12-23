@@ -51,7 +51,7 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
         organization.reload
         expect(organization.regional_parents.pluck(:id)).to eq([organization_regional_parent.id])
         expect(organization_regional_parent.enabled?("bike_stickers")).to be_truthy
-        organization.update_attributes(updated_at: Time.current)
+        organization.update(updated_at: Time.current)
         expect(organization.is_paid).to be_falsey
         # Obviously, this is the long way of getting here - could've just enabled bike_stickers directly on org
         # but it's worth including here because this is a place we care about it
