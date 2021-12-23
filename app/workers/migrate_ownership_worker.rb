@@ -19,8 +19,10 @@ class MigrateOwnershipWorker < ApplicationWorker
   def perform(bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)
     return if bike.blank?
-    bike.save
+    bike.update_column :soon_current_ownership_id, bike.current_ownership&.id
     new_info = (bike.current_ownership&.registration_info || {}).merge(bike.conditional_information)
-    bike.current_ownership&.update(registration_info: new_info)
+    if new_info.present?
+      bike.current_ownership&.update(registration_info: new_info)
+    end
   end
 end
