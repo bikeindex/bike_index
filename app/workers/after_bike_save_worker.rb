@@ -17,7 +17,6 @@ class AfterBikeSaveWorker < ApplicationWorker
     if bike.present? && bike.listing_order != bike.calculated_listing_order
       bike.update_attribute :listing_order, bike.calculated_listing_order
     end
-    update_ownership(bike)
     unless skip_user_update
       # Update the user to update any user alerts relevant to bikes
       AfterUserChangeWorker.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
@@ -65,13 +64,5 @@ class AfterBikeSaveWorker < ApplicationWorker
         bike.bike_organizations.create(organization_id: matching_b_param.organization_id)
       end
     end
-  end
-
-  def update_ownership(bike)
-    if bike.current_ownership_id != bike.current_ownership&.id
-      bike.update_attribute :current_ownership_id, bike.current_ownership&.id
-    end
-    return true if bike.current_ownership.blank?
-    bike.current_ownership&.update(updated_at: Time.current)
   end
 end
