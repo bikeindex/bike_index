@@ -7,7 +7,7 @@ class MigrateOwnershipWorker < ApplicationWorker
 
   def self.bikes
     Bike.unscoped.where("updated_at < ?", Time.at(END_TIMESTAMP))
-      .where.not(soon_current_ownership_id: nil)
+      .where(soon_current_ownership_id: nil)
       .order(updated_at: :desc)
   end
 
