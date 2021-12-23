@@ -2,7 +2,7 @@ class MigrateOwnershipWorker < ApplicationWorker
   sidekiq_options queue: "low_priority", retry: false
   # This timestamp is when the migration started - so any ownership created *after* this timestamp
   # is assumed to be correct
-  END_TIMESTAMP = 1640284743
+  END_TIMESTAMP = 1640292126
   TO_ENQUEUE = (ENV["MIGRATE_OWNERSHIP_QUEUE"] || 2500).to_i
 
   def self.bikes
@@ -13,7 +13,7 @@ class MigrateOwnershipWorker < ApplicationWorker
     # Skip if the queue is backing up
     return if ScheduledWorker.enqueued?
     bikes.limit(TO_ENQUEUE)
-      .pluck(:id).each { |id| MigrateCreationStateToOwnershipWorker.perform_async(id) }
+      .pluck(:id).each { |id| MigrateOwnershipWorker.perform_async(id) }
   end
 
   def perform(bike_id)
