@@ -49,7 +49,7 @@ RSpec.describe PublicImagesController, type: :request do
           }.to change(PublicImage, :count).by 1
           bike.reload
           expect(bike.public_images.first.name).to eq "cool name"
-          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "no user" do
@@ -289,7 +289,7 @@ RSpec.describe PublicImagesController, type: :request do
           post "#{base_url}/#{public_image.id}/is_private", params: {is_private: "true"}
           public_image.reload
           expect(public_image.is_private).to be_truthy
-          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "is_private false" do
@@ -300,7 +300,7 @@ RSpec.describe PublicImagesController, type: :request do
           post "#{base_url}/#{public_image.id}/is_private", params: {is_private: false}
           public_image.reload
           expect(public_image.is_private).to be_falsey
-          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "non owner" do
@@ -333,7 +333,7 @@ RSpec.describe PublicImagesController, type: :request do
         expect(public_image_2.reload.listing_order).to eq 4
         expect(public_image_1.reload.listing_order).to eq 2
         expect(public_image_other.reload.listing_order).to eq 0
-        expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+        expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
       end
     end
   end
