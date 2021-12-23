@@ -77,6 +77,9 @@
                         - elsif bike.status_with_owner?
                           %li
                             = link_to t(".mark_bike_stolen"), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
+                        - if bike.user_hidden
+                          %li
+                            %em.small.text-warning= t(".user_hidden")
 
                 - if bike_alerts.any?
                   - alert = bike_alerts.find { |a| a.kind == "unassigned_bike_org" }

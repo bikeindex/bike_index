@@ -108,7 +108,7 @@
             -# If the bike user is actually the current bike owner, do this
             - if @bike.user == current_user
               - if @bike.user_hidden
-                %strong= t(".this_bike_type_is_hidden", bike_type: @bike.type)
+                %strong.text-warning= t(".this_bike_type_is_hidden", bike_type: @bike.type)
                 = t(".no_one_can_see_it_but_you")
 
               - if @bike.user?
@@ -116,7 +116,7 @@
                   = t(".thank_you_for_registering_this_found_bike_type", bike_type: @bike.type)
                 - elsif @bike.status_stolen?
                   = t(".were_really_bummed_your_bike_type_was_stolen", bike_type: @bike.type)
-                - else
+                - elsif !@bike.user_hidden # user hidden bikes don't get "whoa"
                   = t(".whoa_this_awesome_bike_type_is_yours", bike_type: @bike.type)
 
                 - if @bike.public_images.any?

@@ -5937,6 +5937,7 @@ nl:
         maar deze niet. Over het algemeen sluit u al uw fietsen aan op %{org_name}
         -
       ignore: Negeren
+      user_hidden: Verborgen voor andere gebruikers
   org_public:
     impounded_bikes:
       index:

@@ -1016,7 +1016,7 @@ en:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what
         to look for!
-      add_some_more_information_about_it: Add some more information about it.
+      add_some_more_information_about_it: 'Add some more information about it:'
       can_we_share_your_story: Can we share your story?
       claim_bike_type: Claim %{bike_type}
       claim_it_so_you_can_update_your_listing: Claim it so you can update your listing.
@@ -1030,7 +1030,7 @@ en:
       mark_recovered: Mark recovered
       nevermind: Nevermind
       no_futher_action_necessary: no further action necessary!
-      no_one_can_see_it_but_you: No one can see it but you
+      no_one_can_see_it_but_you: No one can see it but you.
       organization_sent_this_message: "%{org_name} sent this notification"
       please_email_organization_with_questions_html: Please email %{email_link} if
         you have any questions
@@ -1038,7 +1038,7 @@ en:
         back, we really care!
       thank_you_for_registering_this_found_bike_type: Thank you for registering this
         found %{bike_type}!
-      this_bike_type_is_hidden: This %{bike_type} is hidden.
+      this_bike_type_is_hidden: This %{bike_type} is hidden!
       were_honored_to_have_your_bike: We're honored to have your %{bike_type} on the
         Index.
       were_really_bummed_your_bike_type_was_stolen: We're really bummed your %{bike_type}
@@ -1155,7 +1155,7 @@ en:
       delete_bike: Delete bike
       delete_this_bike: Delete this %{bike_type} from Bike Index
       faqs: FAQs
-      hide_this_bike: Hide this %{bike_type}
+      hide_this_bike: Hide this %{bike_type} from other users
       keeping_your_bike_public: >-
         Keeping your bike public is the best way to help recover stolen bikes and
         deter theft.
@@ -4059,6 +4059,7 @@ en:
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
       update_your_profile: Update your profile
       user_bikes: "%{current_user_name} bikes"
+      user_hidden: Hidden from other users
       want_to_sell_your_bikes: Want to sell one of your registered bikes?
       welcome: Welcome
       you_have_no_registered_bikes: You have no registered bikes
