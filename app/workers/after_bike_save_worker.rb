@@ -10,7 +10,7 @@ class AfterBikeSaveWorker < ApplicationWorker
   def perform(bike_id, skip_user_update = false, resave_bike = false)
     bike = Bike.unscoped.where(id: bike_id).first
     return true unless bike.present?
-    bike.update(updated_at: Time.current) if resave_bike
+    bike.update(updated_at: Time.current) && bike.reload if resave_bike
     bike.load_external_images
     update_matching_partial_registrations(bike)
     DuplicateBikeFinderWorker.perform_async(bike_id)
