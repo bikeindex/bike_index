@@ -70,7 +70,7 @@ class PublicImagesController < ApplicationController
     elsif imageable_type == "Blog"
       redirect_to(edit_admin_news_url(@imageable.title_slug), status: 303) && return
     else
-      redirect_to edit_bike_url(imageable_id)
+      redirect_back(fallback_location: edit_bike_url(imageable_id))
     end
   end
 

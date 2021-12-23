@@ -12,20 +12,18 @@
 
           .related-fields.hide-this-bike.no-divider-row
             .form-group.row
-              .hide-this-bike-link
-                %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
-                  - if @bike.user_hidden
-                    = t(".unhide_this_bike", bike_type: @bike.type)
-                  - else
+              - unless @bike.user_hidden
+                .hide-this-bike-link
+                  %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
                     = t(".hide_this_bike", bike_type: @bike.type)
 
-              .collapse#hide_bike_toggle_group
+              .collapse#hide_bike_toggle_group{class: (@bike.user_hidden ? "show in" : "")}
                 - if @bike.user_hidden
                   = f.hidden_field :marked_user_unhidden
                 - else
                   = f.hidden_field :marked_user_hidden
                 .hide-explanation
-                  %p
+                  %p.mt-2
                     %strong= t(".keeping_your_bike_public")
                   %p
                     - faq_link = link_to t(".faqs"), support_path(anchor: 'public-serials')
