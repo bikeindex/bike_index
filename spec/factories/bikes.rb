@@ -44,7 +44,7 @@ FactoryBot.define do
               created_at: bike.created_at)
           end
 
-          ownership = FactoryBot.create(:ownership,
+          FactoryBot.create(:ownership,
             bike: bike,
             creator: bike.creator,
             owner_email: bike.owner_email,
@@ -59,7 +59,6 @@ FactoryBot.define do
             bulk_import: evaluator.creation_state_bulk_import,
             registration_info: evaluator.creation_state_registration_info)
 
-          bike.update_attribute :current_ownership_id, ownership.id
           bike.reload
         end
       end

@@ -414,7 +414,7 @@ RSpec.describe Ownership, type: :model do
             expect(ownership2.claimed?).to be_truthy
             expect(ownership2.send("calculated_organization_pre_registration?")).to be_truthy
             bike.reload
-            expect(bike.current_ownership&.id).to eq ownership2.id
+            expect(bike.current_ownership_id).to eq ownership2.id
           end
         end
       end

@@ -144,7 +144,7 @@ RSpec.describe BikeCreator do
           }
         }
       end
-      let(:b_param) { FactoryBot.create(:b_param, creator: existing_bike.current_ownership.creator, params: params) }
+      let(:b_param) { FactoryBot.create(:b_param, creator: existing_bike.creator, params: params) }
       context "same email" do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "Something@GMAIL.com" }

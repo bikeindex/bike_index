@@ -486,15 +486,14 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "owner" do
+    let(:delete_user) { FactoryBot.create(:user) }
+    let!(:ownership) { FactoryBot.create(:ownership_claimed, user_id: delete_user.id) }
+    let(:bike) { ownership.reload.bike }
     it "doesn't break if the owner is deleted" do
-      delete_user = FactoryBot.create(:user)
-      ownership = FactoryBot.create(:ownership, user_id: delete_user.id)
-      ownership.mark_claimed
-      bike = ownership.bike
-      expect(bike.owner).to eq(delete_user)
+      expect(bike.current_ownership_id).to eq ownership.id
+      expect(bike.owner&.id).to eq(delete_user.id)
       delete_user.delete
-      ownership.reload
-      expect(bike.owner).to eq(ownership.creator)
+      expect(bike.reload.owner&.id).to eq(ownership.creator_id)
     end
   end
 
@@ -931,7 +930,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike, owner_email: owner_email, creator: creator) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, owner_email: owner_email, creator: creator) }
     it "is true" do
-      expect(bike.contact_owner_user?).to be_truthy
+      expect(bike.reload.contact_owner_user?).to be_truthy
       expect(bike.contact_owner_email).to eq owner_email
     end
     context "ownership not claimed" do
