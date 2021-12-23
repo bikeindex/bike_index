@@ -267,7 +267,6 @@ RSpec.describe BikeCreator do
 
     describe "create_bike_organization" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:override_bike_params) { nil }
       let(:bike_params) do
         {
           primary_frame_color_id: color.id,
@@ -276,7 +275,7 @@ RSpec.describe BikeCreator do
           owner_email: "something@stuff.com"
         }
       end
-      let(:b_param) { BParam.create(creator: user, params: {bike: override_bike_params || bike_params}) }
+      let(:b_param) { BParam.create(creator: user, params: {bike: bike_params}) }
       let(:instance) { subject.new(b_param) }
       context "no organization" do
         let(:organization) { nil }
@@ -303,50 +302,21 @@ RSpec.describe BikeCreator do
       end
       context "child organization" do
         let(:organization_parent) { FactoryBot.create(:organization) }
-        let(:override_bike_params) { bike_params.merge(can_edit_claimed: true) }
         let(:organization) { FactoryBot.create(:organization_child, parent_organization: organization_parent) }
         it "creates the bike_organization for both" do
           expect {
             instance.create_bike
-          }.to change(BikeOrganization, :count).by 0
+          }.to change(BikeOrganization, :count).by 2
           bike = Bike.last
           expect(bike.creator&.id).to eq user.id
           expect(bike.current_ownership&.id).to be_present
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 2
-          expect(bike.organizations.pluck(:id)).to match_array([organization_child.id, organization.id])
-          expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([])
+          expect(bike.organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
+          expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
+          expect(bike.soon_current_ownership_id).to be_present
         end
-        # context "can_edit_claimed true, bike organization exists" do
-        #   let(:can_edit_claimed) { true }
-        #   let!(:bike_organization) { BikeOrganization.create(bike: bike, organization: organization_child, can_edit_claimed: true) }
-        #   it "creates bike_organizations for both" do
-        #     bike.reload
-        #     expect(bike.creation_states.count).to eq 0
-        #     expect(bike.bike_organizations.count).to eq 1
-        #     creation_state.save
-        #     expect(bike.reload.creation_states.count).to eq 1
-        #     expect(bike.bike_organizations.count).to eq 2
-        #     expect(creation_state.organization_id).to eq organization_child.id
-        #     expect(bike.organizations.pluck(:id)).to match_array([organization_child.id, organization.id])
-        #     expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([organization_child.id, organization.id])
-        #   end
-        # end
       end
-      # context "already existing bike_organization" do
-      #   let(:creation_state) { FactoryBot.create(:creation_state, bike: bike) }
-      #   it "does not error or duplicate" do
-      #     FactoryBot.create(:bike_organization, bike: bike, organization: organization)
-      #     creation_state.organization = organization
-      #     expect {
-      #       creation_state.create_bike_organization
-      #     }.to change(BikeOrganization, :count).by 0
-      #   end
-      # end
-      # it "has an after_create callback" do
-      #   expect(CreationState._create_callbacks.select { |cb| cb.kind.eql?(:after) }
-      #     .map(&:raw_filter).include?(:create_bike_organization)).to eq(true)
-      # end
     end
   end
 
