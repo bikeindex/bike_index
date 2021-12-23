@@ -6,7 +6,9 @@ class MigrateOwnershipWorker < ApplicationWorker
   TO_ENQUEUE = (ENV["MIGRATE_OWNERSHIP_QUEUE"] || 2500).to_i
 
   def self.bikes
-    Bike.unscoped.where("updated_at < ?", Time.at(END_TIMESTAMP)).order(updated_at: :desc)
+    Bike.unscoped.where("updated_at < ?", Time.at(END_TIMESTAMP))
+      .where.not(soon_current_ownership_id: nil)
+      .order(updated_at: :desc)
   end
 
   def self.enqueue
