@@ -319,10 +319,6 @@ class Bike < ApplicationRecord
     pos_kind.present? && pos_kind != "no_pos"
   end
 
-  # def current_ownership
-  #   ownerships.reorder(:id).last
-  # end
-
   # Use present? to ensure true/false rather than nil
   def claimed?
     current_ownership.present? && current_ownership.claimed.present?
