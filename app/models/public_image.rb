@@ -49,6 +49,6 @@ class PublicImage < ApplicationRecord
     end
     imageable&.update_attributes(updated_at: Time.current)
     return true unless bike?
-    AfterBikeSaveWorker.perform_async(imageable_id)
+    AfterBikeSaveWorker.perform_async(imageable_id, false, true)
   end
 end

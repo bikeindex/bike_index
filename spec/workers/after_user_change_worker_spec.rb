@@ -205,6 +205,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     let(:ownership2) { FactoryBot.create(:ownership_claimed, user: user) }
     let!(:bike1) { ownership1.bike }
     let!(:bike2) { ownership2.bike }
+    let!(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
     it "updates user_name on the ownerships" do
       expect(ownership1.reload.user_id).to eq user.id
       expect(ownership1.claimed?).to be_truthy
@@ -217,6 +218,8 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(bike2.reload.owner_email).to eq user.email
       expect(bike2.user&.id).to eq user.id
       expect(bike2.soon_current_ownership_id).to_not eq ownership2.id
+      expect(bike3.reload.soon_current_ownership_id).to be_present
+      bike3.update_column :updated_at, Time.current - 1.hour
 
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
@@ -228,6 +231,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(ownership2.reload.owner_name).to eq new_name
       expect(bike2.reload.owner_name).to eq new_name
       expect(bike2.soon_current_ownership_id).to eq ownership2.id
+      expect(bike3.reload.updated_at).to be_within(2).of Time.current
     end
   end
 end

@@ -31,7 +31,7 @@ class AfterUserChangeWorker < ApplicationWorker
       ActivateTheftAlertWorker.perform_async(theft_alert.id)
     end
     if ENABLE_RERUN && !skip_bike_update
-      user.bike_ids.each { |id| AfterBikeSaveWorker.perform_async(id, true) }
+      user.bike_ids.each { |id| AfterBikeSaveWorker.perform_async(id, true, true) }
     end
   end
 
