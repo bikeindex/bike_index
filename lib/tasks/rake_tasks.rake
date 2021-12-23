@@ -40,7 +40,7 @@ task exchange_rates_update: :environment do
   print is_success ? "done.\n" : "failed.\n"
 end
 
-task migrate_creation_states: :environment do
+task migrate_ownerships: :environment do
   # Make it possible to stop job
   if MigrateOwnershipWorker::TO_ENQUEUE > 10
     MigrateOwnershipWorker.enqueue
