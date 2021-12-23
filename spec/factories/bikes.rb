@@ -32,7 +32,6 @@ FactoryBot.define do
         creation_state_bulk_import { nil }
         creation_state_registration_info { nil }
       end
-      soon_current_ownership_id { 0 }
 
       after(:create) do |bike, evaluator|
         # Sometimes multiple things include with_ownership, this can get called multiple times
@@ -45,7 +44,7 @@ FactoryBot.define do
               created_at: bike.created_at)
           end
 
-          FactoryBot.create(:ownership,
+          ownership = FactoryBot.create(:ownership,
             bike: bike,
             creator: bike.creator,
             owner_email: bike.owner_email,
@@ -60,6 +59,7 @@ FactoryBot.define do
             bulk_import: evaluator.creation_state_bulk_import,
             registration_info: evaluator.creation_state_registration_info)
 
+          bike.update_attribute :soon_current_ownership_id, ownership.id
           bike.reload
         end
       end

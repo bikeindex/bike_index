@@ -304,7 +304,7 @@ RSpec.describe Bike, type: :model do
           bike.update(organization_affiliation: "community_member")
           bike.reload
           expect(bike.conditional_information).to eq({organization_affiliation: "community_member"}.as_json)
-          expect(bike.registration_info).to eq({})
+          expect(bike.registration_info).to eq({organization_affiliation: "community_member"}.as_json)
           expect(bike.organization_affiliation).to eq "community_member"
         end
         context "other info" do
@@ -319,7 +319,7 @@ RSpec.describe Bike, type: :model do
             bike.reload
             expect(bike.organization_affiliation).to eq "student"
             expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
-            expect(bike.registration_info).to eq target_registration_info
+            expect(bike.registration_info).to eq target_registration_info.merge(organization_affiliation: "student").as_json
           end
         end
       end
@@ -334,7 +334,7 @@ RSpec.describe Bike, type: :model do
           bike.update(student_id: "424242")
           bike.reload
           expect(bike.conditional_information).to eq({student_id: "424242"}.as_json)
-          expect(bike.registration_info).to eq({})
+          expect(bike.registration_info).to eq({student_id: "424242"}.as_json)
           expect(bike.student_id).to eq "424242"
         end
         context "with creation value" do
@@ -353,7 +353,7 @@ RSpec.describe Bike, type: :model do
             bike.reload
             expect(bike.student_id).to eq "66"
             expect(bike.conditional_information).to eq({"student_id" => "66"})
-            expect(bike.registration_info).to eq registration_info.as_json
+            expect(bike.registration_info).to eq registration_info.merge(student_id: "66").as_json
           end
         end
       end

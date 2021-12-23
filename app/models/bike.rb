@@ -847,6 +847,8 @@ class Bike < ApplicationRecord
 
   def organization_affiliation=(val)
     conditional_information["organization_affiliation"] = val
+    current_ownership&.update_registration_information("organization_affiliation", val)
+    val
   end
 
   def organization_affiliation
@@ -855,6 +857,8 @@ class Bike < ApplicationRecord
 
   def student_id=(val)
     conditional_information["student_id"] = val
+    current_ownership&.update_registration_information("student_id", val)
+    val
   end
 
   def student_id

@@ -12,5 +12,7 @@ RSpec.describe BikeDeleterWorker, type: :job do
     instance.perform(bike.id)
     bike.reload
     expect(bike.deleted?).to be_truthy
+    # And it didn't delete ownership
+    expect(Ownership.where(id: ownership.id).count).to eq 1
   end
 end

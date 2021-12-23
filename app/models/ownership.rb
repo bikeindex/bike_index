@@ -130,6 +130,10 @@ class Ownership < ApplicationRecord
     passed_user == User.fuzzy_email_find(owner_email) || passed_user == user
   end
 
+  def update_registration_information(key, value)
+    update(registration_info: registration_info.merge(key => value))
+  end
+
   def calculated_organization
     return organization if organization.present?
     # If this is the first ownership, use the creation organization
