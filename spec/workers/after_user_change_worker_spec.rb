@@ -154,9 +154,9 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     let!(:stolen_record_unclaimed) { FactoryBot.create(:stolen_record, bike: ownership_unclaimed.bike) }
     it "lists the bikes with missing locations" do
       # Ensure we've got the current stolen records set
-      stolen_record.bike.update_attributes(updated_at: Time.current)
-      stolen_record_with_location.bike.update_attributes(updated_at: Time.current)
-      stolen_record_unclaimed.bike.update_attributes(updated_at: Time.current)
+      stolen_record.bike.update(updated_at: Time.current)
+      stolen_record_with_location.bike.update(updated_at: Time.current)
+      stolen_record_unclaimed.bike.update(updated_at: Time.current)
       expect(stolen_record.bike.current_stolen_record).to eq stolen_record
       expect(stolen_record_with_location.bike.current_stolen_record).to eq stolen_record_with_location
       expect(stolen_record_unclaimed.bike.current_stolen_record).to eq stolen_record_unclaimed

@@ -31,7 +31,7 @@ class Admin::StolenBikesController < Admin::BaseController
       update_image
     else
       BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}).update_ownership
-      if @bike.update_attributes(permitted_parameters)
+      if @bike.update(permitted_parameters)
         SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
         flash[:success] = "Bike was successfully updated."
       else

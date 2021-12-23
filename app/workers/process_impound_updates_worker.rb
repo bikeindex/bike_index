@@ -10,7 +10,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
       if matching_display_ids.where.not(id: impound_record.id).any?
         matching_display_ids.reorder(:id).each_with_index do |irecord, index|
           next if index == 0 # don't change the ID of the first one
-          irecord.update_attributes(display_id: nil, display_id_integer: nil, skip_update: true)
+          irecord.update(display_id: nil, display_id_integer: nil, skip_update: true)
         end
       end
       # If there is a display_id_next_integer, and this record hit it, blow it out
@@ -43,7 +43,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
       end
       impound_record_update.update(processed: true, skip_update: true)
     end
-    impound_record.update_attributes(skip_update: true)
+    impound_record.update(skip_update: true)
     # Bump the parking notification to ensure it reflects current state (resolving if relevant)
     impound_record.parking_notification&.update(updated_at: Time.current)
     if claim_retrieved.present?

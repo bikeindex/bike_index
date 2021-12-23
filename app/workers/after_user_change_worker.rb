@@ -22,7 +22,7 @@ class AfterUserChangeWorker < ApplicationWorker
     update_user_alerts(user)
     current_alerts = user_alert_slugs(user)
     unless user.alert_slugs == current_alerts
-      user.update_attributes(alert_slugs: current_alerts, skip_update: true)
+      user.update(alert_slugs: current_alerts, skip_update: true)
     end
 
     # Activate activateable theft alerts!

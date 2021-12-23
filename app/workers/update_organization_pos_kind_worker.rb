@@ -11,7 +11,7 @@ class UpdateOrganizationPosKindWorker < ScheduledWorker
     organization = Organization.find(org_id)
     pos_kind = organization.calculated_pos_kind
     return true unless organization.pos_kind != pos_kind
-    organization.update_attributes(pos_kind: pos_kind)
+    organization.update(pos_kind: pos_kind)
   end
 
   def enqueue_workers

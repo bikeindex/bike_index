@@ -345,21 +345,21 @@ RSpec.describe StolenRecord, type: :model do
     it "does not reset on save" do
       t = Time.current - 1.minute
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
-      stolen_record.update_attributes(theft_description: "Something new description wise")
+      stolen_record.update(theft_description: "Something new description wise")
       stolen_record.reload
       expect(stolen_record.tsved_at.to_i).to eq(t.to_i)
     end
     it "resets from an update to police report" do
       t = Time.current - 1.minute
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
-      stolen_record.update_attributes(police_report_number: "89dasf89dasf")
+      stolen_record.update(police_report_number: "89dasf89dasf")
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
     end
     it "resets from an update to police report department" do
       t = Time.current - 1.minute
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
-      stolen_record.update_attributes(police_report_department: "CPD")
+      stolen_record.update(police_report_department: "CPD")
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
     end

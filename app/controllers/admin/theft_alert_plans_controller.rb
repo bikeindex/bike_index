@@ -25,7 +25,7 @@ class Admin::TheftAlertPlansController < Admin::BaseController
   def update
     @theft_alert_plan = TheftAlertPlan.find(params[:id])
 
-    if @theft_alert_plan.update_attributes(theft_alert_plan_params)
+    if @theft_alert_plan.update(theft_alert_plan_params)
       redirect_to(admin_theft_alert_plans_path)
     else
       flash[:errors] = @theft_alert_plan.errors.full_messages

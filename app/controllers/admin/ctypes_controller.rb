@@ -13,7 +13,7 @@ class Admin::CtypesController < Admin::BaseController
   end
 
   def update
-    if @ctype.update_attributes(permitted_parameters)
+    if @ctype.update(permitted_parameters)
       flash[:success] = "Component Type Saved!"
       redirect_to admin_ctypes_url
     else

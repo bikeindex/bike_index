@@ -50,7 +50,7 @@ class ComponentCreator
       else
         component = @bike.components.new
       end
-      component.update_attributes(permitted_attributes(comp.with_indifferent_access))
+      component.update(permitted_attributes(comp.with_indifferent_access))
     end
   end
 

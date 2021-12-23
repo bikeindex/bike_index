@@ -90,7 +90,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         it "exports only bike with name, email and address" do
           bike.reload
           expect(bike_sticker.claimed?).to be_falsey
-          export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
+          export.update(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
           expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
           expect(Export.with_bike_sticker_code(bike_sticker).pluck(:id)).to eq([])
           expect(export.avery_export?).to be_truthy

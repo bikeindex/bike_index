@@ -79,7 +79,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         it "redirects" do
           ENV["AVERY_EXPORT_URL"] = "https://avery.com?mergeDataURL="
           allow_any_instance_of(Export).to receive(:file_url) { "https://files.bikeindex.org/exports/820181214ccc.xlsx" }
-          export.update_attributes(progress: "finished", options: export.options.merge(avery_export: true))
+          export.update(progress: "finished", options: export.options.merge(avery_export: true))
           get :show, params: {organization_id: organization.to_param, id: export.id, avery_redirect: true}
           expect(response).to redirect_to target_redirect_url
         end
@@ -118,7 +118,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: organization, code: "a1111") }
         let(:export) { FactoryBot.create(:export_avery, organization: organization, bike_code_start: "a1111") }
         it "removes the stickers before destroying" do
-          export.update_attributes(options: export.options.merge(bike_codes_assigned: ["a1111"]))
+          export.update(options: export.options.merge(bike_codes_assigned: ["a1111"]))
           bike_sticker.reload
           export.reload
           expect(bike_sticker.claimed?).to be_truthy

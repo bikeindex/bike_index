@@ -7,7 +7,7 @@ module Organized
       ambassador_task_assignment = AmbassadorTaskAssignment.find(params[:id])
       completed_at = params[:completed] == "true" ? Time.current : nil
 
-      if ambassador_task_assignment.update_attributes(completed_at: completed_at)
+      if ambassador_task_assignment.update(completed_at: completed_at)
         flash[:info] = translation(:status_updated)
       else
         flash[:error] = translation(:could_not_update)

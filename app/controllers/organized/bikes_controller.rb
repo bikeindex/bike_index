@@ -77,7 +77,7 @@ module Organized
           @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
         end
         # we handle filtering & coercion in BParam, just create it with whatever here
-        @b_param.update_attributes(permitted_create_params)
+        @b_param.update(permitted_create_params)
         @bike = BikeCreator.new(@b_param).create_bike
         if @bike.errors.any?
           flash[:error] = @b_param.bike_errors.to_sentence

@@ -264,7 +264,7 @@ class StolenRecord < ApplicationRecord
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
     self.recovered_at = TimeParser.parse(info[:recovered_at], info[:timezone]) || Time.current
 
-    update_attributes(
+    update(
       current: false,
       recovered_description: info[:recovered_description],
       recovering_user_id: info[:recovering_user_id],
@@ -277,7 +277,7 @@ class StolenRecord < ApplicationRecord
 
   def find_or_create_recovery_link_token
     return recovery_link_token if recovery_link_token.present?
-    update_attributes(recovery_link_token: SecurityTokenizer.new_token)
+    update(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
   end
 
@@ -330,7 +330,7 @@ class StolenRecord < ApplicationRecord
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current || bike&.current_stolen_record_id == id
       update_not_current_records
-      bike&.update_attributes(manual_csr: true, current_stolen_record: (current ? self : nil))
+      bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
     theft_alerts.each { |t| t.update(updated_at: Time.current) }
     AfterUserChangeWorker.perform_async(bike.user_id) if bike&.user_id.present?

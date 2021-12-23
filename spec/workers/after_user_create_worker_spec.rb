@@ -113,7 +113,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     it "assigns the extra user attributes" do
       VCR.use_cassette("after_user_create_worker-import_user_attributes") do
         expect(user).to be_present
-        bike.reload.update_attributes(updated_at: Time.current)
+        bike.reload.update(updated_at: Time.current)
         expect(bike.reload.registration_address_source).to eq "initial_creation"
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
         expect_hashes_to_match(bike.send("location_record_address_hash"), target_address_hash.except(:latitude, :longitude).merge(skip_geocoding: false))

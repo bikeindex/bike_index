@@ -9,7 +9,7 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
       # Critical that locations skip_update, so we don't loop
       organization.locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }
       organization.reload # Just in case default location has changed
-      organization.update_attributes(skip_update: true, updated_at: Time.current)
+      organization.update(skip_update: true, updated_at: Time.current)
 
       if organization.enabled?("impound_bikes_locations")
         # If there is isn't a default impound bikes location and there should be, set one
@@ -24,7 +24,7 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
       end
 
       organization.calculated_children.where.not(id: organization_ids_for_update)
-        .each { |o| o.update_attributes(skip_update: true, updated_at: Time.current) }
+        .each { |o| o.update(skip_update: true, updated_at: Time.current) }
 
       # Update mailchimp datum for organizations
       organization.admins.each { |u| MailchimpDatum.find_and_update_or_create_for(u) }

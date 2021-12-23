@@ -93,7 +93,7 @@ RSpec.describe Export, type: :model do
     let(:timezone) { "America/Chicago" }
     let(:export) { FactoryBot.build(:export) }
     it "assigns correctly" do
-      export.update_attributes(timezone: timezone, start_at: time_start, end_at: time_end, headers: %w[party registered_at], bike_code_start: "")
+      export.update(timezone: timezone, start_at: time_start, end_at: time_end, headers: %w[party registered_at], bike_code_start: "")
       expect(export.start_at.to_i).to be_within(1).of target_start
       expect(export.end_at.to_i).to be_within(1).of target_end
       expect(export.headers).to eq(["registered_at"])

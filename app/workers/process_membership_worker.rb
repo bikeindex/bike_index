@@ -9,12 +9,12 @@ class ProcessMembershipWorker < ApplicationWorker
     auto_generate_user_for_organization(membership)
     if membership.send_invitation_email?
       OrganizedMailer.organization_invitation(membership).deliver_now
-      membership.update_attributes(email_invitation_sent_at: Time.current, skip_processing: true)
+      membership.update(email_invitation_sent_at: Time.current, skip_processing: true)
     end
 
     # Bust cache keys on user and organization
-    membership.user&.update_attributes(updated_at: Time.current, skip_update: true)
-    membership.organization.update_attributes(updated_at: Time.current, skip_update: true) if membership.organization.present?
+    membership.user&.update(updated_at: Time.current, skip_update: true)
+    membership.organization.update(updated_at: Time.current, skip_update: true) if membership.organization.present?
 
     # Assign ambassador tasks too
     if membership.ambassador? && membership.user.present?
@@ -25,7 +25,7 @@ class ProcessMembershipWorker < ApplicationWorker
   def assign_membership_user(membership, user_id)
     user_id ||= User.fuzzy_confirmed_or_unconfirmed_email_find(membership.invited_email)&.id
     return false unless user_id.present?
-    membership.update_attributes(user_id: user_id)
+    membership.update(user_id: user_id)
     membership.reload
     User.find_by_id(user_id)&.update(updated_at: Time.current)
   end
@@ -48,7 +48,7 @@ class ProcessMembershipWorker < ApplicationWorker
     user.save!
     user.confirm(user.confirmation_token)
     # We don't want to send users emails in this situation.
-    membership.update_attributes(user_id: user.id, email_invitation_sent_at: Time.current)
+    membership.update(user_id: user.id, email_invitation_sent_at: Time.current)
     membership.reload
   end
 

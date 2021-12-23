@@ -204,7 +204,7 @@ class BikeSticker < ApplicationRecord
   def update_associations
     if bike_id.present?
       found_b = Bike.where(id: bike_id).first
-      found_b&.update_attributes(updated_at: Time.current)
+      found_b&.update(updated_at: Time.current)
     end
   end
 

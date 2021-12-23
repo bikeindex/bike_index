@@ -822,7 +822,7 @@ RSpec.describe BikesController, type: :controller do
           # Also test that we don't don't blank bike_organizations
           # if bike_organization_ids aren't passed
           organization = FactoryBot.create(:organization)
-          ownership.bike.update_attributes(example: true, bike_organization_ids: [organization.id])
+          ownership.bike.update(example: true, bike_organization_ids: [organization.id])
           bike.reload
           expect(bike.bike_organization_ids).to eq([organization.id])
           put :update, params: {id: bike.id, bike: {description: "69"}}

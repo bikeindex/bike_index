@@ -25,7 +25,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def update
     if valid_invoice_parameters?
-      @payment.update_attributes(invoice_parameters) # invoice params are the only params permitted for update ;)
+      @payment.update(invoice_parameters) # invoice params are the only params permitted for update ;)
       flash[:success] = "Payment updated"
       redirect_to admin_payments_path
     else

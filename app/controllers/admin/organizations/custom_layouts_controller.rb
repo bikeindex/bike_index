@@ -12,7 +12,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
   end
 
   def update
-    if @organization.update_attributes(permitted_parameters)
+    if @organization.update(permitted_parameters)
       flash[:success] = "Layout Saved!"
       redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
     else

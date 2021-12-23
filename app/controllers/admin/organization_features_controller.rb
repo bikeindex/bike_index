@@ -19,7 +19,7 @@ class Admin::OrganizationFeaturesController < Admin::BaseController
   end
 
   def update
-    @organization_feature.update_attributes(permitted_update_parameters)
+    @organization_feature.update(permitted_update_parameters)
     flash[:success] = "Feature updated" unless flash[:error].present?
     redirect_to admin_organization_features_path
   end

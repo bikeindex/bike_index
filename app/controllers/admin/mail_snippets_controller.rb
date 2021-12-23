@@ -21,7 +21,7 @@ class Admin::MailSnippetsController < Admin::BaseController
   end
 
   def update
-    if @mail_snippet.update_attributes(permitted_parameters)
+    if @mail_snippet.update(permitted_parameters)
       flash[:success] = "Snippet Saved!"
       redirect_to edit_admin_mail_snippet_url(@mail_snippet)
     else

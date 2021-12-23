@@ -24,7 +24,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
     if @invoice.save
       # Invoice has to be created before it can get organization_feature_ids
       @invoice.organization_feature_ids = permitted_parameters[:organization_feature_ids]
-      @invoice.update_attributes(child_enabled_feature_slugs_string: permitted_parameters[:child_enabled_feature_slugs_string])
+      @invoice.update(child_enabled_feature_slugs_string: permitted_parameters[:child_enabled_feature_slugs_string])
       flash[:success] = "Invoice created! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else
@@ -40,8 +40,8 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
         flash[:error] = "unable to create following invoice. Was this invoice active?"
       end
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
-    elsif @invoice.update_attributes(permitted_parameters.except(:child_enabled_feature_slugs_string))
-      @invoice.update_attributes(child_enabled_feature_slugs_string: permitted_parameters[:child_enabled_feature_slugs_string])
+    elsif @invoice.update(permitted_parameters.except(:child_enabled_feature_slugs_string))
+      @invoice.update(child_enabled_feature_slugs_string: permitted_parameters[:child_enabled_feature_slugs_string])
       flash[:success] = "Invoice updated! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else

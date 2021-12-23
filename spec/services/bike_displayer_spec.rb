@@ -148,7 +148,7 @@ RSpec.describe BikeDisplayer do
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, user: member, bike: bike3, organization: organization_regional_parent) }
       let(:member) { FactoryBot.create(:user, :with_organization, organization: organization_regional_parent) }
       before do
-        organization_regional_parent.update_attributes(updated_at: Time.current)
+        organization_regional_parent.update(updated_at: Time.current)
         organization_regional_child.reload
         organization_regional_child.update(updated_at: Time.current)
         organization_regional_child.reload

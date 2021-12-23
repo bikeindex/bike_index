@@ -587,7 +587,7 @@ RSpec.describe User, type: :model do
         expect(user.render_donation_request).to be_nil
         expect(user.enabled?("unstolen_notifications")).to be_falsey
 
-        invoice.update_attributes(organization_feature_ids: [organization_feature.id])
+        invoice.update(organization_feature_ids: [organization_feature.id])
         organization.save
 
         expect(organization.bike_actions?).to be_truthy

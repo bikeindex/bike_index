@@ -160,8 +160,8 @@ RSpec.describe GraduatedNotification, type: :model do
 
   describe "calculated_primary_bike" do
     before do
-      bike2.current_ownership.update_attributes(created_at: Time.current - 6.months)
-      bike1.current_ownership.update_attributes(created_at: Time.current - 1.year)
+      bike2.current_ownership.update(created_at: Time.current - 6.months)
+      bike1.current_ownership.update(created_at: Time.current - 1.year)
     end
     context "user" do
       let(:user) { FactoryBot.create(:user) }
@@ -239,8 +239,8 @@ RSpec.describe GraduatedNotification, type: :model do
         let(:bike3) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "test@example.edu") }
         let(:bike4) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "test@example.edu") }
         before do
-          bike4.current_ownership.update_attributes(created_at: Time.current - 13.months)
-          bike3.current_ownership.update_attributes(created_at: Time.current - 14.months)
+          bike4.current_ownership.update(created_at: Time.current - 13.months)
+          bike3.current_ownership.update(created_at: Time.current - 14.months)
         end
         it "does not associate them" do
           expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike3.id, bike4.id, bike1.id, bike2.id])

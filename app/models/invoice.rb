@@ -213,7 +213,7 @@ class Invoice < ApplicationRecord
       first_invoice_id: subscription_first_invoice_id)
     new_invoice.organization_feature_ids = organization_features.recurring.pluck(:id)
     new_invoice.reload
-    new_invoice.update_attributes(child_enabled_feature_slugs: child_enabled_feature_slugs)
+    new_invoice.update(child_enabled_feature_slugs: child_enabled_feature_slugs)
     new_invoice
   end
 

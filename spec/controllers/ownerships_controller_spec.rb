@@ -34,7 +34,7 @@ RSpec.describe OwnershipsController, type: :controller do
       end
 
       it "redirects and not change the ownership if it isn't current" do
-        @ownership.update_attributes(owner_email: @user.email, current: false)
+        @ownership.update(owner_email: @user.email, current: false)
         put :show, params: {id: @ownership.id}
         expect(response.code).to eq("302")
         expect(flash).to be_present
@@ -42,7 +42,7 @@ RSpec.describe OwnershipsController, type: :controller do
       end
 
       it "redirects and mark current based on fuzzy find" do
-        @ownership.update_attributes(owner_email: @user.email.upcase)
+        @ownership.update(owner_email: @user.email.upcase)
         put :show, params: {id: @ownership.id}
         expect(response.code).to eq("302")
         expect(response).to redirect_to edit_bike_url(@ownership.bike)

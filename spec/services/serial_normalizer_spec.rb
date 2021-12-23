@@ -124,7 +124,7 @@ RSpec.describe SerialNormalizer do
 
     it "does not make any if the bike is an example bike" do
       bike = FactoryBot.create(:bike)
-      bike.update_attributes(example: true)
+      bike.update(example: true)
       SerialNormalizer.new(serial: "some + : serial").save_segments(bike.id)
       expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(0)
     end

@@ -6,7 +6,7 @@ class LocksController < ApplicationController
   end
 
   def update
-    if @lock.update_attributes(permitted_parameters)
+    if @lock.update(permitted_parameters)
     else
       @page_errors = @lock.errors
     end

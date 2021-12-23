@@ -32,7 +32,7 @@ class Admin::RecoveriesController < Admin::BaseController
       @stolen_record.recovery_display_status = "not_displayed"
     end
 
-    if @stolen_record.update_attributes(permitted_parameters)
+    if @stolen_record.update(permitted_parameters)
       flash[:success] = "Recovery Saved!"
       redirect_to redirect || admin_recoveries_url
     else

@@ -36,7 +36,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def update
-    if @recovery_display.update_attributes(permitted_parameters)
+    if @recovery_display.update(permitted_parameters)
       flash[:success] = "Recovery display saved!"
       redirect_to admin_recovery_displays_path
     else

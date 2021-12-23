@@ -36,7 +36,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       end
       context "bike deleted" do
         it "updates waiting_on_decision to not_displayed" do
-          stolen_record.bike.update_attributes(hidden: true)
+          stolen_record.bike.update(hidden: true)
           expect {
             put :update, params: params
           }.to change(RecoveryDisplay, :count).by 0
@@ -79,8 +79,8 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       let(:bike) { stolen_record.bike }
       let(:params) { {id: stolen_record.id, stolen_record: {mark_as_eligible: true}} }
       it "updates not_displayed to waiting_on_decision" do
-        bike.reload.update_attributes(updated_at: Time.current)
-        stolen_record.reload.update_attributes(updated_at: Time.current)
+        bike.reload.update(updated_at: Time.current)
+        stolen_record.reload.update(updated_at: Time.current)
         expect {
           put :update, params: params
         }.to change(RecoveryDisplay, :count).by 0

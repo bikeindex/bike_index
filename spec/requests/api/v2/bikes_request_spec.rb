@@ -302,7 +302,7 @@ RSpec.describe "Bikes API V2", type: :request do
     let!(:token) { create_doorkeeper_token(scopes: "read_user write_bikes") }
 
     it "doesn't update if user doesn't own the bike" do
-      bike.current_ownership.update_attributes(user_id: FactoryBot.create(:user).id, claimed: true)
+      bike.current_ownership.update(user_id: FactoryBot.create(:user).id, claimed: true)
       expect_any_instance_of(Bike).to receive(:type).and_return("unicorn")
       put url, params: params.to_json, headers: json_headers
       expect(response.body.match("do not own that unicorn")).to be_present
@@ -419,7 +419,7 @@ RSpec.describe "Bikes API V2", type: :request do
 
     it "claims a bike and updates if it should" do
       expect(bike.year).to be_nil
-      bike.current_ownership.update_attributes(owner_email: user.email, creator_id: FactoryBot.create(:user).id, claimed: false)
+      bike.current_ownership.update(owner_email: user.email, creator_id: FactoryBot.create(:user).id, claimed: false)
       expect(bike.reload.owner).not_to eq(user)
       put url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("200")
@@ -492,7 +492,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "fails if the bike isn't owned by the access token user" do
-      bike.current_ownership.update_attributes(user_id: FactoryBot.create(:user).id, claimed: true)
+      bike.current_ownership.update(user_id: FactoryBot.create(:user).id, claimed: true)
       post url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("403")
       expect(response.body.match("application is not approved")).to be_present

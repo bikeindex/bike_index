@@ -46,7 +46,7 @@ class Admin::OrganizationsController < Admin::BaseController
         @organization.manual_pos_kind = manual_pos_kind
       end
     end
-    if @organization.update_attributes(permitted_parameters)
+    if @organization.update(permitted_parameters)
       flash[:success] = "Organization Saved!"
       UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)

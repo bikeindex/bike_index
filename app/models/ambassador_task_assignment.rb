@@ -104,6 +104,6 @@ class AmbassadorTaskAssignment < ApplicationRecord
   end
 
   def update_associated_user
-    ambassador.update_attributes(updated_at: Time.current)
+    ambassador.update(updated_at: Time.current)
   end
 end

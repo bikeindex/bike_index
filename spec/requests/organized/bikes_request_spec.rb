@@ -50,7 +50,7 @@ RSpec.describe Organized::BikesController, type: :request do
   end
 
   describe "create" do
-    before { current_organization.update_attributes(auto_user: auto_user) }
+    before { current_organization.update(auto_user: auto_user) }
     let(:auto_user) { current_user }
     let(:b_param) { BParam.create(creator_id: current_organization.auto_user.id, params: {creation_organization_id: current_organization.id, embeded: true}) }
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
