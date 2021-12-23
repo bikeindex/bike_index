@@ -4,6 +4,8 @@ RSpec.describe BikeCreator do
   let(:subject) { BikeCreator }
   let(:b_param) { BParam.new }
   let(:instance) { subject.new(b_param) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:color) { FactoryBot.create(:color) }
 
   context "legacy BikeCreatorBuilder methods" do
     describe "building" do
@@ -65,7 +67,6 @@ RSpec.describe BikeCreator do
       it "adds se bike data if it exists" do
         VCR.use_cassette("bike_creator-include_bike_book", re_record_interval: 6.months) do
           manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
-          color = FactoryBot.create(:color)
           bike = {
             serial_number: "Some serial",
             description: "Input description",
@@ -179,9 +180,7 @@ RSpec.describe BikeCreator do
     it "creates a bike with the parameters it is passed and returns it" do
       Sidekiq::Testing.inline! do
         organization = FactoryBot.create(:organization)
-        user = FactoryBot.create(:user)
         manufacturer = FactoryBot.create(:manufacturer)
-        color = FactoryBot.create(:color)
         wheel_size = FactoryBot.create(:wheel_size)
         bike = Bike.new
         expect(instance).to receive(:associate).and_return(bike)
@@ -204,18 +203,6 @@ RSpec.describe BikeCreator do
         expect(b_param.skip_email?).to be_falsey
       end
     end
-
-    it "enque listing order working" do
-      Sidekiq::Worker.clear_all
-      Sidekiq::Testing.fake! do
-        bike = FactoryBot.create(:bike)
-        expect(instance).to receive(:associate).and_return(bike)
-        expect(instance).to receive(:validate_record).and_return(bike)
-        expect {
-          instance.send(:save_bike, bike)
-        }.to change(AfterBikeSaveWorker.jobs, :size).by(1)
-      end
-    end
   end
 
   describe "create_bike" do
@@ -231,9 +218,7 @@ RSpec.describe BikeCreator do
     context "organized" do
       it "creates" do
         organization = FactoryBot.create(:organization)
-        user = FactoryBot.create(:user)
         manufacturer = FactoryBot.create(:manufacturer)
-        color = FactoryBot.create(:color)
         wheel_size = FactoryBot.create(:wheel_size)
         b_param = BParam.create(creator: user, params: {
           bike: {
@@ -280,15 +265,63 @@ RSpec.describe BikeCreator do
       expect(response.errors[:errory]).to eq(["something"])
     end
 
-    context "with registration_info" do
-      it "saves registration_info on ownership" do
+    describe "create_bike_organization" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:bike_params) do
+        {
+          primary_frame_color_id: color.id,
+          creation_organization_id: organization&.id,
+          manufacturer_id: FactoryBot.create(:manufacturer).id,
+          owner_email: "something@stuff.com"
+        }
+      end
+      let(:b_param) { BParam.create(creator: user, params: {bike: bike_params}) }
+      let(:instance) { subject.new(b_param) }
+      context "no organization" do
+        let(:organization) { nil }
+        it "returns true" do
+          expect {
+            instance.create_bike
+          }.to change(BikeOrganization, :count).by 0
+          bike = Bike.last
+          expect(bike.creator&.id).to eq user.id
+          expect(bike.current_ownership&.id).to be_present
+        end
+      end
+      context "with organization" do
+        it "creates the bike_organization" do
+          expect {
+            instance.create_bike
+          }.to change(BikeOrganization, :count).by 1
+          bike = Bike.last
+          expect(bike.creator&.id).to eq user.id
+          expect(bike.current_ownership&.id).to be_present
+          expect(bike.bike_organizations.first.organization).to eq organization
+          expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+        end
+      end
+      context "child organization" do
+        let(:organization_parent) { FactoryBot.create(:organization) }
+        let(:organization) { FactoryBot.create(:organization_child, parent_organization: organization_parent) }
+        it "creates the bike_organization for both" do
+          expect {
+            instance.create_bike
+          }.to change(BikeOrganization, :count).by 2
+          bike = Bike.last
+          expect(bike.creator&.id).to eq user.id
+          expect(bike.current_ownership&.id).to be_present
+          expect(bike.creation_organization_id).to eq organization.id
+          expect(bike.bike_organizations.count).to eq 2
+          expect(bike.organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
+          expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
+          expect(bike.soon_current_ownership_id).to be_present
+        end
       end
     end
   end
 
   describe "creating parking_notification bike" do
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
-    let(:color) { FactoryBot.create(:color) }
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:auto_user) { organization.auto_user }
     let!(:creator) { FactoryBot.create(:organization_member, organization: organization) }
@@ -431,9 +464,7 @@ RSpec.describe BikeCreator do
 
   describe "create impounded bike" do
     let!(:state) { FactoryBot.create(:state_new_york) }
-    let(:user) { FactoryBot.create(:user) }
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
-    let(:color) { FactoryBot.create(:color) }
     let(:bike_params) do
       {
         serial_number: "s0s0s0s11111 4321212",
@@ -595,7 +626,6 @@ RSpec.describe BikeCreator do
   end
 
   describe "updated_phone" do
-    let(:user) { FactoryBot.create(:user) }
     let(:bike) { Bike.new(phone: "699.999.9999") }
     before { allow(bike).to receive(:user) { user } }
     it "sets the owner's phone if one is passed in" do

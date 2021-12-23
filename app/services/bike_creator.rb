@@ -68,11 +68,10 @@ class BikeCreator
 
   private
 
-  def creation_state_attributes
+  def ownership_creation_attributes
     {
-      is_bulk: @b_param.is_bulk,
-      is_pos: @b_param.is_pos,
       is_new: @b_param.is_new,
+      pos_kind: @b_param.pos_kind,
       origin: @b_param.origin,
       status: @b_param.status,
       bulk_import_id: @b_param.params["bulk_import_id"],
@@ -80,11 +79,6 @@ class BikeCreator
       can_edit_claimed: @bike.creation_organization_id.present?,
       organization_id: @bike.creation_organization_id
     }.merge(registration_info: @b_param.registration_info_attrs)
-  end
-
-  def ownership_creation_attributes
-    creation_state_attributes.except(:is_bulk, :is_pos)
-      .merge(pos_kind: @b_param.pos_kind)
   end
 
   # Previously all of this stuff was public.
@@ -126,7 +120,7 @@ class BikeCreator
       @bike.errors.add(message[0], message[1][0])
     end
     bike.ownerships.destroy_all
-    bike.creation_states.destroy_all
+    bike.bike_organizations.destroy_all
     bike.impound_records.destroy_all
     bike.parking_notifications.destroy_all
     bike.destroy
@@ -150,11 +144,10 @@ class BikeCreator
     bike.save
     @bike = associate(bike)
     validate_record(@bike)
+    # TODO: part of #2110 - test this based on ownership?
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
-    if @bike.present? && @bike.id.present? && @bike.current_creation_state.blank?
-      # TODO: part of #2110 - remove after shipping updated migration. Don't want to do it yet!
-      @bike.creation_states.create(creation_state_attributes.merge(ownership_id: @bike.current_ownership&.id))
+    if @bike.present? && @bike.id.present?
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_sticker_code.present? && @bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: @bike.creation_organization.id)
@@ -249,6 +242,7 @@ class BikeCreator
         create_impound_record(@b_param, bike)
       end
       ownership = create_ownership(bike)
+      create_bike_organizations(ownership)
       ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
       bike.create_normalized_serial_segments
       assign_user_attributes(bike, ownership&.user)
@@ -274,6 +268,17 @@ class BikeCreator
       raise "Ownership wasn't saved. Are you sure the bike was created?"
     end
     ownership
+  end
+
+  def create_bike_organizations(ownership)
+    organization = ownership.organization
+    return true unless organization.present?
+    unless BikeOrganization.where(bike_id: ownership.bike_id, organization_id: organization.id).present?
+      BikeOrganization.create(bike_id: ownership.bike_id, organization_id: organization.id, can_edit_claimed: ownership.can_edit_claimed)
+    end
+    if organization.parent_organization.present? && BikeOrganization.where(bike_id: ownership.bike_id, organization_id: organization.parent_organization_id).blank?
+      BikeOrganization.create(bike_id: ownership.bike_id, organization_id: organization.parent_organization_id, can_edit_claimed: ownership.can_edit_claimed)
+    end
   end
 
   def create_parking_notification(b_param, bike)

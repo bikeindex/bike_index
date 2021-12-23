@@ -324,7 +324,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
         expect(bike.handlebar_type).to eq bike_attrs[:handlebar_type_slug]
         ownership = bike.current_ownership
-        expect([ownership.pos?, ownership.is_new, ownership.is_bulk]).to eq([false, false, false])
+        expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([false, false, false])
         expect(ownership.organization).to eq @organization
         expect(ownership.creator).to eq bike.creator
         expect(ownership.origin).to eq "api_v1"

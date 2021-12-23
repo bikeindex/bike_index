@@ -283,7 +283,7 @@ RSpec.describe Bike, type: :model do
       let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
       it "scopes correctly" do
-        # There was a factory bug where it was creating multiple creation_states
+        # There was a factory bug where it was creating multiple ownerships
         expect(Ownership.where(bike_id: bike_lightspeed_pos.id).count).to eq 1
         expect(Ownership.count).to eq 2
         expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
@@ -304,10 +304,10 @@ RSpec.describe Bike, type: :model do
           bike.update(organization_affiliation: "community_member")
           bike.reload
           expect(bike.conditional_information).to eq({organization_affiliation: "community_member"}.as_json)
-          expect(bike.registration_info).to eq({})
+          expect(bike.registration_info).to eq({organization_affiliation: "community_member"}.as_json)
           expect(bike.organization_affiliation).to eq "community_member"
         end
-        context "with creation_state" do
+        context "other info" do
           let(:registration_info) { {address: "717 Market St, SF", phone: "717.742.3423", organization_affiliation: "employee"} }
           let(:target_registration_info) { registration_info.as_json.merge("phone" => "7177423423") }
           it "uses correct value" do
@@ -319,7 +319,7 @@ RSpec.describe Bike, type: :model do
             bike.reload
             expect(bike.organization_affiliation).to eq "student"
             expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
-            expect(bike.registration_info).to eq target_registration_info
+            expect(bike.registration_info).to eq target_registration_info.merge(organization_affiliation: "student").as_json
           end
         end
       end
@@ -334,10 +334,10 @@ RSpec.describe Bike, type: :model do
           bike.update(student_id: "424242")
           bike.reload
           expect(bike.conditional_information).to eq({student_id: "424242"}.as_json)
-          expect(bike.registration_info).to eq({})
+          expect(bike.registration_info).to eq({student_id: "424242"}.as_json)
           expect(bike.student_id).to eq "424242"
         end
-        context "with creation_state value" do
+        context "with creation value" do
           let(:registration_info) { {street: "717 Market St, SF", phone: "7177423423", student_id: "CCCIIIIBBBBB"} }
           it "uses correct value" do
             bike.reload
@@ -353,7 +353,7 @@ RSpec.describe Bike, type: :model do
             bike.reload
             expect(bike.student_id).to eq "66"
             expect(bike.conditional_information).to eq({"student_id" => "66"})
-            expect(bike.registration_info).to eq registration_info.as_json
+            expect(bike.registration_info).to eq registration_info.merge(student_id: "66").as_json
           end
         end
       end

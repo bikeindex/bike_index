@@ -84,11 +84,6 @@ class Ownership < ApplicationRecord
     bulk_import_id.present?
   end
 
-  # TODO: part of #2110 - remove, temporarily added for parity with creation_state
-  def is_bulk
-    bulk?
-  end
-
   def pos?
     Organization.pos?(pos_kind)
   end
@@ -133,6 +128,10 @@ class Ownership < ApplicationRecord
 
   def claimable_by?(passed_user)
     passed_user == User.fuzzy_email_find(owner_email) || passed_user == user
+  end
+
+  def update_registration_information(key, value)
+    update(registration_info: registration_info.merge(key => value))
   end
 
   def calculated_organization
