@@ -215,7 +215,7 @@
               %td Kind
               %td
                 Ownership
-                - if @bike.soon_current_ownership_id == ownership.id
+                - if @bike.current_ownership_id == ownership.id
                   %span.text-success Current
                 - elsif ownership.current?
                   %small.less-strong Current but not set on Bike

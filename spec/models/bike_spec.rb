@@ -1785,11 +1785,11 @@ RSpec.describe Bike, type: :model do
       let(:bike) { ownership.bike }
       it "takes location from the creation state" do
         bike.update(updated_at: Time.current)
-        bike.reload # Set soon_current_ownership_id
+        bike.reload # Set current_ownership_id
         expect(user.reload.street).to be_blank
         expect(user.address_set_manually).to be_falsey
         expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
-        expect(bike.reload.soon_current_ownership_id).to eq ownership.id
+        expect(bike.reload.current_ownership_id).to eq ownership.id
         expect(bike.current_ownership.address_hash[:latitude]).to be_blank
         expect(bike.registration_address_source).to eq "initial_creation"
         expect(bike.registration_address(true)["zipcode"]).to eq "99999"
@@ -1812,7 +1812,7 @@ RSpec.describe Bike, type: :model do
           expect(user.reload.street).to be_present
           expect(user.address_set_manually).to be_truthy
           expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
-          expect(bike.reload.soon_current_ownership_id).to eq ownership.id
+          expect(bike.reload.current_ownership_id).to eq ownership.id
           expect(bike.registration_address_source).to eq "user"
 
           bike.reload

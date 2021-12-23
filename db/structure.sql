@@ -434,7 +434,7 @@ CREATE TABLE public.bikes (
     is_phone boolean DEFAULT false,
     conditional_information jsonb DEFAULT '{}'::jsonb,
     current_impound_record_id bigint,
-    soon_current_ownership_id bigint
+    current_ownership_id bigint
 );
 
 
@@ -4346,6 +4346,13 @@ CREATE INDEX index_bikes_on_current_impound_record_id ON public.bikes USING btre
 
 
 --
+-- Name: index_bikes_on_current_ownership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_current_ownership_id ON public.bikes USING btree (current_ownership_id);
+
+
+--
 -- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4420,13 +4427,6 @@ CREATE INDEX index_bikes_on_primary_frame_color_id ON public.bikes USING btree (
 --
 
 CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id);
-
-
---
--- Name: index_bikes_on_soon_current_ownership_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_soon_current_ownership_id ON public.bikes USING btree (soon_current_ownership_id);
 
 
 --
@@ -5861,6 +5861,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211220183631'),
 ('20211220193440'),
 ('20211221010148'),
-('20211222230922');
+('20211222230922'),
+('20211223213257');
 
 

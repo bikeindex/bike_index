@@ -59,7 +59,7 @@ FactoryBot.define do
             bulk_import: evaluator.creation_state_bulk_import,
             registration_info: evaluator.creation_state_registration_info)
 
-          bike.update_attribute :soon_current_ownership_id, ownership.id
+          bike.update_attribute :current_ownership_id, ownership.id
           bike.reload
         end
       end

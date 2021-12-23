@@ -68,10 +68,10 @@ class AfterBikeSaveWorker < ApplicationWorker
   end
 
   def update_ownership(bike)
-    if bike.soon_current_ownership_id != bike.current_ownership&.id
-      bike.update_attribute :soon_current_ownership_id, bike.current_ownership&.id
+    if bike.current_ownership_id != bike.current_ownership&.id
+      bike.update_attribute :current_ownership_id, bike.current_ownership&.id
     end
-    return true if bike.soon_current_ownership.blank?
-    bike.soon_current_ownership&.update(updated_at: Time.current)
+    return true if bike.current_ownership.blank?
+    bike.current_ownership&.update(updated_at: Time.current)
   end
 end
