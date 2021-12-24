@@ -8,7 +8,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
   let(:user) { FactoryBot.create(:user) }
   let(:bike) { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
   let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, creator: creator) }
-  let!(:stolen_notification) { FactoryBot.create(:stolen_notification, bike: bike, sender: user) }
+  let!(:stolen_notification) { FactoryBot.create(:stolen_notification, bike: bike.reload, sender: user) }
   let(:organization) do
     o = FactoryBot.create(:organization)
     o.update_attribute :enabled_feature_slugs, %w[unstolen_notifications]
@@ -41,7 +41,10 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
   context "second notification sent notifications" do
     let!(:stolen_notification2) { FactoryBot.create(:stolen_notification, sender: user) }
     it "sends blocked message to admin" do
-      expect(bike.reload.user_id).to eq ownership.user_id
+      expect(bike.user_id).to eq ownership.user_id
+      expect(bike.current_ownership_id).to eq ownership.id
+      expect(ownership.user_id).to be_present
+      expect(ownership.claimed?).to be_truthy
       expect(stolen_notification.receiver_id).to eq ownership.user_id
       expect {
         instance.perform(stolen_notification.id)

@@ -217,7 +217,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(ownership2.reload.owner_email).to eq user.email
       expect(bike2.reload.owner_email).to eq user.email
       expect(bike2.user&.id).to eq user.id
-      expect(bike2.current_ownership_id).to_not eq ownership2.id
+      expect(bike2.current_ownership_id).to eq ownership2.id
       expect(bike3.reload.current_ownership_id).to be_present
       bike3.update_column :updated_at, Time.current - 1.hour
 
