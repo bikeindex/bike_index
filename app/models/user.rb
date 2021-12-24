@@ -309,26 +309,18 @@ class User < ApplicationRecord
   end
 
   def bikes(user_hidden = true)
-    Bike.unscoped.default_includes.where(id: bike_ids(user_hidden)).reorder(:created_at)
-  end
-
-  # Rough fix for users with large numbers of bikes
-  def rough_approx_bikes
-    Bike.includes(:ownerships).where(ownerships: {current: true, user_id: id}).reorder(:created_at)
+    bikes = Bike.unscoped.without_deleted.where(example: false)
+    # TODO: part of #2110 - migrate bike.hidden to bike.user_hidden - because that's what it is
+    bikes = bikes.where(hidden: false) unless user_hidden
+    bikes.default_includes.where(ownerships: {user_id: id}).order(:id)
   end
 
   def bike_ids(user_hidden = true)
-    owns = ownerships.where(example: false, current: true)
-    owns = owns.not_user_hidden unless user_hidden
-
-    # TODO: This isn't great - but it's better than before #2110
-    owns_bike_ids = owns.pluck(:bike_id)
-    owns_bike_ids - Bike.unscoped.deleted.where(id: owns_bike_ids).pluck(:id)
+    bikes(user_hidden).pluck(:id)
   end
 
-  # Just check a couple, so we don't move too slowly
-  def rough_stolen_bikes
-    rough_approx_bikes.status_stolen.limit(10)
+  def recovered_records
+    StolenRecord.recovered.where(bike_id: bike_ids)
   end
 
   # TODO: make this a little more efficient

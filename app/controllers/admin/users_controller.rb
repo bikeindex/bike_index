@@ -115,11 +115,7 @@ class Admin::UsersController < Admin::BaseController
 
   def calculate_user_bikes
     # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-    bikes = if @user.rough_approx_bikes.count > 25
-      @user.rough_approx_bikes
-    else
-      @user.bikes
-    end
+    bikes = @user.bikes
     @bikescount = @user.bikes.count
     @bikes = bikes.reorder(created_at: :desc).limit(10)
   end

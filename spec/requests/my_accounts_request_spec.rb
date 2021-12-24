@@ -62,22 +62,16 @@ RSpec.describe MyAccountsController, type: :request do
           end
         end
         context "with stuff" do
-          let(:ownership) { FactoryBot.create(:ownership, user_id: current_user.id, current: true) }
-          let(:bike) { ownership.bike }
-          let(:bike_2) { FactoryBot.create(:bike) }
-          let(:lock) { FactoryBot.create(:lock, user: current_user) }
-          before do
-            allow_any_instance_of(User).to receive(:bikes) { [bike, bike_2] }
-            allow_any_instance_of(User).to receive(:locks) { [lock] }
-          end
+          let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+          let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+          let!(:lock) { FactoryBot.create(:lock, user: current_user) }
           it "renders and user things are assigned" do
+            current_user.reload
             get base_url, params: {per_page: 1}
             expect(response.status).to eq(200)
             expect(response).to render_template("show")
-            expect(assigns(:bikes).count).to eq 1
-            expect(assigns(:per_page).to_s).to eq "1"
-            expect(assigns(:bikes).first).to eq(bike)
-            expect(assigns(:locks).first).to eq(lock)
+            expect(assigns(:bikes).pluck(:id)).to eq([bike2.id])
+            expect(assigns(:locks).pluck(:id)).to eq([lock.id])
           end
         end
         context "with lock with deleted manufacturer" do

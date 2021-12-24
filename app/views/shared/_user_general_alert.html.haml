@@ -30,7 +30,7 @@
 
 - elsif current_user.alert_slugs.include?("stolen_bike_without_location")
   -# TODO: use existing user_alert to select correct stolen bike
-  - without_location_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.without_location? }
+  - without_location_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.without_location? }
   - if without_location_bikes.present?
 
     - modal_body = capture_haml do
@@ -48,7 +48,7 @@
 
 - elsif current_user.alert_slugs.include?("theft_alert_without_photo")
   -# TODO: use existing user_alert to select correct theft alert
-  - missing_photo_bikes = current_user.rough_stolen_bikes.select { |bike| bike.current_stolen_record&.theft_alert_missing_photo? }
+  - missing_photo_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.theft_alert_missing_photo? }
   - if missing_photo_bikes.present?
 
     - modal_body = capture_haml do

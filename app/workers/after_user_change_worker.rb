@@ -68,7 +68,7 @@ class AfterUserChangeWorker < ApplicationWorker
       end
     end
 
-    user.rough_stolen_bikes.each do |bike|
+    user.bikes.status_stolen.each do |bike|
       UserAlert.update_stolen_bike_without_location(user: user, bike: bike)
     end
   end

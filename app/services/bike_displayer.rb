@@ -28,7 +28,7 @@ class BikeDisplayer
       return true if bike.bike_stickers.any?(&:user_editable?) ||
         user.updated_bike_stickers.any?(&:user_editable?)
 
-      bike_ids = user.rough_approx_bikes.pluck(:id)
+      bike_ids = user.bike_ids
       # Return false if no bikes
       return false if bike_ids.none?
       sticker_ids = BikeStickerUpdate.where(bike_id: bike_ids).distinct.pluck(:bike_sticker_id)

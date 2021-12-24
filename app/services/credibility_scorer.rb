@@ -109,7 +109,7 @@ class CredibilityScorer
     return [:user_ambassador] if user.ambassador?
     badges = []
     badges += [:user_trusted_organization_member] if user.organizations.any? { |o| organization_trusted?(o) }
-    badges += [:user_has_bike_recovered] if StolenRecord.recovered.where(bike_id: user.rough_approx_bikes.limit(20).pluck(:id)).any?
+    badges += [:user_has_bike_recovered] if user.recovered_records.limit(1).present?
     badges += [:user_sent_in_bike_tip] if Feedback.where(user_id: user.id).stolen_tip.any?
     badges += [:user_supporter] if user.payments.any?
     badges += [:long_time_user] if user.created_at < Time.current - 2.years

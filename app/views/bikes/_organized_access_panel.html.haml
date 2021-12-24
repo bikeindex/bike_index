@@ -211,7 +211,7 @@
       / Additional law enforcement information
       - if passive_organization.enabled?("additional_registrations_information")
         -# If user isn't present, use email to search
-        - other_user_bikes = @bike.user.present? ? @bike.user.rough_approx_bikes : Bike.where(owner_email: @bike.owner_email)
+        - other_user_bikes = @bike.user.present? ? @bike.user.bikes : Bike.where(owner_email: @bike.owner_email)
         .row.law-enforcement-wrapper.mt-4
           .col-xs-12.mt-2
             %p.mt-2.mb-2
