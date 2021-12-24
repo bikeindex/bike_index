@@ -29,24 +29,71 @@ RSpec.describe BikeUpdator do
   end
 
   describe "update_ownership" do
+    let(:email) { "something@fake.com" }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: email) }
+    let(:user) { bike.user }
+    let(:ownership) { bike.ownerships.first }
     it "calls create_ownership if the email has changed" do
-      bike = FactoryBot.create(:bike)
-      user = FactoryBot.create(:user)
-      expect(bike.updator_id).to be_nil
-      expect(Ownership.count).to eq 0
+      expect(bike.reload.updator_id).to be_nil
+      expect(bike.user_id).to be_present
+      expect(Ownership.count).to eq 1
       update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}}.as_json, user: user)
       update_bike.update_ownership
       bike.reload
       expect(bike.updator).to eq(user)
-      expect(Ownership.count).to eq 1
+      expect(Ownership.count).to eq 2
+    end
+    context "email doesn't change" do
+      let(:email) { "another@email.co" }
+      it "does not call create_ownership if the email hasn't changed" do
+        bike.reload
+        expect(Ownership.count).to eq 1
+        update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json)
+        update_bike.update_ownership
+        expect(Ownership.count).to eq 1
+      end
     end
 
-    it "does not call create_ownership if the email hasn't changed" do
-      bike = FactoryBot.create(:bike, owner_email: "another@email.co")
-      update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json)
-      expect(Ownership.count).to eq 0
-      update_bike.update_ownership
-      expect(Ownership.count).to eq 0
+    context "organized" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, owner_email: email) }
+      let(:organization) { bike.organizations.first }
+      it "does not pass organization" do
+        expect(bike.reload.current_ownership.organization).to be_present
+        expect(user.member_of?(organization)).to be_falsey
+        expect(ownership.reload.organization_pre_registration?).to be_falsey
+        expect(ownership.origin).to eq "web"
+        expect(ownership.organization_id).to eq organization.id
+        update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
+        update_bike.update_ownership
+        expect(Ownership.count).to eq 2
+        new_ownership = bike.reload.current_ownership
+        expect(new_ownership.id).to_not eq ownership.id
+        expect(new_ownership.organization_id).to be_blank
+        expect(new_ownership.origin).to eq "transferred_ownership"
+        expect(bike.bike_organizations.count).to eq 1
+        expect(bike.bike_organizations.first.organization).to eq organization
+        expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+      end
+      context "user is an organization member" do
+        it "passes users organization" do
+          FactoryBot.create(:membership_claimed, user: user, organization: organization)
+          expect(bike.reload.current_ownership.organization).to be_present
+          expect(user.reload.member_of?(organization)).to be_truthy
+          expect(ownership.reload.organization_pre_registration?).to be_falsey
+          expect(ownership.origin).to eq "web"
+          expect(ownership.organization_id).to eq organization.id
+          update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
+          update_bike.update_ownership
+          expect(Ownership.count).to eq 2
+          new_ownership = bike.reload.current_ownership
+          expect(new_ownership.id).to_not eq ownership.id
+          expect(new_ownership.organization_id).to eq organization.id
+          expect(new_ownership.origin).to eq "transferred_ownership"
+          expect(bike.bike_organizations.count).to eq 1
+          expect(bike.bike_organizations.first.organization).to eq organization
+          expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+        end
+      end
     end
   end
 
