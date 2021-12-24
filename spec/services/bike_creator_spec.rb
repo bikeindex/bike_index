@@ -306,6 +306,7 @@ RSpec.describe BikeCreator do
         expect(b_param.skip_email?).to be_truthy
         expect(bike.id).to be_present
         expect_attrs_to_match_hash(bike, bike_params)
+        expect(bike.cycle_type).to eq "bike"
         expect(bike.status).to eq "status_impounded"
         expect(bike.status_humanized).to eq "found"
         expect(bike.impound_records.count).to eq 1
@@ -379,16 +380,14 @@ RSpec.describe BikeCreator do
         [FactoryBot.create(:ownership, bike: existing_bike, owner_email: email),
           FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)]
       end
-      let(:params) do
+      let(:user) { existing_bike.creator }
+      let(:bike_params) do
         {
-          bike: {
-            serial_number: "some serial number",
-            owner_email: new_email,
-            no_duplicate: true
-          }
+          serial_number: "some serial number",
+          owner_email: new_email,
+          no_duplicate: true
         }
       end
-      let(:b_param) { FactoryBot.create(:b_param, creator: existing_bike.creator, params: params) }
       context "same email" do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "Something@GMAIL.com" }
@@ -407,6 +406,33 @@ RSpec.describe BikeCreator do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "newsomething@gmail.com" }
         it "does not find a non-duplicate" do
+          expect(b_param.no_duplicate?).to be_truthy
+          expect(b_param.find_duplicate_bike(new_bike)).to be_falsey
+          expect {
+            instance.send(:validate_record, new_bike)
+          }.to change(Ownership, :count).by 0
+          b_param.reload
+          expect(b_param.created_bike_id).to eq new_bike.id
+        end
+      end
+      context "user_hidden" do
+        it "finds duplicate" do
+          existing_bike.update(marked_user_hidden: true)
+          expect(existing_bike.reload.user_hidden).to be_truthy
+          expect(b_param.no_duplicate?).to be_truthy
+          expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
+          expect {
+            instance.send(:validate_record, new_bike)
+          }.to change(Ownership, :count).by(-1)
+          b_param.reload
+          expect(b_param.created_bike_id).to eq existing_bike.id
+          expect(Bike.where(id: new_bike.id)).to_not be_present
+        end
+      end
+      context "deleted" do
+        it "does not find duplicate" do
+          existing_bike.destroy
+          expect(Bike.unscoped.where(id: existing_bike.id).count).to eq 1
           expect(b_param.no_duplicate?).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_falsey
           expect {

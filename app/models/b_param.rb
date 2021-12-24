@@ -454,7 +454,8 @@ class BParam < ApplicationRecord
   end
 
   def find_duplicate_bike(bike)
-    dupe = Bike.where(serial_number: bike.serial_number, owner_email: bike.owner_email)
+    dupe = Bike.with_user_hidden
+      .where(serial_number: bike.serial_number, owner_email: bike.owner_email)
       .where.not(id: bike.id).order(:created_at).first
     return nil unless dupe.present?
     update_attribute :created_bike_id, dupe.id

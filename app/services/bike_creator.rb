@@ -30,11 +30,10 @@ class BikeCreator
 
   def initialize(b_param = nil, location: nil)
     @b_param = b_param
-    @bike = nil
     @location = location
   end
 
-  attr_reader :b_param, :bike
+  attr_reader :b_param
 
   def build_bike(new_attrs = {})
     bike = Bike.new(@b_param.safe_bike_attrs(new_attrs))
@@ -49,13 +48,16 @@ class BikeCreator
   end
 
   def create_bike
-    add_bike_book_data
-    @bike = find_or_build_bike
+    add_bike_book_data(@b_param)
+    bike = find_or_build_bike(@b_param)
+    pp bike.errors.full_messages, bike.id
     # There could be errors during the build - or during the save
-    save_bike(@bike) if @bike.errors.none?
-    return @bike if @bike.errors.none?
-    @b_param&.update(bike_errors: @bike.cleaned_error_messages)
-    @bike
+    save_bike(bike) if bike.errors.none?
+    if bike.errors.any?
+      @b_param&.update(bike_errors: bike.cleaned_error_messages)
+    end
+    pp bike.errors.full_messages, bike.id
+    bike
   end
 
   # Called from ImageAssociatorWorker, so can't be private
@@ -73,47 +75,47 @@ class BikeCreator
   # Previously all of this stuff was public.
   # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
 
-  def add_bike_book_data
-    return nil unless @b_param && @b_param.bike.present? && @b_param.manufacturer_id.present?
-    return nil unless @b_param.bike["frame_model"].present? && @b_param.bike["year"].present?
+  def add_bike_book_data(b_param)
+    return nil unless b_param && b_param.bike.present? && b_param.manufacturer_id.present?
+    return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
     bb_data = BikeBookIntegration.new.get_model({
-      manufacturer: Manufacturer.find(@b_param.bike["manufacturer_id"]).name,
-      year: @b_param.bike["year"],
-      frame_model: @b_param.bike["frame_model"]
+      manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
+      year: b_param.bike["year"],
+      frame_model: b_param.bike["frame_model"]
     })
 
     return true unless bb_data && bb_data["bike"].present?
-    @b_param.params["bike"]["cycle_type"] = bb_data["bike"]["cycle_type"] if bb_data["bike"] && bb_data["bike"]["cycle_type"].present?
+    b_param.params["bike"]["cycle_type"] = bb_data["bike"]["cycle_type"] if bb_data["bike"] && bb_data["bike"]["cycle_type"].present?
     if bb_data["bike"]["paint_description"].present?
-      @b_param.params["bike"]["paint_name"] = bb_data["bike"]["paint_description"] unless @b_param.params["bike"]["paint_name"].present?
+      b_param.params["bike"]["paint_name"] = bb_data["bike"]["paint_description"] unless b_param.params["bike"]["paint_name"].present?
     end
     if bb_data["bike"]["description"].present?
-      if @b_param.params["bike"]["description"].present?
-        @b_param.params["bike"]["description"] += " #{bb_data["bike"]["description"]}"
+      if b_param.params["bike"]["description"].present?
+        b_param.params["bike"]["description"] += " #{bb_data["bike"]["description"]}"
       else
-        @b_param.params["bike"]["description"] = bb_data["bike"]["description"]
+        b_param.params["bike"]["description"] = bb_data["bike"]["description"]
       end
     end
-    @b_param.params["bike"]["rear_wheel_bsd"] = bb_data["bike"]["rear_wheel_bsd"] if bb_data["bike"]["rear_wheel_bsd"].present?
-    @b_param.params["bike"]["rear_tire_narrow"] = bb_data["bike"]["rear_tire_narrow"] if bb_data["bike"]["rear_tire_narrow"].present?
-    @b_param.params["bike"]["stock_photo_url"] = bb_data["bike"]["stock_photo_url"] if bb_data["bike"]["stock_photo_url"].present?
-    @b_param.params["components"] = bb_data["components"] && bb_data["components"].map { |c| c.merge("is_stock" => true) }
-    @b_param.clean_params # if we just rely on the before_save filter, @b_param needs to be reloaded
-    @b_param.save if @b_param.id.present?
-    @b_param
+    b_param.params["bike"]["rear_wheel_bsd"] = bb_data["bike"]["rear_wheel_bsd"] if bb_data["bike"]["rear_wheel_bsd"].present?
+    b_param.params["bike"]["rear_tire_narrow"] = bb_data["bike"]["rear_tire_narrow"] if bb_data["bike"]["rear_tire_narrow"].present?
+    b_param.params["bike"]["stock_photo_url"] = bb_data["bike"]["stock_photo_url"] if bb_data["bike"]["stock_photo_url"].present?
+    b_param.params["components"] = bb_data["components"] && bb_data["components"].map { |c| c.merge("is_stock" => true) }
+    b_param.clean_params # if we just rely on the before_save filter, b_param needs to be reloaded
+    b_param.save if b_param.id.present?
+    b_param
   end
 
   def clear_bike(bike)
-    find_or_build_bike
+    bike = find_or_build_bike(@b_param)
     bike.errors.messages.each do |message|
-      @bike.errors.add(message[0], message[1][0])
+      bike.errors.add(message[0], message[1][0])
     end
     bike.ownerships.destroy_all
     bike.bike_organizations.destroy_all
     bike.impound_records.destroy_all
     bike.parking_notifications.destroy_all
     bike.destroy
-    @bike
+    bike
   end
 
   def validate_record(bike)
@@ -121,47 +123,41 @@ class BikeCreator
     @b_param.find_duplicate_bike(bike) if @b_param.no_duplicate?
     if @b_param.created_bike.present?
       clear_bike(bike)
-      @bike = @b_param.created_bike
+      bike = @b_param.created_bike
     elsif @b_param.id.present? # Only update b_param if it exists
       @b_param.update(created_bike_id: bike.id, bike_errors: nil)
     end
-    @bike
+    bike
   end
 
   def save_bike(bike)
     bike.set_location_info
     bike.save
-    @bike = bike
-    ownership = create_ownership(@b_param, @bike)
-    @bike = associate(@bike, ownership) unless @bike.errors.any?
-    validate_record(@bike)
+    ownership = create_ownership(@b_param, bike)
+    bike = associate(bike, ownership) unless bike.errors.any?
+    validate_record(bike)
     # TODO: part of #2110 - test this based on ownership?
     # We don't want to create an extra creation_state if there was a duplicate.
     # Also - we assume if there is a creation_state, that the bike successfully went through creation
-    if @bike.present? && @bike.id.present?
-      AfterBikeSaveWorker.perform_async(@bike.id)
-      if @b_param.bike_sticker_code.present? && @bike.creation_organization.present?
-        bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: @bike.creation_organization.id)
-        bike_sticker&.claim(user: @bike.creator, bike: @bike.id, organization: @bike.creation_organization)
+    if bike.present? && bike.id.present?
+      AfterBikeSaveWorker.perform_async(bike.id)
+      if @b_param.bike_sticker_code.present? && bike.creation_organization.present?
+        bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
+        bike_sticker&.claim(user: bike.creator, bike: bike.id, organization: bike.creation_organization)
       end
       if @b_param.unregistered_parking_notification?
         # We skipped setting address, with default_parking_notification_attrs, notification will update it
         ParkingNotification.create!(@b_param.parking_notification_params)
       end
       # Check if the bike has a location, update with passed location if no
-      @bike.reload
-      @bike.update(Geohelper.address_hash_from_geocoder_result(@location)) unless @bike.latitude.present?
+      bike.reload
+      bike.update(Geohelper.address_hash_from_geocoder_result(@location)) unless bike.latitude.present?
     end
-
-    @bike
+    bike
   end
 
-  def find_or_build_bike
-    if @b_param&.created_bike&.present?
-      return @bike = @b_param.created_bike
-    end
-    @bike = build_bike
-    @bike
+  def find_or_build_bike(b_param)
+    b_param&.created_bike&.present? ? b_param.created_bike : build_bike
   end
 
   def add_front_wheel_size(bike)
@@ -173,6 +169,7 @@ class BikeCreator
 
   def add_required_attributes(bike)
     bike.propulsion_type ||= "foot-pedal"
+    bike.cycle_type ||= "bike"
     bike
   end
 
