@@ -155,7 +155,7 @@ RSpec.describe "BikesController#create", type: :request do
           new_bike = Bike.last
           expect(new_bike).to be_present
           expect(new_bike.authorized?(current_user)).to be_truthy
-          expect(new_bike.current_ownership.origin).to eq "web"
+          expect(new_bike.current_ownership.origin).to eq "impound_process"
           expect(new_bike.current_ownership.organization&.id).to be_blank
           expect(new_bike.current_ownership.creator&.id).to eq current_user.id
           expect(new_bike.status).to eq "status_impounded"

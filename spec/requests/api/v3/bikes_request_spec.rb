@@ -922,6 +922,7 @@ RSpec.describe "Bikes API V3", type: :request do
           current_ownership = bike.current_ownership
           expect(current_ownership.creator_id).to eq user.id
           expect(current_ownership.owner_email).to eq new_email
+          expect(current_ownership.organization_id).to eq organization.id
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Confirm your #{organization.name} Bike Index registration")
