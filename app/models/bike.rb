@@ -804,7 +804,7 @@ class Bike < ApplicationRecord
   end
 
   def organization_affiliation
-    conditional_information["organization_affiliation"] || registration_info["organization_affiliation"]
+    conditional_information["organization_affiliation"] || registration_info&.dig("organization_affiliation")
   end
 
   def student_id=(val)
@@ -813,7 +813,7 @@ class Bike < ApplicationRecord
   end
 
   def student_id
-    conditional_information["student_id"] || registration_info["student_id"]
+    conditional_information["student_id"] || registration_info&.dig("student_id")
   end
 
   def alert_image_url(version = nil)
