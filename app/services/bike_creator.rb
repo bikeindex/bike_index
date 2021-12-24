@@ -59,9 +59,7 @@ class BikeCreator
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id
     # There could be errors during the build - or during the save
-    pp bike.errors.full_messages
     save_bike(bike) if bike.errors.none?
-    pp bike.errors.full_messages
     if bike.errors.any?
       b_param&.update(bike_errors: bike.cleaned_error_messages)
     end
