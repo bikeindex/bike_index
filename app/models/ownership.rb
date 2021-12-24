@@ -73,7 +73,7 @@ class Ownership < ApplicationRecord
 
   def new_registration?
     return true if first?
-    second? && calculated_organization.present?
+    previous_ownership.present? && previous_ownership.organization_pre_registration?
   end
 
   def phone_registration?
@@ -156,8 +156,7 @@ class Ownership < ApplicationRecord
     return false if skip_email || bike.blank? || phone_registration? || bike.example?
     return false if spam_risky_email?
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
-    return true unless calculated_organization.present?
-    !calculated_organization.enabled?("skip_ownership_email")
+    return true unless organization.present? && organization.enabled?("skip_ownership_email")
   end
 
   # This got a little unwieldy in #2110 - TODO, maybe - clean up
@@ -177,7 +176,7 @@ class Ownership < ApplicationRecord
       end
       # Previous attrs to #2110
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
-      self.claimed ||= self_made?
+      self.claimed = true if self_made?
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_pre_registration ||= calculated_organization_pre_registration?

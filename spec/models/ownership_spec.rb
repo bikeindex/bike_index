@@ -96,13 +96,13 @@ RSpec.describe Ownership, type: :model do
         ownership1.reload
         expect(ownership1.current?).to be_falsey
         expect(ownership1.claim_message).to be_blank
-        expect(ownership1.calculated_organization&.id).to eq bike.organizations.first.id
+        expect(ownership1.organization&.id).to eq bike.organizations.first.id
         expect(ownership1.first?).to be_truthy
         expect(ownership1.previous_ownership_id).to be_blank
         expect(ownership2.current?).to be_truthy
         expect(ownership2.first?).to be_falsey
         expect(ownership2.second?).to be_truthy
-        expect(ownership2.calculated_organization&.id).to be_blank
+        expect(ownership2.organization&.id).to be_blank
         expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
         expect(ownership2.new_registration?).to be_falsey
         expect(ownership2.previous_ownership_id).to eq ownership1.id
@@ -110,20 +110,32 @@ RSpec.describe Ownership, type: :model do
       end
     end
     context "organization" do
-      let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
-      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, creator: organization.auto_user) }
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let(:organization) { FactoryBot.create(:organization, :with_auto_user, user: user) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, creator: user) }
       let(:ownership) { bike.ownerships.first }
       it "returns new_registration" do
         ownership.reload
-        expect(ownership.calculated_organization).to eq organization
+        expect(ownership.organization).to eq organization
         expect(ownership.user).to be_blank
         expect(ownership.new_registration?).to be_truthy
         expect(ownership.claim_message).to eq "new_registration"
+        expect(ownership.organization_pre_registration?).to be_falsey
       end
-      context "transfer from organization to new user" do
-        let(:membership) { FactoryBot.create(:membership, organization: organization) }
-        let(:ownership2) { FactoryBot.build(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
+      context "organization_pre_registration?" do
+        let(:email) { user.email }
+        let(:ownership2) { FactoryBot.build(:ownership, bike: bike, creator: user, owner_email: "new@stuff.com") }
+        let(:ownership3) { FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: "new_again@stuff.com") }
         it "returns new_registration" do
+          expect(bike.reload.owner_email).to eq user.email
+          expect(ownership.reload.owner_email).to eq user.email
+          expect(ownership.self_made?).to be_truthy
+          expect(ownership.claimed?).to be_truthy
+          expect(ownership.current?).to be_truthy
+          expect(ownership.organization&.id).to eq organization.id
+          expect(ownership.first?).to be_truthy
+          expect(ownership.previous_ownership_id).to be_blank
+          expect(ownership.organization_pre_registration?).to be_truthy
           # Before save, still works
           expect(ownership2.current).to be_truthy
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
@@ -133,19 +145,29 @@ RSpec.describe Ownership, type: :model do
           ownership2.reload
           ownership.reload
           expect(ownership.current?).to be_falsey
-          expect(ownership.calculated_organization&.id).to eq organization.id
           expect(ownership.first?).to be_truthy
-          expect(ownership.previous_ownership_id).to be_blank
           expect(ownership2.current?).to be_truthy
           expect(ownership2.first?).to be_falsey
           expect(ownership2.second?).to be_truthy
-          expect(ownership2.calculated_organization&.id).to eq organization.id
+          expect(ownership2.organization_pre_registration?).to be_falsey
+          expect(ownership2.previous_ownership_id).to eq ownership.id
+          expect(ownership2.previous_ownership.organization_pre_registration?).to be_truthy
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
           expect(ownership2.previous_ownership_id).to eq ownership.id
           # Registrations that were initially from an organization member, then transferred outside of the organization,
           # count as "new" - because some organizations pre-register bikes
           expect(ownership2.new_registration?).to be_truthy
           expect(ownership2.claim_message).to eq "new_registration"
+
+          expect(ownership3.reload.current).to be_truthy
+          expect(ownership3.previous_ownership_id).to eq ownership2.id
+          expect(ownership2.reload.current).to be_falsey
+          expect(ownership3.organization_pre_registration?).to be_falsey
+          expect(ownership3.previous_ownership.organization_pre_registration?).to be_falsey
+          expect(ownership3.prior_ownerships.pluck(:id)).to match_array([ownership.id, ownership2.id])
+          expect(ownership3.first?).to be_falsey
+          expect(ownership3.second?).to be_falsey
+          expect(ownership2.new_registration?).to be_falsey
         end
       end
     end
@@ -292,7 +314,7 @@ RSpec.describe Ownership, type: :model do
         ownership2 = FactoryBot.create(:ownership, bike: bike, created_at: Time.current)
         ownership2.update(updated_at: Time.current)
         ownership2.reload
-        expect(ownership2.calculated_organization).to be_blank
+        expect(ownership2.organization).to be_blank
         expect(ownership2.calculated_send_email).to be_truthy
       end
     end
