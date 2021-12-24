@@ -6,7 +6,7 @@ class Admin::BikesController < Admin::BaseController
   def index
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = available_bikes.includes(:creation_organization, :soon_current_ownership, :paint)
+    @bikes = available_bikes.includes(:creation_organization, :current_ownership, :paint)
       .reorder("bikes.#{sort_column} #{sort_direction}")
       .page(@page).per(per_page)
   end
@@ -140,11 +140,7 @@ class Admin::BikesController < Admin::BaseController
   def matching_bikes
     if params[:user_id].present?
       @user = User.username_friendly_find(params[:user_id])
-      bikes = if @user.rough_approx_bikes.count > 25
-        @user.rough_approx_bikes
-      else
-        @user.bikes
-      end
+      bikes = @user.bikes
     elsif params[:search_phone].present?
       bikes = Bike.search_phone(params[:search_phone])
     else

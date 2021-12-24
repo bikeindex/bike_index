@@ -67,11 +67,8 @@ class AfterBikeSaveWorker < ApplicationWorker
     end
   end
 
+  # Bump registration_info attributes on ownerships
   def update_ownership(bike)
-    if bike.soon_current_ownership_id != bike.current_ownership&.id
-      bike.update_attribute :soon_current_ownership_id, bike.current_ownership&.id
-    end
-    return true if bike.soon_current_ownership.blank?
-    bike.soon_current_ownership&.update(updated_at: Time.current)
+    bike.current_ownership&.update(updated_at: Time.current)
   end
 end

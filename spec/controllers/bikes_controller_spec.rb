@@ -533,7 +533,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.current_ownership.origin).to eq "embed"
           expect(bike.current_ownership.organization).to eq organization
           expect(bike.current_ownership.creator).to eq organization.auto_user
-          expect(bike.soon_current_ownership_id).to eq bike.current_ownership.id
+          expect(bike.current_ownership_id).to eq bike.current_ownership.id
         end
       end
       context "non-stolen" do

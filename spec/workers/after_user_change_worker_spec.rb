@@ -112,7 +112,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(organization.paid_money?).to be_falsey
       expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
       expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
-      expect(user.reload.rough_approx_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(user.reload.bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(user.user_alerts.pluck(:kind)).to eq([])
       expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
       instance.perform(user.id)
@@ -173,8 +173,8 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       user.save
       expect(stolen_record.bike.status_stolen?).to be_truthy
       expect(stolen_record_with_location.bike.status_stolen?).to be_truthy
-      expect(user.rough_approx_bikes.status_stolen.pluck(:id)).to match_array([stolen_record.bike_id, stolen_record_with_location.bike_id])
-      expect(user.rough_stolen_bikes.select { |b| b.current_stolen_record.without_location? }.map(&:id)).to eq([stolen_record.bike_id])
+      expect(user.bikes.status_stolen.pluck(:id)).to match_array([stolen_record.bike_id, stolen_record_with_location.bike_id])
+      expect(user.bikes.status_stolen.select { |b| b.current_stolen_record.without_location? }.map(&:id)).to eq([stolen_record.bike_id])
       instance.perform(user.id)
 
       user.reload
@@ -217,8 +217,8 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(ownership2.reload.owner_email).to eq user.email
       expect(bike2.reload.owner_email).to eq user.email
       expect(bike2.user&.id).to eq user.id
-      expect(bike2.soon_current_ownership_id).to_not eq ownership2.id
-      expect(bike3.reload.soon_current_ownership_id).to be_present
+      expect(bike2.current_ownership_id).to eq ownership2.id
+      expect(bike3.reload.current_ownership_id).to be_present
       bike3.update_column :updated_at, Time.current - 1.hour
 
       Sidekiq::Worker.clear_all
@@ -230,7 +230,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(bike1.reload.owner_name).to eq new_name
       expect(ownership2.reload.owner_name).to eq new_name
       expect(bike2.reload.owner_name).to eq new_name
-      expect(bike2.soon_current_ownership_id).to eq ownership2.id
+      expect(bike2.current_ownership_id).to eq ownership2.id
       expect(bike3.reload.updated_at).to be_within(2).of Time.current
     end
   end

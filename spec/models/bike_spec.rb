@@ -486,15 +486,14 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "owner" do
+    let(:delete_user) { FactoryBot.create(:user) }
+    let!(:ownership) { FactoryBot.create(:ownership_claimed, user_id: delete_user.id) }
+    let(:bike) { ownership.reload.bike }
     it "doesn't break if the owner is deleted" do
-      delete_user = FactoryBot.create(:user)
-      ownership = FactoryBot.create(:ownership, user_id: delete_user.id)
-      ownership.mark_claimed
-      bike = ownership.bike
-      expect(bike.owner).to eq(delete_user)
+      expect(bike.current_ownership_id).to eq ownership.id
+      expect(bike.owner&.id).to eq(delete_user.id)
       delete_user.delete
-      ownership.reload
-      expect(bike.owner).to eq(ownership.creator)
+      expect(bike.reload.owner&.id).to eq(ownership.creator_id)
     end
   end
 
@@ -931,7 +930,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike, owner_email: owner_email, creator: creator) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, owner_email: owner_email, creator: creator) }
     it "is true" do
-      expect(bike.contact_owner_user?).to be_truthy
+      expect(bike.reload.contact_owner_user?).to be_truthy
       expect(bike.contact_owner_email).to eq owner_email
     end
     context "ownership not claimed" do
@@ -1372,13 +1371,6 @@ RSpec.describe Bike, type: :model do
         allow(bike).to receive(:first_ownership) { ownership }
         expect(bike.phone).to eq "888.888.8888"
       end
-      # TODO: part of #2110 - it's ok to keep using ownerships!
-      context "not first ownerships" do
-        it "is the users " do
-          allow(bike).to receive(:first_ownership) { Ownership.new } # A different ownership
-          expect(bike.phone).to be_nil
-        end
-      end
     end
     context "creator" do
       let(:ownership) { Ownership.new(creator: user) }
@@ -1785,11 +1777,11 @@ RSpec.describe Bike, type: :model do
       let(:bike) { ownership.bike }
       it "takes location from the creation state" do
         bike.update(updated_at: Time.current)
-        bike.reload # Set soon_current_ownership_id
+        bike.reload # Set current_ownership_id
         expect(user.reload.street).to be_blank
         expect(user.address_set_manually).to be_falsey
         expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
-        expect(bike.reload.soon_current_ownership_id).to eq ownership.id
+        expect(bike.reload.current_ownership_id).to eq ownership.id
         expect(bike.current_ownership.address_hash[:latitude]).to be_blank
         expect(bike.registration_address_source).to eq "initial_creation"
         expect(bike.registration_address(true)["zipcode"]).to eq "99999"
@@ -1812,7 +1804,7 @@ RSpec.describe Bike, type: :model do
           expect(user.reload.street).to be_present
           expect(user.address_set_manually).to be_truthy
           expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
-          expect(bike.reload.soon_current_ownership_id).to eq ownership.id
+          expect(bike.reload.current_ownership_id).to eq ownership.id
           expect(bike.registration_address_source).to eq "user"
 
           bike.reload

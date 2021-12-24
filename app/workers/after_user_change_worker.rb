@@ -1,7 +1,5 @@
 class AfterUserChangeWorker < ApplicationWorker
   sidekiq_options retry: false
-  # TODO: part of #2110 - make sure that this doesn't explode
-  ENABLE_RERUN = ENV["SKIP_BIKE_RESAVE"] != true
 
   def perform(user_id, user = nil, skip_bike_update = false)
     user ||= User.find_by_id(user_id)
@@ -30,7 +28,7 @@ class AfterUserChangeWorker < ApplicationWorker
       next unless theft_alert.activateable?
       ActivateTheftAlertWorker.perform_async(theft_alert.id)
     end
-    if ENABLE_RERUN && !skip_bike_update
+    unless skip_bike_update
       user.bike_ids.each { |id| AfterBikeSaveWorker.perform_async(id, true, true) }
     end
   end
@@ -68,7 +66,7 @@ class AfterUserChangeWorker < ApplicationWorker
       end
     end
 
-    user.rough_stolen_bikes.each do |bike|
+    user.bikes.status_stolen.each do |bike|
       UserAlert.update_stolen_bike_without_location(user: user, bike: bike)
     end
   end

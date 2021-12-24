@@ -227,7 +227,7 @@ RSpec.describe "BikesController#update", type: :request do
 
       expect(bike.claimed?).to be_falsey
       expect(bike.current_ownership.user_id).to be_blank
-      expect(bike.soon_current_ownership_id).to eq ownership2.id
+      expect(bike.current_ownership_id).to eq ownership2.id
       expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
       expect(bike.creator_unregistered_parking_notification?).to be_falsey
       expect(bike.stolen_records.count).to eq 0

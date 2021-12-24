@@ -67,7 +67,7 @@ module Organized
         frame_model: "Example bike",
         primary_frame_color: Color.black)
       @ownership = bike.ownerships.build(owner_email: bike.owner_email, creator: current_user, id: 420)
-      bike.soon_current_ownership = @ownership
+      bike.current_ownership = @ownership
       bike
     end
 

@@ -144,7 +144,7 @@ RSpec.describe BikeCreator do
           }
         }
       end
-      let(:b_param) { FactoryBot.create(:b_param, creator: existing_bike.current_ownership.creator, params: params) }
+      let(:b_param) { FactoryBot.create(:b_param, creator: existing_bike.creator, params: params) }
       context "same email" do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "Something@GMAIL.com" }
@@ -249,7 +249,7 @@ RSpec.describe BikeCreator do
         # And then test ownership
         expect(bike.ownerships.count).to eq 1
         ownership = bike.ownerships.first
-        expect(bike.soon_current_ownership_id).to eq ownership.id
+        expect(bike.current_ownership_id).to eq ownership.id
         expect(ownership.organization_id).to eq organization.id
         expect(ownership.owner_email).to eq "stuff@stuff.com"
         expect(ownership.owner_name).to eq "Sally"
@@ -314,7 +314,7 @@ RSpec.describe BikeCreator do
           expect(bike.bike_organizations.count).to eq 2
           expect(bike.organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
           expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
-          expect(bike.soon_current_ownership_id).to be_present
+          expect(bike.current_ownership_id).to be_present
         end
       end
     end

@@ -44,7 +44,7 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       ownership.reload
       expect(ownership.current?).to be_falsey
       expect(ownership2.send_email).to be_truthy
-      expect(ownership2.calculated_organization).to be_blank
+      expect(ownership2.organization).to be_blank
       expect(ownership2.calculated_send_email).to be_truthy
       ActionMailer::Base.deliveries = []
       EmailOwnershipInvitationWorker.new.perform(ownership2.id)

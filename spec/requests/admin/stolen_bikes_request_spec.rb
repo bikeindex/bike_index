@@ -4,9 +4,8 @@ base_url = "/admin/stolen_bikes"
 RSpec.describe Admin::StolenBikesController, type: :request do
   context "given a logged-in superuser" do
     include_context :request_spec_logged_in_as_superuser
-    let(:bike) { FactoryBot.create(:stolen_bike) }
-    let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike) }
-    let(:stolen_record) { bike.current_stolen_record }
+    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+    let!(:stolen_record) { bike.current_stolen_record }
 
     describe "index" do
       it "renders" do
@@ -95,8 +94,6 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       it "updates the bike and calls update_ownership and serial_normalizer" do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-        ownership = FactoryBot.create(:ownership)
-        bike = ownership.bike
         put "#{base_url}/#{bike.id}", params: {bike: {serial_number: "stuff"}}
         expect(response).to redirect_to(:edit_admin_stolen_bike)
         expect(flash[:success]).to be_present
