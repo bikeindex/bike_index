@@ -31,295 +31,295 @@ RSpec.describe BulkImportWorker, type: :job do
     file
   end
 
-  describe "perform" do
-    context "bulk import already processed" do
-      let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "finished") }
-      it "returns true" do
-        allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
-        expect(instance).to_not receive(:register_bike)
-        instance.perform(bulk_import.id)
-      end
-    end
-    context "bulk import ascend no org" do
-      let(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
-      it "returns enqueues email, returns true" do
-        Sidekiq::Worker.clear_all
-        bulk_import.reload
-        expect(bulk_import.import_errors?).to be_falsey
-        expect(instance).to_not receive(:register_bike)
-        expect {
-          instance.perform(bulk_import.id)
-        }.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
-        bulk_import.reload
-        expect(bulk_import.pending?).to be_truthy
-        expect(bulk_import.import_errors?).to be_truthy
-        expect(UnknownOrganizationForAscendImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
-      end
-    end
-    context "erroring" do
-      let!(:color) { FactoryBot.create(:color, name: "White") }
-      after { tempfile.close && tempfile.unlink }
+  # describe "perform" do
+  #   context "bulk import already processed" do
+  #     let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "finished") }
+  #     it "returns true" do
+  #       allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
+  #       expect(instance).to_not receive(:register_bike)
+  #       instance.perform(bulk_import.id)
+  #     end
+  #   end
+  #   context "bulk import ascend no org" do
+  #     let(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
+  #     it "returns enqueues email, returns true" do
+  #       Sidekiq::Worker.clear_all
+  #       bulk_import.reload
+  #       expect(bulk_import.import_errors?).to be_falsey
+  #       expect(instance).to_not receive(:register_bike)
+  #       expect {
+  #         instance.perform(bulk_import.id)
+  #       }.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
+  #       bulk_import.reload
+  #       expect(bulk_import.pending?).to be_truthy
+  #       expect(bulk_import.import_errors?).to be_truthy
+  #       expect(UnknownOrganizationForAscendImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
+  #     end
+  #   end
+  #   context "erroring" do
+  #     let!(:color) { FactoryBot.create(:color, name: "White") }
+  #     after { tempfile.close && tempfile.unlink }
 
-      def bike_matches_target(bike)
-        expect(bike.manufacturer).to eq Manufacturer.other
-        expect(bike.manufacturer_other).to eq "Surly"
-        expect(bike.primary_frame_color).to eq color
-        expect(bike.frame_size).to eq "19in"
-        expect(bike.serial_number).to eq "ZZZZ"
-        expect(bike.owner_email).to eq "test2@bikeindex.org"
-        expect(bike.description).to eq "Midnight Special"
-      end
+  #     def bike_matches_target(bike)
+  #       expect(bike.manufacturer).to eq Manufacturer.other
+  #       expect(bike.manufacturer_other).to eq "Surly"
+  #       expect(bike.primary_frame_color).to eq color
+  #       expect(bike.frame_size).to eq "19in"
+  #       expect(bike.serial_number).to eq "ZZZZ"
+  #       expect(bike.owner_email).to eq "test2@bikeindex.org"
+  #       expect(bike.description).to eq "Midnight Special"
+  #     end
 
-      context "valid bike and an invalid bike with substituted header" do
-        let(:target_line_error) { [2, ["Owner email can't be blank"]] }
-        let(:csv_lines) do
-          [
-            "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
-            '"Blah","Blah","Surly","","","XXXXX","","",""',
-            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
-          ]
-        end
-        it "registers bike, adds row that is an error" do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
-          expect {
-            instance.perform(bulk_import.id)
-          }.to change(Bike, :count).by 1
-          bulk_import.reload
-          expect(bulk_import.line_import_errors).to eq([target_line_error])
-          expect(bulk_import.headers).to eq(%w[description vendor manufacturer color frame_size serial_number customer_last_name customer_first_name owner_email])
-          expect(bulk_import.import_errors).to eq({line: [target_line_error]}.as_json)
-          expect(bulk_import.bikes.count).to eq 1
-          expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
-        end
-      end
-      context "invalid file" do
-        let(:csv_lines) do
-          [
-            "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
-            '"\"","\'","Surly","","","XXXXX","","","","',
-            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
-          ]
-        end
-        it "stores error line, resumes post errored line successfully" do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
-          # It should throw an error and not create a bike
-          expect {
-            expect { instance.perform(bulk_import.id) }.to raise_error(CSV::MalformedCSVError)
-          }.to change(Bike, :count).by 0
-          bulk_import.reload
-          expect(bulk_import.progress).to eq "finished"
-          expect(bulk_import.line_import_errors).to be_nil
-          expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
-          # Note: we don't have auto-resume built in right now. You have to manually go in through the console
-          # and set the progress to be "ongoing", then re-enqueue
-          bulk_import.update_attribute :progress, "ongoing"
-          expect {
-            instance.perform(bulk_import.id)
-          }.to change(Bike, :count).by 1
-          bulk_import.reload
-          expect(bulk_import.bikes.count).to eq 1
-          bike_matches_target(bulk_import.bikes.first)
-          # And make sure it hasn't updated the file_import_errors
-          expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
-          expect(bulk_import.progress).to eq "finished"
-        end
-      end
-    end
-    context "empty import" do
-      let(:csv_lines) { [sample_csv_lines[0].join(","), ""] }
-      it "marks the import empty" do
-        allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
-        expect {
-          instance.perform(bulk_import.id)
-        }.to_not change(Bike, :count)
-        bulk_import.reload
-        expect(bulk_import.no_bikes?).to be_truthy
-        expect(bulk_import.import_errors?).to be_falsey
-        expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
-      end
-      context "ascend import" do
-        let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
-        let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop", pos_kind: "ascend_pos") }
-        it "resolves error, assigns organization and processes" do
-          bulk_import.check_ascend_import_processable!
-          bulk_import.reload
-          expect(bulk_import.import_errors?).to be_truthy
-          # Create organization here
-          expect(organization).to be_present
-          expect(bulk_import.organization).to_not be_present
-          expect {
-            instance.perform(bulk_import.id)
-          }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
-          bulk_import.reload
-          expect(bulk_import.no_bikes?).to be_truthy
-          expect(bulk_import.import_errors?).to be_falsey
-          expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
-          expect(bulk_import.organization_id).to eq organization.id
-          expect(bulk_import.creator).to eq organization.auto_user
-          # Only has bikes key - no ascend nil key
-          expect(bulk_import.import_errors.keys).to eq(["bikes"])
-        end
-      end
-    end
-    context "valid file" do
-      let!(:color_green) { FactoryBot.create(:color, name: "Green") }
-      let!(:color_white) { FactoryBot.create(:color, name: "White") }
-      let!(:surly) { FactoryBot.create(:manufacturer, name: "Surly") }
-      let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
-      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv" }
-      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
-      # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
-      let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
-      it "creates the bikes, doesn't have any errors" do
-        # In production, we actually use remote files rather than local files.
-        # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
-        VCR.use_cassette("bulk_import-perform-success") do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
-          expect {
-            instance.perform(bulk_import.id)
-            # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-            pp bulk_import.import_errors if bulk_import.reload.blocking_error?
-          }.to change(Bike, :count).by 2
-          bulk_import.reload
-          expect(bulk_import.progress).to eq "finished"
-          expect(bulk_import.bikes.count).to eq 2
-          expect(bulk_import.file_import_errors).to_not be_present
+  #     context "valid bike and an invalid bike with substituted header" do
+  #       let(:target_line_error) { [2, ["Owner email can't be blank"]] }
+  #       let(:csv_lines) do
+  #         [
+  #           "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
+  #           '"Blah","Blah","Surly","","","XXXXX","","",""',
+  #           '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
+  #         ]
+  #       end
+  #       it "registers bike, adds row that is an error" do
+  #         allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+  #         expect {
+  #           instance.perform(bulk_import.id)
+  #         }.to change(Bike, :count).by 1
+  #         bulk_import.reload
+  #         expect(bulk_import.line_import_errors).to eq([target_line_error])
+  #         expect(bulk_import.headers).to eq(%w[description vendor manufacturer color frame_size serial_number customer_last_name customer_first_name owner_email])
+  #         expect(bulk_import.import_errors).to eq({line: [target_line_error]}.as_json)
+  #         expect(bulk_import.bikes.count).to eq 1
+  #         expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
+  #       end
+  #     end
+  #     context "invalid file" do
+  #       let(:csv_lines) do
+  #         [
+  #           "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
+  #           '"\"","\'","Surly","","","XXXXX","","","","',
+  #           '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
+  #         ]
+  #       end
+  #       it "stores error line, resumes post errored line successfully" do
+  #         allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+  #         # It should throw an error and not create a bike
+  #         expect {
+  #           expect { instance.perform(bulk_import.id) }.to raise_error(CSV::MalformedCSVError)
+  #         }.to change(Bike, :count).by 0
+  #         bulk_import.reload
+  #         expect(bulk_import.progress).to eq "finished"
+  #         expect(bulk_import.line_import_errors).to be_nil
+  #         expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
+  #         # Note: we don't have auto-resume built in right now. You have to manually go in through the console
+  #         # and set the progress to be "ongoing", then re-enqueue
+  #         bulk_import.update_attribute :progress, "ongoing"
+  #         expect {
+  #           instance.perform(bulk_import.id)
+  #         }.to change(Bike, :count).by 1
+  #         bulk_import.reload
+  #         expect(bulk_import.bikes.count).to eq 1
+  #         bike_matches_target(bulk_import.bikes.first)
+  #         # And make sure it hasn't updated the file_import_errors
+  #         expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
+  #         expect(bulk_import.progress).to eq "finished"
+  #       end
+  #     end
+  #   end
+  #   context "empty import" do
+  #     let(:csv_lines) { [sample_csv_lines[0].join(","), ""] }
+  #     it "marks the import empty" do
+  #       allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+  #       expect {
+  #         instance.perform(bulk_import.id)
+  #       }.to_not change(Bike, :count)
+  #       bulk_import.reload
+  #       expect(bulk_import.no_bikes?).to be_truthy
+  #       expect(bulk_import.import_errors?).to be_falsey
+  #       expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
+  #     end
+  #     context "ascend import" do
+  #       let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
+  #       let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop", pos_kind: "ascend_pos") }
+  #       it "resolves error, assigns organization and processes" do
+  #         bulk_import.check_ascend_import_processable!
+  #         bulk_import.reload
+  #         expect(bulk_import.import_errors?).to be_truthy
+  #         # Create organization here
+  #         expect(organization).to be_present
+  #         expect(bulk_import.organization).to_not be_present
+  #         expect {
+  #           instance.perform(bulk_import.id)
+  #         }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
+  #         bulk_import.reload
+  #         expect(bulk_import.no_bikes?).to be_truthy
+  #         expect(bulk_import.import_errors?).to be_falsey
+  #         expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
+  #         expect(bulk_import.organization_id).to eq organization.id
+  #         expect(bulk_import.creator).to eq organization.auto_user
+  #         # Only has bikes key - no ascend nil key
+  #         expect(bulk_import.import_errors.keys).to eq(["bikes"])
+  #       end
+  #     end
+  #   end
+  #   context "valid file" do
+  #     let!(:color_green) { FactoryBot.create(:color, name: "Green") }
+  #     let!(:color_white) { FactoryBot.create(:color, name: "White") }
+  #     let!(:surly) { FactoryBot.create(:manufacturer, name: "Surly") }
+  #     let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
+  #     let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv" }
+  #     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+  #     # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+  #     let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
+  #     it "creates the bikes, doesn't have any errors" do
+  #       # In production, we actually use remote files rather than local files.
+  #       # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
+  #       VCR.use_cassette("bulk_import-perform-success") do
+  #         allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
+  #         expect {
+  #           instance.perform(bulk_import.id)
+  #           # This test is being flaky! Add debug printout #2101 (actually after, but still...)
+  #           pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+  #         }.to change(Bike, :count).by 2
+  #         bulk_import.reload
+  #         expect(bulk_import.progress).to eq "finished"
+  #         expect(bulk_import.bikes.count).to eq 2
+  #         expect(bulk_import.file_import_errors).to_not be_present
 
-          bike1 = bulk_import.bikes.reorder(:created_at).first
-          expect(bike1.primary_frame_color).to eq color_green
-          expect(bike1.serial_number).to eq "xyz_test"
-          expect(bike1.owner_email).to eq "test@bikeindex.org"
-          expect(bike1.manufacturer).to eq trek
-          expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
-          expect(bike1.current_ownership.status).to eq "status_with_owner"
-          expect(bike1.creator).to eq organization.auto_user
-          expect(bike1.creation_organization).to eq organization
-          expect(bike1.year).to eq 2019
-          expect(bike1.description).to eq "I love this, it's my favorite"
-          expect(bike1.frame_size).to eq "29in"
-          expect(bike1.frame_size_unit).to eq "in"
-          expect(bike1.public_images.count).to eq 0
-          expect(bike1.phone).to eq("8887776666")
-          # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
-          expect(bike1.registration_address).to eq({"street" => default_location[:address]})
-          expect(bike1.registration_address_source).to eq "initial_creation"
-          target_address_hash = default_location.slice(:latitude, :longitude).merge(street: default_location[:address])
-          expect(bike1.address_hash.reject { |_k, v| v.blank? }.to_h).to eq target_address_hash.as_json
-          expect(bike1.extra_registration_number).to be_nil
-          expect(bike1.owner_name).to be_nil
+  #         bike1 = bulk_import.bikes.reorder(:created_at).first
+  #         expect(bike1.primary_frame_color).to eq color_green
+  #         expect(bike1.serial_number).to eq "xyz_test"
+  #         expect(bike1.owner_email).to eq "test@bikeindex.org"
+  #         expect(bike1.manufacturer).to eq trek
+  #         expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
+  #         expect(bike1.current_ownership.status).to eq "status_with_owner"
+  #         expect(bike1.creator).to eq organization.auto_user
+  #         expect(bike1.creation_organization).to eq organization
+  #         expect(bike1.year).to eq 2019
+  #         expect(bike1.description).to eq "I love this, it's my favorite"
+  #         expect(bike1.frame_size).to eq "29in"
+  #         expect(bike1.frame_size_unit).to eq "in"
+  #         expect(bike1.public_images.count).to eq 0
+  #         expect(bike1.phone).to eq("8887776666")
+  #         # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
+  #         expect(bike1.registration_address).to eq({"street" => default_location[:address]})
+  #         expect(bike1.registration_address_source).to eq "initial_creation"
+  #         target_address_hash = default_location.slice(:latitude, :longitude).merge(street: default_location[:address])
+  #         expect(bike1.address_hash.reject { |_k, v| v.blank? }.to_h).to eq target_address_hash.as_json
+  #         expect(bike1.extra_registration_number).to be_nil
+  #         expect(bike1.owner_name).to be_nil
 
-          bike2 = bulk_import.bikes.reorder(:created_at).last
-          expect(bike2.primary_frame_color).to eq color_white
-          expect(bike2.serial_number).to eq "example"
-          expect(bike2.owner_email).to eq "test2@bikeindex.org"
-          expect(bike2.manufacturer).to eq surly
-          expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
-          expect(bike2.current_ownership.registration_info).to eq({"user_name" => "Sally"})
-          expect(bike2.creator).to eq organization.auto_user
-          expect(bike2.creation_organization).to eq organization
-          expect(bike2.year).to_not be_present
-          expect(bike2.public_images.count).to eq 1
-          expect(bike2.frame_size).to eq "m"
-          expect(bike2.frame_size_unit).to eq "ordinal"
-          expect(bike2.registration_address).to_not be_present
-          expect(bike2.phone).to be_nil
-          expect(bike2.extra_registration_number).to eq "extra serial number"
-          expect(bike2.owner_name).to eq "Sally"
-        end
-      end
-      context "valid file, kind: impounded" do
-        let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
-        let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
-        let(:organization) { impound_configuration.organization }
-        let!(:state) { FactoryBot.create(:state_california) }
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
-        let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
-        include_context :geocoder_real
-        it "creates the bikes and impound records" do
-          VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do
-            allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
-            expect {
-              instance.perform(bulk_import.id)
-              # This test is being flaky! Add debug printout #2101
-              pp bulk_import.import_errors if bulk_import.reload.blocking_error?
-            }.to change(Bike, :count).by 2
-            bulk_import.reload
-            expect(bulk_import.progress).to eq "finished"
-            expect(bulk_import.bikes.count).to eq 2
-            expect(bulk_import.file_import_errors).to_not be_present
-            expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
+  #         bike2 = bulk_import.bikes.reorder(:created_at).last
+  #         expect(bike2.primary_frame_color).to eq color_white
+  #         expect(bike2.serial_number).to eq "example"
+  #         expect(bike2.owner_email).to eq "test2@bikeindex.org"
+  #         expect(bike2.manufacturer).to eq surly
+  #         expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
+  #         expect(bike2.current_ownership.registration_info).to eq({"user_name" => "Sally"})
+  #         expect(bike2.creator).to eq organization.auto_user
+  #         expect(bike2.creation_organization).to eq organization
+  #         expect(bike2.year).to_not be_present
+  #         expect(bike2.public_images.count).to eq 1
+  #         expect(bike2.frame_size).to eq "m"
+  #         expect(bike2.frame_size_unit).to eq "ordinal"
+  #         expect(bike2.registration_address).to_not be_present
+  #         expect(bike2.phone).to be_nil
+  #         expect(bike2.extra_registration_number).to eq "extra serial number"
+  #         expect(bike2.owner_name).to eq "Sally"
+  #       end
+  #     end
+  #     context "valid file, kind: impounded" do
+  #       let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
+  #       let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
+  #       let(:organization) { impound_configuration.organization }
+  #       let!(:state) { FactoryBot.create(:state_california) }
+  #       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+  #       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+  #       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
+  #       include_context :geocoder_real
+  #       it "creates the bikes and impound records" do
+  #         VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do
+  #           allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
+  #           expect {
+  #             instance.perform(bulk_import.id)
+  #             # This test is being flaky! Add debug printout #2101
+  #             pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+  #           }.to change(Bike, :count).by 2
+  #           bulk_import.reload
+  #           expect(bulk_import.progress).to eq "finished"
+  #           expect(bulk_import.bikes.count).to eq 2
+  #           expect(bulk_import.file_import_errors).to_not be_present
+  #           expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
 
-            bike1 = bulk_import.bikes.reorder(:created_at).first
-            expect(bike1.primary_frame_color).to eq color_green
-            expect(bike1.serial_number).to eq "xyz_test"
-            expect(bike1.owner_email).to eq "test@bikeindex.org"
-            expect(bike1.manufacturer).to eq trek
-            expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
-            expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect(bike1.creator).to eq organization.auto_user
-            expect(bike1.creation_organization).to eq organization
-            expect(bike1.year).to eq 2019
-            expect(bike1.description).to eq "I love this, it's my favorite"
-            expect(bike1.frame_size).to eq "29in"
-            expect(bike1.frame_size_unit).to eq "in"
-            expect(bike1.public_images.count).to eq 0
-            expect(bike1.phone).to eq("8887776666")
-            expect(bike1.registration_address).to be_blank
-            expect(bike1.extra_registration_number).to be_nil
-            expect(bike1.owner_name).to be_nil
-            expect(bike1.status).to eq "status_impounded"
-            expect(bike1.created_by_notification_or_impounding?).to be_truthy
-            bike1_impound_record = bike1.current_impound_record
-            expect(bike1_impound_record).to be_present
-            expect(bike1_impound_record.impounded_description).to eq "It was locked to a handicap railing"
-            expect(bike1_impound_record.display_id).to eq "2020-33333"
-            expect(bike1_impound_record.unregistered_bike).to be_truthy
-            expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
-            expect(bike1_impound_record.unregistered_bike).to be_truthy
-            expect(bike1_impound_record.street).to eq "1409 Martin Luther King Jr Way"
-            expect(bike1_impound_record.city).to eq "Berkeley"
-            expect(bike1_impound_record.zipcode).to eq "94709" # NOTE: the zipcode that is entered is 94710
-            expect(bike1_impound_record.state_id).to eq state.id
-            expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
-            expect(bike1.address_hash).to eq bike1_impound_record.address_hash
+  #           bike1 = bulk_import.bikes.reorder(:created_at).first
+  #           expect(bike1.primary_frame_color).to eq color_green
+  #           expect(bike1.serial_number).to eq "xyz_test"
+  #           expect(bike1.owner_email).to eq "test@bikeindex.org"
+  #           expect(bike1.manufacturer).to eq trek
+  #           expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
+  #           expect(bike1.current_ownership.status).to eq "status_impounded"
+  #           expect(bike1.creator).to eq organization.auto_user
+  #           expect(bike1.creation_organization).to eq organization
+  #           expect(bike1.year).to eq 2019
+  #           expect(bike1.description).to eq "I love this, it's my favorite"
+  #           expect(bike1.frame_size).to eq "29in"
+  #           expect(bike1.frame_size_unit).to eq "in"
+  #           expect(bike1.public_images.count).to eq 0
+  #           expect(bike1.phone).to eq("8887776666")
+  #           expect(bike1.registration_address).to be_blank
+  #           expect(bike1.extra_registration_number).to be_nil
+  #           expect(bike1.owner_name).to be_nil
+  #           expect(bike1.status).to eq "status_impounded"
+  #           expect(bike1.created_by_notification_or_impounding?).to be_truthy
+  #           bike1_impound_record = bike1.current_impound_record
+  #           expect(bike1_impound_record).to be_present
+  #           expect(bike1_impound_record.impounded_description).to eq "It was locked to a handicap railing"
+  #           expect(bike1_impound_record.display_id).to eq "2020-33333"
+  #           expect(bike1_impound_record.unregistered_bike).to be_truthy
+  #           expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
+  #           expect(bike1_impound_record.unregistered_bike).to be_truthy
+  #           expect(bike1_impound_record.street).to eq "1409 Martin Luther King Jr Way"
+  #           expect(bike1_impound_record.city).to eq "Berkeley"
+  #           expect(bike1_impound_record.zipcode).to eq "94709" # NOTE: the zipcode that is entered is 94710
+  #           expect(bike1_impound_record.state_id).to eq state.id
+  #           expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
+  #           expect(bike1.address_hash).to eq bike1_impound_record.address_hash
 
-            bike2 = bulk_import.bikes.reorder(:created_at).last
-            expect(bike2.primary_frame_color).to eq color_white
-            expect(bike2.serial_number).to eq "example"
-            expect(bike2.owner_email).to eq "test2@bikeindex.org"
-            expect(bike2.manufacturer).to eq surly
-            expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
-            expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect(bike2.creator).to eq organization.auto_user
-            expect(bike2.creation_organization).to eq organization
-            expect(bike2.year).to_not be_present
-            expect(bike2.public_images.count).to eq 1
-            expect(bike2.frame_size).to eq "m"
-            expect(bike2.frame_size_unit).to eq "ordinal"
-            expect(bike2.registration_address).to_not be_present
-            expect(bike2.phone).to be_nil
-            expect(bike2.extra_registration_number).to eq "extra serial number"
-            expect(bike2.owner_name).to eq "Sally"
-            expect(bike2.status).to eq "status_impounded"
-            expect(bike2.created_by_notification_or_impounding?).to be_truthy
-            bike2_impound_record = bike2.current_impound_record
-            expect(bike2_impound_record).to be_present
-            expect(bike2_impound_record.impounded_description).to eq "Appears to be abandoned"
-            expect(bike2_impound_record.display_id).to eq "1"
-            expect(bike2_impound_record.unregistered_bike).to be_truthy
-            expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
-            expect(bike2_impound_record.street).to eq "327 17th St"
-            expect(bike2_impound_record.city).to eq "Oakland"
-            expect(bike2_impound_record.zipcode).to eq "94612"
-            expect(bike2_impound_record.state_id).to eq state.id
-            expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
-            expect(bike2.address_hash).to eq bike2_impound_record.address_hash
-          end
-        end
-      end
-    end
-  end
+  #           bike2 = bulk_import.bikes.reorder(:created_at).last
+  #           expect(bike2.primary_frame_color).to eq color_white
+  #           expect(bike2.serial_number).to eq "example"
+  #           expect(bike2.owner_email).to eq "test2@bikeindex.org"
+  #           expect(bike2.manufacturer).to eq surly
+  #           expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
+  #           expect(bike1.current_ownership.status).to eq "status_impounded"
+  #           expect(bike2.creator).to eq organization.auto_user
+  #           expect(bike2.creation_organization).to eq organization
+  #           expect(bike2.year).to_not be_present
+  #           expect(bike2.public_images.count).to eq 1
+  #           expect(bike2.frame_size).to eq "m"
+  #           expect(bike2.frame_size_unit).to eq "ordinal"
+  #           expect(bike2.registration_address).to_not be_present
+  #           expect(bike2.phone).to be_nil
+  #           expect(bike2.extra_registration_number).to eq "extra serial number"
+  #           expect(bike2.owner_name).to eq "Sally"
+  #           expect(bike2.status).to eq "status_impounded"
+  #           expect(bike2.created_by_notification_or_impounding?).to be_truthy
+  #           bike2_impound_record = bike2.current_impound_record
+  #           expect(bike2_impound_record).to be_present
+  #           expect(bike2_impound_record.impounded_description).to eq "Appears to be abandoned"
+  #           expect(bike2_impound_record.display_id).to eq "1"
+  #           expect(bike2_impound_record.unregistered_bike).to be_truthy
+  #           expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
+  #           expect(bike2_impound_record.street).to eq "327 17th St"
+  #           expect(bike2_impound_record.city).to eq "Oakland"
+  #           expect(bike2_impound_record.zipcode).to eq "94612"
+  #           expect(bike2_impound_record.state_id).to eq state.id
+  #           expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
+  #           expect(bike2.address_hash).to eq bike2_impound_record.address_hash
+  #         end
+  #       end
+  #     end
+  #   end
+  # end
 
   context "with assigned bulk import" do
     before { instance.bulk_import = bulk_import }

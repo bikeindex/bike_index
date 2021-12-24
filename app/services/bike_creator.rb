@@ -34,6 +34,8 @@ class BikeCreator
     @location = location
   end
 
+  attr_reader :b_param, :bike
+
   def build_bike(new_attrs = {})
     bike = Bike.new(@b_param.safe_bike_attrs(new_attrs))
     # Use bike status because it takes into account new_attrs
@@ -67,19 +69,6 @@ class BikeCreator
   end
 
   private
-
-  def ownership_creation_attributes
-    {
-      is_new: @b_param.is_new,
-      pos_kind: @b_param.pos_kind,
-      origin: @b_param.origin,
-      status: @b_param.status,
-      bulk_import_id: @b_param.params["bulk_import_id"],
-      creator_id: @b_param.creator_id,
-      can_edit_claimed: @bike.creation_organization_id.present?,
-      organization_id: @bike.creation_organization_id
-    }.merge(registration_info: @b_param.registration_info_attrs)
-  end
 
   # Previously all of this stuff was public.
   # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
@@ -142,7 +131,9 @@ class BikeCreator
   def save_bike(bike)
     bike.set_location_info
     bike.save
-    @bike = associate(bike)
+    @bike = bike
+    ownership = create_ownership(@b_param, @bike)
+    @bike = associate(@bike, ownership) unless @bike.errors.any?
     validate_record(@bike)
     # TODO: part of #2110 - test this based on ownership?
     # We don't want to create an extra creation_state if there was a duplicate.
@@ -232,11 +223,8 @@ class BikeCreator
     bike
   end
 
-  # Previously BikeCreatorAssociator
-  def associate(bike)
-    # Create parking_notification first
+  def associate(bike, ownership)
     create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
-    ownership = create_ownership(bike)
     create_bike_organizations(ownership)
     ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
     bike.create_normalized_serial_segments
@@ -248,9 +236,22 @@ class BikeCreator
     bike
   end
 
-  def create_ownership(bike)
-    ownership = bike.ownerships.new(creator: @b_param.creator, skip_email: @b_param.skip_email?)
-    ownership.attributes = ownership_creation_attributes
+  def ownership_creation_attributes(b_param, bike)
+    {
+      is_new: b_param.is_new,
+      pos_kind: b_param.pos_kind,
+      origin: b_param.origin,
+      status: b_param.status,
+      bulk_import_id: b_param.params["bulk_import_id"],
+      creator_id: b_param.creator_id,
+      can_edit_claimed: bike.creation_organization_id.present?,
+      organization_id: bike.creation_organization_id
+    }.merge(registration_info: b_param.registration_info_attrs)
+  end
+
+  def create_ownership(b_param, bike)
+    ownership = bike.ownerships.new(creator: b_param.creator, skip_email: b_param.skip_email?)
+    ownership.attributes = ownership_creation_attributes(b_param, bike)
     unless ownership.save
       ownership.errors.messages.each { |msg| bike.errors.add(msg[0], msg[1][0]) }
     end

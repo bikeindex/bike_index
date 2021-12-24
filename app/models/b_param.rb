@@ -489,7 +489,7 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     bike.merge(status: status).merge(new_attrs.as_json)
-      .select { |_k, v| v.present? }
+      .select { |_k, v| v.present? || v == false }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,
