@@ -92,7 +92,7 @@ class Bike < ApplicationRecord
 
   scope :without_location, -> { where(latitude: nil) }
   scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
-  scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
+  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
@@ -354,10 +354,6 @@ class Bike < ApplicationRecord
     type.split(/(\s|-)/).map(&:capitalize).join("")
   end
 
-  def user_hidden
-    hidden && current_ownership&.user_hidden
-  end
-
   def email_visible_for?(org)
     organizations.include?(org)
   end
@@ -519,7 +515,7 @@ class Bike < ApplicationRecord
   end
 
   def visible_by?(passed_user = nil)
-    return true unless hidden || deleted?
+    return true unless user_hidden || deleted?
     if passed_user.present?
       return true if passed_user.superuser?
       return false if deleted?
@@ -632,13 +628,12 @@ class Bike < ApplicationRecord
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
     if marked_user_hidden.present? && ParamsNormalizer.boolean(marked_user_hidden)
-      self.hidden = true
+      self.user_hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
     elsif marked_user_unhidden.present? && ParamsNormalizer.boolean(marked_user_unhidden)
-      self.hidden = false
+      self.user_hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
-    true
   end
 
   def normalize_emails
