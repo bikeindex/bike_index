@@ -1371,13 +1371,6 @@ RSpec.describe Bike, type: :model do
         allow(bike).to receive(:first_ownership) { ownership }
         expect(bike.phone).to eq "888.888.8888"
       end
-      # TODO: part of #2110 - it's ok to keep using ownerships!
-      context "not first ownerships" do
-        it "is the users " do
-          allow(bike).to receive(:first_ownership) { Ownership.new } # A different ownership
-          expect(bike.phone).to be_nil
-        end
-      end
     end
     context "creator" do
       let(:ownership) { Ownership.new(creator: user) }
