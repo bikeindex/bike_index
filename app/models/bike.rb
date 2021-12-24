@@ -85,6 +85,11 @@ class Bike < ApplicationRecord
   enum propulsion_type: PropulsionType::SLUGS
   enum status: STATUS_ENUM
 
+  delegate :bulk_import, :claimed?, :creation_description,
+    :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
+    :pos_kind, :registration_info, :user, :user_id,
+    to: :current_ownership, allow_nil: true
+
   scope :without_location, -> { where(latitude: nil) }
   scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
@@ -288,54 +293,11 @@ class Bike < ApplicationRecord
     CredibilityScorer.new(self)
   end
 
-  def creation_description
-    current_ownership&.creation_description
-  end
-
-  def bulk_import
-    current_ownership&.bulk_import
-  end
-
-  def pos_kind
-    current_ownership&.pos_kind
-  end
-
-  def registration_info
-    current_ownership&.registration_info || {}
-  end
-
-  def creator_unregistered_parking_notification?
-    current_ownership&.creator_unregistered_parking_notification?
-  end
-
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
     return false if current_ownership.blank?
     %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
       current_ownership.status == "status_impounded"
-  end
-
-  def pos?
-    pos_kind.present? && pos_kind != "no_pos"
-  end
-
-  # Use present? to ensure true/false rather than nil
-  def claimed?
-    current_ownership.present? && current_ownership.claimed.present?
-  end
-
-  # owner resolves to creator if user isn't present, or organization auto user. shouldn't ever be nil
-  def owner
-    current_ownership&.owner
-  end
-
-  # This can be nil!
-  def user
-    current_ownership&.user
-  end
-
-  def user_id
-    current_ownership&.user_id
   end
 
   def user?
@@ -432,11 +394,6 @@ class Bike < ApplicationRecord
 
   def no_serial?
     made_without_serial? || serial_unknown?
-  end
-
-  # This is actually user.name - because user can be nil
-  def owner_name
-    current_ownership.owner_name
   end
 
   def first_ownership
@@ -543,7 +500,7 @@ class Bike < ApplicationRecord
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
     # Only grab the phone number from registration_info if this is the first_ownership (otherwise it should be user, etc)
-    @phone ||= registration_info["phone"] if first_ownership?
+    @phone ||= registration_info&.dig("phone") if first_ownership?
     @phone
   end
 
@@ -844,7 +801,6 @@ class Bike < ApplicationRecord
   def organization_affiliation=(val)
     conditional_information["organization_affiliation"] = val
     current_ownership&.update_registration_information("organization_affiliation", val)
-    val
   end
 
   def organization_affiliation
@@ -854,7 +810,6 @@ class Bike < ApplicationRecord
   def student_id=(val)
     conditional_information["student_id"] = val
     current_ownership&.update_registration_information("student_id", val)
-    val
   end
 
   def student_id

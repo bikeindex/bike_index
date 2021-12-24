@@ -133,6 +133,7 @@ class Ownership < ApplicationRecord
 
   def update_registration_information(key, value)
     update(registration_info: registration_info.merge(key => value))
+    value
   end
 
   def claim_message
