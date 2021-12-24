@@ -10,6 +10,7 @@ class Ownership < ApplicationRecord
     organization_form: 7,
     creator_unregistered_parking_notification: 8,
     impound_import: 9,
+    impound_process: 11,
     transferred_ownership: 10
   }.freeze
 
@@ -72,7 +73,7 @@ class Ownership < ApplicationRecord
   end
 
   def new_registration?
-    return true if first?
+    return true if first? || impound_record_id.present?
     previous_ownership.present? && previous_ownership.organization_pre_registration?
   end
 
@@ -134,19 +135,6 @@ class Ownership < ApplicationRecord
     update(registration_info: registration_info.merge(key => value))
   end
 
-  def calculated_organization
-    return organization if organization.present?
-    # If this is the first ownership, use the creation organization
-    return bike.creation_organization if first?
-    # TODO: part of #2110 - switch to referencing previous ownership.organization_pre_registration
-    # Some organizations pre-register bikes and then transfer them.
-    if second? && creator&.member_of?(bike.creation_organization)
-      return bike.creation_organization
-    end
-    # Otherwise, this is only an organization ownership if it's an impound transfer
-    impound_record&.organization
-  end
-
   def claim_message
     return nil if claimed? || !current? || user.present?
     new_registration? ? "new_registration" : "transferred_registration"
@@ -179,11 +167,18 @@ class Ownership < ApplicationRecord
       self.claimed = true if self_made?
       self.token ||= SecurityTokenizer.new_short_token unless claimed?
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
+      self.organization_id ||= impound_record&.organization_id
       self.organization_pre_registration ||= calculated_organization_pre_registration?
+      # Would this be better in BikeCreator? Maybe, but specs depend on this always being set
+      self.origin ||= if impound_record_id.present?
+        "impound_process"
+      elsif first?
+        "web"
+      else
+        "transferred_ownership"
+      end
     end
     self.registration_info = cleaned_registration_info
-    # Would this be better in BikeCreator? Maybe, but specs depend on this always being set
-    self.origin ||= "web"
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track

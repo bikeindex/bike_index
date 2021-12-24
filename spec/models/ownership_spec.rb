@@ -167,7 +167,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership3.prior_ownerships.pluck(:id)).to match_array([ownership.id, ownership2.id])
           expect(ownership3.first?).to be_falsey
           expect(ownership3.second?).to be_falsey
-          expect(ownership2.new_registration?).to be_falsey
+          expect(ownership3.new_registration?).to be_falsey
         end
       end
     end
@@ -183,6 +183,37 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.claimed?).to be_falsey
         expect(ownership.new_registration?).to be_truthy
         expect(ownership.claim_message).to be_blank
+      end
+    end
+    context "impound_record" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: email) }
+      let!(:ownership1) { bike.ownerships.first }
+      let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+      let(:new_email) { "impound_user@stuff.com" }
+      it "is new_registration" do
+        expect(bike.reload.claimed?).to be_truthy
+        expect(bike.status).to eq "status_with_owner"
+        expect(ownership1.reload.user).to be_present
+        expect(ownership1.new_registration?).to be_truthy
+        expect(ownership1.origin).to eq "web"
+        expect(ownership2.reload.claimed?).to be_falsey
+        expect(ownership2.new_registration?).to be_falsey
+        expect(ownership2.origin).to eq "transferred_ownership"
+        expect(ownership2.claim_message).to eq "transferred_registration"
+
+        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        expect(bike.reload.status).to eq "status_impounded"
+        FactoryBot.create(:impound_record_update, impound_record: impound_record, kind: "transferred_to_new_owner", transfer_email: new_email)
+        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ownership3 = impound_record.reload.ownership
+        expect(ownership3.previous_ownership_id).to eq ownership2.id
+        expect(ownership3.origin).to eq "impound_process"
+        expect(ownership3.owner_email).to eq new_email
+        expect(ownership3.new_registration?).to be_truthy
+        expect(ownership3.claim_message).to eq "new_registration"
+        expect(bike.reload.status).to eq "status_with_owner"
+        expect(bike.owner_email).to eq new_email
       end
     end
   end

@@ -3,11 +3,11 @@
 - skip_to_see ||= false
 
 %p
-  - if ownership.calculated_organization&.display_avatar?
-    = image_tag ownership.calculated_organization.avatar.url(:medium), class: "claim-message-org-avatar"
+  - if ownership.organization&.display_avatar?
+    = image_tag ownership.organization.avatar.url(:medium), class: "claim-message-org-avatar"
   %strong
-    - if ownership.calculated_organization.present?
-      = ownership.calculated_organization.name
+    - if ownership.organization.present?
+      = ownership.organization.name
     - elsif ownership.creator&.name.present?
       = ownership.creator.name
     - else

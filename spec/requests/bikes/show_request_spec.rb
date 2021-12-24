@@ -50,16 +50,18 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
   context "second ownership, from organization, with claim token" do
-    let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
-    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "new_user@stuff.com", creator: organization.auto_user) }
+    let(:auto_user) { FactoryBot.create(:user_confirmed) }
+    let(:organization) { FactoryBot.create(:organization, :with_auto_user, user: auto_user) }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: auto_user.email, creator: auto_user) }
     let!(:ownership1) { bike.ownerships.first }
-    let!(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: bike.owner_email) }
+    let!(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: "new_user@stuff.com") }
     let(:current_user) { nil }
     it "renders claim_message" do
-      ownership2.reload
-      expect(ownership2.second?).to be_truthy
+      expect(ownership1.reload.organization_pre_registration?).to be_truthy
+      expect(ownership2.reload.second?).to be_truthy
       expect(ownership2.current?).to be_truthy
       expect(ownership2.claimed?).to be_falsey
+      expect(ownership2.new_registration?).to be_truthy
       expect(ownership2.claim_message).to eq "new_registration"
       get "#{base_url}/#{bike.id}?t=#{ownership2.token}"
       expect(response).to render_template(:show)

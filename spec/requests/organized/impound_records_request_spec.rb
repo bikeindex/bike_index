@@ -204,7 +204,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(bike.status_with_owner?).to be_truthy
         expect(bike.ownerships.count).to eq 2
         expect(bike.current_ownership.impound_record).to eq impound_record
-        expect(bike.current_ownership.calculated_organization).to eq current_organization
+        expect(bike.current_ownership.organization).to eq current_organization
         expect(bike.current_ownership.owner_email).to eq "a@b.c"
         expect(bike.current_ownership.first?).to be_falsey
         expect(bike.current_ownership.new_registration?).to be_truthy
@@ -317,7 +317,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(bike.status_with_owner?).to be_truthy
           expect(bike.ownerships.count).to eq 2
           expect(bike.current_ownership.impound_record).to eq impound_record
-          expect(bike.current_ownership.calculated_organization).to eq current_organization
+          expect(bike.current_ownership.organization).to eq current_organization
           expect(bike.current_ownership.owner_email).to eq "example@school.edu"
           expect(bike.current_ownership.calculated_send_email).to be_truthy
         end

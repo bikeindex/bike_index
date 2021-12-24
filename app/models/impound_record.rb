@@ -7,6 +7,7 @@ class ImpoundRecord < ApplicationRecord
   belongs_to :location # organization location
 
   has_one :parking_notification
+  has_one :ownership
   has_many :impound_record_updates
   has_many :impound_claims
 
