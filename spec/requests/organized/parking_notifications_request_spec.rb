@@ -248,7 +248,6 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           bike.reload
           expect(bike.status).to eq "status_abandoned"
           expect(bike.serial_hidden?).to be_falsey
-          expect(bike.hidden).to be_falsey
           expect(bike.user_hidden).to be_falsey
           expect(bike.user).to be_present # Verify that user is present
         end

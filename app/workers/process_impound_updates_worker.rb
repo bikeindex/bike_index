@@ -28,7 +28,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
           owner_email: impound_record_update.transfer_email,
           is_for_sale: false,
           address_set_manually: false,
-          hidden: false)
+          marked_user_hidden: false)
         ownership = bike.ownerships.create!(owner_email: impound_record_update.transfer_email,
           impound_record_id: impound_record.id,
           creator_id: impound_record_update.user_id,

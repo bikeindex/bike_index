@@ -310,8 +310,7 @@ class User < ApplicationRecord
 
   def bikes(user_hidden = true)
     bikes = Bike.unscoped.without_deleted.where(example: false)
-    # TODO: part of #2110 - migrate bike.hidden to bike.user_hidden - because that's what it is
-    bikes = bikes.where(hidden: false) unless user_hidden
+    bikes = bikes.where(user_hidden: false) unless user_hidden
     bikes.default_includes.where(ownerships: {user_id: id}).order(:id)
   end
 

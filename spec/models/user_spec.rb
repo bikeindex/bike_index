@@ -377,7 +377,7 @@ RSpec.describe User, type: :model do
       ownership1.bike.update(marked_user_hidden: true)
       expect(ownership1.reload.claimed?).to be_truthy
       expect(ownership1.user_hidden?).to be_truthy
-      expect(ownership1.bike.hidden?).to be_truthy
+      expect(ownership1.bike.user_hidden?).to be_truthy
 
       expect(user.reload.bike_ids).to match_array([bike1_id, bike2_id])
       expect(user.bike_ids(false)).to eq([bike2_id])

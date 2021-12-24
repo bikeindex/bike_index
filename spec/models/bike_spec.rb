@@ -7,7 +7,7 @@ RSpec.describe Bike, type: :model do
   describe "scopes and searching" do
     describe "scopes" do
       it "default scopes to created_at desc" do
-        expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
+        expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, user_hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
       end
       it "recovered_records default scopes to created_at desc" do
         bike = FactoryBot.create(:bike)
@@ -368,19 +368,9 @@ RSpec.describe Bike, type: :model do
       expect(bike.visible_by?).to be_truthy
       expect(bike.visible_by?(User.new)).to be_truthy
     end
-    context "hidden" do
-      it "isn't visible by user or owner" do
-        bike = Bike.new(hidden: true)
-        allow(bike).to receive(:owner).and_return(owner)
-        allow(bike).to receive(:user_hidden).and_return(false)
-        expect(bike.visible_by?(owner)).to be_falsey
-        expect(bike.visible_by?(User.new)).to be_falsey
-        expect(bike.visible_by?(superuser)).to be_truthy
-      end
-    end
     context "user hidden" do
       it "is visible to owner" do
-        bike = Bike.new(hidden: true)
+        bike = Bike.new(user_hidden: true)
         allow(bike).to receive(:owner).and_return(owner)
         allow(bike).to receive(:user_hidden).and_return(true)
         expect(bike.visible_by?(owner)).to be_truthy
@@ -396,7 +386,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.visible_by?(owner)).to be_falsey
         expect(bike.visible_by?(User.new)).to be_falsey
         expect(bike.visible_by?(superuser)).to be_truthy
-        bike.hidden = true
+        bike.user_hidden = true
         expect(bike.visible_by?(superuser)).to be_truthy
       end
     end
@@ -993,35 +983,22 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "user_hidden" do
-    it "is true if bike is hidden and ownership is user hidden" do
-      bike = Bike.new(hidden: true)
-      ownership = Ownership.new(user_hidden: true)
-      allow(bike).to receive(:current_ownership).and_return(ownership)
-      expect(bike.user_hidden).to be_truthy
-    end
-    it "is false otherwise" do
-      bike = Bike.new(hidden: true)
-      expect(bike.user_hidden).to be_falsey
-    end
-  end
-
   describe "set_user_hidden" do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:bike) { ownership.bike }
     it "marks updates ownership user hidden, marks self hidden" do
       bike.marked_user_hidden = true
       bike.set_user_hidden
-      expect(bike.hidden).to be_truthy
+      expect(bike.user_hidden).to be_truthy
       expect(ownership.reload.user_hidden).to be_truthy
     end
 
     context "already user hidden" do
       let(:ownership) { FactoryBot.create(:ownership, user_hidden: true) }
       it "unmarks user hidden, saves ownership and marks self unhidden on save" do
-        bike.update(hidden: true, marked_user_unhidden: true)
+        bike.update(user_hidden: true, marked_user_unhidden: true)
         bike.reload
-        expect(bike.hidden).to be_falsey
+        expect(bike.user_hidden).to be_falsey
         expect(ownership.reload.user_hidden).to be_falsey
       end
     end
