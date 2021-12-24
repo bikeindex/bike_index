@@ -147,8 +147,7 @@ RSpec.describe CustomerMailer, type: :mailer do
   end
 
   describe "stolen_notification_email" do
-    let(:bike) { FactoryBot.create(:stolen_bike) }
-    let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
+    let!(:bike) { FactoryBot.create(:stolen_bike, :with_ownership) }
     let(:sender) { FactoryBot.create(:user, email: "party@example.com") }
     let(:stolen_notification) { FactoryBot.create(:stolen_notification, subject: "test subject", message: "Test Message", reference_url: "something.com", bike: bike, sender: sender) }
     it "renders email and update sent_dates" do

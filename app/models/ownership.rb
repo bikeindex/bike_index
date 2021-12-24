@@ -205,7 +205,7 @@ class Ownership < ApplicationRecord
   def send_notification_and_update_other_ownerships
     # TODO: post #2110 doing this - I'm not sure if it's a good idea...
     if current && id.present?
-      bike.update_column :current_ownership_id, id
+      bike&.update_column :current_ownership_id, id
       prior_ownerships.current.each { |o| o.update(current: false) }
     end
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
