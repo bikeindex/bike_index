@@ -418,7 +418,6 @@ CREATE TABLE public.bikes (
     updator_id integer,
     is_for_sale boolean DEFAULT false NOT NULL,
     made_without_serial boolean DEFAULT false NOT NULL,
-    current_creation_state_id integer,
     frame_material integer,
     handlebar_type integer,
     cycle_type integer DEFAULT 0,
@@ -4328,13 +4327,6 @@ CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_sticker
 --
 
 CREATE INDEX index_bike_stickers_on_secondary_organization_id ON public.bike_stickers USING btree (secondary_organization_id);
-
-
---
--- Name: index_bikes_on_current_creation_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_current_creation_state_id ON public.bikes USING btree (current_creation_state_id);
 
 
 --

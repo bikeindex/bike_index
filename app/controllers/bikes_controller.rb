@@ -116,7 +116,7 @@ class BikesController < Bikes::BaseController
       end
       @b_param.update(params: permitted_bparams,
         origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
-      @bike = BikeCreator.new(@b_param, location: request.safe_location).create_bike
+      @bike = BikeCreator.new(location: request.safe_location).create_bike(@b_param)
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
@@ -136,7 +136,7 @@ class BikesController < Bikes::BaseController
         redirect_to(edit_bike_url(@b_param.created_bike)) && return
       end
       @b_param.clean_params(permitted_bparams)
-      @bike = BikeCreator.new(@b_param).create_bike
+      @bike = BikeCreator.new.create_bike(@b_param)
       if @bike.errors.any?
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else

@@ -28,6 +28,7 @@ class BikeCreator
     %w[street city state zipcode country timezone impounded_at_with_timezone display_id impounded_description].freeze
   end
 
+  # TODO: pass in location in create
   def initialize(b_param = nil, location: nil)
     @b_param = b_param
     @location = location
@@ -36,27 +37,34 @@ class BikeCreator
   attr_reader :b_param
 
   def build_bike(new_attrs = {})
-    bike = Bike.new(@b_param.safe_bike_attrs(new_attrs))
+    # Default attributes
+    bike = Bike.new(propulsion_type: "foot-pedal", cycle_type: "bike")
+    bike.attributes = @b_param.safe_bike_attrs(new_attrs)
     # Use bike status because it takes into account new_attrs
     bike.build_new_stolen_record(@b_param.stolen_attrs) if bike.status_stolen?
     bike.build_new_impound_record(@b_param.impound_attrs) if bike.status_impounded?
     bike = check_organization(bike)
     bike = check_example(bike)
     bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
-    bike = add_required_attributes(bike)
-    add_front_wheel_size(bike)
+    if bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
+      bike.attributes = {front_wheel_size_id: bike.rear_wheel_size_id, front_tire_narrow: bike.rear_tire_narrow}
+    end
+    bike
   end
 
-  def create_bike
-    add_bike_book_data(@b_param)
-    bike = find_or_build_bike(@b_param)
-    pp bike.errors.full_messages, bike.id
+  def create_bike(b_param = nil)
+    b_param ||= @b_param
+    add_bike_book_data(b_param)
+    bike = find_or_build_bike(b_param)
+    # Skip processing if this bike is already created
+    return bike if bike.id.present? && bike.id == b_param.created_bike_id
     # There could be errors during the build - or during the save
+    pp bike.errors.full_messages
     save_bike(bike) if bike.errors.none?
+    pp bike.errors.full_messages
     if bike.errors.any?
-      @b_param&.update(bike_errors: bike.cleaned_error_messages)
+      b_param&.update(bike_errors: bike.cleaned_error_messages)
     end
-    pp bike.errors.full_messages, bike.id
     bike
   end
 
@@ -70,13 +78,21 @@ class BikeCreator
     bike.reload
   end
 
+  def find_duplicate_bike(b_param, bike)
+    return nil unless b_param.no_duplicate?
+    return nil if bike.serial_normalized.blank?
+    Bike.with_user_hidden
+      .where(serial_normalized: bike.serial_normalized, owner_email: bike.owner_email)
+      .where.not(id: bike.id).order(:id).first
+  end
+
   private
 
   # Previously all of this stuff was public.
   # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
 
-  def add_bike_book_data(b_param)
-    return nil unless b_param && b_param.bike.present? && b_param.manufacturer_id.present?
+  def add_bike_book_data(b_param = nil)
+    return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
     return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
     bb_data = BikeBookIntegration.new.get_model({
       manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
@@ -106,7 +122,7 @@ class BikeCreator
   end
 
   def clear_bike(bike)
-    bike = find_or_build_bike(@b_param)
+    # bike = find_or_build_bike(@b_param)
     bike.errors.messages.each do |message|
       bike.errors.add(message[0], message[1][0])
     end
@@ -118,14 +134,13 @@ class BikeCreator
     bike
   end
 
-  def validate_record(bike)
+  def validate_record(b_param, bike)
     return clear_bike(bike) if bike.errors.present?
-    @b_param.find_duplicate_bike(bike) if @b_param.no_duplicate?
-    if @b_param.created_bike.present?
+    if b_param.created_bike_id.present? && b_param.created_bike_id != bike.id
       clear_bike(bike)
-      bike = @b_param.created_bike
-    elsif @b_param.id.present? # Only update b_param if it exists
-      @b_param.update(created_bike_id: bike.id, bike_errors: nil)
+      return b_param.created_bike
+    elsif b_param.id.present? # Only update b_param if it exists
+      b_param.update(created_bike_id: bike.id, bike_errors: nil)
     end
     bike
   end
@@ -135,42 +150,32 @@ class BikeCreator
     bike.save
     ownership = create_ownership(@b_param, bike)
     bike = associate(bike, ownership) unless bike.errors.any?
-    validate_record(bike)
-    # TODO: part of #2110 - test this based on ownership?
-    # We don't want to create an extra creation_state if there was a duplicate.
-    # Also - we assume if there is a creation_state, that the bike successfully went through creation
-    if bike.present? && bike.id.present?
-      AfterBikeSaveWorker.perform_async(bike.id)
-      if @b_param.bike_sticker_code.present? && bike.creation_organization.present?
-        bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
-        bike_sticker&.claim(user: bike.creator, bike: bike.id, organization: bike.creation_organization)
-      end
-      if @b_param.unregistered_parking_notification?
-        # We skipped setting address, with default_parking_notification_attrs, notification will update it
-        ParkingNotification.create!(@b_param.parking_notification_params)
-      end
-      # Check if the bike has a location, update with passed location if no
-      bike.reload
-      bike.update(Geohelper.address_hash_from_geocoder_result(@location)) unless bike.latitude.present?
+    validate_record(b_param, bike)
+    return bike unless bike.present? && bike.id.present?
+    AfterBikeSaveWorker.perform_async(bike.id)
+    if @b_param.bike_sticker_code.present? && bike.creation_organization.present?
+      bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
+      bike_sticker&.claim(user: bike.creator, bike: bike.id, organization: bike.creation_organization)
     end
+    if @b_param.unregistered_parking_notification?
+      # We skipped setting address, with default_parking_notification_attrs, notification will update it
+      ParkingNotification.create!(@b_param.parking_notification_params)
+    end
+    # Check if the bike has a location, update with passed location if no
+    bike.reload
+    bike.update(Geohelper.address_hash_from_geocoder_result(@location)) unless bike.latitude.present?
     bike
   end
 
   def find_or_build_bike(b_param)
-    b_param&.created_bike&.present? ? b_param.created_bike : build_bike
-  end
-
-  def add_front_wheel_size(bike)
-    return bike unless bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
-    bike.front_wheel_size_id = bike.rear_wheel_size_id
-    bike.front_tire_narrow = bike.rear_tire_narrow
-    bike
-  end
-
-  def add_required_attributes(bike)
-    bike.propulsion_type ||= "foot-pedal"
-    bike.cycle_type ||= "bike"
-    bike
+    return b_param.created_bike if b_param&.created_bike&.present?
+     bike = build_bike
+     bike.set_calculated_attributes
+     # If a dupe is found, return that rather than the just built bike
+     dupe = find_duplicate_bike(b_param, bike)
+     return bike unless dupe.present?
+     b_param.update(created_bike_id: dupe.id)
+     dupe
   end
 
   def default_parking_notification_attrs(b_param, bike)

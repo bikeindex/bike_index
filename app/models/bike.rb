@@ -48,7 +48,7 @@ class Bike < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components
   has_many :bike_stickers
-  has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
+  has_many :b_params, foreign_key: :created_bike_id
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
   has_many :duplicate_bikes_including_self, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
