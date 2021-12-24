@@ -234,27 +234,17 @@ class BikeCreator
 
   # Previously BikeCreatorAssociator
   def associate(bike)
-    begin
-      # Create parking_notification and impound_record first
-      if @b_param&.status_abandoned?
-        create_parking_notification(@b_param, bike)
-      elsif @b_param&.status_impounded?
-        create_impound_record(@b_param, bike)
-      end
-      ownership = create_ownership(bike)
-      create_bike_organizations(ownership)
-      ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
-      bike.create_normalized_serial_segments
-      assign_user_attributes(bike, ownership&.user)
-      StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
-      attach_photo(bike)
-      attach_photos(bike)
-      bike.reload.save
-      # TODO: post #2110 - remove ComponentsCreatorError and ownership raise,
-      # I think we don't need to rescue anymore
-    rescue => e
-      bike.errors.add(:association_error, e.message)
-    end
+    # Create parking_notification first
+    create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
+    ownership = create_ownership(bike)
+    create_bike_organizations(ownership)
+    ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
+    bike.create_normalized_serial_segments
+    assign_user_attributes(bike, ownership&.user)
+    StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
+    attach_photo(bike)
+    attach_photos(bike)
+    bike.save
     bike
   end
 
@@ -262,10 +252,7 @@ class BikeCreator
     ownership = bike.ownerships.new(creator: @b_param.creator, skip_email: @b_param.skip_email?)
     ownership.attributes = ownership_creation_attributes
     unless ownership.save
-      ownership.errors.messages.each do |message|
-        bike.errors.add(message[0], message[1][0])
-      end
-      raise "Ownership wasn't saved. Are you sure the bike was created?"
+      ownership.errors.messages.each { |msg| bike.errors.add(msg[0], msg[1][0]) }
     end
     ownership
   end
@@ -288,11 +275,6 @@ class BikeCreator
       user_id: bike.creator.id,
       organization_id: b_param.creation_organization_id)
     ParkingNotification.create(parking_notification_attrs)
-  end
-
-  def create_impound_record(b_param, bike)
-    impound_attrs = b_param.impound_attrs.slice(*self.class.permitted_impound_attrs)
-    bike.build_new_impound_record(impound_attrs).save
   end
 
   def assign_user_attributes(bike, user = nil)

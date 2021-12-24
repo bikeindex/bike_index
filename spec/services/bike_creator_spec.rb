@@ -642,14 +642,4 @@ RSpec.describe BikeCreator do
       end
     end
   end
-
-  describe "associate" do
-    let(:b_param) { nil }
-    it "rescues from the error and add the message to the bike" do
-      expect(StolenRecordUpdator).to be_present # Load the error
-      bike = Bike.new(status: "status_stolen")
-      instance.send("associate", bike)
-      expect(bike.errors.messages[:association_error]).not_to be_nil
-    end
-  end
 end
