@@ -533,6 +533,7 @@ class Bike < ApplicationRecord
     if created_at.blank? || created_at > Time.current - 1.day
       new_stolen_record.creation_organization_id = creation_organization_id
     end
+    self.status ||= "status_stolen"
     new_stolen_record
   end
 
@@ -541,6 +542,7 @@ class Bike < ApplicationRecord
     new_impound_record = impound_records
       .build({country_id: new_country_id, status: "current", user_id: creator_id}.merge(new_attrs))
     new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
+
     new_impound_record
   end
 
@@ -844,19 +846,24 @@ class Bike < ApplicationRecord
     self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
   end
 
+  # TODO: Better name. Used in BikeCreator for dupe finding
+  def set_properties
+    clean_frame_size
+    set_mnfg_name
+    normalize_emails
+    normalize_serial_number
+    set_paints
+  end
+
   def set_calculated_attributes
+    set_properties
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.current_ownership = calculated_current_ownership
     set_location_info
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
-    clean_frame_size
-    set_mnfg_name
     set_user_hidden
-    normalize_emails
-    normalize_serial_number
-    set_paints
     cache_bike
   end
 
