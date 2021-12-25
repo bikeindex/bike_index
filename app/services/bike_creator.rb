@@ -59,7 +59,7 @@ class BikeCreator
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id
     # There could be errors during the build - or during the save
-    save_bike(bike) if bike.errors.none?
+    bike = save_bike(bike) if bike.errors.none?
     if bike.errors.any?
       b_param&.update(bike_errors: bike.cleaned_error_messages)
     end
@@ -120,16 +120,16 @@ class BikeCreator
   end
 
   def clear_bike(bike)
-    # bike = find_or_build_bike(@b_param)
+    built_bike = find_or_build_bike(@b_param)
     bike.errors.messages.each do |message|
-      bike.errors.add(message[0], message[1][0])
+      built_bike.errors.add(message[0], message[1][0])
     end
     bike.ownerships.destroy_all
     bike.bike_organizations.destroy_all
     bike.impound_records.destroy_all
     bike.parking_notifications.destroy_all
     bike.destroy
-    bike
+    built_bike
   end
 
   def validate_record(b_param, bike)
@@ -148,7 +148,7 @@ class BikeCreator
     bike.save
     ownership = create_ownership(@b_param, bike)
     bike = associate(bike, ownership) unless bike.errors.any?
-    validate_record(b_param, bike)
+    bike = validate_record(b_param, bike)
     return bike unless bike.present? && bike.id.present?
     AfterBikeSaveWorker.perform_async(bike.id)
     if @b_param.bike_sticker_code.present? && bike.creation_organization.present?
@@ -167,13 +167,13 @@ class BikeCreator
 
   def find_or_build_bike(b_param)
     return b_param.created_bike if b_param&.created_bike&.present?
-     bike = build_bike
-     bike.set_calculated_attributes
-     # If a dupe is found, return that rather than the just built bike
-     dupe = find_duplicate_bike(b_param, bike)
-     return bike unless dupe.present?
-     b_param.update(created_bike_id: dupe.id)
-     dupe
+    bike = build_bike
+    bike.set_calculated_attributes
+    # If a dupe is found, return that rather than the just built bike
+    dupe = find_duplicate_bike(b_param, bike)
+    return bike unless dupe.present?
+    b_param.update(created_bike_id: dupe.id)
+    dupe
   end
 
   def default_parking_notification_attrs(b_param, bike)
