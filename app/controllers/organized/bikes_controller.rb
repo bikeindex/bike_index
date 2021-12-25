@@ -60,7 +60,7 @@ module Organized
     def new_iframe
       @organization = current_organization
       @b_param = find_or_new_b_param
-      @bike = BikeCreator.new(@b_param).build_bike
+      @bike = BikeCreator.new.build_bike(@b_param)
       render layout: "embed_layout"
     end
 

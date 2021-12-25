@@ -29,37 +29,33 @@ class BikeCreator
   end
 
   # TODO: pass in location in create
-  def initialize(b_param = nil, location: nil)
-    @b_param = b_param
+  def initialize(location: nil)
     @location = location
   end
 
-  attr_reader :b_param
-
-  def build_bike(new_attrs = {})
+  def build_bike(b_param, new_attrs = {})
     # Default attributes
     bike = Bike.new(propulsion_type: "foot-pedal", cycle_type: "bike")
-    bike.attributes = @b_param.safe_bike_attrs(new_attrs)
+    bike.attributes = b_param.safe_bike_attrs(new_attrs)
     # Use bike status because it takes into account new_attrs
-    bike.build_new_stolen_record(@b_param.stolen_attrs) if bike.status_stolen?
-    bike.build_new_impound_record(@b_param.impound_attrs) if bike.status_impounded?
-    bike = check_organization(bike)
-    bike = check_example(bike)
-    bike.attributes = default_parking_notification_attrs(@b_param, bike) if @b_param.unregistered_parking_notification?
+    bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
+    bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?
+    bike = check_organization(b_param, bike)
+    bike = check_example(b_param, bike)
+    bike.attributes = default_parking_notification_attrs(b_param, bike) if b_param.unregistered_parking_notification?
     if bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
       bike.attributes = {front_wheel_size_id: bike.rear_wheel_size_id, front_tire_narrow: bike.rear_tire_narrow}
     end
     bike
   end
 
-  def create_bike(b_param = nil)
-    b_param ||= @b_param
+  def create_bike(b_param)
     add_bike_book_data(b_param)
     bike = find_or_build_bike(b_param)
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id
     # There could be errors during the build - or during the save
-    bike = save_bike(bike) if bike.errors.none?
+    bike = save_bike(b_param, bike) if bike.errors.none?
     if bike.errors.any?
       b_param&.update(bike_errors: bike.cleaned_error_messages)
     end
@@ -67,12 +63,12 @@ class BikeCreator
   end
 
   # Called from ImageAssociatorWorker, so can't be private
-  def attach_photo(bike)
-    return true unless @b_param.image.present?
-    public_image = PublicImage.new(image: @b_param.image)
+  def attach_photo(b_param, bike)
+    return true unless b_param.image.present?
+    public_image = PublicImage.new(image: b_param.image)
     public_image.imageable = bike
     public_image.save
-    @b_param.update(image_processed: true)
+    b_param.update(image_processed: true)
     bike.reload
   end
 
@@ -119,8 +115,8 @@ class BikeCreator
     b_param
   end
 
-  def clear_bike(bike)
-    built_bike = find_or_build_bike(@b_param)
+  def clear_bike(b_param, bike)
+    built_bike = find_or_build_bike(b_param)
     bike.errors.messages.each do |message|
       built_bike.errors.add(message[0], message[1][0])
     end
@@ -133,9 +129,9 @@ class BikeCreator
   end
 
   def validate_record(b_param, bike)
-    return clear_bike(bike) if bike.errors.present?
+    return clear_bike(b_param, bike) if bike.errors.present?
     if b_param.created_bike_id.present? && b_param.created_bike_id != bike.id
-      clear_bike(bike)
+      clear_bike(b_param, bike)
       return b_param.created_bike
     elsif b_param.id.present? # Only update b_param if it exists
       b_param.update(created_bike_id: bike.id, bike_errors: nil)
@@ -143,21 +139,21 @@ class BikeCreator
     bike
   end
 
-  def save_bike(bike)
+  def save_bike(b_param, bike)
     bike.set_location_info
     bike.save
-    ownership = create_ownership(@b_param, bike)
-    bike = associate(bike, ownership) unless bike.errors.any?
+    ownership = create_ownership(b_param, bike)
+    bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)
     return bike unless bike.present? && bike.id.present?
     AfterBikeSaveWorker.perform_async(bike.id)
-    if @b_param.bike_sticker_code.present? && bike.creation_organization.present?
-      bike_sticker = BikeSticker.lookup_with_fallback(@b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
+    if b_param.bike_sticker_code.present? && bike.creation_organization.present?
+      bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
       bike_sticker&.claim(user: bike.creator, bike: bike.id, organization: bike.creation_organization)
     end
-    if @b_param.unregistered_parking_notification?
+    if b_param.unregistered_parking_notification?
       # We skipped setting address, with default_parking_notification_attrs, notification will update it
-      ParkingNotification.create!(@b_param.parking_notification_params)
+      ParkingNotification.create!(b_param.parking_notification_params)
     end
     # Check if the bike has a location, update with passed location if no
     bike.reload
@@ -167,7 +163,7 @@ class BikeCreator
 
   def find_or_build_bike(b_param)
     return b_param.created_bike if b_param&.created_bike&.present?
-    bike = build_bike
+    bike = build_bike(b_param)
     bike.set_calculated_attributes
     # If a dupe is found, return that rather than the just built bike
     dupe = find_duplicate_bike(b_param, bike)
@@ -195,9 +191,9 @@ class BikeCreator
   end
 
   # previously BikeCreatorOrganizer
-  def check_organization(bike)
-    organization_id = @b_param.params.dig("creation_organization_id").presence ||
-      @b_param.params.dig("bike", "creation_organization_id")
+  def check_organization(b_param, bike)
+    organization_id = b_param.params.dig("creation_organization_id").presence ||
+      b_param.params.dig("bike", "creation_organization_id")
     organization = Organization.friendly_find(organization_id)
     if organization.present? && !organization.suspended?
       bike.creation_organization_id = organization.id
@@ -212,9 +208,9 @@ class BikeCreator
     bike
   end
 
-  def check_example(bike)
+  def check_example(b_param, bike)
     example_org = Organization.example
-    bike.creation_organization_id = example_org.id if @b_param.params && @b_param.params["test"]
+    bike.creation_organization_id = example_org.id if b_param.params && b_param.params["test"]
     if bike.creation_organization_id.present? && example_org.present?
       bike.example = true if bike.creation_organization_id == example_org.id
     else
@@ -223,15 +219,15 @@ class BikeCreator
     bike
   end
 
-  def associate(bike, ownership)
-    create_parking_notification(@b_param, bike) if @b_param&.status_abandoned?
+  def associate(b_param, bike, ownership)
+    create_parking_notification(b_param, bike) if b_param&.status_abandoned?
     create_bike_organizations(ownership)
-    ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
+    ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
     bike.create_normalized_serial_segments
     assign_user_attributes(bike, ownership&.user)
-    StolenRecordUpdator.new(bike: bike, b_param: @b_param).update_records
-    attach_photo(bike)
-    attach_photos(bike)
+    StolenRecordUpdator.new(bike: bike, b_param: b_param).update_records
+    attach_photo(b_param, bike)
+    attach_photos(b_param, bike)
     bike.save
     bike
   end
@@ -288,9 +284,9 @@ class BikeCreator
     bike
   end
 
-  def attach_photos(bike)
-    return nil unless @b_param.params["photos"].present?
-    photos = @b_param.params["photos"].uniq.take(7)
+  def attach_photos(b_param, bike)
+    return nil unless b_param.params["photos"].present?
+    photos = b_param.params["photos"].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end
 end

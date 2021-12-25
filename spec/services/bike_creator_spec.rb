@@ -5,7 +5,7 @@ RSpec.describe BikeCreator do
   let(:user) { FactoryBot.create(:user) }
   let(:bike_params) { {} }
   let(:b_param) { BParam.create(creator: user, params: {bike: bike_params}) }
-  let(:instance) { subject.new(b_param) }
+  let(:instance) { subject.new }
   # Frequently used associations
   let(:organization) { FactoryBot.create(:organization) }
   let(:color) { FactoryBot.create(:color) }
@@ -449,7 +449,7 @@ RSpec.describe BikeCreator do
       b_param = BParam.new
       bike = FactoryBot.create(:bike)
       bike.errors.add(:rando_error, "LOLZ")
-      creator = BikeCreator.new(b_param).send(:clear_bike, bike)
+      creator = BikeCreator.new.send(:clear_bike, b_param, bike)
       expect(creator.errors.messages[:rando_error]).not_to be_nil
       expect(Bike.where(id: bike.id)).to be_empty
     end
@@ -480,7 +480,7 @@ RSpec.describe BikeCreator do
         allow(b_param).to receive(:id).and_return(9)
         allow(b_param).to receive(:creator_id).and_return(6)
         allow(b_param).to receive(:params).and_return({bike: {serial_number: "AAAA"}}.as_json)
-        bike = instance.build_bike
+        bike = instance.build_bike(b_param)
         expect(bike.serial_number).to eq("AAAA")
         expect(bike.updator_id).to eq(6)
         expect(bike.b_param_id).to eq(9)
@@ -495,8 +495,8 @@ RSpec.describe BikeCreator do
         b_param.image = test_photo
         b_param.save
         expect(b_param.image).to be_present
-        b_param.params = p
-        subject.new(b_param).attach_photo(bike)
+        b_param.params = {}
+        instance.attach_photo(b_param, bike)
         expect(bike.public_images.count).to eq(1)
       end
     end
@@ -538,7 +538,7 @@ RSpec.describe BikeCreator do
       end
       it "adds se bike data if it exists" do
         VCR.use_cassette("bike_creator-include_bike_book", re_record_interval: 6.months) do
-          BikeCreator.new(b_param).send(:add_bike_book_data, b_param)
+          instance.send(:add_bike_book_data, b_param)
 
           b_param.reload
           expect(b_param.params["components"].count).to be > 5
@@ -555,7 +555,7 @@ RSpec.describe BikeCreator do
   describe "build_bike" do
     let(:b_param_params) { {} }
     let(:b_param) { BParam.new(params: b_param_params) }
-    let(:bike) { instance.build_bike }
+    let(:bike) { instance.build_bike(b_param) }
     it "builds it" do
       expect(bike.status).to eq "status_with_owner"
       expect(bike.id).to be_blank
@@ -638,11 +638,11 @@ RSpec.describe BikeCreator do
     end
     context "status overrides" do
       it "is stolen if it is stolen" do
-        bike = instance.build_bike(status: "status_stolen")
+        bike = instance.build_bike(BParam.new, status: "status_stolen")
         expect(bike.status).to eq "status_stolen"
       end
       it "impounded if status_impounded" do
-        bike = instance.build_bike(status: "status_impounded")
+        bike = instance.build_bike(BParam.new, status: "status_impounded")
         expect(bike.status).to eq "status_impounded"
       end
     end
