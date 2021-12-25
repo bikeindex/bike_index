@@ -20,7 +20,7 @@ class UserRegistrationOrganization < ApplicationRecord
 
   def calculated_bike_ids
     return user.bikes.pluck(:id) if all_bikes
-    current_bike_ids = bike_ids ||
-    user.bikes & current_bike_ids
+    current_bike_ids = bike_ids || user.bikes.organization(organization)
+    current_bike_ids & user.bikes.pluck(:id)
   end
 end
