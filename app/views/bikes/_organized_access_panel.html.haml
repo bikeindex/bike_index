@@ -141,14 +141,14 @@
                           %small.less-strong
                             %em
                               Address source:
-                            = @bike.registration_address_source.humanize
+                            = @bike.registration_address_source&.humanize
                   - else
                     %tr
                       %td
-                        = "#{(bike_attr || reg_field).humanize(keep_id_suffix: true)}"
+                        = "#{(bike_attr || reg_field)&.humanize(keep_id_suffix: true)}"
                       %td
                         - if bike_attr == "organization_affiliation"
-                          = @bike.organization_affiliation.humanize
+                          = @bike.organization_affiliation&.humanize
                         - else
                           = @bike.send(bike_attr)
 
