@@ -146,9 +146,12 @@ class Bike < ApplicationRecord
       query.present? ? pg_search(query) : all
     end
 
-    def organized_email_search(query)
+    def organized_email_and_name_search(query)
       return all unless query.present?
-      where("owner_email ilike ?", "%#{query.strip}%")
+      query_string = "%#{query.strip}%"
+      includes(:current_ownership)
+        .where("bikes.owner_email ilike ? OR ownerships.owner_name ilike ?", query_string, query_string)
+        .references(:current_ownership)
     end
 
     def admin_text_search(query)

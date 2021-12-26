@@ -279,7 +279,6 @@ RSpec.describe BulkImportWorker, type: :job do
             impounded_description: "It was locked to a handicap railing",
             display_id: "2020-33333",
             unregistered_bike: true,
-            unregistered_bike: true,
             street: "1409 Martin Luther King Jr Way",
             city: "Berkeley",
             zipcode: "94709", # NOTE: the zipcode that is entered is 94710

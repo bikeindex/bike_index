@@ -72,8 +72,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def self.bikes
-    Bike.unscoped.includes(:impound_records)
-      .where(impound_records: {id: pluck(:id)})
+    Bike.unscoped.where(id: pluck(:bike_id))
   end
 
   def impound_configuration
