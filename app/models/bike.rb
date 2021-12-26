@@ -543,7 +543,7 @@ class Bike < ApplicationRecord
       .build({country_id: new_country_id, status: "current", user_id: creator_id}.merge(new_attrs))
     new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
 
-    new_impound_record
+    self.current_impound_record = new_impound_record
   end
 
   def fetch_current_stolen_record
