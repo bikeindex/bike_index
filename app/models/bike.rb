@@ -846,8 +846,8 @@ class Bike < ApplicationRecord
     self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
   end
 
-  # TODO: Better name. Used in BikeCreator for dupe finding
-  def set_properties
+  # Called in BikeCreator, so that the serial and email can be used for dupe finding
+  def set_calculated_unassociated_attributes
     clean_frame_size
     set_mnfg_name
     normalize_emails
@@ -856,7 +856,7 @@ class Bike < ApplicationRecord
   end
 
   def set_calculated_attributes
-    set_properties
+    set_calculated_unassociated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.current_ownership = calculated_current_ownership

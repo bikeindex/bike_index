@@ -164,7 +164,7 @@ class BikeCreator
   def find_or_build_bike(b_param)
     return b_param.created_bike if b_param&.created_bike&.present?
     bike = build_bike(b_param)
-    bike.set_properties
+    bike.set_calculated_unassociated_attributes
     # If a dupe is found, return that rather than the just built bike
     dupe = find_duplicate_bike(b_param, bike)
     return bike unless dupe.present?
