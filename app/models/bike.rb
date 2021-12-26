@@ -150,7 +150,7 @@ class Bike < ApplicationRecord
       return all unless query.present?
       query_string = "%#{query.strip}%"
       includes(:current_ownership)
-        .where("bikes.owner_email ilike ? OR ownerships.owner_name ilike ?", query_string, query_string )
+        .where("bikes.owner_email ilike ? OR ownerships.owner_name ilike ?", query_string, query_string)
         .references(:current_ownership)
     end
 
