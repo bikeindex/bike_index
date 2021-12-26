@@ -56,7 +56,7 @@ class BikeUpdator
     @bike_params["bike"]["creation_organization_id"] = @bike.creation_organization_id
     @bike_params["bike"]["creator"] = @bike.creator
     @bike_params["bike"]["example"] = @bike.example
-    @bike_params["bike"]["hidden"] = @bike.hidden
+    @bike_params["bike"]["user_hidden"] = @bike.user_hidden
   end
 
   def update_available_attributes

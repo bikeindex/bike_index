@@ -67,7 +67,7 @@ RSpec.describe AdminMailer, type: :mailer do
     let(:bike) { ownership.bike }
     let(:feedback) { FactoryBot.create(:feedback, feedback_hash: {bike_id: bike.id}, feedback_type: "bike_delete_request") }
     it "doesn't explode" do
-      bike.update_attribute :hidden, true
+      bike.update_attribute :user_hidden, true
       bike.reload
       expect(bike.user_hidden).to be_truthy
       mail = AdminMailer.feedback_notification_email(feedback)

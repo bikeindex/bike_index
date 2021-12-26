@@ -203,7 +203,7 @@ module API
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.save
 
-          bike = BikeCreator.new(b_param).create_bike
+          bike = BikeCreator.new.create_bike(b_param)
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
             created_bike_serialized(bike, true)

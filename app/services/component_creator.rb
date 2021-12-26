@@ -1,6 +1,3 @@
-class ComponentsCreatorError < StandardError
-end
-
 class ComponentCreator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]

@@ -230,7 +230,10 @@ module ApplicationHelper
     require "coderay"
     cleaned_data = if no_blank
       # Show false values, just not empty or nil things
-      data.select { |k, v| v.present? || v == false ? [k, v] : nil }.compact.to_h
+      data.select do |k, v|
+        next unless ParamsNormalizer.present_or_false?(v)
+        [k, v]
+      end.compact.to_h
     else
       data
     end

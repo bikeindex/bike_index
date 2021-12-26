@@ -33,15 +33,13 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
       impound_record.update(parking_notification: parking_notification)
       impound_record.reload
       bike.reload
-      expect(bike.hidden).to be_truthy
       expect(bike.user_hidden).to be_truthy
       expect(parking_notification.unregistered_bike?).to be_truthy
       expect(impound_record.unregistered_bike?).to be_truthy
       instance.perform(impound_record.id)
       impound_record.reload
       bike.reload
-      expect(bike.hidden).to be_falsey
-      expect(bike.marked_user_hidden).to be_falsey
+      expect(bike.user_hidden).to be_falsey
       expect(impound_record.unregistered_bike?).to be_truthy
     end
   end

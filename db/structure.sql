@@ -413,12 +413,11 @@ CREATE TABLE public.bikes (
     listing_order integer,
     all_description text,
     mnfg_name character varying(255),
-    hidden boolean DEFAULT false NOT NULL,
+    user_hidden boolean DEFAULT false NOT NULL,
     frame_size_number double precision,
     updator_id integer,
     is_for_sale boolean DEFAULT false NOT NULL,
     made_without_serial boolean DEFAULT false NOT NULL,
-    current_creation_state_id integer,
     frame_material integer,
     handlebar_type integer,
     cycle_type integer DEFAULT 0,
@@ -2190,7 +2189,6 @@ CREATE TABLE public.ownerships (
     current boolean DEFAULT false,
     claimed boolean,
     example boolean DEFAULT false NOT NULL,
-    legacy_send_email boolean DEFAULT true,
     user_hidden boolean DEFAULT false NOT NULL,
     impound_record_id bigint,
     claimed_at timestamp without time zone,
@@ -4332,13 +4330,6 @@ CREATE INDEX index_bike_stickers_on_secondary_organization_id ON public.bike_sti
 
 
 --
--- Name: index_bikes_on_current_creation_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_current_creation_state_id ON public.bikes USING btree (current_creation_state_id);
-
-
---
 -- Name: index_bikes_on_current_impound_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4371,13 +4362,6 @@ CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at);
 --
 
 CREATE INDEX index_bikes_on_example ON public.bikes USING btree (example);
-
-
---
--- Name: index_bikes_on_hidden; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_hidden ON public.bikes USING btree (hidden);
 
 
 --
@@ -4448,6 +4432,13 @@ CREATE INDEX index_bikes_on_status ON public.bikes USING btree (status);
 --
 
 CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree (tertiary_frame_color_id);
+
+
+--
+-- Name: index_bikes_on_user_hidden; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_user_hidden ON public.bikes USING btree (user_hidden);
 
 
 --
@@ -5862,6 +5853,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211220193440'),
 ('20211221010148'),
 ('20211222230922'),
-('20211223213257');
+('20211223213257'),
+('20211224053713');
 
 

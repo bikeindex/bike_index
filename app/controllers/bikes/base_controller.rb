@@ -114,10 +114,8 @@ class Bikes::BaseController < ApplicationController
     rescue ActiveRecord::StatementInvalid => e
       raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end
-    if @bike.hidden || @bike.deleted?
-      return @bike if current_user.present? && @bike.visible_by?(current_user)
-      fail ActiveRecord::RecordNotFound
-    end
+    return @bike if @bike.visible_by?(current_user)
+    fail ActiveRecord::RecordNotFound
   end
 
   def find_or_new_b_param
