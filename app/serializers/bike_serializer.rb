@@ -26,7 +26,6 @@ class BikeSerializer < ApplicationSerializer
 
   has_one :rear_wheel_size,
     :front_wheel_size,
-    :handlebar_type,
     :front_gear_type,
     :rear_gear_type,
     :stolen_record
