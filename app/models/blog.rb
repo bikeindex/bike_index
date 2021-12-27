@@ -152,8 +152,7 @@ class Blog < ApplicationRecord
   end
 
   def update_title_save
-    return true unless update_title.present?
-    return true if update_title == false || update_title == "0"
+    return true unless ParamsNormalizer.boolean(update_title)
     self.old_title_slug = title_slug
     set_title_slug
   end

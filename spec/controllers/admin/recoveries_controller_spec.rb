@@ -36,7 +36,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       end
       context "bike deleted" do
         it "updates waiting_on_decision to not_displayed" do
-          stolen_record.bike.update(hidden: true)
+          stolen_record.bike.update(user_hidden: true)
           expect {
             put :update, params: params
           }.to change(RecoveryDisplay, :count).by 0

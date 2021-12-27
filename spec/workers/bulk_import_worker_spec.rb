@@ -236,6 +236,66 @@ RSpec.describe BulkImportWorker, type: :job do
         # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
         let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
         include_context :geocoder_real
+        let(:bike1_tareget) do
+          {
+            primary_frame_color: color_green,
+            serial_number: "xyz_test",
+            owner_email: "test@bikeindex.org",
+            manufacturer: trek,
+            creator: organization.auto_user,
+            creation_organization_id: organization.id,
+            year: 2019,
+            description: "I love this, it's my favorite",
+            frame_size: "29in",
+            frame_size_unit: "in",
+            registration_address: {},
+            public_images: [],
+            phone: "8887776666",
+            extra_registration_number: nil,
+            owner_name: nil,
+            status: "status_impounded"
+          }
+        end
+        let(:bike2_target) do
+          {
+            primary_frame_color: color_white,
+            serial_number: "example",
+            owner_email: "test2@bikeindex.org",
+            manufacturer: surly,
+            creator: organization.auto_user,
+            creation_organization_id: organization.id,
+            year: nil,
+            frame_size: "m",
+            frame_size_unit: "ordinal",
+            registration_address: {},
+            phone: nil,
+            extra_registration_number: "extra serial number",
+            owner_name: "Sally",
+            status: "status_impounded"
+          }
+        end
+        let(:impound_record1_target) do
+          {
+            impounded_description: "It was locked to a handicap railing",
+            display_id: "2020-33333",
+            unregistered_bike: true,
+            street: "1409 Martin Luther King Jr Way",
+            city: "Berkeley",
+            zipcode: "94709", # NOTE: the zipcode that is entered is 94710
+            state_id: state.id
+          }
+        end
+        let(:impound_record2_target) do
+          {
+            impounded_description: "Appears to be abandoned",
+            display_id: "1",
+            unregistered_bike: true,
+            street: "327 17th St",
+            city: "Oakland",
+            zipcode: "94612",
+            state_id: state.id
+          }
+        end
         it "creates the bikes and impound records" do
           VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do
             allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
@@ -251,68 +311,25 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
 
             bike1 = bulk_import.bikes.reorder(:created_at).first
-            expect(bike1.primary_frame_color).to eq color_green
-            expect(bike1.serial_number).to eq "xyz_test"
-            expect(bike1.owner_email).to eq "test@bikeindex.org"
-            expect(bike1.manufacturer).to eq trek
             expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect(bike1.creator).to eq organization.auto_user
-            expect(bike1.creation_organization).to eq organization
-            expect(bike1.year).to eq 2019
-            expect(bike1.description).to eq "I love this, it's my favorite"
-            expect(bike1.frame_size).to eq "29in"
-            expect(bike1.frame_size_unit).to eq "in"
-            expect(bike1.public_images.count).to eq 0
-            expect(bike1.phone).to eq("8887776666")
-            expect(bike1.registration_address).to be_blank
-            expect(bike1.extra_registration_number).to be_nil
-            expect(bike1.owner_name).to be_nil
-            expect(bike1.status).to eq "status_impounded"
+            expect_attrs_to_match_hash(bike1, bike1_tareget)
             expect(bike1.created_by_notification_or_impounding?).to be_truthy
             bike1_impound_record = bike1.current_impound_record
-            expect(bike1_impound_record).to be_present
-            expect(bike1_impound_record.impounded_description).to eq "It was locked to a handicap railing"
-            expect(bike1_impound_record.display_id).to eq "2020-33333"
-            expect(bike1_impound_record.unregistered_bike).to be_truthy
+            expect_attrs_to_match_hash(bike1_impound_record, impound_record1_target)
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
-            expect(bike1_impound_record.unregistered_bike).to be_truthy
-            expect(bike1_impound_record.street).to eq "1409 Martin Luther King Jr Way"
-            expect(bike1_impound_record.city).to eq "Berkeley"
-            expect(bike1_impound_record.zipcode).to eq "94709" # NOTE: the zipcode that is entered is 94710
-            expect(bike1_impound_record.state_id).to eq state.id
             expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
             expect(bike1.address_hash).to eq bike1_impound_record.address_hash
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
-            expect(bike2.primary_frame_color).to eq color_white
-            expect(bike2.serial_number).to eq "example"
-            expect(bike2.owner_email).to eq "test2@bikeindex.org"
-            expect(bike2.manufacturer).to eq surly
+            expect_attrs_to_match_hash(bike2, bike2_target)
+            expect(bike2.public_images.count).to eq 1
             expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect(bike2.creator).to eq organization.auto_user
-            expect(bike2.creation_organization).to eq organization
-            expect(bike2.year).to_not be_present
-            expect(bike2.public_images.count).to eq 1
-            expect(bike2.frame_size).to eq "m"
-            expect(bike2.frame_size_unit).to eq "ordinal"
-            expect(bike2.registration_address).to_not be_present
-            expect(bike2.phone).to be_nil
-            expect(bike2.extra_registration_number).to eq "extra serial number"
-            expect(bike2.owner_name).to eq "Sally"
-            expect(bike2.status).to eq "status_impounded"
             expect(bike2.created_by_notification_or_impounding?).to be_truthy
             bike2_impound_record = bike2.current_impound_record
-            expect(bike2_impound_record).to be_present
-            expect(bike2_impound_record.impounded_description).to eq "Appears to be abandoned"
-            expect(bike2_impound_record.display_id).to eq "1"
-            expect(bike2_impound_record.unregistered_bike).to be_truthy
+            expect_attrs_to_match_hash(bike2_impound_record, impound_record2_target)
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
-            expect(bike2_impound_record.street).to eq "327 17th St"
-            expect(bike2_impound_record.city).to eq "Oakland"
-            expect(bike2_impound_record.zipcode).to eq "94612"
-            expect(bike2_impound_record.state_id).to eq state.id
             expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
             expect(bike2.address_hash).to eq bike2_impound_record.address_hash
           end
@@ -474,10 +491,10 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike.serial_number).to eq "unknown"
           expect(bike.frame_model).to eq "Midnight Special"
 
-          creation_state = bike.current_ownership
-          expect(creation_state.bulk?).to be_truthy
-          expect(creation_state.origin).to eq "bulk_import_worker"
-          expect(creation_state.organization).to eq organization
+          ownership = bike.current_ownership
+          expect(ownership.bulk?).to be_truthy
+          expect(ownership.origin).to eq "bulk_import_worker"
+          expect(ownership.organization).to eq organization
           expect(bike.creation_organization).to eq organization
           expect(bike.creator).to eq organization.auto_user
           bike

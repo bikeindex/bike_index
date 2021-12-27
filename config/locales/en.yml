@@ -4415,7 +4415,7 @@ en:
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email
+        search_owner_email: Search owner email and name
         sent_to: Sent to
         settings: settings
         status: 'Status:'
@@ -4551,12 +4551,12 @@ en:
       index:
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email
+        search_owner_email: Search owner email and name
     impound_records:
       index:
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email
+        search_owner_email: Search owner email and name
     manage_impoundings:
       edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings
@@ -4603,7 +4603,7 @@ en:
         parking_notifications: Parking notifications
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email
+        search_owner_email: Search owner email and name
       show_details:
         address: Address
         bike: Bike

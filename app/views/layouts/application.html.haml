@@ -40,7 +40,7 @@
           - elsif current_user.blank?
             .center-navbar-signup-link-container
               = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
-          - bike_search_active = controller_name == "bikes" && action_name == "index"
+          - bike_search_active = controller_namespace.blank? && controller_name == "bikes" && action_name == "index"
           %a#menu-opened-backdrop{ "aria-hidden" => "true" }
           .hamburgler{ "aria-hidden" => "true" }
             %a#primary_nav_hamburgler

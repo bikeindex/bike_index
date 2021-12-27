@@ -19,7 +19,7 @@ class StolenRecordUpdator
   attr_reader :stolen_params
 
   def update_records
-    return if @stolen_params.blank?
+    return if @stolen_params.blank? || @bike.id.blank? # If no bike ID, bike has errored
     @bike.reload
     stolen_record = @bike.fetch_current_stolen_record
     stolen_record ||= @bike.build_new_stolen_record

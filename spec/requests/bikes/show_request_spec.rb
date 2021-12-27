@@ -41,14 +41,6 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
-  context "admin hidden (fake delete)" do
-    before { ownership.bike.update(hidden: true) }
-    it "404s" do
-      expect {
-        get "#{base_url}/#{bike.id}"
-      }.to raise_error(ActiveRecord::RecordNotFound)
-    end
-  end
   context "second ownership, from organization, with claim token" do
     let(:auto_user) { FactoryBot.create(:user_confirmed) }
     let(:organization) { FactoryBot.create(:organization, :with_auto_user, user: auto_user) }
