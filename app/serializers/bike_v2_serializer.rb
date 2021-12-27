@@ -23,11 +23,9 @@ class BikeV2Serializer < ApplicationSerializer
     :year
 
   attr_accessor \
-    :location_found,
     :external_id,
     :registry_name,
-    :registry_url,
-    :status
+    :registry_url
 
   def serial
     object.serial_display
@@ -43,6 +41,16 @@ class BikeV2Serializer < ApplicationSerializer
 
   def stolen
     object.status_stolen?
+  end
+
+  def status
+    object.status_humanized
+  end
+
+  def location_found
+    return object.location_found if defined?(object.location)
+    return nil unless object.status_impounded?
+    object.address
   end
 
   def date_stolen

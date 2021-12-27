@@ -1,7 +1,7 @@
 class ApplicationSerializer < ActiveModel::Serializer
   delegate :cache_key, to: :object
 
-  # otherwise it's true, inexplicably. Manually override
+  # TODO: after #2123, switch this to cache!
   def perform_caching
     false
   end
