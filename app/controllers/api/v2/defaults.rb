@@ -3,8 +3,6 @@ module API
     module Defaults
       extend ActiveSupport::Concern
       included do
-        formatter :json, Grape::Formatter::ActiveModelSerializers
-
         before do
           header["Access-Control-Allow-Origin"] = "*"
           header["Access-Control-Request-Method"] = "*"

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Bikes API V2", type: :request do
   describe "bike search" do
     before :each do
-      @bike = FactoryBot.create(:bike)
+      FactoryBot.create(:bike)
       FactoryBot.create(:bike)
       FactoryBot.create(:impounded_bike)
     end
@@ -12,8 +12,9 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.code).to eq("200")
       expect(response.header["Total"]).to eq("3")
       expect(response.header["Link"].match('page=2&per_page=1>; rel=\"next\"')).to be_present
-      result = response.body
-      expect(JSON.parse(result)["bikes"][0]["id"]).to be_present
+      bike_response = json_result["bikes"][0]
+      expect(bike_response["id"]).to be_present
+      expect(bike_response.keys & ["user_hidden"]).to eq([]) # Verify we aren't showing all attributes
     end
 
     it "non_stolen bikes search works" do
@@ -21,8 +22,9 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.code).to eq("200")
       expect(response.header["Total"]).to eq("3")
       expect(response.header["Link"].match('page=2&per_page=1>; rel=\"next\"')).to be_present
-      result = response.body
-      expect(JSON.parse(result)["bikes"][0]["id"]).to be_present
+      bike_response = json_result["bikes"][0]
+      expect(bike_response["id"]).to be_present
+      expect(bike_response.keys & ["user_hidden"]).to eq([]) # Verify we aren't showing all attributes
     end
 
     it "serial search works" do
@@ -61,6 +63,7 @@ RSpec.describe "Bikes API V2", type: :request do
       FactoryBot.create(:bike, serial_number: "awesome")
       FactoryBot.create(:bike)
       get "/api/v2/bikes_search/count?query=awesome", params: {format: :json}
+      pp json_result
       result = JSON.parse(response.body)
       expect(result["non_stolen"]).to eq(1)
       expect(result["stolen"]).to eq(0)
