@@ -1458,7 +1458,7 @@ RSpec.describe Bike, type: :model do
     let(:wheel_size) { FactoryBot.create(:wheel_size) }
     let(:bike) { FactoryBot.create(:bike, rear_wheel_size: wheel_size) }
     let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
-    let(:target_cached_string) { "#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
+    let(:target_cached_string) { "#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material&.name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
     it "caches all the bike parts" do
       bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: bike.primary_frame_color_id,
@@ -1613,30 +1613,6 @@ RSpec.describe Bike, type: :model do
         bike.bike_organization_ids = "#{organization2.id}, "
         expect(bike.reload.bike_organization_ids).to eq([organization2.id])
       end
-    end
-  end
-
-  describe "handlebar_type_name" do
-    let(:bike) { FactoryBot.create(:bike, handlebar_type: "bmx") }
-    it "returns the normalized name" do
-      normalized_name = HandlebarType.new(bike.handlebar_type).name
-      expect(bike.handlebar_type_name).to eq(normalized_name)
-    end
-  end
-
-  describe "cycle_type_name" do
-    let(:bike) { FactoryBot.create(:bike, cycle_type: "cargo") }
-    it "returns the normalized name" do
-      normalized_name = CycleType.new(bike.cycle_type).name
-      expect(bike.cycle_type_name).to eq(normalized_name)
-    end
-  end
-
-  describe "propulsion_type_name" do
-    let(:bike) { FactoryBot.create(:bike, propulsion_type: "electric-assist") }
-    it "returns the normalized name" do
-      normalized_name = PropulsionType.new(bike.propulsion_type).name
-      expect(bike.propulsion_type_name).to eq(normalized_name)
     end
   end
 

@@ -180,8 +180,8 @@
               - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
               = attr_list_item(@bike.rear_wheel_size&.name, t(".rear_wheel_diameter"))
 
-          = attr_list_item(@bike.frame_material_name, t(".frame_material"))
-          = attr_list_item(@bike.handlebar_type_name, t(".handlebar_type"))
+          = attr_list_item(@bike.frame_material&.name, t(".frame_material"))
+          = attr_list_item(@bike.handlebar_type&.name, t(".handlebar_type"))
         - if @bike.description.present?
           %h3
             = t(".distinguishing_features")

@@ -36,7 +36,7 @@ class BikeSerializer < ApplicationSerializer
   end
 
   def type_of_cycle
-    object.cycle_type_name
+    object.cycle_type&.name
   end
 
   def manufacturer_name
@@ -90,10 +90,10 @@ class BikeSerializer < ApplicationSerializer
   end
 
   def frame_material
-    object.frame_material_name
+    object.frame_material&.name
   end
 
   def handlebar_type
-    object.handlebar_type_name
+    object.handlebar_type&.name
   end
 end

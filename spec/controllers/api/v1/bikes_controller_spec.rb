@@ -445,11 +445,11 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         expect(bike.paint.name).to eq("grazeen")
         expect(bike.description).to eq("something else")
-        expect(bike.frame_material_name).to eq("Steel")
+        expect(bike.frame_material&.name).to eq("Steel")
         expect(bike.frame_material).to eq("steel")
         expect(bike.handlebar_type).to eq("other")
         expect(bike.cycle_type).to eq("unicycle")
-        expect(bike.cycle_type_name).to eq("Unicycle")
+        expect(bike.cycle_type&.name).to eq("Unicycle")
       end
 
       it "creates a record even if the post is a string" do

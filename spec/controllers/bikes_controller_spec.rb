@@ -696,7 +696,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.current_ownership.origin).to eq "embed_extended"
             expect(bike.current_ownership.organization).to eq organization
             expect(bike.current_ownership.creator).to eq bike.creator
-            expect(bike.cycle_type_name).to eq "Pedi Cab (rickshaw)"
+            expect(bike.cycle_type&.name).to eq "Pedi Cab (rickshaw)"
             expect(bike.manufacturer).to eq manufacturer
             expect(bike.public_images.count).to eq 1
           end
