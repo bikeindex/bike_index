@@ -10,8 +10,15 @@ module API
           optional :only_frame, type: Boolean, desc: "Only include Frame Manufacturers"
         end
         get "/" do
-          manufacturers = params[:only_frame].present? ? Manufacturer.frame_makers : Manufacturer
-          paginate manufacturers.reorder(:name)
+          manufacturers = if ParamsNormalizer.boolean(params[:only_frame])
+            Manufacturer.frame_makers
+          else
+            Manufacturer
+          end.reorder(:name)
+
+          ActiveModel::ArraySerializer.new(paginate(manufacturers),
+            each_serializer: ManufacturerSerializer,
+            root: "manufacturers").as_json
         end
 
         desc "Manufacturer matching ID or name", {
@@ -22,13 +29,13 @@ module API
         params do
           requires :id, type: String, desc: "Manufacturer id or slug"
         end
-        get ":id", serializer: ManufacturerV2ShowSerializer do
+        get ":id" do
           manufacturer = Manufacturer.friendly_find(params[:id])
           unless manufacturer.present?
             msg = "Unable to find manufacturer with name or id: #{params[:id]}"
             raise ActiveRecord::RecordNotFound, msg
           end
-          manufacturer
+          ManufacturerV2ShowSerializer.new(manufacturer, root: "manufacturer").as_json
         end
       end
     end
