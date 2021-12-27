@@ -35,7 +35,7 @@ RSpec.describe BikeSerializer, type: :lib do
   describe "caching" do
     include_context :caching_basic
     it "is not cached" do
-      expect(serializer.perform_caching).to be_falsey
+      expect(serializer.perform_caching).to be_truthy
       expect(serializer.as_json.is_a?(Hash)).to be_truthy
     end
   end
