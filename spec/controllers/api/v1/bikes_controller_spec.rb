@@ -3,8 +3,12 @@ require "rails_helper"
 RSpec.describe Api::V1::BikesController, type: :controller do
   describe "index" do
     it "loads the page and have the correct headers" do
-      FactoryBot.create(:bike)
+      FactoryBot.create(:bike, handlebar_type: "flat")
       get :index, params: {format: :json}
+      bike = json_result["bikes"].first
+      expect(bike["id"]).to be_present
+      expect(bike["handlebar_type"]).to eq "Flat or riser"
+      expect(bike.keys.include?("user_hidden")).to be_falsey
       expect(response.code).to eq("200")
     end
     context "stolen bike" do
