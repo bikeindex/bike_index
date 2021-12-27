@@ -10,6 +10,7 @@ class Component < ApplicationRecord
   belongs_to :manufacturer
   belongs_to :ctype
   belongs_to :bike
+  belongs_to :bike_version
 
   before_save :set_front_or_rear
 
