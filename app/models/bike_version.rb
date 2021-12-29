@@ -23,6 +23,22 @@ class BikeVersion < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
+  def authorized?(u, no_superuser_override: false)
+    return false if u.blank?
+    return true if !no_superuser_override && u.superuser?
+    u == owner
+  end
+
+  def visible_by?(passed_user = nil)
+    return true unless user_hidden || deleted?
+    if passed_user.present?
+      return true if passed_user.superuser?
+      return false if deleted?
+      return true if user_hidden && authorized?(passed_user)
+    end
+    false
+  end
+
   def calculated_listing_order
     t = (updated_at || Time.current).to_i / 10000
     public_images.present? ? t : t / 100

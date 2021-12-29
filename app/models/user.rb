@@ -207,7 +207,9 @@ class User < ApplicationRecord
 
   def authorized?(obj, no_superuser_override: false)
     return true if !no_superuser_override && superuser?
-    return obj.authorized?(self, no_superuser_override: no_superuser_override) if obj.is_a?(Bike)
+    if %w[Bike BikeVersion].include?(obj.class.name)
+      return obj.authorized?(self, no_superuser_override: no_superuser_override)
+    end
     return member_of?(obj) if obj.is_a?(Organization)
     return obj.claimable_by?(self) if obj.is_a?(BikeSticker)
     false
