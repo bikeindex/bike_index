@@ -73,9 +73,8 @@ RSpec.describe BikeV2Serializer do
   describe "caching" do
     let(:bike) { Bike.new }
     include_context :caching_basic
-    # TODO: after #2123, switch this to cache!
-    it "is not cached" do
-      expect(serializer.perform_caching).to be_falsey
+    it "is cached" do
+      expect(serializer.perform_caching).to be_truthy
       expect(serializer.as_json.is_a?(Hash)).to be_truthy
     end
   end

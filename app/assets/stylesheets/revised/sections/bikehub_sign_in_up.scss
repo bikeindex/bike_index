@@ -10,6 +10,13 @@ $bikehub-text-color: #212529;
     padding: 0;
   }
 
+  @include media-breakpoint-down(xs) {
+    .container-fluid {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+  }
+
   .primary-logos {
     span,
     a,
@@ -114,7 +121,7 @@ $bikehub-text-color: #212529;
     width: 1.5em;
     height: 1.5em;
     vertical-align: middle;
-    content: "";
+    content: '';
     color: rgba(0, 0, 0, 0.5);
     border-color: rgba(0, 0, 0, 0.1);
     background: no-repeat center center;
@@ -263,7 +270,7 @@ $bikehub-text-color: #212529;
 @media (min-width: 500px) {
   .bikehub {
     .bikehub-banner-header {
-      background-image: image-url("landing_pages/header_bg_bike_hub.jpg");
+      background-image: image-url('landing_pages/header_bg_bike_hub.jpg');
       background-size: auto 100%;
       background-position: right center;
       background-repeat: no-repeat;

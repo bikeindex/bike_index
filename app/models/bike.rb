@@ -915,7 +915,7 @@ class Bike < ApplicationRecord
   end
 
   def handlebar_type_name
-    HandlebarType.new(handlebar_type).name
+    HandlebarType.new(handlebar_type)&.name
   end
 
   def cycle_type_name
