@@ -155,6 +155,7 @@ Rails.application.routes.draw do
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"
 
+  resources :bike_versions
   resources :bike_stickers, only: [:update]
   resources :locks, except: %(show index)
   resources :impound_claims, only: [:create, :update]
