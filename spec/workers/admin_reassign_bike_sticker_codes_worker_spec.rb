@@ -31,6 +31,7 @@ RSpec.describe AdminReassignBikeStickerCodesWorker, type: :job do
         instance.perform(user.id, organization2.id, bike_sticker_batch.id, bike_sticker2.id, bike_sticker3.id)
       end.to change(BikeStickerUpdate, :count).by 2
       expect(bike_sticker1.reload.bike_sticker_updates.count).to eq 0
+
       # Running again doesn't do anything!
       expect do
         instance.perform(user.id, organization2.id, bike_sticker_batch.id, bike_sticker2.id, bike_sticker3.id)
@@ -45,8 +46,7 @@ RSpec.describe AdminReassignBikeStickerCodesWorker, type: :job do
       expect(bike_sticker_update.kind).to eq "admin_reassign"
       expect(bike_sticker_update.creator_kind).to eq "creator_user"
       expect(bike_sticker_update.organization_kind).to eq "primary_organization"
-
-
+      # And the other sticker is updated as well
       expect(bike_sticker3.reload.bike_sticker_updates.count).to eq 1
       expect(bike_sticker3.organization_id).to eq organization2.id
       expect(bike_sticker_update.user_id).to eq user.id

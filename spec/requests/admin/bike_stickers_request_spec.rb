@@ -34,25 +34,6 @@ RSpec.describe Admin::BikeStickersController, type: :request do
     end
   end
 
-  describe "edit" do
-    let!(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
-    let(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "A1102") }
-    context "no id" do
-      it "redirects to reassign" do
-        get "#{base_url}/#{bike_sticker1.id}/edit"
-        expect(response).to redirect_to(edit_admin_bike_sticker_path("reassign"))
-      end
-
-    end
-    it "renders" do
-      get "#{base_url}/reassign/edit"
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:edit)
-      expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker1.id])
-      expect(assigns(:valid_grouping)).to be_falsey
-    end
-  end
-
   describe "create" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:valid_params) do
@@ -125,6 +106,29 @@ RSpec.describe Admin::BikeStickersController, type: :request do
           expect(bike_sticker_batch.errors.full_messages.join).to match("##{bike_sticker_batch1.id}")
         end
       end
+    end
+  end
+
+  describe "reassign" do
+    let!(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
+    let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch) }
+    it "doesn't do invalid things" do
+      get "#{base_url}/reassign"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:edit)
+      expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker1.id])
+      expect(assigns(:valid_selection)).to be_falsey
+      Sidekiq::Worker.clear_all
+      get "#{base_url}/reassign", params: {search_first_sticker: bike_sticker1.code,
+        search_last_sticker: bike_sticker1.code,
+        search_bike_sticker_batch_id: bike_sticker_batch.id,
+        organization_id: organization.id,
+        reassign_now: true}
+      expect(AdminReassignBikeStickerCodesWorker.jobs.count).to eq 0
+      expect(flash[:error]).to be_present
+    end
+    context "valid update" do
+      it "updates"
     end
   end
 end
