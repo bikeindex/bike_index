@@ -108,4 +108,58 @@ RSpec.describe Admin::BikeStickersController, type: :request do
       end
     end
   end
+
+  describe "reassign" do
+    let!(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
+    let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, prefix: "V") }
+    let(:organization) { FactoryBot.create(:organization) }
+    it "doesn't do invalid things" do
+      get "#{base_url}/reassign"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:reassign)
+      expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker1.id])
+      expect(assigns(:valid_selection)).to be_falsey
+      Sidekiq::Worker.clear_all
+      get "#{base_url}/reassign", params: {search_first_sticker: bike_sticker1.code,
+                                           search_last_sticker: bike_sticker1.code,
+                                           search_bike_sticker_batch_id: bike_sticker_batch.id,
+                                           organization_id: organization.id,
+                                           reassign_now: true}
+      expect(AdminReassignBikeStickerCodesWorker.jobs.count).to eq 0
+    end
+    context "valid update" do
+      let!(:bike_stickers) { bike_sticker_batch.create_codes(4, initial_code_integer: 22122) }
+      let(:selection_params) do
+        {
+          search_sticker1: "v 221 23",
+          search_sticker2: "v 221 25",
+          search_bike_sticker_batch_id: bike_sticker_batch.id,
+          organization_id: organization.id
+        }
+      end
+      it "updates" do
+        expect(bike_sticker_batch.reload.bike_stickers.count).to eq 4
+        get "#{base_url}/reassign", params: selection_params
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:reassign)
+        expect(assigns(:bike_stickers).count).to eq 3
+        expect(assigns(:valid_selection)).to be_truthy
+        Sidekiq::Worker.clear_all
+        get "#{base_url}/reassign", params: selection_params.merge(reassign_now: true)
+        expect(AdminReassignBikeStickerCodesWorker.jobs.count).to eq 1
+        expect(BikeStickerUpdate.count).to eq 0
+        expect(flash[:success]).to be_present
+        AdminReassignBikeStickerCodesWorker.drain
+        expect(BikeStickerUpdate.count).to eq 3
+        target_update_attrs = {
+          organization_id: organization.id,
+          user_id: current_user.id,
+          kind: "admin_reassign",
+          creator_kind: "creator_user",
+          organization_kind: "primary_organization"
+        }
+        expect(BikeStickerUpdate.where(target_update_attrs).count).to eq 3
+      end
+    end
+  end
 end

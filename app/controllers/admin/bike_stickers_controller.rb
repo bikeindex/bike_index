@@ -3,22 +3,17 @@ class Admin::BikeStickersController < Admin::BaseController
   before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    @bike_stickers =
-      matching_bike_stickers
-        .reorder("bike_stickers.#{sort_column} #{sort_direction}")
-        .includes(:organization)
-        .page(page)
-        .per(per_page)
+    @bike_stickers = scoped_bike_stickers(matching_bike_stickers)
+
     @bike_sticker_batches = if @bike_sticker_batch.present?
       [@bike_sticker_batch]
     elsif @matching_batches
       BikeStickerBatch.where(id: @bike_stickers.reorder(:bike_sticker_batch_id).distinct.pluck(:bike_sticker_batch_id))
         .reorder(id: :desc)
+        .includes(:organization)
     else
       @all_batches = ParamsNormalizer.boolean(params[:search_all_batches])
-      batches = BikeStickerBatch.reorder(id: :desc)
+      batches = BikeStickerBatch.reorder(id: :desc).includes(:organization)
       @all_batches ? batches : batches.limit(5)
     end
   end
@@ -31,7 +26,7 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def create
-    create_batch_if_valid
+    create_batch_if_valid!
     if @bike_sticker_batch.id.present?
       flash[:success] = "Batch ##{@bike_sticker_batch.id} created. Please wait a few minutes for the stickers to finish creating"
       CreateBikeStickerCodesWorker.perform_async(@bike_sticker_batch.id,
@@ -43,12 +38,50 @@ class Admin::BikeStickersController < Admin::BaseController
     end
   end
 
-  helper_method :matching_bike_stickers
+  def reassign
+    @bike_stickers = scoped_bike_stickers(selected_bike_stickers)
+    # Check that the selection matches our criteria
+    @valid_selection = @bike_sticker1.present? &&
+      selected_bike_stickers.count > 0 &&
+      selected_bike_stickers.count <= max_reassign_size &&
+      params[:organization_id].present? &&
+      params[:search_bike_sticker_batch_id].present?
+    # update if possible
+    if @valid_selection && ParamsNormalizer.boolean(params[:reassign_now])
+      AdminReassignBikeStickerCodesWorker.perform_async(current_user.id,
+        current_organization.id,
+        @bike_sticker_batch.id,
+        @bike_sticker1&.id,
+        @bike_sticker2&.id)
+      flash[:success] = "Reassigning organization! Please wait a few minutes for the stickers to finish updating"
+      redirect_to admin_bike_stickers_path
+      return
+    end
+    @bike_sticker_batches = if @bike_sticker_batch.present?
+      [@bike_sticker_batch]
+    else
+      BikeStickerBatch.where(organization_id: 1).reorder(id: :desc)
+    end
+  end
+
+  helper_method :matching_bike_stickers, :max_reassign_size, :selected_bike_stickers
 
   private
 
+  def max_reassign_size
+    1000
+  end
+
   def sortable_columns
     %w[created_at updated_at claimed_at code_integer organization_id bike_sticker_batch_id]
+  end
+
+  def default_column
+    action_name == "reassign" ? "code_integer" : sortable_columns.first
+  end
+
+  def default_direction
+    action_name == "reassign" ? "asc" : "desc"
   end
 
   def matching_bike_stickers
@@ -76,6 +109,41 @@ class Admin::BikeStickersController < Admin::BaseController
     @matching_bike_stickers = bike_stickers.where(@time_range_column => @time_range)
   end
 
+  def selected_bike_stickers
+    return @selected_bike_stickers if defined?(@selected_bike_stickers)
+    bike_stickers = BikeSticker.all
+    if params[:search_sticker1].present?
+      @bike_sticker1 = bike_stickers.lookup(params[:search_sticker1])
+      if @bike_sticker1.present?
+        bike_stickers = bike_stickers.where("code_integer >= ?", @bike_sticker1.code_integer)
+      end
+    end
+    if params[:search_sticker2].present?
+      @bike_sticker2 = bike_stickers.lookup(params[:search_sticker2])
+      if @bike_sticker2.present?
+        bike_stickers = bike_stickers.where("code_integer <= ?", @bike_sticker2.code_integer)
+      end
+    end
+    # Assign batch based on passed sticker id or  the first sticker found
+    if params[:search_bike_sticker_batch_id].present?
+      @bike_sticker_batch = BikeStickerBatch.find(params[:search_bike_sticker_batch_id])
+    elsif @bike_sticker_batch.blank? && (@bike_sticker1.present? || @bike_sticker2.present?)
+      @bike_sticker_batch = @bike_sticker1&.bike_sticker_batch || @bike_sticker2&.bike_sticker_batch
+    end
+
+    bike_stickers = bike_stickers.where(bike_sticker_batch_id: @bike_sticker_batch.id) if @bike_sticker_batch.present?
+    @selected_bike_stickers = bike_stickers
+  end
+
+  def scoped_bike_stickers(stickers)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 25
+    stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
+      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates)
+      .page(page)
+      .per(per_page)
+  end
+
   def permitted_parameters
     params.require(:bike_sticker_batch)
       .permit(:notes, :prefix, :initial_code_integer, :code_number_length,
@@ -83,7 +151,7 @@ class Admin::BikeStickersController < Admin::BaseController
       .merge(user_id: current_user.id)
   end
 
-  def create_batch_if_valid
+  def create_batch_if_valid!
     @bike_sticker_batch = BikeStickerBatch.new(permitted_parameters)
     @bike_sticker_batch.validate
     unless @bike_sticker_batch.stickers_to_create_count.to_i > 0

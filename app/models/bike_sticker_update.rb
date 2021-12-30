@@ -1,5 +1,5 @@
 class BikeStickerUpdate < ApplicationRecord
-  KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3}.freeze
+  KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
   CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2}.freeze
   ORGANIZATION_KIND_ENUM = {no_organization: 0, primary_organization: 1, regional_organization: 2, other_organization: 3, other_paid_organization: 4}.freeze
 
@@ -13,13 +13,17 @@ class BikeStickerUpdate < ApplicationRecord
   enum creator_kind: CREATOR_KIND_ENUM
   enum organization_kind: ORGANIZATION_KIND_ENUM
 
-  scope :successful, -> { where.not(kind: "failed_claim") }
+  scope :successful, -> { where(kind: successful_kinds) }
   scope :unauthorized_organization, -> { where(organization_kind: organization_kinds_unauthorized) }
 
   before_save :set_calculated_attributes
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
+  end
+
+  def self.successful_kinds
+    kinds - %w[failed_claim admin_reassign]
   end
 
   def self.organization_kinds
