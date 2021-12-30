@@ -121,10 +121,10 @@ RSpec.describe Admin::BikeStickersController, type: :request do
       expect(assigns(:valid_selection)).to be_falsey
       Sidekiq::Worker.clear_all
       get "#{base_url}/reassign", params: {search_first_sticker: bike_sticker1.code,
-        search_last_sticker: bike_sticker1.code,
-        search_bike_sticker_batch_id: bike_sticker_batch.id,
-        organization_id: organization.id,
-        reassign_now: true}
+                                           search_last_sticker: bike_sticker1.code,
+                                           search_bike_sticker_batch_id: bike_sticker_batch.id,
+                                           organization_id: organization.id,
+                                           reassign_now: true}
       expect(AdminReassignBikeStickerCodesWorker.jobs.count).to eq 0
     end
     context "valid update" do

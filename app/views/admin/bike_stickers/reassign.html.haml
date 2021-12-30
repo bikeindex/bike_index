@@ -29,7 +29,7 @@
             - if @bike_sticker1.present?
               .col-12
                 .form-group.fancy-select.unfancy
-                  - opt_vals = BikeStickerBatch.order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id]  }
+                  - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id]  }
                   = label_tag :search_bike_sticker_batch_id, "Sticker Batch"
                   = select_tag :search_bike_sticker_batch_id, options_for_select(opt_vals, selected: @bike_sticker_batch&.id), placeholder: "Select batch", class: 'form-control', include_blank: true
             .col-sm-6
