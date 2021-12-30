@@ -17,7 +17,8 @@ class AdminReassignBikeStickerCodesWorker < ApplicationWorker
       BikeStickerUpdate.create(bike_sticker_id: bike_sticker.id,
         user_id: user_id,
         organization_id: organization_id,
-        kind: "admin_reassign")
+        kind: "admin_reassign",
+        organization_kind: "primary_organization")
     end
   end
 end

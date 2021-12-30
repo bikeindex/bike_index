@@ -47,8 +47,8 @@ class Admin::BikeStickersController < Admin::BaseController
     find_and_validate_selected_bike_stickers
     if @valid_selection && ParamsNormalizer.boolean(params[:reassign_now])
       AdminReassignBikeStickerCodesWorker.perform_async(current_user.id,
-        params[:organization_id],
-        params[:bike_sticker_batch_id],
+        current_organization.id,
+        @bike_sticker_batch.id,
         @bike_sticker1&.id,
         @bike_sticker2&.id)
       flash[:success] = "Reassigning organization! Please wait a few minutes for the stickers to finish updating"
