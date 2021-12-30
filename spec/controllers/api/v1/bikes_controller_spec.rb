@@ -8,7 +8,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       bike = json_result["bikes"].first
       expect(bike["id"]).to be_present
       expect(bike["handlebar_type"]).to eq "Flat or riser"
-      expect(bike.keys.include?("user_hidden")).to be_falsey
+      expect(bike.key?("user_hidden")).to be_falsey
       expect(response.code).to eq("200")
     end
     context "stolen bike" do
