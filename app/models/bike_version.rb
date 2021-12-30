@@ -1,4 +1,10 @@
 class BikeVersion < ApplicationRecord
+  VISIBILITY_ENUM = {
+    all_visible: 0,
+    user_hidden: 1,
+    visibile_not_related: 2
+  }.freeze
+
   acts_as_paranoid without_default_scope: true
 
   belongs_to :bike
@@ -17,9 +23,11 @@ class BikeVersion < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components
 
-  scope :user_hidden, -> { unscoped.where(user_hidden: true) }
+  enum visibility: VISIBILITY_ENUM
 
-  default_scope { without_deleted.where(user_hidden: false).order(listing_order: :desc) }
+  scope :user_hidden, -> { unscoped.user_hidden }
+
+  default_scope { without_deleted.where.not(visibility: "user_hidden").order(listing_order: :desc) }
 
   before_validation :set_calculated_attributes
 

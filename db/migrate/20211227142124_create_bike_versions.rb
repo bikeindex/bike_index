@@ -35,13 +35,14 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.integer :listing_order
       t.text :all_description
       t.string :mnfg_name
-      t.boolean :user_hidden
       t.float :frame_size_number
 
       t.integer :frame_material
       t.integer :handlebar_type
       t.integer :cycle_type
       t.integer :propulsion_type
+
+      t.integer :visibility, default: 0
 
       t.datetime :deleted_at
       t.timestamps
