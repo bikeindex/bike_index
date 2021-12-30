@@ -31,7 +31,7 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def create
-    create_batch_if_valid
+    create_batch_if_valid!
     if @bike_sticker_batch.id.present?
       flash[:success] = "Batch ##{@bike_sticker_batch.id} created. Please wait a few minutes for the stickers to finish creating"
       CreateBikeStickerCodesWorker.perform_async(@bike_sticker_batch.id,
@@ -43,9 +43,33 @@ class Admin::BikeStickersController < Admin::BaseController
     end
   end
 
-  helper_method :matching_bike_stickers
+  def edit
+    # Currently, we only are reassigning in admin sticker edit
+    unless params[:id] == "reassign"
+      redirect_to edit_admin_bike_sticker_path("reassign")
+      return
+    end
+    page = params[:page] || 1
+    per_page = params[:per_page] || 25
+    @bike_stickers = selected_bike_stickers
+      selected_bike_stickers
+        .reorder("bike_stickers.#{sort_column} #{sort_direction}")
+        .includes(:organization)
+        .page(page)
+        .per(per_page)
+    # Must be a single
+    @valid_grouping = params[:search_start_code].present? &&
+       selected_bike_stickers.count < max_reassign_size &&
+       selected_bike_stickers.distinct.pluck(:bike_sticker_batch_id).count == 1
+  end
+
+  helper_method :matching_bike_stickers, :max_reassign_size
 
   private
+
+  def max_reassign_size
+    500
+  end
 
   def sortable_columns
     %w[created_at updated_at claimed_at code_integer organization_id bike_sticker_batch_id]
@@ -76,6 +100,12 @@ class Admin::BikeStickersController < Admin::BaseController
     @matching_bike_stickers = bike_stickers.where(@time_range_column => @time_range)
   end
 
+  def selected_bike_stickers
+    return @selected_bike_stickers if defined?(@selected_bike_stickers)
+    bike_stickers = BikeSticker.all
+    @selected_bike_stickers = bike_stickers
+  end
+
   def permitted_parameters
     params.require(:bike_sticker_batch)
       .permit(:notes, :prefix, :initial_code_integer, :code_number_length,
@@ -83,7 +113,7 @@ class Admin::BikeStickersController < Admin::BaseController
       .merge(user_id: current_user.id)
   end
 
-  def create_batch_if_valid
+  def create_batch_if_valid!
     @bike_sticker_batch = BikeStickerBatch.new(permitted_parameters)
     @bike_sticker_batch.validate
     unless @bike_sticker_batch.stickers_to_create_count.to_i > 0

@@ -1,15 +1,7 @@
 .admin-subnav
-  .col-md-5
+  .col
     %h1
-      Manage Stickers
-  .col-md-7
-    %ul
-      %li.nav-item
-        = link_to "New batch", new_admin_bike_sticker_path, class: "btn btn-outline-success btn-sm"
-      %li.nav-item
-        %small= link_to "reassign", edit_admin_bike_sticker_path("reassign"), class: "btn btn-outline-info btn-sm less-strong ml-2"
-      %li.nav-item
-        = link_to "graph", admin_bike_stickers_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+      Reassign Stickers
 
   .col-12.mt-4
     - unless @bike_sticker_batch.present? # Doesn't make sense to count if there is a batch
