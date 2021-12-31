@@ -1309,37 +1309,6 @@ en:
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
   bikes_edit:
-    bike_fields:
-      revised_colors:
-        add_a_color: Add a color
-        choose_color: Choose color
-        color_help: Color help
-        primary_color_help_content_html: >-
-          The color of the frame and fork&mdash;not the wheels, cranks, or anything
-          else. You can put a more detailed description in paint description (once
-          you've registered), <em>this</em> is to get a general color to make searching
-          easier
-        primary_frame_color: Primary frame color
-        remove_color: Remove color
-        secondary_frame_color: Secondary frame color
-        tertiary_frame_color: Tertiary frame color
-      revised_component_fields:
-        component_type: Component type
-        model: Model
-        model_year: Model Year
-        other_manufacturer: Other manufacturer
-        part_description: Part Description
-        part_serial: Part Serial
-        part_type: Part type
-        remove_part: Remove part
-        unknown_part_type: Unknown part type
-      stolen_location:
-        address_or_intersection: Address or intersection
-        choose_country: Choose country
-        city: City
-        state: State
-        where_was_it_stolen_type: Where was it %{stolen_type}?
-        zipcode: Postal code
     accessories:
       add_a_component: Add a component
       other_handlebar_type: Other handlebar type
@@ -1374,6 +1343,37 @@ en:
       update_serial_number: Update serial number
       updated_serial: Updated serial
       zipcode: Postal code
+    bike_fields:
+      revised_colors:
+        add_a_color: Add a color
+        choose_color: Choose color
+        color_help: Color help
+        primary_color_help_content_html: >-
+          The color of the frame and fork&mdash;not the wheels, cranks, or anything
+          else. You can put a more detailed description in paint description (once
+          you've registered), <em>this</em> is to get a general color to make searching
+          easier
+        primary_frame_color: Primary frame color
+        remove_color: Remove color
+        secondary_frame_color: Secondary frame color
+        tertiary_frame_color: Tertiary frame color
+      revised_component_fields:
+        component_type: Component type
+        model: Model
+        model_year: Model Year
+        other_manufacturer: Other manufacturer
+        part_description: Part Description
+        part_serial: Part Serial
+        part_type: Part type
+        remove_part: Remove part
+        unknown_part_type: Unknown part type
+      stolen_location:
+        address_or_intersection: Address or intersection
+        choose_country: Choose country
+        city: City
+        state: State
+        where_was_it_stolen_type: Where was it %{stolen_type}?
+        zipcode: Postal code
     drivetrain:
       all_diameters: All diameters
       belt_drive: Belt Drive
@@ -1474,41 +1474,6 @@ en:
       were_so_glad: We're so glad you got your %{bike_type} back!
     report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
-    theft_details:
-      charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
-        ad on Facebook.
-      click_to_see_promoted_alert_blog_post_html: >-
-        Click %{link} to read about how Bike Index's Promoted Theft Alerts helped
-        recover a stolen bike in less than one day.
-      department_city: Department & city
-      description_of_the_incident: Description of the incident
-      do_these_things_for_the_best_chance: Do these things for the best chance of
-        recovery!
-      do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
-      eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
-        for its serial number
-      here: here
-      if_this_bike_type_was_added: >-
-        If this %{bike_type} was added to the Index by a bike shop, that counts as
-        proof of ownership
-      police_report: 'Police report #'
-      promoted_theft_alert_service_description: >-
-        Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
-        in the cycling community in the neighborhood where your bike was last seen.
-      promoted_theft_alerts: Promoted Theft Alerts
-      receive_notifications: Receive notifications from Bike Index about this stolen
-        %{bike_type}
-      show_phone_police: Show to verified law enforcement partners
-      show_phone_shops: Show to bike shop users
-      show_phone_users: Show phone to logged in users
-      try_one_now: Try one now!
-      we_can_create_fb_ads_for_you: >-
-        Did you know we can create targeted Facebook ads to spread the word about
-        your stolen bike for you?
-      when_was_it_stolen_at: When was it stolen
-      without_a_valid_report_number_html: >-
-        Without a valid report number, your bike won't be included in partner searches
-        by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
     theft_alerts:
       new:
         best_value: Best value
@@ -1544,6 +1509,41 @@ en:
         plan: Plan
         start: Start
         status: Status
+    theft_details:
+      charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
+        ad on Facebook.
+      click_to_see_promoted_alert_blog_post_html: >-
+        Click %{link} to read about how Bike Index's Promoted Theft Alerts helped
+        recover a stolen bike in less than one day.
+      department_city: Department & city
+      description_of_the_incident: Description of the incident
+      do_these_things_for_the_best_chance: Do these things for the best chance of
+        recovery!
+      do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
+      eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
+        for its serial number
+      here: here
+      if_this_bike_type_was_added: >-
+        If this %{bike_type} was added to the Index by a bike shop, that counts as
+        proof of ownership
+      police_report: 'Police report #'
+      promoted_theft_alert_service_description: >-
+        Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
+        in the cycling community in the neighborhood where your bike was last seen.
+      promoted_theft_alerts: Promoted Theft Alerts
+      receive_notifications: Receive notifications from Bike Index about this stolen
+        %{bike_type}
+      show_phone_police: Show to verified law enforcement partners
+      show_phone_shops: Show to bike shop users
+      show_phone_users: Show phone to logged in users
+      try_one_now: Try one now!
+      we_can_create_fb_ads_for_you: >-
+        Did you know we can create targeted Facebook ads to spread the word about
+        your stolen bike for you?
+      when_was_it_stolen_at: When was it stolen
+      without_a_valid_report_number_html: >-
+        Without a valid report number, your bike won't be included in partner searches
+        by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
   controllers:
     application:
       handle_unverified_request:

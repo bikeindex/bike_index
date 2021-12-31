@@ -1101,7 +1101,7 @@ RSpec.describe BikesController, type: :controller do
 
               put :update, params: {id: bike.id, bike: bike_attrs, edit_template: "fancy_template"}
               expect(flash[:error]).to_not be_present
-              expect(response).to redirect_to edit_bike_url(edit_template: "fancy_template")
+              expect(response).to redirect_to edit_bike_url(bike, edit_template: "fancy_template")
               bike.reload
               expect(bike.status).to eq "status_stolen"
 
