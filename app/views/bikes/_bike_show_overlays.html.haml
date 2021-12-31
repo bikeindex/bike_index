@@ -129,7 +129,7 @@
             - else
               -# The bike has been sent to someone other than the current_user
               = t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
-            = link_to  t(".edit"), edit_bike_path, class: "btn btn-secondary"
+            = link_to  t(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "btn btn-secondary"
 
 - if modal_title.present?
   -# This is for stolen modal or claim modal

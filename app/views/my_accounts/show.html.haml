@@ -62,7 +62,7 @@
                           = attr_list_item(l(bike.current_impound_record.impounded_at, format: :dotted), t('.date_found'))
                           = attr_list_item(bike.current_impound_record.address, t(".location"))
                       %ul.attr-list
-                        %li= link_to t(".edit_bike"), edit_bike_path(bike)
+                        %li= link_to t(".edit_bike"), edit_bike_path(bike, edit_template: bike.default_edit_template)
                         - if bike.status_stolen?
                           -# %li
                           -#   # Hide printable PDF because it isn't working right now :(

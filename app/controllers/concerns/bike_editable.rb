@@ -59,15 +59,12 @@ module BikeEditable
     @edit_templates = edit_templates
     @permitted_return_to = permitted_return_to
 
-    # Determine the appropriate edit template to use in the edit view.
-    #
     # If provided an invalid template name, redirect to the default page for a stolen /
     # unstolen bike
-    default_template = @bike.status_stolen? ? "theft_details" : "bike_details"
-    @edit_template = requested_page || default_template
+    @edit_template = requested_page || @bike.default_edit_template
     valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
     unless valid_requested_page && controller_name == edits_controller_name_for(@edit_template)
-      redirect_template = valid_requested_page ? @edit_template : default_template
+      redirect_template = valid_requested_page ? @edit_template : @bike.default_edit_template
       redirect_to(edit_bike_template_path_for(@bike, redirect_template))
       return false
     end
