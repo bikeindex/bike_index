@@ -35,7 +35,7 @@ RSpec.describe BikeVersion, type: :model do
       expect(superuser.authorized?(bike_version, no_superuser_override: true)).to be_falsey
     end
     context "user_hidden" do
-      let(:bike_version) { FactoryBot.create(:bike_version, user_hidden: true) }
+      let(:bike_version) { FactoryBot.create(:bike_version, visibility: "user_hidden") }
       it "is as expected" do
         expect(bike_version.authorized?(nil)).to be_falsey
         expect(bike_version.authorized?(user)).to be_falsey
