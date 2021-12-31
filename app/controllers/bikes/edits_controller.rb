@@ -1,9 +1,10 @@
+# Note: Created this controller in #2133 so that it could be shared with bike_versions
+# ... also because it was nice to break out the existing setup
 class Bikes::EditsController < Bikes::BaseController
   include BikeEditable
 
   def show
     @page_errors = @bike.errors
-    # NOTE: switched to edit_template param in #2040 (from page), because page is used for pagination
     return unless setup_edit_template(params[:edit_template] || params[:page]) # Returns nil if redirecting
 
     if @edit_template == "photos"

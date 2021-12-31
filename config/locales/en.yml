@@ -1340,10 +1340,10 @@ en:
         state: State
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
-    edit_accessories:
+    accessories:
       add_a_component: Add a component
       other_handlebar_type: Other handlebar type
-    edit_bike_details:
+    bike_details:
       a_qr_sticker: a QR Sticker
       add_a_sticker_label_html: Add %{sticker_information_link}
       bike_name: Bike Name
@@ -1374,7 +1374,7 @@ en:
       update_serial_number: Update serial number
       updated_serial: Updated serial
       zipcode: Postal code
-    edit_drivetrain:
+    drivetrain:
       all_diameters: All diameters
       belt_drive: Belt Drive
       choose_diameter: Choose diameter
@@ -1395,7 +1395,7 @@ en:
       sidetitleize_wheel: "%{sidetitleize} wheel"
       wheels: Wheels
       wide: Wide
-    edit_groups:
+    groups:
       add_an_organization: Add another organization
       are_you_part_of_a_school_want_to_bolster_: >-
         Are you a student of one of our school or university partners? Want to let
@@ -1407,7 +1407,7 @@ en:
       groups_and_organizations: Groups and Organizations
       other_organizations: Other organizations
       remove: Remove
-    edit_ownership:
+    ownership:
       impound_record_page: Impound record page
       sell_trade_or_give_away_this_bike: >-
         Sell, trade or give away this %{bike_type}? Enter the new owner's email to
@@ -1420,18 +1420,18 @@ en:
         If you want to transfer the bike to a new owner, update it with "Transferred
         To New Owner" from the %{link_to_impound_record_page}.
       transfer_ownership: Transfer Ownership
-    edit_photos:
+    photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button
       drag_the_uploaded_photos: Drag the uploaded photos to rearrange the order in
         which they appear
       finished_uploading: Finished uploading
-    edit_primary_menu:
+    primary_menu:
       bike_type_information: "%{bike_type} Information"
       purchase_alert: Purchase Alert
       save_changes: Save changes
       theft_information: Theft Information
-    edit_publicize:
+    publicize:
       do_these_things_for_the_best_chance_of_re: Do these things for the best chance
         of recovery!
       help_me_find_bike: Help me find my stolen bike!
@@ -1439,7 +1439,7 @@ en:
       share_on_twitter: Share on Twitter
       share_your_listing_so_everyone_knows_to_w: Share your listing - so everyone
         knows to watch out for your %{bike_type}!
-    edit_remove:
+    remove:
       delete_bike: Delete bike
       delete_this_bike: Delete this %{bike_type} from Bike Index
       faqs: FAQs
@@ -1459,7 +1459,7 @@ en:
         You can always toggle this setting to show and hide a bike.
       you_can_read_more_html: You can read more about why this is important to us
         in our %{faq_link}.
-    edit_report_recovered:
+    report_recovered:
       can_we_share_your_story: Can we share your story?
       did_we_help: Did we help?
       how_did_you_get_it_back: How did you get it back?
@@ -1472,9 +1472,9 @@ en:
         back, we really care!
       this_bike_has_been_returned: This %{bike_type} has been returned!
       were_so_glad: We're so glad you got your %{bike_type} back!
-    edit_report_stolen:
+    report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
-    edit_theft_details:
+    theft_details:
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
       click_to_see_promoted_alert_blog_post_html: >-
