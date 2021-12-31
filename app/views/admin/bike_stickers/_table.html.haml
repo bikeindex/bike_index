@@ -1,5 +1,6 @@
 - render_sortable ||= false
 - bike_code_batch_organizations = BikeStickerBatch.all.map { |b| [b.id.to_s, b.organization&.short_name] }.to_h
+- skip_updates ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -15,6 +16,9 @@
             = sortable "updated_at"
           - else
             Updated
+      - unless skip_updates
+        %th.small
+          Updates
       %th
         - if render_sortable
           = sortable "organization_id"
@@ -41,15 +45,24 @@
       - bike_stickers.each do |bike_sticker|
         %tr
           %td
-            - if bike_sticker.organization.present?
-              - bike_sticker_url = edit_organization_sticker_path(organization_id: bike_sticker.organization_id, id: bike_sticker.code)
-            - else
-              - bike_sticker_url = "/bikes/scanned/#{bike_sticker.code}"
-            %a.convertTime{ href: bike_sticker_url }
-              = l bike_sticker.created_at, format: :convert_time
+            .less-strong-hold
+              - if bike_sticker.organization.present?
+                - bike_sticker_url = edit_organization_sticker_path(organization_id: bike_sticker.organization_id, id: bike_sticker.code)
+              - else
+                - bike_sticker_url = "/bikes/scanned/#{bike_sticker.code}"
+              %a.convertTime{ href: bike_sticker_url }
+                = l bike_sticker.created_at, format: :convert_time
+              - if display_dev_info?
+                -# Add a space so that the id doesn't get grouped with the time
+                &nbsp;
+                %span.less-strong-right.d-none.d-md-block.only-dev-visible
+                  = bike_sticker.id
           %td
             %a.small.convertTime{ href: admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id) }
               = l bike_sticker.updated_at, format: :convert_time
+          - unless skip_updates
+            %td
+              = link_to admin_number_display(bike_sticker.bike_sticker_updates.count), admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id)
           %td
             - if bike_sticker.organization.present?
               = link_to bike_sticker.organization.name, admin_bike_stickers_path(sortable_search_params.merge(organization_id: bike_sticker.organization_id))

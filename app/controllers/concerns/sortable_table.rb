@@ -6,7 +6,7 @@ module SortableTable
   end
 
   def sort_column
-    sortable_columns.include?(params[:sort]) ? params[:sort] : sortable_columns.first
+    sortable_columns.include?(params[:sort]) ? params[:sort] : default_column
   end
 
   def sort_direction
@@ -16,5 +16,9 @@ module SortableTable
   # So it can be overridden
   def default_direction
     "desc"
+  end
+
+  def default_column
+    sortable_columns.first
   end
 end

@@ -7,6 +7,8 @@
       %li.nav-item
         = link_to "New batch", new_admin_bike_sticker_path, class: "btn btn-outline-success btn-sm"
       %li.nav-item
+        %small= link_to "reassign", reassign_admin_bike_stickers_path, class: "btn btn-outline-secondary btn-sm less-strong ml-2"
+      %li.nav-item
         = link_to "graph", admin_bike_stickers_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
   .col-12.mt-4
@@ -74,11 +76,13 @@
             %li.small
               %code
                 = int
-      Non-sequential stickers:
-      %ul
-        - @bike_sticker_batch.non_sequential_integers.each do |arr|
-          %li.small
-            #{arr[0]} > #{arr[1]}
+
+      - if @bike_sticker_batch.non_sequential_integers.any?
+        Non-sequential stickers:
+        %ul
+          - @bike_sticker_batch.non_sequential_integers.each do |arr|
+            %li.small
+              #{arr[0]} > #{arr[1]}
   .col-md-6.mt-2
     = form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"

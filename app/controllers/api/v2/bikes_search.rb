@@ -50,7 +50,7 @@ module API
           use :search_bikes
         end
         get "/" do
-          bikes_serialized(paginate find_bikes)
+          bikes_serialized(paginate(find_bikes))
         end
 
         desc "Stolen bike search", {
@@ -70,7 +70,7 @@ module API
         get "/stolen" do
           params[:stolen] = true
           set_proximity
-          bikes_serialized(paginate find_bikes)
+          bikes_serialized(paginate(find_bikes))
         end
 
         desc "Non-stolen bike search"
@@ -80,7 +80,7 @@ module API
         end
         get "/non_stolen" do
           params[:non_stolen] = true
-          bikes_serialized(paginate find_bikes)
+          bikes_serialized(paginate(find_bikes))
         end
 
         desc "Count of bikes matching search", {
@@ -123,7 +123,7 @@ module API
         end
         get "/close_serials" do
           close_bikes = BikeSearcher.new(params.merge(api_search: true)).close_serials
-          bikes_serialized(paginate close_bikes)
+          bikes_serialized(paginate(close_bikes))
         end
 
         desc "All stolen bikes", {
