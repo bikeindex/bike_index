@@ -401,12 +401,12 @@ CREATE TABLE public.bike_versions (
     listing_order integer,
     all_description text,
     mnfg_name character varying,
-    user_hidden boolean,
     frame_size_number double precision,
     frame_material integer,
     handlebar_type integer,
     cycle_type integer,
     propulsion_type integer,
+    visibility integer DEFAULT 0,
     deleted_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
