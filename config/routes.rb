@@ -153,7 +153,6 @@ Rails.application.routes.draw do
     resource :theft_alert, only: %i[new create show], controller: "bikes/theft_alerts"
   end
   get "bikes/:id/edit(/:edit_template)", to: "bikes/edits#show", as: :edit_bike
-  # get "bikes/:id/edit", to: "bikes/edits#show", as: :edit_bike
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"
 

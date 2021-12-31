@@ -4,7 +4,7 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "bikes/edit_primary_menu", locals: { no_save_button: true }
+      = render partial: "/bikes_edit/edit_primary_menu", locals: { no_save_button: true }
 
       .col-md-8.form-well#form_well_wrap
         - if @bike.current_stolen_record&.display_checklist?
@@ -13,7 +13,7 @@
               %h3.header-font-alt
                 = t(".do_these_things_for_the_best_chance_of_re")
 
-            = render partial: "bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+            = render partial: "/bikes_edit/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
 
         .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
           .form-well-form-header

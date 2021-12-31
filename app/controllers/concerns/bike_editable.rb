@@ -1,4 +1,4 @@
-module SortableTable
+module BikeEditable
   extend ActiveSupport::Concern
 
   included do

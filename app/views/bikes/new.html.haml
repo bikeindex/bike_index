@@ -77,7 +77,7 @@
               = f.text_field :frame_model, class: 'form-control'
 
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
-          = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
+          = render partial: '/bikes_edit/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
           -# Show the phone if the bike is stolen, the organization requires phone
           -# only show the phone for impounded records if the current user doesn't have a confirmed phone
@@ -91,11 +91,11 @@
 
           - if @bike.status_stolen?
             = fields_for @bike.stolen_records.last do |srecord|
-              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
+              = render partial: '/bikes_edit/bike_fields/stolen_location', locals: { srecord: srecord }
 
           - if @bike.status_impounded?
             = fields_for @bike.impound_records.last do |irecord|
-              = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: irecord }
+              = render partial: '/bikes_edit/bike_fields/stolen_location', locals: { srecord: irecord }
 
           - if include_field_reg_address?(@organization, current_user) && BikeDisplayer.display_edit_address_fields?(@bike, current_user)
             .related-fields

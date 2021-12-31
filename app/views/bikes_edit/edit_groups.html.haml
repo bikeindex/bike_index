@@ -3,7 +3,7 @@
     = hidden_field_tag :return_to, params[:return_to]
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: 'bikes/edit_primary_menu'
+      = render partial: '/bikes_edit/edit_primary_menu'
 
       .col-md-8.form-well
         .form-wrap#edit_bike_organizations
@@ -82,4 +82,4 @@
                 +
               = t(".add_an_organization")
 
-          = render "shared/form_well_footer_save"
+          = render "/shared/form_well_footer_save"

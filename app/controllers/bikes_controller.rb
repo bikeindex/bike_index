@@ -149,22 +149,6 @@ class BikesController < Bikes::BaseController
     end
   end
 
-  def edit
-    @page_errors = @bike.errors
-    # NOTE: switched to edit_template param in #2040 (from page), because page is used for pagination
-    return unless setup_edit_template(params[:edit_template] || params[:page]) # Returns nil if redirecting
-
-    if @edit_template == "photos"
-      @private_images = PublicImage
-        .unscoped
-        .where(imageable_type: "Bike")
-        .where(imageable_id: @bike.id)
-        .where(is_private: true)
-    end
-
-    render "edit_#{@edit_template}".to_sym
-  end
-
   def update
     if params[:bike].present?
       begin
@@ -185,7 +169,7 @@ class BikesController < Bikes::BaseController
 
     @edit_templates = nil # update templates in case bike state has changed
     if @bike.errors.any? || flash[:error].present?
-      edit
+      edit_bike_url(@bike, edit_template: params[:edit_template])
     else
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present

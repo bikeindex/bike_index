@@ -3,7 +3,7 @@
     = hidden_field_tag :return_to, params[:return_to]
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: 'bikes/edit_primary_menu'
+      = render partial: '/bikes_edit/edit_primary_menu'
 
       .col-md-8.form-well
         .form-wrap
@@ -46,7 +46,7 @@
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
 
-          = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f }
+          = render partial: '/bikes_edit/bike_fields/revised_colors', locals: { f: f }
 
           .form-group.row.unnested-field
             = f.label :frame_material, t(".main_frame_material"), class: 'form-well-label'
