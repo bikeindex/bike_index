@@ -139,12 +139,10 @@ RSpec.describe ApplicationHelper, type: :helper do
           end
         end
       end
-      %w[edit update].each do |action|
-        context action do
-          it "returns edit_bike_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
-          end
+      context "update" do
+        it "returns edit_bike_skeleton" do
+          allow(view).to receive(:action_name) { "update" }
+          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
         end
       end
     end
@@ -181,6 +179,33 @@ RSpec.describe ApplicationHelper, type: :helper do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to be_nil
           end
+        end
+      end
+    end
+    describe "bike edit pages" do
+      context "bikes edit" do
+        it "returns edit_bike_skeleton" do
+          allow(view).to receive(:controller_name) { "edits" }
+          allow(view).to receive(:action_name) { "show" }
+          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
+        end
+      end
+      context "theft_alert" do
+        before { allow(view).to receive(:controller_name) { "theft_alert" } }
+        it "new returns edit_bike_skeleton" do
+          allow(view).to receive(:action_name) { "new" }
+          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
+        end
+        it "show returns edit_bike_skeleton" do
+          allow(view).to receive(:action_name) { "show" }
+          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
+        end
+      end
+      context "recovery" do
+        it "new returns edit_bike_skeleton" do
+          allow(view).to receive(:controller_name) { "recovery" }
+          allow(view).to receive(:action_name) { "edit" }
+          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
         end
       end
     end
