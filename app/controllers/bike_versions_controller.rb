@@ -15,22 +15,6 @@ class BikeVersionsController < ApplicationController
   def create
   end
 
-  def edit
-    @page_errors = @bike.errors
-    # NOTE: switched to edit_template param in #2040 (from page), because page is used for pagination
-    return unless setup_edit_template(params[:edit_template] || params[:page]) # Returns nil if redirecting
-
-    if @edit_template == "photos"
-      @private_images = PublicImage
-        .unscoped
-        .where(imageable_type: "Bike")
-        .where(imageable_id: @bike.id)
-        .where(is_private: true)
-    end
-
-    render "edit_#{@edit_template}".to_sym
-  end
-
   def update
     if params[:bike].present?
       begin
@@ -75,7 +59,7 @@ class BikeVersionsController < ApplicationController
   end
 
   def ensure_user_allowed_to_edit
-    return true if @bike.authorized?(current_user)
+    return true if @bike_version.authorized?(current_user)
   end
 
   def render_ad

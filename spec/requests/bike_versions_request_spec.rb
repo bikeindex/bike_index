@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BikesController, type: :request do
+RSpec.describe BikeVersionsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bike_versions" }
   let(:current_user) { bike_version.owner }
@@ -19,11 +19,11 @@ RSpec.describe BikesController, type: :request do
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
-      bike_version.update(user_hidden: true)
+      bike_version.update(visibility: "user_hidden")
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
-      bike_version.update(user_hidden: false)
+      bike_version.update(visibility: "visible_not_related")
       bike_version.destroy
       expect {
         get "#{base_url}/#{bike_version.to_param}"
@@ -35,11 +35,11 @@ RSpec.describe BikesController, type: :request do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
-        bike_version.update(user_hidden: true)
+        bike_version.update(visibility: "user_hidden")
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
-        bike_version.update(user_hidden: false)
+        bike_version.update(visibility: "visible_not_related")
         bike_version.destroy
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
@@ -52,11 +52,11 @@ RSpec.describe BikesController, type: :request do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
-        bike_version.update(user_hidden: true)
+        bike_version.update(visibility: "user_hidden")
         expect {
           get "#{base_url}/#{bike_version.to_param}"
         }.to raise_error(ActiveRecord::RecordNotFound)
-        bike_version.update(user_hidden: true)
+        bike_version.update(visibility: "user_hidden")
         bike_version.destroy
         expect {
           get "#{base_url}/#{bike_version.to_param}"

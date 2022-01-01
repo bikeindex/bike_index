@@ -2,7 +2,7 @@ class BikeVersion < ApplicationRecord
   VISIBILITY_ENUM = {
     all_visible: 0,
     user_hidden: 1,
-    visibile_not_related: 2
+    visible_not_related: 2
   }.freeze
 
   acts_as_paranoid without_default_scope: true
