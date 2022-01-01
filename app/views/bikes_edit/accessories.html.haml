@@ -7,7 +7,7 @@
     = hidden_field_tag :return_to, params[:return_to]
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: 'bikes/edit_primary_menu'
+      = render partial: '/bikes_edit/primary_menu'
 
       .col-md-8.form-well#form_well_wrap{ data: { ctypeother: @ctype_other_id, manufacturerother: @manufacturer_other_id, handlebartypeother: handlebar_type_other } }
         .form-wrap
@@ -27,9 +27,9 @@
           %fieldset.add-additional
             #has_multiples_parts{ data: { ids: Ctype.where(has_multiple: true).map(&:id).to_json } }
             = f.fields_for :components do |builder|
-              = render 'bikes/bike_fields/revised_component_fields', f: builder
+              = render '/bikes_edit/bike_fields/revised_component_fields', f: builder
             %hr
             .add-additional-fields-block.no-divider-row
               = revised_link_to_add_components t(".add_a_component"), f, :components
 
-          = render "shared/form_well_footer_save"
+          = render "/shared/form_well_footer_save"

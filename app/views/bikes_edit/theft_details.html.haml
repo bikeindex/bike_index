@@ -4,7 +4,7 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: 'bikes/edit_primary_menu'
+      = render partial: '/bikes_edit/primary_menu'
 
       .col-md-8.form-well#form_well_wrap
         - if @bike.current_stolen_record&.display_checklist?
@@ -12,7 +12,7 @@
             .form-well-form-header-always-visible
               %h3.header-font-alt
                 = t(".do_these_things_for_the_best_chance")
-            = render partial: "bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+            = render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
 
         .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
           .form-well-form-header
@@ -58,7 +58,7 @@
                   = t(".show_phone_police")
 
 
-            = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord }
+            = render partial: '/bikes_edit/bike_fields/stolen_location', locals: { srecord: srecord }
 
             .form-group.row.unnested-field
               = srecord.label :estimated_value, class: 'form-well-label'
@@ -141,7 +141,7 @@
 
       %p.text-center
         = link_to t(".try_one_now"),
-          edit_bike_path(@bike, params: { edit_template: :alert }),
+          edit_bike_path(@bike, edit_template: :alert),
           class: "btn btn-md btn-primary"
 
   = render partial: "/shared/modal", locals: { title: modal_title, id: "tryAPromotedAlert", modal_body: modal_body, start_open: true }

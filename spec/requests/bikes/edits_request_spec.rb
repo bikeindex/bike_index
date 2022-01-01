@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "BikesController#edit", type: :request do
+RSpec.describe Bikes::EditsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bikes/#{bike.to_param}/edit" }
   let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
@@ -81,21 +81,21 @@ RSpec.describe "BikesController#edit", type: :request do
   it "renders" do
     get base_url
     expect(flash).to be_blank
-    expect(response).to render_template(:edit_bike_details)
+    expect(response).to render_template(:bike_details)
     expect(assigns(:bike).id).to eq bike.id
     expect_hashes_to_match(assigns(:edit_templates), edit_templates)
     # Because user is bike#user
     expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     # If passed an unknown template, it renders default template
     get base_url, params: {id: bike.id, edit_template: "root_party"}
-    expect(response).to redirect_to(edit_bike_url(bike, params: {edit_template: :bike_details}))
+    expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
   end
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
     it "renders" do
       get base_url
       expect(flash).to be_blank
-      expect(response).to render_template(:edit_theft_details)
+      expect(response).to render_template(:theft_details)
       expect(assigns(:edit_template)).to eq "theft_details"
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
@@ -126,7 +126,7 @@ RSpec.describe "BikesController#edit", type: :request do
       expect(response).to be_ok
       expect(assigns(:edit_template)).to eq "bike_details"
       expect(assigns(:edit_templates)).to eq edit_templates.as_json
-      expect(response).to render_template "edit_bike_details"
+      expect(response).to render_template "bike_details"
       expect(assigns(:show_general_alert)).to be_truthy
       expect(session[:return_to]).to be_blank
     end
@@ -140,7 +140,7 @@ RSpec.describe "BikesController#edit", type: :request do
         expect(assigns(:edit_template)).to eq "theft_details"
         expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
         expect(assigns(:show_general_alert)).to be_falsey
-        expect(response).to render_template "edit_theft_details"
+        expect(response).to render_template "theft_details"
       end
     end
     context "test all the edit templates" do
@@ -149,7 +149,7 @@ RSpec.describe "BikesController#edit", type: :request do
         # Grab all the template keys from the controller so we can test that we
         # render all of them Both to ensure we get all of them and because we
         # can't use the let block
-        bc = BikesController.new
+        bc = Bikes::EditsController.new
         bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
         # Don't test alert templates, they're in theft alerts controller
         bc.edit_templates.keys - %w[alert alert_purchase_confirmation]
@@ -167,7 +167,7 @@ RSpec.describe "BikesController#edit", type: :request do
           get base_url, params: {id: bike.id, edit_template: template}
 
           expect(response.status).to eq(200)
-          expect(response).to render_template("edit_#{template}")
+          expect(response).to render_template(template)
           expect(assigns(:edit_template)).to eq(template)
           expect(assigns(:private_images)).to eq([]) if template == "photos"
           expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
@@ -189,12 +189,12 @@ RSpec.describe "BikesController#edit", type: :request do
       expect(bike.authorized?(current_user)).to be_truthy
       get base_url
       expect(flash).to be_blank
-      expect(response).to render_template(:edit_bike_details)
+      expect(response).to render_template(:bike_details)
       expect(assigns(:edit_templates).keys).to match_array(target_edit_template_keys)
       # it also renders the found bike page
       get "#{base_url}?edit_template=found_details"
       expect(flash).to be_blank
-      expect(response).to render_template(:edit_found_details)
+      expect(response).to render_template(:found_details)
       expect(assigns(:edit_templates).keys).to match_array(target_edit_template_keys)
     end
     context "organized impound_record" do
@@ -237,9 +237,9 @@ RSpec.describe "BikesController#edit", type: :request do
           expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
           get base_url
           expect(flash).to be_blank
-          expect(response).to render_template(:edit_bike_details)
+          expect(response).to render_template(:bike_details)
           expect(assigns(:bike).id).to eq bike.id
-          expect(response).to render_template(:edit_bike_details)
+          expect(response).to render_template(:bike_details)
           # Found details go in organization edit
           expect(assigns(:edit_templates).keys).to match_array(target_edit_template_keys - ["found_details"])
         end
@@ -272,7 +272,7 @@ RSpec.describe "BikesController#edit", type: :request do
       expect(bike.authorized_by_organization?(u: current_user)).to be_truthy # Because it's impounded
       get base_url
       expect(flash).to be_blank
-      expect(response).to render_template(:edit_bike_details)
+      expect(response).to render_template(:bike_details)
       expect(assigns(:bike).id).to eq bike.id
     end
   end

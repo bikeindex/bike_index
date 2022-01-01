@@ -347,6 +347,11 @@ class Bike < ApplicationRecord
     self.class.status_humanized_translated(status_humanized)
   end
 
+  # The appropriate edit template to use in the edit view.
+  def default_edit_template
+    status_stolen? ? "theft_details" : "bike_details"
+  end
+
   # Small helper because we call this a lot
   def type
     cycle_type && cycle_type_name&.downcase

@@ -9,7 +9,7 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "/bikes/edit_primary_menu", locals: {purchase_plan_button: true}
+      = render partial: "/bikes_edit/primary_menu", locals: {purchase_plan_button: true}
 
       .col-md-8.form-well
         .form-wrap
@@ -50,7 +50,7 @@
           .row
             .col-sm-12.mt-4
               - if @bike.public_images.none?
-                %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos, return_to: "/bikes/#{@bike.id}/edit?edit_template=alert")))
+                %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos, return_to: "/bikes/#{@bike.id}/edit/alert")))
               - else
                 .image-selection-container#js-select-image-container
                   -# Promoted Alert Image Preview
