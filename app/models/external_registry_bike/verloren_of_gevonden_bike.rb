@@ -1,8 +1,4 @@
 class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
-  def registry_name
-    "verlorenofgevonden.nl"
-  end
-
   def registry_url
     "https://verlorenofgevonden.nl"
   end

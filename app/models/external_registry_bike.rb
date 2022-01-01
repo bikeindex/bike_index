@@ -15,6 +15,14 @@ class ExternalRegistryBike < ApplicationRecord
   enum status: Bike::STATUS_ENUM
 
   class << self
+    def registry_name(str)
+      return nil unless str.present?
+      reg = str.to_s.split("::").last.gsub("Bike", "")
+      return "StopHeling.nl" if reg == "StopHeling"
+      return "VerlorenOfGevonden.nl" if reg == "VerlorenOfGevonden"
+      reg.titleize
+    end
+
     def find_or_search_registry_for(serial_number:)
       serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
 
@@ -61,6 +69,13 @@ class ExternalRegistryBike < ApplicationRecord
     end
   end
 
+  def short_address
+    return nil unless location_found.present?
+    addy = location_found.split(",")
+    shorter_length = addy.length > 3 ? 3 : addy.length
+    addy[-shorter_length..].reject(&:blank?).map(&:strip).join(", ")
+  end
+
   def status_humanized
     shuman = Bike.status_humanized(status)
     return self.class.impounded_kind if shuman == "impounded"
@@ -80,7 +95,7 @@ class ExternalRegistryBike < ApplicationRecord
   end
 
   def registry_name
-    raise NotImplementedError
+    self.class.registry_name(type)
   end
 
   def registry_url

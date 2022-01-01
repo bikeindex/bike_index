@@ -1,8 +1,4 @@
 class ExternalRegistryBike::StopHelingBike < ExternalRegistryBike
-  def registry_name
-    "stopheling.nl"
-  end
-
   def registry_url
     "https://www.stopheling.nl"
   end
