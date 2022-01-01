@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe BikeVersion, type: :model do
+  it_behaves_like "bike_attributable"
+
   describe "factory" do
     let(:bike_version) { FactoryBot.create(:bike_version) }
     it "is valid" do
@@ -47,24 +49,6 @@ RSpec.describe BikeVersion, type: :model do
         expect(bike_version.visible_by?).to be_falsey
         expect(bike_version.visible_by?(user)).to be_falsey
         expect(bike_version.visible_by?(owner)).to be_truthy
-        expect(bike_version.visible_by?(superuser)).to be_truthy
-      end
-    end
-    context "deleted" do
-      let(:bike_version) { FactoryBot.create(:bike_version) }
-      it "is as expected" do
-        bike_version.destroy
-        expect(bike_version.deleted?).to be_truthy
-        expect(bike_version.authorized?(nil)).to be_falsey
-        expect(bike_version.authorized?(user)).to be_falsey
-        expect(bike_version.authorized?(owner)).to be_truthy
-        expect(bike_version.authorized?(owner, no_superuser_override: true)).to be_truthy
-        expect(bike_version.authorized?(superuser)).to be_truthy
-        expect(bike_version.authorized?(superuser, no_superuser_override: true)).to be_falsey
-        # visible
-        expect(bike_version.visible_by?).to be_falsey
-        expect(bike_version.visible_by?(user)).to be_falsey
-        expect(bike_version.visible_by?(owner)).to be_falsey
         expect(bike_version.visible_by?(superuser)).to be_truthy
       end
     end

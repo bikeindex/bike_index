@@ -374,9 +374,9 @@ CREATE TABLE public.bike_versions (
     bike_id bigint,
     paint_id bigint,
     manufacturer_id bigint,
-    primary_frame_color_id_id bigint,
-    secondary_frame_color_id_id bigint,
-    tertiary_frame_color_id_id bigint,
+    primary_frame_color_id bigint,
+    secondary_frame_color_id bigint,
+    tertiary_frame_color_id bigint,
     front_wheel_size_id bigint,
     rear_wheel_size_id bigint,
     rear_gear_type_id bigint,
@@ -407,7 +407,6 @@ CREATE TABLE public.bike_versions (
     cycle_type integer,
     propulsion_type integer,
     visibility integer DEFAULT 0,
-    deleted_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -4456,10 +4455,10 @@ CREATE INDEX index_bike_versions_on_paint_id ON public.bike_versions USING btree
 
 
 --
--- Name: index_bike_versions_on_primary_frame_color_id_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bike_versions_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bike_versions_on_primary_frame_color_id_id ON public.bike_versions USING btree (primary_frame_color_id_id);
+CREATE INDEX index_bike_versions_on_primary_frame_color_id ON public.bike_versions USING btree (primary_frame_color_id);
 
 
 --
@@ -4477,17 +4476,17 @@ CREATE INDEX index_bike_versions_on_rear_wheel_size_id ON public.bike_versions U
 
 
 --
--- Name: index_bike_versions_on_secondary_frame_color_id_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bike_versions_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bike_versions_on_secondary_frame_color_id_id ON public.bike_versions USING btree (secondary_frame_color_id_id);
+CREATE INDEX index_bike_versions_on_secondary_frame_color_id ON public.bike_versions USING btree (secondary_frame_color_id);
 
 
 --
--- Name: index_bike_versions_on_tertiary_frame_color_id_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bike_versions_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bike_versions_on_tertiary_frame_color_id_id ON public.bike_versions USING btree (tertiary_frame_color_id_id);
+CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versions USING btree (tertiary_frame_color_id);
 
 
 --

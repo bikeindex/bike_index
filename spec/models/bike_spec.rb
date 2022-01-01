@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
   it_behaves_like "geocodeable"
+  it_behaves_like "bike_attributable"
 
   describe "scopes and searching" do
     describe "scopes" do
@@ -1409,16 +1410,8 @@ RSpec.describe Bike, type: :model do
       it "caches the photo" do
         bike = FactoryBot.create(:bike)
         FactoryBot.create(:public_image, imageable: bike)
-        bike.reload
-        bike.cache_photo
-        expect(bike.thumb_path).not_to be_nil
-      end
-    end
-    context "no photo" do
-      it "removes existing cache if inaccurate" do
-        bike = Bike.new(thumb_path: "some url")
-        bike.cache_photo
-        expect(bike.thumb_path).to be_nil
+        bike.reload.update(updated_at: Time.current)
+        expect(bike.reload.thumb_path).not_to be_nil
       end
     end
   end
@@ -1471,34 +1464,6 @@ RSpec.describe Bike, type: :model do
       bike.reload
       expect(bike.cached_data).to eq target_cached_string
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
-    end
-  end
-
-  describe "frame_colors" do
-    it "returns an array of the frame colors" do
-      bike = Bike.new
-      color = Color.new
-      color2 = Color.new
-      allow(color).to receive(:name).and_return("Blue")
-      allow(color2).to receive(:name).and_return("Black")
-      allow(bike).to receive(:primary_frame_color).and_return(color)
-      allow(bike).to receive(:secondary_frame_color).and_return(color2)
-      allow(bike).to receive(:tertiary_frame_color).and_return(color)
-      expect(bike.frame_colors).to eq(%w[Blue Black Blue])
-    end
-  end
-
-  describe "cgroup_array" do
-    it "grabs a list of all the cgroups" do
-      bike = Bike.new
-      component1 = Component.new
-      component2 = Component.new
-      component3 = Component.new
-      allow(bike).to receive(:components) { [component1, component2, component3] }
-      allow(component1).to receive(:cgroup_id).and_return(1)
-      allow(component2).to receive(:cgroup_id).and_return(2)
-      allow(component3).to receive(:cgroup_id).and_return(2)
-      expect(bike.cgroup_array).to eq([1, 2])
     end
   end
 

@@ -5,9 +5,9 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.references :bike, index: true
       t.references :paint, index: true
       t.references :manufacturer, index: true
-      t.references :primary_frame_color_id, index: true
-      t.references :secondary_frame_color_id, index: true
-      t.references :tertiary_frame_color_id, index: true
+      t.references :primary_frame_color, index: true
+      t.references :secondary_frame_color, index: true
+      t.references :tertiary_frame_color, index: true
       t.references :front_wheel_size, index: true
       t.references :rear_wheel_size, index: true
       t.references :rear_gear_type, index: true
@@ -44,7 +44,6 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
 
       t.integer :visibility, default: 0
 
-      t.datetime :deleted_at
       t.timestamps
     end
     add_reference :components, :bike_version, index: true

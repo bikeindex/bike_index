@@ -1,6 +1,8 @@
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
+  include BikeSearchable
+  include BikeAttributable
   include Geocodeable
   include PgSearch::Model
 
@@ -17,21 +19,13 @@ class Bike < ApplicationRecord
     unregistered_parking_notification: 4
   }.freeze
 
-  belongs_to :manufacturer
-  belongs_to :primary_frame_color, class_name: "Color"
-  belongs_to :secondary_frame_color, class_name: "Color"
-  belongs_to :tertiary_frame_color, class_name: "Color"
-  belongs_to :rear_wheel_size, class_name: "WheelSize"
-  belongs_to :front_wheel_size, class_name: "WheelSize"
-  belongs_to :rear_gear_type
-  belongs_to :front_gear_type
-  belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: "User"
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :current_impound_record, class_name: "ImpoundRecord"
   belongs_to :current_ownership, class_name: "Ownership"
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
+  belongs_to :paint, counter_cache: true # Not in BikeAttributable because of counter cache
 
   has_many :bike_organizations
   has_many :organizations, through: :bike_organizations
@@ -45,8 +39,7 @@ class Bike < ApplicationRecord
   has_many :stolen_bike_listings
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
-  has_many :public_images, as: :imageable, dependent: :destroy
-  has_many :components
+  has_many :bike_versions
   has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
@@ -79,10 +72,6 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  enum frame_material: FrameMaterial::SLUGS
-  enum handlebar_type: HandlebarType::SLUGS
-  enum cycle_type: CycleType::SLUGS
-  enum propulsion_type: PropulsionType::SLUGS
   enum status: STATUS_ENUM
 
   delegate :bulk_import, :claimed?, :creation_description,
@@ -457,21 +446,21 @@ class Bike < ApplicationRecord
     user == u || current_ownership.claimable_by?(u)
   end
 
-  def authorized?(u, no_superuser_override: false)
-    return false if u.blank?
-    return true if !no_superuser_override && u.superuser?
+  def authorized?(passed_user, no_superuser_override: false)
+    return false if passed_user.blank?
+    return true if !no_superuser_override && passed_user.superuser?
     # authorization requires organization if impounded or marked abandoned by an organization
     unless authorization_requires_organization?
       # Since it doesn't require an organization, authorize by user
-      return true if u == owner || claimable_by?(u)
+      return true if passed_user == owner || claimable_by?(passed_user)
     end
-    authorized_by_organization?(u: u)
+    authorized_by_organization?(u: passed_user)
   end
 
-  def authorize_and_claim_for_user(u)
-    return authorized?(u) unless claimable_by?(u)
+  def authorize_and_claim_for_user(passed_user)
+    return authorized?(passed_user) unless claimable_by?(passed_user)
     current_ownership.mark_claimed
-    authorized?(u)
+    authorized?(passed_user)
   end
 
   # This method only accepts numerical org ids
@@ -837,23 +826,6 @@ class Bike < ApplicationRecord
     end
   end
 
-  def frame_colors
-    [
-      primary_frame_color&.name,
-      secondary_frame_color&.name,
-      tertiary_frame_color&.name
-    ].compact
-  end
-
-  # list of cgroups so that we can arrange them
-  def cgroup_array
-    components.map(&:cgroup_id).uniq
-  end
-
-  def cache_photo
-    self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
-  end
-
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
@@ -896,7 +868,7 @@ class Bike < ApplicationRecord
 
   def cache_bike
     cache_stolen_attributes
-    cache_photo
+    self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
     self.cached_data = [
       mnfg_name,
       (propulsion_type_name == "Foot pedal" ? nil : propulsion_type_name),
