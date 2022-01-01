@@ -38,7 +38,7 @@
 - if @bike.current_stolen_record&.display_checklist?
   %h3{style: "margin: 2rem 0 1rem"}
     = t(".html.improve_your_chances_of_recovery_by_doing")
-  = render partial: "bikes/stolen_checklist",
+  = render partial: "/bikes/stolen_checklist",
   locals: { stolen_record: @bike.current_stolen_record }
 
 %hr/

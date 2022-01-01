@@ -336,6 +336,20 @@ RSpec.describe HeaderTagHelper, type: :helper do
         end
       end
     end
+    describe "bikes edit" do
+      let(:controller_namespace) { "bikes" }
+      let(:controller_name) { "edits" }
+      let(:action_name) { "show" }
+      it "includes bike edit tags" do
+        @edit_templates = "stub"
+        @edit_template = "theft_details"
+        bike.mnfg_name = "Cool"
+        bike.frame_model = "Party"
+        @bike = bike # So it's assigned in the helper
+        header_tags = helper.bikes_header_tags
+        expect(header_tags.find { |t| t.include?("<title>") }).to eq("<title>Theft details - Cool Party</title>")
+      end
+    end
   end
 
   describe "news_header_tags" do

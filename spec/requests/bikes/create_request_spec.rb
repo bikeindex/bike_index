@@ -241,7 +241,7 @@ RSpec.describe "BikesController#create", type: :request do
         # Make sure things render
         expect(response).to redirect_to(edit_bike_path(new_bike))
         get edit_bike_path(new_bike) # Should make the bike claim
-        expect(response).to render_template("bikes/edit_bike_details")
+        expect(response).to render_template("bikes_edit/bike_details")
 
         new_bike.reload
         expect(new_bike.b_params.count).to eq 0
