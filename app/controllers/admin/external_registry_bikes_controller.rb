@@ -1,5 +1,6 @@
 class Admin::ExternalRegistryBikesController < Admin::BaseController
   include SortableTable
+  before_action :set_period, only: [:index]
   before_action :find_bike, only: %i[show]
 
   def index
@@ -14,10 +15,18 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
   def show
   end
 
+  helper_method :registry_types
+
   private
 
   def find_bike
     @bike = ExternalRegistryBike.find(params[:id])
+  end
+
+  def registry_types
+    ["Project529Bike",
+      "StopHelingBike",
+      "VerlorenOfGevondenBike"]
   end
 
   def matching_bikes
@@ -29,14 +38,25 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
       @matching_bikes = @matching_bikes.where(serial_normalized: params[:search_serial_normalized])
     end
 
-    if params[:type].present?
-      @matching_bikes = @matching_bikes.where(type: params[:type])
+    search_type = params[:search_type]&.split("::")&.last
+    @search_type = if registry_types.include?(search_type)
+      @matching_bikes = @matching_bikes.where(type: "ExternalRegistryBike::#{search_type}")
+      search_type
+    else
+      "all"
     end
 
-    @matching_bikes
+    @search_status = if Bike.statuses.include?(params[:search_status])
+      @matching_bikes = @matching_bikes.where(status: params[:search_status])
+      params[:search_status]
+    else
+      "all"
+    end
+
+    @matching_bikes = @matching_bikes.where(created_at: @time_range)
   end
 
   def sortable_columns
-    %w[created_at mnfg_name]
+    %w[created_at mnfg_name status]
   end
 end
