@@ -11,6 +11,7 @@
           - else
             = @search_kind.humanize
         .dropdown-menu
+          = link_to "All kinds", admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@search_kind == "all" ? 'active' : ''}"
           - BikeStickerUpdate.kinds.each do |kind|
             - kind_active = @search_kind == kind
             = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
@@ -21,6 +22,7 @@
           - else
             = @search_organization_kind.humanize
         .dropdown-menu
+          = link_to "All Organization kinds", admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: nil)), class: "dropdown-item #{@search_organization_kind == "all" ? 'active' : ''}"
           - BikeStickerUpdate.organization_kinds.each do |kind|
             - kind_active = @search_organization_kind == kind
             = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
@@ -31,6 +33,7 @@
           - else
             = @search_creator_kind.gsub("creator_", "").humanize
         .dropdown-menu
+          = link_to "All creators", admin_bike_sticker_updates_path(sortable_search_params.merge(search_creator_kind: nil)), class: "dropdown-item #{@search_creator_kind == "all" ? 'active' : ''}"
           - BikeStickerUpdate.creator_kinds.each do |creator_kind|
             - kind_active = @search_creator_kind == creator_kind
             = link_to creator_kind.gsub("creator_", "").humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_creator_kind: kind_active ? nil : creator_kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"

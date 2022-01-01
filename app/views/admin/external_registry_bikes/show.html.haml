@@ -5,7 +5,7 @@
 .row
   .col-lg-2.col-md-3.mt-auto.mb-2.admin-image-thumb
     - if @bike.thumb_url.present?
-      = image_tag @bike.thumb_url, alt: @bike.title_string
+      = image_tag @bike.thumb_url, alt: @bike.title_string, class: "d-block"
     - else
       %h3.less-strong
         No Image
