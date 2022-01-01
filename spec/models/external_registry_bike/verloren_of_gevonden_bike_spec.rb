@@ -15,6 +15,7 @@ RSpec.describe ExternalRegistryBike::VerlorenOfGevondenBike, type: :model do
       end
 
       it "returns a valid VerlorenOfGevondenBike instance" do
+        expect(bike.registry_name).to eq "VerlorenOfGevonden.nl"
         expect(bike).to be_a(ExternalRegistryBike)
         expect(bike).to be_an_instance_of(ExternalRegistryBike::VerlorenOfGevondenBike)
         expect(bike).to_not be_persisted

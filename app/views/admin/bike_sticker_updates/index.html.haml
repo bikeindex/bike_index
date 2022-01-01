@@ -44,7 +44,7 @@
 
 - if @render_chart
   - if @search_kind == "all"
-    - counts_by_kind = counts_by_kind = BikeStickerUpdate.kinds.map { |kind| { name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind)) } }
+    - counts_by_kind = BikeStickerUpdate.kinds.map { |kind| { name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind)) } }
     -# colors, if ever necessary to include the other response types: { green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0" }
     = column_chart counts_by_kind, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
   - else
@@ -84,18 +84,18 @@
               - if @search_kind == "all"
                 - update_kinds.each do |kind|
                   %td
-                    %small= number_with_delimiter(values[kind])
+                    %small= admin_number_display(values[kind])
               %td
-                = number_with_delimiter(values[:total])
+                = admin_number_display(values[:total])
           %tr
             %td Total
             - if @search_kind == "all"
               - update_kinds.each do |kind|
                 %td
                   %small
-                    = number_with_delimiter(matching_sticker_per_org_id.map { |id, values| values[kind] }.sum)
+                    = admin_number_display(matching_sticker_per_org_id.map { |id, values| values[kind] }.sum)
             %td
-              = number_with_delimiter(matching_sticker_per_org_id.map { |id, values| values[:total] }.sum)
+              = admin_number_display(matching_sticker_per_org_id.map { |id, values| values[:total] }.sum)
 
 .mt-2
   = render partial: "/shared/period_select"
@@ -103,7 +103,7 @@
 .row.mt-4.mb-2
   .col-md-6
     %p
-      = number_with_delimiter(@bike_sticker_updates.total_count)
+      = admin_number_display(@bike_sticker_updates.total_count)
       matching sticker updates
       %em
         = humanized_time_range(@time_range)
@@ -126,7 +126,7 @@
           = link_to "bike stickers", admin_bike_stickers_path(search_query: params[:search_query])
         - else
           bike stickers
-        %small= number_with_delimiter(@searched_bike_stickers.count)
+        %small= admin_number_display(@searched_bike_stickers.count)
       - if @searched_bike_stickers.count > 100
         %h3 More than 100 matching stickers, just showing the first 100
       = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @searched_bike_stickers.limit(100) }

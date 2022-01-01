@@ -22,7 +22,7 @@ RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
   describe ".build_from_api_response" do
     it "returns a valid ExternalRegistryBike object" do
       bike = described_class.build_from_api_response(bike_json)
-
+      expect(bike.registry_name).to eq "Project529"
       expect(bike).to an_instance_of(described_class)
       expect(bike).to_not be_persisted
       expect(bike.valid?).to eq(true), bike.errors.full_messages.to_sentence
