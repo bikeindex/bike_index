@@ -14,10 +14,14 @@ module BikeAttributable
     has_many :public_images, as: :imageable, dependent: :destroy
     has_many :components
 
+    accepts_nested_attributes_for :components, allow_destroy: true
+
     enum frame_material: FrameMaterial::SLUGS
     enum handlebar_type: HandlebarType::SLUGS
     enum cycle_type: CycleType::SLUGS
     enum propulsion_type: PropulsionType::SLUGS
+
+    scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   end
 
   def frame_colors
@@ -31,5 +35,57 @@ module BikeAttributable
   # list of cgroups so that we can arrange them
   def cgroup_array
     components.map(&:cgroup_id).uniq
+  end
+
+  # Small helper because we call this a lot
+  def type
+    cycle_type && cycle_type_name&.downcase
+  end
+
+  def type_titleize
+    return "" unless type.present?
+    # make this work for e-scooter
+    type.split(/(\s|-)/).map(&:capitalize).join("")
+  end
+
+  def frame_model_truncated
+    frame_model&.truncate(40)
+  end
+
+  def title_string
+    t = [year, mnfg_name, frame_model_truncated].join(" ")
+    t += " #{type}" if type != "bike"
+    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
+  end
+
+  def video_embed_src
+    return nil unless video_embed.present?
+    code = Nokogiri::HTML(video_embed)
+    code.xpath("//iframe/@src")[0]&.value
+  end
+
+  def render_paint_description?
+    return false unless pos? && primary_frame_color == Color.black
+    secondary_frame_color_id.blank? && paint.present?
+  end
+
+  def paint_description
+    paint.name.titleize if paint.present?
+  end
+
+  def frame_material_name
+    FrameMaterial.new(frame_material).name
+  end
+
+  def handlebar_type_name
+    HandlebarType.new(handlebar_type)&.name
+  end
+
+  def cycle_type_name
+    CycleType.new(cycle_type)&.name
+  end
+
+  def propulsion_type_name
+    PropulsionType.new(propulsion_type).name
   end
 end

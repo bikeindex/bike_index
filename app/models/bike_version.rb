@@ -10,7 +10,7 @@ class BikeVersion < ApplicationRecord
 
   belongs_to :bike
 
-  belongs_to :paint
+  belongs_to :paint # Not in BikeAttributable because of counter cache
 
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
@@ -35,6 +35,10 @@ class BikeVersion < ApplicationRecord
       return true if user_hidden? && authorized?(passed_user)
     end
     false
+  end
+
+  def default_edit_template
+    "bike_details"
   end
 
   def calculated_listing_order

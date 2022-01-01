@@ -80,7 +80,6 @@ class Bike < ApplicationRecord
     to: :current_ownership, allow_nil: true
 
   scope :without_location, -> { where(latitude: nil) }
-  scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
@@ -341,17 +340,6 @@ class Bike < ApplicationRecord
     status_stolen? ? "theft_details" : "bike_details"
   end
 
-  # Small helper because we call this a lot
-  def type
-    cycle_type && cycle_type_name&.downcase
-  end
-
-  def type_titleize
-    return "" unless type.present?
-    # make this work for e-scooter
-    type.split(/(\s|-)/).map(&:capitalize).join("")
-  end
-
   def email_visible_for?(org)
     organizations.include?(org)
   end
@@ -549,16 +537,6 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
-  def frame_model_truncated
-    frame_model&.truncate(40)
-  end
-
-  def title_string
-    t = [year, mnfg_name, frame_model_truncated].join(" ")
-    t += " #{type}" if type != "bike"
-    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
-  end
-
   def stolen_string
     return nil unless status_stolen? && current_stolen_record.present?
     [
@@ -566,19 +544,6 @@ class Bike < ApplicationRecord
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
       current_stolen_record.address && "from #{current_stolen_record.address}. "
     ].compact.join(" ")
-  end
-
-  def video_embed_src
-    if video_embed.present?
-      code = Nokogiri::HTML(video_embed)
-      src = code.xpath("//iframe/@src")
-      src[0]&.value
-    end
-  end
-
-  def render_paint_description?
-    return false unless pos? && primary_frame_color == Color.black
-    secondary_frame_color_id.blank? && paint.present?
   end
 
   def bike_organization_ids
@@ -725,10 +690,6 @@ class Bike < ApplicationRecord
     paint = Paint.friendly_find(paint_name)
     paint = Paint.create(name: paint_name) unless paint.present?
     self.paint_id = paint.id
-  end
-
-  def paint_description
-    paint.name.titleize if paint.present?
   end
 
   # THIS IS FUCKING OBNOXIOUS.
@@ -885,22 +846,6 @@ class Bike < ApplicationRecord
       (type == "bike" ? nil : type),
       components_cache_string
     ].flatten.reject(&:blank?).join(" ")
-  end
-
-  def frame_material_name
-    FrameMaterial.new(frame_material).name
-  end
-
-  def handlebar_type_name
-    HandlebarType.new(handlebar_type)&.name
-  end
-
-  def cycle_type_name
-    CycleType.new(cycle_type)&.name
-  end
-
-  def propulsion_type_name
-    PropulsionType.new(propulsion_type).name
   end
 
   # Only geocode if address is set manually (and not skipping geocoding)
