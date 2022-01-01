@@ -34,10 +34,7 @@
 
 - if @render_chart
   - if @search_type == "all"
-    -# -# If searching a specific type, search only that type
-    -# - graphed_types = @search_type == "all" ? registry_types : [@search_type]
     - counts_by_type = registry_types.map { |search_type| { name: ExternalRegistryBike.registry_name(search_type), data: time_range_counts(collection: @matching_bikes.where(type: "ExternalRegistryBike::#{search_type}")) } }
-    -# colors, if ever necessary to include the other response types: { green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0" }
     = column_chart counts_by_type, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
   - else
     = column_chart time_range_counts(collection: @matching_bikes), stacked: true, thousands: ",", defer: true

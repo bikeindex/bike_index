@@ -25,8 +25,8 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
 
   def registry_types
     ["Project529Bike",
-     "StopHelingBike",
-     "VerlorenOfGevondenBike"]
+      "StopHelingBike",
+      "VerlorenOfGevondenBike"]
   end
 
   def matching_bikes
