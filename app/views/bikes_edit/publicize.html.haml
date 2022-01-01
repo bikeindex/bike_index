@@ -13,7 +13,7 @@
               %h3.header-font-alt
                 = t(".do_these_things_for_the_best_chance_of_re")
 
-            = render partial: "/bikes_edit/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+            = render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
 
         .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
           .form-well-form-header
