@@ -5,6 +5,18 @@
   .col-md-7
     %ul
       %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_status != "all" ? "active" : "") }
+          - if @search_status == "all"
+            All Statuses
+          - else
+            = Bike.status_humanized(@search_status)
+        .dropdown-menu
+          = link_to "All statuses", admin_external_registry_bikes_path(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@search_status == "all" ? 'active' : ''}"
+          - shown_statuses = %w[status_with_owner status_stolen status_impounded]
+          - shown_statuses.each do |status|
+            - status_active = @search_status == status
+            = link_to Bike.status_humanized(status), admin_external_registry_bikes_path(sortable_search_params.merge(search_status: status_active ? nil : status)), class: "dropdown-item #{status_active ? 'active' : ''}"
+      %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_type != "all" ? "active" : "") }
           - if @search_type == "all"
             All Registries

@@ -46,10 +46,17 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
       "all"
     end
 
+    @search_status = if Bike.statuses.include?(params[:search_status])
+      @matching_bikes = @matching_bikes.where(status: params[:search_status])
+      params[:search_status]
+    else
+      "all"
+    end
+
     @matching_bikes = @matching_bikes.where(created_at: @time_range)
   end
 
   def sortable_columns
-    %w[created_at mnfg_name]
+    %w[created_at mnfg_name status]
   end
 end

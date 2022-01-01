@@ -69,6 +69,13 @@ class ExternalRegistryBike < ApplicationRecord
     end
   end
 
+  def short_address
+    return nil unless location_found.present?
+    addy = location_found.split(",")
+    shorter_length = addy.length > 3 ? 3 : addy.length
+    addy[-shorter_length..].reject(&:blank?).map(&:strip).join(", ")
+  end
+
   def status_humanized
     shuman = Bike.status_humanized(status)
     return self.class.impounded_kind if shuman == "impounded"

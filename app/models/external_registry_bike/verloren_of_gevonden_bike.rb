@@ -1,4 +1,8 @@
 class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
+  def registry_url
+    "https://verlorenofgevonden.nl"
+  end
+
   def url
     [registry_url, "overzicht?search=#{external_id}"].join("/")
   end

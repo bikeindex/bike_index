@@ -55,9 +55,9 @@
           %td Updated
           %td
             %span.convertTime.preciseTime= l @bike.updated_at, format: :convert_time
-        %tr
-          %td Info Hash
-          %td.data-cell
-            = pretty_print_json(@bike.info_hash)
+    .mt-2.p-2.pb-0{style: "border: 1px solid rgba(0,0,0,0.15);"}
+      %p.mb-0 Info Hash
+      %code{style: "overflow: scroll; display: block; width: 100%;"}
+        = pretty_print_json(@bike.info_hash)
 
 

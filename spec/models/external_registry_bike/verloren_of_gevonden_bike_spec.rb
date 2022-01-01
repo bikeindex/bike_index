@@ -48,6 +48,7 @@ RSpec.describe ExternalRegistryBike::VerlorenOfGevondenBike, type: :model do
         expect(bike.location_found).to(eq <<~STR.chomp)
           Pieter Steynstraat, Rest van de stad Zwolle - NL
         STR
+        expect(bike.short_address).to eq "Pieter Steynstraat, Rest van de stad Zwolle - NL"
       end
     end
   end
