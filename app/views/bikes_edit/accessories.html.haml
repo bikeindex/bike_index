@@ -17,7 +17,7 @@
             .form-group.row.unnested-field.no-divider-row
               = f.label :handlebar_type_id, class: 'form-well-label'
               .form-well-input.fancy-select-placeholder.unfancy
-                = select(:bike, :handlebar_type, HandlebarType.select_options , { prompt: " " }, { class: "form-control handlebar-type-input" })
+                = select(:bike, :handlebar_type, HandlebarType.select_options , { prompt: " " }, { class: "form-control" })
 
           %fieldset.add-additional
             #has_multiples_parts{ data: { ids: Ctype.where(has_multiple: true).map(&:id).to_json } }
