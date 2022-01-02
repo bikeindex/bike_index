@@ -365,73 +365,6 @@ ALTER SEQUENCE public.bike_stickers_id_seq OWNED BY public.bike_stickers.id;
 
 
 --
--- Name: bike_versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.bike_versions (
-    id bigint NOT NULL,
-    owner_id bigint,
-    bike_id bigint,
-    paint_id bigint,
-    manufacturer_id bigint,
-    primary_frame_color_id bigint,
-    secondary_frame_color_id bigint,
-    tertiary_frame_color_id bigint,
-    front_wheel_size_id bigint,
-    rear_wheel_size_id bigint,
-    rear_gear_type_id bigint,
-    front_gear_type_id bigint,
-    name character varying,
-    frame_model text,
-    rear_tire_narrow boolean,
-    number_of_seats integer,
-    propulsion_type_other character varying,
-    manufacturer_other character varying,
-    cached_data text,
-    description text,
-    thumb_path text,
-    video_embed text,
-    year integer,
-    front_tire_narrow boolean,
-    handlebar_type_other character varying,
-    belt_drive boolean,
-    coaster_brake boolean,
-    frame_size character varying,
-    frame_size_unit character varying,
-    listing_order integer,
-    all_description text,
-    mnfg_name character varying,
-    frame_size_number double precision,
-    frame_material integer,
-    handlebar_type integer,
-    cycle_type integer,
-    propulsion_type integer,
-    visibility integer DEFAULT 0,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: bike_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.bike_versions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: bike_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.bike_versions_id_seq OWNED BY public.bike_versions.id;
-
-
---
 -- Name: bikes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -726,8 +659,7 @@ CREATE TABLE public.components (
     rear boolean,
     manufacturer_other character varying(255),
     serial_number character varying(255),
-    is_stock boolean DEFAULT false NOT NULL,
-    bike_version_id bigint
+    is_stock boolean DEFAULT false NOT NULL
 );
 
 
@@ -3200,13 +3132,6 @@ ALTER TABLE ONLY public.bike_stickers ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: bike_versions id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.bike_versions ALTER COLUMN id SET DEFAULT nextval('public.bike_versions_id_seq'::regclass);
-
-
---
 -- Name: bikes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3746,14 +3671,6 @@ ALTER TABLE ONLY public.bike_sticker_updates
 
 ALTER TABLE ONLY public.bike_stickers
     ADD CONSTRAINT bike_stickers_pkey PRIMARY KEY (id);
-
-
---
--- Name: bike_versions bike_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.bike_versions
-    ADD CONSTRAINT bike_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -4411,83 +4328,6 @@ CREATE INDEX index_bike_stickers_on_secondary_organization_id ON public.bike_sti
 
 
 --
--- Name: index_bike_versions_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_bike_id ON public.bike_versions USING btree (bike_id);
-
-
---
--- Name: index_bike_versions_on_front_gear_type_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_front_gear_type_id ON public.bike_versions USING btree (front_gear_type_id);
-
-
---
--- Name: index_bike_versions_on_front_wheel_size_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_front_wheel_size_id ON public.bike_versions USING btree (front_wheel_size_id);
-
-
---
--- Name: index_bike_versions_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_manufacturer_id ON public.bike_versions USING btree (manufacturer_id);
-
-
---
--- Name: index_bike_versions_on_owner_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_owner_id ON public.bike_versions USING btree (owner_id);
-
-
---
--- Name: index_bike_versions_on_paint_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_paint_id ON public.bike_versions USING btree (paint_id);
-
-
---
--- Name: index_bike_versions_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_primary_frame_color_id ON public.bike_versions USING btree (primary_frame_color_id);
-
-
---
--- Name: index_bike_versions_on_rear_gear_type_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_rear_gear_type_id ON public.bike_versions USING btree (rear_gear_type_id);
-
-
---
--- Name: index_bike_versions_on_rear_wheel_size_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_rear_wheel_size_id ON public.bike_versions USING btree (rear_wheel_size_id);
-
-
---
--- Name: index_bike_versions_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_secondary_frame_color_id ON public.bike_versions USING btree (secondary_frame_color_id);
-
-
---
--- Name: index_bike_versions_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versions USING btree (tertiary_frame_color_id);
-
-
---
 -- Name: index_bikes_on_current_impound_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4618,13 +4458,6 @@ CREATE INDEX index_blog_content_tags_on_content_tag_id ON public.blog_content_ta
 --
 
 CREATE INDEX index_components_on_bike_id ON public.components USING btree (bike_id);
-
-
---
--- Name: index_components_on_bike_version_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_components_on_bike_version_id ON public.components USING btree (bike_version_id);
 
 
 --
@@ -6020,7 +5853,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211222230922'),
 ('20211223213257'),
 ('20211224053713'),
-('20211227142124'),
 ('20220102153706');
 
 
