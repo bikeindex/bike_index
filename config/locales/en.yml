@@ -145,7 +145,6 @@ en:
         pdf: Pdf
         primary_frame_color: :activerecord.models.primary_frame_color
         propulsion_type: Propulsion type
-        propulsion_type_other: Propulsion type other
         public_images: Public images
         rear_gear_type: :activerecord.models.rear_gear_type
         rear_tire_narrow: Rear tire narrow
