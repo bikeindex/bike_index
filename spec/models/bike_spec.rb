@@ -1106,7 +1106,7 @@ RSpec.describe Bike, type: :model do
     end
 
     context "unconfirmed secondary email" do
-      it "sets owner email to primary email (on save)" do
+      it "uses passed owner_email" do
         user_email = FactoryBot.create(:user_email, confirmation_token: "123456789")
         user = user_email.user
         expect(user_email.unconfirmed?).to be_truthy

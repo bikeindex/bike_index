@@ -1,7 +1,6 @@
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
-  include BikeSearchable
   include BikeAttributable
   include Geocodeable
   include PgSearch::Model
@@ -884,9 +883,11 @@ class Bike < ApplicationRecord
     end.strip.truncate(60)
   end
 
-  # NOTE: this definitely slows down bike#save for unknown
   def normalized_email
-    return user.email if user.present?
+    # If the owner_email changed, we look up the owner - skip the lookup if possible
+    unless owner_email_changed?
+      return user.present? ? user.email : owner_email
+    end
     existing_user = User.fuzzy_email_find(owner_email)
     if existing_user.present?
       existing_user.email
