@@ -6,6 +6,7 @@ class BikeVersionCreatorWorker < ApplicationWorker
     bike_version = bike.bike_versions.build(owner_id: bike.owner.id,
       manufacturer_id: bike.manufacturer_id,
       mnfg_name: bike.mnfg_name,
+      manufacturer_other: bike.manufacturer_other,
 
       year: bike.year,
       frame_model: bike.frame_model,
@@ -31,6 +32,10 @@ class BikeVersionCreatorWorker < ApplicationWorker
       front_gear_type_id: bike.front_gear_type_id,
       belt_drive: bike.belt_drive,
       coaster_brake: bike.coaster_brake)
+
+    bike.components.each do |c|
+      bike_version.components.build(c.version_duplicated_attrs)
+    end
     bike_version.save
   end
 end

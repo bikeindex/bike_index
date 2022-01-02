@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe BikeVersionCreatorWorker, type: :job do
   let(:instance) { described_class.new }
 
-  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, manufacturer: Manufacturer.other, manufacturer_other: "some cool name") }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, manufacturer: Manufacturer.other, manufacturer_other: "Unknown cool MNFG") }
   let(:user) { bike.user }
   it "creates the bike_version" do
     expect(bike.reload.bike_versions.count).to eq 0
@@ -15,7 +15,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
     expect(bike_version.owner_id).to eq user.id
     expect(bike_version.authorized?(user)).to be_truthy
     expect(bike_version.manufacturer_id).to eq Manufacturer.other.id
-    expect(bike_version.mnfg_name).to eq "Some cool name"
+    expect(bike_version.mnfg_name).to eq "Unknown cool MNFG"
     expect(bike_version.frame_colors).to eq bike.frame_colors
   end
   context "with all the associations" do
@@ -105,7 +105,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(version_component1.description).to eq "some description"
       expect(version_component1.front).to be_truthy
 
-      version_component2 = bike_version.copmonents.where.not(id: version_component1.id).first
+      version_component2 = bike_version.components.where.not(id: version_component1.id).first
       expect_attrs_to_match_hash(version_component2, component_attrs.except(:bike_id))
     end
   end
