@@ -6,7 +6,7 @@ class BikeCreator
       serial_normalized made_without_serial extra_registration_number
       creation_organization_id manufacturer year thumb_path name
       current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
-      handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
+      handlebar_type frame_size frame_size_number frame_size_unit
       rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
       primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
       propulsion_type street zipcode country_id state_id city belt_drive

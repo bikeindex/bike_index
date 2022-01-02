@@ -126,7 +126,6 @@ en:
         front_tire_narrow: Front tire narrow
         front_wheel_size: :activerecord.models.front_wheel_size
         handlebar_type: Handlebar type
-        handlebar_type_other: Handlebar type other
         hidden: Hidden
         invoice: :activerecord.models.invoice
         is_for_sale: Is for sale

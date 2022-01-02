@@ -851,7 +851,6 @@ RSpec.describe BikesController, type: :controller do
           bike_attrs = {
             description: "69",
             handlebar_type: other_handlebar_type,
-            handlebar_type_other: "Joysticks",
             owner_email: "  #{bike.owner_email.upcase}",
             city: "Rotterdam",
             zipcode: "3035",
@@ -872,7 +871,6 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.description).to eq("69")
           expect(response).to redirect_to edit_bike_url(bike)
           expect(bike.handlebar_type).to eq other_handlebar_type
-          expect(bike.handlebar_type_other).to eq "Joysticks"
           expect(assigns(:bike)).to be_present
           expect(bike.user_hidden).to be_falsey
           expect(bike.country&.name).to eq(Country.netherlands.name)
