@@ -9,7 +9,6 @@ RSpec.describe BikeVersion, type: :model do
       expect(bike_version).to be_valid
       expect(bike_version.bike).to be_present
       expect(bike_version.owner).to eq bike_version.bike.owner
-
     end
   end
 

@@ -3,16 +3,25 @@ class BikeVersionCreatorWorker < ApplicationWorker
 
   def perform(bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)
-    bike_version = bike.bike_versions.build(manufacturer: bike.manufacturer,
+    bike_version = bike.bike_versions.build(owner_id: bike.owner.id,
+      manufacturer_id: bike.manufacturer_id,
       mnfg_name: bike.mnfg_name,
-      primary_frame_color: bike.primary_frame_color,
-      secondary_frame_color: bike.secondary_frame_color,
-      tertiary_frame_color: bike.tertiary_frame_color,
-      rear_wheel_size: bike.rear_wheel_size,
-      front_wheel_size: bike.front_wheel_size,
-      rear_gear_type: bike.rear_gear_type,
-      front_gear_type: bike.front_gear_type,
-      owner_id: bike.owner.id)
+      primary_frame_color_id: bike.primary_frame_color_id,
+      secondary_frame_color_id: bike.secondary_frame_color_id,
+      tertiary_frame_color_id: bike.tertiary_frame_color_id,
+
+      front_wheel_size_id: bike.front_wheel_size_id,
+      front_tire_narrow: bike.front_tire_narrow,
+      rear_wheel_size_id: bike.rear_wheel_size_id,
+      rear_tire_narrow: bike.rear_tire_narrow,
+
+      rear_gear_type_id: bike.rear_gear_type_id,
+      front_gear_type_id: bike.front_gear_type_id,
+
+      cycle_type: bike.cycle_type,
+      handlebar_type: bike.handlebar_type,
+      propulsion_type: bike.propulsion_type,
+      )
     bike_version.save
   end
 end

@@ -12,7 +12,7 @@ class Component < ApplicationRecord
   belongs_to :bike
   belongs_to :bike_version
 
-  before_save :set_front_or_rear
+  before_save :set_calculated_attributes
 
   def set_front_or_rear
     return true unless front_or_rear.present?
@@ -52,11 +52,9 @@ class Component < ApplicationRecord
     if manufacturer && manufacturer.name == "Other" && manufacturer_other.present?
       manufacturer_other
     else
-      manufacturer&.name
+      manufacturer&.simple_name
     end
   end
-
-  before_save :set_is_stock
 
   def set_is_stock
     return true if setting_is_stock
@@ -66,10 +64,11 @@ class Component < ApplicationRecord
     true
   end
 
-  before_validation :set_manufacturer
-
-  def set_manufacturer
-    return true unless mnfg_name.present?
-    self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
+  def set_calculated_attributes
+    set_front_or_rear
+    set_is_stock
+    if mnfg_name.present?
+      self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
+    end
   end
 end

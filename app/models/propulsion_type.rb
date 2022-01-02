@@ -14,7 +14,7 @@ class PropulsionType
 
   NAMES = {
     "foot-pedal": "Foot pedal",
-    "hand-pedal": "Hand pedal",
+    "hand-pedal": "Hand cycle (hand pedal)",
     sail: "Sail",
     insufflation: "Insufflation",
     "electric-assist": "Electric Assist",

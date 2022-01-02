@@ -1058,26 +1058,23 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "set_mnfg_name" do
+  describe "calculated_mnfg_name" do
     let(:manufacturer_other) { Manufacturer.new(name: "Other") }
     let(:manufacturer) { Manufacturer.new(name: "Mnfg name") }
     it "returns the value of manufacturer_other if manufacturer is other" do
       bike = Bike.new(manufacturer: manufacturer_other, manufacturer_other: "Other manufacturer name")
-      bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq("Other manufacturer name")
+      expect(bike.send(:calculated_mnfg_name)).to eq("Other manufacturer name")
     end
 
     it "returns the name of the manufacturer if it isn't other" do
       bike = Bike.new(manufacturer: manufacturer)
-      bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq("Mnfg name")
+      expect(bike.send(:calculated_mnfg_name)).to eq("Mnfg name")
     end
 
     context "malicious" do
       let(:bike) { Bike.new(manufacturer: manufacturer_other, manufacturer_other: '<a href="bad_site.js">stuff</a>') }
       it "removes bad things" do
-        bike.set_mnfg_name
-        expect(bike.mnfg_name).to eq("stuff")
+        expect(bike.send(:calculated_mnfg_name)).to eq("stuff")
       end
     end
 
@@ -1091,51 +1088,10 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "type" do
-    let(:bike) { FactoryBot.build(:bike, cycle_type: type) }
-    let(:type) { "trailer" }
-    it "returns the cycle type name" do
-      expect(bike.type).to eq("bike trailer")
-      expect(bike.type_titleize).to eq("Bike Trailer")
-    end
-    context "e_scooter" do
-      let(:type) { "e-scooter" }
-      it "returns expected" do
-        expect(bike.type).to eq "e-scooter"
-        expect(bike.type_titleize).to eq "E-Scooter"
-      end
-    end
-  end
-
-  describe "video_embed_src" do
-    it "returns false if there is no video_embed" do
-      @bike = Bike.new
-      allow(@bike).to receive(:video_embed).and_return(nil)
-      expect(@bike.video_embed_src).to be_nil
-    end
-
-    it "returns just the url of the video from a youtube iframe" do
-      youtube_share = '
-          <iframe width="560" height="315" src="//www.youtube.com/embed/Sv3xVOs7_No" frameborder="0" allowfullscreen></iframe>
-        '
-      @bike = Bike.new
-      allow(@bike).to receive(:video_embed).and_return(youtube_share)
-      expect(@bike.video_embed_src).to eq("//www.youtube.com/embed/Sv3xVOs7_No")
-    end
-
-    it "returns just the url of the video from a vimeo iframe" do
-      vimeo_share = '<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'
-      @bike = Bike.new
-      allow(@bike).to receive(:video_embed).and_return(vimeo_share)
-      expect(@bike.video_embed_src).to eq("http://player.vimeo.com/video/13094257")
-    end
-  end
-
-  describe "#normalize_emails" do
+  describe "#normalized_email" do
     it "sets normalized owner email" do
       bike = Bike.new(owner_email: "  somethinG@foo.orG")
-      bike.normalize_emails
-      expect(bike.owner_email).to eq("something@foo.org")
+      expect(bike.send(:normalized_email)).to eq("something@foo.org")
     end
 
     context "confirmed secondary email" do
@@ -1145,8 +1101,7 @@ RSpec.describe Bike, type: :model do
         bike = FactoryBot.build(:bike, owner_email: user_email.email)
         expect(user.email).to_not eq user_email.email
         expect(bike.owner_email).to eq user_email.email
-        bike.normalize_emails
-        expect(bike.owner_email).to eq user.email
+        expect(bike.send(:normalized_email)).to eq user.email
       end
     end
 
@@ -1578,30 +1533,6 @@ RSpec.describe Bike, type: :model do
         bike.bike_organization_ids = "#{organization2.id}, "
         expect(bike.reload.bike_organization_ids).to eq([organization2.id])
       end
-    end
-  end
-
-  describe "handlebar_type_name" do
-    let(:bike) { FactoryBot.create(:bike, handlebar_type: "bmx") }
-    it "returns the normalized name" do
-      normalized_name = HandlebarType.new(bike.handlebar_type).name
-      expect(bike.handlebar_type_name).to eq(normalized_name)
-    end
-  end
-
-  describe "cycle_type_name" do
-    let(:bike) { FactoryBot.create(:bike, cycle_type: "cargo") }
-    it "returns the normalized name" do
-      normalized_name = CycleType.new(bike.cycle_type).name
-      expect(bike.cycle_type_name).to eq(normalized_name)
-    end
-  end
-
-  describe "propulsion_type_name" do
-    let(:bike) { FactoryBot.create(:bike, propulsion_type: "electric-assist") }
-    it "returns the normalized name" do
-      normalized_name = PropulsionType.new(bike.propulsion_type).name
-      expect(bike.propulsion_type_name).to eq(normalized_name)
     end
   end
 

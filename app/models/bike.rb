@@ -579,17 +579,6 @@ class Bike < ApplicationRecord
     nil
   end
 
-  def set_mnfg_name
-    n = if manufacturer.blank?
-      ""
-    elsif manufacturer.name == "Other" && manufacturer_other.present?
-      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
-    else
-      manufacturer.simple_name
-    end
-    self.mnfg_name = n.strip.truncate(60)
-  end
-
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
     if marked_user_hidden.present? && ParamsNormalizer.boolean(marked_user_hidden)
@@ -599,15 +588,6 @@ class Bike < ApplicationRecord
       self.user_hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
-  end
-
-  def normalize_emails
-    self.owner_email = if User.fuzzy_email_find(owner_email)
-      User.fuzzy_email_find(owner_email).email
-    else
-      EmailNormalizer.normalize(owner_email)
-    end
-    true
   end
 
   def normalize_serial_number
@@ -790,8 +770,8 @@ class Bike < ApplicationRecord
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
-    set_mnfg_name
-    normalize_emails
+    self.mnfg_name = calculated_mnfg_name
+    self.owner_email = normalized_email
     normalize_serial_number
     set_paints
   end
@@ -898,5 +878,25 @@ class Bike < ApplicationRecord
 
   def calculated_current_ownership
     ownerships.order(:id).last
+  end
+
+  def calculated_mnfg_name
+    return "" if manufacturer.blank?
+    if manufacturer.name == "Other" && manufacturer_other.present?
+      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
+    else
+      manufacturer.simple_name
+    end.strip.truncate(60)
+  end
+
+  # NOTE: this definitely slows down bike#save for unknown
+  def normalized_email
+    return user.email if user.present?
+    existing_user = User.fuzzy_email_find(owner_email)
+    if existing_user.present?
+      existing_user.email
+    else
+      EmailNormalizer.normalize(owner_email)
+    end
   end
 end
