@@ -26,7 +26,6 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.text :video_embed
       t.integer :year
       t.boolean :front_tire_narrow
-      t.string :handlebar_type_other
       t.boolean :belt_drive
       t.boolean :coaster_brake
       t.string :frame_size

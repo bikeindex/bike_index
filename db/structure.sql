@@ -393,7 +393,6 @@ CREATE TABLE public.bike_versions (
     video_embed text,
     year integer,
     front_tire_narrow boolean,
-    handlebar_type_other character varying,
     belt_drive boolean,
     coaster_brake boolean,
     frame_size character varying,
@@ -446,7 +445,6 @@ CREATE TABLE public.bikes (
     creation_organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    propulsion_type_other character varying(255),
     manufacturer_other character varying(255),
     zipcode character varying(255),
     cached_data text,
@@ -460,7 +458,6 @@ CREATE TABLE public.bikes (
     primary_frame_color_id integer,
     secondary_frame_color_id integer,
     tertiary_frame_color_id integer,
-    handlebar_type_other character varying(255),
     front_wheel_size_id integer,
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
@@ -6022,6 +6019,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211222230922'),
 ('20211223213257'),
 ('20211224053713'),
-('20211227142124');
+('20220102153706'),
+('20220102160149');
 
 

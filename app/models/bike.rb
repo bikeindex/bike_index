@@ -790,13 +790,8 @@ class Bike < ApplicationRecord
 
   def components_cache_string
     components.includes(:manufacturer, :ctype).map.each do |c|
-      if c.ctype.present? && c.ctype.name.present?
-        [
-          c.year,
-          c.manufacturer&.name,
-          c.component_type
-        ]
-      end
+      next unless c.ctype.present? && c.ctype.name.present?
+      [c.year, c.manufacturer&.name, c.component_type]
     end
   end
 

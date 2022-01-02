@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe BikeVersionCreatorWorker, type: :job do
   let(:instance) { described_class.new }
 
-  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, manufacturer: Manufacturer.other, manufacturer_other: "some cool name") }
   let(:user) { bike.user }
   it "creates the bike_version" do
     expect(bike.reload.bike_versions.count).to eq 0
@@ -14,7 +14,8 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
     bike_version = bike.bike_versions.first
     expect(bike_version.owner_id).to eq user.id
     expect(bike_version.authorized?(user)).to be_truthy
-    expect(bike_version.mnfg_name).to eq bike.mnfg_name
+    expect(bike_version.manufacturer_id).to eq Manufacturer.other.id
+    expect(bike_version.mnfg_name).to eq "Some cool name"
     expect(bike_version.frame_colors).to eq bike.frame_colors
   end
   context "with all the associations" do
@@ -31,6 +32,12 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
         cycle_type: "cargo",
         handlebar_type: "rearward",
         propulsion_type: "electric-assist",
+        frame_material: "organic",
+        year: 1969,
+        name: "My cool bike",
+        frame_model: "Cool model name",
+        description: "A really cool description",
+        number_of_seats: 3,
         primary_frame_color: color1,
         secondary_frame_color: black,
         tertiary_frame_color: color2,
@@ -76,6 +83,12 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.cycle_type_name).to eq "Cargo Bike (front storage)"
       expect(bike_version.handlebar_type_name).to eq "Rear facing"
       expect(bike_version.propulsion_type_name).to eq "Electric Assist"
+      expect(bike_version.frame_material_name).to eq "Wood or organic material"
+      expect(bike_version.name).to eq "My cool bike"
+      expect(bike_version.year).to eq 1969
+      expect(bike_version.frame_model).to eq "Cool model name"
+      expect(bike_version.description).to eq "A really cool description"
+      expect(bike_version.number_of_seats).to eq 3
       expect(bike_version.primary_frame_color_id).to eq color1.id
       expect(bike_version.secondary_frame_color_id).to eq black.id
       expect(bike_version.tertiary_frame_color_id).to eq color2.id
@@ -85,6 +98,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.rear_tire_narrow).to eq true
       expect(bike_version.front_gear_type_id).to eq front_gear_type.id
       expect(bike_version.rear_gear_type_id).to eq rear_gear_type.id
+      expect(bike_version.paint_id).to eq paint.id
 
       expect(bike_version.components.count).to eq 2
       version_component1 = bike_version.components.where(manufacturer_id: component_manufacturer.id).first
