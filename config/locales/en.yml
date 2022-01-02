@@ -1345,7 +1345,6 @@ en:
   bikes_edit:
     accessories:
       add_a_component: Add a component
-      other_handlebar_type: Other handlebar type
     bike_details:
       a_qr_sticker: a QR Sticker
       add_a_sticker_label_html: Add %{sticker_information_link}

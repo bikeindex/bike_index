@@ -364,7 +364,6 @@ nl:
         frame_size_unit: Framemaat eenheid
         front_tire_narrow: Voorband smal
         handlebar_type: Type stuur
-        handlebar_type_other: Type stuur anders
         hidden: Verborgen
         is_for_sale: Is te koop
         listing_order: Aanbieding bestelling
@@ -5757,7 +5756,6 @@ nl:
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
-      other_handlebar_type: Ander type stuur
     bike_details:
       a_qr_sticker: een QR-sticker
       add_a_sticker_label_html: Voeg %{sticker_information_link} toe
