@@ -4,7 +4,6 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.references :owner, index: true
       t.references :bike, index: true
       t.references :paint, index: true
-      t.references :manufacturer, index: true
       t.references :primary_frame_color, index: true
       t.references :secondary_frame_color, index: true
       t.references :tertiary_frame_color, index: true
@@ -13,12 +12,14 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.references :rear_gear_type, index: true
       t.references :front_gear_type, index: true
 
+      t.references :manufacturer, index: true
+      t.string :manufacturer_other
+      t.string :mnfg_name
+
       t.string :name
       t.text :frame_model
       t.boolean :rear_tire_narrow
       t.integer :number_of_seats
-      t.string :propulsion_type_other
-      t.string :manufacturer_other
       t.text :cached_data
       t.text :description
 
@@ -30,11 +31,9 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.boolean :coaster_brake
       t.string :frame_size
       t.string :frame_size_unit
+      t.float :frame_size_number
 
       t.integer :listing_order
-      t.text :all_description
-      t.string :mnfg_name
-      t.float :frame_size_number
 
       t.integer :frame_material
       t.integer :handlebar_type

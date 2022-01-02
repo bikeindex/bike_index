@@ -15,17 +15,17 @@ class Component < ApplicationRecord
   before_save :set_calculated_attributes
 
   def version_duplicated_attrs
-    { cmodel_name: cmodel_name,
-      year: year,
-      description: description,
-      manufacturer_id: manufacturer_id,
-      ctype_id: ctype_id,
-      ctype_other: ctype_other,
-      front: front,
-      rear: rear,
-      manufacturer_other: manufacturer_other,
-      serial_number: serial_number,
-      is_stock: is_stock }
+    {cmodel_name: cmodel_name,
+     year: year,
+     description: description,
+     manufacturer_id: manufacturer_id,
+     ctype_id: ctype_id,
+     ctype_other: ctype_other,
+     front: front,
+     rear: rear,
+     manufacturer_other: manufacturer_other,
+     serial_number: serial_number,
+     is_stock: is_stock}
   end
 
   def set_front_or_rear

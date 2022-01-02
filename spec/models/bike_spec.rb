@@ -1371,33 +1371,33 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "components_cache_string" do
+  describe "components_cache_array" do
     it "caches the components" do
       bike = FactoryBot.create(:bike)
-      c = FactoryBot.create(:component, bike: bike)
+      manufacturer = FactoryBot.create(:manufacturer)
+      c = FactoryBot.create(:component, bike: bike, year: 2025, manufacturer: manufacturer)
       bike.save
-      expect(bike.components_cache_string.to_s).to match(c.ctype.name)
+      expect(bike.send("components_cache_array").join(" ")).to match(c.ctype.name)
+      expect(bike.cached_data).to match("2025 #{manufacturer.name} #{c.ctype.name}")
     end
   end
 
-  describe "cache_stolen_attributes" do
+  describe "cached_description_and_stolen_description" do
     context "current_stolen_record with lat and long" do
       it "saves the stolen description to all description and set stolen_rec_id" do
         stolen_record = FactoryBot.create(:stolen_record, theft_description: "some theft description", latitude: 40.7143528, longitude: -74.0059731)
         bike = stolen_record.bike
-        bike.description = "I love my bike"
-        bike.cache_stolen_attributes
-        expect(bike.all_description).to eq("I love my bike some theft description")
+        bike.update(description: "I love my bike")
+        expect(bike.reload.all_description).to eq("I love my bike some theft description")
       end
     end
     context "no current_stolen_record" do
       it "sets the description and unsets current_stolen_record_id" do
         bike = Bike.new(current_stolen_record_id: 99999, description: "lalalala")
         bike.current_stolen_record = nil
-        bike.cache_stolen_attributes
 
         expect(bike.current_stolen_record_id).not_to be_present
-        expect(bike.all_description).to eq("lalalala")
+        expect(bike.send("cached_description_and_stolen_description")).to eq("lalalala")
       end
     end
   end

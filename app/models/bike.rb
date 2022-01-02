@@ -784,42 +784,10 @@ class Bike < ApplicationRecord
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     set_user_hidden
-    cache_bike
-  end
-
-  def components_cache_string
-    components.includes(:manufacturer, :ctype).map.each do |c|
-      next unless c.ctype.present? && c.ctype.name.present?
-      [c.year, c.manufacturer&.name, c.component_type]
-    end
-  end
-
-  def cache_stolen_attributes
-    self.all_description =
-      [description, current_stolen_record&.theft_description]
-      .reject(&:blank?)
-      .join(" ")
-  end
-
-  def cache_bike
-    cache_stolen_attributes
-    self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
-    self.cached_data = [
-      mnfg_name,
-      (propulsion_type_name == "Foot pedal" ? nil : propulsion_type_name),
-      year,
-      (primary_frame_color && primary_frame_color.name),
-      (secondary_frame_color && secondary_frame_color.name),
-      (tertiary_frame_color && tertiary_frame_color.name),
-      (frame_material && frame_material_name),
-      frame_size,
-      frame_model,
-      (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
-      (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
-      extra_registration_number,
-      (type == "bike" ? nil : type),
-      components_cache_string
-    ].flatten.reject(&:blank?).join(" ")
+    # cache_bike
+    self.all_description = cached_description_and_stolen_description
+    self.thumb_path = public_images&.first&.image_url(:small)
+    self.cached_data = cached_data_array.join(" ")
   end
 
   # Only geocode if address is set manually (and not skipping geocoding)
@@ -894,5 +862,10 @@ class Bike < ApplicationRecord
     else
       EmailNormalizer.normalize(owner_email)
     end
+  end
+
+  def cached_description_and_stolen_description
+    [description, current_stolen_record&.theft_description]
+      .reject(&:blank?).join(" ")
   end
 end

@@ -53,4 +53,11 @@ RSpec.describe BikeVersion, type: :model do
       end
     end
   end
+
+  describe "cached_data" do
+    let(:bike_version) { FactoryBot.create(:bike_version) }
+    it "caches" do
+      expect(bike_version.cached_data).to be_present
+    end
+  end
 end

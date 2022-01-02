@@ -51,8 +51,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
         belt_drive: true,
         coaster_brake: true,
         frame_size: "xl",
-        frame_size_unit: "ordinal",
-        )
+        frame_size_unit: "ordinal")
     end
     let(:component_manufacturer) { FactoryBot.create(:manufacturer, frame_maker: false) }
     let!(:component1) { FactoryBot.create(:component, bike: bike, manufacturer: component_manufacturer, description: "some description", front: true) }
@@ -61,7 +60,6 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
         bike_id: bike.id,
         manufacturer: Manufacturer.other,
         manufacturer_other: "Some other Manufacturer",
-        serial_number: "stuff",
         cmodel_name: "party",
         serial_number: "999999FFF",
         year: "2020"
@@ -99,6 +97,11 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.front_gear_type_id).to eq front_gear_type.id
       expect(bike_version.rear_gear_type_id).to eq rear_gear_type.id
       expect(bike_version.paint_id).to eq paint.id
+      expect(bike_version.frame_size).to eq "xl"
+      expect(bike_version.frame_size_unit).to eq "ordinal"
+      expect(bike_version.frame_size_number).to eq nil
+      # And the final test - does everything calculate?
+      expect(bike_version.cached_data).to eq bike.cached_data
 
       expect(bike_version.components.count).to eq 2
       version_component1 = bike_version.components.where(manufacturer_id: component_manufacturer.id).first

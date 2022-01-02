@@ -88,4 +88,32 @@ module BikeAttributable
   def propulsion_type_name
     PropulsionType.new(propulsion_type).name
   end
+
+  def cached_data_array
+    [
+      mnfg_name,
+      (propulsion_type_name == "Foot pedal" ? nil : propulsion_type_name),
+      year,
+      (primary_frame_color && primary_frame_color.name),
+      (secondary_frame_color && secondary_frame_color.name),
+      (tertiary_frame_color && tertiary_frame_color.name),
+      (frame_material && frame_material_name),
+      frame_size,
+      frame_model,
+      (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
+      (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
+      extra_registration_number,
+      (type == "bike" ? nil : type),
+      components_cache_array
+    ].flatten.reject(&:blank?)
+  end
+
+  protected
+
+  def components_cache_array
+    components.includes(:manufacturer, :ctype).map do |c|
+      c.ctype.present? && c.ctype.name.present? &&
+        [c.year, c.manufacturer&.name, c.component_type].compact
+    end
+  end
 end

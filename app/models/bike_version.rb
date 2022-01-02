@@ -37,10 +37,6 @@ class BikeVersion < ApplicationRecord
     false
   end
 
-  def default_edit_template
-    "bike_details"
-  end
-
   def calculated_listing_order
     t = (updated_at || Time.current).to_i / 10000
     public_images.present? ? t : t / 100
@@ -48,5 +44,17 @@ class BikeVersion < ApplicationRecord
 
   def set_calculated_attributes
     self.listing_order = calculated_listing_order
+    self.thumb_path = public_images&.first&.image_url(:small)
+    self.cached_data = cached_data_array.join(" ")
+  end
+
+  # Method from bike that is static in bike_version
+  def default_edit_template
+    "bike_details"
+  end
+
+  # Method from bike that is static in bike_version
+  def extra_registration_number
+    nil
   end
 end

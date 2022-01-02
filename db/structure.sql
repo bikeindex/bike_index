@@ -385,7 +385,6 @@ CREATE TABLE public.bike_versions (
     frame_model text,
     rear_tire_narrow boolean,
     number_of_seats integer,
-    propulsion_type_other character varying,
     manufacturer_other character varying,
     cached_data text,
     description text,

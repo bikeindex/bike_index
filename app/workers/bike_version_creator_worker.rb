@@ -15,6 +15,11 @@ class BikeVersionCreatorWorker < ApplicationWorker
       propulsion_type: bike.propulsion_type,
       frame_material: bike.frame_material,
       number_of_seats: bike.number_of_seats,
+
+      frame_size: bike.frame_size,
+      frame_size_unit: bike.frame_size_unit,
+      frame_size_number: bike.frame_size_number,
+
       name: bike.name,
       description: bike.description,
 
