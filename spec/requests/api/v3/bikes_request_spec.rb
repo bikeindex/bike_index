@@ -796,7 +796,7 @@ RSpec.describe "Bikes API V3", type: :request do
       components = bike.components.reload
       expect(components.count).to eq(3)
       expect(comp2.reload.year).to eq(1999)
-      expect(components.map(&:cmodel_name).compact).to eq(["Sram GXP Eagle"])
+      expect(components.map(&:component_model).compact).to eq(["Sram GXP Eagle"])
 
       manufacturers = components.map { |c| [c.description, c.manufacturer&.name] }.compact
       expect(manufacturers).to(match_array([["C-1", "new manufacturer"],
