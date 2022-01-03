@@ -390,7 +390,6 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
       expect(bike.components.pluck(:component_model)).to match_array([nil, nil, "Richie rich"])
-      pp bike.components.map(&:mnfg_name)
       expect(bike.components.map(&:mnfg_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.count).to eq(3)

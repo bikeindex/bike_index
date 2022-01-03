@@ -141,7 +141,6 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
     it "copies them" do
       bike.reload
       expect(bike.public_images.count).to eq 1
-      pp bike.public_images.map(&:image_url)
       expect {
         instance.perform(bike.id)
       }.to change(BikeVersion, :count).by 1
