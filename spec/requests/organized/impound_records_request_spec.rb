@@ -316,6 +316,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(bike.ownerships.count).to eq 2
           current_ownership = bike.current_ownership
           expect(current_ownership.impound_record).to eq impound_record
+          expect(current_ownership.creator_id).to eq impound_record.user_id
+          expect(current_ownership.user_id).to be_blank
           expect(current_ownership.organization).to eq current_organization
           expect(current_ownership.origin).to eq "impound_process"
           expect(current_ownership.owner_email).to eq "example@school.edu"
