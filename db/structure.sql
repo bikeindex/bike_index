@@ -646,7 +646,7 @@ ALTER SEQUENCE public.colors_id_seq OWNED BY public.colors.id;
 
 CREATE TABLE public.components (
     id integer NOT NULL,
-    cmodel_name character varying(255),
+    component_model character varying(255),
     year integer,
     description text,
     manufacturer_id integer,
@@ -5853,6 +5853,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211222230922'),
 ('20211223213257'),
 ('20211224053713'),
-('20220102153706');
+('20220102153706'),
+('20220102160149');
 
 
