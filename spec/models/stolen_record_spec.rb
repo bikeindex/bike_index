@@ -186,7 +186,7 @@ RSpec.describe StolenRecord, type: :model do
       expect(StolenRecord.recovered_ordered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order("recovered_at desc").to_sql)
     end
     it "scopes displayable" do
-      expect(StolenRecord.displayable.to_sql).to eq(StolenRecord.unscoped.where(current: false, can_share_recovery: true).order("recovered_at desc").to_sql)
+      expect(StolenRecord.can_share_recovery.to_sql).to eq(StolenRecord.unscoped.where(current: false, can_share_recovery: true).order("recovered_at desc").to_sql)
     end
     it "scopes tsv_today" do
       stolen1 = FactoryBot.create(:stolen_record, current: true, tsved_at: Time.current)
