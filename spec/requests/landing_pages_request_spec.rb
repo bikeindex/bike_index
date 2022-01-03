@@ -46,4 +46,26 @@ RSpec.describe LandingPagesController, type: :request do
       expect(response).to render_template(:index)
     end
   end
+
+  describe "organization show" do
+    let(:title) { response.body[/<title[^>]*>([^<]*)/, 1] }
+    let!(:organization) { FactoryBot.create(:organization, short_name: "University") }
+
+    it "renders" do
+      expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+      get "/university"
+      expect(response.status).to eq(200)
+      expect(response).to render_template("show")
+      expect(title).to eq "University Bike Registration"
+    end
+
+    context "xml request format" do
+      it "renders (ignoring response format)" do
+        get "/#{organization.slug}.xml"
+        expect(response.status).to eq(200)
+        expect(response).to render_template("show")
+        expect(title).to eq "University Bike Registration"
+      end
+    end
+  end
 end
