@@ -105,6 +105,8 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
         expect(UserRegistrationOrganization.unscoped.count).to eq 1
         expect(user.reload.user_registration_organizations.count).to eq 1
+        expect(ownership.reload.registration_info).to eq({})
+        expect(ownership.overridden_by_user_registration?).to be_falsey
         user_registration_organization = user.reload.user_registration_organizations.first
         expect(user_registration_organization.organization_id).to eq organization.id
         expect(user_registration_organization.all_bikes).to be_falsey
@@ -156,12 +158,10 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
           expect(ownership.reload.registration_info).to eq registration_info.as_json
           expect(bike_organization.reload.organization_id).to eq organization.id
           expect(bike_organization.overridden_by_user_registration?).to be_truthy
+          expect(ownership.reload.registration_info).to eq registration_info.as_json
+          expect(ownership.overridden_by_user_registration?).to be_truthy
           bike2.reload
           expect(bike2.bike_organizations.pluck(:organization_id)).to eq([organization.id])
-          expect(ownership.reload.registration_info).to eq registration_info.as_json
-        end
-        context "existing and edited" do
-          it "doesn't alter"
         end
       end
     end

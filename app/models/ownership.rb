@@ -131,6 +131,10 @@ class Ownership < ApplicationRecord
     passed_user == User.fuzzy_email_find(owner_email) || passed_user == user
   end
 
+  def overridden_by_user_registration?
+    user&.user_registration_organizations&.where.not(registration_info: [nil, {}])&.any?
+  end
+
   def update_registration_information(key, value)
     update(registration_info: registration_info.merge(key => value))
     value
