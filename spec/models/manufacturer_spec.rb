@@ -128,7 +128,8 @@ RSpec.describe Manufacturer, type: :model do
     let(:manufacturer_other) { Manufacturer.other }
     let(:manufacturer) { Manufacturer.new(name: "Mnfg name") }
     it "returns the value of manufacturer_other if manufacturer is other" do
-      expect(Manufacturer.calculated_mnfg_name(manufacturer, "Other manufacturer name")).to eq("Other manufacturer name")
+      expect(Manufacturer.calculated_mnfg_name(manufacturer, "Other manufacturer name")).to eq "Mnfg name"
+      expect(Manufacturer.calculated_mnfg_name(manufacturer_other, "Other manufacturer name")).to eq("Other manufacturer name")
     end
 
     it "returns the name of the manufacturer if it isn't other" do
