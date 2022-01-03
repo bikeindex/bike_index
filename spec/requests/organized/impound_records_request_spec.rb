@@ -313,13 +313,16 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           expect(impound_record_update.processed?).to be_truthy
 
           bike.reload
+          expect(bike.ownerships.count).to eq 2
+          current_ownership = bike.current_ownership
+          expect(current_ownership.impound_record).to eq impound_record
+          expect(current_ownership.organization).to eq current_organization
+          expect(current_ownership.origin).to eq "impound_process"
+          expect(current_ownership.owner_email).to eq "example@school.edu"
+          expect(current_ownership.calculated_send_email).to be_truthy
+          # Test here
           expect(bike.owner_email).to eq "example@school.edu"
           expect(bike.status_with_owner?).to be_truthy
-          expect(bike.ownerships.count).to eq 2
-          expect(bike.current_ownership.impound_record).to eq impound_record
-          expect(bike.current_ownership.organization).to eq current_organization
-          expect(bike.current_ownership.owner_email).to eq "example@school.edu"
-          expect(bike.current_ownership.calculated_send_email).to be_truthy
         end
       end
       context "retrieved_by_owner" do

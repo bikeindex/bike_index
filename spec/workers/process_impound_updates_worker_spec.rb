@@ -147,10 +147,15 @@ RSpec.describe ProcessImpoundUpdatesWorker, type: :job do
   context "transferred_to_new_owner" do
     let(:kind) { "transferred_to_new_owner" }
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike, claimed: false) }
+    let!(:impound_record_update) do
+      impound_record.impound_record_updates.create(processed: false,
+        kind: kind,
+        transfer_email: "something@party.com",
+        user: impound_record.user)
+    end
     it "creates 2 new ownerships, transfers it to the user, then to the new email, only sends one email" do
-      impound_record.reload
-      impound_record_update.update(transfer_email: "something@party.com")
       expect(bike.reload.ownerships.count).to eq 1
+      expect(impound_record_update).to be_valid
       Sidekiq::Worker.clear_all
       ActionMailer::Base.deliveries = []
       expect {

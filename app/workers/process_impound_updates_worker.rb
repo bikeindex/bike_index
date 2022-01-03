@@ -33,7 +33,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
           impound_record_id: impound_record.id,
           creator_id: impound_record_update.user_id,
           current: true)
-        bike.ownerships.current.where.not(id: ownership.id).each { |o| o.update(current: false) }
+        pp impound_record_update.transfer_email, ownership.owner_email, ownership.errors.full_messages
       elsif impound_record_update.kind == "removed_from_bike_index"
         impound_record.bike.destroy
       elsif impound_record_update.kind == "retrieved_by_owner" &&
