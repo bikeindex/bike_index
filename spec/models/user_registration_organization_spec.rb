@@ -7,16 +7,4 @@ RSpec.describe UserRegistrationOrganization, type: :model do
       expect(user_registration_organization).to be_valid
     end
   end
-
-  describe "calculated_bike_ids" do
-    context "not set" do
-      it "uses ownerships"
-    end
-    context "all bikes" do
-      it "does all"
-    end
-    context "set and bike_ids" do
-      it "does it"
-    end
-  end
 end
