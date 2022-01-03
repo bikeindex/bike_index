@@ -4,9 +4,9 @@ class CreateUserRegistrationOrganizations < ActiveRecord::Migration[5.2]
       t.references :user, index: true
       t.references :organization, index: true
       t.boolean :all_bikes, default: false
-      t.jsonb :bike_ids
+      t.boolean :can_not_edit_claimed, default: false
       t.jsonb :registration_info
-      t.deleted_at :datetime
+      t.datetime :deleted_at
 
       t.timestamps
     end

@@ -191,7 +191,7 @@ class Bike < ApplicationRecord
     end
 
     def organization(org_or_org_ids)
-      ids = org_or_org_ids.is_a?(Organization) ? Organization.friendly_find(org_or_org_ids)&.id : org_or_org_ids
+      ids = org_or_org_ids.is_a?(Organization) ? org_or_org_ids.id : org_or_org_ids
       includes(:bike_organizations).where(bike_organizations: {organization_id: ids})
     end
 

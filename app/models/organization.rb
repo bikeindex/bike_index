@@ -238,6 +238,11 @@ class Organization < ApplicationRecord
     is_paid
   end
 
+  # For now - just using paid
+  def user_registration_all_bikes?
+    paid?
+  end
+
   def paid_money?
     paid? && current_invoices.any? { |i| i.paid_money_in_full? }
   end

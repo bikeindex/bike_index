@@ -27,6 +27,7 @@ class User < ApplicationRecord
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
+  has_many :user_registration_organizations
 
   has_many :integrations, dependent: :destroy
   has_many :impound_claims

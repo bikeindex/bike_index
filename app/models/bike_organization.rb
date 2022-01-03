@@ -9,6 +9,15 @@ class BikeOrganization < ApplicationRecord
 
   scope :can_edit_claimed, -> { where(can_not_edit_claimed: false) }
 
+  def user_registration_organization
+    bike.user&.user_registration_organizations&.where(organization_id: organization_id)&.first
+  end
+
+  # Could eventually be more sophisticated! Not clear what we'll do
+  def overridden_by_user_registration?
+    user_registration_organization&.all_bikes?
+  end
+
   # Because seth wants to have default=false attributes in the database, but can_edit_claimed is easier to think about
   def can_edit_claimed
     !can_not_edit_claimed

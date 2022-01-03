@@ -22,6 +22,7 @@ class AfterBikeSaveWorker < ApplicationWorker
       # Update the user to update any user alerts relevant to bikes
       AfterUserChangeWorker.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
     end
+    create_user_registration_organizations(bike)
     return true unless bike.status_stolen? # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
   end
@@ -70,5 +71,19 @@ class AfterBikeSaveWorker < ApplicationWorker
   # Bump registration_info attributes on ownerships
   def update_ownership(bike)
     bike.current_ownership&.update(updated_at: Time.current)
+  end
+
+  def create_user_registration_organizations(bike)
+    return unless bike.reload.user.present?
+    bike.bike_organizations.each do |bike_organization|
+      organization = bike_organization.organization
+      next if UserRegistrationOrganization.unscoped
+        .where(user_id: bike.user.id, organization_id: organization.id).any?
+      user_registration_organization = UserRegistrationOrganization.new(user_id: bike.user.id, organization_id: organization.id)
+      user_registration_organization.all_bikes = organization.user_registration_all_bikes?
+      user_registration_organization.can_not_edit_claimed = bike_organization.can_not_edit_claimed
+      user_registration_organization.set_initial_registration_info
+      user_registration_organization.save
+    end
   end
 end
