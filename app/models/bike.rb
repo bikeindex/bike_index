@@ -769,7 +769,7 @@ class Bike < ApplicationRecord
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
-    self.mnfg_name = calculated_mnfg_name
+    self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
@@ -840,15 +840,6 @@ class Bike < ApplicationRecord
 
   def calculated_current_ownership
     ownerships.order(:id).last
-  end
-
-  def calculated_mnfg_name
-    return "" if manufacturer.blank?
-    if manufacturer.name == "Other" && manufacturer_other.present?
-      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
-    else
-      manufacturer.simple_name
-    end.strip.truncate(60)
   end
 
   def normalized_email

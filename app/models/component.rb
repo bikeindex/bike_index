@@ -62,14 +62,6 @@ class Component < ApplicationRecord
     ctype.cgroup.name
   end
 
-  def manufacturer_name
-    if manufacturer && manufacturer.name == "Other" && manufacturer_other.present?
-      manufacturer_other
-    else
-      manufacturer&.simple_name
-    end
-  end
-
   def set_is_stock
     return true if setting_is_stock
     if id.present? && is_stock && description_changed? || component_model_changed?
@@ -80,21 +72,6 @@ class Component < ApplicationRecord
   def set_calculated_attributes
     set_front_or_rear
     set_is_stock
-    # if manufacturer.blank? && mnfg_name.present?
-    #   self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
-    #   self.mnfg_name = nil
-    # end
-    self.mnfg_name = calculated_mnfg_name
-  end
-
-  private
-
-  def calculated_mnfg_name
-    return "" if manufacturer.blank?
-    if manufacturer.name == "Other" && manufacturer_other.present?
-      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
-    else
-      manufacturer.simple_name
-    end.strip.truncate(60)
+    self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
   end
 end

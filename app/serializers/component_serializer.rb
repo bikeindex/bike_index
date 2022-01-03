@@ -13,4 +13,8 @@ class ComponentSerializer < ApplicationSerializer
   def model_name
     object.component_model
   end
+
+  def manufacturer_name
+    object.mnfg_name
+  end
 end

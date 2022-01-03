@@ -28,15 +28,6 @@ RSpec.describe Component, type: :model do
     end
   end
 
-  describe "manufacturer_name" do
-    let(:manufacturer) { FactoryBot.create(:manufacturer) }
-    it "returns the name of the manufacturer if it isn't other" do
-      component = Component.new(manufacturer: manufacturer, manufacturer_other: "ooooop")
-      allow(component).to receive(:manufacturer_other).and_return("oooop")
-      expect(component.manufacturer_name).to eq manufacturer.name
-    end
-  end
-
   describe "set_is_stock" do
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     it "sets not stock if description changed" do

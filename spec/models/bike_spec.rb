@@ -1058,36 +1058,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "calculated_mnfg_name" do
-    let(:manufacturer_other) { Manufacturer.new(name: "Other") }
-    let(:manufacturer) { Manufacturer.new(name: "Mnfg name") }
-    it "returns the value of manufacturer_other if manufacturer is other" do
-      bike = Bike.new(manufacturer: manufacturer_other, manufacturer_other: "Other manufacturer name")
-      expect(bike.send(:calculated_mnfg_name)).to eq("Other manufacturer name")
-    end
-
-    it "returns the name of the manufacturer if it isn't other" do
-      bike = Bike.new(manufacturer: manufacturer)
-      expect(bike.send(:calculated_mnfg_name)).to eq("Mnfg name")
-    end
-
-    context "malicious" do
-      let(:bike) { Bike.new(manufacturer: manufacturer_other, manufacturer_other: '<a href="bad_site.js">stuff</a>') }
-      it "removes bad things" do
-        expect(bike.send(:calculated_mnfg_name)).to eq("stuff")
-      end
-    end
-
-    context "manufacturer with parens" do
-      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
-      let(:bike) { FactoryBot.build(:bike, manufacturer: manufacturer) }
-      it "returns Just SE Bikes (and does it on save)" do
-        bike.save
-        expect(bike.mnfg_name).to eq("SE Racing")
-      end
-    end
-  end
-
   describe "#normalized_email" do
     it "sets normalized owner email" do
       bike = Bike.new(owner_email: "  somethinG@foo.orG")
@@ -1360,6 +1330,14 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "mnfg_name" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
+    let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
+    it "is the simple_name" do
+      expect(bike.reload.mnfg_name).to eq "SE Racing"
+    end
+  end
+
   describe "cache_photo" do
     context "existing photo" do
       it "caches the photo" do
@@ -1375,10 +1353,9 @@ RSpec.describe Bike, type: :model do
     it "caches the components" do
       bike = FactoryBot.create(:bike)
       manufacturer = FactoryBot.create(:manufacturer)
-      c = FactoryBot.create(:component, bike: bike, year: 2025, manufacturer: manufacturer)
+      FactoryBot.create(:component, bike: bike, year: 2025, manufacturer: manufacturer, component_model: "Cool model")
       bike.save
-      expect(bike.send("components_cache_array").join(" ")).to match(c.ctype.name)
-      expect(bike.cached_data).to match("2025 #{manufacturer.name} #{c.ctype.name}")
+      expect(bike.cached_data).to match("2025 #{manufacturer.name} Cool model")
     end
   end
 
@@ -1409,8 +1386,8 @@ RSpec.describe Bike, type: :model do
     let(:target_cached_string) { "#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
     it "caches all the bike parts" do
       bike.update(year: 1999, frame_material: "steel",
-        secondary_frame_color_id: bike.primary_frame_color_id,
-        tertiary_frame_color_id: bike.primary_frame_color_id,
+        secondary_frame_color_id: FactoryBot.create(:color).id,
+        tertiary_frame_color_id: FactoryBot.create(:color).id,
         handlebar_type: "bmx",
         propulsion_type: "sail",
         cycle_type: "unicycle",
