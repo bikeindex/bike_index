@@ -261,8 +261,8 @@
                       - else
                         = component.component_type.titleize if component.component_type.present?
                     = component.description
-                    - if component.year.present? ||  component.cmodel_name.present? || component.manufacturer.present?
-                      = t(".componentcmodel_name", componentcmodel_name: component.cmodel_name)
+                    - if component.year.present? ||  component.component_model.present? || component.manufacturer.present?
+                      = component_model
                       = t(".componentyear", componentyear: component.year) if component.year.present?
                       = "(#{component.manufacturer_name})"
     .col-md-4

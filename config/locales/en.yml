@@ -145,7 +145,6 @@ en:
         pdf: Pdf
         primary_frame_color: :activerecord.models.primary_frame_color
         propulsion_type: Propulsion type
-        propulsion_type_other: Propulsion type other
         public_images: Public images
         rear_gear_type: :activerecord.models.rear_gear_type
         rear_tire_narrow: Rear tire narrow
@@ -225,7 +224,7 @@ en:
         priority: Priority
       component:
         bike: :activerecord.models.bike
-        cmodel_name: Cmodel name
+        component_model: Component Model
         ctype: :activerecord.models.ctype
         ctype_other: Ctype other
         description: Description
@@ -1208,7 +1207,6 @@ en:
       bike_photo: "%{bike_type} photo"
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
-      componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
       contact_the_owner: Contact the owner
       created_to_record_parking_notification: created by %{organization} to record
