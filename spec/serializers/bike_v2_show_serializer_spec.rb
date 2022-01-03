@@ -27,7 +27,7 @@ RSpec.describe BikeV2ShowSerializer do
         rear: component.rear,
         front: component.front,
         manufacturer_name: component.manufacturer_name,
-        model_name: component.cmodel_name,
+        model_name: component.model_name,
         year: component.year
       }
     end

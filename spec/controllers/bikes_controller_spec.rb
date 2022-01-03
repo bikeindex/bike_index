@@ -844,7 +844,7 @@ RSpec.describe BikesController, type: :controller do
             description: "sdfsdfsdf",
             manufacturer_id: bike.manufacturer_id.to_s,
             manufacturer_other: "stuffffffff",
-            cmodel_name: "asdfasdf",
+            model_name: "asdfasdf",
             year: "1995",
             serial_number: "simple_serial"
           }

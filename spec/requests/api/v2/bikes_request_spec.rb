@@ -141,7 +141,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
-      expect(bike.components.map(&:cmodel_name).compact).to eq(["Richie rich"])
+      expect(bike.components.map(&:model_name).compact).to eq(["Richie rich"])
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       ownership = bike.current_ownership
@@ -389,7 +389,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.is_for_sale).to be_truthy
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
-      expect(bike.components.pluck(:cmodel_name)).to match_array([nil, nil, "Richie rich"])
+      expect(bike.components.pluck(:model_name)).to match_array([nil, nil, "Richie rich"])
       expect(bike.components.map(&:manufacturer_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.count).to eq(3)

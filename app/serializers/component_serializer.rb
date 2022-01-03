@@ -9,4 +9,8 @@ class ComponentSerializer < ApplicationSerializer
     :manufacturer_name,
     :model_name,
     :year
+
+  def model_name
+    object.component_model
+  end
 end

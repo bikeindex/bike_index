@@ -60,10 +60,10 @@ RSpec.describe Component, type: :model do
       component.set_is_stock
       expect(component.is_stock).to be_falsey
     end
-    it "sets not stock if cmodel_name changed" do
+    it "sets not stock if model_name changed" do
       component = FactoryBot.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
-      component.cmodel_name = "New mode"
+      component.model_name = "New mode"
       component.set_is_stock
       expect(component.is_stock).to be_falsey
     end
@@ -71,7 +71,7 @@ RSpec.describe Component, type: :model do
       component = FactoryBot.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.setting_is_stock = true
-      component.cmodel_name = "New mode"
+      component.model_name = "New mode"
       component.set_is_stock
       expect(component.is_stock).to be_truthy
     end

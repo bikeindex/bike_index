@@ -3,15 +3,26 @@ class Component < ApplicationRecord
 
   attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
 
-  def model_name=(val)
-    self.cmodel_name = val
-  end
-
   belongs_to :manufacturer
   belongs_to :ctype
   belongs_to :bike
+  belongs_to :bike_version
 
-  before_save :set_front_or_rear
+  before_save :set_calculated_attributes
+
+  def version_duplicated_attrs
+    {model_name: model_name,
+     year: year,
+     description: description,
+     manufacturer_id: manufacturer_id,
+     ctype_id: ctype_id,
+     ctype_other: ctype_other,
+     front: front,
+     rear: rear,
+     manufacturer_other: manufacturer_other,
+     serial_number: serial_number,
+     is_stock: is_stock}
+  end
 
   def set_front_or_rear
     return true unless front_or_rear.present?
@@ -51,24 +62,23 @@ class Component < ApplicationRecord
     if manufacturer && manufacturer.name == "Other" && manufacturer_other.present?
       manufacturer_other
     else
-      manufacturer&.name
+      manufacturer&.simple_name
     end
   end
 
-  before_save :set_is_stock
-
   def set_is_stock
     return true if setting_is_stock
-    if id.present? && is_stock && description_changed? || cmodel_name_changed?
+    if (id.present? && is_stock && description_changed?) || component_model_changed?
       self.is_stock = false
     end
     true
   end
 
-  before_validation :set_manufacturer
-
-  def set_manufacturer
-    return true unless mnfg_name.present?
-    self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
+  def set_calculated_attributes
+    set_front_or_rear
+    set_is_stock
+    if mnfg_name.present?
+      self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
+    end
   end
 end
