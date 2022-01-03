@@ -1,8 +1,4 @@
 class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
-  def registry_name
-    "Project529"
-  end
-
   def registry_url
     "https://project529.com"
   end

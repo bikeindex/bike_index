@@ -10,7 +10,7 @@ RSpec.describe BikeStickerUpdate, type: :model do
     end
   end
 
-  describe "user assocaition" do
+  describe "user association" do
     let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed) }
     let(:user) { bike_sticker.user }
     let!(:bike_sticker_update) { FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker) }

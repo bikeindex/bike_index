@@ -39,7 +39,7 @@ module API
         end
 
         # POST /api/v3/organizations
-        post serializer: OrganizationSerializer, root: "organization" do
+        post "/" do
           error!("Unauthorized. Cannot write organizations", 401) unless allowed_write_organizations
 
           permitted = declared(params, include_missing: false)
@@ -57,7 +57,7 @@ module API
           end
 
           organization.save || error!(organization.errors.full_messages, 422)
-          organization
+          OrganizationSerializer.new(organization, root: "organization")
         end
       end
     end

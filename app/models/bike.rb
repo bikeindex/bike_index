@@ -48,7 +48,7 @@ class Bike < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components
   has_many :bike_stickers
-  has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
+  has_many :b_params, foreign_key: :created_bike_id
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
   has_many :duplicate_bikes_including_self, through: :duplicate_bike_groups, class_name: "Bike", source: :bikes
   has_many :recovered_records, -> { recovered_ordered }, class_name: "StolenRecord"
@@ -92,7 +92,7 @@ class Bike < ApplicationRecord
 
   scope :without_location, -> { where(latitude: nil) }
   scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
-  scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
+  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
@@ -109,6 +109,7 @@ class Bike < ApplicationRecord
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
+  scope :with_user_hidden, -> { unscoped.non_example.without_deleted }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }
@@ -145,9 +146,12 @@ class Bike < ApplicationRecord
       query.present? ? pg_search(query) : all
     end
 
-    def organized_email_search(query)
+    def organized_email_and_name_search(query)
       return all unless query.present?
-      where("owner_email ilike ?", "%#{query.strip}%")
+      query_string = "%#{query.strip}%"
+      includes(:current_ownership)
+        .where("bikes.owner_email ilike ? OR ownerships.owner_name ilike ?", query_string, query_string)
+        .references(:current_ownership)
     end
 
     def admin_text_search(query)
@@ -343,6 +347,11 @@ class Bike < ApplicationRecord
     self.class.status_humanized_translated(status_humanized)
   end
 
+  # The appropriate edit template to use in the edit view.
+  def default_edit_template
+    status_stolen? ? "theft_details" : "bike_details"
+  end
+
   # Small helper because we call this a lot
   def type
     cycle_type && cycle_type_name&.downcase
@@ -352,10 +361,6 @@ class Bike < ApplicationRecord
     return "" unless type.present?
     # make this work for e-scooter
     type.split(/(\s|-)/).map(&:capitalize).join("")
-  end
-
-  def user_hidden
-    hidden && current_ownership&.user_hidden
   end
 
   def email_visible_for?(org)
@@ -519,7 +524,7 @@ class Bike < ApplicationRecord
   end
 
   def visible_by?(passed_user = nil)
-    return true unless hidden || deleted?
+    return true unless user_hidden || deleted?
     if passed_user.present?
       return true if passed_user.superuser?
       return false if deleted?
@@ -536,6 +541,7 @@ class Bike < ApplicationRecord
     if created_at.blank? || created_at > Time.current - 1.day
       new_stolen_record.creation_organization_id = creation_organization_id
     end
+    self.status ||= "status_stolen"
     new_stolen_record
   end
 
@@ -544,7 +550,8 @@ class Bike < ApplicationRecord
     new_impound_record = impound_records
       .build({country_id: new_country_id, status: "current", user_id: creator_id}.merge(new_attrs))
     new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
-    new_impound_record
+
+    self.current_impound_record = new_impound_record
   end
 
   def fetch_current_stolen_record
@@ -632,13 +639,12 @@ class Bike < ApplicationRecord
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
     if marked_user_hidden.present? && ParamsNormalizer.boolean(marked_user_hidden)
-      self.hidden = true
+      self.user_hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
     elsif marked_user_unhidden.present? && ParamsNormalizer.boolean(marked_user_unhidden)
-      self.hidden = false
+      self.user_hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
-    true
   end
 
   def normalize_emails
@@ -848,19 +854,24 @@ class Bike < ApplicationRecord
     self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
   end
 
+  # Called in BikeCreator, so that the serial and email can be used for dupe finding
+  def set_calculated_unassociated_attributes
+    clean_frame_size
+    set_mnfg_name
+    normalize_emails
+    normalize_serial_number
+    set_paints
+  end
+
   def set_calculated_attributes
+    set_calculated_unassociated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.current_ownership = calculated_current_ownership
     set_location_info
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
-    clean_frame_size
-    set_mnfg_name
     set_user_hidden
-    normalize_emails
-    normalize_serial_number
-    set_paints
     cache_bike
   end
 
@@ -909,7 +920,7 @@ class Bike < ApplicationRecord
   end
 
   def handlebar_type_name
-    HandlebarType.new(handlebar_type).name
+    HandlebarType.new(handlebar_type)&.name
   end
 
   def cycle_type_name

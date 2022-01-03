@@ -11,6 +11,6 @@ class ComponentSerializer < ApplicationSerializer
     :year
 
   def model_name
-    object.cmodel_name
+    object.component_model
   end
 end

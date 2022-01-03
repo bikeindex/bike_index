@@ -22,7 +22,7 @@ RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
   describe ".build_from_api_response" do
     it "returns a valid ExternalRegistryBike object" do
       bike = described_class.build_from_api_response(bike_json)
-
+      expect(bike.registry_name).to eq "Project529"
       expect(bike).to an_instance_of(described_class)
       expect(bike).to_not be_persisted
       expect(bike.valid?).to eq(true), bike.errors.full_messages.to_sentence
@@ -53,6 +53,7 @@ RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
       expect(bike.frame_model).to eq(bike_json["model_string"])
       expect(bike.date_stolen).to eq(bike_json.dig("active_incident", "last_seen"))
       expect(bike.location_found).to eq(bike_json.dig("active_incident", "location_address"))
+      expect(bike.short_address).to eq "Cambridge, MA 02138, USA"
       expect(bike.mnfg_name).to eq(bike_json["manufacturer_string"])
       expect(bike.description).to eq("2015 SE Racing 700C Lager")
       expect(bike.frame_colors).to eq(["Red", "Gold"])

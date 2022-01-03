@@ -20,8 +20,8 @@ group :red_green_refactor, halt_on_fail: true do
     watch("spec/spec_helper.rb") { "spec" }
     watch("spec/rails_helper.rb") { "spec" }
 
-    watch(%r{^app/controllers/api/v2/(.+)\.rb$}) { |m| "spec/requests/api/v2/#{m[1]}_spec.rb" }
-    watch(%r{^app/controllers/api/v3/(.+)\.rb$}) { |m| "spec/requests/api/v3/#{m[1]}_spec.rb" }
+    watch(%r{^app/controllers/api/v2/(.+)\.rb$}) { |m| "spec/requests/api/v2/#{m[1]}_request_spec.rb" }
+    watch(%r{^app/controllers/api/v3/(.+)\.rb$}) { |m| "spec/requests/api/v3/#{m[1]}_request_spec.rb" }
 
     watch(%r{^app/(.+)\.rb$}) { |m| "spec/#{m[1]}_spec.rb" }
     watch(%r{^app/(.*)(\.erb|\.haml)$}) { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }

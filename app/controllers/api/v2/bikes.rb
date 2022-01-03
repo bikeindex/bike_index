@@ -105,8 +105,8 @@ module API
         params do
           requires :id, type: Integer, desc: "Bike id"
         end
-        get ":id", serializer: BikeV2ShowSerializer, root: "bike" do
-          find_bike
+        get ":id" do
+          BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
         end
 
         desc "Check if a bike is already registered", {
@@ -203,7 +203,7 @@ module API
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.save
 
-          bike = BikeCreator.new(b_param).create_bike
+          bike = BikeCreator.new.create_bike(b_param)
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
             created_bike_serialized(bike, true)
@@ -232,7 +232,7 @@ module API
             optional :destroy, type: Boolean, desc: "Delete this component (requires an ID)"
           end
         end
-        put ":id", serializer: BikeV2ShowSerializer, root: "bike" do
+        put ":id" do
           declared_p = {"declared_params" => declared(params, include_missing: false)}
           find_bike
           authorize_bike_for_user
@@ -245,7 +245,7 @@ module API
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end
-          @bike.reload
+          BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
         desc "Add an image to a bike", {
@@ -266,12 +266,12 @@ module API
           requires :id, type: Integer, desc: "Bike ID"
           requires :file, type: Rack::Multipart::UploadedFile, desc: "Attachment."
         end
-        post ":id/image", serializer: PublicImageSerializer, root: "image" do
+        post ":id/image" do
           find_bike
           authorize_bike_for_user
           public_image = PublicImage.new(imageable: @bike, image: params[:file])
           if public_image.save
-            public_image
+            PublicImageSerializer.new(public_image, root: "image").as_json
           else
             error!(public_image.errors.full_messages.to_sentence, 401)
           end
@@ -292,13 +292,13 @@ module API
           requires :id, type: Integer, desc: "Bike ID"
           requires :image_id, type: Integer, desc: "Image ID"
         end
-        delete ":id/images/:image_id", serializer: BikeV2ShowSerializer, root: "bike" do
+        delete ":id/images/:image_id" do
           find_bike
           authorize_bike_for_user
           public_image = @bike.public_images.find_by_id(params[:image_id])
           error!("Unable to find that image", 404) unless public_image.present?
           public_image.destroy
-          @bike
+          BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
         desc "Send a stolen notification<span class='accstr'>*</span>", {
@@ -319,14 +319,15 @@ module API
           requires :id, type: Integer, desc: "Bike ID. **MUST BE A STOLEN BIKE**"
           requires :message, type: String, desc: "The message you are sending to the owner"
         end
-        post ":id/send_stolen_notification", serializer: StolenNotificationSerializer do
+        post ":id/send_stolen_notification" do
           find_bike
           error!("Bike is not stolen", 400) unless @bike.present? && @bike.status_stolen?
           # Unless application is authorized....
           authorize_bike_for_user(" (this application is not approved to send notifications)")
-          StolenNotification.create(bike_id: params[:id],
+          stolen_notification = StolenNotification.create(bike_id: params[:id],
             message: params[:message],
             sender: current_user)
+          StolenNotificationSerializer.new(stolen_notification).as_json
         end
       end
     end

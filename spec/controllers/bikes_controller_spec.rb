@@ -844,14 +844,13 @@ RSpec.describe BikesController, type: :controller do
             description: "sdfsdfsdf",
             manufacturer_id: bike.manufacturer_id.to_s,
             manufacturer_other: "stuffffffff",
-            cmodel_name: "asdfasdf",
+            component_model: "asdfasdf",
             year: "1995",
             serial_number: "simple_serial"
           }
           bike_attrs = {
             description: "69",
             handlebar_type: other_handlebar_type,
-            handlebar_type_other: "Joysticks",
             owner_email: "  #{bike.owner_email.upcase}",
             city: "Rotterdam",
             zipcode: "3035",
@@ -872,9 +871,8 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.description).to eq("69")
           expect(response).to redirect_to edit_bike_url(bike)
           expect(bike.handlebar_type).to eq other_handlebar_type
-          expect(bike.handlebar_type_other).to eq "Joysticks"
           expect(assigns(:bike)).to be_present
-          expect(bike.hidden).to be_falsey
+          expect(bike.user_hidden).to be_falsey
           expect(bike.country&.name).to eq(Country.netherlands.name)
           expect(bike.zipcode).to eq "3035"
           expect(bike.city).to eq "Rotterdam"
@@ -890,9 +888,9 @@ RSpec.describe BikesController, type: :controller do
 
         it "marks the bike unhidden" do
           bike.update(marked_user_hidden: "1")
-          expect(bike.hidden).to be_truthy
+          expect(bike.user_hidden).to be_truthy
           put :update, params: {id: bike.id, bike: {marked_user_unhidden: "true"}}
-          expect(bike.reload.hidden).to be_falsey
+          expect(bike.reload.user_hidden?).to be_falsey
         end
 
         context "bike_sticker" do
@@ -1101,7 +1099,7 @@ RSpec.describe BikesController, type: :controller do
 
               put :update, params: {id: bike.id, bike: bike_attrs, edit_template: "fancy_template"}
               expect(flash[:error]).to_not be_present
-              expect(response).to redirect_to edit_bike_url(edit_template: "fancy_template")
+              expect(response).to redirect_to edit_bike_url(bike, edit_template: "fancy_template")
               bike.reload
               expect(bike.status).to eq "status_stolen"
 
@@ -1220,7 +1218,7 @@ RSpec.describe BikesController, type: :controller do
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_present
         bike.reload
-        expect(bike.hidden).to be_falsey
+        expect(bike.user_hidden).to be_falsey
         allowed_attributes.except(*skipped_attrs).each do |key, value|
           pp value, key unless bike.send(key) == value
           expect(bike.send(key)).to eq value
@@ -1235,7 +1233,7 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to redirect_to edit_bike_url(bike)
           expect(assigns(:bike)).to be_present
           bike.reload
-          expect(bike.hidden).to be_falsey
+          expect(bike.user_hidden).to be_falsey
           allowed_attributes.except(*skipped_attrs).each do |key, value|
             pp value, key unless bike.send(key) == value
             expect(bike.send(key)).to eq value
@@ -1285,7 +1283,7 @@ RSpec.describe BikesController, type: :controller do
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_present
         bike.reload
-        expect(bike.hidden).to be_falsey
+        expect(bike.user_hidden).to be_falsey
         expect(bike.description).to eq "new description"
         expect(bike.handlebar_type).to eq "forward"
         expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
@@ -1316,7 +1314,7 @@ RSpec.describe BikesController, type: :controller do
             expect(response).to redirect_to edit_bike_url(bike)
             expect(assigns(:bike)).to be_present
             bike.reload
-            expect(bike.hidden).to be_falsey
+            expect(bike.user_hidden).to be_falsey
             expect(bike.description).to eq "new description"
             expect(bike.handlebar_type).to eq "forward"
           end

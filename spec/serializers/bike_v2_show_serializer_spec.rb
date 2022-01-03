@@ -27,7 +27,7 @@ RSpec.describe BikeV2ShowSerializer do
         rear: component.rear,
         front: component.front,
         manufacturer_name: component.manufacturer_name,
-        model_name: component.cmodel_name,
+        model_name: component.component_model,
         year: component.year
       }
     end
@@ -75,13 +75,22 @@ RSpec.describe BikeV2ShowSerializer do
         external_id: nil,
         registry_name: nil,
         registry_url: nil,
-        status: nil
+        status: "with owner"
       }
     end
 
     it "returns the expected thing" do
       bike.reload
       expect(subject.as_json(root: false)).to eq target
+    end
+  end
+
+  describe "caching" do
+    let(:serializer) { described_class.new(Bike.new, root: false) }
+    include_context :caching_basic
+    it "is cached" do
+      expect(serializer.perform_caching).to be_truthy
+      expect(serializer.as_json.is_a?(Hash)).to be_truthy
     end
   end
 end

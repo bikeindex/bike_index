@@ -1,4 +1,5 @@
 class Bikes::TheftAlertsController < Bikes::BaseController
+  include BikeEditable
   before_action :get_existing_theft_alerts, except: [:create]
 
   def new

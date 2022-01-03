@@ -75,8 +75,10 @@ module API
 
           NOTE
         }
-        get "/bikes", each_serializer: BikeV2Serializer, root: "bikes" do
-          valid_current_user.bikes
+        get "/bikes" do
+          ActiveModel::ArraySerializer.new(valid_current_user.bikes,
+            each_serializer: BikeV2Serializer,
+            root: "bikes").as_json
         end
       end
     end

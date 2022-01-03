@@ -117,7 +117,7 @@ RSpec.describe BikeUpdator do
         creator: new_creator,
         creation_organization_id: 69,
         example: false,
-        hidden: true,
+        user_hidden: true,
         owner_email: " "
       }
       BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json).update_available_attributes
@@ -127,7 +127,7 @@ RSpec.describe BikeUpdator do
       expect(bike.creation_organization_id).to eq(og_bike.creation_organization_id)
       expect(bike.creator).to eq(og_bike.creator)
       expect(bike.example).to eq(og_bike.example)
-      expect(bike.hidden).to be_falsey
+      expect(bike.user_hidden).to be_falsey
       expect(bike.description).to eq("something long")
       expect(bike.owner_email).to eq("foo@bar.com")
       expect(bike.status).to eq "status_with_owner"
@@ -153,8 +153,7 @@ RSpec.describe BikeUpdator do
       expect(bike.user_hidden).to be_falsey
       bike_params = {marked_user_hidden: true}
       BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json).update_available_attributes
-      expect(bike.reload.hidden).to be_truthy
-      expect(bike.user_hidden).to be_truthy
+      expect(bike.reload.user_hidden).to be_truthy
     end
 
     it "updates the bike and set year to nothing if year nil" do

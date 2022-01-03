@@ -1,0 +1,92 @@
+.admin-subnav
+  .col
+    %h1
+      Reassign Stickers
+
+  .col-12.mt-4
+    %h5
+      = admin_number_display(@bike_sticker_batches.count)
+      - if @bike_sticker_batch.present?
+        Selected batch
+      - else
+        batches
+
+    = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false}
+
+
+  = render partial: "/shared/admin_current_header", locals: { viewing: "Stickers" }
+.row
+  .col-md-8.offset-md-2.mt-2
+    = form_tag reassign_admin_bike_stickers_path, method: :get, id: "reassign_form" do
+
+      .card.bg-light
+        .card-body
+          %h4 Select stickers to reassign
+
+          = render partial: "/shared/hidden_search_fields", locals: {skip_organization: true}
+
+          .row.mt-4
+            - if @bike_sticker1.present?
+              .col-12
+                .form-group.fancy-select.unfancy
+                  - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id]  }
+                  = label_tag :search_bike_sticker_batch_id, "Sticker Batch"
+                  = select_tag :search_bike_sticker_batch_id, options_for_select(opt_vals, selected: @bike_sticker_batch&.id), placeholder: "Select batch", class: 'form-control', include_blank: true
+            .col-sm-6
+              .form-group
+                = label_tag :search_sticker1, "Starting Sticker code"
+                = text_field_tag :search_sticker1, params[:search_sticker1], class: "form-control"
+            .col-sm-6
+              .form-group
+                = label_tag :search_sticker2, "Ending Sticker code"
+                = text_field_tag :search_sticker2, params[:search_sticker2], class: "form-control"
+            .col-12
+              .form-group.fancy-select.unfancy
+                = label_tag :organization, "Organization to assign stickers to"
+                - org_opt_vals = Organization.approved.name_ordered.pluck(:name, :id)
+                = select_tag(:organization_id, options_for_select(org_opt_vals, selected: current_organization&.id), include_blank: true, placeholder: "Select organization", class: 'form-control')
+          .form-group.mt-2
+            = submit_tag 'Select', name: 'select', class: 'btn btn-primary ml-2'
+
+          - if @valid_selection
+            .alert.alert-success.mt-4
+              %h4 Selected codes can be reassigned
+              = hidden_field_tag :reassign_now, false
+              .text-center
+                %btn#reassignNowBtn.btn.btn-success.btn-lg{style: "cursor: pointer"}
+                  Reassign Now
+            :javascript
+              $('#reassignNowBtn').on('click', e => {
+                e.preventDefault()
+                $('#reassign_now').val(true)
+                $("#reassign_form").submit()
+              })
+          .alert.alert-info.mt-4
+            %h4 To reassign codes:
+            %ul
+              %li
+                Enter a starting sticker code and a final sticker code. Only #{max_reassign_size} codes can be reassigned at a time (choose an appropriate start and end code).
+              %li Select the organization that you want to assign the stickers to
+              %li Click "Select" to find the group of stickers
+              %li Make sure that the "batch" that is chosen is the one that you want to use.
+              %li Review the selected stickers.
+              %li You will see a button to "Reassign now" if the reassignment can be done. Press it to reassign the stickers.
+
+
+
+.row.mt-4
+  .col-md-6
+    %p
+      = admin_number_display(@bike_stickers.total_count)
+      matching
+      = "sticker".pluralize(@bike_stickers.total_count)
+      %span.less-strong
+        = number_with_delimiter(matching_bike_stickers.claimed.count)
+        claimed
+
+.mt-2
+= paginate @bike_stickers, views_prefix: "admin"
+
+= render partial: "table", locals: { bike_stickers: @bike_stickers, render_sortable: true }
+
+= paginate @bike_stickers, views_prefix: "admin"

@@ -50,8 +50,8 @@ module ApplicationHelper
     return nil if @force_landing_page_render
     case controller_name
     when "bikes"
-      "edit_bike_skeleton" if %w[edit update].include?(action_name)
-    when "theft_alerts"
+      "edit_bike_skeleton" if %w[update].include?(action_name)
+    when "edits", "theft_alerts", "recovery"
       "edit_bike_skeleton"
     when "info"
       "content_skeleton" unless %w[terms security vendor_terms privacy support_the_index].include?(action_name)
@@ -115,7 +115,7 @@ module ApplicationHelper
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) { |builder|
-      render("/bikes/bike_fields/revised_component_fields", f: builder, ctype_id: Ctype.other.id)
+      render("/bikes_edit/bike_fields/revised_component_fields", f: builder, ctype_id: Ctype.other.id)
     }
     text = "<span class='context-display-help'>+</span>#{name}"
     link_to(text.html_safe, "#", class: "add_fields", data: {id: id, fields: fields.delete("\n")})
@@ -230,7 +230,10 @@ module ApplicationHelper
     require "coderay"
     cleaned_data = if no_blank
       # Show false values, just not empty or nil things
-      data.select { |k, v| v.present? || v == false ? [k, v] : nil }.compact.to_h
+      data.select do |k, v|
+        next unless ParamsNormalizer.present_or_false?(v)
+        [k, v]
+      end.compact.to_h
     else
       data
     end

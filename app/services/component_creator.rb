@@ -1,6 +1,3 @@
-class ComponentsCreatorError < StandardError
-end
-
 class ComponentCreator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
@@ -25,7 +22,7 @@ class ComponentCreator
 
   def permitted_attributes(component)
     comp_attributes = {
-      cmodel_name: component[:model_name] || component[:model],
+      component_model: component[:model_name] || component[:model],
       description: component[:description],
       year: component[:year],
       serial_number: component[:serial_number] || component[:serial],

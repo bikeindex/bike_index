@@ -174,7 +174,6 @@ RSpec.describe ParkingNotification, type: :model do
     it "sets the impound record" do
       bike.reload
       expect(bike.status).to eq "unregistered_parking_notification"
-      expect(bike.hidden).to be_truthy
       expect(bike.user_hidden).to be_truthy
       expect(parking_notification1.unregistered_bike?).to be_truthy
       expect(parking_notification1.resolved_at).to be_blank
@@ -191,7 +190,6 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification2.resolved_at).to be_present # The job sets the resolved at
       expect(bike.status).to eq "status_impounded"
       expect(parking_notification2.unregistered_bike?).to be_truthy
-      expect(bike.hidden).to be_falsey
       expect(bike.user_hidden).to be_falsey
 
       expect(parking_notification1.reload.resolved_at).to be_present

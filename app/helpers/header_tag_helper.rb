@@ -6,6 +6,7 @@ module HeaderTagHelper
   # Everything below here is an internal method, not private for testing purposes
 
   def header_tag_array
+    return bikes_header_tags if controller_namespace == "bikes" # eg bikes_edit
     return default_header_tag_array unless page_with_custom_header_tags?
     send("#{controller_name}_header_tags")
   end
@@ -104,7 +105,7 @@ module HeaderTagHelper
     if (action_name == "new" || action_name == "create") && @bike.status_stolen?
       self.page_title = translation_title(location: "meta_titles.bikes_new_stolen")
       self.page_description = translation_description(location: "meta_descriptions.bikes_new_stolen")
-    elsif action_name == "edit" || action_name == "update"
+    elsif action_name == "edit" || action_name == "update" || @edit_templates.present?
       if @edit_templates.present?
         # Some of the theft alert templates don't have translations, so just jam it in there
         template_str = @edit_templates[@edit_template] || @edit_template&.humanize

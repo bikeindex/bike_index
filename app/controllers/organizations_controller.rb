@@ -40,7 +40,7 @@ class OrganizationsController < ApplicationController
   # previously accepted stolen_first=true as a parameter.
   # Stopped accepting in PR#1875, because consistency, use stolen=true instead
   def embed
-    @bike = BikeCreator.new(@b_param).build_bike
+    @bike = BikeCreator.new.build_bike(@b_param)
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
     @stolen = @bike.status_stolen?
@@ -48,7 +48,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed_extended
-    @bike = BikeCreator.new(@b_param).build_bike
+    @bike = BikeCreator.new.build_bike(@b_param)
     if params[:email].present?
       @bike.owner_email = params[:email]
       @persist_email = true unless defined?(@persist_email)

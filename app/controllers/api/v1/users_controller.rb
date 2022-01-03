@@ -35,7 +35,7 @@ module Api
               bike.save
               bike.create_normalized_serial_segments
             elsif params[:manufacturer_update_manufacturer].present?
-              feedback.feedback_hash[:old_manufacturer] = bike.manufacturer.name
+              feedback.feedback_hash[:old_manufacturer] = bike.mnfg_name
               if bike.manufacturer_other.present?
                 feedback.feedback_hash[:old_manufacturer] += " (#{bike.manufacturer_other})"
                 bike.manufacturer_other = nil

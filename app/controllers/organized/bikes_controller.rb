@@ -60,7 +60,7 @@ module Organized
     def new_iframe
       @organization = current_organization
       @b_param = find_or_new_b_param
-      @bike = BikeCreator.new(@b_param).build_bike
+      @bike = BikeCreator.new.build_bike(@b_param)
       render layout: "embed_layout"
     end
 
@@ -78,7 +78,7 @@ module Organized
         end
         # we handle filtering & coercion in BParam, just create it with whatever here
         @b_param.update(permitted_create_params)
-        @bike = BikeCreator.new(@b_param).create_bike
+        @bike = BikeCreator.new.create_bike(@b_param)
         if @bike.errors.any?
           flash[:error] = @b_param.bike_errors.to_sentence
           iframe_redirect_params[:b_param_id_token] = @b_param.id_token
@@ -152,7 +152,7 @@ module Organized
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_search(params[:search_email]) if params[:search_email].present?
+        bikes = bikes.organized_email_and_name_search(params[:search_email]) if params[:search_email].present?
       else
         bikes = Bike.search(@interpreted_params)
       end

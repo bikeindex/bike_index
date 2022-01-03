@@ -23,6 +23,12 @@ module API
           BikeSearcher.new(params.merge(api_search: true)).find_bikes
         end
 
+        def bikes_serialized(bikes)
+          ActiveModel::ArraySerializer.new(bikes,
+            each_serializer: BikeV2Serializer,
+            root: "bikes").as_json
+        end
+
         def set_proximity
           params[:proximity_radius] ||= params[:proximity_square] if params[:proximity_square].present?
           params[:proximity_radius] ||= 100
@@ -43,8 +49,8 @@ module API
         params do
           use :search_bikes
         end
-        get "/", root: "bikes", each_serializer: BikeV2Serializer do
-          paginate find_bikes
+        get "/" do
+          bikes_serialized(paginate(find_bikes))
         end
 
         desc "Stolen bike search", {
@@ -61,10 +67,10 @@ module API
           use :search_bikes
           use :stolen_search
         end
-        get "/stolen", root: "bikes", each_serializer: BikeV2Serializer do
+        get "/stolen" do
           params[:stolen] = true
           set_proximity
-          paginate find_bikes
+          bikes_serialized(paginate(find_bikes))
         end
 
         desc "Non-stolen bike search"
@@ -72,9 +78,9 @@ module API
         params do
           use :search_bikes
         end
-        get "/non_stolen", root: "bikes", each_serializer: BikeV2Serializer do
+        get "/non_stolen" do
           params[:non_stolen] = true
-          paginate find_bikes
+          bikes_serialized(paginate(find_bikes))
         end
 
         desc "Count of bikes matching search", {
@@ -98,7 +104,7 @@ module API
           use :search_bikes
           use :stolen_search
         end
-        get "/count", root: "bikes", each_serializer: BikeV2Serializer do
+        get "/count" do
           params[:proximity] = params[:proximity] || "ip"
           set_proximity
           BikeSearcher.new(params.except("format")).find_bike_counts
@@ -115,9 +121,9 @@ module API
         params do
           requires :serial, type: String, desc: "Serial to search for"
         end
-        get "/close_serials", root: "bikes", each_serializer: BikeV2Serializer do
-          bikes = BikeSearcher.new(params.merge(api_search: true)).close_serials
-          paginate bikes
+        get "/close_serials" do
+          close_bikes = BikeSearcher.new(params.merge(api_search: true)).close_serials
+          bikes_serialized(paginate(close_bikes))
         end
 
         desc "All stolen bikes", {

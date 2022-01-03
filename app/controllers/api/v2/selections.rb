@@ -5,43 +5,47 @@ module API
 
       resource :selections, desc: "Selections (static options)" do
         desc "Frame colors"
-        get "/colors", root: "colors" do
-          Color.all
+        get "/colors" do
+          ActiveModel::ArraySerializer.new(Color.all,
+            each_serializer: ColorSerializer,
+            root: "colors").as_json
         end
 
         desc "Types of components"
-        get "/component_types", each_serializer: CtypeSerializer, root: "component_types" do
-          Ctype.all
+        get "/component_types" do
+          ActiveModel::ArraySerializer.new(Ctype.all,
+            each_serializer: CtypeSerializer,
+            root: "component_types").as_json
         end
 
         desc "Types of cycles"
-        get "/cycle_types", root: "cycle_types" do
-          CycleType.legacy_selections
+        get "/cycle_types" do
+          {cycle_types: CycleType.legacy_selections}
         end
 
         desc "Frame materials"
-        get "/frame_materials", root: "frame_materials" do
-          FrameMaterial.legacy_selections
+        get "/frame_materials" do
+          {frame_materials: FrameMaterial.legacy_selections}
         end
 
         desc "Front gear types"
-        get "/front_gear_types", root: "front_gear_types" do
-          FrontGearType.all
+        get "/front_gear_types" do
+          {front_gear_types: FrontGearType.all}
         end
 
         desc "Rear gear types"
-        get "/rear_gear_types", root: "rear_gear_types" do
-          RearGearType.all
+        get "/rear_gear_types" do
+          {rear_gear_types: RearGearType.all}
         end
 
         desc "Handlebars"
-        get "/handlebar_types", root: "handlebar_types" do
-          HandlebarType.legacy_selections
+        get "/handlebar_types" do
+          {handlebar_types: HandlebarType.legacy_selections}
         end
 
         desc "Propulsion types"
-        get "/propulsion_types", root: "propulsion_types" do
-          PropulsionType.legacy_selections
+        get "/propulsion_types" do
+          {propulsion_types: PropulsionType.legacy_selections}
         end
 
         desc "Wheel sizes (paginated)", {
@@ -55,10 +59,12 @@ module API
         params do
           optional :min_popularity, type: String, desc: "Minimum commonness of wheel size to include", values: WheelSize.popularities
         end
-        get "/wheel_sizes", root: "wheel_sizes" do
+        get "/wheel_sizes" do
           priority = WheelSize.popularities.index(params[:min_popularity]) || 0
-          wheel_sizes = WheelSize.where("priority  > ?", priority)
-          paginate wheel_sizes
+          wheel_sizes = paginate(WheelSize.where("priority  > ?", priority))
+          ActiveModel::ArraySerializer.new(wheel_sizes,
+            each_serializer: WheelSizeSerializer,
+            root: "wheel_sizes").as_json
         end
       end
     end
