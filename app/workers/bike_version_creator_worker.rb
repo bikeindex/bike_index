@@ -43,5 +43,17 @@ class BikeVersionCreatorWorker < ApplicationWorker
     end
 
     bike_version.save
+
+    bike.public_images.each do |public_image|
+      next if bike_version.public_images.where(external_image_url: public_image.image_url).present?
+      # Complicated mainly because of testing and local development
+      new_public_image = bike_version.public_images.new(name: public_image.name)
+      if public_image.local_file?
+        new_public_image.external_image_url = public_image.image_url
+      else
+        new_public_image.image = public_image.image.image
+      end
+      new_public_image.save
+    end
   end
 end

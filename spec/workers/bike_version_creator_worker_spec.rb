@@ -135,4 +135,24 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect_attrs_to_match_hash(version_component2, component_attrs.except(:bike_id))
     end
   end
+  context "with public_images" do
+    let(:large_image) { File.open(Rails.root.join("spec", "fixtures", "hugeimg.png")) }
+    let!(:public_image) { FactoryBot.create(:public_image, image: large_image, imageable: bike) }
+    it "copies them" do
+      bike.reload
+      expect(bike.public_images.count).to eq 1
+      pp bike.public_images.map(&:image_url)
+      expect {
+        instance.perform(bike.id)
+      }.to change(BikeVersion, :count).by 1
+      expect(bike.reload.bike_versions.count).to eq 1
+      bike_version = bike.bike_versions.first
+      expect(bike_version.owner_id).to eq user.id
+      expect(bike_version.authorized?(user)).to be_truthy
+      expect(bike_version.manufacturer_id).to eq Manufacturer.other.id
+      expect(bike_version.mnfg_name).to eq "Unknown cool MNFG"
+      expect(bike_version.frame_colors).to eq bike.frame_colors
+      expect(bike_version.public_images.count).to eq 1
+    end
+  end
 end

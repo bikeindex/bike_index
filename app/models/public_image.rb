@@ -51,4 +51,10 @@ class PublicImage < ApplicationRecord
     return true unless bike?
     AfterBikeSaveWorker.perform_async(imageable_id, false, true)
   end
+
+  # Because the way we load the file is different if it's remote or local
+  # This is hacky, but whatever
+  def local_file?
+    image&._storage&.to_s == "CarrierWave::Storage::File"
+  end
 end
