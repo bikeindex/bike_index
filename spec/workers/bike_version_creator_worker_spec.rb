@@ -54,13 +54,13 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
         frame_size_unit: "ordinal")
     end
     let(:component_manufacturer) { FactoryBot.create(:manufacturer, frame_maker: false) }
-    let!(:component1) { FactoryBot.create(:component, bike: bike, manufacturer: component_manufacturer, description: "some description", front: true) }
+    let!(:component1) { FactoryBot.create(:component, bike: bike, manufacturer: component_manufacturer, description: "some description", front: true, year: 2020) }
     let(:component_attrs) do
       {
         bike_id: bike.id,
         manufacturer: Manufacturer.other,
         manufacturer_other: "Some other Manufacturer",
-        cmodel_name: "party",
+        component_model: "party",
         serial_number: "999999FFF",
         year: "2020"
       }
@@ -79,12 +79,17 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
         bike.tertiary_frame_color.name,
         "#{bike.rear_wheel_size.name} wheel",
         "#{bike.front_wheel_size.name} wheel",
+        component_manufacturer.simple_name,
+        "Some other Manufacturer",
+        "party",
+        2020
       ]
     end
     let!(:component2) { FactoryBot.create(:component, component_attrs) }
     it "creates" do
       expect(bike.reload.bike_versions.count).to eq 0
       expect(user).to be_present
+      expect(component2.reload.mnfg_name).to eq "Some other Manufacturer"
       expect {
         instance.perform(bike.id)
       }.to change(BikeVersion, :count).by 1
@@ -117,10 +122,9 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.frame_size_unit).to eq "ordinal"
       expect(bike_version.frame_size_number).to eq nil
       # And the final test - does everything calculate?
-      pp bike_version.cached_data_array, bike_version.cached_data_array - target_cached_array
       expect(bike_version.cached_data_array).to match_array target_cached_array
       # And, test that bike is the same
-      expect(bike_version.cached_data).to eq bike.cached_data
+      expect(bike.cached_data).to eq bike_version.cached_data
 
       expect(bike_version.components.count).to eq 2
       version_component1 = bike_version.components.where(manufacturer_id: component_manufacturer.id).first

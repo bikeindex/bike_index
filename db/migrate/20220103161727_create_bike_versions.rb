@@ -45,5 +45,6 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.timestamps
     end
     add_reference :components, :bike_version, index: true
+    add_column :components, :mnfg_name, :string
   end
 end

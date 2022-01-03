@@ -724,7 +724,8 @@ CREATE TABLE public.components (
     manufacturer_other character varying(255),
     serial_number character varying(255),
     is_stock boolean DEFAULT false NOT NULL,
-    bike_version_id bigint
+    bike_version_id bigint,
+    mnfg_name character varying
 );
 
 
@@ -6018,6 +6019,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211223213257'),
 ('20211224053713'),
 ('20220102153706'),
-('20220102160149');
+('20220102160149'),
+('20220103161727');
 
 

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :manufacturer do
-    name { FactoryBot.generate(:unique_name) }
+    sequence(:name) { |n| "Manufacturer #{n}" }
     frame_maker { true }
   end
 end

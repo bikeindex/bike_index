@@ -103,15 +103,15 @@ module BikeAttributable
       extra_registration_number,
       (cycle_type == "bike" ? nil : type),
       components_cache_array
-    ].flatten.reject(&:blank?)
+    ].flatten.reject(&:blank?).uniq
   end
 
   protected
 
   def components_cache_array
     components.includes(:manufacturer, :ctype).map do |c|
-      c.ctype.present? && c.ctype.name.present? &&
-        [c.year, c.manufacturer&.name, c.component_type, c.model_name].compact
+      next unless c.ctype.present? || c.component_model.present?
+      [c.year, c.mnfg_name, c.component_model].compact
     end
   end
 end

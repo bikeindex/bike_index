@@ -41,6 +41,7 @@ class BikeVersionCreatorWorker < ApplicationWorker
     bike.components.each do |c|
       bike_version.components.build(c.version_duplicated_attrs)
     end
+
     bike_version.save
   end
 end

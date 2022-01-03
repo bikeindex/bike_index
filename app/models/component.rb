@@ -1,7 +1,7 @@
 class Component < ApplicationRecord
   include ActiveModel::Dirty
 
-  attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
+  attr_accessor :front_or_rear, :setting_is_stock
 
   def model_name=(val)
     self.component_model = val
@@ -15,7 +15,7 @@ class Component < ApplicationRecord
   before_save :set_calculated_attributes
 
   def version_duplicated_attrs
-    {cmodel_name: cmodel_name,
+    {component_model: component_model,
      year: year,
      description: description,
      manufacturer_id: manufacturer_id,
@@ -80,8 +80,21 @@ class Component < ApplicationRecord
   def set_calculated_attributes
     set_front_or_rear
     set_is_stock
-    if mnfg_name.present?
-      self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
-    end
+    # if manufacturer.blank? && mnfg_name.present?
+    #   self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
+    #   self.mnfg_name = nil
+    # end
+    self.mnfg_name = calculated_mnfg_name
+  end
+
+  private
+
+  def calculated_mnfg_name
+    return "" if manufacturer.blank?
+    if manufacturer.name == "Other" && manufacturer_other.present?
+      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
+    else
+      manufacturer.simple_name
+    end.strip.truncate(60)
   end
 end
