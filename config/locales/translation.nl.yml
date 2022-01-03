@@ -433,7 +433,6 @@ nl:
         paints: verven
         priority: Prioriteit
       component:
-        cmodel_name: Cmodel naam
         ctype_other: Ctype anders
         description: Beschrijving
         front: Voorkant
@@ -442,6 +441,7 @@ nl:
         rear: achterkant
         serial_number: Framenummer
         year: jaar
+        component_model: Componentmodel
       country:
         iso: Iso
         locations: Locaties
@@ -1934,7 +1934,6 @@ nl:
     show:
       bike_photo: "%{bike_type} foto"
       color_may_not_match: Kleur komt mogelijk niet overeen!
-      componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
       contact_the_owner: Neem contact op met de eigenaar
       cycle_type: Type cyclus
