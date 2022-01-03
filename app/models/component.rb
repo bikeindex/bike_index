@@ -4,7 +4,7 @@ class Component < ApplicationRecord
   attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
 
   def model_name=(val)
-    self.cmodel_name = val
+    self.component_model = val
   end
 
   belongs_to :manufacturer
@@ -59,7 +59,7 @@ class Component < ApplicationRecord
 
   def set_is_stock
     return true if setting_is_stock
-    if id.present? && is_stock && description_changed? || cmodel_name_changed?
+    if id.present? && is_stock && description_changed? || component_model_changed?
       self.is_stock = false
     end
     true

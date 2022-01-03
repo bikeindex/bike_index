@@ -313,7 +313,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(component.ctype.slug).to eq("headset")
         expect(component.year).to eq(1999)
         expect(component.manufacturer_id).to eq(manufacturer.id)
-        expect(component.cmodel_name).to eq("Richie rich")
+        expect(component.component_model).to eq("Richie rich")
         expect(bike.public_images.count).to eq(2)
         expect(f_count).to eq(Feedback.count)
         skipped = %w[send_email frame_size_unit rear_wheel_bsd color example rear_gear_type_slug front_gear_type_slug handlebar_type_slug]
