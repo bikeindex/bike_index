@@ -65,6 +65,22 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
         year: "2020"
       }
     end
+    let(:target_cached_array) do
+      [
+        bike.mnfg_name,
+        bike.frame_size,
+        bike.type,
+        bike.propulsion_type_name,
+        bike.year,
+        bike.frame_material_name,
+        bike.frame_model,
+        bike.primary_frame_color.name,
+        bike.secondary_frame_color.name,
+        bike.tertiary_frame_color.name,
+        "#{bike.rear_wheel_size.name} wheel",
+        "#{bike.front_wheel_size.name} wheel",
+      ]
+    end
     let!(:component2) { FactoryBot.create(:component, component_attrs) }
     it "creates" do
       expect(bike.reload.bike_versions.count).to eq 0
@@ -101,6 +117,9 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.frame_size_unit).to eq "ordinal"
       expect(bike_version.frame_size_number).to eq nil
       # And the final test - does everything calculate?
+      pp bike_version.cached_data_array, bike_version.cached_data_array - target_cached_array
+      expect(bike_version.cached_data_array).to match_array target_cached_array
+      # And, test that bike is the same
       expect(bike_version.cached_data).to eq bike.cached_data
 
       expect(bike_version.components.count).to eq 2

@@ -94,9 +94,7 @@ module BikeAttributable
       mnfg_name,
       (propulsion_type_name == "Foot pedal" ? nil : propulsion_type_name),
       year,
-      (primary_frame_color&.name),
-      (secondary_frame_color&.name),
-      (tertiary_frame_color&.name),
+      frame_colors,
       (frame_material && frame_material_name),
       frame_size,
       frame_model,
@@ -113,7 +111,7 @@ module BikeAttributable
   def components_cache_array
     components.includes(:manufacturer, :ctype).map do |c|
       c.ctype.present? && c.ctype.name.present? &&
-        [c.year, c.manufacturer&.name, c.component_type].compact
+        [c.year, c.manufacturer&.name, c.component_type, c.model_name].compact
     end
   end
 end
