@@ -295,6 +295,21 @@ RSpec.describe BikeDisplayer do
           expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_falsey
         end
       end
+      context "user_registration_organization" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_address"]) }
+        let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, organization: organization, user: user) }
+        it "is falsey" do
+          expect(user.reload.address_set_manually).to be_falsey
+          expect(user.user_registration_organizations.pluck(:id)).to eq([user_registration_organization.id])
+          expect(user.uro_organizations.pluck(:id)).to eq([organization.id])
+          expect(user.uro_organizations.first.additional_registration_fields).to eq(["reg_address"])
+          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
+          expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_falsey
+        end
+      end
       context "impounded" do
         let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
         it "is falsey" do

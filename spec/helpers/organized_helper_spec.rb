@@ -200,6 +200,8 @@ RSpec.describe OrganizedHelper, type: :helper do
             expect(include_field_reg_extra_registration_number?(organization, user)).to be_truthy
             expect(include_field_reg_organization_affiliation?(organization)).to be_truthy
             expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
+            expect(include_field_reg_student_id?(organization)).to be_truthy
+            expect(include_field_reg_student_id?(organization, user)).to be_falsey
           end
         end
       end

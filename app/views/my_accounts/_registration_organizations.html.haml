@@ -44,11 +44,25 @@
               Allow
               %em= organization.short_name
               to edit your bikes
-
-      -# Add fields for the organization!
-      -# organization.fields_for
-
-
-
+        - (organization.additional_registration_fields - rendered_registration_info_fields).each do |registration_field|
+          - next if registration_field == "reg_bike_sticker"
+          - rendered_registration_info_fields << registration_field
+          - if registration_field == "reg_organization_affiliation"
+            .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
+              = label_tag :organization_affiliation, registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name), class: "form-well-label"
+              .form-well-input
+                = select_tag :organization_affiliation, options_for_select(organization.organization_affiliation_options, user_registration_organization.registration_info["organization_affiliation"]), class: "form-control"
+          - elsif registration_field == "reg_address"
+            .form-group.row.unnested-field.no-divider-row
+              = label_tag :reg_address, registration_field_label(organization, "reg_address") || t(".mailing_address"), class: "form-well-label"
+              .form-well-input-large
+                Update your address on the
+                %strong= link_to("User Settings page", edit_my_account_path(edit_template: "root"))
+          - elsif registration_field == "reg_phone"
+            .form-group.row.unnested-field.no-divider-row
+              = label_tag :reg_phone, registration_field_label(organization, "reg_phone") || t(".phone"), class: "form-well-label"
+              .form-well-input-large
+                Update your phone on the
+                %strong= link_to("User Settings page", edit_my_account_path(edit_template: "root"))
 
   = render "/shared/form_well_footer_save"

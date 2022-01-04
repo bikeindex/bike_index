@@ -4,12 +4,6 @@
       line-height: 1.5em;
     }
   }
-  .add-additional-organization-label {
-    background: purple;
-    @include media-breakpoint-down(md) {
-      display: none !important;
-    }
-  }
 
   .delete-email {
     color: $gray-light;

@@ -28,6 +28,7 @@ class User < ApplicationRecord
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
   has_many :user_registration_organizations
+  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
 
   has_many :integrations, dependent: :destroy
   has_many :impound_claims

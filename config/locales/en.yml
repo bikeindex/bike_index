@@ -4042,6 +4042,9 @@ en:
     registration_organizations:
       registration_organization_information: Manage the organizations your bikes
         are registered with.
+      affiliation: "%{org_name} affiliation"
+      mailing_address: Mailing address
+      phone: Phone
       registration_organizations: Registration organizations
     root:
       add_additional_email: Add additional email
