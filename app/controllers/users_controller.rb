@@ -111,6 +111,7 @@ class UsersController < ApplicationController
   def edit
   end
 
+  # this action should only be for vendor terms of service
   def update
     @user = current_user
     unless @user.present? # Shouldn't happen, but block in case it does

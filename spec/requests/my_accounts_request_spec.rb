@@ -135,11 +135,24 @@ RSpec.describe MyAccountsController, type: :request do
       it "doesn't update username" do
         current_user.reload
         expect(current_user.username).to eq "something"
-        patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
+        expect {
+          patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
+        }.to change(AfterUserChangeWorker.jobs, :size).by(1)
         expect(assigns(:edit_template)).to eq("sharing")
         current_user.reload
         expect(current_user.username).to eq("something")
       end
+    end
+
+    it "updates notification" do
+      expect(current_user.notification_unstolen).to be_truthy # Because it's set to true by default
+      expect {
+        patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
+      }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+      expect(response).to redirect_to edit_my_account_url
+      current_user.reload
+      expect(current_user.notification_newsletters).to be_truthy
+      expect(current_user.notification_unstolen).to be_falsey
     end
 
     it "doesn't update user if current password not present" do
@@ -239,6 +252,101 @@ RSpec.describe MyAccountsController, type: :request do
           expect(current_user.user_phones.count).to eq 0
           expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
         end
+      end
+    end
+    context "previous password was too short" do
+      # Prior to #1738 password requirement was 8 characters.
+      # Ensure users who had valid passwords for the previous requirements can update their password
+      it "updates password" do
+        current_user.update_attribute :password, "old_pass"
+        expect(current_user.reload.authenticate("old_pass")).to be_truthy
+        patch base_url, params: {
+          user: {
+            current_password: "old_pass",
+            password: "172ddfasdf1LDF",
+            name: "Mr. Slick",
+            password_confirmation: "172ddfasdf1LDF"
+          }
+        }
+        expect(response).to redirect_to edit_my_account_path
+        expect(flash[:success]).to be_present
+        current_user.reload
+        expect(current_user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
+      end
+    end
+
+    context "organization with hotsheet" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
+      let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:membership) { current_user.memberships.first }
+      it "updates hotsheet" do
+        expect(membership.notification_never?).to be_truthy
+        # request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
+        # Doesn't include the parameter because when false, it doesn't include
+        patch base_url, params: {
+          id: current_user.username,
+          hot_sheet_organization_ids: organization.id.to_s,
+          hot_sheet_notifications: {organization.id.to_s => "1"}
+        }, headers: {"HTTP_REFERER" => organization_hot_sheet_path(organization_id: organization.to_param)}
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
+        membership.reload
+        expect(membership.notification_daily?).to be_truthy
+      end
+      context "with other parameters too" do
+        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
+        let(:organization2) { hot_sheet_configuration2.organization }
+        let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
+        it "updates all the parameters" do
+          expect(membership.notification_never?).to be_truthy
+          expect(membership2.notification_daily?).to be_truthy
+          put base_url, params: {
+            id: current_user.username,
+            hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
+            hot_sheet_notifications: {organization.id.to_s => "1"},
+            user: {
+              notification_newsletters: "true",
+              notification_unstolen: "false"
+            }
+          }
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to edit_my_account_url
+          membership.reload
+          membership2.reload
+          expect(membership.notification_daily?).to be_truthy
+          expect(membership2.notification_daily?).to be_falsey
+
+          current_user.reload
+          expect(current_user.notification_newsletters).to be_truthy
+          expect(current_user.notification_unstolen).to be_falsey
+        end
+      end
+    end
+
+    describe "preferred_language" do
+      it "updates if valid" do
+        expect(current_user.reload.preferred_language).to eq(nil)
+        patch base_url, params: {id: current_user.username, locale: "nl", user: {preferred_language: "en"}}
+        expect(flash[:success]).to match(/success/i)
+        expect(response).to redirect_to "/my_account/edit?locale=nl"
+        expect(current_user.reload.preferred_language).to eq("en")
+      end
+
+      it "changes from previous if valid" do
+        current_user.update_attribute :preferred_language, "en"
+        patch base_url, params: {id: current_user.username, locale: "en", user: {preferred_language: "nl"}}
+        expect(flash[:success]).to match(/successfully updated/i)
+        expect(response).to redirect_to "/my_account/edit?locale=en"
+        expect(current_user.reload.preferred_language).to eq("nl")
+      end
+
+      it "does not update the preferred_language if invalid" do
+        expect(current_user.reload.preferred_language).to eq(nil)
+        patch base_url, params: {id: current_user.username, user: {preferred_language: "klingon"}}
+        expect(flash[:success]).to be_blank
+        expect(response).to render_template(:edit)
+        expect(current_user.reload.preferred_language).to eq(nil)
       end
     end
   end

@@ -1668,7 +1668,7 @@ en:
         user_settings: User Settings
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
-            for updating your password.
+          for updating your password.
         successfully_updated: Your information was successfully updated.
     oauth:
       applications:
