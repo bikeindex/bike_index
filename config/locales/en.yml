@@ -1666,6 +1666,10 @@ en:
         password: Password
         sharing: Sharing + Personal Page
         user_settings: User Settings
+      update:
+        current_password_doesnt_match: Current password doesn't match, it's required
+            for updating your password.
+        successfully_updated: Your information was successfully updated.
     oauth:
       applications:
         ensure_app_owner!:
@@ -1908,9 +1912,6 @@ en:
         accept_tos_to_use_as_org: >-
           You have to accept the Terms of Service if you would like to use Bike Index
           through an organization
-        current_password_doesnt_match: Current password doesn't match, it's required
-          for updating your password.
-        successfully_updated: Your information was successfully updated.
         thanks_for_accepting_tos: Thanks for accepting the terms of service!
         you_can_use_bike_index: Thanks! Now you can use Bike Index.
         you_can_use_bike_index_as_org: Thanks! Now you can use Bike Index as %{org_name}

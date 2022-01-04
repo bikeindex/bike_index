@@ -1,4 +1,4 @@
-= form_for @user, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
+= form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
   .form-well-container.container
     .row
       %nav.primary-edit-form-well-menu
