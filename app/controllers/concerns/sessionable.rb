@@ -51,4 +51,10 @@ module Sessionable
     # In development, secure: true breaks the cookie storage. Only add if production
     Rails.env.production? ? c.merge(secure: true) : c
   end
+
+  def update_user_authentication_for_new_password
+    @user.generate_auth_token("auth_token") # Doesn't save user
+    @user.update_auth_token("password_reset_token") # saves users
+    @user.reload
+  end
 end
