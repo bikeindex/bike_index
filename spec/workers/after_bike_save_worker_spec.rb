@@ -151,7 +151,6 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
           expect(user_registration_organization.all_bikes).to be_truthy
           expect(user_registration_organization.bikes.pluck(:id)).to match_array([bike.id, bike2.id])
           expect(user_registration_organization.registration_info).to eq registration_info.as_json
-          bike_organization
           expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
           expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
           expect(bike.registration_info).to eq registration_info.as_json
@@ -162,6 +161,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
           expect(ownership.overridden_by_user_registration?).to be_truthy
           bike2.reload
           expect(bike2.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          expect(bike2.bike_organizations.first.overridden_by_user_registration?).to be_truthy
         end
       end
     end
