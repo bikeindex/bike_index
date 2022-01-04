@@ -6,6 +6,7 @@ class AfterUserChangeWorker < ApplicationWorker
     return false unless user.present?
     # Bump updated_at to bust cache
     user.update(updated_at: Time.current, skip_update: true)
+
     add_phones_for_verification(user)
 
     associate_feedbacks(user)
