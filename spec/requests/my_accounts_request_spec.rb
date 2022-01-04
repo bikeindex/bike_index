@@ -101,12 +101,15 @@ RSpec.describe MyAccountsController, type: :request do
 
   describe "/edit" do
     include_context :request_spec_logged_in_as_user
+    let(:default_edit_templates) { {root: "User Settings", password: "Password", sharing: "Sharing + Personal Page"} }
     context "no page given" do
       it "renders root" do
         get "#{base_url}/edit"
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq("root")
+        expect(assigns(:edit_templates)).to eq default_edit_templates.as_json
         expect(response).to render_template("edit")
+        expect(response).to render_template(partial: "_root")
         expect(response).to render_template("layouts/application")
       end
     end
@@ -117,10 +120,29 @@ RSpec.describe MyAccountsController, type: :request do
             get "#{base_url}/edit/#{template}"
             expect(response).to be_ok
             expect(assigns(:edit_template)).to eq(template)
+            expect(assigns(:edit_templates)).to eq default_edit_templates.as_json
             expect(response).to render_template(partial: "_#{template}")
             expect(response).to render_template("layouts/application")
           end
         end
+      end
+    end
+    context "with user_registration_organization" do
+      let(:target_templates) { default_edit_templates.merge(registration_organizations: "Registration Organizations") }
+      let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: current_user) }
+      it "includes user_registration_organization template" do
+        expect(current_user.reload.user_registration_organizations.pluck(:id)).to eq([user_registration_organization.id])
+        get "#{base_url}/edit"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("root")
+        expect(assigns(:edit_templates)).to eq target_templates.as_json
+        expect(response).to render_template(partial: "_root")
+        get "#{base_url}/edit/registration_organizations"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("registration_organizations")
+        expect(assigns(:edit_templates)).to eq target_templates.as_json
+        expect(response).to render_template(partial: "_registration_organizations")
+        expect(response).to render_template("layouts/application")
       end
     end
   end

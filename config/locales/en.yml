@@ -1664,6 +1664,7 @@ en:
     my_accounts:
       edit:
         password: Password
+        registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
         user_settings: User Settings
       update:
@@ -4033,6 +4034,10 @@ en:
       password_helper_text_html: Password must be at least 12 characters. Longer is
         %{better_password_link}.
       reset_password: Reset password
+    registration_organizations:
+      registration_organization_information: Manage the organizations that your bikes
+        are registered with.
+      registration_organizations: Registration organizations
     root:
       add_additional_email: Add additional email
       add_new_phone_number: Add a new phone number

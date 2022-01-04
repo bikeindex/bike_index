@@ -1,0 +1,11 @@
+.form-wrap
+  .form-well-form-header-always-visible
+    %h3= t(".registration_organizations")
+  .col-xs-12
+    %p= t(".registration_organization_information")
+  .form-group.row.unnested-field
+    = f.label :current_password, class: 'form-well-label'
+    .form-well-input
+      = f.password_field :current_password, placeholder: "dd", class: 'form-control'
+
+  = render "/shared/form_well_footer_save"

@@ -53,7 +53,12 @@ class MyAccountsController < ApplicationController
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
       password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
       sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit])
-    }.as_json
+    }.merge(registration_organization_template).as_json
+  end
+
+  def registration_organization_template
+    return {} unless current_user.user_registration_organizations.any?
+    {registration_organizations: translation(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
   end
 
   def template_param
