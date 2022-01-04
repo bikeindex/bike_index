@@ -1,5 +1,7 @@
 class MyAccountsController < ApplicationController
-  before_action :authenticate_user_for_my_accounts_controller, only: [:show, :choose_registration]
+  include UserEditable
+  before_action :assign_edit_template, only: %i[edit update]
+  before_action :authenticate_user_for_my_accounts_controller
 
   def show
     page = params[:page] || 1
@@ -9,8 +11,12 @@ class MyAccountsController < ApplicationController
     @locks = current_user.locks
   end
 
-  private
+  def edit
+    @user = current_user
+    @page_errors = @user.errors
+  end
 
+  private
   def authenticate_user_for_my_accounts_controller
     authenticate_user(translation_key: :create_account, flash_type: :info)
   end
