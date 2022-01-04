@@ -31,7 +31,7 @@ class UserRegistrationOrganization < ApplicationRecord
   end
 
   # Because seth wants to have default=false attributes in the database, but can_edit_claimed is easier to think about
-  # Replicates bike_organization
+  # Duplicates functionality in bike_organization
   def can_edit_claimed
     !can_not_edit_claimed
   end
