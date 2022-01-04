@@ -327,7 +327,7 @@ RSpec.describe MyAccountsController, type: :request do
       it "updates if valid" do
         expect(current_user.reload.preferred_language).to eq(nil)
         patch base_url, params: {id: current_user.username, locale: "nl", user: {preferred_language: "en"}}
-        expect(flash[:success]).to match(/success/i)
+        expect(flash[:success]).to match(/succesvol/i)
         expect(response).to redirect_to "/my_account/edit?locale=nl"
         expect(current_user.reload.preferred_language).to eq("en")
       end

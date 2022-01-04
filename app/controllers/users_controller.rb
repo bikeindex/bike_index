@@ -111,18 +111,12 @@ class UsersController < ApplicationController
   def edit
   end
 
-  # this action should only be for vendor terms of service
+  # this action should only be for terms of service (or vendor_terms_of_service)
   def update
     @user = current_user
-    unless @user.present? # Shouldn't happen, but block in case it does
-      flash[:error] = translation(:current_password_doesnt_match) # use random existing message because lazy
-      redirect_back(fallback_location: user_root_url)
-    end
-    if params[:user].present? && @user.update(permitted_parameters)
+    if @user.present? && params[:user].present? && @user.update(permitted_parameters)
       if params.dig(:user, :terms_of_service).present?
         if ParamsNormalizer.boolean(params.dig(:user, :terms_of_service))
-          @user.terms_of_service = true
-          @user.save
           flash[:success] = translation(:you_can_use_bike_index)
           redirect_to(my_account_url) && return
         else
@@ -130,7 +124,7 @@ class UsersController < ApplicationController
           redirect_to(accept_terms_url) && return
         end
       elsif params.dig(:user, :vendor_terms_of_service).present?
-        if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
+        if ParamsNormalizer.boolean(params.dig(:user, :vendor_terms_of_service))
           @user.update(accepted_vendor_terms_of_service: true)
           flash[:success] = if @user.memberships.any?
             translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
@@ -143,14 +137,8 @@ class UsersController < ApplicationController
         end
       end
     end
-    # if successfully_updated
-    #     flash[:success] ||= translation(:successfully_updated)
-    #     # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
-    #     redirect_back(fallback_location: edit_my_account_url) && return
-    #   end
-    # end
-    # @page_errors = @user.errors.full_messages
-    # render action: :edit
+    flash[:error] = @user.errors.full_messages if @user&.errors&.full_messages.present?
+    redirect_back(fallback_location: user_root_url)
   end
 
   def accept_terms
