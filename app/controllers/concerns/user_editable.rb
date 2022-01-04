@@ -5,9 +5,9 @@ module UserEditable
 
   def edit_templates
     @edit_templates ||= {
-      root: translation(:user_settings),
-      password: translation(:password),
-      sharing: translation(:sharing)
+      root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
+      password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
+      sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit])
     }.as_json
   end
 

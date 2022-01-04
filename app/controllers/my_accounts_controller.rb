@@ -17,6 +17,7 @@ class MyAccountsController < ApplicationController
   end
 
   private
+
   def authenticate_user_for_my_accounts_controller
     authenticate_user(translation_key: :create_account, flash_type: :info)
   end

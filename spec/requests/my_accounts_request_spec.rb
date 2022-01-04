@@ -98,4 +98,30 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
   end
+
+  describe "/edit" do
+    include_context :request_spec_logged_in_as_user
+    context "no page given" do
+      it "renders root" do
+        get "#{base_url}/edit"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("root")
+        expect(response).to render_template("edit")
+        expect(response).to render_template("layouts/application")
+      end
+    end
+    context "application layout" do
+      %w[root password sharing].each do |template|
+        context template do
+          it "renders the template" do
+            get "#{base_url}/edit/#{template}"
+            expect(response).to be_ok
+            expect(assigns(:edit_template)).to eq(template)
+            expect(response).to render_template(partial: "_#{template}")
+            expect(response).to render_template("layouts/application")
+          end
+        end
+      end
+    end
+  end
 end

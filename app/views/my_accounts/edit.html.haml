@@ -19,8 +19,8 @@
               %option{ selected: (@edit_template == template), value: edit_my_account_path(edit_template: template) }
                 = description
         .edit-form-well-submit-wrapper
-          = hidden_field_tag :page, @edit_template
+          = hidden_field_tag :edit_template, @edit_template
           = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary'
 
       .col-md-8.form-well
-        = render partial: "edit_#{@edit_template}", locals: { f: f }
+        = render partial: @edit_template, locals: { f: f }
