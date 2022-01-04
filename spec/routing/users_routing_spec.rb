@@ -14,7 +14,7 @@ RSpec.describe "users routing", type: :routing do
     it "directs to edit" do
       expect(get: "/my_account/edit").to route_to(
         controller: "my_accounts",
-        action: "edit",
+        action: "edit"
       )
     end
     context "edit_template parameter" do

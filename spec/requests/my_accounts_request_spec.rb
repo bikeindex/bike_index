@@ -282,7 +282,6 @@ RSpec.describe MyAccountsController, type: :request do
       let(:membership) { current_user.memberships.first }
       it "updates hotsheet" do
         expect(membership.notification_never?).to be_truthy
-        # request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
         # Doesn't include the parameter because when false, it doesn't include
         patch base_url, params: {
           id: current_user.username,
