@@ -25,31 +25,8 @@ class MyAccountsController < ApplicationController
     end
     unless @user.errors.any?
       successfully_updated = update_hot_sheet_notifications
-      if params[:user].present? && @user.update(permitted_update_parameters)
+      if params[:user].present? && @user.update(permitted_parameters)
         successfully_updated = true
-        if params.dig(:user, :terms_of_service).present?
-          if ParamsNormalizer.boolean(params.dig(:user, :terms_of_service))
-            @user.terms_of_service = true
-            @user.save
-            flash[:success] = translation(:you_can_use_bike_index)
-            redirect_to(my_account_url) && return
-          else
-            flash[:notice] = translation(:accept_tos)
-            redirect_to(accept_terms_url) && return
-          end
-        elsif params.dig(:user, :vendor_terms_of_service).present?
-          if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
-            @user.update(accepted_vendor_terms_of_service: true)
-            flash[:success] = if @user.memberships.any?
-              translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
-            else
-              translation(:thanks_for_accepting_tos)
-            end
-            redirect_to(user_root_url) && return
-          else
-            redirect_to(accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org)) && return
-          end
-        end
         if params.dig(:user, :password).present?
           update_user_authentication_for_new_password
           default_session_set(@user)
@@ -99,17 +76,13 @@ class MyAccountsController < ApplicationController
     true
   end
 
-    def permitted_parameters
-    params.require(:user)
+  def permitted_parameters
+    pparams = params.require(:user)
       .permit(:name, :username, :notification_newsletters, :notification_unstolen, :terms_of_service,
         :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
         :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :website, :show_website,
         :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password,
         :password_confirmation, :preferred_language)
-  end
-
-  def permitted_update_parameters
-    pparams = permitted_parameters
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end

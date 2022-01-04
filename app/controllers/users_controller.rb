@@ -117,7 +117,7 @@ class UsersController < ApplicationController
       flash[:error] = translation(:current_password_doesnt_match) # use random existing message because lazy
       redirect_back(fallback_location: user_root_url)
     end
-    if params[:user].present? && @user.update(permitted_update_parameters)
+    if params[:user].present? && @user.update(permitted_parameters)
       if params.dig(:user, :terms_of_service).present?
         if ParamsNormalizer.boolean(params.dig(:user, :terms_of_service))
           @user.terms_of_service = true

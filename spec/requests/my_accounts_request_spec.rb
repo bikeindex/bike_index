@@ -127,7 +127,9 @@ RSpec.describe MyAccountsController, type: :request do
 
   describe "update" do
     include_context :request_spec_logged_in_as_user
-    let!(:current_user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_password", password_confirmation: "old_password", username: "something") }
+    let!(:current_user) { FactoryBot.create(:user_confirmed, password: "old_password", password_confirmation: "old_password", username: "something") }
+    # force skip_update to be false, like it is in reality
+    before { current_user.skip_update = false }
 
     context "nil username" do
       it "doesn't update username" do
@@ -165,82 +167,79 @@ RSpec.describe MyAccountsController, type: :request do
       expect(current_user.name).not_to eq("Mr. Slick")
     end
 
-    # context "setting address" do
-    #   let(:country) { Country.united_states }
-    #   let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
-    #   it "sets address, geocodes" do
-    #     user.reload
-    #     expect(user.address_set_manually).to be_falsey
-    #     set_current_user(user)
-    #     expect(user.notification_newsletters).to be_falsey
-    #     put :update, params: {
-    #       id: user.username,
-    #       user: {
-    #         name: "Mr. Slick",
-    #         country_id: country.id,
-    #         state_id: state.id,
-    #         city: "New York",
-    #         street: "278 Broadway",
-    #         zipcode: "10007",
-    #         notification_newsletters: "1",
-    #         phone: "3223232"
-    #       }
-    #     }
-    #     expect(response).to redirect_to(edit_my_account_url)
-    #     expect(flash[:error]).to_not be_present
-    #     user.reload
-    #     expect(user.name).to eq("Mr. Slick")
-    #     expect(user.country).to eq country
-    #     expect(user.state).to eq state
-    #     expect(user.street).to eq "278 Broadway"
-    #     expect(user.zipcode).to eq "10007"
-    #     expect(user.notification_newsletters).to be_truthy
-    #     expect(user.latitude).to eq default_location[:latitude]
-    #     expect(user.longitude).to eq default_location[:longitude]
-    #     expect(user.phone).to eq "3223232"
-    #     expect(user.address_set_manually).to be_truthy
-    #   end
-    # end
+    context "setting address" do
+      let(:country) { Country.united_states }
+      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      it "sets address, geocodes" do
+        current_user.reload
+        expect(current_user.address_set_manually).to be_falsey
+        expect(current_user.notification_newsletters).to be_falsey
+        put base_url, params: {
+          id: current_user.username,
+          user: {
+            name: "Mr. Slick",
+            country_id: country.id,
+            state_id: state.id,
+            city: "New York",
+            street: "278 Broadway",
+            zipcode: "10007",
+            notification_newsletters: "1",
+            phone: "3223232"
+          }
+        }
+        expect(response).to redirect_to(edit_my_account_url)
+        expect(flash[:error]).to_not be_present
+        current_user.reload
+        expect(current_user.name).to eq("Mr. Slick")
+        expect(current_user.country).to eq country
+        expect(current_user.state).to eq state
+        expect(current_user.street).to eq "278 Broadway"
+        expect(current_user.zipcode).to eq "10007"
+        expect(current_user.notification_newsletters).to be_truthy
+        expect(current_user.latitude).to eq default_location[:latitude]
+        expect(current_user.longitude).to eq default_location[:longitude]
+        expect(current_user.phone).to eq "3223232"
+        expect(current_user.address_set_manually).to be_truthy
+      end
+    end
 
-    # describe "updating phone" do
-    #   it "updates and adds the phone" do
-    #     user.reload
-    #     expect(user.phone).to be_blank
-    #     expect(user.user_phones.count).to eq 0
-    #     set_current_user(user)
-    #     Sidekiq::Worker.clear_all
-    #     VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
-    #       Sidekiq::Testing.inline! {
-    #         put :update, params: {id: user.id, user: {phone: "15005550006"}}
-    #       }
-    #     end
-    #     expect(flash[:success]).to be_present
-    #     user.reload
-    #     expect(user.phone).to eq "15005550006"
-    #     expect(user.user_phones.count).to eq 1
-    #     expect(user.phone_waiting_confirmation?).to be_truthy
-    #     expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
+    describe "updating phone" do
+      it "updates and adds the phone" do
+        current_user.reload
+        expect(current_user.phone).to be_blank
+        expect(current_user.user_phones.count).to eq 0
+        Sidekiq::Worker.clear_all
+        VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
+          Sidekiq::Testing.inline! {
+            put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
+          }
+        end
+        expect(flash[:success]).to be_present
+        current_user.reload
+        expect(current_user.phone).to eq "15005550006"
+        expect(current_user.user_phones.count).to eq 1
+        expect(current_user.phone_waiting_confirmation?).to be_truthy
+        expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
 
-    #     user_phone = user.user_phones.reorder(:created_at).last
-    #     expect(user_phone.phone).to eq "15005550006"
-    #     expect(user_phone.confirmed?).to be_falsey
-    #     expect(user_phone.confirmation_code).to be_present
-    #     expect(user_phone.notifications.count).to eq 1
-    #   end
-    #   context "without background" do
-    #     it "still shows general alert" do
-    #       user.reload
-    #       expect(user.phone).to be_blank
-    #       expect(user.user_phones.count).to eq 0
-    #       set_current_user(user)
-    #       put :update, params: {id: user.id, user: {phone: "15005550006"}}
-    #       expect(flash[:success]).to be_present
-    #       user.reload
-    #       expect(user.phone).to eq "15005550006"
-    #       expect(user.user_phones.count).to eq 0
-    #       expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
-    #     end
-    #   end
-    # end
+        user_phone = current_user.user_phones.reorder(:created_at).last
+        expect(user_phone.phone).to eq "15005550006"
+        expect(user_phone.confirmed?).to be_falsey
+        expect(user_phone.confirmation_code).to be_present
+        expect(user_phone.notifications.count).to eq 1
+      end
+      context "without background" do
+        it "still shows general alert" do
+          current_user.reload
+          expect(current_user.phone).to be_blank
+          expect(current_user.user_phones.count).to eq 0
+          patch base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
+          expect(flash[:success]).to be_present
+          current_user.reload
+          expect(current_user.phone).to eq "15005550006"
+          expect(current_user.user_phones.count).to eq 0
+          expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
+        end
+      end
+    end
   end
 end
