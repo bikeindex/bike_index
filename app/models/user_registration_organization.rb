@@ -12,6 +12,10 @@ class UserRegistrationOrganization < ApplicationRecord
     all_bikes? ? user.bikes : user.bikes.organization(organization_id)
   end
 
+  def manages_information?
+    registration_info.present? || organization.additional_registration_fields.any?
+  end
+
   # Use all the registration info from the bikes
   def set_initial_registration_info
     reg_info_array = bikes.reorder(:updated_at).map(&:registration_info).reject(&:blank?)

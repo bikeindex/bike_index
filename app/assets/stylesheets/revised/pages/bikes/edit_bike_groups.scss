@@ -7,4 +7,9 @@
       font-weight: $normal-font-weight;
     }
   }
+  .add-additional-organization-label {
+    @include media-breakpoint-down(xs) {
+      display: none !important;
+    }
+  }
 }

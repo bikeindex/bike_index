@@ -30,17 +30,25 @@
                       %span.context-display-help
                         &ndash;
                       = t(".remove")
+              - displayed_other_organizations = false
               - @bike.bike_organizations.reorder(:created_at).each_with_index do |bike_organization, index|
                 - next if bike_organization.organization == @bike.creation_organization
                 .form-group.row
                   %label.form-well-label.less-strong
-                    = t(".other_organizations")
+                    - if displayed_other_organizations
+                      &nbsp;
+                    - else
+                      = t(".other_organizations")
+                      - displayed_other_organizations = true
                   %p.form-well-input-static.bike_organization_static_input{ data: { orgid: bike_organization.organization_id } }
                     = bike_organization.organization.name
                     %span.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
                         = check_box_tag "organization_ids_can_edit_claimed[]", bike_organization.organization_id, bike_organization.can_edit_claimed, multiple: true
                         = t(".can_edit_this_bike", bike_type: @bike.type)
+                      - if bike_organization.user_registration_organization&.manages_information?
+                        %br
+                        = link_to "manage organization information", edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link mb-2"
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
@@ -57,7 +65,7 @@
             :plain
               <script id="additional-organization-template" type="x-tmpl-mustache">
                 <div class='form-group row collapse'>
-                  <label class='form-well-label'></label>
+                  <label class='form-well-label add-additional-organization-label'></label>
                   <div class='form-well-input fancy-select-placeholder unfancy'>
                     <select class="form-control bike_organization_input" autocomplete="off" autocorrect="off" autocapitalize="off">
                       <option value="" disabled selected>
