@@ -1438,6 +1438,11 @@ en:
       groups_and_organizations: Groups and Organizations
       other_organizations: Other organizations
       remove: Remove
+    edit_bike_organization:
+      can_edit_this_bike: Can edit this %{bike_type}
+      manage_organization_information: Manage organization information
+      manage_organization_information_via: Organization information managed via your account
+      remove: Remove
     ownership:
       impound_record_page: Impound record page
       sell_trade_or_give_away_this_bike: >-
@@ -4035,7 +4040,7 @@ en:
         %{better_password_link}.
       reset_password: Reset password
     registration_organizations:
-      registration_organization_information: Manage the organizations that your bikes
+      registration_organization_information: Manage the organizations your bikes
         are registered with.
       registration_organizations: Registration organizations
     root:

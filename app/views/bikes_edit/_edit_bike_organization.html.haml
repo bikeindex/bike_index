@@ -1,0 +1,28 @@
+-# Requires locals: bike_organization, main_label
+
+- organization ||= bike_organization.organization
+.form-group.row
+  %label.form-well-label.less-strong
+    - if main_label.present?
+      = main_label
+    - else
+      &nbsp;
+  -# mt-1 to align the label with the org name - and it's ok to give a little more space in places that don't have a label
+  %p.form-well-input-static.bike_organization_static_input.mt-1{data: {orgid: organization.id}}
+    = organization.name
+    %span.can-edit-checkbox
+      - if bike_organization.overridden_by_user_registration?
+        = link_to t(".manage_organization_information_via"), edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link mb-2"
+      - else
+        %label.checkbox-inline.not-fixed
+          = check_box_tag "organization_ids_can_edit_claimed[]", organization.id, bike_organization.can_edit_claimed, multiple: true
+          = t(".can_edit_this_bike", bike_type: @bike.type)
+        - if bike_organization.user_registration_organization&.manages_information?
+          %br
+          = link_to t(".manage_organization_information"), edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link mb-2"
+  - unless bike_organization.overridden_by_user_registration?
+    .right-input-help
+      %a.optional-form-block.remove-organization{ href: '#' }
+        %span.context-display-help
+          &ndash;
+        = t(".remove")

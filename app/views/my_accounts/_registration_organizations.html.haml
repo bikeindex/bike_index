@@ -3,9 +3,52 @@
     %h3= t(".registration_organizations")
   .col-xs-12
     %p= t(".registration_organization_information")
-  .form-group.row.unnested-field
-    = f.label :current_password, class: 'form-well-label'
-    .form-well-input
-      = f.password_field :current_password, placeholder: "dd", class: 'form-control'
+
+  - rendered_registration_info_fields = []
+  - user_bike_ids = current_user.bike_ids.sort
+  -# Show paid organizations first. It would be great to render alphabetically, but whatever
+  - user_registration_organizations = @user.user_registration_organizations.paid_organizations
+  - user_registration_organizations += @user.user_registration_organizations.not_paid_organizations
+  - user_registration_organizations.each do |user_registration_organization|
+    - organization = user_registration_organization.organization
+    = fields_for user_registration_organization do |uro|
+      %hr
+      .related-fields
+        .form-group.row
+          %label.form-well-label
+            %strong= organization.name
+          .form-well-input-large
+            %label.pt-2.mb-0{ style: "line-height: 1.5em;" }
+              = uro.check_box :all_bikes
+              Register all your bikes with this organization
+            .below-input-help
+              %em When not selected, manage through the "Groups and Organizations" page for each bike.
+              - unless user_registration_organization.all_bikes?
+                %span.less-strong.mt-1
+                  - if user_registration_organization.bikes.pluck(:id).sort == user_bike_ids
+                    All your bikes are registered with this organization
+                  - else
+                    %br
+                    = admin_number_display(user_registration_organization.bikes.count)
+                    = "bike".pluralize(user_registration_organization.bikes.count)
+                    registered with
+                    %em= organization.short_name
+                    - if user_registration_organization.bikes.count > 0
+                      \-
+                      = safe_join(user_registration_organization.bikes.limit(5).map { |b| link_to(b.title_string, edit_bike_path(b, edit_template: "groups")) }, ", ")
+        .form-group.row.pt-0
+          %label.form-well-label &nbsp;
+          .form-well-input-large.small
+            %label.pt-2.mb-0{ style: "line-height: 1.5em;" }
+              = uro.check_box :can_edit_claimed
+              Allow
+              %em= organization.short_name
+              to edit your bikes
+
+      -# Add fields for the organization!
+      -# organization.fields_for
+
+
+
 
   = render "/shared/form_well_footer_save"

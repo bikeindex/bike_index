@@ -14,6 +14,7 @@ class MyAccountsController < ApplicationController
   def edit
     @user = current_user
     @page_errors = @user.errors
+    @page_title = @edit_templates[@edit_template]
   end
 
   def update
@@ -87,7 +88,8 @@ class MyAccountsController < ApplicationController
         :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
         :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :website, :show_website,
         :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password,
-        :password_confirmation, :preferred_language)
+        :password_confirmation, :preferred_language,
+        user_registration_organization_attributes: [:all_bikes, :can_edit_claimed])
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end

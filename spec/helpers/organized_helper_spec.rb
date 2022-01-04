@@ -187,6 +187,21 @@ RSpec.describe OrganizedHelper, type: :helper do
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
         end
+        context "with user_registration_organization" do
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
+          let(:user_registration_organization) { FactoryBot.create(:user_registration_organization, organization: organization)}
+          let(:user) { user_registration_organization.user }
+          it "is falsey with user" do
+            expect(include_field_reg_phone?(organization)).to be_truthy
+            expect(include_field_reg_phone?(organization, user)).to be_truthy # Purely based on whether user has address
+            expect(include_field_reg_address?(organization)).to be_truthy
+            expect(include_field_reg_address?(organization, user)).to be_falsey
+            expect(include_field_reg_extra_registration_number?(organization)).to be_truthy
+            expect(include_field_reg_extra_registration_number?(organization, user)).to be_truthy
+            expect(include_field_reg_organization_affiliation?(organization)).to be_truthy
+            expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
+          end
+        end
       end
       context "stickers" do
         it "includes" do

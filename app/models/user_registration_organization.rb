@@ -8,6 +8,9 @@ class UserRegistrationOrganization < ApplicationRecord
 
   after_commit :update_associations
 
+  scope :paid_organizations, -> { includes(:organization).where(organizations: {is_paid: true}) }
+  scope :not_paid_organizations, -> { includes(:organization).where(organizations: {is_paid: false}) }
+
   def bikes
     all_bikes? ? user.bikes : user.bikes.organization(organization_id)
   end
