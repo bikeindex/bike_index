@@ -1661,6 +1661,15 @@ en:
         lock_created: Lock created successfully!
       find_lock:
         not_your_lock: Whoops, that's not your lock!
+    my_accounts:
+      edit:
+        password: Password
+        sharing: Sharing + Personal Page
+        user_settings: User Settings
+      update:
+        current_password_doesnt_match: Current password doesn't match, it's required
+          for updating your password.
+        successfully_updated: Your information was successfully updated.
     oauth:
       applications:
         ensure_app_owner!:
@@ -1880,10 +1889,6 @@ en:
     users:
       confirm:
         already_confirmed: Your user account is already confirmed. Please log in.
-      edit_templates:
-        password: Password
-        sharing: Sharing + Personal Page
-        user_settings: User Settings
       find_user_from_password_reset_token!:
         does_not_match_token: Doesn't match user's password reset token
         token_expired: Password reset token expired, try resetting password again.
@@ -1907,9 +1912,6 @@ en:
         accept_tos_to_use_as_org: >-
           You have to accept the Terms of Service if you would like to use Bike Index
           through an organization
-        current_password_doesnt_match: Current password doesn't match, it's required
-          for updating your password.
-        successfully_updated: Your information was successfully updated.
         thanks_for_accepting_tos: Thanks for accepting the terms of service!
         you_can_use_bike_index: Thanks! Now you can use Bike Index.
         you_can_use_bike_index_as_org: Thanks! Now you can use Bike Index as %{org_name}
@@ -4020,6 +4022,79 @@ en:
       es: EUR
       nl: EUR
   my_accounts:
+    edit:
+      save_changes: Save changes
+      you_are_editing: You are editing
+    password:
+      better_password: better
+      for_password_update: For password update
+      new_password: New Password
+      new_password_confirmation: New Password confirmation
+      password_helper_text_html: Password must be at least 12 characters. Longer is
+        %{better_password_link}.
+      reset_password: Reset password
+    root:
+      add_additional_email: Add additional email
+      add_new_phone_number: Add a new phone number
+      additional_email: Additional email
+      address: Street address
+      any_use_of_your_personal_information_html: >-
+        Any use of your personal information is governed by the terms of our %{privacy_policy}.
+        We do not sell, trade, or rent your personal information.
+      choose_country: Choose country
+      choose_language: Choose language
+      city: City
+      confirmed_emails: Confirmed emails
+      daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
+      give_us_permission_html: >-
+        Give us permission to contact you if we believe your bike has been stolen,
+        <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
+      have_multiple_emails: Have multiple emails? Consolidate them into one account
+        here
+      make_primary_email: Make primary email
+      notifications_email: This is the email we send notifications to
+      personal_information_for_user: Personal Information for %{user_name}
+      preferred_language: Preferred language
+      primary_email: Primary email
+      receive_the_bike_index_newsletter: Receive the Bike Index newsletter
+      remove_email: Remove email
+      remove_number: remove number
+      resend_confirmation: Resend confirmation
+      state: State
+      stolen_hot_sheets: Stolen Bike Hot Sheets
+      unconfirmed: unconfirmed!
+      unconfirmed_emails: Unconfirmed emails
+      verified: verified
+      why_you_should_text: Read why you should
+      zipcode: Postal code
+    sharing:
+      additional_link: Additional Link
+      choose_file: Choose file...
+      create_page: Create page
+      create_public_page: Create public page
+      example_url: http://example.com
+      my_awesome_link: My awesome link
+      no_personal_site: No personal site
+      no_please_dont_create_me_a_page: No, please don't create me a page
+      no_twitter: No Twitter
+      page_text: Page text
+      page_title: Page title
+      personal_site_url: Personal Site URL
+      preview_page: preview page
+      profile_avatar: Profile avatar
+      sharing_and_personal_page_settings: Sharing and Personal page settings
+      show_personal_site: Show Personal Site
+      show_personal_website: Show personal website
+      show_twitter: Show Twitter
+      the_bike_index_can_create_a_page: >-
+        The Bike Index can create a page listing all your bikes that includes all
+        the information you want to share. It's your personal page.
+      this_users_bikes: This user's bikes
+      title_for_link: Title for link
+      twitter_handle: Twitter handle
+      your_username_is_the_url_for_your_sharing: >-
+        Your username is the URL for your sharing page and the bike embed form. Update
+        it if you care about those things.
     show:
       add_a_bike: Add a bike
       add_a_lock: Add a lock
@@ -5385,79 +5460,6 @@ en:
       could_not_find_matching_ticket: That ticket doesn't match anything in our records.
         Sorry.
       woops: Woops
-    edit:
-      save_changes: Save changes
-      you_are_editing: You are editing
-    edit_password:
-      better_password: better
-      for_password_update: For password update
-      new_password: New Password
-      new_password_confirmation: New Password confirmation
-      password_helper_text_html: Password must be at least 12 characters. Longer is
-        %{better_password_link}.
-      reset_password: Reset password
-    edit_root:
-      add_additional_email: Add additional email
-      add_new_phone_number: Add a new phone number
-      additional_email: Additional email
-      address: Street address
-      any_use_of_your_personal_information_html: >-
-        Any use of your personal information is governed by the terms of our %{privacy_policy}.
-        We do not sell, trade, or rent your personal information.
-      choose_country: Choose country
-      choose_language: Choose language
-      city: City
-      confirmed_emails: Confirmed emails
-      daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
-      give_us_permission_html: >-
-        Give us permission to contact you if we believe your bike has been stolen,
-        <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
-      have_multiple_emails: Have multiple emails? Consolidate them into one account
-        here
-      make_primary_email: Make primary email
-      notifications_email: This is the email we send notifications to
-      personal_information_for_user: Personal Information for %{user_name}
-      preferred_language: Preferred language
-      primary_email: Primary email
-      receive_the_bike_index_newsletter: Receive the Bike Index newsletter
-      remove_email: Remove email
-      remove_number: remove number
-      resend_confirmation: Resend confirmation
-      state: State
-      stolen_hot_sheets: Stolen Bike Hot Sheets
-      unconfirmed: unconfirmed!
-      unconfirmed_emails: Unconfirmed emails
-      verified: verified
-      why_you_should_text: Read why you should
-      zipcode: Postal code
-    edit_sharing:
-      additional_link: Additional Link
-      choose_file: Choose file...
-      create_page: Create page
-      create_public_page: Create public page
-      example_url: http://example.com
-      my_awesome_link: My awesome link
-      no_personal_site: No personal site
-      no_please_dont_create_me_a_page: No, please don't create me a page
-      no_twitter: No Twitter
-      page_text: Page text
-      page_title: Page title
-      personal_site_url: Personal Site URL
-      preview_page: preview page
-      profile_avatar: Profile avatar
-      sharing_and_personal_page_settings: Sharing and Personal page settings
-      show_personal_site: Show Personal Site
-      show_personal_website: Show personal website
-      show_twitter: Show Twitter
-      the_bike_index_can_create_a_page: >-
-        The Bike Index can create a page listing all your bikes that includes all
-        the information you want to share. It's your personal page.
-      this_users_bikes: This user's bikes
-      title_for_link: Title for link
-      twitter_handle: Twitter handle
-      your_username_is_the_url_for_your_sharing: >-
-        Your username is the URL for your sharing page and the bike embed form. Update
-        it if you care about those things.
     new:
       agree_bikeindex_bikehub_toc_html: I agree to BikeHub's %{bikehub_toc_link} and
         Bike Index's %{bikeindex_toc_link}.

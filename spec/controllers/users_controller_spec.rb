@@ -267,6 +267,25 @@ RSpec.describe UsersController, type: :controller do
         end
       end
     end
+    context "revised" do
+      let(:user_attrs) do
+        {
+          name: "foo",
+          email: "foo1@bar.com",
+          password: "coolpasswprd$$$$$",
+          terms_of_service: "0",
+          notification_newsletters: "0"
+        }
+      end
+
+      context "create attrs" do
+        it "renders" do
+          expect {
+            post :create, params: {user: user_attrs}
+          }.to change(User, :count).by(1)
+        end
+      end
+    end
   end
 
   describe "confirm" do
@@ -380,31 +399,11 @@ RSpec.describe UsersController, type: :controller do
     end
   end
 
-  context "revised" do
-    let(:user_attrs) do
-      {
-        name: "foo",
-        email: "foo1@bar.com",
-        password: "coolpasswprd$$$$$",
-        terms_of_service: "0",
-        notification_newsletters: "0"
-      }
-    end
-
-    context "create attrs" do
-      it "renders" do
-        expect {
-          post :create, params: {user: user_attrs}
-        }.to change(User, :count).by(1)
-      end
-    end
-  end
-
   describe "show" do
     before { expect(user.confirmed).to be_truthy }
     it "404s if the user doesn't exist" do
       expect {
-        get :show, params: {id: "fake_user extra stuff"}
+        get :show, params: {id: "fake_user-extra-stuff"}
       }.to raise_error(ActionController::RoutingError)
     end
 
@@ -422,314 +421,6 @@ RSpec.describe UsersController, type: :controller do
       expect(response).to render_template :show
       expect(assigns(:per_page)).to eq "1"
       expect(assigns(:page)).to eq "1"
-    end
-  end
-
-  describe "accept_vendor_terms" do
-    it "renders" do
-      set_current_user(user)
-      get :accept_vendor_terms
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:accept_vendor_terms)
-      expect(response).to render_template("layouts/application")
-    end
-  end
-
-  describe "accept_terms" do
-    it "renders" do
-      set_current_user(user)
-      get :accept_terms
-      expect(response).to render_template(:accept_terms)
-    end
-  end
-
-  describe "edit" do
-    include_context :logged_in_as_user
-    context "no page given" do
-      it "renders root" do
-        get :edit
-        expect(response).to be_ok
-        expect(assigns(:edit_template)).to eq("root")
-        expect(response).to render_template("edit")
-        expect(response).to render_template("layouts/application")
-      end
-    end
-    context "application layout" do
-      %w[root password sharing].each do |template|
-        context template do
-          it "renders the template" do
-            get :edit, params: {page: template}
-            expect(response).to be_ok
-            expect(assigns(:edit_template)).to eq(template)
-            expect(response).to render_template(partial: "_edit_#{template}")
-            expect(response).to render_template("layouts/application")
-          end
-        end
-      end
-    end
-  end
-
-  describe "update" do
-    let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_password", password_confirmation: "old_password", username: "something") }
-    context "nil username" do
-      it "doesn't update username" do
-        user.reload
-        expect(user.username).to eq "something"
-        set_current_user(user)
-        patch :update, params: {id: user.username, user: {username: " ", name: "tim"}, page: "sharing"}
-        expect(assigns(:edit_template)).to eq("sharing")
-        user.reload
-        expect(user.username).to eq("something")
-      end
-    end
-
-    it "doesn't update user if current password not present" do
-      set_current_user(user)
-      patch :update, params: {
-        id: user.username,
-        user: {
-          password: "new_password",
-          password_confirmation: "new_password"
-        }
-      }
-      expect(user.reload.authenticate("new_password")).to be_falsey
-    end
-
-    it "doesn't update user if password doesn't match" do
-      set_current_user(user)
-      patch :update, params: {
-        id: user.username,
-        user: {
-          current_password: "old_password",
-          password: "new_password",
-          name: "Mr. Slick",
-          password_confirmation: "new_passwordd"
-        }
-      }
-      expect(user.reload.authenticate("new_password")).to be_falsey
-      expect(user.name).not_to eq("Mr. Slick")
-    end
-
-    context "setting address" do
-      let(:country) { Country.united_states }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
-      it "sets address, geocodes" do
-        user.reload
-        expect(user.address_set_manually).to be_falsey
-        set_current_user(user)
-        expect(user.notification_newsletters).to be_falsey
-        put :update, params: {
-          id: user.username,
-          user: {
-            name: "Mr. Slick",
-            country_id: country.id,
-            state_id: state.id,
-            city: "New York",
-            street: "278 Broadway",
-            zipcode: "10007",
-            notification_newsletters: "1",
-            phone: "3223232"
-          }
-        }
-        expect(response).to redirect_to(edit_my_account_url)
-        expect(flash[:error]).to_not be_present
-        user.reload
-        expect(user.name).to eq("Mr. Slick")
-        expect(user.country).to eq country
-        expect(user.state).to eq state
-        expect(user.street).to eq "278 Broadway"
-        expect(user.zipcode).to eq "10007"
-        expect(user.notification_newsletters).to be_truthy
-        expect(user.latitude).to eq default_location[:latitude]
-        expect(user.longitude).to eq default_location[:longitude]
-        expect(user.phone).to eq "3223232"
-        expect(user.address_set_manually).to be_truthy
-      end
-    end
-
-    describe "updating phone" do
-      it "updates and adds the phone" do
-        user.reload
-        expect(user.phone).to be_blank
-        expect(user.user_phones.count).to eq 0
-        set_current_user(user)
-        Sidekiq::Worker.clear_all
-        VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
-          Sidekiq::Testing.inline! {
-            put :update, params: {id: user.id, user: {phone: "15005550006"}}
-          }
-        end
-        expect(flash[:success]).to be_present
-        user.reload
-        expect(user.phone).to eq "15005550006"
-        expect(user.user_phones.count).to eq 1
-        expect(user.phone_waiting_confirmation?).to be_truthy
-        expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
-
-        user_phone = user.user_phones.reorder(:created_at).last
-        expect(user_phone.phone).to eq "15005550006"
-        expect(user_phone.confirmed?).to be_falsey
-        expect(user_phone.confirmation_code).to be_present
-        expect(user_phone.notifications.count).to eq 1
-      end
-      context "without background" do
-        it "still shows general alert" do
-          user.reload
-          expect(user.phone).to be_blank
-          expect(user.user_phones.count).to eq 0
-          set_current_user(user)
-          put :update, params: {id: user.id, user: {phone: "15005550006"}}
-          expect(flash[:success]).to be_present
-          user.reload
-          expect(user.phone).to eq "15005550006"
-          expect(user.user_phones.count).to eq 0
-          expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
-        end
-      end
-    end
-
-    it "updates the terms of service" do
-      user.reload
-      expect(user.address_set_manually).to be_falsey
-      set_current_user(user)
-      put :update, params: {id: user.username, user: {terms_of_service: "1"}}
-      expect(response).to redirect_to(my_account_url)
-      expect(user.reload.terms_of_service).to be_truthy
-      expect(user.address_set_manually).to be_falsey
-    end
-
-    describe "preferred_language" do
-      it "updates if valid" do
-        expect(user.preferred_language).to eq(nil)
-        set_current_user(user)
-        patch :update, params: {id: user.username, locale: "nl", user: {preferred_language: "en"}}
-        expect(flash[:success]).to match(/succesvol/i)
-        expect(response).to redirect_to(edit_my_account_url)
-        expect(user.reload.preferred_language).to eq("en")
-      end
-
-      it "changes from previous if valid" do
-        user.update_attribute :preferred_language, "en"
-        set_current_user(user)
-        patch :update, params: {id: user.username, locale: "en", user: {preferred_language: "nl"}}
-        expect(flash[:success]).to match(/successfully updated/i)
-        expect(response).to redirect_to(edit_my_account_url)
-        expect(user.reload.preferred_language).to eq("nl")
-      end
-
-      it "does not update the preferred_language if invalid" do
-        expect(user.preferred_language).to eq(nil)
-        set_current_user(user)
-        patch :update, params: {id: user.username, user: {preferred_language: "klingon"}}
-        expect(flash[:success]).to be_blank
-        expect(response).to render_template(:edit)
-        expect(user.reload.preferred_language).to eq(nil)
-      end
-    end
-
-    it "updates notification" do
-      set_current_user(user)
-      expect(user.notification_unstolen).to be_truthy # Because it's set to true by default
-      patch :update, params: {id: user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
-      expect(response).to redirect_to edit_my_account_url
-      user.reload
-      expect(user.notification_newsletters).to be_truthy
-      expect(user.notification_unstolen).to be_falsey
-    end
-
-    context "organization with hotsheet" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
-      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:membership) { user.memberships.first }
-      it "updates hotsheet" do
-        set_current_user(user)
-        expect(membership.notification_never?).to be_truthy
-        request.env["HTTP_REFERER"] = organization_hot_sheet_path(organization_id: organization.to_param)
-        # Doesn't include the parameter because when false, it doesn't include
-        patch :update, params: {
-          id: user.username,
-          hot_sheet_organization_ids: organization.id.to_s,
-          hot_sheet_notifications: {organization.id.to_s => "1"}
-        }
-        expect(flash[:success]).to be_present
-        expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
-        membership.reload
-        expect(membership.notification_daily?).to be_truthy
-      end
-      context "with other parameters too" do
-        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
-        let(:organization2) { hot_sheet_configuration2.organization }
-        let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: user, hot_sheet_notification: "notification_daily") }
-        it "updates all the parameters" do
-          set_current_user(user)
-          expect(membership.notification_never?).to be_truthy
-          expect(membership2.notification_daily?).to be_truthy
-          put :update, params: {
-            id: user.username,
-            hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
-            hot_sheet_notifications: {organization.id.to_s => "1"},
-            user: {
-              notification_newsletters: "true",
-              notification_unstolen: "false"
-            }
-          }
-          expect(flash[:success]).to be_present
-          expect(response).to redirect_to edit_my_account_url
-          membership.reload
-          membership2.reload
-          expect(membership.notification_daily?).to be_truthy
-          expect(membership2.notification_daily?).to be_falsey
-
-          user.reload
-          expect(user.notification_newsletters).to be_truthy
-          expect(user.notification_unstolen).to be_falsey
-        end
-      end
-    end
-
-    it "updates the vendor terms of service and emailable" do
-      user = FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false)
-      expect(user.notification_newsletters).to be_falsey
-      organization = FactoryBot.create(:organization)
-      FactoryBot.create(:membership_claimed, organization: organization, user: user)
-      user.reload
-      expect(user.default_organization).to eq organization
-      set_current_user(user)
-      patch :update, params: {id: user.username, user: {vendor_terms_of_service: "1", notification_newsletters: true}}
-      expect(response.code).to eq("302")
-      expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
-      expect(user.reload.accepted_vendor_terms_of_service?).to be_truthy
-      expect(user.when_vendor_terms_of_service).to be_within(1.second).of Time.current
-      expect(user.notification_newsletters).to be_truthy
-    end
-
-    it "enqueues job (it enqueues job whenever update is successful)" do
-      set_current_user(user)
-      expect {
-        patch :update, params: {id: user.username, user: {name: "Cool stuff"}}
-      }.to change(AfterUserChangeWorker.jobs, :size).by(1)
-      expect(user.reload.name).to eq("Cool stuff")
-    end
-
-    describe "submit without updating terms" do
-      it "redirects to accept the terms" do
-        set_current_user(user)
-        patch :update, params: {id: user.username, user: {terms_of_service: "0"}}
-        expect(response).to redirect_to accept_terms_path
-        expect(user.reload.terms_of_service).to be_falsey
-      end
-      context "vendor_terms" do
-        let(:user) { FactoryBot.create(:user_confirmed) }
-        it "redirects to accept the terms" do
-          expect(user.terms_of_service).to be_truthy
-          expect(user.accepted_vendor_terms_of_service?).to be_falsey
-          set_current_user(user)
-          patch :update, params: {id: user.username, user: {vendor_terms_of_service: "0"}}
-          expect(response).to redirect_to accept_vendor_terms_path
-          expect(user.reload.vendor_terms_of_service).to be_falsey
-        end
-      end
     end
   end
 

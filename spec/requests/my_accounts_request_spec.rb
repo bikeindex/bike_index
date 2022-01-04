@@ -98,4 +98,255 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
   end
+
+  describe "/edit" do
+    include_context :request_spec_logged_in_as_user
+    context "no page given" do
+      it "renders root" do
+        get "#{base_url}/edit"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("root")
+        expect(response).to render_template("edit")
+        expect(response).to render_template("layouts/application")
+      end
+    end
+    context "application layout" do
+      %w[root password sharing].each do |template|
+        context template do
+          it "renders the template" do
+            get "#{base_url}/edit/#{template}"
+            expect(response).to be_ok
+            expect(assigns(:edit_template)).to eq(template)
+            expect(response).to render_template(partial: "_#{template}")
+            expect(response).to render_template("layouts/application")
+          end
+        end
+      end
+    end
+  end
+
+  describe "update" do
+    include_context :request_spec_logged_in_as_user
+    let!(:current_user) { FactoryBot.create(:user_confirmed, password: "old_password", password_confirmation: "old_password", username: "something") }
+    # force skip_update to be false, like it is in reality
+    before { current_user.skip_update = false }
+
+    context "nil username" do
+      it "doesn't update username" do
+        current_user.reload
+        expect(current_user.username).to eq "something"
+        expect {
+          patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
+        }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+        expect(assigns(:edit_template)).to eq("sharing")
+        current_user.reload
+        expect(current_user.username).to eq("something")
+      end
+    end
+
+    it "updates notification" do
+      expect(current_user.notification_unstolen).to be_truthy # Because it's set to true by default
+      expect {
+        patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
+      }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+      expect(response).to redirect_to edit_my_account_url
+      current_user.reload
+      expect(current_user.notification_newsletters).to be_truthy
+      expect(current_user.notification_unstolen).to be_falsey
+    end
+
+    it "doesn't update user if current password not present" do
+      patch base_url, params: {
+        id: current_user.username,
+        user: {
+          password: "new_password",
+          password_confirmation: "new_password"
+        }
+      }
+      expect(current_user.reload.authenticate("new_password")).to be_falsey
+    end
+
+    it "doesn't update user if password doesn't match" do
+      patch base_url, params: {
+        id: current_user.username,
+        user: {
+          current_password: "old_password",
+          password: "new_password",
+          name: "Mr. Slick",
+          password_confirmation: "new_passwordd"
+        }
+      }
+      expect(current_user.reload.authenticate("new_password")).to be_falsey
+      expect(current_user.name).not_to eq("Mr. Slick")
+    end
+
+    context "setting address" do
+      let(:country) { Country.united_states }
+      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      it "sets address, geocodes" do
+        current_user.reload
+        expect(current_user.address_set_manually).to be_falsey
+        expect(current_user.notification_newsletters).to be_falsey
+        put base_url, params: {
+          id: current_user.username,
+          user: {
+            name: "Mr. Slick",
+            country_id: country.id,
+            state_id: state.id,
+            city: "New York",
+            street: "278 Broadway",
+            zipcode: "10007",
+            notification_newsletters: "1",
+            phone: "3223232"
+          }
+        }
+        expect(response).to redirect_to(edit_my_account_url)
+        expect(flash[:error]).to_not be_present
+        current_user.reload
+        expect(current_user.name).to eq("Mr. Slick")
+        expect(current_user.country).to eq country
+        expect(current_user.state).to eq state
+        expect(current_user.street).to eq "278 Broadway"
+        expect(current_user.zipcode).to eq "10007"
+        expect(current_user.notification_newsletters).to be_truthy
+        expect(current_user.latitude).to eq default_location[:latitude]
+        expect(current_user.longitude).to eq default_location[:longitude]
+        expect(current_user.phone).to eq "3223232"
+        expect(current_user.address_set_manually).to be_truthy
+      end
+    end
+
+    describe "updating phone" do
+      it "updates and adds the phone" do
+        current_user.reload
+        expect(current_user.phone).to be_blank
+        expect(current_user.user_phones.count).to eq 0
+        Sidekiq::Worker.clear_all
+        VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
+          Sidekiq::Testing.inline! {
+            put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
+          }
+        end
+        expect(flash[:success]).to be_present
+        current_user.reload
+        expect(current_user.phone).to eq "15005550006"
+        expect(current_user.user_phones.count).to eq 1
+        expect(current_user.phone_waiting_confirmation?).to be_truthy
+        expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
+
+        user_phone = current_user.user_phones.reorder(:created_at).last
+        expect(user_phone.phone).to eq "15005550006"
+        expect(user_phone.confirmed?).to be_falsey
+        expect(user_phone.confirmation_code).to be_present
+        expect(user_phone.notifications.count).to eq 1
+      end
+      context "without background" do
+        it "still shows general alert" do
+          current_user.reload
+          expect(current_user.phone).to be_blank
+          expect(current_user.user_phones.count).to eq 0
+          patch base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
+          expect(flash[:success]).to be_present
+          current_user.reload
+          expect(current_user.phone).to eq "15005550006"
+          expect(current_user.user_phones.count).to eq 0
+          expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
+        end
+      end
+    end
+    context "previous password was too short" do
+      # Prior to #1738 password requirement was 8 characters.
+      # Ensure users who had valid passwords for the previous requirements can update their password
+      it "updates password" do
+        current_user.update_attribute :password, "old_pass"
+        expect(current_user.reload.authenticate("old_pass")).to be_truthy
+        patch base_url, params: {
+          user: {
+            current_password: "old_pass",
+            password: "172ddfasdf1LDF",
+            name: "Mr. Slick",
+            password_confirmation: "172ddfasdf1LDF"
+          }
+        }
+        expect(response).to redirect_to edit_my_account_path
+        expect(flash[:success]).to be_present
+        current_user.reload
+        expect(current_user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
+      end
+    end
+
+    context "organization with hotsheet" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
+      let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:membership) { current_user.memberships.first }
+      it "updates hotsheet" do
+        expect(membership.notification_never?).to be_truthy
+        # Doesn't include the parameter because when false, it doesn't include
+        patch base_url, params: {
+          id: current_user.username,
+          hot_sheet_organization_ids: organization.id.to_s,
+          hot_sheet_notifications: {organization.id.to_s => "1"}
+        }, headers: {"HTTP_REFERER" => organization_hot_sheet_path(organization_id: organization.to_param)}
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
+        membership.reload
+        expect(membership.notification_daily?).to be_truthy
+      end
+      context "with other parameters too" do
+        let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
+        let(:organization2) { hot_sheet_configuration2.organization }
+        let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
+        it "updates all the parameters" do
+          expect(membership.notification_never?).to be_truthy
+          expect(membership2.notification_daily?).to be_truthy
+          put base_url, params: {
+            id: current_user.username,
+            hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
+            hot_sheet_notifications: {organization.id.to_s => "1"},
+            user: {
+              notification_newsletters: "true",
+              notification_unstolen: "false"
+            }
+          }
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to edit_my_account_url
+          membership.reload
+          membership2.reload
+          expect(membership.notification_daily?).to be_truthy
+          expect(membership2.notification_daily?).to be_falsey
+
+          current_user.reload
+          expect(current_user.notification_newsletters).to be_truthy
+          expect(current_user.notification_unstolen).to be_falsey
+        end
+      end
+    end
+
+    describe "preferred_language" do
+      it "updates if valid" do
+        expect(current_user.reload.preferred_language).to eq(nil)
+        patch base_url, params: {id: current_user.username, locale: "nl", user: {preferred_language: "en"}}
+        expect(flash[:success]).to match(/succesvol/i)
+        expect(response).to redirect_to "/my_account/edit?locale=nl"
+        expect(current_user.reload.preferred_language).to eq("en")
+      end
+
+      it "changes from previous if valid" do
+        current_user.update_attribute :preferred_language, "en"
+        patch base_url, params: {id: current_user.username, locale: "en", user: {preferred_language: "nl"}}
+        expect(flash[:success]).to match(/successfully updated/i)
+        expect(response).to redirect_to "/my_account/edit?locale=en"
+        expect(current_user.reload.preferred_language).to eq("nl")
+      end
+
+      it "does not update the preferred_language if invalid" do
+        expect(current_user.reload.preferred_language).to eq(nil)
+        patch base_url, params: {id: current_user.username, user: {preferred_language: "klingon"}}
+        expect(flash[:success]).to be_blank
+        expect(response).to render_template(:edit)
+        expect(current_user.reload.preferred_language).to eq(nil)
+      end
+    end
+  end
 end
