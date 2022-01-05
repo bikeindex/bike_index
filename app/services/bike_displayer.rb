@@ -39,7 +39,7 @@ class BikeDisplayer
     end
 
     def display_edit_address_fields?(bike, user = nil)
-      return false unless user_edit_address?(bike, user)
+      return false unless user_edit_bike_address?(bike, user)
       # Make absolutely sure with stolen bikes
       return false if bike.current_stolen_record_id.present?
       # parking notifications, impounded, stolen etc use the associated record for their address
@@ -47,14 +47,13 @@ class BikeDisplayer
     end
 
     # Intended as an internal method, splitting out for testing purposes
-    def user_edit_address?(bike, user = nil)
+    def user_edit_bike_address?(bike, user = nil)
       return false if user.blank?
       if bike.user.present?
         # If the user has set their address, that's the only way to update bike addresses
         return false if bike.user.address_set_manually
         if bike.user == user
-          # If the user is the bike owner, we may show
-          # ... but not if the user has user_registration_organizations with reg_address -
+          # If user is bike owner, check for user_registration_organizations with reg_address -
           # because then they need to edit address via their account page
           return user.uro_organizations.with_enabled_feature_slugs("reg_address").none?
         end

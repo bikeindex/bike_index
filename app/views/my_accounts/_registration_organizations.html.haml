@@ -33,9 +33,12 @@
                     = "bike".pluralize(user_registration_organization.bikes.count)
                     registered with
                     %em= organization.short_name
-                    - if user_registration_organization.bikes.count > 0
+                    - bikes_count = user_registration_organization.bikes.count
+                    - if bikes_count > 0
                       \-
                       = safe_join(user_registration_organization.bikes.limit(5).map { |b| link_to(b.title_string, edit_bike_path(b, edit_template: "groups")) }, ", ")
+                      - if bikes_count > 5
+                        %em and #{bikes_count - 5} more.
         .form-group.row.pt-0
           %label.form-well-label &nbsp;
           .form-well-input-large.small

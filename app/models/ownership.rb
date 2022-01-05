@@ -132,7 +132,8 @@ class Ownership < ApplicationRecord
   end
 
   def overridden_by_user_registration?
-    user&.user_registration_organizations&.where.not(registration_info: [nil, {}])&.any?
+    return false if user.blank?
+    user.user_registration_organizations.where.not(registration_info: [nil, {}]).any?
   end
 
   def update_registration_information(key, value)

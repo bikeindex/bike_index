@@ -244,20 +244,20 @@ RSpec.describe BikeDisplayer do
     end
   end
 
-  describe "user_edit_address?, display_edit_address_fields? and edit_street_address?" do
+  describe "user_edit_bike_address?, display_edit_address_fields? and edit_street_address?" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:user) { FactoryBot.create(:user, :confirmed) }
     let(:admin) { FactoryBot.create(:admin) }
 
     it "is falsey" do
       expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-      expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+      expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_falsey
     end
     context "new bike" do
       let(:bike) { Bike.new }
       it "is truthy" do
         expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
-        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+        expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
       end
     end
     context "owner" do
@@ -268,7 +268,7 @@ RSpec.describe BikeDisplayer do
         expect(bike.reload.authorized?(user)).to be_truthy
         expect(bike.user_id).to be_blank
         expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+        expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_falsey
         expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
       end
     end
@@ -280,7 +280,7 @@ RSpec.describe BikeDisplayer do
       end
       it "is truthy" do
         expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
-        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+        expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
         expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
         expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
       end
@@ -289,7 +289,7 @@ RSpec.describe BikeDisplayer do
         it "is falsey" do
           expect(user.reload.address_set_manually).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
           expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_falsey
@@ -303,7 +303,7 @@ RSpec.describe BikeDisplayer do
           expect(user.user_registration_organizations.pluck(:id)).to eq([user_registration_organization.id])
           expect(user.uro_organizations.pluck(:id)).to eq([organization.id])
           expect(user.uro_organizations.first.additional_registration_fields).to eq(["reg_address"])
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_falsey
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
           expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
@@ -315,7 +315,7 @@ RSpec.describe BikeDisplayer do
         it "is falsey" do
           expect(bike.reload.status).to eq "status_impounded"
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
@@ -324,7 +324,7 @@ RSpec.describe BikeDisplayer do
         it "is falsey" do
           expect(bike.reload.status).to eq "status_impounded"
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
@@ -332,7 +332,7 @@ RSpec.describe BikeDisplayer do
         it "is falsey" do
           bike.status = "unregistered_parking_notification"
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
@@ -341,7 +341,7 @@ RSpec.describe BikeDisplayer do
         it "is truthy" do
           expect(bike.reload.street).to eq "444 something"
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
           expect(BikeDisplayer.edit_street_address?(bike, user)).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_truthy
           expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_truthy
@@ -355,11 +355,11 @@ RSpec.describe BikeDisplayer do
       it "is truthy" do
         expect(bike.authorized?(user)).to be_truthy
         expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
-        expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+        expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
         expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
         expect(bike.authorized?(organization_member)).to be_truthy
         expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_truthy
-        expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_truthy
+        expect(BikeDisplayer.user_edit_bike_address?(bike, organization_member)).to be_truthy
         expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
       end
       context "organization reg_address" do
@@ -367,11 +367,11 @@ RSpec.describe BikeDisplayer do
         it "is truthy" do
           expect(bike.authorized?(user)).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
           expect(BikeDisplayer.edit_street_address?(bike, user)).to be_truthy
           expect(bike.authorized?(organization_member)).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_truthy
-          expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, organization_member)).to be_truthy
           expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_truthy
         end
       end
@@ -379,10 +379,10 @@ RSpec.describe BikeDisplayer do
         let(:user) { FactoryBot.create(:user, :in_amsterdam) }
         it "is falsey" do
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
           expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_falsey
-          expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_falsey
+          expect(BikeDisplayer.user_edit_bike_address?(bike, organization_member)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
         end
       end
@@ -390,9 +390,9 @@ RSpec.describe BikeDisplayer do
         let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["no_address"]) }
         it "is falsey" do
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_truthy
-          expect(BikeDisplayer.user_edit_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
           expect(BikeDisplayer.display_edit_address_fields?(bike, organization_member)).to be_truthy
-          expect(BikeDisplayer.user_edit_address?(bike, organization_member)).to be_truthy
+          expect(BikeDisplayer.user_edit_bike_address?(bike, organization_member)).to be_truthy
           expect(BikeDisplayer.edit_street_address?(bike, organization_member)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, admin)).to be_falsey
         end
