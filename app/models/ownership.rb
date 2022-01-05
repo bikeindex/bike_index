@@ -229,10 +229,10 @@ class Ownership < ApplicationRecord
     return r_info if org_id.blank? || r_info.blank?
     # NOTE: This is deleted when the user_registration_organization processes (or will be)
     if r_info["student_id"].present?
-      r_info["student_id_#{org_id}"] = r_info["student_id"]
+      r_info["student_id_#{org_id}"] ||= r_info["student_id"]
     end
     if r_info["organization_affiliation"].present?
-      r_info["organization_affiliation_#{org_id}"] = r_info["organization_affiliation"]
+      r_info["organization_affiliation_#{org_id}"] ||= r_info["organization_affiliation"]
     end
     r_info
   end
