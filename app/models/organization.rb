@@ -167,6 +167,12 @@ class Organization < ApplicationRecord
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
+  def self.with_any_enabled_feature_slugs(slugs)
+    matching_slugs = OrganizationFeature.matching_slugs(slugs)
+    return none unless matching_slugs.present?
+    where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
+  end
+
   def self.permitted_domain_passwordless_signin
     where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
   end

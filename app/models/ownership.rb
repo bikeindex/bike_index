@@ -212,14 +212,42 @@ class Ownership < ApplicationRecord
     bike.ownerships.create(skip_email: true, owner_email: user.email, creator_id: user.id)
   end
 
+  # Calling this inline because ownerships are updated in background processes (except on create...)
   def corrected_registration_info
     if overridden_by_user_registration?
-      self.registration_info = UserRegistrationOrganization.universal_registration_info_for(user)
+      UserRegistrationOrganization.universal_registration_info_for(user)
+    else
+      # Only assign info with organization_uniq if
+      r_info = info_with_organization_uniq(reg_info, organization_id)
+      clean_registration_info(r_info)
     end
-    self.class.clean_registration_info(registration_info, organization_id)
   end
 
   private
+
+  def info_with_organization_uniq(r_info, org_id = nil)
+    return r_info if org_id.blank? || r_info.blank?
+    # NOTE: This is deleted when the user_registration_organization processes (or will be)
+    if r_info["student_id"].present?
+      r_info["student_id_#{org_id}"] = r_info["student_id"]
+    end
+    if r_info["organization_affiliation"].present?
+      r_info["organization_affiliation_#{org_id}"] = r_info["organization_affiliation"]
+    end
+    r_info
+  end
+
+  def clean_registration_info(r_info)
+    # skip cleaning if it's blank
+    return {} if r_info.blank?
+    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
+    r_info["phone"] = Phonifyer.phonify(r_info["phone"])
+    # bike_code should be renamed bike_sticker. Legacy ownership issue
+    if r_info["bike_code"].present?
+      r_info["bike_sticker"] = r_info.delete("bike_code")
+    end
+    r_info.reject { |_k, v| v.blank? }
+  end
 
   def spam_risky_email?
     risky_domains = ["@yahoo.co", "@hotmail.co"]

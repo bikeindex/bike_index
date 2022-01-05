@@ -545,11 +545,19 @@ RSpec.describe Ownership, type: :model do
       end
       context "cleaned_registration_info" do
         let(:registration_info) { {user_name: "George", bike_code: "9998888", phone: "(111) 222-4444", student_id: "1222", organization_affiliation: "employee"} }
-        let(:target_cleaned) { {user_name: "George", bike_sticker: "9998888", phone: "1112224444", student_id: "1222", organization_affiliation: "employee"} }
+        let(:target_cleaned) { {user_name: "George", bike_sticker: "9998888", phone: "1112224444", student_id: "1222", organization_affiliation: "employee"}.as_json }
+        let(:organized_target) { target_cleaned.merge("student_id_#{organization.id}" => "1222", "organization_affiliation_#{organization.id}" => "employee") }
+        #   {"user_name" => "George",
+        #     "bike_sticker" => "9998888",
+        #     "phone" => "1112224444",
+        #     "student_id_#{organization.id}" => "1222",
+        #     "organization_affiliation_#{organization.id}" => "employee"}
+        # }
+        # end
         let(:organization) { FactoryBot.create(:organization) }
-        let(:organization2) { FactoryBot.create(:organization)}
+        let(:organization2) { FactoryBot.create(:organization) }
         it "cleans things" do
-          expect(bike.reload.registration_info).to eq target_cleaned.as_json
+          expect(bike.reload.registration_info).to eq target_cleaned
           expect(bike.owner_name).to eq "George"
 
           ownership = bike.current_ownership
@@ -570,31 +578,23 @@ RSpec.describe Ownership, type: :model do
           expect(bike.organization_affiliation(organization)).to eq "employee"
           expect(bike.organization_affiliation(organization2)).to eq "employee"
           expect(ownership.organization_id).to be_blank
-          expect(ownership.registration_info).to eq target_cleaned.as_json
+          expect(ownership.registration_info).to eq target_cleaned
           expect(ownership.owner_name).to eq "George"
           # If there is a organization, it cleans things using the org id
           ownership.update(organization: organization)
-          organized_target = {
-            "user_name" => "George",
-            "bike_sticker" => "9998888",
-            "phone" => "1112224444",
-            "student_id_#{organization.id}" => "1222",
-            "organization_affiliation_#{organization.id}" => "employee"
-          }
-
-          expect(ownership.student_id_key).to eq "student_id_#{organization.id}"
+          expect(ownership.registration_info).to eq organized_target
+          expect(ownership.student_id_key).to eq "student_id"
           expect(ownership.student_id_key(organization)).to eq "student_id_#{organization.id}"
           expect(ownership.student_id_key(organization.id)).to eq "student_id_#{organization.id}"
           expect(ownership.student_id(organization.slug)).to eq "1222"
-          expect(ownership.student_id(organization2)).to be_blank
+          expect(ownership.student_id(organization2)).to eq "1222"
 
           expect(ownership.organization_affiliation).to eq "employee"
           expect(ownership.organization_affiliation(organization)).to eq "employee"
           expect(ownership.organization_affiliation(organization.id)).to eq "employee"
           expect(ownership.organization_affiliation(organization.slug)).to eq "employee"
-          expect(ownership.organization_affiliation(organization2)).to be_blank
+          expect(ownership.organization_affiliation(organization2)).to eq "employee"
 
-          expect(ownership.registration_info).to eq organized_target
           # sanity check
           expect(ownership.registration_info_uniq_keys).to match_array organization_uniq_keys
 
@@ -602,6 +602,7 @@ RSpec.describe Ownership, type: :model do
           expect(bike.student_id(organization)).to eq "1222"
           expect(bike.organization_affiliation).to eq "employee"
         end
+        context "user_registration_organization"
       end
     end
     context "with creator" do
