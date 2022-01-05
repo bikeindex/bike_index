@@ -199,6 +199,7 @@ RSpec.describe Organization, type: :model do
         expect(Organization.with_enabled_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
         expect(Organization.with_enabled_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
         expect(Organization.with_enabled_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
+        expect(Organization.with_any_enabled_feature_slugs("show_bulk_import reg_phone show_recoveries no_address").pluck(:id)).to match_array([organization1.id, organization2.id])
         expect(Organization.admin_text_search(" show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
         expect(Organization.admin_text_search(" show_bulk_import show_recoveries").pluck(:id)).to eq([organization2.id])
       end

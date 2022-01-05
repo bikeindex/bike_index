@@ -215,7 +215,7 @@ class Ownership < ApplicationRecord
   # Calling this inline because ownerships are updated in background processes (except on create...)
   def corrected_registration_info
     if overridden_by_user_registration?
-      UserRegistrationOrganization.universal_registration_info_for(user)
+      UserRegistrationOrganization.universal_registration_info_for(user, reg_info)
     else
       # Only assign info with organization_uniq if
       r_info = info_with_organization_uniq(reg_info, organization_id)

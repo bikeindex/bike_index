@@ -35,7 +35,7 @@ module RegistrationInfoable
 
   def registration_info_uniq_keys
     [reg_info[student_id_key].present? ? "student_id" : nil,
-     reg_info[student_id_key].present? ? "organization_affiliation" : nil].compact
+      reg_info[student_id_key].present? ? "organization_affiliation" : nil].compact
   end
 
   # Accepts organization or organization.id

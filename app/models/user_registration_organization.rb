@@ -28,7 +28,7 @@ class UserRegistrationOrganization < ApplicationRecord
   end
 
   # TODO: maybe should be in ownership
-  def self.universal_registration_info_for(user)
+  def self.universal_registration_info_for(user, passed_reg_info = {})
     uro_reg_info = user.user_registration_organizations.pluck(:registration_info).reduce({}, :merge)
     own_reg_info = user.ownerships.reorder(:updated_at).pluck(:registration_info).reduce({}, :merge)
     # Pretty sure that user_name and extra_registration_number can't end up in registration_info anymore
@@ -60,7 +60,7 @@ class UserRegistrationOrganization < ApplicationRecord
         ids.each { |i| new_reg_info["organization_affiliation_#{i}"] ||= organization_affiliation }
       end
     end
-    new_reg_info
+    new_reg_info.merge(passed_reg_info.slice(*ignored_own_keys))
   end
 
   def bikes

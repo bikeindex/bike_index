@@ -547,13 +547,6 @@ RSpec.describe Ownership, type: :model do
         let(:registration_info) { {user_name: "George", bike_code: "9998888", phone: "(111) 222-4444", student_id: "1222", organization_affiliation: "employee"} }
         let(:target_cleaned) { {user_name: "George", bike_sticker: "9998888", phone: "1112224444", student_id: "1222", organization_affiliation: "employee"}.as_json }
         let(:organized_target) { target_cleaned.merge("student_id_#{organization.id}" => "1222", "organization_affiliation_#{organization.id}" => "employee") }
-        #   {"user_name" => "George",
-        #     "bike_sticker" => "9998888",
-        #     "phone" => "1112224444",
-        #     "student_id_#{organization.id}" => "1222",
-        #     "organization_affiliation_#{organization.id}" => "employee"}
-        # }
-        # end
         let(:organization) { FactoryBot.create(:organization) }
         let(:organization2) { FactoryBot.create(:organization) }
         it "cleans things" do
