@@ -2,11 +2,28 @@ require "rails_helper"
 
 RSpec.shared_examples "registration_infoable" do
   let(:model_sym) { subject.class.name.underscore.to_sym }
-  let(:instance) { FactoryBot.create model_sym }
+  let(:instance) { FactoryBot.create(model_sym, registration_info: registration_info) }
+  let(:registration_info) { {} }
 
-  describe "student_id" do
+  describe "scoping" do
+    let(:registration_info) { {student_id: "12", organization_affiliation: "student"} }
+    let(:registration_info2) { {"student_id_#{organization.id}" => "42", "organization_affiliation_#{organization.id}" => "employee"} }
+    let!(:instance2) { FactoryBot.create(model_sym, registration_info: registration_info2) }
+    let!(:instance3) { FactoryBot.create(model_sym, registration_info: {user_name: "party", organization_affiliation: "1"}) }
+    let(:organization) { FactoryBot.create(:organization) }
     it "is expected" do
+      expect(instance.student_id).to eq "12"
+      expect(instance.student_id(organization.id)).to eq "12"
+      expect(instance.organization_affiliation).to eq "student"
+      expect(instance.organization_affiliation(organization.slug)).to eq "student"
+      expect(subject.class.pluck(:id)).to match_array([instance.id, instance2.id, instance3.id])
+      expect(subject.class.with_student_id(organization).pluck(:id)).to match_array([instance.id, instance2.id])
+      expect(subject.class.with_student_id(organization.id).pluck(:id)).to match_array([instance.id, instance2.id])
+      expect(subject.class.with_student_id(organization.id + 2222).pluck(:id)).to match_array([instance.id])
 
+      expect(subject.class.with_organization_affiliation(organization).pluck(:id)).to match_array([instance.id, instance2.id, instance3.id])
+      expect(subject.class.with_organization_affiliation(organization.id).pluck(:id)).to match_array([instance.id, instance2.id, instance3.id])
+      expect(subject.class.with_organization_affiliation(organization.id + 2222).pluck(:id)).to match_array([instance.id, instance3.id])
     end
   end
 end

@@ -80,17 +80,17 @@ class OrganizationFeature < ApplicationRecord
     reg_field.to_s.gsub("reg_", "")
   end
 
+  def self.reg_fields
+    REG_FIELDS
+  end
+
   def self.reg_fields_with_customizable_labels
     # Can't rename bike_stickers
-    REG_FIELDS - %w[reg_bike_sticker]
+    reg_fields - %w[reg_bike_sticker]
   end
 
   def self.reg_fields_organization_uniq
     %w[reg_organization_affiliation reg_student_id]
-  end
-
-  def self.reg_fields_universal
-    REG_FIELDS - reg_fields_organization_uniq
   end
 
   def one_time?

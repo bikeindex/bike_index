@@ -628,25 +628,4 @@ RSpec.describe Ownership, type: :model do
       end
     end
   end
-
-  describe "scoping" do
-    let(:model_sym) { :ownership }
-    let(:registration_info) { {student_id: "12", organization_affiliation: "student"} }
-    let(:registration_info2) { {"student_id_#{organization.id}" => "42", "organization_affiliation_#{organization.id}" => "employee"} }
-    let(:instance) { FactoryBot.create(model_sym, registration_info: registration_info) }
-    let(:instance2) { FactoryBot.create(model_sym, registration_info: registration_info2) }
-    let(:instance3) { FactoryBot.create(model_sym, registration_info: {user_name: "party", organization_affiliation: "1"}) }
-    let(:organization) { FactoryBot.create(:organization) }
-    it "is expected" do
-      pp subject.class
-      expect(subject.class.pluck(:id)).to match_array([instance.id, instance2.id, instance3.id])
-      expect(subject.class.with_student_id(organization).pluck(:id)).to match_array([instance.id, instance2.id])
-      expect(subject.class.with_student_id(organization.id).pluck(:id)).to match_array([instance.id, instance2.id])
-      expect(subject.class.with_student_id(organization.id + 2222).pluck(:id)).to match_array([])
-
-      expect(subject.class.with_organization_affiliation(organization).pluck(:id)).to match_array([instance.id, instance2.id])
-      expect(subject.class.with_organization_affiliation(organization.id).pluck(:id)).to match_array([instance.id, instance2.id])
-      expect(subject.class.with_organization_affiliation(organization.id + 2222).pluck(:id)).to match_array([])
-    end
-  end
 end

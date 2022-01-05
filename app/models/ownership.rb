@@ -134,7 +134,7 @@ class Ownership < ApplicationRecord
 
   def overridden_by_user_registration?
     return false if user.blank?
-    user.user_registration_organizations.where.not(registration_info: [nil, {}]).any?
+    user.user_registration_organizations.where.not(registration_info: {}).any?
   end
 
   def claim_message
@@ -214,12 +214,9 @@ class Ownership < ApplicationRecord
 
   def corrected_registration_info
     if overridden_by_user_registration?
-
+      self.registration_info = UserRegistrationOrganization.universal_registration_info_for(user)
     end
-    registration_info_uniq_keys
-    # skip cleaning if it's blank
-    return {} if registration_info.blank?
-    clean_registration_info(registration_info)
+    self.class.clean_registration_info(registration_info, organization_id)
   end
 
   private
@@ -228,24 +225,6 @@ class Ownership < ApplicationRecord
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
     pos?
-  end
-
-  def clean_registration_info(r_info)
-    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
-    r_info["phone"] = Phonifyer.phonify(r_info["phone"])
-    # bike_code should be renamed bike_sticker
-    if r_info["bike_code"].present?
-      r_info["bike_sticker"] = r_info.delete("bike_code")
-    end
-    if organization_id.present?
-      if r_info["student_id"].present?
-        r_info["student_id_#{organization_id}"] = r_info.delete("student_id")
-      end
-      if r_info["organization_affiliation"].present?
-        r_info["organization_affiliation_#{organization_id}"] = r_info.delete("organization_affiliation")
-      end
-    end
-    r_info.reject { |_k, v| v.blank? }
   end
 
   # Some organizations pre-register bikes and then transfer them.

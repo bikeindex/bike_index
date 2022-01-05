@@ -65,11 +65,4 @@ RSpec.describe OrganizationFeature, type: :model do
       end
     end
   end
-
-  describe "reg_fields_organization_uniq reg_fields_universal" do
-    it "contains all the fields" do
-      reg_fields = OrganizationFeature.reg_fields_organization_uniq + OrganizationFeature.reg_fields_universal
-      expect(reg_fields.sort).to eq OrganizationFeature::REG_FIELDS.sort
-    end
-  end
 end

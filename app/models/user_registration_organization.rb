@@ -20,6 +20,28 @@ class UserRegistrationOrganization < ApplicationRecord
     REGISTRATION_INFO_KEYS
   end
 
+  def self.org_ids_with_uniq_info(user)
+    user.bike_organizations.with_enabled_feature_slugs(OrganizationFeature.reg_fields).pluck(:id)
+  end
+
+  def self.universal_registration_info_for(user)
+    org_reg_info = user.user_registration_organizations.pluck(:registration_info).reduce({}, :merge)
+    own_reg_info = user.ownerships.reorder(:updated_at).pluck(:registration_info).reduce({}, :merge)
+    # Pretty sure that user_name and extra_registration_number can't end up in registration_info anymore
+    # TODO: post #2121 remove them if that's true
+    ignored_own_keys = %w[user_name bike_sticker extra_registration_number]
+    merging_own_keys = (own_reg_info.keys - org_reg_info.keys - ignored_own_keys)
+    # Then, remove location keys
+    location_keys = %w[city country state street zipcode latitude longitude]
+    unless (org_reg_info.keys & location_keys).count == location_keys.count
+      merging_own_keys += location_keys
+    end
+    new_reg_info = org_reg_info.merge(own_reg_info.slice(*merging_own_keys))
+    org_ids = org_ids_with_uniq_info(user)
+    pp org_id
+    clean_registration_info(new_reg_info, organization)
+  end
+
   def bikes
     all_bikes? ? user.bikes : user.bikes.organization(organization_id)
   end
