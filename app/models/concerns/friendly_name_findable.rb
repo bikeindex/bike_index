@@ -12,9 +12,8 @@ module FriendlyNameFindable
       friendly_find(str) || (raise ActiveRecord::RecordNotFound)
     end
 
-    def friendly_id_find(n)
-      m = friendly_find(n)
-      m&.id
+    def friendly_find_id(n)
+      friendly_find(n)&.id
     end
   end
 end

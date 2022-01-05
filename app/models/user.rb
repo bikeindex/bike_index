@@ -105,7 +105,7 @@ class User < ApplicationRecord
     fuzzy_email_find(str) || username_friendly_find(str)
   end
 
-  def self.friendly_id_find(str)
+  def self.friendly_find_id(str)
     friendly_find(str)&.id
   end
 

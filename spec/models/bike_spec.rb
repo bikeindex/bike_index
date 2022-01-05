@@ -111,7 +111,7 @@ RSpec.describe Bike, type: :model do
       let!(:bike1) { FactoryBot.create(:bike, owner_email: "something@stuff.edu") }
       let(:user) { FactoryBot.create(:user_confirmed, name: "George Jones", email: "something2@stuff.edu") }
       let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: user.email, user: user) }
-      let!(:bike3) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: {user_name: "Sally Jones"}, owner_email: "something@stuff.com") }
+      let!(:bike3) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: {user_name: "Sally Jones"}, owner_email: "something@stuff.com") }
       it "finds the things" do
         expect(bike2.reload.owner_name).to eq "George Jones"
         expect(bike3.reload.owner_name).to eq "Sally Jones"
@@ -311,7 +311,7 @@ RSpec.describe Bike, type: :model do
 
     describe "registration_info and conditional_information" do
       describe "organization_affiliation" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: registration_info) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: registration_info) }
         let(:registration_info) { {} }
         it "sets if searched" do
           expect(bike.organization_affiliation).to be_blank
@@ -341,7 +341,7 @@ RSpec.describe Bike, type: :model do
       end
 
       describe "student_id" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: registration_info) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: registration_info) }
         let(:registration_info) { {} }
         it "sets if searched" do
           expect(bike.student_id).to be_blank
@@ -1233,7 +1233,7 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "address_source" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: registration_info) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: registration_info) }
     let(:registration_info) { {street: "2864 Milwaukee Ave"} }
     context "no address" do
       it "returns nil" do
@@ -1268,7 +1268,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "with stolen record" do
-        let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creation_state_registration_info: registration_info) }
+        let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creation_registration_info: registration_info) }
         it "returns initial_creation" do
           expect(bike.reload.registration_address_source).to eq "initial_creation"
         end
@@ -1285,7 +1285,7 @@ RSpec.describe Bike, type: :model do
           creation_organization: organization,
           owner_email: user.email,
           creator: user,
-          creation_state_registration_info: {street: "102 Washington Pl", city: "State College"})
+          creation_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
       # let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
       include_context :geocoder_real

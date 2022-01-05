@@ -36,7 +36,7 @@ class Manufacturer < ApplicationRecord
     end
   end
 
-  def self.friendly_id_find(n)
+  def self.friendly_find_id(n)
     m = friendly_find(n)
     m&.id
   end

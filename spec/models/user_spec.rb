@@ -546,9 +546,9 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "friendly_id_find" do
+  describe "friendly_find_id" do
     it "fails with nil" do
-      result = User.friendly_id_find("some stuff")
+      result = User.friendly_find_id("some stuff")
       expect(result).to be_nil
     end
   end

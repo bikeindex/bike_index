@@ -85,6 +85,14 @@ class OrganizationFeature < ApplicationRecord
     REG_FIELDS - %w[reg_bike_sticker]
   end
 
+  def self.reg_fields_organization_uniq
+    %w[reg_organization_affiliation reg_student_id]
+  end
+
+  def self.reg_fields_universal
+    REG_FIELDS - reg_fields_organization_uniq
+  end
+
   def one_time?
     standard_one_time? || custom_one_time?
   end

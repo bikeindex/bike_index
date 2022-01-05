@@ -1,4 +1,6 @@
 class UserRegistrationOrganization < ApplicationRecord
+  include RegistrationInfoable
+
   acts_as_paranoid
 
   belongs_to :user
@@ -13,6 +15,10 @@ class UserRegistrationOrganization < ApplicationRecord
   scope :not_paid_organizations, -> { includes(:organization).where(organizations: {is_paid: false}) }
 
   attr_accessor :skip_update
+
+  def self.registration_info_keys
+    REGISTRATION_INFO_KEYS
+  end
 
   def bikes
     all_bikes? ? user.bikes : user.bikes.organization(organization_id)
