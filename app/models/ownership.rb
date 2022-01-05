@@ -184,7 +184,7 @@ class Ownership < ApplicationRecord
         "transferred_ownership"
       end
     end
-    self.registration_info = cleaned_registration_info
+    self.registration_info = corrected_registration_info
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track
@@ -220,6 +220,14 @@ class Ownership < ApplicationRecord
     bike.ownerships.create(skip_email: true, owner_email: user.email, creator_id: user.id)
   end
 
+  def corrected_registration_info
+    if overridden_by_user_registration?
+    else
+      # Clean it if it's present
+      registration_info.present? ? cleaned_registration_info : {}
+    end
+  end
+
   private
 
   def spam_risky_email?
@@ -229,7 +237,6 @@ class Ownership < ApplicationRecord
   end
 
   def cleaned_registration_info
-    return {} unless registration_info.present?
     # The only place user_name comes from, other than a user setting it themselves, is bulk_import
     self.owner_name ||= registration_info["user_name"]
     registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])

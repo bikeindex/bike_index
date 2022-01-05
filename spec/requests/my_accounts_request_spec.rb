@@ -345,6 +345,67 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
 
+    context "user_registration_organization" do
+      let(:organization1) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
+      let!(:user_registration_organization1) { FactoryBot.create(:user_registration_organization, organization: organization1, user: current_user) }
+      let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: current_user, creation_organization: organization1) }
+      let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+      let(:feature_slugs) { OrganizationFeature::REG_FIELDS }
+      it "updates" do
+        expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+        expect(user_registration_organization1.can_edit_claimed).to be_truthy
+        expect(user_registration_organization1.registration_info).to be_blank
+
+        expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        bike_organization1 = bike1.bike_organizations.first
+        expect(bike_organization1.reload.can_not_edit_claimed).to be_falsey
+        expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+        expect(bike1.registration_info).to be_blank
+
+        expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
+        expect(bike2.registration_info).to be_blank
+
+        Sidekiq::Worker.clear_all
+        put base_url, params: {
+          edit_template: "registration_organizations",
+          user_registration_organization_all_bikes: [user_registration_organization1.id.to_s, ""],
+          user_registration_organization_can_edit_claimed: [],
+          "uro-#{user_registration_organization1.id}-organization_affiliation"=>"student",
+          "uro-#{user_registration_organization1.id}-student_id"=>"XXX777YYY"
+        }
+        # expect(AfterUserChangeWorker.jobs.count).to eq 1
+        # expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
+        expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+        expect(user_registration_organization1.can_edit_claimed).to be_falsey
+        target_info = {organization_affiliation: "student", student_id: "XXX777YYY"}.as_json
+        expect(user_registration_organization1.registration_info).to eq target_info
+
+        Sidekiq::Testing.inline! {
+          AfterUserChangeWorker.drain
+        }
+        expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        expect(bike_organization1.reload.can_not_edit_claimed).to be_truthy
+        expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+        expect(bike1.registration_info).to eq target_info
+
+        expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        bike_organization2 = bike2.bike_organizations.first
+        expect(bike_organization2.can_edit_claimed).to be_truthy
+        expect(bike_organization2.overridden_by_user_registration?).to be_truthy
+        expect(bike2.registration_info).to eq target_info
+      end
+      # context "with multiple user_registration_organizations" do
+      #   let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: current_user) }
+      #   let(:organization2) { user_registration_organization2.organization }
+      #   it "updates" do
+
+      #     # Remove the fancy user_registration_organization from all
+      #   end
+      # end
+    end
+
     describe "preferred_language" do
       it "updates if valid" do
         expect(current_user.reload.preferred_language).to eq(nil)

@@ -1,4 +1,4 @@
-.form-wrap
+.form-wrap#myAccountRegistrationOrganizations
   .form-well-form-header-always-visible
     %h3= t(".registration_organizations")
   .col-xs-12
@@ -13,22 +13,21 @@
     - organization = user_registration_organization.organization
     = fields_for user_registration_organization do |uro|
       %hr
-      .related-fields
+      .related-fields.userRegistrationOrganization
         .form-group.row
           %label.form-well-label
             %strong= organization.name
           .form-well-input-large
-            %label.pt-2.mb-0{ style: "line-height: 1.5em;" }
-              = uro.check_box :all_bikes
+            %label.pt-2.mb-0.allBikesCheck{ style: "line-height: 1.5em;" }
+              = check_box_tag "user_registration_organization_all_bikes[]", user_registration_organization.id, user_registration_organization.all_bikes?, multiple: true
               Register all your bikes with this organization
             .below-input-help
               %em When not selected, manage through the "Groups and Organizations" page for each bike.
-              - unless user_registration_organization.all_bikes?
-                %span.less-strong.mt-1
+              .collapse.mt-1.collapse-NotAllBikes{class: (user_registration_organization.all_bikes? ? "" : "in")}
+                %span.less-strong
                   - if user_registration_organization.bikes.pluck(:id).sort == user_bike_ids
                     All your bikes are registered with this organization
                   - else
-                    %br
                     = admin_number_display(user_registration_organization.bikes.count)
                     = "bike".pluralize(user_registration_organization.bikes.count)
                     registered with
@@ -38,32 +37,36 @@
                       \-
                       = safe_join(user_registration_organization.bikes.limit(5).map { |b| link_to(b.title_string, edit_bike_path(b, edit_template: "groups")) }, ", ")
                       - if bikes_count > 5
-                        %em and #{bikes_count - 5} more.
-        .form-group.row.pt-0
+                        %em and #{bikes_count - 5} other bikes.
+        .form-group.row.pt-0.collapse.collapse-AllBikes{class: (user_registration_organization.all_bikes? ? "in" : "")}
           %label.form-well-label &nbsp;
           .form-well-input-large.small
             %label.pt-2.mb-0{ style: "line-height: 1.5em;" }
-              = uro.check_box :can_edit_claimed
+              = check_box_tag "user_registration_organization_can_edit_claimed[]", user_registration_organization.id, user_registration_organization.can_edit_claimed, multiple: true
               Allow
               %em= organization.short_name
               to edit your bikes
         - (organization.additional_registration_fields - rendered_registration_info_fields).each do |registration_field|
           - next if registration_field == "reg_bike_sticker"
-          - rendered_registration_info_fields << registration_field
           - if registration_field == "reg_organization_affiliation"
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
-              = label_tag :organization_affiliation, registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name), class: "form-well-label"
+              = label_tag "reg_field-organization_affiliation_#{organization.id}", registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name), class: "form-well-label"
               .form-well-input
-                = select_tag :organization_affiliation, options_for_select(organization.organization_affiliation_options, user_registration_organization.registration_info["organization_affiliation"]), class: "form-control"
+                = select_tag "reg_field-organization_affiliation_#{organization.id}", options_for_select(organization.organization_affiliation_options, user_registration_organization.registration_info["organization_affiliation"]), class: "form-control"
+          - if registration_field == "reg_organization_affiliation"
+            .form-group.row.unnested-field.no-divider-row
+              = label_tag "reg_field-student_id_#{organization.id}", registration_field_label(@organization, "student_id") || t(".student_id"), class: "form-well-label"
+              .form-well-input
+                = text_field_tag "reg_field-student_id_#{organization.id}", user_registration_organization.registration_info["student_id"], autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
           - elsif registration_field == "reg_address"
             .form-group.row.unnested-field.no-divider-row
-              = label_tag :reg_address, registration_field_label(organization, "reg_address") || t(".mailing_address"), class: "form-well-label"
+              = label_tag "reg_field-eg_address_#{organization.id}", registration_field_label(organization, "reg_address") || t(".mailing_address"), class: "form-well-label"
               .form-well-input-large
                 Update your address on the
                 %strong= link_to("User Settings page", edit_my_account_path(edit_template: "root"))
           - elsif registration_field == "reg_phone"
             .form-group.row.unnested-field.no-divider-row
-              = label_tag :reg_phone, registration_field_label(organization, "reg_phone") || t(".phone"), class: "form-well-label"
+              = label_tag "reg_field-reg_phone_#{organization.id}", registration_field_label(organization, "reg_phone") || t(".phone"), class: "form-well-label"
               .form-well-input-large
                 Update your phone on the
                 %strong= link_to("User Settings page", edit_my_account_path(edit_template: "root"))

@@ -17,12 +17,12 @@ class AfterBikeSaveWorker < ApplicationWorker
     if bike.present? && bike.listing_order != bike.calculated_listing_order
       bike.update_attribute :listing_order, bike.calculated_listing_order
     end
+    create_user_registration_organizations(bike)
     update_ownership(bike)
     unless skip_user_update
       # Update the user to update any user alerts relevant to bikes
       AfterUserChangeWorker.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
     end
-    create_user_registration_organizations(bike)
     return true unless bike.status_stolen? # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
   end
@@ -85,5 +85,6 @@ class AfterBikeSaveWorker < ApplicationWorker
       user_registration_organization.set_initial_registration_info
       user_registration_organization.save
     end
+    bike.reload
   end
 end
