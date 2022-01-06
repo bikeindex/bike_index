@@ -73,8 +73,15 @@ RSpec.describe UserRegistrationOrganization, type: :model do
     end
     context "with an organization with reg_organization_affiliation and reg_student_id" do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_organization_affiliation reg_student_id]) }
-      let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization2) }
-      let(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, all_bikes: false, organization: organization2, user: user, registration_info: {phone: "9999"}) }
+      let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization2, can_edit_claimed: false) }
+      let(:user_registration_organization2) do
+        FactoryBot.create(:user_registration_organization,
+          all_bikes: false,
+          organization: organization2,
+          user: user,
+          can_edit_claimed: true,
+          registration_info: {phone: "9999"})
+      end
       let(:target_universal_info) do
         ownership_registration_info.except("student_id", "organization_affiliation", "bike_sticker", "user_name")
           .merge("phone" => "9998887777",
@@ -87,21 +94,42 @@ RSpec.describe UserRegistrationOrganization, type: :model do
         user.update(phone: "999 888 - 7777")
         expect(organization2.reload.enabled_feature_slugs).to match_array(%w[reg_organization_affiliation reg_student_id])
         expect(bike.reload.registration_info).to be_present
+        expect(bike.organizations.pluck(:id)).to eq([])
+        expect(bike2.reload.organizations.pluck(:id)).to eq([organization2.id])
+        bike2_organization2 = bike2.bike_organizations.first
+        expect(bike2_organization2.overridden_by_user_registration?).to be_falsey
+        expect(bike2_organization2.can_edit_claimed).to be_falsey
         expect(ownership2.reload.registration_info).to be_blank
+
         expect(user_registration_organization.all_bikes).to be_truthy
+        expect(user_registration_organization.bikes.pluck(:id)).to match_array([bike.id, bike2.id])
         expect(user_registration_organization2.all_bikes).to be_falsey
+        expect(user_registration_organization2.bikes.pluck(:id)).to eq([bike2.id])
         user.reload
         expect(UserRegistrationOrganization.org_ids_with_uniq_info(user)).to eq([organization2.id])
         expect(UserRegistrationOrganization.universal_registration_info_for(user.reload)).to eq target_universal_info
-        expect(ownership2.overridden_by_user_registration?).to be_truthy
-        ownership2.update(updated_at: Time.current)
-        expect(ownership2.reload.registration_info).to eq target_universal_info
+
         ownership1.update(updated_at: Time.current)
         expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888", "user_name" => "George")
         expect(bike.reload.organizations.pluck(:id)).to eq([organization.id])
+        bike_organization = bike.bike_organizations.first
+        expect(bike_organization.overridden_by_user_registration?).to be_truthy
+        expect(bike_organization.can_edit_claimed).to be_truthy
+        expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+
+        expect(ownership2.overridden_by_user_registration?).to be_truthy
+        ownership2.update(updated_at: Time.current)
+        expect(ownership2.reload.registration_info).to eq target_universal_info
         expect(bike2.organizations.pluck(:id)).to match_array([organization.id, organization2.id])
+        bike2_organization = bike2.bike_organizations.where(organization_id: organization.id).first
+
+        expect(bike2_organization.overridden_by_user_registration?).to be_truthy
+        expect(bike2_organization.can_edit_claimed).to be_truthy
+        # Because all_bikes isn't true, this isn't updated
+        expect(bike2_organization2.overridden_by_user_registration?).to be_falsey
+        expect(bike2_organization2.can_edit_claimed).to be_falsey
       end
-      it "still works if the thing is deleted" do
+      it "still works if the bike_organization is deleted" do
         user.update(phone: "999 888 - 7777")
         expect(organization2.reload.enabled_feature_slugs).to match_array(%w[reg_organization_affiliation reg_student_id])
         expect(bike.reload.registration_info).to be_present

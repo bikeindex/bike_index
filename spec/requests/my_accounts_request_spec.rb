@@ -150,7 +150,7 @@ RSpec.describe MyAccountsController, type: :request do
   describe "update" do
     include_context :request_spec_logged_in_as_user
     let!(:current_user) { FactoryBot.create(:user_confirmed, password: "old_password", password_confirmation: "old_password", username: "something") }
-    # force skip_update to be false, like it is in reality
+    # force skip_update to be false, like it is in reality (unblocks updating)
     before { current_user.skip_update = false }
 
     context "nil username" do
@@ -171,7 +171,7 @@ RSpec.describe MyAccountsController, type: :request do
       expect {
         patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
       }.to change(AfterUserChangeWorker.jobs, :size).by(1)
-      expect(response).to redirect_to edit_my_account_url
+      expect(response).to redirect_to edit_my_account_url(edit_template: "root")
       current_user.reload
       expect(current_user.notification_newsletters).to be_truthy
       expect(current_user.notification_unstolen).to be_falsey
@@ -222,7 +222,7 @@ RSpec.describe MyAccountsController, type: :request do
             phone: "3223232"
           }
         }
-        expect(response).to redirect_to(edit_my_account_url)
+        expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:error]).to_not be_present
         current_user.reload
         expect(current_user.name).to eq("Mr. Slick")
@@ -290,7 +290,7 @@ RSpec.describe MyAccountsController, type: :request do
             password_confirmation: "172ddfasdf1LDF"
           }
         }
-        expect(response).to redirect_to edit_my_account_path
+        expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:success]).to be_present
         current_user.reload
         expect(current_user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
@@ -332,7 +332,7 @@ RSpec.describe MyAccountsController, type: :request do
             }
           }
           expect(flash[:success]).to be_present
-          expect(response).to redirect_to edit_my_account_url
+          expect(response).to redirect_to edit_my_account_url(edit_template: "root")
           membership.reload
           membership2.reload
           expect(membership.notification_daily?).to be_truthy
@@ -347,33 +347,34 @@ RSpec.describe MyAccountsController, type: :request do
 
     context "user_registration_organization" do
       let(:organization1) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
-      let!(:user_registration_organization1) { FactoryBot.create(:user_registration_organization, organization: organization1, user: current_user) }
+      let!(:user_registration_organization1) { FactoryBot.create(:user_registration_organization, all_bikes: false, organization: organization1, user: current_user) }
       let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: current_user, creation_organization: organization1) }
-      let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+      let(:bike_organization1) { bike1.bike_organizations.first }
       let(:feature_slugs) { OrganizationFeature::REG_FIELDS }
-      before { current_user.skip_update = false } # Unblock updating
-      it "updates" do
-        expect(user_registration_organization1.reload.all_bikes?).to be_truthy
-        expect(user_registration_organization1.can_edit_claimed).to be_truthy
-        expect(user_registration_organization1.registration_info).to be_blank
-
-        expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
-        bike_organization1 = bike1.bike_organizations.first
-        expect(bike_organization1.reload.can_not_edit_claimed).to be_falsey
-        expect(bike_organization1.overridden_by_user_registration?).to be_truthy
-        expect(bike1.registration_info).to be_blank
-
-        expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
-        expect(bike2.registration_info).to be_blank
-
-        Sidekiq::Worker.clear_all
-        put base_url, params: {
+      let(:update_params) do
+        {
           :edit_template => "registration_organizations",
           :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
           :user_registration_organization_can_edit_claimed => [],
           "reg_field-organization_affiliation_#{organization1.id}" => "student",
           "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
         }
+      end
+      def expect_bike1_initiated
+        expect(user_registration_organization1.reload.all_bikes?).to be_falsey
+        expect(user_registration_organization1.can_edit_claimed).to be_truthy
+        expect(user_registration_organization1.registration_info).to be_blank
+        expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        expect(bike_organization1.reload.can_edit_claimed).to be_truthy
+        expect(bike_organization1.overridden_by_user_registration?).to be_falsey
+        expect(bike1.registration_info).to be_blank
+      end
+
+      it "updates" do
+        expect_bike1_initiated
+
+        Sidekiq::Worker.clear_all
+        put base_url, params: update_params
         expect(AfterUserChangeWorker.jobs.count).to eq 1
         expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
         expect(flash[:success]).to be_present
@@ -387,24 +388,65 @@ RSpec.describe MyAccountsController, type: :request do
           AfterUserChangeWorker.drain
         }
         expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
-        expect(bike_organization1.reload.can_not_edit_claimed).to be_truthy
-        expect(bike_organization1.overridden_by_user_registration?).to be_truthy
         expect(bike1.registration_info).to eq target_info
-
-        expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
-        bike_organization2 = bike2.bike_organizations.first
-        expect(bike_organization2.can_edit_claimed).to be_truthy
-        expect(bike_organization2.overridden_by_user_registration?).to be_truthy
-        expect(bike2.registration_info).to eq target_info
+        expect(bike_organization1.reload.can_edit_claimed).to be_falsey
+        expect(bike_organization1.overridden_by_user_registration?).to be_truthy
       end
-      # context "with multiple user_registration_organizations" do
-      #   let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: current_user) }
-      #   let(:organization2) { user_registration_organization2.organization }
-      #   it "updates" do
+      context "multiple bikes" do
+        let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+        # it "updates" do
+        #   expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+        #   expect(user_registration_organization1.can_edit_claimed).to be_truthy
+        #   expect(user_registration_organization1.registration_info).to be_blank
 
-      #     # Remove the fancy user_registration_organization from all
-      #   end
-      # end
+        #   expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        #   bike_organization1 = bike1.bike_organizations.first
+        #   expect(bike_organization1.reload.can_not_edit_claimed).to be_falsey
+        #   expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+        #   expect(bike1.registration_info).to be_blank
+
+        #   expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
+        #   expect(bike2.registration_info).to be_blank
+
+        #   Sidekiq::Worker.clear_all
+        #   put base_url, params: {
+        #     :edit_template => "registration_organizations",
+        #     :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
+        #     :user_registration_organization_can_edit_claimed => [],
+        #     "reg_field-organization_affiliation_#{organization1.id}" => "student",
+        #     "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
+        #   }
+        #   expect(AfterUserChangeWorker.jobs.count).to eq 1
+        #   expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+        #   expect(flash[:success]).to be_present
+        #   expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
+        #   expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+        #   expect(user_registration_organization1.can_edit_claimed).to be_falsey
+        #   target_info = {"organization_affiliation_#{organization1.id}" => "student", "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
+        #   expect(user_registration_organization1.registration_info).to eq target_info
+
+        #   Sidekiq::Testing.inline! {
+        #     AfterUserChangeWorker.drain
+        #   }
+        #   expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        #   expect(bike_organization1.reload.can_not_edit_claimed).to be_truthy
+        #   expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+        #   expect(bike1.registration_info).to eq target_info
+
+        #   expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        #   bike_organization2 = bike2.bike_organizations.first
+        #   expect(bike_organization2.can_edit_claimed).to be_truthy
+        #   expect(bike_organization2.overridden_by_user_registration?).to be_truthy
+        #   expect(bike2.registration_info).to eq target_info
+        # end
+        # context "with multiple user_registration_organizations" do
+        #   let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: current_user) }
+        #   let(:organization2) { user_registration_organization2.organization }
+        #   it "updates" do
+        #     # Remove the fancy user_registration_organization from all
+        #   end
+        # end
+      end
     end
 
     describe "preferred_language" do
@@ -412,7 +454,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.reload.preferred_language).to eq(nil)
         patch base_url, params: {id: current_user.username, locale: "nl", user: {preferred_language: "en"}}
         expect(flash[:success]).to match(/succesvol/i)
-        expect(response).to redirect_to "/my_account/edit?locale=nl"
+        expect(response).to redirect_to "/my_account/edit/root?locale=nl"
         expect(current_user.reload.preferred_language).to eq("en")
       end
 
@@ -420,7 +462,7 @@ RSpec.describe MyAccountsController, type: :request do
         current_user.update_attribute :preferred_language, "en"
         patch base_url, params: {id: current_user.username, locale: "en", user: {preferred_language: "nl"}}
         expect(flash[:success]).to match(/successfully updated/i)
-        expect(response).to redirect_to "/my_account/edit?locale=en"
+        expect(response).to redirect_to "/my_account/edit/root?locale=en"
         expect(current_user.reload.preferred_language).to eq("nl")
       end
 

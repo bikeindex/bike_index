@@ -88,21 +88,24 @@ class UserRegistrationOrganization < ApplicationRecord
   end
 
   def update_associations
-    create_missing_bike_organizations
+    create_or_update_bike_organizations
     return true if skip_update
     AfterUserChangeWorker.perform_async(user_id)
   end
 
   private
 
-  def create_missing_bike_organizations
+  def create_or_update_bike_organizations
     bikes.each do |bike|
-      bike_organization = BikeOrganization.unscoped.where(organization_id: organization_id, bike_id: bike.id).first_or_create
-      bike_organization.deleted_at = nil if all_bikes
-      bike_organization.can_not_edit_claimed = can_not_edit_claimed
-      unless bike.bike_organizations.where(organization_id: organization_id).any?
-        bike.bike_organizations.create(organization_id: organization_id, can_not_edit_claimed: can_not_edit_claimed)
+      bike_organization = BikeOrganization.unscoped
+        .where(organization_id: organization_id, bike_id: bike.id)
+        .first_or_initialize
+
+      if bike_organization.overridden_by_user_registration?
+        bike_organization.deleted_at = nil
+        bike_organization.can_not_edit_claimed = can_not_edit_claimed
       end
+      bike_organization.save
     end
   end
 end

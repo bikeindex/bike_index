@@ -36,7 +36,7 @@ class MyAccountsController < ApplicationController
       if successfully_updated
         flash[:success] ||= translation(:successfully_updated)
         # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
-        redirect_back(fallback_location: edit_my_account_url(edit_template: template_param)) && return
+        redirect_back(fallback_location: edit_my_account_url(edit_template: @edit_template)) && return
       end
     end
     @page_errors = @user.errors.full_messages
@@ -62,12 +62,8 @@ class MyAccountsController < ApplicationController
     {registration_organizations: translation(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
   end
 
-  def template_param
-    params[:edit_template] || params[:page]
-  end
-
   def assign_edit_template
-    @edit_template = edit_templates[template_param].present? ? template_param : edit_templates.keys.first
+    @edit_template = edit_templates[params[:edit_template]].present? ? params[:edit_template] : edit_templates.keys.first
   end
 
   def update_hot_sheet_notifications
@@ -87,7 +83,7 @@ class MyAccountsController < ApplicationController
     uro_all_bikes = (params[:user_registration_organization_all_bikes] || []).reject(&:blank?).map(&:to_i)
     uro_can_edit_claimed = (params[:user_registration_organization_can_edit_claimed] || []).reject(&:blank?).map(&:to_i)
     new_registration_info = calculated_new_registration_info
-    pp new_registration_info, uro_can_edit_claimed
+    # pp new_registration_info, uro_can_edit_claimed
     @user.user_registration_organizations.each do |user_registration_organization|
       user_registration_organization.update(skip_update: true,
         all_bikes: uro_all_bikes.include?(user_registration_organization.id),
