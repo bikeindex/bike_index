@@ -351,6 +351,7 @@ RSpec.describe MyAccountsController, type: :request do
       let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: current_user, creation_organization: organization1) }
       let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
       let(:feature_slugs) { OrganizationFeature::REG_FIELDS }
+      before { current_user.skip_update = false } # Unblock updating
       it "updates" do
         expect(user_registration_organization1.reload.all_bikes?).to be_truthy
         expect(user_registration_organization1.can_edit_claimed).to be_truthy
@@ -370,16 +371,16 @@ RSpec.describe MyAccountsController, type: :request do
           :edit_template => "registration_organizations",
           :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
           :user_registration_organization_can_edit_claimed => [],
-          "reg_field-organization_affiliation_#{user_registration_organization1.organization_id}" => "student",
-          "reg_field-student_id_#{user_registration_organization1.organization_id}" => "XXX777YYY"
+          "reg_field-organization_affiliation_#{organization1.id}" => "student",
+          "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
         }
-        # expect(AfterUserChangeWorker.jobs.count).to eq 1
-        # expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+        expect(AfterUserChangeWorker.jobs.count).to eq 1
+        expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
         expect(flash[:success]).to be_present
         expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
         expect(user_registration_organization1.reload.all_bikes?).to be_truthy
         expect(user_registration_organization1.can_edit_claimed).to be_falsey
-        # target_info = {"organization_affiliation_#{}": "student", student_id: "XXX777YYY"}.as_json
+        target_info = {"organization_affiliation_#{organization1.id}" => "student", "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
         expect(user_registration_organization1.registration_info).to eq target_info
 
         Sidekiq::Testing.inline! {

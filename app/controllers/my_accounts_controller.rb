@@ -86,22 +86,28 @@ class MyAccountsController < ApplicationController
     return false unless params.key?(:user_registration_organization_all_bikes)
     uro_all_bikes = (params[:user_registration_organization_all_bikes] || []).reject(&:blank?).map(&:to_i)
     uro_can_edit_claimed = (params[:user_registration_organization_can_edit_claimed] || []).reject(&:blank?).map(&:to_i)
+    new_registration_info = calculated_new_registration_info
+    pp new_registration_info, uro_can_edit_claimed
     @user.user_registration_organizations.each do |user_registration_organization|
       user_registration_organization.update(skip_update: true,
         all_bikes: uro_all_bikes.include?(user_registration_organization.id),
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
-        registration_info: registration_info_for(user_registration_organization))
+        registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
+    # Bump user to enqueue AfterUserChangeWorker
+    @user.update(updated_at: Time.current)
+    @user
   end
 
-  def registration_info_for(user_registration_organization)
+  def calculated_new_registration_info
     # Select the matching key value pairs, and rename them
     new_info = params.as_json.map do |k, v|
-      next unless k.match?(/uro-#{user_registration_organization.id}-/)
-      [k.gsub("uro-#{user_registration_organization.id}-", ""), v]
+      next unless k.match?(/reg_field-/)
+      [k.gsub("reg_field-", ""), v]
     end.compact.to_h
     # merge in existing registration_info
-    user_registration_organization.registration_info.merge(new_info)
+    # user_registration_organization.registration_info.merge(new_info)
+    new_info
   end
 
   def permitted_parameters
