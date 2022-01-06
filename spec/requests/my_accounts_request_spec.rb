@@ -367,11 +367,11 @@ RSpec.describe MyAccountsController, type: :request do
 
         Sidekiq::Worker.clear_all
         put base_url, params: {
-          edit_template: "registration_organizations",
-          user_registration_organization_all_bikes: [user_registration_organization1.id.to_s, ""],
-          user_registration_organization_can_edit_claimed: [],
-          "reg_field-organization_affiliation_#{user_registration_organization1.organization_id}"=>"student",
-          "reg_field-student_id_#{user_registration_organization1.organization_id}"=>"XXX777YYY"
+          :edit_template => "registration_organizations",
+          :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
+          :user_registration_organization_can_edit_claimed => [],
+          "reg_field-organization_affiliation_#{user_registration_organization1.organization_id}" => "student",
+          "reg_field-student_id_#{user_registration_organization1.organization_id}" => "XXX777YYY"
         }
         # expect(AfterUserChangeWorker.jobs.count).to eq 1
         # expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!

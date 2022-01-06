@@ -88,9 +88,9 @@ class MyAccountsController < ApplicationController
     uro_can_edit_claimed = (params[:user_registration_organization_can_edit_claimed] || []).reject(&:blank?).map(&:to_i)
     @user.user_registration_organizations.each do |user_registration_organization|
       user_registration_organization.update(skip_update: true,
-      all_bikes: uro_all_bikes.include?(user_registration_organization.id),
-      can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
-      registration_info: registration_info_for(user_registration_organization))
+        all_bikes: uro_all_bikes.include?(user_registration_organization.id),
+        can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
+        registration_info: registration_info_for(user_registration_organization))
     end
   end
 
@@ -98,7 +98,7 @@ class MyAccountsController < ApplicationController
     # Select the matching key value pairs, and rename them
     new_info = params.as_json.map do |k, v|
       next unless k.match?(/uro-#{user_registration_organization.id}-/)
-      [k.gsub("uro-#{user_registration_organization.id}-",""), v]
+      [k.gsub("uro-#{user_registration_organization.id}-", ""), v]
     end.compact.to_h
     # merge in existing registration_info
     user_registration_organization.registration_info.merge(new_info)
