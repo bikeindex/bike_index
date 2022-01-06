@@ -15,7 +15,7 @@
         %em
           = link_to t(".manage_organization_information_via"), edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link"
       - else
-        %label.checkbox-inline.not-fixed
+        %label.checkbox-inline.not-fixed.pt-0
           = check_box_tag "organization_ids_can_edit_claimed[]", organization.id, bike_organization.can_edit_claimed, multiple: true
           = t(".can_edit_this_bike", bike_type: @bike.type)
         - if bike_organization.user_registration_organization&.manages_information?

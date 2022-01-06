@@ -4045,7 +4045,16 @@ en:
       registration_organization_information: Manage the organizations your bikes are
         registered with.
       registration_organizations: Registration organizations
+      register_all_with: Register all your bikes with this organization
+      when_not_selected: When not checked, manage through the "Groups and Organizations" page of each bike.
+      all_bikes_with_organization: All your bikes are registered with this organization
+      allow_organization_to_edit_bikes_html: Allow %{org_name_em} to edit your bikes
+      update_your_address_on_html: Update your address in %{user_settings_link}
+      update_your_phone_on_html: Update your phone in %{user_settings_link}
+      bike: bike
+      registered_with: registered with
       student_id: Student ID
+      and_other_bikes_count: and %{other_bikes_count} other bikes.
     root:
       add_additional_email: Add additional email
       add_new_phone_number: Add a new phone number

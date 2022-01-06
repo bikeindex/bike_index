@@ -96,11 +96,11 @@ class UserRegistrationOrganization < ApplicationRecord
 
   # Manually called from AfterUserChangeWorker
   def create_or_update_bike_organizations
+    return true unless all_bikes # only overrides bike_organizations if all_bikes is checked
     bikes.each do |bike|
       bike_organization = BikeOrganization.unscoped
         .where(organization_id: organization_id, bike_id: bike.id)
         .first_or_initialize
-      next unless bike_organization.overridden_by_user_registration?
       bike_organization.update(deleted_at: nil, can_not_edit_claimed: can_not_edit_claimed)
     end
   end
