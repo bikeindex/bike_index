@@ -360,6 +360,10 @@ RSpec.describe MyAccountsController, type: :request do
           "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
         }
       end
+      let(:target_info) do
+        {"organization_affiliation_#{organization1.id}" => "student",
+        "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
+      end
       def expect_bike1_initiated
         expect(user_registration_organization1.reload.all_bikes?).to be_falsey
         expect(user_registration_organization1.can_edit_claimed).to be_truthy
@@ -381,7 +385,6 @@ RSpec.describe MyAccountsController, type: :request do
         expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
         expect(user_registration_organization1.reload.all_bikes?).to be_truthy
         expect(user_registration_organization1.can_edit_claimed).to be_falsey
-        target_info = {"organization_affiliation_#{organization1.id}" => "student", "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
         expect(user_registration_organization1.registration_info).to eq target_info
 
         Sidekiq::Testing.inline! {
@@ -394,58 +397,114 @@ RSpec.describe MyAccountsController, type: :request do
       end
       context "multiple bikes" do
         let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
-        # it "updates" do
-        #   expect(user_registration_organization1.reload.all_bikes?).to be_truthy
-        #   expect(user_registration_organization1.can_edit_claimed).to be_truthy
-        #   expect(user_registration_organization1.registration_info).to be_blank
+        let(:bike2_organization1) { bike2.bike_organizations.where(organization_id: organization1.id).first }
+        it "updates" do
+          expect_bike1_initiated
 
-        #   expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
-        #   bike_organization1 = bike1.bike_organizations.first
-        #   expect(bike_organization1.reload.can_not_edit_claimed).to be_falsey
-        #   expect(bike_organization1.overridden_by_user_registration?).to be_truthy
-        #   expect(bike1.registration_info).to be_blank
+          expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
+          expect(bike2.registration_info).to be_blank
 
-        #   expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
-        #   expect(bike2.registration_info).to be_blank
+          Sidekiq::Worker.clear_all
+          put base_url, params: {
+            :edit_template => "registration_organizations",
+            :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
+            :user_registration_organization_can_edit_claimed => [""],
+            "reg_field-organization_affiliation_#{organization1.id}" => "student",
+            "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
+          }
+          expect(AfterUserChangeWorker.jobs.count).to eq 1
+          expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
+          expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+          expect(user_registration_organization1.can_edit_claimed).to be_falsey
+          expect(user_registration_organization1.registration_info).to eq target_info
 
-        #   Sidekiq::Worker.clear_all
-        #   put base_url, params: {
-        #     :edit_template => "registration_organizations",
-        #     :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
-        #     :user_registration_organization_can_edit_claimed => [],
-        #     "reg_field-organization_affiliation_#{organization1.id}" => "student",
-        #     "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
-        #   }
-        #   expect(AfterUserChangeWorker.jobs.count).to eq 1
-        #   expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
-        #   expect(flash[:success]).to be_present
-        #   expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
-        #   expect(user_registration_organization1.reload.all_bikes?).to be_truthy
-        #   expect(user_registration_organization1.can_edit_claimed).to be_falsey
-        #   target_info = {"organization_affiliation_#{organization1.id}" => "student", "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
-        #   expect(user_registration_organization1.registration_info).to eq target_info
+          Sidekiq::Testing.inline! {
+            AfterUserChangeWorker.drain
+          }
+          expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+          expect(bike1.registration_info).to eq target_info
+          expect(bike_organization1.reload.can_edit_claimed).to be_falsey
+          expect(bike_organization1.overridden_by_user_registration?).to be_truthy
 
-        #   Sidekiq::Testing.inline! {
-        #     AfterUserChangeWorker.drain
-        #   }
-        #   expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
-        #   expect(bike_organization1.reload.can_not_edit_claimed).to be_truthy
-        #   expect(bike_organization1.overridden_by_user_registration?).to be_truthy
-        #   expect(bike1.registration_info).to eq target_info
+          expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+          expect(bike2.registration_info).to eq target_info
+          expect(bike2_organization1.can_edit_claimed).to be_falsey
+          expect(bike2_organization1.overridden_by_user_registration?).to be_truthy
+        end
+        context "with multiple user_registration_organizations" do
+          let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_organization_affiliation"]) }
+          let(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, all_bikes: true, user: current_user, organization: organization2) }
+          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_address).as_json }
+          let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, :in_nyc, user: current_user, creation_registration_info: bike3_information) }
+          let(:target_extra_info) do
+            target_info.merge("organization_affiliation_#{organization2.id}" => "employee")
+              .merge(default_location_registration_address).as_json
+          end
+          it "updates" do
+            expect_bike1_initiated
+            expect(current_user.reload.to_coordinates).to eq([nil, nil])
+            expect(current_user.address_set_manually).to be_falsey
+            expect(bike2.bike_organizations.pluck(:organization_id)).to eq([])
 
-        #   expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
-        #   bike_organization2 = bike2.bike_organizations.first
-        #   expect(bike_organization2.can_edit_claimed).to be_truthy
-        #   expect(bike_organization2.overridden_by_user_registration?).to be_truthy
-        #   expect(bike2.registration_info).to eq target_info
-        # end
-        # context "with multiple user_registration_organizations" do
-        #   let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: current_user) }
-        #   let(:organization2) { user_registration_organization2.organization }
-        #   it "updates" do
-        #     # Remove the fancy user_registration_organization from all
-        #   end
-        # end
+            expect(user_registration_organization2.registration_info).to be_blank
+
+            expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization2.id])
+            expect(bike2.registration_info).to be_blank
+            bike2_organization2 = bike2.bike_organizations.where(organization_id: organization2.id).first
+            expect(bike2_organization2).to be_present
+            bike1_organization2 = bike1.bike_organizations.where(organization_id: organization2.id).first
+            expect(bike1_organization2).to be_valid
+            bike1_organization2.destroy
+
+            expect(bike3.reload.registration_info).to eq(bike3_information)
+            expect(bike3.address_hash).to eq default_location_registration_address.as_json
+
+            Sidekiq::Worker.clear_all
+            put base_url, params: {
+              :edit_template => "registration_organizations",
+              :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
+              :user_registration_organization_can_edit_claimed => ["", user_registration_organization2.id],
+              "reg_field-organization_affiliation_#{organization1.id}" => "student",
+              "reg_field-student_id_#{organization1.id}" => "XXX777YYY",
+              "reg_field-organization_affiliation_#{organization2.id}" => "employee"
+            }
+            expect(AfterUserChangeWorker.jobs.count).to eq 1
+            expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+            expect(flash[:success]).to be_present
+            expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
+            expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+            expect(user_registration_organization1.can_edit_claimed).to be_falsey
+            expect(user_registration_organization1.registration_info).to eq target_extra_info
+
+            expect(user_registration_organization2.reload.all_bikes?).to be_falsey
+            expect(user_registration_organization2.can_edit_claimed).to be_truthy
+            expect(user_registration_organization2.registration_info).to eq target_extra_info
+
+            Sidekiq::Testing.inline! {
+              AfterUserChangeWorker.drain
+            }
+            deleted_bike_organization = BikeOrganization.unscoped.where(id: bike1_organization2.id).first
+            expect(deleted_bike_organization.deleted?).to be_truthy
+            # expect(BikeOrganization.unscoped.where(id: bike1_organization2.id).deleted?).to be_truthy
+            expect(bike1.reload.organizations.pluck(:id)).to eq([organization1.id])
+            expect(bike1.registration_info).to eq target_extra_info
+            expect(bike_organization1.reload.can_edit_claimed).to be_falsey
+            expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+
+            expect(bike2.reload.bike_organizations.pluck(:organization_id)).to match_array([organization1.id, organization2.id])
+            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_address).as_json
+            expect(bike2_organization1.can_edit_claimed).to be_falsey
+            expect(bike2_organization1.overridden_by_user_registration?).to be_truthy
+
+            expect(bike3.reload.organizations.pluck(:id)).to match_array([organization1.id])
+            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
+            expect(bike3.registration_info).to eq target_bike3_info
+
+            expect(current_user.reload.address_hash).to eq default_location_registration_address.as_json
+          end
+        end
       end
     end
 

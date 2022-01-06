@@ -355,7 +355,6 @@ class User < ApplicationRecord
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
     self.alert_slugs = (alert_slugs || [])
-    self.address_set_manually = street.present?
     # Rather than waiting for twilio to send, immediately update alert_slugs
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
     self.username = Slugifyer.slugify(username) if username

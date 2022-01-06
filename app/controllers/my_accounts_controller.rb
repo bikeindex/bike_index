@@ -26,6 +26,7 @@ class MyAccountsController < ApplicationController
     end
     unless @user.errors.any?
       successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations
+      @user.address_set_manually = true if params&.dig(:user, :street).present?
       if params[:user].present? && @user.update(permitted_parameters)
         successfully_updated = true
         if params.dig(:user, :password).present?
@@ -83,15 +84,13 @@ class MyAccountsController < ApplicationController
     uro_all_bikes = (params[:user_registration_organization_all_bikes] || []).reject(&:blank?).map(&:to_i)
     uro_can_edit_claimed = (params[:user_registration_organization_can_edit_claimed] || []).reject(&:blank?).map(&:to_i)
     new_registration_info = calculated_new_registration_info
-    # pp new_registration_info, uro_can_edit_claimed
     @user.user_registration_organizations.each do |user_registration_organization|
-      user_registration_organization.update(skip_update: true,
+      user_registration_organization.update(skip_after_user_change_worker: true,
         all_bikes: uro_all_bikes.include?(user_registration_organization.id),
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    # Bump user to enqueue AfterUserChangeWorker
-    @user.update(updated_at: Time.current)
+    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeWorker
     @user
   end
 
@@ -102,8 +101,8 @@ class MyAccountsController < ApplicationController
       [k.gsub("reg_field-", ""), v]
     end.compact.to_h
     # merge in existing registration_info
-    # user_registration_organization.registration_info.merge(new_info)
-    new_info
+    UserRegistrationOrganization.universal_registration_info_for(current_user)
+      .merge(new_info)
   end
 
   def permitted_parameters
