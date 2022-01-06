@@ -362,7 +362,7 @@ RSpec.describe MyAccountsController, type: :request do
       end
       let(:target_info) do
         {"organization_affiliation_#{organization1.id}" => "student",
-        "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
+         "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
       end
       def expect_bike1_initiated
         expect(user_registration_organization1.reload.all_bikes?).to be_falsey

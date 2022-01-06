@@ -259,7 +259,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(ownership.origin).to eq "web"
         expect(ownership.creator_id).to eq current_user.id
         reg_hash = bike_params_with_address.slice(:street, :city, :zipcode, :state)
-          .merge("organization_affiliation_#{organization.id}" => "community_member",)
+          .merge("organization_affiliation_#{organization.id}" => "community_member")
         expect_hashes_to_match(ownership.registration_info, reg_hash)
 
         expect_hashes_to_match(new_bike.registration_address, reg_hash.except("organization_affiliation_#{organization.id}"))

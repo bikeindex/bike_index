@@ -146,6 +146,12 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.user&.id).to eq current_user.id
         AfterUserChangeWorker.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq([])
+        expect(current_user.address).to eq "278 Broadway, New York, 10007, US"
+        expect(current_user.address_set_manually).to be_truthy
+        # saving the bike one more time changes address_set_manually to be false
+        # Someone surprising, but I think I'm happy with the outcome - it should be set by user
+        bike.reload.update(updated_at: Time.current)
+        expect(bike.reload.address_set_manually).to be_falsey
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           # get edit because it should claim the bike
@@ -164,7 +170,8 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.user&.id).to eq current_user.id
         expect(bike.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
-        expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
+        # It no longer has an address, the stolen record has updated it
+        expect(bike.address_hash.values.compact).to eq(["US"])
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present

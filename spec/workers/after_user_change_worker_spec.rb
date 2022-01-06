@@ -147,7 +147,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
   describe "user_address" do
     let(:user) { FactoryBot.create(:user) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :in_vancouver, user: user, address_set_manually: true) }
-    let(:target_address) { {street: "278 Broadway", zipcode:"10007", city: "Vancouver", country: "CA", state: nil, latitude: 49.253992, longitude: -123.241084}.as_json }
+    let(:target_address) { {street: "278 Broadway", zipcode: "10007", city: "Vancouver", country: "CA", state: nil, latitude: 49.253992, longitude: -123.241084}.as_json }
     it "sets based on bikes" do
       expect(bike.reload.registration_address(true)).to eq target_address
       expect(bike.address_set_manually).to be_truthy
