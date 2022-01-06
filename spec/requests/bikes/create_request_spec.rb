@@ -224,7 +224,10 @@ RSpec.describe "BikesController#create", type: :request do
     let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
     include_context :geocoder_real
     it "creates with address" do
+      expect(current_user.reload.address).to be_blank
+      expect(current_user.user_registration_organizations.count).to eq 0
       VCR.use_cassette("bikes_controller-create-reg_address", match_requests_on: [:method]) do
+        expect(BikeDisplayer.display_edit_address_fields?(Bike.new, current_user)).to be_truthy
         organization.reload
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
@@ -265,6 +268,12 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.latitude.to_i).to eq 37
         expect(new_bike.longitude.to_i).to eq(-122)
         expect(new_bike.valid_mailing_address?).to be_truthy
+        expect(current_user.reload.address).to eq new_bike.address
+        expect(BikeDisplayer.display_edit_address_fields?(new_bike, current_user)).to be_falsey
+        expect(current_user.user_registration_organizations.pluck(:organization_id)).to eq([organization.id])
+        user_registration_organization = current_user.user_registration_organizations.first
+        expect(user_registration_organization.all_bikes?).to be_truthy
+        expect(user_registration_organization.can_edit_claimed).to be_truthy
       end
     end
     context "no address passed" do
