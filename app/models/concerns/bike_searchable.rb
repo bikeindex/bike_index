@@ -94,7 +94,7 @@ module BikeSearchable
       if manufacturer_id && !manufacturer_id.is_a?(Integer)
         manufacturer_id = [manufacturer_id].flatten.map { |m_id|
           next m_id.to_i if m_id.is_a?(Integer) || m_id.strip =~ /\A\d*\z/
-          Manufacturer.friendly_id_find(m_id)
+          Manufacturer.friendly_find_id(m_id)
         }.compact
         manufacturer_id = manufacturer_id.first if manufacturer_id.count == 1
       end
@@ -105,13 +105,13 @@ module BikeSearchable
       # params[:colors] should be an array (or a comma delineated string) - otherwise we parse out of the query string
       if query_params[:colors].present?
         colors = query_params[:colors].is_a?(String) ? query_params[:colors].split(",") : query_params[:colors]
-        return {colors: colors.map { |id| Color.friendly_id_find(id) }.compact}
+        return {colors: colors.map { |id| Color.friendly_find_id(id) }.compact}
       end
       color_ids = extracted_query_items_color_ids(query_params)
       if color_ids && !color_ids.is_a?(Integer)
         color_ids = color_ids.map { |c_id|
           next c_id.to_i if c_id.is_a?(Integer) || c_id.strip =~ /\A\d*\z/
-          Color.friendly_id_find(c_id)
+          Color.friendly_find_id(c_id)
         }
       end
       color_ids ? {colors: color_ids} : {}

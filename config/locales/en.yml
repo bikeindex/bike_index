@@ -1358,7 +1358,6 @@ en:
       manufacturer: Manufacturer
       model_year: Model year
       nevermind: Nevermind
-      organization_affiliation: "%{org_name} affiliation"
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
       reason_for_update: Reason for update
@@ -1426,22 +1425,22 @@ en:
       sidetitleize_wheel: "%{sidetitleize} wheel"
       wheels: Wheels
       wide: Wide
+    edit_bike_organization:
+      can_edit_this_bike: Can edit this %{bike_type}
+      manage_organization_information: Manage organization information
+      manage_organization_information_via: organization information managed via your
+        account
+      remove: Remove
     groups:
       add_an_organization: Add another organization
       are_you_part_of_a_school_want_to_bolster_: >-
         Are you a student of one of our school or university partners? Want to let
         a local advocacy organization know that you love them? Add the organization
         here.
-      can_edit_this_bike: Can edit this %{bike_type}
       choose_organization: Choose organization
       creation_organization: Creation organization
       groups_and_organizations: Groups and Organizations
       other_organizations: Other organizations
-      remove: Remove
-    edit_bike_organization:
-      can_edit_this_bike: Can edit this %{bike_type}
-      manage_organization_information: Manage organization information
-      manage_organization_information_via: Organization information managed via your account
       remove: Remove
     ownership:
       impound_record_page: Impound record page
@@ -4040,13 +4039,24 @@ en:
         %{better_password_link}.
       reset_password: Reset password
     registration_organizations:
-      registration_organization_information: Manage the organizations your bikes
-        are registered with.
       affiliation: "%{org_name} affiliation"
+      all_bikes_with_organization: All your bikes are registered with this organization
+      allow_organization_to_edit_bikes_html: Allow %{org_name_em} to edit your bikes
+      and_other_bikes_count: and %{other_bikes_count} other bikes.
+      bike: bike
       mailing_address: Mailing address
       phone: Phone
-      student_id: Student ID
+      register_all_with: Register all your bikes with this organization
+      registered_with: registered with
+      registration_organization_information: Manage the organizations your bikes are
+        registered with.
       registration_organizations: Registration organizations
+      student_id: Student ID
+      update_your_address_on_html: Update your address in %{user_settings_link}
+      update_your_phone_on_html: Update your phone in %{user_settings_link}
+      when_not_selected: >-
+        When not checked, manage through the "Groups and Organizations" page of each
+        bike.
     root:
       add_additional_email: Add additional email
       add_new_phone_number: Add a new phone number

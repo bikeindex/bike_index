@@ -18,11 +18,11 @@ class Admin::OwnershipsController < Admin::BaseController
     error_message = []
     if params[:ownership]
       if params[:ownership][:user_email].present?
-        params[:ownership][:user_id] = User.friendly_id_find(params[:ownership].delete(:user_email))
+        params[:ownership][:user_id] = User.friendly_find_id(params[:ownership].delete(:user_email))
         error_message << "No confirmed user with that User email!" unless params[:ownership][:user_id].present?
       end
       if params[:ownership][:creator_email].present?
-        params[:ownership][:creator_id] = User.friendly_id_find(params[:ownership].delete(:creator_email))
+        params[:ownership][:creator_id] = User.friendly_find_id(params[:ownership].delete(:creator_email))
         error_message << "No confirmed user with creator email!" unless params[:ownership][:creator_id].present?
       end
     end

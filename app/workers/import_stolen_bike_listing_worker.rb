@@ -44,7 +44,7 @@ class ImportStolenBikeListingWorker < ApplicationWorker
 
   def color_attrs(str)
     colors = str.to_s.split(/\/|,/).map { |c| Paint.paint_name_parser(c) }
-    color_ids = colors.map { |c| Color.friendly_id_find(c) }.reject(&:blank?)
+    color_ids = colors.map { |c| Color.friendly_find_id(c) }.reject(&:blank?)
     {
       primary_frame_color_id: color_ids[0] || Color.black.id,
       secondary_frame_color_id: color_ids[1],

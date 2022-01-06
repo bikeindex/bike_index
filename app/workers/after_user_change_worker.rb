@@ -15,7 +15,16 @@ class AfterUserChangeWorker < ApplicationWorker
     MailchimpDatum.find_and_update_or_create_for(user)
 
     no_address = user.bike_organizations.with_enabled_feature_slugs("no_address").any?
-    user.update(no_address: no_address) if user.no_address != no_address
+    if no_address
+      user.no_address = no_address unless user.no_address
+    elsif !user.address_set_manually # If user.address_set_manually bikes pick it up on save
+      address_bike = user.bikes.with_street.first || user.bikes.with_location.first
+      if address_bike.present?
+        user.attributes = address_bike.address_hash
+        user.address_set_manually = address_bike.address_set_manually
+      end
+    end
+    user.update(skip_update: true, skip_geocoding: true) if user.changed?
 
     update_user_alerts(user)
     current_alerts = user_alert_slugs(user)
@@ -28,6 +37,8 @@ class AfterUserChangeWorker < ApplicationWorker
       next unless theft_alert.activateable?
       ActivateTheftAlertWorker.perform_async(theft_alert.id)
     end
+    # Process user_registration_organizations
+    user.user_registration_organizations.each { |u| u.create_or_update_bike_organizations }
     unless skip_bike_update
       user.bike_ids.each { |id| AfterBikeSaveWorker.perform_async(id, true, true) }
     end

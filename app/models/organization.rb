@@ -142,6 +142,10 @@ class Organization < ApplicationRecord
     find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
   end
 
+  def self.friendly_find_id(n)
+    friendly_find(n)&.id
+  end
+
   def self.integer_slug?(n)
     n.is_a?(Integer) || n.match(/\A\d+\z/).present?
   end
@@ -161,6 +165,12 @@ class Organization < ApplicationRecord
     matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
+  end
+
+  def self.with_any_enabled_feature_slugs(slugs)
+    matching_slugs = OrganizationFeature.matching_slugs(slugs)
+    return none unless matching_slugs.present?
+    where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
   end
 
   def self.permitted_domain_passwordless_signin
@@ -344,7 +354,7 @@ class Organization < ApplicationRecord
   def organization_affiliation_options
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
-    pp "ffffff"
+
     %w[student employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end

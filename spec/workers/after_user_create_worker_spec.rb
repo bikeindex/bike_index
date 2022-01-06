@@ -107,7 +107,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         :with_ownership_claimed,
         owner_email: "aftercreate@bikeindex.org",
         user: user,
-        creation_state_registration_info: {phone: "(111) 222-3333"}.merge(target_address_hash))
+        creation_registration_info: {phone: "(111) 222-3333"}.merge(target_address_hash))
     end
     include_context :geocoder_real
     it "assigns the extra user attributes" do

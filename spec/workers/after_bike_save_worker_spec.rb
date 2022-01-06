@@ -133,7 +133,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       end
       context "with paid organization" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
-        let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_state_registration_info: registration_info) }
+        let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_registration_info: registration_info) }
         let(:registration_info) { default_location_registration_address.merge(phone: "1112223333", student_id: "ffffff") }
         it "creates with all_bikes" do
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])

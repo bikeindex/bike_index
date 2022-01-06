@@ -1,4 +1,5 @@
 class Ownership < ApplicationRecord
+  include RegistrationInfoable
   ORIGIN_ENUM = {
     web: 0,
     embed: 1,
@@ -133,12 +134,7 @@ class Ownership < ApplicationRecord
 
   def overridden_by_user_registration?
     return false if user.blank?
-    user.user_registration_organizations.where.not(registration_info: [nil, {}]).any?
-  end
-
-  def update_registration_information(key, value)
-    update(registration_info: registration_info.merge(key => value))
-    value
+    user.user_registration_organizations.where.not(registration_info: {}).any?
   end
 
   def claim_message
@@ -185,6 +181,7 @@ class Ownership < ApplicationRecord
       end
     end
     self.registration_info = corrected_registration_info
+    self.owner_name ||= registration_info["user_name"]
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track
@@ -195,11 +192,6 @@ class Ownership < ApplicationRecord
   def prior_ownerships
     ownerships = Ownership.where(bike_id: bike_id)
     id.present? ? ownerships.where("id < ?", id) : ownerships
-  end
-
-  def address_hash
-    (registration_info || {}).slice("street", "city", "state", "zipcode", "state", "country")
-      .with_indifferent_access
   end
 
   def send_notification_and_update_other_ownerships
@@ -220,27 +212,50 @@ class Ownership < ApplicationRecord
     bike.ownerships.create(skip_email: true, owner_email: user.email, creator_id: user.id)
   end
 
+  # Calling this inline because ownerships are updated in background processes (except on create...)
   def corrected_registration_info
     if overridden_by_user_registration?
+      UserRegistrationOrganization.universal_registration_info_for(user, registration_info)
     else
-      # Clean it if it's present
-      registration_info.present? ? cleaned_registration_info : {}
+      # Only assign info with organization_uniq if
+      r_info = info_with_organization_uniq(registration_info, organization_id)
+      clean_registration_info(r_info)
     end
   end
 
   private
 
+  def info_with_organization_uniq(r_info, org_id = nil)
+    return r_info if org_id.blank? || r_info.blank?
+    # NOTE: This is deleted when the user_registration_organization processes (or will be)
+    if r_info["student_id"].present?
+      r_info["student_id_#{org_id}"] ||= r_info["student_id"]
+    end
+    if r_info["organization_affiliation"].present?
+      r_info["organization_affiliation_#{org_id}"] ||= r_info["organization_affiliation"]
+    end
+    r_info
+  end
+
+  def clean_registration_info(r_info)
+    r_info ||= {}
+    # TODO: post #2121 remove - temporary conditional_information is dropped
+    r_info = r_info.as_json.merge(bike&.conditional_information || {})
+    # skip cleaning if it's blank
+    return {} if r_info.blank?
+    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
+    r_info["phone"] = Phonifyer.phonify(r_info["phone"])
+    # bike_code should be renamed bike_sticker. Legacy ownership issue
+    if r_info["bike_code"].present?
+      r_info["bike_sticker"] = r_info.delete("bike_code")
+    end
+    r_info.reject { |_k, v| v.blank? }
+  end
+
   def spam_risky_email?
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
     pos?
-  end
-
-  def cleaned_registration_info
-    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
-    self.owner_name ||= registration_info["user_name"]
-    registration_info["phone"] = Phonifyer.phonify(registration_info["phone"])
-    registration_info.reject { |_k, v| v.blank? }
   end
 
   # Some organizations pre-register bikes and then transfer them.

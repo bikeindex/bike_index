@@ -86,7 +86,7 @@ class Blog < ApplicationRecord
 
   def content_tag_names=(val)
     val = val.is_a?(Array) ? val : val.split(",")
-    ctag_ids = val.map { |c| ContentTag.friendly_id_find(c) }.compact
+    ctag_ids = val.map { |c| ContentTag.friendly_find_id(c) }.compact
     blog_content_tags.where.not(content_tag_id: ctag_ids).each { |c| c.destroy }
     blog_content_tag_ids = blog_content_tags.map(&:content_tag_id)
     (ctag_ids - blog_content_tag_ids).each { |c| blog_content_tags.build(content_tag_id: c) }
