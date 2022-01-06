@@ -150,6 +150,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     let(:target_address) { {street: "278 Broadway", zipcode:"10007", city: "Vancouver", country: "CA", state: nil, latitude: 49.253992, longitude: -123.241084}.as_json }
     it "sets based on bikes" do
       expect(bike.reload.registration_address(true)).to eq target_address
+      expect(bike.address_set_manually).to be_truthy
       expect(user.reload.address).to be_blank
       expect(user.address_set_manually).to be_falsey
       # Inline so it processes the bikes
@@ -158,12 +159,12 @@ RSpec.describe AfterUserChangeWorker, type: :job do
         instance.perform(user.id)
       end
       expect(user.reload.address_hash).to eq target_address
-      expect(user.address_set_manually).to be_falsey
+      expect(user.address_set_manually).to be_truthy # Because bike was set manually!
       expect(user.latitude).to be_within(0.01).of(49.253992)
       expect(user.longitude).to be_within(0.01).of(-123.241084)
 
       expect(bike.reload.registration_address(true)).to eq target_address
-      expect(bike.address_set_manually).to be_truthy
+      expect(bike.address_set_manually).to be_falsey # It's switched to being set by user :shrug:
     end
     context "address_set_manually" do
       let(:user) { FactoryBot.create(:user, :in_los_angeles, address_set_manually: true, skip_geocoding: true) }

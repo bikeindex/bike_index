@@ -19,7 +19,10 @@ class AfterUserChangeWorker < ApplicationWorker
       user.no_address = no_address unless user.no_address
     elsif !user.address_set_manually # If user.address_set_manually bikes pick it up on save
       address_bike = user.bikes.with_street.first || user.bikes.with_location.first
-      user.attributes = address_bike.address_hash if address_bike.present?
+      if address_bike.present?
+        user.attributes = address_bike.address_hash
+        user.address_set_manually = address_bike.address_set_manually
+      end
     end
     user.update(skip_update: true, skip_geocoding: true) if user.changed?
 
