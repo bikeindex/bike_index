@@ -17,7 +17,7 @@ RSpec.describe "BikesController#update", type: :request do
     end
   end
   context "setting address for bike" do
-    let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
+    let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address.merge(address_set_manually: true)) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
     let(:update) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
     include_context :geocoder_real # But it shouldn't make any actual calls!
