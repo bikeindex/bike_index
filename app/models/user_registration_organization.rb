@@ -16,10 +16,6 @@ class UserRegistrationOrganization < ApplicationRecord
 
   attr_accessor :skip_update
 
-  def self.registration_info_keys
-    REGISTRATION_INFO_KEYS
-  end
-
   # Includes deleted, just to be safe
   def self.org_ids_with_uniq_info(user, fields = nil)
     fields ||= OrganizationFeature.reg_fields

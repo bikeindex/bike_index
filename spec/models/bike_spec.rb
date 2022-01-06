@@ -309,17 +309,15 @@ RSpec.describe Bike, type: :model do
       end
     end
 
-    describe "registration_info and conditional_information" do
+    describe "registration_info" do
       describe "organization_affiliation" do
         let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: registration_info) }
         let(:registration_info) { {} }
         it "sets if searched" do
           expect(bike.organization_affiliation).to be_blank
-          expect(bike.conditional_information).to eq({})
           expect(bike.registration_info).to eq({})
           bike.update(organization_affiliation: "community_member")
           bike.reload
-          expect(bike.conditional_information).to eq({organization_affiliation: "community_member"}.as_json)
           expect(bike.registration_info).to eq({organization_affiliation: "community_member"}.as_json)
           expect(bike.organization_affiliation).to eq "community_member"
         end
@@ -328,13 +326,11 @@ RSpec.describe Bike, type: :model do
           let(:target_registration_info) { registration_info.as_json.merge("phone" => "7177423423") }
           it "uses correct value" do
             bike.reload
-            expect(bike.conditional_information).to eq({})
-            expect(bike.registration_info).to eq target_registration_info
+            # expect(bike.registration_info).to eq target_registration_info
             expect(bike.organization_affiliation).to eq "employee"
             bike.update(organization_affiliation: "student")
             bike.reload
             expect(bike.organization_affiliation).to eq "student"
-            expect(bike.conditional_information).to eq({"organization_affiliation" => "student"})
             expect(bike.registration_info).to eq target_registration_info.merge(organization_affiliation: "student").as_json
           end
         end
@@ -345,11 +341,9 @@ RSpec.describe Bike, type: :model do
         let(:registration_info) { {} }
         it "sets if searched" do
           expect(bike.student_id).to be_blank
-          expect(bike.conditional_information).to eq({})
           expect(bike.registration_info).to eq({})
           bike.update(student_id: "424242")
           bike.reload
-          expect(bike.conditional_information).to eq({student_id: "424242"}.as_json)
           expect(bike.registration_info).to eq({student_id: "424242"}.as_json)
           expect(bike.student_id).to eq "424242"
         end
@@ -359,16 +353,13 @@ RSpec.describe Bike, type: :model do
             bike.reload
             expect(bike.current_ownership&.id).to be_present
             bike.reload
-            expect(bike.conditional_information).to eq({})
             expect(bike.registration_info).to eq registration_info.as_json
             expect(bike.student_id).to eq "CCCIIIIBBBBB"
             expect(bike.phone).to eq "7177423423"
-            expect(bike.conditional_information).to eq({})
             expect(bike.registration_info).to eq registration_info.as_json
             bike.update(student_id: "66")
             bike.reload
             expect(bike.student_id).to eq "66"
-            expect(bike.conditional_information).to eq({"student_id" => "66"})
             expect(bike.registration_info).to eq registration_info.merge(student_id: "66").as_json
           end
         end

@@ -88,7 +88,7 @@ class Bike < ApplicationRecord
   delegate :bulk_import, :claimed?, :creation_description,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
     :pos_kind, :registration_info, :user, :user_id,
-    :student_id, :organization_affiliation,
+    :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
     to: :current_ownership, allow_nil: true
 
   scope :without_location, -> { where(latitude: nil) }

@@ -215,10 +215,10 @@ class Ownership < ApplicationRecord
   # Calling this inline because ownerships are updated in background processes (except on create...)
   def corrected_registration_info
     if overridden_by_user_registration?
-      UserRegistrationOrganization.universal_registration_info_for(user, reg_info)
+      UserRegistrationOrganization.universal_registration_info_for(user, registration_info)
     else
       # Only assign info with organization_uniq if
-      r_info = info_with_organization_uniq(reg_info, organization_id)
+      r_info = info_with_organization_uniq(registration_info, organization_id)
       clean_registration_info(r_info)
     end
   end
@@ -238,6 +238,9 @@ class Ownership < ApplicationRecord
   end
 
   def clean_registration_info(r_info)
+    r_info ||= {}
+    # TODO: post #2121 remove - temporary conditional_information is dropped
+    r_info = r_info.as_json.merge(bike&.conditional_information || {})
     # skip cleaning if it's blank
     return {} if r_info.blank?
     # The only place user_name comes from, other than a user setting it themselves, is bulk_import
