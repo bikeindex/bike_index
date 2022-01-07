@@ -49,6 +49,9 @@ module BikeEditable
       h[:ownership] = translation(:ownership, scope: [:controllers, :bikes, :edit])
       h[:groups] = translation(:groups, scope: [:controllers, :bikes, :edit])
       h[:remove] = translation(:remove, scope: [:controllers, :bikes, :edit])
+      if Flipper.enabled?(:bike_versions, current_user)
+        h[:versions] = translation(:versions, scope: [:controllers, :bikes, :edit])
+      end
       unless @bike.status_stolen_or_impounded?
         h[:report_stolen] = translation(:report_stolen, scope: [:controllers, :bikes, :edit])
       end

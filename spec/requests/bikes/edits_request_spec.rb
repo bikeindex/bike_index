@@ -90,6 +90,17 @@ RSpec.describe Bikes::EditsController, type: :request do
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
   end
+  context "with bike_versions" do
+    it "renders" do
+      Flipper.enable_actor :bike_versions, current_user
+      get base_url
+      expect(response).to render_template(:bike_details)
+      expect(assigns(:edit_templates)).to eq edit_templates.merge(versions: "Bike Versions")
+      get "#{base_url}/bike_versions"
+      expect(response).to be_ok
+      expect(response).to render_template(:bike_versions)
+    end
+  end
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
     it "renders" do
