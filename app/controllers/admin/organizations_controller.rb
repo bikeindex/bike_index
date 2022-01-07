@@ -1,5 +1,6 @@
 class Admin::OrganizationsController < Admin::BaseController
   include SortableTable
+  before_action :set_period, only: [:index]
   before_action :find_organization, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -117,7 +118,9 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
-    @matching_organizations = matching_organizations
+    @time_range_column = sort_column if %w[updated_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    @matching_organizations = matching_organizations.where(@time_range_column => @time_range)
   end
 
   def sortable_columns
