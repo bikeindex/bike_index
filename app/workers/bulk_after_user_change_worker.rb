@@ -2,7 +2,7 @@ class BulkAfterUserChangeWorker < AfterUserChangeWorker
   sidekiq_options retry: false, queue: "low_priority"
 
   def self.migration_at
-    Time.at(ENV["MIGRATION_START"] || 1641517243)
+    Time.at((ENV["MIGRATION_START"] || 1641517243).to_i)
   end
 
   def self.bikes
