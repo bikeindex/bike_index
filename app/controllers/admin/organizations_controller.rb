@@ -6,7 +6,12 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    @organizations = matching_organizations.reorder("organizations.#{sort_column} #{sort_direction}").page(page).per(per_page)
+    @organizations = if sort_column == "bikes"
+      matching_organizations.left_joins(:bikes).group(:id)
+      .order("COUNT(bikes.id) #{sort_direction}")
+    else
+      matching_organizations.reorder("organizations.#{sort_column} #{sort_direction}")
+    end.page(page).per(per_page)
   end
 
   def show
@@ -124,7 +129,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[created_at name approved pos_kind]
+    %w[created_at name approved pos_kind bikes]
   end
 
   def pos_kind_for_organizations
