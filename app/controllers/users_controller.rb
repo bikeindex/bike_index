@@ -1,8 +1,6 @@
 class UsersController < ApplicationController
   include Sessionable
-  before_action :authenticate_user, only: [:edit]
   before_action :skip_if_signed_in, only: %i[new globalid]
-  before_action :assign_edit_template, only: %i[edit update]
   before_action :find_user_from_password_reset_token!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
 
   def new
@@ -111,61 +109,36 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = current_user
-    @page_errors = @user.errors
   end
 
+  # this action should only be for terms of service (or vendor_terms_of_service)
   def update
     @user = current_user
-    unless @user.present? # Shouldn't happen, but block in case it does
-      flash[:error] = translation(:current_password_doesnt_match) # use random existing message because lazy
-      redirect_back(fallback_location: user_root_url)
-    end
-    if params.dig(:user, :password).present?
-      unless @user.authenticate(params.dig(:user, :current_password))
-        @user.errors.add(:base, translation(:current_password_doesnt_match))
-      end
-    end
-    unless @user.errors.any?
-      successfully_updated = update_hot_sheet_notifications
-      if params[:user].present? && @user.update(permitted_update_parameters)
-        successfully_updated = true
-        if params.dig(:user, :terms_of_service).present?
-          if ParamsNormalizer.boolean(params.dig(:user, :terms_of_service))
-            @user.terms_of_service = true
-            @user.save
-            flash[:success] = translation(:you_can_use_bike_index)
-            redirect_to(my_account_url) && return
-          else
-            flash[:notice] = translation(:accept_tos)
-            redirect_to(accept_terms_url) && return
-          end
-        elsif params.dig(:user, :vendor_terms_of_service).present?
-          if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
-            @user.update(accepted_vendor_terms_of_service: true)
-            flash[:success] = if @user.memberships.any?
-              translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
-            else
-              translation(:thanks_for_accepting_tos)
-            end
-            redirect_to(user_root_url) && return
-          else
-            redirect_to(accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org)) && return
-          end
+    if @user.present? && params[:user].present? && @user.update(permitted_parameters)
+      if params.dig(:user, :terms_of_service).present?
+        if ParamsNormalizer.boolean(params.dig(:user, :terms_of_service))
+          flash[:success] = translation(:you_can_use_bike_index)
+          redirect_to(my_account_url) && return
+        else
+          flash[:notice] = translation(:accept_tos)
+          redirect_to(accept_terms_url) && return
         end
-        if params.dig(:user, :password).present?
-          update_user_authentication_for_new_password
-          default_session_set(@user)
+      elsif params.dig(:user, :vendor_terms_of_service).present?
+        if ParamsNormalizer.boolean(params.dig(:user, :vendor_terms_of_service))
+          @user.update(accepted_vendor_terms_of_service: true)
+          flash[:success] = if @user.memberships.any?
+            translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
+          else
+            translation(:thanks_for_accepting_tos)
+          end
+          redirect_to(user_root_url) && return
+        else
+          redirect_to(accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org)) && return
         end
       end
-      if successfully_updated
-        flash[:success] ||= translation(:successfully_updated)
-        # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
-        redirect_back(fallback_location: edit_my_account_url(edit_template: template_param)) && return
-      end
     end
-    @page_errors = @user.errors.full_messages
-    render action: :edit
+    flash[:error] = @user.errors.full_messages if @user&.errors&.full_messages.present?
+    redirect_back(fallback_location: user_root_url)
   end
 
   def accept_terms
@@ -195,52 +168,13 @@ class UsersController < ApplicationController
 
   def permitted_parameters
     params.require(:user)
-      .permit(:name, :username, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
-        :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
-        :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :website, :show_website,
-        :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password,
-        :password_confirmation, :preferred_language)
+      .permit(:name, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
+        :password, :password_confirmation, :preferred_language)
       .merge(sign_in_partner.present? ? {partner_data: {sign_up: sign_in_partner}} : {})
-  end
-
-  def permitted_update_parameters
-    pparams = permitted_parameters.except(:email)
-    if pparams.key?("username")
-      pparams.delete("username") unless pparams["username"].present?
-    end
-    pparams
   end
 
   def permitted_password_reset_parameters
     params.require(:user).permit(:password, :password_confirmation)
-  end
-
-  def edit_templates
-    @edit_templates ||= {
-      root: translation(:user_settings),
-      password: translation(:password),
-      sharing: translation(:sharing)
-    }.as_json
-  end
-
-  def template_param
-    params[:edit_template] || params[:page]
-  end
-
-  def assign_edit_template
-    @edit_template = edit_templates[template_param].present? ? template_param : edit_templates.keys.first
-  end
-
-  def update_hot_sheet_notifications
-    return false unless params[:hot_sheet_organization_ids].present?
-    params[:hot_sheet_organization_ids].split(",").each do |org_id|
-      notify = params.dig(:hot_sheet_notifications, org_id).present?
-      membership = @user.memberships.where(organization_id: org_id).first
-      next unless membership.present?
-      membership.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
-      flash[:success] ||= "Notification setting updated"
-    end
-    true
   end
 
   def find_user_from_password_reset_token!
@@ -250,11 +184,5 @@ class UsersController < ApplicationController
     remove_session
     flash[:error] = @user.blank? ? translation(:does_not_match_token) : translation(:token_expired)
     redirect_to(request_password_reset_form_users_path) && return
-  end
-
-  def update_user_authentication_for_new_password
-    @user.generate_auth_token("auth_token") # Doesn't save user
-    @user.update_auth_token("password_reset_token") # saves users
-    @user.reload
   end
 end

@@ -112,14 +112,14 @@ RSpec.describe Manufacturer, type: :model do
     end
   end
 
-  describe "friendly_id_find" do
+  describe "friendly_find_id" do
     it "gets id from name" do
       manufacturer = FactoryBot.create(:manufacturer)
-      result = Manufacturer.friendly_id_find(manufacturer.name)
+      result = Manufacturer.friendly_find_id(manufacturer.name)
       expect(result).to eq(manufacturer.id)
     end
     it "fails with nil" do
-      result = Manufacturer.friendly_id_find("some stuff")
+      result = Manufacturer.friendly_find_id("some stuff")
       expect(result).to be_nil
     end
   end

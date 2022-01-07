@@ -16,36 +16,16 @@
             = hidden_field_tag :organization_ids_can_edit_claimed_present, true
             .related-fields.no-divider-row
               - if @bike.bike_organizations.where(organization_id: @bike.creation_organization_id).present? && @bike.creation_organization.present?
-                .form-group.row
-                  %label.form-well-label
-                    = t(".creation_organization")
-                  %p.form-well-input-static.bike_organization_static_input{ data: { orgid: @bike.creation_organization_id } }
-                    = @bike.creation_organization.name
-                    %span.can-edit-checkbox
-                      %label.checkbox-inline.not-fixed
-                        = check_box_tag "organization_ids_can_edit_claimed[]", @bike.creation_organization_id, @bike.editable_organizations.pluck(:id).include?(@bike.creation_organization_id), multiple: true
-                        = t(".can_edit_this_bike", bike_type: @bike.type)
-                  .right-input-help
-                    %a.optional-form-block.remove-organization{ href: '#' }
-                      %span.context-display-help
-                        &ndash;
-                      = t(".remove")
+                - bike_organization = @bike.bike_organizations.where(organization_id: @bike.creation_organization_id).first
+                = render partial: "/bikes_edit/edit_bike_organization", locals: {bike_organization: bike_organization, main_label: t(".creation_organization")}
+
+              - displayed_other_organizations = false
               - @bike.bike_organizations.reorder(:created_at).each_with_index do |bike_organization, index|
                 - next if bike_organization.organization == @bike.creation_organization
-                .form-group.row
-                  %label.form-well-label.less-strong
-                    = t(".other_organizations")
-                  %p.form-well-input-static.bike_organization_static_input{ data: { orgid: bike_organization.organization_id } }
-                    = bike_organization.organization.name
-                    %span.can-edit-checkbox
-                      %label.checkbox-inline.not-fixed
-                        = check_box_tag "organization_ids_can_edit_claimed[]", bike_organization.organization_id, bike_organization.can_edit_claimed, multiple: true
-                        = t(".can_edit_this_bike", bike_type: @bike.type)
-                  .right-input-help
-                    %a.optional-form-block.remove-organization{ href: '#' }
-                      %span.context-display-help
-                        &ndash;
-                      = t(".remove")
+                - main_label = displayed_other_organizations ? nil : t(".other_organizations")
+                - displayed_other_organizations = true
+                = render partial: "/bikes_edit/edit_bike_organization", locals: {bike_organization: bike_organization, main_label: main_label}
+
 
           :javascript
             window.organizations = #{Organization.approved.map { |organization| { name: organization.name, id: organization.id } }.to_json };
@@ -56,8 +36,8 @@
 
             :plain
               <script id="additional-organization-template" type="x-tmpl-mustache">
-                <div class='form-group row collapse'>
-                  <label class='form-well-label'></label>
+                <div class='form-group row collapse mt-2'>
+                  <label class='form-well-label add-additional-organization-label'></label>
                   <div class='form-well-input fancy-select-placeholder unfancy'>
                     <select class="form-control bike_organization_input" autocomplete="off" autocorrect="off" autocapitalize="off">
                       <option value="" disabled selected>

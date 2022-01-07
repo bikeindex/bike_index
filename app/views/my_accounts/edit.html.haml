@@ -1,4 +1,4 @@
-= form_for @user, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
+= form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
   .form-well-container.container
     .row
       %nav.primary-edit-form-well-menu
@@ -11,16 +11,14 @@
                   = description
 
         .form-well-edit-page-select
-          %span.menu-select-overlay
-            = t(".you_are_editing")
           // ignore this select in dirty forms
           %select.dirtyignore
             - @edit_templates.each do |template, description|
               %option{ selected: (@edit_template == template), value: edit_my_account_path(edit_template: template) }
                 = description
         .edit-form-well-submit-wrapper
-          = hidden_field_tag :page, @edit_template
+          = hidden_field_tag :edit_template, @edit_template
           = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary'
 
       .col-md-8.form-well
-        = render partial: "edit_#{@edit_template}", locals: { f: f }
+        = render partial: @edit_template, locals: { f: f }

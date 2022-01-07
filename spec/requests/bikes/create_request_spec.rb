@@ -224,7 +224,10 @@ RSpec.describe "BikesController#create", type: :request do
     let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
     include_context :geocoder_real
     it "creates with address" do
+      expect(current_user.reload.address).to be_blank
+      expect(current_user.user_registration_organizations.count).to eq 0
       VCR.use_cassette("bikes_controller-create-reg_address", match_requests_on: [:method]) do
+        expect(BikeDisplayer.display_edit_address_fields?(Bike.new, current_user)).to be_truthy
         organization.reload
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
@@ -255,15 +258,22 @@ RSpec.describe "BikesController#create", type: :request do
         ownership = new_bike.current_ownership
         expect(ownership.origin).to eq "web"
         expect(ownership.creator_id).to eq current_user.id
-        reg_hash = bike_params_with_address.slice(:organization_affiliation, :street, :city, :zipcode, :state)
+        reg_hash = bike_params_with_address.slice(:street, :city, :zipcode, :state)
+          .merge("organization_affiliation_#{organization.id}" => "community_member")
         expect_hashes_to_match(ownership.registration_info, reg_hash)
 
-        expect_hashes_to_match(new_bike.registration_address, reg_hash.except(:organization_affiliation))
+        expect_hashes_to_match(new_bike.registration_address, reg_hash.except("organization_affiliation_#{organization.id}"))
         expect(new_bike.address).to eq "1400 32nd St, Oakland, CA 94608, US"
         expect(new_bike.street).to eq "1400 32nd St"
         expect(new_bike.latitude.to_i).to eq 37
         expect(new_bike.longitude.to_i).to eq(-122)
         expect(new_bike.valid_mailing_address?).to be_truthy
+        expect(current_user.reload.address).to eq new_bike.address
+        expect(BikeDisplayer.display_edit_address_fields?(new_bike, current_user)).to be_falsey
+        expect(current_user.user_registration_organizations.pluck(:organization_id)).to eq([organization.id])
+        user_registration_organization = current_user.user_registration_organizations.first
+        expect(user_registration_organization.all_bikes?).to be_truthy
+        expect(user_registration_organization.can_edit_claimed).to be_truthy
       end
     end
     context "no address passed" do
@@ -285,7 +295,7 @@ RSpec.describe "BikesController#create", type: :request do
         ownership = new_bike.current_ownership
         expect(ownership.origin).to eq "web"
         expect(ownership.creator_id).to eq current_user.id
-        expect(ownership.registration_info).to eq({"organization_affiliation" => "community_member"})
+        expect(ownership.registration_info).to eq({"organization_affiliation_#{organization.id}" => "community_member"})
         # It doesn't have a registration address! But it does have an address - which is just the organization
         expect(new_bike.registration_address).to be_blank
         expect(new_bike.address).to be_present
@@ -394,7 +404,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.extra_registration_number).to eq "XXXZZZ"
       expect(new_bike.organization_affiliation).to eq "employee"
       expect(new_bike.student_id).to eq "999888"
-      expect_hashes_to_match(new_bike.conditional_information, {organization_affiliation: "employee", student_id: "999888"})
+      expect_hashes_to_match(new_bike.registration_info, {phone: "18887776666", street: default_location[:formatted_address_no_country], organization_affiliation: "employee", student_id: "999888"})
       expect(new_bike.phone).to eq "18887776666"
       current_user.reload
       expect(new_bike.owner).to eq current_user # NOTE: not bike user

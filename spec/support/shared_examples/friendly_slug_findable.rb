@@ -53,7 +53,7 @@ RSpec.shared_examples "friendly_slug_findable" do
       it "finds by the slug" do
         expect(subject.class.friendly_find(" #{instance.name}")).to eq instance
         expect(subject.class.friendly_find!(" #{instance.name}")).to eq instance
-        expect(subject.class.friendly_id_find(" #{instance.name}")).to eq instance.id
+        expect(subject.class.friendly_find_id(" #{instance.name}")).to eq instance.id
       end
     end
   end

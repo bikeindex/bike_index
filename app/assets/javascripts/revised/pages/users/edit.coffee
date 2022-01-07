@@ -6,6 +6,7 @@ class BikeIndex.UsersEdit extends BikeIndex
 
     @initializePersonalSharing() if $('.sharing-collapser').length > 0
     @initializeAdditionalEmails() if $('#additional-email-template').length > 0
+    @initializeRegistrationOrganizations() if $('#myAccountRegistrationOrganizations').length > 0
 
     united_states_id = $('#us_id_data').data('usid')
     new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
@@ -53,3 +54,16 @@ class BikeIndex.UsersEdit extends BikeIndex
   updateAdditionalEmailValues: ->
     values = $('#additional_email_fields .add-email-field').get().map (i) -> i.value
     $('#user_additional_emails').val(values)
+
+  initializeRegistrationOrganizations: ->
+    $(".allBikesCheck").change (event) ->
+      $target = $(event.target)
+      checked = $target.prop('checked')
+      $uro_fields = $(event.target).parents(".userRegistrationOrganization")
+      if checked
+        $uro_fields.find(".collapse-NotAllBikes").collapse("hide")
+        $uro_fields.find(".collapse-AllBikes").collapse("show")
+      else
+        $uro_fields.find(".collapse-NotAllBikes").collapse("show")
+        $uro_fields.find(".collapse-AllBikes").collapse("hide")
+

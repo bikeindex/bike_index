@@ -75,6 +75,98 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
     end
   end
 
+  describe "create_user_registration_organizations" do
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership) }
+    let(:ownership) { bike.current_ownership }
+    it "doesn't create" do
+      expect(bike.reload.user&.id).to be_blank
+      expect(bike.bike_organizations.count).to eq 1
+      expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+      expect(UserRegistrationOrganization.unscoped.count).to eq 0
+      instance.perform(bike.id)
+      expect(UserRegistrationOrganization.unscoped.count).to eq 0
+      expect(bike.reload.bike_organizations.count).to eq 1
+      expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+    end
+    context "with ownership claimed" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creation_organization: organization) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { bike.user }
+      let(:bike_organization) { bike.bike_organizations.first }
+      it "creates" do
+        expect(bike.reload.user&.id).to be_present
+        expect(bike_organization.organization_id).to eq organization.id
+        expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+        expect(ownership.registration_info).to eq({})
+        expect(UserRegistrationOrganization.unscoped.count).to eq 0
+        expect(user.user_registration_organizations.count).to eq 0
+        instance.perform(bike.id)
+        expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+        expect(UserRegistrationOrganization.unscoped.count).to eq 1
+        expect(user.reload.user_registration_organizations.count).to eq 1
+        expect(ownership.reload.registration_info).to eq({})
+        expect(ownership.overridden_by_user_registration?).to be_falsey
+        user_registration_organization = user.reload.user_registration_organizations.first
+        expect(user_registration_organization.organization_id).to eq organization.id
+        expect(user_registration_organization.all_bikes).to be_falsey
+        expect(user_registration_organization.registration_info).to be_blank
+        expect(user_registration_organization.bikes.pluck(:id)).to eq([bike.id])
+        expect(bike_organization.reload.organization_id).to eq organization.id
+        expect(bike_organization.overridden_by_user_registration?).to be_falsey
+      end
+      context "with deleted user_registration_organization" do
+        it "does not create" do
+          expect(bike.reload.user&.id).to be_present
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+          expect(ownership.registration_info).to eq({})
+          user_registration_organization = user.user_registration_organizations.create(organization: organization)
+          user_registration_organization.destroy
+          expect(UserRegistrationOrganization.unscoped.count).to eq 1
+          expect(user.user_registration_organizations.count).to eq 0
+          instance.perform(bike.id)
+          expect(UserRegistrationOrganization.unscoped.count).to eq 1
+          expect(user_registration_organization.reload.deleted?).to be_truthy
+          expect(user.reload.user_registration_organizations.count).to eq 0
+        end
+      end
+      context "with paid organization" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features) }
+        let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_registration_info: registration_info) }
+        let(:registration_info) { default_location_registration_address.merge(phone: "1112223333", student_id: "ffffff") }
+        it "creates with all_bikes" do
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+          expect(ownership.registration_info).to eq({})
+          expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
+          expect(bike2.registration_info).to eq registration_info.as_json
+          expect(UserRegistrationOrganization.unscoped.count).to eq 0
+          expect(user.user_registration_organizations.count).to eq 0
+          instance.perform(bike.id)
+          expect(UserRegistrationOrganization.unscoped.count).to eq 1
+          expect(user.reload.user_registration_organizations.count).to eq 1
+          user_registration_organization = user.reload.user_registration_organizations.first
+          expect(user_registration_organization.organization_id).to eq organization.id
+          expect(user_registration_organization.all_bikes).to be_truthy
+          expect(user_registration_organization.bikes.pluck(:id)).to match_array([bike.id, bike2.id])
+          expect(user_registration_organization.registration_info).to eq registration_info.as_json
+          expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+          expect(bike.registration_info).to eq registration_info.as_json
+          expect(ownership.reload.registration_info).to eq registration_info.as_json
+          expect(bike_organization.reload.organization_id).to eq organization.id
+          expect(bike_organization.overridden_by_user_registration?).to be_truthy
+          expect(ownership.reload.registration_info).to eq registration_info.as_json
+          expect(ownership.overridden_by_user_registration?).to be_truthy
+          bike2.reload
+          expect(bike2.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+          expect(bike2.bike_organizations.first.overridden_by_user_registration?).to be_truthy
+        end
+      end
+    end
+  end
+
   describe "serialized" do
     let!(:bike) { FactoryBot.create(:stolen_bike) }
     it "doesn't call the webhook" do

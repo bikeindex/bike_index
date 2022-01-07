@@ -107,12 +107,12 @@ RSpec.describe ImportStolenBikeListingWorker, type: :lib do
         # Ensure with all the other colors, we still get same result
         expect(instance.color_attrs("Blk")).to eq black_target
         # And test with multiple colors
-        purple_target = black_target.merge(secondary_frame_color_id: Color.friendly_id_find("purple"))
+        purple_target = black_target.merge(secondary_frame_color_id: Color.friendly_find_id("purple"))
         expect(instance.color_attrs("Black/Purple")).to eq purple_target
         expect(instance.color_attrs("Blk/Purpl")).to eq purple_target
         # And test with 3 colors
-        expect(Color.friendly_id_find("silver")).to be_present # Sanity check
-        expect(instance.color_attrs("Blk/Purpl/silver")).to eq purple_target.merge(tertiary_frame_color_id: Color.friendly_id_find("silver"))
+        expect(Color.friendly_find_id("silver")).to be_present # Sanity check
+        expect(instance.color_attrs("Blk/Purpl/silver")).to eq purple_target.merge(tertiary_frame_color_id: Color.friendly_find_id("silver"))
       end
     end
   end

@@ -3,6 +3,77 @@ require "rails_helper"
 RSpec.describe UsersController, type: :request do
   base_url = "/users"
 
+  describe "update" do
+    include_context :request_spec_logged_in_as_user
+
+    it "updates the terms of service" do
+      expect(current_user.reload.address_set_manually).to be_falsey
+      put "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {terms_of_service: "1"}}
+      expect(response).to redirect_to(my_account_url)
+      expect(current_user.reload.terms_of_service).to be_truthy
+      expect(current_user.address_set_manually).to be_falsey
+    end
+
+    context "vendor terms" do
+      let(:current_user) { FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false) }
+      it "updates the vendor terms of service and emailable" do
+        expect(current_user.reload.notification_newsletters).to be_falsey
+        organization = FactoryBot.create(:organization)
+        FactoryBot.create(:membership_claimed, organization: organization, user: current_user)
+        current_user.reload
+        expect(current_user.default_organization).to eq organization
+        patch "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {vendor_terms_of_service: "1", notification_newsletters: true}}
+        expect(response.code).to eq("302")
+        expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
+        expect(current_user.reload.accepted_vendor_terms_of_service?).to be_truthy
+        expect(current_user.when_vendor_terms_of_service).to be_within(1.second).of Time.current
+        expect(current_user.notification_newsletters).to be_truthy
+      end
+    end
+
+    describe "submit without updating terms" do
+      it "redirects to accept the terms" do
+        patch "#{base_url}/#{current_user.id}", params: {id: current_user.username, user: {terms_of_service: "0"}}
+        expect(response).to redirect_to accept_terms_path
+        expect(current_user.reload.terms_of_service).to be_falsey
+      end
+      context "vendor_terms" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
+        it "redirects to accept the terms" do
+          expect(current_user.terms_of_service).to be_truthy
+          expect(current_user.accepted_vendor_terms_of_service?).to be_falsey
+          patch "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {vendor_terms_of_service: "0"}}
+          expect(response).to redirect_to accept_vendor_terms_path
+          expect(current_user.reload.vendor_terms_of_service).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe "accept_terms" do
+    include_context :request_spec_logged_in_as_user
+    let(:current_user) { FactoryBot.create(:user_confirmed, terms_of_service: false) }
+    it "renders" do
+      expect(current_user.reload.terms_of_service).to be_falsey
+      expect(current_user.vendor_terms_of_service).to be_falsey
+      get "/accept_terms"
+      expect(response).to render_template(:accept_terms)
+    end
+  end
+
+  describe "accept_vendor_terms" do
+    include_context :request_spec_logged_in_as_user
+    let(:current_user) { FactoryBot.create(:user_confirmed, vendor_terms_of_service: false) }
+    it "renders" do
+      expect(current_user.reload.terms_of_service).to be_truthy
+      expect(current_user.vendor_terms_of_service).to be_falsey
+      get "/accept_vendor_terms"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:accept_vendor_terms)
+      expect(response).to render_template("layouts/application")
+    end
+  end
+
   describe "please_confirm_email" do
     it "renders" do
       get "#{base_url}/please_confirm_email"
@@ -10,6 +81,7 @@ RSpec.describe UsersController, type: :request do
       expect(flash).to be_blank
     end
   end
+
   describe "resend_confirmation_email" do
     it "doesn't send anything if no user found" do
       ActionMailer::Base.deliveries = []
@@ -80,30 +152,6 @@ RSpec.describe UsersController, type: :request do
           expect(ActionMailer::Base.deliveries.count).to eq 0
           expect(Notification.count).to eq 0
         end
-      end
-    end
-  end
-
-  describe "update password" do
-    include_context :request_spec_logged_in_as_user
-    context "previous password was too short" do
-      # Prior to #1738 password requirement was 8 characters.
-      # Ensure users who had valid passwords for the previous requirements can update their password
-      it "updates password" do
-        current_user.update_attribute :password, "old_pass"
-        expect(current_user.reload.authenticate("old_pass")).to be_truthy
-        patch "#{base_url}/#{current_user.username}", params: {
-          user: {
-            current_password: "old_pass",
-            password: "172ddfasdf1LDF",
-            name: "Mr. Slick",
-            password_confirmation: "172ddfasdf1LDF"
-          }
-        }
-        expect(response).to redirect_to edit_my_account_path
-        expect(flash[:success]).to be_present
-        current_user.reload
-        expect(current_user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
       end
     end
   end

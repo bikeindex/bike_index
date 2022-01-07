@@ -3026,6 +3026,42 @@ ALTER SEQUENCE public.user_phones_id_seq OWNED BY public.user_phones.id;
 
 
 --
+-- Name: user_registration_organizations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_registration_organizations (
+    id bigint NOT NULL,
+    user_id bigint,
+    organization_id bigint,
+    all_bikes boolean DEFAULT false,
+    can_not_edit_claimed boolean DEFAULT false,
+    registration_info jsonb,
+    deleted_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: user_registration_organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_registration_organizations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_registration_organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_registration_organizations_id_seq OWNED BY public.user_registration_organizations.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3653,6 +3689,13 @@ ALTER TABLE ONLY public.user_phones ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: user_registration_organizations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_registration_organizations ALTER COLUMN id SET DEFAULT nextval('public.user_registration_organizations_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4264,6 +4307,14 @@ ALTER TABLE ONLY public.user_emails
 
 ALTER TABLE ONLY public.user_phones
     ADD CONSTRAINT user_phones_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_registration_organizations user_registration_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_registration_organizations
+    ADD CONSTRAINT user_registration_organizations_pkey PRIMARY KEY (id);
 
 
 --
@@ -5410,6 +5461,20 @@ CREATE INDEX index_user_phones_on_user_id ON public.user_phones USING btree (use
 
 
 --
+-- Name: index_user_registration_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_registration_organizations_on_organization_id ON public.user_registration_organizations USING btree (organization_id);
+
+
+--
+-- Name: index_user_registration_organizations_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_registration_organizations_on_user_id ON public.user_registration_organizations USING btree (user_id);
+
+
+--
 -- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6018,6 +6083,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211222230922'),
 ('20211223213257'),
 ('20211224053713'),
+('20211225005744'),
 ('20220102153706'),
 ('20220102160149'),
 ('20220103161727');

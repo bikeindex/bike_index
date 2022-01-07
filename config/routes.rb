@@ -109,9 +109,10 @@ Rails.application.routes.draw do
     end
     member { get "unsubscribe" }
   end
-  get :edit_my_account, to: "users#edit", as: :edit_my_account
-  # TODO: Move edit_my_account into my_account controller
   resource :my_account, only: %i[show update]
+  # Can remove legacy a little while after merging #2142
+  get :edit_my_account, to: "my_accounts#edit", as: :legacy_edit_my_account
+  get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
@@ -198,7 +199,7 @@ Rails.application.routes.draw do
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
       :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data, :user_alerts,
-      :notifications
+      :notifications, :user_registration_organizations
 
     resources :bike_stickers do
       collection { get :reassign }

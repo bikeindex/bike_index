@@ -76,6 +76,7 @@ class Bike < ApplicationRecord
   delegate :bulk_import, :claimed?, :creation_description,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
     :pos_kind, :registration_info, :user, :user_id,
+    :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
     to: :current_ownership, allow_nil: true
 
   scope :without_location, -> { where(latitude: nil) }
@@ -178,7 +179,7 @@ class Bike < ApplicationRecord
     end
 
     def organization(org_or_org_ids)
-      ids = org_or_org_ids.is_a?(Organization) ? Organization.friendly_find(org_or_org_ids)&.id : org_or_org_ids
+      ids = org_or_org_ids.is_a?(Organization) ? org_or_org_ids.id : org_or_org_ids
       includes(:bike_organizations).where(bike_organizations: {organization_id: ids})
     end
 
@@ -731,24 +732,6 @@ class Bike < ApplicationRecord
       return true unless address_attrs.present? # No address hash present so skip
       self.attributes = address_attrs
     end
-  end
-
-  def organization_affiliation=(val)
-    conditional_information["organization_affiliation"] = val
-    current_ownership&.update_registration_information("organization_affiliation", val)
-  end
-
-  def organization_affiliation
-    conditional_information["organization_affiliation"] || registration_info&.dig("organization_affiliation")
-  end
-
-  def student_id=(val)
-    conditional_information["student_id"] = val
-    current_ownership&.update_registration_information("student_id", val)
-  end
-
-  def student_id
-    conditional_information["student_id"] || registration_info&.dig("student_id")
   end
 
   def alert_image_url(version = nil)

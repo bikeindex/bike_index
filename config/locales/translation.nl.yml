@@ -2229,10 +2229,6 @@ nl:
     users:
       confirm:
         already_confirmed: Uw gebruikersaccount is al bevestigd. Log alsjeblieft in.
-      edit_templates:
-        password: Wachtwoord
-        sharing: Delen + persoonlijke pagina
-        user_settings: Gebruikersinstellingen
       show:
         user_not_sharing: Sorry, die gebruiker deelt zijn fietsen niet.
       unsubscribe:
@@ -2242,9 +2238,6 @@ nl:
           gebruiken.
         accept_tos_to_use_as_org: Je moet de Servicevoorwaarden accepteren als je
           Bike Index via een organisatie wilt gebruiken
-        current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
-          is vereist voor het bijwerken van uw wachtwoord.
-        successfully_updated: Uw gegevens zijn succesvol bijgewerkt.
         thanks_for_accepting_tos: Bedankt voor het accepteren van de servicevoorwaarden!
         you_can_use_bike_index: Bedankt! Nu kunt u Bike Index gebruiken.
         you_can_use_bike_index_as_org: Bedankt! Nu kunt u Bike Index gebruiken als
@@ -2420,6 +2413,16 @@ nl:
       update:
         cannot_update: Je kunt dat %{kind} niet bijwerken. Neem contact op met support@bikeindex.org
           als u denkt dat dit mogelijk zou moeten zijn.
+    my_accounts:
+      edit:
+        password: Wachtwoord
+        sharing: Delen + persoonlijke pagina
+        user_settings: Gebruikersinstellingen
+        registration_organizations: Registratie Organisaties
+      update:
+        current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
+          is vereist voor het bijwerken van uw wachtwoord.
+        successfully_updated: Uw gegevens zijn succesvol bijgewerkt.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5145,79 +5148,6 @@ nl:
       could_not_find_matching_ticket: Dat ticket komt met niets overeen in onze administratie.
         Sorry.
       woops: Woops
-    edit:
-      save_changes: Wijzigingen opslaan
-      you_are_editing: Je bent aan het bewerken
-    edit_password:
-      for_password_update: Voor wachtwoordupdate
-      new_password: Nieuw wachtwoord
-      new_password_confirmation: Bevestiging van nieuwe wachtwoord
-      reset_password: Reset wachtwoord
-      better_password: beter
-      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
-        is %{better_password_link}.
-    edit_root:
-      add_additional_email: Voeg extra e-mail toe
-      additional_email: Extra E-mail
-      address: Adres
-      any_use_of_your_personal_information_html: Elk gebruik van uw persoonlijke informatie
-        valt onder de voorwaarden van onze %{privacy_policy}. We verkopen, verhandelen
-        of verhuren uw persoonlijke gegevens niet aan derden.
-      choose_country: Kies land
-      choose_language: Kies een taal
-      city: City
-      confirmed_emails: Bevestigde e-mails
-      give_us_permission_html: Geef ons toestemming om contact met u op te nemen als
-        we denken dat uw fiets is gestolen, <em>zelfs als deze niet als gestolen is
-        gemarkeerd -</em> <strong>%{why_you_should_link}</strong>
-      have_multiple_emails: Heeft u meerdere e-mails? Consolideer ze hier in één account
-      make_primary_email: Maak primaire e-mail
-      notifications_email: Dit is de e-mail waarnaar we meldingen sturen
-      personal_information_for_user: Persoonlijke informatie voor %{user_name}
-      preferred_language: Voorkeurstaal
-      primary_email: primaire email
-      receive_the_bike_index_newsletter: Ontvang de Bike Index-nieuwsbrief
-      remove_email: E-mail verwijderen
-      resend_confirmation: Opnieuw verzenden Bevestiging
-      state: Staat
-      unconfirmed_emails: Niet-bevestigde e-mails
-      zipcode: Postcode
-      why_you_should_text: Lees waarom u zou moeten
-      daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
-      stolen_hot_sheets: Gestolen Bike Hot Sheets
-      add_new_phone_number: Voeg een nieuw telefoonnummer toe
-      remove_number: nummer verwijderen
-      unconfirmed: niet bevestigd!
-      verified: Geverifieerd
-    edit_sharing:
-      additional_link: Aanvullende link
-      choose_file: Kies bestand...
-      create_page: Creëer pagina
-      create_public_page: Maak een openbare pagina
-      example_url: http://example.com
-      my_awesome_link: Mijn geweldige link
-      no_personal_site: Geen persoonlijke site
-      no_please_dont_create_me_a_page: Nee, maak alsjeblieft geen pagina voor me
-      no_twitter: Geen Twitter
-      page_text: Paginatekst
-      page_title: Pagina titel
-      personal_site_url: Persoonlijke site-URL
-      preview_page: voorbeeldpagina
-      profile_avatar: Profiel avatar
-      sharing_and_personal_page_settings: Instellingen voor delen en persoonlijke
-        pagina
-      show_personal_site: Persoonlijke site weergeven
-      show_personal_website: Persoonlijke website tonen
-      show_twitter: Twitter weergeven
-      the_bike_index_can_create_a_page: Met de fietsindex kunt u een pagina maken
-        met al uw fietsen met alle informatie die u wilt delen. Het is je persoonlijke
-        pagina.
-      this_users_bikes: De fietsen van deze gebruiker
-      title_for_link: Titel voor link
-      twitter_handle: Twitter account
-      your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
-        uw deelpagina en het embed-formulier van de fiets. Update het als je om die
-        dingen geeft.
     new:
       agree_bikeindex_bikehub_toc_html: Ik ga akkoord met BikeHub's %{bikehub_toc_link}
         en Bike Index's %{bikeindex_toc_link}.
@@ -5742,6 +5672,97 @@ nl:
         -
       ignore: Negeren
       user_hidden: Verborgen voor andere gebruikers
+    edit:
+      save_changes: Wijzigingen opslaan
+    password:
+      better_password: beter
+      for_password_update: Voor wachtwoordupdate
+      new_password: Nieuw wachtwoord
+      new_password_confirmation: Bevestiging van nieuwe wachtwoord
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
+      reset_password: Reset wachtwoord
+    root:
+      add_additional_email: Voeg extra e-mail toe
+      add_new_phone_number: Voeg een nieuw telefoonnummer toe
+      additional_email: Extra E-mail
+      address: Adres
+      any_use_of_your_personal_information_html: Elk gebruik van uw persoonlijke informatie
+        valt onder de voorwaarden van onze %{privacy_policy}. We verkopen, verhandelen
+        of verhuren uw persoonlijke gegevens niet aan derden.
+      choose_country: Kies land
+      choose_language: Kies een taal
+      city: City
+      confirmed_emails: Bevestigde e-mails
+      daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
+      give_us_permission_html: Geef ons toestemming om contact met u op te nemen als
+        we denken dat uw fiets is gestolen, <em>zelfs als deze niet als gestolen is
+        gemarkeerd -</em> <strong>%{why_you_should_link}</strong>
+      have_multiple_emails: Heeft u meerdere e-mails? Consolideer ze hier in één account
+      make_primary_email: Maak primaire e-mail
+      notifications_email: Dit is de e-mail waarnaar we meldingen sturen
+      personal_information_for_user: Persoonlijke informatie voor %{user_name}
+      preferred_language: Voorkeurstaal
+      primary_email: primaire email
+      receive_the_bike_index_newsletter: Ontvang de Bike Index-nieuwsbrief
+      remove_email: E-mail verwijderen
+      remove_number: nummer verwijderen
+      resend_confirmation: Opnieuw verzenden Bevestiging
+      state: Staat
+      stolen_hot_sheets: Gestolen Bike Hot Sheets
+      unconfirmed: niet bevestigd!
+      unconfirmed_emails: Niet-bevestigde e-mails
+      verified: Geverifieerd
+      why_you_should_text: Lees waarom u zou moeten
+      zipcode: Postcode
+    sharing:
+      additional_link: Aanvullende link
+      choose_file: Kies bestand...
+      create_page: Creëer pagina
+      create_public_page: Maak een openbare pagina
+      example_url: http://example.com
+      my_awesome_link: Mijn geweldige link
+      no_personal_site: Geen persoonlijke site
+      no_please_dont_create_me_a_page: Nee, maak alsjeblieft geen pagina voor me
+      no_twitter: Geen Twitter
+      page_text: Paginatekst
+      page_title: Pagina titel
+      personal_site_url: Persoonlijke site-URL
+      preview_page: voorbeeldpagina
+      profile_avatar: Profiel avatar
+      sharing_and_personal_page_settings: Instellingen voor delen en persoonlijke
+        pagina
+      show_personal_site: Persoonlijke site weergeven
+      show_personal_website: Persoonlijke website tonen
+      show_twitter: Twitter weergeven
+      the_bike_index_can_create_a_page: Met de fietsindex kunt u een pagina maken
+        met al uw fietsen met alle informatie die u wilt delen. Het is je persoonlijke
+        pagina.
+      this_users_bikes: De fietsen van deze gebruiker
+      title_for_link: Titel voor link
+      twitter_handle: Twitter account
+      your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
+        uw deelpagina en het embed-formulier van de fiets. Update het als je om die
+        dingen geeft.
+    registration_organizations:
+      affiliation: "%{org_name} aansluiting"
+      all_bikes_with_organization: Al uw fietsen zijn geregistreerd bij deze organisatie
+      allow_organization_to_edit_bikes_html: Sta %{org_name_em} toe om je fietsen
+        te bewerken
+      and_other_bikes_count: en %{other_bikes_count} andere fietsen.
+      bike: Fiets
+      mailing_address: Postadres
+      phone: Telefoon
+      register_all_with: Registreer al je fietsen bij deze organisatie
+      registered_with: aangemeld met
+      registration_organization_information: Beheer de organisaties waarbij uw fietsen
+        zijn geregistreerd.
+      registration_organizations: Registratie organisaties
+      student_id: Student-ID
+      update_your_address_on_html: Werk uw adres bij in %{user_settings_link}
+      update_your_phone_on_html: Update je telefoon in %{user_settings_link}
+      when_not_selected: Indien niet aangevinkt, beheer via de pagina "Groepen en
+        organisaties" van elke fiets.
   org_public:
     impounded_bikes:
       index:
@@ -5769,7 +5790,6 @@ nl:
       manufacturer: Fabrikant
       model_year: Modeljaar
       nevermind: Laat maar
-      organization_affiliation: "%{org_name} aansluiting"
       other_serial_or_registration_number: Ander framenummer of registratienummer
       please_fill_in_both_fields: Gelieve beide velden in te vullen
       reason_for_update: Reden voor update
@@ -5841,7 +5861,6 @@ nl:
       are_you_part_of_a_school_want_to_bolster_: Ben je een student van een van onze
         school- of universitaire partners? Wil je een lokale belangenorganisatie laten
         weten dat je van ze houdt? Voeg hier de organisatie toe.
-      can_edit_this_bike: Kan dit bewerken %{bike_type}
       choose_organization: Kies organisatie
       creation_organization: Creatie organisatie
       groups_and_organizations: Groepen en organisaties
@@ -5944,3 +5963,8 @@ nl:
       without_a_valid_report_number_html: Zonder een geldig rapportnummer wordt uw
         fiets niet opgenomen in <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">partnerzoekopdrachten</a>
         door <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+    edit_bike_organization:
+      can_edit_this_bike: Kan dit bewerken %{bike_type}
+      manage_organization_information: Organisatie-informatie beheren
+      manage_organization_information_via: organisatie-informatie beheerd via uw account
+      remove: Verwijderen

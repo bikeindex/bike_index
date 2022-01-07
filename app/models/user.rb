@@ -27,6 +27,8 @@ class User < ApplicationRecord
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
+  has_many :user_registration_organizations
+  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
 
   has_many :integrations, dependent: :destroy
   has_many :impound_claims
@@ -103,7 +105,7 @@ class User < ApplicationRecord
     fuzzy_email_find(str) || username_friendly_find(str)
   end
 
-  def self.friendly_id_find(str)
+  def self.friendly_find_id(str)
     friendly_find(str)&.id
   end
 
@@ -357,7 +359,6 @@ class User < ApplicationRecord
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
     self.alert_slugs = (alert_slugs || [])
-    self.address_set_manually = street.present?
     # Rather than waiting for twilio to send, immediately update alert_slugs
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
     self.username = Slugifyer.slugify(username) if username
