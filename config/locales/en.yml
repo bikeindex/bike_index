@@ -4029,7 +4029,6 @@ en:
   my_accounts:
     edit:
       save_changes: Save changes
-      you_are_editing: You are editing
     password:
       better_password: better
       for_password_update: For password update
