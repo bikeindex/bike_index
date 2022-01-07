@@ -1569,7 +1569,9 @@ en:
       edit:
         accessories: Accessories and Components
         alert: Activate Promoted Alert
-        bike_details: Bike Details
+        bike_details: "%{bike_or_version} Details"
+        bike_or_version_bike: Bike
+        bike_or_version_version: Version
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         versions: Bike Versions
@@ -5111,6 +5113,7 @@ en:
       owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
         has permission to edit
       view_bike: View %{bike_type}
+      view_bike_version: View %{bike_type} version
     email_bike_box:
       color: Color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!

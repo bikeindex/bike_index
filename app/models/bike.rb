@@ -292,6 +292,11 @@ class Bike < ApplicationRecord
       current_ownership.status == "status_impounded"
   end
 
+  # Abbreviation, checks if this is a bike_version
+  def version?
+    false
+  end
+
   def user?
     user.present?
   end
@@ -315,24 +320,6 @@ class Bike < ApplicationRecord
   def messages_count
     notifications.count + parking_notifications.count + graduated_notifications.count +
       Feedback.bike(id).count + UserAlert.where(bike_id: id).count
-  end
-
-  def status_stolen_or_impounded?
-    %w[status_stolen status_impounded].include?(status)
-  end
-
-  def status_found?
-    return false unless status_impounded?
-    (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
-  end
-
-  def status_humanized
-    return "found" if status_found?
-    self.class.status_humanized(status)
-  end
-
-  def status_humanized_translated
-    self.class.status_humanized_translated(status_humanized)
   end
 
   # The appropriate edit template to use in the edit view.

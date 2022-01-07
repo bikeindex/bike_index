@@ -41,6 +41,7 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.integer :propulsion_type
 
       t.integer :visibility, default: 0
+      t.integer :status, default: 0
 
       t.timestamps
     end

@@ -15,12 +15,44 @@ class BikeVersion < ApplicationRecord
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
   enum visibility: VISIBILITY_ENUM
+  enum status: Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
 
   scope :user_hidden, -> { unscoped.user_hidden }
 
   default_scope { where.not(visibility: "user_hidden").order(listing_order: :desc) }
 
   before_validation :set_calculated_attributes
+
+  delegate :bike_versions,
+    :no_serial?, :serial_number, :serial_unknown, :made_without_serial?,
+    to: :bike, allow_nil: true
+
+  def version?
+    true
+  end
+
+  # Methods that duplicate bike
+  def status_found?
+    false
+  end
+  def deleted?
+    false
+  end
+  def user
+    owner
+  end
+  def user?
+    owner.present?
+  end
+  def authorized_by_organization?(u: nil, org: nil)
+    false
+  end
+  def bike_stickers
+    BikeSticker.none
+  end
+  def organizations
+    Organization.none
+  end
 
   def authorized?(passed_user, no_superuser_override: false)
     return false if passed_user.blank?

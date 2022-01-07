@@ -11,7 +11,6 @@
             %h3
               = @edit_templates[@edit_template]
 
-
           .related-fields
             .form-group.row
               = f.label :serial_number, class: 'form-well-label'
@@ -20,31 +19,48 @@
                   = t(".made_without_serial")
                 - else
                   = @bike.serial_number
-              .right-input-help.right-text-help
-                %a{ data: { toggle: 'modal', target: '#serial-correction' } }
-                  = t(".submit_serial_correction")
+              - unless @bike.version?
+                .right-input-help.right-text-help
+                  %a{ data: { toggle: 'modal', target: '#serial-correction' } }
+                    = t(".submit_serial_correction")
             .form-group.row
               = f.label :manufacturer, class: 'form-well-label'
               %p.form-well-input-static
                 = @bike.mnfg_name
-              .right-input-help.right-text-help
-                %a{ data: { toggle: 'modal', target: '#manufacturer-correction' } }
-                  = t(".submit_manufacturer_correction")
+              - unless @bike.version?
+                .right-input-help.right-text-help
+                  %a{ data: { toggle: 'modal', target: '#manufacturer-correction' } }
+                    = t(".submit_manufacturer_correction")
+          - if @bike.version?
+            .form-group.row.fancy-select-placeholder.unfancy.unnested-field
+              = f.label :year, t(".model_year"), class: 'form-well-label'
+              .form-well-input
+                - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
+                = f.select :year, years, prompt: t(".unsure_or_unknown"), allow_blank: true
+              .right-input-help
+                %label
+                  %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+                  = t(".unknown_year")
 
-          .form-group.row.fancy-select-placeholder.unfancy.unnested-field
-            = f.label :year, t(".model_year"), class: 'form-well-label'
-            .form-well-input
-              - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
-              = f.select :year, years, prompt: t(".unsure_or_unknown"), allow_blank: true
-            .right-input-help
-              %label
-                %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
-                = t(".unknown_year")
+            .form-group.row.unnested-field
+              = f.label :frame_model, class: 'form-well-label'
+              .form-well-input
+                = f.text_field :frame_model, class: 'form-control'
+          - else
+            .form-group.row.fancy-select-placeholder.unfancy.unnested-field
+              = f.label :year, t(".model_year"), class: 'form-well-label'
+              .form-well-input
+                - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
+                = f.select :year, years, prompt: t(".unsure_or_unknown"), allow_blank: true
+              .right-input-help
+                %label
+                  %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+                  = t(".unknown_year")
 
-          .form-group.row.unnested-field
-            = f.label :frame_model, class: 'form-well-label'
-            .form-well-input
-              = f.text_field :frame_model, class: 'form-control'
+            .form-group.row.unnested-field
+              = f.label :frame_model, class: 'form-well-label'
+              .form-well-input
+                = f.text_field :frame_model, class: 'form-control'
 
           = render partial: '/bikes_edit/bike_fields/revised_colors', locals: { f: f }
 

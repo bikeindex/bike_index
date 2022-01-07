@@ -121,6 +121,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.frame_size).to eq "xl"
       expect(bike_version.frame_size_unit).to eq "ordinal"
       expect(bike_version.frame_size_number).to eq nil
+      expect(bike_version.status).to eq "status_with_owner"
       # And the final test - does everything calculate?
       expect(bike_version.cached_data_array).to match_array target_cached_array
       # And, test that bike is the same

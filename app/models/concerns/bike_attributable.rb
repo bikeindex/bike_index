@@ -24,6 +24,37 @@ module BikeAttributable
     scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   end
 
+  def status_stolen_or_impounded?
+    %w[status_stolen status_impounded].include?(status)
+  end
+
+  def status_found?
+    return false unless status_impounded?
+    (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
+  end
+
+  def status_humanized
+    return "found" if status_found?
+    self.class.status_humanized(status)
+  end
+
+  def status_humanized_translated
+    self.class.status_humanized_translated(status_humanized)
+  end
+
+  # We may eventually remove the boolean. For now, we're just going with it.
+  def made_without_serial?
+    made_without_serial
+  end
+
+  def serial_unknown?
+    serial_number == "unknown"
+  end
+
+  def no_serial?
+    made_without_serial? || serial_unknown?
+  end
+
   def frame_colors
     [
       primary_frame_color&.name,

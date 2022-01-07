@@ -26,15 +26,19 @@ module BikeEditable
 
   protected
 
+  def t_scope
+    [:controllers, :bikes, :edit]
+  end
+
   # NB: Hash insertion order here determines how nav links are displayed in the
   # UI. Keys also correspond to template names and query parameters, and values
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:theft_details, scope: [:controllers, :bikes, :edit])
-      h[:publicize] = translation(:publicize, scope: [:controllers, :bikes, :edit])
-      h[:alert] = translation(:alert, scope: [:controllers, :bikes, :edit])
-      h[:report_recovered] = translation(:report_recovered, scope: [:controllers, :bikes, :edit])
+      h[:theft_details] = translation(:theft_details, scope: t_scope)
+      h[:publicize] = translation(:publicize, scope: t_scope)
+      h[:alert] = translation(:alert, scope: t_scope)
+      h[:report_recovered] = translation(:report_recovered, scope: t_scope)
     end
   end
 
@@ -42,20 +46,27 @@ module BikeEditable
   # UI. Keys also correspond to template names and query parameters, and values
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
+    bike_or_version = if @bike.version?
+      translation(:bike_or_version_version, scope: t_scope)
+    else
+      translation(:bike_or_version_bike, scope: t_scope)
+    end
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details, scope: [:controllers, :bikes, :edit])
-      h[:found_details] = translation(:found_details, scope: [:controllers, :bikes, :edit]) if @bike.status_found?
-      h[:photos] = translation(:photos, scope: [:controllers, :bikes, :edit])
-      h[:drivetrain] = translation(:drivetrain, scope: [:controllers, :bikes, :edit])
-      h[:accessories] = translation(:accessories, scope: [:controllers, :bikes, :edit])
-      h[:ownership] = translation(:ownership, scope: [:controllers, :bikes, :edit])
-      h[:groups] = translation(:groups, scope: [:controllers, :bikes, :edit])
-      h[:remove] = translation(:remove, scope: [:controllers, :bikes, :edit])
-      if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
-        h[:versions] = translation(:versions, scope: [:controllers, :bikes, :edit])
+      h[:bike_details] = translation(:bike_details, bike_or_version: bike_or_version, scope: t_scope)
+      h[:found_details] = translation(:found_details, scope: t_scope) if @bike.status_found?
+      h[:photos] = translation(:photos, scope: t_scope)
+      h[:drivetrain] = translation(:drivetrain, scope: t_scope)
+      h[:accessories] = translation(:accessories, scope: t_scope)
+      unless @bike.version?
+        h[:ownership] = translation(:ownership, scope: t_scope)
+        h[:groups] = translation(:groups, scope: t_scope)
       end
-      unless @bike.status_stolen_or_impounded?
-        h[:report_stolen] = translation(:report_stolen, scope: [:controllers, :bikes, :edit])
+      h[:remove] = translation(:remove, scope: t_scope)
+      if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
+        h[:versions] = translation(:versions, scope: t_scope)
+      end
+      unless @bike.status_stolen_or_impounded? || @bike.version?
+        h[:report_stolen] = translation(:report_stolen, scope: t_scope)
       end
     end
   end

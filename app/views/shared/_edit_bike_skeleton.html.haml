@@ -1,7 +1,8 @@
 #edit-bike-skeleton
   .form-well-header.container{ data: { template: @edit_template } }
-    -# Show alerts if bike is impounded or has current notifications
-    = render partial: "/bikes/owner_bike_status_alerts"
+    - unless @bike.version?
+      -# Show alerts if bike is impounded or has current notifications
+      = render partial: "/bikes/owner_bike_status_alerts"
     .edit-bike-header
       %h1.uncap
         - if @bike.status_with_owner?
@@ -24,5 +25,8 @@
             = t(".owned_but_hasnt_been_claimed_html", owner_email: @bike.owner_email)
 
       %p.mb-4
-        = link_to t(".view_bike", bike_type: @bike.type_titleize), bike_path(@bike), class: "gray-link"
+        - if @bike.version?
+          = link_to t(".view_bike_version", bike_type: @bike.type_titleize), bike_version_path(@bike), class: "gray-link"
+        - else
+          = link_to t(".view_bike", bike_type: @bike.type_titleize), bike_path(@bike), class: "gray-link"
   = yield
