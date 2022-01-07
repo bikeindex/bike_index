@@ -11,14 +11,14 @@ class BulkAfterUserChangeWorker < AfterUserChangeWorker
   end
 
   def self.bikes
-    Bike.reorder(:updated_at).where("bikes.updated_at < ?", migration_at)
+    Bike.reorder(updated_at: :desc).where("bikes.updated_at < ?", migration_at)
   end
 
   def self.users
-    User.reorder(:updated_at).where("users.updated_at < ?", migration_at)
+    User.reorder(updated_at: :desc).where("users.updated_at < ?", migration_at)
   end
 
   def self.ownerships
-    Ownership.reorder(:updated_at).where("ownerships.updated_at < ?", migration_at)
+    Ownership.reorder(updated_at: :desc).where("ownerships.updated_at < ?", migration_at)
   end
 end
