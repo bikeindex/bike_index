@@ -21,7 +21,7 @@ class BikeDisplayer
     end
 
     def display_sticker_edit?(bike, user = nil)
-      return false unless user.present?
+      return false unless user.present? && !bike.version?
       return true if user.superuser? || user.enabled?("bike_stickers")
       # user_can_claim_sticker? checks if they've made too many sticker updates
       return false unless BikeSticker.user_can_claim_sticker?(user)

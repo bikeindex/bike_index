@@ -31,22 +31,18 @@
                 .right-input-help.right-text-help
                   %a{ data: { toggle: 'modal', target: '#manufacturer-correction' } }
                     = t(".submit_manufacturer_correction")
-          - if @bike.version?
-            .form-group.row.fancy-select-placeholder.unfancy.unnested-field
-              = f.label :year, t(".model_year"), class: 'form-well-label'
-              .form-well-input
-                - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
-                = f.select :year, years, prompt: t(".unsure_or_unknown"), allow_blank: true
-              .right-input-help
-                %label
-                  %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
-                  = t(".unknown_year")
+            - if @bike.version?
+              - if @bike.year.present?
+                .form-group.row
+                  = f.label :year, class: 'form-well-label'
+                  %p.form-well-input-static
+                    = @bike.year
+              .form-group.row
+                = f.label :frame_model, class: 'form-well-label'
+                %p.form-well-input-static
+                  = @bike.frame_model
 
-            .form-group.row.unnested-field
-              = f.label :frame_model, class: 'form-well-label'
-              .form-well-input
-                = f.text_field :frame_model, class: 'form-control'
-          - else
+          - unless @bike.version?
             .form-group.row.fancy-select-placeholder.unfancy.unnested-field
               = f.label :year, t(".model_year"), class: 'form-well-label'
               .form-well-input
@@ -64,36 +60,48 @@
 
           = render partial: '/bikes_edit/bike_fields/revised_colors', locals: { f: f }
 
-          .form-group.row.unnested-field
-            = f.label :frame_material, t(".main_frame_material"), class: 'form-well-label'
-            .form-well-input.fancy-select-placeholder.unfancy
-              = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: t(".choose_material")})
-          .related-fields
-            .form-group.row.frame-sizes{ class: ('unexpanded-unit-size' unless %w(cm in).include?(@bike.frame_size_unit)) }
-              %label.form-well-label
-                = t(".frame_size")
-              .form-well-input
-                .ordinal-sizes.btn-group{ role: 'group', 'aria-label' => 'Size', data: { toggle: 'buttons' } }
-                  - %w(xxs xs s m l xl xxl).each do |size|
-                    - active = (@bike.frame_size == size)
-                    %label.btn.btn-secondary{ class: ('active' if active), data: { size: size } }
-                      %input{ type: 'radio', name: 'frame_size', autocomplete: 'off', checked: active }
-                      = size.upcase
-              .right-input-help
-                .frame-size-units.btn-group{ role: 'group', 'aria-label' => 'Size', data: { toggle: 'buttons' } }
-                  - %w(cm in).each do |unit|
-                    - active = (@bike.frame_size_unit == unit)
-                    %label.btn.btn-secondary{ class: ('active' if active), data: { size: unit } }
-                      %input{ type: 'radio', name: 'frame_size', autocomplete: 'off', checked: active }
-                      = unit.upcase
-            .form-group.row.hidden-other.frame-size-other
-              = f.label :frame_size, t(".seat_tube_length"), class: 'form-well-label'
-              .form-well-input
-                = f.hidden_field :frame_size_unit
-                = f.hidden_field :frame_size
-                - if @bike.frame_size_number.present?
-                  - @bike.frame_size_number = @bike.frame_size_number.round if @bike.frame_size_number.to_i == @bike.frame_size_number
-                = f.number_field :frame_size_number, class: 'form-control', step: 0.1
+          - if @bike.version?
+            - if @bike.frame_material.present?
+              .form-group.row
+                = f.label :frame_material, class: 'form-well-label'
+                %p.form-well-input-static
+                  = @bike.frame_material_name
+            - if @bike.frame_material.present?
+              .form-group.row
+                = f.label :frame_size, class: 'form-well-label'
+                %p.form-well-input-static
+                  = @bike.frame_size
+          - else
+            .form-group.row.unnested-field
+              = f.label :frame_material, t(".main_frame_material"), class: 'form-well-label'
+              .form-well-input.fancy-select-placeholder.unfancy
+                = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: t(".choose_material")})
+            .related-fields
+              .form-group.row.frame-sizes{ class: ('unexpanded-unit-size' unless %w(cm in).include?(@bike.frame_size_unit)) }
+                %label.form-well-label
+                  = t(".frame_size")
+                .form-well-input
+                  .ordinal-sizes.btn-group{ role: 'group', 'aria-label' => 'Size', data: { toggle: 'buttons' } }
+                    - %w(xxs xs s m l xl xxl).each do |size|
+                      - active = (@bike.frame_size == size)
+                      %label.btn.btn-secondary{ class: ('active' if active), data: { size: size } }
+                        %input{ type: 'radio', name: 'frame_size', autocomplete: 'off', checked: active }
+                        = size.upcase
+                .right-input-help
+                  .frame-size-units.btn-group{ role: 'group', 'aria-label' => 'Size', data: { toggle: 'buttons' } }
+                    - %w(cm in).each do |unit|
+                      - active = (@bike.frame_size_unit == unit)
+                      %label.btn.btn-secondary{ class: ('active' if active), data: { size: unit } }
+                        %input{ type: 'radio', name: 'frame_size', autocomplete: 'off', checked: active }
+                        = unit.upcase
+              .form-group.row.hidden-other.frame-size-other
+                = f.label :frame_size, t(".seat_tube_length"), class: 'form-well-label'
+                .form-well-input
+                  = f.hidden_field :frame_size_unit
+                  = f.hidden_field :frame_size
+                  - if @bike.frame_size_number.present?
+                    - @bike.frame_size_number = @bike.frame_size_number.round if @bike.frame_size_number.to_i == @bike.frame_size_number
+                  = f.number_field :frame_size_number, class: 'form-control', step: 0.1
 
           .form-group.row.unnested-field
             = f.label :name, t(".bike_name"), class: 'form-well-label'

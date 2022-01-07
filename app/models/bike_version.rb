@@ -84,9 +84,4 @@ class BikeVersion < ApplicationRecord
   def default_edit_template
     "bike_details"
   end
-
-  # Method from bike that is static in bike_version
-  def extra_registration_number
-    nil
-  end
 end

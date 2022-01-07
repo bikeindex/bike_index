@@ -15,6 +15,7 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.references :manufacturer, index: true
       t.string :manufacturer_other
       t.string :mnfg_name
+      t.string :extra_registration_number # There might be a chance this changes between versions
 
       t.string :name
       t.text :frame_model

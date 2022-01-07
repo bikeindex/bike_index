@@ -383,6 +383,7 @@ CREATE TABLE public.bike_versions (
     manufacturer_id bigint,
     manufacturer_other character varying,
     mnfg_name character varying,
+    extra_registration_number character varying,
     name character varying,
     frame_model text,
     rear_tire_narrow boolean,
@@ -494,9 +495,9 @@ CREATE TABLE public.bikes (
     state_id bigint,
     address_set_manually boolean DEFAULT false,
     is_phone boolean DEFAULT false,
+    conditional_information jsonb DEFAULT '{}'::jsonb,
     current_impound_record_id bigint,
-    current_ownership_id bigint,
-    conditional_information jsonb
+    current_ownership_id bigint
 );
 
 
