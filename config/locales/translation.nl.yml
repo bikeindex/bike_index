@@ -5674,7 +5674,6 @@ nl:
       user_hidden: Verborgen voor andere gebruikers
     edit:
       save_changes: Wijzigingen opslaan
-      you_are_editing: Je bent aan het bewerken
     password:
       better_password: beter
       for_password_update: Voor wachtwoordupdate
