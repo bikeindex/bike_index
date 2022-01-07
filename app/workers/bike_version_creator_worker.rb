@@ -55,5 +55,7 @@ class BikeVersionCreatorWorker < ApplicationWorker
       end
       new_public_image.save
     end
+
+    bike_version # Needs to return bike version because it is run inline
   end
 end

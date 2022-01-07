@@ -9,10 +9,17 @@ class BikeVersionsController < ApplicationController
   def show
   end
 
-  def new
-  end
-
   def create
+    bike = Bike.unscoped.find(params[:bike_id])
+    if bike&.authorized?(current_user)
+      # Do it inline because it's blocking
+      bike_version = BikeVersionCreatorWorker.new.perform(bike.id)
+      flash[:success] = "Bike Version created!"
+      redirect_to edit_bike_version_path(bike_version.id)
+    else
+      flash[:error] = "You don't have permission to create a new version of that bike!"
+      redirect_back(fallback_location: user_root_url)
+    end
   end
 
   def update
@@ -32,6 +39,8 @@ class BikeVersionsController < ApplicationController
 
   def ensure_user_allowed_to_edit
     return true if @bike_version.authorized?(current_user)
+    flash[:error] = "You don't appear to own that bike version"
+    redirect_to(bike_version_path(@bike_version)) && return
   end
 
   def render_ad

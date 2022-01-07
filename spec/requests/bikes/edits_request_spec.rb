@@ -92,13 +92,14 @@ RSpec.describe Bikes::EditsController, type: :request do
   end
   context "with bike_versions" do
     it "renders" do
-      Flipper.enable_actor :bike_versions, current_user
+      Flipper.enable :bike_versions # Simpler to just enable it all
       get base_url
+      expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
-      expect(assigns(:edit_templates)).to eq edit_templates.merge(versions: "Bike Versions")
-      get "#{base_url}/bike_versions"
-      expect(response).to be_ok
-      expect(response).to render_template(:bike_versions)
+      expect(assigns(:edit_templates)).to eq edit_templates.merge(versions: "Bike Versions").as_json
+      get "#{base_url}/versions"
+      expect(response.status).to eq 200
+      expect(response).to render_template(:versions)
     end
   end
   context "stolen bike" do

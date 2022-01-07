@@ -1,0 +1,33 @@
+= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
+  - if params[:return_to].present?
+    = hidden_field_tag :return_to, params[:return_to]
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: '/bikes_edit/primary_menu'
+
+      .col-md-8.form-well
+        .form-wrap#edit_bike_organizations
+          .form-well-form-header
+            %h3 Versions
+          .col-xs-12
+            %p Store and manage snapshots of your bike at specific times
+
+          - if @bike_versions.any?
+            - rendered_version_label = false
+            .related-fields.no-divider-row-wrap
+              - @bike_versions.each do |bike_version|
+                .form-group.row
+                  %label.form-well-label.less-strong
+                    - if rendered_version_label
+                      &nbsp;
+                    - else
+                      Bike Versions
+                      - rendered_version_label = true
+                  %p.form-well-input-static{class: (rendered_version_label ? "" : "mt-1")}
+                    = link_to bike_version.name, edit_bike_version_path(bike_version)
+
+          .add-additional-fields-block.no-divider-row
+            = link_to bike_versions_path(bike_id: @bike.id), method: :create, class: "add_fields", role: "button" do
+              %span.context-display-help
+                +
+              Create a version

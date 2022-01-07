@@ -2,6 +2,8 @@ module BikeEditable
   extend ActiveSupport::Concern
 
   included do
+    before_action :assign_versions
+
     helper_method :edit_bike_template_path_for
   end
 
@@ -49,7 +51,7 @@ module BikeEditable
       h[:ownership] = translation(:ownership, scope: [:controllers, :bikes, :edit])
       h[:groups] = translation(:groups, scope: [:controllers, :bikes, :edit])
       h[:remove] = translation(:remove, scope: [:controllers, :bikes, :edit])
-      if Flipper.enabled?(:bike_versions, current_user)
+      if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
         h[:versions] = translation(:versions, scope: [:controllers, :bikes, :edit])
       end
       unless @bike.status_stolen_or_impounded?
@@ -74,6 +76,11 @@ module BikeEditable
 
     @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
     true
+  end
+
+  def assign_versions
+    return true unless Flipper.enabled?(:bike_versions, @current_user)
+    @bike_versions = @bike.bike_versions.where(owner_id: @current_user.id) if @bike.present?
   end
 
   def edits_controller_name_for(requested_page)
