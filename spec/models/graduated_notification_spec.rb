@@ -440,6 +440,41 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification1.processed?).to be_falsey
       expect(graduated_notification1.send_email?).to be_falsey
     end
+    context "user_registration_organization" do
+      let(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: user, organization: organization, all_bikes: true) }
+      it "removes all_bikes" do
+        expect(user_registration_organization.reload.bikes.pluck(:id)).to eq([bike1.id])
+        AfterUserChangeWorker.new.perform(user.id)
+        graduated_notification1.save
+        expect(graduated_notification1.reload.user).to be_present
+        expect(graduated_notification1.processed?).to be_falsey
+        expect(graduated_notification1.send_email?).to be_truthy
+        expect(graduated_notification1.user_registration_organization&.id).to eq user_registration_organization.id
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+        expect(GraduatedNotification.count).to eq 1
+        expect {
+          expect(graduated_notification1.process_notification).to be_truthy
+        }.to change(CreateGraduatedNotificationWorker.jobs, :count).by 0
+        graduated_notification1.reload
+        expect(graduated_notification1.status).to eq "active"
+        expect(graduated_notification1.processed?).to be_truthy
+        expect(graduated_notification1.send_email?).to be_truthy
+        Sidekiq::Testing.inline! do
+          AfterUserChangeWorker.new.perform(user.id)
+        end
+        expect(bike1.reload.bike_organizations.count).to eq 0
+        expect(UserRegistrationOrganization.count).to eq 0
+        expect(graduated_notification1.user_registration_organization&.id).to eq user_registration_organization.id
+        graduated_notification1.mark_remaining!
+        Sidekiq::Testing.inline! do
+          graduated_notification1.mark_remaining!
+        end
+        expect(bike1.reload.bike_organizations.count).to eq 1
+        expect(UserRegistrationOrganization.count).to eq 1
+        expect(UserRegistrationOrganization.unscoped.count).to eq 1
+      end
+    end
     context "bike created inside of notification interval" do
       let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, created_at: Time.current - 1.hour) }
       let(:interval_start) { Time.current - graduated_notification_interval }

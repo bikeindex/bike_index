@@ -105,6 +105,13 @@ class GraduatedNotification < ApplicationRecord
     bike_organization_id.present? ? BikeOrganization.unscoped.find_by_id(bike_organization_id) : nil
   end
 
+  # Get it unscoped, because we delete it
+  def user_registration_organization
+    return nil if user.blank?
+    UserRegistrationOrganization.unscoped.where(user_id: user_id,
+      organization_id: organization_id).first
+  end
+
   def current?
     self.class.current_statuses.include?(status)
   end
@@ -183,6 +190,10 @@ class GraduatedNotification < ApplicationRecord
       end
       pre_notification.mark_remaining!
     end
+    # Update user_registration_organization only once, after everything has already been updated
+    if primary_notification? && user_registration_organization&.deleted?
+      user_registration_organization.update(deleted_at: nil)
+    end
     true
   end
 
@@ -223,6 +234,7 @@ class GraduatedNotification < ApplicationRecord
     return true if email_success?
     return false unless processable?
 
+    user_registration_organization&.destroy!
     bike_organization&.destroy!
 
     # deliver email before everything, so if fails, we send when we try again
