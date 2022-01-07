@@ -40,14 +40,16 @@ task exchange_rates_update: :environment do
   print is_success ? "done.\n" : "failed.\n"
 end
 
-task migrate_ownerships: :environment do
-  # Make it possible to stop job
-  if MigrateOwnershipWorker::TO_ENQUEUE > 10
-    MigrateOwnershipWorker.enqueue
-    sleep(20)
-    MigrateOwnershipWorker.enqueue
-    sleep(20)
-    MigrateOwnershipWorker.enqueue
+task migrate_user_registration_organizations: :environment do
+  # manually enqueued:
+  BulkAfterUserChangeWorker.bikes.where.not(conditional_information: [{}, nil]).includes(:ownerships).where(ownerships: {claimed: true}).limit(10).find_each { |b| b.touch && (AfterUserChangeWorker.perform_async(b.user.id) if b.user&.id.present?) }
+
+  # Bike.reorder(:updated_at).where("bikes.updated_at > ?", BulkAfterUserChangeWorker.migration_at).count
+  unless ENV["USER_REGISTRATION_MIGRATION_STOP"]
+    BulkAfterUserChangeWorker.bikes
+      .includes(:bike_organizations).where.not(bike_organizations: {id: nil})
+      .includes(:ownerships).where(ownerships: {claimed: true}).limit(2000)
+      .find_each { |b| b.touch && (AfterUserChangeWorker.perform_async(b.user.id) if b.user&.id.present?) }
   end
 end
 
