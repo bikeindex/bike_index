@@ -38,7 +38,13 @@ class AfterUserChangeWorker < ApplicationWorker
       ActivateTheftAlertWorker.perform_async(theft_alert.id)
     end
     # Process user_registration_organizations
-    user.user_registration_organizations.each { |u| u.create_or_update_bike_organizations }
+    user.user_registration_organizations.order(:id).each do |u|
+      # Delete dupe user_registration_organizations
+      user.user_registration_organizations
+        .where(organization_id: u.organization_id).where("id > ?", u.id)
+        .each { |other| other.really_destroy! }
+      u.create_or_update_bike_organizations
+    end
     unless skip_bike_update
       user.bike_ids.each { |id| AfterBikeSaveWorker.perform_async(id, true, true) }
     end

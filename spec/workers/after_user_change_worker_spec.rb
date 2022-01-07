@@ -276,4 +276,21 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(bike3.reload.updated_at).to be_within(2).of Time.current
     end
   end
+
+  describe "user_registration_organization" do
+    let(:user_registration_organization) { FactoryBot.create(:user_registration_organization, all_bikes: true) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+    let(:user) { user_registration_organization.user }
+    let(:organization) { user_registration_organization.organization }
+    let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: user, organization: organization) }
+    it "removes dupes" do
+      expect(user.user_registration_organizations.count).to eq 2
+      expect(user.user_registration_organizations.pluck(:organization_id).uniq).to eq([organization.id])
+      expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([])
+      instance.perform(user.id)
+      expect(user.reload.user_registration_organizations.count).to eq 1
+      expect(UserRegistrationOrganization.pluck(:id)).to eq([user_registration_organization.id])
+      expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+    end
+  end
 end
