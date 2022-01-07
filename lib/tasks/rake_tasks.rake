@@ -40,14 +40,12 @@ task exchange_rates_update: :environment do
   print is_success ? "done.\n" : "failed.\n"
 end
 
-task migrate_ownerships: :environment do
-  # Make it possible to stop job
-  if MigrateOwnershipWorker::TO_ENQUEUE > 10
-    MigrateOwnershipWorker.enqueue
-    sleep(20)
-    MigrateOwnershipWorker.enqueue
-    sleep(20)
-    MigrateOwnershipWorker.enqueue
+task migrate_user_registration_organizations: :environment do
+  if ENV["USER_REGISTRATION_MIGRATION_STOP"].blank? && BulkAfterUserChangeWorker.enqueue?
+    uro_limit = (ENV["USER_LIMIT"] || 500).to_i
+    BulkAfterUserChangeWorker.users
+      .includes(:ownerships).where.not(ownerships: {id: nil})
+      .limit(uro_limit).pluck(:id).each { |i| BulkAfterUserChangeWorker.perform_async(i) }
   end
 end
 

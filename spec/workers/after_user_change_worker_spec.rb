@@ -144,6 +144,48 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
   end
 
+  describe "user_address" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :in_vancouver, user: user, address_set_manually: true) }
+    let(:target_address) { {street: "278 Broadway", zipcode: "10007", city: "Vancouver", country: "CA", state: nil, latitude: 49.253992, longitude: -123.241084}.as_json }
+    it "sets based on bikes" do
+      expect(bike.reload.registration_address(true)).to eq target_address
+      expect(bike.address_set_manually).to be_truthy
+      expect(user.reload.address).to be_blank
+      expect(user.address_set_manually).to be_falsey
+      # Inline so it processes the bikes
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        instance.perform(user.id)
+      end
+      expect(user.reload.address_hash).to eq target_address
+      expect(user.address_set_manually).to be_truthy # Because bike was set manually!
+      expect(user.latitude).to be_within(0.01).of(49.253992)
+      expect(user.longitude).to be_within(0.01).of(-123.241084)
+
+      expect(bike.reload.registration_address(true)).to eq target_address
+      expect(bike.address_set_manually).to be_falsey # It's switched to being set by user :shrug:
+    end
+    context "address_set_manually" do
+      let(:user) { FactoryBot.create(:user, :in_los_angeles, address_set_manually: true, skip_geocoding: true) }
+      let(:target_address) { {street: "100 W 1st St", city: "Los Angeles", state: "CA", zipcode: "90021", country: "US", latitude: 34.05223, longitude: -118.24368}.as_json }
+      it "updates bike to be users address" do
+        expect(bike.reload.registration_address(true)).to eq target_address
+        expect(user.reload.address_hash).to eq target_address
+        # Inline so it processes the bikes
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          instance.perform(user.id)
+        end
+        expect(bike.reload.registration_address(true)).to eq target_address
+        expect(bike.address_set_manually).to be_falsey
+        expect(bike.latitude).to be_within(0.01).of(34.05223)
+        expect(bike.longitude).to be_within(0.01).of(-118.24368)
+        expect(user.reload.address_hash).to eq target_address
+      end
+    end
+  end
+
   describe "stolen records missing locations" do
     let(:user) { FactoryBot.create(:user) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }
@@ -232,6 +274,23 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(bike2.reload.owner_name).to eq new_name
       expect(bike2.current_ownership_id).to eq ownership2.id
       expect(bike3.reload.updated_at).to be_within(2).of Time.current
+    end
+  end
+
+  describe "user_registration_organization" do
+    let(:user_registration_organization) { FactoryBot.create(:user_registration_organization, all_bikes: true) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+    let(:user) { user_registration_organization.user }
+    let(:organization) { user_registration_organization.organization }
+    let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: user, organization: organization) }
+    it "removes dupes" do
+      expect(user.user_registration_organizations.count).to eq 2
+      expect(user.user_registration_organizations.pluck(:organization_id).uniq).to eq([organization.id])
+      expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([])
+      instance.perform(user.id)
+      expect(user.reload.user_registration_organizations.count).to eq 1
+      expect(UserRegistrationOrganization.pluck(:id)).to eq([user_registration_organization.id])
+      expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
     end
   end
 end

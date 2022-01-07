@@ -101,12 +101,15 @@ RSpec.describe MyAccountsController, type: :request do
 
   describe "/edit" do
     include_context :request_spec_logged_in_as_user
+    let(:default_edit_templates) { {root: "User Settings", password: "Password", sharing: "Sharing + Personal Page"} }
     context "no page given" do
       it "renders root" do
         get "#{base_url}/edit"
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq("root")
+        expect(assigns(:edit_templates)).to eq default_edit_templates.as_json
         expect(response).to render_template("edit")
+        expect(response).to render_template(partial: "_root")
         expect(response).to render_template("layouts/application")
       end
     end
@@ -117,10 +120,29 @@ RSpec.describe MyAccountsController, type: :request do
             get "#{base_url}/edit/#{template}"
             expect(response).to be_ok
             expect(assigns(:edit_template)).to eq(template)
+            expect(assigns(:edit_templates)).to eq default_edit_templates.as_json
             expect(response).to render_template(partial: "_#{template}")
             expect(response).to render_template("layouts/application")
           end
         end
+      end
+    end
+    context "with user_registration_organization" do
+      let(:target_templates) { default_edit_templates.merge(registration_organizations: "Registration Organizations") }
+      let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: current_user) }
+      it "includes user_registration_organization template" do
+        expect(current_user.reload.user_registration_organizations.pluck(:id)).to eq([user_registration_organization.id])
+        get "#{base_url}/edit"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("root")
+        expect(assigns(:edit_templates)).to eq target_templates.as_json
+        expect(response).to render_template(partial: "_root")
+        get "#{base_url}/edit/registration_organizations"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("registration_organizations")
+        expect(assigns(:edit_templates)).to eq target_templates.as_json
+        expect(response).to render_template(partial: "_registration_organizations")
+        expect(response).to render_template("layouts/application")
       end
     end
   end
@@ -128,7 +150,7 @@ RSpec.describe MyAccountsController, type: :request do
   describe "update" do
     include_context :request_spec_logged_in_as_user
     let!(:current_user) { FactoryBot.create(:user_confirmed, password: "old_password", password_confirmation: "old_password", username: "something") }
-    # force skip_update to be false, like it is in reality
+    # force skip_update to be false, like it is in reality (unblocks updating)
     before { current_user.skip_update = false }
 
     context "nil username" do
@@ -149,7 +171,7 @@ RSpec.describe MyAccountsController, type: :request do
       expect {
         patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
       }.to change(AfterUserChangeWorker.jobs, :size).by(1)
-      expect(response).to redirect_to edit_my_account_url
+      expect(response).to redirect_to edit_my_account_url(edit_template: "root")
       current_user.reload
       expect(current_user.notification_newsletters).to be_truthy
       expect(current_user.notification_unstolen).to be_falsey
@@ -200,7 +222,7 @@ RSpec.describe MyAccountsController, type: :request do
             phone: "3223232"
           }
         }
-        expect(response).to redirect_to(edit_my_account_url)
+        expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:error]).to_not be_present
         current_user.reload
         expect(current_user.name).to eq("Mr. Slick")
@@ -268,7 +290,7 @@ RSpec.describe MyAccountsController, type: :request do
             password_confirmation: "172ddfasdf1LDF"
           }
         }
-        expect(response).to redirect_to edit_my_account_path
+        expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:success]).to be_present
         current_user.reload
         expect(current_user.reload.authenticate("172ddfasdf1LDF")).to be_truthy
@@ -310,7 +332,7 @@ RSpec.describe MyAccountsController, type: :request do
             }
           }
           expect(flash[:success]).to be_present
-          expect(response).to redirect_to edit_my_account_url
+          expect(response).to redirect_to edit_my_account_url(edit_template: "root")
           membership.reload
           membership2.reload
           expect(membership.notification_daily?).to be_truthy
@@ -323,12 +345,175 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
 
+    context "user_registration_organization" do
+      let(:organization1) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
+      let!(:user_registration_organization1) { FactoryBot.create(:user_registration_organization, all_bikes: false, organization: organization1, user: current_user) }
+      let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: current_user, creation_organization: organization1) }
+      let(:bike_organization1) { bike1.bike_organizations.first }
+      let(:feature_slugs) { OrganizationFeature::REG_FIELDS }
+      let(:update_params) do
+        {
+          :edit_template => "registration_organizations",
+          :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
+          :user_registration_organization_can_edit_claimed => [],
+          "reg_field-organization_affiliation_#{organization1.id}" => "student",
+          "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
+        }
+      end
+      let(:target_info) do
+        {"organization_affiliation_#{organization1.id}" => "student",
+         "student_id_#{organization1.id}" => "XXX777YYY"}.as_json
+      end
+      def expect_bike1_initiated
+        expect(user_registration_organization1.reload.all_bikes?).to be_falsey
+        expect(user_registration_organization1.can_edit_claimed).to be_truthy
+        expect(user_registration_organization1.registration_info).to be_blank
+        expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        expect(bike_organization1.reload.can_edit_claimed).to be_truthy
+        expect(bike_organization1.overridden_by_user_registration?).to be_falsey
+        expect(bike1.registration_info).to be_blank
+      end
+
+      it "updates" do
+        expect_bike1_initiated
+
+        Sidekiq::Worker.clear_all
+        put base_url, params: update_params
+        expect(AfterUserChangeWorker.jobs.count).to eq 1
+        expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
+        expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+        expect(user_registration_organization1.can_edit_claimed).to be_falsey
+        expect(user_registration_organization1.registration_info).to eq target_info
+
+        Sidekiq::Testing.inline! {
+          AfterUserChangeWorker.drain
+        }
+        expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+        expect(bike1.registration_info).to eq target_info
+        expect(bike_organization1.reload.can_edit_claimed).to be_falsey
+        expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+      end
+      context "multiple bikes" do
+        let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+        let(:bike2_organization1) { bike2.bike_organizations.where(organization_id: organization1.id).first }
+        it "updates" do
+          expect_bike1_initiated
+
+          expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
+          expect(bike2.registration_info).to be_blank
+
+          Sidekiq::Worker.clear_all
+          put base_url, params: {
+            :edit_template => "registration_organizations",
+            :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
+            :user_registration_organization_can_edit_claimed => [""],
+            "reg_field-organization_affiliation_#{organization1.id}" => "student",
+            "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
+          }
+          expect(AfterUserChangeWorker.jobs.count).to eq 1
+          expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
+          expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+          expect(user_registration_organization1.can_edit_claimed).to be_falsey
+          expect(user_registration_organization1.registration_info).to eq target_info
+
+          Sidekiq::Testing.inline! {
+            AfterUserChangeWorker.drain
+          }
+          expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+          expect(bike1.registration_info).to eq target_info
+          expect(bike_organization1.reload.can_edit_claimed).to be_falsey
+          expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+
+          expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
+          expect(bike2.registration_info).to eq target_info
+          expect(bike2_organization1.can_edit_claimed).to be_falsey
+          expect(bike2_organization1.overridden_by_user_registration?).to be_truthy
+        end
+        context "with multiple user_registration_organizations" do
+          let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_organization_affiliation"]) }
+          let(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, all_bikes: true, user: current_user, organization: organization2) }
+          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_address).as_json }
+          let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, :in_nyc, user: current_user, creation_registration_info: bike3_information) }
+          let(:target_extra_info) do
+            target_info.merge("organization_affiliation_#{organization2.id}" => "employee")
+              .merge(default_location_registration_address).as_json
+          end
+          it "updates" do
+            expect_bike1_initiated
+            expect(current_user.reload.to_coordinates).to eq([nil, nil])
+            expect(current_user.address_set_manually).to be_falsey
+            expect(bike2.bike_organizations.pluck(:organization_id)).to eq([])
+
+            expect(user_registration_organization2.registration_info).to be_blank
+
+            expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization2.id])
+            expect(bike2.registration_info).to be_blank
+            bike2_organization2 = bike2.bike_organizations.where(organization_id: organization2.id).first
+            expect(bike2_organization2).to be_present
+            bike1_organization2 = bike1.bike_organizations.where(organization_id: organization2.id).first
+            expect(bike1_organization2).to be_valid
+            bike1_organization2.destroy
+
+            expect(bike3.reload.registration_info).to eq(bike3_information)
+            expect(bike3.address_hash).to eq default_location_registration_address.as_json
+
+            Sidekiq::Worker.clear_all
+            put base_url, params: {
+              :edit_template => "registration_organizations",
+              :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
+              :user_registration_organization_can_edit_claimed => ["", user_registration_organization2.id],
+              "reg_field-organization_affiliation_#{organization1.id}" => "student",
+              "reg_field-student_id_#{organization1.id}" => "XXX777YYY",
+              "reg_field-organization_affiliation_#{organization2.id}" => "employee"
+            }
+            expect(AfterUserChangeWorker.jobs.count).to eq 1
+            expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+            expect(flash[:success]).to be_present
+            expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
+            expect(user_registration_organization1.reload.all_bikes?).to be_truthy
+            expect(user_registration_organization1.can_edit_claimed).to be_falsey
+            expect(user_registration_organization1.registration_info).to eq target_extra_info
+
+            expect(user_registration_organization2.reload.all_bikes?).to be_falsey
+            expect(user_registration_organization2.can_edit_claimed).to be_truthy
+            expect(user_registration_organization2.registration_info).to eq target_extra_info
+
+            Sidekiq::Testing.inline! {
+              AfterUserChangeWorker.drain
+            }
+            deleted_bike_organization = BikeOrganization.unscoped.where(id: bike1_organization2.id).first
+            expect(deleted_bike_organization.deleted?).to be_truthy
+            # expect(BikeOrganization.unscoped.where(id: bike1_organization2.id).deleted?).to be_truthy
+            expect(bike1.reload.organizations.pluck(:id)).to eq([organization1.id])
+            expect(bike1.registration_info).to eq target_extra_info
+            expect(bike_organization1.reload.can_edit_claimed).to be_falsey
+            expect(bike_organization1.overridden_by_user_registration?).to be_truthy
+
+            expect(bike2.reload.bike_organizations.pluck(:organization_id)).to match_array([organization1.id, organization2.id])
+            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_address).as_json
+            expect(bike2_organization1.can_edit_claimed).to be_falsey
+            expect(bike2_organization1.overridden_by_user_registration?).to be_truthy
+
+            expect(bike3.reload.organizations.pluck(:id)).to match_array([organization1.id])
+            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
+            expect(bike3.registration_info).to eq target_bike3_info
+
+            expect(current_user.reload.address_hash).to eq default_location_registration_address.as_json
+          end
+        end
+      end
+    end
+
     describe "preferred_language" do
       it "updates if valid" do
         expect(current_user.reload.preferred_language).to eq(nil)
         patch base_url, params: {id: current_user.username, locale: "nl", user: {preferred_language: "en"}}
         expect(flash[:success]).to match(/succesvol/i)
-        expect(response).to redirect_to "/my_account/edit?locale=nl"
+        expect(response).to redirect_to "/my_account/edit/root?locale=nl"
         expect(current_user.reload.preferred_language).to eq("en")
       end
 
@@ -336,7 +521,7 @@ RSpec.describe MyAccountsController, type: :request do
         current_user.update_attribute :preferred_language, "en"
         patch base_url, params: {id: current_user.username, locale: "en", user: {preferred_language: "nl"}}
         expect(flash[:success]).to match(/successfully updated/i)
-        expect(response).to redirect_to "/my_account/edit?locale=en"
+        expect(response).to redirect_to "/my_account/edit/root?locale=en"
         expect(current_user.reload.preferred_language).to eq("nl")
       end
 

@@ -142,6 +142,10 @@ class Organization < ApplicationRecord
     find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
   end
 
+  def self.friendly_find_id(n)
+    friendly_find(n)&.id
+  end
+
   def self.integer_slug?(n)
     n.is_a?(Integer) || n.match(/\A\d+\z/).present?
   end
@@ -161,6 +165,12 @@ class Organization < ApplicationRecord
     matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
+  end
+
+  def self.with_any_enabled_feature_slugs(slugs)
+    matching_slugs = OrganizationFeature.matching_slugs(slugs)
+    return none unless matching_slugs.present?
+    where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
   end
 
   def self.permitted_domain_passwordless_signin
@@ -236,6 +246,11 @@ class Organization < ApplicationRecord
   # TODO: rename - actually should be "enabled_features?" - because many orgs haven't actually paid
   def paid?
     is_paid
+  end
+
+  # For now - just using paid
+  def user_registration_all_bikes?
+    paid? && [36, 1].exclude?(id) # Exclude SBR and BikeIndex
   end
 
   def paid_money?

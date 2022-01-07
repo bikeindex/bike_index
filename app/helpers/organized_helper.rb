@@ -96,13 +96,16 @@ module OrganizedHelper
   end
 
   def include_field_reg_organization_affiliation?(organization = nil, user = nil)
-    organization.present? &&
+    return false unless organization.present? &&
       organization.additional_registration_fields.include?("reg_organization_affiliation")
+    return true if user.blank?
+    user.user_registration_organizations.with_organization_affiliation(organization.id).none?
   end
 
   def include_field_reg_address?(organization = nil, user = nil)
-    organization.present? &&
+    return false unless organization.present? &&
       organization.additional_registration_fields.include?("reg_address")
+    !user&.address_set_manually?
   end
 
   def include_field_reg_phone?(organization = nil, user = nil)
@@ -119,8 +122,10 @@ module OrganizedHelper
   end
 
   def include_field_reg_student_id?(organization = nil, user = nil)
-    organization.present? &&
+    return false unless organization.present? &&
       organization.additional_registration_fields.include?("reg_student_id")
+    return true if user.blank?
+    user.user_registration_organizations.with_student_id(organization.id).none?
   end
 
   def registration_field_label(organization = nil, field_slug = nil)

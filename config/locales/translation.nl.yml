@@ -2418,6 +2418,7 @@ nl:
         password: Wachtwoord
         sharing: Delen + persoonlijke pagina
         user_settings: Gebruikersinstellingen
+        registration_organizations: Registratie Organisaties
       update:
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
@@ -5744,6 +5745,25 @@ nl:
       your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
         uw deelpagina en het embed-formulier van de fiets. Update het als je om die
         dingen geeft.
+    registration_organizations:
+      affiliation: "%{org_name} aansluiting"
+      all_bikes_with_organization: Al uw fietsen zijn geregistreerd bij deze organisatie
+      allow_organization_to_edit_bikes_html: Sta %{org_name_em} toe om je fietsen
+        te bewerken
+      and_other_bikes_count: en %{other_bikes_count} andere fietsen.
+      bike: Fiets
+      mailing_address: Postadres
+      phone: Telefoon
+      register_all_with: Registreer al je fietsen bij deze organisatie
+      registered_with: aangemeld met
+      registration_organization_information: Beheer de organisaties waarbij uw fietsen
+        zijn geregistreerd.
+      registration_organizations: Registratie organisaties
+      student_id: Student-ID
+      update_your_address_on_html: Werk uw adres bij in %{user_settings_link}
+      update_your_phone_on_html: Update je telefoon in %{user_settings_link}
+      when_not_selected: Indien niet aangevinkt, beheer via de pagina "Groepen en
+        organisaties" van elke fiets.
   org_public:
     impounded_bikes:
       index:
@@ -5771,7 +5791,6 @@ nl:
       manufacturer: Fabrikant
       model_year: Modeljaar
       nevermind: Laat maar
-      organization_affiliation: "%{org_name} aansluiting"
       other_serial_or_registration_number: Ander framenummer of registratienummer
       please_fill_in_both_fields: Gelieve beide velden in te vullen
       reason_for_update: Reden voor update
@@ -5843,7 +5862,6 @@ nl:
       are_you_part_of_a_school_want_to_bolster_: Ben je een student van een van onze
         school- of universitaire partners? Wil je een lokale belangenorganisatie laten
         weten dat je van ze houdt? Voeg hier de organisatie toe.
-      can_edit_this_bike: Kan dit bewerken %{bike_type}
       choose_organization: Kies organisatie
       creation_organization: Creatie organisatie
       groups_and_organizations: Groepen en organisaties
@@ -5946,3 +5964,8 @@ nl:
       without_a_valid_report_number_html: Zonder een geldig rapportnummer wordt uw
         fiets niet opgenomen in <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">partnerzoekopdrachten</a>
         door <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+    edit_bike_organization:
+      can_edit_this_bike: Kan dit bewerken %{bike_type}
+      manage_organization_information: Organisatie-informatie beheren
+      manage_organization_information_via: organisatie-informatie beheerd via uw account
+      remove: Verwijderen

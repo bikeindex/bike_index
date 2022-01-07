@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Ownership, type: :model do
+  it_behaves_like "registration_infoable"
+
   describe "factories" do
     let(:ownership) { FactoryBot.create(:ownership) }
     it "creates" do
@@ -528,7 +530,8 @@ RSpec.describe Ownership, type: :model do
 
   describe "owner_name" do
     context "registration_info" do
-      let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_state_registration_info: {user_name: "Cool Name"}) }
+      let(:registration_info) { {user_name: "Cool Name"} }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: registration_info) }
       let(:user) { FactoryBot.create(:user_confirmed, name: "New name", email: bike.owner_email) }
       it "is registration_info" do
         expect(bike.reload.user&.id).to be_blank
@@ -539,6 +542,71 @@ RSpec.describe Ownership, type: :model do
         expect(bike.reload.user&.id).to eq user.id
         expect(bike.current_ownership.owner_name).to eq "New name"
         expect(bike.owner_name).to eq "New name"
+      end
+      context "cleaned_registration_info" do
+        let(:registration_info) { {user_name: "George", bike_code: "9998888", phone: "(111) 222-4444", student_id: "1222", organization_affiliation: "employee"} }
+        let(:target_cleaned) { {user_name: "George", bike_sticker: "9998888", phone: "1112224444", student_id: "1222", organization_affiliation: "employee"}.as_json }
+        let(:organized_target) { target_cleaned.merge("student_id_#{organization.id}" => "1222", "organization_affiliation_#{organization.id}" => "employee") }
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:organization2) { FactoryBot.create(:organization) }
+        it "cleans things" do
+          expect(bike.reload.registration_info).to eq target_cleaned
+          expect(bike.owner_name).to eq "George"
+
+          ownership = bike.current_ownership
+          expect(ownership.student_id_key).to eq "student_id"
+          expect(ownership.student_id_key(organization)).to eq "student_id"
+          expect(ownership.student_id_key(organization.id)).to eq "student_id"
+          expect(ownership.student_id_key(organization2)).to eq "student_id"
+          expect(ownership.student_id_key(organization2.slug)).to eq "student_id"
+          expect(ownership.organization_affiliation).to eq "employee"
+          organization_uniq_keys = OrganizationFeature.reg_fields_organization_uniq.map { |f| f.gsub("reg_", "") }
+          expect(ownership.registration_info_uniq_keys).to match_array organization_uniq_keys
+
+          expect(bike.student_id).to eq "1222"
+
+          expect(bike.student_id(organization)).to eq "1222"
+          expect(bike.student_id(organization2)).to eq "1222"
+          expect(bike.organization_affiliation).to eq "employee"
+          expect(bike.organization_affiliation(organization)).to eq "employee"
+          expect(bike.organization_affiliation(organization2)).to eq "employee"
+          expect(ownership.organization_id).to be_blank
+          expect(ownership.registration_info).to eq target_cleaned
+          expect(ownership.owner_name).to eq "George"
+          # If there is a organization, it cleans things using the org id
+          ownership.update(organization: organization)
+          expect(ownership.registration_info).to eq organized_target
+          expect(ownership.student_id_key).to eq "student_id"
+          expect(ownership.student_id_key(organization)).to eq "student_id_#{organization.id}"
+          expect(ownership.student_id_key(organization.id)).to eq "student_id_#{organization.id}"
+          expect(ownership.student_id(organization.slug)).to eq "1222"
+          expect(ownership.student_id(organization2)).to eq "1222"
+
+          expect(ownership.organization_affiliation).to eq "employee"
+          expect(ownership.organization_affiliation(organization)).to eq "employee"
+          expect(ownership.organization_affiliation(organization.id)).to eq "employee"
+          expect(ownership.organization_affiliation(organization.slug)).to eq "employee"
+          expect(ownership.organization_affiliation(organization2)).to eq "employee"
+
+          # sanity check
+          expect(ownership.registration_info_uniq_keys).to match_array organization_uniq_keys
+
+          expect(bike.reload.student_id).to eq "1222"
+          expect(bike.student_id(organization)).to eq "1222"
+          expect(bike.organization_affiliation).to eq "employee"
+        end
+        context "user_registration_organization"
+      end
+      context "conditional_information" do
+        # TODO: post #2121 remove once conditional_information is dropped
+        let(:registration_info) { {student_id: "99xxx"} }
+        it "overrides things" do
+          expect(bike.registration_info).to eq({student_id: "99xxx"}.as_json)
+          bike.update(conditional_information: {student_id: "//**CCCCC"})
+          ownership = bike.reload.current_ownership
+          ownership.update(updated_at: Time.current)
+          expect(ownership.reload.registration_info).to eq({student_id: "//**CCCCC"}.as_json)
+        end
       end
     end
     context "with creator" do

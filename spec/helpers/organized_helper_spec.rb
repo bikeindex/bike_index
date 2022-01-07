@@ -187,6 +187,36 @@ RSpec.describe OrganizedHelper, type: :helper do
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
         end
+        context "with user_registration_organization" do
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
+          let(:registration_info) { {} }
+          let(:user) { FactoryBot.create(:user_confirmed) }
+          let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: user, organization: organization, registration_info: registration_info) }
+          it "is falsey with user" do
+            expect(include_field_reg_phone?(organization)).to be_truthy
+            expect(include_field_reg_phone?(organization, user)).to be_truthy # Purely based on whether user has phone
+            expect(include_field_reg_address?(organization)).to be_truthy
+            expect(include_field_reg_address?(organization, user)).to be_truthy
+            expect(include_field_reg_organization_affiliation?(organization)).to be_truthy
+            expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
+            expect(include_field_reg_student_id?(organization)).to be_truthy
+            expect(include_field_reg_student_id?(organization, user)).to be_truthy
+          end
+          context "with registration_info" do
+            let(:user) { FactoryBot.create(:user_confirmed, :in_edmonton, phone: "7773335555", address_set_manually: true) }
+            let(:registration_info) { {student_id: "12", organization_affiliation: "staff"} }
+            it "is falsey" do
+              expect(user.reload.street).to be_present
+              expect(include_field_reg_phone?(organization, user)).to be_falsey # Purely based on whether user has phone
+              expect(include_field_reg_address?(organization, user)).to be_falsey
+              expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
+              expect(include_field_reg_student_id?(organization, user)).to be_falsey
+              # Each bike needs to have these fields - regardless of user_registration_organization
+              expect(include_field_reg_extra_registration_number?(organization, user)).to be_truthy
+              expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
+            end
+          end
+        end
       end
       context "stickers" do
         it "includes" do

@@ -30,7 +30,7 @@ FactoryBot.define do
         creation_state_pos_kind { "" }
         creation_state_origin { "" }
         creation_state_bulk_import { nil }
-        creation_state_registration_info { nil }
+        creation_registration_info { nil }
       end
 
       after(:create) do |bike, evaluator|
@@ -57,7 +57,7 @@ FactoryBot.define do
             origin: evaluator.creation_state_origin,
             pos_kind: evaluator.creation_state_pos_kind,
             bulk_import: evaluator.creation_state_bulk_import,
-            registration_info: evaluator.creation_state_registration_info)
+            registration_info: evaluator.creation_registration_info)
 
           bike.reload
         end

@@ -17,7 +17,7 @@ RSpec.describe "BikesController#update", type: :request do
     end
   end
   context "setting address for bike" do
-    let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address) }
+    let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address.merge(address_set_manually: true)) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
     let(:update) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
     include_context :geocoder_real # But it shouldn't make any actual calls!
@@ -146,6 +146,12 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.user&.id).to eq current_user.id
         AfterUserChangeWorker.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq([])
+        expect(current_user.address).to eq "278 Broadway, New York, 10007, US"
+        expect(current_user.address_set_manually).to be_truthy
+        # saving the bike one more time changes address_set_manually to be false
+        # Someone surprising, but I think I'm happy with the outcome - it should be set by user
+        bike.reload.update(updated_at: Time.current)
+        expect(bike.reload.address_set_manually).to be_falsey
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           # get edit because it should claim the bike
@@ -164,7 +170,8 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.user&.id).to eq current_user.id
         expect(bike.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
-        expect(bike.address_hash).to eq({country: "US", city: "New York", street: "278 Broadway", zipcode: "10007", state: nil, latitude: nil, longitude: nil}.as_json)
+        # It no longer has an address, the stolen record has updated it
+        expect(bike.address_hash.values.compact).to eq(["US"])
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present

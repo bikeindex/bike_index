@@ -69,6 +69,6 @@ class Component < ApplicationRecord
 
   def set_manufacturer
     return true unless mnfg_name.present?
-    self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
+    self.manufacturer_id = Manufacturer.friendly_find_id(mnfg_name)
   end
 end

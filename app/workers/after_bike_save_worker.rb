@@ -17,6 +17,7 @@ class AfterBikeSaveWorker < ApplicationWorker
     if bike.present? && bike.listing_order != bike.calculated_listing_order
       bike.update_attribute :listing_order, bike.calculated_listing_order
     end
+    create_user_registration_organizations(bike)
     update_ownership(bike)
     unless skip_user_update
       # Update the user to update any user alerts relevant to bikes
@@ -70,5 +71,20 @@ class AfterBikeSaveWorker < ApplicationWorker
   # Bump registration_info attributes on ownerships
   def update_ownership(bike)
     bike.current_ownership&.update(updated_at: Time.current)
+  end
+
+  def create_user_registration_organizations(bike)
+    return unless bike.reload.user.present?
+    bike.bike_organizations.each do |bike_organization|
+      organization = bike_organization.organization
+      next if UserRegistrationOrganization.unscoped
+        .where(user_id: bike.user.id, organization_id: organization.id).any?
+      user_registration_organization = UserRegistrationOrganization.new(user_id: bike.user.id, organization_id: organization.id)
+      user_registration_organization.all_bikes = organization.user_registration_all_bikes?
+      user_registration_organization.can_not_edit_claimed = bike_organization.can_not_edit_claimed
+      user_registration_organization.set_initial_registration_info
+      user_registration_organization.save
+    end
+    bike.reload
   end
 end

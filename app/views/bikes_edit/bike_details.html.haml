@@ -124,12 +124,6 @@
                   .form-well-input
                     = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: 'form-control' })
 
-          - organization_with_affiliation = @bike.organizations.with_enabled_feature_slugs("organization_affiliation").first
-          - if organization_with_affiliation.present?
-            .form-group.row.unnested-field
-              = f.label :organization_affiliation, t(".organization_affiliation", org_name: organization_with_affiliation.short_name), class: "form-well-label"
-              .form-well-input
-                = f.select :organization_affiliation, organization_with_affiliation.organization_affiliation_options, { prompt: "Choose affiliation" }, { class: "form-control", required: true }
           -# need to check if any stickers, because maybe it has some that aren't user editable
           - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
             = render "shared/form_well_footer_save"
