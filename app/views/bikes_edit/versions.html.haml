@@ -12,7 +12,7 @@
           .col-xs-12
             %p Store and manage snapshots of your bike at specific times
 
-          - if @bike_versions.any?
+          - if @bike_versions.present?
             - rendered_version_label = false
             .related-fields.no-divider-row-wrap
               - @bike_versions.each do |bike_version|

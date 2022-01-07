@@ -21,6 +21,8 @@ class BikeVersion < ApplicationRecord
 
   default_scope { where.not(visibility: "user_hidden").order(listing_order: :desc) }
 
+  validates :name, uniqueness: {scope: [:bike_id, :owner_id]}
+
   before_validation :set_calculated_attributes
 
   delegate :bike_versions,

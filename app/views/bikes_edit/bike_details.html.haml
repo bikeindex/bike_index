@@ -11,6 +11,11 @@
             %h3
               = @edit_templates[@edit_template]
 
+          - if @bike.version?
+            .form-group.row.unnested-field
+              = f.label :name, t(".version_name"), class: 'form-well-label'
+              .form-well-input
+                = f.text_field :name, class: 'form-control'
           .related-fields
             .form-group.row
               = f.label :serial_number, class: 'form-well-label'
@@ -103,10 +108,10 @@
                     - @bike.frame_size_number = @bike.frame_size_number.round if @bike.frame_size_number.to_i == @bike.frame_size_number
                   = f.number_field :frame_size_number, class: 'form-control', step: 0.1
 
-          .form-group.row.unnested-field
-            = f.label :name, t(".bike_name"), class: 'form-well-label'
-            .form-well-input
-              = f.text_field :name, class: 'form-control'
+            .form-group.row.unnested-field
+              = f.label :name, t(".bike_name"), class: 'form-well-label'
+              .form-well-input
+                = f.text_field :name, class: 'form-control'
 
           .form-group.row.unnested-field
             = f.label :description, t(".general_description"), class: 'form-well-label form-well-label-large-input'

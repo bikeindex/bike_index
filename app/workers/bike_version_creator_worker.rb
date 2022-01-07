@@ -20,7 +20,7 @@ class BikeVersionCreatorWorker < ApplicationWorker
       frame_size_unit: bike.frame_size_unit,
       frame_size_number: bike.frame_size_number,
 
-      name: bike.name,
+      name: version_name_for(bike),
       description: bike.description,
 
       primary_frame_color_id: bike.primary_frame_color_id,
@@ -57,5 +57,13 @@ class BikeVersionCreatorWorker < ApplicationWorker
     end
 
     bike_version # Needs to return bike version because it is run inline
+  end
+
+  def version_name_for(bike)
+    version_number = bike.bike_versions.where(owner_id: bike.user&.id).count + 1
+    [
+      bike.name,
+      "version #{version_number}"
+     ].compact.join(", ")
   end
 end

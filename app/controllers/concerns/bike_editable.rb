@@ -15,7 +15,9 @@ module BikeEditable
   end
 
   def edit_bike_template_path_for(bike, template = nil)
-    if edits_controller_name_for(template) == "edits"
+    if bike.version?
+      edit_bike_version_url(bike.id, edit_template: template)
+    elsif edits_controller_name_for(template) == "edits"
       edit_bike_url(bike.id, edit_template: template)
     elsif template.to_s == "alert"
       new_bike_theft_alert_path(bike_id: bike.id)
