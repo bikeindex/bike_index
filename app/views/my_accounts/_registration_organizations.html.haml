@@ -12,7 +12,7 @@
   - user_registration_organizations.each do |user_registration_organization|
     - organization = user_registration_organization.organization
     = fields_for user_registration_organization do |uro|
-      %hr
+      %hr.d-none.d-sm-block
       .related-fields.userRegistrationOrganization
         .form-group.row
           %label.form-well-label
