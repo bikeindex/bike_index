@@ -42,14 +42,19 @@ end
 
 task migrate_user_registration_organizations: :environment do
   # manually enqueued:
-  BulkAfterUserChangeWorker.bikes.where.not(conditional_information: [{}, nil]).includes(:ownerships).where(ownerships: {claimed: true}).limit(10).find_each { |b| b.touch && (AfterUserChangeWorker.perform_async(b.user.id) if b.user&.id.present?) }
+  # BulkAfterUserChangeWorker.bikes.where.not(conditional_information: [{}, nil]).pluck(:id).each { |i| AfterBikeSaveWorker.perform_async(i) }
+  # .includes(:ownerships).where(ownerships: {claimed: true}).limit(10).find_each { |b| b.touch && (AfterUserChangeWorker.perform_async(b.user.id) if b.user&.id.present?) }
+  # BulkAfterUserChangeWorker.bikes
+  #     .includes(:bike_organizations).where.not(bike_organizations: {id: nil})
+  #     .includes(:ownerships).where(ownerships: {claimed: true}).limit(2000)
+  #     .find_each { |b| b.touch && (AfterUserChangeWorker.perform_async(b.user.id) if b.user&.id.present?) }
 
   # Bike.reorder(:updated_at).where("bikes.updated_at > ?", BulkAfterUserChangeWorker.migration_at).count
+  # User.reorder(:updated_at).where("users.updated_at > ?", BulkAfterUserChangeWorker.migration_at).count
   unless ENV["USER_REGISTRATION_MIGRATION_STOP"]
-    BulkAfterUserChangeWorker.bikes
-      .includes(:bike_organizations).where.not(bike_organizations: {id: nil})
-      .includes(:ownerships).where(ownerships: {claimed: true}).limit(2000)
-      .find_each { |b| b.touch && (AfterUserChangeWorker.perform_async(b.user.id) if b.user&.id.present?) }
+    BulkAfterUserChangeWorker.users
+      .includes(:ownerships).where.not(ownerships: {id: nil})
+      .limit(1000).pluck(:id).each { |i| AfterUserChangeWorker.perform_async(i) }
   end
 end
 
