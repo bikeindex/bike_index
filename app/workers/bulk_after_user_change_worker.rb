@@ -5,6 +5,11 @@ class BulkAfterUserChangeWorker < AfterUserChangeWorker
     Time.at((ENV["MIGRATION_START"] || 1641517243).to_i)
   end
 
+  def self.enqueue?
+    # Skip if the queue is backing up
+    !ScheduledWorker.enqueued?
+  end
+
   def self.bikes
     Bike.reorder(:updated_at).where("bikes.updated_at < ?", migration_at)
   end

@@ -51,7 +51,7 @@ task migrate_user_registration_organizations: :environment do
 
   # Bike.reorder(:updated_at).where("bikes.updated_at > ?", BulkAfterUserChangeWorker.migration_at).count
   # User.reorder(:updated_at).where("users.updated_at > ?", BulkAfterUserChangeWorker.migration_at).count
-  unless ENV["USER_REGISTRATION_MIGRATION_STOP"]
+  if ENV["USER_REGISTRATION_MIGRATION_STOP"].blank? && BulkAfterUserChangeWorker.enqueue?
     uro_limit = (ENV["USER_LIMIT"] || 500).to_i
     BulkAfterUserChangeWorker.users
       .includes(:ownerships).where.not(ownerships: {id: nil})
