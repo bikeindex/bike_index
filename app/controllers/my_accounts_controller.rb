@@ -59,7 +59,7 @@ class MyAccountsController < ApplicationController
   end
 
   def registration_organization_template
-    return {} unless current_user.user_registration_organizations.any?
+    return {} unless current_user&.user_registration_organizations.present?
     {registration_organizations: translation(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
   end
 
