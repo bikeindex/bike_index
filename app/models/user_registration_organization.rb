@@ -14,7 +14,7 @@ class UserRegistrationOrganization < ApplicationRecord
   scope :paid_organizations, -> { includes(:organization).where(organizations: {is_paid: true}) }
   scope :not_paid_organizations, -> { includes(:organization).where(organizations: {is_paid: false}) }
 
-  attr_accessor :skip_update, :skip_after_user_change_worker
+  attr_accessor :skip_after_user_change_worker
 
   # Includes deleted, just to be safe
   def self.org_ids_with_uniq_info(user, fields = nil)
@@ -88,7 +88,6 @@ class UserRegistrationOrganization < ApplicationRecord
   end
 
   def update_associations
-    return true if skip_update
     create_or_update_bike_organizations
     return true if skip_after_user_change_worker
     AfterUserChangeWorker.perform_async(user_id)

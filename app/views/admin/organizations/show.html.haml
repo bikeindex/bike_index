@@ -94,6 +94,11 @@
             #stupidLegacyToken{ style: "overflow-x: scroll; " }
               %code.small
                 = @organization.access_token
+        %tr.small
+          %td.only-dev-visible
+            User Reg all bikes?
+          %td.only-dev-visible
+            = @organization.user_registration_all_bikes?
 
       %tr
         %td
