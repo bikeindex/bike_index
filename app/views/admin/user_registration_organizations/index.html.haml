@@ -75,7 +75,7 @@
           %td
             - if user_registration_organization.organization.present?
               = link_to user_registration_organization.organization.name, admin_organization_path(user_registration_organization.organization_id)
-          %td.small.data-cell
+          %td.small.data-cell.only-data
             - if user_registration_organization.registration_info.present?
               = pretty_print_json(user_registration_organization.registration_info)
           %td.table-cell-check

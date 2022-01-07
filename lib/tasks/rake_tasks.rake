@@ -54,7 +54,7 @@ task migrate_user_registration_organizations: :environment do
   unless ENV["USER_REGISTRATION_MIGRATION_STOP"]
     BulkAfterUserChangeWorker.users
       .includes(:ownerships).where.not(ownerships: {id: nil})
-      .limit(1000).pluck(:id).each { |i| AfterUserChangeWorker.perform_async(i) }
+      .limit(1000).pluck(:id).each { |i| BulkAfterUserChangeWorker.perform_async(i) }
   end
 end
 
