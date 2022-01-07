@@ -239,8 +239,6 @@ class Ownership < ApplicationRecord
 
   def clean_registration_info(r_info)
     r_info ||= {}
-    # TODO: post #2121 remove - temporary conditional_information is dropped
-    r_info = r_info.as_json.merge(bike&.conditional_information || {})
     # skip cleaning if it's blank
     return {} if r_info.blank?
     # The only place user_name comes from, other than a user setting it themselves, is bulk_import
