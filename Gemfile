@@ -7,8 +7,8 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config and Dockerfile if Ruby version is bumped
 ruby "2.7.3"
-gem "rack", "2.0.8"
-gem "rails", "~> 5.2"
+gem "rack", "~> 2.0"
+gem "rails", "~> 6.1"
 
 gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
@@ -110,7 +110,7 @@ gem "memory_profiler", require: false
 gem "rack-mini-profiler", require: ["prepend_net_http_patch"] # If you can't see it you can't make it better
 gem "stackprof", require: false
 
-gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)
+gem "responders", "~> 3.0.1" # required because of class level respond_to blocks (API v1)
 gem "thor"
 
 gem "bundler", ">= 1.8.4" # required for rails-assets.org - JS and CSS assets
