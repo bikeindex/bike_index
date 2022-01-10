@@ -3,7 +3,7 @@ class BulkAfterUserChangeWorker < AfterUserChangeWorker
   sidekiq_options retry: false, queue: "low_priority"
 
   def self.migration_at
-    Time.at((ENV["MIGRATION_START"] || 1641522364).to_i)
+    Time.at(1641522364)
   end
 
   def self.enqueue?
@@ -25,7 +25,7 @@ class BulkAfterUserChangeWorker < AfterUserChangeWorker
 
   def perform(user_id, user = nil, skip_bike_update = false)
     user ||= User.find_by_id(user_id)
-    return false unless user.present?
+    return false if user.blank? || user.updated_at > self.class.migration_at
     resave_bikes = create_user_registration_organizations(user)
     user.reload.update(updated_at: Time.current, skip_update: true)
 
@@ -45,6 +45,7 @@ class BulkAfterUserChangeWorker < AfterUserChangeWorker
     BikeOrganization.unscoped.where(bike_id: user.bike_ids).select("DISTINCT ON (organization_id) *").each do |bo|
       next if UserRegistrationOrganization.unscoped
         .where(user_id: user.id, organization_id: bo.organization_id).any?
+      next if bo.organization.blank?
       resave_bikes ||= true
       user_registration_organization = UserRegistrationOrganization.new(user_id: user.id, organization_id: bo.organization_id)
       user_registration_organization.all_bikes = bo.organization.user_registration_all_bikes?
