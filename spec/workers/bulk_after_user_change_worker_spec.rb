@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe AfterUserChangeWorker, type: :job do
+RSpec.describe BulkAfterUserChangeWorker, type: :job do
   let(:instance) { described_class.new }
 
   context "no user" do
