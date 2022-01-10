@@ -8,7 +8,7 @@ class Admin::OrganizationsController < Admin::BaseController
     per_page = params[:per_page] || 25
     @organizations = if sort_column == "bikes"
       matching_organizations.left_joins(:bikes).group(:id)
-      .order("COUNT(bikes.id) #{sort_direction}")
+        .order("COUNT(bikes.id) #{sort_direction}")
     else
       matching_organizations
         .reorder("organizations.#{sort_column} #{sort_direction}")

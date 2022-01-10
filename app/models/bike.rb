@@ -537,15 +537,6 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
-  def stolen_string
-    return nil unless status_stolen? && current_stolen_record.present?
-    [
-      "Stolen ",
-      current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.address && "from #{current_stolen_record.address}. "
-    ].compact.join(" ")
-  end
-
   def bike_organization_ids
     bike_organizations.pluck(:organization_id)
   end
