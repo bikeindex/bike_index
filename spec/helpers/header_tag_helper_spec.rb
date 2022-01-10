@@ -320,7 +320,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
         end
         context "stolen" do
           let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
-          let(:title_string) { "#{bike.manufacturer.simple_name}" }
+          let(:title_string) { bike.manufacturer.simple_name.to_s }
           let(:target_page_description) do
             "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number}. " \
             "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
@@ -348,7 +348,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
             expect(bike.reload.current_impound_record.address).to eq "New York, NY 10007"
             expect(bike.status_humanized).to eq "found"
             expect(bike.title_string).to eq title_string
-            header_tags = helper.bikes_header_tags
+            helper.bikes_header_tags
             expect(helper.page_title).to eq "Found #{title_string}"
             expect(helper.page_description).to eq target_page_description
           end
@@ -367,7 +367,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
             expect(bike.reload.current_impound_record.address).to eq "Edmonton, AB T6G 2B3, CA"
             expect(bike.status_humanized).to eq "impounded"
             expect(bike.title_string).to eq title_string
-            header_tags = helper.bikes_header_tags
+            helper.bikes_header_tags
             expect(helper.page_title).to eq "Impounded #{title_string}"
             expect(helper.page_description).to eq target_page_description
           end
