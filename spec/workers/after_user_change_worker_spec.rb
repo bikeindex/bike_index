@@ -289,8 +289,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([])
       Sidekiq::Worker.clear_all
       instance.perform(user.id)
-      pp Sidekiq::Worker.jobs
-      expect(Sidekiq::Worker.jobs.count).to eq 0
+      expect(Sidekiq::Worker.jobs.count).to eq 1
       expect(user.reload.user_registration_organizations.count).to eq 1
       expect(UserRegistrationOrganization.pluck(:id)).to eq([user_registration_organization.id])
       expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])

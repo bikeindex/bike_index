@@ -83,7 +83,10 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       expect(bike.bike_organizations.count).to eq 1
       expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
       expect(UserRegistrationOrganization.unscoped.count).to eq 0
+      Sidekiq::Worker.clear_all
       instance.perform(bike.id)
+      expect(Sidekiq::Worker.jobs.count).to eq 1
+      expect(Sidekiq::Worker.jobs.reject { |j| j["class"] == "DuplicateBikeFinderWorker" }.count).to eq 0
       expect(UserRegistrationOrganization.unscoped.count).to eq 0
       expect(bike.reload.bike_organizations.count).to eq 1
       expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
@@ -100,7 +103,10 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(ownership.registration_info).to eq({})
         expect(UserRegistrationOrganization.unscoped.count).to eq 0
         expect(user.user_registration_organizations.count).to eq 0
+        Sidekiq::Worker.clear_all
         instance.perform(bike.id)
+        expect(Sidekiq::Worker.jobs.count).to eq 1
+        expect(Sidekiq::Worker.jobs.reject { |j| j["class"] == "DuplicateBikeFinderWorker" }.count).to eq 0
         expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
         expect(UserRegistrationOrganization.unscoped.count).to eq 1
