@@ -302,19 +302,75 @@ RSpec.describe HeaderTagHelper, type: :helper do
     end
     describe "show" do
       let(:action_name) { "show" }
-      before { allow(bike).to receive(:title_string) { "Something special 1969" } }
+      let(:bike) { FactoryBot.create(:bike, frame_model: "Something special", year: 1969, description: "Cool description") }
+      let(:title_string) { "1969 #{bike.manufacturer.simple_name} Something special" }
+      before { @bike = bike } # So it's assigned in the helper
       context "default" do
         it "returns the bike name on Show" do
+          expect(bike.title_string).to eq title_string
           allow(bike).to receive(:stock_photo_url) { "http://something.com" }
-          @bike = bike # So that it's assigned in the helper
-          header_tags = helper.bikes_header_tags
-          expect(helper.page_title).to eq "Stolen Something special 1969"
-          expect(helper.page_description).not_to eq "Blank"
+          header_tags = helper.bikes_header_tags # Required to be called in here (can't be in a let)
+          expect(helper.page_title).to eq title_string
+          expect(helper.page_description).to eq "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number}. Cool description."
           og_image = header_tags.find { |t| t && t[/og.image/] }
           twitter_image = header_tags.find { |t| t&.include?("twitter:image") }
           expect(og_image.include?("http://something.com")).to be_truthy
           expect(twitter_image.include?("http://something.com")).to be_truthy
           expect(header_tags.find { |t| t && t.include?("twitter:card") }).to match "summary_large_image"
+        end
+        context "stolen" do
+          let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
+          let(:title_string) { "#{bike.manufacturer.simple_name}" }
+          let(:target_page_description) do
+            "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number}. " \
+            "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
+          end
+          it "returns expected things" do
+            expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608, US"
+            expect(bike.title_string).to eq title_string
+            header_tags = helper.bikes_header_tags
+            expect(helper.page_title).to eq "Stolen #{title_string}"
+            expect(helper.page_description).to eq target_page_description
+            og_image = header_tags.find { |t| t && t[/og.image/] }
+            twitter_image = header_tags.find { |t| t&.include?("twitter:image") }
+            expect(og_image.include?("/bike_index.png")).to be_truthy
+            expect(twitter_image.include?("/bike_index.png")).to be_truthy
+            expect(header_tags.find { |t| t && t.include?("twitter:card") }).to match "summary"
+          end
+        end
+        context "found" do
+          let!(:impound_record) { FactoryBot.create(:impound_record, :in_nyc, bike: bike) }
+          let(:target_page_description) do
+            "#{@bike.primary_frame_color.name} #{title_string}, serial: Hidden. Cool description. " \
+            "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007"
+          end
+          it "returns expected things" do
+            expect(bike.reload.current_impound_record.address).to eq "New York, NY 10007"
+            expect(bike.status_humanized).to eq "found"
+            expect(bike.title_string).to eq title_string
+            header_tags = helper.bikes_header_tags
+            expect(helper.page_title).to eq "Found #{title_string}"
+            expect(helper.page_description).to eq target_page_description
+          end
+        end
+        context "impounded" do
+          let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton, bike: bike, use_entered_address: true) }
+          let(:organization) { parking_notification.organization }
+          let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike, parking_notification: parking_notification, organization: organization) }
+          let(:target_page_description) do
+            "#{@bike.primary_frame_color.name} #{title_string}, serial: Hidden. Cool description. " \
+            "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB T6G 2B3, CA"
+          end
+          it "returns expected things" do
+            expect(parking_notification.reload.address).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, CA"
+            impound_record.reload
+            expect(bike.reload.current_impound_record.address).to eq "Edmonton, AB T6G 2B3, CA"
+            expect(bike.status_humanized).to eq "impounded"
+            expect(bike.title_string).to eq title_string
+            header_tags = helper.bikes_header_tags
+            expect(helper.page_title).to eq "Impounded #{title_string}"
+            expect(helper.page_description).to eq target_page_description
+          end
         end
       end
       context "twitter present and shown" do
