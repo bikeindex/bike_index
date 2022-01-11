@@ -43,9 +43,9 @@ end
 task migrate_user_registration_organizations: :environment do
   if ENV["USER_REGISTRATION_MIGRATION_LIMIT"] != 0 && BulkAfterUserChangeWorker.enqueue?
     uro_limit = (ENV["USER_REGISTRATION_MIGRATION_LIMIT"] || 500).to_i
-    BulkAfterUserChangeWorker.users
-      .includes(:ownerships).where.not(ownerships: {id: nil})
-      .limit(uro_limit).pluck(:id).each { |i| BulkAfterUserChangeWorker.perform_async(i) }
+    BulkAfterUserChangeWorker.users.includes(:ownerships).where.not(ownerships: {id: nil})
+      .limit(uro_limit).pluck(:id).uniq
+      .each { |i| BulkAfterUserChangeWorker.perform_async(i) }
   end
 end
 
