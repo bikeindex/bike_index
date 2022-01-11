@@ -7,7 +7,7 @@ RSpec.describe Organized::BikesController, type: :request do
   describe "index" do
     # NOTE: Additional index tests in controller spec because of session
     let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs)}
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
     let(:query_params) do
       {
         query: "1",

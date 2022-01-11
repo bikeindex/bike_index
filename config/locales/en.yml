@@ -4490,6 +4490,7 @@ en:
         avery: Avery?
         bike: bike
         color: Color
+        create_export: Create export of searched bikes
         email_hidden: email hidden
         impounded: Impounded
         link: Link
@@ -4508,7 +4509,6 @@ en:
         owner_name: Owner name
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
-        create_export: Create export of searched bikes
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
         search_owner_email: Search owner email and name
