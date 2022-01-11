@@ -173,7 +173,7 @@ RSpec.describe SessionsController, type: :controller do
         get :destroy, params: {partner: "bikehub"}
         expect(cookies.signed[:auth]).to be_nil
         expect(session[:user_id]).to be_nil
-        expect(response).to redirect_to "https://parkit.bikehub.com/"
+        expect(response).to redirect_to "https://bikehub.com/"
         expect(session[:return_to]).to be_nil
         expect(session[:partner]).to be_nil
         expect(session[:passive_organization_id]).to be_nil
@@ -197,7 +197,7 @@ RSpec.describe SessionsController, type: :controller do
             get :destroy, params: {partner: "bikehub", return_to: "https://badplace.stuff.com/"}
             expect(cookies.signed[:auth]).to be_nil
             expect(session[:user_id]).to be_nil
-            expect(response).to redirect_to "https://parkit.bikehub.com/"
+            expect(response).to redirect_to "https://bikehub.com/"
             expect(session[:return_to]).to be_nil
             expect(session[:partner]).to be_nil
             expect(session[:passive_organization_id]).to be_nil
