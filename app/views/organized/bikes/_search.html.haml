@@ -119,6 +119,10 @@
       = t(".only_with_owner_html")
     = link_to organization_bikes_path(search_params.merge(search_status: "stolen")), class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do
       = t(".only_stolen_html")
+  - if current_organization.enabled?("csv_exports")
+    %p.search-sort-btns.text-right
+      = link_to t(".create_export"), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
+
 
 %p.mt-4
   - if @search_query_present || params[:search_stickers].present? || params[:search_address].present?

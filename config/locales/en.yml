@@ -4490,6 +4490,7 @@ en:
         avery: Avery?
         bike: bike
         color: Color
+        create_export: Create export of searched bikes
         email_hidden: email hidden
         impounded: Impounded
         link: Link

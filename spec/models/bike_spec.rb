@@ -120,6 +120,7 @@ RSpec.describe Bike, type: :model do
         expect(Bike.organized_email_and_name_search("\nstuff.EDU  ").pluck(:id)).to match_array([bike1.id, bike2.id])
         expect(Bike.organized_email_and_name_search("jones").pluck(:id)).to match_array([bike2.id, bike3.id])
         expect(Bike.organized_email_and_name_search("  sally").pluck(:id)).to match_array([bike3.id])
+        expect(Bike.claimed.pluck(:id)).to eq([bike2.id])
       end
     end
 

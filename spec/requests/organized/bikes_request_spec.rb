@@ -4,7 +4,52 @@ RSpec.describe Organized::BikesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/bikes" }
   include_context :request_spec_logged_in_as_organization_member
 
-  # NOTE: Index is tested in controller spec because of session
+  describe "index" do
+    # NOTE: Additional index tests in controller spec because of session
+    let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
+    let(:query_params) do
+      {
+        query: "1",
+        manufacturer: "2",
+        colors: %w[3 4],
+        location: "5",
+        distance: "6",
+        serial: "9",
+        query_items: %w[7 8],
+        stolenness: "stolen"
+      }.as_json
+    end
+    let!(:non_organization_bike) { FactoryBot.create(:bike) }
+    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+    it "sends all the params and renders search template to organization_bikes" do
+      get base_url, params: query_params
+      expect(response.status).to eq(200)
+      expect(assigns(:current_organization)).to eq current_organization
+      expect(assigns(:search_query_present)).to be_truthy
+      expect(assigns(:bikes).pluck(:id)).to eq([])
+      # create_export fails if the org doesn't have have csv_exports
+      expect {
+        get base_url, params: query_params.merge(create_export: true)
+      }.to_not change(Export, :count)
+    end
+    describe "create_export" do
+      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
+      it "creates export" do
+        Sidekiq::Worker.clear_all
+        expect {
+          get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
+        }.to change(Export, :count).by 1
+        expect(flash[:success]).to be_present
+        export = Export.last
+        expect(export.organization_id).to eq current_organization.id
+        expect(export.kind).to eq "organization"
+        expect(export.custom_bike_ids).to eq([bike.id])
+        expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
+        expect(OrganizationExportWorker.jobs.count).to eq 1
+      end
+    end
+  end
 
   describe "new" do
     it "renders" do

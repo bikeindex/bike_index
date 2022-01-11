@@ -27,7 +27,7 @@ RSpec.describe Organized::BikesController, type: :controller do
     include_context :logged_in_as_user
     let!(:organization) { FactoryBot.create(:organization) }
     it "redirects the user, reassigns passive_organization_id" do
-      session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization
+      session[:passive_organization_id] = "0" # Because, who knows! Maybe they don't have org access at some point.
       get :index, params: {organization_id: organization.to_param}
       expect(response.location).to eq my_account_url
       expect(flash[:error]).to be_present
@@ -140,30 +140,6 @@ RSpec.describe Organized::BikesController, type: :controller do
       let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
       before { organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) } # Stub organization having organization feature
       describe "index" do
-        context "with params" do
-          let(:query_params) do
-            {
-              query: "1",
-              manufacturer: "2",
-              colors: %w[3 4],
-              location: "5",
-              distance: "6",
-              serial: "9",
-              query_items: %w[7 8],
-              stolenness: "stolen"
-            }.as_json
-          end
-          let(:organization_bikes) { organization.bikes }
-          it "sends all the params and renders search template to organization_bikes" do
-            session[:passive_organization_id] = "0" # Because, who knows! Maybe they don't have org access at some point.
-            get :index, params: query_params.merge(organization_id: organization.to_param)
-            expect(response.status).to eq(200)
-            expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:search_query_present)).to be_truthy
-            expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
-            expect(session[:passive_organization_id]).to eq organization.id
-          end
-        end
         context "with search_stickers" do
           let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: organization) }
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }

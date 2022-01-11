@@ -94,6 +94,7 @@ class Bike < ApplicationRecord
   scope :without_location, -> { where(latitude: nil) }
   scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
+  scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
