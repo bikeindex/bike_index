@@ -4506,6 +4506,7 @@ en:
         only_with_owner_html: Not stolen or impounded
         only_with_stickers_html: Only <strong>with</strong> stickers
         owner_name: Owner name
+        status_cell: Status
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
         search_bike_descriptions: Search bike descriptions

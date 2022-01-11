@@ -52,6 +52,7 @@
     "impounded_cell" => "Impounded",
     "avery_cell" => "Avery Exportable",
     "cycle_type_cell" => "Vehicle type",
+    "status_cell" => "Status",
     "url_cell" => "URL"
   }
   # Most columns are enabled by default, including organization specific registration columns
@@ -68,7 +69,7 @@
   initially_checked_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
   enabled_columns = initially_checked_columns
   # Some optional columns
-  enabled_columns += %w[url_cell updated_at_cell cycle_type_cell]
+  enabled_columns += %w[url_cell updated_at_cell cycle_type_cell status_cell]
   enabled_columns += additional_registration_fields.map { |f| "#{f}_cell" }
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
   enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
@@ -168,8 +169,9 @@
         %th.hiddenColumn.creation_description_cell
           Source
         %th.hiddenColumn.owner_name_cell.hidden-xs-down
-          %small
-            = t(".owner_name")
+          %small= t(".owner_name")
+        %th.hiddenColumn.status_cell.hidden-xs-down
+          %small= t(".status_cell")
         - additional_registration_fields.each do |reg_field|
           - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
           %th.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
@@ -229,14 +231,15 @@
               - if bike.owner_name.present?
                 %em
                   = bike.owner_name
+            %td.hiddenColumn.status_cell.small
+              - unless bike.status_with_owner?
+                = status_display(bike.status_humanized)
             - additional_registration_fields.each do |reg_field|
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
                 - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                 - if bike_attr == "address"
-                  - if !bike.status_with_owner?
-                    %em.small.text-warning= bike.status_humanized
-                  - elsif bike.valid_mailing_address?
+                  - if bike.valid_mailing_address?
                     -# Don't show organization address
                     %small{style: "line-height: 1.5;"}
                       = bike.address_hash["street"]
