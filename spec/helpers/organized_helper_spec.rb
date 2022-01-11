@@ -52,6 +52,9 @@ RSpec.describe OrganizedHelper, type: :helper do
       expect(status_display("current")).to eq "<span class=\"text-success\">current</span>"
       expect(status_display("Current")).to eq "<span class=\"text-success\">Current</span>"
     end
+    it "renders text-warning" do
+      expect(status_display("stolen")).to eq "<span class=\"text-warning\">stolen</span>"
+    end
     context "retrieved" do
       it "is blue" do
         expect(status_display("retrieved_by_owner")).to eq "<span class=\"text-info\">retrieved by owner</span>"
