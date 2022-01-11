@@ -33,22 +33,5 @@ RSpec.describe "users routing", type: :routing do
         )
       end
     end
-    # Legacy - kept so routes don't disappear.
-    # Can remove a little while after merging #2121
-    context "edit_my_account" do
-      it "directs to edit" do
-        expect(get: "/edit_my_account").to route_to(
-          controller: "my_accounts",
-          action: "edit"
-        )
-      end
-      it "directs to edit" do
-        expect(get: "/edit_my_account?edit_template=sharing").to route_to(
-          controller: "my_accounts",
-          action: "edit",
-          edit_template: "sharing"
-        )
-      end
-    end
   end
 end
