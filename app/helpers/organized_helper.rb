@@ -79,6 +79,8 @@ module OrganizedHelper
       content_tag(:span, status_str.gsub("otherwise", ""), class: "text-info")
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/
       content_tag(:span, status_str, class: "text-danger")
+    when "stolen"
+      content_tag(:span, status_str, class: "text-warning")
     else
       content_tag(:span, status_str, class: "less-strong")
     end

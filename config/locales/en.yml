@@ -4514,6 +4514,7 @@ en:
         sent_to: Sent to
         settings: settings
         status: 'Status:'
+        status_cell: Status
         sticker: Sticker
         stickers: 'Stickers:'
         stolen: Stolen
