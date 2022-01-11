@@ -35,7 +35,6 @@ RSpec.describe UserRegistrationOrganization, type: :model do
     let(:user) { FactoryBot.create(:user, name: "Name Goes Here") }
     let(:ownership_registration_info) do
       {
-        user_name: "George",
         bike_sticker: "9998888",
         phone: "1112224444",
         student_id: "XXZZUUU",
@@ -44,7 +43,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
     end
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_registration_info: ownership_registration_info) }
     let(:target_universal_info) do
-      ownership_registration_info.except("bike_sticker", "user_name")
+      ownership_registration_info.except("bike_sticker")
         .merge("phone" => "3334445555").as_json
     end
     let(:ownership1) { bike.current_ownership }
@@ -69,7 +68,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
       expect(UserRegistrationOrganization.org_ids_with_uniq_info(user)).to eq([])
       expect(UserRegistrationOrganization.universal_registration_info_for(user.reload)).to eq target_universal_info
       ownership1.update(updated_at: Time.current)
-      expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888", "user_name" => "George")
+      expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888")
     end
     context "with an organization with reg_organization_affiliation and reg_student_id" do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_organization_affiliation reg_student_id]) }
@@ -83,7 +82,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
           registration_info: {phone: "9999"})
       end
       let(:target_universal_info) do
-        ownership_registration_info.except("student_id", "organization_affiliation", "bike_sticker", "user_name")
+        ownership_registration_info.except("student_id", "organization_affiliation", "bike_sticker")
           .merge("phone" => "9998887777",
             "student_id_#{organization2.id}" => "XXZZUUU",
             "organization_affiliation_#{organization2.id}" => "community_member")
@@ -110,7 +109,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
         expect(UserRegistrationOrganization.universal_registration_info_for(user.reload)).to eq target_universal_info
 
         ownership1.update(updated_at: Time.current)
-        expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888", "user_name" => "George")
+        expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888")
         expect(bike.reload.organizations.pluck(:id)).to eq([organization.id])
         bike_organization = bike.bike_organizations.first
         expect(bike_organization.overridden_by_user_registration?).to be_truthy
@@ -146,7 +145,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
         ownership2.update(updated_at: Time.current)
         expect(ownership2.reload.registration_info).to eq target_universal_info
         ownership1.update(updated_at: Time.current)
-        expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888", "user_name" => "George")
+        expect(ownership1.reload.registration_info).to eq target_universal_info.merge("bike_sticker" => "9998888")
         expect(bike.reload.organizations.pluck(:id)).to eq([organization.id])
         expect(bike2.organizations.pluck(:id)).to eq([organization.id])
       end

@@ -383,6 +383,7 @@ CREATE TABLE public.bike_versions (
     manufacturer_id bigint,
     manufacturer_other character varying,
     mnfg_name character varying,
+    extra_registration_number character varying,
     name character varying,
     frame_model text,
     rear_tire_narrow boolean,
@@ -404,6 +405,7 @@ CREATE TABLE public.bike_versions (
     cycle_type integer,
     propulsion_type integer,
     visibility integer DEFAULT 0,
+    status integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -493,7 +495,6 @@ CREATE TABLE public.bikes (
     state_id bigint,
     address_set_manually boolean DEFAULT false,
     is_phone boolean DEFAULT false,
-    conditional_information jsonb DEFAULT '{}'::jsonb,
     current_impound_record_id bigint,
     current_ownership_id bigint
 );
@@ -6086,6 +6087,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211225005744'),
 ('20220102153706'),
 ('20220102160149'),
-('20220103161727');
+('20220103161727'),
+('20220107041406');
 
 
