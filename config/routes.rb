@@ -110,8 +110,6 @@ Rails.application.routes.draw do
     member { get "unsubscribe" }
   end
   resource :my_account, only: %i[show update]
-  # Can remove legacy a little while after merging #2142
-  get :edit_my_account, to: "my_accounts#edit", as: :legacy_edit_my_account
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")
