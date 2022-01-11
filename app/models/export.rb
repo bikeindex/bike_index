@@ -258,7 +258,7 @@ class Export < ApplicationRecord
 
   def bike_id_from_url(bike_url)
     return nil unless bike_url.present?
-    return bike_url if bike_url.is_a?(Integer) # Used by organized bikes_controller to generate an export
+    return bike_url if bike_url.is_a?(Integer) # integers passed directly in organized bikes_controller
     id_str = bike_url.strip
     if id_str.match?(/\A\d+\z/)
       id_str.to_i
