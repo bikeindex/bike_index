@@ -36,6 +36,7 @@ RSpec.describe Organized::BikesController, type: :request do
     describe "create_export" do
       let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
       it "creates export" do
+        Sidekiq::Worker.clear_all
         expect {
           get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
         }.to change(Export, :count).by 1
@@ -45,6 +46,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(export.kind).to eq "organization"
         expect(export.custom_bike_ids).to eq([bike.id])
         expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
+        expect(OrganizationExportWorker.jobs.count).to eq 1
       end
     end
   end

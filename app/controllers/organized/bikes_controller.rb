@@ -17,6 +17,7 @@ module Organized
             flash[:error] = "Too many bikes selected to export"
           else
             export = Export.create(create_export_params)
+            OrganizationExportWorker.perform_async(export.id)
             flash[:success] = "Export created"
             redirect_to organization_export_path(export, organization_id: current_organization.id)
           end
@@ -210,7 +211,7 @@ module Organized
       {
         kind: "organization",
         organization_id: current_organization.id,
-        custom_bike_ids: @bikes.pluck(:id),
+        custom_bike_ids: @available_bikes.pluck(:id),
         only_custom_bike_ids: true,
         headers: Export.permitted_headers(current_organization)
       }
