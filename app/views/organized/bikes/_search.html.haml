@@ -234,8 +234,10 @@
               %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
                 - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                 - if bike_attr == "address"
-                  -# Don't show organization address
-                  - if bike.valid_mailing_address?
+                  - if !bike.status_with_owner?
+                    %em.small.text-warning= bike.status_humanized
+                  - elsif bike.valid_mailing_address?
+                    -# Don't show organization address
                     %small{style: "line-height: 1.5;"}
                       = bike.address_hash["street"]
                 - elsif bike_attr == "organization_affiliation"
