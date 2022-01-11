@@ -64,7 +64,7 @@ class StolenRecord < ApplicationRecord
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
-  scope :without_location, -> { where(street: ["", nil]) } # Overrides geocodeable without_location, we need more specificity
+  scope :without_location, -> { without_street } # References geocodeable without_street, we need to reconcile this
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
