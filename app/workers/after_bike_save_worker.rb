@@ -83,7 +83,7 @@ class AfterBikeSaveWorker < ApplicationWorker
       user_registration_organization.all_bikes = organization.user_registration_all_bikes?
       user_registration_organization.can_not_edit_claimed = bike_organization.can_not_edit_claimed
       user_registration_organization.set_initial_registration_info
-      user_registration_organization.save
+      user_registration_organization.update(skip_after_user_change_worker: true)
     end
     bike.reload
   end

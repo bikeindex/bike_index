@@ -4357,6 +4357,8 @@ nl:
         only_stolen_html: alleen gestolen
         only_with_owner_html: Niet gestolen of in beslag genomen
         status: 'Toestand:'
+        status_cell: Toestand
+        create_export: Maak export van gezochte fietsen
     bulk_imports:
       index:
         added: Toegevoegd
@@ -5674,7 +5676,6 @@ nl:
       user_hidden: Verborgen voor andere gebruikers
     edit:
       save_changes: Wijzigingen opslaan
-      you_are_editing: Je bent aan het bewerken
     password:
       better_password: beter
       for_password_update: Voor wachtwoordupdate

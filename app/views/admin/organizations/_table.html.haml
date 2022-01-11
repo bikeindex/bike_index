@@ -4,31 +4,19 @@
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light.sortable
       %th
-        - if render_sortable
-          = sortable "name"
-        - else
-          Name
+        = sortable "name", render_sortable: render_sortable
       %th
-        - if render_sortable
-          = sortable "approved"
-        - else
-          Approved
+        = sortable "approved", render_sortable: render_sortable
       %th
-        - if render_sortable
-          = sortable "created_at"
-        - else
-          Created at
+        = sortable "created_at", render_sortable: render_sortable
       %th
-        Bikes
+        = sortable "bikes", render_sortable: render_sortable
       %th
         Memberships
       %th
         Type
       %th
-        - if render_sortable
-          = sortable "pos_kind", "POS"
-        - else
-          POS
+        = sortable "pos_kind", "POS", render_sortable: render_sortable
       %th
         Locations
     %tbody
@@ -46,9 +34,9 @@
               %span.convertTime
                 = l organization.created_at, format: :convert_time
             %td
-              = number_with_delimiter(organization.bikes.count)
+              = admin_number_display(organization.bikes.count)
             %td
-              = organization.memberships.count
+              = admin_number_display(organization.memberships.count)
             %td
               = link_to organization.kind.humanize, admin_organizations_path(sortable_search_params.merge(search_kind: organization.kind))
             %td
@@ -59,8 +47,7 @@
                   = link_to pos_kind.humanize, admin_organizations_path(sortable_search_params.merge(search_pos: organization.pos_kind)), class: link_class
             %td
               .less-strong-hold
-
-                = organization.locations.count
+                = admin_number_display(organization.locations.count)
                 - if organization.show_on_map
                   %span.less-strong-right
                     Mapped

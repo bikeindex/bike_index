@@ -1,11 +1,18 @@
 class Admin::OrganizationsController < Admin::BaseController
   include SortableTable
+  before_action :set_period, only: [:index]
   before_action :find_organization, only: [:show, :edit, :update, :destroy]
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    @organizations = matching_organizations.reorder("organizations.#{sort_column} #{sort_direction}").page(page).per(per_page)
+    @organizations = if sort_column == "bikes"
+      matching_organizations.left_joins(:bikes).group(:id)
+        .order("COUNT(bikes.id) #{sort_direction}")
+    else
+      matching_organizations
+        .reorder("organizations.#{sort_column} #{sort_direction}")
+    end.page(page).per(per_page)
   end
 
   def show
@@ -117,11 +124,13 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
-    @matching_organizations = matching_organizations
+    @time_range_column = sort_column if %w[updated_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    @matching_organizations = matching_organizations.where(@time_range_column => @time_range)
   end
 
   def sortable_columns
-    %w[created_at name approved pos_kind]
+    %w[created_at name approved pos_kind bikes]
   end
 
   def pos_kind_for_organizations

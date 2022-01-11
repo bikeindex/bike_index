@@ -56,7 +56,7 @@ class UserRegistrationOrganization < ApplicationRecord
         ids.each { |i| new_reg_info["organization_affiliation_#{i}"] ||= organization_affiliation }
       end
     end
-    new_reg_info.merge(passed_reg_info.slice(*ignored_own_keys))
+    new_reg_info.merge((passed_reg_info || {}).slice(*ignored_own_keys))
   end
 
   def bikes

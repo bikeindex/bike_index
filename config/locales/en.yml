@@ -4029,7 +4029,6 @@ en:
   my_accounts:
     edit:
       save_changes: Save changes
-      you_are_editing: You are editing
     password:
       better_password: better
       for_password_update: For password update
@@ -4491,6 +4490,7 @@ en:
         avery: Avery?
         bike: bike
         color: Color
+        create_export: Create export of searched bikes
         email_hidden: email hidden
         impounded: Impounded
         link: Link
@@ -4515,6 +4515,7 @@ en:
         sent_to: Sent to
         settings: settings
         status: 'Status:'
+        status_cell: Status
         sticker: Sticker
         stickers: 'Stickers:'
         stolen: Stolen

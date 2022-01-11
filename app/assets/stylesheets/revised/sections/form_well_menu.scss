@@ -86,6 +86,7 @@ $active-bike-edit-border-width: 2px;
       font-family: $header-font-family;
       font-weight: $strong-font-weight;
       color: $header-font-nocolor;
+      -webkit-appearance: none;
       border-radius: 0;
       border: none;
       font-size: 15px;

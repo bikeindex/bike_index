@@ -9,8 +9,19 @@ module Organized
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
+
         @per_page = params[:per_page] || 10
         search_organization_bikes
+        if current_organization.enabled?("csv_exports") && ParamsNormalizer.boolean(params[:create_export])
+          if @bikes.count > 10_000 # Don't want everything to explode...
+            flash[:error] = "Too many bikes selected to export"
+          else
+            export = Export.create(create_export_params)
+            OrganizationExportWorker.perform_async(export.id)
+            flash[:success] = "Export created"
+            redirect_to organization_export_path(export, organization_id: current_organization.id)
+          end
+        end
       else
         @per_page = params[:per_page] || 50
         @available_bikes = if current_organization.enabled?("claimed_ownerships")
@@ -194,6 +205,16 @@ module Organized
       valid_statuses = %w[with_owner stolen all]
       valid_statuses += %w[impounded not_impounded] if current_organization.enabled?("impound_bikes")
       @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last
+    end
+
+    def create_export_params
+      {
+        kind: "organization",
+        organization_id: current_organization.id,
+        custom_bike_ids: @available_bikes.pluck(:id),
+        only_custom_bike_ids: true,
+        headers: Export.permitted_headers(current_organization)
+      }
     end
   end
 end

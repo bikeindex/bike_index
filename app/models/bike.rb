@@ -94,6 +94,7 @@ class Bike < ApplicationRecord
   scope :without_location, -> { where(latitude: nil) }
   scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
+  scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
@@ -569,15 +570,6 @@ class Bike < ApplicationRecord
     t = [year, mnfg_name, frame_model_truncated].join(" ")
     t += " #{type}" if type != "bike"
     Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
-  end
-
-  def stolen_string
-    return nil unless status_stolen? && current_stolen_record.present?
-    [
-      "Stolen ",
-      current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.address && "from #{current_stolen_record.address}. "
-    ].compact.join(" ")
   end
 
   def video_embed_src
