@@ -148,7 +148,8 @@ class Export < ApplicationRecord
   end
 
   def custom_bike_ids=(val)
-    custom_ids = val.split(/\s+|,/).map { |cid| bike_id_from_url(cid) }.compact.uniq
+    custom_ids = (val.is_a?(Array) ? val : val.split(/\s+|,/))
+      .map { |cid| bike_id_from_url(cid) }.compact.uniq
     custom_ids = nil if custom_ids.none?
     self.options = options.merge(custom_bike_ids: custom_ids)
   end
@@ -257,6 +258,7 @@ class Export < ApplicationRecord
 
   def bike_id_from_url(bike_url)
     return nil unless bike_url.present?
+    return bike_url if bike_url.is_a?(Integer) # Used by organized bikes_controller to generate an export
     id_str = bike_url.strip
     if id_str.match?(/\A\d+\z/)
       id_str.to_i

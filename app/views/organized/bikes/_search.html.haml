@@ -119,6 +119,10 @@
       = t(".only_with_owner_html")
     = link_to organization_bikes_path(search_params.merge(search_status: "stolen")), class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do
       = t(".only_stolen_html")
+  - if current_organization.enabled?("csv_exports")
+    %p.search-sort-btns
+      = link_to "create export from searched bikes", organization_bikes_path(search_params.merge(create_export: true)), class: "small"
+
 
 %p.mt-4
   - if @search_query_present || params[:search_stickers].present? || params[:search_address].present?
@@ -196,7 +200,7 @@
           - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
             %td.hiddenColumn.url_cell
               %code.small.p0{style: "word-break: normal"}
-                = bike.html_url
+                = bike.html_url.gsub("https://", "")
             %td.hiddenColumn.created_at_cell
               %a.convertTime{ href: bike_path(bike, organization_id: current_organization.to_param) }
                 = l bike.created_at, format: :convert_time
