@@ -2534,18 +2534,18 @@ nl:
           niet hebt hersteld of hebt gemarkeerd dat deze per ongeluk is hersteld,
           beantwoord je deze e-mail en laat het ons weten!"
         the_description_of_the_recovery_was: 'De beschrijving van het herstel was:'
-        were_so_glad_you_got_your_biketype_back: We zijn zo blij dat je je %{biketype}
+        were_so_glad_you_got_your_bike_type_back: We zijn zo blij dat je je %{bike_type}
           terug hebt!
-        your_biketype_was_marked_recovered_on_bik: 'Je %{biketype} is gemarkeerd als
-          hersteld op Bike Index:'
+        your_bike_type_was_marked_recovered_on_bik: 'Je %{bike_type} is gemarkeerd
+          als hersteld op Bike Index:'
       subject: Je %{biketype} is gemarkeerd als hersteld!
       text:
         if_you_didnt_recover_your_bike_or_marked_: Als je je fiets niet hebt hersteld
           of hebt gemarkeerd dat deze per ongeluk is hersteld, beantwoord je deze
           e-mail en laat het ons weten!
-        were_so_glad_you_got_your_biketype_back: We zijn zo blij dat je je %{biketype}
+        were_so_glad_you_got_your_bike_type_back: We zijn zo blij dat je je %{bike_type}
           terug hebt!
-        your_biketype_was_marked_recovered: 'Je %{biketype} is gemarkeerd als hersteld
+        your_bike_type_was_marked_recovered: 'Je %{bike_type} is gemarkeerd als hersteld
           op Bike Index: %{bike_url}'
     stolen_bike_alert_email:
       html:
@@ -2579,20 +2579,20 @@ nl:
           !
         sender_email_sent_you_a_message_html: "%{sender_email} heeft je een bericht
           gestuurd over je %{link}!"
-        stolen_biketype: gestolen %{biketype}
         they_believe_it_is_stolen: Ze geloven dat het is gestolen!
-        this_email_is_about_the_biketype_register: Deze e-mail gaat over de %{biketype}
-          geregistreerd op Bike Index op %{date}
         you_can_just_forward_this_message_to: 'U kunt dit bericht gewoon doorsturen
           naar het e-mailadres van de eigenaar: %{bikeowner_email}'
-        you_registered_this_biketype_on: U heeft deze %{biketype} geregistreerd op
-          %{date}. De eigenaar heeft het nog niet geclaimd en het is niet gemarkeerd
-          als gestolen, dus je hebt deze e-mail ontvangen om toestemming te geven
-          contact met hem op te nemen.
         no_one_should_be_extorted: Als je denkt dat deze persoon je afperst of het
           systeem misbruikt, stuur ons dan een e-mail en laat het ons weten - je mag
           nooit gedwongen worden om iemand te 'belonen' of 'terug te betalen' voor
           je gestolen fiets
+        stolen_bike_type: gestolen %{bike_type}
+        this_email_is_about_the_bike_type_register: Deze e-mail gaat over de %{bike_type}
+          geregistreerd op Bike Index op %{date}
+        you_registered_this_bike_type_on: U heeft deze %{bike_type} geregistreerd
+          op %{date}. De eigenaar heeft het nog niet geclaimd en het is niet gemarkeerd
+          als gestolen, dus je hebt deze e-mail ontvangen om toestemming te geven
+          contact met hem op te nemen.
       subject: Contact met gestolen fiets
       text:
         message_about_stolen_bike: "** %{sender_email} heeft een bericht verzonden
@@ -2686,7 +2686,7 @@ nl:
         bike_registry: 'Fietsregister:'
     user_alert_email:
       html:
-        this_email_is_about_the_biketype_register: Deze e-mail gaat over de %{biketype}
+        this_email_is_about_the_bike_type_register: Deze e-mail gaat over de %{bike_type}
           geregistreerd op Bike Index op %{date}
   info:
     about:
@@ -4652,11 +4652,8 @@ nl:
           bij Bike Index
         bike_register_with_bike_index_and_org: Gefeliciteerd met het registreren van
           uw %{biketype} bij Bike Index en %{org_name}
-        biketype_thieves_are_jerks: "%{biketype} dieven zijn klootzakken."
         cable_locks_should_never_be_used: Kabelsloten mogen nooit worden gebruikt
           als primair middel om een fiets in een stad te vergrendelen.
-        claim_the_biketype: Claim de %{biketype}
-        confirm_this_biketype: Bevestig dit %{biketype}
         correctly_locking_a_bike: Een fiets correct vergrendelen
         donating: doneren
         give_us_a_heads_up: Geef ons een waarschuwing
@@ -4677,21 +4674,25 @@ nl:
           te volgen.
         protecting_your_bike_here: hier je fiets beschermen
         read_more_about_protecting_html: Lees meer over %{link}.
-        recovered_biketype: hersteld / gevonden %{biketype}
         secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
           met twee U-sloten, of één U-slot en één zware kabel.
         sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
           je %{biketype} te claimen en te bewerken, foto's te uploaden en ervoor te
           zorgen dat je nooit je vertrouwde ros uit het oog verliest!
-        stolen_biketype: gestolen %{biketype}
-        thanks_for_adding_this_biketype_you_found: Bedankt voor het toevoegen van
-          deze %{biketype} die je aan Bike Index hebt gevonden
         use_a_ulock: Gebruik een U-Lock.
         welcome_to_bike_index: Welkom bij Bike Index
-        were_sorry_your_biketype_was_stolen: Het spijt ons dat uw %{biketype} is gestolen.
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
         youre_almost_done_registering: Je bent bijna klaar met registreren
+        bike_type_thieves_are_jerks: "%{bike_type} dieven zijn klootzakken."
+        claim_the_bike_type: Claim de %{bike_type}
+        confirm_this_bike_type: Bevestig dit %{bike_type}
+        recovered_bike_type: hersteld / gevonden %{bike_type}
+        stolen_bike_type: gestolen %{bike_type}
+        thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
+          deze %{bike_type} die je aan Bike Index hebt gevonden
+        were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
+          gestolen.
       subject: Bevestig uw %{organization_name} Bike Index-registratie
       text:
         before_locking_check: "- Controleer voordat u vergrendelt of datgene waarnaar
@@ -4702,13 +4703,11 @@ nl:
         bike_make: 'Merk: %{bike_mnfg_name}'
         bike_serial: 'Serieel: %{bike_serial_number}'
         bike_stolen_from: 'Gestolen van: %{address}'
-        claim_the_biketype_at_this_url: 'Claim de %{biketype} op deze URL: %{bike_url}'
         color_may_be_incorrect: Kleur is mogelijk onjuist. Claim je fiets en update
           hem indien nodig!
         edit_it_upload_photos: Bewerk het, upload foto's en zorg dat je nooit je vertrouwde
           ros uit het oog verliest!
         give_us_a_heads_up_when_you_do: Geef ons een waarschuwing als u dat doet (%{bike_edit_url})
-        hopefully_you_find_the_biketype_soon: Hopelijk vindt u de %{biketype} binnenkort.
         hopefully_you_find_the_owner_soon: Hopelijk vind je snel de eigenaar.
         org_added_a_bike: "%{org_name} heeft voor jou een %{bike_type} toegevoegd
           op Bike Index"
@@ -4716,16 +4715,18 @@ nl:
         protect_your_bike: Bescherm uw fiets door deze vergrendelingsrichtlijnen te
           volgen.
         read_more_here: 'Lees hier meer: %{protect_your_bike_url}'
-        recovered_biketype: hersteld / gevonden %{biketype}
         secure_both_wheels: "- Beveilig beide wielen - hetzij met twee U-sloten, hetzij
           één U-slot en één zware kabel."
         sign_up_on_bikeindex_to_claim: Meld u aan op BikeIndex.org om uw %{biketype}
           te claimen
-        stolen_biketype: gestolen %{biketype}
         use_a_ulock: "- * Gebruik een U-Lock. * Kabelsloten mogen nooit worden gebruikt
           als primair middel om een fiets in een stad te vergrendelen."
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
+        claim_the_bike_type_at_this_url: 'Claim de %{bike_type} op deze URL: %{bike_url}'
+        hopefully_you_find_the_bike_type_soon: Hopelijk vindt u de %{biketype} binnenkort.
+        recovered_bike_type: hersteld / gevonden %{bike_type}
+        stolen_bike_type: gestolen %{bike_type}
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
     organization_invitation:

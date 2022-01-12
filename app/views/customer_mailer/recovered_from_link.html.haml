@@ -1,6 +1,6 @@
-%h1= t(".html.were_so_glad_you_got_your_biketype_back", biketype:  @biketype )
+%h1= t(".html.were_so_glad_you_got_your_bike_type_back", bike_type:  @bike_type )
 
-%p= t(".html.your_biketype_was_marked_recovered_on_bik", biketype:  @biketype )
+%p= t(".html.your_bike_type_was_marked_recovered_on_bik", bike_type:  @bike_type )
 
 = render partial: "shared/email_bike_box", locals: { bike_url: bike_url(@bike) }
 

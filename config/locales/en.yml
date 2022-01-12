@@ -2056,18 +2056,18 @@ en:
           <strong>Note:</strong> If you didn't recover your bike, or marked it recovered
           accidentally, reply to this email and let us know!
         the_description_of_the_recovery_was: 'The description of the recovery was:'
-        were_so_glad_you_got_your_biketype_back: We're so glad you got your %{biketype}
+        were_so_glad_you_got_your_bike_type_back: We're so glad you got your %{bike_type}
           back!
-        your_biketype_was_marked_recovered_on_bik: 'Your %{biketype} was marked recovered
-          on Bike Index:'
-      subject: Your %{biketype} has been marked recovered!
+        your_bike_type_was_marked_recovered_on_bik: 'Your %{bike_type} was marked
+          recovered on Bike Index:'
+      subject: Your %{bike_type} has been marked recovered!
       text:
         if_you_didnt_recover_your_bike_or_marked_: >-
           If you didn't recover your bike, or marked it recovered accidentally, reply
           to this email and let us know!
-        were_so_glad_you_got_your_biketype_back: We're so glad you got your %{biketype}
+        were_so_glad_you_got_your_bike_type_back: We're so glad you got your %{bike_type}
           back!
-        your_biketype_was_marked_recovered: 'Your %{biketype} was marked recovered
+        your_bike_type_was_marked_recovered: 'Your %{bike_type} was marked recovered
           on Bike Index: %{bike_url}'
     stolen_bike_alert_email:
       html:
@@ -2105,14 +2105,14 @@ en:
           it is <span class='stolen-color'>stolen</span>!
         sender_email_sent_you_a_message_html: "%{sender_email} sent you a message
           about your %{link}!"
-        stolen_biketype: stolen %{biketype}
+        stolen_bike_type: stolen %{bike_type}
         they_believe_it_is_stolen: They believe it is stolen!
-        this_email_is_about_the_biketype_register: This email is about the %{biketype}
+        this_email_is_about_the_bike_type_register: This email is about the %{bike_type}
           registered on Bike Index on %{date}
         you_can_just_forward_this_message_to: >-
           You can just forward this message to the owner's email address: %{bikeowner_email}
-        you_registered_this_biketype_on: >-
-          You registered this %{biketype} on %{date}. The owner hasn't claimed it
+        you_registered_this_bike_type_on: >-
+          You registered this %{bike_type} on %{date}. The owner hasn't claimed it
           yet and it isn't marked stolen, so you have received this email to authorize
           contacting them.
       subject: Stolen bike contact
@@ -2180,7 +2180,7 @@ en:
           recently became a 501(c)(3) nonprofit.
     user_alert_email:
       html:
-        this_email_is_about_the_biketype_register: This email is about the %{biketype}
+        this_email_is_about_the_bike_type_register: This email is about the %{bike_type}
           registered on Bike Index on %{date}
     welcome_email:
       html:
@@ -4827,19 +4827,19 @@ en:
           We're a 501(c)(3) nonprofit and depend on donations to operate
         before_locking_check: Before locking, check that what you are locking to can't
           be easily removed.
-        bike_register_with_bike_index: Congrats on registering your %{biketype} with
+        bike_register_with_bike_index: Congrats on registering your %{bike_type} with
           Bike Index
-        bike_register_with_bike_index_and_org: Congrats on registering your %{biketype}
+        bike_register_with_bike_index_and_org: Congrats on registering your %{bike_type}
           with Bike Index and %{org_name}
-        biketype_thieves_are_jerks: "%{biketype} thieves are jerks."
+        bike_type_thieves_are_jerks: "%{bike_type} thieves are jerks."
         cable_locks_should_never_be_used: Cable locks should never be used as a primary
           means of locking a bike in a city.
-        claim_the_biketype: Claim the %{biketype}
-        confirm_this_biketype: Confirm this %{biketype}
+        claim_the_bike_type: Claim the %{bike_type}
+        confirm_this_bike_type: Confirm this %{bike_type}
         correctly_locking_a_bike: Correctly locking a bike
         donating: donating
         give_us_a_heads_up: Give us a heads up
-        hopefully_you_find_the_bike_html: Hopefully you find the %{biketype} soon.
+        hopefully_you_find_the_bike_html: Hopefully you find the %{bike_type} soon.
         hopefully_you_find_the_owner_html: Hopefully you find the owner soon. %{edit_bike_link}
           when you do!
         mark_recovered_link_html: "%{mark_recovered_link} when you do!"
@@ -4856,19 +4856,19 @@ en:
           these locking guidelines.
         protecting_your_bike_here: protecting your bike here
         read_more_about_protecting_html: Read more about %{link}.
-        recovered_biketype: recovered/found %{biketype}
+        recovered_bike_type: recovered/found %{bike_type}
         secure_both_wheels_either_with_two_ulocks: >-
           Secure both wheels - either with two U-locks, or one U-lock and one heavy
           duty cable.
         sign_up_on_bikeindexorg_to_claim_your_bik: >-
-          Sign up on BikeIndex.org to claim your %{biketype} and edit it, upload photos
-          and make sure you never lose track of your trusty steed!
-        stolen_biketype: stolen %{biketype}
-        thanks_for_adding_this_biketype_you_found: Thanks for adding this %{biketype}
+          Sign up on BikeIndex.org to claim your %{bike_type} and edit it, upload
+          photos and make sure you never lose track of your trusty steed!
+        stolen_bike_type: stolen %{bike_type}
+        thanks_for_adding_this_bike_type_you_found: Thanks for adding this %{bike_type}
           you found to Bike Index
         use_a_ulock: Use a U-Lock.
         welcome_to_bike_index: Welcome to Bike Index
-        were_sorry_your_biketype_was_stolen: We're sorry your %{biketype} was stolen.
+        were_sorry_your_bike_type_was_stolen: We're sorry your %{bike_type} was stolen.
         you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
         youre_almost_done_registering: You're almost done registering
       subject: Confirm your %{organization_name}Bike Index registration
@@ -4881,24 +4881,25 @@ en:
         bike_make: 'Make: %{bike_mnfg_name}'
         bike_serial: 'Serial: %{bike_serial_number}'
         bike_stolen_from: 'Stolen from: %{address}'
-        claim_the_biketype_at_this_url: 'Claim the %{biketype} at this URL: %{bike_url}'
+        claim_the_bike_type_at_this_url: 'Claim the %{bike_type} at this URL: %{bike_url}'
         color_may_be_incorrect: Color may be incorrect. Claim your bike and update
           it if necessary!
         edit_it_upload_photos: Edit it, upload photos and make sure you never lose
           track of your trusty steed!
         give_us_a_heads_up_when_you_do: Give us a heads up when you do (%{bike_edit_url})
-        hopefully_you_find_the_biketype_soon: Hopefully you find the %{biketype} soon.
+        hopefully_you_find_the_bike_type_soon: Hopefully you find the %{bike_type}
+          soon.
         hopefully_you_find_the_owner_soon: Hopefully you find the owner soon.
         org_added_a_bike: "%{org_name} added a %{bike_type} on Bike Index for you"
         org_sent_a_bike: "%{org_name} sent you a %{bike_type} on Bike Index"
         protect_your_bike: Protect your bike by following these locking guidelines.
         read_more_here: 'Read more here: %{protect_your_bike_url}'
-        recovered_biketype: recovered/found %{biketype}
+        recovered_bike_type: recovered/found %{bike_type}
         secure_both_wheels: >-
           - Secure both wheels - either with two U-locks, or one U-lock and one heavy
           duty cable.
-        sign_up_on_bikeindex_to_claim: Sign up on BikeIndex.org to claim your %{biketype}
-        stolen_biketype: stolen %{biketype}
+        sign_up_on_bikeindex_to_claim: Sign up on BikeIndex.org to claim your %{bike_type}
+        stolen_bike_type: stolen %{bike_type}
         use_a_ulock: >-
           - *Use a U-Lock.* Cable locks should never be used as a primary means of
           locking a bike in a city.
