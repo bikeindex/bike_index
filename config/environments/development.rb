@@ -34,19 +34,14 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   config.action_mailer.raise_delivery_errors = true
-  # config.action_mailer.default_url_options = {host: "localhost", port: 3001}
-  # if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
-  #   config.action_mailer.perform_deliveries = false
-  #   config.action_mailer.delivery_method = :smtp
-  # else
+  config.action_mailer.default_url_options = {host: "localhost", port: 3001}
+  if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
+    config.action_mailer.perform_deliveries = false
+    config.action_mailer.delivery_method = :smtp
+  else
     config.action_mailer.perform_deliveries = true
-    config.action_mailer.delivery_method = :postmark
-    config.action_mailer.default_url_options = {protocol: "https", host: "bikeindex.org"}
-    config.action_mailer.postmark_settings = {
-      api_token: ENV["POSTMARK_API_TOKEN"]
-    }
-  #   config.action_mailer.delivery_method = :letter_opener
-  # end
+    config.action_mailer.delivery_method = :letter_opener
+  end
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
