@@ -9,6 +9,7 @@ class DonationMailer < ActionMailer::Base
       bcc: "gavin+review@bikeindex.org",
       from: '"Gavin Hoover" <gavin@bikeindex.org>',
       subject: "Thank you for donating to Bike Index",
-      template_name: notification_kind)
+      template_name: notification_kind,
+      tag: "donation")
   end
 end

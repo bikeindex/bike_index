@@ -15,7 +15,8 @@ class OrganizedMailer < ApplicationMailer
       mail(
         reply_to: reply_to,
         to: @b_param.owner_email,
-        subject: default_i18n_subject(default_subject_vars)
+        subject: default_i18n_subject(default_subject_vars),
+        tag: __callee__
       )
     end
   end
@@ -34,9 +35,13 @@ class OrganizedMailer < ApplicationMailer
     @organization = @ownership.organization
     @vars[:donation_message] = @bike.status_stolen? && !(@organization && !@organization.paid?)
     subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
-
+    tag = __callee__
+    tag = "#{tag}_pos" if @ownership.pos? && @ownership.new_registration?
     I18n.with_locale(@user&.preferred_language) do
-      mail(reply_to: reply_to, to: @vars[:email], subject: subject)
+      mail(reply_to: reply_to,
+        to: @vars[:email],
+        subject: subject,
+        tag: tag)
     end
   end
 
@@ -48,7 +53,10 @@ class OrganizedMailer < ApplicationMailer
     @new_user = User.fuzzy_email_find(@vars[:email]).present?
 
     I18n.with_locale(@sender&.preferred_language) do
-      mail(reply_to: reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
+      mail(reply_to: reply_to,
+        to: @vars[:email],
+        subject: default_i18n_subject(default_subject_vars),
+        tag: __callee__)
     end
   end
 
@@ -64,6 +72,7 @@ class OrganizedMailer < ApplicationMailer
     I18n.with_locale(@sender&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,
         to: @parking_notification.email,
+        tag: __callee__,
         subject: @parking_notification.subject) do |format|
         format.html { render "parking_notification" }
         format.text { render "parking_notification" }
@@ -80,7 +89,10 @@ class OrganizedMailer < ApplicationMailer
     end
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(reply_to: reply_to, to: @graduated_notification.email, subject: @graduated_notification.subject)
+      mail(reply_to: reply_to,
+        to: @graduated_notification.email,
+        subject: @graduated_notification.subject,
+        tag: __callee__)
     end
   end
 
@@ -101,7 +113,8 @@ class OrganizedMailer < ApplicationMailer
     mail(reply_to: reply_to,
       to: direct_to,
       bcc: recipient_emails,
-      subject: @hot_sheet.subject)
+      subject: @hot_sheet.subject,
+      tag: __callee__)
   end
 
   def impound_claim_submitted(impound_claim)
@@ -109,7 +122,8 @@ class OrganizedMailer < ApplicationMailer
     set_impound_claim_ivars
     mail(reply_to: "contact@bikeindex.org",
       to: @impound_claim.impound_record_email,
-      subject: "New impound claim submitted")
+      subject: "New impound claim submitted",
+      tag: __callee__)
   end
 
   def impound_claim_approved_or_denied(impound_claim)
@@ -117,7 +131,8 @@ class OrganizedMailer < ApplicationMailer
     set_impound_claim_ivars
     mail(reply_to: impound_claim.impound_record_email,
       to: @impound_claim.user.email,
-      subject: "Your impound claim was #{@impound_claim.status_humanized}")
+      subject: "Your impound claim was #{@impound_claim.status_humanized}",
+      tag: __callee__)
   end
 
   private

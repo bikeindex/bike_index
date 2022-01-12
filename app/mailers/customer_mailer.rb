@@ -6,7 +6,7 @@ class CustomerMailer < ApplicationMailer
     @user = user
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email)
+      mail(to: @user.email, tag: __callee__)
     end
   end
 
@@ -15,7 +15,7 @@ class CustomerMailer < ApplicationMailer
     @partner = @user.partner_sign_up
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email)
+      mail(to: @user.email, tag: __callee__)
     end
   end
 
@@ -24,7 +24,7 @@ class CustomerMailer < ApplicationMailer
     @url = update_password_form_with_reset_token_users_url(token: @user.password_reset_token)
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email)
+      mail(to: @user.email, tag: __callee__)
     end
   end
 
@@ -33,7 +33,7 @@ class CustomerMailer < ApplicationMailer
     @url = magic_link_session_url(token: @user.magic_link_token)
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email)
+      mail(to: @user.email, tag: __callee__)
     end
   end
 
@@ -42,7 +42,7 @@ class CustomerMailer < ApplicationMailer
     @user = @user_email.user
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user_email.email)
+      mail(to: @user_email.email, tag: __callee__)
     end
   end
 
@@ -51,7 +51,7 @@ class CustomerMailer < ApplicationMailer
     @user = payment.user
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @payment.email)
+      mail(to: @payment.email, tag: __callee__)
     end
   end
 
@@ -74,7 +74,9 @@ class CustomerMailer < ApplicationMailer
     @tweet_text = @info["tweet_string"]&.split("https://bikeindex.org")&.first
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @customer_contact.user_email, subject: @customer_contact.title)
+      mail(to: @customer_contact.user_email,
+        subject: @customer_contact.title,
+        tag: __callee__)
     end
   end
 
@@ -84,7 +86,10 @@ class CustomerMailer < ApplicationMailer
     title = if @notification.kind == "theft_alert_posted"
       "Your promoted alert advertisement is live!"
     end
-    mail(to: @notification.user.email, subject: title, from: "seth@bikeindex.org")
+    mail(to: @notification.user.email,
+      subject: title,
+      from: "seth@bikeindex.org",
+      tag: __callee__)
   end
 
   def admin_contact_stolen_email(customer_contact)
@@ -98,7 +103,8 @@ class CustomerMailer < ApplicationMailer
         to: @customer_contact.user_email,
         sender: @customer_contact.creator_email,
         reply_to: @customer_contact.creator_email,
-        subject: @customer_contact.title
+        subject: @customer_contact.title,
+        tag: __callee__
       )
     end
   end
@@ -113,7 +119,8 @@ class CustomerMailer < ApplicationMailer
         cc: ["bryan@bikeindex.org", "gavin@bikeindex.org"],
         reply_to: @stolen_notification.sender.email,
         from: "bryan@bikeindex.org",
-        subject: @stolen_notification.subject || default_i18n_subject
+        subject: @stolen_notification.subject || default_i18n_subject,
+        tag: __callee__
       )
     end
 
@@ -129,7 +136,8 @@ class CustomerMailer < ApplicationMailer
       mail(
         to: @user_alert.user.email,
         from: "bryan@bikeindex.org",
-        subject: @user_alert.email_subject
+        subject: @user_alert.email_subject,
+        tag: __callee__
       )
     end
   end
@@ -141,7 +149,8 @@ class CustomerMailer < ApplicationMailer
 
     I18n.with_locale(@user&.preferred_language || I18n.default_locale) do
       mail(to: @bike.owner_email,
-        subject: "We may have found your stolen #{@bike.title_string}")
+        subject: "We may have found your stolen #{@bike.title_string}",
+        tag: __callee__)
     end
   end
 
@@ -155,7 +164,8 @@ class CustomerMailer < ApplicationMailer
       mail(
         to: [@bike.owner_email],
         from: "bryan@bikeindex.org",
-        subject: default_i18n_subject(biketype: @biketype)
+        subject: default_i18n_subject(biketype: @biketype,
+        tag: __callee__)
       )
     end
   end
@@ -165,7 +175,9 @@ class CustomerMailer < ApplicationMailer
     @_action_has_layout = false # layout is manually included here
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, from: '"Gavin Hoover" <gavin@bikeindex.org>')
+      mail(to: @user.email,
+        from: '"Gavin Hoover" <gavin@bikeindex.org>',
+        tag: __callee__)
     end
   end
 end

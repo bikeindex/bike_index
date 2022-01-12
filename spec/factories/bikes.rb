@@ -25,9 +25,9 @@ FactoryBot.define do
         claimed { false }
         claimed_at { nil }
         can_edit_claimed { true }
+        creation_pos_kind { "" }
         # Previous Creation State attributes
         # TODO: part of #2110 - remove prefix
-        creation_state_pos_kind { "" }
         creation_state_origin { "" }
         creation_state_bulk_import { nil }
         creation_registration_info { nil }
@@ -55,7 +55,7 @@ FactoryBot.define do
             organization_id: bike.creation_organization_id,
             can_edit_claimed: evaluator.can_edit_claimed,
             origin: evaluator.creation_state_origin,
-            pos_kind: evaluator.creation_state_pos_kind,
+            pos_kind: evaluator.creation_pos_kind,
             bulk_import: evaluator.creation_state_bulk_import,
             registration_info: evaluator.creation_registration_info)
 
@@ -148,7 +148,7 @@ FactoryBot.define do
 
       factory :bike_lightspeed_pos do
         creation_state_origin { "api_v1" }
-        creation_state_pos_kind { "lightspeed_pos" }
+        creation_pos_kind { "lightspeed_pos" }
       end
 
       factory :bike_ascend_pos do
@@ -156,7 +156,7 @@ FactoryBot.define do
           bulk_import { FactoryBot.create(:bulk_import_ascend, organization: creation_organization) }
         end
         creation_state_origin { "bulk_import_worker" }
-        creation_state_pos_kind { "ascend_pos" }
+        creation_pos_kind { "ascend_pos" }
         creation_state_bulk_import { bulk_import }
       end
     end

@@ -23,6 +23,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.subject).to eq("Finish your Bike Index registration!")
         expect(mail.to).to eq([b_param.owner_email])
         expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+        expect(mail.tag).to eq "partial_registration"
       end
     end
     context "with organization" do
@@ -38,6 +39,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.to).to eq([b_param.owner_email])
           expect(mail.reply_to).to eq([organization.auto_user.email])
           expect(mail.body.encoded).to match header_mail_snippet.body
+          expect(mail.tag).to eq "partial_registration"
         end
         context "with partial snippet" do
           let!(:partial_mail_snippet) do
@@ -56,6 +58,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
             expect(mail.reply_to).to eq([organization.auto_user.email])
             expect(mail.body.encoded).to match header_mail_snippet.body
             expect(mail.body.encoded).to match partial_mail_snippet.body
+            expect(mail.tag).to eq "partial_registration"
           end
         end
       end
@@ -68,6 +71,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       let(:ownership) { FactoryBot.create(:ownership) }
       it "renders email" do
         expect(mail.subject).to match "Confirm your Bike Index registration"
+        expect(mail.tag).to eq "finished_registration"
       end
     end
     context "existing bike and ownership passed" do
@@ -80,6 +84,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(ownership1).to be_present
           expect(mail.subject).to eq("Confirm your Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.tag).to eq "finished_registration"
         end
       end
       context "claimed registration (e.g. self_made)" do
@@ -90,6 +95,27 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(ownership.claimed).to be_truthy
           expect(mail.subject).to eq("Bike Index registration successful")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.tag).to eq "finished_registration"
+        end
+      end
+      context "pos registration" do
+        let(:bike) { FactoryBot.create(:bike_lightspeed_pos) }
+        let(:ownership) { bike.current_ownership }
+        it "renders email" do
+          expect(bike.reload.new_registration?).to be_truthy
+          expect(bike.pos?).to be_truthy
+          expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
+          expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.tag).to eq "finished_registration_pos"
+          # But for a transferred registration, it does different
+          ownership2 = FactoryBot.create(:ownership, bike: bike)
+          expect(bike.reload.new_registration?).to be_falsey
+          expect(bike.pos?).to be_falsey
+          expect(ownership2.organization_pre_registration).to be_falsey
+          mail2 = OrganizedMailer.finished_registration(ownership2)
+          expect(mail2.subject).to eq("Confirm your Bike Index registration")
+          expect(mail2.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail2.tag).to eq "finished_registration"
         end
       end
       context "stolen" do
@@ -99,6 +125,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.subject).to eq("Confirm your stolen #{bike.type} on Bike Index")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.body.encoded).to match bike.current_stolen_record.find_or_create_recovery_link_token
+          expect(mail.tag).to eq "finished_registration"
         end
       end
     end
@@ -129,6 +156,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to match welcome_mail_snippet.body
           expect(mail.body.encoded).to match security_mail_snippet.body
           expect(mail.reply_to).to eq([organization.auto_user.email])
+          expect(mail.tag).to eq "finished_registration"
         end
       end
       context "new stolen registration" do
@@ -140,6 +168,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to match security_mail_snippet.body
           expect(mail.subject).to eq("Confirm your #{organization.short_name} stolen #{bike.type} on Bike Index")
           expect(mail.reply_to).to eq([organization.auto_user.email])
+          expect(mail.tag).to eq "finished_registration"
         end
       end
       context "non-new (pre-existing ownership)" do
@@ -159,6 +188,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to_not match security_mail_snippet.body
           expect(mail.subject).to eq("Confirm your Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+          expect(mail.tag).to eq "finished_registration"
         end
       end
     end
@@ -172,6 +202,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.subject).to eq("Join #{organization.short_name} on Bike Index")
       expect(mail.reply_to).to eq([organization.auto_user.email])
+      expect(mail.tag).to eq "organization_invitation"
     end
   end
 
@@ -187,6 +218,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.body.encoded).to match "I picked up my"
       expect(mail.body.encoded).to match target_retrieval_link_url
       expect(mail.reply_to).to eq([parking_notification.reply_to_email])
+      expect(mail.tag).to eq "parking_notification"
     end
     context "impound" do
       let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, kind: "impound_notification") }
@@ -233,6 +265,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.to).to eq([graduated_notification.email])
         expect(mail.reply_to).to eq([organization.auto_user.email])
         expect(mail.subject).to eq graduated_notification.subject
+        expect(mail.tag).to eq "graduated_notification"
       end
     end
   end

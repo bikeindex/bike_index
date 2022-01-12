@@ -2,8 +2,9 @@ class AdminMailer < ApplicationMailer
   helper LocalizationHelper
 
   default content_type: "multipart/alternative",
-    parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
-  default to: "contact@bikeindex.org"
+    parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"],
+    to: "contact@bikeindex.org",
+    tag: "admin"
 
   def feedback_notification_email(feedback)
     @feedback = feedback
@@ -17,28 +18,35 @@ class AdminMailer < ApplicationMailer
         send_to = "bryan@bikeindex.org"
       end
     end
-    mail("Reply-To" => feedback.email, :to => send_to, :subject => feedback.title)
+    mail("Reply-To" => feedback.email,
+      :to => send_to,
+      :subject => feedback.title)
   end
 
   def no_admins_notification_email(organization)
     @organization = organization
-    mail(to: "contact@bikeindex.org", subject: "#{@organization.name} doesn't have any admins!")
+    mail(to: "contact@bikeindex.org",
+      subject: "#{@organization.name} doesn't have any admins!")
   end
 
   def blocked_stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
-    mail(to: "bryan@bikeindex.org", bcc: "contact@bikeindex.org", subject: "Stolen notification blocked!")
+    mail(to: "bryan@bikeindex.org",
+      bcc: "contact@bikeindex.org",
+      subject: "Stolen notification blocked!")
   end
 
   def unknown_organization_for_ascend_import(bulk_import)
     @bulk_import = bulk_import
-    mail(to: ["gavin@bikeindex.org", "craig@bikeindex.org"], subject: "Unknown organization for ascend import")
+    mail(to: ["gavin@bikeindex.org", "craig@bikeindex.org"],
+      subject: "Unknown organization for ascend import")
   end
 
   def lightspeed_notification_email(organization, api_key)
     @organization = organization
     @api_key = api_key
-    mail(to: "admin@bikeindex.org", subject: "Api Notification sent!")
+    mail(to: "admin@bikeindex.org",
+      subject: "Api Notification sent!")
   end
 
   def theft_alert_notification(theft_alert, notification_type: nil)
