@@ -68,7 +68,6 @@ gem "rqrcode", "0.10.1" # QR Codes
 gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3" # QR codes more
 
 # API wrappers
-gem "simple_spark" # Sparkpost gem - we use it to send newsletters
 gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
