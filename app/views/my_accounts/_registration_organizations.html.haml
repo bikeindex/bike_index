@@ -6,11 +6,11 @@
 
   - rendered_registration_info_fields = []
   - user_bike_ids = current_user.bike_ids.sort
-  -# Show paid organizations first. It would be great to render alphabetically, but whatever
-  - user_registration_organizations = @user.user_registration_organizations.paid_organizations
-  - user_registration_organizations += @user.user_registration_organizations.not_paid_organizations
-  - user_registration_organizations.each do |user_registration_organization|
-    - organization = user_registration_organization.organization
+  -# get the organizations, so that we can sort alphabetically
+  - uro_organizations = @user.uro_organizations.paid.name_ordered
+  - uro_organizations += @user.uro_organizations.unpaid.name_ordered
+  - uro_organizations.each do |organization|
+    - user_registration_organization = @user.user_registration_organizations.find_by(organization_id: organization.id)
     = fields_for user_registration_organization do |uro|
       %hr.d-none.d-sm-block
       .related-fields.userRegistrationOrganization

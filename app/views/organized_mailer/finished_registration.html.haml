@@ -12,24 +12,24 @@
 
   -# used to be logic in here, but the @ownership.claim_message should mostly take this over
   - if @bike.status_impounded?
-    %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
+    %h1= t(".html.thanks_for_adding_this_bike_type_you_found", bike_type: @bike.type )
   - elsif @bike.status_stolen?
-    %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
-    %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
+    %h1= t(".html.bike_type_thieves_are_jerks", bike_type: @bike.type )
+    %p= t(".html.were_sorry_your_bike_type_was_stolen", bike_type: @bike.type )
   - else
     %h1.uncap
       - if @organization.present?
-        = t(".html.bike_register_with_bike_index_and_org", biketype: @bike.type, org_name: @organization.short_name)
+        = t(".html.bike_register_with_bike_index_and_org", bike_type: @bike.type, org_name: @organization.short_name)
       - else
-        = t(".html.bike_register_with_bike_index", biketype: @bike.type)
+        = t(".html.bike_register_with_bike_index", bike_type: @bike.type)
 
   %p
     - org_name = @creation_org&.name || @ownership&.creator&.display_name
 
     - bike_type = if @bike.status_impounded?
-      - t(".html.recovered_biketype", biketype: @bike.type)
+      - t(".html.recovered_bike_type", bike_type: @bike.type)
     - elsif @bike.status_stolen?
-      - t(".html.stolen_biketype", biketype: @bike.type)
+      - t(".html.stolen_bike_type", bike_type: @bike.type)
     - else
       - @bike.type
 
@@ -51,7 +51,7 @@
       - edit_bike_link = link_to t(".html.give_us_a_heads_up"), edit_bike_url(@bike)
       = t(".html.hopefully_you_find_the_owner_html", edit_bike_link: edit_bike_link)
     - else
-      = t(".html.hopefully_you_find_the_bike_html", biketype: @bike.type )
+      = t(".html.hopefully_you_find_the_bike_html", bike_type: @bike.type )
       %strong
         - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.fetch_current_stolen_record.find_or_create_recovery_link_token))
         = t(".html.mark_recovered_link_html", mark_recovered_link: mark_recovered_link)
@@ -67,14 +67,14 @@
 
 - unless @ownership.claimed?
   - if @vars[:registered_by_owner]
-    = link_to t(".html.claim_the_biketype", biketype: @bike.type), bike_url(@bike, email: @vars[:email]), class: 'binx-button'
+    = link_to t(".html.claim_the_bike_type", bike_type: @bike.type), bike_url(@bike, email: @vars[:email]), class: 'binx-button'
   - else
-    = link_to t(".html.confirm_this_biketype", biketype: @bike.type), bike_url(@bike, t: @ownership.token, email: @vars[:email]), class: 'binx-button'
+    = link_to t(".html.confirm_this_bike_type", bike_type: @bike.type), bike_url(@bike, t: @ownership.token, email: @vars[:email]), class: 'binx-button'
 
   - if @bike.status_stolen?
-    %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", biketype: @bike.type)
+    %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: @bike.type)
   - else
-    %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", biketype: @bike.type)
+    %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: @bike.type)
 
 - if @organization && @organization.mail_snippet_body("security").present?
   = @organization.mail_snippet_body("security").html_safe
