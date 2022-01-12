@@ -601,9 +601,6 @@ GEM
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
     simple_oauth (0.3.1)
-    simple_spark (1.0.12)
-      excon (>= 0.16.0, < 1.0)
-      json (>= 1.7.7, < 3.0)
     simplecov (0.17.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -797,7 +794,6 @@ DEPENDENCIES
   secure_headers (~> 2.5.0)
   sidekiq
   sidekiq-failures
-  simple_spark
   simplecov
   sitemap_generator (~> 6)
   skylight
