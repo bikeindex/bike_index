@@ -432,6 +432,11 @@ GEM
     pg_search (2.3.0)
       activerecord (>= 4.2)
       activesupport (>= 4.2)
+    postmark (1.22.0)
+      json
+    postmark-rails (0.21.0)
+      actionmailer (>= 3.0.0)
+      postmark (>= 1.21.3, < 2.0)
     premailer (1.11.1)
       addressable
       css_parser (>= 1.6.0)
@@ -759,6 +764,7 @@ DEPENDENCIES
   paranoia
   pg (~> 1.0)
   pg_search
+  postmark-rails
   premailer-rails
   pry-byebug
   pry-rails

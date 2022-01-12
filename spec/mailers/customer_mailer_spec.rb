@@ -9,6 +9,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to eq("Welcome to Bike Index!")
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
+      expect(mail.tag).to eq "welcome_email"
     end
   end
 
@@ -18,6 +19,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to eq("Please confirm your Bike Index email!")
       expect(mail.to).to eq([user.email])
       expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.tag).to eq "confirmation_email"
     end
     context "partner signup" do
       let(:user) { FactoryBot.create(:user_bikehub_signup) }
@@ -27,6 +29,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.subject).to eq("Please confirm your Bike Index email!")
         expect(mail.to).to eq([user.email])
         expect(mail.from).to eq(["contact@bikeindex.org"])
+        expect(mail.tag).to eq "confirmation_email"
       end
     end
   end
@@ -40,6 +43,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.body.encoded).to match(user.password_reset_token)
       # And just to be sure, test the route a little more
       expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.password_reset_token}/)
+      expect(mail.tag).to eq "password_reset_email"
     end
   end
 
@@ -50,6 +54,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to eq("Sign in to Bike Index")
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.body.encoded).to match(user.magic_link_token)
+      expect(mail.tag).to eq "magic_login_link_email"
     end
   end
 
@@ -59,6 +64,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       mail = CustomerMailer.additional_email_confirmation(user_email)
       expect(mail.subject).to match(/confirm/i)
       expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.tag).to eq "additional_email_confirmation"
     end
   end
 
@@ -71,6 +77,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.to).to eq([user.email])
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.body.encoded).to match "donation of"
+        expect(mail.tag).to eq "invoice_email"
       end
     end
     context "payment" do
@@ -81,6 +88,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.to).to eq([user.email])
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.body.encoded).to_not match "donation of"
+        expect(mail.tag).to eq "invoice_email"
       end
     end
   end

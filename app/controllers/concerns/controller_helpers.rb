@@ -364,7 +364,7 @@ module ControllerHelpers
   end
 
   def bikehub_website_url(path = nil)
-    return "#{valid_partner_domain || 'https://bikehub.com'}/#{path}"
+    "#{valid_partner_domain || "https://bikehub.com"}/#{path}"
   end
 
   def valid_partner_domain
