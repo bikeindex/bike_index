@@ -102,14 +102,14 @@ RSpec.describe OrganizedMailer, type: :mailer do
         let(:bike) { FactoryBot.create(:bike_lightspeed_pos) }
         let(:ownership) { bike.current_ownership }
         it "renders email" do
-          expect(bike.reload.new_registration?).to be_truthy
+          expect(bike.reload.current_ownership.new_registration?).to be_truthy
           expect(bike.pos?).to be_truthy
           expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration_pos"
           # But for a transferred registration, it does different
           ownership2 = FactoryBot.create(:ownership, bike: bike)
-          expect(bike.reload.new_registration?).to be_falsey
+          expect(bike.reload.current_ownership.new_registration?).to be_falsey
           expect(bike.pos?).to be_falsey
           expect(ownership2.organization_pre_registration).to be_falsey
           mail2 = OrganizedMailer.finished_registration(ownership2)
