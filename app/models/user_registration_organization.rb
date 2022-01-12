@@ -11,9 +11,6 @@ class UserRegistrationOrganization < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations, if: :persisted?
 
-  scope :paid_organizations, -> { includes(:organization).where(organizations: {is_paid: true}) }
-  scope :not_paid_organizations, -> { includes(:organization).where(organizations: {is_paid: false}) }
-
   attr_accessor :skip_after_user_change_worker
 
   # Includes deleted, just to be safe
