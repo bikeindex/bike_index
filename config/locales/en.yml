@@ -2051,8 +2051,8 @@ en:
         the_description_of_the_recovery_was: 'The description of the recovery was:'
         were_so_glad_you_got_your_bike_type_back: We're so glad you got your %{bike_type}
           back!
-        your_bike_type_was_marked_recovered_on_bik: 'Your %{bike_type} was marked recovered
-          on Bike Index:'
+        your_bike_type_was_marked_recovered_on_bik: 'Your %{bike_type} was marked
+          recovered on Bike Index:'
       subject: Your %{bike_type} has been marked recovered!
       text:
         if_you_didnt_recover_your_bike_or_marked_: >-
@@ -4854,8 +4854,8 @@ en:
           Secure both wheels - either with two U-locks, or one U-lock and one heavy
           duty cable.
         sign_up_on_bikeindexorg_to_claim_your_bik: >-
-          Sign up on BikeIndex.org to claim your %{bike_type} and edit it, upload photos
-          and make sure you never lose track of your trusty steed!
+          Sign up on BikeIndex.org to claim your %{bike_type} and edit it, upload
+          photos and make sure you never lose track of your trusty steed!
         stolen_bike_type: stolen %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Thanks for adding this %{bike_type}
           you found to Bike Index
@@ -4880,7 +4880,8 @@ en:
         edit_it_upload_photos: Edit it, upload photos and make sure you never lose
           track of your trusty steed!
         give_us_a_heads_up_when_you_do: Give us a heads up when you do (%{bike_edit_url})
-        hopefully_you_find_the_bike_type_soon: Hopefully you find the %{bike_type} soon.
+        hopefully_you_find_the_bike_type_soon: Hopefully you find the %{bike_type}
+          soon.
         hopefully_you_find_the_owner_soon: Hopefully you find the owner soon.
         org_added_a_bike: "%{org_name} added a %{bike_type} on Bike Index for you"
         org_sent_a_bike: "%{org_name} sent you a %{bike_type} on Bike Index"
