@@ -164,8 +164,8 @@ class CustomerMailer < ApplicationMailer
       mail(
         to: [@bike.owner_email],
         from: "bryan@bikeindex.org",
-        subject: default_i18n_subject(biketype: @biketype,
-          tag: __callee__)
+        subject: default_i18n_subject(biketype: @biketype),
+        tag: __callee__
       )
     end
   end
