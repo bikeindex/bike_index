@@ -7,9 +7,5 @@ unless Rails.env.test?
       password: ENV["SPARKPOST_PASSWORD"],
       authentication: :plain
     }
-  else
-    config.action_mailer.postmark_settings = {
-      api_token: ENV["POSTMARK_API_TOKEN"]
-    }
   end
 end
