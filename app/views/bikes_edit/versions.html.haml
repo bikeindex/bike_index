@@ -10,7 +10,7 @@
           .form-well-form-header
             %h3 Versions
           .col-xs-12
-            %p Store and manage snapshots of your bike at specific times
+            %p Store and manage snapshots of your #{@bike.type} at specific times
 
           - if @bike_versions.present?
             - rendered_version_label = false

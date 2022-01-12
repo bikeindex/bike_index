@@ -12,16 +12,16 @@
 
           .related-fields.hide-this-bike.no-divider-row
             .form-group.row
-              - unless @bike.user_hidden
+              - unless @bike.user_hidden?
                 .hide-this-bike-link
                   %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
                     = t(".hide_this_bike", bike_type: @bike.type)
 
-              .collapse#hide_bike_toggle_group{class: (@bike.user_hidden ? "show in" : "")}
-                - if @bike.user_hidden
-                  = f.hidden_field :marked_user_unhidden
-                - else
-                  = f.hidden_field :marked_user_hidden
+              .collapse#hide_bike_toggle_group{class: (@bike.user_hidden? ? "show in" : "")}
+                / - if @bike.user_hidden?
+                /   = f.hidden_field :marked_user_unhidden
+                / - else
+                /   = f.hidden_field :marked_user_hidden
                 .hide-explanation
                   %p.mt-2
                     %strong= t(".keeping_your_bike_public")
@@ -31,9 +31,9 @@
                   %p
                     = t(".we_strongly_recommend", bike_type: @bike.type)
                   %p.text-xs-center
-                    - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
+                    - btn_type = @bike.user_hidden? ? 'btn-success' : 'btn-danger'
                     %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type }
-                      - if @bike.user_hidden
+                      - if @bike.user_hidden?
                         = t(".unhide_this_bike", bike_type: @bike.type)
                       - else
                         = t(".hide_this_bike", bike_type: @bike.type)

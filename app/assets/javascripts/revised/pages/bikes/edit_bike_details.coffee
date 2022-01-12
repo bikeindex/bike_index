@@ -22,6 +22,7 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
     new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
 
   updateYear: ->
+    return unless $('#bike_year').length
     if $('#bike_year').val().length == 0
       # $('#bike_year').selectize()[0].selectize.disable()
       $('#bike_unknown_year').prop('checked', true)
@@ -39,7 +40,7 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
 
   setFrameSize: ->
     unit = $('#bike_frame_size_unit').val()
-    if unit != 'ordinal' and unit.length > 0
+    if unit and unit != 'ordinal' and unit.length > 0
       $('.frame-size-other').slideDown().addClass('unhidden')
       $('.frame-size-units').addClass('ex-size')
 
