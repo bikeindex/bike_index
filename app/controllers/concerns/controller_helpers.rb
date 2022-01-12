@@ -363,6 +363,10 @@ module ControllerHelpers
     "#{valid_partner_domain || "https://parkit.bikehub.com"}/#{path}"
   end
 
+  def bikehub_website_url(path = nil)
+    "#{valid_partner_domain || "https://bikehub.com"}/#{path}"
+  end
+
   def valid_partner_domain
     # Sometimes might just be return_to, but if there is a redirect_uri query param, use that
     redirect_redirect_uri = Addressable::URI.parse(session[:return_to])&.query_values&.dig("redirect_uri")

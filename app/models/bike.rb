@@ -81,6 +81,7 @@ class Bike < ApplicationRecord
 
   scope :without_location, -> { where(latitude: nil) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
+  scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
@@ -522,15 +523,6 @@ class Bike < ApplicationRecord
     return current_stolen_record if defined?(manual_csr)
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
-  end
-
-  def stolen_string
-    return nil unless status_stolen? && current_stolen_record.present?
-    [
-      "Stolen ",
-      current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.address && "from #{current_stolen_record.address}. "
-    ].compact.join(" ")
   end
 
   def bike_organization_ids

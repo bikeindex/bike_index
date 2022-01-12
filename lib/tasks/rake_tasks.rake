@@ -40,15 +40,6 @@ task exchange_rates_update: :environment do
   print is_success ? "done.\n" : "failed.\n"
 end
 
-task migrate_user_registration_organizations: :environment do
-  if ENV["USER_REGISTRATION_MIGRATION_STOP"].blank? && BulkAfterUserChangeWorker.enqueue?
-    uro_limit = (ENV["USER_LIMIT"] || 500).to_i
-    BulkAfterUserChangeWorker.users
-      .includes(:ownerships).where.not(ownerships: {id: nil})
-      .limit(uro_limit).pluck(:id).each { |i| BulkAfterUserChangeWorker.perform_async(i) }
-  end
-end
-
 task database_size: :environment do
   database_name = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
   sql = "SELECT pg_size_pretty(pg_database_size('#{database_name}'));"

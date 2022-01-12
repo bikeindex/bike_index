@@ -4357,6 +4357,8 @@ nl:
         only_stolen_html: alleen gestolen
         only_with_owner_html: Niet gestolen of in beslag genomen
         status: 'Toestand:'
+        status_cell: Toestand
+        create_export: Maak export van gezochte fietsen
     bulk_imports:
       index:
         added: Toegevoegd

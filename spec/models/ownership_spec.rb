@@ -595,18 +595,6 @@ RSpec.describe Ownership, type: :model do
           expect(bike.student_id(organization)).to eq "1222"
           expect(bike.organization_affiliation).to eq "employee"
         end
-        context "user_registration_organization"
-      end
-      context "conditional_information" do
-        # TODO: post #2121 remove once conditional_information is dropped
-        let(:registration_info) { {student_id: "99xxx"} }
-        it "overrides things" do
-          expect(bike.registration_info).to eq({student_id: "99xxx"}.as_json)
-          bike.update(conditional_information: {student_id: "//**CCCCC"})
-          ownership = bike.reload.current_ownership
-          ownership.update(updated_at: Time.current)
-          expect(ownership.reload.registration_info).to eq({student_id: "//**CCCCC"}.as_json)
-        end
       end
     end
     context "with creator" do

@@ -10,6 +10,7 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(@mail.subject).to eq("New Feedback Submitted")
       expect(@mail.to).to eq(["contact@bikeindex.org"])
       expect(@mail.reply_to).to eq([feedback.email])
+      expect(@mail.tag).to eq("admin")
     end
   end
 
@@ -23,6 +24,7 @@ RSpec.describe AdminMailer, type: :mailer do
         expect(mail.subject).to eq("New Feedback Submitted")
         expect(mail.to).to eq(["contact@bikeindex.org", "bryan@bikeindex.org", "gavin@bikeindex.org"])
         expect(mail.reply_to).to eq([feedback.email])
+        expect(mail.tag).to eq("admin")
       end
     end
     context "a stolen_information email" do
@@ -30,6 +32,7 @@ RSpec.describe AdminMailer, type: :mailer do
       it "sends a stolen_information email" do
         mail = AdminMailer.feedback_notification_email(feedback)
         expect(mail.to).to eq(["bryan@bikeindex.org"])
+        expect(mail.tag).to eq("admin")
       end
     end
     context "serial_update" do
@@ -39,6 +42,7 @@ RSpec.describe AdminMailer, type: :mailer do
         expect(mail.subject).to eq("New Feedback Submitted")
         expect(mail.to).to eq(["contact@bikeindex.org"])
         expect(mail.reply_to).to eq([feedback.email])
+        expect(mail.tag).to eq("admin")
       end
       context "with a link" do
         let(:feedback) { FactoryBot.create(:feedback, body: "something <a href='sddddd'>ffffff</a> WHAT UP", feedback_type: feedback_type, feedback_hash: {bike_id: bike.id}) }
@@ -46,6 +50,7 @@ RSpec.describe AdminMailer, type: :mailer do
           mail = AdminMailer.feedback_notification_email(feedback)
           expect(mail.subject).to eq("New Feedback Submitted")
           expect(mail.body.encoded).to_not match(/<a href=.sddddd/)
+          expect(mail.tag).to eq("admin")
         end
       end
     end
@@ -58,6 +63,7 @@ RSpec.describe AdminMailer, type: :mailer do
         mail = AdminMailer.feedback_notification_email(feedback)
         expect(mail.to).to eq(["gavin@bikeindex.org", "craig@bikeindex.org"])
         expect(mail.reply_to).to eq([feedback.email])
+        expect(mail.tag).to eq("admin")
       end
     end
   end
@@ -74,6 +80,7 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(mail.subject).to eq("New Feedback Submitted")
       expect(mail.to).to eq(["contact@bikeindex.org"])
       expect(mail.reply_to).to eq([feedback.email])
+      expect(mail.tag).to eq("admin")
     end
   end
 
@@ -86,6 +93,7 @@ RSpec.describe AdminMailer, type: :mailer do
     it "renders email" do
       expect(@mail.to).to eq(["contact@bikeindex.org"])
       expect(@mail.subject).to match("doesn't have any admins")
+      expect(@mail.tag).to eq("admin")
     end
   end
 
@@ -98,6 +106,7 @@ RSpec.describe AdminMailer, type: :mailer do
     it "renders email" do
       expect(@mail.subject[/blocked/i].present?).to be_truthy
       expect(@mail.body.encoded).to match(@stolen_notification.message)
+      expect(@mail.tag).to eq("admin")
     end
   end
 
@@ -108,6 +117,7 @@ RSpec.describe AdminMailer, type: :mailer do
     it "renders email" do
       expect(mail.to).to eq(["gavin@bikeindex.org", "craig@bikeindex.org"])
       expect(mail.subject).to match("Unknown organization for ascend import")
+      expect(mail.tag).to eq("admin")
     end
   end
 
@@ -120,6 +130,7 @@ RSpec.describe AdminMailer, type: :mailer do
         expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
         expect(mail.subject).to match("RECOVERED Promoted Alert: #{theft_alert.id}")
         expect(mail.body.encoded).to include("RECOVERED")
+        expect(mail.tag).to eq("admin")
       end
     end
   end

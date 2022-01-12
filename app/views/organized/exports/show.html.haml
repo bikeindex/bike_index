@@ -87,16 +87,18 @@
             - if @export.only_custom_bike_ids
               %small.d-block.mb-1 Only these specific bikes are included in this export:
             - included_bike_ids = (@export.custom_bike_ids & @export.bikes_scoped.pluck(:id))
-            %ul.mb-0
-              - @export.custom_bike_ids.each do |custom_id|
-                %li
-                  - if included_bike_ids.include?(custom_id)
-                    = link_to custom_id, bike_path(custom_id, organization_id: current_organization.to_param)
-                  - else
-                    %small.text-warning
-                      = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning text-underline")
-                      \:
-                      %em= t(".unable_to_export")
+            -# Make sure if there are a bunch of custom bikes, that it doesn't go on forever
+            %div{style: "max-height: 300px; overflow-x: scroll;"}
+              %ul.mb-0.row
+                - @export.custom_bike_ids.each do |custom_id|
+                  %li.col-md-4.col-xs-6
+                    - if included_bike_ids.include?(custom_id)
+                      = link_to custom_id, bike_path(custom_id, organization_id: current_organization.to_param)
+                    - else
+                      %small.text-warning
+                        = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning text-underline")
+                        \:
+                        %em= t(".unable_to_export")
       - if @export.avery_export?
         %tr
           %td= t(".avery_export")

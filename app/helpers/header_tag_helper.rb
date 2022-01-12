@@ -114,8 +114,18 @@ module HeaderTagHelper
         self.page_title = "Edit #{@bike.title_string}"
       end
     elsif action_name == "show"
-      self.page_title = "#{"Stolen " if @bike.status_stolen?}#{@bike.title_string}"
-      self.page_description = "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
+      status_prefix = @bike.status_with_owner? ? "" : @bike.status_humanized.titleize
+      self.page_title = [status_prefix, @bike.title_string].compact.join(" ")
+      special_status_string = if @bike.status_stolen? && @bike.current_stolen_record.present?
+        "#{status_prefix}: #{@bike.current_stolen_record.date_stolen&.strftime("%Y-%m-%d")}, from: #{@bike.current_stolen_record.address}"
+      elsif @bike.current_impound_record.present?
+        "#{status_prefix}: #{@bike.current_impound_record.impounded_at&.strftime("%Y-%m-%d")}, in: #{@bike.current_impound_record.address}"
+      end
+      self.page_description = [
+        "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_display}.",
+        (@bike.description.present? ? "#{@bike.description}." : nil),
+        special_status_string
+      ].compact.join(" ")
       if @bike.current_stolen_record.present?
         self.page_image = @bike.alert_image_url(:square)
         self.twitter_image = @bike.alert_image_url(:twitter)
