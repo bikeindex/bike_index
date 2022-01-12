@@ -4,7 +4,7 @@
   - sender_email = @stolen_notification.sender.email
   %p
     - if @bike.status_stolen?
-      - link = link_to t(".html.stolen_biketype", biketype: @bike.type), bike_url(@bike)
+      - link = link_to t(".html.stolen_bike_type", bike_type: @bike.type), bike_url(@bike)
       = t(".html.sender_email_sent_you_a_message_html", sender_email: sender_email, link: link)
 
     - else
@@ -24,7 +24,7 @@
         %br
         %small.less-strong{ style: "display: block; line-height: 1.5;" }
           - date = l @bike.current_ownership.created_at, format: :dotted
-          = t(".html.you_registered_this_biketype_on", biketype: @bike.type, date: date)
+          = t(".html.you_registered_this_bike_type_on", bike_type: @bike.type, date: date)
 
       %small.less-strong{ style: "display: block; line-height: 1; margin: 1em 0 -0.5rem;" }
         = t(".html.if_you_believe_this_email_is_illegitimate")
@@ -45,7 +45,7 @@
 
 %p.less-strong.center-text
   - date = l @bike.created_at, format: :dotted
-  = t(".html.this_email_is_about_the_biketype_register", biketype: @bike.type, date: date)
+  = t(".html.this_email_is_about_the_bike_type_register", bike_type: @bike.type, date: date)
 
 
 = render partial: 'shared/email_bike_box'

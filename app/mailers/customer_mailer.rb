@@ -157,14 +157,14 @@ class CustomerMailer < ApplicationMailer
   def recovered_from_link(stolen_record)
     @stolen_record = stolen_record
     @bike = stolen_record.bike
-    @biketype = @bike.cycle_type_name&.downcase
+    @bike_type = @bike.cycle_type_name&.downcase
     @recovering_user = stolen_record.recovering_user
 
     I18n.with_locale(@bike.owner&.preferred_language) do
       mail(
         to: [@bike.owner_email],
         from: "bryan@bikeindex.org",
-        subject: default_i18n_subject(biketype: @biketype),
+        subject: default_i18n_subject(bike_type: @bike_type),
         tag: __callee__
       )
     end
