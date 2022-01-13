@@ -59,6 +59,8 @@ RSpec.describe BikeUpdator do
       let(:organization) { bike.organizations.first }
       it "does not pass organization" do
         expect(bike.reload.current_ownership.organization).to be_present
+        expect(bike.not_updated_by_user?).to be_truthy
+        expect(bike.updator_id).to be_blank
         expect(user.member_of?(organization)).to be_falsey
         expect(ownership.reload.organization_pre_registration?).to be_falsey
         expect(ownership.origin).to eq "web"
@@ -73,6 +75,8 @@ RSpec.describe BikeUpdator do
         expect(bike.bike_organizations.count).to eq 1
         expect(bike.bike_organizations.first.organization).to eq organization
         expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+        expect(bike.not_updated_by_user?).to be_falsey
+        expect(bike.updator_id).to eq user.id
       end
       context "user is an organization member" do
         it "passes users organization" do

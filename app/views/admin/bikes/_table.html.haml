@@ -12,23 +12,16 @@
     - unless no_show_header
       %thead.thead-light.sortable
         %th
-          - if render_sortable
-            = sortable "id", "Added"
-          - else
-            Added
+          = sortable "id", "Added", render_sortable: render_sortable
+        %th.small
+          = sortable "updated_by_user_at", "Updated", render_sortable: render_sortable
         %th.d-none.d-md-table-cell
           .less-strong-hold
-            - if render_sortable
-              = sortable "owner_email", "Sent to"
-            - else
-              Sent to
+            = sortable "owner_email", "Sent to", render_sortable: render_sortable
             %small.d-none.d-lg-block.text-info{style: "position: absolute; right: 0.25em; top: 0.4em;"}
               claimed?
         %th
-          - if render_sortable
-            = sortable "manufacturer_id"
-          - else
-            Manufacturer
+          = sortable "manufacturer_id", render_sortable: render_sortable
         %th.d-none.d-lg-table-cell
           Info
         %th.admin-bike-table-serial-cell
@@ -55,6 +48,10 @@
               - if bike.deleted?
                 .small.text-danger
                   Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
+            %td
+              - if bike.updated_by_user_at.present?
+                %small.convertTime
+                  = l bike.updated_by_user_at, format: :convert_time
             %td.d-none.d-md-table-cell
               = bike.owner_email
               = user_icon(bike.user)
