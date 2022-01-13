@@ -496,7 +496,8 @@ CREATE TABLE public.bikes (
     address_set_manually boolean DEFAULT false,
     is_phone boolean DEFAULT false,
     current_impound_record_id bigint,
-    current_ownership_id bigint
+    current_ownership_id bigint,
+    updated_by_user_at timestamp without time zone
 );
 
 
@@ -6087,7 +6088,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211225005744'),
 ('20220102153706'),
 ('20220102160149'),
-('20220103161727'),
-('20220107041406');
+('20220107041406'),
+('20220113194000'),
+('20220113194041');
 
 
