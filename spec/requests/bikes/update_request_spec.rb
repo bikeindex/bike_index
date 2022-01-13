@@ -23,9 +23,9 @@ RSpec.describe "BikesController#update", type: :request do
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
-      bike.update(updated_at: Time.current)
+      bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
       bike.reload
-      expect(bike.user_updated_at).to be_blank
+      expect(bike.user_updated_at).to eq bike.created_at
       expect(bike.current_ownership.claimed?).to be_truthy
       expect(bike.user&.id).to eq current_user.id
       expect(current_user.authorized?(bike)).to be_truthy
