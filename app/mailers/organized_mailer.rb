@@ -109,12 +109,14 @@ class OrganizedMailer < ApplicationMailer
     else
       direct_to = recipient_emails.shift
     end
-
-    mail(reply_to: reply_to,
-      to: direct_to,
-      bcc: recipient_emails,
-      subject: @hot_sheet.subject,
-      tag: __callee__)
+    # Postmark only allows 50 emails per sent email, so abide by that
+    recipient_emails.each_slice(48).each do |permitted_recipient_emails|
+      mail(reply_to: reply_to,
+        to: direct_to,
+        bcc: permitted_recipient_emails,
+        subject: @hot_sheet.subject,
+        tag: __callee__)
+    end
   end
 
   def impound_claim_submitted(impound_claim)
