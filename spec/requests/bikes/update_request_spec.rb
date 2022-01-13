@@ -25,6 +25,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
       bike.update(updated_at: Time.current)
       bike.reload
+      expect(bike.user_updated_at).to be_blank
       expect(bike.current_ownership.claimed?).to be_truthy
       expect(bike.user&.id).to eq current_user.id
       expect(current_user.authorized?(bike)).to be_truthy
@@ -41,6 +42,7 @@ RSpec.describe "BikesController#update", type: :request do
       bike.reload
       expect(bike.street).to eq default_location[:street]
       expect(bike.address_set_manually).to be_falsey
+      expect(bike.user_updated_at).to be > (Time.current - 1)
     end
     context "with user without address" do
       let!(:current_user) { FactoryBot.create(:user_confirmed) }
