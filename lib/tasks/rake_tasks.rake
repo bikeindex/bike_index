@@ -72,8 +72,8 @@ end
 
 task migrate_updated_by_user_at: :environment do
   MigrateUpdateByUserAtWorker.perform_async
-  sleep(30)
-  MigrateUpdateByUserAtWorker.perform_async
+  MigrateUpdateByUserAtWorker.perform_in(15.seconds)
+  MigrateUpdateByUserAtWorker.perform_in(30.seconds)
 end
 
 desc "Provide DB vacuum for production environment"
