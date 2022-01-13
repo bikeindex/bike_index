@@ -56,8 +56,14 @@ class BikeVersionsController < ApplicationController
     @ad = true
   end
 
+  # Sometimes this is bike_version:{}, other times it's bike:{} and I don't know why
+  # I'm not super worried about it, so ignoring
   def permitted_params
-    params.require(:bike_version).permit(:name,
+    if params[:bike_version].present?
+      params.require(:bike_version)
+    else
+      params.require(:bike)
+    end.permit(:name,
       :description,
       :primary_frame_color_id,
       :secondary_frame_color_id,

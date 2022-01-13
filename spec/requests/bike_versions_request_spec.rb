@@ -103,5 +103,15 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(bike_version.owner_id).to eq current_user.id
       expect(bike_version.bike_id).to eq og_bike_id
     end
+    it "updates with bike param" do
+      expect(current_user.authorized?(bike_version)).to be_truthy
+      expect(valid_update_params).to be_present
+
+      patch "#{base_url}/#{bike_version.id}", params: {
+        bike: valid_update_params
+      }
+      expect(flash[:success]).to be_present
+      expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
+    end
   end
 end

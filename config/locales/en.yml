@@ -1578,7 +1578,7 @@ en:
         bike_or_version_version: Version
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
-        versions: "%{bike_type} Versions"
+        versions: Versions
         groups: Groups and Organizations
         ownership: Transfer Ownership
         photos: Photos

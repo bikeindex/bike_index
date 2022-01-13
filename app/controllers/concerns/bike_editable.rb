@@ -65,7 +65,7 @@ module BikeEditable
       end
       h[:remove] = translation(:remove, scope: t_scope)
       if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
-        h[:versions] = translation(:versions, bike_type: @bike.type, scope: t_scope)
+        h[:versions] = translation(:versions, scope: t_scope)
       end
       unless @bike.status_stolen_or_impounded? || @bike.version?
         h[:report_stolen] = translation(:report_stolen, scope: t_scope)
@@ -95,7 +95,7 @@ module BikeEditable
     return true unless Flipper.enabled?(:bike_versions, @current_user) && @bike.present?
     @bike_og ||= @bike # Already assigned by bike_versions controller
     @bike_versions = @bike_og.bike_versions
-      # .where(owner_id: @current_user.id) # May want to do this
+    # .where(owner_id: @current_user.id) # May want to do this
   end
 
   def edits_controller_name_for(requested_page)

@@ -43,21 +43,27 @@ class BikeVersion < ApplicationRecord
   def status_found?
     false
   end
+
   def deleted?
     false
   end
+
   def user
     owner
   end
+
   def user?
     owner.present?
   end
+
   def authorized_by_organization?(u: nil, org: nil)
     false
   end
+
   def bike_stickers
     BikeSticker.none
   end
+
   def organizations
     Organization.none
   end

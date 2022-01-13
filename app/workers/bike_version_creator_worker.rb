@@ -54,6 +54,6 @@ class BikeVersionCreatorWorker < ApplicationWorker
     [
       bike.name,
       "version #{version_number}"
-     ].reject(&:blank?).join(", ")
+    ].reject(&:blank?).join(", ")
   end
 end
