@@ -70,6 +70,11 @@ task database_size: :environment do
   puts "\n#{"Total size".ljust(name_col_length)} | #{ActiveRecord::Base.connection.execute(sql)[0]["pg_size_pretty"]}"
 end
 
+task migrate_updated_by_user_at: :environment do
+  Bike.unscoped.where(updated_by_user_at: nil).limit(10000)
+    .pluck(:id).each { |i| MigrateUpdateByUserAtWorker.perform_async(i) }
+end
+
 desc "Provide DB vacuum for production environment"
 task database_vacuum: :environment do
   tables = ActiveRecord::Base.connection.tables
