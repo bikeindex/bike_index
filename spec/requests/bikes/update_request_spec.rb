@@ -23,8 +23,10 @@ RSpec.describe "BikesController#update", type: :request do
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
-      bike.update(updated_at: Time.current)
+      bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
       bike.reload
+      expect(bike.updated_by_user_at).to eq bike.created_at
+      expect(bike.not_updated_by_user?).to be_truthy
       expect(bike.current_ownership.claimed?).to be_truthy
       expect(bike.user&.id).to eq current_user.id
       expect(current_user.authorized?(bike)).to be_truthy
@@ -41,6 +43,8 @@ RSpec.describe "BikesController#update", type: :request do
       bike.reload
       expect(bike.street).to eq default_location[:street]
       expect(bike.address_set_manually).to be_falsey
+      expect(bike.updated_by_user_at).to be > (Time.current - 1)
+      expect(bike.not_updated_by_user?).to be_falsey
     end
     context "with user without address" do
       let!(:current_user) { FactoryBot.create(:user_confirmed) }
