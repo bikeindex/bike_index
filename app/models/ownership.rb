@@ -181,7 +181,7 @@ class Ownership < ApplicationRecord
       end
     end
     self.registration_info = corrected_registration_info
-    self.owner_name ||= registration_info["user_name"]
+    self.owner_name ||= fallback_owner_name
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track
@@ -263,5 +263,13 @@ class Ownership < ApplicationRecord
     self.origin = "creator_unregistered_parking_notification" if status == "unregistered_parking_notification"
     return true if creator_unregistered_parking_notification?
     self_made? && creator_id == organization&.auto_user_id
+  end
+
+  def fallback_owner_name
+    return registration_info["user_name"] if registration_info["user_name"].present?
+    # If it's made by PSU and not from a member of PSU, use the creator name
+    if new_registration? && organization_id == 553 && !creator.member_of?(organization)
+      creator.name
+    end
   end
 end

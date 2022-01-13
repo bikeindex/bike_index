@@ -620,5 +620,17 @@ RSpec.describe Ownership, type: :model do
         expect(bike.owner_name).to eq "Sally Stuff"
       end
     end
+    context "stupid PSU bullshit" do
+      # PSU makes their students create accounts and then send the bike to a different email address. So handle that
+      # I'm working on convincing them to stop doing this.
+      let(:organization) { FactoryBot.create(:organization, short_name: "PSU", id: 553) }
+      let(:creator) { FactoryBot.create(:user_confirmed, name: "Jill Example") }
+      let(:bike) { FactoryBot.create(:bike_organized, claimed: false, user: nil, creator: creator, creation_organization: organization, owner_email: "sally@example.com") }
+      it "uses the creator name" do
+        expect(organization.reload.id).to eq 553
+        expect(bike.current_ownership.user_id).to be_blank
+        expect(bike.current_ownership.owner_name).to eq "Jill Example"
+      end
+    end
   end
 end
