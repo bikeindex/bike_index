@@ -181,7 +181,7 @@ class Ownership < ApplicationRecord
       end
     end
     self.registration_info = corrected_registration_info
-    self.owner_name ||= fallback_owner_name
+    self.owner_name ||= user&.name.presence || fallback_owner_name
     if claimed?
       self.claimed_at ||= Time.current
       # Update owner name always! Keep it in track
