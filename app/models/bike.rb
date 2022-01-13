@@ -298,6 +298,10 @@ class Bike < ApplicationRecord
     false
   end
 
+  def display_name
+    name.presence || "Original bike"
+  end
+
   def user?
     user.present?
   end
@@ -735,6 +739,7 @@ class Bike < ApplicationRecord
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
+    self.name = name.present? ? name.strip : nil
   end
 
   def set_calculated_attributes

@@ -24,6 +24,10 @@ module BikeAttributable
     scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   end
 
+  def display_name
+    name
+  end
+
   def status_stolen_or_impounded?
     %w[status_stolen status_impounded].include?(status)
   end

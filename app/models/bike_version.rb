@@ -21,7 +21,7 @@ class BikeVersion < ApplicationRecord
 
   default_scope { where.not(visibility: "user_hidden").order(listing_order: :desc) }
 
-  validates :name, uniqueness: {scope: [:bike_id, :owner_id]}
+  validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
 
   before_validation :set_calculated_attributes
 
@@ -86,6 +86,7 @@ class BikeVersion < ApplicationRecord
     self.listing_order = calculated_listing_order
     self.thumb_path = public_images&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
+    self.name = name&.strip
     # And the bike attributes
     self.frame_material = bike&.frame_material
     self.manufacturer_id = bike&.manufacturer_id

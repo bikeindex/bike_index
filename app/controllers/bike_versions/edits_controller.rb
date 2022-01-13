@@ -3,8 +3,6 @@ class BikeVersions::EditsController < BikeVersionsController
   before_action :ensure_user_allowed_to_edit
 
   def show
-    @bike = @bike_version
-
     @page_errors = @bike.errors
     return unless setup_edit_template(params[:edit_template] || params[:page]) # Returns nil if redirecting
 

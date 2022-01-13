@@ -51,7 +51,7 @@ module BikeEditable
     bike_or_version = if @bike.version?
       translation(:bike_or_version_version, scope: t_scope)
     else
-      @bike.type
+      ""
     end
     {}.with_indifferent_access.tap do |h|
       h[:bike_details] = translation(:bike_details, bike_or_version: bike_or_version, scope: t_scope)
@@ -92,8 +92,10 @@ module BikeEditable
   end
 
   def assign_versions
-    return true unless Flipper.enabled?(:bike_versions, @current_user)
-    @bike_versions = @bike.bike_versions.where(owner_id: @current_user.id) if @bike.present?
+    return true unless Flipper.enabled?(:bike_versions, @current_user) && @bike.present?
+    @bike_og ||= @bike # Already assigned by bike_versions controller
+    @bike_versions = @bike_og.bike_versions
+      # .where(owner_id: @current_user.id) # May want to do this
   end
 
   def edits_controller_name_for(requested_page)

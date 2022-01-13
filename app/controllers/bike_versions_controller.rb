@@ -33,6 +33,8 @@ class BikeVersionsController < ApplicationController
     rescue ActiveRecord::StatementInvalid => e
       raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end
+    @bike = @bike_version
+    @bike_og = @bike_version.bike
     return @bike_version if @bike_version.visible_by?(current_user)
     fail ActiveRecord::RecordNotFound
   end
