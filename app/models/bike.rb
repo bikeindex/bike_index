@@ -374,6 +374,10 @@ class Bike < ApplicationRecord
     status_impounded? || unregistered_parking_notification?
   end
 
+  def not_updated_by_user?
+    updated_by_user_at.blank? || updated_by_user_at == created_at
+  end
+
   def serial_display(u = nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_organization?

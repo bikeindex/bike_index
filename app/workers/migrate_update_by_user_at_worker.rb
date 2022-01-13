@@ -1,10 +1,8 @@
-# Useful because of looking at PSU errors.
-# Checkout https://github.com/bikeindex/bike_index/pull/1042
+class MigrateUpdateByUserAtWorker < ApplicationWorker
+  sidekiq_options queue: "low_priority"
 
-class AveryableBikeWorker < ApplicationWorker
-  def perform(filename, bike_id)
+  def perform(bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)
-    return true if bike.avery_exportable?
-    File.open(filename, "a+") { |f| f << "\n#{bike.id}" }
+    bike.update_column :updated_by_user_at, bike.current_ownership&.claimed_at || bike.created_at
   end
 end
