@@ -75,7 +75,6 @@
 :javascript
   window.interpreted_params = #{@interpreted_params.to_json};
   window.bike_placeholder_image = "#{bike_placeholder_image_path}";
-  window.forwarded_ip_address = "#{@forwarded_ip_address}";
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do
