@@ -597,6 +597,13 @@ RSpec.describe Ownership, type: :model do
         end
       end
     end
+    context "unclaimed but with user" do
+      let(:user) { FactoryBot.create(:user, name: "Party Party") }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, user: user) }
+      it "uses the user name"  do
+        expect(bike.reload.owner_name).to eq "Party Party"
+     end
+    end
     context "with creator" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:creator) { FactoryBot.create(:user_confirmed, name: "Stephanie Example") }
