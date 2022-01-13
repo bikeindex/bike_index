@@ -108,9 +108,10 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(valid_update_params).to be_present
 
       patch "#{base_url}/#{bike_version.id}", params: {
-        bike: valid_update_params
+        bike: valid_update_params, edit_template: "accessories"
       }
       expect(flash[:success]).to be_present
+      expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/accessories")
       expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
     end
   end

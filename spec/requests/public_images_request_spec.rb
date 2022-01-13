@@ -62,6 +62,35 @@ RSpec.describe PublicImagesController, type: :request do
         end
       end
     end
+    context "bike_version" do
+      let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user) }
+      context "valid owner" do
+        it "creates an image" do
+          bike_version.update_column :updated_at, Time.current - 1.hour
+          Sidekiq::Worker.clear_all
+          post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
+            public_image: {name: "cool name"}, format: :js
+          }
+          expect(AfterBikeSaveWorker.jobs.count).to eq 0
+          expect(bike_version.reload.updated_at).to be_within(1).of Time.current
+          expect(bike_version.public_images.first.name).to eq "cool name"
+        end
+        # context "user hidden" do
+        #   xit "creates an image" do
+        #     bike.update(marked_user_hidden: true)
+        #     bike.update_column :updated_at, Time.current - 1.hour
+        #     expect(bike.reload.user_hidden).to be_truthy
+        #     expect(bike.thumb_path).to be_blank
+        #     Sidekiq::Worker.clear_all
+        #     post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
+        #     expect(AfterBikeSaveWorker.jobs.count).to eq 1
+        #     AfterBikeSaveWorker.drain
+        #     expect(bike.reload.updated_at).to be_within(1).of Time.current
+        #     expect(bike.public_images.first.name).to eq "cool name"
+        #   end
+        # end
+      end
+    end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
@@ -195,7 +224,7 @@ RSpec.describe PublicImagesController, type: :request do
           public_image = FactoryBot.create(:public_image, imageable: bike)
           expect(bike.authorized?(current_user)).to be_truthy
           expect {
-            delete "#{base_url}/#{public_image.id}?page=redirect_page"
+            delete "#{base_url}/#{public_image.id}?edit_template=redirect_page"
           }.to change(PublicImage, :count).by(-1)
           expect(response).to redirect_to(edit_bike_path(bike, edit_template: "redirect_page"))
         end

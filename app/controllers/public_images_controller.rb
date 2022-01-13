@@ -65,7 +65,7 @@ class PublicImagesController < ApplicationController
     end
     @public_image.destroy
     flash[:success] = translation(:image_deleted)
-    if params[:page].present?
+    if params[:edit_template].present?
       redirect_to(edit_bike_url(imageable_id, edit_template: params[:edit_template])) && return
     elsif imageable_type == "Blog"
       redirect_to(edit_admin_news_url(@imageable.title_slug), status: 303) && return
@@ -85,8 +85,12 @@ class PublicImagesController < ApplicationController
   protected
 
   def ensure_authorized_to_create!
-    if params[:bike_id].present? # Ensure the
-      @bike = Bike.unscoped.find(params[:bike_id])
+    if params[:bike_id].present?
+      @bike = if params[:imageable_type] == "BikeVersion"
+        BikeVersion.unscoped.find(params[:bike_id])
+      else
+        Bike.unscoped.find(params[:bike_id])
+      end
       return true if @bike.authorized?(current_user)
     end
     # Otherwise, it's a blog image or an organization image (or someone messing about),

@@ -103,7 +103,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.handlebar_type_name).to eq "Rear facing"
       expect(bike_version.propulsion_type_name).to eq "Electric Assist"
       expect(bike_version.frame_material_name).to eq "Wood or organic material"
-      expect(bike_version.name).to eq "My cool bike, version 1"
+      expect(bike_version.name).to eq "My cool bike, Version 1"
       expect(bike_version.year).to eq 1969
       expect(bike_version.frame_model).to eq "Cool model name"
       expect(bike_version.description).to eq "A really cool description"

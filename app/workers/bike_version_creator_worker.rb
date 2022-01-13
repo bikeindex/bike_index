@@ -53,7 +53,7 @@ class BikeVersionCreatorWorker < ApplicationWorker
     version_number = bike.bike_versions.where(owner_id: bike.user&.id).count + 1
     [
       bike.name,
-      "version #{version_number}"
+      "Version #{version_number}"
     ].reject(&:blank?).join(", ")
   end
 end
