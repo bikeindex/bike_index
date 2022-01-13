@@ -4,7 +4,7 @@ class BikeVersions::EditsController < BikeVersionsController
 
   def show
     @page_errors = @bike.errors
-    return unless setup_edit_template(params[:edit_template] || params[:page]) # Returns nil if redirecting
+    return unless setup_edit_template(params[:edit_template]) # Returns nil if redirecting
 
     if @edit_template == "photos"
       @private_images = PublicImage

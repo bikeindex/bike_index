@@ -299,7 +299,7 @@ class Bike < ApplicationRecord
   end
 
   def display_name
-    name.presence || "Original bike"
+    name.presence || cycle_type.titleize
   end
 
   def user?

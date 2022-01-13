@@ -86,7 +86,7 @@ class BikeVersion < ApplicationRecord
     self.listing_order = calculated_listing_order
     self.thumb_path = public_images&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
-    self.name = name&.strip
+    self.name = name.present? ? name.strip : nil
     # And the bike attributes
     self.frame_material = bike&.frame_material
     self.manufacturer_id = bike&.manufacturer_id

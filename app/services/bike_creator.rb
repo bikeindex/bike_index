@@ -18,8 +18,7 @@ class BikeCreator
       [
         stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
         impound_records_attributes: permitted_impound_attrs,
-        components_attributes: %i[id component_model year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
-          manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy]
+        components_attributes: Component.permitted_attributes
       ]
     ).freeze
   end

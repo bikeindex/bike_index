@@ -16,11 +16,11 @@
             .related-fields.no-divider-row-wrap
               .form-group.row
                 %label.form-well-label.less-strong
-                  Bike registration
+                  Registration
                 %p.form-well-input-static.mt-1
                   - if @bike.id == @bike_og.id && !@bike.version?
                     %span.text-muted{style: "text-decoration: underline;"}= @bike_og.display_name
-                    %em.text-muted.less-strong currently viewing
+                    %em.text-muted.less-strong currently editing
                   - else
                     = link_to @bike_og.display_name, edit_bike_path(@bike_og)
 
@@ -32,12 +32,12 @@
                     - if rendered_version_label
                       &nbsp;
                     - else
-                      Bike Versions
+                      Versions
                       - rendered_version_label = true
                   %p.form-well-input-static{class: (rendered_version_label ? "" : "mt-1")}
                     - if bike_version.id == @bike.id && @bike.version?
                       %span.text-muted{style: "text-decoration: underline;"}= bike_version.display_name
-                      %em.text-muted.less-strong currently viewing
+                      %em.text-muted.less-strong currently editing
                     - else
                       = link_to bike_version.display_name, edit_bike_version_path(bike_version)
 

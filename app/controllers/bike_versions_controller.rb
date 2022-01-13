@@ -23,6 +23,14 @@ class BikeVersionsController < ApplicationController
   end
 
   def update
+    pp permitted_params
+    if @bike_version.update(permitted_params)
+      flash[:success] = "#{@bike.type.titleize} version updated"
+      redirect_to(edit_bike_version_path(@bike_version, edit_template: @edit_template)) && return
+    else
+      flash[:error] = "Unable to update"
+      render :edit_template
+    end
   end
 
   protected
@@ -47,5 +55,20 @@ class BikeVersionsController < ApplicationController
 
   def render_ad
     @ad = true
+  end
+
+  def permitted_params
+    params.require(:bike_version).permit(:name,
+      :description,
+      :primary_frame_color_id,
+      :secondary_frame_color_id,
+      :tertiary_frame_color_id,
+      :front_wheel_size_id,
+      :rear_wheel_size_id,
+      :rear_gear_type_id,
+      :front_gear_type_id,
+      :front_tire_narrow,
+      :handlebar_type,
+      components_attributes: Component.permitted_attributes)
   end
 end

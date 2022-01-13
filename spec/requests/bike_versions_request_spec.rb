@@ -72,4 +72,36 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       end
     end
   end
+
+  describe "update" do
+    let(:color) { FactoryBot.create(:color) }
+    let(:valid_update_params) do
+      {
+        name: "some new name",
+        description: "New description",
+        primary_frame_color_id: color.id,
+        secondary_frame_color_id: FactoryBot.create(:color).id,
+        tertiary_frame_color_id: color.id,
+        front_wheel_size_id: FactoryBot.create(:wheel_size).id,
+        rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
+        rear_gear_type_id: FactoryBot.create(:front_gear_type).id,
+        front_gear_type_id: FactoryBot.create(:rear_gear_type).id,
+        front_tire_narrow: true,
+        handlebar_type: "drop_bar"
+      }
+    end
+    it "updates" do
+      expect(current_user.authorized?(bike_version)).to be_truthy
+      expect(valid_update_params).to be_present
+      pp valid_update_params
+
+      patch "#{base_url}/#{bike_version.id}", params: {
+        bike_version: valid_update_params.merge(owner_id: current_user.id + 12)
+      }
+      expect(flash[:success]).to be_present
+      expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
+      expect(bike_version.owner_id).to eq current_user.id
+      expect(bike_version.bike_id).to eq bike.id
+    end
+  end
 end

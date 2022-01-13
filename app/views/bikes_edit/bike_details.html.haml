@@ -25,8 +25,8 @@
                 - else
                   = @bike.serial_number
                 - if @bike.version?
-                  - original_bike_link = link_to t(".original_bike", bike_type: @bike.type), edit_bike_path(@bike.bike)
-                  %a.ml-1.inline-input-help{title: t(".update_on_bike", bike_type: @bike.type), data: {toggle: "popover", content: t(".update_these_attributes_on_bike_html", bike_type: @bike.type, original_bike_link: original_bike_link)}}
+                  - bike_registration_link = link_to t(".bike_registration", bike_type: @bike.type), edit_bike_path(@bike.bike)
+                  %a.ml-1.inline-input-help{title: t(".update_on_bike", bike_type: @bike.type), data: {toggle: "popover", content: t(".update_these_attributes_on_bike_html", bike_type: @bike.type, bike_registration_link: bike_registration_link)}}
                     ?
               - unless @bike.version?
                 .right-input-help.right-text-help
