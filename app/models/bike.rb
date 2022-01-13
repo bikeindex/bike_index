@@ -846,6 +846,7 @@ class Bike < ApplicationRecord
     set_location_info
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
+    self.updated_by_user_at ||= created_at
     set_user_hidden
     cache_bike
   end

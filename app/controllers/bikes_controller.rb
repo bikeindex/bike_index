@@ -152,7 +152,7 @@ class BikesController < Bikes::BaseController
   def update
     if params[:bike].present?
       begin
-        @bike.user_updated_at = Time.current
+        @bike.updated_by_user_at = Time.current
         @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
       rescue => e
         flash[:error] = e.message
