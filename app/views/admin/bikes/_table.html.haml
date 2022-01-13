@@ -49,9 +49,8 @@
                 .small.text-danger
                   Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
             %td
-              - if bike.updated_by_user_at.present?
-                %small.convertTime
-                  = l bike.updated_by_user_at, format: :convert_time
+              %small.convertTime
+                = l bike.updated_by_user_fallback, format: :convert_time
             %td.d-none.d-md-table-cell
               = bike.owner_email
               = user_icon(bike.user)

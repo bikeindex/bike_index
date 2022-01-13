@@ -153,7 +153,7 @@
         %th.hiddenColumn.created_at_cell
           = sortable "id", t(".registered")
         %th.hiddenColumn.updated_at_cell.hidden-xs-down
-          = sortable "updated_at", t(".updated")
+          = sortable "updated_by_user_at", t(".updated")
         %th.hiddenColumn.hidden-xs-down.stolen_cell
           %small
             = t(".stolen")
@@ -206,7 +206,7 @@
                 = l bike.created_at, format: :convert_time
             %td.hiddenColumn.updated_at_cell.hidden-xs-down
               %small.convertTime
-                = l bike.updated_at, format: :convert_time
+                = l bike.updated_by_user_fallback, format: :convert_time
             %td.hiddenColumn.hidden-xs-down.table-cell-check.stolen_cell
               = check_mark if bike.status_stolen?
             %td.hiddenColumn.hidden-xs-down.cycle_type_cell

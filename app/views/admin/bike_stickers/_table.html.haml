@@ -13,7 +13,7 @@
       %th
         %small
           - if render_sortable
-            = sortable "updated_by_user_at"
+            = sortable "updated_at"
           - else
             Updated
       - unless skip_updates
@@ -59,7 +59,7 @@
                   = bike_sticker.id
           %td
             %a.small.convertTime{ href: admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id) }
-              = l bike_sticker.updated_by_user_at, format: :convert_time
+              = l bike_sticker.updated_at, format: :convert_time
           - unless skip_updates
             %td
               = link_to admin_number_display(bike_sticker.bike_sticker_updates.count), admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id)
