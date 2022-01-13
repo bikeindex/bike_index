@@ -299,7 +299,6 @@ RSpec.describe OrganizedMailer, type: :mailer do
     context "passed in email" do
       let(:mail) { OrganizedMailer.hot_sheet(hot_sheet, ["seth@test.com"]) }
       it "sends to passed in email" do
-        pp mail
         expect(mail.to).to eq(["seth@test.com"])
         expect(mail.reply_to).to eq([organization.auto_user.email])
         expect(mail.bcc).to eq([])
