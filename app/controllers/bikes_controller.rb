@@ -9,7 +9,6 @@ class BikesController < Bikes::BaseController
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
     @stolenness = @interpreted_params[:stolenness]
-    @forwarded_ip_address = forwarded_ip_address
 
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
