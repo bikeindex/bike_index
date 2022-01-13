@@ -109,17 +109,12 @@ class OrganizedMailer < ApplicationMailer
     else
       direct_to = recipient_emails.shift
     end
-    # Postmark only allows 50 emails per sent email, so abide by that
-    # NOTE: This isn't that great of a solution, quick hack to solve the problem.
-    # TODO: Add a test
-    recipient_emails = [nil] if recipient_emails.blank? # ensure mail is sent if there aren't any recipient emails
-    recipient_emails.each_slice(48).map do |permitted_recipient_emails|
-      mail(reply_to: reply_to,
-        to: direct_to,
-        bcc: permitted_recipient_emails,
-        subject: @hot_sheet.subject,
-        tag: __callee__)
-    end
+
+    mail(reply_to: reply_to,
+      to: direct_to,
+      bcc: recipient_emails,
+      subject: @hot_sheet.subject,
+      tag: __callee__)
   end
 
   def impound_claim_submitted(impound_claim)
