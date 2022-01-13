@@ -93,7 +93,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
     it "updates" do
       expect(current_user.authorized?(bike_version)).to be_truthy
       expect(valid_update_params).to be_present
-      pp valid_update_params
+      og_bike_id = bike_version.bike_id
 
       patch "#{base_url}/#{bike_version.id}", params: {
         bike_version: valid_update_params.merge(owner_id: current_user.id + 12)
@@ -101,7 +101,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(flash[:success]).to be_present
       expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
       expect(bike_version.owner_id).to eq current_user.id
-      expect(bike_version.bike_id).to eq bike.id
+      expect(bike_version.bike_id).to eq og_bike_id
     end
   end
 end

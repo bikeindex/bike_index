@@ -23,7 +23,6 @@ class BikeVersionsController < ApplicationController
   end
 
   def update
-    pp permitted_params
     if @bike_version.update(permitted_params)
       flash[:success] = "#{@bike.type.titleize} version updated"
       redirect_to(edit_bike_version_path(@bike_version, edit_template: @edit_template)) && return
