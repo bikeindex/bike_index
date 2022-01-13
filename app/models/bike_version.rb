@@ -29,6 +29,12 @@ class BikeVersion < ApplicationRecord
     :no_serial?, :serial_number, :serial_unknown, :made_without_serial?,
     to: :bike, allow_nil: true
 
+  def self.original_bike_override_attributes
+    %w[manufacturer manufacturer_other mnfg_name
+      frame_model frame_material
+      frame_size frame_size_unit frame_size_number]
+  end
+
   def version?
     true
   end
@@ -80,6 +86,15 @@ class BikeVersion < ApplicationRecord
     self.listing_order = calculated_listing_order
     self.thumb_path = public_images&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
+    # And the bike attributes
+    self.frame_material = bike&.frame_material
+    self.manufacturer_id = bike&.manufacturer_id
+    self.mnfg_name = bike&.mnfg_name
+    self.manufacturer_other = bike&.manufacturer_other
+    self.year = bike&.year
+    self.frame_size = bike&.frame_size
+    self.frame_size_unit = bike&.frame_size_unit
+    self.frame_size_number = bike&.frame_size_number
   end
 
   # Method from bike that is static in bike_version

@@ -23,6 +23,10 @@ class AfterBikeSaveWorker < ApplicationWorker
       # Update the user to update any user alerts relevant to bikes
       AfterUserChangeWorker.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
     end
+    bike.bike_versions.each do |bike_version|
+      bike_version.set_calculated_attributes
+      bike_version.save if bike_version.changed?
+    end
     return true unless bike.status_stolen? # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
   end

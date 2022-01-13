@@ -65,7 +65,7 @@ module BikeEditable
       end
       h[:remove] = translation(:remove, scope: t_scope)
       if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
-        h[:versions] = translation(:versions, biketype: @bike.type, scope: t_scope)
+        h[:versions] = translation(:versions, bike_type: @bike.type, scope: t_scope)
       end
       unless @bike.status_stolen_or_impounded? || @bike.version?
         h[:report_stolen] = translation(:report_stolen, scope: t_scope)

@@ -1374,10 +1374,10 @@ en:
       update_serial_number: Update serial number
       updated_serial: Updated serial
       zipcode: Postal code
-      update_on_bike: Update on %{biketype}
-      original_bike: edit the original %{biketype} here
+      update_on_bike: Update on %{bike_type}
+      original_bike: Edit the original %{bike_type} here
       update_these_attributes_on_bike_html: >-
-        These attributes don't change between versions. The need to be updated on the original bike - %{original_bike_link}
+        These attributes don't change between versions and need to be updated on the original %{bike_type}. %{original_bike_link}
     bike_fields:
       revised_colors:
         add_a_color: Add a color
@@ -1578,7 +1578,7 @@ en:
         bike_or_version_version: Version
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
-        versions: "%{biketype} Versions"
+        versions: "%{bike_type} Versions"
         groups: Groups and Organizations
         ownership: Transfer Ownership
         photos: Photos
