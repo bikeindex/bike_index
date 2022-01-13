@@ -110,6 +110,7 @@ class OrganizedMailer < ApplicationMailer
       direct_to = recipient_emails.shift
     end
     # Postmark only allows 50 emails per sent email, so abide by that
+    # NOTE: This isn't that great of a solution, quick hack to solve the problem
     recipient_emails.each_slice(48).each do |permitted_recipient_emails|
       mail(reply_to: reply_to,
         to: direct_to,
