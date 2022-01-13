@@ -341,6 +341,10 @@ class Bike < ApplicationRecord
     status_impounded? || unregistered_parking_notification?
   end
 
+  def not_updated_by_user?
+    updated_by_user_at.blank? || updated_by_user_at == created_at
+  end
+
   def serial_display(u = nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_organization?
@@ -750,6 +754,7 @@ class Bike < ApplicationRecord
     set_location_info
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
+    self.updated_by_user_at ||= created_at
     set_user_hidden
     # cache_bike
     self.all_description = cached_description_and_stolen_description

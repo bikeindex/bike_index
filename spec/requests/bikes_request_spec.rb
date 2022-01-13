@@ -5,6 +5,7 @@ require "rails_helper"
 #  - bikes/show_request_spec.rb
 #  - bikes/update_request_spec.rb
 #  - bikes/edit_request_spec.rb
+#  - bikes/index_request_spec.rb
 
 RSpec.describe BikesController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
@@ -12,14 +13,6 @@ RSpec.describe BikesController, type: :request do
   let(:ownership) { FactoryBot.create(:ownership) }
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
-
-  describe "index" do
-    it "renders" do
-      get base_url
-      expect(response.code).to eq("200")
-      expect(response).to render_template(:index)
-    end
-  end
 
   describe "new" do
     it "renders" do

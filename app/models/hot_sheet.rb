@@ -70,8 +70,13 @@ class HotSheet < ApplicationRecord
   end
 
   def deliver_email
-    # This is called from process_hot_sheet_worker, so it can be delivered inline
-    OrganizedMailer.hot_sheet(self).deliver_now if recipient_emails.any?
+    if recipient_emails.any?
+      # Postmark only allows 50 emails per sent email, so abide by that
+      recipient_emails.each_slice(48).map do |permitted_recipient_emails|
+        # This is called from process_hot_sheet_worker, so it can be delivered inline
+        OrganizedMailer.hot_sheet(self, permitted_recipient_emails).deliver_now
+      end
+    end
     update(delivery_status: "email_success")
   end
 
