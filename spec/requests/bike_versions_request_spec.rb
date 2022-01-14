@@ -132,8 +132,8 @@ RSpec.describe BikeVersions::EditsController, type: :request do
 
   describe "delete" do
     it "destroys" do
-      expect(BikeVersion.unscoped.count).to eq 1
       og_bike_id = bike_version.bike_id
+      expect(BikeVersion.unscoped.count).to eq 1
       expect do
         delete "#{base_url}/#{bike_version.id}"
       end.to change(BikeVersion, :count).by(-1)

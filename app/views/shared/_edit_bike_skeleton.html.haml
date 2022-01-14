@@ -17,10 +17,10 @@
         - else
           = bike_title_html(@bike)
         - if @bike.deleted?
-          %em.text-danger.uncap
-            This #{@bike.type} was deleted
+          %em.text-danger.uncap.d-block
+            This #{@bike.version? ? "version" : @bike.type} was deleted
             - if @bike.deleted_at.present?
-              %span.convertTime.preciseTime
+              %span.convertTime.preciseTime.withPreposition
                 = l(@bike.deleted_at, format: :convert_time)
 
       - unless @bike.user?
