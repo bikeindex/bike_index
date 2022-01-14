@@ -122,7 +122,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[id updated_at owner_email manufacturer_id frame_model cycle_type]
+      %w[id updated_by_user_at owner_email manufacturer_id frame_model cycle_type]
     end
 
     def organization_bikes

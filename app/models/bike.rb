@@ -345,6 +345,10 @@ class Bike < ApplicationRecord
     updated_by_user_at.blank? || updated_by_user_at == created_at
   end
 
+  def updated_by_user_fallback
+    updated_by_user_at || updated_at
+  end
+
   def serial_display(u = nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_organization?
