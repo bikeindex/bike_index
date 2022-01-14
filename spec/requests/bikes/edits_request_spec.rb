@@ -8,7 +8,7 @@ RSpec.describe Bikes::EditsController, type: :request do
 
   let(:edit_templates) do
     {
-      bike_details: "Bike Details",
+      bike_details: "Details",
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",
@@ -96,7 +96,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       get base_url
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
-      expect(assigns(:edit_templates)).to eq edit_templates.merge(versions: "Bike Versions").as_json
+      expect(assigns(:edit_templates)).to eq edit_templates.merge(versions: "Versions").as_json
       get "#{base_url}/versions"
       expect(response.status).to eq 200
       expect(response).to render_template(:versions)

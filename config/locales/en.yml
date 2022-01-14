@@ -1574,7 +1574,7 @@ en:
       edit:
         accessories: Accessories and Components
         alert: Activate Promoted Alert
-        bike_details: "%{bike_or_version} Details"
+        bike_details: Details
         bike_or_version_version: Version
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding

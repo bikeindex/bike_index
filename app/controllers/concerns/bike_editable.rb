@@ -48,13 +48,9 @@ module BikeEditable
   # UI. Keys also correspond to template names and query parameters, and values
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
-    bike_or_version = if @bike.version?
-      translation(:bike_or_version_version, scope: t_scope)
-    else
-      ""
-    end
+    version = @bike.version? ? translation(:bike_or_version_version, scope: t_scope) : nil
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details, bike_or_version: bike_or_version, scope: t_scope)
+      h[:bike_details] = [version, translation(:bike_details, scope: t_scope)].compact.join(" ")
       h[:found_details] = translation(:found_details, scope: t_scope) if @bike.status_found?
       h[:photos] = translation(:photos, scope: t_scope)
       h[:drivetrain] = translation(:drivetrain, scope: t_scope)

@@ -24,7 +24,6 @@ class AfterBikeSaveWorker < ApplicationWorker
       AfterUserChangeWorker.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
     end
     bike.bike_versions.each do |bike_version|
-      next unless bike.user_id == bike_version.owner_id # If the bike has changed hands, don't update the version
       bike_version.set_calculated_attributes
       bike_version.save if bike_version.changed?
     end
