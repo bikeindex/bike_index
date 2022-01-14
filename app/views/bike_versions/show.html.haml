@@ -14,10 +14,7 @@
     .col-md-4
       .social-share-bike.mb-4.mt-4
         %h4
-          - if @bike.status_stolen_or_impounded?
-            = t(".spread_the_word")
-          - else
-            Share it!
+          Share it!
         = render "shared/share_this"
 
       .ad-block.ad-binx.ad300x600
