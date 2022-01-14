@@ -278,7 +278,7 @@ class Bike < ApplicationRecord
   def calculated_listing_order
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
-    t = (updated_at || Time.current).to_i / 10000
+    t = (updated_by_user_fallback || Time.current).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
 

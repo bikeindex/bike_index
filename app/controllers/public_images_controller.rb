@@ -1,6 +1,6 @@
 class PublicImagesController < ApplicationController
-  before_action :ensure_authorized_to_update!, only: [:edit, :update, :destroy, :is_private, :update_kind]
-  before_action :ensure_authorized_to_create!, only: [:create]
+  before_action :ensure_authorized_to_update!, only: %i[edit update destroy is_private update_kind]
+  before_action :ensure_authorized_to_create!, only: %i[create]
 
   def show
     @public_image = PublicImage.find(params[:id])
@@ -65,12 +65,15 @@ class PublicImagesController < ApplicationController
     end
     @public_image.destroy
     flash[:success] = translation(:image_deleted)
-    if params[:edit_template].present?
-      redirect_to(edit_bike_url(imageable_id, edit_template: params[:edit_template])) && return
-    elsif imageable_type == "Blog"
+    if imageable_type == "Blog"
       redirect_to(edit_admin_news_url(@imageable.title_slug), status: 303) && return
     else
-      redirect_back(fallback_location: edit_bike_url(imageable_id))
+      fallback_link = if imageable_type == "BikeVersion"
+        edit_bike_version_url(imageable_id, edit_template: params[:edit_template])
+      else
+        edit_bike_url(imageable_id, edit_template: params[:edit_template])
+      end
+      redirect_back(fallback_location: fallback_link)
     end
   end
 
@@ -102,8 +105,9 @@ class PublicImagesController < ApplicationController
   def current_user_image_authorized?(public_image)
     if public_image.bike?
       Bike.unscoped.find_by_id(public_image.imageable_id)&.authorized?(current_user) || false
+    elsif public_image.imageable_type == "BikeVersion"
+      BikeVersion.unscoped.without_deleted.find_by_id(public_image.imageable_id)&.authorized?(current_user) || false
     else
-      # if public_image.imageable_type == "Blog" || public_image.imageable_type == "MailSnippet"
       current_user&.superuser? || false
     end
   end

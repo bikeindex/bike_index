@@ -46,6 +46,8 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.integer :status, default: 0
 
       t.datetime :deleted_at
+      t.datetime :start_at
+      t.datetime :end_at
 
       t.timestamps
     end

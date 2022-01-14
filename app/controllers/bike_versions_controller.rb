@@ -87,6 +87,8 @@ class BikeVersionsController < ApplicationController
       :front_tire_narrow,
       :handlebar_type,
       :visibility,
+      :start_at,
+      :end_at,
       components_attributes: Component.permitted_attributes)
   end
 end

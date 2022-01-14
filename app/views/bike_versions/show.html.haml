@@ -1,1 +1,24 @@
-Bike Version!
+= render partial: "/bikes/bike_show_overlays"
+
+.container
+  .row
+    .col-md-8
+      %h1.bike-title
+        = bike_status_span(@bike)
+        %span.uncap= bike_title_html(@bike)
+
+    .col-md-4.ad-col
+      .ad-block.ad-binx.ad468x60
+  .row
+    = render partial: "/bikes/main_show_block"
+    .col-md-4
+      .social-share-bike.mb-4.mt-4
+        %h4
+          - if @bike.status_stolen_or_impounded?
+            = t(".spread_the_word")
+          - else
+            Share it!
+        = render "shared/share_this"
+
+      .ad-block.ad-binx.ad300x600
+      = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-2"}

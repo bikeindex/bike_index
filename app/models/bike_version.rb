@@ -44,37 +44,49 @@ class BikeVersion < ApplicationRecord
     true
   end
 
-  # Methods that duplicate bike
+  # Necessary to duplicate bike
   def status_found?
     false
   end
 
-  def deleted?
+  # Necessary to duplicate bike
+  def pos?
     false
   end
 
+  # Necessary to duplicate bike
   def user
     owner
   end
 
+  # Necessary to duplicate bike
   def user?
     owner.present?
   end
 
+  # Necessary to duplicate bike
   def authorized_by_organization?(*)
     false
   end
 
+  # Necessary to duplicate bike
   def bike_owner_different?
     bike.user_id != owner_id
   end
 
+  # Necessary to duplicate bike
   def bike_stickers
     BikeSticker.none
   end
 
+  # Necessary to duplicate bike
   def organizations
     Organization.none
+  end
+
+  # Necessary to duplicate bike
+  def stock_photo_url
+    nil
   end
 
   def authorized?(passed_user, no_superuser_override: false)
