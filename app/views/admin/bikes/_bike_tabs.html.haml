@@ -91,7 +91,7 @@
                   Updated
                 %td
                   %span.convertTime
-                    = l bike.updated_at, format: :convert_time
+                    = l bike.updated_by_user_fallback, format: :convert_time
                   - if bike.updator_id.present?
                     %em.small
                       by
@@ -101,6 +101,11 @@
                         %span.text-danger
                           User ##{params[:user_id]}
                           %em missing
+                  - if bike.not_updated_by_user?
+                    %em.small.less-strong not updated after creation
+                  - if display_dev_info?
+                    %small.only-dev-visible.convertTime
+                      = l bike.updated_at, format: :convert_time
 
               - pdf ||= false
               - if pdf
