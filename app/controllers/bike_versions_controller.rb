@@ -7,6 +7,7 @@ class BikeVersionsController < ApplicationController
   end
 
   def show
+    @page_title = @bike_version.display_name
   end
 
   def create
@@ -30,6 +31,17 @@ class BikeVersionsController < ApplicationController
       @edit_template = nil
       flash[:error] = "Unable to update"
       render :edit_template
+    end
+  end
+
+  def destroy
+    pp @bike_og.id
+    if @bike_version.destroy
+      flash[:success] = "#{@bike_og.type.titleize} removed"
+      redirect_to(edit_bike_path(@bike_og))
+    else
+      flash[:error] = "Unable to delete #{@bike.type}"
+      redirect_back(fallback_location: edit_bike_version_path(@bike_version, edit_template: @edit_template))
     end
   end
 

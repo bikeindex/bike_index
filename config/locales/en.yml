@@ -1482,8 +1482,10 @@ en:
     remove:
       delete_bike: Delete bike
       delete_this_bike: Delete this %{bike_type} from Bike Index
+      delete_this_version_html: Delete <em>%{version_name}</em>
       faqs: FAQs
       hide_this_bike: Hide this %{bike_type} from other users
+      visibility: Visibility
       keeping_your_bike_public: >-
         Keeping your bike public is the best way to help recover stolen bikes and
         deter theft.

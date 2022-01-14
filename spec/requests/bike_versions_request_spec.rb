@@ -127,4 +127,15 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       end
     end
   end
+
+  describe "delete" do
+    it "destroys" do
+      og_bike_id = bike_version.bike_id
+      expect do
+        delete "#{base_url}/#{bike_version.id}"
+      end.to change(BikeVersion, :count).by(-1)
+      expect(flash[:success]).to be_present
+      expect(response).to redirect_to("/bikes/#{og_bike_id}/edit")
+    end
+  end
 end

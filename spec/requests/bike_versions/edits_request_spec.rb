@@ -6,7 +6,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
   let!(:bike_version) { FactoryBot.create(:bike_version, owner: current_user) }
   let(:edit_templates) do
     {
-      bike_details: "Version Details",
+      bike_details: "Details",
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",

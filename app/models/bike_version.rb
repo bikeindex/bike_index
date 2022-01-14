@@ -1,11 +1,12 @@
 class BikeVersion < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
+  acts_as_paranoid without_default_scope: true
 
   VISIBILITY_ENUM = {
-    all_visible: 0,
-    user_hidden: 1,
-    visible_not_related: 2
+    visible_not_related: 0,
+    all_visible: 1,
+    user_hidden: 2
   }.freeze
 
   belongs_to :bike
@@ -19,7 +20,7 @@ class BikeVersion < ApplicationRecord
 
   scope :user_hidden, -> { unscoped.user_hidden }
 
-  default_scope { where.not(visibility: "user_hidden").order(listing_order: :desc) }
+  default_scope { where.not(visibility: "user_hidden").where(deleted_at: nil).order(listing_order: :desc) }
 
   validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
 

@@ -9,7 +9,13 @@
           = t(".edit")
         - else
           = bike_status_span(@bike)
-        = bike_title_html(@bike)
+        - if @bike.version?
+          %strong= @bike.display_name
+          %small.d-block.d-md-inline
+            of
+            %em= @bike_og.title_string
+        - else
+          = bike_title_html(@bike)
         - if @bike.deleted?
           %em.text-danger.uncap
             This #{@bike.type} was deleted

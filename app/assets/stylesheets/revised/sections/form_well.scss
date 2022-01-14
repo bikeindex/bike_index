@@ -18,8 +18,10 @@
     padding-right: 1.6875rem;
   }
 
+  // This is the same as form-well-input-full-width - but it makes text bold
   .form-well-input-static-full-width {
     @extend .form-well-input-static;
+    @extend .form-well-input-full-width;
   }
 
   .right-input-help.right-text-help {
@@ -90,6 +92,7 @@
   .form-well-label,
   .form-well-input,
   .form-well-input-large,
+  .form-well-input-full-width,
   .right-input-help {
     @include make-col-ready;
   }
@@ -129,8 +132,8 @@
 
     .radio-inline,
     .checkbox-inline {
-      input[type="radio"],
-      input[type="checkbox"] {
+      input[type='radio'],
+      input[type='checkbox'] {
         margin-top: 0.6em;
       }
     }
@@ -198,7 +201,7 @@
 
     .unnested-field::after,
     .related-fields::after {
-      content: "";
+      content: '';
       display: block;
       margin: 0 15px (2 * $vertical-height) 10%;
       border-bottom: 1px $form-well-divider-color solid;
@@ -239,7 +242,7 @@
     }
 
     .form-well-input-large,
-    .form-well-input-static-full-width {
+    .form-well-input-full-width {
       @include make-col(8);
     }
 
@@ -366,7 +369,7 @@
       @include make-col(6);
     }
 
-    .form-well-input-static-full-width {
+    .form-well-input-full-width {
       @include make-col(9);
     }
   }
