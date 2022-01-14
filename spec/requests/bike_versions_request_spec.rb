@@ -88,33 +88,41 @@ RSpec.describe BikeVersions::EditsController, type: :request do
         front_gear_type_id: FactoryBot.create(:rear_gear_type).id,
         front_tire_narrow: true,
         handlebar_type: "drop_bar"
-        # start_at: "2020-04-28T11:00",
-        # end_at: "2020-04-28T11:00"
       }
     end
     it "updates" do
       expect(current_user.authorized?(bike_version)).to be_truthy
       expect(valid_update_params).to be_present
       og_bike_id = bike_version.bike_id
-
+      bike_version.update(start_at: Time.current, end_at: Time.current)
       patch "#{base_url}/#{bike_version.id}", params: {
-        bike_version: valid_update_params.merge(owner_id: current_user.id + 12)
+        bike_version: valid_update_params.merge(owner_id: current_user.id + 12,
+          start_at: nil,
+          end_at: "")
       }
       expect(flash[:success]).to be_present
       expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
       expect(bike_version.owner_id).to eq current_user.id
       expect(bike_version.bike_id).to eq og_bike_id
+      expect(bike_version.start_at).to be_blank
+      expect(bike_version.end_at).to be_blank
     end
     it "updates with bike param" do
       expect(current_user.authorized?(bike_version)).to be_truthy
       expect(valid_update_params).to be_present
 
       patch "#{base_url}/#{bike_version.id}", params: {
-        bike: valid_update_params, edit_template: "accessories"
+        edit_template: "accessories",
+        bike: valid_update_params.merge(start_at: "2018-04-28T11:00",
+          end_at: "2021-09-28T11:00",
+          timezone: "Pacific Time (US & Canada)")
       }
       expect(flash[:success]).to be_present
       expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/accessories")
       expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
+      # Something is wrong with timezones here, I think
+      expect(bike_version.start_at.to_i).to be_within(1).of 1524931200
+      expect(bike_version.end_at.to_i).to be_within(1).of 1632844800
     end
     context "update visibility" do
       it "updates visibility" do

@@ -407,6 +407,8 @@ CREATE TABLE public.bike_versions (
     visibility integer DEFAULT 0,
     status integer DEFAULT 0,
     deleted_at timestamp without time zone,
+    start_at timestamp without time zone,
+    end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

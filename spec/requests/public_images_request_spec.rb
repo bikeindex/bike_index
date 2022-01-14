@@ -252,7 +252,7 @@ RSpec.describe PublicImagesController, type: :request do
         end
       end
       context "non owner" do
-        bike_version = FactoryBot.create(:bike_version)
+        let(:bike_version) { FactoryBot.create(:bike_version) }
         it "rejects the destroy" do
           expect(bike_version.reload.authorized?(current_user)).to be_falsey
           expect {

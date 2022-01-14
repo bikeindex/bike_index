@@ -18,6 +18,8 @@ class BikeVersion < ApplicationRecord
   enum visibility: VISIBILITY_ENUM
   enum status: Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
 
+  attr_accessor :timezone
+
   scope :user_hidden, -> { unscoped.user_hidden }
 
   default_scope { where.not(visibility: "user_hidden").where(deleted_at: nil).order(listing_order: :desc) }

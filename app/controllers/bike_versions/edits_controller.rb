@@ -10,7 +10,7 @@ class BikeVersions::EditsController < BikeVersionsController
       @private_images = PublicImage
         .unscoped
         .where(imageable_type: "BikeVersion")
-        .where(imageable_id: @bike.id)
+        .where(imageable_id: @bike_version.id)
         .where(is_private: true)
     end
 

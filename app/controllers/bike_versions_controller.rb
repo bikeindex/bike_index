@@ -24,7 +24,14 @@ class BikeVersionsController < ApplicationController
   end
 
   def update
-    if @bike_version.update(permitted_params)
+    # Set the start and end at with timezone
+    if permitted_params.key?(:start_at)
+      @bike_version.start_at = TimeParser.parse(permitted_params[:start_at], permitted_params[:timezone])
+    end
+    if permitted_params.key?(:end_at)
+      @bike_version.end_at = TimeParser.parse(permitted_params[:end_at], permitted_params[:timezone])
+    end
+    if @bike_version.update(permitted_params.except(:start_at, :end_at, :timezone))
       flash[:success] = "#{@bike.type.titleize} version updated"
       redirect_to(edit_bike_version_path(@bike_version, edit_template: params[:edit_template])) && return
     else
