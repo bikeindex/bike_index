@@ -18,11 +18,12 @@ class CreateBikeVersions < ActiveRecord::Migration[5.2]
       t.string :extra_registration_number # There might be a chance this changes between versions
 
       t.string :name
+      t.text :description
+
       t.text :frame_model
       t.boolean :rear_tire_narrow
       t.integer :number_of_seats
       t.text :cached_data
-      t.text :description
 
       t.text :thumb_path
       t.text :video_embed

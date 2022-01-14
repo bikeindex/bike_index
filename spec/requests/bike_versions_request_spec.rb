@@ -114,5 +114,17 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/accessories")
       expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
     end
+    context "update visibility" do
+      it "updates visibility" do
+        expect(bike_version.reload.visibility).to eq "all_visible"
+        patch "#{base_url}/#{bike_version.id}", params: {
+          bike: {visibility: "user_hidden"}, edit_template: "remove"
+        }
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/remove")
+
+        expect(bike_version.reload.visibility).to eq "user_hidden"
+      end
+    end
   end
 end
