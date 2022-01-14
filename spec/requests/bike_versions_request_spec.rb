@@ -116,7 +116,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
     end
     context "update visibility" do
       it "updates visibility" do
-        expect(bike_version.reload.visibility).to eq "all_visible"
+        expect(bike_version.reload.visibility).to eq "visible_not_related"
         patch "#{base_url}/#{bike_version.id}", params: {
           bike: {visibility: "user_hidden"}, edit_template: "remove"
         }
@@ -130,12 +130,14 @@ RSpec.describe BikeVersions::EditsController, type: :request do
 
   describe "delete" do
     it "destroys" do
+      expect(BikeVersion.unscoped.count).to eq 1
       og_bike_id = bike_version.bike_id
       expect do
         delete "#{base_url}/#{bike_version.id}"
       end.to change(BikeVersion, :count).by(-1)
       expect(flash[:success]).to be_present
       expect(response).to redirect_to("/bikes/#{og_bike_id}/edit")
+      expect(BikeVersion.unscoped.count).to eq 1
     end
   end
 end

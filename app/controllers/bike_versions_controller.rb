@@ -35,7 +35,6 @@ class BikeVersionsController < ApplicationController
   end
 
   def destroy
-    pp @bike_og.id
     if @bike_version.destroy
       flash[:success] = "#{@bike_og.type.titleize} removed"
       redirect_to(edit_bike_path(@bike_og))
