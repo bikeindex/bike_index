@@ -114,7 +114,7 @@ class Admin::BikesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[id owner_email manufacturer_id]
+    %w[id owner_email manufacturer_id updated_by_user_at]
   end
 
   def permitted_parameters

@@ -21,13 +21,19 @@ class BikeUpdator
 
   def update_ownership
     # Because this is a mess, managed independently in ProcessImpoundUpdatesWorker
-    @bike.update_attribute :updator_id, @user.id if @user.present? && @bike.updator_id != @user.id
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
     return false if new_owner_email.blank? || @bike.owner_email == new_owner_email
+
     # Since we've deleted the owner_email from the update hash, we have to assign it here
     # This is required because ownership_creator uses it :/ - not a big fan of this side effect though
     @bike.owner_email = new_owner_email
-    @bike.update(status: "status_with_owner", marked_user_unhidden: true) if @bike.unregistered_parking_notification?
+    @bike.attributes = updator_attrs
+    if @bike.unregistered_parking_notification?
+      @bike.update(status: "status_with_owner", marked_user_unhidden: true)
+    elsif !@skip_ownership_bike_save
+      # If this is not called from update_available_attributes, save to set the updator attributes
+      @bike.save
+    end
     # If updator is a member of the creation organization, add org to the new ownership!
     ownership_org = @bike.current_ownership&.organization
     @bike.ownerships.create(owner_email: new_owner_email,
@@ -35,6 +41,7 @@ class BikeUpdator
       origin: "transferred_ownership",
       organization: @user&.member_of?(ownership_org) ? ownership_org : nil,
       skip_email: @bike_params.dig("bike", "skip_email"))
+
     # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
     @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
@@ -62,13 +69,14 @@ class BikeUpdator
   def update_available_attributes
     ensure_ownership!
     set_protected_attributes
+    @skip_ownership_bike_save = true # Don't save bike an extra time in update ownership
     update_ownership
     update_api_components if @bike_params["components"].present?
     update_attrs = @bike_params["bike"].except("stolen_records_attributes", "impound_records_attributes")
     if update_attrs.slice("street", "city", "zipcode").values.reject(&:blank?).any?
       @bike.address_set_manually = true
     end
-    if @bike.update(update_attrs)
+    if @bike.update(update_attrs.merge(updator_attrs))
       update_stolen_record
       update_impound_record
     end
@@ -99,5 +107,9 @@ class BikeUpdator
     impound_record = @bike.current_impound_record
     return unless impound_params.present? && impound_record.present?
     impound_record.update(impound_params)
+  end
+
+  def updator_attrs
+    {updated_by_user_at: Time.current}.merge(@user.present? ? {updator_id: @user.id} : {})
   end
 end
