@@ -75,20 +75,19 @@ RSpec.describe PublicImagesController, type: :request do
           expect(bike_version.reload.updated_at).to be_within(1).of Time.current
           expect(bike_version.public_images.first.name).to eq "cool name"
         end
-        # context "user hidden" do
-        #   xit "creates an image" do
-        #     bike.update(marked_user_hidden: true)
-        #     bike.update_column :updated_at, Time.current - 1.hour
-        #     expect(bike.reload.user_hidden).to be_truthy
-        #     expect(bike.thumb_path).to be_blank
-        #     Sidekiq::Worker.clear_all
-        #     post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
-        #     expect(AfterBikeSaveWorker.jobs.count).to eq 1
-        #     AfterBikeSaveWorker.drain
-        #     expect(bike.reload.updated_at).to be_within(1).of Time.current
-        #     expect(bike.public_images.first.name).to eq "cool name"
-        #   end
-        # end
+        context "user hidden" do
+          it "creates an image" do
+            bike_version.update(visibility: "user_hidden")
+            expect(bike_version.thumb_path).to be_blank
+            Sidekiq::Worker.clear_all
+            post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
+              public_image: {name: "cool name"}, format: :js
+            }
+            expect(AfterBikeSaveWorker.jobs.count).to eq 0
+            expect(bike_version.reload.updated_at).to be_within(1).of Time.current
+            expect(bike_version.public_images.first.name).to eq "cool name"
+          end
+        end
       end
     end
     context "blog" do
