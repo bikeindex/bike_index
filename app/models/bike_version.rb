@@ -19,6 +19,7 @@ class BikeVersion < ApplicationRecord
   enum status: Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
 
   attr_accessor :timezone
+  attr_writer :end_at_shown, :start_at_shown
 
   scope :user_hidden, -> { unscoped.user_hidden }
 
@@ -89,6 +90,14 @@ class BikeVersion < ApplicationRecord
   # Necessary to duplicate bike
   def stock_photo_url
     nil
+  end
+
+  def end_at_shown
+    end_at.present?
+  end
+
+  def start_at_shown
+    start_at.present?
   end
 
   def authorized?(passed_user, no_superuser_override: false)

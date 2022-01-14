@@ -97,8 +97,8 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       bike_version.update(start_at: Time.current, end_at: Time.current)
       patch "#{base_url}/#{bike_version.id}", params: {
         bike_version: valid_update_params.merge(owner_id: current_user.id + 12,
-          start_at: nil,
-          end_at: "")
+          start_at: "",
+          end_at: nil)
       }
       expect(flash[:success]).to be_present
       expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
@@ -113,16 +113,17 @@ RSpec.describe BikeVersions::EditsController, type: :request do
 
       patch "#{base_url}/#{bike_version.id}", params: {
         edit_template: "accessories",
-        bike: valid_update_params.merge(start_at: "2018-04-28T11:00",
+        bike: valid_update_params.merge(start_at_shown: true,
+          start_at: "2018-04-28T11:00",
+          end_at_shown: "1",
           end_at: "2021-09-28T11:00",
           timezone: "Pacific Time (US & Canada)")
       }
       expect(flash[:success]).to be_present
       expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/accessories")
       expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
-      # Something is wrong with timezones here, I think
-      expect(bike_version.start_at.to_i).to be_within(1).of 1524931200
-      expect(bike_version.end_at.to_i).to be_within(1).of 1632844800
+      expect(bike_version.start_at.to_i).to be_within(1).of 1524938400
+      expect(bike_version.end_at.to_i).to be_within(1).of 1632852000
     end
     context "update visibility" do
       it "updates visibility" do
