@@ -32,7 +32,7 @@ class BikeVersion < ApplicationRecord
 
   def self.bike_override_attributes
     %i[manufacturer_id manufacturer_other mnfg_name frame_model frame_material
-       year frame_size frame_size_unit frame_size_number]
+      year frame_size frame_size_unit frame_size_number]
   end
 
   # Get it unscoped, because unregistered_bike notifications

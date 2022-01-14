@@ -10,7 +10,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",
-      remove: "Hide or Delete",
+      remove: "Hide or Delete"
     }
   end
 

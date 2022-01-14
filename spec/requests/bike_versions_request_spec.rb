@@ -87,7 +87,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
         rear_gear_type_id: FactoryBot.create(:front_gear_type).id,
         front_gear_type_id: FactoryBot.create(:rear_gear_type).id,
         front_tire_narrow: true,
-        handlebar_type: "drop_bar",
+        handlebar_type: "drop_bar"
         # start_at: "2020-04-28T11:00",
         # end_at: "2020-04-28T11:00"
       }

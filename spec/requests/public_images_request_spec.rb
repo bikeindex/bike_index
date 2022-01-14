@@ -69,8 +69,7 @@ RSpec.describe PublicImagesController, type: :request do
           bike_version.update_column :updated_at, Time.current - 1.hour
           Sidekiq::Worker.clear_all
           post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
-            public_image: {name: "cool name"}, format: :js
-          }
+                                  public_image: {name: "cool name"}, format: :js}
           expect(AfterBikeSaveWorker.jobs.count).to eq 0
           expect(bike_version.reload.updated_at).to be_within(1).of Time.current
           expect(bike_version.public_images.first.name).to eq "cool name"
@@ -81,8 +80,7 @@ RSpec.describe PublicImagesController, type: :request do
             expect(bike_version.thumb_path).to be_blank
             Sidekiq::Worker.clear_all
             post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
-              public_image: {name: "cool name"}, format: :js
-            }
+                                    public_image: {name: "cool name"}, format: :js}
             expect(AfterBikeSaveWorker.jobs.count).to eq 0
             expect(bike_version.reload.updated_at).to be_within(1).of Time.current
             expect(bike_version.public_images.first.name).to eq "cool name"
