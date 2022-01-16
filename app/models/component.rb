@@ -3,6 +3,11 @@ class Component < ApplicationRecord
 
   attr_accessor :front_or_rear, :setting_is_stock
 
+  def self.permitted_attributes
+    %i[id component_model year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
+      manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy]
+  end
+
   def model_name=(val)
     self.component_model = val
   end

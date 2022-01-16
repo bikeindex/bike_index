@@ -18,10 +18,13 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
       @requestManufacturerUpdate()
     $('.frame-sizes .btn').click (e) =>
       @updateFrameSize(e)
+    $('.toggle-version-date').click (e) =>
+      @updateVersionDates(e)
     united_states_id = $('#us_id_data').data('usid')
     new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
 
   updateYear: ->
+    return unless $('#bike_year').length
     if $('#bike_year').val().length == 0
       # $('#bike_year').selectize()[0].selectize.disable()
       $('#bike_unknown_year').prop('checked', true)
@@ -39,7 +42,7 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
 
   setFrameSize: ->
     unit = $('#bike_frame_size_unit').val()
-    if unit != 'ordinal' and unit.length > 0
+    if unit and unit != 'ordinal' and unit.length > 0
       $('.frame-size-other').slideDown().addClass('unhidden')
       $('.frame-size-units').addClass('ex-size')
 
@@ -110,3 +113,16 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
       $('#manufacturer-correction .alert').slideDown('fast')
+
+  updateVersionDates: (e) ->
+    # Delay to let the fields populate
+    window.setTimeout (->
+      # Update the hidden fields
+      start_at = $("#start-at").hasClass("unhidden")
+      $('#bike_version_start_at_shown').val("#{start_at}")
+      end_at = $("#end-at").hasClass("unhidden")
+      $('#bike_version_end_at_shown').val("#{end_at}")
+      console.log(!start_at)
+      console.log(!end_at)
+    ), 1000
+

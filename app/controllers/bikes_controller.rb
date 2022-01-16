@@ -174,7 +174,7 @@ class BikesController < Bikes::BaseController
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
       # Go directly to theft_details after reporting stolen
-      next_template = params[:edit_template] || params[:page]
+      next_template = params[:edit_template]
       next_template = "theft_details" if next_template == "report_stolen" && @bike.status_stolen?
       redirect_to(edit_bike_url(@bike, edit_template: next_template)) && return
     end

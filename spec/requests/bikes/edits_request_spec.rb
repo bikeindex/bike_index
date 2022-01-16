@@ -8,7 +8,7 @@ RSpec.describe Bikes::EditsController, type: :request do
 
   let(:edit_templates) do
     {
-      bike_details: "Bike Details",
+      bike_details: "Details",
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",
@@ -89,6 +89,18 @@ RSpec.describe Bikes::EditsController, type: :request do
     # If passed an unknown template, it renders default template
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
+  end
+  context "with bike_versions" do
+    it "renders" do
+      Flipper.enable :bike_versions # Simpler to just enable it all
+      get base_url
+      expect(response.status).to eq 200
+      expect(response).to render_template(:bike_details)
+      expect(assigns(:edit_templates)).to eq edit_templates.merge(versions: "Versions").as_json
+      get "#{base_url}/versions"
+      expect(response.status).to eq 200
+      expect(response).to render_template(:versions)
+    end
   end
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }

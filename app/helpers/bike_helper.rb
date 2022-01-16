@@ -19,6 +19,7 @@ module BikeHelper
     end
   end
 
+  # The same thing as title_string - but with the manufacturer bold
   def bike_title_html(bike)
     content_tag(:span) do
       concat("#{bike.year} ") if bike.year.present?

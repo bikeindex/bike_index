@@ -22,6 +22,7 @@
         = form_for PublicImage.new do |f|
           .row.edit-photo-upload
             = hidden_field_tag :bike_id, @bike.id
+            = hidden_field_tag :imageable_type, @bike.class.name
             .col-xs-12
               %h5.light-italic
                 = t(".drag_and_drop_files_here_html")

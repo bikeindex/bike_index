@@ -385,27 +385,30 @@ CREATE TABLE public.bike_versions (
     mnfg_name character varying,
     extra_registration_number character varying,
     name character varying,
-    frame_model text,
-    rear_tire_narrow boolean,
-    number_of_seats integer,
-    cached_data text,
     description text,
-    thumb_path text,
-    video_embed text,
+    frame_model text,
     year integer,
-    front_tire_narrow boolean,
-    belt_drive boolean,
-    coaster_brake boolean,
     frame_size character varying,
     frame_size_unit character varying,
     frame_size_number double precision,
-    listing_order integer,
+    rear_tire_narrow boolean,
+    front_tire_narrow boolean,
+    number_of_seats integer,
+    belt_drive boolean,
+    coaster_brake boolean,
     frame_material integer,
     handlebar_type integer,
     cycle_type integer,
     propulsion_type integer,
+    cached_data text,
+    thumb_path text,
+    video_embed text,
+    listing_order integer,
     visibility integer DEFAULT 0,
     status integer DEFAULT 0,
+    deleted_at timestamp without time zone,
+    start_at timestamp without time zone,
+    end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -496,7 +499,8 @@ CREATE TABLE public.bikes (
     address_set_manually boolean DEFAULT false,
     is_phone boolean DEFAULT false,
     current_impound_record_id bigint,
-    current_ownership_id bigint
+    current_ownership_id bigint,
+    updated_by_user_at timestamp without time zone
 );
 
 
@@ -6087,7 +6091,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211225005744'),
 ('20220102153706'),
 ('20220102160149'),
-('20220103161727'),
-('20220107041406');
+('20220107041406'),
+('20220113194000'),
+('20220113194041');
 
 

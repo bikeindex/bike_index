@@ -69,4 +69,24 @@ RSpec.describe "bikes routing", type: :routing do
       end
     end
   end
+
+  describe "bike_versions edit" do
+    it "directs to edit" do
+      expect(get: "bike_versions/111/edit").to route_to(
+        controller: "bike_versions/edits",
+        action: "show",
+        id: "111"
+      )
+    end
+    context "edit_template parameter" do
+      it "directs to edit" do
+        expect(get: "bike_versions/111/edit/photos").to route_to(
+          controller: "bike_versions/edits",
+          action: "show",
+          id: "111",
+          edit_template: "photos"
+        )
+      end
+    end
+  end
 end

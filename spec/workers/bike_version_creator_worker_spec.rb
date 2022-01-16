@@ -103,7 +103,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.handlebar_type_name).to eq "Rear facing"
       expect(bike_version.propulsion_type_name).to eq "Electric Assist"
       expect(bike_version.frame_material_name).to eq "Wood or organic material"
-      expect(bike_version.name).to eq "My cool bike"
+      expect(bike_version.name).to eq "My cool bike, Version 1"
       expect(bike_version.year).to eq 1969
       expect(bike_version.frame_model).to eq "Cool model name"
       expect(bike_version.description).to eq "A really cool description"
@@ -121,6 +121,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.frame_size).to eq "xl"
       expect(bike_version.frame_size_unit).to eq "ordinal"
       expect(bike_version.frame_size_number).to eq nil
+      expect(bike_version.status).to eq "status_with_owner"
       # And the final test - does everything calculate?
       expect(bike_version.cached_data_array).to match_array target_cached_array
       # And, test that bike is the same

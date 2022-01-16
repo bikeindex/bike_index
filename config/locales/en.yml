@@ -1006,12 +1006,14 @@ en:
       thank_you_for_registering_this_found_bike_type: Thank you for registering this
         found %{bike_type}!
       this_bike_type_is_hidden: This %{bike_type} is hidden!
+      this_bike_version_is_hidden_html: "<em>%{version_name}</em> is hidden!"
       were_honored_to_have_your_bike: We're honored to have your %{bike_type} on the
         Index.
       were_really_bummed_your_bike_type_was_stolen: We're really bummed your %{bike_type}
         was stolen.
       when_did_you_recover_it: When did you recover it?
       whoa_this_awesome_bike_type_is_yours: Whoa, this awesome %{bike_type} is yours!
+      whoa_this_awesome_version_is_yours: Whoa, %{version_name} is yours!
       you_have_already_marked_remaining: You have already marked this %{bike_type}
         remaining
       you_have_already_marked_resolved: You have marked this notification resolved
@@ -1033,6 +1035,43 @@ en:
       submit: submit
       within: within
       you: you
+    main_show_block:
+      bike_photo: "%{bike_type} photo"
+      color_may_not_match: Color may not match!
+      componentyear: "%{componentyear}"
+      cycle_type: Cycle type
+      department_city: Department & city
+      description_of_incident: Description of incident
+      distinguishing_features: Distinguishing features
+      found_at: Found at
+      frame_material: Frame Material
+      frame_size: Frame size
+      front: Front
+      front_rear: Front & rear
+      front_wheel_diameter: Front wheel diameter
+      handlebar_type: Handlebar type
+      hidden_because_status: because %{bike_type} is %{status}
+      hidden_for_unauthorized_users: hidden for unauthorized users
+      impounded_at: Impounded
+      location: Location
+      locking_circumvented: Locking circumvented
+      locking_description: Locking description
+      manufacturer: Manufacturer
+      model: Model
+      name: Name
+      other: Other
+      other_serial: Other serial/registration/sticker
+      paint_description: Color description
+      police_report: 'Police report #'
+      primary_colors: Primary colors
+      rear: Rear
+      rear_wheel_diameter: Rear wheel diameter
+      serial: Serial
+      stock_photo: Stock photo of a %{year} %{model}
+      stolen_at: Stolen at
+      stolen_details: Theft Details
+      wheel_diameter: Wheel diameter
+      year: Year
     new:
       additional_serial_sticker_number: Additional serial/sticker number
       affiliation: "%{org_name} affiliation"
@@ -1204,68 +1243,32 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
-      bike_photo: "%{bike_type} photo"
       change_the_bike_sticker_linked_to: Change the bike it links to
-      color_may_not_match: Color may not match!
-      componentyear: "%{componentyear}"
       contact_the_owner: Contact the owner
       created_to_record_parking_notification: created by %{organization} to record
         a Parking Notification
-      cycle_type: Cycle type
-      department_city: Department & city
-      description_of_incident: Description of incident
-      distinguishing_features: Distinguishing features
-      found_at: Found at
-      frame_material: Frame Material
-      frame_size: Frame size
       from: from
-      front: Front
-      front_rear: Front & rear
-      front_wheel_diameter: Front wheel diameter
-      handlebar_type: Handlebar type
-      hidden_because_status: because %{bike_type} is %{status}
       hidden_by_owner: HIDDEN by owner
-      hidden_for_unauthorized_users: hidden for unauthorized users
-      impounded_at: Impounded
       in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
-      location: Location
-      locking_circumvented: Locking circumvented
-      locking_description: Locking description
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
-      manufacturer: Manufacturer
-      model: Model
-      name: Name
       no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index
         admins) can see it
       not_registered_by_user: Not registered to a user
       or_call: Or call
-      other: Other
-      other_serial: Other serial/registration/sticker
       owners_phone_number: 'Owner''s phone number:'
-      paint_description: Color description
-      police_report: 'Police report #'
-      primary_colors: Primary colors
-      rear: Rear
-      rear_wheel_diameter: Rear wheel diameter
       send_message: Send message
-      serial: Serial
       share_it: Share it!
       spread_the_word: Spread the word!
-      stock_photo: Stock photo of a %{year} %{model}
-      stolen_at: Stolen at
-      stolen_details: Theft Details
       switch_to_new_bike_id: Switch to a new bike ID
       update: Update
       view_users_other_registrations: View user's other registrations
-      wheel_diameter: Wheel diameter
       where_did_you_see_this_bike: >-
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
       write_them_a_message: Write them a message
-      year: Year
       you_scanned_this_sticker_html: >-
         You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
@@ -1347,6 +1350,7 @@ en:
       a_qr_sticker: a QR Sticker
       add_a_sticker_label_html: Add %{sticker_information_link}
       bike_name: Bike Name
+      bike_registration: Edit the %{bike_type} registration here
       choose_country: Choose country
       choose_material: Choose material
       city: City
@@ -1370,8 +1374,13 @@ en:
       tell_us_about_your_bike: Tell us about your bike!
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
+      update_on_bike: Update on registration
       update_serial_number: Update serial number
+      update_these_attributes_on_bike_html: >-
+        These attributes don't change between versions and need to be updated on the
+        original %{bike_type} registration. %{bike_registration_link}.
       updated_serial: Updated serial
+      version_name: Version Name
       zipcode: Postal code
     bike_fields:
       revised_colors:
@@ -1477,6 +1486,7 @@ en:
     remove:
       delete_bike: Delete bike
       delete_this_bike: Delete this %{bike_type} from Bike Index
+      delete_this_version_html: Delete <em>%{version_name}</em>
       faqs: FAQs
       hide_this_bike: Hide this %{bike_type} from other users
       keeping_your_bike_public: >-
@@ -1488,6 +1498,7 @@ en:
       reason_modal_body: Please fill in the reason for the %{bike_type} deletion
       reason_modal_title: We want to know why!
       unhide_this_bike: Un-hide this %{bike_type}
+      visibility: Visibility
       we_strongly_recommend: >-
         We strongly recommend keeping your %{bike_type} visible, but you can hide
         this %{bike_type} if you prefer. Even though we don't think it's a good idea.
@@ -1569,7 +1580,8 @@ en:
       edit:
         accessories: Accessories and Components
         alert: Activate Promoted Alert
-        bike_details: Bike Details
+        bike_details: Details
+        bike_or_version_version: Version
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         groups: Groups and Organizations
@@ -1580,6 +1592,7 @@ en:
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
         theft_details: Theft details
+        versions: Versions
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
@@ -5113,6 +5126,7 @@ en:
       owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
         has permission to edit
       view_bike: View %{bike_type}
+      view_bike_version: View %{bike_type} version
     email_bike_box:
       color: Color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!

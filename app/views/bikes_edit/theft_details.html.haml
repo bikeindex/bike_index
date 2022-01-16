@@ -22,7 +22,6 @@
           = f.fields_for :stolen_records do |srecord|
             - next unless srecord.object.current? # Because they may have multiple stolen records
 
-            %h3
             .form-group.row.unnested-field
               = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = srecord.label :date_stolen, t(".when_was_it_stolen_at"), class: 'form-well-label'

@@ -1,4 +1,5 @@
-#bikes_show {
+#bikes_show,
+#bike_versions_show {
   // Stock photo text
   .stock-photo {
     position: absolute;
@@ -144,7 +145,8 @@
 //
 // Horizontal thumbnail list (below the main image)
 @media (max-width: $grid-breakpoint-md - 1px) {
-  #bikes_show .bike-photos {
+  #bikes_show .bike-photos,
+  #bike_versions_show .bike-photos {
     $thumbnails-height: 120px;
     $thumbnails-width: 178px;
 
@@ -220,7 +222,8 @@
 //
 // Vertical thumbnails (to the right of the main image)
 @media (min-width: $grid-breakpoint-md) {
-  #bikes_show .bike-photos {
+  #bikes_show .bike-photos,
+  #bike_versions_show .bike-photos {
     $thumbnails-height: 120px;
     $thumbnails-width: 100%;
     $thumbnail-list-width: 15%;

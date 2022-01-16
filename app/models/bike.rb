@@ -278,7 +278,7 @@ class Bike < ApplicationRecord
   def calculated_listing_order
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
-    t = (updated_at || Time.current).to_i / 10000
+    t = (updated_by_user_fallback || Time.current).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
 
@@ -291,6 +291,15 @@ class Bike < ApplicationRecord
     return false if current_ownership.blank?
     %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
       current_ownership.status == "status_impounded"
+  end
+
+  # Abbreviation, checks if this is a bike_version
+  def version?
+    false
+  end
+
+  def display_name
+    name.presence || cycle_type.titleize
   end
 
   def user?
@@ -316,24 +325,6 @@ class Bike < ApplicationRecord
   def messages_count
     notifications.count + parking_notifications.count + graduated_notifications.count +
       Feedback.bike(id).count + UserAlert.where(bike_id: id).count
-  end
-
-  def status_stolen_or_impounded?
-    %w[status_stolen status_impounded].include?(status)
-  end
-
-  def status_found?
-    return false unless status_impounded?
-    (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
-  end
-
-  def status_humanized
-    return "found" if status_found?
-    self.class.status_humanized(status)
-  end
-
-  def status_humanized_translated
-    self.class.status_humanized_translated(status_humanized)
   end
 
   # The appropriate edit template to use in the edit view.
@@ -756,6 +747,7 @@ class Bike < ApplicationRecord
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
+    self.name = name.present? ? name.strip : nil
   end
 
   def set_calculated_attributes

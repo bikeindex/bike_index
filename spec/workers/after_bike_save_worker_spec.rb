@@ -266,4 +266,25 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       end
     end
   end
+
+  describe "versions" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:bike_version) { FactoryBot.create(:bike_version, bike: bike) }
+    let(:update_attributes) do
+      {
+        frame_material: "steel",
+        frame_size: "xxl",
+        manufacturer_id: Manufacturer.other.id,
+        manufacturer_other: "Some cool thing",
+        year: 1969
+      }
+    end
+    it "makes the things equal" do
+      bike.update(update_attributes)
+      instance.perform(bike.id)
+      expect_attrs_to_match_hash(bike_version.reload, update_attributes)
+      expect(bike_version.mnfg_name).to eq "Some cool thing"
+      expect(bike_version.frame_size_unit).to eq "ordinal"
+    end
+  end
 end

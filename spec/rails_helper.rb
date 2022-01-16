@@ -83,13 +83,14 @@ RSpec.configure do |config|
   config.include_context :geocoder_default_location
 end
 
-RSpec.configure do |config|
-  config.before(:each) do
-    # Reset feature-flipping between examples
-    # (In test examples, stub Flipper as needed, passing specific args to #with)
-    allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
-  end
-end
+# Doesn't seem to be important
+# RSpec.configure do |config|
+#   config.before(:each) do
+#     # Reset feature-flipping between examples
+#     # (In test examples, stub Flipper as needed, passing specific args to #with)
+#     allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
+#   end
+# end
 
 # DB Cleaner metadata tags
 # ========================

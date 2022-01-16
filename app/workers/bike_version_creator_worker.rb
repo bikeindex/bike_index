@@ -4,23 +4,13 @@ class BikeVersionCreatorWorker < ApplicationWorker
   def perform(bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)
     bike_version = bike.bike_versions.build(owner_id: bike.owner.id,
-      manufacturer_id: bike.manufacturer_id,
-      mnfg_name: bike.mnfg_name,
-      manufacturer_other: bike.manufacturer_other,
-
-      year: bike.year,
       frame_model: bike.frame_model,
       cycle_type: bike.cycle_type,
       handlebar_type: bike.handlebar_type,
       propulsion_type: bike.propulsion_type,
-      frame_material: bike.frame_material,
       number_of_seats: bike.number_of_seats,
 
-      frame_size: bike.frame_size,
-      frame_size_unit: bike.frame_size_unit,
-      frame_size_number: bike.frame_size_number,
-
-      name: bike.name,
+      name: version_name_for(bike),
       description: bike.description,
 
       primary_frame_color_id: bike.primary_frame_color_id,
@@ -55,5 +45,15 @@ class BikeVersionCreatorWorker < ApplicationWorker
       end
       new_public_image.save
     end
+
+    bike_version # Needs to return bike version because it is run inline
+  end
+
+  def version_name_for(bike)
+    version_number = bike.bike_versions.where(owner_id: bike.user&.id).count + 1
+    [
+      bike.name,
+      "Version #{version_number}"
+    ].reject(&:blank?).join(", ")
   end
 end

@@ -39,7 +39,7 @@ class PublicImage < ApplicationRecord
 
   # Method to make create_revised.js easier to handle
   def bike_type
-    return false unless bike?
+    return false unless %w[Bike BikeVersion].include?(imageable_type)
     imageable.present? ? imageable.cycle_type : "bike" # hidden bike handling
   end
 
