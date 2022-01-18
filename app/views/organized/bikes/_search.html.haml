@@ -27,7 +27,7 @@
     = hidden_field_tag :search_stickers, params[:search_stickers]
     = hidden_field_tag :search_address, params[:search_address]
 
-%hr{ style: "opacity: .3;" }
+%hr{style: "opacity: .3;"}
 
 :ruby
   search_params = sortable_search_params.merge(@interpreted_params.merge(organization_id: current_organization.to_param))
@@ -81,7 +81,7 @@
   initially_checked_columns += ["impounded_cell"] if @search_impoundedness == "impounded"
   enabled_columns = enabled_columns.sort { |a, b| column_renames[a] <=> column_renames[b] }
 
-.collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => initially_checked_columns.to_json, class: (settings_default_open ? "in" : "") }
+.collapse#organizedSearchSettings.settings-list{"data-defaultcols" => initially_checked_columns.to_json, class: (settings_default_open ? "in" : "")}
   %h3.header-font-alt
     = t(".visible_columns")
   .row.pb-3
@@ -135,13 +135,13 @@
     = humanized_time_range(@time_range)
   - unless skip_view_just_stolen
     - if @stolenness == 'all'
-      %a.float-right.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'stolen')), data: { stolenness: 'stolen' } }
+      %a.float-right.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "stolen")), data: {stolenness: "stolen"}}
         = t(".view_just_stolen_bikes")
     - else
       = t(".stolen_bikes_html")
-      %a.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'all')), data: { stolenness: 'all' } }
+      %a.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "all")), data: {stolenness: "all"}}
         = t(".view_all_bikes")
-  %a.float-right.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb" }
+  %a.float-right.less-strong{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb"}
     = t(".settings")
 
 .full-screen-table.pl-lg-1.pr-lg-1
@@ -178,10 +178,10 @@
           %small= t(".status_cell")
         - additional_registration_fields.each do |reg_field|
           - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
-          %th.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
+          %th.hiddenColumn.hidden-xs-down{class: "#{reg_field}_cell"}
             = column_renames["#{reg_field}_cell"]
         -# All organizations can see additional serial#
-        %th.hiddenColumn.hidden-xs-down{ class: "extra_registration_number_cell" }
+        %th.hiddenColumn.hidden-xs-down{class: "extra_registration_number_cell"}
           Secondary#
         - if current_organization.enabled?("bike_stickers")
           %th.hiddenColumn.hidden-xs-down.sticker_cell
@@ -197,12 +197,12 @@
     %tbody
       - @bikes.each do |bike|
         %tr
-          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}") do
             %td.hiddenColumn.url_cell
               %code.small.p0{style: "word-break: normal"}
                 = bike.html_url
             %td.hiddenColumn.created_at_cell
-              %a.convertTime{ href: bike_path(bike, organization_id: current_organization.to_param) }
+              %a.convertTime{href: bike_path(bike, organization_id: current_organization.to_param)}
                 = l bike.created_at, format: :convert_time
             %td.hiddenColumn.updated_at_cell.hidden-xs-down
               %small.convertTime
@@ -240,7 +240,7 @@
                 = status_display(bike.status_humanized)
             - additional_registration_fields.each do |reg_field|
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
-              %td.hiddenColumn.hidden-xs-down{ class: "#{reg_field}_cell" }
+              %td.hiddenColumn.hidden-xs-down{class: "#{reg_field}_cell"}
                 - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                 - if bike_attr == "address"
                   - if bike.valid_mailing_address?
@@ -252,11 +252,11 @@
                 - else
                   = bike.send(bike_attr)
             -# All organizations can see additional serial#
-            %td.hiddenColumn.hidden-xs-down{ class: "extra_registration_number_cell" }
+            %td.hiddenColumn.hidden-xs-down{class: "extra_registration_number_cell"}
               = bike.extra_registration_number
 
             - if current_organization.enabled?("bike_stickers")
-              %td.hidden-xs-down{ class: "sticker_cell" }
+              %td.hidden-xs-down{class: "sticker_cell"}
                 - if @bike_sticker.present?
                   %small
                     = link_to t(".link"), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: "PUT"
@@ -270,17 +270,16 @@
                     - if index > 0
                       %br
             - if current_organization.enabled?("impound_bikes")
-              %td.hiddenColumn.hidden-xs-down{ class: "impounded_cell" }
+              %td.hiddenColumn.hidden-xs-down{class: "impounded_cell"}
                 - if bike.status_impounded? && bike.current_impound_record&.created_at&.present?
                   %small.convertTime
                     = l bike.current_impound_record.created_at, format: :convert_time
           - if show_avery_export # NOTE: this is outside of the cache for the bike
-            %td.hiddenColumn.hidden-xs-down{ class: "avery_cell" }
+            %td.hiddenColumn.hidden-xs-down{class: "avery_cell"}
               = check_mark if bike.avery_exportable?
 - if @bikes.total_count > @bikes.count
   .paginate-container.paginate-container-bottom.row
     .col-sm-6.mb-2
       = paginate @bikes
     .col-sm-6.text-right
-      = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), { class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;" }
-
+      = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), {class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;"}
