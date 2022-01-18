@@ -197,7 +197,7 @@
     %tbody
       - @bikes.each do |bike|
         %tr
-          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}") do
             %td.hiddenColumn.url_cell
               %code.small.p0{style: "word-break: normal"}
                 = bike.html_url
@@ -256,7 +256,7 @@
               = bike.extra_registration_number
 
             - if current_organization.enabled?("bike_stickers")
-              %td.hidden-xs-down{ class: "sticker_cell" }
+              %td.hidden-xs-down{class: "sticker_cell"}
                 - if @bike_sticker.present?
                   %small
                     = link_to t(".link"), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: "PUT"
