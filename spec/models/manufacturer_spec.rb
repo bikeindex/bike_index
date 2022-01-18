@@ -124,6 +124,33 @@ RSpec.describe Manufacturer, type: :model do
     end
   end
 
+  describe "calculated_mnfg_name" do
+    let(:manufacturer_other) { Manufacturer.other }
+    let(:manufacturer) { Manufacturer.new(name: "Mnfg name") }
+    it "returns the value of manufacturer_other if manufacturer is other" do
+      expect(Manufacturer.calculated_mnfg_name(manufacturer, "Other manufacturer name")).to eq "Mnfg name"
+      expect(Manufacturer.calculated_mnfg_name(manufacturer_other, "Other manufacturer name")).to eq("Other manufacturer name")
+    end
+
+    it "returns the name of the manufacturer if it isn't other" do
+      expect(Manufacturer.calculated_mnfg_name(manufacturer, nil)).to eq("Mnfg name")
+    end
+
+    context "malicious" do
+      let(:malicious_str) { '<a href="bad_site.js">stuff</a>' }
+      it "removes bad things" do
+        expect(Manufacturer.calculated_mnfg_name(manufacturer_other, malicious_str)).to eq "stuff"
+      end
+    end
+
+    context "manufacturer with parens" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
+      it "returns Just SE Bikes (and does it on save)" do
+        expect(Manufacturer.calculated_mnfg_name(manufacturer, nil)).to eq "SE Racing"
+      end
+    end
+  end
+
   describe "set_calculated_attributes" do
     it "sets twitter_name" do
       manufacturer = Manufacturer.new(twitter_name: "@cool-thing")

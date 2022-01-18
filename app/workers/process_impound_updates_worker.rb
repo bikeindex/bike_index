@@ -29,11 +29,10 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
           is_for_sale: false,
           address_set_manually: false,
           marked_user_hidden: false)
-        ownership = bike.ownerships.create!(owner_email: impound_record_update.transfer_email,
+        bike.ownerships.create!(owner_email: impound_record_update.transfer_email,
           impound_record_id: impound_record.id,
           creator_id: impound_record_update.user_id,
           current: true)
-        bike.ownerships.current.where.not(id: ownership.id).each { |o| o.update(current: false) }
       elsif impound_record_update.kind == "removed_from_bike_index"
         impound_record.bike.destroy
       elsif impound_record_update.kind == "retrieved_by_owner" &&
@@ -43,7 +42,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
       end
       impound_record_update.update(processed: true, skip_update: true)
     end
-    impound_record.update(skip_update: true)
+    impound_record.reload.update(skip_update: true)
     # Bump the parking notification to ensure it reflects current state (resolving if relevant)
     impound_record.parking_notification&.update(updated_at: Time.current)
     if claim_retrieved.present?
@@ -54,8 +53,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
       if impound_record.unregistered_bike?
         impound_record.bike&.marked_user_unhidden = true
       end
-      impound_record.bike&.update(updated_at: Time.current)
-      impound_record.bike&.reload
+      bike&.reload&.update(updated_at: Time.current)
     end
   end
 

@@ -3,10 +3,6 @@ FactoryBot.define do
     "user#{n}s@bikeiasdndex.org"
   end
 
-  sequence :unique_name do |n|
-    "Special_name#{n}"
-  end
-
   sequence :serial_number do |n|
     "serial#{n}"
   end
@@ -24,33 +20,28 @@ FactoryBot.define do
   end
 
   factory :front_gear_type do
-    name { FactoryBot.generate(:unique_name) }
+    sequence(:name) { |n| "Front Gear #{n}" }
     count { 1 }
   end
 
   factory :rear_gear_type do
-    name { FactoryBot.generate(:unique_name) }
+    sequence(:name) { |n| "Rear Gear #{n}" }
     count { 1 }
   end
 
   factory :wheel_size do
-    name { FactoryBot.generate(:unique_name) }
+    sequence(:name) { |n| "Wheel size #{n}" }
     iso_bsd { FactoryBot.generate(:unique_iso) }
     priority { 1 }
-    description { FactoryBot.generate(:unique_name) }
-  end
-
-  factory :handlebar_type do
-    name { FactoryBot.generate(:unique_name) }
-    slug { FactoryBot.generate(:unique_name).downcase }
+    sequence(:description) { |n| "Wheel Description #{n}" }
   end
 
   factory :paint do
-    name { FactoryBot.generate(:unique_name) }
+    sequence(:name) { |n| "Paint #{n}" }
   end
 
   factory :cgroup do
-    name { FactoryBot.generate(:unique_name) }
+    sequence(:name) { |n| "Cgroup #{n}" }
   end
 
   factory :ctype do
@@ -64,7 +55,7 @@ FactoryBot.define do
   end
 
   factory :lock_type do
-    name { FactoryBot.generate(:unique_name) }
+    sequence(:name) { |n| "Lock type #{n}" }
   end
 
   factory :lock do

@@ -1749,6 +1749,8 @@ nl:
         als u vragen heeft
       thank_you_for_registering_this_found_bike_type: Bedankt voor het registreren
         van deze gevonden %{bike_type}!
+      this_bike_version_is_hidden_html: "<em>%{version_name}</em> is verborgen!"
+      whoa_this_awesome_version_is_yours: Wauw, %{version_name} is van jou!
     index:
       all: Alle
       anywhere: Overal
@@ -1932,51 +1934,22 @@ nl:
         fietscodes geclaimd.
       link_bike_sticker_kind: Link %{bike_sticker_kind}
     show:
-      bike_photo: "%{bike_type} foto"
-      color_may_not_match: Kleur komt mogelijk niet overeen!
-      componentyear: "%{componentyear}"
       contact_the_owner: Neem contact op met de eigenaar
-      cycle_type: Type cyclus
-      department_city: Afdeling & stad
-      description_of_incident: Beschrijving van het incident
-      distinguishing_features: Onderscheidende kenmerken
-      frame_material: Frame materiaal
-      frame_size: Kadergrootte
-      front: Voorkant
-      front_rear: Voor en achter
-      front_wheel_diameter: Diameter voorwiel
-      handlebar_type: Type stuur
       hidden_by_owner: VERBORGEN door eigenaar
       know_something_about_this_bike_type: Weet u hier iets over %{bike_type}?
       link_url: Link url
-      location: Plaats
-      locking_circumvented: Vergrendeling omzeild
-      locking_description: Beschrijving vergrendeling
-      manufacturer: Fabrikant
-      model: Model
-      name: Naam
       no_one_but_the_user_and_bike_index_admins: niemand anders dan de gebruiker (en
         Bike Index-beheerders) kunnen het zien
       or_call: Of bel
-      other: Ander
-      other_serial: Andere serie / registratie / sticker
       owners_phone_number: 'Telefoonnummer van de eigenaar:'
-      police_report: 'Politierapport #'
-      primary_colors: Primaire kleuren
-      rear: achterkant
-      rear_wheel_diameter: Diameter achterwiel
       send_message: Verstuur bericht
-      serial: Serie
       share_it: Deel het!
       spread_the_word: Vertel het verder!
-      stock_photo: Stock foto van een %{year} %{model}
       view_users_other_registrations: Bekijk andere registraties van gebruiker
-      wheel_diameter: Wiel diameter
       where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als u contact
         opneemt over een advertentie die u online hebt gevonden, neemt u een link
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
-      year: jaar
       change_the_bike_sticker_linked_to: Verander de fiets waarnaar het linkt
       is_this_linked_to_incorrect_bike: Is deze sticker gekoppeld aan de verkeerde
         fiets?
@@ -1986,16 +1959,9 @@ nl:
         gescand die aan deze %{bike_type} is toegewezen.
       created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
         om een parkeermelding op te nemen"
-      paint_description: Kleurbeschrijving
       from: uit
-      impounded_at: In beslag genomen fietsen
-      found_at: Gevonden bij
-      stolen_at: Gestolen op
-      stolen_details: Diefstal details
       not_registered_by_user: Niet geregistreerd door een gebruiker
       in: in
-      hidden_because_status: omdat %{bike_type} %{status} is
-      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
       looking_for_correct_owner: Op zoek naar de juiste eigenaar van deze %{bike_type}!
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
@@ -2062,6 +2028,43 @@ nl:
         plan: Plan
         start: Begin
         status: Toestand
+    main_show_block:
+      bike_photo: "%{bike_type} foto"
+      color_may_not_match: Kleur komt mogelijk niet overeen!
+      componentyear: "%{componentyear}"
+      cycle_type: Type cyclus
+      department_city: Afdeling & stad
+      description_of_incident: Beschrijving van het incident
+      distinguishing_features: Onderscheidende kenmerken
+      found_at: Gevonden bij
+      frame_material: Frame materiaal
+      frame_size: Kadergrootte
+      front: Voorkant
+      front_rear: Voor en achter
+      front_wheel_diameter: Diameter voorwiel
+      handlebar_type: Type stuur
+      hidden_because_status: omdat %{bike_type} %{status} is
+      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
+      impounded_at: In beslag genomen bij
+      location: Plaats
+      locking_circumvented: Vergrendeling omzeild
+      locking_description: Beschrijving vergrendeling
+      manufacturer: Fabrikant
+      model: Model
+      name: Naam
+      other: Ander
+      other_serial: Andere serie / registratie / sticker
+      paint_description: Kleurbeschrijving
+      police_report: 'Politierapport #'
+      primary_colors: Primaire kleuren
+      rear: achterkant
+      rear_wheel_diameter: Diameter achterwiel
+      serial: Serie
+      stock_photo: Stock foto van een %{year} %{model}
+      stolen_at: Gestolen op
+      stolen_details: Diefstal details
+      wheel_diameter: Wiel diameter
+      year: jaar
   controllers:
     bikes:
       edit:
@@ -2078,6 +2081,8 @@ nl:
         report_stolen: Melden als gestolen of vermist
         theft_details: Diefstal details
         found_details: Informatie over het vinden
+        bike_or_version_version: Versie
+        versions: versies
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -5005,6 +5010,7 @@ nl:
       owned_with_permission_to_edit_html: Eigendom van <em>%{owner_email}</em> maar
         %{org_name} heeft toestemming om te bewerken
       view_bike: Bekijk %{bike_type}
+      view_bike_version: Bekijk %{bike_type} versie
     organized_skeleton:
       additional_features_html: Bike Index biedt extra functies voor geverifieerde
         wetshandhavingsorganisaties. Neem contact op met %{email_link} om ze ingeschakeld
@@ -5808,6 +5814,16 @@ nl:
       update_serial_number: Framenummer bijwerken
       updated_serial: Framenummer bijgewerkt
       zipcode: Postcode
+      add_end: Einddatum versie toevoegen
+      add_start: Startdatum versie toevoegen
+      bike_registration: Bewerk hier de %{bike_type}-registratie
+      remove_end: einde verwijderen
+      remove_start: Verwijder start
+      update_on_bike: Update over registratie
+      update_these_attributes_on_bike_html: Deze kenmerken veranderen niet tussen
+        versies en moeten worden bijgewerkt op de originele %{bike_type}-registratie.
+        %{bike_registration_link}.
+      version_name: Versienaam
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -5920,6 +5936,8 @@ nl:
         een fiets weer te geven en te verbergen.
       you_can_read_more_html: U kunt meer lezen over waarom dit belangrijk voor ons
         is in onze %{faq_link}.
+      delete_this_version_html: Verwijder <em>%{version_name}</em>
+      visibility: Zichtbaarheid
     report_recovered:
       can_we_share_your_story: Kunnen we jouw verhaal delen?
       did_we_help: Hebben we geholpen?
@@ -5971,3 +5989,7 @@ nl:
       manage_organization_information: Organisatie-informatie beheren
       manage_organization_information_via: organisatie-informatie beheerd via uw account
       remove: Verwijderen
+  bike_versions:
+    index:
+      primary_colors: Primaire kleuren
+      search_bike_descriptions: Zoek fietsbeschrijvingen

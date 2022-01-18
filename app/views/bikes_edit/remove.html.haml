@@ -1,71 +1,100 @@
-= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
+= form_for @bike, multipart: true, html: { class: "primary-edit-bike-form" } do |f|
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "/bikes_edit/primary_menu", locals: { no_save_button: true }
+      = render partial: "/bikes_edit/primary_menu", locals: { no_save_button: !@bike.version? }
 
       .col-md-8.form-well
         .form-wrap
           .form-well-form-header
-            %h3= "#{@edit_templates[@edit_template]} #{@bike.type}"
+            %h3
+              = @edit_templates[@edit_template]
+              %em= @bike.display_name
 
-          .related-fields.hide-this-bike.no-divider-row
-            .form-group.row
-              - unless @bike.user_hidden
-                .hide-this-bike-link
-                  %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
-                    = t(".hide_this_bike", bike_type: @bike.type)
+          - if @bike.version?
+            .related-fields.no-divider-row.form-group.row.unnested-field
+              %label.form-well-label.less-strong
+                = t(".visibility")
+              .form-well-input-full-width
+                %label.radio-inline.d-block.mt-1
+                  = f.radio_button :visibility, :visible_not_related
+                  Visible
+                %label.radio-inline.d-block
+                  = f.radio_button :visibility, :all_visible
+                  Visible and show relations
+                  %span.less-strong includes links to all the versions and the registration.
+                %label.radio-inline.d-block
+                  = f.radio_button :visibility, :user_hidden
+                  Hidden
+                  %span.less-strong (only visible by you)
 
-              .collapse#hide_bike_toggle_group{class: (@bike.user_hidden ? "show in" : "")}
-                - if @bike.user_hidden
-                  = f.hidden_field :marked_user_unhidden
-                - else
-                  = f.hidden_field :marked_user_hidden
-                .hide-explanation
-                  %p.mt-2
-                    %strong= t(".keeping_your_bike_public")
-                  %p
-                    - faq_link = link_to t(".faqs"), support_path(anchor: 'public-serials')
-                    = t(".you_can_read_more_html", faq_link: faq_link)
-                  %p
-                    = t(".we_strongly_recommend", bike_type: @bike.type)
-                  %p.text-xs-center
-                    - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
-                    %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type }
-                      - if @bike.user_hidden
-                        = t(".unhide_this_bike", bike_type: @bike.type)
-                      - else
-                        = t(".hide_this_bike", bike_type: @bike.type)
-          %hr
+            .col-sm-12.pb-4
+              = render "shared/form_well_footer_save"
 
-          .delete-from-index.no-divider-row
-            %a{data: { toggle: 'modal', target: '#request-delete' } }
-              = render 'shared/trash_icon'
-              = t(".delete_this_bike", bike_type: @bike.type)
+            %hr
 
--# Don't redirect to admin, because admin doesn't actually include js for rendering BikeIndexAlerts
-- after_delete_redirect = current_user&.superuser ? my_account_path : user_root_url
--# Referenced by the edit_remove.coffee file, so we can redirect there afterward
-:javascript
-  window.userRootUrl = "#{after_delete_redirect}";
-- modal_title = t(".modal_title", bike_type: @bike.type)
-- modal_body = capture_haml do
-  = form_tag do |t|
-    .modal-body
-      = render partial: 'shared/alert', locals: { body: t(".reason_modal_body", bike_type: @bike.type), title: t(".reason_modal_title"), class_names: 'currently-hidden' }
-      = hidden_field_tag :bike_delete_bike_id, @bike.id
+            .delete-from-index.no-divider-row
+              = link_to bike_version_path(@bike_version), method: :delete, confirm: "Are you sure?" do
+                = render "shared/trash_icon"
+                = t(".delete_this_version_html", version_name: @bike.display_name)
+          - else
+            .related-fields.hide-this-bike.no-divider-row
+              .form-group.row
+                - unless @bike.user_hidden?
+                  .hide-this-bike-link
+                    %a.collapsed{ href: "#hide_bike_toggle_group", data: { toggle: "collapse" } }
+                      = t(".hide_this_bike", bike_type: @bike.type)
 
-      .form-group
-        %label{ for: :bike_delete_reason }
-          = t(".reason_for_deletion")
-        = text_area_tag :bike_delete_reason, '', required: true, class: 'form-control'
-    .modal-btn-footer
-      .row
-        .col-xs-6.col-xs-push-6
-          = submit_tag t(".delete_bike"), class: 'btn btn-danger'
-        .col-xs-6.col-xs-pull-6
-          %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-            = t(".nevermind")
+                .collapse#hide_bike_toggle_group{class: (@bike.user_hidden? ? "show in" : "")}
+                  - if @bike.user_hidden?
+                    = f.hidden_field :marked_user_unhidden
+                  - else
+                    = f.hidden_field :marked_user_hidden
+                  .hide-explanation
+                    %p.mt-2
+                      %strong= t(".keeping_your_bike_public")
+                    %p
+                      - faq_link = link_to t(".faqs"), support_path(anchor: "public-serials")
+                      = t(".you_can_read_more_html", faq_link: faq_link)
+                    %p
+                      = t(".we_strongly_recommend", bike_type: @bike.type)
+                    %p.text-xs-center
+                      - btn_type = @bike.user_hidden? ? "btn-success" : "btn-danger"
+                      %a.btn.btn-lg#hide_bike_toggle{role: "button", class: btn_type }
+                        - if @bike.user_hidden?
+                          = t(".unhide_this_bike", bike_type: @bike.type)
+                        - else
+                          = t(".hide_this_bike", bike_type: @bike.type)
+            %hr
 
-= render partial: 'shared/modal', locals: { title: modal_title, id: 'request-delete', modal_body: modal_body }
+            .delete-from-index.no-divider-row
+              %a{data: { toggle: "modal", target: "#request-delete" } }
+                = render "shared/trash_icon"
+                = t(".delete_this_bike", bike_type: @bike.type)
+
+            -# Don't redirect to admin, because admin doesn't actually include js for rendering BikeIndexAlerts
+            - after_delete_redirect = current_user&.superuser ? my_account_path : user_root_url
+            -# Referenced by the edit_remove.coffee file, so we can redirect there afterward
+            :javascript
+              window.userRootUrl = "#{after_delete_redirect}";
+            - modal_title = t(".modal_title", bike_type: @bike.type)
+            - modal_body = capture_haml do
+              = form_tag do |t|
+                .modal-body
+                  = render partial: "shared/alert", locals: { body: t(".reason_modal_body", bike_type: @bike.type), title: t(".reason_modal_title"), class_names: "currently-hidden" }
+                  = hidden_field_tag :bike_delete_bike_id, @bike.id
+
+                  .form-group
+                    %label{ for: :bike_delete_reason }
+                      = t(".reason_for_deletion")
+                    = text_area_tag :bike_delete_reason, "", required: true, class: "form-control"
+                .modal-btn-footer
+                  .row
+                    .col-xs-6.col-xs-push-6
+                      = submit_tag t(".delete_bike"), class: "btn btn-danger"
+                    .col-xs-6.col-xs-pull-6
+                      %button.btn.btn-secondary{ "data-dismiss" => "modal", type: "button" }
+                        = t(".nevermind")
+
+            = render partial: "shared/modal", locals: { title: modal_title, id: "request-delete", modal_body: modal_body }

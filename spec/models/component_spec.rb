@@ -28,32 +28,14 @@ RSpec.describe Component, type: :model do
     end
   end
 
-  describe "manufacturer_name" do
-    it "returns the value of manufacturer_other if manufacturer is other" do
-      mnfg = Ctype.new
-      component = Component.new
-      allow(component).to receive(:manufacturer).and_return(mnfg)
-      allow(mnfg).to receive(:name).and_return("stuff")
-      expect(component.manufacturer_name).to eq("stuff")
-    end
-
-    it "returns the name of the manufacturer if it isn't other" do
-      mnfg = Ctype.new
-      component = Component.new
-      allow(component).to receive(:manufacturer).and_return(mnfg)
-      allow(component).to receive(:manufacturer_other).and_return("oooop")
-      allow(mnfg).to receive(:name).and_return("Other")
-      expect(component.manufacturer_name).to eq("oooop")
-    end
-  end
-
   describe "set_is_stock" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
     it "sets not stock if description changed" do
       component = FactoryBot.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.year = 1987
       expect(component.is_stock).to be_truthy
-      component.manufacturer_id = 69
+      component.manufacturer_id = manufacturer.id
       component.set_is_stock
       expect(component.is_stock).to be_truthy
       component.description = "A new description"
@@ -74,9 +56,6 @@ RSpec.describe Component, type: :model do
       component.component_model = "New mode"
       component.set_is_stock
       expect(component.is_stock).to be_truthy
-    end
-    it "has before_save_callback_method defined for clean_frame_size" do
-      expect(Component._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_is_stock)).to eq(true)
     end
   end
 end

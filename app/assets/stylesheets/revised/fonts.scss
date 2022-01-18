@@ -1,5 +1,5 @@
-$body-font-family: "Open Sans", sans-serif;
-$header-font-family: "Montserrat", sans-serif;
+$body-font-family: 'Open Sans', sans-serif;
+$header-font-family: 'Montserrat', sans-serif;
 $normal-font-weight: 400;
 $strong-font-weight: 700;
 $light-italic-weight: 300;
@@ -81,6 +81,10 @@ h5 {
   font-style: italic;
   font-size: 18px;
   line-height: 1.3em;
+}
+
+.text-normal-weight {
+  font-weight: $normal-font-weight;
 }
 
 .header-font {

@@ -153,7 +153,7 @@
                       - r_hub = hubs.where(rear: true).first
                       - if r_hub.present?
                         - model_name = r_hub.component_model
-                        - mfg_name = r_hub.manufacturer_name
+                        - mfg_name = r_hub.mnfg_name
                         = "(#{model_name} #{t('.by')} #{mfg_name})"
 
 

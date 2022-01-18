@@ -1,6 +1,7 @@
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
+  include BikeAttributable
   include Geocodeable
   include PgSearch::Model
 
@@ -17,21 +18,13 @@ class Bike < ApplicationRecord
     unregistered_parking_notification: 4
   }.freeze
 
-  belongs_to :manufacturer
-  belongs_to :primary_frame_color, class_name: "Color"
-  belongs_to :secondary_frame_color, class_name: "Color"
-  belongs_to :tertiary_frame_color, class_name: "Color"
-  belongs_to :rear_wheel_size, class_name: "WheelSize"
-  belongs_to :front_wheel_size, class_name: "WheelSize"
-  belongs_to :rear_gear_type
-  belongs_to :front_gear_type
-  belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: "User"
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :current_impound_record, class_name: "ImpoundRecord"
   belongs_to :current_ownership, class_name: "Ownership"
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
+  belongs_to :paint, counter_cache: true # Not in BikeAttributable because of counter cache
 
   has_many :bike_organizations
   has_many :organizations, through: :bike_organizations
@@ -45,8 +38,7 @@ class Bike < ApplicationRecord
   has_many :stolen_bike_listings
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships
-  has_many :public_images, as: :imageable, dependent: :destroy
-  has_many :components
+  has_many :bike_versions
   has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id
   has_many :duplicate_bike_groups, -> { unignored }, through: :normalized_serial_segments
@@ -79,10 +71,6 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  enum frame_material: FrameMaterial::SLUGS
-  enum handlebar_type: HandlebarType::SLUGS
-  enum cycle_type: CycleType::SLUGS
-  enum propulsion_type: PropulsionType::SLUGS
   enum status: STATUS_ENUM
 
   delegate :bulk_import, :claimed?, :creation_description,
@@ -92,7 +80,6 @@ class Bike < ApplicationRecord
     to: :current_ownership, allow_nil: true
 
   scope :without_location, -> { where(latitude: nil) }
-  scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
@@ -291,7 +278,7 @@ class Bike < ApplicationRecord
   def calculated_listing_order
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
-    t = (updated_at || Time.current).to_i / 10000
+    t = (updated_by_user_fallback || Time.current).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
 
@@ -304,6 +291,15 @@ class Bike < ApplicationRecord
     return false if current_ownership.blank?
     %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
       current_ownership.status == "status_impounded"
+  end
+
+  # Abbreviation, checks if this is a bike_version
+  def version?
+    false
+  end
+
+  def display_name
+    name.presence || cycle_type.titleize
   end
 
   def user?
@@ -331,38 +327,9 @@ class Bike < ApplicationRecord
       Feedback.bike(id).count + UserAlert.where(bike_id: id).count
   end
 
-  def status_stolen_or_impounded?
-    %w[status_stolen status_impounded].include?(status)
-  end
-
-  def status_found?
-    return false unless status_impounded?
-    (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
-  end
-
-  def status_humanized
-    return "found" if status_found?
-    self.class.status_humanized(status)
-  end
-
-  def status_humanized_translated
-    self.class.status_humanized_translated(status_humanized)
-  end
-
   # The appropriate edit template to use in the edit view.
   def default_edit_template
     status_stolen? ? "theft_details" : "bike_details"
-  end
-
-  # Small helper because we call this a lot
-  def type
-    cycle_type && cycle_type_name&.downcase
-  end
-
-  def type_titleize
-    return "" unless type.present?
-    # make this work for e-scooter
-    type.split(/(\s|-)/).map(&:capitalize).join("")
   end
 
   def email_visible_for?(org)
@@ -467,21 +434,21 @@ class Bike < ApplicationRecord
     user == u || current_ownership.claimable_by?(u)
   end
 
-  def authorized?(u, no_superuser_override: false)
-    return false if u.blank?
-    return true if !no_superuser_override && u.superuser?
+  def authorized?(passed_user, no_superuser_override: false)
+    return false if passed_user.blank?
+    return true if !no_superuser_override && passed_user.superuser?
     # authorization requires organization if impounded or marked abandoned by an organization
     unless authorization_requires_organization?
       # Since it doesn't require an organization, authorize by user
-      return true if u == owner || claimable_by?(u)
+      return true if passed_user == owner || claimable_by?(passed_user)
     end
-    authorized_by_organization?(u: u)
+    authorized_by_organization?(u: passed_user)
   end
 
-  def authorize_and_claim_for_user(u)
-    return authorized?(u) unless claimable_by?(u)
+  def authorize_and_claim_for_user(passed_user)
+    return authorized?(passed_user) unless claimable_by?(passed_user)
     current_ownership.mark_claimed
-    authorized?(u)
+    authorized?(passed_user)
   end
 
   # This method only accepts numerical org ids
@@ -570,29 +537,6 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
-  def frame_model_truncated
-    frame_model&.truncate(40)
-  end
-
-  def title_string
-    t = [year, mnfg_name, frame_model_truncated].join(" ")
-    t += " #{type}" if type != "bike"
-    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
-  end
-
-  def video_embed_src
-    if video_embed.present?
-      code = Nokogiri::HTML(video_embed)
-      src = code.xpath("//iframe/@src")
-      src[0]&.value
-    end
-  end
-
-  def render_paint_description?
-    return false unless pos? && primary_frame_color == Color.black
-    secondary_frame_color_id.blank? && paint.present?
-  end
-
   def bike_organization_ids
     bike_organizations.pluck(:organization_id)
   end
@@ -626,17 +570,6 @@ class Bike < ApplicationRecord
     nil
   end
 
-  def set_mnfg_name
-    n = if manufacturer.blank?
-      ""
-    elsif manufacturer.name == "Other" && manufacturer_other.present?
-      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
-    else
-      manufacturer.simple_name
-    end
-    self.mnfg_name = n.strip.truncate(60)
-  end
-
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
     if marked_user_hidden.present? && ParamsNormalizer.boolean(marked_user_hidden)
@@ -646,15 +579,6 @@ class Bike < ApplicationRecord
       self.user_hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
-  end
-
-  def normalize_emails
-    self.owner_email = if User.fuzzy_email_find(owner_email)
-      User.fuzzy_email_find(owner_email).email
-    else
-      EmailNormalizer.normalize(owner_email)
-    end
-    true
   end
 
   def normalize_serial_number
@@ -739,10 +663,6 @@ class Bike < ApplicationRecord
     self.paint_id = paint.id
   end
 
-  def paint_description
-    paint.name.titleize if paint.present?
-  end
-
   # THIS IS FUCKING OBNOXIOUS.
   # Somehow we need to get rid of needing to have this method. country should default to optional
   def address
@@ -820,30 +740,14 @@ class Bike < ApplicationRecord
     end
   end
 
-  def frame_colors
-    [
-      primary_frame_color&.name,
-      secondary_frame_color&.name,
-      tertiary_frame_color&.name
-    ].compact
-  end
-
-  # list of cgroups so that we can arrange them
-  def cgroup_array
-    components.map(&:cgroup_id).uniq
-  end
-
-  def cache_photo
-    self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
-  end
-
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
-    set_mnfg_name
-    normalize_emails
+    self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
+    self.owner_email = normalized_email
     normalize_serial_number
     set_paints
+    self.name = name.present? ? name.strip : nil
   end
 
   def set_calculated_attributes
@@ -856,63 +760,10 @@ class Bike < ApplicationRecord
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at
     set_user_hidden
-    cache_bike
-  end
-
-  def components_cache_string
-    components.includes(:manufacturer, :ctype).map.each do |c|
-      if c.ctype.present? && c.ctype.name.present?
-        [
-          c.year,
-          c.manufacturer&.name,
-          c.component_type
-        ]
-      end
-    end
-  end
-
-  def cache_stolen_attributes
-    self.all_description =
-      [description, current_stolen_record&.theft_description]
-      .reject(&:blank?)
-      .join(" ")
-  end
-
-  def cache_bike
-    cache_stolen_attributes
-    cache_photo
-    self.cached_data = [
-      mnfg_name,
-      (propulsion_type_name == "Foot pedal" ? nil : propulsion_type_name),
-      year,
-      (primary_frame_color && primary_frame_color.name),
-      (secondary_frame_color && secondary_frame_color.name),
-      (tertiary_frame_color && tertiary_frame_color.name),
-      (frame_material && frame_material_name),
-      frame_size,
-      frame_model,
-      (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
-      (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
-      extra_registration_number,
-      (type == "bike" ? nil : type),
-      components_cache_string
-    ].flatten.reject(&:blank?).join(" ")
-  end
-
-  def frame_material_name
-    FrameMaterial.new(frame_material).name
-  end
-
-  def handlebar_type_name
-    HandlebarType.new(handlebar_type)&.name
-  end
-
-  def cycle_type_name
-    CycleType.new(cycle_type)&.name
-  end
-
-  def propulsion_type_name
-    PropulsionType.new(propulsion_type).name
+    # cache_bike
+    self.all_description = cached_description_and_stolen_description
+    self.thumb_path = public_images&.first&.image_url(:small)
+    self.cached_data = cached_data_array.join(" ")
   end
 
   # Only geocode if address is set manually (and not skipping geocoding)
@@ -965,5 +816,23 @@ class Bike < ApplicationRecord
 
   def calculated_current_ownership
     ownerships.order(:id).last
+  end
+
+  def normalized_email
+    # If the owner_email changed, we look up the owner - skip the lookup if possible
+    unless owner_email_changed?
+      return user.present? ? user.email : owner_email
+    end
+    existing_user = User.fuzzy_email_find(owner_email)
+    if existing_user.present?
+      existing_user.email
+    else
+      EmailNormalizer.normalize(owner_email)
+    end
+  end
+
+  def cached_description_and_stolen_description
+    [description, current_stolen_record&.theft_description]
+      .reject(&:blank?).join(" ")
   end
 end

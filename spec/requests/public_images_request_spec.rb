@@ -62,6 +62,33 @@ RSpec.describe PublicImagesController, type: :request do
         end
       end
     end
+    context "bike_version" do
+      let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user) }
+      context "valid owner" do
+        it "creates an image" do
+          bike_version.update_column :updated_at, Time.current - 1.hour
+          Sidekiq::Worker.clear_all
+          post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
+                                  public_image: {name: "cool name"}, format: :js}
+          expect(AfterBikeSaveWorker.jobs.count).to eq 0
+          expect(bike_version.reload.updated_at).to be_within(1).of Time.current
+          expect(bike_version.public_images.first.name).to eq "cool name"
+        end
+        context "user hidden" do
+          it "creates an image" do
+            bike_version.update(visibility: "user_hidden")
+            expect(bike_version.thumb_path).to be_blank
+            Sidekiq::Worker.clear_all
+            post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
+                                    public_image: {name: "cool name"}, format: :js}
+            expect(AfterBikeSaveWorker.jobs.count).to eq 0
+            expect(bike_version.reload.updated_at).to be_within(1).of Time.current
+            expect(bike_version.public_images.first.name).to eq "cool name"
+            expect(bike_version.public_images.first.is_private).to be_falsey
+          end
+        end
+      end
+    end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
@@ -168,8 +195,10 @@ RSpec.describe PublicImagesController, type: :request do
         expect(flash).to be_present
       end
     end
-    context "with owner" do
+    describe "bike" do
       let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
       it "allows the destroy of public_image" do
         bike = FactoryBot.create(:bike, :with_ownership_claimed, user: current_user)
         public_image = FactoryBot.create(:public_image, imageable: bike)
@@ -179,25 +208,57 @@ RSpec.describe PublicImagesController, type: :request do
           delete "#{base_url}/#{public_image.id}"
         }.to change(PublicImage, :count).by(-1)
       end
+      context "owner and hidden bike" do
+        it "allows the destroy" do
+          bike.update(marked_user_hidden: true)
+          expect(bike.reload.user_hidden?).to be_truthy
+          expect(bike.authorized?(current_user)).to be_truthy
+          expect {
+            delete "#{base_url}/#{public_image.id}?edit_template=redirect_page"
+          }.to change(PublicImage, :count).by(-1)
+          expect(response).to redirect_to(edit_bike_path(bike, edit_template: "redirect_page"))
+        end
+      end
       context "non owner" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
         it "rejects the destroy" do
-          bike = FactoryBot.create(:bike, :with_ownership)
-          public_image = FactoryBot.create(:public_image, imageable: bike)
           expect(bike.authorized?(current_user)).to be_falsey
           expect {
             delete "#{base_url}/#{public_image.id}"
           }.not_to change(PublicImage, :count)
         end
       end
-      context "owner and hidden bike" do
-        it "allows the destroy" do
-          bike = FactoryBot.create(:bike, :with_ownership_claimed, user: current_user)
-          public_image = FactoryBot.create(:public_image, imageable: bike)
-          expect(bike.authorized?(current_user)).to be_truthy
+    end
+    describe "bike_version" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user) }
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike_version) }
+      context "with owner" do
+        it "allows the destroy of public_image" do
+          expect(bike_version.reload.authorized?(current_user)).to be_truthy
           expect {
-            delete "#{base_url}/#{public_image.id}?page=redirect_page"
+            delete "#{base_url}/#{public_image.id}"
           }.to change(PublicImage, :count).by(-1)
-          expect(response).to redirect_to(edit_bike_path(bike, edit_template: "redirect_page"))
+          expect(response).to redirect_to(edit_bike_version_path(bike_version))
+        end
+        context "owner and hidden bike" do
+          it "allows the destroy" do
+            bike_version.update(visibility: "user_hidden")
+            expect(bike_version.reload.authorized?(current_user)).to be_truthy
+            expect {
+              delete "#{base_url}/#{public_image.id}?edit_template=redirect_page&imageable_type=BikeVersion"
+            }.to change(PublicImage, :count).by(-1)
+            expect(response).to redirect_to(edit_bike_version_path(bike_version, edit_template: "redirect_page"))
+          end
+        end
+      end
+      context "non owner" do
+        let(:bike_version) { FactoryBot.create(:bike_version) }
+        it "rejects the destroy" do
+          expect(bike_version.reload.authorized?(current_user)).to be_falsey
+          expect {
+            delete "#{base_url}/#{public_image.id}"
+          }.not_to change(PublicImage, :count)
         end
       end
     end

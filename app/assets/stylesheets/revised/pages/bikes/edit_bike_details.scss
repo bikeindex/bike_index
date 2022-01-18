@@ -35,6 +35,12 @@
       transition: top 0.1s linear;
     }
   }
+  .toggle-version-date {
+    display: inline-block;
+    &.currently-hidden {
+      display: none;
+    }
+  }
 }
 
 @media (max-width: $grid-breakpoint-md - 1px) {

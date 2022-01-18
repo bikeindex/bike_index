@@ -38,6 +38,7 @@ class BikeIndex.Init extends BikeIndex
       return window.pageScript = new BikeIndex.LandingPage
     if body_id.match 'bikes_theft_alerts'
       return window.pageScript = new BikeIndex.BikesEdit
+
     # All the rest per-page javascripts
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
@@ -50,8 +51,12 @@ class BikeIndex.Init extends BikeIndex
       bikes_create: BikeIndex.BikesNew
       bikes_edits_show: BikeIndex.BikesEdit
       bikes_update: BikeIndex.BikesEdit
+      bike_versions_edits_show: BikeIndex.BikesEdit
+      bike_versions_update: BikeIndex.BikesEdit
       bikes_show: BikeIndex.BikesShow
+      bike_versions_show: BikeIndex.BikesShow
       bikes_index: BikeIndex.BikesIndex
+      bike_versions_index: BikeIndex.BikesIndex
       organized_bikes_index: BikeIndex.BikesIndex
       orgpublic_impounded_bikes_index: BikeIndex.BikesIndex
       manufacturers_index: BikeIndex.InfoManufacturers

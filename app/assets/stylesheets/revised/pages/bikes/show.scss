@@ -1,4 +1,5 @@
-#bikes_show {
+#bikes_show,
+#bike_versions_show {
   .bike-overlay-wrapper {
     position: fixed;
     bottom: 0;
@@ -203,7 +204,8 @@
 
 // On small screens, use the tabbed interface for components
 @media (max-width: $grid-breakpoint-md - 1px) {
-  #bikes_show {
+  #bikes_show,
+  #bike_versions_show {
     .map-holder {
       width: 100%;
       pointer-events: none;
@@ -244,7 +246,8 @@
 
 // XS screen overrides - instead of ($grid-breakpoint-sm - 1px), break it where it breaks
 @media (max-width: 576px) {
-  #bikes_show {
+  #bikes_show,
+  #bike_versions_show {
     .nav-tabs.component-types {
       @include binx-nav-tabs-vertical;
     }
@@ -262,7 +265,8 @@
 
 // On medium screens and bigger, display all the components
 @media (min-width: $grid-breakpoint-md) {
-  #bikes_show {
+  #bikes_show,
+  #bike_versions_show {
     .nav-tabs.component-types {
       display: none;
     }

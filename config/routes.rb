@@ -155,6 +155,9 @@ Rails.application.routes.draw do
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"
 
+  resources :bike_versions, except: [:edit]
+  get "bike_versions/:id/edit(/:edit_template)", to: "bike_versions/edits#show", as: :edit_bike_version
+
   resources :bike_stickers, only: [:update]
   resources :locks, except: %(show index)
   resources :impound_claims, only: [:create, :update]

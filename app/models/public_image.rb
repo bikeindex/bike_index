@@ -39,7 +39,7 @@ class PublicImage < ApplicationRecord
 
   # Method to make create_revised.js easier to handle
   def bike_type
-    return false unless bike?
+    return false unless %w[Bike BikeVersion].include?(imageable_type)
     imageable.present? ? imageable.cycle_type : "bike" # hidden bike handling
   end
 
@@ -50,5 +50,11 @@ class PublicImage < ApplicationRecord
     imageable&.update(updated_at: Time.current)
     return true unless bike?
     AfterBikeSaveWorker.perform_async(imageable_id, false, true)
+  end
+
+  # Because the way we load the file is different if it's remote or local
+  # This is hacky, but whatever
+  def local_file?
+    image&._storage&.to_s == "CarrierWave::Storage::File"
   end
 end

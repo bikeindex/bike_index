@@ -2,6 +2,8 @@ module BikeEditable
   extend ActiveSupport::Concern
 
   included do
+    before_action :assign_versions
+
     helper_method :edit_bike_template_path_for
   end
 
@@ -13,7 +15,9 @@ module BikeEditable
   end
 
   def edit_bike_template_path_for(bike, template = nil)
-    if edits_controller_name_for(template) == "edits"
+    if bike.version?
+      edit_bike_version_url(bike.id, edit_template: template)
+    elsif edits_controller_name_for(template) == "edits"
       edit_bike_url(bike.id, edit_template: template)
     elsif template.to_s == "alert"
       new_bike_theft_alert_path(bike_id: bike.id)
@@ -24,15 +28,19 @@ module BikeEditable
 
   protected
 
+  def t_scope
+    [:controllers, :bikes, :edit]
+  end
+
   # NB: Hash insertion order here determines how nav links are displayed in the
   # UI. Keys also correspond to template names and query parameters, and values
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:theft_details, scope: [:controllers, :bikes, :edit])
-      h[:publicize] = translation(:publicize, scope: [:controllers, :bikes, :edit])
-      h[:alert] = translation(:alert, scope: [:controllers, :bikes, :edit])
-      h[:report_recovered] = translation(:report_recovered, scope: [:controllers, :bikes, :edit])
+      h[:theft_details] = translation(:theft_details, scope: t_scope)
+      h[:publicize] = translation(:publicize, scope: t_scope)
+      h[:alert] = translation(:alert, scope: t_scope)
+      h[:report_recovered] = translation(:report_recovered, scope: t_scope)
     end
   end
 
@@ -41,16 +49,21 @@ module BikeEditable
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details, scope: [:controllers, :bikes, :edit])
-      h[:found_details] = translation(:found_details, scope: [:controllers, :bikes, :edit]) if @bike.status_found?
-      h[:photos] = translation(:photos, scope: [:controllers, :bikes, :edit])
-      h[:drivetrain] = translation(:drivetrain, scope: [:controllers, :bikes, :edit])
-      h[:accessories] = translation(:accessories, scope: [:controllers, :bikes, :edit])
-      h[:ownership] = translation(:ownership, scope: [:controllers, :bikes, :edit])
-      h[:groups] = translation(:groups, scope: [:controllers, :bikes, :edit])
-      h[:remove] = translation(:remove, scope: [:controllers, :bikes, :edit])
-      unless @bike.status_stolen_or_impounded?
-        h[:report_stolen] = translation(:report_stolen, scope: [:controllers, :bikes, :edit])
+      h[:bike_details] = translation(:bike_details, scope: t_scope)
+      h[:found_details] = translation(:found_details, scope: t_scope) if @bike.status_found?
+      h[:photos] = translation(:photos, scope: t_scope)
+      h[:drivetrain] = translation(:drivetrain, scope: t_scope)
+      h[:accessories] = translation(:accessories, scope: t_scope)
+      unless @bike.version?
+        h[:ownership] = translation(:ownership, scope: t_scope)
+        h[:groups] = translation(:groups, scope: t_scope)
+      end
+      h[:remove] = translation(:remove, scope: t_scope)
+      if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
+        h[:versions] = translation(:versions, scope: t_scope)
+      end
+      unless @bike.status_stolen_or_impounded? || @bike.version?
+        h[:report_stolen] = translation(:report_stolen, scope: t_scope)
       end
     end
   end
@@ -71,6 +84,13 @@ module BikeEditable
 
     @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
     true
+  end
+
+  def assign_versions
+    return true unless Flipper.enabled?(:bike_versions, @current_user) && @bike.present?
+    @bike_og ||= @bike # Already assigned by bike_versions controller
+    @bike_versions = @bike_og.bike_versions
+      .where(owner_id: @current_user.id)
   end
 
   def edits_controller_name_for(requested_page)

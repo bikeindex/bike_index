@@ -77,13 +77,17 @@ RSpec.describe "Bikes API V2", type: :request do
       end
       it "creates" do
         VCR.use_cassette("bikes_v2-create-matching-bike-book", match_requests_on: [:path]) do
+          expect(manufacturer.reload.name).to eq "Trek"
+          expect(Bike.count).to eq 0
           expect {
             post "/api/v2/bikes?access_token=#{token.token}",
               params: bike_attrs.to_json,
               headers: json_headers
           }.to change(Ownership, :count).by 1
           expect(response.code).to eq("201")
+          expect(Bike.count).to eq 1
           result = json_result["bike"]
+          expect(Bike.last.mnfg_name).to eq "Trek" # For some reason, fixed a flaky spec
           expect(result["manufacturer_name"]).to eq bike_attrs[:manufacturer]
           %i[serial year frame_model].each do |k|
             pp k unless bike_attrs[k].downcase == result[k]&.to_s&.downcase
@@ -390,7 +394,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
       expect(bike.components.pluck(:component_model)).to match_array([nil, nil, "Richie rich"])
-      expect(bike.components.map(&:manufacturer_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
+      expect(bike.components.map(&:mnfg_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.count).to eq(3)
     end

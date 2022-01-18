@@ -21,7 +21,7 @@ class BikeDisplayer
     end
 
     def display_sticker_edit?(bike, user = nil)
-      return false unless user.present?
+      return false unless user.present? && !bike.version?
       return true if user.superuser? || user.enabled?("bike_stickers")
       # user_can_claim_sticker? checks if they've made too many sticker updates
       return false unless BikeSticker.user_can_claim_sticker?(user)
@@ -41,7 +41,7 @@ class BikeDisplayer
     def display_edit_address_fields?(bike, user = nil)
       return false unless user_edit_bike_address?(bike, user)
       # Make absolutely sure with stolen bikes
-      return false if bike.current_stolen_record_id.present?
+      return false if bike.version? || bike.current_stolen_record_id.present?
       # parking notifications, impounded, stolen etc use the associated record for their address
       %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
     end
