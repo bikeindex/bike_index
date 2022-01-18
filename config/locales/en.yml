@@ -1349,6 +1349,8 @@ en:
     bike_details:
       a_qr_sticker: a QR Sticker
       add_a_sticker_label_html: Add %{sticker_information_link}
+      add_end: Add version end date
+      add_start: Add version start date
       bike_name: Bike Name
       bike_registration: Edit the %{bike_type} registration here
       choose_country: Choose country
@@ -1356,10 +1358,6 @@ en:
       city: City
       existing_stickers: Existing stickers
       frame_size: Frame size
-      add_start: Add version start date
-      remove_start: Remove start
-      add_end: Add version end date
-      remove_end: Remove end
       general_description: General description
       made_without_serial: Made without serial
       main_frame_material: Main frame material
@@ -1369,6 +1367,8 @@ en:
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
       reason_for_update: Reason for update
+      remove_end: Remove end
+      remove_start: Remove start
       seat_tube_length: Seat tube length
       state: State
       street: Street
