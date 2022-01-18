@@ -972,6 +972,10 @@ en:
         stolen: stolen
         unregistered: unregistered
         with_owner: with owner
+  bike_versions:
+    index:
+      primary_colors: Primary colors
+      search_bike_descriptions: Search bike descriptions
   bikes:
     bike:
       hidden_because_status: because %{bike_type} is %{status}
@@ -4246,10 +4250,6 @@ en:
         used to join the group?
       whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
         to a bike
-  bike_versions:
-    index:
-      search_bike_descriptions: Search bike descriptions
-      primary_colors: Primary colors
   organizations:
     embed:
       add_a_color: Add a color
