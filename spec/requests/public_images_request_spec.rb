@@ -84,6 +84,7 @@ RSpec.describe PublicImagesController, type: :request do
             expect(AfterBikeSaveWorker.jobs.count).to eq 0
             expect(bike_version.reload.updated_at).to be_within(1).of Time.current
             expect(bike_version.public_images.first.name).to eq "cool name"
+            expect(bike_version.public_images.first.is_private).to be_falsey
           end
         end
       end

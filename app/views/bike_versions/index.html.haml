@@ -1,1 +1,55 @@
-All the Bike Versions!
+= javascript_pack_tag "bikes_search"
+
+.container
+  .row.first-row
+    .col-md-12
+      %h1
+        Search for bike versions
+
+  .row
+    .col-md-12
+      = form_tag bike_versions_path, id: 'bikes_search_form', class: 'bikes-search-form', enforce_utf8: false, method: :get do
+        .query-field-wrap.nojs
+          = hidden_field_tag :locale, params[:locale] if params[:locale].present?
+          - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
+          = select_tag :query_items, options_for_select(opt_vals, selected: opt_vals.map(&:last)), placeholder: t(".search_bike_descriptions"), title: t(".search_bike_descriptions"), class: 'form-control query-field', multiple: true
+          = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), title: t(".search_bike_descriptions"), class: 'form-control query-field'
+        .search-button-wrap
+          = button_tag(type: "submit", class: 'searchit btn btn-primary') do
+            :plain
+              <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+
+  .row
+    .col-md-12
+      - if @bike_versions.present?
+        %ul.bike-boxes
+          - @bike_versions.each do |bike_version|
+            %li.bike-box-item
+              %a.bike-list-image{ href: bike_version_path(bike_version), class: ('hover-expand' if bike_version.thumb_path) }
+                = bike_thumb_image(bike_version)
+              .bike-information
+                %h5.title-link
+                  %a{ href: bike_version_path(bike_version) }
+                    %strong
+                      = bike_version.type unless bike_version.type == 'bike'
+                      = [bike_version.year, bike_version.mnfg_name].reject(&:blank?).join(' ')
+                    = bike_version.frame_model.to_s
+                %ul.attr-list
+                  = attr_list_item(bike_version.frame_colors.to_sentence, t(".primary_colors"))
+        .row
+          .col-md-4.mt-4.offset-md-2
+            .ad-block.ad-binx.ad468x60
+          .col-md-8.col-lg-4.mt-4
+            .paginate-container.paginate-container-bottom
+              = paginate @bike_versions
+        .row
+          .col-md-8.mt-4.offset-md-2
+            = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}
+      - else
+        %h3.no-exact-results
+          No bike versions matched
+
+
+:javascript
+  window.interpreted_params = #{@interpreted_params.to_json};
+  window.bike_placeholder_image = "#{bike_placeholder_image_path}";

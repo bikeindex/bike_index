@@ -100,6 +100,11 @@ class BikeVersion < ApplicationRecord
     start_at.present?
   end
 
+  # Prevent returning ip address, rather than the TLD URL
+  def html_url
+    "#{ENV["BASE_URL"]}/bike_versions/#{id}"
+  end
+
   def authorized?(passed_user, no_superuser_override: false)
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?

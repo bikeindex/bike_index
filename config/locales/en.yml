@@ -4246,6 +4246,10 @@ en:
         used to join the group?
       whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
         to a bike
+  bike_versions:
+    index:
+      search_bike_descriptions: Search bike descriptions
+      primary_colors: Primary colors
   organizations:
     embed:
       add_a_color: Add a color

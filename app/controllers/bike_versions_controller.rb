@@ -4,6 +4,10 @@ class BikeVersionsController < ApplicationController
   before_action :ensure_user_allowed_to_edit, except: %i[index show new create]
 
   def index
+    @interpreted_params = BikeVersion.searchable_interpreted_params(permitted_search_params)
+
+    @bike_versions = BikeVersion.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10)
+    @selected_query_items_options = BikeVersion.selected_query_items_options(@interpreted_params)
   end
 
   def show
@@ -79,6 +83,11 @@ class BikeVersionsController < ApplicationController
 
   def render_ad
     @ad = true
+  end
+
+  def permitted_search_params
+    params.permit(*BikeVersion.permitted_search_params)
+      .merge(stolenness: "non")
   end
 
   # Sometimes this is bike_version:{}, other times it's bike:{} and I don't know why

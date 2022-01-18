@@ -6,7 +6,7 @@ module HeaderTagHelper
   # Everything below here is an internal method, not private for testing purposes
 
   def header_tag_array
-    return bikes_header_tags if %w[bikes bikeversions].include?(controller_namespace) # eg bikes_edit
+    return bikes_header_tags if %w[bikes bike_versions].include?(controller_namespace) # eg bikes_edit
     return default_header_tag_array unless page_with_custom_header_tags?
     send("#{controller_name}_header_tags")
   end
