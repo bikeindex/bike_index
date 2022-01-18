@@ -1,6 +1,6 @@
 - bike_type ||= image.bike_type || "bike"
 
-%li.col-xs-6.col-sm-4.edit-photo-display-list-item{ id: image.id }
+%li.col-xs-6.col-sm-4.edit-photo-display-list-item{id: image.id}
   .edit-photo-display-wrap
     .kind-select-wrap
       - kind_select_options = {photo_uncategorized: t(".photo_uncategorized", bike_type: bike_type),
@@ -20,9 +20,9 @@
         = t(".missing_image")
     .bottom-photo-edit-wrap
       %label.keep-private
-        %input.is_private_check{ type: 'checkbox', checked: image.is_private }
+        %input.is_private_check{type: 'checkbox', checked: image.is_private}
         = t(".keep_image_private")
       .remove-wrapper
-        %a.photo-remove{ href: public_image_url(image, imageable_type: @bike.class.name, edit_template: 'photos', return_url: edit_bike_url(@bike, edit_template: 'photos')), rel: 'nofollow', 'data-method' => 'delete' }
+        %a.photo-remove{href: public_image_url(image, imageable_type: @bike.class.name, edit_template: 'photos', return_url: edit_bike_url(@bike, edit_template: 'photos')), rel: 'nofollow', 'data-method' => 'delete'}
           = render 'shared/trash_icon'
 
