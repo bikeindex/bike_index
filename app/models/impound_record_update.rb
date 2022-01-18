@@ -17,7 +17,8 @@ class ImpoundRecordUpdate < ApplicationRecord
   belongs_to :user
   belongs_to :location
 
-  validates_presence_of :impound_record_id, :user_id
+  validates_presence_of :impound_record_id
+  validates_presence_of :user_id, if: :user_required?
   validates_presence_of :transfer_email, if: :transferred_to_new_owner?
   validates_presence_of :location_id, if: :move_location?
 
@@ -42,6 +43,10 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def self.resolved_kinds
     kinds - active_kinds
+  end
+
+  def self.no_user_required_kinds
+    %w[expired]
   end
 
   def self.update_only_kinds
@@ -84,6 +89,10 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def unprocessed?
     !processed
+  end
+
+  def user_required?
+    !self.class.no_user_required_kinds.include?(kind)
   end
 
   def kind_humanized

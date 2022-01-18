@@ -33,7 +33,7 @@ class ProcessImpoundUpdatesWorker < ApplicationWorker
           impound_record_id: impound_record.id,
           creator_id: impound_record_update.user_id,
           current: true)
-      elsif impound_record_update.kind == "removed_from_bike_index"
+      elsif %w[removed_from_bike_index expired].include?(impound_record_update.kind)
         impound_record.bike.destroy
       elsif impound_record_update.kind == "retrieved_by_owner" &&
           impound_record.impound_claims.approved.any?

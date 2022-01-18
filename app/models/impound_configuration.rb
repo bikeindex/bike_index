@@ -38,6 +38,15 @@ class ImpoundConfiguration < ApplicationRecord
     organization&.update(updated_at: Time.current)
   end
 
+  def expired_before
+    Time.current - expiration_period_days.days
+  end
+
+  def impound_records_to_expire
+    return ImpoundRecord.none unless expiration_period_days.present?
+    impound_records.active.where("impound_records.created_at < ?", expired_before)
+  end
+
   private
 
   def last_display_id_integer
