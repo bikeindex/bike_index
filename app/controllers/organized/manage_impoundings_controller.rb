@@ -34,7 +34,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:impound_configuration).permit(:display_id_prefix, :public_view, :email)
+      params.require(:impound_configuration).permit(:display_id_prefix, :public_view, :email, :expiration_period_days)
     end
   end
 end

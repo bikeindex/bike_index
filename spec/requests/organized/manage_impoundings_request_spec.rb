@@ -62,7 +62,8 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
           display_id_prefix: "xXx3",
           public_view: true,
           display_id_next_integer: 324,
-          email: "impounding@organization.com"
+          email: "impounding@organization.com",
+          expiration_period_days: 333,
         }
       end
       it "updates" do
@@ -77,10 +78,11 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
         # TODO: this should be updateable for organizations in the future. But skipping for now,
         # to be able to enable, we need to add validations that check that the display_id_next_integer
         expect(impound_configuration.display_id_next_integer).to eq nil
+        expect(impound_configuration.expiration_period_days).to eq 333
       end
       context "other update" do
-        let(:impound_configuration) { FactoryBot.create(:impound_configuration, public_view: true, email: "something@stuff.com") }
-        let(:update) { {public_view: "0", display_id_prefix: "1", email: " "} }
+        let(:impound_configuration) { FactoryBot.create(:impound_configuration, public_view: true, email: "something@stuff.com", expiration_period_days: 12) }
+        let(:update) { {public_view: "0", display_id_prefix: "1", email: " ", impound_configuration: nil, expiration_period_days: 0} }
         it "updates" do
           patch base_url, params: {
             organization_id: current_organization.to_param,
@@ -93,6 +95,7 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
           expect(impound_configuration.display_id_prefix).to eq "1"
           expect(impound_configuration.public_view).to be_falsey
           expect(impound_configuration.email).to eq nil
+          expect(impound_configuration.expiration_period_days).to eq nil
         end
       end
     end

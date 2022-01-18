@@ -1384,7 +1384,8 @@ CREATE TABLE public.impound_configurations (
     display_id_prefix character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    email character varying
+    email character varying,
+    expiration_period_days integer
 );
 
 
@@ -6093,6 +6094,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220102160149'),
 ('20220107041406'),
 ('20220113194000'),
-('20220113194041');
+('20220113194041'),
+('20220118221319');
 
 
