@@ -32,13 +32,9 @@ class BikeVersionsController < ApplicationController
     if permitted_params.key?(:start_at)
       @bike_version.start_at = if ParamsNormalizer.boolean(permitted_params[:start_at_shown])
         TimeParser.parse(permitted_params[:start_at], permitted_params[:timezone])
-      else
-        nil
       end
       @bike_version.end_at = if ParamsNormalizer.boolean(permitted_params[:end_at_shown])
         TimeParser.parse(permitted_params[:end_at], permitted_params[:timezone])
-      else
-        nil
       end
     end
     if @bike_version.update(permitted_params.except(:start_at, :end_at))
@@ -90,8 +86,7 @@ class BikeVersionsController < ApplicationController
       .merge(stolenness: "non")
   end
 
-  # Sometimes this is bike_version:{}, other times it's bike:{} and I don't know why
-  # I'm not super worried about it, so ignoring
+  # Sometimes this is bike_version:[], other times it's bike:[], I'm not super worried about it, so ignoring
   def permitted_params
     if params[:bike_version].present?
       params.require(:bike_version)

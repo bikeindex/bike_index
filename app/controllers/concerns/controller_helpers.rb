@@ -200,7 +200,10 @@ module ControllerHelpers
   end
 
   def controller_namespace
-    @controller_namespace ||= self.class.parent.name != "Object" ? self.class.parent.name.underscore.downcase : nil
+    return @controller_namespace if defined?(@controller_namespace)
+    @controller_namespace = if self.class.parent.name != "Object"
+      self.class.parent.name.underscore.downcase
+    end
   end
 
   # This is overridden in FeedbacksController and InfoController
