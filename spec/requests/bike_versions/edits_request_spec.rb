@@ -18,6 +18,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
     get base_url
     expect(response.code).to eq "200"
     expect(response).to render_template("bikes_edit/bike_details")
+    expect(assigns(:page_id)).to eq "bike_versions_edits_show"
     bike_version.update(visibility: "user_hidden")
     get base_url
     expect(response.code).to eq "200"

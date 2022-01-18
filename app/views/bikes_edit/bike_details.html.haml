@@ -26,15 +26,15 @@
                   %a#add-start-at.mt-1.toggle-version-date.optional-form-block{class: ("currently-hidden" if show_start_at), data: {target: "#start-at", toggle: "#rm-start-at"}}
                     %span.context-display-help
                       +
-                    Add start
-                  #start-at.hidden-other{ class: (show_start_at ? "unhidden" : "") }
+                    = t(".add_start")
+                  #start-at.hidden-other.mb-0{ class: (show_start_at ? "unhidden" : "") }
                     - @bike.start_at = TimeParser.round(@bike.start_at || Time.current)
                     = f.datetime_local_field :start_at, max: Time.current + 1.day, step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.start_at, format: :convert_time)
                 .right-input-help
                   %a#rm-start-at.toggle-version-date.optional-form-block{class: (show_start_at ? "" : "currently-hidden"), data: {target: "#start-at", toggle: "#add-start-at", action: "rm-block"}}
                     %span.context-display-help
                       &ndash;
-                    Remove start
+                    = t(".remove_start")
               .form-group.row
                 - show_end_at = @bike.end_at.present?
                 = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
@@ -44,15 +44,15 @@
                   %a#add-end-at.mt-1.toggle-version-date.optional-form-block{class: ("currently-hidden" if show_end_at), data: {target: "#end-at", toggle: "#rm-end-at"}}
                     %span.context-display-help
                       +
-                    Add end
-                  #end-at.hidden-other{ class: (show_end_at ? "unhidden" : "") }
+                    = t(".add_end")
+                  #end-at.hidden-other.mb-0{ class: (show_end_at ? "unhidden" : "") }
                     - @bike.end_at = TimeParser.round(@bike.end_at || Time.current)
                     = f.datetime_local_field :end_at, max: Time.current + 1.day, step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.end_at, format: :convert_time)
                 .right-input-help
                   %a#rm-end-at.toggle-version-date.optional-form-block{class: (show_end_at ? "" : "currently-hidden"), data: {target: "#end-at", toggle: "#add-end-at", action: "rm-block"}}
                     %span.context-display-help
                       &ndash;
-                    Remove end
+                    = t(".remove_end")
 
           .related-fields
             .form-group.row

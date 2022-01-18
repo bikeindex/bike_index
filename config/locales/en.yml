@@ -1356,6 +1356,10 @@ en:
       city: City
       existing_stickers: Existing stickers
       frame_size: Frame size
+      add_start: Add version start date
+      remove_start: Remove start
+      add_end: Add version end date
+      remove_end: Remove end
       general_description: General description
       made_without_serial: Made without serial
       main_frame_material: Main frame material

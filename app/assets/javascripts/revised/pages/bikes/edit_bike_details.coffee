@@ -122,7 +122,5 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
       $('#bike_version_start_at_shown').val("#{start_at}")
       end_at = $("#end-at").hasClass("unhidden")
       $('#bike_version_end_at_shown').val("#{end_at}")
-      console.log(!start_at)
-      console.log(!end_at)
     ), 1000
 

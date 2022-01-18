@@ -33,6 +33,7 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template("edit")
         expect(flash).to_not be_present
+        expect(assigns(:page_id)).to eq "admin_bikes_edit"
       end
     end
     context "with recovery" do

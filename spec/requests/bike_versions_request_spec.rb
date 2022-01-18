@@ -7,9 +7,11 @@ RSpec.describe BikeVersions::EditsController, type: :request do
 
   describe "index" do
     it "renders" do
+      expect(bike_version).to be_present
       get base_url
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
+      expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
     end
   end
 

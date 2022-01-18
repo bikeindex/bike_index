@@ -51,8 +51,8 @@ class BikeIndex.Init extends BikeIndex
       bikes_create: BikeIndex.BikesNew
       bikes_edits_show: BikeIndex.BikesEdit
       bikes_update: BikeIndex.BikesEdit
-      bikeversions_edits_show: BikeIndex.BikesEdit
-      bikeversions_update: BikeIndex.BikesEdit
+      bike_versions_edits_show: BikeIndex.BikesEdit
+      bike_versions_update: BikeIndex.BikesEdit
       bikes_show: BikeIndex.BikesShow
       bike_versions_show: BikeIndex.BikesShow
       bikes_index: BikeIndex.BikesIndex
