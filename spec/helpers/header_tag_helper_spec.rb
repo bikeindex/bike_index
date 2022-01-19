@@ -342,7 +342,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
           let!(:impound_record) { FactoryBot.create(:impound_record, :in_nyc, bike: bike) }
           let(:target_page_description) do
             "#{@bike.primary_frame_color.name} #{title_string}, serial: Hidden. Cool description. " \
-            "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007"
+            "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007, US"
           end
           it "returns expected things" do
             expect(bike.reload.current_impound_record.address).to eq "New York, NY 10007"
