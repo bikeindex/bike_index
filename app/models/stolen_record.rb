@@ -170,28 +170,12 @@ class StolenRecord < ApplicationRecord
     false
   end
 
-  def address(skip_default_country: false, force_show_address: false)
+  def address(force_show_address: false, country: [:iso, :optional])
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
-      country: [(:skip_default if skip_default_country)]
+      country: country
     ).presence
-  end
-
-  # The stolen bike's general location (city and state / city and country if non-US)
-  # Include all available components (city, state, country) unconditionally if
-  # `include_all` is passed.
-  def address_location(include_all: false)
-    city_and_state =
-      [city&.titleize, state&.abbreviation&.upcase].reject(&:blank?).join(", ")
-
-    if include_all.present?
-      [city_and_state, country&.iso].reject(&:blank?).join(" - ")
-    elsif state.present?
-      city_and_state
-    elsif country.present?
-      [city&.titleize, country&.iso].reject(&:blank?).join(" - ")
-    end
   end
 
   def set_calculated_attributes

@@ -833,6 +833,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.status).to eq "status_impounded"
         expect(bike.status_humanized).to eq "found"
         expect(bike.status_humanized_translated).to eq "found"
+        expect(bike.current_record&.id).to eq impound_record.id
         expect(bike.authorized?(user)).to be_truthy
         expect(bike.authorized?(superuser)).to be_truthy
       end
@@ -1358,6 +1359,8 @@ RSpec.describe Bike, type: :model do
         bike = stolen_record.bike
         bike.update(description: "I love my bike")
         expect(bike.reload.all_description).to eq("I love my bike some theft description")
+        expect(bike.current_record_date).to eq stolen_record.reload.date_stolen
+        expect(bike.current_record&.id).to eq stolen_record.id
       end
     end
     context "no current_stolen_record" do

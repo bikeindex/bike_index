@@ -537,6 +537,14 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
+  def current_record
+    current_impound_record || current_stolen_record
+  end
+
+  def current_record_date
+    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
+  end
+
   def bike_organization_ids
     bike_organizations.pluck(:organization_id)
   end

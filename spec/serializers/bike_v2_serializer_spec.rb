@@ -42,7 +42,7 @@ RSpec.describe BikeV2Serializer do
       let(:target_stolen) do
         target.merge(year: nil,
           status: "stolen",
-          stolen_location: "New York, NY - US",
+          stolen_location: "New York, NY 10007, US",
           stolen: true,
           stolen_coordinates: [40.71, -74.01], # public (truncated) coordinates
           date_stolen: bike.current_stolen_record.date_stolen.to_i)

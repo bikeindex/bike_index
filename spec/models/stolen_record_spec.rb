@@ -519,53 +519,26 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  describe "#address_location" do
+  describe "#address" do
     context "given include_all" do
       it "returns all available location components" do
         stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
-        expect(stolen_record.address_location(include_all: true)).to eq("New York, NY - US")
+        expect(stolen_record.address).to eq("New York, NY 10007, US")
+        expect(stolen_record.address(country: [:skip_default])).to eq("New York, NY 10007")
         stolen_record.street = ""
         expect(stolen_record.without_location?).to be_truthy
 
         ca = FactoryBot.create(:state, name: "California", abbreviation: "CA")
         stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ca, country: Country.united_states)
-        expect(stolen_record.address_location(include_all: true)).to eq("CA - US")
-      end
-    end
-
-    context "given an domestic location" do
-      it "returns the city and state" do
-        stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
-        expect(stolen_record.address_location).to eq("New York, NY")
-      end
-    end
-
-    context "given an international location" do
-      it "returns the city and state" do
-        stolen_record = FactoryBot.create(:stolen_record, :in_amsterdam, state: nil)
-        expect(stolen_record.address_location).to eq("Amsterdam - NL")
-      end
-    end
-
-    context "given only a country" do
-      it "returns only the country" do
-        stolen_record = FactoryBot.create(:stolen_record, city: nil, state: nil, country: Country.netherlands)
-        expect(stolen_record.address_location).to eq("NL")
-      end
-    end
-
-    context "given only a state" do
-      it "returns only the state" do
-        ny_state = FactoryBot.create(:state, abbreviation: "NY")
-        stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ny_state)
-        expect(stolen_record.address_location).to eq("NY")
+        expect(stolen_record.address).to eq("CA, US")
+        expect(stolen_record.address(country: [:skip_default])).to eq("CA")
       end
     end
 
     context "given only a city" do
       it "returns nil" do
         stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
-        expect(stolen_record.address_location).to eq(nil)
+        expect(stolen_record.address).to eq("New Paltz")
       end
     end
 
