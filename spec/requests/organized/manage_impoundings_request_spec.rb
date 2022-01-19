@@ -63,7 +63,7 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
           public_view: true,
           display_id_next_integer: 324,
           email: "impounding@organization.com",
-          expiration_period_days: 333,
+          expiration_period_days: 333
         }
       end
       it "updates" do
