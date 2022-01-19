@@ -341,6 +341,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.street).to eq "3554 W Shakespeare Ave"
           expect(impound_record.address).to eq "Chicago, IL 60647"
           expect(impound_record.address(force_show_address: true)).to eq "3554 W Shakespeare Ave, Chicago, IL 60647"
+          expect(impound_record.address(force_show_address: true, country: [:skip_default])).to eq "3554 W Shakespeare Ave, Chicago, IL 60647"
           expect(impound_record.latitude).to eq latitude
           expect(impound_record.longitude).to eq longitude
           expect(impound_record.valid?).to be_truthy

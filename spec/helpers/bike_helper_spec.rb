@@ -34,10 +34,21 @@ RSpec.describe BikeHelper, type: :helper do
         expect(bike_title_html(bike)).to eq("<span><strong></strong> escape tags?&lt;/p&gt;</span>")
       end
     end
-    context "html frame_model" do
+    context "quotes" do
       let(:bike) { Bike.new(frame_model: "Bullit 'Love Ride'") }
+      let(:target) { "<span><strong></strong> Bullit &#39;Love Ride&#39;</span>" }
       it "escapes the HTML" do
-        expect(bike_title_html(bike)).to eq("<span><strong></strong> Bullit &#39;Love Ride&#39;</span>")
+        expect(bike_title_html(bike)).to eq target
+        expect(bike_title_html(bike, include_status: true)).to eq target
+      end
+    end
+    context "year and cycle_type and status" do
+      let(:bike) { Bike.new(frame_model: '"Love Ride"', cycle_type: "trailer", year: 2020, status: "status_stolen", mnfg_name: "Bullit") }
+      let(:target_no_span) { "<strong>2020 Bullit</strong> &quot;Love Ride&quot;<em> Bike Trailer</em></span>" }
+      it "escapes the HTML" do
+        expect(bike_title_html(bike)).to eq "<span>#{target_no_span}"
+        expect(bike_title_html(bike, include_status: false)).to eq "<span>#{target_no_span}"
+        expect(bike_title_html(bike, include_status: true)).to eq "<span>#{bike_status_span(bike)} #{target_no_span}"
       end
     end
   end

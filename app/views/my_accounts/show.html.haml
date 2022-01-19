@@ -33,15 +33,18 @@
                       = bike_thumb_image(bike)
                     .bike-information.multi-attr-lists
                       %h5.title-link
-                        = bike_status_span(bike)
-                        %strong
-                          - unless bike.type == 'bike'
-                            = bike.type
-                          = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
-                        #{bike.frame_model}
+                        = link_to bike_title_html(bike, include_status: true), bike_path(bike)
                       %ul.attr-list
                         = attr_list_item(bike.serial_display(current_user), t(".serial"))
                         = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
+                        %li.less-strong
+                          %strong.attr-title #{t(".registered")}:
+                          %span.convertTime= l bike.created_at, format: :convert_time
+                        %li.less-strong
+                          %strong.attr-title #{t(".updated")}:
+                          %span.convertTime= l bike.updated_by_user_fallback, format: :convert_time
+
+                      %ul.attr-list
                         - if bike.bike_stickers.any?
                           - sticker_count = bike.bike_stickers.count
                           %li
@@ -54,21 +57,12 @@
                             - else
                               - bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
                                 %code.sticker-code= bike_sticker.pretty_code
-                        %br
                         - if bike.current_record_date.present?
                           %li
-                            %strong.attr-title= bike.status_humanized.titleize
+                            %strong.attr-title #{bike.status_humanized.titleize}:
                             %span.convertTime= l bike.current_record_date, format: :convert_time
                         - if bike.current_record.present?
                           = attr_list_item(bike.current_record.address(country: [:skip_default]), t(".location"))
-
-                      %ul.attr-list
-                        %li
-                          %strong.attr-title= t(".registered")
-                          %span.convertTime= l bike.created_at, format: :convert_time
-                        %li
-                          %strong.attr-title= t(".updated")
-                          %span.convertTime= l bike.updated_by_user_fallback, format: :convert_time
 
                         %li= link_to t(".edit_bike"), edit_bike_path(bike, edit_template: bike.default_edit_template)
                         - if bike.status_stolen?

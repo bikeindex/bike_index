@@ -19,13 +19,18 @@ module BikeHelper
     end
   end
 
-  # The same thing as title_string - but with the manufacturer bold
-  def bike_title_html(bike)
+  def bike_title_html(bike, include_status: false)
     content_tag(:span) do
-      concat("#{bike.year} ") if bike.year.present?
-      concat(content_tag(:strong, bike.mnfg_name))
+      if include_status && bike_status_span(bike).present?
+        concat(bike_status_span(bike))
+        concat(" ")
+      end
+      year_and_mnfg = [bike.year, bike.mnfg_name].compact.join(" ")
+      concat(content_tag(:strong, year_and_mnfg))
       concat(" #{bike.frame_model_truncated}") if bike.frame_model.present?
-      concat(" #{bike.type}") if bike.type != "bike"
+      if bike.type != "bike"
+        concat(content_tag(:em, " #{bike.type&.titleize}"))
+      end
     end
   end
 end

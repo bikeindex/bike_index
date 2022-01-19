@@ -170,7 +170,7 @@ class StolenRecord < ApplicationRecord
     false
   end
 
-  def address(force_show_address: false, country: [:iso])
+  def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
