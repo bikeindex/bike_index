@@ -2551,6 +2551,7 @@ nl:
           terug hebt!
         your_bike_type_was_marked_recovered: 'Je %{bike_type} is gemarkeerd als hersteld
           op Bike Index: %{bike_url}'
+      subject: Je %{bike_type} is gemarkeerd als hersteld!
     stolen_bike_alert_email:
       html:
         alert_retweeted_by_html: Melding geretweet door %{retweets}
@@ -4689,6 +4690,14 @@ nl:
           deze %{bike_type} die je aan Bike Index hebt gevonden
         were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
           gestolen.
+        bike_register_with_bike_index: Gefeliciteerd met het registreren van uw %{bike_type}
+          bij Bike Index
+        bike_register_with_bike_index_and_org: Gefeliciteerd met het registreren van
+          uw %{bike_type} bij Bike Index en %{org_name}
+        hopefully_you_find_the_bike_html: Hopelijk vindt u de %{bike_type} binnenkort.
+        sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
+          je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
+          te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
       subject: Bevestig uw %{organization_name} Bike Index-registratie
       text:
         before_locking_check: "- Controleer voordat u vergrendelt of datgene waarnaar
@@ -4720,6 +4729,9 @@ nl:
         claim_the_bike_type_at_this_url: 'Claim de %{bike_type} op deze URL: %{bike_url}'
         recovered_bike_type: hersteld / gevonden %{bike_type}
         stolen_bike_type: gestolen %{bike_type}
+        hopefully_you_find_the_bike_type_soon: Hopelijk vindt u de %{bike_type} binnenkort.
+        sign_up_on_bikeindex_to_claim: Meld u aan op BikeIndex.org om uw %{bike_type}
+          te claimen
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
     organization_invitation:
