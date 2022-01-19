@@ -1,4 +1,10 @@
 #my_accounts_show {
+  .title-link {
+    font-size: 17px;
+    a {
+      color: $body-font-color;
+    }
+  }
   .lock-group {
     @extend .row;
 

@@ -117,9 +117,9 @@ module HeaderTagHelper
       status_prefix = @bike.status_with_owner? ? "" : @bike.status_humanized.titleize
       self.page_title = [status_prefix, @bike.title_string].compact.join(" ")
       special_status_string = if @bike.status_stolen? && @bike.current_stolen_record.present?
-        "#{status_prefix}: #{@bike.current_stolen_record.date_stolen&.strftime("%Y-%m-%d")}, from: #{@bike.current_stolen_record.address}"
+        "#{status_prefix}: #{@bike.current_stolen_record.date_stolen&.strftime("%Y-%m-%d")}, from: #{@bike.current_stolen_record.address(country: [:iso])}"
       elsif @bike.current_impound_record.present?
-        "#{status_prefix}: #{@bike.current_impound_record.impounded_at&.strftime("%Y-%m-%d")}, in: #{@bike.current_impound_record.address}"
+        "#{status_prefix}: #{@bike.current_impound_record.impounded_at&.strftime("%Y-%m-%d")}, in: #{@bike.current_impound_record.address(country: [:iso, :optional])}"
       end
       self.page_description = [
         "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_display}.",

@@ -34,7 +34,7 @@
             %li
               %strong
                 = @bike.status_impounded? ? t(".found") : t(".stolen_from")
-              = stolen_record.address(skip_default_country: true)
+              = stolen_record.address(country: [:skip_default])
             %li
               %strong
                 = t(".stolen_at")
