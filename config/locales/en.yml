@@ -4143,14 +4143,10 @@ en:
       add_a_bike: Add a bike
       add_a_lock: Add a lock
       add_a_photo: Add a photo
-      registered: Registered
-      updated: Updated
       add_it_now: Add it now!
       bike_sticker: Bike Sticker
       bikes: bikes
       combination: Combination
-      date_found: Date found
-      date_stolen: Date stolen
       edit: Edit
       edit_bike: Edit Bike
       generally_connect_to_org: >-
@@ -4167,6 +4163,7 @@ en:
       next: Next steps
       primary_colors: Primary colors
       register_new_items: Register new items
+      registered: Registered
       serial: Serial
       sorry_your_bike_was_stolen: >-
         We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
@@ -4176,6 +4173,7 @@ en:
         to the Index.
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
       update_your_profile: Update your profile
+      updated: Updated
       user_bikes: "%{current_user_name} bikes"
       user_hidden: Hidden from other users
       want_to_sell_your_bikes: Want to sell one of your registered bikes?
