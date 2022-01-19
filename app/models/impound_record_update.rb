@@ -8,7 +8,8 @@ class ImpoundRecordUpdate < ApplicationRecord
     transferred_to_new_owner: 4,
     note: 5,
     claim_approved: 6,
-    claim_denied: 7
+    claim_denied: 7,
+    expired: 8
   }.freeze
 
   belongs_to :impound_record
@@ -16,7 +17,8 @@ class ImpoundRecordUpdate < ApplicationRecord
   belongs_to :user
   belongs_to :location
 
-  validates_presence_of :impound_record_id, :user_id
+  validates_presence_of :impound_record_id
+  validates_presence_of :user_id, if: :user_required?
   validates_presence_of :transfer_email, if: :transferred_to_new_owner?
   validates_presence_of :location_id, if: :move_location?
 
@@ -43,6 +45,10 @@ class ImpoundRecordUpdate < ApplicationRecord
     kinds - active_kinds
   end
 
+  def self.no_user_required_kinds
+    %w[expired]
+  end
+
   def self.update_only_kinds
     %w[move_location note claim_approved claim_denied]
   end
@@ -56,7 +62,8 @@ class ImpoundRecordUpdate < ApplicationRecord
       removed_from_bike_index: "Removed from Bike Index",
       transferred_to_new_owner: "Transferred to new owner",
       claim_approved: "Claim approved",
-      claim_denied: "Claim denied"
+      claim_denied: "Claim denied",
+      expired: "Removed after expiration period"
     }
   end
 
@@ -69,7 +76,8 @@ class ImpoundRecordUpdate < ApplicationRecord
       removed_from_bike_index: "Trashed",
       transferred_to_new_owner: "Transferred",
       claim_approved: "Claim approved",
-      claim_denied: "Claim denied"
+      claim_denied: "Claim denied",
+      expired: "Expired"
     }
   end
 
@@ -83,6 +91,10 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def unprocessed?
     !processed
+  end
+
+  def user_required?
+    !self.class.no_user_required_kinds.include?(kind)
   end
 
   def kind_humanized

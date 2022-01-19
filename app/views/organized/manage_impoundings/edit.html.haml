@@ -61,6 +61,13 @@
             %li
               %code=prefix
 
+  .form-group.row.small-line-height
+    = f.label :expiration_period_days, "Expiration in days", class: "org-form-label mt-md-2"
+    .col-sm-4
+      = f.number_field :expiration_period_days, step: 1, min: 0, class: "form-control"
+      %span.below-input-help
+        If your organization automatically removes or auctions bikes after a certain time period, enter the period here
+
   .form-group.row.mt-4.small-line-height
     .form-submit-button
       = f.submit t(".save"), class: "btn btn-success btn-lg"

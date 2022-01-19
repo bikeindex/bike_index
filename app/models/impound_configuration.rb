@@ -8,6 +8,12 @@ class ImpoundConfiguration < ApplicationRecord
 
   after_commit :update_organization
 
+  scope :expiration, -> { where.not(expiration_period_days: nil) }
+
+  def expiration?
+    expiration_period_days.present?
+  end
+
   # May do something different in the future
   def previous_prefixes
     organization.impound_records.distinct.pluck(:display_id_prefix).reject(&:blank?)
@@ -27,6 +33,7 @@ class ImpoundConfiguration < ApplicationRecord
   def set_calculated_attributes
     self.display_id_prefix = nil if display_id_prefix.blank?
     self.email = nil if email.blank?
+    self.expiration_period_days = nil unless expiration_period_days.present? && expiration_period_days > 0
     unless bulk_import_view
       self.bulk_import_view = false # should set based off whether there are any bulk imports, and not turn off once on
     end
@@ -35,6 +42,15 @@ class ImpoundConfiguration < ApplicationRecord
   # Bump organization to update enabled slugs
   def update_organization
     organization&.update(updated_at: Time.current)
+  end
+
+  def expired_before
+    Time.current - expiration_period_days.days
+  end
+
+  def impound_records_to_expire
+    return ImpoundRecord.none unless expiration?
+    impound_records.active.where("impound_records.created_at < ?", expired_before)
   end
 
   private

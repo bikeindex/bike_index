@@ -49,7 +49,11 @@ module Organized
     end
 
     def available_statuses
-      %w[current resolved all] + (ImpoundRecord.statuses - ["current"]) # current ordered the way we want to display
+      # current ordered the way we want to display
+      return @available_statuses if defined?(@available_statuses)
+      available_statuses = %w[current resolved all] + (ImpoundRecord.statuses - ["current"])
+      available_statuses -= ["expired"] unless current_organization.fetch_impound_configuration.expiration?
+      @available_statuses = available_statuses
     end
 
     def bike_search_params_present?

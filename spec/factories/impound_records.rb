@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :impound_record do
-    bike { FactoryBot.create(:bike) }
+    bike { FactoryBot.create(:bike, created_at: created_at) }
     user { FactoryBot.create(:user) }
 
     trait :with_organization do

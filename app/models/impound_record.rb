@@ -170,7 +170,7 @@ class ImpoundRecord < ApplicationRecord
 
   def update_kinds
     return ["note"] if resolved?
-    u_kinds = ImpoundRecordUpdate.kinds
+    u_kinds = ImpoundRecordUpdate.kinds - ["expired"]
     u_kinds -= %w[move_location] unless organization&.enabled?("impound_bikes_locations")
     if impound_claims.approved.any? || impound_claims.active.none?
       u_kinds -= %w[claim_approved claim_denied]
@@ -183,7 +183,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_multi_kinds
-    u_kinds = update_kinds - ["current"]
+    u_kinds = update_kinds - %w[current expired]
     return u_kinds if resolved? || impound_claims.submitted.active.none?
     # If there are approved claims, you can have the bike retrieved_by_owner, but can't approve other claims
     u_kinds - if impound_claims.approved.any?
