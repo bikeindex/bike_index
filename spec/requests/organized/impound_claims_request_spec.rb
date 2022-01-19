@@ -96,7 +96,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(impound_record.impound_record_updates.count).to eq 0
         expect(impound_record.status).to eq "current"
         expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
-        expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location])
+        expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location expired])
         expect {
           patch "#{base_url}/#{impound_claim.to_param}", params: {
             submit: "Approve",
@@ -107,7 +107,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
         expect(impound_record.status).to eq "current"
-        expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied])
+        expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied expired])
         expect(impound_record.impound_record_updates.count).to eq 1
         impound_record_update = impound_record.impound_record_updates.last
         expect(impound_record_update.user&.id).to eq current_user.id
@@ -133,7 +133,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           expect(impound_record.impound_record_updates.count).to eq 0
           expect(impound_record.status).to eq "current"
           expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
-          expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location])
+          expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location expired])
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
@@ -155,7 +155,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           expect(assigns(:impound_claim)).to eq impound_claim
           impound_record.reload
           expect(impound_record.status).to eq "current"
-          expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied])
+          expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied expired])
           expect(impound_record.impound_record_updates.count).to eq 1
           impound_record_update = impound_record.impound_record_updates.last
           expect(impound_record_update.user&.id).to eq current_user.id

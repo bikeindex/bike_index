@@ -371,10 +371,11 @@ RSpec.describe ImpoundRecord, type: :model do
 
   describe "set_calculated_display_id" do
     let(:impound_record) { ImpoundRecord.new(organization: organization) }
+    let(:update_multi_kinds) { %w[retrieved_by_owner removed_from_bike_index transferred_to_new_owner note] }
     it "is 1" do
       expect(impound_record.send("set_calculated_display_id")).to eq "1"
-      expect(impound_record.update_kinds).to eq %w[current retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
-      expect(impound_record.update_multi_kinds).to eq %w[retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
+      expect(impound_record.update_kinds).to eq(["current"] + update_multi_kinds)
+      expect(impound_record.update_multi_kinds).to eq update_multi_kinds
     end
     context "existing impound_record" do
       let!(:impound_record_existing) { FactoryBot.create(:impound_record_with_organization, organization: organization, display_id_prefix: "asdfasdf", display_id_integer: 2222) }
@@ -392,9 +393,8 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record2.display_id).to eq "1"
         # The og record updates!
         expect(impound_record.send("set_calculated_display_id")).to eq "2"
-        expect(impound_configuration.statuses).to eq ImpoundRecordUpdate.kinds
-        expect(impound_record.update_kinds).to eq %w[current retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
-        expect(impound_record.update_multi_kinds).to eq %w[retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
+        expect(impound_record.update_kinds).to eq(["current"] + update_multi_kinds)
+        expect(impound_record.update_multi_kinds).to eq update_multi_kinds
       end
     end
   end
