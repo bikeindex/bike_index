@@ -2543,7 +2543,7 @@ nl:
           terug hebt!
         your_bike_type_was_marked_recovered_on_bik: 'Je %{bike_type} is gemarkeerd
           als hersteld op Bike Index:'
-      subject: Je %{biketype} is gemarkeerd als hersteld!
+      subject: Je %{bike_type} is gemarkeerd als hersteld!
       text:
         if_you_didnt_recover_your_bike_or_marked_: Als je je fiets niet hebt hersteld
           of hebt gemarkeerd dat deze per ongeluk is hersteld, beantwoord je deze
@@ -4653,16 +4653,16 @@ nl:
           en zijn afhankelijk van donaties om te opereren
         before_locking_check: Controleer voordat u vergrendelt, dat wat u vergrendelt,
           niet eenvoudig kan worden verwijderd.
-        bike_register_with_bike_index: Gefeliciteerd met het registreren van uw %{biketype}
+        bike_register_with_bike_index: Gefeliciteerd met het registreren van uw %{bike_type}
           bij Bike Index
         bike_register_with_bike_index_and_org: Gefeliciteerd met het registreren van
-          uw %{biketype} bij Bike Index en %{org_name}
+          uw %{bike_type} bij Bike Index en %{org_name}
         cable_locks_should_never_be_used: Kabelsloten mogen nooit worden gebruikt
           als primair middel om een fiets in een stad te vergrendelen.
         correctly_locking_a_bike: Een fiets correct vergrendelen
         donating: doneren
         give_us_a_heads_up: Geef ons een waarschuwing
-        hopefully_you_find_the_bike_html: Hopelijk vindt u de %{biketype} binnenkort.
+        hopefully_you_find_the_bike_html: Hopelijk vindt u de %{bike_type} binnenkort.
         hopefully_you_find_the_owner_html: Hopelijk vind je snel de eigenaar. %{edit_bike_link}
           wanneer u dat doet!
         mark_recovered_link_html: "%{mark_recovered_link} wanneer u dat doet!"
@@ -4682,7 +4682,7 @@ nl:
         secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
           met twee U-sloten, of één U-slot en één zware kabel.
         sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
-          je %{biketype} te claimen en te bewerken, foto's te uploaden en ervoor te
+          je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor te
           zorgen dat je nooit je vertrouwde ros uit het oog verliest!
         use_a_ulock: Gebruik een U-Lock.
         welcome_to_bike_index: Welkom bij Bike Index
@@ -4722,14 +4722,14 @@ nl:
         read_more_here: 'Lees hier meer: %{protect_your_bike_url}'
         secure_both_wheels: "- Beveilig beide wielen - hetzij met twee U-sloten, hetzij
           één U-slot en één zware kabel."
-        sign_up_on_bikeindex_to_claim: Meld u aan op BikeIndex.org om uw %{biketype}
+        sign_up_on_bikeindex_to_claim: Meld u aan op BikeIndex.org om uw %{bike_type}
           te claimen
         use_a_ulock: "- * Gebruik een U-Lock. * Kabelsloten mogen nooit worden gebruikt
           als primair middel om een fiets in een stad te vergrendelen."
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
         claim_the_bike_type_at_this_url: 'Claim de %{bike_type} op deze URL: %{bike_url}'
-        hopefully_you_find_the_bike_type_soon: Hopelijk vindt u de %{biketype} binnenkort.
+        hopefully_you_find_the_bike_type_soon: Hopelijk vindt u de %{bike_type} binnenkort.
         recovered_bike_type: hersteld / gevonden %{bike_type}
         stolen_bike_type: gestolen %{bike_type}
     finished_stolen_registration:
