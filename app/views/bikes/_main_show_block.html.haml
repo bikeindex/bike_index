@@ -92,7 +92,7 @@
           = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
         .col-md-4
           %ul.attr-list.separate-lines
-            = attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
+            = attr_list_item(@stolen_record.address(country: [:skip_default]), t(".location"))
             = attr_list_item(@stolen_record.locking_description, t(".locking_description"))
             = attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
             %li

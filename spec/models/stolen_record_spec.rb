@@ -524,6 +524,8 @@ RSpec.describe StolenRecord, type: :model do
       it "returns all available location components" do
         stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
         expect(stolen_record.address_location(include_all: true)).to eq("New York, NY - US")
+        expect(stolen_record.address).to eq("New York, NY 10007, US")
+        expect(stolen_record.address(country: [:skip_default])).to eq("New York, NY 10007")
         stolen_record.street = ""
         expect(stolen_record.without_location?).to be_truthy
 

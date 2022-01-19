@@ -220,11 +220,11 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
-  def address(force_show_address: false)
+  def address(force_show_address: false, country: [:skip_default, :iso])
     Geocodeable.address(
       self,
       street: (force_show_address || show_address),
-      country: %i[skip_default optional]
+      country: county
     ).presence
   end
 
