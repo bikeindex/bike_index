@@ -101,7 +101,7 @@
               - kinds_for_select = ImpoundRecordUpdate.kinds_humanized
               -# Never include claim_approved or denied, even if they're valid update kinds - they have to be done through impound_claims
               -# Also - never display "current" because it can't be updated that way
-              - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied, :current)
+              - kinds_for_select = kinds_for_select.except(:claim_approved, :claim_denied, :current, :expired)
               - @impound_record_update.kind ||= "retrieved_by_owner"
               #impoundRecordUpdateForm
                 .row

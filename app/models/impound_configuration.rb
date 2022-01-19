@@ -8,6 +8,12 @@ class ImpoundConfiguration < ApplicationRecord
 
   after_commit :update_organization
 
+  scope :expiration, -> { where.not(expiration_period_days: nil) }
+
+  def expiration?
+    expiration_period_days.present?
+  end
+
   # May do something different in the future
   def previous_prefixes
     organization.impound_records.distinct.pluck(:display_id_prefix).reject(&:blank?)
@@ -43,7 +49,7 @@ class ImpoundConfiguration < ApplicationRecord
   end
 
   def impound_records_to_expire
-    return ImpoundRecord.none unless expiration_period_days.present?
+    return ImpoundRecord.none unless expiration?
     impound_records.active.where("impound_records.created_at < ?", expired_before)
   end
 

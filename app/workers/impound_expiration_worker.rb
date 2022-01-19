@@ -6,7 +6,7 @@ class ImpoundExpirationWorker < ScheduledWorker
   end
 
   def perform
-    ImpoundConfiguration.where.not(expiration_period_days: nil).each do |impound_configuration|
+    ImpoundConfiguration.expiration.each do |impound_configuration|
       impound_configuration.impound_records_to_expire.each { |i| i.impound_record_updates.create(kind: "expired") }
     end
   end

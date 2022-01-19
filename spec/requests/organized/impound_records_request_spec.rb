@@ -10,11 +10,13 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111) }
 
   describe "index" do
+    let(:available_statuses) { %w[current resolved all retrieved_by_owner removed_from_bike_index transferred_to_new_owner] }
     it "renders" do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:impound_records).count).to eq 0
+      expect(assigns(:available_statuses)).to eq available_statuses
     end
     context "multiple impound_records" do
       let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }
@@ -22,6 +24,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, :with_organization, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
       let!(:impound_record_unorganized) { FactoryBot.create(:impound_record) }
       it "finds by bike searches and also by impound scoping" do
+        current_organization.fetch_impound_configuration
+        current_organization.reload.impound_configuration.update(expiration_period_days: 55)
         [impound_record2, impound_record_retrieved, impound_record_unorganized].each do |ir|
           ProcessImpoundUpdatesWorker.new.perform(ir.id)
         end
@@ -36,6 +40,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(response).to render_template(:index)
         expect(assigns(:search_status)).to eq "current"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
+        expect(assigns(:available_statuses)).to eq(available_statuses + ["expired"])
 
         get "#{base_url}?search_email=&serial=yar1s"
         expect(response.status).to eq(200)

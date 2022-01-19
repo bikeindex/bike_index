@@ -55,7 +55,7 @@ RSpec.describe ImpoundRecord, type: :model do
       let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization, display_id: "v8xcv833") }
       let!(:user2) { FactoryBot.create(:organization_member, organization: organization) }
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
-      let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied] }
+      let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied expired] }
       it "updates the record and the user" do
         ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
         bike.reload
@@ -109,7 +109,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.authorized?(organization_member)).to be_truthy
           # Doesn't include move update kind, because there is no location
           expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
-          expect(impound_record.update_multi_kinds).to eq(impound_record.update_kinds - ["current"])
+          expect(impound_record.update_multi_kinds).to eq(impound_record.update_kinds - %w[current expired])
           Sidekiq::Worker.clear_all
           expect {
             impound_record_update.save
@@ -150,7 +150,7 @@ RSpec.describe ImpoundRecord, type: :model do
           it "associates with the approved claim" do
             expect(impound_claim.reload.status).to eq "submitting"
             expect(impound_claim.submitted?).to be_truthy
-            expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location retrieved_by_owner])
+            expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location retrieved_by_owner expired])
             expect(impound_record.update_multi_kinds).to eq valid_multi_update_claim_kinds
             expect(impound_record_update_approved).to be_valid
             impound_claim.reload
@@ -373,11 +373,14 @@ RSpec.describe ImpoundRecord, type: :model do
     let(:impound_record) { ImpoundRecord.new(organization: organization) }
     it "is 1" do
       expect(impound_record.send("set_calculated_display_id")).to eq "1"
+      expect(impound_record.update_kinds).to eq %w[current retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
+      expect(impound_record.update_multi_kinds).to eq %w[retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
     end
     context "existing impound_record" do
       let!(:impound_record_existing) { FactoryBot.create(:impound_record_with_organization, organization: organization, display_id_prefix: "asdfasdf", display_id_integer: 2222) }
       it "is 1" do
-        expect(impound_record_existing.display_id_integer).to eq 2222
+        impound_configuration.update(expiration_period_days: 222)
+        expect(impound_record_existing.reload.display_id_integer).to eq 2222
         expect(impound_record_existing.display_id_prefix).to eq "asdfasdf"
         expect(impound_record_existing.display_id).to eq "asdfasdf2222"
         expect(impound_configuration.display_id_prefix).to eq nil
@@ -389,6 +392,9 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record2.display_id).to eq "1"
         # The og record updates!
         expect(impound_record.send("set_calculated_display_id")).to eq "2"
+        expect(impound_configuration.statuses).to eq ImpoundRecordUpdate.kinds
+        expect(impound_record.update_kinds).to eq %w[current retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
+        expect(impound_record.update_multi_kinds).to eq %w[retrieved_by_owner removed_from_bike_index transferred_to_new_owner note]
       end
     end
   end
