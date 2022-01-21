@@ -72,6 +72,7 @@ class Organization < ApplicationRecord
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_with OrganizationNameValidator
+  validates_uniqueness_of :manufacturer_id, allow_blank: true
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }

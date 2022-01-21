@@ -170,6 +170,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(organization.lightspeed_register_with_phone).to be_falsey
       end
     end
+    context "update manufacturer_id" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      it "updates" do
+        put "#{base_url}/#{organization.to_param}", params: {organization: {manufacturer_id: manufacturer.id}}
+        expect(organization.reload.manufacturer_id).to eq manufacturer.id
+        put "#{base_url}/#{organization.to_param}", params: {organization: {manufacturer_id: ""}}
+        expect(organization.reload.manufacturer_id).to be_blank
+      end
+    end
     context "update passwordless_user_domain" do
       it "updates (only blocking non-developers in frontend because whateves)" do
         put "#{base_url}/#{organization.to_param}", params: {organization: {passwordless_user_domain: "@bikeindex.org"}}

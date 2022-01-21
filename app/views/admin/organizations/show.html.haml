@@ -37,6 +37,10 @@
             %span.badge.badge-success.ml-2 Trusted credibility
           - elsif CredibilityScorer.organization_suspicious?(@organization)
             %span.badge.badge-warning.ml-2 Suspicious credibility
+          - if @organization.manufacturer_id.present?
+            %br
+            %strong= @organization.manufacturer.name
+            %em Manufacturer official account of
       %tr
         %td
           Map

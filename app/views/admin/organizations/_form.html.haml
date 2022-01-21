@@ -124,6 +124,14 @@
             You can use #{ENV['AUTO_ORG_MEMBER']} if
             there are no members of the organization
 
+    - if @organization.enabled?("official_manufacturer_organization")
+      .form-group.fancy-select.unfancy
+        = f.label :manufacturer
+        = collection_select(:organization, :manufacturer_id, Manufacturer.frame_makers, :id, :name, {}, { required: true, class: "form-control" })
+        %small
+          %strong This organization has <code>Official manufacturer organization</code> enabled.
+          Select a manufacturer to give them manufacturer access.
+
     - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users graduated_notifications] + OrganizationFeature.reg_fields_with_customizable_labels
     - if @organization.any_enabled?(enabled_features_with_admin_forms)
       .card

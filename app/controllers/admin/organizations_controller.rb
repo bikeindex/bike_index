@@ -102,6 +102,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :passwordless_user_domain,
         :graduated_notification_interval_days,
         :lock_show_on_map,
+        :manufacturer_id,
         :name,
         :parent_organization_id,
         :previous_slug,
