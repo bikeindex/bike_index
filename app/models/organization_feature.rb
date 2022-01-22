@@ -40,6 +40,7 @@ class OrganizationFeature < ApplicationRecord
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
+    official_manufacturer
     no_address
     passwordless_users
     regional_bike_counts

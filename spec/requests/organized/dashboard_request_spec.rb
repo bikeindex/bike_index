@@ -49,7 +49,7 @@ RSpec.describe Organized::BaseController, type: :request do
         current_organization.reload
         expect(current_organization.overview_dashboard?).to be_truthy
         get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to render_template(:index)
+        expect(response).to render_template(:child_and_regional)
       end
     end
     context "organization regional parent" do
@@ -66,7 +66,7 @@ RSpec.describe Organized::BaseController, type: :request do
         # ... but it renders if the current_user is superuser
         current_user.update(superuser: true)
         get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to render_template(:index)
+        expect(response).to render_template(:child_and_regional)
       end
     end
     context "organization with claimed_ownerships" do
@@ -80,24 +80,43 @@ RSpec.describe Organized::BaseController, type: :request do
         current_organization.reload
         expect(current_organization.overview_dashboard?).to be_truthy
         get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to render_template(:index)
+        expect(response).to render_template(:child_and_regional)
         expect(assigns(:period)).to eq "year"
         expect(assigns(:bikes_in_organizations).pluck(:id)).to eq([bike.id])
         expect(assigns(:claimed_ownerships).pluck(:id)).to eq([])
 
         get "/o/#{current_organization.to_param}/dashboard?period=custom&start_time=#{Time.current - 2.years}&end_time=#{Time.current - 1.year}"
-        expect(response).to render_template(:index)
+        expect(response).to render_template(:child_and_regional)
         expect(assigns(:period)).to eq "custom"
         expect(assigns(:bikes_in_organizations).pluck(:id)).to eq([bike_claimed.id])
         expect(assigns(:claimed_ownerships).pluck(:id)).to eq([bike_claimed.current_ownership.id])
 
         # 14months - current
         get "/o/#{current_organization.to_param}/dashboard?period=custom&start_time=#{Time.current - 14.months}"
-        expect(response).to render_template(:index)
+        expect(response).to render_template(:child_and_regional)
         expect(assigns(:period)).to eq "custom"
         expect(assigns(:bikes_in_organizations).pluck(:id)).to eq([bike.id])
         expect(assigns(:claimed_ownerships).pluck(:id)).to eq([bike_claimed.current_ownership.id])
         expect(assigns(:end_time)).to be_within(5).of Time.current
+      end
+    end
+    context "manufacturer_id" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:current_organization) { FactoryBot.create(:organization, manufacturer_id: manufacturer.id) }
+      it "redirects" do
+        current_organization.reload
+        expect(current_organization.overview_dashboard?).to be_falsey
+        get "/o/#{current_organization.to_param}/dashboard"
+        expect(response).to redirect_to(organization_bikes_path)
+      end
+      context "with official_manufacturer" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer_id: manufacturer.id, enabled_feature_slugs: ["official_manufacturer"]) }
+        it "renders" do
+          expect(current_organization.overview_dashboard?).to be_truthy
+          expect(current_organization.bike_shop_display_integration_alert?).to be_falsey
+          get "/o/#{current_organization.to_param}/dashboard"
+          expect(response).to render_template(:manufacturer)
+        end
       end
     end
   end

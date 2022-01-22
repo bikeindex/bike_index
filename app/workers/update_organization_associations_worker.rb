@@ -10,6 +10,7 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
       organization.locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }
       organization.reload # Just in case default location has changed
       organization.update(skip_update: true, updated_at: Time.current)
+      add_organization_manufacturers(organization)
 
       if organization.enabled?("impound_bikes_locations")
         # If there is isn't a default impound bikes location and there should be, set one
@@ -49,5 +50,17 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
     # Remove duplicates
     (organization_ids + parent_ids + regional_child_ids + regional_parents.map(&:id))
       .flatten.map(&:to_i).reject { |i| i == 0 }.uniq
+  end
+
+  def add_organization_manufacturers(organization)
+    return unless organization.bike_shop?
+    manufacturer_ids = Organization.with_enabled_feature_slugs("official_manufacturer")
+      .where.not(manufacturer_id: nil).pluck(:manufacturer_id)
+    new_manufacturer_ids = manufacturer_ids - organization.organization_manufacturers.pluck(:manufacturer_id)
+    new_manufacturer_ids.each do |manufacturer_id|
+      next unless organization.bikes.where(manufacturer_id: manufacturer_id).any?
+      OrganizationManufacturer.create(manufacturer_id: manufacturer_id,
+        organization_id: organization.id)
+    end
   end
 end

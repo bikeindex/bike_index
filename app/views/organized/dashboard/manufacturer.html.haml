@@ -1,0 +1,85 @@
+.organized-page-header.mb-4
+  %h1.text-center
+    %em= current_organization.name
+    Dashboard
+
+-# colors = { green: "#178813", red: "#d12310", orange: "#ffc281", blue: "#88a2e0" }
+- org_manufacturer_counts = [{name: "#{current_organization.name} registrations", data: time_range_counts(collection: @manufacturer_bikes, column: "bikes.created_at")}]
+= column_chart org_manufacturer_counts, stacked: true, thousands: ",", defer: true, colors: ["#88a2e0"]
+.mt-4
+-# Stolen records
+- stolen_counts = [{name: "#{current_organization.name} Stolen reports", data: time_range_counts(collection: @stolen_records, column: "bikes.created_at")}]
+= column_chart stolen_counts, stacked: true, thousands: ",", defer: true, colors: ["#c0392b"]
+
+- if current_organization.enabled?("claimed_ownerships")
+  :ruby
+    claimed_ownerships = [
+      # {name: "Registrations sent to new owner", data: time_range_counts(collection: @ownerships_to_new_owner, column: "ownerships.created_at")},
+      {name: "Registrations claimed", data: time_range_counts(collection: @claimed_ownerships, column: "ownerships.claimed_at")}
+    ]
+  .mt-4
+  = column_chart claimed_ownerships, thousands: ",", defer: true, stacked: true, colors: ["#88a2e0", "#178813"]
+
+%div{ style: "margin-top: 50px;" }
+  = render partial: "/shared/period_select"
+
+%h3.mt-4.uncap
+  Registrations
+  = humanized_time_range(@time_range)
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %tbody
+      %tr
+        %td Registered with #{current_organization.name} organization
+        %td= number_with_delimiter(@bikes_in_organization_count)
+      - if current_organization.enabled?("claimed_ownerships")
+        -# %tr
+        -#   %td Registrations sent to new owners
+        -#   %td= number_with_delimiter(@ownerships_to_new_owner.count)
+        %tr
+          %td Registrations claimed by their owners
+          %td= number_with_delimiter(@claimed_ownerships.count)
+      -# TODO: add shops visibility
+      -# %tr
+      -#   %td
+      -#     Registered by shops giving you visibility
+      %tr
+        %td
+          %strong
+            Total
+            %em= current_organization.name
+            registrations
+          %td
+            %strong
+              = number_with_delimiter(@manufacturer_bikes.count)
+      %tr
+        %td
+          Total Stolen
+          %em= current_organization.name
+          bikes
+        %td= number_with_delimiter(@stolen_records.count)
+      %tr
+        %td
+          Total Recovered
+          %em= current_organization.name
+          bikes
+        %td= number_with_delimiter(@recovered_records.count)
+
+  %h3.mt-5.uncap
+    Registrations by organizations granting #{current_organization.name} visibility
+    = humanized_time_range(@time_range)
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead
+        %th Organization
+        %th.small Signed up
+        %th Bikes
+      %tbody
+        - @child_organizations.reorder(:name).each do |organization|
+          %tr
+            %td
+              = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param)
+            %td
+              %small.convertTime= l(organization.created_at, format: :convert_time)
+            %td
+              = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)

@@ -19,6 +19,27 @@ module Organized
         return
       end
 
+      if current_organization.official_manufacturer?
+        render_manufacturer
+      else
+        render_child_and_regional
+      end
+    end
+
+    private
+
+    def render_manufacturer
+      manufacturer_id = current_organization.manufacturer_id
+      @child_organizations = current_organization.organization_view_counts
+      @manufacturer_bikes = Bike.unscoped.where(manufacturer_id: manufacturer_id).where(created_at: @time_range)
+      stolen_records = StolenRecord.unscoped.left_joins(:bike).where(bikes: {manufacturer_id: manufacturer_id})
+        .where(date_stolen: @time_range)
+      @stolen_records = stolen_records.where(current: true)
+      @recovered_records = stolen_records.where(current: false)
+      render "manufacturer"
+    end
+
+    def render_child_and_regional
       @child_organizations = current_organization.child_organizations
       @bikes_in_organizations = Bike.unscoped.current.organization(current_organization.nearby_and_partner_organization_ids).where(created_at: @time_range)
       @bikes_in_organization_count = current_organization.bikes.where(created_at: @time_range).count
@@ -40,9 +61,8 @@ module Organized
         # It's only relevant to organizations that register to themselves first (e.g. Pro's Closet)
         @ownerships_to_new_owner = non_org_ownerships.where(created_at: @time_range)
       end
+      render "child_and_regional"
     end
-
-    private
 
     def set_fallback_period
       @period = "year" unless params[:period].present?

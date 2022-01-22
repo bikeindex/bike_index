@@ -30,6 +30,7 @@ class Organization < ApplicationRecord
 
   belongs_to :parent_organization, class_name: "Organization"
   belongs_to :auto_user, class_name: "User"
+  belongs_to :manufacturer
 
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
@@ -44,6 +45,7 @@ class Organization < ApplicationRecord
   has_many :ownerships
   has_many :created_bikes, through: :ownerships, source: :bike
 
+  has_many :organization_manufacturers
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :mail_snippets
   has_many :parking_notifications
@@ -70,6 +72,7 @@ class Organization < ApplicationRecord
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_with OrganizationNameValidator
+  validates_uniqueness_of :manufacturer_id, allow_blank: true
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
@@ -323,8 +326,12 @@ class Organization < ApplicationRecord
     enabled?("regional_bike_counts")
   end
 
+  def official_manufacturer?
+    enabled?("official_manufacturer")
+  end
+
   def overview_dashboard?
-    regional? || enabled?("claimed_ownerships")
+    regional? || enabled?("claimed_ownerships") || official_manufacturer?
   end
 
   def bike_stickers
@@ -339,6 +346,12 @@ class Organization < ApplicationRecord
 
   def nearby_and_partner_organization_ids
     [id, parent_organization_id].compact + child_ids + nearby_organizations_including_siblings.pluck(:id)
+  end
+
+  def organization_view_counts
+    return Organization.none unless manufacturer_id.present?
+    Organization.left_joins(:organization_manufacturers)
+      .where(organization_manufacturers: {can_view_counts: true, manufacturer_id: manufacturer_id})
   end
 
   def mail_snippet_body(snippet_kind)
@@ -368,7 +381,8 @@ class Organization < ApplicationRecord
   end
 
   def bike_shop_display_integration_alert?
-    bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind)
+    bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind) &&
+      !official_manufacturer?
   end
 
   # Bikes geolocated within `search_radius` miles.

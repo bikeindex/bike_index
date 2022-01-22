@@ -2183,6 +2183,39 @@ ALTER SEQUENCE public.organization_features_id_seq OWNED BY public.organization_
 
 
 --
+-- Name: organization_manufacturers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_manufacturers (
+    id bigint NOT NULL,
+    manufacturer_id bigint,
+    organization_id bigint,
+    can_view_counts boolean DEFAULT false,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_manufacturers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_manufacturers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_manufacturers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organization_manufacturers.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2221,7 +2254,8 @@ CREATE TABLE public.organizations (
     manual_pos_kind integer,
     passwordless_user_domain character varying,
     graduated_notification_interval bigint,
-    lightspeed_register_with_phone boolean DEFAULT false
+    lightspeed_register_with_phone boolean DEFAULT false,
+    manufacturer_id bigint
 );
 
 
@@ -3562,6 +3596,13 @@ ALTER TABLE ONLY public.organization_features ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: organization_manufacturers id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT nextval('public.organization_manufacturers_id_seq'::regclass);
+
+
+--
 -- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4161,6 +4202,14 @@ ALTER TABLE ONLY public.oauth_applications
 
 ALTER TABLE ONLY public.organization_features
     ADD CONSTRAINT organization_features_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_manufacturers organization_manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_manufacturers
+    ADD CONSTRAINT organization_manufacturers_pkey PRIMARY KEY (id);
 
 
 --
@@ -5117,10 +5166,31 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications
 
 
 --
+-- Name: index_organization_manufacturers_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_manufacturers_on_manufacturer_id ON public.organization_manufacturers USING btree (manufacturer_id);
+
+
+--
+-- Name: index_organization_manufacturers_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organization_manufacturers USING btree (organization_id);
+
+
+--
 -- Name: index_organizations_on_location_latitude_and_location_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_organizations_on_location_latitude_and_location_longitude ON public.organizations USING btree (location_latitude, location_longitude);
+
+
+--
+-- Name: index_organizations_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_on_manufacturer_id ON public.organizations USING btree (manufacturer_id);
 
 
 --
@@ -6095,6 +6165,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220107041406'),
 ('20220113194000'),
 ('20220113194041'),
-('20220118221319');
+('20220118221319'),
+('20220121230959');
 
 

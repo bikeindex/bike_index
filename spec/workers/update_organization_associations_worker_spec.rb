@@ -80,4 +80,26 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(user.mailchimp_datum.updated_at).to be > Time.current - 1.minute
     end
   end
+
+  describe "organization_manufacturers" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer: manufacturer, enabled_feature_slugs: ["official_manufacturer"]) }
+    let!(:organization) { FactoryBot.create(:organization, kind: "bike_advocacy") }
+    let!(:organization2) { FactoryBot.create(:organization, kind: "bike_shop") }
+    let!(:bike_shop) { FactoryBot.create(:organization, kind: "bike_shop") }
+    let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, manufacturer: manufacturer) }
+    let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: bike_shop, manufacturer: manufacturer) }
+    it "associates for the manufacturer" do
+      expect(OrganizationManufacturer.count).to eq 0
+      instance.perform(organization.id)
+      instance.perform(organization2.id)
+      instance.perform(bike_shop.id)
+      expect(OrganizationManufacturer.count).to eq 1
+      organization_manufacturer = OrganizationManufacturer.first
+      expect(organization_manufacturer.organization_id).to eq bike_shop.id
+      expect(organization_manufacturer.manufacturer_id).to eq manufacturer.id
+      expect(organization_manufacturer.can_view_counts).to be_falsey
+      expect { instance.perform(bike_shop.id) }.to_not change(OrganizationManufacturer, :count)
+    end
+  end
 end
