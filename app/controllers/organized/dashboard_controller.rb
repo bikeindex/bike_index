@@ -33,14 +33,6 @@ module Organized
       organization_ids = [current_organization.id], @child_organizations.pluck(:id)
       @bikes_in_organizations = Bike.unscoped.where(manufacturer_id: current_organization.manufacturer_id).where(created_at: @time_range)
       @bikes_in_organization_count = current_organization.bikes.where(created_at: @time_range).count
-
-      if current_organization.regional?
-        @bikes_not_in_organizations = current_organization.nearby_bikes.where.not(id: @bikes_in_organizations.pluck(:id)).where(created_at: @time_range)
-
-        @bikes_in_child_organizations_count = Bike.organization(@child_organizations.pluck(:id)).where(created_at: @time_range).count
-        @bikes_in_nearby_organizations_count = Bike.organization(current_organization.regional_ids).where(created_at: @time_range).count
-        @bikes_in_region_not_in_organizations_count = @bikes_not_in_organizations.count
-      end
     end
 
     def enable_child_and_regional
