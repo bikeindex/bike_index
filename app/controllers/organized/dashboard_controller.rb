@@ -31,7 +31,6 @@ module Organized
     def render_manufacturer
       manufacturer_id = current_organization.manufacturer_id
       @child_organizations = current_organization.organization_view_counts
-      organization_ids = [current_organization.id], @child_organizations.pluck(:id)
       @manufacturer_bikes = Bike.unscoped.where(manufacturer_id: manufacturer_id).where(created_at: @time_range)
       stolen_records = StolenRecord.unscoped.left_joins(:bike).where(bikes: {manufacturer_id: manufacturer_id})
         .where(date_stolen: @time_range)
