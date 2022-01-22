@@ -1,0 +1,50 @@
+%h3.mt-4.uncap
+  Registrations
+  = humanized_time_range(@time_range)
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %tbody
+      %tr
+        %td Registered with #{current_organization.name}
+        %td= number_with_delimiter(@bikes_in_organization_count)
+      - if current_organization.enabled?("claimed_ownerships")
+        -# %tr
+        -#   %td Registrations sent to new owners
+        -#   %td= number_with_delimiter(@ownerships_to_new_owner.count)
+        %tr
+          %td Registrations claimed by their owners
+          %td= number_with_delimiter(@claimed_ownerships.count)
+        %tr
+          %td
+            Registered by shops giving you visibility
+          %td= number_with_delimiter(@bikes_in_nearby_organizations_count)
+        %tr
+          %td Not registered with a shop granting you visibility
+          %td= number_with_delimiter(@bikes_in_region_not_in_organizations_count)
+        %tr
+          %td
+            %strong
+              Total registrations
+          %td
+            %strong
+              - total_bikes = @bikes_in_organizations.count(:all) + @bikes_not_in_organizations.count(:all)
+              = number_with_delimiter(total_bikes)
+
+  %h3.mt-5.uncap
+    Registrations by organizations granting visibility
+    = humanized_time_range(@time_range)
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead
+        %th Organization
+        %th.small Signed up
+        %th Bikes
+      %tbody
+        - @child_organizations.reorder(:name).each do |organization|
+          %tr
+            %td
+              = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param)
+            %td
+              %small.convertTime= l(organization.created_at, format: :convert_time)
+            %td
+              = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)

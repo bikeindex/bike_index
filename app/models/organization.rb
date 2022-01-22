@@ -326,8 +326,12 @@ class Organization < ApplicationRecord
     enabled?("regional_bike_counts")
   end
 
+  def official_manufacturer?
+    enabled?("official_manufacturer")
+  end
+
   def overview_dashboard?
-    regional? || enabled?("claimed_ownerships")
+    regional? || enabled?("claimed_ownerships") || official_manufacturer?
   end
 
   def bike_stickers
@@ -377,7 +381,8 @@ class Organization < ApplicationRecord
   end
 
   def bike_shop_display_integration_alert?
-    bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind)
+    bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind) &&
+      !official_manufacturer?
   end
 
   # Bikes geolocated within `search_radius` miles.

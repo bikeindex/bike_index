@@ -54,8 +54,9 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
 
   def add_organization_manufacturers(organization)
     return unless organization.bike_shop?
-    new_manufacturer_ids = Organization.where.not(manufacturer_id: nil).pluck(:manufacturer_id) -
-      organization.organization_manufacturers.pluck(:manufacturer_id)
+    manufacturer_ids = Organization.with_enabled_feature_slugs("official_manufacturer")
+      .where.not(manufacturer_id: nil).pluck(:manufacturer_id)
+    new_manufacturer_ids = manufacturer_ids - organization.organization_manufacturers.pluck(:manufacturer_id)
     new_manufacturer_ids.each do |manufacturer_id|
       next unless organization.bikes.where(manufacturer_id: manufacturer_id).any?
       OrganizationManufacturer.create(manufacturer_id: manufacturer_id,

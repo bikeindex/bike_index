@@ -83,7 +83,7 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
 
   describe "organization_manufacturers" do
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
-    let!(:manufacturer_organization) { FactoryBot.create(:organization, manufacturer: manufacturer) }
+    let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer: manufacturer, enabled_feature_slugs: ["official_manufacturer"]) }
     let!(:organization) { FactoryBot.create(:organization, kind: "bike_advocacy") }
     let!(:organization2) { FactoryBot.create(:organization, kind: "bike_shop") }
     let!(:bike_shop) { FactoryBot.create(:organization, kind: "bike_shop") }

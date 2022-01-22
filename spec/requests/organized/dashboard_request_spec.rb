@@ -100,5 +100,24 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(assigns(:end_time)).to be_within(5).of Time.current
       end
     end
+    context "manufacturer_id" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:organization) { FactoryBot.create(:organization, manufacturer_id: manufacturer.id) }
+      it "redirects" do
+        current_organization.reload
+        expect(current_organization.overview_dashboard?).to be_falsey
+        get "/o/#{current_organization.to_param}/dashboard"
+        expect(response).to redirect_to(organization_bikes_path)
+      end
+      context "with official_manufacturer" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, manufacturer_id: manufacturer.id, enabled_feature_slugs: ["official_manufacturer"]) }
+        it "renders" do
+          current_organization.reload
+          expect(current_organization.overview_dashboard?).to be_falsey
+          get "/o/#{current_organization.to_param}/dashboard"
+          expect(response).to redirect_to(organization_bikes_path)
+        end
+      end
+    end
   end
 end

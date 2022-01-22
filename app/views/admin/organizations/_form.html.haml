@@ -124,9 +124,7 @@
             You can use #{ENV['AUTO_ORG_MEMBER']} if
             there are no members of the organization
 
-    -# NOTE: This is the only place that the feature official_manufacturer_organization
-    -# actually matters. everywhere else just checks that manufacturer_id is present
-    - if @organization.enabled?("official_manufacturer_organization")
+    - if @organization.official_manufacturer?
       .form-group.fancy-select.unfancy
         = f.label :manufacturer
         = collection_select(:organization, :manufacturer_id, Manufacturer.frame_makers, :id, :name, {}, { required: true, class: "form-control" })
