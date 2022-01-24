@@ -91,13 +91,13 @@ module Geocodeable
   def latitude_public
     return nil if latitude.blank?
     return latitude unless defined?(show_address)
-    show_address ? latitude : latitude.round(2)
+    show_address ? latitude : latitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def longitude_public
     return nil if longitude.blank?
     return longitude unless defined?(show_address)
-    show_address ? longitude : longitude.round(2)
+    show_address ? longitude : longitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   # Should the receiving object be geocoded?
