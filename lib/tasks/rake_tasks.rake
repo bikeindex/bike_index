@@ -2,11 +2,6 @@ task run_scheduler: :environment do
   ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
 end
 
-task migrate_occurred_at: :environment do
-  Bike.unscoped.where(status: %w[status_impounded status_stolen]).where(occurred_at: nil)
-    .limit(5000).each { |b| b.update_column :occurred_at, b.calculated_occurred_at }
-end
-
 desc "Reset Soulheart - colors and frame_makers"
 task reset_autocomplete: :environment do
   AutocompleteLoaderWorker.perform_async("reset")
