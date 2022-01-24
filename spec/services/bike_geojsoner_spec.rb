@@ -14,10 +14,10 @@ RSpec.describe BikeGeojsoner do
         {
           type: "Feature",
           properties: {
-            bike_id: bike.id,
-            kind: "theft",
-            occurred_at: date_stolen.to_i,
-            title: bike.title_string,
+            :bike_id => bike.id,
+            :kind => "theft",
+            :occurred_at => date_stolen.to_i,
+            :title => bike.title_string,
             "marker-size" => "small",
             "marker-color" => "#BD1622"
           },
