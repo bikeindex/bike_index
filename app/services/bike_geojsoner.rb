@@ -40,7 +40,7 @@ class BikeGeojsoner
   def self.feature_from_plucked(id, occurred_at, latitude, longitude)
     {
       type: "Feature",
-      properties: {id: bike.id, color: stolen_marker_color(occurred_at)},
+      properties: {id: id, color: stolen_marker_color(occurred_at)},
       geometry: {
         type: "Point",
         coordinates: [

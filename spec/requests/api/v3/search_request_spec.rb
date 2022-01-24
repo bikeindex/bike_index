@@ -28,25 +28,22 @@ RSpec.describe "Search API V3", type: :request do
       {
         type: "Feature",
         properties: {id: bike2.id, color: "#BD1622"},
-        geometry: {type: "Point", coordinates: [40.71,-74.01]}
+        geometry: {type: "Point", coordinates: [-74.01,40.71]}
       }
     end
     context "with per_page" do
       it "returns matching bikes, defaults to stolen" do
         expect(Bike.count).to eq 2
         get "/api/v3/search/geojson?lat=#{default_location[:latitude]}&lng=#{default_location[:longitude]}"
-        pp response.body
         result = JSON.parse(response.body)
         expect(result.keys).to match_array(["type", "features"])
         expect(result["type"]).to eq "FeatureCollection"
         expect(result["features"].count).to eq 1
         expect_hashes_to_match(result["features"].first, target)
-        expect(response.header["Total"]).to eq("1")
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
 
         get "/api/v3/search/geojson?lat=#{default_location[:latitude]}&lng=#{default_location[:longitude]}&query=#{manufacturer.name}"
-        expect(response.header["Total"]).to eq("1")
         result2 = JSON.parse(response.body)
         expect(result2["features"].count).to eq 1
         expect_hashes_to_match(result2["features"].first, target)
