@@ -789,6 +789,11 @@ class Bike < ApplicationRecord
     "status_with_owner"
   end
 
+  # TODO: delete after migration finished from #2172
+  def current_record_date
+    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
+  end
+
   # TODO: make private after migration finished from #2172
   def calculated_occurred_at
     return nil if current_record.blank?
