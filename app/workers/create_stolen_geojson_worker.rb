@@ -5,8 +5,15 @@ class CreateStolenGeojsonWorker < ScheduledWorker
     24.1.hours
   end
 
+  def file_prefix
+    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
+  end
+
   def perform
-    { type: "FeatureCollection", features: geojson_bike_features }
+    out_file = File.join(Rails.root, "#{file_prefix}stolen_geojson.json")
+    output = File.open(out_file, "w") do |f|
+      f.write(Oj.dump({type: "FeatureCollection", features: geojson_bike_features}))
+    end
   end
 
   def geojson_bike_features
