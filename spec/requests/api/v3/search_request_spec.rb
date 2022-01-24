@@ -35,6 +35,7 @@ RSpec.describe "Search API V3", type: :request do
       it "returns matching bikes, defaults to stolen" do
         expect(Bike.count).to eq 2
         get "/api/v3/search/geojson?lat=#{default_location[:latitude]}&lng=#{default_location[:longitude]}"
+        pp response.body
         result = JSON.parse(response.body)
         expect(result.keys).to match_array(["type", "features"])
         expect(result["type"]).to eq "FeatureCollection"
