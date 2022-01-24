@@ -5,6 +5,8 @@ class Bike < ApplicationRecord
   include Geocodeable
   include PgSearch::Model
 
+  PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
+
   acts_as_paranoid without_default_scope: true
 
   mount_uploader :pdf, PdfUploader
@@ -541,10 +543,6 @@ class Bike < ApplicationRecord
     current_impound_record || current_stolen_record
   end
 
-  def current_record_date
-    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
-  end
-
   def bike_organization_ids
     bike_organizations.pluck(:organization_id)
   end
@@ -762,6 +760,7 @@ class Bike < ApplicationRecord
     set_calculated_unassociated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     fetch_current_impound_record # Used by a bunch of things, but this method is private
+    self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
     set_location_info
     self.listing_order = calculated_listing_order
@@ -842,5 +841,10 @@ class Bike < ApplicationRecord
   def cached_description_and_stolen_description
     [description, current_stolen_record&.theft_description]
       .reject(&:blank?).join(" ")
+  end
+
+  def calculated_occurred_at
+    return nil if current_record.blank?
+    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
   end
 end

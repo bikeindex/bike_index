@@ -26,6 +26,7 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.bike.status_stolen?).to be_truthy
         bike.reload
         expect(bike.current_stolen_record_id).to eq stolen_record.id
+        expect(bike.occurred_at).to be_present
 
         stolen_record.add_recovery_information
         stolen_record.reload
@@ -33,6 +34,7 @@ RSpec.describe StolenRecord, type: :model do
 
         expect(bike.status_stolen?).to be_falsey
         expect(bike.current_stolen_record_id).to be_blank
+        expect(bike.occurred_at).to be_blank
 
         expect(stolen_record.recovered?).to be_truthy
         expect(stolen_record.bike.status_stolen?).to be_falsey
