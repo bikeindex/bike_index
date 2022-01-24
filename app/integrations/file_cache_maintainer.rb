@@ -27,7 +27,8 @@ class FileCacheMaintainer
         "approved_current_stolen_bikes.tsv" => "Stolen (without blocklisted bikes)",
         "current_stolen_with_reports.tsv" => "Stolen with serials & police reports",
         "approved_current_stolen_with_reports.tsv" => "Stolen with serials & police reports (without blocklisted bikes)",
-        "all_stolen_cache.json" => "Cached API response of all stolen bikes"
+        "all_stolen_cache.json" => "Cached API response of all stolen bikes",
+        "stolen_geojson.json" => "GeoJSON data on all the stolen bikes"
       }
     end
 

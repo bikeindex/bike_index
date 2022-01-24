@@ -14,6 +14,7 @@ public/partner
 ubuntu-xenial-16.04-cloudimg-console.log
 *.rdb
 current_stolen_bikes.tsv
+stolen_geojson.json
 spec/fixtures/tsv_creation/*.tsv
 spec/fixtures/tsv_creation/*.json
 

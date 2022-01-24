@@ -35,6 +35,7 @@ class ScheduledWorkerRunner < ScheduledWorker
   def self.scheduled_workers
     [
       CreateUserAlertNotificationWorker,
+      CreateStolenGeojsonWorker,
       UpdateInvoiceWorker,
       UpdateCountsWorker,
       UpdateOrganizationPosKindWorker,

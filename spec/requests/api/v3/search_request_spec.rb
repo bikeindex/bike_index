@@ -5,7 +5,7 @@ RSpec.describe "Search API V3", type: :request do
   let(:color) { FactoryBot.create(:color) }
   describe "/" do
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-    let!(:bike_2) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer) }
+    let!(:bike2) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer) }
     let(:query_params) { {query_items: [manufacturer.search_id]} }
     context "with per_page" do
       it "returns matching bikes, defaults to stolen" do
@@ -13,7 +13,7 @@ RSpec.describe "Search API V3", type: :request do
         get "/api/v3/search", params: query_params.merge(per_page: 1, format: :json)
         expect(response.header["Total"]).to eq("1")
         result = JSON.parse(response.body)
-        expect(result["bikes"][0]["id"]).to eq bike_2.id
+        expect(result["bikes"][0]["id"]).to eq bike2.id
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       end
@@ -139,7 +139,7 @@ RSpec.describe "Search API V3", type: :request do
     end
     context "with query items" do
       let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-      let!(:bike_2) { FactoryBot.create(:bike) }
+      let!(:bike2) { FactoryBot.create(:bike) }
       let(:query_params) { {query_items: [manufacturer.search_id]} }
       it "succeeds" do
         get "/api/v3/search/count", params: query_params.merge(format: :json)
