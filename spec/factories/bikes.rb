@@ -96,13 +96,18 @@ FactoryBot.define do
         # default to NYC coordinates
         latitude { 40.7143528 }
         longitude { -74.0059731 }
+        date_stolen { Time.current }
       end
     end
 
     trait :with_stolen_record do
       stolen_trait
       after(:create) do |bike, evaluator|
-        create(:stolen_record, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+        create(:stolen_record,
+          bike: bike,
+          latitude: evaluator.latitude,
+          longitude: evaluator.longitude,
+          date_stolen: evaluator.date_stolen)
         bike.reload
       end
     end

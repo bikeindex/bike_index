@@ -1,6 +1,3 @@
-class UserNotLoggedInError < StandardError
-end
-
 class BikeUpdatorError < StandardError
 end
 
