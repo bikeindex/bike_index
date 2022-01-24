@@ -55,7 +55,7 @@ class TsvCreator
     out_file = File.join(Rails.root, "#{@file_prefix}org_count_bikes.tsv")
     output = File.open(out_file, "w")
     output.puts org_counts_header
-    obikes.each { |b| output.puts org_count_row(b) }
+    obikes.find_each { |b| output.puts org_count_row(b) }
     send_to_uploader(output)
   end
 
@@ -74,7 +74,7 @@ class TsvCreator
     out_file = File.join(Rails.root, "#{@file_prefix}manufacturers.tsv")
     output = File.open(out_file, "w")
     output.puts manufacturers_header
-    Manufacturer.all.each { |m| output.puts manufacturer_row(m) }
+    Manufacturer.all.find_each { |m| output.puts manufacturer_row(m) }
     send_to_uploader(output)
   end
 
@@ -84,7 +84,7 @@ class TsvCreator
     out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_header
-    stolen_records.includes(:bike).each do |sr|
+    stolen_records.includes(:bike).find_each do |sr|
       output.puts sr.tsv_row if sr.tsv_row.present?
     end
     send_to_uploader(output)
@@ -96,7 +96,7 @@ class TsvCreator
     out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_with_reports_header
-    stolen_records.joins(:bike, :state).merge(Bike.with_known_serial).each do |sr|
+    stolen_records.joins(:bike, :state).merge(Bike.with_known_serial).find_each do |sr|
       next unless sr.police_report_number.present?
       row = sr.tsv_row(false, with_stolen_locations: true)
       output.puts row if row.present?
