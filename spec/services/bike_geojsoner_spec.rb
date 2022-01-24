@@ -14,12 +14,8 @@ RSpec.describe BikeGeojsoner do
         {
           type: "Feature",
           properties: {
-            :bike_id => bike.id,
-            :kind => "theft",
-            :occurred_at => date_stolen.to_i,
-            :title => bike.title_string,
-            "marker-size" => "small",
-            "marker-color" => "#BD1622"
+            id: bike.id,
+            color: "#BD1622",
           },
           geometry: {
             type: "Point",
@@ -27,10 +23,15 @@ RSpec.describe BikeGeojsoner do
           }
         }
       end
+      let(:extended_properties) { target[:properties].merge(kind: "theft", occurred_at: date_stolen.to_i, title: bike.title_string) }
+      let(:target_extended) { target.merge(properties: extended_properties) }
       it "returns target" do
         expect(bike.reload.to_coordinates).to eq([40.7143528, -74.0059731])
         expect(bike.current_stolen_record.date_stolen).to be_within(1).of date_stolen
         expect_hashes_to_match(described_class.feature(bike), target)
+        expect_hashes_to_match(described_class.feature(bike, true), target_extended)
+        described_class.feature_from_plucked(bike.id, bike.occurred_at, bike.latitude, bike.longitude)
+        expect_hashes_to_match(, target)
       end
     end
   end

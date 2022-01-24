@@ -52,6 +52,34 @@ module API
           serialized_bikes_results(paginate(Bike.search(interpreted_params)))
         end
 
+        get "/geojson"
+        params do
+          optional :query, type: String, desc: "Full text search"
+          requires :lat, type: String, desc: "Latitude"
+          requires :lng, type: String, desc: "Longitude"
+          optional :distance, type: String, desc: "Distance in miles from coordinates", default: 10
+          optional :limit, type: Integer, default: 100, desc: "Stolen Bikes returned (max 500)"
+        end
+        get "/" do
+          bounding_box = Geocoder::Calculations.bounding_box([params[:lat], params[:lng]], distance)
+          bikes = if bounding_box.detect(&:nan?) # If we can't create a bounding box, no bikes
+            Bike.none
+          else
+            Bike.unscoped.status_stolen.within_bounding_box(bounding_box)
+          end
+          bikes = bikes.pg_search(params[:query]) if params[:query].present?
+          limit = params[:limit].to_i
+          limit = if limit.blank? || limit < 1
+            100
+          else
+            limit > 500 ? 500 : limit
+          end
+          distance = params[:distance]
+          distance = 10 if distance.blank? || distance < 1
+          {type: "FeatureCollection",
+           features: bikes.limit(limit).pluck(:id, :latitude, :longitude) { |b|  }}
+        end
+
         desc "Count of bikes matching search", {
           notes: <<-NOTE
             Include all the options passed in your search. This endpoint accepts the same parameters as the root `/search` endpoint.
