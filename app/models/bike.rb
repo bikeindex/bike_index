@@ -789,6 +789,12 @@ class Bike < ApplicationRecord
     "status_with_owner"
   end
 
+  # TODO: make private after migration finished from #2172
+  def calculated_occurred_at
+    return nil if current_record.blank?
+    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
+  end
+
   private
 
   # Select the source from which to derive location data, in the following order
@@ -841,10 +847,5 @@ class Bike < ApplicationRecord
   def cached_description_and_stolen_description
     [description, current_stolen_record&.theft_description]
       .reject(&:blank?).join(" ")
-  end
-
-  def calculated_occurred_at
-    return nil if current_record.blank?
-    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
   end
 end
