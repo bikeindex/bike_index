@@ -10,10 +10,11 @@ class CreateStolenGeojsonWorker < ScheduledWorker
   end
 
   def perform
-    out_file = File.join(Rails.root, "#{file_prefix}stolen_geojson.json")
-    output = File.open(out_file, "w") do |f|
-      f.write(Oj.dump({type: "FeatureCollection", features: geojson_bike_features}))
-    end
+    filename = "#{file_prefix}stolen_geojson.json"
+    out_file = File.join(Rails.root, filename)
+    output = File.open(out_file, "w")
+    output.puts Oj.dump({type: "FeatureCollection", features: geojson_bike_features})
+    TsvCreator.new.send_to_uploader(output)
   end
 
   def geojson_bike_features
