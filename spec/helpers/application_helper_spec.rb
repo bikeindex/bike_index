@@ -27,18 +27,22 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-  describe "#show_twitter_and_website" do
-    it "combines twitter and website" do
-      user = User.new(show_website: true,
+  describe "#show_sharing_links" do
+    it "combines twitter, instagram, and website" do
+      user = User.new(
+        show_website: true,
         website: "website",
         show_twitter: true,
-        twitter: "twitter")
-      html = show_twitter_and_website(user)
-      expect(html).to eq("<a href=\"https://twitter.com/twitter\">Twitter</a> and <a href=\"website\">Website</a>")
+        twitter: "twitter",
+        show_instagram: true,
+        instagram: "instagram",
+      )
+      html = show_sharing_links(user)
+      expect(html).to eq("<a href=\"https://twitter.com/twitter\">Twitter</a>, <a href=\"https://instagram.com/instagram\">Instagram</a>, and <a href=\"website\">Website</a>")
     end
-    it "justs return website if no twitter" do
+    it "justs return website if no twitter or instagram" do
       user = User.new(show_website: true, website: "website")
-      html = show_twitter_and_website(user)
+      html = show_sharing_links(user)
       expect(html).to eq("<a href=\"website\">Website</a>")
     end
   end
