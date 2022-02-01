@@ -46,7 +46,7 @@ task seed_test_users_and_bikes: :environment do
     bike.serial_number = (0...10).map { rand(65..90).chr }.join
     bike.creation_organization_id = @org.id
     if bike.save
-      ownership = Ownership.new(bike_id: bike.id, creator_id: @member.id, user_id: @user.id, owner_email: @user.email, current: true)
+      ownership = Ownership.new(bike_id: bike.id, creator_id: @member.id, user_id: @user.id, owner_email: @user.email, current: true, skip_email: true)
       unless ownership.save
         puts "\n Ownership error \n #{ownership.errors.messages}"
         raise StandardError
