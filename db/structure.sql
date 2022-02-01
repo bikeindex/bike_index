@@ -3154,7 +3154,9 @@ CREATE TABLE public.users (
     magic_link_token text,
     alert_slugs jsonb DEFAULT '[]'::jsonb,
     address_set_manually boolean DEFAULT false,
-    no_address boolean DEFAULT false
+    no_address boolean DEFAULT false,
+    show_instagram boolean DEFAULT false,
+    instagram character varying
 );
 
 
@@ -6168,6 +6170,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220113194041'),
 ('20220118221319'),
 ('20220121230959'),
-('20220124192245');
+('20220124192245'),
+('20220201213958');
 
 
