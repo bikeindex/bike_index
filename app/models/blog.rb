@@ -116,6 +116,11 @@ class Blog < ApplicationRecord
     canonical_url.present?
   end
 
+  def pretty_canonical
+    return nil unless canonical_url?
+    canonical_url.gsub(/https?:\/\//i, "").truncate(90)
+  end
+
   def set_calculated_attributes
     self.published_at ||= Time.current # We need to have a published time...
     self.canonical_url = Urlifyer.urlify(canonical_url)

@@ -4185,6 +4185,7 @@ en:
       bike_index_blog: Bike Index Blog
       bike_index_blog_feed: Bike Index blog feed
     show:
+      also_published: 'Also published at:'
       by: by
   number:
     currency:
