@@ -2774,6 +2774,9 @@ en:
       when_adding_a_bike_to_the_index: >-
         When adding a bike to the Index, it's best to enter all the groups of numbers
         and letters separated by spaces.
+    show:
+      also_published: 'Also published at:'
+      updated: Updated
     terms_text:
       about_our_terms_of_service: About our Terms of Service
       available_here: available here

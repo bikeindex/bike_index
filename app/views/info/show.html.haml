@@ -1,19 +1,12 @@
-= content_for :header do
-  %link{rel: :canonical, href: canonical_url(@blog) }
-  - if @blog&.secondary_title.present? # This is gross, but whatever
-    <meta name="title" content="#{@blog.secondary_title}">
-
 .blog-header
   %h1.global-title
     = @blog.title
 
   %article.blogger-info
     %h4.pub-date
-      updated
-      - if @blog.published_at > Time.current - 1.week
-        = l(@blog.published_at, format: :standard_display)
-      - else
-        = l(@blog.published_at, format: :no_day_with_year)
+      = t(".updated")
+      %span.convertTime.withPreposition= l @blog.published_at, format: :convert_time
+  %hr.mb-5.less-strong
 
 - if @blog.is_listicle
   - @blog.listicles.each_with_index do |list_item, i|
@@ -24,3 +17,9 @@
 - else
   :markdown
     #{@blog.body}
+
+- if @blog.canonical_url?
+  .mt-4
+    %h4.less-strong
+      = t(".also_published")
+      = link_to @blog.pretty_canonical, @blog.canonical_url

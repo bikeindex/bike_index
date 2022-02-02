@@ -1,7 +1,7 @@
 - if @blog.present? && @render_info
   #news_show.container
     = content_for :header do
-      %link{rel: :canonical, href: canonical_url(@blog) }
+      %link{rel: :canonical, href: news_url(@blog) }
       - if @blog.secondary_title.present? # This is gross, but whatever
         <meta name="title" content="#{@blog.secondary_title}">
 
