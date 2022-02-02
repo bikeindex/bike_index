@@ -428,30 +428,61 @@ RSpec.describe HeaderTagHelper, type: :helper do
           description_abbr: "Bike Index did something cool",
           published_at: target_time,
           updated_at: target_time,
-          user: user)
+          user: user,
+          canonical_url: canonical_url)
       end
+      let(:canonical_url) { nil }
       let(:target_url) { "http://something.com" }
       context "index image present" do
-        it "adds the index image and the tags we want" do
+        before do
+          blog.set_title_slug
           allow(blog).to receive(:index_image) { target_url }
           allow(blog).to receive(:index_image_lg) { target_url }
+        end
+        it "adds the index image and the tags we want" do
+          blog.secondary_title = "Another title for cool stuff"
           @blog = blog
           expect(helper.page_with_custom_header_tags?).to be_truthy
           header_tags = helper.news_header_tags
           expect(helper.page_title).to eq "Cool blog"
           expect(helper.page_description).to eq "Bike Index did something cool"
           expect(helper.page_image).to eq "http://something.com"
-          expect(header_tags.find { |t| t && t.include?("og:type") }).to match "article"
-          expect(header_tags.find { |t| t && t.include?("twitter:creator") }).to match "@stolenbikereg"
-          expect(header_tags.find { |t| t && t.include?("og:published_time") }).to match target_time.to_s
-          expect(header_tags.find { |t| t && t.include?("og:modified_time") }).to match target_time.to_s
+          # pp header_tags
+          expect(header_tags.find { |t| t&.include?("og:type") }).to match "article"
+          expect(header_tags.find { |t| t&.include?("twitter:creator") }).to match "@stolenbikereg"
+          expect(header_tags.find { |t| t&.include?("og:published_time") }).to match target_time.to_s
+          expect(header_tags.find { |t| t&.include?("og:modified_time") }).to match target_time.to_s
+          expect(header_tags.find { |t| t&.include?("meta name=\"title\"") }).to match "Another title for cool stuff"
           expect(header_tags.include?(auto_discovery_tag)).to be_truthy
           expect(header_tags.include?("<link rel=\"author\" href=\"#{user_url(user)}\" />")).to be_truthy
+          expect(header_tags.include?("<meta name=\"title\" content=\"Another title for cool stuff\" />")).to be_truthy
+          canonical_tag = "<link rel=\"canonical\" href=\"http://example.com/news/bike-index-did-something-cool\" />"
+          expect(header_tags.find { |t| t&.include?("bike-index-did-something-cool") }).to eq canonical_tag
+        end
+        context "canonical_url" do
+          let(:canonical_url) { "https://somewhereelse.com" }
+          it "doesn't include creator" do
+            @blog = blog
+            expect(helper.page_with_custom_header_tags?).to be_truthy
+            header_tags = helper.news_header_tags
+            expect(helper.page_title).to eq "Cool blog"
+            expect(helper.page_description).to eq "Bike Index did something cool"
+            expect(helper.page_image).to eq "http://something.com"
+            expect(header_tags.find { |t| t&.include?("og:type") }).to match "article"
+            expect(header_tags.find { |t| t&.include?("og:published_time") }).to match target_time.to_s
+            expect(header_tags.find { |t| t&.include?("og:modified_time") }).to match target_time.to_s
+            expect(header_tags.find { |t| t&.include?("og:modified_time") }).to match target_time.to_s
+            expect(header_tags.include?(auto_discovery_tag)).to be_truthy
+            expect(header_tags.find { |t| t&.include?("twitter:creator") }).to match "@stolenbikereg"
+            expect(header_tags.find { |t| t&.include?("<link rel=\"author\"") }).to be_blank
+            expect(header_tags.include?("<link rel=\"canonical\" href=\"#{canonical_url}\" />")).to be_truthy
+          end
         end
       end
       context "public_image present" do
         let(:public_image) { PublicImage.new }
         it "adds the public image we want" do
+          blog.set_title_slug
           allow(public_image).to receive(:image_url) { target_url }
           allow(blog).to receive(:public_images) { [public_image] }
           allow(blog).to receive(:index_image_lg) { target_url }
@@ -468,6 +499,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
         it "returns the info tags" do
           blog.kind = "info"
           blog.created_at = target_time
+          blog.set_title_slug
           allow(blog).to receive(:index_image) { target_url }
           allow(blog).to receive(:index_image_lg) { target_url }
           @blog = blog

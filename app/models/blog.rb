@@ -112,6 +112,10 @@ class Blog < ApplicationRecord
     title_slug
   end
 
+  def canonical_url?
+    canonical_url.present?
+  end
+
   def set_calculated_attributes
     self.published_at ||= Time.current # We need to have a published time...
     self.canonical_url = Urlifyer.urlify(canonical_url)
