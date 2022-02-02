@@ -48,7 +48,7 @@
         = f.label :manufacturer_id do
           Manufacturer
           %em.small
-            = link_to "mfg bikes", admin_bikes_path(search_manufacturer_id: @bike.manufacturer_id), class: "less-strong"
+            = link_to "mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "less-strong"
         = collection_select(:bike, :manufacturer_id, Manufacturer.frame_makers, :id, :name, {}, { required: true, class: "form-control" })
     .col-6.col-md-4.col-lg-3
       .form-group

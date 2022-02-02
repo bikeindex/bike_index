@@ -15,7 +15,7 @@ RSpec.describe BikeGeojsoner do
           type: "Feature",
           properties: {
             id: bike.id,
-            color: "#BD1622",
+            color: "#BD1622"
           },
           geometry: {
             type: "Point",

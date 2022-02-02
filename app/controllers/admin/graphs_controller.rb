@@ -51,6 +51,14 @@ class Admin::GraphsController < Admin::BaseController
   def matching_bikes
     bikes = Bike.unscoped.where(created_at: @time_range)
     bikes = bikes.where(deleted_at: nil) unless ParamsNormalizer.boolean(params[:search_deleted])
+    if params[:search_manufacturer].present?
+      @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer])
+      bikes = if @manufacturer.present?
+        bikes.where(manufacturer_id: @manufacturer&.id)
+      else
+        bikes.where(mnfg_name: params[:search_manufacturer])
+      end
+    end
     bikes
   end
 

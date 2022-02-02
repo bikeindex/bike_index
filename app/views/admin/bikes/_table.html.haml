@@ -7,6 +7,10 @@
   -# required because of caching
   <style>.only-dev-visible { display: none !important; } </style>
 
+- skip_manufacturer_link = params[:search_manufacturer].present?
+- if skip_manufacturer_link
+  <style>.display-mnfg-link { display: none; }</style>
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.bikeTable{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
     - unless no_show_header
@@ -62,6 +66,7 @@
                   = bike.manufacturer_other
               - else
                 = bike.mnfg_name
+              %small= link_to "bikes", admin_bikes_path(search_manufacturer: bike.mnfg_name), class: "gray-link display-mnfg-link"
             %td.d-none.d-lg-table-cell
               .less-strong-hold
                 = [bike.year, bike.frame_model_truncated].join(' ')
