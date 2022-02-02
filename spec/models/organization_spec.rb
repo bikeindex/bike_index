@@ -298,6 +298,25 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "user_registration_all_bikes?" do
+    it "is falsey" do
+      expect(Organization.new.user_registration_all_bikes?).to be_falsey
+    end
+    context "paid" do
+      let(:enabled_feature_slugs) { ["regional_bike_counts"] }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
+      it "is truthy" do
+        expect(organization.user_registration_all_bikes?).to be_truthy
+      end
+      context "official_manufacturer?" do
+        let(:enabled_feature_slugs) { "official_manufacturer" }
+        it "is falsey" do
+          expect(organization.user_registration_all_bikes?).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "is_paid and enabled? calculations" do
     let(:organization_feature) { FactoryBot.create(:organization_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: %w[child_organizations csv_exports]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
