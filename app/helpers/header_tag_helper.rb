@@ -68,7 +68,10 @@ module HeaderTagHelper
   end
 
   def social_meta_content_tags(meta_hash)
-    meta_hash.map { |k, v| content_tag(:meta, nil, content: v, property: k) }
+    meta_hash.map do |k, v|
+      next if v.blank?
+      content_tag(:meta, nil, content: v, property: k)
+    end.compact
   end
 
   def main_header_tags
@@ -173,14 +176,21 @@ module HeaderTagHelper
       "og:published_time" => @blog.published_at.utc,
       "og:modified_time" => @blog.updated_at.utc
     }
-    meta_overrides["twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
+    meta_overrides["title"] = @blog.secondary_title if @blog.secondary_title.present?
     if @blog.index_image.present?
       self.page_image = @blog.index_image_lg
     elsif @blog.public_images.any?
       self.page_image = @blog.public_images.last.image_url
     end
-    default_header_tag_array(meta_overrides) +
-      [news_auto_discovery_link, tag(:link, rel: "author", href: user_url(@blog.user))]
+    additional_tags = [news_auto_discovery_link,
+      tag(:link, rel: "canonical", href: canonical_url(@blog))]
+    if @blog.canonical_url?
+      meta_overrides["twitter:creator"] = nil
+    else
+      meta_overrides["twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
+      additional_tags += [tag(:link, rel: "author", href: user_url(@blog.user))]
+    end
+    default_header_tag_array(meta_overrides) + additional_tags
   end
 
   # This only will show up on info/show - and is the same as news, but without the author stuff
@@ -254,5 +264,13 @@ module HeaderTagHelper
 
   def news_auto_discovery_link
     auto_discovery_link_tag(:atom, news_index_url(format: "atom"), title: "Bike Index news atom feed")
+  end
+
+  # Return the canonical url for the given blog post.
+  # If none available, default to the bike index url, removing any query params
+  # (e.g. the locale param).
+  def canonical_url(blog)
+    url = blog.canonical_url.presence || news_url(blog.to_param)
+    url.split("?").first
   end
 end

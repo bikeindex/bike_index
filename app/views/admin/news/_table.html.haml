@@ -28,17 +28,18 @@
           %td
             %small.convertTime= l blog.updated_at, format: :convert_time
           %td
-            %p.blog-index
-              = link_to blog.title, edit_admin_news_url(blog)
-              %br
-              = blog.body_abbr.html_safe if blog.body_abbr
-              - if blog.content_tag_names.any?
-                %small.d-block
-                  %span.less-strong Topics:
-                  - if tags_no_link
-                    = blog.content_tag_names.join(", ")
-                  - else
-                    = safe_join(blog.content_tags.name_ordered.map { |c| link_to(c.name, sortable_search_params.merge(search_tags: tags_param + [c.to_param]), class: "less-strong") }, ", ")
+            = link_to blog.title, edit_admin_news_url(blog)
+            %br
+            = blog.body_abbr.html_safe if blog.body_abbr
+            - if blog.content_tag_names.any?
+              %small.d-block
+                %span.less-strong Topics:
+                - if tags_no_link
+                  = blog.content_tag_names.join(", ")
+                - else
+                  = safe_join(blog.content_tags.name_ordered.map { |c| link_to(c.name, sortable_search_params.merge(search_tags: tags_param + [c.to_param]), class: "less-strong") }, ", ")
+            - if blog.canonical_url?
+              %small.d-block Canonical: #{link_to blog.pretty_canonical, blog.canonical_url, class: "gray-link"}
           - unless skip_kind
             %td
               - if !blog.blog?

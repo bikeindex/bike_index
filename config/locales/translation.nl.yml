@@ -3628,6 +3628,9 @@ nl:
       signup_page: aanmeldpagina
       us_partner_organizations: Amerikaanse partnerorganisaties
       website_for_organization: "%{org_name} website"
+    show:
+      also_published: 'Ook gepubliceerd op:'
+      updated: Bijgewerkt
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: Na een paar herstelacties raakte
@@ -5493,6 +5496,7 @@ nl:
       bike_index_blog_feed: Bike Index blog feed
     show:
       by: Door
+      also_published: 'Ook gepubliceerd op:'
   recovery_displays:
     recovery_display:
       bike: Fiets

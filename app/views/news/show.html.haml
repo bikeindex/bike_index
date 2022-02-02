@@ -1,8 +1,3 @@
-= content_for :header do
-  %link{rel: :canonical, href: canonical_url(@blog) }
-  - if @blog.present? && @blog.secondary_title.present? # This is gross, but whatever
-    <meta name="title" content="#{@blog.secondary_title}">
-
 - blogger = @blog.user
 .blog-header
   %h1.global-title
@@ -12,16 +7,14 @@
     = @blog.title
 
   %article.blogger-info.pl-2
-    %h4
-      = t(".by")
-
-      %a.blog-poster{href: blogger.userlink}
-        = blogger.name.presence
+    - unless @blog.canonical_url?
+      %h4
+        = t(".by")
+        %a.blog-poster{href: blogger.userlink}
+          = blogger.name.presence
     %h4.pub-date
-      - if @blog.published_at > Time.current - 1.week
-        = l(@blog.published_at, format: :standard_display)
-      - else
-        = l(@blog.published_at, format: :no_day_with_year)
+      %span.convertTime= l @blog.published_at, format: :convert_time
+
     %p.blog-topics-list.mb-3
       Topics:
       = safe_join(@blog.content_tags.commonness.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "gray-link") }, ", ")
@@ -35,6 +28,13 @@
 - else
   :markdown
     #{@blog.body}
+
+- if @blog.canonical_url?
+  .mt-4
+    %h4.less-strong
+      = t(".also_published")
+      = link_to @blog.pretty_canonical, @blog.canonical_url
+
 
 - if Rails.env.production? && @blog.published
   -# Clear the ad overhang with a padded block
