@@ -54,7 +54,7 @@
             Bikes
           %td
             = admin_number_display(@manufacturer.bikes.count)
-            %a{ href: admin_bikes_path(search_manufacturer_id: @manufacturer.slug) }
+            %a{ href: admin_bikes_path(search_manufacturer: @manufacturer.slug) }
               view
         %tr
           %td

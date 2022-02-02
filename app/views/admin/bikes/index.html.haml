@@ -96,7 +96,7 @@
         = humanized_time_range(@time_range)
 
     = render partial: "/shared/admin_current_header", locals: { viewing: "Bikes" }
-    - if (params.keys & %w[user_id search_manufacturer_id]).any? || current_organization.present?
+    - if (params.keys & %w[user_id search_manufacturer]).any? || current_organization.present?
       %ul.mt-0
         - if current_organization.present?
           %li
@@ -119,7 +119,7 @@
               No user found for
               %code
                 = params[:user_id]
-        - if params[:search_manufacturer_id].present?
+        - if params[:search_manufacturer].present?
           %li
             - if @manufacturer.present?
               Made by
@@ -127,7 +127,8 @@
             - else
               No manufacturer found for
               %code
-                = params[:search_manufacturer_id]
+                = params[:search_manufacturer]
+            = link_to "view all manufacturer bikes", admin_bikes_path(sortable_search_params.merge(search_manufacturer: nil)), class: "gray-link small"
   .col-md-5
     = form_tag admin_bikes_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
