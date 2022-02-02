@@ -789,7 +789,7 @@ DEPENDENCIES
   rb-fsevent (~> 0.10.3)
   redis
   rerun
-  responders (~> 3.0.1)
+  responders
   rqrcode (= 0.10.1)
   rqrcode-rails3!
   rspec (~> 3.4)
