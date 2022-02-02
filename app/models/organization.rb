@@ -253,7 +253,8 @@ class Organization < ApplicationRecord
 
   # For now - just using paid
   def user_registration_all_bikes?
-    paid? && [36, 1].exclude?(id) # Exclude SBR and BikeIndex
+    paid? && !official_manufacturer? &&
+      [36, 1].exclude?(id) # Exclude SBR and BikeIndex
   end
 
   def paid_money?
