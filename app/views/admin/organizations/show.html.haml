@@ -37,10 +37,6 @@
             %span.badge.badge-success.ml-2 Trusted credibility
           - elsif CredibilityScorer.organization_suspicious?(@organization)
             %span.badge.badge-warning.ml-2 Suspicious credibility
-          - if @organization.manufacturer_id.present?
-            %br
-            %strong= @organization.manufacturer.name
-            %em Manufacturer official account of
       %tr
         %td
           Map
@@ -63,6 +59,17 @@
           Kind
         %td
           = @organization.kind.humanize
+          - if @organization.enabled?("official_manufacturer")
+            - unless @organization.kind == "bike_manufacturer"
+              %span.text-warning Kind should be "Bike Manufacturer"
+            %br
+            - if @organization.manufacturer_id.present?
+              %strong= @organization.manufacturer.name
+              %em.less-strong Manufacturer official account of
+            - else
+              %strong.text-danger No Manufacturer assigned
+              %span.less-strong #{link_to "edit organization", edit_admin_organization_path(@organization)} to add
+
       %tr
         %td
           Slug
