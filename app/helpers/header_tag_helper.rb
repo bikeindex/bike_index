@@ -68,7 +68,10 @@ module HeaderTagHelper
   end
 
   def social_meta_content_tags(meta_hash)
-    meta_hash.map { |k, v| content_tag(:meta, nil, content: v, property: k) }
+    meta_hash.map do |k, v|
+      next if v.blank?
+      content_tag(:meta, nil, content: v, property: k)
+    end.compact
   end
 
   def main_header_tags
@@ -181,7 +184,9 @@ module HeaderTagHelper
     end
     additional_tags = [news_auto_discovery_link,
       tag(:link, rel: "canonical", href: canonical_url(@blog))]
-    unless @blog.canonical_url?
+    if @blog.canonical_url?
+      meta_overrides["twitter:creator"] = nil
+    else
       meta_overrides["twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
       additional_tags += [tag(:link, rel: "author", href: user_url(@blog.user))]
     end
@@ -265,7 +270,7 @@ module HeaderTagHelper
   # If none available, default to the bike index url, removing any query params
   # (e.g. the locale param).
   def canonical_url(blog)
-    url = blog.canonical_url.presence || news_url(blog)
+    url = blog.canonical_url.presence || news_url(blog.to_param)
     url.split("?").first
   end
 end

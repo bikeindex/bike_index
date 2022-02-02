@@ -5493,6 +5493,7 @@ nl:
       bike_index_blog_feed: Bike Index blog feed
     show:
       by: Door
+      also_published: 'Ook gepubliceerd op:'
   recovery_displays:
     recovery_display:
       bike: Fiets

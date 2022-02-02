@@ -447,17 +447,15 @@ RSpec.describe HeaderTagHelper, type: :helper do
           expect(helper.page_title).to eq "Cool blog"
           expect(helper.page_description).to eq "Bike Index did something cool"
           expect(helper.page_image).to eq "http://something.com"
-          # pp header_tags
           expect(header_tags.find { |t| t&.include?("og:type") }).to match "article"
           expect(header_tags.find { |t| t&.include?("twitter:creator") }).to match "@stolenbikereg"
           expect(header_tags.find { |t| t&.include?("og:published_time") }).to match target_time.to_s
           expect(header_tags.find { |t| t&.include?("og:modified_time") }).to match target_time.to_s
-          expect(header_tags.find { |t| t&.include?("meta name=\"title\"") }).to match "Another title for cool stuff"
+          expect(header_tags.find { |t| t&.include?("property=\"title\"") }).to match "Another title for cool stuff"
           expect(header_tags.include?(auto_discovery_tag)).to be_truthy
           expect(header_tags.include?("<link rel=\"author\" href=\"#{user_url(user)}\" />")).to be_truthy
-          expect(header_tags.include?("<meta name=\"title\" content=\"Another title for cool stuff\" />")).to be_truthy
-          canonical_tag = "<link rel=\"canonical\" href=\"http://example.com/news/bike-index-did-something-cool\" />"
-          expect(header_tags.find { |t| t&.include?("bike-index-did-something-cool") }).to eq canonical_tag
+          canonical_tag = "<link rel=\"canonical\" href=\"http://test.host/news/cool-blog\" />"
+          expect(header_tags.find { |t| t&.include?("rel=\"canonical\"") }).to eq canonical_tag
         end
         context "canonical_url" do
           let(:canonical_url) { "https://somewhereelse.com" }
@@ -473,7 +471,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
             expect(header_tags.find { |t| t&.include?("og:modified_time") }).to match target_time.to_s
             expect(header_tags.find { |t| t&.include?("og:modified_time") }).to match target_time.to_s
             expect(header_tags.include?(auto_discovery_tag)).to be_truthy
-            expect(header_tags.find { |t| t&.include?("twitter:creator") }).to match "@stolenbikereg"
+            expect(header_tags.find { |t| t&.include?("twitter:creator") }).to be_blank
             expect(header_tags.find { |t| t&.include?("<link rel=\"author\"") }).to be_blank
             expect(header_tags.include?("<link rel=\"canonical\" href=\"#{canonical_url}\" />")).to be_truthy
           end
