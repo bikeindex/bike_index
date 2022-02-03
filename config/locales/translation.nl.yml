@@ -1125,6 +1125,7 @@ nl:
           translation_backend: Vertaling backend (google of deepl)
           value: 'Waarde. Interpoleert: %{value}, %{human_key}, %{key}, %{default},
             %{value_or_human_key}, %{value_or_default_or_human_key}'
+          config: Configuratielocatie overschrijven
       desc:
         add_missing: Ontbrekende sleutels om gegevens locale
         check_consistent_interpolations: Controleer of alle vertalingen de juiste
