@@ -45,6 +45,11 @@ RSpec.describe ApplicationHelper, type: :helper do
       html = show_sharing_links(user)
       expect(html).to eq("<a href=\"website\">Website</a>")
     end
+    it "handles when no sharing links are present" do
+      user = User.new(show_website: false, show_twitter: false, show_instagram: false)
+      html = show_sharing_links(user)
+      expect(html).to eq("")
+    end
   end
 
   describe "#websiteable" do
