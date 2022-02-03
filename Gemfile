@@ -7,7 +7,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config and Dockerfile if Ruby version is bumped
 ruby "2.7.3"
-gem "rack", "~> 2.0"
+gem "rack", "2.0.8"
 gem "rails", "~> 5.2"
 
 gem "puma" # App server
