@@ -202,28 +202,25 @@ module ApplicationHelper
     end
   end
 
-  # TODO: location refactor - do something more sophisticated
-  def address_formatted(obj)
-    obj.address
-  end
-
   def websiteable(user)
     if user.show_website && user.website
       link_to "Website", user.website
     end
   end
 
-  def show_twitter_and_website(user)
-    if twitterable(user) || websiteable(user)
-      html = ""
-      if twitterable(user)
-        html << twitterable(user)
-        html << " and #{websiteable(user)}" if websiteable(user)
-      else
-        html << websiteable(user)
-      end
-      html.html_safe
+  def instagramable(user)
+    if user.show_instagram && user.instagram
+      link_to "Instagram", "https://instagram.com/#{user.instagram}"
     end
+  end
+
+  # TODO: location refactor - do something more sophisticated
+  def address_formatted(obj)
+    obj.address
+  end
+
+  def show_sharing_links(user)
+    [twitterable(user), instagramable(user), websiteable(user)].compact.to_sentence.html_safe
   end
 
   def pretty_print_json(data, no_blank = false)

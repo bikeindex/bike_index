@@ -18,6 +18,21 @@
       .form-well-input
         = f.text_field :twitter, placeholder: t(".twitter_handle"), class: 'form-control'
 
+    .form-group.row.sharing-collapser{ data: { target: '#instagram-field' } }
+      %label.form-well-label
+        = t(".show_instagram")
+      .form-well-input
+        %label.radio-inline
+          = f.radio_button :show_instagram, true
+          = t(".show_instagram")
+        %label.radio-inline
+          = f.radio_button :show_instagram, false
+          = t(".no_instagram")
+    #instagram-field.form-group.row.collapse
+      = f.label :instagram, t(".instagram_handle"), class: 'form-well-label'
+      .form-well-input
+        = f.text_field :instagram, placeholder: t(".instagram_handle"), class: 'form-control'
+
     .form-group.row.sharing-collapser{ data: { target: '#personal-field' } }
       %label.form-well-label
         = t(".show_personal_site")

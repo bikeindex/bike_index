@@ -4120,7 +4120,9 @@ en:
       create_page: Create page
       create_public_page: Create public page
       example_url: http://example.com
+      instagram_handle: Instagram handle
       my_awesome_link: My awesome link
+      no_instagram: No Instagram
       no_personal_site: No personal site
       no_please_dont_create_me_a_page: No, please don't create me a page
       no_twitter: No Twitter
@@ -4130,6 +4132,7 @@ en:
       preview_page: preview page
       profile_avatar: Profile avatar
       sharing_and_personal_page_settings: Sharing and Personal page settings
+      show_instagram: Show Instagram
       show_personal_site: Show Personal Site
       show_personal_website: Show personal website
       show_twitter: Show Twitter
