@@ -35,7 +35,7 @@ RSpec.describe ApplicationHelper, type: :helper do
         show_twitter: true,
         twitter: "twitter",
         show_instagram: true,
-        instagram: "instagram",
+        instagram: "instagram"
       )
       html = show_sharing_links(user)
       expect(html).to eq("<a href=\"https://twitter.com/twitter\">Twitter</a>, <a href=\"https://instagram.com/instagram\">Instagram</a>, and <a href=\"website\">Website</a>")

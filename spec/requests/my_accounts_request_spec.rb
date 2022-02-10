@@ -246,16 +246,15 @@ RSpec.describe MyAccountsController, type: :request do
           show_instagram: false,
           instagram: nil,
           show_website: false,
-          website: nil,
+          website: nil
         )
 
-        patch base_url, params: { id: current_user.id,
-          user: {
-            instagram: "bikeinsta", show_instagram: true,
-            twitter: "biketwitter", show_twitter: true,
-            website: "https://bikeindex.org", show_website: true,
-          }
-        }
+        patch base_url, params: {id: current_user.id,
+                                 user: {
+                                   instagram: "bikeinsta", show_instagram: true,
+                                   twitter: "biketwitter", show_twitter: true,
+                                   website: "https://bikeindex.org", show_website: true
+                                 }}
 
         current_user.reload
         expect(current_user.instagram).to eq "bikeinsta"

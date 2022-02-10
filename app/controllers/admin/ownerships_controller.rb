@@ -54,12 +54,12 @@ class Admin::OwnershipsController < Admin::BaseController
   def matching_ownerships
     ownerships = Ownership.unscoped
     @search_origin = if ownership_kinds.include?(params[:search_origin])
-      if params[:search_origin] == "only_initial"
-        ownerships = ownerships.initial
+      ownerships = if params[:search_origin] == "only_initial"
+        ownerships.initial
       elsif params[:search_origin] == "only_transferred"
-        ownerships = ownerships.transferred
+        ownerships.transferred
       else
-        ownerships = ownerships.where(origin: params[:search_origin])
+        ownerships.where(origin: params[:search_origin])
       end
       params[:search_origin]
     else
