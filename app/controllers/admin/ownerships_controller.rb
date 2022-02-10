@@ -39,7 +39,7 @@ class Admin::OwnershipsController < Admin::BaseController
     end
   end
 
-  helper_method :matching_ownerships
+  helper_method :matching_ownerships, :ownership_kinds
 
   private
 
@@ -47,15 +47,21 @@ class Admin::OwnershipsController < Admin::BaseController
     %w[created_at updated_at creator_id owner_email]
   end
 
+  def ownership_kinds
+    Ownership.origins + %w[only_initial only_transferred]
+  end
+
   def matching_ownerships
     ownerships = Ownership.unscoped
-    @search_initialness = if %w[only_initial only_transferred].include?(params[:search_initialness])
-      if params[:search_initialness] == "only_initial"
+    @search_origin = if ownership_kinds.include?(params[:search_origin])
+      if params[:search_origin] == "only_initial"
         ownerships = ownerships.initial
-      elsif params[:search_initialness] == "only_transferred"
+      elsif params[:search_origin] == "only_transferred"
         ownerships = ownerships.transferred
+      else
+        ownerships = ownerships.where(origin: params[:search_origin])
       end
-      params[:search_initialness]
+      params[:search_origin]
     else
       "all"
     end
