@@ -14,6 +14,8 @@
       %th
         Creator
       %th
+        = sortable "origin", render_sortable: render_sortable
+      %th
         = sortable "owner_email", render_sortable: render_sortable
       %th
         = sortable "organization_id", render_sortable: render_sortable
@@ -51,10 +53,10 @@
               - if display_dev_info?
                 %span.only-dev-visible
                   \##{ownership.creator_id}
-            - elsif creator.name.present?
-              = creator.name
             - else
-              = creator.email
+              = creator.display_name
+          %td
+            %small= ownership.creation_description
           %td
             = ownership.owner_email
           %td

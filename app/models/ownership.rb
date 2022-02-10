@@ -47,6 +47,15 @@ class Ownership < ApplicationRecord
 
   attr_accessor :creator_email, :user_email, :can_edit_claimed
 
+  def self.origins
+    ORIGIN_ENUM.keys.map(&:to_s)
+  end
+
+  def self.origin_humanized(str)
+    return nil unless str.present?
+    str.titleize.downcase
+  end
+
   def bike
     # Get it unscoped, because example/hidden/deleted
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
@@ -99,7 +108,7 @@ class Ownership < ApplicationRecord
       return "org reg" if %w[embed_extended organization_form].include?(origin)
       return "landing page" if origin == "embed_partial"
       return "parking notification" if origin == "unregistered_parking_notification"
-      origin.humanize.downcase
+      self.class.origin_humanized(origin)
     end
   end
 

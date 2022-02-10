@@ -207,7 +207,7 @@
 
 #BParamsView.mt-5.collapse{class: (display_dev_info? ? "show in" : "")}
   .row
-    - @bike.ownerships.each do |ownership|
+    - @bike.ownerships.reorder(created_at: :desc).each do |ownership|
       .col-md-6.mt-2
         %table.table-list
           %tbody
