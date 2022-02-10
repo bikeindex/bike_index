@@ -53,17 +53,13 @@ class Admin::OwnershipsController < Admin::BaseController
 
   def matching_ownerships
     ownerships = Ownership.unscoped
-    @search_origin = if ownership_kinds.include?(params[:search_origin])
+    @search_origin = ownership_kinds.include?(params[:search_origin]) ? params[:search_origin] : "all"
+    unless @search_origin == "all"
       ownerships = if params[:search_origin] == "only_initial"
         ownerships.initial
-      elsif params[:search_origin] == "only_transferred"
-        ownerships.transferred
       else
         ownerships.where(origin: params[:search_origin])
       end
-      params[:search_origin]
-    else
-      "all"
     end
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
