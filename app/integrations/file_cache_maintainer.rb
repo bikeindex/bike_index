@@ -50,13 +50,14 @@ class FileCacheMaintainer
 
     def file_info_hash(k)
       path = Pathname.new(k)
-      daily_export = path.basename.to_s.match(/\A\d+/).present?
+      file_base = path.basename.to_s
+      daily_export = file_base.match(/\A\d+/).present? || file_base == "stolen.geojson"
       {
         path: k,
-        filename: path.basename.to_s,
+        filename: file_base,
         daily: daily_export,
         updated_at: @result[k],
-        description: descriptions[path.basename.to_s]
+        description: descriptions[file_base]
       }
     end
 

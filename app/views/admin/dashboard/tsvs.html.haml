@@ -17,6 +17,7 @@
         %th Updated
         %th File
         %th description
+        %th Daily
       %tbody
         - @tsvs.sort_by { |a| a[:updated_at] }.each do |tsv_info|
           %tr
@@ -28,6 +29,8 @@
                 = tsv_info[:filename]
             %td
               = tsv_info[:description]
+            %td
+              = check_mark if tsv_info[:daily]
 
 .row.mt-4
   .col-md-6
