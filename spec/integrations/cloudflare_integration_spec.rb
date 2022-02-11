@@ -6,8 +6,6 @@ RSpec.describe CloudflareIntegration do
   describe "expire_cache" do
     it "purges" do
       # Documentation: https://api.cloudflare.com/#zone-purge-files-by-url
-      # Note: not really testing this,
-      # just recording the cassette and verifying the request happens
       VCR.use_cassette("cloudflare_integration-expire_cache", match_requests_on: [:path]) do
         result = instance.expire_cache(CreateStolenGeojsonWorker.file_url)
         expect(result["success"]).to be_truthy
