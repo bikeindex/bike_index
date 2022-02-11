@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.cloudflare.com/client/v4/zones/82c727a79571ff204a7ddc188d1806ec/purge_cache
+    body:
+      encoding: UTF-8
+      string: '{"files":["https://files.bikeindex.org/uploads/tsvs/stolen.geojson"]}'
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Faraday v1.4.3
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 11 Feb 2022 16:32:04 GMT
+      Content-Type:
+      - application/json; charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cf-Ray:
+      - 6dbef899dcdb2574-SJC
+      Vary:
+      - Accept-Encoding
+      Cf-Cache-Status:
+      - DYNAMIC
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      X-Envoy-Upstream-Service-Time:
+      - '243'
+      Server:
+      - cloudflare
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "result": {
+            "id": "82c727a79571ff204a7ddc188d1806ec"
+          },
+          "success": true,
+          "errors": [],
+          "messages": []
+        }
+    http_version: 
+  recorded_at: Fri, 11 Feb 2022 16:32:04 GMT
+recorded_with: VCR 5.0.0

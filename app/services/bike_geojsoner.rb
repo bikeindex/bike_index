@@ -1,17 +1,20 @@
 class BikeGeojsoner
+  # Using an array of colors here to make it easier to copy, specifically for github.com/bikeindex/bike_thefts_map
+  COLORS = ["#BD1622", "#E74C3C", "#EB6759", "#EE8276", "#F29D94", "#F6B9B3"].freeze
+
   def self.stolen_marker_color(date_stolen)
     if date_stolen > Time.now - 1.day
-      "#BD1622"
+      COLORS[0]
     elsif date_stolen > Time.now - 1.week
-      "#E74C3C"
+      COLORS[1]
     elsif date_stolen > Time.now - 1.month
-      "#EB6759"
-    elsif date_stolen > Time.now - 6.months
-      "#EE8276"
+      COLORS[2]
+    elsif date_stolen > Time.now - 1.year
+      COLORS[3]
     elsif date_stolen > Time.now - 5.years
-      "#F29D94"
+      COLORS[4]
     else
-      "#F6B9B3"
+      COLORS[5]
     end
   end
 
