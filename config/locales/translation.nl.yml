@@ -5758,6 +5758,9 @@ nl:
       your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
         uw deelpagina en het embed-formulier van de fiets. Update het als je om die
         dingen geeft.
+      instagram_handle: Instagram-handvat
+      no_instagram: Geen Instagram
+      show_instagram: Toon Instagram
     registration_organizations:
       affiliation: "%{org_name} aansluiting"
       all_bikes_with_organization: Al uw fietsen zijn geregistreerd bij deze organisatie

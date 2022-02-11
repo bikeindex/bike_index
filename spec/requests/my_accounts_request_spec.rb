@@ -238,6 +238,34 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
 
+    describe "settings sharing links (twitter, instagram, website)" do
+      it "updates sharing links on the User" do
+        current_user.update(
+          show_twitter: false,
+          twitter: nil,
+          show_instagram: false,
+          instagram: nil,
+          show_website: false,
+          website: nil
+        )
+
+        patch base_url, params: {id: current_user.id,
+                                 user: {
+                                   instagram: "bikeinsta", show_instagram: true,
+                                   twitter: "biketwitter", show_twitter: true,
+                                   website: "https://bikeindex.org", show_website: true
+                                 }}
+
+        current_user.reload
+        expect(current_user.instagram).to eq "bikeinsta"
+        expect(current_user.show_instagram).to be true
+        expect(current_user.twitter).to eq "biketwitter"
+        expect(current_user.show_twitter).to be true
+        expect(current_user.website).to eq "https://bikeindex.org"
+        expect(current_user.show_website).to be true
+      end
+    end
+
     describe "updating phone" do
       it "updates and adds the phone" do
         current_user.reload

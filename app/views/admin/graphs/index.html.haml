@@ -68,7 +68,7 @@
                 %th Kind
                 %th Bikes
               %tbody
-                - Ownership.origins.keys.each do |origin|
+                - Ownership.origins.each do |origin|
                   %tr
                     %td.text-left= origin.humanize
                     %td.text-right= admin_number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
