@@ -12,6 +12,7 @@ class BikeIndex.BikesEditRemove extends BikeIndex
       setTimeout (->
         $("#request-delete input[type=submit]").attr("disabled", false)
       ), 500
+      false
 
   toggleHidden: (e) ->
     e.preventDefault()
