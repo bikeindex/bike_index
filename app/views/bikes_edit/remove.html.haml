@@ -74,10 +74,10 @@
                 = t(".delete_this_bike", bike_type: @bike.type)
 
 -# Explicitly redirect to my_account - other locations (e.g. admin) don't include js for rendering BikeIndexAlerts
-- after_delete_redirect = my_account_path
 -# Referenced by the edit_remove.coffee file, so we can redirect there afterward
 :javascript
-  window.userRootUrl = "#{after_delete_redirect}";
+  window.userRootUrl = "#{my_account_path}";
+-# NOTE: This modal needs to be up levels - or else the form is wrapped in the other form and it fails
 - modal_title = t(".modal_title", bike_type: @bike.type)
 - modal_body = capture_haml do
   = form_tag do |t|
