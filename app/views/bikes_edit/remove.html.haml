@@ -77,7 +77,7 @@
 -# Referenced by the edit_remove.coffee file, so we can redirect there afterward
 :javascript
   window.userRootUrl = "#{my_account_path}";
--# NOTE: This modal needs to be up levels - or else the form is wrapped in the other form and it fails
+-# NOTE: This modal needs to be outside of form - or else the modal's form is wrapped in the other form and it submits the parent form
 - modal_title = t(".modal_title", bike_type: @bike.type)
 - modal_body = capture_haml do
   = form_tag do |t|
