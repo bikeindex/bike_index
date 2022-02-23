@@ -81,6 +81,7 @@ class Organization < ApplicationRecord
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
+  scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[unstolen_notifications parking_notifications impound_bikes]) }
   # Regional orgs have to have the organization feature slug AND the search location set
@@ -122,6 +123,10 @@ class Organization < ApplicationRecord
 
   def self.no_pos_kinds
     %w[no_pos does_not_need_pos]
+  end
+
+  def self.with_pos_kinds
+    pos_kinds - broken_pos_kinds - no_pos_kinds
   end
 
   def self.pos?(kind = nil)
