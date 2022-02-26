@@ -121,8 +121,6 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
             user: bike.user,
             facebook_data: facebook_data)
         end
-        # Previously, we had more engagement on the tested post. Let's try to get one with more engagement soon!
-        # let(:target_engagement) { {post: "2", comment: "1", link_click: "4", post_reaction: "1", unique_clicks: "16", page_engagement: "8", post_engagement: "8", landing_page_view: "2"} }
         let(:target_engagement) { {landing_page_view: "2", link_click: "5", page_engagement: "5", post_engagement: "5", unique_clicks: "7"} }
         it "updates and sets the data" do
           expect(theft_alert).to be_valid
