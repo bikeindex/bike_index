@@ -118,6 +118,10 @@ class TheftAlert < ApplicationRecord
     latitude.blank? && longitude.blank?
   end
 
+  def address_string
+    stolen_record&.address(force_show_address: true, country: [:iso])
+  end
+
   def stolen_record_approved?
     stolen_record&.approved? || false
   end
