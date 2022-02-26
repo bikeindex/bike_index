@@ -26,27 +26,23 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       end
     end
 
-    # describe "reference_interests" do
-    #   it "gets the campaign" do
-    #     VCR.use_cassette("../facebook/ads_integration-reference_interests", match_requests_on: [:method]) do
-    #       interests = instance.reference_interests
-    #       expect(interests.is_a?(Array)).to be_truthy
-    #       expect(interests.first.keys).to match_array(%w[id name])
-    #       pp instance.reference_targeting
-    #       custom_audiences = instance.reference_custom_audiences
-    #       pp custom_audiences
-    #       expect(custom_audiences.is_a?(Array)).to be_truthy
-    #       expect(custom_audiences.first.keys).to match_array(%w[id name])
-    #     end
-    #   end
-    # end
+    describe "reference_interests" do
+      it "gets the campaign" do
+        VCR.use_cassette("facebook/ads_integration-reference_interests", match_requests_on: [:method]) do
+          interests = instance.reference_interests
+          expect(interests.is_a?(Array)).to be_truthy
+          expect(interests.first.keys).to match_array(%w[id name])
+        end
+      end
+    end
 
     context "with theft_alert" do
       let(:campaign_id) { "6273987584814" }
       let(:adset_id) { "6250587419614" }
       let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 999) }
       let(:bike) { Bike.new(id: 32, mnfg_name: "Surly") } # Manually stubbing so test has a valid URL
-      let(:stolen_record) { StolenRecord.new(bike: bike, city: "Oakland") }
+      let(:canada) { Country.canada }
+      let(:stolen_record) { StolenRecord.new(bike: bike, city: "Edmonton", street: "10000 138 st", zipcode: "T5N 2H7", country: canada) }
       let(:theft_alert) do
         TheftAlert.new(id: 12, theft_alert_plan: theft_alert_plan,
           stolen_record: stolen_record,
@@ -62,6 +58,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       describe "create_campaign" do
         let(:theft_alert) { TheftAlert.new(id: 12) }
         it "creates a campaign" do
+          expect(theft_alert.address_string).to eq "10000 138 st, Edmonton, T5N 2H7, CA"
           VCR.use_cassette("facebook/ads_integration-create_campaign", match_requests_on: [:method]) do
             campaign = instance.create_campaign(theft_alert)
             expect(campaign).to be_present
@@ -82,7 +79,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       end
 
       describe "create_ad, create_for" do
-        let(:message) { "Oakland: Keep an eye out for this stolen Surly. If you see it, let the owner know on Bike Index!" }
+        let(:message) { "Edmonton: Keep an eye out for this stolen Surly. If you see it, let the owner know on Bike Index!" }
         it "creates an adset" do
           expect(theft_alert.bike).to eq bike
           expect(theft_alert.adset_id).to eq adset_id
@@ -94,22 +91,22 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
           end
         end
 
-        #   describe "create_for" do
-        #     let(:theft_alert) { FactoryBot.create(:theft_alert, theft_alert_plan: theft_alert_plan) }
-        #     it "creates an ad and saves the data" do
-        #       expect(theft_alert.message).to eq message
-        #       expect(theft_alert).to be_valid
-        #       expect(theft_alert.facebook_data).to be_blank
-        #       VCR.use_cassette("facebook/ads_integration-create_for", match_requests_on: [:method]) do
-        #         instance.create_for(theft_alert)
-        #         theft_alert.reload
-        #         expect(theft_alert.campaign_id).to be_present
-        #         expect(theft_alert.adset_id).to be_present
-        #         expect(theft_alert.ad_id).to be_present
-        #         expect(theft_alert.facebook_post_url).to be_present
-        #       end
-        #     end
-        #   end
+        describe "create_for" do
+          let(:theft_alert) { FactoryBot.create(:theft_alert, theft_alert_plan: theft_alert_plan) }
+          it "creates an ad and saves the data" do
+            expect(theft_alert.message).to eq message
+            expect(theft_alert).to be_valid
+            expect(theft_alert.facebook_data).to be_blank
+            VCR.use_cassette("facebook/ads_integration-create_for", match_requests_on: [:method]) do
+              instance.create_for(theft_alert)
+              theft_alert.reload
+              expect(theft_alert.campaign_id).to be_present
+              expect(theft_alert.adset_id).to be_present
+              expect(theft_alert.ad_id).to be_present
+              expect(theft_alert.facebook_post_url).to be_present
+            end
+          end
+        end
       end
 
       describe "update_facebook_data" do
@@ -126,7 +123,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
         end
         # Previously, we had more engagement on the tested post. Let's try to get one with more engagement soon!
         # let(:target_engagement) { {post: "2", comment: "1", link_click: "4", post_reaction: "1", unique_clicks: "16", page_engagement: "8", post_engagement: "8", landing_page_view: "2"} }
-        let(:target_engagement) { {link_click: "3", page_engagement: "3", post_engagement: "3", unique_clicks: "4"} }
+        let(:target_engagement) { {landing_page_view: "2", link_click: "5", page_engagement: "5", post_engagement: "5", unique_clicks: "7"} }
         it "updates and sets the data" do
           expect(theft_alert).to be_valid
           expect(theft_alert.id).to be_present
@@ -138,9 +135,9 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
             expect(theft_alert.facebook_updated_at).to be_within(2).of Time.current
             expect(theft_alert.facebook_data["effective_object_story_id"]).to eq effective_object_story_id
             expect(theft_alert.facebook_data["amount_cents"]).to eq 999
-            expect(theft_alert.facebook_data["spend_cents"]).to eq 468.0
-            expect(theft_alert.reach).to eq 3232
-            expect(theft_alert.amount_cents_facebook_spent).to eq 468
+            expect(theft_alert.facebook_data["spend_cents"].to_i).to eq 745
+            expect(theft_alert.reach).to eq 4705
+            expect(theft_alert.amount_cents_facebook_spent).to eq 745
             expect_hashes_to_match(theft_alert.engagement, target_engagement)
           end
         end
