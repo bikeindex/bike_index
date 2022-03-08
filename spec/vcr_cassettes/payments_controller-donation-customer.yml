@@ -5,14 +5,14 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=donate&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=7500&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer=cus_JmR9ccDp8JD2Mo
+      string: submit_type=donate&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=7500&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2F<MAILCHIMP_KEY>.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2F<MAILCHIMP_KEY>.host%2Fpayments%2Fnew&customer=cus_JmR9ccDp8JD2Mo
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_aa6QsIYdeGGOR6","request_duration_ms":198}}'
+      - '{"last_request_metrics":{"request_id":"req_RJKX2zWbd03qm7","request_duration_ms":703}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 21 Dec 2021 03:16:48 GMT
+      - Wed, 16 Feb 2022 20:21:53 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1689'
+      - '1742'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -45,11 +45,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Idempotency-Key:
-      - c4b969c3-781a-40f5-b6e8-aef85ee64f84
+      - c77d969b-3c80-4deb-b8ff-066b5e847372
       Original-Request:
-      - req_qCqBEo5mqbx19C
+      - req_LeuTcPE5pTIAjI
       Request-Id:
-      - req_qCqBEo5mqbx19C
+      - req_LeuTcPE5pTIAjI
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -60,7 +60,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cs_test_a1hIc9ssBujoh1Icb0uKR1i873y5MpDo51yKfzFFbAbHhNv2gWqkRQFkvW",
+          "id": "cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -71,26 +71,28 @@ http_interactions:
             "status": null
           },
           "billing_address_collection": null,
-          "cancel_url": "http://test.host/payments/new",
+          "cancel_url": "http://<MAILCHIMP_KEY>.host/payments/new",
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
           "currency": "usd",
           "customer": "cus_JmR9ccDp8JD2Mo",
+          "customer_creation": null,
           "customer_details": {
-            "email": "testly@bikeindex.org",
+            "email": "<MAILCHIMP_KEY>ly@bikeindex.org",
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": null
           },
           "customer_email": null,
-          "expires_at": 1640143008,
+          "expires_at": 1645129313,
           "livemode": false,
           "locale": null,
           "metadata": {
           },
           "mode": "payment",
-          "payment_intent": "pi_2K8yqKm0T0GBfX0v0kway1uR",
+          "payment_intent": "pi_2KTu0bm0T0GBfX0v0sGOd4Lk",
+          "payment_link": null,
           "payment_method_options": {
           },
           "payment_method_types": [
@@ -111,19 +113,19 @@ http_interactions:
           "status": "open",
           "submit_type": "donate",
           "subscription": null,
-          "success_url": "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://<MAILCHIMP_KEY>.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/pay/cs_test_a1hIc9ssBujoh1Icb0uKR1i873y5MpDo51yKfzFFbAbHhNv2gWqkRQFkvW#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/pay/cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-    http_version: 
-  recorded_at: Tue, 21 Dec 2021 03:16:48 GMT
+    http_version:
+  recorded_at: Wed, 16 Feb 2022 20:21:53 GMT
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1hIc9ssBujoh1Icb0uKR1i873y5MpDo51yKfzFFbAbHhNv2gWqkRQFkvW
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc
     body:
       encoding: US-ASCII
       string: ''
@@ -133,7 +135,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_qCqBEo5mqbx19C","request_duration_ms":522}}'
+      - '{"last_request_metrics":{"request_id":"req_LeuTcPE5pTIAjI","request_duration_ms":795}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -146,11 +148,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 21 Dec 2021 03:16:49 GMT
+      - Wed, 16 Feb 2022 20:21:53 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1689'
+      - '1742'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -166,7 +168,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_AyfVeRtkQGpkwI
+      - req_lRtr2rnFBJp9Ik
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -175,7 +177,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cs_test_a1hIc9ssBujoh1Icb0uKR1i873y5MpDo51yKfzFFbAbHhNv2gWqkRQFkvW",
+          "id": "cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -186,26 +188,28 @@ http_interactions:
             "status": null
           },
           "billing_address_collection": null,
-          "cancel_url": "http://test.host/payments/new",
+          "cancel_url": "http://<MAILCHIMP_KEY>.host/payments/new",
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
           "currency": "usd",
           "customer": "cus_JmR9ccDp8JD2Mo",
+          "customer_creation": null,
           "customer_details": {
-            "email": "testly@bikeindex.org",
+            "email": "<MAILCHIMP_KEY>ly@bikeindex.org",
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": null
           },
           "customer_email": null,
-          "expires_at": 1640143008,
+          "expires_at": 1645129313,
           "livemode": false,
           "locale": null,
           "metadata": {
           },
           "mode": "payment",
-          "payment_intent": "pi_2K8yqKm0T0GBfX0v0kway1uR",
+          "payment_intent": "pi_2KTu0bm0T0GBfX0v0sGOd4Lk",
+          "payment_link": null,
           "payment_method_options": {
           },
           "payment_method_types": [
@@ -226,16 +230,16 @@ http_interactions:
           "status": "open",
           "submit_type": "donate",
           "subscription": null,
-          "success_url": "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://<MAILCHIMP_KEY>.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/pay/cs_test_a1hIc9ssBujoh1Icb0uKR1i873y5MpDo51yKfzFFbAbHhNv2gWqkRQFkvW#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/pay/cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-    http_version: 
-  recorded_at: Tue, 21 Dec 2021 03:16:48 GMT
+    http_version:
+  recorded_at: Wed, 16 Feb 2022 20:21:53 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmR9ccDp8JD2Mo
@@ -248,7 +252,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_AyfVeRtkQGpkwI","request_duration_ms":204}}'
+      - '{"last_request_metrics":{"request_id":"req_lRtr2rnFBJp9Ik","request_duration_ms":248}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -261,7 +265,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 21 Dec 2021 03:16:49 GMT
+      - Wed, 16 Feb 2022 20:21:54 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -281,7 +285,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_HOPFrVb3sv8qxa
+      - req_4yRKyMD5xcbLp8
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -318,7 +322,7 @@ http_interactions:
           "delinquent": false,
           "description": null,
           "discount": null,
-          "email": "testly@bikeindex.org",
+          "email": "<MAILCHIMP_KEY>ly@bikeindex.org",
           "invoice_prefix": "80897ED8",
           "invoice_settings": {
             "custom_fields": null,
@@ -366,6 +370,6 @@ http_interactions:
           "tax_info": null,
           "tax_info_verification": null
         }
-    http_version: 
-  recorded_at: Tue, 21 Dec 2021 03:16:49 GMT
+    http_version:
+  recorded_at: Wed, 16 Feb 2022 20:21:54 GMT
 recorded_with: VCR 5.0.0

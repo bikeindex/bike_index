@@ -25,7 +25,7 @@ http_interactions:
       Connection:
       - keep-alive
       Date:
-      - Tue, 21 Dec 2021 03:16:48 GMT
+      - Wed, 16 Feb 2022 20:19:36 GMT
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -33,14 +33,14 @@ http_interactions:
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 67c5370c4ea2e5f9f865960e31ef2d86.cloudfront.net (CloudFront)
+      - 1.1 5fa120f79d5713714191c32768eca58c.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
-      - SFO20-C1
+      - SFO5-C1
       X-Amz-Cf-Id:
-      - fXUSn_1ts9Sq-MUadlYY5PMvQzkfU7hlFPaunvE_KYlKW0YfwnDYvw==
+      - HdapAi2__zuJB7tOlUI8zpLGOLENAYUXZSuP8Dr9vpt_4H_FuQ9DHw==
     body:
       encoding: UTF-8
       string: "\n"
-    http_version: 
-  recorded_at: Tue, 21 Dec 2021 03:16:48 GMT
+    http_version:
+  recorded_at: Wed, 16 Feb 2022 20:19:36 GMT
 recorded_with: VCR 5.0.0

@@ -5,12 +5,14 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=pay&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Payment&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew
+      string: submit_type=pay&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Payment&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2F<MAILCHIMP_KEY>.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2F<MAILCHIMP_KEY>.host%2Fpayments%2Fnew
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_INLHNXUSaMzEx9","request_duration_ms":2}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -23,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 21 Dec 2021 03:16:47 GMT
+      - Wed, 16 Feb 2022 20:21:52 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1567'
+      - '1624'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -43,11 +45,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Idempotency-Key:
-      - 36b07793-daf2-4b2a-b6e9-0effd7e45778
+      - 2eab043b-c005-415b-937e-9522b922982e
       Original-Request:
-      - req_FzaLdkLyEMBcFk
+      - req_RJKX2zWbd03qm7
       Request-Id:
-      - req_FzaLdkLyEMBcFk
+      - req_RJKX2zWbd03qm7
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -58,7 +60,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cs_test_a1sbcVgQGdxw3nusNKx3CjJkl3JiyDkvFhV886ypSQrbwIs8km4LpNnlZl",
+          "id": "cs_<MAILCHIMP_KEY>_a1n1jEtcdVHB50O4AWNqPuM1jxzNoOlzhi2rs90dldJxkZvFeLCc5gbIXJ",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -69,21 +71,23 @@ http_interactions:
             "status": null
           },
           "billing_address_collection": null,
-          "cancel_url": "http://test.host/payments/new",
+          "cancel_url": "http://<MAILCHIMP_KEY>.host/payments/new",
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
           "currency": "usd",
           "customer": null,
+          "customer_creation": "always",
           "customer_details": null,
           "customer_email": null,
-          "expires_at": 1640143007,
+          "expires_at": 1645129312,
           "livemode": false,
           "locale": null,
           "metadata": {
           },
           "mode": "payment",
-          "payment_intent": "pi_2K8yqJm0T0GBfX0v0xi3KuHo",
+          "payment_intent": "pi_2KTu0am0T0GBfX0v1OUFGLPr",
+          "payment_link": null,
           "payment_method_options": {
           },
           "payment_method_types": [
@@ -104,14 +108,14 @@ http_interactions:
           "status": "open",
           "submit_type": "pay",
           "subscription": null,
-          "success_url": "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://<MAILCHIMP_KEY>.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/pay/cs_test_a1sbcVgQGdxw3nusNKx3CjJkl3JiyDkvFhV886ypSQrbwIs8km4LpNnlZl#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/pay/cs_<MAILCHIMP_KEY>_a1n1jEtcdVHB50O4AWNqPuM1jxzNoOlzhi2rs90dldJxkZvFeLCc5gbIXJ#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-    http_version: 
-  recorded_at: Tue, 21 Dec 2021 03:16:47 GMT
+    http_version:
+  recorded_at: Wed, 16 Feb 2022 20:21:52 GMT
 recorded_with: VCR 5.0.0

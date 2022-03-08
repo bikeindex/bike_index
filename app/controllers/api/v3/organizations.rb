@@ -47,10 +47,10 @@ module API
             permitted.to_h.except("locations").merge(auto_user_id: current_user.id)
           )
 
-          if permitted.locations.present?
-            relations = permitted.locations.map { |loc|
-              state = State.where(name: loc.state).first
-              country = Country.where(name: loc.country).first
+          if permitted[:locations].present?
+            relations = permitted[:locations].map { |loc|
+              state = State.where(name: loc[:state]).first
+              country = Country.where(name: loc[:country]).first
               loc.merge(state: state, country: country).to_h
             }
             organization.locations.build(relations)
