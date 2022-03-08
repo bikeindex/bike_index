@@ -33,7 +33,7 @@ module API
         "Content-Type" => "application/json",
         "Access-Control-Allow-Origin" => "*",
         "Access-Control-Request-Method" => "*"
-      }).finish
+      })
     end
 
     def self.status_code_for(error, eclass)
