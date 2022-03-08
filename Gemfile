@@ -80,7 +80,7 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 gem "api-pagination"
 gem "doorkeeper", "~> 5.2.5" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
-gem "grape", "~> 1.0.3" # API DSL
+gem "grape", "~> 1.1.0" # API DSL
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "hashie" # required for some Grape endpoints
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"

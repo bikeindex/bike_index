@@ -227,7 +227,7 @@ GEM
       text (>= 1.3.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
-    grape (1.0.3)
+    grape (1.1.0)
       activesupport
       builder
       mustermann-grape (~> 1.0.0)
@@ -727,7 +727,7 @@ DEPENDENCIES
   fog-aws
   foreman
   geocoder
-  grape (~> 1.0.3)
+  grape (~> 1.1.0)
   grape-swagger (= 0.11)
   grape_logging
   groupdate
