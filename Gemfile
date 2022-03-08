@@ -74,8 +74,7 @@ gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
-gem "facebookbusiness", "~> 0.11.0", github: "facebook/facebook-ruby-business-sdk" # For promoted alerts
-# gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk" # For promoted alerts
+gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"

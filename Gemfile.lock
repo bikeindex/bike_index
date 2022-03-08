@@ -14,9 +14,10 @@ GIT
 
 GIT
   remote: https://github.com/facebook/facebook-ruby-business-sdk.git
-  revision: 5dcb7becbfa874f8f4c9750254763d2aca644a2c
+  revision: 0b02efae9cf57a7e326ba1b45d2692cb4d277736
+  branch: main
   specs:
-    facebookbusiness (0.11.0.0)
+    facebookbusiness (0.12.0.1)
       concurrent-ruby (~> 1.1)
       countries (~> 3.0)
       faraday (~> 1.0)
@@ -715,7 +716,7 @@ DEPENDENCIES
   doorkeeper-i18n
   dotenv-rails
   eventmachine
-  facebookbusiness (~> 0.11.0)!
+  facebookbusiness!
   factory_bot_rails
   faraday_middleware
   fast_blank (~> 1.0)

@@ -12,7 +12,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_RJKX2zWbd03qm7","request_duration_ms":703}}'
+      - '{"last_request_metrics":{"request_id":"req_VvS43tRKmfecIX","request_duration_ms":227}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Wed, 16 Feb 2022 20:21:53 GMT
+      - Sat, 26 Feb 2022 01:01:14 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -45,11 +45,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Idempotency-Key:
-      - c77d969b-3c80-4deb-b8ff-066b5e847372
+      - 609f8df0-37d4-4def-82ed-921f76b141ed
       Original-Request:
-      - req_LeuTcPE5pTIAjI
+      - req_MrVTUSHMn16sZ0
       Request-Id:
-      - req_LeuTcPE5pTIAjI
+      - req_MrVTUSHMn16sZ0
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -60,7 +60,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc",
+          "id": "cs_test_a1n5ZDf40zLjwLlE7dvhJiEtP34lBHRXp7SKFIRNbqApiBiX4SGIYgJW3Z",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -85,13 +85,13 @@ http_interactions:
             "tax_ids": null
           },
           "customer_email": null,
-          "expires_at": 1645129313,
+          "expires_at": 1645923674,
           "livemode": false,
           "locale": null,
           "metadata": {
           },
           "mode": "payment",
-          "payment_intent": "pi_2KTu0bm0T0GBfX0v0sGOd4Lk",
+          "payment_intent": "pi_2KXEesm0T0GBfX0v0qSr927g",
           "payment_link": null,
           "payment_method_options": {
           },
@@ -119,13 +119,13 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/pay/cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/pay/cs_test_a1n5ZDf40zLjwLlE7dvhJiEtP34lBHRXp7SKFIRNbqApiBiX4SGIYgJW3Z#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-    http_version:
-  recorded_at: Wed, 16 Feb 2022 20:21:53 GMT
+    http_version: 
+  recorded_at: Sat, 26 Feb 2022 01:01:14 GMT
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1n5ZDf40zLjwLlE7dvhJiEtP34lBHRXp7SKFIRNbqApiBiX4SGIYgJW3Z
     body:
       encoding: US-ASCII
       string: ''
@@ -135,7 +135,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_LeuTcPE5pTIAjI","request_duration_ms":795}}'
+      - '{"last_request_metrics":{"request_id":"req_MrVTUSHMn16sZ0","request_duration_ms":523}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -148,7 +148,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Wed, 16 Feb 2022 20:21:53 GMT
+      - Sat, 26 Feb 2022 01:01:14 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -168,7 +168,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_lRtr2rnFBJp9Ik
+      - req_hCOkBQfQXh4bJL
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -177,7 +177,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc",
+          "id": "cs_test_a1n5ZDf40zLjwLlE7dvhJiEtP34lBHRXp7SKFIRNbqApiBiX4SGIYgJW3Z",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -202,13 +202,13 @@ http_interactions:
             "tax_ids": null
           },
           "customer_email": null,
-          "expires_at": 1645129313,
+          "expires_at": 1645923674,
           "livemode": false,
           "locale": null,
           "metadata": {
           },
           "mode": "payment",
-          "payment_intent": "pi_2KTu0bm0T0GBfX0v0sGOd4Lk",
+          "payment_intent": "pi_2KXEesm0T0GBfX0v0qSr927g",
           "payment_link": null,
           "payment_method_options": {
           },
@@ -236,10 +236,10 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/pay/cs_<MAILCHIMP_KEY>_a1Nrim2Ra7Xr4uMUKsbx58zDMBrjwPdTl6erP5Lk9rsYAZgEhc2YfulWhc#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/pay/cs_test_a1n5ZDf40zLjwLlE7dvhJiEtP34lBHRXp7SKFIRNbqApiBiX4SGIYgJW3Z#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-    http_version:
-  recorded_at: Wed, 16 Feb 2022 20:21:53 GMT
+    http_version: 
+  recorded_at: Sat, 26 Feb 2022 01:01:14 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmR9ccDp8JD2Mo
@@ -252,7 +252,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_lRtr2rnFBJp9Ik","request_duration_ms":248}}'
+      - '{"last_request_metrics":{"request_id":"req_hCOkBQfQXh4bJL","request_duration_ms":211}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -265,7 +265,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Wed, 16 Feb 2022 20:21:54 GMT
+      - Sat, 26 Feb 2022 01:01:15 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -285,7 +285,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_4yRKyMD5xcbLp8
+      - req_FNUtw1H5C7DdL7
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -370,6 +370,6 @@ http_interactions:
           "tax_info": null,
           "tax_info_verification": null
         }
-    http_version:
-  recorded_at: Wed, 16 Feb 2022 20:21:54 GMT
+    http_version: 
+  recorded_at: Sat, 26 Feb 2022 01:01:14 GMT
 recorded_with: VCR 5.0.0

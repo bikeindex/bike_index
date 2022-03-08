@@ -2708,10 +2708,6 @@ nl:
         hij met zijn masters, sociale ondernemerschap, in Nederland bezig was. Na
         een aantal jaren hier alleen mee bezig te zijn geweest, helpt hij nu Bike
         Index uit te breiden binnen en buiten Europa."
-      lily_williams_bio_html: "<strong>Lily Williams</strong> heeft haar masterdiploma
-        behaald aan de Medill School of Journalism, maar kwam er al gauw achter dat
-        ze meer voldoening putte uit het werken of schrijven over fietsen. Zij doet
-        dan ook de communicatie voor Bike Index."
       merging_the_services: Door het samenvoegen van de diensten van Seth en Bryan,
         ontstond er een universele fiets-registratieservice. Dit was een droom die
         uitkwam, een database die wordt gebruikt en doorzocht door zowel particulieren
@@ -2742,6 +2738,11 @@ nl:
         zich dat het achtervolgen en terughalen van gestolen fietsen erg leuk was.
         Hij houdt zich bezig met cybersecurity en past OSINT-methoden en -processen
         toe op het achtervolgen van fietsdieven."
+      gavin_hoover_bio_html: "<strong>Gavin Hoover</strong> bracht tien jaar van zijn
+        leven door met fietsen en racen over de hele wereld voordat hij zich realiseerde
+        dat andere mensen fietsen als vervoermiddel gebruiken. Hij brengt veel kennis
+        van de wielerwereld met zich mee en zorgt ervoor dat achter de schermen bij
+        Bike Index alles blijft draaien."
     dev_and_design:
       bike_index_logos_html: "%{link} - logo's van vector- en png-fietsindex"
       bike_shop_card: Fietswinkel kaart
