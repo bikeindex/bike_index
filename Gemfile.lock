@@ -727,7 +727,7 @@ DEPENDENCIES
   fog-aws
   foreman
   geocoder
-  grape (~> 1.2.0)
+  grape (~> 1.2.4)
   grape-swagger (= 0.11)
   grape_logging
   groupdate
