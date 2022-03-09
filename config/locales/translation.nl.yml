@@ -1236,7 +1236,6 @@ nl:
         regexp: is ongeldig
         blank: is leeg
         values: heeft geen geldige waarde
-        except: heeft een waarde niet toegestaan
         missing_vendor_option:
           problem: 'ontbreekt: verkoperoptie.'
           summary: 'bij versie met koptekst moet u opgeven: leverancieroptie.'
@@ -1278,6 +1277,9 @@ nl:
         invalid_version_header:
           problem: Ongeldige versieheader
           resolution: "%{message}"
+        except_values: heeft een waarde niet toegestaan
+        same_as: is niet hetzelfde als %{parameter}
+        invalid_response: Ongeldig antwoord
   flash:
     actions:
       create:
