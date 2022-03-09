@@ -7,7 +7,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config and Dockerfile if Ruby version is bumped
 ruby "2.7.3"
-gem "rack", "2.0.8"
+gem "rack", "2.2.3"
 gem "rails", "~> 5.2"
 
 gem "puma" # App server
@@ -80,10 +80,11 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 gem "api-pagination"
 gem "doorkeeper", "~> 5.2.5" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
-gem "grape", "~> 0.19.1" # API DSL
+gem "grape", "~> 1.3.0" # API DSL
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
+gem "hashie" # required for some Grape endpoints
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
-gem "wine_bouncer" # Grape Authentication management
+gem "wine_bouncer", github: "bikeindex/wine_bouncer", branch: "master" # Grape Authentication management
 
 # Secure things
 gem "rack-throttle" # Rate limiting

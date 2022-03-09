@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a17wYrWqVcrfgLkOnthsa6r4STYqidDh3gTU8pkUqgGepDZSprYeoT8VxV
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<MAILCHIMP_KEY>_a17wYrWqVcrfgLkOnthsa6r4STYqidDh3gTU8pkUqgGepDZSprYeoT8VxV
     body:
       encoding: US-ASCII
       string: ''
@@ -50,9 +50,9 @@ http_interactions:
       - max-age=31556926; includeSubDomains; preload
     body:
       encoding: UTF-8
-      string: |
+      string: |-
         {
-          "id": "cs_test_a17wYrWqVcrfgLkOnthsa6r4STYqidDh3gTU8pkUqgGepDZSprYeoT8VxV",
+          "id": "cs_<MAILCHIMP_KEY>_a17wYrWqVcrfgLkOnthsa6r4STYqidDh3gTU8pkUqgGepDZSprYeoT8VxV",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -74,16 +74,13 @@ http_interactions:
             "email": "seth@bikeindex.org",
             "phone": null,
             "tax_exempt": "none",
-            "tax_ids": [
-
-            ]
+            "tax_ids": []
           },
           "customer_email": null,
           "expires_at": 1625334867,
           "livemode": false,
           "locale": null,
-          "metadata": {
-          },
+          "metadata": {},
           "mode": "payment",
           "payment_intent": "pi_0J8qZLm0T0GBfX0v6J8Q3YjN",
           "payment_link": null,
@@ -100,9 +97,7 @@ http_interactions:
           "setup_intent": null,
           "shipping": null,
           "shipping_address_collection": null,
-          "shipping_options": [
-
-          ],
+          "shipping_options": [],
           "shipping_rate": null,
           "status": "complete",
           "submit_type": "donate",

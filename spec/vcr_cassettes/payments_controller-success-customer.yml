@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<MAILCHIMP_KEY>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
     body:
       encoding: US-ASCII
       string: ''
@@ -54,7 +54,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
+          "id": "cs_<MAILCHIMP_KEY>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -73,7 +73,7 @@ http_interactions:
           "customer": "cus_JmR9ccDp8JD2Mo",
           "customer_creation": null,
           "customer_details": {
-            "email": "testly@bikeindex.org",
+            "email": "<MAILCHIMP_KEY>ly@bikeindex.org",
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": [
