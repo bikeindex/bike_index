@@ -6,38 +6,20 @@
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
-        - if render_sortable
-          = sortable "created_at"
-        - else
-          Created&nbsp;<small class="convertTimezone"></small>
+        = sortable "created_at", render_sortable: render_sortable
       %th
-        - if render_sortable
-          = sortable "invited_email", "recipient"
-        - else
-          recipient
+        = sortable "invited_email", "recipient", render_sortable: render_sortable
       - unless skip_organization
         %th
-          - if render_sortable
-            = sortable "organization_id"
-          - else
-            Organization
+          = sortable "organization_id", render_sortable: render_sortable
       %th
-        - if render_sortable
-          = sortable "claimed_at"
-        - else
-          Claimed
+        = sortable "claimed_at", render_sortable: render_sortable
       %th
         %small
-          - if render_sortable
-            = sortable "sender_id", "Sender"
-          - else
-            Sender
+          = sortable "sender_id", "Sender", render_sortable: render_sortable
       %th
         %small
-          - if render_sortable
-            = sortable "role", "Admin?"
-          - else
-            Admin?
+          = sortable "role", "Admin?", render_sortable: render_sortable
 
     %tbody
       - memberships.each do |membership|
