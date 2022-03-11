@@ -49,7 +49,7 @@ class Admin::MembershipsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at invited_email sender_id claimed_at organization_id]
+    %w[created_at invited_email sender_id claimed_at organization_id role]
   end
 
   def permitted_parameters
