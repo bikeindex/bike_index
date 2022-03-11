@@ -28,7 +28,6 @@
 
 .custom-time-selection {
   @extend .row;
-  width: 100%;
   justify-content: flex-end;
   // We always want the form to be inline, so style manually
   .form-group {
