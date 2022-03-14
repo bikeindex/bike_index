@@ -201,8 +201,8 @@ module ControllerHelpers
 
   def controller_namespace
     return @controller_namespace if defined?(@controller_namespace)
-    @controller_namespace = if self.class.parent.name != "Object"
-      self.class.parent.name.underscore.downcase
+    @controller_namespace = if self.class.module_parent.name != "Object"
+      self.class.module_parent.name.underscore.downcase
     end
   end
 
