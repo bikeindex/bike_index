@@ -4,15 +4,23 @@ module GraphingHelper
   def time_range_counts(collection:, column: "created_at", time_range: nil)
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
-    collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
-      .count
+    collection.send(
+      group_by_method(time_range),
+      column,
+      range: time_range,
+      format: group_by_format(time_range)
+    ).count
   end
 
   def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil, convert_to_dollars: false)
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
-    result = collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
-      .sum(amount_column)
+    result = collection.send(
+      group_by_method(time_range),
+      column,
+      range: time_range,
+      format: group_by_format(time_range)
+    ).sum(amount_column)
 
     return result unless convert_to_dollars
 
