@@ -179,7 +179,7 @@ class Feedback < ApplicationRecord
   def calculated_kind
     return feedback_type if self.class.kinds.include?(feedback_type)
     if feedback_type == "stolen_information"
-      return title.match?(/chop.?shop/i) ? "tip_chop_shop" : "tip_stolen_bike"
+      return title&.match?(/chop.?shop/i) ? "tip_chop_shop" : "tip_stolen_bike"
     end
     "message"
   end
