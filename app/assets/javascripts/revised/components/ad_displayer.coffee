@@ -1,66 +1,76 @@
 class @AdDisplayer
-  ads_skyscraper = ["ad300x600"]
-  ads_sm_rectangle = ["ad468x60"]
-  ads_full_width = ["adFullWidth"]
+  ad_types = [
+    {kind: "skyscraper", klass: "ad300x600"},
+    {kind: "sm_rectangle", klass: "ad468x60"}
+    # {kind: "full_width", klass: "adFullWidth"} # currently only via google
+  ]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
-
   max_tracker_url = "https://www.indiegogo.com/projects/maxtracker-anti-theft-gps-bicycle-security-system--2#/"
+  ottalaus_url = "https://ottalausinc.ca/"
 
-  internalAds = {
-    "max_tracker_300": {
-      "href": max_tracker_url,
-      "body": "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
-    },
-    "max_tracker_468": {
-      "href": max_tracker_url,
-      "body": "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
+  internalAds = [
+    {
+      name: "max_tracker_300",
+      kind: "skyscraper",
+      href: max_tracker_url,
+      body: "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
+    }, {
+      name: "max_tracker_468",
+      kind: "sm_rectangle",
+      href: max_tracker_url,
+      body: "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
+    }, {
+      name: "ottalaus_300"
+      kind: "skyscraper",
+      href: ottalaus_url,
+      body: "<img src=\"/ads/ottalaus-300.png\" alt=\"Ottalaus\">"
+    }, {
+      name: "ottalaus_468",
+      kind: "sm_rectangle",
+      href: ottalaus_url,
+      body: "<img src=\"/ads/ottalaus-468.png\" alt=\"Ottalaus\">"
     }
-  }
+  ]
 
-  skyscrapers = ["max_tracker_300"]
-  sm_rectangles = ["max_tracker_468"]
-  full_width = []
+  # Absolutely biased shuffle, but whatever! Better than nothing. And it works with a small number of elements
+  # Doing it twice seems to fix an error where it didn't actually shuffle
+  shuffle: (a) ->
+    b = a.sort -> 0.5 - Math.random()
+    b.sort -> 0.5 - Math.random()
 
   constructor: ->
     @renderedAds = []
     # Google ads are rendered on blocks with class .ad-google
     # our ads are rendered on blocks with class .ad-binx
 
-    # TODO: don't use jquery here for the element iterating
-    for el_klass in ads_skyscraper
-      $(".ad-binx.#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
+    # Only shuffle the ads once, and render from the shuffled list
+    adsToRender = @shuffle(internalAds)
+    for ad_type in ad_types
+      available = adsToRender.filter (x) -> x.kind == ad_type.kind
 
-    for el_klass in ads_sm_rectangle
-      $(".ad-binx.#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
-
-    # ads_full_width are only google right now
-    # for el_klass in ads_full_width
-    #   $(".ad-binx.#{el_klass}").each (index, el) =>
-    #     @renderedAds.push @renderAdElement(el, index, el_klass, full_width)
+      for el, index in document.querySelectorAll(".ad-binx.#{ad_type.klass}")
+        @renderedAds.push @renderAdElement(el, available[index])
 
     # Remove undefined ads (ie they weren't rendered)
     @renderedAds = @renderedAds.filter (x) ->
       x != undefined
 
     # TODO: not tracking google ad loading. Should be tracking it too.
-    # If google analytics is loaded, create an event for each ad that is loaded, and track the clicks
+    # If google analytics is loaded, this creates an event for each ad that is loaded and track the clicks
     if window.ga
       for adname in @renderedAds
         window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-load", eventLabel: "#{adname}"})
         $("#binxad-#{adname}").click (e) ->
           window.ga("send", {hitType: "event", eventCategory: "advertisement", eventAction: "ad-click", eventLabel: "#{adname}"})
 
-  renderAdElement: (el, index, klass, adArray) ->
+
+  renderAdElement: (el, ad) ->
     # check if element is visible, skip rendering if it isn't
-    return unless el.offsetWidth > 0 && el.offsetHeight > 0;
+    return unless el.offsetWidth > 0 && el.offsetHeight > 0 && ad
     el.classList.add("rendered-ad")
-    if adArray[index]
-      renderedAd = internalAds[adArray[index]]
-      el.innerHTML = "<a href=\"#{renderedAd.href}\" id=\"binxad-#{adArray[index]}\">#{renderedAd.body}</a>"
-      adArray[index]
+    el.innerHTML = "<a href=\"#{ad.href}\" id=\"binxad-#{ad.name}\">#{ad.body}</a>"
+    ad.name # Return name, which is added to the renderedAds array
 
 
   # geolocatedAd: ->
