@@ -1,45 +1,51 @@
 class @AdDisplayer
-  ads_skyscraper = ["ad300x600"]
-  ads_sm_rectangle = ["ad468x60"]
-  ads_full_width = ["adFullWidth"]
+  ad_types = [
+    {kind: "skyscraper", klass: "ad300x600"},
+    {kind: "sm_rectangle", klass: "ad468x60"}
+    # {kind: "full_width", klass: "adFullWidth"} # currently only via google
+  ]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
-
   max_tracker_url = "https://www.indiegogo.com/projects/maxtracker-anti-theft-gps-bicycle-security-system--2#/"
+  ottalaus_url = "https://ottalausinc.ca/"
 
-  internalAds = {
-    "max_tracker_300": {
-      "href": max_tracker_url,
-      "body": "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
-    },
-    "max_tracker_468": {
-      "href": max_tracker_url,
-      "body": "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
+  internalAds = [
+    {
+      kind: "skyscraper",
+      href: max_tracker_url,
+      body: "<img src=\"/ads/maxtracker-300x600-2.jpg\" alt=\"MaxTracker\">"
+    }, {
+      kind: "sm_rectangle",
+      href: max_tracker_url,
+      body: "<img src=\"/ads/maxtracker-468x60-2.jpg\" alt=\"MaxTracker\">"
+    }, {
+      kind: "skyscraper",
+      href: ottalaus_url,
+      body: "<img src=\"/ads/ottalaus-468.png\" alt=\"Ottalaus\">"
+    }, {
+      kind: "sm_rectangle",
+      href: ottalaus_url,
+      body: "<img src=\"/ads/ottalaus-300.png\" alt=\"Ottalaus\">"
     }
-  }
+  ]
 
-  skyscrapers = ["max_tracker_300"]
-  sm_rectangles = ["max_tracker_468"]
-  full_width = []
+  # Absolutely biased shuffle, but whatever! Better than nothing. And it works with a small number of elements
+  # Doing it twice seems to fix an error where it didn't actually shuffle
+  shuffle: (a) ->
+    b = a.sort -> 0.5 - Math.random()
+    b.sort -> 0.5 - Math.random()
 
   constructor: ->
     @renderedAds = []
     # Google ads are rendered on blocks with class .ad-google
     # our ads are rendered on blocks with class .ad-binx
-
     # TODO: don't use jquery here for the element iterating
-    for el_klass in ads_skyscraper
-      $(".ad-binx.#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, el_klass, skyscrapers)
 
-    for el_klass in ads_sm_rectangle
-      $(".ad-binx.#{el_klass}").each (index, el) =>
-        @renderedAds.push @renderAdElement(el, index, el_klass, sm_rectangles)
-
-    # ads_full_width are only google right now
-    # for el_klass in ads_full_width
-    #   $(".ad-binx.#{el_klass}").each (index, el) =>
-    #     @renderedAds.push @renderAdElement(el, index, el_klass, full_width)
+    for ad_type in ad_types
+      available = internalAds.filter (x) -> x.kind == ad_type.kind
+      # # available = ad for ad in internalAds when ad.kind == ad_type.kind
+      console.log available.map (ad) -> ad.body
+    return
 
     # Remove undefined ads (ie they weren't rendered)
     @renderedAds = @renderedAds.filter (x) ->
