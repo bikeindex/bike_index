@@ -233,7 +233,7 @@ module ControllerHelpers
         end
       else
         set_time_range_from_period
-      @period = default_period unless %w[hour day month year week all next_week next_month].include?(@period)
+      end
     elsif params[:search_at].present?
       @period = "custom"
       @search_at = TimeParser.parse(params[:search_at], @timezone)
@@ -242,7 +242,7 @@ module ControllerHelpers
       @end_time = @search_at + offset
     else
       set_time_range_from_period
-    @period = default_period unless %w[hour day month year week all next_week next_month].include?(@period)
+    end
     # Add this render_chart in here so we don't have to define it in all the controllers
     @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @time_range = @start_time..@end_time
