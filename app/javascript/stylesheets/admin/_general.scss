@@ -51,11 +51,16 @@
     @extend .nav;
     @extend .nav-pills;
     @extend .justify-content-end;
+    // On small screens, make nav links align left
+    @include media-breakpoint-down(sm) {
+      justify-content: normal !important;
+    }
   }
   .nav-item {
     @extend .small;
     margin-left: 0.25rem;
-    a {
+    a,
+    .button_to .btn {
       padding: 0.25rem 0.5rem;
     }
   }

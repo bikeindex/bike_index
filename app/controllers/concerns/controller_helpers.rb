@@ -222,14 +222,24 @@ module ControllerHelpers
     @timezone ||= Time.zone
     # Set time period
     @period ||= params[:period]
-    if @period == "custom" && params[:start_time].present?
-      @start_time = TimeParser.parse(params[:start_time], @timezone)
-      @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
-      if @start_time > @end_time
-        new_end_time = @start_time
-        @start_time = @end_time
-        @end_time = new_end_time
+    if @period == "custom"
+      if params[:start_time].present?
+        @start_time = TimeParser.parse(params[:start_time], @timezone)
+        @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
+        if @start_time > @end_time
+          new_end_time = @start_time
+          @start_time = @end_time
+          @end_time = new_end_time
+        end
+      else
+        set_time_range_from_period
       end
+    elsif params[:search_at].present?
+      @period = "custom"
+      @search_at = TimeParser.parse(params[:search_at], @timezone)
+      offset = params[:period].present? ? params[:period].to_i : 10.minutes.to_i
+      @start_time = @search_at - offset
+      @end_time = @search_at + offset
     else
       set_time_range_from_period
     end
