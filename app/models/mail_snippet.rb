@@ -52,7 +52,7 @@ class MailSnippet < ApplicationRecord
   end
 
   def self.organization_message_kinds
-    ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
+    ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved location_stolen_message]
   end
 
   def self.finished_registration_kinds
@@ -77,7 +77,7 @@ class MailSnippet < ApplicationRecord
 
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
-    self.kind = "custom" if kind.blank?
+    self.kind ||= "custom"
   end
 
   def update_associations

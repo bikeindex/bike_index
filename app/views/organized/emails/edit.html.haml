@@ -6,6 +6,12 @@
     %em
       = @kind.humanize
 
+- unless viewable_email_kinds.include?(@kind)
+  .alert.alert-warning.mb-4
+    This email isn't normally viewable by normal users, it isn't part of the organizations permitted viewable kinds
+
+
+
 - if @can_edit
   .row
     .col-md-6

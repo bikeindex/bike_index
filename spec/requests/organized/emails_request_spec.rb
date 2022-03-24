@@ -4,7 +4,11 @@ RSpec.describe Organized::EmailsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/emails" }
   # we need a default organized bike to render emails, so build one
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
-  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes] }
+  let(:all_viewable_email_kinds) do
+    %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification graduated_notification
+      impound_notification impound_claim_approved impound_claim_denied location_stolen_message]
+  end
+  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes location_stolen_message] }
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member
@@ -47,14 +51,12 @@ RSpec.describe Organized::EmailsController, type: :request do
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
-    let(:all_viewable_email_kinds) do
-      %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification graduated_notification
-        impound_notification impound_claim_approved impound_claim_denied]
-    end
     describe "index" do
       it "renders" do
         get base_url
         expect(response).to render_template(:index)
+        # Sanity check
+        expect(all_viewable_email_kinds).to match_array(MailSnippet.organization_message_kinds + %w[finished_registration partial_registration])
         expect(assigns(:viewable_email_kinds)).to match_array(all_viewable_email_kinds)
       end
     end
@@ -166,6 +168,15 @@ RSpec.describe Organized::EmailsController, type: :request do
           end
         end
       end
+      context "partial_registration without access" do
+        let(:enabled_feature_slugs) { %w[customize_emails graduated_notifications] }
+        it "redirects" do
+          get "#{base_url}/partial_registration/edit"
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+          expect(assigns(:kind)).to eq "finished_registration"
+        end
+      end
     end
 
     describe "update" do
@@ -212,6 +223,35 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(mail_snippet.body).to eq "cool new things"
           expect(mail_snippet.subject).to eq "a fancy custom subject"
           expect(mail_snippet.is_enabled).to be_falsey
+        end
+      end
+    end
+  end
+
+  context "logged_in_as_super_admin" do
+    include_context :request_spec_logged_in_as_superuser
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
+    # Also defined in controller
+    let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied location_stolen_message] }
+    describe "edit" do
+      it "renders" do
+        viewable_kinds.each do |kind|
+          get "#{base_url}/#{kind}/edit"
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+          expect(assigns(:kind)).to eq kind
+          unless %w[partial_registration finished_registration].include?(kind)
+            expect(assigns(:can_edit)).to be_truthy
+          end
+        end
+      end
+      context "partial_registration without access" do
+        let(:enabled_feature_slugs) { %w[customize_emails graduated_notifications] }
+        it "redirects" do
+          get "#{base_url}/partial_registration/edit"
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+          expect(assigns(:kind)).to eq "partial_registration"
         end
       end
     end

@@ -71,6 +71,11 @@ module Organized
       bike
     end
 
+    def potential_viewable_email_kinds
+      ParkingNotification.kinds + %w[finished_registration partial_registration
+        graduated_notification impound_claim_approved impound_claim_denied location_stolen_message]
+    end
+
     def viewable_email_kinds
       return @viewable_email_kinds if defined?(@viewable_email_kinds)
       viewable_email_kinds = ["finished_registration"]
@@ -78,12 +83,15 @@ module Organized
       viewable_email_kinds += ParkingNotification.kinds if current_organization.enabled?("parking_notifications")
       viewable_email_kinds += ["graduated_notification"] if current_organization.enabled?("graduated_notifications")
       viewable_email_kinds += %w[impound_claim_approved impound_claim_denied] if current_organization.enabled?("impound_bikes")
+      viewable_email_kinds += %w[location_stolen_message] if current_organization.enabled?("location_stolen_message")
       @viewable_email_kinds = viewable_email_kinds
     end
 
     def find_mail_snippets
       @organization = current_organization
-      @kind = viewable_email_kinds.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
+      @kind = potential_viewable_email_kinds.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
+      # Allow superusers to view any email kind
+      @kind = viewable_email_kinds.first unless viewable_email_kinds.include?(@kind) || current_user.superuser?
       @impound_claim_kind = @kind.match?(/impound_claim/)
       # These are uneditable kinds:
       @can_edit = !%w[finished_registration partial_registration].include?(@kind)
