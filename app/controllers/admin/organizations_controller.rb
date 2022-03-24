@@ -106,7 +106,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :name,
         :parent_organization_id,
         :previous_slug,
-        :search_radius,
+        :search_radius_miles,
         :short_name,
         :show_on_map,
         :slug,

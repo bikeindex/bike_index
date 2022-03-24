@@ -149,11 +149,11 @@
                   Unless this is set, the organization will not send graduated notifications - even if they have the feature enabled
           - if @organization.enabled?("regional_bike_counts")
             .form-group
-              = f.label :search_radius do
+              = f.label :search_radius_miles do
                 Search radius (mi)
                 %small
                   <span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations
-              = f.number_field :search_radius, { class: "form-control" }
+              = f.number_field :search_radius_miles, { class: "form-control" }
               .text-warning.p-1
                 %em.small
                   %code.d-inline nearby_organizations
