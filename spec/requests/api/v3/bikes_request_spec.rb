@@ -464,6 +464,8 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.example).to be_falsey
       expect(bike.is_for_sale).to be_truthy
       expect(bike.frame_material).to eq(bike_attrs[:frame_material])
+      expect(bike.serial_unknown?).to be_falsey
+      expect(bike.serial_normalized).to eq "69 N0N EXAMP1E"
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
@@ -535,6 +537,7 @@ RSpec.describe "Bikes API V3", type: :request do
       organization.save
       bike_attrs[:organization_slug] = organization.slug
       date_stolen = 1357192800
+      bike_attrs[:serial] = "unknown"
       bike_attrs[:stolen_record] = {
         phone: "1234567890",
         date_stolen: date_stolen,
@@ -552,12 +555,14 @@ RSpec.describe "Bikes API V3", type: :request do
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(json_result).to include("bike")
-      expect(json_result["bike"]["serial"]).to eq(bike_attrs[:serial])
+      expect(json_result["bike"]["serial"]).to eq "Unknown"
       expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
       bike = Bike.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to eq(organization)
       expect(bike.bike_organizations.count).to eq 1
+      expect(bike.serial_unknown?).to be_truthy
+      expect(bike.serial_normalized).to be_blank
       bike_organization = bike.bike_organizations.first
       expect(bike_organization.organization_id).to eq organization.id
       expect(bike_organization.can_edit_claimed).to be_truthy
