@@ -18,6 +18,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :frame_material_slug,
     :front_gear_type_slug,
     :rear_gear_type_slug,
+    :extra_registration_number,
     :additional_registration
 
   has_one :stolen_record
