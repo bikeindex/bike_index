@@ -314,7 +314,7 @@ class Organization < ApplicationRecord
     Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles)
   end
 
-  # Try for publicly_visible, fall back to whatever
+  # Try for publicly_visible, fall back to whatever - TODO: make this configurable
   def default_location
     locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first
   end
