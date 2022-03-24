@@ -311,7 +311,7 @@ class Organization < ApplicationRecord
   end
 
   def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius)
+    Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles)
   end
 
   # Try for publicly_visible, fall back to whatever

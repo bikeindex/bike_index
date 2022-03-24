@@ -53,8 +53,8 @@ RSpec.describe Organized::BaseController, type: :request do
       end
     end
     context "organization regional parent" do
-      let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 50) }
-      let!(:organization_child1) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: current_organization) }
+      let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 50) }
+      let!(:organization_child1) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: current_organization) }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization_child1) }
       it "does not rendern" do
         current_organization.update(updated_at: Time.current)

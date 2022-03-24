@@ -144,7 +144,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
       context "already enabled" do
         let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: current_organization, is_on: true, timezone_str: "America/Los_Angeles") }
         it "turns off if set off" do
-          current_organization.update(search_radius: 101)
+          current_organization.update(search_radius_miles: 101)
           Sidekiq::Worker.clear_all
           expect {
             put base_url, params: {
