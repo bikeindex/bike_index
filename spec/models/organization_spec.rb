@@ -64,10 +64,10 @@ RSpec.describe Organization, type: :model do
     let(:invoice) { FactoryBot.create(:invoice_paid, organization: organization_parent) }
     let(:country) { Country.united_states }
     let(:state) { FactoryBot.create(:state_california) }
-    let(:organization_parent) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 50) }
-    let(:organization_child1) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: organization_parent) }
-    let(:organization_child2) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: organization_parent) }
-    let(:organization_child3) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius: 3, parent_organization: organization_parent) }
+    let(:organization_parent) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 50) }
+    let(:organization_child1) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: organization_parent) }
+    let(:organization_child2) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: organization_parent) }
+    let(:organization_child3) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: organization_parent) }
     let(:organization_shop) { FactoryBot.create(:organization, kind: "bike_shop") }
     let(:location_parent) { organization_parent.locations.create(state: state, country: country, city: "Los Angeles", street: "100 West 1st Street", zipcode: "90012", name: organization_parent.name) }
     let(:location_child1) { organization_child1.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "90014", name: organization_child1.name) }

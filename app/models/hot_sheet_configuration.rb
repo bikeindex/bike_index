@@ -74,7 +74,7 @@ class HotSheetConfiguration < ApplicationRecord
 
   def set_calculated_attributes
     unless search_radius_miles.present? && search_radius_miles > 1
-      self.search_radius_miles = organization&.search_radius || 50
+      self.search_radius_miles = organization&.search_radius_miles || 50
       # switch km default to 100
       self.search_radius_kilometers = 100 if search_radius_metric_units? && search_radius_miles == 50
     end
