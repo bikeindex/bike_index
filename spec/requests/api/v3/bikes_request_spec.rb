@@ -502,6 +502,30 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.is_for_sale).to be_falsey
     end
 
+    context "with extra_registration_number" do
+      let(:bike_attrs) do
+        {
+          serial: "made_without_serial",
+          extra_registration_number: "Another Serial",
+          manufacturer: manufacturer.name,
+          color: color.name,
+          owner_email: user.email,
+        }
+      end
+      it "registers with extra_registration_number" do
+        post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        bike = Bike.last
+        bike_response = json_result["bike"]
+        expect(bike_response["id"]).to eq(bike.id)
+        expect(bike_response["serial"]).to eq "Made without serial"
+        expect(bike_response["frame_colors"].first).to eq(color.name)
+        expect(bike_response["manufacturer_id"]).to eq(manufacturer.id)
+        expect(bike_response["extra_registration_number"]).to eq "Another Serial"
+        expect(bike.made_without_serial?).to be_truthy
+        expect(bike.serial_normalized).to be_blank
+      end
+    end
+
     it "creates a stolen bike through an organization and uses the passed phone" do
       organization = FactoryBot.create(:organization)
       user.update_attribute :phone, "0987654321"

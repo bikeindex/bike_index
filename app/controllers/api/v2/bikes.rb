@@ -17,6 +17,7 @@ module API
           optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color (case sensitive match)"
           optional :rear_gear_type_slug, type: String, desc: "rear gears (has to be one of the `selections`)"
           optional :front_gear_type_slug, type: String, desc: "front gears (has to be one of the `selections`)"
+          optional :extra_registration_number, type: String, desc: "Additional serial or registration number (not the original serial)"
           optional :handlebar_type_slug, type: String, desc: "handlebar type (has to be one of the `selections`)"
           optional :no_notify, type: Boolean, desc: "On create or ownership change, don't notify the new owner."
           optional :is_for_sale, type: Boolean
@@ -114,7 +115,7 @@ module API
           notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
         }
         params do
-          requires :serial, type: String, desc: "The serial number for the bike"
+          requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial. Enter 'unknown' if the serial is not known)"
           requires :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
