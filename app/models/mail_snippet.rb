@@ -7,7 +7,7 @@ class MailSnippet < ApplicationRecord
     welcome: 2,
     footer: 3,
     security: 4,
-    is_location_triggered: 5,
+    location_stolen_message: 5,
     partial: 6,
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
@@ -22,7 +22,6 @@ class MailSnippet < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy
 
   scope :enabled, -> { where(is_enabled: true) }
-  scope :location_triggered, -> { where(is_location_triggered: true) }
   scope :with_organizations, -> { where.not(organization_id: nil) }
   scope :without_organizations, -> { where(organization_id: nil) }
 
@@ -60,6 +59,10 @@ class MailSnippet < ApplicationRecord
     %w[welcome footer security]
   end
 
+  def self.location_triggered_kinds
+    ["location_stolen_message"].freeze
+  end
+
   def organization_snippet?
     self.class.organization_snippet_kinds.include?(kind)
   end
@@ -68,11 +71,13 @@ class MailSnippet < ApplicationRecord
     self.class.organization_message_kinds.include?(kind)
   end
 
+  def location_triggered?
+    self.class.location_triggered_kinds.include?(kind)
+  end
+
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
-    if is_location_triggered # No longer used, but keeping in case we decide to use. Check PR#415
-      self.kind = "location_triggered"
-    elsif kind.blank?
+    if kind.blank?
       self.kind = "custom"
     end
   end
@@ -87,8 +92,6 @@ class MailSnippet < ApplicationRecord
   private
 
   def should_be_geocoded?
-    return false if skip_geocoding?
-    return true if is_location_triggered?
-    address_changed?
+    false # Currently the only location_triggered variety is set from the organization location
   end
 end

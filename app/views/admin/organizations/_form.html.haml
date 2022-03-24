@@ -132,8 +132,7 @@
           %strong This organization has <code>Official manufacturer organization</code> enabled.
           Select a manufacturer to give them manufacturer access.
 
-    - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users graduated_notifications] + OrganizationFeature.reg_fields_with_customizable_labels
-    - if @organization.any_enabled?(enabled_features_with_admin_forms)
+    - if @organization.any_enabled?(Organization.with_admin_organization_attributes)
       .card
         .card-body
           %h4.mb-4 Settings for organization features
@@ -143,7 +142,7 @@
                 Interval for send graduated notifications, in days
                 %small
                   <span class="text-success">graduated_notifications setting</span>
-              = f.number_field :graduated_notification_interval_days, { class: "form-control" }
+              = f.number_field :graduated_notification_interval_days, {class: "form-control"}
               .text-warning.p-1
                 %em.small
                   Unless this is set, the organization will not send graduated notifications - even if they have the feature enabled
@@ -153,11 +152,19 @@
                 Search radius (mi)
                 %small
                   <span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations
-              = f.number_field :search_radius, { class: "form-control" }
+              = f.number_field :search_radius, {class: "form-control"}
               .text-warning.p-1
                 %em.small
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area
+
+          - if @organization.enabled?("location_stolen_message")
+            .form-group
+              = f.label :location_stolen_message_radius_miles do
+                Stolen Message radius (mi)
+                %small
+                  <span class="text-success">Location Stolen Message setting</span>, controls how large the region is that gets the message the organization sets
+              = f.number_field :location_stolen_message_radius_miles, {class: "form-control"}
 
           - if @organization.enabled?("passwordless_users")
             .form-group

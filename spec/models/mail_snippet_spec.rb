@@ -18,4 +18,10 @@ RSpec.describe MailSnippet, type: :model do
       expect((MailSnippet.kinds & ParkingNotification.kinds).count).to eq(ParkingNotification.kinds.count)
     end
   end
+
+  describe "location triggered" do
+    it "includes the location triggered" do
+      expect(MailSnippet.location_triggered).to eq(["location_stolen_message"])
+    end
+  end
 end

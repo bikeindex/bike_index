@@ -40,8 +40,9 @@ class OrganizationFeature < ApplicationRecord
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
-    official_manufacturer
+    location_stolen_message
     no_address
+    official_manufacturer
     passwordless_users
     regional_bike_counts
     show_bulk_import
@@ -92,6 +93,12 @@ class OrganizationFeature < ApplicationRecord
 
   def self.reg_fields_organization_uniq
     %w[reg_organization_affiliation reg_student_id]
+  end
+
+  # These are attributes that add fields to admin organization edit
+  def self.with_admin_organization_attributes
+    reg_fields_with_customizable_labels +
+      %w[regional_bike_counts passwordless_users graduated_notifications location_stolen_message]
   end
 
   def one_time?
