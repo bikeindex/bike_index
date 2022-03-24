@@ -1771,7 +1771,6 @@ ALTER SEQUENCE public.locks_id_seq OWNED BY public.locks.id;
 CREATE TABLE public.mail_snippets (
     id integer NOT NULL,
     is_enabled boolean DEFAULT false NOT NULL,
-    is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
     latitude double precision,
     longitude double precision,
@@ -2256,7 +2255,8 @@ CREATE TABLE public.organizations (
     passwordless_user_domain character varying,
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
-    manufacturer_id bigint
+    manufacturer_id bigint,
+    location_stolen_message_radius_miles double precision DEFAULT 50.0
 );
 
 
@@ -2758,7 +2758,8 @@ CREATE TABLE public.stolen_records (
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying,
-    no_notify boolean DEFAULT false
+    no_notify boolean DEFAULT false,
+    location_stolen_message_id integer
 );
 
 
@@ -6172,6 +6173,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220121230959'),
 ('20220124192245'),
 ('20220201213958'),
-('20220324004315');
+('20220324004315'),
+('20220324163815');
 
 

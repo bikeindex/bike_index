@@ -132,7 +132,7 @@
           %strong This organization has <code>Official manufacturer organization</code> enabled.
           Select a manufacturer to give them manufacturer access.
 
-    - if @organization.any_enabled?(Organization.with_admin_organization_attributes)
+    - if @organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
       .card
         .card-body
           %h4.mb-4 Settings for organization features

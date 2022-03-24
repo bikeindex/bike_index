@@ -77,9 +77,7 @@ class MailSnippet < ApplicationRecord
 
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
-    if kind.blank?
-      self.kind = "custom"
-    end
+    self.kind = "custom" if kind.blank?
   end
 
   def update_associations
