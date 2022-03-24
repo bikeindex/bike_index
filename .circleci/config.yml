@@ -14,7 +14,7 @@ jobs:
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
-      - image: cimg/ruby:2.7.5-buster-node
+      - image: cimg/ruby:2.7.5-node
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root
