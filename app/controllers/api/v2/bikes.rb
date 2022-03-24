@@ -115,7 +115,7 @@ module API
           notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
         }
         params do
-          requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial. Enter 'unknown' if the serial is not known)"
+          requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial, 'unknown' if the serial is not known)"
           requires :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
@@ -156,7 +156,7 @@ module API
           NOTE
         }
         params do
-          requires :serial, type: String, desc: "The serial number for the bike"
+          requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial, 'unknown' if the serial is not known)"
           requires :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
