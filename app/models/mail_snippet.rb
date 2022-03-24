@@ -43,6 +43,11 @@ class MailSnippet < ApplicationRecord
     }.with_indifferent_access.freeze
   end
 
+  # Will become more complex soon! Specifically for location_stolen_message
+  def self.kind_humanized(str)
+    str&.humanize
+  end
+
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
   end
@@ -59,6 +64,10 @@ class MailSnippet < ApplicationRecord
     %w[welcome footer security]
   end
 
+  def self.editable_subject_kinds
+    organization_message_kinds - ["location_stolen_message"]
+  end
+
   def self.location_triggered_kinds
     ["location_stolen_message"].freeze
   end
@@ -73,6 +82,14 @@ class MailSnippet < ApplicationRecord
 
   def location_triggered?
     self.class.location_triggered_kinds.include?(kind)
+  end
+
+  def editable_subject?
+    self.class.editable_subject_kinds.include?(kind)
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   def set_calculated_attributes

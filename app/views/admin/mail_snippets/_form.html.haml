@@ -4,7 +4,7 @@
 .alert.alert-info.mt-2.mb-4
  %strong Note:
  Organization message snippets are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
- %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, kind.humanize) }, ", ")
+ %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ")
 
 - if @mail_snippet.id.present? && @mail_snippet.organization_message?
  .mb-4
@@ -16,7 +16,7 @@
 
 .form-group
   = f.label :kind
-  = f.select :kind, MailSnippet.kinds.map { |k| [k.humanize, k] }, {required: true}, class: "form-control"
+  = f.select :kind, MailSnippet.kinds.map { |k| [MailSnippet.kind_humanized(k), k] }, {required: true}, class: "form-control"
 
 .form-group.fancy-select.unfancy
   = f.label :organization_id

@@ -21,7 +21,7 @@
         - mail_snippets = current_organization.mail_snippets.where(kind: kind)
       %tr
         %td
-          = link_to kind.humanize, edit_organization_email_path(kind, organization_id: current_organization.to_param)
+          = link_to MailSnippet.kind_humanized(kind), edit_organization_email_path(kind, organization_id: current_organization.to_param)
         %td
           = check_mark if mail_snippets.any? && mail_snippets.enabled.any?
         %td
