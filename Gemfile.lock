@@ -719,9 +719,6 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    wicked_pdf (1.4.0)
-      activesupport
-    wkhtmltopdf-binary (0.12.6.5)
     zeitwerk (2.5.4)
 
 PLATFORMS
@@ -849,9 +846,7 @@ DEPENDENCIES
   vcr
   webmock
   webpacker
-  wicked_pdf
   wine_bouncer!
-  wkhtmltopdf-binary
 
 RUBY VERSION
    ruby 2.7.3p183
