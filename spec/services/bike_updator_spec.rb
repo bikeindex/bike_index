@@ -17,14 +17,14 @@ RSpec.describe BikeUpdator do
       ownership = FactoryBot.create(:ownership)
       user = FactoryBot.create(:user)
       bike = ownership.bike
-      expect { BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send("ensure_ownership!") }.to raise_error(BikeUpdatorError)
+      expect { BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send(:ensure_ownership!) }.to raise_error(BikeUpdatorError)
     end
 
     it "returns true if the bike is owned by the user" do
       ownership = FactoryBot.create(:ownership)
       user = ownership.creator
       bike = ownership.bike
-      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send("ensure_ownership!")).to be_truthy
+      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send(:ensure_ownership!)).to be_truthy
     end
   end
 

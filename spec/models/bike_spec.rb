@@ -1369,7 +1369,7 @@ RSpec.describe Bike, type: :model do
         bike.current_stolen_record = nil
 
         expect(bike.current_stolen_record_id).not_to be_present
-        expect(bike.send("cached_description_and_stolen_description")).to eq("lalalala")
+        expect(bike.send(:cached_description_and_stolen_description)).to eq("lalalala")
       end
     end
   end
@@ -1605,7 +1605,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.address_set_manually).to be_falsey
           expect(bike.registration_address_source).to be_blank
           expect(bike.status).to eq "status_stolen"
-          expect(bike.send("authorization_requires_organization?")).to be_falsey
+          expect(bike.send(:authorization_requires_organization?)).to be_falsey
         end
       end
     end

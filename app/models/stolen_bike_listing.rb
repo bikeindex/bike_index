@@ -108,20 +108,20 @@ class StolenBikeListing < ActiveRecord::Base
       frame_size_number.to_s.gsub(".0", "") + frame_size_unit
     else
       case frame_size.downcase
-                        when /xxs/
-                          "xxs"
-                        when /x*sma/, "xs"
-                          "xs"
-                        when /sma/, "s"
-                          "s"
-                        when /med/, "m"
-                          "m"
-                        when /(lg)|(large)/, "l"
-                          "l"
-                        when /xxl/
-                          "xxl"
-                        when /x*l/, "xl"
-                          "xl"
+      when /xxs/
+        "xxs"
+      when /x*sma/, "xs"
+        "xs"
+      when /sma/, "s"
+        "s"
+      when /med/, "m"
+        "m"
+      when /(lg)|(large)/, "l"
+        "l"
+      when /xxl/
+        "xxl"
+      when /x*l/, "xl"
+        "xl"
       end
     end
     true

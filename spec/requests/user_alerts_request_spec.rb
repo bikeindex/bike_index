@@ -45,7 +45,7 @@ RSpec.describe UserAlertsController, type: :request do
             user_alert.update(dismissed_at: dismissed_time)
             # And dismiss without failing again
             patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"},
-                                                  headers: {"HTTP_REFERER" => "http://bikeindex.org/bikes"}
+              headers: {"HTTP_REFERER" => "http://bikeindex.org/bikes"}
             expect(response).to redirect_to "/bikes"
             expect(flash).to be_blank
             expect(user_alert.reload.dismissed_at).to be_within(1).of dismissed_time
@@ -103,7 +103,7 @@ RSpec.describe UserAlertsController, type: :request do
         expect(current_user.alert_slugs).to eq(["unassigned_bike_org"])
         Sidekiq::Worker.clear_all
         patch "#{base_url}/#{user_alert.to_param}", params: {add_bike_organization: "true"},
-                                                    headers: {"HTTP_REFERER" => "http://bikeindex.org/my_account"}
+          headers: {"HTTP_REFERER" => "http://bikeindex.org/my_account"}
         expect(AfterUserChangeWorker.jobs.count).to eq 1
         expect(response).to redirect_to "/my_account"
         expect(flash).to be_blank

@@ -111,7 +111,7 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
         expect(organization).to be_present
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "broken_lightspeed_pos").to_json,
-                                                headers: json_headers
+            headers: json_headers
         end
         expect(response.code).to eq("200")
         expect(json_result).to eq target.merge(manual_pos_kind: "broken_lightspeed_pos").as_json
@@ -129,7 +129,7 @@ RSpec.describe Api::V1::OrganizationsController, type: :request do
         expect(organization.manual_pos_kind).to eq "lightspeed_pos"
         expect {
           put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "no_pos").to_json,
-                                                headers: json_headers
+            headers: json_headers
         }.to change(UpdateOrganizationPosKindWorker.jobs, :count).by(1)
         expect(response.code).to eq("200")
         expect(json_result).to eq target_with_no_pos.as_json

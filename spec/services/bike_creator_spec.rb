@@ -505,14 +505,14 @@ RSpec.describe BikeCreator do
       let(:bike) { Bike.new(phone: "699.999.9999") }
       before { allow(bike).to receive(:user) { user } }
       it "sets the owner's phone if one is passed in" do
-        instance.send("assign_user_attributes", bike)
+        instance.send(:assign_user_attributes, bike)
         user.reload
         expect(user.phone).to eq("6999999999")
       end
       context "user already has a phone" do
         let(:user) { FactoryBot.create(:user, phone: "0000000000") }
         it "does not set the phone if the user already has a phone" do
-          instance.send("assign_user_attributes", bike)
+          instance.send(:assign_user_attributes, bike)
           user.reload
           expect(user.phone).to eq("0000000000")
         end

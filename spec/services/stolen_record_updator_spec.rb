@@ -38,7 +38,7 @@ RSpec.describe StolenRecordUpdator do
   describe "update_with_params" do
     it "returns the stolen record if no stolen record is associated" do
       stolen_record = StolenRecord.new
-      updator = StolenRecordUpdator.new.send("update_with_params", stolen_record)
+      updator = StolenRecordUpdator.new.send(:update_with_params, stolen_record)
       expect(updator).to eq(stolen_record)
     end
 
@@ -59,7 +59,7 @@ RSpec.describe StolenRecordUpdator do
       b_param = BParam.new(params: {stolen_record: sr}.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param)
-      stolen_record = updator.send("update_with_params", stolen_record)
+      stolen_record = updator.send(:update_with_params, stolen_record)
       expect(stolen_record.police_report_number).to eq(sr[:police_report_number])
       expect(stolen_record.police_report_department).to eq(sr[:police_report_department])
       expect(stolen_record.theft_description).to eq(sr[:theft_description])
@@ -79,7 +79,7 @@ RSpec.describe StolenRecordUpdator do
       b_param = BParam.new(params: {stolen_record: sr}.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param)
-      stolen_record = updator.send("update_with_params", stolen_record)
+      stolen_record = updator.send(:update_with_params, stolen_record)
       expect(stolen_record.country).to eq(country)
       expect(stolen_record.state).to eq(state)
     end

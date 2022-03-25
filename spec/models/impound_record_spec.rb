@@ -99,7 +99,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(bike.creator_unregistered_parking_notification?).to be_truthy
           expect(bike.authorized?(user)).to be_truthy
           impound_record.reload
-          expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+          expect(impound_record.send(:calculated_unregistered_bike?)).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
           expect(impound_record.creator&.id).to eq user2.id
           expect(impound_record.location).to be_blank
@@ -264,7 +264,7 @@ RSpec.describe ImpoundRecord, type: :model do
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
     it "is not authorized by user" do
       bike.reload
-      expect(bike.send("authorization_requires_organization?")).to be_truthy
+      expect(bike.send(:authorization_requires_organization?)).to be_truthy
       expect(bike.authorized?(bike.user)).to be_falsey
       expect(bike.authorized?(user)).to be_truthy
       expect(bike.current_impound_record).to be_present
@@ -285,11 +285,11 @@ RSpec.describe ImpoundRecord, type: :model do
     context "note and message" do
       let(:parking_notification1) do
         FactoryBot.create(:parking_notification, bike: bike, organization: organization, kind: "parked_incorrectly_notification",
-                                                 internal_notes: "Internal note 1", created_at: Time.current - 1.month)
+          internal_notes: "Internal note 1", created_at: Time.current - 1.month)
       end
       let!(:parking_notification2) do
         FactoryBot.create(:parking_notification, is_repeat: true, organization: organization, kind: "impound_notification", impound_record: impound_record,
-                                                 initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
+          initial_record_id: parking_notification1.id, internal_notes: "Internal note 2", message: "this is a message")
       end
       let(:impound_record_update) { FactoryBot.create(:impound_record_update, impound_record: impound_record, kind: "retrieved_by_owner") }
       it "returns note and message" do
@@ -373,7 +373,7 @@ RSpec.describe ImpoundRecord, type: :model do
     let(:impound_record) { ImpoundRecord.new(organization: organization) }
     let(:update_multi_kinds) { %w[retrieved_by_owner removed_from_bike_index transferred_to_new_owner note] }
     it "is 1" do
-      expect(impound_record.send("set_calculated_display_id")).to eq "1"
+      expect(impound_record.send(:set_calculated_display_id)).to eq "1"
       expect(impound_record.update_kinds).to eq(["current"] + update_multi_kinds)
       expect(impound_record.update_multi_kinds).to eq update_multi_kinds
     end
@@ -386,13 +386,13 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record_existing.display_id).to eq "asdfasdf2222"
         expect(impound_configuration.display_id_prefix).to eq nil
         expect(impound_configuration.calculated_display_id_next_integer).to eq 1
-        expect(impound_record.send("set_calculated_display_id")).to eq "1"
+        expect(impound_record.send(:set_calculated_display_id)).to eq "1"
         expect(impound_record.display_id).to eq "1" # it's set, but not stored
         # it doesn't respect unstored records
         impound_record2 = FactoryBot.create(:impound_record_with_organization, organization: organization)
         expect(impound_record2.display_id).to eq "1"
         # The og record updates!
-        expect(impound_record.send("set_calculated_display_id")).to eq "2"
+        expect(impound_record.send(:set_calculated_display_id)).to eq "2"
         expect(impound_record.update_kinds).to eq(["current"] + update_multi_kinds)
         expect(impound_record.update_multi_kinds).to eq update_multi_kinds
       end
@@ -410,7 +410,7 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(Ownership.where(bike_id: bike.id).count).to eq 1
       expect(bike.current_ownership.status).to eq "status_with_owner"
       expect(bike.created_by_notification_or_impounding?).to be_falsey
-      expect(impound_record.send("calculated_unregistered_bike?")).to be_falsey
+      expect(impound_record.send(:calculated_unregistered_bike?)).to be_falsey
     end
     context "status_impounded" do
       let!(:ownership) { FactoryBot.create(:ownership, bike: bike, status: "status_impounded") }
@@ -418,18 +418,18 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(Ownership.where(bike_id: bike.id).count).to eq 1
         expect(bike.current_ownership.status).to eq "status_impounded"
         expect(bike.created_by_notification_or_impounding?).to be_truthy
-        expect(impound_record.reload.send("calculated_unregistered_bike?")).to be_truthy
+        expect(impound_record.reload.send(:calculated_unregistered_bike?)).to be_truthy
       end
       context "impound record earlier?" do
         let(:impounded_time) { time - 1.minute }
         it "is truthy" do
-          expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+          expect(impound_record.send(:calculated_unregistered_bike?)).to be_truthy
         end
       end
       context "impound_record created at a vastly different time" do
         let(:impounded_time) { time + 1.day }
         it "is falsey" do
-          expect(impound_record.send("calculated_unregistered_bike?")).to be_falsey
+          expect(impound_record.send(:calculated_unregistered_bike?)).to be_falsey
         end
       end
     end
