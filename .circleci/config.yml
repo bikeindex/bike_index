@@ -46,10 +46,8 @@ jobs:
               libssl-dev \
               libz-dev \
               postgresql-client
-
-      - run: "imagemagick test"
-          name: "Test imagemagick"
-          command: "convert -list format | grep SVG"
+            echo "Test imagemagick"
+            convert -list format | grep SVG
 
       - run:
           name: "Update Node.js and npm"
