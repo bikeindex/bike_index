@@ -22,8 +22,6 @@ Rails.application.configure do
   config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
 
-  # Raises error for missing translations
-  config.i18n.raise_on_missing_translations = true
   # Don't check for precompiled assets
   config.assets.check_precompiled_asset = false
 
@@ -47,7 +45,7 @@ Rails.application.configure do
   config.active_support.deprecation = :stderr
 
   # Raises error for missing translations
-  config.action_view.raise_on_missing_translations = true
+  config.i18n.raise_on_missing_translations = true
   config.i18n.exception_handler = proc { |exception| raise exception.to_exception }
   config.action_mailer.default_url_options = {host: ENV["BASE_URL"]}
 
