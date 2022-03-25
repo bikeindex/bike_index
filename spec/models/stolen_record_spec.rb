@@ -324,21 +324,21 @@ RSpec.describe StolenRecord, type: :model do
       stolen_record = StolenRecord.new
       stupid_year = Date.strptime("07-22-0014", "%m-%d-%Y")
       stolen_record.date_stolen = stupid_year
-      stolen_record.send("fix_date")
+      stolen_record.send(:fix_date)
       expect(stolen_record.date_stolen.year).to eq(2014)
     end
     it "it should set the year to not last century" do
       stolen_record = StolenRecord.new
       wrong_century = Date.strptime("07-22-1913", "%m-%d-%Y")
       stolen_record.date_stolen = wrong_century
-      stolen_record.send("fix_date")
+      stolen_record.send(:fix_date)
       expect(stolen_record.date_stolen.year).to eq(2013)
     end
     it "it should set the year to the past year if the date hasn't happened yet" do
       stolen_record = FactoryBot.create(:stolen_record)
       next_year = (Time.current + 2.months)
       stolen_record.date_stolen = next_year
-      stolen_record.send("fix_date")
+      stolen_record.send(:fix_date)
       expect(stolen_record.date_stolen.year).to eq(Time.current.year - 1)
     end
   end

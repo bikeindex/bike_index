@@ -68,6 +68,7 @@ RSpec.describe BikeV2ShowSerializer do
         front_gear_type_slug: nil,
         rear_gear_type_slug: nil,
         additional_registration: "XXYY",
+        extra_registration_number: "XXYY",
         stolen_record: nil,
         public_images: [public_image_target],
         components: [component_target],
