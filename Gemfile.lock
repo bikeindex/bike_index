@@ -230,10 +230,10 @@ GEM
       ffi (>= 1.0.0)
       rake
     flamegraph (0.9.5)
-    flipper (0.17.1)
-    flipper-active_record (0.17.1)
+    flipper (0.17.2)
+    flipper-active_record (0.17.2)
       activerecord (>= 4.2, < 7)
-      flipper (~> 0.17.1)
+      flipper (~> 0.17.2)
     flipper-ui (0.17.1)
       erubi (>= 1.0.0, < 2.0.0)
       flipper (~> 0.17.1)
@@ -395,7 +395,7 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
-    mini_magick (4.9.5)
+    mini_magick (4.11.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.0)
     minitest (5.15.0)
@@ -849,7 +849,7 @@ DEPENDENCIES
   wine_bouncer!
 
 RUBY VERSION
-   ruby 2.7.3p183
+   ruby 2.7.5p203
 
 BUNDLED WITH
    2.1.4
