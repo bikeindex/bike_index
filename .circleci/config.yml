@@ -40,13 +40,12 @@ jobs:
             sudo apt-get -y install \
               curl \
               gettext \
-              imagemagick=6.9.7-4 \
+              imagemagick \
               libcurl4-gnutls-dev \
               libexpat1-dev \
               libssl-dev \
               libz-dev \
               postgresql-client
-          # NOTE: forcing imagemagick version installed on production
 
       - run:
           name: "Update Node.js and npm"
