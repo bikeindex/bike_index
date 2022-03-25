@@ -75,10 +75,6 @@ class MailSnippet < ApplicationRecord
     ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
   end
 
-  def self.editable_subject_kinds
-    organization_message_kinds
-  end
-
   def self.location_triggered_kinds
     ["area_stolen_message"].freeze
   end
@@ -95,12 +91,13 @@ class MailSnippet < ApplicationRecord
     self.class.organization_message_kinds.include?(kind)
   end
 
-  def location_triggered?
-    self.class.location_triggered_kinds.include?(kind)
+  # stub for now, but might be more complicated later. Makes it clearer for a form field
+  def editable_subject?
+    organization_message?
   end
 
-  def editable_subject?
-    self.class.editable_subject_kinds.include?(kind)
+  def location_triggered?
+    self.class.location_triggered_kinds.include?(kind)
   end
 
   def kind_humanized
