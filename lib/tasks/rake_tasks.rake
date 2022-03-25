@@ -30,7 +30,7 @@ task exchange_rates_update: :environment do
 end
 
 task database_size: :environment do
-  database_name = ActiveRecord::Base.connection.instance_variable_get("@config")[:database]
+  database_name = ActiveRecord::Base.connection.instance_variable_get(:@config)[:database]
   sql = "SELECT pg_size_pretty(pg_database_size('#{database_name}'));"
 
   # Get table sizes, sorted by their size

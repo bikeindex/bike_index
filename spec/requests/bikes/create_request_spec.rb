@@ -168,7 +168,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(impound_record.kind).to eq "found"
           expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
           expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
-          expect(impound_record.send("calculated_unregistered_bike?")).to be_truthy
+          expect(impound_record.send(:calculated_unregistered_bike?)).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
 
           ownership = new_bike.current_ownership

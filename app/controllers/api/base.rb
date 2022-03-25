@@ -13,8 +13,8 @@ end
 module API
   class Base < Grape::API
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: "grape_key",
-                                                 include: [GrapeLogging::Loggers::BinxLogger.new,
-                                                   GrapeLogging::Loggers::FilterParameters.new]
+      include: [GrapeLogging::Loggers::BinxLogger.new,
+        GrapeLogging::Loggers::FilterParameters.new]
     mount API::V3::RootV3
     mount API::V2::RootV2
 
