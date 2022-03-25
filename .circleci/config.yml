@@ -14,12 +14,12 @@ jobs:
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
-      - image: circleci/ruby:2.7.5-node
+      - image: cimg/ruby:2.7.5-node
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root
           PSQL_PAGER: ""
-      - image: circleci/postgres:12.0-alpine-postgis
+      - image: cimg/postgres:12.0-alpine-postgis
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test
