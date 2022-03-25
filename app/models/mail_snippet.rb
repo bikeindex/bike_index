@@ -8,7 +8,7 @@ class MailSnippet < ApplicationRecord
     footer: 3,
     security: 4,
     area_stolen_message: 5,
-    partial: 6,
+    partial_registration: 6,
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
     impound_notification: 9,
@@ -38,7 +38,7 @@ class MailSnippet < ApplicationRecord
       header: {emails: "all", description: "Top of email block"},
       welcome: {emails: "finished_registration", description: "Below header"},
       footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
-      partial: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
+      partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
       security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""},
       area_stolen_message: {emails: "finished_registration_stolen", description: "Message to bikes stolen in your area about how to report the theft"}
     }.with_indifferent_access.freeze
@@ -65,8 +65,7 @@ class MailSnippet < ApplicationRecord
   end
 
   def self.organization_emails_with_snippets
-    # TODO: rename partial > partial_registration
-    # Worth noting: no snippet is named "finished_registration" - but the snippets for finished_registration
+    # Worth noting: no snippet is named "finished_registration"
     ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
         graduated_notification impound_claim_approved impound_claim_denied]
   end

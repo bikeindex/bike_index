@@ -2,7 +2,8 @@
 -# And if registration snippet, show the ability to preview in organized/emails view
 .alert.alert-info.mt-2.mb-4
   %strong Note:
-  Organization message snippets are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
+  Some snippets are actually the entire email. They are the Organization message
+  Organization emails are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
   %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ")
 
 - if @mail_snippet.id.present? && @mail_snippet.organization_message?
@@ -13,8 +14,8 @@
 - if @mail_snippet.errors.any?
   = render partial: "/shared/errors", locals: {name: "Mail Snippet", obj: @mail_snippet}
 
-- def select_display(k); "#{MailSnippet.kind_humanized(k)} - in #{MailSnippet.organization_email_for(k)} email" end
-.form-group
+- def select_display(k); "#{MailSnippet.kind_humanized(k)} - in #{MailSnippet.organization_email_for(k)} emails" end
+.form-group.fancy-select.unfancy
   = f.label :kind
   = f.select :kind, MailSnippet.kinds.map { |k| [select_display(k), k] }, {required: true}, class: "form-control"
 
