@@ -48,7 +48,8 @@ jobs:
               postgresql-client
 
       - run: "imagemagick test"
-        command: "convert -list format | grep SVG"
+          name: "Test imagemagick"
+          command: "convert -list format | grep SVG"
 
       - run:
           name: "Update Node.js and npm"
