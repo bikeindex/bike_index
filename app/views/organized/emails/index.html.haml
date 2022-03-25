@@ -14,9 +14,9 @@
   %tbody
     - viewable_email_kinds.each do |kind|
       - if kind == "finished_registration"
-        - mail_snippets = current_organization.mail_snippets.where(kind: MailSnippet.finished_registration_kinds)
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("finished_registration") }
       - elsif kind == "partial_registration"
-        - mail_snippets = current_organization.mail_snippets.where(kind: "partial")
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("partial_registration") }
       - else
         - mail_snippets = current_organization.mail_snippets.where(kind: kind)
       %tr

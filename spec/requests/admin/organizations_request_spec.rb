@@ -225,7 +225,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           name: "other namE",
           search_radius_miles: "1222.2",
           graduated_notification_interval_days: 4444,
-          location_stolen_message_radius_miles: 44,
+          area_stolen_message_radius_miles: 44,
           passwordless_user_domain: "stuff.com"
         }
       end

@@ -21,7 +21,52 @@ RSpec.describe MailSnippet, type: :model do
 
   describe "location triggered" do
     it "includes the location triggered" do
-      expect(MailSnippet.location_triggered_kinds).to eq(["location_stolen_message"])
+      expect(MailSnippet.location_triggered_kinds).to eq(["area_stolen_message"])
+    end
+  end
+
+  describe "organization_emails_with_snippets" do
+    let(:target) do
+      %w[
+        finished_registration
+        finished_registration_stolen
+        partial_registration
+        appears_abandoned_notification
+        parked_incorrectly_notification
+        impound_notification
+        impound_claim_approved
+        impound_claim_denied
+        graduated_notification
+      ]
+    end
+    it "is target" do
+      # TODO - maybe better to use actual email methods?
+      # all_emails = OrganizedMailer.new.methods - AdminMailer.new.methods
+      expect(MailSnippet.organization_emails_with_snippets.sort).to eq target.sort
+    end
+  end
+
+  describe "organization_email" do
+    let(:mail_snippet) { MailSnippet.new(kind: kind) }
+    let(:kind) { "header" }
+    it "is in all" do
+      expect(MailSnippet.organization_email_for(:header)).to eq "all"
+      expect(MailSnippet.organization_email_for("header")).to eq "all"
+      expect(mail_snippet.which_organization_email).to eq "all"
+      expect(mail_snippet.in_email?("finished_registration")).to be_truthy
+      MailSnippet.organization_emails_with_snippets.each do |email|
+        expect(mail_snippet.in_email?(email)).to be_truthy
+      end
+    end
+    context "organization_message_kinds" do
+      it "is kind" do
+        MailSnippet.organization_message_kinds.each do |kind|
+          message_mail_snippet = MailSnippet.new(kind: kind)
+          expect(message_mail_snippet.which_organization_email).to eq kind
+          expect(message_mail_snippet.in_email?(kind)).to be_truthy
+          expect(message_mail_snippet.in_email?("finished_registration")).to be_falsey
+        end
+      end
     end
   end
 end

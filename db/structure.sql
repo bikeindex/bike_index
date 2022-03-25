@@ -2256,7 +2256,7 @@ CREATE TABLE public.organizations (
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
-    location_stolen_message_radius_miles double precision DEFAULT 50.0
+    area_stolen_message_radius_miles double precision DEFAULT 50.0
 );
 
 
@@ -2759,7 +2759,7 @@ CREATE TABLE public.stolen_records (
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying,
     no_notify boolean DEFAULT false,
-    location_stolen_message_id integer
+    area_stolen_message_id integer
 );
 
 

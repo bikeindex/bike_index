@@ -40,7 +40,7 @@ class OrganizationFeature < ApplicationRecord
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
-    location_stolen_message
+    area_stolen_message
     no_address
     official_manufacturer
     passwordless_users
@@ -98,7 +98,7 @@ class OrganizationFeature < ApplicationRecord
   # These are attributes that add fields to admin organization edit
   def self.with_admin_organization_attributes
     reg_fields_with_customizable_labels +
-      %w[regional_bike_counts passwordless_users graduated_notifications location_stolen_message]
+      %w[regional_bike_counts passwordless_users graduated_notifications area_stolen_message]
   end
 
   def one_time?

@@ -4,7 +4,7 @@
   %h1
     Edit
     %em
-      = @kind.humanize
+      = MailSnippet.kind_humanized(@kind)
 
 - unless viewable_email_kinds.include?(@kind)
   .alert.alert-warning.mb-4
