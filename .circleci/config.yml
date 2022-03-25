@@ -19,7 +19,7 @@ jobs:
           PGHOST: 127.0.0.1
           PGUSER: root
           PSQL_PAGER: ""
-      - image: cimg/postgres:12.0-alpine-postgis
+      - image: cimg/postgres:13.5-postgis
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test
