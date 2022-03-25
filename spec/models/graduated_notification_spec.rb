@@ -16,7 +16,7 @@ RSpec.describe GraduatedNotification, type: :model do
       graduated_notification.reload
       expect(graduated_notification).to be_valid
       expect(bike.created_at).to be < (Time.current - graduated_notification_interval)
-      expect(graduated_notification.send("calculated_primary_notification").id).to eq graduated_notification.id
+      expect(graduated_notification.send(:calculated_primary_notification).id).to eq graduated_notification.id
       expect(graduated_notification.send_email?).to be_truthy
       expect(graduated_notification.email_success?).to be_falsey
       expect {
@@ -307,7 +307,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification1.user_id).to_not be_present
         expect(graduated_notification1.processed?).to be_truthy
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id]) # Only finds this, the other is removed now
-        expect(graduated_notification1.send("calculated_primary_notification")&.id).to eq graduated_notification1.id
+        expect(graduated_notification1.send(:calculated_primary_notification)&.id).to eq graduated_notification1.id
         expect(graduated_notification1.associated_notifications.pluck(:id)).to eq([graduated_notification2.id])
 
         graduated_notification2.reload
@@ -350,9 +350,9 @@ RSpec.describe GraduatedNotification, type: :model do
 
       expect(bike2.user&.id).to eq user.id
       graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
-      expect(graduated_notification2.send("potential_matching_period").include?(graduated_notification1.created_at)).to be_truthy
-      expect(graduated_notification2.send("calculated_primary_notification").id).to eq graduated_notification1.id
-      expect(graduated_notification2.send("existing_sent_notification")&.id).to eq graduated_notification1.id
+      expect(graduated_notification2.send(:potential_matching_period).include?(graduated_notification1.created_at)).to be_truthy
+      expect(graduated_notification2.send(:calculated_primary_notification).id).to eq graduated_notification1.id
+      expect(graduated_notification2.send(:existing_sent_notification)&.id).to eq graduated_notification1.id
       expect(graduated_notification2.primary_notification_id).to eq graduated_notification1.id
       expect(graduated_notification2.primary_notification?).to be_falsey
       expect(graduated_notification2.primary_bike).to eq bike2
@@ -360,7 +360,7 @@ RSpec.describe GraduatedNotification, type: :model do
 
       # Ensure it's still the primary notification, even though it isn't the primary bike
       graduated_notification1.reload
-      expect(graduated_notification1.send("calculated_primary_notification").id).to eq graduated_notification1.id
+      expect(graduated_notification1.send(:calculated_primary_notification).id).to eq graduated_notification1.id
       expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(graduated_notification1.primary_notification?).to be_truthy
     end
@@ -497,7 +497,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(CreateGraduatedNotificationWorker.jobs.map { |j| j["args"] }.flatten).to eq([organization.id, bike2.id])
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
-        expect(graduated_notification1.send("associated_bike_ids_missing_notifications")).to eq([bike2.id])
+        expect(graduated_notification1.send(:associated_bike_ids_missing_notifications)).to eq([bike2.id])
 
         expect(GraduatedNotification.count).to eq 1
         expect {

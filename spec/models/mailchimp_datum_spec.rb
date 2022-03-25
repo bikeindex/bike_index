@@ -156,7 +156,7 @@ RSpec.describe MailchimpDatum, type: :model do
 
   describe "calculated_lists" do
     it "is empty" do
-      expect(MailchimpDatum.new.send("calculated_lists")).to eq([])
+      expect(MailchimpDatum.new.send(:calculated_lists)).to eq([])
     end
   end
 

@@ -108,7 +108,7 @@ module ApplicationHelper
       render(filename, f: builder)
     }
     link_to name, "#", class: "add_fields #{class_name}",
-                       data: {id: id, fields: fields.delete("\n")}
+      data: {id: id, fields: fields.delete("\n")}
   end
 
   def revised_link_to_add_components(name, f, association)
