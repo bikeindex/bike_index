@@ -104,7 +104,7 @@ RSpec.describe Organized::BaseController, type: :request do
       let(:manufacturer) { FactoryBot.create(:manufacturer) }
       let(:current_organization) { FactoryBot.create(:organization, manufacturer_id: manufacturer.id) }
       it "redirects" do
-        current_organization.reload
+        expect(current_organization.reload.official_manufacturer?).to be_falsey
         expect(current_organization.overview_dashboard?).to be_falsey
         get "/o/#{current_organization.to_param}/dashboard"
         expect(response).to redirect_to(organization_bikes_path)
@@ -112,10 +112,17 @@ RSpec.describe Organized::BaseController, type: :request do
       context "with official_manufacturer" do
         let(:current_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer_id: manufacturer.id, enabled_feature_slugs: ["official_manufacturer"]) }
         it "renders" do
+          expect(manufacturer.reload.official_organization&.id).to eq current_organization.id
+          expect(current_organization.reload.invoices.active.count).to eq 1
+          expect(current_organization.official_manufacturer?).to be_truthy
           expect(current_organization.overview_dashboard?).to be_truthy
           expect(current_organization.bike_shop_display_integration_alert?).to be_falsey
           get "/o/#{current_organization.to_param}/dashboard"
           expect(response).to render_template(:manufacturer)
+          expect(assigns(:period)).to eq "year"
+          get "/o/#{current_organization.to_param}/dashboard?period=all"
+          # Official manufacturers start at 2017
+          expect(assigns(:start_time)).to be_within(1.day).of Time.parse("2017-1-1")
         end
       end
     end
