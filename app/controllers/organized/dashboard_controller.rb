@@ -67,5 +67,13 @@ module Organized
     def set_fallback_period
       @period = "year" unless params[:period].present?
     end
+
+    def earliest_period_date
+      if current_organization.official_manufacturer?
+        Time.parse("2017-01-01")
+      else
+        earliest_organization_period_date
+      end
+    end
   end
 end
