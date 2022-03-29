@@ -31,7 +31,7 @@
   = render partial: "/shared/admin_current_header", locals: { viewing: "Tweets" }
 
 - if @render_chart
-  = column_chart time_range_counts(collection: matching_tweets), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: matching_tweets), stacked: true, thousands: ","
 
 .mt-2
   = render partial: "/shared/period_select", locals: { include_future: true }

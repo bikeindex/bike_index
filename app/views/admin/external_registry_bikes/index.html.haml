@@ -35,9 +35,9 @@
 - if @render_chart
   - if @search_type == "all"
     - counts_by_type = registry_types.map { |search_type| { name: ExternalRegistryBike.registry_name(search_type), data: time_range_counts(collection: @matching_bikes.where(type: "ExternalRegistryBike::#{search_type}")) } }
-    = column_chart counts_by_type, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
+    = column_chart counts_by_type, stacked: true, thousands: ",", colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
   - else
-    = column_chart time_range_counts(collection: @matching_bikes), stacked: true, thousands: ",", defer: true
+    = column_chart time_range_counts(collection: @matching_bikes), stacked: true, thousands: ","
 
 .mt-4
   = render partial: "/shared/period_select"

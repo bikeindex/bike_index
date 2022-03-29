@@ -68,7 +68,7 @@
       %hr
       %h2.mt-4.text-warning Can't graph with user search
     - else
-      = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
+      = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ","
 
 = render partial: "/shared/period_select"
 
