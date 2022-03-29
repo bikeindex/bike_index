@@ -43,7 +43,7 @@
   = render partial: "/shared/admin_current_header", locals: { viewing: "Organizations" }
 
 - if @render_chart
-  = column_chart time_range_counts(collection: matching_organizations, column: @time_range_column), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: matching_organizations, column: @time_range_column), stacked: true, thousands: ","
 = render partial: "/shared/period_select"
 
 .row.mb-4

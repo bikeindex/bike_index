@@ -3,7 +3,7 @@
 %h1= t(".org_recoveries_html", org_name: current_organization.name)
 
 - if @render_chart
-  = column_chart time_range_counts(collection: @matching_recoveries, column: "stolen_records.recovered_at"), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: @matching_recoveries, column: "stolen_records.recovered_at"), stacked: true, thousands: ","
 
 .mb-2{ style: "margin-top: 50px;" }
   - if current_organization.regional?

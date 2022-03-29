@@ -2,16 +2,16 @@
 - if @kind == "general"
 
   %h2.mt-4 Users past week
-  = column_chart variable_admin_graphs_path(search_kind: "users", period: "week"), stacked: true, thousands: ",", defer: true
+  = column_chart variable_admin_graphs_path(search_kind: "users", period: "week"), stacked: true, thousands: ","
 
   %h2.mt-4
     Users past year
-  = column_chart variable_admin_graphs_path(search_kind: "users", period: "year"), stacked: true, thousands: ",", defer: true
+  = column_chart variable_admin_graphs_path(search_kind: "users", period: "year"), stacked: true, thousands: ","
 
 
   %h2.mt-4
     Bikes past year
-  = column_chart variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true, thousands: ",", defer: true
+  = column_chart variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true, thousands: ","
 
 - else
   - if @kind == "bikes"
@@ -40,7 +40,7 @@
         = humanized_time_range(@time_range)
 
   .mt-4
-  = column_chart variable_admin_graphs_path(sortable_search_params), stacked: true, thousands: ",", defer: true
+  = column_chart variable_admin_graphs_path(sortable_search_params), stacked: true, thousands: ","
 
   -# Don't render all the extra stuff if looking at a period that is longer than 1 year
   - render_other_bike_graphs = group_by_method(@time_range) != :group_by_month
@@ -73,7 +73,7 @@
                     %td.text-left= origin.humanize
                     %td.text-right= admin_number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
       .mt-4
-      = column_chart variable_admin_graphs_path(sortable_search_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ",", defer: true
+      = column_chart variable_admin_graphs_path(sortable_search_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ","
 
     .col-sm-6.offset-sm-3.mt-4
       .full-screen-table

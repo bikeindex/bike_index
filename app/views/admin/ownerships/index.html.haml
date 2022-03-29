@@ -23,7 +23,7 @@
   = render partial: "/shared/admin_current_header", locals: {viewing: "Ownerships"}
 
 - if @render_chart
-  = column_chart time_range_counts(collection: matching_ownerships, column: @time_range_column), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: matching_ownerships, column: @time_range_column), stacked: true, thousands: ","
 
 = render partial: "/shared/period_select"
 

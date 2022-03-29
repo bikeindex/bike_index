@@ -52,15 +52,15 @@
         end
       end
     .col-12.mt-2
-      = column_chart theft_alerts_graph, stacked: true, thousands: ",", defer: true
+      = column_chart theft_alerts_graph, stacked: true, thousands: ","
     - if @search_facebook_data
       %h3.mt-5
         %em Sum of Facebook reach for ads started in the period
-      = column_chart facebook_reach_graph, stacked: true, thousands: ",", defer: true
+      = column_chart facebook_reach_graph, stacked: true, thousands: ","
       .mt-5
     - unless @search_recovered
       .col-12.mt-2
-        = column_chart alerts_recoveries_graph, stacked: true, thousands: ",", defer: true
+        = column_chart alerts_recoveries_graph, stacked: true, thousands: ","
 
   = render partial: "/shared/period_select"
 

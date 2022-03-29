@@ -37,9 +37,9 @@
 
 - if @render_chart
   %h4.mt-2 Counts
-  = column_chart payments_counts.map { |c| { name: c[:name], data: c[:data] } }, stacked: true, thousands: ",", defer: true
+  = column_chart payments_counts.map { |c| { name: c[:name], data: c[:data] } }, stacked: true, thousands: ","
   %h4.mt-2 Amounts
-  = column_chart payments_counts.map { |c| { name: c[:name], data: c[:data_money] } }, stacked: true, thousands: ",", prefix: "$", round: 2, defer: true
+  = column_chart payments_counts.map { |c| { name: c[:name], data: c[:data_money] } }, stacked: true, thousands: ",", prefix: "$", round: 2
 
 
 = render partial: "/shared/period_select"

@@ -2,7 +2,7 @@
   %h1= t(".org_incomplete_registrations_html", org_name: current_organization.name)
 
 - if @render_chart
-  = column_chart time_range_counts(collection: @b_params_total, column: "b_params.created_at"), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: @b_params_total, column: "b_params.created_at"), stacked: true, thousands: ","
 .text-right.mb-2
   %a.btn.btn-sm.less-strong.btn-outline-secondary{ href: incompletes_organization_bikes_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)), class: (@render_chart ? "active" : "") }
     Render chart

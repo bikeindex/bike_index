@@ -31,7 +31,7 @@
   - else
     - feedback_counts = time_range_counts(collection: available_feedbacks)
 
-  = column_chart feedback_counts, stacked: true, thousands: ",", defer: true, colors: colors
+  = column_chart feedback_counts, stacked: true, thousands: ",", colors: colors
 
 = render partial: "/shared/period_select"
 
