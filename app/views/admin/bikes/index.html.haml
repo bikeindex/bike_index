@@ -124,6 +124,9 @@
             - if @manufacturer.present?
               Made by
               = link_to @manufacturer.name, admin_manufacturer_path(@manufacturer)
+              - if @manufacturer.official_organization.present?
+                %small.less-strong
+                  (view #{link_to "official org", admin_organization_path(@manufacturer.official_organization.to_param))
             - else
               No manufacturer found for
               %code

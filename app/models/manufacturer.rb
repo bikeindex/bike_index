@@ -81,6 +81,10 @@ class Manufacturer < ApplicationRecord
     slug
   end
 
+  def official_organization
+    @official_organization ||= Organization.find_by_manufacturer_id(id)
+  end
+
   # Because of issues with autocomplete if the names are the same
   # Also, probably just a good idea in general
   def ensure_non_blocking_name
