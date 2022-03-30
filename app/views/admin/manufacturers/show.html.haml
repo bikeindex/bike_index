@@ -13,6 +13,12 @@
             = @manufacturer.id
         %tr
           %td
+            Official Org
+          %td
+            - if @manufacturer.official_organization.present?
+              = link_to @manufacturer.official_organization.name, admin_organization_path(@manufacturer.official_organization.to_param)
+        %tr
+          %td
             Created
           %td
             %span.convertTime.preciseTime

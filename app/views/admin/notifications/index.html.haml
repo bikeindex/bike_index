@@ -46,7 +46,7 @@
 
   - else
     - user_alert_counts = time_range_counts(collection: matching_notifications)
-  = column_chart user_alert_counts, stacked: true, thousands: ",", defer: true, colors: colors
+  = column_chart user_alert_counts, stacked: true, thousands: ",", colors: colors
 
 - if @render_kind_counts
   .row.mt-4.mb-4
