@@ -41,7 +41,7 @@
         = link_to current_organization.short_name, admin_organization_path(current_organization)
 
 - if @render_chart
-  = column_chart time_range_counts(collection: matching_impound_claims), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: matching_impound_claims), stacked: true, thousands: ","
   - unless params[:organization_id].present?
     .row.mt-4
       .col-md-6.offset-md-3

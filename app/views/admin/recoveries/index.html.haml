@@ -32,7 +32,7 @@
 
 - if @render_chart
   .mt-2.mb-4
-    = column_chart time_range_counts(collection: available_recoveries, column: @time_range_column), stacked: true, thousands: ",", defer: true
+    = column_chart time_range_counts(collection: available_recoveries, column: @time_range_column), stacked: true, thousands: ","
   .row.mt-4.mb-4
     .col-sm-6.offset-sm-3
       %table.table-list.wide-definition.no-italic-definition

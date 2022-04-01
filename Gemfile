@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config and Dockerfile if Ruby version is bumped
-ruby "2.7.3"
+ruby "2.7.5"
 gem "rack", "2.2.3"
 gem "rails", "~> 6.0"
 
@@ -61,8 +61,8 @@ gem "sitemap_generator", "~> 6"
 gem "carrierwave", "~> 0.11.2" # File uploader
 gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
-gem "wicked_pdf"
-gem "wkhtmltopdf-binary"
+# gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
+# gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "rqrcode", "0.10.1" # QR Codes
 gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3" # QR codes more

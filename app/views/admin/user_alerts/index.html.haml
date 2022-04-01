@@ -40,7 +40,7 @@
     - user_alert_counts = UserAlert.kinds.map { |k| {name: UserAlert.kind_humanized(k), data: time_range_counts(collection: matching_user_alerts.where(kind: k), column: @time_range_column)} }
   - else
     - user_alert_counts = time_range_counts(collection: matching_user_alerts)
-  = column_chart user_alert_counts, stacked: true, thousands: ",", defer: true, colors: colors
+  = column_chart user_alert_counts, stacked: true, thousands: ",", colors: colors
 
 - if @render_kind_counts
   .row.mt-4.mb-4

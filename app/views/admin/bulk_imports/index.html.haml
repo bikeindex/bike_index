@@ -24,7 +24,7 @@
 
   = render partial: "/shared/admin_current_header", locals: { viewing: "Bulk imports" }
 
-= column_chart time_range_counts(collection: matching_bulk_imports), stacked: true, thousands: ",", defer: true
+= column_chart time_range_counts(collection: matching_bulk_imports), stacked: true, thousands: ","
 
 = render partial: "/shared/period_select"
 

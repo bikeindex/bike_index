@@ -32,7 +32,7 @@
 
 - if @render_chart
   - time_range_column = @search_status == "marked_remaining" ? "marked_remaining_at" : "created_at"
-  = column_chart time_range_counts(collection: matching_graduated_notifications, column: time_range_column), stacked: true, thousands: ",", defer: true
+  = column_chart time_range_counts(collection: matching_graduated_notifications, column: time_range_column), stacked: true, thousands: ","
 
 .mt-2.mb-4
   = render partial: "/shared/period_select"

@@ -18,7 +18,7 @@
 
   - if @render_chart
     .col-12.mt-2
-      = column_chart time_range_counts(collection: matching_recovery_displays, column: "recovery_displays.#{@time_range_column}"), stacked: true, thousands: ",", defer: true
+      = column_chart time_range_counts(collection: matching_recovery_displays, column: "recovery_displays.#{@time_range_column}"), stacked: true, thousands: ","
 
   = render partial: "/shared/period_select"
 

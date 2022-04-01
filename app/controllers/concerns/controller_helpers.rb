@@ -428,14 +428,16 @@ module ControllerHelpers
     Time.current
   end
 
+  def earliest_organization_period_date
+    return nil if current_organization.blank?
+    start_time = current_organization.created_at - 6.months
+    start_time = Time.current - 1.year if start_time > (Time.current - 1.year)
+    start_time
+  end
+
   # Separate method so it can be overridden on per controller basis
+  # Copied
   def earliest_period_date
-    if current_organization.present?
-      @start_time = current_organization.created_at - 6.months
-      @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)
-      @start_time
-    else
-      @start_time = Time.at(1134972000) # Earliest bike created at
-    end
+    earliest_organization_period_date || Time.at(1134972000) # Earliest bike created at
   end
 end
