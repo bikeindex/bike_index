@@ -43,7 +43,7 @@
   = column_chart variable_admin_graphs_path(sortable_search_params), stacked: true, thousands: ","
 
   -# Don't render all the extra stuff if looking at a period that is longer than 1 year
-  - render_other_bike_graphs = group_by_method(@time_range) != :group_by_month
+  - render_other_bike_graphs = time_range_length(@time_range) < 367.days.to_i
   - if @kind == "bikes" && render_other_bike_graphs
     - bike_graph_kinds.each do |graph_kind|
       - if graph_kind == "stolen"
