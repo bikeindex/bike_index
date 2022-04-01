@@ -70,7 +70,7 @@ RSpec.describe Admin::DashboardController, type: :request do
       it "renders" do
         FactoryBot.create(:manufacturer, name: "other")
         FactoryBot.create(:ctype, name: "other")
-        BParam.create(creator_id: user.id)
+        BParam.create(creator_id: current_user.id)
         get "/admin/maintenance"
         expect(response.code).to eq "200"
         expect(response).to render_template(:maintenance)
