@@ -27,6 +27,7 @@ class OrganizationFeature < ApplicationRecord
 
   # NOTE: impound_bikes_public is automatically added if the org configures, no need to manually addz
   EXPECTED_SLUGS = (%w[
+    area_stolen_message
     avery_export
     bike_search
     bike_stickers
@@ -40,7 +41,6 @@ class OrganizationFeature < ApplicationRecord
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
-    area_stolen_message
     no_address
     official_manufacturer
     passwordless_users
