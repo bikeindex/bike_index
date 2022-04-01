@@ -1668,6 +1668,9 @@ en:
       sessionable:
         sign_in_and_redirect:
           logged_in: Logged in!
+          user_is_banned: >-
+            We're sorry, but it appears that your account has been locked. If you
+            are unsure as to the reasons for this, please contact us.
         skip_if_signed_in:
           already_signed_in: You're already signed in!
     feedbacks:
@@ -1862,9 +1865,6 @@ en:
     sessions:
       create:
         invalid_email_or_password: Invalid email/password
-        user_is_banned: >-
-          We're sorry, but it appears that your account has been locked. If you are
-          unsure as to the reasons for this, please contact us.
       create_magic_link:
         link_sent: Sign in link sent! Just click the link in your email to sign in
         user_not_found: Unable to find that user
