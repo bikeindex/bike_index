@@ -74,6 +74,7 @@
                   %tr
                     %td.text-left= origin.humanize
                     %td.text-right= admin_number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
+                -# TODO: make this actually work
                 -# %tr
                 -#   %td.text-left Transferred pre-registration
                 -#   %td.text-right= admin_number_display(Ownership.transferred_pre_registration.where(bike_id: bike_ids).count)
