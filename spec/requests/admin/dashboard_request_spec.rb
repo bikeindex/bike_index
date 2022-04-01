@@ -1,26 +1,26 @@
 require "rails_helper"
 
-RSpec.describe Admin::DashboardController, type: :controller do
+RSpec.describe Admin::DashboardController, type: :request do
   describe "index" do
     context "not logged in" do
       it "redirects" do
-        get :index
+        get "/admin"
         expect(response.code).to eq("302")
         expect(response).to redirect_to(root_url)
       end
     end
     context "non-admin" do
-      include_context :logged_in_as_organization_admin
+      include_context :request_spec_logged_in_as_organization_admin
       it "redirects" do
-        get :index
+        get "/admin"
         expect(response.code).to eq("302")
-        expect(response).to redirect_to organization_root_path(organization_id: user.default_organization.to_param)
+        expect(response).to redirect_to organization_root_path(organization_id: current_user.default_organization.to_param)
       end
     end
   end
 
   context "logged in as admin" do
-    include_context :logged_in_as_super_admin
+    include_context :request_spec_logged_in_as_superuser
 
     describe "index (also timezone setting tests)" do
       before do
@@ -32,29 +32,16 @@ RSpec.describe Admin::DashboardController, type: :controller do
       let(:timezone) { "America/Los_Angeles" }
       let(:time_range_start) { Time.now.in_time_zone(timezone).beginning_of_day - 7.days }
       it "renders, sets timezone from params" do
-        get :index, params: {timezone: timezone}
+        get "/admin", params: {timezone: timezone}
         expect(response.code).to eq "200"
         expect(response).to render_template(:index)
         expect(session[:timezone]).to eq timezone
         expect(assigns(:time_range).first).to be_within(2.seconds).of time_range_start
         expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
       end
-      context "timezone set in session, not passed" do
-        let(:timezone) { "Amsterdam" } # UTC + 1
-        it "uses session timezone" do
-          session[:timezone] = timezone
-          get :index
-          expect(response.code).to eq "200"
-          expect(response).to render_template(:index)
-          expect(session[:timezone]).to eq timezone
-          expect(assigns(:time_range).first).to be_within(2.seconds).of time_range_start
-          expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
-        end
-      end
       context "passing nonsense timezone" do
         it "doesn't set the timezone" do
-          session[:timezone] = timezone
-          get :index, params: {timezone: "party-zone"}
+          get "/admin", params: {timezone: "party-zone"}
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(session[:timezone]).to be_blank
@@ -65,7 +52,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
     describe "credibility_badges" do
       it "renders" do
-        get :credibility_badges
+        get "/admin/credibility_badges"
         expect(response.code).to eq "200"
         expect(response).to render_template(:credibility_badges)
       end
@@ -73,7 +60,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
     describe "scheduled_jobs" do
       it "renders" do
-        get :scheduled_jobs
+        get "/admin/scheduled_jobs"
         expect(response.code).to eq "200"
         expect(response).to render_template(:scheduled_jobs)
       end
@@ -83,8 +70,8 @@ RSpec.describe Admin::DashboardController, type: :controller do
       it "renders" do
         FactoryBot.create(:manufacturer, name: "other")
         FactoryBot.create(:ctype, name: "other")
-        BParam.create(creator_id: user.id)
-        get :maintenance
+        BParam.create(creator_id: current_user.id)
+        get "/admin/maintenance"
         expect(response.code).to eq "200"
         expect(response).to render_template(:maintenance)
       end
@@ -97,7 +84,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
         # tsvs = [{ filename: 'current_stolen_bikes.tsv', updated_at: t.to_i.to_s, description: 'Approved Stolen bikes' }]
         blocklist = %w[1010101 2 4 6]
         FileCacheMaintainer.reset_blocklist_ids(blocklist)
-        get :tsvs
+        get "/admin/tsvs"
         expect(response.code).to eq("200")
         # assigns(:tsvs).should eq(tsvs)
         expect(assigns(:blocklist).include?("2")).to be_truthy
@@ -107,7 +94,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
     describe "update_tsv_blocklist" do
       it "renders and updates" do
         ids = "\n1\n2\n69\n200\n22222\n\n\n"
-        put :update_tsv_blocklist, params: {blocklist: ids}
+        put "/admin/update_tsv_blocklist", params: {blocklist: ids}
         expect(FileCacheMaintainer.blocklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))
       end
     end
