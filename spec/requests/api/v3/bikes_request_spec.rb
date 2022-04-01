@@ -511,7 +511,7 @@ RSpec.describe "Bikes API V3", type: :request do
           extra_registration_number: "Another Serial",
           manufacturer: manufacturer.name,
           color: color.name,
-          owner_email: user.email,
+          owner_email: user.email
         }
       end
       it "registers with extra_registration_number" do
