@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
@@ -41,6 +41,8 @@ jobs:
               curl \
               gettext \
               imagemagick \
+              ghostscript \
+              libgs-dev \
               libcurl4-gnutls-dev \
               libexpat1-dev \
               libssl-dev \
