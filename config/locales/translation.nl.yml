@@ -2177,8 +2177,6 @@ nl:
     sessions:
       create:
         invalid_email_or_password: Ongeldig e-mailadres / wachtwoord
-        user_is_banned: Het spijt ons, maar het lijkt erop dat uw account is vergrendeld.
-          Neem contact met ons op als u niet zeker weet waarom.
       create_magic_link:
         link_sent: Aanmelden link verzonden! Klik op de link in uw e-mail om in te
           loggen
@@ -2296,6 +2294,8 @@ nl:
       sessionable:
         sign_in_and_redirect:
           logged_in: Ingelogd!
+          user_is_banned: Het spijt ons, maar het lijkt erop dat uw account is vergrendeld.
+            Neem contact met ons op als u niet zeker weet waarom.
         skip_if_signed_in:
           already_signed_in: Je bent al ingelogd!
     oauth:

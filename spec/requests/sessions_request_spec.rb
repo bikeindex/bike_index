@@ -61,7 +61,8 @@ RSpec.describe SessionsController, type: :request do
 
   describe "create" do
     let(:password) { "example_password2" }
-    let!(:user) { FactoryBot.create(:user_confirmed, password: password) }
+    let!(:user) { FactoryBot.create(:user_confirmed, password: password, password_confirmation: password, banned: banned) }
+    let(:banned) { false }
     it "signs in" do
       post "/session", params: {session: {email: user.email, password: password}}
       expect(response).to redirect_to my_account_url
@@ -69,10 +70,10 @@ RSpec.describe SessionsController, type: :request do
       expect(user.last_login_at).to be_within(1.second).of Time.current
     end
     context "banned" do
-      let!(:user) { FactoryBot.create(:user_confirmed, password: password, banned: true) }
+      let(:banned) { true }
       it "renders" do
         post "/session", params: {session: {email: user.email, password: password}}
-        expect(response).to render_template("new")
+        expect(response).to redirect_to new_session_path
         user.reload
         expect(user.last_login_at).to be_blank
       end

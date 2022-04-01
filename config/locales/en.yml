@@ -1669,8 +1669,8 @@ en:
         sign_in_and_redirect:
           logged_in: Logged in!
           user_is_banned: >-
-            We're sorry, but it appears that your account has been locked. If you are
-            unsure as to the reasons for this, please contact us.
+            We're sorry, but it appears that your account has been locked. If you
+            are unsure as to the reasons for this, please contact us.
         skip_if_signed_in:
           already_signed_in: You're already signed in!
     feedbacks:
