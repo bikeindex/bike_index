@@ -1,6 +1,10 @@
 version: 2.1
 jobs:
   build:
+    parameters:
+      cache_version:
+        type: integer
+        default: 1
     working_directory: ~/bikeindex/bike_index
     parallelism: 2
     shell: /bin/bash --login
@@ -57,7 +61,7 @@ jobs:
 
       - type: cache-restore
         name: "Dockerize: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        key: cache-<< parameters.cache_version >>-dockerize-0.6.1
 
       - run:
           name: "Dockerize: install"
@@ -72,13 +76,13 @@ jobs:
 
       - type: cache-save
         name: "Dockerize: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        key: cache-<< parameters.cache_version >>-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
 
       - type: cache-restore
         name: "Git: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        key: cache-<< parameters.cache_version >>-git-2.22.0
 
       - run:
           name: "Git: install"
@@ -113,13 +117,13 @@ jobs:
 
       - type: cache-save
         name: "Git: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        key: cache-<< parameters.cache_version >>-git-2.22.0
         paths:
           - ~/.cache/git/git-2.22.0
 
       - type: cache-restore
         name: "Hub: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        key: cache-<< parameters.cache_version >>-hub-2.12.3
 
       - run:
           name: "Hub: install"
@@ -143,7 +147,7 @@ jobs:
 
       - type: cache-restore
         name: "Hub: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        key: cache-<< parameters.cache_version >>-hub-2.12.3
         paths:
           - ~/.cache/hub
 
@@ -153,7 +157,7 @@ jobs:
 
       - type: cache-restore
         name: "Ruby dependencies: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
+        key: cache-<< parameters.cache_version >>-gems-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: "Ruby dependencies: install"
@@ -164,7 +168,7 @@ jobs:
 
       - type: cache-save
         name: "Ruby dependencies: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
+        key: cache-<< parameters.cache_version >>-gems-{{ checksum "Gemfile.lock" }}
         paths:
           - ~/.cache/bundle
 
@@ -175,7 +179,7 @@ jobs:
 
       - type: cache-restore
         name: "Node dependencies: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        key: cache-<< parameters.cache_version >>-yarn-{{ checksum "yarn.lock" }}
 
       - run:
           name: "Node dependencies: install"
@@ -186,13 +190,13 @@ jobs:
 
       - type: cache-save
         name: "Node dependencies: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        key: cache-<< parameters.cache_version >>-yarn-{{ checksum "yarn.lock" }}
         paths:
           - ~/.cache/yarn
 
       - type: cache-restore
         name: "Assets: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: cache-<< parameters.cache_version >>-assets-{{ .Environment.CIRCLE_SHA1 }}
 
       - run:
           name: "Assets: precompile"
@@ -204,7 +208,7 @@ jobs:
 
       - type: cache-save
         name: "Assets: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: cache-<< parameters.cache_version >>-assets-{{ .Environment.CIRCLE_SHA1 }}
         paths:
           - .sass-cache
           - public/assets
@@ -298,10 +302,11 @@ jobs:
             curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
-  version: 2
+  version: 2.1
   commit:
     jobs:
-      - build
+      - build:
+        cache_version: 6
       - upload-coverage:
           requires:
             - build
