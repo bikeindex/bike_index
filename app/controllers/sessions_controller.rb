@@ -52,10 +52,6 @@ class SessionsController < ApplicationController
       else
         # User couldn't authenticate, so password is invalid
         flash.now[:error] = translation(:invalid_email_or_password)
-        # If user is banned, tell them about it.
-        if @user.banned?
-          flash.now[:error] = translation(:user_is_banned)
-        end
         render_partner_or_default_signin_layout(render_action: :new)
       end
     else

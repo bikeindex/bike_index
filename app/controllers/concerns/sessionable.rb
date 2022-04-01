@@ -15,6 +15,10 @@ module Sessionable
   end
 
   def sign_in_and_redirect(user)
+    if user.banned? # If user is banned, tell them about it.
+      flash.now[:error] = translation(:user_is_banned, scope: [:controllers, :concerns, :sessionable, __method__])
+      redirect_back(fallback_location: new_session_url) && return
+    end
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(user.default_organization) # Set that organization!
