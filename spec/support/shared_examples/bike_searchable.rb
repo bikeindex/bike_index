@@ -376,6 +376,27 @@ RSpec.shared_examples "bike_searchable" do
         expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
       end
     end
+    context "serial with spaces rather than dashes" do
+      let(:query_params) { {serial: "11I528 111JJJJJ", stolenness: "all"} }
+      it "matches only non-exact" do
+        expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
+      end
+    end
+    context "spaces" do
+      let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|I LSZB 111J JJJJ", manufacturer: manufacturer) }
+      context "dashes not spaces" do
+        let(:query_params) { {serial: "011-I528-111J-JJJJ", stolenness: "all"} }
+        it "matches only non-exact" do
+          expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to match_array([stolen_bike.id, non_stolen_bike.id])
+        end
+      end
+      context "no spaces" do
+        let(:query_params) { {serial: "11I528111JJJJJ", stolenness: "all"} }
+        it "matches only non-exact" do
+          expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to match_array([stolen_bike.id, non_stolen_bike.id])
+        end
+      end
+    end
     context "close serial with stolenness" do
       let(:query_params) { {serial: "011I528-111JJJk", stolenness: "non"} }
       it "returns matching stolenness" do
