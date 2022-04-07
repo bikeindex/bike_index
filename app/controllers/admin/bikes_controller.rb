@@ -40,7 +40,7 @@ class Admin::BikesController < Admin::BaseController
       params[:bikes_selected].keys.each do |bid|
         Bike.unscoped.find_by_id(bid)&.update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
-      flash[:success] = "Success. Bikes updated"
+      flash[:success] = "Success. #{params[:bikes_selected].keys.count} Bikes updated"
     else
       flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     end
