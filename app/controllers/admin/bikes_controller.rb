@@ -189,7 +189,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = bikes.where(created_at: @time_range) unless @period == "all"
     @include_blank = ParamsNormalizer.boolean(params[:search_include_blank])
-    bikes = bikes.where.not(manufacturer_other: nil)  unless @include_blank
+    bikes = bikes.where.not(manufacturer_other: nil) unless @include_blank
     bikes = if session[:missing_manufacturer_time_order]
       bikes.order("created_at desc")
     else

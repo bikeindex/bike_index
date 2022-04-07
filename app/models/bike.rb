@@ -101,7 +101,6 @@ class Bike < ApplicationRecord
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
-  scope :manufacturer_other, -> { order(arel_table["name"].lower) }
   scope :with_user_hidden, -> { unscoped.non_example.without_deleted }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
