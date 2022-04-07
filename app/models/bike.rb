@@ -101,6 +101,7 @@ class Bike < ApplicationRecord
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
+  scope :manufacturer_other, -> { order(arel_table["name"].lower) }
   scope :with_user_hidden, -> { unscoped.non_example.without_deleted }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
@@ -750,6 +751,7 @@ class Bike < ApplicationRecord
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
+    self.manufacturer_other = nil if manufacturer_other.blank?
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.owner_email = normalized_email
     normalize_serial_number
