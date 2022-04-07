@@ -26,12 +26,12 @@ class Admin::BikesController < Admin::BaseController
     if params[:manufacturer_id].present? && params[:bikes_selected].present?
       manufacturer_id = params[:manufacturer_id]
       params[:bikes_selected].keys.each do |bid|
-        Bike.find(bid).update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
+        Bike.unscoped.find_by_id(bid)&.update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
       flash[:success] = "Success. Bikes updated"
-      redirect_back(fallback_location: root_url) && return
+    else
+      flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     end
-    flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     redirect_back(fallback_location: root_url)
   end
 
