@@ -7,11 +7,20 @@
       %li.nav-item
         = link_to "all bikes", admin_bikes_path, class: "nav-link"
       %li.nav-item
-        = link_to "Alphabetical view", missing_manufacturer_admin_bikes_path(reset_view: true), class: !session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
+        = link_to "Alphabetical view", url_for(sortable_search_params.merge(reset_view: true)), class: !session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
       %li.nav-item
-        = link_to "Time ordered view", missing_manufacturer_admin_bikes_path(time_ordered: true), class: session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
+        = link_to "Time ordered view", url_for(sortable_search_params.merge(search_time_ordered: true)), class: session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
 
-.row.mb-4
+= render partial: "/shared/period_select"
+
+- if @exclude_organizations.present?
+  %p
+    %span.text-warning
+      Excluding #{"organization".pluralize(@exclude_organizations.count)}:
+    - @exclude_organizations.each do |organization|
+      = link_to organization.name, admin_organization_path(organization.to_param)
+
+.row.mb-4.mt-4
   .col-md-8
     %p
       %strong
@@ -85,7 +94,8 @@
 
             %td
               .less-strong-hold
-                = bike.creation_organization.name if bike.creation_organization.present?
+                - if bike.creation_organization.present?
+                  = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
                 - if bike.pos?
                   %span.less-strong-right
                     pos
