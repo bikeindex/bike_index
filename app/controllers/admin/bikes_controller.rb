@@ -16,11 +16,13 @@ class Admin::BikesController < Admin::BaseController
     if params[:search_time_ordered].present?
       session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:search_time_ordered])
     end
-    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id).includes(:creation_organization, :current_ownership, :paint)
+    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = bikes.where(created_at: @time_range) unless @period == "all"
     bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
-    if params[:search_exclude_organization_ids].present?
+    if current_organization.present?
+      bikes = bikes.where(creation_organization_id: current_organization.id)
+    elsif params[:search_exclude_organization_ids].present?
       @exclude_organizations = params[:search_exclude_organization_ids].split(",").map do |s|
         Organization.friendly_find(s)
       end.compact
@@ -28,7 +30,8 @@ class Admin::BikesController < Admin::BaseController
     end
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = bikes.page(@page).per(per_page)
+    @bikes = bikes.includes(:creation_organization, :current_ownership, :paint)
+      .page(@page).per(per_page)
   end
 
   def update_manufacturers

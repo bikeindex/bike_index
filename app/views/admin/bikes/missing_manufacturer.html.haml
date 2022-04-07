@@ -13,18 +13,17 @@
 
 = render partial: "/shared/period_select"
 
-- if @exclude_organizations.present?
+- if @current_organization.present?
+  %p
+    %em
+      Only including bikes from
+    = link_to current_organization.name, admin_organization_path(current_organization.to_param)
+- elsif @exclude_organizations.present?
   %p
     %span.text-warning
       Excluding #{"organization".pluralize(@exclude_organizations.count)}:
     - @exclude_organizations.each do |organization|
       = link_to organization.name, admin_organization_path(organization.to_param)
-
-- if @current_organization.present?
-  %p
-    %span.text-warning
-      Only bikes from
-      = link_to current_organization.name, admin_organization_path(current_organization.to_param)
 
 .row.mb-4.mt-4
   .col-md-8
