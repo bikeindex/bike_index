@@ -1,7 +1,7 @@
 class Admin::BikesController < Admin::BaseController
   include SortableTable
   before_action :find_bike, only: %i[edit destroy update get_destroy show]
-  before_action :set_period, only: [:index]
+  before_action :set_period, only: %i[index missing_manufacturer]
 
   def index
     @page = params[:page] || 1
@@ -13,25 +13,37 @@ class Admin::BikesController < Admin::BaseController
 
   def missing_manufacturer
     session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
-    session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:time_ordered]) if params[:time_ordered].present?
+    if params[:search_time_ordered].present?
+      session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:search_time_ordered])
+    end
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
+    bikes = bikes.where(created_at: @time_range) unless @period == "all"
     bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
-    page = params[:page] || 1
+    if current_organization.present?
+      bikes = bikes.where(creation_organization_id: current_organization.id)
+    elsif params[:search_exclude_organization_ids].present?
+      @exclude_organizations = params[:search_exclude_organization_ids].split(",").map do |s|
+        Organization.friendly_find(s)
+      end.compact
+      bikes = bikes.where.not(creation_organization_id: @exclude_organizations.map(&:id))
+    end
+    @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = bikes.page(page).per(per_page)
+    @bikes = bikes.includes(:creation_organization, :current_ownership, :paint)
+      .page(@page).per(per_page)
   end
 
   def update_manufacturers
     if params[:manufacturer_id].present? && params[:bikes_selected].present?
       manufacturer_id = params[:manufacturer_id]
       params[:bikes_selected].keys.each do |bid|
-        Bike.find(bid).update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
+        Bike.unscoped.find_by_id(bid)&.update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
-      flash[:success] = "Success. Bikes updated"
-      redirect_back(fallback_location: root_url) && return
+      flash[:success] = "Success. #{params[:bikes_selected].keys.count} Bikes updated"
+    else
+      flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     end
-    flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     redirect_back(fallback_location: root_url)
   end
 

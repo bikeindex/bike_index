@@ -41,7 +41,7 @@ class Ownership < ApplicationRecord
   scope :claimed, -> { where(claimed: true) }
   scope :initial, -> { where(previous_ownership_id: nil) }
   scope :transferred, -> { where.not(previous_ownership_id: nil) }
-  scope :transferred_pre_registration, -> { left_joins(:previous_ownership).where(previous_ownerships: {organization_pre_registration: true})}
+  scope :transferred_pre_registration, -> { left_joins(:previous_ownership).where(previous_ownerships: {organization_pre_registration: true}) }
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
