@@ -1329,6 +1329,13 @@ RSpec.describe Bike, type: :model do
     it "is the simple_name" do
       expect(bike.reload.mnfg_name).to eq "SE Racing"
     end
+    context "manufacturer_other blank" do
+      let(:bike) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: " ") }
+      it "is nil" do
+        expect(bike.manufacturer_other).to eq nil
+        expect(bike.mnfg_name).to eq "Other"
+      end
+    end
   end
 
   describe "cache_photo" do

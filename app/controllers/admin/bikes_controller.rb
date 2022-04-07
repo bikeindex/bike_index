@@ -12,25 +12,9 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def missing_manufacturer
-    session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
-    if params[:search_time_ordered].present?
-      session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:search_time_ordered])
-    end
-    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
-    bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
-    bikes = bikes.where(created_at: @time_range) unless @period == "all"
-    bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
-    if current_organization.present?
-      bikes = bikes.where(creation_organization_id: current_organization.id)
-    elsif params[:search_exclude_organization_ids].present?
-      @exclude_organizations = params[:search_exclude_organization_ids].split(",").map do |s|
-        Organization.friendly_find(s)
-      end.compact
-      bikes = bikes.where.not(creation_organization_id: @exclude_organizations.map(&:id))
-    end
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = bikes.includes(:creation_organization, :current_ownership, :paint)
+    @bikes = missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint)
       .page(@page).per(per_page)
   end
 
@@ -194,5 +178,31 @@ class Admin::BikesController < Admin::BaseController
 
   def available_bikes
     @available_bikes ||= matching_bikes.where(created_at: @time_range)
+  end
+
+  def missing_manufacturer_bikes
+    session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
+    if params[:search_time_ordered].present?
+      session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:search_time_ordered])
+    end
+    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
+    bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
+    bikes = bikes.where(created_at: @time_range) unless @period == "all"
+    @include_blank = ParamsNormalizer.boolean(params[:search_include_blank])
+    bikes = bikes.where.not(manufacturer_other: nil) unless @include_blank
+    bikes = if session[:missing_manufacturer_time_order]
+      bikes.order("created_at desc")
+    else
+      bikes.order(bikes.arel_table["manufacturer_other"].lower)
+    end
+    if current_organization.present?
+      bikes = bikes.where(creation_organization_id: current_organization.id)
+    elsif params[:search_exclude_organization_ids].present?
+      @exclude_organizations = params[:search_exclude_organization_ids].split(",").map do |s|
+        Organization.friendly_find(s)
+      end.compact
+      bikes = bikes.where.not(creation_organization_id: @exclude_organizations.map(&:id))
+    end
+    bikes
   end
 end
