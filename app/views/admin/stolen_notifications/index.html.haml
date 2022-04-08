@@ -3,22 +3,21 @@
     %h1
       Stolen Notifications
 
-%p
-  = number_with_delimiter(StolenNotification.count)
-  Stolen Notifications created,
-  %em
-    (#{number_with_delimiter(StolenNotification.where("created_at >= ?", Time.current.beginning_of_day).count)} today)
+= render partial: "/shared/period_select"
 
+= render partial: "/shared/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count, name: "Stolen Notifications", views_prefix: "admin"}
 
-= paginate @stolen_notifications, views_prefix: "admin"
+- skip_sortable = false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
+    %thead.sortable
       %th
-        Date created
+        = sortable "created_at", skip_sortable: skip_sortable
+      %th.small
+        = sortable "updated_at", skip_sortable: skip_sortable
       %th
-        Bike
+        = sortable "bike_id", skip_sortable: skip_sortable
       %th
         message
       %th
@@ -29,6 +28,9 @@
         %tr
           %td
             %a.convertTime{ href: admin_stolen_notification_url(stolen_notification) }
+              = l stolen_notification.created_at, format: :convert_time
+          %td
+            %small.convertTime
               = l stolen_notification.created_at, format: :convert_time
           %td
             - if stolen_notification.bike
@@ -48,4 +50,4 @@
             - else
               = stolen_notification.send_dates_parsed.count
 
-= paginate @stolen_notifications, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count, name: "Stolen Notifications", views_prefix: "admin", skip_total: true}
