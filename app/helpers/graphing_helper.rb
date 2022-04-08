@@ -32,20 +32,18 @@ module GraphingHelper
     time_range.last - time_range.first
   end
 
-  def group_by_format(time_range, group_period = nil)
-    group_period ||= group_by_method(time_range)
-    if group_period == :group_by_minute
-      "%l:%M %p"
-    elsif group_period == :group_by_hour
-      "%a%l %p"
-    elsif group_period == :group_by_week
-      "%Y-%-m-%-d"
-    elsif %i[group_by_day group_by_week].include?(group_period) || time_range.present? && time_range.last - time_range.first < 2.weeks.to_i
-      "%a %Y-%-m-%-d"
-    elsif group_period == :group_by_month
-      "%Y-%-m"
+  def group_by_method(time_range)
+    if time_range.last - time_range.first < 3601 # 1.hour + 1 second
+      :group_by_minute
+    elsif time_range.last - time_range.first < 500_000 # around 6 days
+      :group_by_hour
+    elsif time_range.last - time_range.first < 5_000_000 # around 60 days
+      :group_by_day
+    elsif time_range.last - time_range.first < 31730400 # 1.year + 2.days
+      :group_by_week
+    else
+      :group_by_month
     end
-    # If no match, it falls back to the default handling
   end
 
   def group_by_format(time_range, group_period = nil)
@@ -54,6 +52,8 @@ module GraphingHelper
       "%l:%M %p"
     elsif group_period == :group_by_hour
       "%a%l %p"
+    elsif group_period == :group_by_week
+      "%Y-%-m-%-d"
     elsif %i[group_by_day group_by_week].include?(group_period) || time_range.present? && time_range.last - time_range.first < 2.weeks.to_i
       "%a %Y-%-m-%-d"
     elsif group_period == :group_by_month
