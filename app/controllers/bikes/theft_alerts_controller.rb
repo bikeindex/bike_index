@@ -80,7 +80,9 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       .theft_alerts
       .includes(:theft_alert_plan)
       .creation_ordered_desc
-      .where(user: current_user)
       .references(:theft_alert_plan)
+    # Only show non-user theft_alerts to superuser
+    return @theft_alerts if current_user.superuser?
+    @theft_alerts = @theft_alerts.where(user: current_user)
   end
 end

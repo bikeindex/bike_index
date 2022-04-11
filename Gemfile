@@ -144,7 +144,7 @@ group :development do
   # Extra faraday response logging. Used in exchange rate api client and external registry
   # Commented out because of facebook upgrade
   # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
-  gem "guard"
+  gem "guard", require: false
   gem "guard-rspec", require: false
   gem "letter_opener"
   gem "rerun"

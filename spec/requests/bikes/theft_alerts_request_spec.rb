@@ -5,20 +5,65 @@ re_record_interval = 30.days
 RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_requests_on: [:method], re_record_interval: re_record_interval do
   let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }
   let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user: current_user) }
+  let(:stolen_record) { bike.current_stolen_record }
   let(:base_url) { "/bikes/#{bike.to_param}/theft_alert" }
   include_context :request_spec_logged_in_as_user
 
   describe "new" do
+    let(:theft_alert_plan2) { FactoryBot.create(:theft_alert_plan) }
+    before { theft_alert_plan && theft_alert_plan2 }
     it "renders" do
-      # there need to be 2 plans
-      FactoryBot.create(:theft_alert_plan)
-      theft_alert_plan2 = FactoryBot.create(:theft_alert_plan)
       get "#{base_url}/new"
       expect(response.code).to eq("200")
       expect(response).to render_template("new")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_falsey
       expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
+      expect(assigns(:theft_alerts).pluck(:id)).to eq([])
+    end
+    context "existing theft alert" do
+      let!(:theft_alert_paid) do
+        FactoryBot.create(:theft_alert, :paid, :ended,
+          user: theft_alert_user,
+          theft_alert_plan: theft_alert_plan,
+          stolen_record: stolen_record)
+      end
+      let(:theft_alert_user) { current_user }
+      it "renders theft alert" do
+        expect(stolen_record.reload.theft_alerts.pluck(:id)).to eq([theft_alert_paid.id])
+        expect(stolen_record.theft_alerts.active.pluck(:id)).to eq([])
+        get "#{base_url}/new"
+        expect(response.code).to eq("200")
+        expect(response).to render_template("new")
+        expect(flash).to_not be_present
+        expect(assigns(:show_general_alert)).to be_falsey
+        expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
+        expect(assigns(:theft_alerts).pluck(:id)).to eq([theft_alert_paid.id])
+      end
+      context "not users" do
+        let(:theft_alert_user) { FactoryBot.create(:user_confirmed) }
+        it "doesn't render" do
+          get "#{base_url}/new"
+          expect(response.code).to eq("200")
+          expect(response).to render_template("new")
+          expect(flash).to_not be_present
+          expect(assigns(:show_general_alert)).to be_falsey
+          expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
+          expect(assigns(:theft_alerts).pluck(:id)).to eq([])
+        end
+        context "superadmin" do
+          let(:current_user) { FactoryBot.create(:admin) }
+          it "renders" do
+            get "#{base_url}/new"
+            expect(response.code).to eq("200")
+            expect(response).to render_template("new")
+            expect(flash).to_not be_present
+            expect(assigns(:show_general_alert)).to be_falsey
+            expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
+            expect(assigns(:theft_alerts).pluck(:id)).to eq([theft_alert_paid.id])
+          end
+        end
+      end
     end
     context "current user not owner of bike" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record) }
@@ -85,7 +130,6 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
     context "passing alert_image" do
       let!(:image1) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
       let!(:image2) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
-      let(:stolen_record) { bike.current_stolen_record }
       it "updates the alert image" do
         stolen_record.reload.current_alert_image
         expect(stolen_record.reload.alert_image).to be_present
