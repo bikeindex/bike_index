@@ -59,6 +59,10 @@ class TheftAlert < ApplicationRecord
       .sort_by { |c| -c[3] }
   end
 
+  def self.paid_cents
+    paid.sum("payments.amount_cents")
+  end
+
   # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?

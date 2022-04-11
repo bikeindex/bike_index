@@ -125,11 +125,13 @@
               %th Count
               %th Fbook Reach
               %th Fbook Spend
+              %th Revenue
               %th.small Recovered
             %tbody
               - alert_count_total = 0
               - fbook_reach_total = 0
               - fbook_cents_total = 0
+              - revenue_cents_total = 0
               - recovered_count_total = 0
               - theft_alert_plans.each do |theft_alert_plan|
                 %tr
@@ -149,6 +151,10 @@
                     - fbook_cents_total += fbook_cents
                     = MoneyFormater.money_format(fbook_cents)
                   %td.small
+                    - revenue_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).paid_cents
+                    - revenue_cents_total += revenue_cents
+                    = MoneyFormater.money_format(revenue_cents)
+                  %td.small
                     - recovered_count = stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count
                     - recovered_count_total += recovered_count
                     = admin_number_display(recovered_count)
@@ -158,6 +164,8 @@
                 %td= admin_number_display(alert_count_total)
                 %td= admin_number_display(fbook_reach_total)
                 %td= MoneyFormater.money_format(fbook_cents_total)
+                %td
+                  %small= MoneyFormater.money_format(revenue_cents_total)
                 %td.small= admin_number_display(recovered_count_total)
 
 
