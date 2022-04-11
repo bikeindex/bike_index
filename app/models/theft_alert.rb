@@ -24,7 +24,7 @@ class TheftAlert < ApplicationRecord
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :paid, -> { joins(:payment).where.not(payments: {first_payment_date: nil}) }
-  scope :posted, -> { where.not(begin_at: nil) }
+  scope :posted, -> { where.not(start_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
@@ -77,7 +77,7 @@ class TheftAlert < ApplicationRecord
 
   # Active or has been active
   def posted?
-    begin_at.present?
+    start_at.present?
   end
 
   def facebook_updateable?
@@ -183,13 +183,13 @@ class TheftAlert < ApplicationRecord
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
 
-  def calculated_begin_at
-    begin_at.present? ? begin_at : Time.current
+  def calculated_start_at
+    start_at.present? ? start_at : Time.current
   end
 
   # Default to 3 days, because something
   def calculated_end_at
-    calculated_begin_at + (duration_days_facebook || 3).days
+    calculated_start_at + (duration_days_facebook || 3).days
   end
 
   def set_calculated_attributes
@@ -204,13 +204,13 @@ class TheftAlert < ApplicationRecord
   private
 
   def alert_cannot_begin_in_past_or_after_ends
-    return if begin_at.blank? && end_at.blank?
+    return if start_at.blank? && end_at.blank?
 
-    if begin_at.blank?
-      errors.add(:begin_at, :must_be_present)
+    if start_at.blank?
+      errors.add(:start_at, :must_be_present)
     elsif end_at.blank?
       errors.add(:end_at, :must_be_present)
-    elsif begin_at >= end_at
+    elsif start_at >= end_at
       errors.add(:end_at, :must_be_later_than_start_time)
     end
   end

@@ -89,7 +89,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       it "sets alert timestamps when beginning an alert" do
         alert = FactoryBot.create(:theft_alert)
         expect(alert.status).to eq("pending")
-        expect(alert.begin_at).to eq(nil)
+        expect(alert.start_at).to eq(nil)
         expect(alert.end_at).to eq(nil)
 
         patch "/admin/theft_alerts/#{alert.id}",
@@ -102,7 +102,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(alert.reload.status).to eq("active")
-        expect(alert.begin_at).to be_within(2.seconds).of(Time.current)
+        expect(alert.start_at).to be_within(2.seconds).of(Time.current)
         expect(alert.end_at).to be_within(2.seconds).of(Time.current + 7.days)
       end
 
@@ -110,7 +110,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         alert = FactoryBot.create(:theft_alert)
         expect(alert.status).to eq("pending")
         expect(alert.notes).to be_nil
-        expect(alert.begin_at).to be_nil
+        expect(alert.start_at).to be_nil
         expect(alert.end_at).to be_nil
 
         patch "/admin/theft_alerts/#{alert.id}",
@@ -125,7 +125,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(alert.reload.status).to eq("pending")
         expect(alert.notes).to eq("updated note")
-        expect(alert.begin_at).to be_nil
+        expect(alert.start_at).to be_nil
         expect(alert.end_at).to be_nil
       end
 
@@ -139,14 +139,14 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
             theft_alert: {
               status: "active",
               theft_alert_plan_id: alert.theft_alert_plan.id,
-              begin_at: now,
+              start_at: now,
               end_at: now + 1.day
             }
           }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(alert.reload.status).to eq("active")
-        expect(alert.begin_at).to be_within(5.seconds).of(now)
+        expect(alert.start_at).to be_within(5.seconds).of(now)
         expect(alert.end_at).to be_within(5.seconds).of(now + 1.day)
       end
 

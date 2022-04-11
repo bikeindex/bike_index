@@ -2832,7 +2832,7 @@ CREATE TABLE public.theft_alerts (
     payment_id integer,
     user_id integer,
     status integer DEFAULT 0 NOT NULL,
-    begin_at timestamp without time zone,
+    start_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -6173,6 +6173,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220124192245'),
 ('20220201213958'),
 ('20220324004315'),
-('20220405173312');
+('20220405173312'),
+('20220411165641');
 
 

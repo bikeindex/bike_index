@@ -25,8 +25,8 @@
                 %td= alert.theft_alert_plan.name
                 %td= alert.status
                 %td
-                  - if alert.begin_at.present?
-                    %span.convertTime= l(alert.begin_at, format: :convert_time)
+                  - if alert.start_at.present?
+                    %span.convertTime= l(alert.start_at, format: :convert_time)
                 %td
                   - if alert.end_at.present?
                     .convertTime= l(alert.end_at, format: :convert_time)

@@ -52,7 +52,7 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   def theft_alert_params
     params.require(:theft_alert).permit(
-      :begin_at,
+      :start_at,
       :end_at,
       :notes,
       :status,
@@ -70,7 +70,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[created_at theft_alert_plan_id amount_cents_facebook_spent reach status begin_at end_at]
+    %w[created_at theft_alert_plan_id amount_cents_facebook_spent reach status start_at end_at]
   end
 
   def available_statuses
@@ -130,14 +130,14 @@ class Admin::TheftAlertsController < Admin::BaseController
     if currently_pending && transitioning_to_active
       theft_alert_plan = TheftAlertPlan.find(theft_alert_attrs[:theft_alert_plan_id])
       now = Time.current
-      theft_alert_attrs[:begin_at] = now
+      theft_alert_attrs[:start_at] = now
       theft_alert_attrs[:end_at] = now + theft_alert_plan.duration_days.days
     elsif transitioning_to_pending
-      theft_alert_attrs[:begin_at] = nil
+      theft_alert_attrs[:start_at] = nil
       theft_alert_attrs[:end_at] = nil
     else
       timezone = TimeParser.parse_timezone(params[:timezone])
-      theft_alert_attrs[:begin_at] = TimeParser.parse(theft_alert_attrs[:begin_at], timezone)
+      theft_alert_attrs[:start_at] = TimeParser.parse(theft_alert_attrs[:start_at], timezone)
       theft_alert_attrs[:end_at] = TimeParser.parse(theft_alert_attrs[:end_at], timezone)
     end
 

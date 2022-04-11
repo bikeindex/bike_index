@@ -92,7 +92,7 @@ RSpec.describe TheftAlert, type: :model do
     end
     context "campaign_id" do
       let(:end_at) { Time.current - 1.hour }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {campaign_id: "cxcxc"}, begin_at: Time.current - 1.week, end_at: end_at) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {campaign_id: "cxcxc"}, start_at: Time.current - 1.week, end_at: end_at) }
       it "is truthy" do
         expect(theft_alert.reload.facebook_updateable?).to be_truthy
         expect(theft_alert.live?).to be_falsey
