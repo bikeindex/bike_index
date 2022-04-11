@@ -47,6 +47,7 @@ class TheftAlert < ApplicationRecord
   def self.flatten_city(counted)
     @countries ||= Country.pluck(:id, :name).to_h
     @states ||= State.pluck(:id, :name).to_h
+
     [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
   end
 
