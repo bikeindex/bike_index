@@ -17,7 +17,7 @@
               %th= t(".start")
               %th= t(".end")
               - if show_creator
-                %th.small Creator
+                %th.small=t(".creator")
 
           %tbody
             - theft_alerts.each do |theft_alert|

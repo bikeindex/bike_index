@@ -595,7 +595,7 @@ en:
         end_at: End at
         notes: Notes
         payment: :activerecord.models.payment
-        start_at: Begin at
+        start_at: Start at
         status: Status
         stolen_record: :activerecord.models.stolen_record
         theft_alert_plan: :activerecord.models.theft_alert_plan
@@ -1342,6 +1342,7 @@ en:
         your_order_is_pending: Your order is pending.
       table:
         created: Created
+        creator: Creator
         end: End
         existing_theft_alerts: Existing Promoted Alerts
         plan: Plan

@@ -2843,7 +2843,9 @@ CREATE TABLE public.theft_alerts (
     reach integer,
     bike_id bigint,
     facebook_updated_at timestamp without time zone,
-    amount_cents_facebook_spent integer
+    amount_cents_facebook_spent integer,
+    admin boolean DEFAULT false,
+    ad_radius_miles integer
 );
 
 

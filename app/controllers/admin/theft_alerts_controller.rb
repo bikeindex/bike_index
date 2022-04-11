@@ -31,12 +31,45 @@ class Admin::TheftAlertsController < Admin::BaseController
       UpdateTheftAlertFacebookWorker.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
-    elsif @theft_alert.update(set_alert_timestamps(theft_alert_params))
+    elsif @theft_alert.update(permitted_update_params)
       flash[:success] = "Success!"
       redirect_to admin_theft_alerts_path
     else
       flash[:error] = @theft_alert.errors.to_a
       render :edit
+    end
+  end
+
+  def new
+    @bike = Bike.unscoped.find_by_id(params[:bike_id])
+    unless @bike.present?
+      flash[:info] = "Unable to find that bike. Select a bike to create a new promoted alert"
+      redirect_to admin_theft_alerts_path
+      return
+    end
+    @stolen_record = @bike.current_stolen_record
+    @theft_alerts = @stolen_record&.theft_alerts || []
+
+    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
+    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
+
+    @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
+
+    @theft_alert = TheftAlert.new(stolen_record: @stolen_record,
+      theft_alert_plan: @theft_alert_plans.first,
+      user: current_user,
+      admin: true)
+    @theft_alert.set_calculated_attributes # Set some stuff
+  end
+
+  def create
+    @theft_alert = TheftAlert.new(permitted_create_params)
+    if @theft_alert.save
+      ActivateTheftAlertWorker.perform_async(@theft_alert.id) if @theft_alert.activateable?
+      flash[:success] = "Promoted alert created!"
+      redirect_to edit_admin_theft_alert_path(@theft_alert)
+    else
+      render :new
     end
   end
 
@@ -50,14 +83,16 @@ class Admin::TheftAlertsController < Admin::BaseController
     @bike ||= Bike.unscoped.find(@stolen_record.bike_id)
   end
 
-  def theft_alert_params
-    params.require(:theft_alert).permit(
-      :start_at,
-      :end_at,
-      :notes,
-      :status,
-      :theft_alert_plan_id
-    )
+  def permitted_update_params
+    params.require(:theft_alert).permit(:notes)
+  end
+
+  def permitted_create_params
+    params.require(:theft_alert).permit(:notes,
+      :stolen_record_id,
+      :ad_radius_miles,
+      :theft_alert_plan_id)
+      .merge(user: current_user, admin: true)
   end
 
   # Override, set one week before earliest created theft alert

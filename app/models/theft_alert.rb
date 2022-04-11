@@ -29,7 +29,7 @@ class TheftAlert < ApplicationRecord
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
 
-  delegate :duration_days, :duration_days_facebook, :ad_radius_miles, :amount_cents, to: :theft_alert_plan
+  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   geocoded_by nil
@@ -92,7 +92,8 @@ class TheftAlert < ApplicationRecord
 
   # literally CAN NOT activate
   def activateable_except_approval?
-    !missing_photo? && !missing_location? && paid?
+    return false if missing_photo? || missing_location?
+    admin ? true : paid?
   end
 
   # Probably don't want to activate
@@ -175,10 +176,6 @@ class TheftAlert < ApplicationRecord
     facebook_data&.dig("engagement") || {}
   end
 
-  def ad_radius_miles
-    25
-  end
-
   def message
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
@@ -198,6 +195,7 @@ class TheftAlert < ApplicationRecord
       self.longitude = stolen_record.longitude
     end
     self.bike_id = stolen_record&.bike_id
+    self.ad_radius_miles = theft_alert_plan&.ad_radius_miles unless admin
     self.amount_cents_facebook_spent = calculated_cents_facebook_spent
   end
 

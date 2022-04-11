@@ -1,6 +1,10 @@
 - if @bike.present?
-  = render partial: "/admin/bikes/bike_tabs", locals: { bike: @bike, active_tab: "theft_alerts", display_recovery: true }
-  %h1.mt-5.mb-4 Promoted Alerts
+  = render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", display_recovery: true}
+  %h1.mt-5.mb-4
+    Promoted Alerts
+    = link_to "New Promoted alert", new_admin_theft_alert_path(bike_id: @bike.id), class: "small btn btn-outline-success btn-sm ml-2"
+
+
 - else
   .admin-subnav
     .col-md-5
@@ -125,8 +129,9 @@
                 %td= MoneyFormater.money_format(fbook_cents_total)
                 %td.small= admin_number_display(recovered_count_total)
 
+
 = render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: matching_theft_alerts.count, name: "Promoted Alert", views_prefix: "admin"}
 
-= render partial: "/admin/theft_alerts/table", locals: { render_sortable: true, theft_alerts: @theft_alerts }
+= render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: @bike.present?}
 
 = render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: matching_theft_alerts.count, name: "Promoted Alert", views_prefix: "admin", skip_total: true}
