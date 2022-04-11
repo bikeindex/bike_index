@@ -6,11 +6,12 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   def index
     @theft_alerts =
-      matching_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
+      searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan, :stolen_record)
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
     @page_title = "Admin | Promoted alerts"
+    @location_counts = ParamsNormalizer.boolean(params[:search_location_counts])
   end
 
   def show
@@ -73,7 +74,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     end
   end
 
-  helper_method :matching_theft_alerts, :available_statuses, :available_paid_admin
+  helper_method :searched_theft_alerts, :available_statuses, :available_paid_admin
 
   private
 
@@ -116,7 +117,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     %w[paid admin paid_or_admin]
   end
 
-  def matching_theft_alerts
+  def searched_theft_alerts
     @search_recovered = ParamsNormalizer.boolean(params[:search_recovered])
     theft_alerts = if @search_recovered
       stolen_record_ids = StolenRecord.recovered.with_theft_alerts
