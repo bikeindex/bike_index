@@ -63,7 +63,7 @@
         = column_chart alerts_recoveries_graph, stacked: true, thousands: ","
 
   = render partial: "/shared/period_select"
-  .row.mb-4
+  .row.mb-4.mt-4
     .col
       = form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do
         = hidden_field_tag :search_recovery_display_status, @search_recovered
