@@ -33,7 +33,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       #   expect(theft_alert.missing_photo?).to be_falsey
       #   expect(theft_alert.activateable?).to be_truthy
       #   expect(theft_alert.status).to eq "pending"
-      #   expect(theft_alert.begin_at).to be_blank
+      #   expect(theft_alert.start_at).to be_blank
       #   expect(theft_alert.facebook_data).to be_blank
       #   Sidekiq::Worker.clear_all
       #   VCR.use_cassette("facebook/activate_theft_alert_worker-success", match_requests_on: [:method]) do
@@ -41,7 +41,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       #     theft_alert.reload
       #     expect(theft_alert.activateable?).to be_truthy
       #     expect(theft_alert.status).to eq "active"
-      #     expect(theft_alert.begin_at).to be_present
+      #     expect(theft_alert.start_at).to be_present
       #     expect(theft_alert.facebook_data.activating_at).to be_present
       #     # Somehow this doesn't show up, in requests after the first request
       #     # expect(theft_alert.facebook_post_url).to be_present

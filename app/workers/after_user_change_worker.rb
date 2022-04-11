@@ -33,7 +33,7 @@ class AfterUserChangeWorker < ApplicationWorker
     end
 
     # Activate activateable theft alerts!
-    user.theft_alerts.paid.where(begin_at: nil).each do |theft_alert|
+    user.theft_alerts.paid.where(start_at: nil).each do |theft_alert|
       next unless theft_alert.activateable?
       ActivateTheftAlertWorker.perform_async(theft_alert.id)
     end

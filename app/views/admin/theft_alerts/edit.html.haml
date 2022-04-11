@@ -145,34 +145,38 @@
   url: admin_theft_alert_path(@theft_alert),
   method: :patch,
   html: { class: "m-0" } do |f|
+
+  -# Can't edit many things here! They're set via the theft_alert_plan
+  -# - unless @theft_alert.pending?
   .row
-    .col-sm-6
+    .col-sm-4
       .form-group
         = f.label :status
         = f.select :status,
           options_for_select(TheftAlert.statuses, @theft_alert.status),
           {},
-          class: "form-control"
-    .col-sm-6
+          {disabled: true, class: "form-control"}
+    .col-sm-4
       .form-group
         - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
         = f.label :theft_alert_plan_id
         = f.select :theft_alert_plan_id,
           options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
           {},
-          class: "form-control"
-
-  - unless @theft_alert.pending?
-    .row
-      = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-      .col-sm-6
-        .form-group
-          = f.label :begin_at
-          = f.datetime_local_field :begin_at, include_blank: true, class: "form-control"
-      .col-sm-6
-        .form-group
-          = f.label :end_at
-          = f.datetime_local_field :end_at, include_blank: true, class: "form-control"
+          {disabled: true, class: "form-control"}
+    .col-sm-4
+      .form-group
+        = f.label :ad_radius_miles
+        = f.number_field :ad_radius_miles, disabled: true, class: "form-control"
+  .row
+    .col-sm-6
+      .form-group
+        = f.label :start_at
+        = f.datetime_local_field :start_at, step: 60, disabled: true, class: "form-control"
+    .col-sm-6
+      .form-group
+        = f.label :end_at
+        = f.datetime_local_field :end_at, step: 60, disabled: true, class: "form-control"
 
   .form-group
     = f.label :notes

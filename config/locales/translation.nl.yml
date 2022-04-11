@@ -719,10 +719,10 @@ nl:
         zipcode: Postcode
         recovered_at: Datum hersteld
       theft_alert:
-        begin_at: Begin bij
         end_at: Eindig op
         notes: Notes
         status: Toestand
+        start_at: Begin bij
       theft_alert_plan:
         active: Actief
         amount_cents: Bedrag centen
@@ -2031,6 +2031,7 @@ nl:
         plan: Plan
         start: Begin
         status: Toestand
+        creator: Schepper
     main_show_block:
       bike_photo: "%{bike_type} foto"
       color_may_not_match: Kleur komt mogelijk niet overeen!

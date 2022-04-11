@@ -26,7 +26,7 @@
             = humanized_time_range(@time_range)
         - elsif !skip_total
           %em.less-strong
-            (#{number_with_delimiter(collection.where("created_at >= ?", Time.current.beginning_of_day).total_count)} today)
+            (#{number_with_delimiter(collection.where("#{collection.table_name}.created_at >= ?", Time.current.beginning_of_day).total_count)} today)
   - unless skip_pagination
     .pagination-flex.justify-content-md-end{class: (skip_total ? "col-12" : "col-md-7")}
       = paginate collection, views_prefix: views_prefix

@@ -1,6 +1,7 @@
 - first_form_well ||= false
 
 - if theft_alerts.present?
+  - show_creator = theft_alerts.pluck(:user_id).uniq != [current_user.id]
   .form-wrap{ class: first_form_well ? "" : "secondary-form-wrap" }
     .form-well-form-header-always-visible
       %h3
@@ -15,18 +16,23 @@
               %th= t(".status")
               %th= t(".start")
               %th= t(".end")
+              - if show_creator
+                %th.small=t(".creator")
 
           %tbody
-            - theft_alerts.each do |alert|
+            - theft_alerts.each do |theft_alert|
               %tr
                 %td
                   %span.convertTime
-                    = l(alert.created_at, format: :convert_time)
-                %td= alert.theft_alert_plan.name
-                %td= alert.status
+                    = l(theft_alert.created_at, format: :convert_time)
+                %td= theft_alert.theft_alert_plan.name
+                %td= theft_alert.status
                 %td
-                  - if alert.begin_at.present?
-                    %span.convertTime= l(alert.begin_at, format: :convert_time)
+                  - if theft_alert.start_at.present?
+                    %span.convertTime= l(theft_alert.start_at, format: :convert_time)
                 %td
-                  - if alert.end_at.present?
-                    .convertTime= l(alert.end_at, format: :convert_time)
+                  - if theft_alert.end_at.present?
+                    .convertTime= l(theft_alert.end_at, format: :convert_time)
+                - if show_creator
+                  %td
+                    %small= theft_alert.user&.display_name
