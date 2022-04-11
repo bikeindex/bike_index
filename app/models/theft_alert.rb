@@ -62,7 +62,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def notify?
-    return false if facebook_data.blank? || facebook_data&.dig("no_notify").present?
+    return false if admin? || facebook_data.blank? || facebook_data&.dig("no_notify").present?
     stolen_record.present? && stolen_record.receive_notifications?
   end
 

@@ -113,7 +113,7 @@ RSpec.describe TheftAlert, type: :model do
     end
   end
 
-  describe "admin" do
+  describe "admin differences" do
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, ad_radius_miles: 24) }
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, approved: true) }
     let(:theft_alert) do
@@ -124,15 +124,19 @@ RSpec.describe TheftAlert, type: :model do
         admin: admin)
     end
     let(:admin) { false }
-    it "is via plan" do
+    it "is default attributes" do
       expect(theft_alert.reload.ad_radius_miles).to eq 24
       expect(theft_alert.activateable?).to be_falsey
+      theft_alert.facebook_data = {activating_at: Time.current.to_i}
+      expect(theft_alert.notify?).to be_truthy
     end
     context "admin" do
       let(:admin) { true }
       it "is what is set" do
         expect(theft_alert.reload.ad_radius_miles).to eq 333
         expect(theft_alert.activateable?).to be_truthy
+        theft_alert.facebook_data = {activating_at: Time.current.to_i}
+        expect(theft_alert.notify?).to be_falsey
       end
     end
   end
