@@ -10,9 +10,9 @@
 .row.mt-5.mb-4
   .offset-md-2.col-md-8
     - if @theft_alert.activateable?
-      .alert.alert-info
+      .alert.alert-success
         %h4
-          This alert will active as soon as you create it
+          This alert will activate as soon as you create it.
     - else
       .alert.alert-warning
         %h4
@@ -53,4 +53,4 @@
     = f.text_area :notes, rows: 3, class: "form-control"
 
   .form-group
-    = submit_tag "Create", class: "btn btn-info"
+    = submit_tag "Create", class: "btn btn-success"
