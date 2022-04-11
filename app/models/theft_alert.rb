@@ -1,6 +1,6 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
-  STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
+  STATUS_ENUM = {pending: 0, active: 1, inactive: 2, canceled: 3}.freeze
   # Timestamp 1s before first alert was automated
   AUTOMATION_START = 1625586988 # 2021-7-6
 
@@ -47,7 +47,6 @@ class TheftAlert < ApplicationRecord
   def self.flatten_city(counted)
     @countries ||= Country.pluck(:id, :name).to_h
     @states ||= State.pluck(:id, :name).to_h
-
     [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
   end
 

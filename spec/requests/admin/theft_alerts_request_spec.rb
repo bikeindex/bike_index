@@ -68,19 +68,37 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
     end
 
     describe "PATCH /admin/theft_alerts/:id" do
+      let(:theft_alert) { FactoryBot.create(:theft_alert) }
       it "redirects to the index route on update success" do
-        theft_alert = FactoryBot.create(:theft_alert)
-        expect(theft_alert.status).to eq("pending")
+        expect(theft_alert.reload.status).to eq("pending")
 
-        patch "/admin/theft_alerts/#{theft_alert.id}",
-          params: {
-            theft_alert: {update_theft_alert: true, notes: "Some notes"}
-          }
+        Sidekiq::Worker.clear_all
+        patch "/admin/theft_alerts/#{theft_alert.id}", params: {
+          theft_alert: {update_theft_alert: true, notes: "Some notes"}
+        }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(flash[:success]).to match(/success/i)
-        expect(flash[:errors]).to be_blank
+        expect(flash[:error]).to be_blank
         expect(theft_alert.reload.notes).to eq("Some notes")
+        expect(ActivateTheftAlertWorker.jobs.count).to eq 0
+        expect(UpdateTheftAlertFacebookWorker.jobs.count).to eq 0
+      end
+      context "cancel" do
+        let(:theft_alert) { FactoryBot.create(:theft_alert, :begun) }
+        it "cancels" do
+          expect(theft_alert.reload.status).to eq "active"
+          patch "/admin/theft_alerts/#{theft_alert.id}", params: {
+            cancel_theft_alert: true
+          }
+
+          expect(flash[:success]).to match(/cancel/i)
+          expect(flash[:error]).to be_blank
+          expect(theft_alert.reload.canceling?).to be_truthy
+          expect(theft_alert.status).to eq "canceled"
+          expect(ActivateTheftAlertWorker.jobs.count).to eq 0
+          expect(UpdateTheftAlertFacebookWorker.jobs.count).to eq 1
+        end
       end
     end
 
