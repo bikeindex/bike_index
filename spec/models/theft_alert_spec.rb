@@ -129,6 +129,7 @@ RSpec.describe TheftAlert, type: :model do
       expect(theft_alert.activateable?).to be_falsey
       theft_alert.facebook_data = {activating_at: Time.current.to_i}
       expect(theft_alert.notify?).to be_truthy
+      expect(TheftAlert.cities_count).to eq([["Canada", "Vancouver", nil, 1]])
     end
     context "admin" do
       let(:admin) { true }

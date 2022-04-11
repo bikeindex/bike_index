@@ -44,6 +44,21 @@ class TheftAlert < ApplicationRecord
     Time.current - 2.days
   end
 
+  def self.flatten_city(counted)
+    @countries ||= Country.pluck(:id, :name).to_h
+    @states ||= State.pluck(:id, :name).to_h
+
+    [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
+  end
+
+  def self.cities_count
+    joins(:stolen_record)
+      .group("stolen_records.country_id", "stolen_records.city", "stolen_records.state_id")
+      .count
+      .map { |c| flatten_city(c) }
+      .sort_by { |c| -c[3] }
+  end
+
   # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?
