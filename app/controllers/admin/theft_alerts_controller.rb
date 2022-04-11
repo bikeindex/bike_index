@@ -29,7 +29,6 @@ class Admin::TheftAlertsController < Admin::BaseController
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
     elsif ParamsNormalizer.boolean(params[:cancel_theft_alert])
-      pp "fasdfasdf"
       @theft_alert.update(status: "canceled")
       UpdateTheftAlertFacebookWorker.new.perform(@theft_alert.id)
       flash[:success] = "Canceling alert"

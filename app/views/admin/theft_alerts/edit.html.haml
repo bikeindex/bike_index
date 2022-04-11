@@ -162,11 +162,15 @@
   .row
     .col-sm-4
       .form-group
-        = f.label :status
+        - status_updateable = @theft_alert.active?
+        = f.label :status do
+          Status
+          %small.less-strong
+            Only can be updated to cancel
         = f.select :status,
           options_for_select(TheftAlert.statuses, @theft_alert.status),
           {},
-          {disabled: true, class: "form-control"}
+          {disabled: status_updateable, class: "form-control"}
     .col-sm-4
       .form-group
         - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }

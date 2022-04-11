@@ -13,6 +13,8 @@ class UpdateTheftAlertFacebookWorker < ScheduledWorker
     # If the ad_id is blank, we need to activate the ad
     if theft_alert.facebook_data&.dig("ad_id").blank?
       return ActivateTheftAlertWorker.perform_async(theft_alert_id)
+    elsif theft_alert.cancelling?
+      return ActivateTheftAlertWorker.perform_async(theft_alert_id)
     end
     Facebook::AdsIntegration.new.update_facebook_data(theft_alert)
 
