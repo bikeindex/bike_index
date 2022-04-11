@@ -73,7 +73,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     end
   end
 
-  helper_method :matching_theft_alerts, :available_statuses
+  helper_method :matching_theft_alerts, :available_statuses, :available_paid_admin
 
   private
 
@@ -112,6 +112,10 @@ class Admin::TheftAlertsController < Admin::BaseController
     TheftAlert.statuses + ["posted"]
   end
 
+  def available_paid_admin
+    %w[paid admin paid_or_admin]
+  end
+
   def matching_theft_alerts
     @search_recovered = ParamsNormalizer.boolean(params[:search_recovered])
     theft_alerts = if @search_recovered
@@ -121,8 +125,9 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
-    @search_paid = ParamsNormalizer.boolean(params[:search_paid])
-    theft_alerts = theft_alerts.paid if @search_paid
+    @search_paid_admin = available_paid_admin.include?(params[:search_paid_admin]) ? params[:search_paid_admin] : nil
+    theft_alerts = theft_alerts.send(@search_paid_admin) if @search_paid_admin.present?
+
     @search_facebook_data = ParamsNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
     if available_statuses.include?(params[:search_status])
