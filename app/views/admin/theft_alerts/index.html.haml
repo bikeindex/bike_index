@@ -63,35 +63,24 @@
         = column_chart alerts_recoveries_graph, stacked: true, thousands: ","
 
   = render partial: "/shared/period_select"
-
-  .mt-4.mb-4
-    = form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do
-      = hidden_field_tag :search_recovery_display_status, @search_recovered
-      = hidden_field_tag :search_status, @status
-      = hidden_field_tag :search_paid, @search_paid
-      = hidden_field_tag :search_facebook_data, @search_facebook_data
-      = hidden_field_tag :search_recovered, @search_recovered
-      = render partial: "/shared/hidden_search_fields"
-
-      .form-group.ml-auto.mr-1.mb-2
-        %em.small.less-strong.mr-1.d-md-inline.d-none within
-        = number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;"
-        %em.small.less-strong.ml-1.mr-1.d-md-inline.d-none miles of
-      .form-group.mr-2.mb-2
-        = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
-      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
-
-  .row.mb-4{ style: "margin-top: 30px;" }
+  .row.mb-4
     .col
-      %p
-        %strong
-          = admin_number_display(matching_theft_alerts.count)
-        - if sortable_search_params?
-          Matching
-        Promoted Alerts
-        %em
-          = humanized_time_range_column(@time_range_column)
-          = humanized_time_range(@time_range)
+      = form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do
+        = hidden_field_tag :search_recovery_display_status, @search_recovered
+        = hidden_field_tag :search_status, @status
+        = hidden_field_tag :search_paid, @search_paid
+        = hidden_field_tag :search_facebook_data, @search_facebook_data
+        = hidden_field_tag :search_recovered, @search_recovered
+        = render partial: "/shared/hidden_search_fields"
+
+        .form-group.ml-auto.mr-1.mb-2
+          %em.small.less-strong.mr-1.d-md-inline.d-none within
+          = number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;"
+          %em.small.less-strong.ml-1.mr-1.d-md-inline.d-none miles of
+        .form-group.mr-2.mb-2
+          = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
+        = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+
     - if theft_alert_plans.present?
       .col
         .full-screen-table
@@ -136,7 +125,8 @@
                 %td= MoneyFormater.money_format(fbook_cents_total)
                 %td.small= admin_number_display(recovered_count_total)
 
+= render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: matching_theft_alerts.count, name: "Promoted Alert", views_prefix: "admin"}
 
 = render partial: "/admin/theft_alerts/table", locals: { render_sortable: true, theft_alerts: @theft_alerts }
 
-= paginate @theft_alerts, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: matching_theft_alerts.count, name: "Promoted Alert", views_prefix: "admin", skip_total: true}
