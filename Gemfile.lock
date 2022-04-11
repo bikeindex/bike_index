@@ -295,9 +295,6 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    guard-rubocop (1.4.0)
-      guard (~> 2.0)
-      rubocop (< 2.0)
     hamlit (2.16.0)
       temple (>= 0.8.2)
       thor
@@ -761,7 +758,6 @@ DEPENDENCIES
   groupdate
   guard
   guard-rspec
-  guard-rubocop
   hamlit
   hashie
   honeybadger
