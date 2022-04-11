@@ -591,11 +591,11 @@ en:
         tsved_at: Tsved at
         zipcode: Postal code
       theft_alert:
-        start_at: Begin at
         creator: :activerecord.models.creator
         end_at: End at
         notes: Notes
         payment: :activerecord.models.payment
+        start_at: Begin at
         status: Status
         stolen_record: :activerecord.models.stolen_record
         theft_alert_plan: :activerecord.models.theft_alert_plan
