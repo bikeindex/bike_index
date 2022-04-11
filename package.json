@@ -11,6 +11,8 @@
     "@emotion/core": "^10.0.10",
     "@honeybadger-io/react": "^0.0.2",
     "@rails/webpacker": "^5.4.3",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12",
     "@uppy/core": "^1.1.0",
     "@uppy/dashboard": "^1.1.0",
     "@uppy/drag-drop": "^1.1.0",
@@ -66,6 +68,6 @@
     "jest-worker": "^24.9.0",
     "postcss-cssnext": "^3.1.0",
     "react-testing-library": "^6.0.4",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3"
   }
 }
