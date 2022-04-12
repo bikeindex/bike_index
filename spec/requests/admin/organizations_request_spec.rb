@@ -207,7 +207,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
       it "updates the registration_field_label" do
         put "#{base_url}/#{organization.to_param}", params: update_params
-        organization.reload
+        expect(organization.reload.name).to eq "new name"
         expect(organization.registration_field_labels).to eq target.as_json
       end
       context "with existing registration_field_label" do
@@ -217,6 +217,21 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization.reload
           expect(organization.registration_field_labels).to eq target.as_json
         end
+      end
+    end
+    context "updating with_admin_organization_attributes" do
+      let(:update_params) do
+        {
+          name: "other namE",
+          search_radius_miles: "1222.2",
+          graduated_notification_interval_days: 4444,
+          area_stolen_message_radius_miles: 44,
+          passwordless_user_domain: "stuff.com"
+        }
+      end
+      it "updates the organization attributes" do
+        put "#{base_url}/#{organization.to_param}", params: {organization: update_params}
+        expect_attrs_to_match_hash(organization.reload, update_params)
       end
     end
     context "not updating manual_pos_kind" do
