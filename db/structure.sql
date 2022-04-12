@@ -179,6 +179,7 @@ CREATE TABLE public.ar_internal_metadata (
 CREATE TABLE public.area_stolen_messages (
     id bigint NOT NULL,
     organization_id bigint,
+    kind integer,
     latitude double precision,
     longitude double precision,
     radius_miles double precision,

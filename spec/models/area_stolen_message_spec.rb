@@ -2,21 +2,23 @@ require "rails_helper"
 
 RSpec.describe AreaStolenMessage, type: :model do
   describe "calculated_attributes" do
-    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
     let(:area_stolen_message) { AreaStolenMessage.create(organization_id: organization.id) }
     it "uses attributes" do
       expect(area_stolen_message.reload.organization_id).to eq organization.id
-      area_stolen_message.update(enabled: true, message: "  ")
+      expect(area_stolen_message.kind).to eq "area"
+      area_stolen_message.update(enabled: true, message: "  ", kind: "association")
       expect(area_stolen_message.enabled).to be_falsey
       expect(area_stolen_message.message).to eq nil
       expect(area_stolen_message.latitude).to be_blank
     end
     context "organization with location" do
-      let(:organization) { FactoryBot.create(:organization, :in_nyc, search_radius_miles: 94) }
+      let(:organization) { FactoryBot.create(:organization, :in_nyc, kind: "bike_manufacturer", search_radius_miles: 94) }
       it "uses location" do
         expect(area_stolen_message.reload.latitude).to eq organization.location_latitude
         expect(area_stolen_message.longitude).to eq organization.location_longitude
         expect(area_stolen_message.radius_miles).to eq 94
+        expect(area_stolen_message.kind).to eq "association"
         expect(area_stolen_message.enabled).to be_falsey
         area_stolen_message.update(enabled: true, message: "  Something\n<strong> PARTy</strong>  ", radius_miles: 12, latitude: 22, longitude: 22)
         expect(area_stolen_message.reload.latitude).to eq organization.location_latitude

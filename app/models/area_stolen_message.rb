@@ -1,10 +1,13 @@
 class AreaStolenMessage < ApplicationRecord
   MAX_MESSAGE_LENGTH = 300
+  KIND_ENUM = {area: 0, association: 1}
 
   belongs_to :organization
   has_many :stolen_records
 
   before_validation :set_calculated_attributes
+
+  enum kind: KIND_ENUM
 
   scope :enabled, -> { where(enabled: true) }
   scope :disabled, -> { where(enabled: false) }
@@ -19,6 +22,10 @@ class AreaStolenMessage < ApplicationRecord
       .strip.gsub(/\s+/, " ").truncate(MAX_MESSAGE_LENGTH, omission: "")
   end
 
+  def self.default_kind_for_organization_kind(org_kind)
+    %w[organization&.kind].include?
+  end
+
   def disabled?
     !enabled?
   end
@@ -28,6 +35,7 @@ class AreaStolenMessage < ApplicationRecord
     self.latitude = organization&.location_latitude
     self.longitude = organization&.location_longitude
     self.radius_miles ||= organization.search_radius_miles
+    self.kind ||= self.class.default_kind_for_organization_kind(organization&.kind)
     self.enabled = false unless message.present? && latitude.present? &&
       longitude.present? && radius_miles.present?
   end

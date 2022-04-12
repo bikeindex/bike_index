@@ -2,6 +2,7 @@ class CreateAreaStolenMessages < ActiveRecord::Migration[6.1]
   def change
     create_table :area_stolen_messages do |t|
       t.references :organization, index: true
+      t.integer :kind
       t.float :latitude
       t.float :longitude
       t.float :radius_miles

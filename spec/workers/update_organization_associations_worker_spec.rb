@@ -102,4 +102,9 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect { instance.perform(bike_shop.id) }.to_not change(OrganizationManufacturer, :count)
     end
   end
+
+  describe "area_stolen_message" do
+    let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["area_stolen_message"]) }
+    it "is "
+  end
 end
