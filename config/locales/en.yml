@@ -1530,13 +1530,18 @@ en:
     report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     theft_details:
-      do_these_things_for_the_best_chance: Do these things for the best chance of
-        recovery!
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
       click_to_see_promoted_alert_blog_post_html: >-
         Click %{link} to read about how Bike Index's Promoted Theft Alerts helped
         recover a stolen bike in less than one day.
+      do_these_things_for_the_best_chance: Do these things for the best chance of
+        recovery!
+      here: here
+      promoted_theft_alert_service_description: >-
+        Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
+        in the cycling community in the neighborhood where your bike was last seen.
+      promoted_theft_alerts: Promoted Theft Alerts
       try_one_now: Try one now!
       we_can_create_fb_ads_for_you: >-
         Did you know we can create targeted Facebook ads to spread the word about
@@ -1547,15 +1552,10 @@ en:
       do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
       eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
         for its serial number
-      here: here
       if_this_bike_type_was_added: >-
         If this %{bike_type} was added to the Index by a bike shop, that counts as
         proof of ownership
       police_report: 'Police report #'
-      promoted_theft_alert_service_description: >-
-        Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
-        in the cycling community in the neighborhood where your bike was last seen.
-      promoted_theft_alerts: Promoted Theft Alerts
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
       show_phone_police: Show to verified law enforcement partners
