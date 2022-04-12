@@ -248,7 +248,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
                 phone_for_users: "1",
                 phone_for_shops: "0",
                 phone_for_police: "1",
-                country_id: "#{Country.united_states.id}",
+                country_id: Country.united_states.id.to_s,
                 street: "2143412",
                 city: "San Francisco",
                 zipcode: "94141",
@@ -295,7 +295,6 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect_attrs_to_match_hash(stolen_record1, stolen_record_attrs)
               expect(stolen_record1.proof_of_ownership).to be_truthy
               expect(stolen_record1.receive_notifications).to be_truthy
-
 
               bike2 = bulk_import.bikes.reorder(:created_at).last
               expect(bike2.mnfg_name).to eq "Surly"
