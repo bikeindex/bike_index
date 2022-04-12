@@ -6,6 +6,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
   let(:current_user) { nil }
   let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
   let(:impound_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: %w[impound_bikes show_bulk_import_impound]) }
+  let(:stolen_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: %w[show_bulk_import_stolen]) }
   before { log_in(current_user) if current_user.present? }
 
   context "organization without show_bulk_import" do
@@ -120,6 +121,16 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(response).to render_template :index
             expect(assigns(:current_organization)).to eq current_organization
             expect(assigns(:permitted_kinds)).to eq(["impounded"])
+          end
+        end
+        context "show_bulk_import_stolen" do
+          let!(:current_organization) { stolen_organization }
+          it "renders" do
+            get base_url
+            expect(response.status).to eq(200)
+            expect(response).to render_template :index
+            expect(assigns(:current_organization)).to eq current_organization
+            expect(assigns(:permitted_kinds)).to eq(["stolen"])
           end
         end
       end

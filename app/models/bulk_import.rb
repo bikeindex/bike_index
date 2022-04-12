@@ -1,6 +1,6 @@
 class BulkImport < ApplicationRecord
   VALID_PROGRESSES = {pending: 0, ongoing: 1, finished: 2}.freeze
-  KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3}.freeze
+  KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
