@@ -127,17 +127,17 @@
           New registrations will be created for all of the bikes. No emails will be sent on registration.
 
       = form_for @bulk_import, {url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}} do |f|
-        = f.hidden_field :kind, value: "organization_import"
-
+        = f.hidden_field :kind, value: "stolen"
         - @bike = Bike.new
         - @stolen_record = @bike.stolen_records.new(phone: current_user.current_user_phone)
         - @bike.current_stolen_record = @stolen_record
         - @edit_templates = ["theft_details"]
         - @edit_template = "theft_details"
+
         .card.col-sm-8
           .card-block
             .form-well
-              = f.fields_for @stolen_record do |srecord|
+              = fields_for @stolen_record do |srecord|
                 = render partial: "/bikes_edit/theft_details_partial", locals: {srecord: srecord, rendering_bulk_import: true}
 
               .mt-5
