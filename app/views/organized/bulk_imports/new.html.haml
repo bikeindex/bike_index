@@ -130,27 +130,28 @@
         = f.hidden_field :kind, value: "organization_import"
 
         - @bike = Bike.new
-        - @stolen_record = @bike.stolen_records.new
+        - @stolen_record = @bike.stolen_records.new(phone: current_user.current_user_phone)
         - @bike.current_stolen_record = @stolen_record
         - @edit_templates = ["theft_details"]
         - @edit_template = "theft_details"
         .card.col-sm-8
           .card-block
-            = f.fields_for @stolen_record do |srecord|
-              = render partial: "/bikes_edit/theft_details_partial", locals: {srecord: srecord, rendering_bulk_import: true}
+            .form-well
+              = f.fields_for @stolen_record do |srecord|
+                = render partial: "/bikes_edit/theft_details_partial", locals: {srecord: srecord, rendering_bulk_import: true}
 
-            .mt-5
-            = f.label :file, t(".csv_file_with_bikes")
-            .form-group.row.file-upload-wrapper
-              .form-well-input
-                %label.file
-                  = f.file_field :file, class: "avatar-upload-field"
-                  %span.file-custom
-                    %span.file-upload-text= t(".choose_file")
+              .mt-5
+              = f.label :file, t(".csv_file_with_bikes")
+              .form-group.row.file-upload-wrapper
+                .form-well-input
+                  %label.file
+                    = f.file_field :file, required: true, class: "avatar-upload-field"
+                    %span.file-custom
+                      %span.file-upload-text= t(".choose_file")
 
-            .form-group.row
-              .form-well-input
-                = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
+              .form-group.row
+                .form-well-input
+                  = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
 
 
 %hr.mt-4

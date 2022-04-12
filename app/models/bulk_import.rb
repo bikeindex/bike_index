@@ -135,8 +135,14 @@ class BulkImport < ApplicationRecord
     }
   end
 
+  def stolen_record_attrs
+    return {} unless stolen? && data&.dig("stolen_record").present?
+    data["stolen_record"].merge(proof_of_ownership: true, receive_notifications: true)
+  end
+
   def set_calculated_attributes
     self.kind ||= calculated_kind
+    self.no_notify = true if kind == "stolen"
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
     unless creator.present?

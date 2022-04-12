@@ -238,6 +238,78 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bike2.current_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-30")
             end
           end
+          context "stolen" do
+            let(:stolen_record_params) do
+              {
+                timezone: "America/Los_Angeles",
+                date_stolen: "2022-04-12T14:00",
+                phone: "2223335555",
+                secondary_phone: "",
+                phone_for_users: "1",
+                phone_for_shops: "0",
+                phone_for_police: "1",
+                country_id: "#{Country.united_states.id}",
+                street: "2143412",
+                city: "San Francisco",
+                zipcode: "94141",
+                state_id: "",
+                theft_description: "Someone something",
+                police_report_number: "333444",
+                police_report_department: "555666",
+                bad_attribute: "dddd"
+              }
+            end
+            let(:stolen_record_attrs) { stolen_record_params.except(:bad_attribute) }
+            let!(:current_organization) { stolen_organization }
+            let!(:color_green) { FactoryBot.create(:color, name: "Green") }
+            let!(:color_white) { FactoryBot.create(:color, name: "White") }
+            it "creates with stolen attributes" do
+              Sidekiq::Worker.clear_all
+              expect {
+                post base_url, params: {
+                  bulk_import: {file: file, kind: "stolen"},
+                  stolen_record: stolen_record_params
+                }
+              }.to change(BulkImport, :count).by 1
+              bulk_import = BulkImport.last
+              expect(bulk_import.user).to eq current_user
+              expect(bulk_import.file_url).to be_present
+              expect(bulk_import.progress).to eq "pending"
+              expect(bulk_import.organization_id).to eq current_organization.id
+              expect(bulk_import.kind).to eq "stolen"
+              expect(bulk_import.no_notify).to be_truthy
+              expect_hashes_to_match(bulk_import.data["stolen_record"].except("timezone"), stolen_record_attrs.except(:timezone))
+              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+
+              expect { BulkImportWorker.drain }.to change(Bike, :count).by 2
+
+              bike1 = bulk_import.bikes.reorder(:created_at).first
+              expect(bike1.mnfg_name).to eq "Trek"
+              expect(bike1.serial_number).to eq "xyz_test"
+              expect(bike1.frame_model).to eq "Roscoe 8"
+              expect(bike1.primary_frame_color_id).to eq color_green.id
+              expect(bike1.owner_email).to eq "test@bikeindex.org"
+              expect(bike1.status).to eq "status_stolen"
+              expect(bike1.created_by_notification_or_impounding?).to be_falsey
+              stolen_record1 = bike1.current_stolen_record
+              expect_attrs_to_match_hash(stolen_record1, stolen_record_attrs)
+              expect(stolen_record1.proof_of_ownership).to be_truthy
+              expect(stolen_record1.receive_notifications).to be_truthy
+
+
+              bike2 = bulk_import.bikes.reorder(:created_at).last
+              expect(bike2.mnfg_name).to eq "Surly"
+              expect(bike2.serial_number).to eq "example"
+              expect(bike2.frame_model).to eq "Midnight Special"
+              expect(bike2.primary_frame_color_id).to eq color_white.id
+              expect(bike2.owner_email).to eq "test2@bikeindex.org"
+              expect(bike2.status).to eq "status_stolen"
+              stolen_record2 = bike2.current_stolen_record
+              expect_attrs_to_match_hash(stolen_record2, stolen_record_attrs)
+              expect(stolen_record2.proof_of_ownership).to be_truthy
+              expect(stolen_record2.receive_notifications).to be_truthy
+            end
+          end
         end
       end
     end
