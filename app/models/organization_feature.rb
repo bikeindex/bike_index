@@ -46,6 +46,7 @@ class OrganizationFeature < ApplicationRecord
     regional_bike_counts
     show_bulk_import
     show_bulk_import_impound_bikes
+    show_bulk_import_stolen_bikes
     show_multi_serial
     show_partial_registrations
     show_recoveries
