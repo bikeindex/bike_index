@@ -104,7 +104,25 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
   end
 
   describe "organization_stolen_message" do
-    let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"]) }
-    it "is "
+    let(:organization) { FactoryBot.create(:organization, :in_nyc) }
+    # Have to do this whole dance because factories inline sidekiq processing of this job
+    let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: ["organization_stolen_message"]) }
+    let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization, subscription_start_at: Time.current - 1.year) }
+    it "adds it and disables it" do
+      expect(organization.reload.organization_stolen_message).to be_blank
+      invoice.update(organization_feature_ids: [organization_feature.id])
+      instance.perform(organization.id)
+      expect(organization.reload.enabled_feature_slugs).to eq(["organization_stolen_message"])
+      organization_stolen_message = organization.reload.organization_stolen_message
+      expect(organization_stolen_message).to be_present
+      expect(organization_stolen_message.enabled?).to be_falsey
+      expect(organization_stolen_message.kind).to eq "association"
+      organization_stolen_message.update(message: "stuff", enabled: true)
+      expect(organization_stolen_message.reload.enabled?).to be_truthy
+      invoice.update(subscription_end_at: Time.current - 1.day)
+      instance.perform(organization.id)
+      expect(organization.reload.enabled_feature_slugs).to eq([])
+      expect(organization_stolen_message.reload.enabled?).to be_falsey
+    end
   end
 end

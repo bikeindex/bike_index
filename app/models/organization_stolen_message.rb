@@ -5,6 +5,8 @@ class OrganizationStolenMessage < ApplicationRecord
   belongs_to :organization
   has_many :stolen_records
 
+  validates :organization_id, presence: true, uniqueness: true
+
   before_validation :set_calculated_attributes
 
   enum kind: KIND_ENUM
@@ -13,6 +15,7 @@ class OrganizationStolenMessage < ApplicationRecord
   scope :disabled, -> { where(enabled: false) }
 
   def self.for_coordinates(latitude, longitude)
+    # area.
     # Geocoder::Calculations.bounding_box([to_coordinates], search_radius_miles)
   end
 
