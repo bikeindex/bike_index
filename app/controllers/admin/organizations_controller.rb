@@ -100,7 +100,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :graduated_notification_interval_days,
         :is_suspended,
         :lightspeed_register_with_phone,
-        :area_stolen_message_radius_miles,
+        # :organization_stolen_message_radius_miles,
         :lock_show_on_map,
         :manufacturer_id,
         :name,

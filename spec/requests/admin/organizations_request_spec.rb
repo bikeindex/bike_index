@@ -225,17 +225,17 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           name: "other namE",
           search_radius_miles: "1222.2",
           graduated_notification_interval_days: 4444,
-          area_stolen_message_radius_miles: 44,
-          area_stolen_message_kind: "association",
+          organization_stolen_message_radius_miles: 44,
+          organization_stolen_message_kind: "association",
           passwordless_user_domain: "stuff.com"
         }
       end
       it "updates the organization attributes" do
-        expect(organization.reload.area_stolen_message).to be_blank
+        expect(organization.reload.organization_stolen_message).to be_blank
         put "#{base_url}/#{organization.to_param}", params: {organization: update_params}
-        expect_attrs_to_match_hash(organization.reload, update_params.except(:area_stolen_message_radius_miles, :area_stolen_message_kind))
-        expect(organization.area_stolen_message.kind).to eq "association"
-        expect(organization.area_stolen_message.radius_miles).to eq 44
+        expect_attrs_to_match_hash(organization.reload, update_params.except(:organization_stolen_message_radius_miles, :organization_stolen_message_kind))
+        expect(organization.organization_stolen_message.kind).to eq "association"
+        expect(organization.organization_stolen_message.radius_miles).to eq 44
       end
     end
     context "not updating manual_pos_kind" do

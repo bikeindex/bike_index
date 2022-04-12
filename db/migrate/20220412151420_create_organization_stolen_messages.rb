@@ -1,6 +1,6 @@
-class CreateAreaStolenMessages < ActiveRecord::Migration[6.1]
+class CreateOrganizationStolenMessages < ActiveRecord::Migration[6.1]
   def change
-    create_table :area_stolen_messages do |t|
+    create_table :organization_stolen_messages do |t|
       t.references :organization, index: true
       t.integer :kind
       t.float :latitude
@@ -12,6 +12,6 @@ class CreateAreaStolenMessages < ActiveRecord::Migration[6.1]
 
       t.timestamps
     end
-    add_reference :stolen_records, :area_stolen_message
+    add_reference :stolen_records, :organization_stolen_message
   end
 end

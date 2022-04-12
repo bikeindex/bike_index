@@ -1,4 +1,4 @@
-class AreaStolenMessage < ApplicationRecord
+class OrganizationStolenMessage < ApplicationRecord
   MAX_MESSAGE_LENGTH = 300
   KIND_ENUM = {area: 0, association: 1}
 
@@ -23,7 +23,7 @@ class AreaStolenMessage < ApplicationRecord
   end
 
   def self.default_kind_for_organization_kind(org_kind)
-    %w[organization&.kind].include?
+    %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
   end
 
   def disabled?

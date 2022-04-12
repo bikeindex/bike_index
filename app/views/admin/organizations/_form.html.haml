@@ -158,13 +158,13 @@
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area
 
-          - if @organization.enabled?("area_stolen_message")
+          - if @organization.enabled?("organization_stolen_message")
             .form-group
-              = f.label :area_stolen_message_radius_miles do
+              = f.label :organization_stolen_message_radius_miles do
                 Stolen Message radius (mi)
                 %small
-                  <span class="text-success">Area Stolen Message setting</span>, controls how large the region is that gets the message the organization sets
-              = f.number_field :area_stolen_message_radius_miles, {class: "form-control"}
+                  <span class="text-success">Organization Stolen Message setting</span>, controls how large the region is that gets the message the organization sets
+              = f.number_field :organization_stolen_message_radius_miles, {class: "form-control"}
 
           - if @organization.enabled?("passwordless_users")
             .form-group

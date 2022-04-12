@@ -58,7 +58,7 @@ class Organization < ApplicationRecord
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
-  has_one :area_stolen_message
+  has_one :organization_stolen_message
   has_one :impound_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets

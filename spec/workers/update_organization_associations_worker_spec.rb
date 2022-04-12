@@ -103,8 +103,8 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
     end
   end
 
-  describe "area_stolen_message" do
-    let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["area_stolen_message"]) }
+  describe "organization_stolen_message" do
+    let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"]) }
     it "is "
   end
 end
