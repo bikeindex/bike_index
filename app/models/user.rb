@@ -348,9 +348,8 @@ class User < ApplicationRecord
   end
 
   def current_user_phone
-    user_phone = user_phones.where(phone: phone).last ||
-      user_phones.confirmed.order(:updated_at)&.last
-    user_phone&.phone
+    (user_phones.where(phone: phone).last ||
+      user_phones.confirmed.order(:updated_at)&.last)&.phone
   end
 
   def phone_confirmed?
