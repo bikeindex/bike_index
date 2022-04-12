@@ -24,7 +24,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
         theft_alert_plan: theft_alert_plan,
         stolen_record: stolen_record,
         facebook_data: facebook_data,
-        begin_at: Time.current - 1.minute,
+        start_at: Time.current - 1.minute,
         end_at: Time.current + theft_alert_plan.duration_days_facebook)
     end
     before { stub_const("Facebook::AdsIntegration", FakeIntegrationClass) }
@@ -40,7 +40,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
       expect(theft_alert.activateable?).to be_truthy
       expect(theft_alert.notify?).to be_truthy
       expect(theft_alert.status).to eq "pending"
-      expect(theft_alert.begin_at).to be_present
+      expect(theft_alert.start_at).to be_present
       expect(theft_alert.end_at).to be_present
       expect(theft_alert.facebook_post_url).to be_blank
       expect(theft_alert.facebook_updated_at).to be_blank
@@ -77,7 +77,7 @@ RSpec.describe UpdateTheftAlertFacebookWorker, type: :job do
         expect(theft_alert.activateable?).to be_truthy
         expect(theft_alert.notify?).to be_falsey
         expect(theft_alert.status).to eq "pending"
-        expect(theft_alert.begin_at).to be_present
+        expect(theft_alert.start_at).to be_present
         expect(theft_alert.end_at).to be_present
         expect(theft_alert.facebook_post_url).to be_blank
         expect(theft_alert.facebook_updated_at).to be_blank

@@ -1,1 +1,0 @@
-Redis.current = Redis.new

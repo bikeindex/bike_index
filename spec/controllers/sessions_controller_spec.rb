@@ -148,6 +148,21 @@ RSpec.describe SessionsController, type: :controller do
           expect(user.last_login_ip).to be_blank
         end
       end
+      context "banned user" do
+        let(:user) { FactoryBot.create(:user_confirmed, banned: true) }
+        it "renders" do
+          user.update_auth_token("magic_link_token")
+          user.reload
+          expect(user.confirmed?).to be_truthy
+          post :sign_in_with_magic_link, params: {token: user.magic_link_token}
+          expect(cookies.signed[:auth]).to be_nil
+          expect(response).to redirect_to new_session_path
+          expect(flash[:error]).to match "locked"
+          user.reload
+          expect(user.last_login_at).to be_blank
+          expect(user.last_login_ip).to be_blank
+        end
+      end
     end
   end
 

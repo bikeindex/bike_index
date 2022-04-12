@@ -61,6 +61,7 @@ development:
     host: localhost
     port: 3033
     public: localhost:3033
+    live_reload: true
     hmr: false
     # Inline should be set to true if using HMR
     inline: true

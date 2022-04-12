@@ -92,7 +92,7 @@ RSpec.describe TheftAlert, type: :model do
     end
     context "campaign_id" do
       let(:end_at) { Time.current - 1.hour }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {campaign_id: "cxcxc"}, begin_at: Time.current - 1.week, end_at: end_at) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {campaign_id: "cxcxc"}, start_at: Time.current - 1.week, end_at: end_at) }
       it "is truthy" do
         expect(theft_alert.reload.facebook_updateable?).to be_truthy
         expect(theft_alert.live?).to be_falsey
@@ -109,6 +109,35 @@ RSpec.describe TheftAlert, type: :model do
           expect(theft_alert.should_update_facebook?).to be_falsey
           expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([])
         end
+      end
+    end
+  end
+
+  describe "admin differences" do
+    let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, ad_radius_miles: 24) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, approved: true) }
+    let(:theft_alert) do
+      FactoryBot.create(:theft_alert,
+        theft_alert_plan: theft_alert_plan,
+        ad_radius_miles: 333,
+        stolen_record: stolen_record,
+        admin: admin)
+    end
+    let(:admin) { false }
+    it "is default attributes" do
+      expect(theft_alert.reload.ad_radius_miles).to eq 24
+      expect(theft_alert.activateable?).to be_falsey
+      theft_alert.facebook_data = {activating_at: Time.current.to_i}
+      expect(theft_alert.notify?).to be_truthy
+      expect(TheftAlert.cities_count).to eq([["Canada", "Vancouver", nil, 1]])
+    end
+    context "admin" do
+      let(:admin) { true }
+      it "is what is set" do
+        expect(theft_alert.reload.ad_radius_miles).to eq 333
+        expect(theft_alert.activateable?).to be_truthy
+        theft_alert.facebook_data = {activating_at: Time.current.to_i}
+        expect(theft_alert.notify?).to be_falsey
       end
     end
   end

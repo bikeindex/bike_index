@@ -8,7 +8,7 @@ RSpec.describe DeactivateExpiredTheftAlertWorker, type: :job do
     it "deactivates expired theft alerts" do
       active = FactoryBot.create_list(:theft_alert_begun, 2)
       expired = FactoryBot.create_list(:theft_alert_begun, 2,
-        begin_at: Time.current - 2.days,
+        start_at: Time.current - 2.days,
         end_at: Time.current - 1.day)
       expect(TheftAlert.active.count).to eq(4)
       expect(TheftAlert.inactive.count).to eq(0)

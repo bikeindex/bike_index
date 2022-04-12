@@ -67,7 +67,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(theft_alert.reload.bike_id).to eq bike.id
           expect(theft_alert.activateable?).to be_falsey
           expect(theft_alert.activateable_except_approval?).to be_truthy
-          expect(theft_alert.begin_at).to be_blank
+          expect(theft_alert.start_at).to be_blank
           bike.reload
           stolen_record.reload
           expect(stolen_record.approved).to be_falsey
