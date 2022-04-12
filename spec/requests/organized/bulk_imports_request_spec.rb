@@ -5,7 +5,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
   let(:bulk_import) { FactoryBot.create(:bulk_import, organization: current_organization) }
   let(:current_user) { nil }
   let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
-  let(:impound_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: %w[impound_bikes show_bulk_import_impound_bikes]) }
+  let(:impound_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: %w[impound_bikes show_bulk_import_impound]) }
   before { log_in(current_user) if current_user.present? }
 
   context "organization without show_bulk_import" do
@@ -112,7 +112,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(assigns(:permitted_kinds)).to eq(["ascend"])
           end
         end
-        context "show_bulk_import_impound_bikes" do
+        context "show_bulk_import_impound" do
           let!(:current_organization) { impound_organization }
           it "renders" do
             get base_url
