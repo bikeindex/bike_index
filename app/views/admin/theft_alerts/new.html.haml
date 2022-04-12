@@ -31,7 +31,7 @@
   .row
     .col-md-6
       .form-group
-        - plan_options = @theft_alert_plans.map { |e| [theft_alert_plan_title(e), e.id] }
+        - plan_options = @theft_alert_plans.map { |e| ["#{theft_alert_plan_title(e)} - #{e.amount_formatted}", e.id] }
         = f.label :theft_alert_plan_id
         = f.select :theft_alert_plan_id,
           options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
