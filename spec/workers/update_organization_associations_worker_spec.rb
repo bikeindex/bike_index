@@ -107,7 +107,7 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
     let(:organization) { FactoryBot.create(:organization, :in_nyc) }
     # Have to do this whole dance because factories inline sidekiq processing of this job
     let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: ["organization_stolen_message"]) }
-    let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization, subscription_start_at: Time.current - 1.year) }
+    let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization, subscription_start_at: Time.current - 6.months) }
     it "adds it and disables it" do
       expect(organization.reload.organization_stolen_message).to be_blank
       invoice.update(organization_feature_ids: [organization_feature.id])
