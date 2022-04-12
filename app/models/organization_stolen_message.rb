@@ -14,6 +14,10 @@ class OrganizationStolenMessage < ApplicationRecord
   scope :enabled, -> { where(enabled: true) }
   scope :disabled, -> { where(enabled: false) }
 
+  def self.kinds
+    KIND_ENUM.keys.map(&:to_s)
+  end
+
   def self.for_coordinates(latitude, longitude)
     # area.
     # Geocoder::Calculations.bounding_box([to_coordinates], search_radius_miles)

@@ -158,14 +158,6 @@
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area
 
-          - if @organization.enabled?("organization_stolen_message")
-            .form-group
-              = f.label :organization_stolen_message_radius_miles do
-                Stolen Message radius (mi)
-                %small
-                  <span class="text-success">Organization Stolen Message setting</span>, controls how large the region is that gets the message the organization sets
-              = f.number_field :organization_stolen_message_radius_miles, {class: "form-control"}
-
           - if @organization.enabled?("passwordless_users")
             .form-group
               = f.label :passwordless_user_domain do
@@ -191,6 +183,23 @@
                   %small.less-strong
                     leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred
                 = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), { class: "form-control" }
+
+          - if @organization.enabled?("organization_stolen_message") && @organization.organization_stolen_message.present?
+            - organization_stolen_message = @organization.organization_stolen_message
+            .form-group.mt-4
+              = label_tag :organization_stolen_message_kind do
+                Stolen Message type
+                %small
+                  <span class="text-success">Organization Stolen Message setting</span>, edit message in the #{link_to "orgs own edit page", "#"} TODO: Link
+              - message_kind_opts = [["Association: Evey associated stolen bike sees message. Default for schools", "association"], ["Area: seen by bikes stolen in radius. Default for law enforcement, advocacy", "area"]]
+              = select_tag :organization_stolen_message_kind, options_for_select(message_kind_opts, selected: organization_stolen_message.kind), {class: "form-control"}
+              - if organization_stolen_message.area?
+                .form-group.mt-2
+                  = label_tag :organization_stolen_message_radius_miles do
+                    Stolen Message radius (mi)
+                    %small
+                      <span class="text-success">Organization Stolen Message setting</span> - only available for area type
+                  = number_field_tag :organization_stolen_message_radius_miles, organization_stolen_message.radius_miles, {class: "form-control"}
 
 
 

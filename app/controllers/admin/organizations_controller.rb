@@ -54,6 +54,7 @@ class Admin::OrganizationsController < Admin::BaseController
       end
     end
     if @organization.update(permitted_parameters)
+      update_organization_stolen_message
       flash[:success] = "Organization Saved!"
       UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)
@@ -100,7 +101,6 @@ class Admin::OrganizationsController < Admin::BaseController
         :graduated_notification_interval_days,
         :is_suspended,
         :lightspeed_register_with_phone,
-        # :organization_stolen_message_radius_miles,
         :lock_show_on_map,
         :manufacturer_id,
         :name,
@@ -156,6 +156,14 @@ class Admin::OrganizationsController < Admin::BaseController
   def permitted_locations_params
     %i[name zipcode city state_id _destroy id country_id street phone email publicly_visible
       impound_location default_impound_location]
+  end
+
+  def update_organization_stolen_message
+    message_params = {radius_miles: params[:organization_stolen_message_radius_miles],
+      kind: params[:organization_stolen_message_kind]}
+    return unless @organization.organization_stolen_message.present? &&
+      message_params.values.present?
+    @organization.organization_stolen_message.update(message_params)
   end
 
   def find_organization
