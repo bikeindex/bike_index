@@ -5971,36 +5971,37 @@ nl:
       click_to_see_promoted_alert_blog_post_html: Klik op %{link} om te lezen hoe
         de gesponsorde diefstalmeldingen van Bike Index een gestolen fiets in minder
         dan één dag hebben hersteld.
-      department_city: Afdeling & stad
-      description_of_the_incident: Beschrijving van het incident
       do_these_things_for_the_best_chance: Doe deze dingen voor de beste kans op herstel!
-      do_you_have_proof_of_ownership: Hebt u een bewijs van eigendom van deze %{bike_type}?
-      eg_if_we_tweet_about_it: bijv. als we erover tweeten of iemand zien zoeken naar
-        het framenummer
       here: hier
-      if_this_bike_type_was_added: Als deze %{bike_type} door een fietsenwinkel aan
-        de Index is toegevoegd, geldt dat als bewijs van eigendom
-      police_report: 'Politierapport #'
       promoted_theft_alert_service_description: De nieuwe Promoted Theft Alert-service
         van Bike Index krijgt uw fiets in de gaten van mensen in de fietsgemeenschap
         in de buurt waar uw fiets voor het laatst werd gezien.
       promoted_theft_alerts: Gepromoveerde diefstalmeldingen
-      receive_notifications: Ontvang meldingen van Bike Index over deze gestolen %{bike_type}
-      show_phone_police: Weergeven aan geverifieerde wetshandhavingspartners
-      show_phone_shops: Laat zien aan gebruikers van fietsenwinkels
-      show_phone_users: Toon telefoon aan ingelogde gebruikers
       try_one_now: Probeer er nu een!
       we_can_create_fb_ads_for_you: Wist je dat we gerichte Facebook-advertenties
         kunnen maken om het woord over je gestolen fiets voor jou te verspreiden?
-      when_was_it_stolen_at: Wanneer is het gestolen?
-      without_a_valid_report_number_html: Zonder een geldig rapportnummer wordt uw
-        fiets niet opgenomen in <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">partnerzoekopdrachten</a>
-        door <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
     edit_bike_organization:
       can_edit_this_bike: Kan dit bewerken %{bike_type}
       manage_organization_information: Organisatie-informatie beheren
       manage_organization_information_via: organisatie-informatie beheerd via uw account
       remove: Verwijderen
+    theft_details_partial:
+      department_city: Afdeling & stad
+      description_of_the_incident: Beschrijving van het incident
+      do_you_have_proof_of_ownership: Hebt u een bewijs van eigendom van deze %{bike_type}?
+      eg_if_we_tweet_about_it: bijv. als we erover tweeten of iemand zien zoeken naar
+        het framenummer
+      if_this_bike_type_was_added: Als deze %{bike_type} door een fietsenwinkel aan
+        de Index is toegevoegd, geldt dat als bewijs van eigendom
+      police_report: 'Politierapport #'
+      receive_notifications: Ontvang meldingen van Bike Index over deze gestolen %{bike_type}
+      show_phone_police: Weergeven aan geverifieerde wetshandhavingspartners
+      show_phone_shops: Laat zien aan gebruikers van fietsenwinkels
+      show_phone_users: Toon telefoon aan ingelogde gebruikers
+      when_was_it_stolen_at: Wanneer is het gestolen?
+      without_a_valid_report_number_html: Zonder een geldig rapportnummer wordt uw
+        fiets niet opgenomen in <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">partnerzoekopdrachten</a>
+        door <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
   bike_versions:
     index:
       primary_colors: Primaire kleuren

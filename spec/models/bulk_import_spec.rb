@@ -1,6 +1,14 @@
 require "rails_helper"
 
 RSpec.describe BulkImport, type: :model do
+  describe "kind_humanized" do
+    it "is expected" do
+      expect(BulkImport.kind_humanized("ascend")).to eq "ascend"
+      expect(BulkImport.kind_humanized("organization_import")).to eq "standard"
+      expect(BulkImport.kind_humanized("impounded")).to eq "impounded"
+      expect(BulkImport.kind_humanized("unorganized")).to eq "unorganized"
+    end
+  end
   describe "add_file_errors" do
     context "no errors" do
       let!(:bulk_import) { FactoryBot.build(:bulk_import) }

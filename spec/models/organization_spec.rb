@@ -136,6 +136,8 @@ RSpec.describe Organization, type: :model do
         expect(org).to be_approved
         expect(org.website).to be_present
         expect(org.ascend_name).to be_present
+        expect(org.pos_kind).to eq "no_pos"
+        expect(org.show_bulk_import?).to be_falsey
         expect(org.parent_organization).to be_present
         expect(org.enabled?("unstolen_notifications")).to be_falsey
         expect(org.enabled_feature_slugs).to eq([])
@@ -150,6 +152,7 @@ RSpec.describe Organization, type: :model do
         expect(org.website).to be_blank
         expect(org.ascend_name).to be_blank
         expect(org.parent_organization).to be_blank
+        expect(org.show_bulk_import?).to be_falsey
         expect(org.enabled?("unstolen_notifications")).to be_truthy
         expect(org.enabled_feature_slugs).to eq(["unstolen_notifications"])
       end
@@ -375,10 +378,12 @@ RSpec.describe Organization, type: :model do
     it "is falsey" do
       expect(organization.show_bulk_import?).to be_falsey
     end
-    context "paid_for" do
-      let(:organization) { Organization.new(enabled_feature_slugs: ["show_bulk_import"]) }
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_truthy
+    context "enabled" do
+      %w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen].each do |slug|
+        let(:organization) { Organization.new(enabled_feature_slugs: [slug]) }
+        it "is truthy" do
+          expect(organization.show_bulk_import?).to be_truthy
+        end
       end
     end
   end

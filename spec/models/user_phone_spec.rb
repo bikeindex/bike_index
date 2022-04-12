@@ -15,7 +15,13 @@ RSpec.describe UserPhone, type: :model do
       user_phone1.reload
       expect(user_phone1.confirmed?).to be_truthy
       expect(user_phone1.confirmed_at).to be_within(1).of Time.current
-      expect(user_phone1.user.phone_waiting_confirmation?).to be_falsey
+      user = user_phone1.user
+      expect(user.phone_waiting_confirmation?).to be_falsey
+      expect(user.phone).to eq nil
+      expect(user.current_user_phone).to eq user_phone1.phone
+      user.update(phone: user_phone1.phone)
+      expect(user.reload.phone).to eq user_phone1.phone
+      expect(user.current_user_phone).to eq user_phone1.phone
       expect(User.search_phone("1112223333").pluck(:id)).to match_array([user_phone2.user_id, user_phone3.user_id])
       expect(User.search_phone("11122233").pluck(:id)).to match_array([user_phone2.user_id, user_phone3.user_id])
       expect(User.search_phone("11222333").pluck(:id)).to match_array([user_phone2.user_id, user_phone3.user_id])

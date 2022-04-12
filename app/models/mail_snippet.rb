@@ -38,7 +38,7 @@ class MailSnippet < ApplicationRecord
       welcome: {emails: "finished_registration", description: "Below header"},
       footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
       partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
-      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""},
+      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""}
     }.with_indifferent_access.freeze
   end
 
@@ -65,7 +65,7 @@ class MailSnippet < ApplicationRecord
   def self.organization_emails_with_snippets
     # Worth noting: no snippet is named "finished_registration"
     ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
-        graduated_notification impound_claim_approved impound_claim_denied]
+      graduated_notification impound_claim_approved impound_claim_denied]
   end
 
   def self.organization_message_kinds

@@ -1,6 +1,6 @@
 class BulkImport < ApplicationRecord
   VALID_PROGRESSES = {pending: 0, ongoing: 1, finished: 2}.freeze
-  KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3}.freeze
+  KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
@@ -33,7 +33,7 @@ class BulkImport < ApplicationRecord
   end
 
   def self.kind_humanized(str)
-    str&.gsub("_", " ")
+    str == "organization_import" ? "standard" : str&.gsub("_", " ")
   end
 
   # NOTE: Headers were added in PR#1914 - 2021-3-11 - many bulk imports don't have them stored
@@ -135,8 +135,14 @@ class BulkImport < ApplicationRecord
     }
   end
 
+  def stolen_record_attrs
+    return {} unless stolen? && data&.dig("stolen_record").present?
+    data["stolen_record"].merge(proof_of_ownership: true, receive_notifications: true)
+  end
+
   def set_calculated_attributes
     self.kind ||= calculated_kind
+    self.no_notify = true if kind == "stolen"
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
     unless creator.present?
