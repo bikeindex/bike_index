@@ -173,6 +173,43 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: area_stolen_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.area_stolen_messages (
+    id bigint NOT NULL,
+    organization_id bigint,
+    latitude double precision,
+    longitude double precision,
+    radius_miles double precision,
+    message text,
+    updator_id bigint,
+    enabled boolean DEFAULT false,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: area_stolen_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.area_stolen_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: area_stolen_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.area_stolen_messages_id_seq OWNED BY public.area_stolen_messages.id;
+
+
+--
 -- Name: b_params; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2758,7 +2795,8 @@ CREATE TABLE public.stolen_records (
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying,
-    no_notify boolean DEFAULT false
+    no_notify boolean DEFAULT false,
+    area_stolen_message_id bigint
 );
 
 
@@ -3241,6 +3279,13 @@ ALTER TABLE ONLY public.ambassador_task_assignments ALTER COLUMN id SET DEFAULT 
 --
 
 ALTER TABLE ONLY public.ambassador_tasks ALTER COLUMN id SET DEFAULT nextval('public.ambassador_tasks_id_seq'::regclass);
+
+
+--
+-- Name: area_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.area_stolen_messages ALTER COLUMN id SET DEFAULT nextval('public.area_stolen_messages_id_seq'::regclass);
 
 
 --
@@ -3799,6 +3844,14 @@ ALTER TABLE ONLY public.ambassador_tasks
 
 ALTER TABLE ONLY public.ar_internal_metadata
     ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
+
+
+--
+-- Name: area_stolen_messages area_stolen_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.area_stolen_messages
+    ADD CONSTRAINT area_stolen_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -4419,6 +4472,20 @@ CREATE INDEX index_ambassador_task_assignments_on_user_id ON public.ambassador_t
 --
 
 CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks USING btree (title);
+
+
+--
+-- Name: index_area_stolen_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_area_stolen_messages_on_organization_id ON public.area_stolen_messages USING btree (organization_id);
+
+
+--
+-- Name: index_area_stolen_messages_on_updator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_area_stolen_messages_on_updator_id ON public.area_stolen_messages USING btree (updator_id);
 
 
 --
@@ -5388,6 +5455,13 @@ CREATE INDEX index_stolen_notifications_on_oauth_application_id ON public.stolen
 
 
 --
+-- Name: index_stolen_records_on_area_stolen_message_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_records_on_area_stolen_message_id ON public.stolen_records USING btree (area_stolen_message_id);
+
+
+--
 -- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6176,6 +6250,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220201213958'),
 ('20220324004315'),
 ('20220405173312'),
-('20220411165641');
+('20220411165641'),
+('20220412151420');
 
 

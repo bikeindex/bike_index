@@ -69,8 +69,8 @@ RSpec.describe OrganizationFeature, type: :model do
   describe "with_admin_organization_attributes" do
     let(:target_kinds) do
       %w[regional_bike_counts passwordless_users graduated_notifications
-         area_stolen_message reg_extra_registration_number
-         reg_organization_affiliation reg_address reg_phone reg_student_id]
+        area_stolen_message reg_extra_registration_number
+        reg_organization_affiliation reg_address reg_phone reg_student_id]
     end
     it "is expected" do
       expect(OrganizationFeature.with_admin_organization_attributes).to match_array target_kinds
