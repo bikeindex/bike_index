@@ -1530,15 +1530,20 @@ en:
     report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     theft_details:
+      do_these_things_for_the_best_chance: Do these things for the best chance of
+        recovery!
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
       click_to_see_promoted_alert_blog_post_html: >-
         Click %{link} to read about how Bike Index's Promoted Theft Alerts helped
         recover a stolen bike in less than one day.
+      try_one_now: Try one now!
+      we_can_create_fb_ads_for_you: >-
+        Did you know we can create targeted Facebook ads to spread the word about
+        your stolen bike for you?
+    theft_details_partial:
       department_city: Department & city
       description_of_the_incident: Description of the incident
-      do_these_things_for_the_best_chance: Do these things for the best chance of
-        recovery!
       do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
       eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
         for its serial number
@@ -1556,10 +1561,6 @@ en:
       show_phone_police: Show to verified law enforcement partners
       show_phone_shops: Show to bike shop users
       show_phone_users: Show phone to logged in users
-      try_one_now: Try one now!
-      we_can_create_fb_ads_for_you: >-
-        Did you know we can create targeted Facebook ads to spread the word about
-        your stolen bike for you?
       when_was_it_stolen_at: When was it stolen
       without_a_valid_report_number_html: >-
         Without a valid report number, your bike won't be included in partner searches

@@ -1,0 +1,89 @@
+- rendering_bulk_import ||= false
+
+.form-group.row.unnested-field
+  = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+  = srecord.label :date_stolen, t(".when_was_it_stolen_at"), class: 'form-well-label'
+  .form-well-input
+    - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.current)
+    = srecord.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
+
+.related-fields
+  .form-group.row
+    = srecord.label :phone, class: 'form-well-label'
+    .form-well-input
+      = srecord.text_field :phone, class: 'form-control'
+
+  .form-group.row
+    = srecord.label :secondary_phone, class: 'form-well-label'
+    .form-well-input
+      = srecord.text_field :secondary_phone, class: 'form-control'
+
+  .form-group.row
+    %label.form-well-label.mb-0
+    %label.form-well-input.mb-0
+      = srecord.check_box :phone_for_users
+      = t(".show_phone_users")
+  .form-group.row
+    %label.form-well-label.mb-0
+    %label.form-well-input.mb-0
+      = srecord.check_box :phone_for_shops
+      = t(".show_phone_shops")
+  .form-group.row
+    %label.form-well-label.mb-0
+    %label.form-well-input.mb-0
+      = srecord.check_box :phone_for_police
+      = t(".show_phone_police")
+
+
+= render partial: '/bikes_edit/bike_fields/stolen_location', locals: { srecord: srecord }
+- unless rendering_bulk_import
+  .form-group.row.unnested-field
+    = srecord.label :estimated_value, class: 'form-well-label'
+    .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
+      .input-group-addon
+        = t("number.currency.format.unit")
+      = srecord.number_field :estimated_value, min: '1', class: 'form-control'
+
+  .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+    = srecord.label :locking_description, class:  'form-well-label'
+    .form-well-input
+      = srecord.select(:locking_description, StolenRecord.locking_description_select_options, prompt: '')
+  .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+    = srecord.label :lock_defeat_description, class:  'form-well-label'
+    .form-well-input
+      = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select_options, prompt: '')
+
+.form-group.row.unnested-field
+  = srecord.label :theft_description, t(".description_of_the_incident"), class:  'form-well-label'
+  .form-well-input-large
+    = srecord.text_area :theft_description, rows: 3, class: 'form-control'
+
+.form-group.row.unnested-field
+  = srecord.label :police_report_number, t(".police_report"), class: 'form-well-label'
+  .form-well-input
+    = srecord.text_field :police_report_number, class: 'form-control'
+    %span.below-input-help
+      = t(".without_a_valid_report_number_html")
+.form-group.row.unnested-field.no-divider-row
+  = srecord.label :police_report_department, t(".department_city"), class: 'form-well-label'
+  .form-well-input
+    = srecord.text_field :police_report_department, class: 'form-control'
+
+- unless rendering_bulk_import
+  %hr
+  .form-group.row.unnested-field.full-width-section.no-divider-row
+    %label
+      = srecord.check_box :proof_of_ownership
+      = t(".do_you_have_proof_of_ownership", bike_type: @bike.type)
+    .full-width-checkbox-help
+      = t(".if_this_bike_type_was_added", bike_type: @bike.type)
+  %hr
+  .form-group.row.unnested-field.full-width-section.no-divider-row
+    %label
+      = srecord.check_box :receive_notifications
+      = t(".receive_notifications", bike_type: @bike.type)
+    .full-width-checkbox-help
+      = t(".eg_if_we_tweet_about_it")
+
+- unless rendering_bulk_import
+  = render "shared/form_well_footer_save"
