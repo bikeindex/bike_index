@@ -597,7 +597,7 @@ RSpec.describe Organization, type: :model do
       end
     end
     context "non-enabled snippet type" do
-      let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, kind: "partial", is_enabled: false) }
+      let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, kind: "partial_registration", is_enabled: false) }
       it "returns nil for not-enabled snippet" do
         expect(organization.mail_snippet_body("partial")).to be nil
       end

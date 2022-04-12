@@ -44,7 +44,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
         context "with partial snippet" do
           let!(:partial_mail_snippet) do
             FactoryBot.create(:organization_mail_snippet,
-              kind: "partial",
+              kind: "partial_registration",
               organization: organization,
               body: "<p>PARTIALYXSNIPPET</p>")
           end
