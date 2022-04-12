@@ -78,7 +78,6 @@ module Organized
       viewable_email_kinds += ParkingNotification.kinds if current_organization.enabled?("parking_notifications")
       viewable_email_kinds += ["graduated_notification"] if current_organization.enabled?("graduated_notifications")
       viewable_email_kinds += %w[impound_claim_approved impound_claim_denied] if current_organization.enabled?("impound_bikes")
-      # viewable_email_kinds += %w[area_stolen_message] if current_organization.enabled?("area_stolen_message")
       @viewable_email_kinds = viewable_email_kinds
     end
 

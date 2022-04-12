@@ -7,9 +7,8 @@ RSpec.describe Organized::EmailsController, type: :request do
   let(:all_viewable_email_kinds) do
     %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification graduated_notification
       impound_notification impound_claim_approved impound_claim_denied]
-      # TODO: add area_stolen_message
   end
-  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes area_stolen_message] }
+  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes] }
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member
@@ -234,7 +233,6 @@ RSpec.describe Organized::EmailsController, type: :request do
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     # Also defined in controller
     let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied] }
-    # TODO: add area_stolen_message
     describe "edit" do
       it "renders" do
         viewable_kinds.each do |kind|

@@ -7,7 +7,6 @@ class MailSnippet < ApplicationRecord
     welcome: 2,
     footer: 3,
     security: 4,
-    area_stolen_message: 5,
     partial_registration: 6,
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
@@ -40,7 +39,6 @@ class MailSnippet < ApplicationRecord
       footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
       partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
       security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""},
-      area_stolen_message: {emails: "finished_registration_stolen", description: "Message to bikes stolen in your area about how to report the theft"}
     }.with_indifferent_access.freeze
   end
 
@@ -75,7 +73,7 @@ class MailSnippet < ApplicationRecord
   end
 
   def self.location_triggered_kinds
-    ["area_stolen_message"].freeze
+    []
   end
 
   def which_organization_email
