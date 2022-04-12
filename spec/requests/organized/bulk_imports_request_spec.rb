@@ -7,6 +7,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
   let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
   let(:impound_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: %w[impound_bikes show_bulk_import_impound]) }
   let(:stolen_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: %w[show_bulk_import_stolen]) }
+  let(:everything_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: %w[show_bulk_import show_bulk_import_stolen impound_bikes show_bulk_import_impound]) }
   before { log_in(current_user) if current_user.present? }
 
   context "organization without show_bulk_import" do
@@ -49,7 +50,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(assigns(:current_organization)).to eq current_organization
-          expect(assigns(:permitted_kinds)).to eq(%w[organization_import impounded])
+          expect(assigns(:permitted_kinds)).to eq(%w[organization_import impounded stolen])
         end
       end
 
@@ -140,6 +141,28 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template :new
           expect(assigns(:current_organization)).to eq current_organization
+          expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+          get "#{base_url}/new?kind=stolen"
+          expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+        end
+        context "all kinds" do
+          let!(:current_organization) { everything_organization }
+          it "renders" do
+            get "#{base_url}/new"
+            expect(response.status).to eq(200)
+            expect(response).to render_template :new
+            expect(assigns(:current_organization)).to eq current_organization
+            expect(assigns(:permitted_kinds)).to eq(%w[organization_import impounded stolen])
+            expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+            get "#{base_url}/new?kind=impounded"
+            expect(assigns(:bulk_import)&.kind).to eq "impounded"
+            get "#{base_url}/new?kind=stolen"
+            expect(assigns(:bulk_import)&.kind).to eq "stolen"
+            get "#{base_url}/new?kind=ascend"
+            expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+            get "#{base_url}/new?kind=unorganized"
+            expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+          end
         end
       end
       describe "show" do

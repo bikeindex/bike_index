@@ -19,20 +19,16 @@
         %a.nav-link{class: link_class, href: "#tab-#{kind}", "data-toggle" => "tab", "data-role" => "tab"}
           - if kind == "organization_import"
             Bikes with their owner
-          - elsif kind == "impounded"
-            Impounded bikes
           - else
-            = BulkImport.kind_humanized(kind)
+            #{BulkImport.kind_humanized(kind).titleize} bikes
 - elsif @permitted_kinds.count == 1
   - kind = @permitted_kinds.first
   %h2.uncap.mt-4.mt-4
     Importing
     - if kind == "organization_import"
       Bikes with their owner
-    - elsif kind == "impounded"
-      Impounded bikes
     - else
-      = BulkImport.kind_humanized(kind)
+      #{BulkImport.kind_humanized(kind).titleize} bikes
 %div.mt-4.pb-4{ class: (render_tabs ? "tab-content" : "") }
   - if @permitted_kinds.include?("organization_import")
     - tab_classes = "tab-pane fade"
@@ -99,6 +95,42 @@
         .card.col-sm-6
           .card-block
             = f.label :file, "CSV File with impounded bikes"
+            .form-group.row.file-upload-wrapper
+              .form-well-input
+                %label.file
+                  = f.file_field :file, class: "avatar-upload-field"
+                  %span.file-custom
+                    %span.file-upload-text= t(".choose_file")
+
+            .form-group.row
+              .form-well-input
+                = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
+  - if @permitted_kinds.include?("stolen")
+    - tab_classes = "tab-pane fade"
+    - tab_classes += " in active" if @active_kind == "stolen"
+    %div{id: "tab-stolen", role: "tabpanel", class: (render_tabs ? tab_classes : "")}
+      .mb-4
+        %p
+          %strong
+            = t(".must_have_required_headers_html")
+          = t(".required_headers_are_html")
+
+        %p
+          - link_to_example_csv = link_to t(".our_example_csv_here"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv"
+          #{t(".look_at_example_csv_and_html", link_to_example_csv: link_to_example_csv)} #{link_to(t(".example_csv_with_all_options"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv")}.
+
+        %p
+          This is intended for importing a large number of bikes that were stolen at the same time and place - something that's unfortunately become more common recently.
+          %em stolen imports
+          all get the stolen attributes entered in the form below. If you want to import multiple bikes with different stolen information, please contact #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"}.
+        %p
+          This will create new registrations for all of the bikes. No emails will be sent for the
+
+      = form_for @bulk_import, { url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+        = f.hidden_field :kind, value: "organization_import"
+        .card.col-sm-6
+          .card-block
+            = f.label :file, t(".csv_file_with_bikes")
             .form-group.row.file-upload-wrapper
               .form-well-input
                 %label.file
