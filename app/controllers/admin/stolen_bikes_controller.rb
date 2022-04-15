@@ -87,15 +87,23 @@ class Admin::StolenBikesController < Admin::BaseController
   def available_stolen_records
     return @available_stolen_records if defined?(@available_stolen_records)
     @unapproved_only = !ParamsNormalizer.boolean(params[:search_unapproved])
+    @only_without_location = ParamsNormalizer.boolean(params[:search_without_location])
     if @unapproved_only
       available_stolen_records = StolenRecord.current.unapproved
-      @only_with_location = !ParamsNormalizer.boolean(params[:without_location])
-      if @only_with_location
+      unless @only_without_location
         @unapproved_without_location_count = available_stolen_records.without_location.count
         available_stolen_records = available_stolen_records.with_location
       end
     else
       available_stolen_records = StolenRecord
+    end
+
+    # We always render distance
+    distance = params[:search_distance].to_i
+    @distance = distance.present? && distance > 0 ? distance : 50
+    if !@only_without_location && params[:search_location].present?
+      bounding_box = Geocoder::Calculations.bounding_box(params[:search_location], @distance)
+      available_stolen_records = available_stolen_records.within_bounding_box(bounding_box)
     end
 
     @time_range_column = sort_column if %w[date_stolen].include?(sort_column)
