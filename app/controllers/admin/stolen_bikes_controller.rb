@@ -98,6 +98,13 @@ class Admin::StolenBikesController < Admin::BaseController
       available_stolen_records = StolenRecord
     end
 
+    if params[:search_location].present?
+      bounding_box = Geocoder::Calculations.bounding_box(params[:search_location], @distance)
+      available_stolen_records = available_stolen_records.within_bounding_box(bounding_box)
+    end
+
+    available_stolen_records =
+
     @time_range_column = sort_column if %w[date_stolen].include?(sort_column)
     @time_range_column ||= "created_at"
     @available_stolen_records = available_stolen_records.where(@time_range_column => @time_range)
