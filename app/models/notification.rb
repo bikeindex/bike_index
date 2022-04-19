@@ -26,7 +26,8 @@ class Notification < ApplicationRecord
     stolen_twitter_alerter: 2,
     bike_possibly_found: 23,
     user_alert_theft_alert_without_photo: 24,
-    user_alert_stolen_bike_without_location: 25
+    user_alert_stolen_bike_without_location: 25,
+    theft_survey_4_2022: 26
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -34,7 +35,7 @@ class Notification < ApplicationRecord
     text: 1
   }.freeze
 
-  belongs_to :user # ALWAYS receiver of the notification (unless it's a stolen_notification_blocked, which is sent to admin instead)
+  belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
