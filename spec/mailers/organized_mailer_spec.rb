@@ -14,6 +14,28 @@ RSpec.describe OrganizedMailer, type: :mailer do
       organization: organization,
       body: "<p>#{variable_snippet_kind}-snippet</p>")
   end
+
+  def expect_render_donation(should_render, mail)
+    snippet_to_match = "make a donation"
+    # if should_render
+    #   expect(mail.body.encoded).to match snippet_to_match
+    # else
+    #   expect(mail.body.encoded).to_not match snippet_to_match
+    # end
+  end
+
+  def expect_render_supporters(should_render, mail)
+    snippet_to_match = "make a donation"
+    matches_snippet = mail.body.encoded.match?(snippet_to_match)
+    pp matches_snippet, should_render
+    return if matches_snippet == should_render
+    if should_render
+      expect("Mail Body").to match snippet_to_match
+    else
+      expect("Mail Body").to match snippet_to_match
+    end
+  end
+
   describe "partial_registration" do
     context "without organization" do
       let(:b_param) { FactoryBot.create(:b_param_stolen) }
@@ -24,6 +46,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.to).to eq([b_param.owner_email])
         expect(mail.reply_to).to eq(["contact@bikeindex.org"])
         expect(mail.tag).to eq "partial_registration"
+        expect_render_donation(true, mail)
+        expect_render_supporters(true, mail)
       end
     end
     context "with organization" do
@@ -40,6 +64,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.reply_to).to eq([organization.auto_user.email])
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.tag).to eq "partial_registration"
+          expect_render_donation(false, mail)
+          expect_render_supporters(false, mail)
+          fail
         end
         context "with partial snippet" do
           let!(:partial_mail_snippet) do
@@ -59,6 +86,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
             expect(mail.body.encoded).to match header_mail_snippet.body
             expect(mail.body.encoded).to match partial_mail_snippet.body
             expect(mail.tag).to eq "partial_registration"
+            expect_render_donation(false, mail)
+            expect_render_supporters(false, mail)
           end
         end
       end
@@ -72,6 +101,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
       it "renders email" do
         expect(mail.subject).to match "Confirm your Bike Index registration"
         expect(mail.tag).to eq "finished_registration"
+        expect_render_donation(true, mail)
+        expect_render_supporters(true, mail)
       end
     end
     context "existing bike and ownership passed" do
@@ -85,6 +116,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.subject).to eq("Confirm your Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
         end
       end
       context "claimed registration (e.g. self_made)" do
@@ -96,6 +129,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.subject).to eq("Bike Index registration successful")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
         end
       end
       context "pos registration" do
@@ -116,6 +151,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail2.subject).to eq("Confirm your Bike Index registration")
           expect(mail2.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail2.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(false, mail)
         end
       end
       context "stolen" do
@@ -126,6 +163,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.body.encoded).to match bike.current_stolen_record.find_or_create_recovery_link_token
           expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(false, mail)
         end
       end
     end

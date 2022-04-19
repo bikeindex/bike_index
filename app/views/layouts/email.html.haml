@@ -49,6 +49,6 @@
         %h5
           #{Time.current.year} &copy; #{t(".bike_index")}.
 
-          - unless @organization.present? && controller_path == 'organized_mailer' && @organization.paid?
+          - if @render_donation
             = t(".help_prevent_theft")
             = link_to(t(".make_a_donation"), support_the_index_url)
