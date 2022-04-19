@@ -17,22 +17,19 @@ RSpec.describe OrganizedMailer, type: :mailer do
 
   def expect_render_donation(should_render, mail)
     snippet_to_match = "make a donation"
-    # if should_render
-    #   expect(mail.body.encoded).to match snippet_to_match
-    # else
-    #   expect(mail.body.encoded).to_not match snippet_to_match
-    # end
+    if should_render
+      expect(mail.body.encoded).to match snippet_to_match
+    else
+      expect(mail.body.encoded).to_not match snippet_to_match
+    end
   end
 
   def expect_render_supporters(should_render, mail)
-    snippet_to_match = "make a donation"
-    matches_snippet = mail.body.encoded.match?(snippet_to_match)
-    pp matches_snippet, should_render
-    return if matches_snippet == should_render
+    snippet_to_match = "supported by"
     if should_render
-      expect("Mail Body").to match snippet_to_match
+      expect(mail.body.encoded).to match snippet_to_match
     else
-      expect("Mail Body").to match snippet_to_match
+      expect(mail.body.encoded).to_not match snippet_to_match
     end
   end
 
@@ -66,7 +63,6 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.tag).to eq "partial_registration"
           expect_render_donation(false, mail)
           expect_render_supporters(false, mail)
-          fail
         end
         context "with partial snippet" do
           let!(:partial_mail_snippet) do
@@ -142,6 +138,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration_pos"
+          expect_render_donation(true, mail)
+          expect_render_supporters(false, mail)
           # But for a transferred registration, it does different
           ownership2 = FactoryBot.create(:ownership, bike: bike)
           expect(bike.reload.current_ownership.new_registration?).to be_falsey
@@ -152,7 +150,32 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail2.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail2.tag).to eq "finished_registration"
           expect_render_donation(true, mail)
-          expect_render_supporters(false, mail)
+          expect_render_supporters(true, mail)
+        end
+      end
+      context "Organization registration" do
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_advocacy") }
+        let(:ownership) { bike.current_ownership }
+        it "renders email" do
+          expect(bike.reload.current_ownership.organization&.id).to eq organization.id
+          expect(bike.pos?).to be_falsey
+          expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
+          expect(mail.reply_to).to eq([organization.auto_user&.email])
+          expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
+        end
+        context "Bike shop" do
+          let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
+          it "renders without supporters" do
+            expect(bike.reload.current_ownership.organization&.id).to eq organization.id
+            expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
+            expect(mail.reply_to).to eq([organization.auto_user&.email])
+            expect(mail.tag).to eq "finished_registration"
+            expect_render_donation(true, mail)
+            expect_render_supporters(false, mail)
+          end
         end
       end
       context "stolen" do
@@ -164,7 +187,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to match bike.current_stolen_record.find_or_create_recovery_link_token
           expect(mail.tag).to eq "finished_registration"
           expect_render_donation(true, mail)
-          expect_render_supporters(false, mail)
+          expect_render_supporters(true, mail)
         end
       end
     end

@@ -10,6 +10,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "welcome_email"
+      expect(mail.body.encoded).to_not match(/supported by/i)
     end
   end
 

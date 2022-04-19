@@ -11,6 +11,7 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(@mail.to).to eq(["contact@bikeindex.org"])
       expect(@mail.reply_to).to eq([feedback.email])
       expect(@mail.tag).to eq("admin")
+      expect(mail.body.encoded).to match "supported by"
     end
   end
 

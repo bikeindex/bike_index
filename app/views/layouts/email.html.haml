@@ -52,3 +52,8 @@
           - if @render_donation
             = t(".help_prevent_theft")
             = link_to(t(".make_a_donation"), support_the_index_url)
+
+        - if @render_supporters
+          %p
+            Bike Index is also supported by #{link_to "MaxTracker", "https://www.indiegogo.com/projects/maxtracker-anti-theft-gps-bicycle-security-system--2#/"}, #{link_to "Ottalaus", "https://ottalausinc.ca/"} and #{link_to "The Pro's Closet", "https://www.theproscloset.com/"}.
+
