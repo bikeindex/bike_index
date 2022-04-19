@@ -137,11 +137,6 @@ class OrganizedMailer < ApplicationMailer
 
   private
 
-  def assign_render_donation_and_supporters
-    @render_donation = true
-    @render_supporters = true
-  end
-
   def finished_registration_type
     return "_stolen" if @bike.status_stolen?
     @ownership.claimed ? "_owned" : ""
