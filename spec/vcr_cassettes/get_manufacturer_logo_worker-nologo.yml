@@ -25,7 +25,7 @@ http_interactions:
       Connection:
       - keep-alive
       Date:
-      - Sat, 26 Feb 2022 01:01:14 GMT
+      - Wed, 20 Apr 2022 18:30:06 GMT
       Server:
       - envoy
       Strict-Transport-Security:
@@ -37,14 +37,14 @@ http_interactions:
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 dd8f9d87a6d86878defca85ee01d6d4e.cloudfront.net (CloudFront)
+      - 1.1 912d83c7c9b4676eb19f09c9bfabda24.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
-      - SFO5-C1
+      - SFO5-P2
       X-Amz-Cf-Id:
-      - 4wQy1g2yAyxPbaZLMsrbgt3uNMjOVVVV3OTal_zYk0QmXP6qcLtoLw==
+      - btK1njNZfmEQhx2CxC9C-XtfNQLk7O2xlSb3gj7FCklQ4uW7YCeG8Q==
     body:
       encoding: UTF-8
       string: "\n"
     http_version: 
-  recorded_at: Sat, 26 Feb 2022 01:01:14 GMT
+  recorded_at: Wed, 20 Apr 2022 18:30:06 GMT
 recorded_with: VCR 5.0.0
