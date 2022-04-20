@@ -1,27 +1,14 @@
 - render_sortable ||= false
-- updated_at ||= false
-- unless updated_at
-  <style>.updated-cell { display: none; }</style>
 
 .full-screen-table
   %table.table.table-bordered.table-striped.table-sm
     %thead.thead-light.sortable
       %th
-        - if render_sortable
-          = sortable "created_at", "Added"
-        - else
-          Added&nbsp;<small class="convertTimezone d-none d-sm-inline"></small>
-      %th.updated-cell
-        %small
-          - if render_sortable
-            = sortable "updated_at", "Updated"
-          - else
-            Updated
+        = sortable "created_at", render_sortable: render_sortable
+      %th.only-dev-visible
+        %small= sortable "updated_at", render_sortable: render_sortable
       %th
-        - if render_sortable
-          = sortable "email"
-        - else
-          Email
+        = sortable "email", render_sortable: render_sortable
       %th
         Secondary Emails
       %th
@@ -46,7 +33,7 @@
             %td
               %span.convertTime
                 = l user.created_at, format: :convert_time
-            %td.updated-cell
+            %td.only-dev-visible
               %small.convertTime
                 = l user.updated_at, format: :convert_time
             %td
