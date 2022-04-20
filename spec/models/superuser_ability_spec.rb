@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe SuperuserAbility, type: :model do
   let(:user) { FactoryBot.create(:user_confirmed) }

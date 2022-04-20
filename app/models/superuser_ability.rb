@@ -1,3 +1,5 @@
+# TODO: make this the way that superuser is defined for everyone
+# e.g. if universal, update user to be superuser: true, remove superuser: true if deleted, etc
 class SuperuserAbility < ApplicationRecord
   KIND_ENUM = {
     universal: 0,
