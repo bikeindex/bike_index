@@ -2782,6 +2782,41 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
+-- Name: superuser_abilities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.superuser_abilities (
+    id bigint NOT NULL,
+    user_id bigint,
+    kind integer DEFAULT 0,
+    controller_name character varying,
+    action_name character varying,
+    deleted_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: superuser_abilities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.superuser_abilities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: superuser_abilities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.superuser_abilities_id_seq OWNED BY public.superuser_abilities.id;
+
+
+--
 -- Name: theft_alert_plans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3692,6 +3727,13 @@ ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: superuser_abilities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.superuser_abilities ALTER COLUMN id SET DEFAULT nextval('public.superuser_abilities_id_seq'::regclass);
+
+
+--
 -- Name: theft_alert_plans id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4311,6 +4353,14 @@ ALTER TABLE ONLY public.stolen_bike_listings
 
 ALTER TABLE ONLY public.stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: superuser_abilities superuser_abilities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.superuser_abilities
+    ADD CONSTRAINT superuser_abilities_pkey PRIMARY KEY (id);
 
 
 --
@@ -5409,6 +5459,13 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
+-- Name: index_superuser_abilities_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_superuser_abilities_on_user_id ON public.superuser_abilities USING btree (user_id);
+
+
+--
 -- Name: index_theft_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6176,6 +6233,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220201213958'),
 ('20220324004315'),
 ('20220405173312'),
-('20220411165641');
+('20220411165641'),
+('20220420145734');
 
 
