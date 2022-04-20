@@ -1,8 +1,4 @@
 !!!
--
-- skip_donation = @organization.present? && controller_path == "organized_mailer" && @organization.paid?
-- render_donation = @organization.blank? || !@organization.paid?
-- render_supporters = @organization.blank? || !@organization.paid? || !@organization.bike_shop?
 %html
   %head
     %meta{ content: 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type' }
@@ -53,11 +49,11 @@
         %h5
           #{Time.current.year} &copy; #{t(".bike_index")}.
 
-          - if render_donation
+          - if render_donation?(@organization)
             = t(".help_prevent_theft")
             = link_to(t(".make_a_donation"), support_the_index_url)
 
-        - if render_supporters
+        - if render_supporters?(@organization)
           %p
             Bike Index is also supported by #{link_to "MaxTracker", "https://www.indiegogo.com/projects/maxtracker-anti-theft-gps-bicycle-security-system--2#/"}, #{link_to "Ottalaus", "https://ottalausinc.ca/"} and #{link_to "The Pro's Closet", "https://www.theproscloset.com/"}.
 
