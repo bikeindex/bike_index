@@ -54,7 +54,7 @@
                 = link_to user.email, edit_admin_user_url(user.id)
                 = user_icon(user)
                 %small.less-strong-right
-                  = user.id
+                  &nbsp;#{user.id}
             %td
               %small.less-strong
                 = user.secondary_emails.join(', ')
