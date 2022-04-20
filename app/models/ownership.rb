@@ -7,7 +7,7 @@ class Ownership < ApplicationRecord
     embed_partial: 3,
     api_v1: 4,
     api_v2: 5,
-    api_v3: 12,
+    api_v3: 12, # added on 2022-4-20, prior to that v3 was reported as v2 :/
     bulk_import_worker: 6,
     organization_form: 7,
     creator_unregistered_parking_notification: 8,

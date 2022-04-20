@@ -628,7 +628,6 @@ RSpec.describe "Bikes API V3", type: :request do
       context "duplicated serial" do
         context "matching email" do
           it "returns existing bike if authorized by organization" do
-
             bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
             bike.organizations << organization
             bike.save
