@@ -17,6 +17,11 @@ class SuperuserAbility < ApplicationRecord
     KIND_ENUM.keys.map(&:to_s)
   end
 
+  def self.can_access?(controller_name: nil, action_name: nil)
+    universal.any? || controller.where(controller_name: controller_name).any? ||
+      action.where(controller_name: controller_name, action_name: action_name).any?
+  end
+
   def set_calculated_attributes
     self.kind = calculated_kind
   end

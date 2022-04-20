@@ -1,4 +1,6 @@
-= render partial: "admin/graphs/graphs_subnav", locals: {location_count: true}
+- if current_user.superuser?
+  = render partial: "admin/graphs/graphs_subnav", locals: {location_count: true}
+
 .mb-4
   = form_tag tables_admin_graphs_path, method: :get do
     .form-inline
