@@ -101,7 +101,7 @@ RSpec.describe BParam, type: :model do
     it "gets the organization id" do
       org = FactoryBot.create(:organization, name: "Something")
       p = {organization_slug: org.slug}
-      b_param = BParam.new(params: p, origin: "api_v2")
+      b_param = BParam.new(params: p, origin: "api_v3") # Also works for v3
       b_param.massage_if_v2
       expect(b_param.bike["creation_organization_id"]).to eq(org.id)
     end

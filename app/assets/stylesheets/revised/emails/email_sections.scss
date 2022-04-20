@@ -106,11 +106,24 @@ $foot-padding: 0.5 * ($header-height - $font-size);
   background-color: $gray-darker;
   padding: $foot-padding;
 
-  h5 {
+  h5,
+  p {
     color: $less-strong-font-color;
-    font-weight: 600;
+    font-size: $font-size;
     text-align: center;
     line-height: 1.2em;
     width: 100%;
+  }
+
+  h5 {
+    font-weight: 600;
+  }
+
+  p {
+    margin: 1.5rem 0 0;
+    font-style: italic;
+    a {
+      color: #3a78a8; // equivalent to 0.7 opacity
+    }
   }
 }

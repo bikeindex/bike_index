@@ -6,6 +6,7 @@ class @AdDisplayer
   ]
 
   # Note: links have id of binxad-#{ad name} - which enables click tracking with ga events
+  # ALSO: urls are duplicated in supporters in email.html.haml
   max_tracker_url = "https://www.indiegogo.com/projects/maxtracker-anti-theft-gps-bicycle-security-system--2#/"
   ottalaus_url = "https://ottalausinc.ca/"
 
