@@ -48,6 +48,10 @@ RSpec.describe UserPhone, type: :model do
   describe "add_phone_for_user_id" do
     let(:user) { FactoryBot.create(:user) }
     let(:phone) { "2342342345" }
+    before do
+      UserPhoneConfirmationWorker.new # Instantiate for stubbing
+      stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+    end
 
     it "adds a user_phone" do
       expect(user.phone).to be_blank
