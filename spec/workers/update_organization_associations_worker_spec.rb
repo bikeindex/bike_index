@@ -67,8 +67,6 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(organization.reload.admins.pluck(:id)).to eq([user.id])
       mailchimp_datum.update(updated_at: Time.current - 1.hour)
       user.reload
-      UpdateMailchimpDatumWorker.new # So that it's present post stubbing
-      stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
       expect(UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP).to be_falsey
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do

@@ -327,7 +327,7 @@ class BParam < ApplicationRecord
   end
 
   def massage_if_v2
-    self.params = self.class.v2_params(params) if origin == "api_v2"
+    self.params = self.class.v2_params(params) if %w[api_v2 api_v3].include?(origin)
     true
   end
 

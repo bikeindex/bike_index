@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe UpdateMailchimpDatumWorker, type: :job do
   let(:instance) { described_class.new }
-
+  before { stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", true) }
   describe "perform" do
     context "organization" do
       let(:target_body) do

@@ -138,6 +138,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.first?).to be_truthy
           expect(ownership.previous_ownership_id).to be_blank
           expect(ownership.organization_pre_registration?).to be_truthy
+          expect(ownership.send_email).to be_truthy # still defaults to true
           # Before save, still works
           expect(ownership2.current).to be_truthy
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
