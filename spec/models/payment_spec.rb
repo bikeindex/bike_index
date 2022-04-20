@@ -96,7 +96,6 @@ RSpec.describe Payment, type: :model do
     it "creates a mailchimp_datum" do
       user.reload
       expect(user.mailchimp_datum).to be_blank
-      UpdateMailchimpDatumWorker.new # So that it's present post stubbing
       expect(UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP).to be_falsey
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do

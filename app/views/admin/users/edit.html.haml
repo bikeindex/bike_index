@@ -59,6 +59,35 @@
                 %strong.text-success TRUE
               - else
                 %small.less-strong address permitted
+        %tr
+          %td
+            Superuser
+          %td
+            - if @user.developer?
+              %span.only-dev-visible developer
+            - superuser_abilities = @user.superuser_abilities
+            - if @user.superuser?
+              %strong full superuser
+              - superuser_ability = superuser_abilities.universal.first
+              - if superuser_ability.present?
+                %small.less-strong
+                  since
+                  %span.convertTime.preciseTime
+                    = l superuser_ability.created_at, format: :convert_time
+            - elsif superuser_abilities.any?
+              = link_to "limited", admin_superuser_abilities_path(user_id: @user.id), class: "text-info"
+              %ul.small.mb-0
+                - superuser_abilities.each do |superuser_ability|
+                  %li
+                    - if superuser_ability.universal?
+                      %strong full superuser
+                    - else
+                      Can access
+                      - if superuser_ability.action_name.present?
+                        %em= superuser_ability.action_name
+                        in
+                      = superuser_ability.controller_name
+
   .col-md-6.mt-auto
     %table.table-list
       %tr

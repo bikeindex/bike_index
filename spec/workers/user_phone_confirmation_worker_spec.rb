@@ -4,6 +4,7 @@ RSpec.describe UserPhoneConfirmationWorker, type: :job do
   let(:instance) { described_class.new }
   let(:user) { FactoryBot.create(:user) }
   let(:user_phone) { FactoryBot.create(:user_phone, user: user, phone: "2134442323") }
+  before { stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true) }
 
   it "adds the phone for the user" do
     expect(user_phone.confirmed?).to be_falsey

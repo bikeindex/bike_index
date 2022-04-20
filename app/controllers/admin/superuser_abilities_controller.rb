@@ -19,7 +19,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   end
 
   def earliest_period_date
-    Time.at(1650467457)
+    Date.parse("2013-1-1").beginning_of_day # First user is 2013-1-11
   end
 
   def permitted_kinds
@@ -27,15 +27,21 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   end
 
   def searched_superuser_abilities
-    searched_superuser_abilities = SuperuserAbility
+    @deleted = ParamsNormalizer.boolean(params[:search_deleted])
+    superuser_abilities = @deleted ? SuperuserAbility.unscoped : SuperuserAbility
+
     if SuperuserAbility.kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
-      searched_superuser_abilities = searched_superuser_abilities.send(@kind)
+      superuser_abilities = superuser_abilities.send(@kind)
     else
       @kind = "all"
     end
+    if params[:user_id].present?
+      superuser_abilities = superuser_abilities.where(user_id: params[:user_id])
+    end
+
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
-    searched_superuser_abilities.where(@time_range_column => @time_range)
+    superuser_abilities.where(@time_range_column => @time_range)
   end
 end

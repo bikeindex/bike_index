@@ -12,6 +12,10 @@ RSpec.describe AfterUserChangeWorker, type: :job do
   describe "add_phones_for_verification" do
     let(:phone) { "4334445555" }
     let(:user) { FactoryBot.create(:user, phone: phone) }
+    before do
+      UserPhoneConfirmationWorker.new # instantiate before stubbing
+      stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+    end
     it "adds the phone, in a streamlined way without calling multiple times" do
       user.reload
       expect_any_instance_of(TwilioIntegration).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
