@@ -50,7 +50,7 @@ class User < ApplicationRecord
   scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
-  scope :superusers, -> { where(superuser: true) }
+  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
   scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
 
