@@ -19,7 +19,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   end
 
   def earliest_period_date
-    Date.parse("2013-1-1").beginning_of_day # First user is 2013-1-11
+    Date.parse("2013-1-1").beginning_of_day # First user created 2013-1-11
   end
 
   def permitted_kinds
