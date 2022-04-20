@@ -15,6 +15,8 @@ class SuperuserAbility < ApplicationRecord
 
   enum kind: KIND_ENUM
 
+  scope :non_universal, -> { where.not(kind: "universal") }
+
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
   end

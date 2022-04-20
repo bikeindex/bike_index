@@ -68,5 +68,7 @@
               %small
                 = "super" if user.superuser?
                 = "developer" if user.developer?
+                - if user.superuser_abilities.non_universal.any?
+                  %span.text-info limited
             %td.table-cell-check
               = check_mark if user.confirmed

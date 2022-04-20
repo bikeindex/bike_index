@@ -1,5 +1,6 @@
 - render_sortable ||= false
 - skip_user ||= false
+- render_deleted ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -17,6 +18,9 @@
         = sortable "controller_name", render_sortable: render_sortable
       %th
         = sortable "action_name", render_sortable: render_sortable
+      - if render_deleted
+        %th
+          = sortable "deleted_at", render_sortable: render_sortable
     %tbody
       - superuser_abilities.each do |superuser_ability|
         %tr
@@ -46,3 +50,8 @@
             = superuser_ability.controller_name
           %td
             = superuser_ability.action_name
+          - if render_deleted
+            %td
+              - if superuser_ability.deleted_at.present?
+                %span.convertTime
+                  = l(superuser_ability.deleted_at, format: :convert_time)

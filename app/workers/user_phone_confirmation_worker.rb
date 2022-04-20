@@ -1,8 +1,10 @@
 class UserPhoneConfirmationWorker < ApplicationWorker
   sidekiq_options queue: "notify", retry: 1
+  UPDATE_TWILIO = ENV["UPDATE_TWILIO_ENABLED"] == "true"
 
   def perform(user_phone_id, skip_user_update = false)
     user_phone = UserPhone.find(user_phone_id)
+    return unless UPDATE_TWILIO
     notification = Notification.create(user: user_phone.user,
       kind: "phone_verification",
       message_channel: "text",
