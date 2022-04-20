@@ -2217,6 +2217,44 @@ ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organiza
 
 
 --
+-- Name: organization_stolen_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_stolen_messages (
+    id bigint NOT NULL,
+    organization_id bigint,
+    kind integer,
+    latitude double precision,
+    longitude double precision,
+    radius_miles double precision,
+    message text,
+    updator_id bigint,
+    enabled boolean DEFAULT false,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_stolen_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_stolen_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_stolen_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_stolen_messages_id_seq OWNED BY public.organization_stolen_messages.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2758,7 +2796,8 @@ CREATE TABLE public.stolen_records (
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying,
-    no_notify boolean DEFAULT false
+    no_notify boolean DEFAULT false,
+    organization_stolen_message_id bigint
 );
 
 
@@ -2779,6 +2818,41 @@ CREATE SEQUENCE public.stolen_records_id_seq
 --
 
 ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
+
+
+--
+-- Name: superuser_abilities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.superuser_abilities (
+    id bigint NOT NULL,
+    user_id bigint,
+    kind integer DEFAULT 0,
+    controller_name character varying,
+    action_name character varying,
+    deleted_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: superuser_abilities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.superuser_abilities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: superuser_abilities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.superuser_abilities_id_seq OWNED BY public.superuser_abilities.id;
 
 
 --
@@ -3608,6 +3682,13 @@ ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT n
 
 
 --
+-- Name: organization_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_stolen_messages ALTER COLUMN id SET DEFAULT nextval('public.organization_stolen_messages_id_seq'::regclass);
+
+
+--
 -- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3689,6 +3770,13 @@ ALTER TABLE ONLY public.stolen_notifications ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('public.stolen_records_id_seq'::regclass);
+
+
+--
+-- Name: superuser_abilities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.superuser_abilities ALTER COLUMN id SET DEFAULT nextval('public.superuser_abilities_id_seq'::regclass);
 
 
 --
@@ -4218,6 +4306,14 @@ ALTER TABLE ONLY public.organization_manufacturers
 
 
 --
+-- Name: organization_stolen_messages organization_stolen_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_stolen_messages
+    ADD CONSTRAINT organization_stolen_messages_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4311,6 +4407,14 @@ ALTER TABLE ONLY public.stolen_bike_listings
 
 ALTER TABLE ONLY public.stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: superuser_abilities superuser_abilities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.superuser_abilities
+    ADD CONSTRAINT superuser_abilities_pkey PRIMARY KEY (id);
 
 
 --
@@ -5185,6 +5289,20 @@ CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organ
 
 
 --
+-- Name: index_organization_stolen_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_stolen_messages_on_organization_id ON public.organization_stolen_messages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_stolen_messages_on_updator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_stolen_messages_on_updator_id ON public.organization_stolen_messages USING btree (updator_id);
+
+
+--
 -- Name: index_organizations_on_location_latitude_and_location_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5402,10 +5520,24 @@ CREATE INDEX index_stolen_records_on_latitude_and_longitude ON public.stolen_rec
 
 
 --
+-- Name: index_stolen_records_on_organization_stolen_message_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_records_on_organization_stolen_message_id ON public.stolen_records USING btree (organization_stolen_message_id);
+
+
+--
 -- Name: index_stolen_records_on_recovering_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records USING btree (recovering_user_id);
+
+
+--
+-- Name: index_superuser_abilities_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_superuser_abilities_on_user_id ON public.superuser_abilities USING btree (user_id);
 
 
 --
@@ -6176,6 +6308,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220201213958'),
 ('20220324004315'),
 ('20220405173312'),
-('20220411165641');
+('20220411165641'),
+('20220420145734');
 
 

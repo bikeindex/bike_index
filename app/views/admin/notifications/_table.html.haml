@@ -8,35 +8,20 @@
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
     %thead.small-header.hidden-md-down
       %th
-        - if render_sortable
-          = sortable "created_at"
-        - else
-          Created
+        = sortable "created_at", render_sortable: render_sortable
       %th.small
-        - if render_sortable
-          = sortable "updated_at"
-        - else
-          Updated
+        = sortable "updated_at", render_sortable: render_sortable
       %th
-        - if render_sortable
-          = sortable "kind"
-        - else
-          Kind
+        = sortable "kind", render_sortable: render_sortable
       - unless skip_channel
         %th.small Method
       - unless skip_user
         %th
-          - if render_sortable
-            = sortable "user_id"
-          - else
-            User
+          = sortable "user_id", render_sortable: render_sortable
       %th.small Delivered?
       - unless skip_bike
         %th
-          - if render_sortable
-            = sortable "bike_id"
-          - else
-            Bike
+          = sortable "bike_id", render_sortable: render_sortable
       %th Object
       - unless skip_sender
         %th Sender

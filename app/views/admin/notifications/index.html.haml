@@ -5,7 +5,7 @@
   .col-md-7
     %ul
       %li.nav-item.dropdown
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "") }
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "")}
           #{@kind.titleize} #{(special_kind_scopes + ["all"]).include?(@kind) ? "kinds" : ""}
         .dropdown-menu
           = link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == 'all' ? 'active' : '' }"
@@ -23,7 +23,7 @@
         = link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: { viewing: "Notifications" }
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Notifications"}
 
 
 -# Only render stacked kinds if rendering type counts
@@ -76,14 +76,8 @@
 
 = render partial: "/shared/period_select"
 
-.row.mb-4.mt-4
-  .col-sm-6.col-lg-4.mt-4
-    = admin_number_display(matching_notifications.count)
-    = "matching Notification".pluralize(matching_notifications.count)
-    %em
-      = humanized_time_range_column(@time_range_column)
-      = humanized_time_range(@time_range)
-  .col-lg-4
-    = paginate @notifications, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @notifications, count: matching_notifications.count, name: "Notifications", views_prefix: "admin"}
 
-= render partial: "/admin/notifications/table", locals: { notifications: @notifications, render_sortable: true }
+= render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true}
+
+= render partial: "/shared/pagination", locals: {collection: @notifications, count: matching_notifications.count, name: "Notifications", views_prefix: "admin", skip_total: true}
