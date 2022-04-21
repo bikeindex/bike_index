@@ -39,10 +39,10 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       expect(instance.send_survey?(stolen_record3)).to be_falsey # stolen record has theft_survey notification
       expect(instance.send_survey?(stolen_record_no_notify1)).to be_falsey # no notify
       expect(instance.send_survey?(stolen_record_no_notify2)).to be_falsey # no notify
-      expect(instance.send_survey?(recovered_record)).to be_truthy
+      expect(instance.no_survey?(recovered_record)).to be_falsey
       # It enqueues the bikes that we want - even though some won't be surveyed
-      enqueued_ids = ScheduledEmailSurveyWorker.jobs.map { |j| j["args"] }.last&.flatten || []
-      # expect(enqueued_ids).to match_array([stolen_record1.id, recovered_record.id])
+      enqueued_ids = ScheduledEmailSurveyWorker.jobs.map { |j| j["args"] }.flatten || []
+      expect(enqueued_ids).to match_array([stolen_record1.id, recovered_record.id])
     end
   end
   # it "sends a theft survey email" do
