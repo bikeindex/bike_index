@@ -93,6 +93,11 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.bike_possibly_found_email(contact)
   end
 
+  def theft_survey
+    notification = Notification.theft_survey.last
+    CustomerMailer.theft_survey(notification)
+  end
+
   private
 
   def preview_user

@@ -13,7 +13,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     return if !force_send && no_survey?(stolen_record)
     notification = Notification.create(kind: :theft_survey_4_2022, notifiable: stolen_record,
       user: stolen_record.user)
-    CustomerMailer.theft_survey_4_2022(notification).deliver_now
+    CustomerMailer.theft_survey(notification).deliver_now
     notification.update(delivery_status: "email_success", message_channel: "email")
   end
 
@@ -21,7 +21,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     return false unless stolen_record.present? && !stolen_record.no_notify? &&
       survey_period.cover?(stolen_record.date_stolen)
     user = stolen_record.user
-    user.present? && user.notifications.theft_surveys.none?
+    user.present? && user.notifications.theft_survey.none?
   end
 
   def no_survey?(stolen_record)
@@ -29,13 +29,18 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   end
 
   def enqueue_workers
+    potential_stolen_records.limit(SURVEY_COUNT).find_each do |stolen_record|
+      next if no_survey?(stolen_record)
+      ScheduledEmailSurveyWorker.perform_async(stolen_record.id)
+    end
+  end
+
+  # Split out to make it easier to individually send messages
+  def potential_stolen_records
     StolenRecord.unscoped.where(no_notify: false, date_stolen: survey_period)
       .left_joins(:theft_surveys).where(notifications: {notifiable_id: nil})
-      .order(:updated_at).limit(SURVEY_COUNT)
-      .find_each do |stolen_record|
-        next if no_survey?(stolen_record)
-        ScheduledEmailSurveyWorker.perform_async(stolen_record.id)
-      end
+      .where(country_id: [nil, Country.united_states.id, Country.canada.id])
+      .order(:updated_at)
   end
 
   def survey_period

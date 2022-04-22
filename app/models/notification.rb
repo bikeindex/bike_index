@@ -53,7 +53,7 @@ class Notification < ApplicationRecord
   scope :theft_alert, -> { where(kind: theft_alert_kinds) }
   scope :impound_claim, -> { where(kind: impound_claim_kinds) }
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
-  scope :theft_surveys, -> { where(kind: "theft_survey_4_2022") }
+  scope :theft_survey, -> { where(kind: "theft_survey_4_2022") }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)

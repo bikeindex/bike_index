@@ -30,7 +30,6 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       # Notifications
       notification = Notification.create(kind: "theft_survey_4_2022", user: user2, notifiable: stolen_record3)
       expect(notification).to be_valid
-      #
       notification2 = Notification.create(kind: "stolen_notification_sent", user: user1, notifiable: stolen_record1)
       expect(notification2).to be_valid
       Sidekiq::Worker.clear_all
@@ -48,7 +47,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
   end
 
   describe "perform" do
-    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_4_2022", subject: "Survey!", body: "XXXvvvvCCC", is_enabled: true) }
+    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_4_2022", subject: "Survey!", body: "Dear Bike Index Registrant, XXXvvvvCCC", is_enabled: true) }
     it "sends a theft survey email" do
       expect(mail_snippet).to be_valid
       ActionMailer::Base.deliveries = []
@@ -67,7 +66,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       expect(mail.from).to eq(["gavin@bikeindex.org"])
       expect(mail.to).to eq([user1.email])
       expect(mail.tag).to eq "theft_survey_4_2022"
-      expect(mail.body.encoded).to match(/XXXvvvvCCC/i)
+      expect(mail.body.encoded).to match "Dear #{user1.name}, XXXvvvvCCC"
       expect(mail.body.encoded).to_not match "supported by"
     end
   end
