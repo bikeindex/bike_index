@@ -55,6 +55,14 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def theft_survey(notification)
+    mail_snippet = MailSnippet.theft_survey_4_2022.first
+    mail_body = mail_snippet.body.gsub(/Bike Index Registrant/i, notification.user.name)
+
+    mail(to: notification.user.email, from: "gavin@bikeindex.org",
+      subject: mail_snippet.subject, body: mail_body, tag: notification.kind)
+  end
+
   def stolen_bike_alert_email(customer_contact)
     @customer_contact = customer_contact
     @info = customer_contact.info_hash

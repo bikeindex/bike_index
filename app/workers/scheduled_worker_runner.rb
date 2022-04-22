@@ -55,6 +55,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       CleanBulkImportWorker,
       ImpoundExpirationWorker,
       CleanBParamsWorker,
+      ScheduledEmailSurveyWorker,
       self
     ]
   end

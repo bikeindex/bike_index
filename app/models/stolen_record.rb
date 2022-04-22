@@ -37,6 +37,8 @@ class StolenRecord < ApplicationRecord
   has_many :impound_claims
   has_many :tweets
   has_many :theft_alerts
+  has_many :notifications, as: :notifiable
+  has_many :theft_surveys, -> { theft_survey }, as: :notifiable, class_name: "Notification"
   has_one :alert_image
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
