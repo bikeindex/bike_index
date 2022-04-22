@@ -1,7 +1,7 @@
 class ScheduledEmailSurveyWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
-  sidekiq_options retry: 1
-  SURVEY_COUNT = (ENV["THEFT_SURVEY"] || 200).to_i
+  sidekiq_options retry: 2
+  SURVEY_COUNT = (ENV["THEFT_SURVEY_COUNT"] || 200).to_i
 
   def self.frequency
     24.hours
@@ -11,8 +11,10 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     return enqueue_workers if stolen_record_id.blank?
     stolen_record = StolenRecord.unscoped.find(stolen_record_id)
     return if !force_send && no_survey?(stolen_record)
-    # In case something got enqueued in between
-    pp "sending!!!"
+    notification = Notification.create(kind: :theft_survey_4_2022, notifiable: stolen_record,
+      user: stolen_record.user)
+    CustomerMailer.theft_survey_4_2022(notification).deliver_now
+    notification.update(delivery_status: "email_success", message_channel: "email")
   end
 
   def send_survey?(stolen_record = nil)

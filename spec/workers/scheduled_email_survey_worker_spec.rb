@@ -5,11 +5,12 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
+  let(:at) { Time.current - 5.weeks }
+  let!(:stolen_record1) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, date_stolen: at).current_stolen_record }
+  let(:user1) { stolen_record1.user }
+
   describe "enqueue workers" do
-    let(:at) { Time.current - 5.weeks }
     let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, date_stolen: at) }
-    let!(:stolen_record1) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, date_stolen: at).current_stolen_record }
-    let(:user1) { stolen_record1.user }
     let!(:stolen_record2) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, date_stolen: at).current_stolen_record }
     let(:user2) { stolen_record2.user }
     let!(:stolen_record3) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, date_stolen: at, user: user2).current_stolen_record }
@@ -45,9 +46,29 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       expect(enqueued_ids).to match_array([stolen_record1.id, recovered_record.id])
     end
   end
-  # it "sends a theft survey email" do
-  #   ActionMailer::Base.deliveries = []
-  #   EmailConfirmationWorker.new.perform(user.id)
-  #   expect(ActionMailer::Base.deliveries.empty?).to be_falsey
-  # end
+
+  describe "perform" do
+    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_4_2022", subject: "Survey!", body: "XXXvvvvCCC", is_enabled: true) }
+    it "sends a theft survey email" do
+      expect(mail_snippet).to be_valid
+      ActionMailer::Base.deliveries = []
+      expect(Notification.count).to eq 0
+      ScheduledEmailSurveyWorker.new.perform(stolen_record1.id)
+      expect(Notification.count).to eq 1
+      notification = Notification.last
+      expect(notification.kind).to eq "theft_survey_4_2022"
+      expect(notification.user).to eq user1
+      expect(notification.notifiable).to eq stolen_record1
+      expect(notification.delivered?).to be_truthy
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.subject).to eq("Survey!")
+      expect(mail.from).to eq(["gavin@bikeindex.org"])
+      expect(mail.to).to eq([user1.email])
+      expect(mail.tag).to eq "theft_survey_4_2022"
+      expect(mail.body.encoded).to match(/XXXvvvvCCC/i)
+      expect(mail.body.encoded).to_not match "supported by"
+    end
+  end
 end
