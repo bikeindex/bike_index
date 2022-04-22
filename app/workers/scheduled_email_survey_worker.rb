@@ -40,7 +40,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     StolenRecord.unscoped.where(no_notify: false, date_stolen: survey_period)
       .left_joins(:theft_surveys).where(notifications: {notifiable_id: nil})
       .where(country_id: [nil, Country.united_states.id, Country.canada.id])
-      .order(:updated_at)
+      .reorder(Arel.sql("random()"))
   end
 
   def survey_period
