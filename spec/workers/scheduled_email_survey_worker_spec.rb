@@ -52,7 +52,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       expect(mail_snippet).to be_valid
       ActionMailer::Base.deliveries = []
       expect(Notification.count).to eq 0
-      ScheduledEmailSurveyWorker.new.perform(stolen_record1.id)
+      instance.perform(stolen_record1.id)
       expect(Notification.count).to eq 1
       notification = Notification.last
       expect(notification.kind).to eq "theft_survey_4_2022"
@@ -68,6 +68,14 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       expect(mail.tag).to eq "theft_survey_4_2022"
       expect(mail.body.encoded).to match "Dear #{user1.name}, XXXvvvvCCC"
       expect(mail.body.encoded).to_not match "supported by"
+      # Doing it again doesn't send it
+      instance.perform(stolen_record1.id)
+      expect(Notification.count).to eq 1
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      # But - with force_send, it sends!
+      instance.perform(stolen_record1.id, true)
+      expect(Notification.count).to eq 2
+      expect(ActionMailer::Base.deliveries.count).to eq 2
     end
   end
 end

@@ -8,7 +8,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   end
 
   def perform(stolen_record_id = nil, force_send = false)
-    return enqueue_workers if stolen_record_id.blank?
+    return enqueue_workers(SURVEY_COUNT) if stolen_record_id.blank?
     stolen_record = StolenRecord.unscoped.find(stolen_record_id)
     return if !force_send && no_survey?(stolen_record)
     notification = Notification.create(kind: :theft_survey_4_2022, notifiable: stolen_record,
@@ -28,8 +28,8 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     !send_survey?(stolen_record)
   end
 
-  def enqueue_workers
-    potential_stolen_records.limit(SURVEY_COUNT).find_each do |stolen_record|
+  def enqueue_workers(enqueue_limit)
+    potential_stolen_records.limit(enqueue_limit).find_each do |stolen_record|
       next if no_survey?(stolen_record)
       ScheduledEmailSurveyWorker.perform_async(stolen_record.id)
     end
