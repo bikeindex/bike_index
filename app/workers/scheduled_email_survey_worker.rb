@@ -44,6 +44,6 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   end
 
   def survey_period
-    (Time.current - 8.weeks)..(Time.current - 4.weeks)
+    (Time.current - 1.year)..(Time.current - 4.weeks)
   end
 end
