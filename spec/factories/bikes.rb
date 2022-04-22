@@ -116,14 +116,6 @@ FactoryBot.define do
 
     factory :stolen_bike, traits: [:with_stolen_record]
 
-    # factory :recovered_bike do
-    #   stolen_trait
-    #   after(:create) do |bike, evaluator|
-    #     create(:stolen_record_recovered, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
-    #     bike.reload
-    #   end
-    # end
-
     # These factories are separate from the stolen bike factory because we only want to call after create once
     factory :stolen_bike_in_amsterdam, traits: [:stolen_trait] do
       after(:create) do |bike|
