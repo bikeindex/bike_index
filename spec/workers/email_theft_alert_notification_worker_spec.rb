@@ -46,7 +46,7 @@ RSpec.describe EmailTheftAlertNotificationWorker, type: :job do
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq "Your promoted alert advertisement is live!"
         expect(mail.from.count).to eq(1)
-        expect(mail.from.first).to eq("seth@bikeindex.org")
+        expect(mail.from.first).to eq("gavin@bikeindex.org")
         # Not currently including a link to the ad, because it wasn't working
         # expect(mail.body.encoded).to match(facebook_data[:effective_object_story_id])
 
