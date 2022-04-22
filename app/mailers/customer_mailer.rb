@@ -96,7 +96,7 @@ class CustomerMailer < ApplicationMailer
     end
     mail(to: @notification.user.email,
       subject: title,
-      from: "seth@bikeindex.org",
+      from: "gavin@bikeindex.org",
       tag: __callee__)
   end
 
