@@ -103,6 +103,8 @@
           %td
             - if bike.present?
               = bike.title_string
+              - if bike.thumb_path.present?
+                %small 📷
             - else
               %span.text-warning no bike
 
