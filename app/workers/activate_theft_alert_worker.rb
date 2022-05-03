@@ -1,4 +1,6 @@
 class ActivateTheftAlertWorker < ApplicationWorker
+  sidekiq_options retry: 4 # It will retry because of UpdateTheftAlertFacebookWorker
+
   def perform(theft_alert_id, force_activate = false)
     theft_alert = TheftAlert.find(theft_alert_id)
     return false unless theft_alert.pending?
