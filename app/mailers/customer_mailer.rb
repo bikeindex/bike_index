@@ -60,7 +60,8 @@ class CustomerMailer < ApplicationMailer
     mail_body = mail_snippet.body.gsub(/Bike Index Registrant/i, notification.user.name)
 
     mail(to: notification.user.email, from: "gavin@bikeindex.org",
-      subject: mail_snippet.subject, body: mail_body, tag: notification.kind)
+      subject: mail_snippet.subject, body: mail_body, tag: notification.kind,
+      message_stream: "survey-stream")
   end
 
   def stolen_bike_alert_email(customer_contact)
