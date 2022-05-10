@@ -16,7 +16,7 @@ RUN apt-get update -yq \
     && ln -s $HOME/.yarn/bin/yarn /usr/local/bin/yarn \
 
     # PostgreSQL Client
-    && apt-get install postgresql-client-11 -yq
+    && apt-get install postgresql-11 postgresql-client-11 -yq
 
 COPY ./Gemfile /src/Gemfile
 COPY ./Gemfile.lock /src/Gemfile.lock
