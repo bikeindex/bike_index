@@ -217,6 +217,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.tag).to eq "theft_survey_4_2022"
       expect(mail.body.encoded).to match "Dear #{user.name}, XXXvvvvCCC"
       expect(mail.body.encoded).to_not match "supported by"
+      expect(mail.message_stream).to eq "outbound"
     end
   end
 end
