@@ -60,7 +60,7 @@ class CustomerMailer < ApplicationMailer
     mail_body = mail_snippet.body.gsub(/Bike Index Registrant/i, notification.user.name)
 
     mail(to: notification.user.email, from: "gavin@bikeindex.org",
-      subject: mail_snippet.subject, body: mail_body, tag: notification.kind,
+      subject: mail_snippet.subject, body: mail_body + "\n\n\n\n", tag: notification.kind,
       message_stream: "survey-stream")
   end
 
