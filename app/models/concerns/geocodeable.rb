@@ -152,7 +152,7 @@ module Geocodeable
   # Override assignment to enable friendly finding state and country
   def state=(val)
     if val.is_a?(String)
-      self.state = State.fuzzy_find(val)
+      self.state = State.friendly_find(val)
     else
       super
     end
@@ -164,7 +164,7 @@ module Geocodeable
 
   def country=(val)
     if val.is_a?(String)
-      self.country = Country.fuzzy_find(val)
+      self.country = Country.friendly_find(val)
     else
       super
     end

@@ -25,9 +25,9 @@ class TwitterAccount < ApplicationRecord
     if (geo = results.first)
       account.city = geo.city
       account.neighborhood = geo.neighborhood
-      country = Country.fuzzy_find(geo.country)
+      country = Country.friendly_find(geo.country)
       account.country = country
-      account.state = State.fuzzy_find(geo.state_code) if country&.united_states?
+      account.state = State.friendly_find(geo.state_code) if country&.united_states?
     end
   end
 
@@ -47,7 +47,7 @@ class TwitterAccount < ApplicationRecord
   end
 
   def self.default_account_for_country(country_name)
-    country = Country.fuzzy_find(country_name)
+    country = Country.friendly_find(country_name)
     national.where(country: country).first || default_account
   end
 

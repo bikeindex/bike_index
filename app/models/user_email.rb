@@ -28,18 +28,18 @@ class UserEmail < ActiveRecord::Base
     end
   end
 
-  def self.fuzzy_find(str)
+  def self.friendly_find(str)
     return nil if str.blank?
     find_by_email(EmailNormalizer.normalize(str))
   end
 
   def self.fuzzy_user_id_find(str)
-    ue = fuzzy_find(str)
+    ue = friendly_find(str)
     ue&.user_id
   end
 
   def self.fuzzy_user_find(str)
-    ue = fuzzy_find(str)
+    ue = friendly_find(str)
     ue&.user
   end
 
