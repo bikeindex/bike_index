@@ -1585,6 +1585,9 @@ RSpec.describe Bike, type: :model do
             stolen_record.attributes = {street: "", city: "", zipcode: ""}
             expect(stolen_record.should_be_geocoded?).to be_truthy
             stolen_record.save
+            expect(stolen_record.street).to be_nil
+            expect(stolen_record.city).to be_nil
+            expect(stolen_record.zipcode).to be_nil
           end
           stolen_record.reload
           bike.reload

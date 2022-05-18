@@ -125,6 +125,7 @@ module Geocodeable
   # Separate from bike_index_geocode because some models handle geocoding independently
   def clean_state_and_street_data
     self.street = nil if street.blank?
+    self.city = nil if city.blank?
     self.zipcode = nil if zipcode.blank?
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
