@@ -7,7 +7,7 @@ class MigratePostalCodeWorker < ApplicationWorker
     new_zipcode = Geocodeable.format_postal_code(code, country_id)
 
     Bike.unscoped.where(country_id: [country_id, nil])
-      .where(zipcode: code)
+      .where(zipcode: [code, new_zipcode])
       .update_all(zipcode: new_zipcode, country_id: country_id)
   end
 end
