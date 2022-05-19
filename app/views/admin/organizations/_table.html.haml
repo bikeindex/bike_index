@@ -37,7 +37,7 @@
               - if organization.parent_organization.present?
                 .small.mt-1
                   %em.less-strong.text-warning parent:
-                  = link_to(organization.parent_organization.short_name, admin_organization_url(organization), class: "less-strong")
+                  = link_to(organization.parent_organization.short_name, admin_organization_url(organization.parent_organization), class: "less-strong")
             %td.table-cell-check
               = check_mark if organization.approved
             %td
