@@ -1009,7 +1009,7 @@ RSpec.describe BikesController, type: :controller do
                 phone: "9999999999",
                 street: "2222 Cambridge St.,",
                 country_id: canada.id,
-                city: "Vancouver\n ",
+                city: "Vancouver\n, ",
                 zipcode: "v5l1E6",
                 state_id: state.id,
                 locking_description: "I locked it up!",

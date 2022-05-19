@@ -75,7 +75,7 @@ module Geocodeable
     ].reject(&:blank?).join(", ")
   end
 
-  # For testing, look it up, otherwise use the standard
+  # For testing, look it up, otherwise use static
   def self.canada_id
     Rails.env.test? ? Country.canada.id : 38
   end
