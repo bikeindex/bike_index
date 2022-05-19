@@ -83,7 +83,8 @@ module Geocodeable
   def self.format_postal_code(str, country_id = nil)
     str = str.strip.upcase.gsub(/\s*,\z/, "")
     return str unless country_id == canada_id && str.gsub(/\s+/, "").length == 6
-    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")  end
+    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+  end
 
   def address(**kwargs)
     Geocodeable.address(self, **kwargs)
