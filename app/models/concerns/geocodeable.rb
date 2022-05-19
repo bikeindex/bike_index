@@ -124,9 +124,9 @@ module Geocodeable
 
   # Separate from bike_index_geocode because some models handle geocoding independently
   def clean_state_and_street_data
-    self.street = street.blank? ? nil : street.strip
-    self.city = city.blank? ? nil : city.strip
-    self.zipcode = zipcode.blank? ? nil : zipcode.strip.upcase.gsub(/\s*,\z/, "")
+    self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
+    self.city = city.blank? ? nil : city.strip.gsub(/\s*,\z/, "")
+    self.zipcode = zipcode.blank? ? nil : format_postal_code(zipcode)
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
@@ -178,5 +178,11 @@ module Geocodeable
 
   def metric_units?
     country.blank? || !country.united_states?
+  end
+
+  def format_postal_code(code)
+    str = code.strip.upcase.gsub(/\s*,\z/, "")
+    return str unless country&.iso == "CA" && str.gsub(/\s+/, "").length == 6
+    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
   end
 end
