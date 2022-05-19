@@ -1,9 +1,9 @@
 !!!
 %html
   %head
-    %meta{ content: 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type' }
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type" }
     %title= content_for?(:title) ? yield(:title) : t(".bike_index")
-    = stylesheet_link_tag 'email'
+    = stylesheet_link_tag "email"
 
     -# Remove the top and bottom margin on email preview, because they look funky
     - if @email_preview
@@ -15,7 +15,7 @@
     .binx-wrapper
       %table.binx-header
         %tbody
-          %td{ class: (@partner.present? ? "partner-header" : "") }
+          %td{class: (@partner.present? ? "partner-header" : "")}
             - if @partner
               %span.partner-logo-wrapper
                 = image_tag "https://files.bikeindex.org/email_assets/bikehub_logo_plus.png",
@@ -23,18 +23,18 @@
                   alt: "BikeHub Logo",
                   class: "partner-header-logo"
 
-            %img.bike-index-logo{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
+            %img.bike-index-logo{src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo"}
 
       .binx-body
         -# We only render snippets for organized messages - or if we're doing a preview
-        - render_organization_snippets = @organization.present? && (controller_path == 'organized_mailer' || @email_preview)
-        - if render_organization_snippets && @organization.mail_snippet_body('header').present?
-          = @organization.mail_snippet_body('header').html_safe
+        - render_organization_snippets = @organization.present? && (controller_path == "organized_mailer" || @email_preview)
+        - if render_organization_snippets && @organization.mail_snippet_body("header").present?
+          = @organization.mail_snippet_body("header").html_safe
 
         = yield
 
-        - if render_organization_snippets && @organization.mail_snippet_body('footer').present?
-          = @organization.mail_snippet_body('footer').html_safe
+        - if render_organization_snippets && @organization.mail_snippet_body("footer").present?
+          = @organization.mail_snippet_body("footer").html_safe
 
       .binx-pstscpt
         .hearts
@@ -49,6 +49,11 @@
         %h5
           #{Time.current.year} &copy; #{t(".bike_index")}.
 
-          - unless @organization.present? && controller_path == 'organized_mailer' && @organization.paid?
+          - if render_donation?(@organization)
             = t(".help_prevent_theft")
             = link_to(t(".make_a_donation"), support_the_index_url)
+
+        - if render_supporters?(@organization)
+          %p
+            Bike Index is also supported by #{link_to "MaxTracker", "https://www.indiegogo.com/projects/maxtracker-anti-theft-gps-bicycle-security-system--2#/"}, #{link_to "Ottalaus", "https://ottalausinc.ca/"} and #{link_to "The Pro's Closet", "https://www.theproscloset.com/"}.
+

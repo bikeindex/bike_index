@@ -342,7 +342,10 @@ module ControllerHelpers
   end
 
   def require_index_admin!
-    return true if current_user.present? && current_user.superuser?
+    if current_user.present?
+      return true if current_user.superuser?
+      return true if current_user.superuser_abilities.can_access?(controller_name: controller_name, action_name: action_name)
+    end
     flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(user_root_url) && return
   end

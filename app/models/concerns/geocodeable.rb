@@ -75,6 +75,16 @@ module Geocodeable
     ].reject(&:blank?).join(", ")
   end
 
+  # For testing, look it up, otherwise use static
+  def self.canada_id
+    Rails.env.test? ? Country.canada.id : 38
+  end
+
+  def self.format_postal_code(str, country_id = nil)
+    str = str.strip.upcase.gsub(/\s*,\z/, "")
+    return str unless country_id == canada_id && str.gsub(/\s+/, "").length == 6
+    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")  end
+
   def address(**kwargs)
     Geocodeable.address(self, **kwargs)
   end
@@ -124,7 +134,9 @@ module Geocodeable
 
   # Separate from bike_index_geocode because some models handle geocoding independently
   def clean_state_and_street_data
-    self.street = nil if street.blank?
+    self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
+    self.city = city.blank? ? nil : city.strip.gsub(/\s*,\z/, "")
+    self.zipcode = zipcode.blank? ? nil : Geocodeable.format_postal_code(zipcode, country_id)
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
@@ -152,7 +164,7 @@ module Geocodeable
   # Override assignment to enable friendly finding state and country
   def state=(val)
     if val.is_a?(String)
-      self.state = State.fuzzy_find(val)
+      self.state = State.friendly_find(val)
     else
       super
     end
@@ -164,7 +176,7 @@ module Geocodeable
 
   def country=(val)
     if val.is_a?(String)
-      self.country = Country.fuzzy_find(val)
+      self.country = Country.friendly_find(val)
     else
       super
     end

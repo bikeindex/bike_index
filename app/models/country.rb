@@ -11,7 +11,7 @@ class Country < ApplicationRecord
     end
   end
 
-  def self.fuzzy_find(name_or_iso)
+  def self.friendly_find(name_or_iso)
     name_or_iso = name_or_iso.to_s.strip.downcase
     return if name_or_iso.blank?
     return united_states if name_or_iso.in? %w[us usa]

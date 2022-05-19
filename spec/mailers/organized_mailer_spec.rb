@@ -14,6 +14,25 @@ RSpec.describe OrganizedMailer, type: :mailer do
       organization: organization,
       body: "<p>#{variable_snippet_kind}-snippet</p>")
   end
+
+  def expect_render_donation(should_render, mail)
+    snippet_to_match = "make a donation"
+    if should_render
+      expect(mail.body.encoded).to match snippet_to_match
+    else
+      expect(mail.body.encoded).to_not match snippet_to_match
+    end
+  end
+
+  def expect_render_supporters(should_render, mail)
+    snippet_to_match = "supported by"
+    if should_render
+      expect(mail.body.encoded).to match snippet_to_match
+    else
+      expect(mail.body.encoded).to_not match snippet_to_match
+    end
+  end
+
   describe "partial_registration" do
     context "without organization" do
       let(:b_param) { FactoryBot.create(:b_param_stolen) }
@@ -24,6 +43,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.to).to eq([b_param.owner_email])
         expect(mail.reply_to).to eq(["contact@bikeindex.org"])
         expect(mail.tag).to eq "partial_registration"
+        expect_render_donation(true, mail)
+        expect_render_supporters(true, mail)
       end
     end
     context "with organization" do
@@ -33,25 +54,29 @@ RSpec.describe OrganizedMailer, type: :mailer do
         it "renders, with reply to for the organization" do
           expect(b_param.owner_email).to be_present
           expect(header_mail_snippet).to be_present
-          organization.reload
+          expect(organization.reload.paid_money?).to be_falsey
           mail = OrganizedMailer.partial_registration(b_param)
           expect(mail.subject).to eq("Finish your #{organization.short_name} Bike Index registration!")
           expect(mail.to).to eq([b_param.owner_email])
           expect(mail.reply_to).to eq([organization.auto_user.email])
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.tag).to eq "partial_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
         end
-        context "with partial snippet" do
+        context "with partial snippet and paid invoice" do
           let!(:partial_mail_snippet) do
             FactoryBot.create(:organization_mail_snippet,
               kind: "partial_registration",
               organization: organization,
               body: "<p>PARTIALYXSNIPPET</p>")
           end
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user) }
+          let!(:invoice2) { FactoryBot.create(:invoice_with_payment, organization: organization) }
           it "includes mail snippet" do
             expect(b_param.owner_email).to be_present
             expect(header_mail_snippet).to be_present
-            organization.reload
+            expect(organization.reload.paid_money?).to be_truthy
             mail = OrganizedMailer.partial_registration(b_param)
             expect(mail.subject).to eq("Finish your #{organization.short_name} Bike Index registration!")
             expect(mail.to).to eq([b_param.owner_email])
@@ -59,6 +84,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
             expect(mail.body.encoded).to match header_mail_snippet.body
             expect(mail.body.encoded).to match partial_mail_snippet.body
             expect(mail.tag).to eq "partial_registration"
+            expect_render_donation(false, mail)
+            expect_render_supporters(false, mail)
           end
         end
       end
@@ -72,6 +99,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
       it "renders email" do
         expect(mail.subject).to match "Confirm your Bike Index registration"
         expect(mail.tag).to eq "finished_registration"
+        expect_render_donation(true, mail)
+        expect_render_supporters(true, mail)
       end
     end
     context "existing bike and ownership passed" do
@@ -85,6 +114,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.subject).to eq("Confirm your Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
         end
       end
       context "claimed registration (e.g. self_made)" do
@@ -96,26 +127,100 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.subject).to eq("Bike Index registration successful")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
         end
       end
       context "pos registration" do
-        let(:bike) { FactoryBot.create(:bike_lightspeed_pos) }
+        let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
+        let(:bike) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: organization) }
         let(:ownership) { bike.current_ownership }
         it "renders email" do
           expect(bike.reload.current_ownership.new_registration?).to be_truthy
+          expect(bike.current_ownership.organization_pre_registration?).to be_falsey
+          expect(bike.creation_organization.kind).to eq "bike_shop"
           expect(bike.pos?).to be_truthy
           expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.tag).to eq "finished_registration_pos"
+          expect_render_donation(true, mail)
+          expect_render_supporters(false, mail)
           # But for a transferred registration, it does different
           ownership2 = FactoryBot.create(:ownership, bike: bike)
-          expect(bike.reload.current_ownership.new_registration?).to be_falsey
+          expect(bike.reload.current_ownership.id).to eq ownership2.id
           expect(bike.pos?).to be_falsey
-          expect(ownership2.organization_pre_registration).to be_falsey
+          expect(ownership2.reload.new_registration?).to be_falsey
+          expect(ownership2.organization_pre_registration?).to be_falsey
+          expect(ownership2.organization_id).to be_blank
           mail2 = OrganizedMailer.finished_registration(ownership2)
           expect(mail2.subject).to eq("Confirm your Bike Index registration")
           expect(mail2.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail2.tag).to eq "finished_registration"
+          expect_render_donation(true, mail2)
+          expect_render_supporters(true, mail2)
+        end
+      end
+      context "organization_pre_registration" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop", user: user) }
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: user.email, creator: user) }
+        let(:ownership) { bike.ownerships.first }
+        it "renders email" do
+          expect(bike.reload.creation_organization.kind).to eq "bike_shop"
+          expect(bike.pos?).to be_falsey
+          expect(ownership.reload.new_registration?).to be_truthy
+          expect(ownership.organization_pre_registration?).to be_truthy
+          expect(ownership.send_email).to be_truthy
+          expect(mail.subject).to eq("#{bike.creation_organization.name} Bike Index registration successful")
+          expect(mail.reply_to).to eq([user.email])
+          expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(false, mail)
+          # Transferred registration
+          BikeUpdator.new(user: user, bike: bike, b_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
+          AfterBikeSaveWorker.new.perform(bike.id, true, true)
+          ownership2 = bike.reload.current_ownership
+          expect(ownership2.id).to_not eq ownership.id
+          expect(ownership.reload.current).to be_falsey
+          expect(bike.pos?).to be_falsey
+          expect(bike.owner_email).to eq "new@bikes.com"
+          expect(ownership2.reload.new_registration?).to be_truthy
+          expect(ownership2.owner_email).to eq "new@bikes.com"
+          expect(ownership2.organization_pre_registration?).to be_falsey
+          expect(ownership2.organization_id).to eq organization.id
+
+          mail2 = OrganizedMailer.finished_registration(ownership2)
+          expect(mail2.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
+          expect(mail2.reply_to).to eq([user.email])
+          expect(mail2.tag).to eq "finished_registration"
+          # Doesn't render supporters
+          expect_render_donation(true, mail2)
+          expect_render_supporters(false, mail2)
+        end
+      end
+      context "Organization registration" do
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_advocacy") }
+        let(:ownership) { bike.current_ownership }
+        it "renders email" do
+          expect(bike.reload.current_ownership.organization&.id).to eq organization.id
+          expect(bike.pos?).to be_falsey
+          expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
+          expect(mail.reply_to).to eq([organization.auto_user&.email])
+          expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
+        end
+        context "Bike shop" do
+          let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
+          it "renders without supporters" do
+            expect(bike.reload.current_ownership.organization&.id).to eq organization.id
+            expect(mail.subject).to eq("Confirm your #{bike.creation_organization.name} Bike Index registration")
+            expect(mail.reply_to).to eq([organization.auto_user&.email])
+            expect(mail.tag).to eq "finished_registration"
+            expect_render_donation(true, mail)
+            expect_render_supporters(false, mail)
+          end
         end
       end
       context "stolen" do
@@ -126,6 +231,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.reply_to).to eq(["contact@bikeindex.org"])
           expect(mail.body.encoded).to match bike.current_stolen_record.find_or_create_recovery_link_token
           expect(mail.tag).to eq "finished_registration"
+          expect_render_donation(true, mail)
+          expect_render_supporters(true, mail)
         end
       end
     end

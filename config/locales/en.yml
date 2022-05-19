@@ -1535,31 +1535,32 @@ en:
       click_to_see_promoted_alert_blog_post_html: >-
         Click %{link} to read about how Bike Index's Promoted Theft Alerts helped
         recover a stolen bike in less than one day.
-      department_city: Department & city
-      description_of_the_incident: Description of the incident
       do_these_things_for_the_best_chance: Do these things for the best chance of
         recovery!
-      do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
-      eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
-        for its serial number
       here: here
-      if_this_bike_type_was_added: >-
-        If this %{bike_type} was added to the Index by a bike shop, that counts as
-        proof of ownership
-      police_report: 'Police report #'
       promoted_theft_alert_service_description: >-
         Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
         in the cycling community in the neighborhood where your bike was last seen.
       promoted_theft_alerts: Promoted Theft Alerts
+      try_one_now: Try one now!
+      we_can_create_fb_ads_for_you: >-
+        Did you know we can create targeted Facebook ads to spread the word about
+        your stolen bike for you?
+    theft_details_partial:
+      department_city: Department & city
+      description_of_the_incident: Description of the incident
+      do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
+      eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
+        for its serial number
+      if_this_bike_type_was_added: >-
+        If this %{bike_type} was added to the Index by a bike shop, that counts as
+        proof of ownership
+      police_report: 'Police report #'
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
       show_phone_police: Show to verified law enforcement partners
       show_phone_shops: Show to bike shop users
       show_phone_users: Show phone to logged in users
-      try_one_now: Try one now!
-      we_can_create_fb_ads_for_you: >-
-        Did you know we can create targeted Facebook ads to spread the word about
-        your stolen bike for you?
       when_was_it_stolen_at: When was it stolen
       without_a_valid_report_number_html: >-
         Without a valid report number, your bike won't be included in partner searches
@@ -3272,7 +3273,7 @@ en:
         time by following the instructions on our website in your organization’s Vendor
         Account profile. We may terminate this Agreement and close your Bike Index
         Vendor Account at any time for any reason effective upon providing you notice
-        in accordance with Section A10(references to our relationships) above. We
+        in accordance with Section A10 (references to our relationships) above. We
         may suspend your Bike Index account and your access to the Service, or terminate
         this Agreement, if (i) we determine in our sole discretion that you are ineligible
         for the Service for reasons, including without limitation customer complaints
@@ -3345,7 +3346,7 @@ en:
         publicly-accessible bike registration service (the "Service") that gives
         organizations registered on Bike Index ("Vendors", "you") the ability to quickly
         and easily register bikes for their "Customers" - patrons of their services -
-        using Vendor "Accounts." We believe that such a service that the Service deters
+        using Vendor "Accounts." We believe that such a service deters
         bike theft and helps Customers recover stolen bikes.
       with_the_following_brief_descriptions: >-
         With the following brief descriptions of the parts of this "Agreement", we

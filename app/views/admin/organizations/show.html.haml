@@ -187,7 +187,7 @@
           = pluralize(@organization.parent_organization.invoices.count, "invoice")
         %small.less-strong
           which may add features to this organization
-    = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
+    = render partial: "/admin/organizations/invoices/table", locals: {invoices: @organization.invoices.order(id: :desc).limit(3), skip_discount_due: true}
   .col-md-6
     %table.table-list
       %tbody

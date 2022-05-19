@@ -108,16 +108,17 @@ module Organized
       permitted_kinds += ["ascend"] if current_organization.ascend_pos?
       permitted_kinds += ["organization_import"] if current_organization.enabled?("show_bulk_import")
       permitted_kinds += ["impounded"] if current_organization.enabled?("impound_bikes")
+      permitted_kinds += ["stolen"] if current_organization.enabled?("show_bulk_import_stolen")
       # Only show both types to superusers if the organization doesn't have any
       # to more closely resemble the organization interface
       if permitted_kinds.empty? && current_user.superuser?
-        permitted_kinds = %w[organization_import impounded]
+        permitted_kinds = %w[organization_import impounded stolen]
       end
       @permitted_kinds = permitted_kinds
     end
 
     def permitted_parameters
-      if params[:file].present?
+      pparams = if params[:file].present?
         {file: params[:file]}
       else
         permitted_p = params.require(:bulk_import).permit(:file, :kind)
@@ -127,6 +128,7 @@ module Organized
           permitted_p.except(:kind) # Remove kind, so it can be calculated independently
         end
       end.merge(creator_attributes)
+      pparams[:kind] == "stolen" ? pparams.merge(stolen_attributes) : pparams
     end
 
     def creator_attributes
@@ -135,6 +137,11 @@ module Organized
       else
         {user_id: (@current_user || current_user).id, organization_id: current_organization&.id}
       end
+    end
+
+    def stolen_attributes
+      {data: {stolen_record:
+        params.require(:stolen_record).permit(*StolenRecordUpdator.old_attr_accessible)}}
     end
   end
 end

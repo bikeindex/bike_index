@@ -316,6 +316,8 @@ RSpec.describe User, type: :model do
       expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
     end
     it "adds user phone, if blank" do
+      UserPhoneConfirmationWorker.new # Instantiate for stubbing
+      stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
       user.reload
       user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
       expect(user.user_phones.count).to eq 0

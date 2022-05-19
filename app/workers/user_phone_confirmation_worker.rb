@@ -1,5 +1,6 @@
 class UserPhoneConfirmationWorker < ApplicationWorker
   sidekiq_options queue: "notify", retry: 1
+  UPDATE_TWILIO = ENV["UPDATE_TWILIO_ENABLED"] == "true"
 
   def perform(user_phone_id, skip_user_update = false)
     user_phone = UserPhone.find(user_phone_id)
@@ -8,9 +9,11 @@ class UserPhoneConfirmationWorker < ApplicationWorker
       message_channel: "text",
       notifiable: user_phone)
 
-    TwilioIntegration.new.send_notification(notification,
-      to: user_phone.phone,
-      body: user_phone.confirmation_message)
+    if UPDATE_TWILIO
+      TwilioIntegration.new.send_notification(notification,
+        to: user_phone.phone,
+        body: user_phone.confirmation_message)
+    end
 
     return true if skip_user_update
     # Manually run after user change to add a user alert

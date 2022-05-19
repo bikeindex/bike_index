@@ -224,7 +224,7 @@ class Organization < ApplicationRecord
 
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
-    enabled?("show_bulk_import") || ascend_pos? || enabled?("show_bulk_import_impound_bikes")
+    ascend_pos? || any_enabled?(%w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen])
   end
 
   def show_multi_serial?

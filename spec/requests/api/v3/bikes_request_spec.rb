@@ -78,9 +78,7 @@ RSpec.describe "Bikes API V3", type: :request do
       }
     end
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
-    before :each do
-      FactoryBot.create(:wheel_size, iso_bsd: 559)
-    end
+    before { FactoryBot.create(:wheel_size, iso_bsd: 559) }
 
     context "no token" do
       let(:token) { nil }
@@ -473,8 +471,11 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
       ownership = bike.current_ownership
-      expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([true, true, false])
-      # expect(ownership.origin).to eq 'api_v3'
+      expect(ownership.pos?).to be_truthy
+      expect(ownership.is_new).to be_truthy
+      expect(ownership.bulk?).to be_falsey
+      expect(ownership.organization_id).to be_blank
+      expect(ownership.origin).to eq "api_v3"
 
       # We return things will alert if they're written directly to the dom - worth noting, since it might be a problem
       expect(result["description"]).to eq "<svg/onload=alert(document.cookie)>"
@@ -566,7 +567,7 @@ RSpec.describe "Bikes API V3", type: :request do
       bike_organization = bike.bike_organizations.first
       expect(bike_organization.organization_id).to eq organization.id
       expect(bike_organization.can_edit_claimed).to be_truthy
-      expect(bike.current_ownership.origin).to eq "api_v2" # Because it just inherits v2 :/
+      expect(bike.current_ownership.origin).to eq "api_v3"
       expect(bike.current_ownership.organization).to eq organization
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
@@ -589,7 +590,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to be_within(1).of Time.current.to_i
       bike = Bike.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to be_blank
-      expect(bike.current_ownership.origin).to eq "api_v2" # Because it just inherits v2 :/
+      expect(bike.current_ownership.origin).to eq "api_v3"
       expect(bike.status_stolen?).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to be_nil
@@ -609,15 +610,14 @@ RSpec.describe "Bikes API V3", type: :request do
         rear_wheel_bsd: "559",
         color: color.name,
         year: "1969",
-        owner_email: "fun_times@examples.com",
+        owner_email: email,
         organization_slug: organization.slug,
         cycle_type: "bike"
       }
     end
+    let(:email) { "fun_times@examples.com" }
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
-    before :each do
-      FactoryBot.create(:wheel_size, iso_bsd: 559)
-    end
+    before { FactoryBot.create(:wheel_size, iso_bsd: 559) }
 
     context "with membership" do
       before do
@@ -628,7 +628,6 @@ RSpec.describe "Bikes API V3", type: :request do
       context "duplicated serial" do
         context "matching email" do
           it "returns existing bike if authorized by organization" do
-            email = bike_attrs[:owner_email]
             bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
             bike.organizations << organization
             bike.save
@@ -682,10 +681,77 @@ RSpec.describe "Bikes API V3", type: :request do
         end
       end
 
+      context "organization_pre_registration" do
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
+        let(:auto_user) { organization.auto_user }
+        let(:email) { auto_user.email }
+        before { Sidekiq::Testing.inline! }
+        after { Sidekiq::Testing.fake! }
+        it "creates, update with email includes organization" do
+          expect(auto_user.confirmed?).to be_truthy
+          expect(auto_user.id).to_not eq user.id
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Worker.clear_all
+          expect(Bike.count).to eq 0
+
+          post tokenized_url,
+            params: bike_attrs.merge(no_duplicate: true).to_json,
+            headers: json_headers
+
+          expect(Bike.count).to eq 1
+          expect(response.code).to eq("201")
+
+          bike = Bike.find(json_result.dig("bike", "id"))
+          expect(bike.creation_organization&.id).to eq(organization.id)
+          expect(bike.creator&.id).to eq(auto_user.id)
+          expect(bike.secondary_frame_color).to be_nil
+          expect(bike.pos?).to be_falsey
+          expect(bike.owner_email).to eq email
+          ownership = bike.current_ownership
+          expect(ownership.new_registration?).to be_truthy
+          expect(ownership.send_email).to be_truthy
+          expect(ownership.owner_email).to eq email
+          expect(ownership.creator_id).to eq auto_user.id
+          expect(ownership.user_id).to eq auto_user.id
+          expect(ownership.organization_pre_registration?).to be_truthy
+          EmailOwnershipInvitationWorker.drain
+          expect(ActionMailer::Base.deliveries).to_not be_empty
+          mail = ActionMailer::Base.deliveries.last
+          expect(mail.subject).to eq("#{organization.name} Bike Index registration successful")
+          expect(mail.reply_to).to eq([email])
+          expect(mail.tag).to eq "finished_registration"
+          expect(mail.body.encoded).to_not match "supported by"
+
+          # Updating to send to a new owner, the new ownership is through the organization
+          # (needs to use a new token)
+          put "/api/v2/bikes/#{bike.id}?access_token=#{v2_access_token.token}",
+            params: {owner_email: "newperson@stuff.com"}.to_json,
+            headers: json_headers
+
+          expect(response.status).to eq(200)
+          expect(bike.ownerships.count).to eq 2
+          ownership2 = bike.reload.current_ownership
+          expect(ownership2.id).to_not eq ownership.id
+          expect(ownership2.owner_email).to eq "newperson@stuff.com"
+          expect(ownership2.creator_id).to eq user.id
+          expect(ownership2.origin).to eq "transferred_ownership"
+          expect(ownership2.new_registration?).to be_truthy
+          expect(ownership2.organization_pre_registration?).to be_falsey
+          expect(ownership2.organization_id).to eq organization.id
+
+          mail2 = ActionMailer::Base.deliveries.last
+          expect(mail2.subject).to eq("Confirm your #{organization.name} Bike Index registration")
+          expect(mail2.reply_to).to eq([email])
+          expect(mail2.tag).to eq "finished_registration"
+          expect(mail2.body.encoded).to_not match "supported by"
+        end
+      end
+
       it "doesn't create a bike without an organization with v3_accessor" do
         post tokenized_url, params: bike_attrs.except(:organization_slug).to_json, headers: json_headers
         expect(response.code).to eq("403")
         expect(json_result["error"].is_a?(String)).to be_truthy
+        expect(json_result["error"]).to match(/permanent token/i)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries).to be_empty
       end
@@ -696,6 +762,9 @@ RSpec.describe "Bikes API V3", type: :request do
       post tokenized_url, params: bike_attrs.to_json, headers: json_headers
       expect(response.code).to eq("403")
       expect(json_result["error"].is_a?(String)).to be_truthy
+      expect(json_result["error"]).to match(/permanent token/i)
+      EmailOwnershipInvitationWorker.drain
+      expect(ActionMailer::Base.deliveries).to be_empty
     end
   end
 

@@ -13,7 +13,8 @@ class MailSnippet < ApplicationRecord
     impound_notification: 9,
     impound_claim_approved: 11,
     impound_claim_denied: 12,
-    graduated_notification: 10
+    graduated_notification: 10,
+    theft_survey_4_2022: 13
   }.freeze
 
   belongs_to :organization

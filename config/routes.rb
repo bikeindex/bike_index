@@ -197,7 +197,7 @@ Rails.application.routes.draw do
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
       :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data, :user_alerts,
-      :notifications, :user_registration_organizations, :theft_alerts
+      :notifications, :user_registration_organizations, :theft_alerts, :superuser_abilities
 
     resources :bike_stickers do
       collection { get :reassign }

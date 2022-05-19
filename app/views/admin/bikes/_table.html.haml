@@ -74,6 +74,8 @@
                 - if bike.stolen_recovery?
                   %small
                     = link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "text-success text-underline"
+                - if bike.thumb_path.present?
+                  %small 📷
                 %span.d-none.d-lg-inline.less-strong= bike.frame_colors.to_sentence
                 - if BikeDisplayer.paint_description?(bike)
                   %small.less-strong.d-none.d-lg-inline

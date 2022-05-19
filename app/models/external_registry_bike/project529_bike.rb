@@ -61,7 +61,7 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
 
     def country(attrs)
       name = attrs.dig("active_incident", "location_address")&.split(",")&.last
-      Country.fuzzy_find(name)
+      Country.friendly_find(name)
     end
 
     def frame_colors(attrs)

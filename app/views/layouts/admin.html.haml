@@ -13,7 +13,7 @@
   %body{ id: page_id, class:  admin_body_class || body_class }
     %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar
       %span.navbar-brand
-        = link_to (image_tag("logo.svg")), admin_root_path
+        = link_to (image_tag("logo.svg")), user_root_url
       - if current_user.superuser?
         %ul.navbar-nav.d-none.d-lg-flex
           %li.nav-item
@@ -44,7 +44,7 @@
         .fancy-select.unfancy.no-restore-on-backspace
           = select(:admin, :other_navigation, options_for_select(admin_nav_select_links.map { |l| [l[:title], l[:path]] }), { prompt: admin_nav_select_prompt }, { class: "form-control" })
 
-        = link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block"
+      = link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block"
     = render 'layouts/revised_messages'
 
     %section#admin-content.pb-4.mb-4

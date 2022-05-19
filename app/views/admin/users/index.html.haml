@@ -8,22 +8,16 @@
           = link_to current_user.id, admin_user_path(current_user)
   .col-7
     %ul
-      - if display_dev_info?
-        %li.nav-item
-          = link_to "updated", admin_users_path(sortable_search_params.merge(search_updated_at: !@updated_at)), class: @updated_at ? "nav-link active" : "nav-link only-dev-visible"
       %li.nav-item
-        - banned_search_params = sortable_search_params.merge(search_banned: !@search_banned)
-        = link_to "Banned", admin_users_path(banned_search_params), class: @search_banned ? "nav-link active" : "nav-link"
+        = link_to "Banned", url_for(sortable_search_params.merge(search_banned: !@search_banned)), class: @search_banned ? "nav-link active" : "nav-link"
       %li.nav-item
-        - ambassadors_search_params = sortable_search_params.merge(search_ambassadors: !@search_ambassadors)
-        = link_to "Ambassadors", admin_users_path(ambassadors_search_params), class: @search_ambassadors ? "nav-link active" : "nav-link"
+        = link_to "Ambassadors", url_for(sortable_search_params.merge(search_ambassadors: !@search_ambassadors)), class: @search_ambassadors ? "nav-link active" : "nav-link"
       %li.nav-item
-        - superusers_search_params = sortable_search_params.merge(search_superusers: !@search_superusers)
-        = link_to "Superusers", admin_users_path(superusers_search_params), class: @search_superusers ? "nav-link active" : "nav-link"
+        = link_to "Superusers", url_for(sortable_search_params.merge(search_superusers: !@search_superusers)), class: @search_superusers ? "nav-link active" : "nav-link"
       %li.nav-item
-        = link_to "graph", admin_users_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-  = render partial: "/shared/admin_current_header", locals: { viewing: "Users" }
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Users"}
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_users, column: @time_range_column), stacked: true, thousands: ","
@@ -31,13 +25,8 @@
 .mt-2
   = render partial: "/shared/period_select"
 
-.row.mt-4
-  .col-md-5
-    %p
-      #{number_with_delimiter(matching_users.count)} matching users
-      %em
-        = humanized_time_range(@time_range)
-  .col-md-7
+.row.mt-4.mb-4
+  .col-md-6.offset-md-3
     = form_tag admin_users_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
@@ -48,10 +37,10 @@
         = text_field_tag :query, params[:query], placeholder: "Find by name or email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-.mt-4
-= paginate @users, views_prefix: "admin"
-= render partial: "/admin/users/table", locals: { render_sortable: true, updated_at: @updated_at }
-= paginate @users, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @users, count: matching_users.count, name: "User", views_prefix: "admin"}
+= render partial: "/admin/users/table", locals: {render_sortable: true}
+= render partial: "/shared/pagination", locals: {collection: @users, count: matching_users.count, name: "User", views_prefix: "admin", skip_total: true}
+
 - unless @users.present?
   %h1.mt-4
     No users found!

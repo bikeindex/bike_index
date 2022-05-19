@@ -3,10 +3,21 @@
 # Define a way to check if an update hash matches an object. Particularly useful for request specs
 def expect_attrs_to_match_hash(obj, hash)
   unmatched_obj_attrs = {}
+  # So far, I don't want timezone from objects - so ignore it.
+  hash = hash.dup
+  timezone = hash&.delete(:timezone) || hash&.delete("timezone")
   hash.each do |key, value|
     # Just in case there are some type issues
-    next if obj.send(key).to_s == value.to_s
-    unmatched_obj_attrs[key] = obj.send(key)
+    obj_val = obj.send(key)
+    next if obj_val.to_s == value.to_s
+    if [true, false].include?(obj_val)
+      # If we're comparing a boolean, use params normalizer
+      next if obj_val == ParamsNormalizer.boolean(value)
+    elsif obj_val.is_a?(Time) && value.is_a?(String)
+      # If we're comparing a date, use timeparser
+      next if obj_val.round(1).to_i == TimeParser.parse(value, timezone).round(1).to_i
+    end
+    unmatched_obj_attrs[key] = obj_val
   end
   return true unless unmatched_obj_attrs.present?
   expect(unmatched_obj_attrs).to eq hash.slice(*unmatched_obj_attrs.keys)

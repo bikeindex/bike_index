@@ -65,7 +65,7 @@ module API
             if org && current_token.application.owner.present? && current_token.application.owner.admin_of?(org)
               return org.auto_user_id
             end
-            error!("Permanent tokens can only be used to create bikes for organizations your are an admin of", 403)
+            error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
           end
           current_user.id
         end
@@ -98,6 +98,10 @@ module API
         def authorize_bike_for_user(addendum = "")
           return true if @bike.authorize_and_claim_for_user(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
+        end
+
+        def origin_api_version
+          request.path_info.to_s&.match?("v3") ? "api_v3" : "api_v2"
         end
       end
 
@@ -177,7 +181,7 @@ module API
           if found_bike.present? && found_bike.authorized?(current_user)
             # prepare params
             declared_p = {"declared_params" => declared(params, include_missing: false)}
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
             b_param.clean_params
             @bike = found_bike
             authorize_bike_for_user
@@ -201,9 +205,8 @@ module API
           end
 
           declared_p = {"declared_params" => declared(params, include_missing: false).merge(creation_state_params)}
-          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
           b_param.save
-
           bike = BikeCreator.new.create_bike(b_param)
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
@@ -237,7 +240,7 @@ module API
           declared_p = {"declared_params" => declared(params, include_missing: false)}
           find_bike
           authorize_bike_for_user
-          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: origin_api_version)
           b_param.clean_params
           hash = b_param.params
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
