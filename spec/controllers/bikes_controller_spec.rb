@@ -939,7 +939,7 @@ RSpec.describe BikesController, type: :controller do
               street: "66666666 foo street",
               country_id: country.id,
               city: "Chicago ",
-              zipcode: "60647 ",
+              zipcode: "60647 , ", # seems fairly common that people include a trailing comma, probably a paste error
               state_id: state.id,
               locking_description: "Some description",
               lock_defeat_description: "It was cuttttt",
