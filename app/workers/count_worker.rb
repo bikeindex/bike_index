@@ -7,7 +7,7 @@ class CountWorker < ApplicationWorker
   end
 
   def redis_key
-    bike_counts
+    "bike_counts"
   end
 
   def comma_wrapped_string(array)
@@ -31,7 +31,8 @@ class CountWorker < ApplicationWorker
     bikes_2018 = bikes.where(created_at: (begin_2020 - 2.years)..(begin_2020 - 1.year)).count
     bikes_2017 = bikes.where(created_at: (begin_2020 - 3.years)..(begin_2020 - 2.years)).count
     country_name = bikes.where.not(country_id: nil).first&.country&.name
-    vals = [country_name, city, zipcode, bikes.count,bikes_2022, bikes_2021, bikes_2020, bikes_2019, bikes_2018, (cities.uniq - [city.downcase]).join(", ")]
-    redis.append(comma_wrapped_string(vals) + "\n")
+    extra_cities = cities.uniq.any? ? (cities.uniq - [city&.downcase]).join(", ") : nil
+    vals = [country_name, city, zipcode, bikes.count,bikes_2022, bikes_2021, bikes_2020, bikes_2019, bikes_2018, extra_cities]
+    redis.append(redis_key, comma_wrapped_string(vals))
   end
 end
