@@ -75,6 +75,12 @@ module Geocodeable
     ].reject(&:blank?).join(", ")
   end
 
+  def self.format_postal_code(str, country_id = nil)
+    str = str.strip.upcase.gsub(/\s*,\z/, "")
+    return str unless country_id == Country.canada.id && str.gsub(/\s+/, "").length == 6
+    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+  end
+
   def address(**kwargs)
     Geocodeable.address(self, **kwargs)
   end
@@ -126,7 +132,7 @@ module Geocodeable
   def clean_state_and_street_data
     self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
     self.city = city.blank? ? nil : city.strip.gsub(/\s*,\z/, "")
-    self.zipcode = zipcode.blank? ? nil : format_postal_code(zipcode)
+    self.zipcode = zipcode.blank? ? nil : self.class.format_postal_code(zipcode, country_id)
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
@@ -178,11 +184,5 @@ module Geocodeable
 
   def metric_units?
     country.blank? || !country.united_states?
-  end
-
-  def format_postal_code(code)
-    str = code.strip.upcase.gsub(/\s*,\z/, "")
-    return str unless country&.iso == "CA" && str.gsub(/\s+/, "").length == 6
-    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
   end
 end
