@@ -20,15 +20,15 @@ class Country < ApplicationRecord
   end
 
   def self.united_states
-    @united_states ||= where(name: "United States", iso: "US").first_or_create
+    where(name: "United States", iso: "US").first_or_create
   end
 
   def self.canada
-    @canada ||= where(name: "Canada", iso: "CA").first_or_create
+    where(name: "Canada", iso: "CA").first_or_create
   end
 
   def self.netherlands
-    @netherlands ||= where(name: "Netherlands", iso: "NL").first_or_create
+    where(name: "Netherlands", iso: "NL").first_or_create
   end
 
   def self.valid_names

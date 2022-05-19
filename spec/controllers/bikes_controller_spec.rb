@@ -1047,6 +1047,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(current_stolen_record.state_id).to be_blank # Ensure we don't do this accidentally, like we were
                 expect(current_stolen_record.latitude).to be_within(0.001).of(49.1573)
                 expect(current_stolen_record.longitude).to be_within(0.001).of(-123.9664322)
+                expect(current_stolen_record.country_id).to eq Country.canada.id
                 expect(current_stolen_record.city).to eq "Vancouver"
                 expect(current_stolen_record.zipcode).to eq "V5L 1E6"
                 expect(current_stolen_record.street).to eq "2222 Cambridge St."
