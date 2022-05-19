@@ -936,10 +936,10 @@ RSpec.describe BikesController, type: :controller do
               date_stolen: "2016-02-08 04:00:00",
               timezone: "America/Chicago",
               phone: "9999999999",
-              street: "66666666 foo street",
+              street: "66666666 foo street ,",
               country_id: country.id,
-              city: "Chicago",
-              zipcode: "60647",
+              city: "Chicago ", # seems fairly common that people include a trailing comma, probably a paste error
+              zipcode: "60647 , ", # here too
               state_id: state.id,
               locking_description: "Some description",
               lock_defeat_description: "It was cuttttt",
@@ -960,7 +960,7 @@ RSpec.describe BikesController, type: :controller do
               }
             }
           end
-          let(:skipped_attrs) { %w[proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
+          let(:skipped_attrs) { %w[street city zipcode proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
           include_context :geocoder_real
           it "updates and returns to the right page" do
             # VCR for some reason fails to match this request with standard matching, so specify different
@@ -991,6 +991,9 @@ RSpec.describe BikesController, type: :controller do
               expect(current_stolen_record.receive_notifications?).to be_falsey
               expect(current_stolen_record.no_notify?).to be_truthy
               expect(current_stolen_record.estimated_value).to eq 1200
+              expect(current_stolen_record.city).to eq "Chicago"
+              expect(current_stolen_record.zipcode).to eq "60647"
+              expect(current_stolen_record.street).to eq "66666666 foo street"
               stolen_attrs.except(*skipped_attrs).each do |key, value|
                 pp key unless current_stolen_record.send(key) == value
                 expect(current_stolen_record.send(key)).to eq value
@@ -1004,10 +1007,10 @@ RSpec.describe BikesController, type: :controller do
                 date_stolen: "2016-02-08 04:00:00",
                 timezone: "America/Chicago",
                 phone: "9999999999",
-                street: "2222 Cambridge St.",
+                street: "2222 Cambridge St.,",
                 country_id: canada.id,
-                city: "Vancouver",
-                zipcode: "V5L1E6",
+                city: "Vancouver\n, ",
+                zipcode: "v5l1E6",
                 state_id: state.id,
                 locking_description: "I locked it up!",
                 lock_defeat_description: "",
@@ -1044,6 +1047,10 @@ RSpec.describe BikesController, type: :controller do
                 expect(current_stolen_record.state_id).to be_blank # Ensure we don't do this accidentally, like we were
                 expect(current_stolen_record.latitude).to be_within(0.001).of(49.1573)
                 expect(current_stolen_record.longitude).to be_within(0.001).of(-123.9664322)
+                expect(current_stolen_record.country_id).to eq Country.canada.id
+                expect(current_stolen_record.city).to eq "Vancouver"
+                expect(current_stolen_record.zipcode).to eq "V5L 1E6"
+                expect(current_stolen_record.street).to eq "2222 Cambridge St."
                 stolen_attrs.except(:state_id, *skipped_attrs).each do |key, value|
                   pp key unless current_stolen_record.send(key) == value
                   expect(current_stolen_record.send(key)).to eq value
