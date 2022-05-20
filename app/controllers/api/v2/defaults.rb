@@ -13,6 +13,13 @@ module API
             doorkeeper_access_token
           end
 
+          def current_organization
+            organization = Organization.friendly_find(params[:organization_slug])
+            if organization.present? && current_user.authorized?(organization)
+              organization
+            end
+          end
+
           def current_user
             # If user isn't confirmed, raise error for us to manage
             raise WineBouncer::Errors::OAuthForbiddenError, "User is unconfirmed" if resource_owner&.unconfirmed?

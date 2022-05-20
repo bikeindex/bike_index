@@ -215,6 +215,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
             expect(bike_sticker.bike_sticker_updates.count).to eq 1
             bike_sticker_update = bike_sticker.bike_sticker_updates.first
             expect(bike_sticker_update.organization_id).to eq organization.id
+            expect(bike_sticker_update.creator_kind).to eq "creator_pos"
           end
         end
       end

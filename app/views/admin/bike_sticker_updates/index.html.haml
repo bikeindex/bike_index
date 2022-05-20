@@ -207,6 +207,6 @@
                 - if bike_sticker_update.creator_export?
                   = link_to "export", organization_export_path(bike_sticker_update.export_id, organization_id: bike_sticker_update.organization_id)
                 - else
-                  = bike_sticker_update.creator_kind.gsub("creator_", "").humanize
+                  = bike_sticker_update.creator_kind_humanized
 
 

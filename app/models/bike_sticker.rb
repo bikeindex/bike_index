@@ -168,7 +168,7 @@ class BikeSticker < ApplicationRecord
     claiming_organization = claiming_organization_for_args(args)
     bike_sticker_update = BikeStickerUpdate.new(bike_sticker_id: id, user: args[:user],
       organization: claiming_organization, bike: claiming_bike,
-      safe_assign_creator_kind: args[:creator_kind], export_id: args[:export_id])
+      export_id: args[:export_id], safe_assign_creator_kind: args[:creator_kind])
     if claiming_bike.blank? && args[:bike].is_a?(String) && args[:bike].length > 0
       not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
       errors.add(:bike, "\"#{args[:bike]}\" #{not_found}")
