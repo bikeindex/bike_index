@@ -50,6 +50,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def self.creator_kind_humanized(str)
     return "" unless str.present?
+    return "bike registration" if str == "creator_bike_creation"
     str.gsub("creator_", "").tr("_", " ")
   end
 
@@ -87,9 +88,12 @@ class BikeStickerUpdate < ApplicationRecord
   end
 
   def safe_assign_creator_kind=(val)
-    return set_creator_kind! if val == "creator_bike_creation"
     return unless CREATOR_KIND_ENUM.keys.map(&:to_s).include?(val.to_s)
-    self.creator_kind = val
+    if val == "creator_bike_creation"
+      set_creator_kind!
+    else
+      self.creator_kind = val
+    end
   end
 
   def set_calculated_attributes

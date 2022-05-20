@@ -46,11 +46,12 @@ RSpec.describe BikeStickerUpdate, type: :model do
       let(:creator_kind) { "creator_bike_creation" }
       it "assigns" do
         expect(bike_sticker_update.creator_kind).to eq "creator_bike_creation"
+        expect(bike_sticker_update.creator_kind_humanized).to eq "bike registration"
       end
       context "bike pos registration" do
         let(:ownership) { Ownership.new(pos_kind: "ascend_pos") }
         it "assigns creator_pos" do
-          expect(bike_sticker_update.bike&.current_ownership.pos?).to be_truthy
+          expect(bike_sticker_update.bike&.current_ownership&.pos?).to be_truthy
           expect(bike.current_ownership.pos?).to be_truthy
           expect(bike_sticker_update.creator_kind).to eq "creator_pos"
         end
