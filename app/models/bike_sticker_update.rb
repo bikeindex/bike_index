@@ -1,6 +1,6 @@
 class BikeStickerUpdate < ApplicationRecord
   KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
-  CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2}.freeze
+  CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_import: 3}.freeze
   ORGANIZATION_KIND_ENUM = {no_organization: 0, primary_organization: 1, regional_organization: 2, other_organization: 3, other_paid_organization: 4}.freeze
 
   belongs_to :bike_sticker
@@ -87,12 +87,13 @@ class BikeStickerUpdate < ApplicationRecord
   end
 
   def safe_assign_creator_kind=(val)
+    # if pp claiming_bike.current_ownership.origin
     return unless CREATOR_KIND_ENUM.keys.map(&:to_s).include?(val.to_s)
     self.creator_kind = val
   end
 
   def set_calculated_attributes
-    self.creator_kind ||= export_id.present? ? "creator_export" : "creator_user"
+    self.creator_kind ||= "creator_user" # export_id.present? ? "creator_export" : "creator_user"
     self.organization_kind ||= calculated_organization_kind
     self.kind ||= calculated_kind
     self.update_number ||= previous_successful_updates.count + 1

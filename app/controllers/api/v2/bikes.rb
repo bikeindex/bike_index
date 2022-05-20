@@ -23,6 +23,7 @@ module API
           optional :is_for_sale, type: Boolean
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
           optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
+          optional :bike_sticker, type: String, desc: "Bike Sticker code"
 
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"

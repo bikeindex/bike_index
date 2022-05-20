@@ -20,4 +20,25 @@ RSpec.describe BikeStickerUpdate, type: :model do
       expect(user.updated_bike_stickers.pluck(:id)).to eq([bike_sticker.id])
     end
   end
+
+  describe "safe_assign_creator_kind" do
+    let(:bike_sticker) { BikeSticker.new }
+    let(:bike_sticker_update) { bike_sticker.bike_sticker_updates.new(safe_assign_creator_kind: creator_kind) }
+    let(:creator_kind) { nil }
+    it "does nothing with nil" do
+      expect(bike_sticker_update.creator_kind).to be_blank
+    end
+    context "random" do
+      let(:creator_kind) { "partypartyparty" }
+      it "is nil" do
+        expect(bike_sticker_update.creator_kind).to be_blank
+      end
+    end
+    context "creator_export" do
+      let(:creator_kind) { "creator_export" }
+      it "assigns" do
+        expect(bike_sticker_update.creator_kind).to eq "creator_export"
+      end
+    end
+  end
 end

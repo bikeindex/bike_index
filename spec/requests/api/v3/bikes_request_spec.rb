@@ -197,6 +197,7 @@ RSpec.describe "Bikes API V3", type: :request do
           new_front_wheel_size = FactoryBot.create(:wheel_size, name: "new_front_wheel_size", iso_bsd: 12)
           old_cycle_type = CycleType.new("unicycle")
           new_cycle_type = CycleType.new("tricycle")
+          bike_sticker = FactoryBot.create(:bike_sticker)
           old_year = 1969
           new_year = 2001
           bike1 = FactoryBot.create(
@@ -224,6 +225,7 @@ RSpec.describe "Bikes API V3", type: :request do
             year: new_year,
             owner_email: user.email,
             frame_material: "steel",
+            bike_sticker: bike_sticker.code.downcase,
             cycle_type_name: new_cycle_type.slug.to_s
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
@@ -238,6 +240,16 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
           expect(bike2["rear_tire_narrow"]).to eq(true)
           expect(bike2["frame_material_slug"]).to eq("steel")
+
+          bike_sticker.reload
+          expect(bike_sticker.bike_id).to eq bike.id
+          expect(bike_sticker.claimed?).to be_truthy
+          expect(bike_sticker.organization_id).to eq primary_organization.id
+          expect(bike_sticker.secondary_organization_id).to be_blank
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+          bike_sticker_update = bike_sticker.bike_sticker_updates.first
+          expect(bike_sticker_update.organization_id).to eq organization.id
+          expect(bike_sticker_update.creator_kind).to eq "creator_pos"
         end
       end
 
