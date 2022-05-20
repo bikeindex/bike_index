@@ -62,8 +62,8 @@ module API
 
         def creation_user_id
           if current_user.id == ENV["V2_ACCESSOR_ID"].to_i
-            return current_organization.auto_user_id if current_organization &&
-              current_token.application.owner.present? && current_token.application.owner.admin_of?(current_organization)
+            return current_organization.auto_user_id if current_organization.present? &&
+              current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
 
             error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
           end
@@ -190,7 +190,10 @@ module API
             end
             if b_param.bike_sticker_code.present?
               bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: current_organization&.id)
-              bike_sticker&.claim(user: found_bike.creator, bike: found_bike.id, organization: current_organization)
+              # Don't reclaim an already claimed sticker
+              if bike_sticker.present? && bike_sticker.bike_id != found_bike.id
+                bike_sticker.claim_if_permitted(user: found_bike.creator, bike: found_bike.id, organization: current_organization)
+              end
             end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
