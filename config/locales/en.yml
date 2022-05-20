@@ -4593,7 +4593,7 @@ en:
           work</em>. Examples:
         importing_stickers_html: >-
           If you are importing stickers along with bikes, stickers will only be assigned
-          if the sticker is not yet claimed.
+          if the sticker code is found and can be assigned.
         incorrect_image_on_webpage_html: '<span class="text-danger"">INCORRECT</span>:
           image on webpage'
         look_at_example_csv_and_html: Look at %{link_to_example_csv}, and also our

@@ -8,6 +8,7 @@ class BikeStickerUpdate < ApplicationRecord
   belongs_to :user
   belongs_to :organization
   belongs_to :export
+  belongs_to :bulk_import
 
   enum kind: KIND_ENUM
   enum creator_kind: CREATOR_KIND_ENUM

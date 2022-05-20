@@ -170,7 +170,7 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
-      let(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
       it "creates the bikes, doesn't have any errors" do
         expect(bike_sticker.reload.claimed?).to be_falsey
         expect(bike_sticker.bike_sticker_updates.count).to eq 0
@@ -212,9 +212,15 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.owner_name).to be_nil
           expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
           bike_sticker.reload
-          bike_sticker_update = bike_sticker.bike_sticker_updates.last
+          expect(bike_sticker.claimed?).to be_truthy
+          expect(bike_sticker.bike_id).to eq bike1.id
+          expect(bike_sticker.organization_id).to be_blank
+          expect(bike_sticker.secondary_organization_id).to eq organization.id
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+          bike_sticker_update = bike_sticker.bike_sticker_updates.first
+          expect(bike_sticker_update.organization_id).to eq organization.id
           expect(bike_sticker_update.creator_kind).to eq "creator_import"
-          expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
+          expect(bike_sticker_update.bulk_import&.id).to eq bulk_import.id
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
           expect(bike2.primary_frame_color).to eq color_white
@@ -322,7 +328,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bulk_import.progress).to eq "finished"
             expect(bulk_import.bikes.count).to eq 2
             expect(bulk_import.file_import_errors).to_not be_present
-            expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
+            expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size bike_sticker photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
 
             bike1 = bulk_import.bikes.reorder(:created_at).first
             expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
@@ -334,7 +340,18 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
             expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
             expect(bike1.address_hash).to eq bike1_impound_record.address_hash
-            expect(bike1.bike_stickers.pluck(:id)).to eq([])
+            expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+            expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_truthy
+            expect(bike_sticker.bike_id).to eq bike1.id
+            expect(bike_sticker.organization_id).to be_blank
+            expect(bike_sticker.secondary_organization_id).to eq organization.id
+            expect(bike_sticker.bike_sticker_updates.count).to eq 1
+            bike_sticker_update = bike_sticker.bike_sticker_updates.first
+            expect(bike_sticker_update.organization_id).to eq organization.id
+            expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
+            expect(bike_sticker_update.creator_kind).to eq "creator_import"
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
             expect_attrs_to_match_hash(bike2, bike2_target)
@@ -347,7 +364,8 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
             expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
             expect(bike2.address_hash).to eq bike2_impound_record.address_hash
-            expect(bike2.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+
+
           end
         end
       end
@@ -422,7 +440,8 @@ RSpec.describe BulkImportWorker, type: :job do
           extra_registration_number: nil,
           user_name: nil,
           send_email: true,
-          creation_organization_id: nil
+          creation_organization_id: nil,
+          bike_sticker: nil
         }
       end
       describe "row_to_b_param_hash" do
@@ -461,7 +480,8 @@ RSpec.describe BulkImportWorker, type: :job do
             extra_registration_number: nil,
             user_name: nil,
             send_email: true,
-            creation_organization_id: nil
+            creation_organization_id: nil,
+            bike_sticker: nil
           }
         end
         let(:target_impound) do
