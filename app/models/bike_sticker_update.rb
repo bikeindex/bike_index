@@ -1,6 +1,6 @@
 class BikeStickerUpdate < ApplicationRecord
   KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
-  CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_import: 3}.freeze
+  CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_bike_creation: 3, creator_import: 4}.freeze
   ORGANIZATION_KIND_ENUM = {no_organization: 0, primary_organization: 1, regional_organization: 2, other_organization: 3, other_paid_organization: 4}.freeze
 
   belongs_to :bike_sticker
@@ -87,7 +87,7 @@ class BikeStickerUpdate < ApplicationRecord
   end
 
   def safe_assign_creator_kind=(val)
-    return set_creator_kind! if val == "bike_creation"
+    return set_creator_kind! if val == "creator_bike_creation"
     return unless CREATOR_KIND_ENUM.keys.map(&:to_s).include?(val.to_s)
     self.creator_kind = val
   end
@@ -108,7 +108,7 @@ class BikeStickerUpdate < ApplicationRecord
         self.bulk_import_id = bike.current_ownership.bulk_import_id
       end
     end
-    self.creator_kind ||= "creator_user"
+    self.creator_kind ||= "creator_bike_creation"
   end
 
   private

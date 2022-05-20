@@ -242,14 +242,15 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike2["frame_material_slug"]).to eq("steel")
 
           bike_sticker.reload
-          expect(bike_sticker.bike_id).to eq bike.id
           expect(bike_sticker.claimed?).to be_truthy
-          expect(bike_sticker.organization_id).to eq primary_organization.id
+          expect(bike_sticker.bike_id).to eq bike1.id
+          expect(bike_sticker.organization_id).to eq organization.id
           expect(bike_sticker.secondary_organization_id).to be_blank
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
           bike_sticker_update = bike_sticker.bike_sticker_updates.first
           expect(bike_sticker_update.organization_id).to eq organization.id
-          expect(bike_sticker_update.creator_kind).to eq "creator_pos"
+          expect(bike_sticker_update.creator_kind).to eq "creator_bike_creation"
+          expect(bike_sticker_update.creator_kind_humanized).to eq "bike registration"
         end
       end
 

@@ -42,10 +42,10 @@ RSpec.describe BikeStickerUpdate, type: :model do
         expect(bike_sticker_update.creator_kind).to eq "creator_export"
       end
     end
-    context "bike_creation" do
-      let(:creator_kind) { "bike_creation" }
+    context "creator_bike_creation" do
+      let(:creator_kind) { "creator_bike_creation" }
       it "assigns" do
-        expect(bike_sticker_update.creator_kind).to eq "creator_user"
+        expect(bike_sticker_update.creator_kind).to eq "creator_bike_creation"
       end
       context "bike pos registration" do
         let(:ownership) { Ownership.new(pos_kind: "ascend_pos") }
@@ -58,9 +58,9 @@ RSpec.describe BikeStickerUpdate, type: :model do
       context "creator_import" do
         let(:organization) { FactoryBot.create(:organization) }
         let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
-        let(:ownership) { Ownership.new(bulk_import: bulk_import) }
+        let(:ownership) { Ownership.new(bulk_import: bulk_import, organization: organization) }
         it "assigns creator_pos" do
-          expect(bike_sticker_update.bike&.current_ownership.bulk?).to be_truthy
+          expect(bike_sticker_update.bike.current_ownership.bulk?).to be_truthy
           expect(bike_sticker_update.creator_kind).to eq "creator_import"
           expect(bike_sticker_update.organization_id).to eq organization.id
           expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
