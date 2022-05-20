@@ -116,7 +116,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           end
         end
         context "show_bulk_import_impound" do
-          let!(:current_organization) { ç }
+          let!(:current_organization) { impound_organization }
           it "renders" do
             get base_url
             expect(response.status).to eq(200)

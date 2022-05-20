@@ -4587,12 +4587,13 @@ en:
           If only some of your bikes have values in optional columns, leave the cell
           blank for the ones that don't have it (e.g. rather than putting <em>unknown</em>
           or <em>n/a</em>).
-        importing_stickers_html: >-
-          If you are importing stickers along with bikes, stickers will only be assigned if the sticker is not yet claimed. It will not show an error if a sticker cannot be assigned.
         if_you_are_including_photo_url_html: >-
           If you are including "photo_url" make sure the url is of the image itself.
           If it's of a webpage with the photo on it, <em>the photo import will not
           work</em>. Examples:
+        importing_stickers_html: >-
+          If you are importing stickers along with bikes, stickers will only be assigned
+          if the sticker is not yet claimed.
         incorrect_image_on_webpage_html: '<span class="text-danger"">INCORRECT</span>:
           image on webpage'
         look_at_example_csv_and_html: Look at %{link_to_example_csv}, and also our
@@ -4605,10 +4606,6 @@ en:
         required_headers_are_html: >-
           The required headers are <code>manufacturer</code>, <code>model</code>,
           <code>color</code>, <code>email</code> and <code>serial</code>.
-        spokecard_image_url: >-
-          https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
-        spokecard_page_url: >-
-          https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
         this_will_not_work: this will not work!
         upload_and_begin_import: Upload and begin import
         we_support_a_few_additional: >-
