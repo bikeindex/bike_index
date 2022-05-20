@@ -4587,6 +4587,8 @@ en:
           If only some of your bikes have values in optional columns, leave the cell
           blank for the ones that don't have it (e.g. rather than putting <em>unknown</em>
           or <em>n/a</em>).
+        importing_stickers_html: >-
+          If you are importing stickers along with bikes, stickers will only be assigned if the sticker is not yet claimed. It will not show an error if a sticker cannot be assigned.
         if_you_are_including_photo_url_html: >-
           If you are including "photo_url" make sure the url is of the image itself.
           If it's of a webpage with the photo on it, <em>the photo import will not
