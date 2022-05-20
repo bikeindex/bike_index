@@ -45,6 +45,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
     context "logged in as super admin" do
       let(:current_user) { FactoryBot.create(:admin) }
       describe "index" do
+        let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: ["impound_bikes"]) }
         it "renders" do
           get base_url
           expect(response.status).to eq(200)
@@ -115,7 +116,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           end
         end
         context "show_bulk_import_impound" do
-          let!(:current_organization) { impound_organization }
+          let!(:current_organization) { ç }
           it "renders" do
             get base_url
             expect(response.status).to eq(200)
