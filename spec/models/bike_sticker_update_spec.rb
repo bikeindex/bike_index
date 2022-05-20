@@ -23,7 +23,9 @@ RSpec.describe BikeStickerUpdate, type: :model do
 
   describe "safe_assign_creator_kind" do
     let(:bike_sticker) { BikeSticker.new }
-    let(:bike_sticker_update) { bike_sticker.bike_sticker_updates.new(safe_assign_creator_kind: creator_kind) }
+    let(:ownership) { Ownership.new }
+    let(:bike) { Bike.new(current_ownership: ownership) }
+    let(:bike_sticker_update) { bike_sticker.bike_sticker_updates.new(bike: bike, safe_assign_creator_kind: creator_kind) }
     let(:creator_kind) { nil }
     it "does nothing with nil" do
       expect(bike_sticker_update.creator_kind).to be_blank
@@ -38,6 +40,31 @@ RSpec.describe BikeStickerUpdate, type: :model do
       let(:creator_kind) { "creator_export" }
       it "assigns" do
         expect(bike_sticker_update.creator_kind).to eq "creator_export"
+      end
+    end
+    context "bike_creation" do
+      let(:creator_kind) { "bike_creation" }
+      it "assigns" do
+        expect(bike_sticker_update.creator_kind).to eq "creator_user"
+      end
+      context "bike pos registration" do
+        let(:ownership) { Ownership.new(pos_kind: "ascend_pos") }
+        it "assigns creator_pos" do
+          expect(bike_sticker_update.bike&.current_ownership.pos?).to be_truthy
+          expect(bike.current_ownership.pos?).to be_truthy
+          expect(bike_sticker_update.creator_kind).to eq "creator_pos"
+        end
+      end
+      context "creator_import" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
+        let(:ownership) { Ownership.new(bulk_import: bulk_import) }
+        it "assigns creator_pos" do
+          expect(bike_sticker_update.bike&.current_ownership.bulk?).to be_truthy
+          expect(bike_sticker_update.creator_kind).to eq "creator_import"
+          expect(bike_sticker_update.organization_id).to eq organization.id
+          expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
+        end
       end
     end
   end

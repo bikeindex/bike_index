@@ -300,7 +300,8 @@ CREATE TABLE public.bike_sticker_updates (
     update_number integer,
     failed_claim_errors text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    bulk_import_id bigint
 );
 
 
@@ -2217,6 +2218,44 @@ ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organiza
 
 
 --
+-- Name: organization_stolen_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_stolen_messages (
+    id bigint NOT NULL,
+    organization_id bigint,
+    kind integer,
+    latitude double precision,
+    longitude double precision,
+    radius_miles double precision,
+    message text,
+    updator_id bigint,
+    enabled boolean DEFAULT false,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_stolen_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_stolen_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_stolen_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_stolen_messages_id_seq OWNED BY public.organization_stolen_messages.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2758,7 +2797,8 @@ CREATE TABLE public.stolen_records (
     recovering_user_id integer,
     recovery_display_status integer DEFAULT 0,
     neighborhood character varying,
-    no_notify boolean DEFAULT false
+    no_notify boolean DEFAULT false,
+    organization_stolen_message_id bigint
 );
 
 
@@ -3643,6 +3683,13 @@ ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT n
 
 
 --
+-- Name: organization_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_stolen_messages ALTER COLUMN id SET DEFAULT nextval('public.organization_stolen_messages_id_seq'::regclass);
+
+
+--
 -- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4260,6 +4307,14 @@ ALTER TABLE ONLY public.organization_manufacturers
 
 
 --
+-- Name: organization_stolen_messages organization_stolen_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_stolen_messages
+    ADD CONSTRAINT organization_stolen_messages_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4525,6 +4580,13 @@ CREATE INDEX index_bike_sticker_updates_on_bike_id ON public.bike_sticker_update
 --
 
 CREATE INDEX index_bike_sticker_updates_on_bike_sticker_id ON public.bike_sticker_updates USING btree (bike_sticker_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_bulk_import_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_bulk_import_id ON public.bike_sticker_updates USING btree (bulk_import_id);
 
 
 --
@@ -5235,6 +5297,20 @@ CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organ
 
 
 --
+-- Name: index_organization_stolen_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_stolen_messages_on_organization_id ON public.organization_stolen_messages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_stolen_messages_on_updator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_stolen_messages_on_updator_id ON public.organization_stolen_messages USING btree (updator_id);
+
+
+--
 -- Name: index_organizations_on_location_latitude_and_location_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5449,6 +5525,13 @@ CREATE INDEX index_stolen_records_on_bike_id ON public.stolen_records USING btre
 --
 
 CREATE INDEX index_stolen_records_on_latitude_and_longitude ON public.stolen_records USING btree (latitude, longitude);
+
+
+--
+-- Name: index_stolen_records_on_organization_stolen_message_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_records_on_organization_stolen_message_id ON public.stolen_records USING btree (organization_stolen_message_id);
 
 
 --
@@ -6234,6 +6317,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220324004315'),
 ('20220405173312'),
 ('20220411165641'),
-('20220420145734');
+('20220412151420'),
+('20220420145734'),
+('20220520180217');
 
 
