@@ -170,7 +170,10 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
       it "creates the bikes, doesn't have any errors" do
+        expect(bike_sticker.reload.claimed?).to be_falsey
+        expect(bike_sticker.bike_sticker_updates.count).to eq 0
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
         VCR.use_cassette("bulk_import-perform-success") do
@@ -207,6 +210,11 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.address_hash.reject { |_k, v| v.blank? }.to_h).to eq target_address_hash.as_json
           expect(bike1.extra_registration_number).to be_nil
           expect(bike1.owner_name).to be_nil
+          expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+          bike_sticker.reload
+          bike_sticker_update = bike_sticker.bike_sticker_updates.last
+          expect(bike_sticker_update.creator_kind).to eq "creator_import"
+          expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
           expect(bike2.primary_frame_color).to eq color_white
@@ -225,6 +233,10 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.phone).to be_nil
           expect(bike2.extra_registration_number).to eq "extra serial number"
           expect(bike2.owner_name).to eq "Sally"
+          expect(bike2.bike_stickers.pluck(:id)).to eq([])
+
+          expect(bike_sticker.reload.claimed?).to be_truthy
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
         end
       end
       context "valid file, kind: impounded" do
@@ -297,6 +309,8 @@ RSpec.describe BulkImportWorker, type: :job do
           }
         end
         it "creates the bikes and impound records" do
+          expect(bike_sticker.reload.claimed?).to be_falsey
+          expect(bike_sticker.bike_sticker_updates.count).to eq 0
           VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do
             allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
             expect {
@@ -320,6 +334,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
             expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
             expect(bike1.address_hash).to eq bike1_impound_record.address_hash
+            expect(bike1.bike_stickers.pluck(:id)).to eq([])
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
             expect_attrs_to_match_hash(bike2, bike2_target)
@@ -332,6 +347,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
             expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
             expect(bike2.address_hash).to eq bike2_impound_record.address_hash
+            expect(bike2.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
           end
         end
       end
