@@ -160,15 +160,19 @@
 %ul
   %li= t(".we_support_a_few_additional")
   %li= t(".if_only_some_of_your_bikes_html")
+  - if current_organization.enabled?("bike_stickers")
+    %li= t(".importing_stickers_html")
   %li
     = t(".if_you_are_including_photo_url_html")
     %ul{style: "word-break: break-word;"}
       %li.mt-3{style: "line-height: 1.5;"}
         = t(".correct_actual_image_url_html")
-        = link_to t(".spokecard_image_url"), style: "word-wrap: break-word;", class: "small"
+        - spokecard_image_url = "https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg"
+        = link_to spokecard_image_url, spokecard_image_url, style: "word-wrap: break-word;", class: "small"
       %li.mt-3{style: "line-height: 1.5;"}
         = t(".incorrect_image_on_webpage_html")
-        = link_to t(".spokecard_page_url"), style: "word-wrap: break-word;", class: "small"
+        - spokecard_page_url = "https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg"
+        = link_to spokecard_page_url, spokecard_page_url, style: "word-wrap: break-word;", class: "small"
         %em.text-danger
           \-
           = t(".this_will_not_work")
