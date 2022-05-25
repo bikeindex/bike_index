@@ -5126,7 +5126,8 @@ en:
       where: Where
     donation_form:
       501c3_nonprofit: 501(c)(3) nonprofit
-      bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link} <small class="less-strong">EIN 81-4296194</small>.
+      bike_index_is_a_nonprofit_html: >-
+        Bike Index is a %{nonprofit_link} <small class="less-strong">EIN 81-4296194</small>.
       next: next  >
       other_amount: Other amount (USD)
       skip: No donation
