@@ -10,7 +10,6 @@ module API
 
         helpers do
           def current_token
-            pp doorkeeper_access_token
             doorkeeper_access_token
           end
 

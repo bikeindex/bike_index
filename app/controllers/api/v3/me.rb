@@ -67,7 +67,7 @@ module API
         end
 
         desc "Current user's bikes<span class='accstr'>*</span>", {
-          # authorizations: {oauth2: [{scope: :read_bikes}]},
+          authorizations: {oauth2: [{scope: :read_bikes}]},
           notes: <<-NOTE
             This returns the current user's bikes, so long as the access_token has the `read_bikes` scope.
             This uses the bike list bike objects, which only contains the most important information.
@@ -76,14 +76,6 @@ module API
           NOTE
         }
         get "/bikes" do
-          pp current_token
-          # pp env["HTTP_AUTHORIZATION"]
-
-          require "doorkeeper/grape/authorization_decorator"
-          doorkeeper_request =  Doorkeeper::Grape::AuthorizationDecorator.new(request)
-          pp Doorkeeper::OAuth::Token.from_request(doorkeeper_request, Doorkeeper::Config.new.access_token_methods)
-          pp "^^^ -------"
-
           ActiveModel::ArraySerializer.new(valid_current_user.bikes,
             each_serializer: BikeV2Serializer,
             root: "bikes").as_json
