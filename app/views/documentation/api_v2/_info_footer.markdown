@@ -24,9 +24,9 @@ There are two supported ways of authenticating with Bike Index through OAuth2:
 2. **Client-side flow**, also called Implicit grant flow or Bearer flow.
 
 
-The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about [Authorization flow in OAuth2](http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow).
+The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about [Authorization flow in OAuth2](https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow).
 
-The Client-side flow is good for client-side javascript apps. Here's an article on [Client-side flow in OAuth2](http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/).
+The Client-side flow is good for client-side javascript apps. Here's an article on [Client-side flow in OAuth2](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow).
 
 *There will be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
 
@@ -40,9 +40,7 @@ Review the applications you've authorized at [/oauth/authorized_applications](/o
 
 ###Sending your access tokens in requests
 
-By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters. We recommend putting the authentication information in the header.
-
-All the authenticated requests in this documentation put the access token in the parameters for clarity
+We recommend putting the authentication information in the parameters, as done in the documentation, for clarity.
 
 
 <a class="ref" id="ref_refresh_tokens">
