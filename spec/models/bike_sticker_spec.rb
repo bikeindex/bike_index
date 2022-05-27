@@ -18,6 +18,8 @@ RSpec.describe BikeSticker, type: :model do
       expect(BikeSticker.normalize_code("Ca012")).to eq "CA12"
       expect(BikeSticker.normalize_code("LA 0011 12")).to eq "LA1112"
       expect(BikeSticker.normalize_code("L A 011 12")).to eq "LA1112"
+      expect(BikeSticker.normalize_code("00000")).to eq ""
+      expect(BikeSticker.normalize_code("00000", one_zero: true)).to eq "0"
     end
     context "leading_zeros" do
       it "keeps zeros" do
@@ -83,6 +85,28 @@ RSpec.describe BikeSticker, type: :model do
     end
   end
 
+  describe "sticker 0" do
+    let(:sticker0) { FactoryBot.create(:bike_sticker, code: "ca000000") }
+    it "is 0" do
+      expect(sticker0.reload.code).to eq "CA0"
+      expect(sticker0.code_number_length).to eq 6
+      expect(sticker0.code_integer).to eq 0
+      expect(sticker0.code_prefix).to eq "CA"
+
+      expect(BikeSticker.normalize_code("CA 00 00 0", one_zero: true)).to eq "CA0"
+      expect(BikeSticker.code_integer_and_prefix_search("CA0").pluck(:id)).to eq([sticker0.id])
+      expect(BikeSticker.lookup("CA0000000")).to eq sticker0
+
+      expect(BikeSticker.normalize_code("00 00 0", one_zero: true)).to eq "0"
+      expect(BikeSticker.code_integer_and_prefix_search("0").pluck(:id)).to eq([sticker0.id])
+      expect(BikeSticker.lookup("00 00 0")).to eq sticker0
+
+      expect(BikeSticker.sticker_code_search("0").pluck(:id)).to match_array([sticker0.id])
+      expect(BikeSticker.sticker_code_search("000000").pluck(:id)).to match_array([sticker0.id])
+      expect(BikeSticker.sticker_code_search("0000000").pluck(:id)).to match_array([sticker0.id])
+    end
+  end
+
   describe "lookup and admin_text_search" do
     let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
     let!(:spokecard) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "12", bike: bike1) }
@@ -106,9 +130,10 @@ RSpec.describe BikeSticker, type: :model do
       expect(sticker4.reload.code_integer).to eq 99112
       expect(sticker4.code).to eq "CA99112"
       expect(sticker4.code_number_length).to eq 6
-
-      expect(sticker0.reload.code).to eq "CA"
+      expect(sticker0.reload.code).to eq "CA0"
       expect(sticker0.code_number_length).to eq 6
+      expect(sticker0.code_integer).to eq 0
+      expect(BikeSticker.calculated_code_integer("ca000000")).to eq 0
       expect(BikeSticker.claimed.count).to eq 2
       expect(BikeSticker.unclaimed.count).to eq 5
       expect(BikeSticker.spokecard.count).to eq 2
@@ -121,10 +146,9 @@ RSpec.describe BikeSticker, type: :model do
       expect(BikeSticker.lookup("000012", organization_id: "whateves")).to eq spokecard
       expect(BikeSticker.lookup("000012")).to eq spokecard
       expect(BikeSticker.lookup("ca112")).to eq sticker2
-      expect(BikeSticker.lookup("ca1120")).to eq sticker2
-      expect(BikeSticker.lookup("ca00011")).to eq sticker2
-      expect(BikeSticker.lookup("ca00011")).to eq sticker2
-      expect(BikeSticker.lookup("ca0011")).to eq sticker2
+      expect(BikeSticker.lookup("ca1120")).to eq sticker3
+      expect(BikeSticker.lookup("ca00011")).to be_blank
+      expect(BikeSticker.lookup("ca0011")).to be_blank
       expect(BikeSticker.lookup("00000")).to eq sticker0
       expect(BikeSticker.lookup("CA0000000")).to eq sticker0
       expect(BikeSticker.lookup("99112")).to eq([sticker4.id])

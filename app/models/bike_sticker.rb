@@ -22,7 +22,7 @@ class BikeSticker < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  def self.normalize_code(str = nil, leading_zeros: false)
+  def self.normalize_code(str = nil, leading_zeros: false, one_zero: false)
     return nil unless str.present?
     code = str.to_s.upcase.strip.gsub(/\s*/, "")
     if code.match?(/BIKEINDEX.ORG/)
@@ -30,10 +30,12 @@ class BikeSticker < ApplicationRecord
       code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
     end
     # split into letters/numbers
-    code.scan(/[^\d]+|\d+/).map { |seg|
+    result = code.scan(/[^\d]+|\d+/).map { |seg|
       next seg if leading_zeros
       seg.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them - wherever they occur
     }.join("")
+    return result unless one_zero && !result.match?(/\d/)
+    "#{result}0"
   end
 
   def self.calculated_code_integer(str)
@@ -47,7 +49,11 @@ class BikeSticker < ApplicationRecord
   def self.code_integer_and_prefix_search(str)
     code_integer = calculated_code_integer(str)
     return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
-    where(code_integer: code_integer, code_prefix: calculated_code_prefix(str))
+    lookup_query = {}
+    lookup_query[:code_integer] = code_integer if code_integer.present?
+    code_prefix = calculated_code_prefix(str)
+    lookup_query[:code_prefix] = code_prefix if code_prefix.present?
+    where(lookup_query)
   end
 
   def self.search_matches_start_with?(str = nil)
@@ -67,7 +73,7 @@ class BikeSticker < ApplicationRecord
   # organization_id can be any organization identifier (name, slug, id)
   # generally don't pass in normalized_code
   def self.lookup(str, organization_id: nil)
-    normalized_code = normalize_code(str)
+    normalized_code = normalize_code(str, one_zero: true)
     matching_codes = code_integer_and_prefix_search(normalized_code)
     matching_codes.organization_search(organization_id).first || matching_codes.first
   end
@@ -217,7 +223,7 @@ class BikeSticker < ApplicationRecord
 
   def set_calculated_attributes
     self.code_number_length ||= calculated_code_number_length
-    self.code = self.class.normalize_code(code)
+    self.code = self.class.normalize_code(code, one_zero: true)
     self.code_integer = self.class.calculated_code_integer(code)
     self.code_prefix = self.class.calculated_code_prefix(code)
   end
