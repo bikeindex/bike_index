@@ -19,41 +19,131 @@ RSpec.describe BikeSticker, type: :model do
       expect(BikeSticker.normalize_code("LA 0011 12")).to eq "LA1112"
       expect(BikeSticker.normalize_code("L A 011 12")).to eq "LA1112"
     end
+    context "leading_zeros" do
+      it "keeps zeros" do
+        expect(BikeSticker.normalize_code("01", leading_zeros: true)).to eq "01"
+        expect(BikeSticker.normalize_code("0000001", leading_zeros: true)).to eq "0000001"
+        expect(BikeSticker.normalize_code("A01", leading_zeros: true)).to eq "A01"
+        expect(BikeSticker.normalize_code("https://bikeindex.org/bikes/scanned/012/", leading_zeros: true)).to eq "012"
+        expect(BikeSticker.normalize_code("https://bikeindex.org/bikes/scanned/a000012/", leading_zeros: true)).to eq "A000012"
+      end
+    end
   end
 
-  describe "basic stuff" do
+  describe "search_matches_start_with?" do
+    it "is falsey for nil" do
+      expect(BikeSticker.search_matches_start_with?()).to be_falsey
+      expect(BikeSticker.search_matches_start_with?(nil)).to be_falsey
+      expect(BikeSticker.search_matches_start_with?(" ")).to be_falsey
+    end
+    it "is falsey for numbers not zero" do
+      expect(BikeSticker.search_matches_start_with?("123")).to be_falsey
+      expect(BikeSticker.search_matches_start_with?(" 10000")).to be_falsey
+      expect(BikeSticker.search_matches_start_with?(" 123 ")).to be_falsey
+    end
+    it "is falsey if only letters" do
+      expect(BikeSticker.search_matches_start_with?(" A")).to be_falsey
+      expect(BikeSticker.search_matches_start_with?("ADDDX")).to be_falsey
+      expect(BikeSticker.search_matches_start_with?("\nADDDX")).to be_falsey
+      expect(BikeSticker.search_matches_start_with?("https://bikeindex.org/bikes/scanned/12/")).to be_falsey
+    end
+    context "is truthy" do
+      it "with letter prefix" do
+        expect(BikeSticker.search_matches_start_with?("a1")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("a123 ")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("a 1 1")).to be_truthy
+      end
+      it "with leading 0" do
+        expect(BikeSticker.search_matches_start_with?("01")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("0 1")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("\t0001")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("a 0 1")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("00000")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("a 000")).to be_truthy
+      end
+      it "for bike codes" do
+        expect(BikeSticker.search_matches_start_with?("https://bikeindex.org/bikes/scanned/012/")).to be_truthy
+        expect(BikeSticker.search_matches_start_with?("https://bikeindex.org/bikes/scanned/a12/")).to be_truthy
+      end
+    end
+  end
+
+  describe "lookup and admin_text_search" do
     let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
     let!(:spokecard) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "12", bike: bike1) }
-    let!(:sticker) { FactoryBot.create(:bike_sticker, code: 12, organization_id: organization.id) }
+    let!(:sticker) { FactoryBot.create(:bike_sticker, code: "012", organization_id: organization.id) }
     let!(:sticker_dupe) { FactoryBot.build(:bike_sticker, code: "00012", organization_id: organization.id) }
-    let!(:sticker2) { FactoryBot.create(:bike_sticker, code: "c000112", organization_id: organization.id) }
+    let!(:sticker2) { FactoryBot.create(:bike_sticker, code: "ca000112", organization_id: organization.id) }
+    let!(:sticker3) { FactoryBot.create(:bike_sticker, code: "ca001120", organization_id: organization.id) }
+    let!(:sticker4) { FactoryBot.create(:bike_sticker, code: "ca099112", organization_id: organization.id) }
+    let!(:sticker0) { FactoryBot.create(:bike_sticker, code: "ca000000", organization_id: organization.id) }
     let!(:spokecard_text) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "a31b", bike: bike1) }
 
-    it "calls the things we expect and finds the things we expect" do
+    xit "calls the things we expect and finds the things we expect" do
+      expect(sticker.reload.code_integer).to eq 112
+      expect(sticker.code_number_length).to eq 3
+      expect(sticker2.reload.code_integer).to eq 112
+      expect(sticker2.code).to eq "CA112" # Intended effect
+      expect(sticker2.code_number_length).to eq 6
+      expect(sticker3.reload.code_integer).to eq 1112
+      expect(sticker3.code).to eq "CA1112"
+      expect(sticker3.code_number_length).to eq 6
+      expect(sticker4.reload.code_integer).to eq 9999112
+      expect(sticker4.code).to eq "CA9999112"
+      expect(sticker4.code_number_length).to eq 6
+
+      expect(sticker0.reload.code).to eq "CA0"
+      expect(sticker0.code_number_length).to eq 6
       expect(BikeSticker.claimed.count).to eq 2
       expect(BikeSticker.unclaimed.count).to eq 2
       expect(BikeSticker.spokecard.count).to eq 2
       expect(BikeSticker.sticker.count).to eq 2
-      expect(sticker2.code).to eq "C112" # Side effect, we're ok with this
       expect(BikeSticker.lookup("92233720368547758999")).to be_blank # Outside of range
       expect(BikeSticker.lookup("000012", organization_id: organization.id)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: organization.to_param)).to eq sticker
       expect(BikeSticker.lookup("https://bikeindex.org/bikes/scanned/000012?organization_id=#{organization.short_name}", organization_id: organization.short_name)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: organization.name)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: "whateves")).to eq spokecard
-      expect(BikeSticker.lookup("000012")).to eq spokecard
-      expect(BikeSticker.admin_text_search("1").pluck(:id)).to match_array([spokecard_text.id, spokecard.id, sticker.id, sticker2.id])
-      expect(BikeSticker.admin_text_search(" ").pluck(:id)).to match_array([spokecard.id, sticker.id, spokecard_text.id, sticker2.id])
-      expect(BikeSticker.admin_text_search("0012").pluck(:id)).to match_array([spokecard.id, sticker.id, sticker2.id])
-      expect(BikeSticker.admin_text_search("c112").pluck(:id)).to eq([sticker2.id])
-      expect(BikeSticker.admin_text_search("c0112").pluck(:id)).to eq([sticker2.id])
-      expect(BikeSticker.admin_text_search("c11").pluck(:id)).to eq([sticker2.id])
+      expect(BikeSticker.lookup("000012")).to eq snpokecard
+      expect(BikeSticker.lookup("ca112")).to eq sticker2
+      expect(BikeSticker.lookup("ca00011")).to eq sticker2
+      expect(BikeSticker.lookup("ca0011")).to eq sticker2
+      expect(BikeSticker.lookup("00000")).to eq sticker0
+      expect(BikeSticker.lookup("CA0000000")).to eq sticker0
+      expect(BikeSticker.lookup("99112")).to eq([sticker4.id])
+      expect(BikeSticker.sticker_code_search("1").pluck(:id)).to match_array([spokecard_text.id, spokecard.id, sticker.id, sticker2.id, sticker4.id])
+      expect(BikeSticker.sticker_code_search("112").pluck(:id)).to match_array([spokecard_text.id,sticker.id, sticker2.id, sticker4.id])
+      expect(BikeSticker.sticker_code_search(" ").pluck(:id)).to match_array([spokecard.id, sticker.id, spokecard_text.id, sticker2.id, sticker4.id, sticker0.id])
+      expect(BikeSticker.sticker_code_search("99112").pluck(:id)).to eq([sticker4.id])
+      # leading 00s
+      expect(BikeSticker.sticker_code_search("0").pluck(:id)).to match_array([sticker.id, sticker2.id, sticker3.id, sticker4.id, sticker0.id, sticker0.id])
+      expect(BikeSticker.sticker_code_search("00").pluck(:id)).to match_array([sticker2.id, sticker3.id, sticker0.id])
+      expect(BikeSticker.sticker_code_search("000").pluck(:id)).to match_array([sticker2.id, sticker0.id])
+      expect(BikeSticker.sticker_code_search("012").pluck(:id)).to match_array([sticker.id, sticker2.id, sticker3.id])
+      expect(BikeSticker.sticker_code_search("0012").pluck(:id)).to match_array([sticker2.id, sticker3.id])
+      expect(BikeSticker.sticker_code_search("00012").pluck(:id)).to match_array([sticker2.id])
+      # C prefix
+      expect(BikeSticker.sticker_code_search("c").pluck(:id)).to match_array([sticker.id, sticker2.id, sticker4.id, sticker0.id, sticker4.id])
+      expect(BikeSticker.sticker_code_search("ca").pluck(:id)).to match_array([sticker.id, sticker2.id, sticker4.id, sticker0.id, sticker4.id])
+      expect(BikeSticker.sticker_code_search("ca112").pluck(:id)).to eq([sticker2.id])
+      expect(BikeSticker.sticker_code_search("ca0112").pluck(:id)).to eq([sticker2.id])
+      expect(BikeSticker.sticker_code_search("ca11").pluck(:id)).to eq([sticker2.id])
+      expect(BikeSticker.sticker_code_search("CA99").pluck(:id)).to eq([sticker4.id])
+      expect(BikeSticker.sticker_code_search("CA00").pluck(:id)).to eq([sticker4.id])
 
-      expect(BikeSticker.admin_text_search("a").pluck(:id)).to match_array([spokecard_text.id])
+      # leading zeros
+
+      # Things that don't match
+      expect(BikeSticker.sticker_code_search("ca12").pluck(:id)).to eq([])
+      expect(BikeSticker.sticker_code_search("ca99112").pluck(:id)).to eq([])
+      expect(BikeSticker.sticker_code_search("c11").pluck(:id)).to eq([])
+
+      expect(BikeSticker.sticker_code_search("a").pluck(:id)).to match_array([spokecard_text.id])
       expect(spokecard.claimed?).to be_truthy
       expect(sticker_dupe.save).to be_falsey
     end
   end
+
 
   describe "claimed?" do
     it "is not claimed if bike doesn't exist" do
@@ -339,6 +429,40 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker3.claimable_by?(user, organization)).to be_falsey # user isn't authorized on the organization
       end
     end
+    # context "other organizations" do
+    #   let(:organization1) { FactoryBot.create(:organization) }
+    #   let(:organization2) { FactoryBot.create(:organization) }
+    #   let(:organization3) { FactoryBot.create(:organization) }
+    #   let(:user1) { FactoryBot.create(:organization_member, organization: organization1) }
+    #   let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
+    #   let(:user3) { FactoryBot.create(:organization_member, organization: organization2) }
+    #   let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization1) }
+    #   let(:bike) { FactoryBot.create(:bike) }
+    #   it "is falsey for claimed" do
+    #     expect(bike_sticker.reload.secondary_organization_id).to be_blank
+    #     expect(bike_sticker.organization_id).to eq organization1.id
+    #     expect(bike_sticker.claimable_by?(user1)).to be_truthy
+    #     expect(bike_sticker.claimable_by?(user2)).to be_truthy
+    #     expect(bike_sticker.claimable_by?(user3)).to be_truthy
+    #     expect(bike_sticker.claimable_by?(user1, organization1)).to be_truthy
+    #     expect(bike_sticker.claimable_by?(user2, organization2)).to be_truthy
+    #     expect(bike_sticker.claimable_by?(user3, organization3)).to be_truthy
+    #     expect(bike_sticker.organization_authorized?(organization1)).to be_truthy
+    #     expect(bike_sticker.organization_authorized?(organization2)).to be_truthy
+    #     expect(bike_sticker.organization_authorized?(organization3)).to be_truthy
+    #     # But with not-users org, it's not authorized
+    #     expect(bike_sticker.claimable_by?(user1, organization3)).to be_falsey
+    #     expect(bike_sticker.claimable_by?(user2, organization3)).to be_falsey
+    #     expect(bike_sticker.claimable_by?(user3, organization1)).to be_falsey
+    #     # claim, then watch the change
+    #     bike_sticker.claim_if_permitted(user: user3, bike: bike.id, organization: organization2)
+    #     expect(bike_sticker.reload.secondary_organization_id).to eq organization2.id
+    #     expect(bike_sticker.organization_id).to eq organization1.id
+    #     expect(bike_sticker.claimable_by?(user1)).to be_truthy
+    #     expect(bike_sticker.claimable_by?(user2)).to be_truthy
+    #     expect(bike_sticker.claimable_by?(user3)).to be_falsey
+    #   end
+    # end
   end
 
   describe "claim" do

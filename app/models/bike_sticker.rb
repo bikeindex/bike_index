@@ -22,7 +22,7 @@ class BikeSticker < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  def self.normalize_code(str = nil)
+  def self.normalize_code(str = nil, leading_zeros: false)
     return nil unless str.present?
     code = str.to_s.upcase.strip.gsub(/\s*/, "")
     if code.match?(/BIKEINDEX.ORG/)
@@ -31,6 +31,7 @@ class BikeSticker < ApplicationRecord
     end
     # split into letters/numbers
     code.scan(/[^\d]+|\d+/).map { |seg|
+      next seg if leading_zeros
       seg.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them - wherever they occur
     }.join("")
   end
@@ -47,6 +48,12 @@ class BikeSticker < ApplicationRecord
     code_integer = calculated_code_integer(str)
     return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
     where(code_integer: code_integer, code_prefix: calculated_code_prefix(str))
+  end
+
+  def self.search_matches_start_with?(str = nil)
+    code = normalize_code(str, leading_zeros: true)
+    return false if code.blank?
+    code.start_with?("0") || code.match?(/\D\d/)
   end
 
   def self.organization_search(organization_id)
