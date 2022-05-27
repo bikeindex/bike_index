@@ -107,7 +107,7 @@ module Organized
       permitted_kinds = []
       permitted_kinds += ["ascend"] if current_organization.ascend_pos?
       permitted_kinds += ["organization_import"] if current_organization.enabled?("show_bulk_import")
-      permitted_kinds += ["impounded"] if current_organization.enabled?("impound_bikes")
+      permitted_kinds += ["impounded"] if current_organization.enabled?("show_bulk_import_impound")
       permitted_kinds += ["stolen"] if current_organization.enabled?("show_bulk_import_stolen")
       # Only show both types to superusers if the organization doesn't have any
       # to more closely resemble the organization interface

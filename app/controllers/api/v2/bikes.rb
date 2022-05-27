@@ -23,6 +23,7 @@ module API
           optional :is_for_sale, type: Boolean
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
           optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
+          optional :bike_sticker, type: String, desc: "Bike Sticker code"
 
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
@@ -61,10 +62,9 @@ module API
 
         def creation_user_id
           if current_user.id == ENV["V2_ACCESSOR_ID"].to_i
-            org = params[:organization_slug].present? && Organization.friendly_find(params[:organization_slug])
-            if org && current_token.application.owner.present? && current_token.application.owner.admin_of?(org)
-              return org.auto_user_id
-            end
+            return current_organization.auto_user_id if current_organization.present? &&
+              current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
+
             error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
           end
           current_user.id
@@ -130,8 +130,7 @@ module API
           use :bike_attrs
         end
         post "check_if_registered" do
-          organization = Organization.friendly_find(params[:organization_slug])
-          if organization.present? && current_user.authorized?(organization)
+          if current_organization.present?
             {registered: find_owned_bike.present?}
           else
             error!("You are not authorized for that organization", 401)
@@ -189,7 +188,13 @@ module API
             if b_param.params.dig("bike", "external_image_urls").present?
               @bike.load_external_images(b_param.params["bike"]["external_image_urls"])
             end
-
+            if b_param.bike_sticker_code.present?
+              bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: current_organization&.id)
+              # Don't reclaim an already claimed sticker
+              if bike_sticker.present? && bike_sticker.bike_id != found_bike.id
+                bike_sticker.claim_if_permitted(user: found_bike.creator, bike: found_bike.id, organization: current_organization)
+              end
+            end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
               bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone))

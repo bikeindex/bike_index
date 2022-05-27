@@ -300,7 +300,8 @@ CREATE TABLE public.bike_sticker_updates (
     update_number integer,
     failed_claim_errors text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    bulk_import_id bigint
 );
 
 
@@ -4582,6 +4583,13 @@ CREATE INDEX index_bike_sticker_updates_on_bike_sticker_id ON public.bike_sticke
 
 
 --
+-- Name: index_bike_sticker_updates_on_bulk_import_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_bulk_import_id ON public.bike_sticker_updates USING btree (bulk_import_id);
+
+
+--
 -- Name: index_bike_sticker_updates_on_export_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6310,6 +6318,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220405173312'),
 ('20220411165641'),
 ('20220412151420'),
-('20220420145734');
+('20220420145734'),
+('20220520180217');
 
 

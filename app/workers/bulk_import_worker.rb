@@ -96,6 +96,7 @@ class BulkImportWorker < ApplicationWorker
         frame_size: row[:frame_size],
         phone: row[:phone],
         address: row[:address],
+        bike_sticker: row[:bike_sticker],
         user_name: row[:owner_name],
         extra_registration_number: row[:secondary_serial],
         send_email: @bulk_import.send_email,

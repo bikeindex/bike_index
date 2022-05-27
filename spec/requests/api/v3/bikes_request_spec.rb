@@ -78,6 +78,7 @@ RSpec.describe "Bikes API V3", type: :request do
       }
     end
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
     before { FactoryBot.create(:wheel_size, iso_bsd: 559) }
 
     context "no token" do
@@ -188,6 +189,7 @@ RSpec.describe "Bikes API V3", type: :request do
         end
 
         it "updates the pre-existing record" do
+          expect(bike_sticker.reload.bike_sticker_updates.count).to eq 0
           old_color = FactoryBot.create(:color, name: "old_color")
           new_color = FactoryBot.create(:color, name: "new_color")
           old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
@@ -224,6 +226,7 @@ RSpec.describe "Bikes API V3", type: :request do
             year: new_year,
             owner_email: user.email,
             frame_material: "steel",
+            bike_sticker: bike_sticker.code.downcase,
             cycle_type_name: new_cycle_type.slug.to_s
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
@@ -238,6 +241,16 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
           expect(bike2["rear_tire_narrow"]).to eq(true)
           expect(bike2["frame_material_slug"]).to eq("steel")
+
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_truthy
+          expect(bike_sticker.bike_id).to eq bike1.id
+          expect(bike_sticker.organization_id).to be_blank
+          expect(bike_sticker.secondary_organization_id).to be_blank
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+          bike_sticker_update = bike_sticker.bike_sticker_updates.first
+          expect(bike_sticker_update.organization_id).to be_blank
+          expect(bike_sticker_update.creator_kind).to eq "creator_user"
         end
       end
 
@@ -294,10 +307,13 @@ RSpec.describe "Bikes API V3", type: :request do
             manufacturer: bike.manufacturer.name,
             color: color.name,
             year: "2012",
+            bike_sticker: "#{bike_sticker.code}  ",
             owner_email: bike.owner_email
           }
         end
         it "updates" do
+          bike_sticker.claim(bike: bike, user: FactoryBot.create(:admin))
+          expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
           expect(bike.year).to_not eq 2012
           expect {
             post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
@@ -310,6 +326,8 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(returned_bike["year"]).to eq 2012
           bike.reload
           expect(bike.year).to eq 2012
+          # It doesn't reclaim sticker
+          expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
         end
         context "can_edit_claimed false" do
           let(:can_edit_claimed) { false }
@@ -449,6 +467,7 @@ RSpec.describe "Bikes API V3", type: :request do
         is_bulk: true,
         is_new: true,
         is_pos: true,
+        bike_sticker: bike_sticker.code.downcase,
         external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
         description: "<svg/onload=alert(document.cookie)>")
       expect {
