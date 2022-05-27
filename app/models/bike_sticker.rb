@@ -216,12 +216,19 @@ class BikeSticker < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.code_number_length ||= calculated_code_number_length
     self.code = self.class.normalize_code(code)
     self.code_integer = self.class.calculated_code_integer(code)
     self.code_prefix = self.class.calculated_code_prefix(code)
   end
 
   private
+
+  def calculated_code_number_length
+    return bike_sticker_batch.code_number_length if bike_sticker_batch&.code_number_length.present?
+    # In production, stickers should only be created with batches. This is really only for testing
+    code.gsub(/\D/, "").length
+  end
 
   def code_number_string
     str = code_integer.to_s

@@ -68,44 +68,61 @@ RSpec.describe BikeSticker, type: :model do
     end
   end
 
+  describe "code_number_length" do
+    let!(:bike_sticker1) { FactoryBot.create(:bike_sticker, code: "00012") }
+    let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "ca0112") }
+    let!(:bike_sticker3) { FactoryBot.create(:bike_sticker, code: "cA10", bike_sticker_batch_id: bike_sticker_batch.id) }
+    let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, code_number_length: 5) }
+    it "matches the batch length or the calculated length" do
+      expect(bike_sticker1.code).to eq "12"
+      expect(bike_sticker1.code_number_length).to eq 5
+      expect(bike_sticker2.code).to eq "CA112"
+      expect(bike_sticker2.code_number_length).to eq 4
+      expect(bike_sticker3.code).to eq "CA10"
+      expect(bike_sticker3.code_number_length).to eq 5
+    end
+  end
+
   describe "lookup and admin_text_search" do
     let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
     let!(:spokecard) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "12", bike: bike1) }
     let!(:sticker) { FactoryBot.create(:bike_sticker, code: "012", organization_id: organization.id) }
     let!(:sticker_dupe) { FactoryBot.build(:bike_sticker, code: "00012", organization_id: organization.id) }
-    let!(:sticker2) { FactoryBot.create(:bike_sticker, code: "ca000112", organization_id: organization.id) }
     let!(:sticker3) { FactoryBot.create(:bike_sticker, code: "ca001120", organization_id: organization.id) }
+    let!(:sticker2) { FactoryBot.create(:bike_sticker, code: "ca000112", organization_id: organization.id) }
     let!(:sticker4) { FactoryBot.create(:bike_sticker, code: "ca099112", organization_id: organization.id) }
     let!(:sticker0) { FactoryBot.create(:bike_sticker, code: "ca000000", organization_id: organization.id) }
     let!(:spokecard_text) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "a31b", bike: bike1) }
 
-    xit "calls the things we expect and finds the things we expect" do
-      expect(sticker.reload.code_integer).to eq 112
+    it "calls the things we expect and finds the things we expect" do
+      expect(sticker.reload.code_integer).to eq 12
       expect(sticker.code_number_length).to eq 3
       expect(sticker2.reload.code_integer).to eq 112
       expect(sticker2.code).to eq "CA112" # Intended effect
       expect(sticker2.code_number_length).to eq 6
-      expect(sticker3.reload.code_integer).to eq 1112
-      expect(sticker3.code).to eq "CA1112"
+      expect(sticker3.reload.code_integer).to eq 1120
+      expect(sticker3.code).to eq "CA1120"
       expect(sticker3.code_number_length).to eq 6
-      expect(sticker4.reload.code_integer).to eq 9999112
-      expect(sticker4.code).to eq "CA9999112"
+      expect(sticker4.reload.code_integer).to eq 99112
+      expect(sticker4.code).to eq "CA99112"
       expect(sticker4.code_number_length).to eq 6
 
-      expect(sticker0.reload.code).to eq "CA0"
+      expect(sticker0.reload.code).to eq "CA"
       expect(sticker0.code_number_length).to eq 6
       expect(BikeSticker.claimed.count).to eq 2
-      expect(BikeSticker.unclaimed.count).to eq 2
+      expect(BikeSticker.unclaimed.count).to eq 5
       expect(BikeSticker.spokecard.count).to eq 2
-      expect(BikeSticker.sticker.count).to eq 2
+      expect(BikeSticker.sticker.count).to eq 5
       expect(BikeSticker.lookup("92233720368547758999")).to be_blank # Outside of range
       expect(BikeSticker.lookup("000012", organization_id: organization.id)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: organization.to_param)).to eq sticker
       expect(BikeSticker.lookup("https://bikeindex.org/bikes/scanned/000012?organization_id=#{organization.short_name}", organization_id: organization.short_name)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: organization.name)).to eq sticker
       expect(BikeSticker.lookup("000012", organization_id: "whateves")).to eq spokecard
-      expect(BikeSticker.lookup("000012")).to eq snpokecard
+      expect(BikeSticker.lookup("000012")).to eq spokecard
       expect(BikeSticker.lookup("ca112")).to eq sticker2
+      expect(BikeSticker.lookup("ca1120")).to eq sticker2
+      expect(BikeSticker.lookup("ca00011")).to eq sticker2
       expect(BikeSticker.lookup("ca00011")).to eq sticker2
       expect(BikeSticker.lookup("ca0011")).to eq sticker2
       expect(BikeSticker.lookup("00000")).to eq sticker0
