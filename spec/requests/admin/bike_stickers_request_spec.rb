@@ -41,7 +41,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         notes: "Cool new thing",
         prefix: "XX",
         initial_code_integer: "012",
-        code_number_length: "04",
+        code_number_length: "05",
         stickers_to_create_count: 2,
         organization_id: organization.id
       }
@@ -58,7 +58,9 @@ RSpec.describe Admin::BikeStickersController, type: :request do
       expect(bike_sticker_batch.organization_id).to eq passed_params[:organization_id]
       expect(bike_sticker_batch.user_id).to eq current_user.id
       expect(bike_sticker_batch.prefix).to eq passed_params[:prefix].strip.upcase
-      expect(bike_sticker_batch.code_number_length).to eq passed_params[:code_number_length]&.to_i
+      if passed_params[:code_number_length].present?
+        expect(bike_sticker_batch.code_number_length).to eq passed_params[:code_number_length]&.to_i
+      end
       expect(response).to redirect_to(admin_bike_stickers_path(search_bike_sticker_batch_id: bike_sticker_batch.id))
 
       expect(CreateBikeStickerCodesWorker.jobs.count).to eq 1
@@ -67,10 +69,24 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         passed_params[:initial_code_integer]&.to_i]
 
       expect(CreateBikeStickerCodesWorker.jobs.map { |j| j["args"] }.last.flatten).to eq target_args
+
+      bike_sticker_batch
     end
 
     it "creates" do
       expect_success(base_url, valid_params)
+    end
+    context "with no code_number_length" do
+      it "creates" do
+        bike_sticker_batch = expect_success(base_url, valid_params.except(:code_number_length))
+        expect(bike_sticker_batch.code_number_length).to eq 4 # Default, because number was smaller
+      end
+    end
+    context "calculated code_number_length 5" do
+      it "creates" do
+        bike_sticker_batch = expect_success(base_url, valid_params.except(:code_number_length).merge(initial_code_integer: "012345"))
+        expect(bike_sticker_batch.code_number_length).to eq 5
+      end
     end
     context "no prefix" do
       it "fails" do

@@ -17,7 +17,7 @@ RSpec.describe BikeStickerBatch, type: :model do
     it "create_codes works and derives last code" do
       bike_sticker_batch.update_column :updated_at, Time.current - 1.hour
       expect(bike_sticker_batch.updated_at).to be < Time.current - 50.minutes
-      expect(bike_sticker_batch.code_number_length_or_default).to eq 4
+      expect(bike_sticker_batch.calculated_code_number_length).to eq 4
       expect(bike_sticker_batch.bike_stickers.count).to eq 0
       expect {
         bike_sticker_batch.create_codes(3, initial_code_integer: 9999)
@@ -29,7 +29,7 @@ RSpec.describe BikeStickerBatch, type: :model do
       expect(organization.bike_stickers.count).to eq 3
       expect(bike_sticker_batch.bike_stickers.pluck(:code)).to match_array target_codes
       expect(bike_sticker_batch.bike_stickers.pluck(:code_integer)).to match_array([9999, 10_000, 10_001])
-      expect(bike_sticker_batch.code_number_length_or_default).to eq 5
+      expect(bike_sticker_batch.calculated_code_number_length).to eq 4
 
       expect {
         bike_sticker_batch.create_codes(1)
@@ -55,6 +55,24 @@ RSpec.describe BikeStickerBatch, type: :model do
         expect {
           bike_sticker_batch.create_codes(100)
         }.to raise_error(/prefix/i)
+      end
+    end
+  end
+
+  context "calculated_code_number_length" do
+    it "is 4 by default" do
+      expect(BikeStickerBatch.new.calculated_code_number_length).to eq 4
+    end
+    context "with initial_code_integer" do
+      let(:bike_sticker_batch) { BikeStickerBatch.new(initial_code_integer: "012345") }
+      it "is the initial_code_integer length" do
+        expect(bike_sticker_batch.calculated_code_number_length).to eq 5
+      end
+    end
+    context "with initial_code_integer" do
+      let(:bike_sticker_batch) { BikeStickerBatch.new(initial_code_integer: "99999", stickers_to_create_count: 2) }
+      it "is the max sticker length" do
+        expect(bike_sticker_batch.calculated_code_number_length).to eq 6
       end
     end
   end

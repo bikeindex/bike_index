@@ -222,7 +222,8 @@ class BikeSticker < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.code_number_length ||= calculated_code_number_length
+    return if id.present? # no need to recalculate these every time
+    self.code_number_length = calculated_code_number_length
     self.code = self.class.normalize_code(code, one_zero: true)
     self.code_integer = self.class.calculated_code_integer(code)
     self.code_prefix = self.class.calculated_code_prefix(code)

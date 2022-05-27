@@ -146,14 +146,15 @@ class Admin::BikeStickersController < Admin::BaseController
 
   def permitted_parameters
     params.require(:bike_sticker_batch)
-      .permit(:notes, :prefix, :initial_code_integer, :code_number_length,
-        :stickers_to_create_count, :organization_id)
+      .permit(:notes, :prefix, :initial_code_integer, :stickers_to_create_count,
+        :organization_id, :code_number_length)
       .merge(user_id: current_user.id)
   end
 
   def create_batch_if_valid!
     @bike_sticker_batch = BikeStickerBatch.new(permitted_parameters)
     @bike_sticker_batch.validate
+    pp @bike_sticker_batch.code_number_length
     unless @bike_sticker_batch.stickers_to_create_count.to_i > 0
       @bike_sticker_batch.errors.add(:base, "Number of stickers to create is required")
     end
