@@ -80,7 +80,7 @@ class BikeSticker < ApplicationRecord
     bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
   end
 
-  def self.admin_text_search(str)
+  def self.sticker_code_search(str)
     normalized_code = normalize_code(str)
     return all unless normalized_code.present?
     where("code ILIKE ?", "%#{normalized_code}%")

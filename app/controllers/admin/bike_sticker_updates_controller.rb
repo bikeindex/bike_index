@@ -58,7 +58,7 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
       @searched_bike_stickers = BikeSticker.where(id: params[:search_bike_sticker_id])
       bike_sticker_updates = bike_sticker_updates.where(bike_sticker_id: @searched_bike_stickers.pluck(:id))
     elsif params[:search_query].present?
-      @searched_bike_stickers = bike_stickers.admin_text_search(params[:search_query])
+      @searched_bike_stickers = bike_stickers.sticker_code_search(params[:search_query])
       bike_sticker_updates = bike_sticker_updates.where(bike_sticker_id: @searched_bike_stickers.pluck(:id))
     end
     bike_sticker_updates.where(created_at: @time_range)

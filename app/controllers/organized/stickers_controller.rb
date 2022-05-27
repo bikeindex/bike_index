@@ -65,7 +65,7 @@ module Organized
       elsif params[:search_claimedness] && params[:search_claimedness] != "all"
         searched_codes = params[:search_claimedness] == "claimed" ? searched_codes.claimed : searched_codes.unclaimed
       end
-      searched_codes.admin_text_search(params[:query])
+      searched_codes.sticker_code_search(params[:query])
     end
 
     def ensure_access_to_bike_stickers!

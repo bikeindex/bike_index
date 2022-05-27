@@ -102,7 +102,7 @@ class Admin::BikeStickersController < Admin::BaseController
     end
     if params[:search_query].present?
       @matching_batches = true
-      bike_stickers = bike_stickers.admin_text_search(params[:search_query])
+      bike_stickers = bike_stickers.sticker_code_search(params[:search_query])
     end
     @time_range_column = sort_column if %w[created_at updated_at claimed_at].include?(sort_column)
     @time_range_column ||= "created_at"
