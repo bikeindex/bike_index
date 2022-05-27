@@ -154,7 +154,6 @@ class Admin::BikeStickersController < Admin::BaseController
   def create_batch_if_valid!
     @bike_sticker_batch = BikeStickerBatch.new(permitted_parameters)
     @bike_sticker_batch.validate
-    pp @bike_sticker_batch.code_number_length
     unless @bike_sticker_batch.stickers_to_create_count.to_i > 0
       @bike_sticker_batch.errors.add(:base, "Number of stickers to create is required")
     end

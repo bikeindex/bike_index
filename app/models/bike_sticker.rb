@@ -38,16 +38,23 @@ class BikeSticker < ApplicationRecord
     "#{result}0"
   end
 
+  def self.calculated_code_numbers(str)
+    str&.to_s&.gsub(/\A\D+/, "")
+  end
+
   def self.calculated_code_integer(str)
-    str.present? ? str.gsub(/\A\D+/, "").to_i : nil
+    return str if str.is_a?(Integer)
+    numbers = calculated_code_numbers(str)
+    numbers.present? ? numbers.to_i : nil
   end
 
   def self.calculated_code_prefix(str)
     str.present? ? str.gsub(/\d+\z/, "").upcase : nil
   end
 
-  def self.code_integer_and_prefix_search(str)
-    code_integer = calculated_code_integer(str)
+  # Pass in NOT normalized_code
+  def self.code_integer_and_prefix_search(str, code_integer: nil)
+    code_integer ||= calculated_code_integer(str)
     return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
     lookup_query = {}
     lookup_query[:code_integer] = code_integer if code_integer.present?
@@ -73,8 +80,12 @@ class BikeSticker < ApplicationRecord
   # organization_id can be any organization identifier (name, slug, id)
   # generally don't pass in normalized_code
   def self.lookup(str, organization_id: nil)
-    normalized_code = normalize_code(str, one_zero: true)
+    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    normalized_code = normalize_code(normalized_code_with_zeroes, one_zero: true)
+    code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
+
     matching_codes = code_integer_and_prefix_search(normalized_code)
+    matching_codes = matching_codes.of_length(code_number_length)
     matching_codes.organization_search(organization_id).first || matching_codes.first
   end
 
@@ -93,10 +104,18 @@ class BikeSticker < ApplicationRecord
     bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
   end
 
+  def self.of_length(int)
+    where("code_number_length >= ?", int)
+  end
+
   def self.sticker_code_search(str)
-    normalized_code = normalize_code(str)
-    return all unless normalized_code.present?
-    where("code ILIKE ?", "%#{normalized_code}%")
+    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    return all unless normalized_code_with_zeroes.present?
+    normalized_code = normalize_code(normalized_code_with_zeroes, one_zero: true)
+    code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
+
+    of_length(code_number_length)
+      .where("code ILIKE ?", "%#{normalized_code}%")
   end
 
   def self.next_unclaimed_code(after_id = nil)

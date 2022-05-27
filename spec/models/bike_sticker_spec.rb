@@ -93,17 +93,17 @@ RSpec.describe BikeSticker, type: :model do
       expect(sticker0.code_integer).to eq 0
       expect(sticker0.code_prefix).to eq "CA"
 
-      expect(BikeSticker.code_integer_and_prefix_search("CA 00 00 0").pluck(:id)).to eq([sticker0.id])
+      expect(BikeSticker.code_integer_and_prefix_search("CA00000").pluck(:id)).to eq([sticker0.id])
       expect(BikeSticker.code_integer_and_prefix_search("CA0").pluck(:id)).to eq([sticker0.id])
-      expect(BikeSticker.lookup("CA0000000")).to eq sticker0
+      expect(BikeSticker.lookup("CA00 00 00")).to eq sticker0
 
       expect(BikeSticker.normalize_code("00 00 0", one_zero: true)).to eq "0"
       expect(BikeSticker.code_integer_and_prefix_search("0").pluck(:id)).to eq([sticker0.id])
       expect(BikeSticker.lookup("00 00 0")).to eq sticker0
 
       expect(BikeSticker.sticker_code_search("0").pluck(:id)).to match_array([sticker0.id])
-      expect(BikeSticker.sticker_code_search("000000").pluck(:id)).to match_array([sticker0.id])
-      expect(BikeSticker.sticker_code_search("0000000").pluck(:id)).to match_array([sticker0.id])
+      expect(BikeSticker.sticker_code_search("00 00 0").pluck(:id)).to match_array([sticker0.id])
+      expect(BikeSticker.sticker_code_search("00 00 00").pluck(:id)).to match_array([sticker0.id])
     end
   end
 
@@ -114,26 +114,36 @@ RSpec.describe BikeSticker, type: :model do
     it "looks up correctly" do
       expect(sticker.reload.code_integer).to eq 12
       expect(sticker.code_number_length).to eq 4
+      expect(sticker2.reload.code_integer).to eq 112
+      expect(sticker2.code).to eq "CA112" # Intended effect
+      expect(sticker2.code_number_length).to eq 6
+
+      expect(BikeSticker.of_length(5).pluck(:id)).to eq([sticker2.id])
 
       expect(BikeSticker.lookup("12")).to eq sticker
       expect(BikeSticker.lookup("12", organization_id: organization.id)).to eq sticker
       expect(BikeSticker.lookup("0012")).to eq sticker
-      expect(BikeSticker.lookup("00012")).to eq sticker2
+      expect(BikeSticker.lookup("00012")).to be_blank
       expect(BikeSticker.lookup("00000012")).to be_blank
       expect(BikeSticker.lookup("112")).to eq sticker2
-      expect(BikeSticker.lookup("ca12")).to eq sticker2
+      expect(BikeSticker.lookup("00 0 112")).to eq sticker2
+      expect(BikeSticker.lookup("00 00 112")).to be_blank
+      expect(BikeSticker.lookup("ca00 0 112")).to eq sticker2
 
       expect(BikeSticker.sticker_code_search("12").pluck(:id)).to match_array([sticker.id, sticker2.id])
       expect(BikeSticker.sticker_code_search("001 2").pluck(:id)).to match_array([sticker.id, sticker2.id])
       expect(BikeSticker.sticker_code_search("0 0 012").pluck(:id)).to match_array([sticker2.id])
       expect(BikeSticker.sticker_code_search("00 0 0 012").pluck(:id)).to eq([])
 
-      expect(BikeSticker.sticker_code_search("A12").pluck(:id)).to match_array([sticker2.id])
-      expect(BikeSticker.sticker_code_search("cA 0000012").pluck(:id)).to eq([])
+      expect(BikeSticker.sticker_code_search("CA112").pluck(:id)).to match_array([sticker2.id])
+      expect(BikeSticker.sticker_code_search("C A 000 112").pluck(:id)).to match_array([sticker2.id])
+
+      expect(BikeSticker.sticker_code_search("CA12").pluck(:id)).to match_array([])
+      expect(BikeSticker.sticker_code_search("cA 00000112").pluck(:id)).to eq([])
+      expect(BikeSticker.sticker_code_search("A12").pluck(:id)).to eq([])
 
       # Some zeros
-      expect(BikeSticker.sticker_code_search("0").pluck(:id)).to match_array([sticker.id, sticker2.id])
-      expect(BikeSticker.sticker_code_search("00").pluck(:id)).to match_array([sticker.id, sticker2.id])
+      expect(BikeSticker.sticker_code_search("0").pluck(:id)).to match_array([])
 
       # Can't save something that has the same number
       sticker_dupe = FactoryBot.build(:bike_sticker, code: "00012", organization_id: organization.id)
@@ -146,17 +156,14 @@ RSpec.describe BikeSticker, type: :model do
       let!(:sticker0) { FactoryBot.create(:bike_sticker, code: "ca000000", organization_id: organization.id) }
       let!(:spokecard_text) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "a31b", bike: bike1) }
 
-      xit "calls the things we expect and finds the things we expect" do
+      it "calls the things we expect and finds the things we expect" do
+        expect(sticker.reload.code_integer).to eq 12 # sanity
+        expect(sticker2.reload.code_integer).to eq 112 # sanity
+
         expect(spokecard.reload.code_integer).to eq 12
         expect(spokecard.code).to eq "12"
         expect(spokecard.code_number_length).to eq 2
         expect(spokecard.claimed?).to be_truthy
-
-        expect(sticker.reload.code_integer).to eq 12 # sanity
-
-        expect(sticker2.reload.code_integer).to eq 112
-        expect(sticker2.code).to eq "CA112" # Intended effect
-        expect(sticker2.code_number_length).to eq 6
         expect(sticker3.reload.code_integer).to eq 1120
         expect(sticker3.code).to eq "CA1120"
         expect(sticker3.code_number_length).to eq 6
@@ -166,6 +173,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(sticker0.reload.code).to eq "CA0"
         expect(sticker0.code_number_length).to eq 6
         expect(sticker0.code_integer).to eq 0
+
         expect(BikeSticker.calculated_code_integer("ca000000")).to eq 0
         expect(BikeSticker.claimed.count).to eq 2
         expect(BikeSticker.unclaimed.count).to eq 5
@@ -287,8 +295,7 @@ RSpec.describe BikeSticker, type: :model do
       it "finds the sticker" do
         expect(BikeSticker.lookup("CAL09999")).to eq bike_sticker
         expect(BikeSticker.lookup("CAL9999")).to eq bike_sticker
-        expect(BikeSticker.lookup("CAL0009999")).to eq bike_sticker
-        expect(BikeSticker.lookup("CAL0009999")).to eq bike_sticker
+        expect(BikeSticker.lookup("CAL09999")).to eq bike_sticker
         expect(BikeSticker.lookup("CAL09999", organization_id: organization2.id)).to eq bike_sticker
         expect(BikeSticker.lookup_with_fallback("CAL09999", organization_id: organization2.id)).to eq bike_sticker
         expect(BikeSticker.lookup_with_fallback("CAL 00 099 98", organization_id: organization2.id)).to eq bike_sticker2
