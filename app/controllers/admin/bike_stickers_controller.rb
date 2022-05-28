@@ -102,7 +102,7 @@ class Admin::BikeStickersController < Admin::BaseController
     end
     if params[:search_query].present?
       @matching_batches = true
-      bike_stickers = bike_stickers.admin_text_search(params[:search_query])
+      bike_stickers = bike_stickers.sticker_code_search(params[:search_query])
     end
     @time_range_column = sort_column if %w[created_at updated_at claimed_at].include?(sort_column)
     @time_range_column ||= "created_at"
@@ -146,8 +146,8 @@ class Admin::BikeStickersController < Admin::BaseController
 
   def permitted_parameters
     params.require(:bike_sticker_batch)
-      .permit(:notes, :prefix, :initial_code_integer, :code_number_length,
-        :stickers_to_create_count, :organization_id)
+      .permit(:notes, :prefix, :initial_code_integer, :stickers_to_create_count,
+        :organization_id, :code_number_length)
       .merge(user_id: current_user.id)
   end
 

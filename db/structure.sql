@@ -342,7 +342,8 @@ CREATE TABLE public.bike_stickers (
     bike_sticker_batch_id integer,
     code_integer bigint,
     code_prefix character varying,
-    secondary_organization_id bigint
+    secondary_organization_id bigint,
+    code_number_length integer
 );
 
 
@@ -6243,6 +6244,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220405173312'),
 ('20220411165641'),
 ('20220420145734'),
-('20220520180217');
+('20220520180217'),
+('20220527162543');
 
 
