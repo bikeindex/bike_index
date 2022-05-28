@@ -156,24 +156,6 @@ RSpec.describe Organized::StickersController, type: :request do
               expect(bike_sticker.bike_id).to eq bike2.id
             end
           end
-          context "incomplete code non-matching" do
-            let!(:bike_sticker) { FactoryBot.create(:bike_sticker, bike_id: bike.id, organization_id: current_organization.id, code: "AA9151515") }
-            it "updates" do
-              expect(BikeSticker.sticker_code_search("151515").pluck(:id)).to eq([bike_sticker.id])
-              expect(BikeSticker.sticker_code_search("000151515").pluck(:id)).to eq([])
-              expect {
-                put "#{base_url}/code",
-                  params: {bike_sticker: {bike_id: bike2.id, code: "000151515"}},
-                  headers: {"HTTP_REFERER" => bike_path(bike2)}
-              }.to change(BikeStickerUpdate, :count).by 1
-              pp flash
-              expect(flash[:error]).to be_present
-              expect(response).to redirect_to edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_sticker.code)
-              bike_sticker.reload
-              expect(bike_sticker.bike.id).to eq bike.id
-              expect(bike_sticker.bike_sticker_updates.last.kind).to eq "failed_claim"
-            end
-          end
         end
         context "non-organization bike_sticker" do
           let(:og_organization) { FactoryBot.create(:organization) }
@@ -192,24 +174,6 @@ RSpec.describe Organized::StickersController, type: :request do
             expect(bike_sticker.organization_id).to eq og_organization.id
             expect(bike_sticker.secondary_organization_id).to eq current_organization.id
             expect(bike_sticker.bike_id).to eq bike2.id
-          end
-        end
-        context "claimed other organization bike_sticker" do
-          let(:og_organization) { FactoryBot.create(:organization) }
-          let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: og_organization) }
-          it "responds with flash error" do
-            expect(bike_sticker.reload.organization_id).to be_present
-            expect(bike_sticker.claimed?).to be_truthy
-            expect(BikeSticker.user_can_claim_sticker?(current_user, bike_sticker)).to be_falsey
-            expect {
-              put "#{base_url}/#{bike_sticker.code}", params: {bike_id: bike2.id, organization_id: current_organization.id}
-            }.to change(BikeStickerUpdate, :count).by 1
-            expect(flash[:error]).to be_present
-            expect(response).to redirect_to edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_sticker.code)
-            bike_sticker.reload
-            expect(bike_sticker.bike.id).to eq bike.id
-            expect(bike_sticker.organization_id).to eq og_organization.id
-            expect(bike_sticker.bike_sticker_updates.last.kind).to eq "failed_claim"
           end
         end
         context "nil bike_id" do
