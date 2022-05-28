@@ -34,38 +34,38 @@ RSpec.describe BikeSticker, type: :model do
 
   describe "search_matches_start_with?" do
     it "is falsey for nil" do
-      expect(BikeSticker.search_matches_start_with?()).to be_falsey
-      expect(BikeSticker.search_matches_start_with?(nil)).to be_falsey
-      expect(BikeSticker.search_matches_start_with?(" ")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?)).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, nil)).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, " ")).to be_falsey
     end
     it "is falsey for numbers not zero" do
-      expect(BikeSticker.search_matches_start_with?("123")).to be_falsey
-      expect(BikeSticker.search_matches_start_with?(" 10000")).to be_falsey
-      expect(BikeSticker.search_matches_start_with?(" 123 ")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, "123")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, " 10000")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, " 123 ")).to be_falsey
     end
     it "is falsey if only letters" do
-      expect(BikeSticker.search_matches_start_with?(" A")).to be_falsey
-      expect(BikeSticker.search_matches_start_with?("ADDDX")).to be_falsey
-      expect(BikeSticker.search_matches_start_with?("\nADDDX")).to be_falsey
-      expect(BikeSticker.search_matches_start_with?("https://bikeindex.org/bikes/scanned/12/")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, " A")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, "ADDDX")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, "\nADDDX")).to be_falsey
+      expect(BikeSticker.send(:search_matches_start_with?, "https://bikeindex.org/bikes/scanned/12/")).to be_falsey
     end
     context "is truthy" do
       it "with letter prefix" do
-        expect(BikeSticker.search_matches_start_with?("a1")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("a123 ")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("a 1 1")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "a1")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "a123 ")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "a 1 1")).to be_truthy
       end
       it "with leading 0" do
-        expect(BikeSticker.search_matches_start_with?("01")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("0 1")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("\t0001")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("a 0 1")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("00000")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("a 000")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "01")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "0 1")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "\t0001")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "a 0 1")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "00000")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "a 000")).to be_truthy
       end
       it "for bike codes" do
-        expect(BikeSticker.search_matches_start_with?("https://bikeindex.org/bikes/scanned/012/")).to be_truthy
-        expect(BikeSticker.search_matches_start_with?("https://bikeindex.org/bikes/scanned/a12/")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "https://bikeindex.org/bikes/scanned/012/")).to be_truthy
+        expect(BikeSticker.send(:search_matches_start_with?, "https://bikeindex.org/bikes/scanned/a12/")).to be_truthy
       end
     end
   end
@@ -109,8 +109,8 @@ RSpec.describe BikeSticker, type: :model do
 
   describe "lookup and admin_text_search" do
     let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
-    let!(:sticker) { FactoryBot.create(:bike_sticker, code: "0012", organization_id: organization.id) }
-    let!(:sticker2) { FactoryBot.create(:bike_sticker, code: "ca000112", organization_id: organization.id) }
+    let(:sticker) { FactoryBot.create(:bike_sticker, code: "0012", organization_id: organization.id) }
+    let(:sticker2) { FactoryBot.create(:bike_sticker, code: "ca000112", organization_id: organization.id) }
     it "looks up correctly" do
       expect(sticker.reload.code_integer).to eq 12
       expect(sticker.code_number_length).to eq 4
@@ -157,8 +157,8 @@ RSpec.describe BikeSticker, type: :model do
       let!(:spokecard_text) { FactoryBot.create(:bike_sticker, kind: "spokecard", code: "a31b", bike: bike1) }
 
       it "calls the things we expect and finds the things we expect" do
-        expect(sticker.reload.code_integer).to eq 12 # sanity
-        expect(sticker2.reload.code_integer).to eq 112 # sanity
+        expect(sticker.reload.code_integer).to eq 12 # create later, to test order
+        expect(sticker2.reload.code_integer).to eq 112 # create later, to test order
 
         expect(spokecard.reload.code_integer).to eq 12
         expect(spokecard.code).to eq "12"
@@ -174,33 +174,35 @@ RSpec.describe BikeSticker, type: :model do
         expect(sticker0.code_number_length).to eq 6
         expect(sticker0.code_integer).to eq 0
 
-        expect(BikeSticker.calculated_code_integer("ca000000")).to eq 0
+        expect(BikeSticker.send(:calculated_code_integer, "ca000000")).to eq 0
         expect(BikeSticker.claimed.count).to eq 2
         expect(BikeSticker.unclaimed.count).to eq 5
         expect(BikeSticker.spokecard.count).to eq 2
         expect(BikeSticker.sticker.count).to eq 5
         expect(BikeSticker.lookup("92233720368547758999")).to be_blank # Outside of range
-        expect(BikeSticker.lookup("000012", organization_id: organization.id)).to eq sticker
-        expect(BikeSticker.lookup("000012", organization_id: organization.to_param)).to eq sticker
-        expect(BikeSticker.lookup("https://bikeindex.org/bikes/scanned/000012?organization_id=#{organization.short_name}", organization_id: organization.short_name)).to eq sticker
-        expect(BikeSticker.lookup("000012", organization_id: organization.name)).to eq sticker
-        expect(BikeSticker.lookup("000012", organization_id: "whateves")).to eq spokecard
-        expect(BikeSticker.lookup("000012")).to eq spokecard
+
+        expect(BikeSticker.lookup("12", organization_id: "whateves")).to eq spokecard
+        expect(BikeSticker.lookup("12")).to eq spokecard
+        expect(BikeSticker.lookup("0012", organization_id: organization.id)).to eq sticker
+        expect(BikeSticker.lookup("0012", organization_id: organization.to_param)).to eq sticker
+        expect(BikeSticker.lookup("https://bikeindex.org/bikes/scanned/0012?organization_id=#{organization.short_name}", organization_id: organization.short_name)).to eq sticker
+        expect(BikeSticker.lookup("0012", organization_id: organization.name)).to eq sticker
         expect(BikeSticker.lookup("ca112")).to eq sticker2
         expect(BikeSticker.lookup("ca1120")).to eq sticker3
         expect(BikeSticker.lookup("ca00011")).to be_blank
         expect(BikeSticker.lookup("ca0011")).to be_blank
+        expect(BikeSticker.lookup("0")).to eq sticker0
         expect(BikeSticker.lookup("00000")).to eq sticker0
-        expect(BikeSticker.lookup("CA0000000")).to eq sticker0
+        expect(BikeSticker.lookup("CA000000")).to eq sticker0
         expect(BikeSticker.lookup("99112")).to eq sticker4
         expect(BikeSticker.sticker_code_search("1").pluck(:id)).to match_array([spokecard_text.id, spokecard.id, sticker.id, sticker2.id, sticker3.id, sticker4.id])
         expect(BikeSticker.sticker_code_search("112").pluck(:id)).to match_array([sticker2.id, sticker3.id, sticker4.id])
         expect(BikeSticker.sticker_code_search(" ").pluck(:id)).to match_array([spokecard.id, sticker.id, spokecard_text.id, sticker2.id, sticker3.id, sticker4.id, sticker0.id])
         expect(BikeSticker.sticker_code_search("99112").pluck(:id)).to eq([sticker4.id])
         # leading 00s
-        expect(BikeSticker.sticker_code_search("0").pluck(:id)).to match_array([sticker.id, sticker2.id, sticker3.id, sticker4.id, sticker0.id, sticker0.id])
-        expect(BikeSticker.sticker_code_search("00").pluck(:id)).to match_array([sticker2.id, sticker3.id, sticker0.id])
-        expect(BikeSticker.sticker_code_search("000").pluck(:id)).to match_array([sticker2.id, sticker0.id])
+        expect(BikeSticker.sticker_code_search("0").pluck(:id)).to eq([sticker0.id])
+        expect(BikeSticker.sticker_code_search("00").pluck(:id)).to eq([sticker0.id])
+        expect(BikeSticker.sticker_code_search("000").pluck(:id)).to eq([sticker0.id])
         expect(BikeSticker.sticker_code_search("012").pluck(:id)).to match_array([sticker.id, sticker2.id, sticker3.id])
         expect(BikeSticker.sticker_code_search("0012").pluck(:id)).to match_array([sticker2.id, sticker3.id])
         expect(BikeSticker.sticker_code_search("00012").pluck(:id)).to match_array([sticker2.id])
@@ -212,8 +214,6 @@ RSpec.describe BikeSticker, type: :model do
         expect(BikeSticker.sticker_code_search("ca11").pluck(:id)).to eq([sticker2.id])
         expect(BikeSticker.sticker_code_search("CA99").pluck(:id)).to eq([sticker4.id])
         expect(BikeSticker.sticker_code_search("CA00").pluck(:id)).to eq([sticker4.id])
-
-        # leading zeros
 
         # Things that don't match
         expect(BikeSticker.sticker_code_search("ca12").pluck(:id)).to eq([])
