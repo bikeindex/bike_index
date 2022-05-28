@@ -71,7 +71,7 @@ end
 
 
 desc "migrate task"
-task :add_code_number_length :environment do
+task add_code_number_length: :environment do
   BikeStickerBatch.where(code_number_length: nil).each do |batch|
     batch.update(code_number_length: batch.calculated_code_number_length)
   end

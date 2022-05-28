@@ -22,102 +22,100 @@ class BikeSticker < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-    def self.normalize_code(str = nil, leading_zeros: false, one_zero: false)
-      return nil unless str.present?
-      code = str.to_s.upcase.strip.gsub(/\s*/, "")
-      if code.match?(/BIKEINDEX.ORG/)
-        code = code.gsub(%r{\A.*BIKEINDEX.ORG/BIKES}, "").gsub(/\?.*/, "") # Remove the start and query string
-        code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
-      end
-      # split into letters/numbers
-      result = code.scan(/[^\d]+|\d+/).map { |seg|
-        next seg if leading_zeros
-        seg.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them - wherever they occur
-      }.join("")
-      return result unless one_zero && !result.match?(/\d/)
-      "#{result}0"
+  def self.normalize_code(str = nil, leading_zeros: false, one_zero: false)
+    return nil unless str.present?
+    code = str.to_s.upcase.strip.gsub(/\s*/, "")
+    if code.match?(/BIKEINDEX.ORG/)
+      code = code.gsub(%r{\A.*BIKEINDEX.ORG/BIKES}, "").gsub(/\?.*/, "") # Remove the start and query string
+      code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
     end
+    # split into letters/numbers
+    result = code.scan(/[^\d]+|\d+/).map { |seg|
+      next seg if leading_zeros
+      seg.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them - wherever they occur
+    }.join("")
+    return result unless one_zero && !result.match?(/\d/)
+    "#{result}0"
+  end
 
-    def self.calculated_code_integer(str)
-      return str if str.is_a?(Integer)
-      numbers = calculated_code_numbers(str)
-      numbers.present? ? numbers.to_i : nil
+  def self.calculated_code_integer(str)
+    return str if str.is_a?(Integer)
+    numbers = calculated_code_numbers(str)
+    numbers.present? ? numbers.to_i : nil
+  end
+
+  def self.calculated_code_prefix(str)
+    str.present? ? str.gsub(/\d+\z/, "").upcase : nil
+  end
+
+  # Pass in NOT normalized_code
+  def self.code_integer_and_prefix_search(str, code_integer: nil)
+    code_integer ||= calculated_code_integer(str)
+    return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
+    lookup_query = {}
+    lookup_query[:code_integer] = code_integer if code_integer.present?
+    code_prefix = calculated_code_prefix(str)
+    lookup_query[:code_prefix] = code_prefix if code_prefix.present?
+    where(lookup_query).order(:id)
+  end
+
+  # organization_id can be any organization identifier (name, slug, id)
+  # generally don't pass in normalized_code
+  def self.lookup(str, organization_id: nil)
+    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    normalized_code = normalize_code(normalized_code_with_zeroes, one_zero: true)
+    code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
+
+    matching_codes = code_integer_and_prefix_search(normalized_code)
+    matching_codes = matching_codes.of_length(code_number_length)
+    matching_codes.organization_search(organization_id).first || matching_codes.first
+  end
+
+  def self.lookup_with_fallback(str, organization_id: nil, user: nil)
+    return nil unless str.present?
+    normalized_code = normalize_code(str)
+    matching_codes = code_integer_and_prefix_search(normalized_code)
+    bike_sticker ||= matching_codes.organization_search(organization_id).first
+    return bike_sticker if bike_sticker.present?
+    user_organization_ids = user&.memberships&.pluck(:organization_id) || []
+    if user_organization_ids.any?
+      bike_sticker ||= matching_codes.where(organization_id: user_organization_ids).first
     end
+    bike_sticker ||= matching_codes.first
+    bike_sticker ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
+    bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
+  end
 
-    def self.calculated_code_prefix(str)
-      str.present? ? str.gsub(/\d+\z/, "").upcase : nil
-    end
+  def self.sticker_code_search(str)
+    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    return all unless normalized_code_with_zeroes.present?
 
-    # Pass in NOT normalized_code
-    def self.code_integer_and_prefix_search(str, code_integer: nil)
-      code_integer ||= calculated_code_integer(str)
-      return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
-      lookup_query = {}
-      lookup_query[:code_integer] = code_integer if code_integer.present?
-      code_prefix = calculated_code_prefix(str)
-      lookup_query[:code_prefix] = code_prefix if code_prefix.present?
-      where(lookup_query).order(:id)
-    end
-
-    # organization_id can be any organization identifier (name, slug, id)
-    # generally don't pass in normalized_code
-    def self.lookup(str, organization_id: nil)
-      normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
-      normalized_code = normalize_code(normalized_code_with_zeroes, one_zero: true)
-      code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
-
-      matching_codes = code_integer_and_prefix_search(normalized_code)
-      matching_codes = matching_codes.of_length(code_number_length)
-      matching_codes.organization_search(organization_id).first || matching_codes.first
-    end
-
-    def self.lookup_with_fallback(str, organization_id: nil, user: nil)
-      return nil unless str.present?
-      normalized_code = normalize_code(str)
-      matching_codes = code_integer_and_prefix_search(normalized_code)
-      bike_sticker ||= matching_codes.organization_search(organization_id).first
-      return bike_sticker if bike_sticker.present?
-      user_organization_ids = user&.memberships&.pluck(:organization_id) || []
-      if user_organization_ids.any?
-        bike_sticker ||= matching_codes.where(organization_id: user_organization_ids).first
-      end
-      bike_sticker ||= matching_codes.first
-      bike_sticker ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
-      bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
-    end
-
-    def self.sticker_code_search(str)
-      normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
-      return all unless normalized_code_with_zeroes.present?
-      return where(code_integer: 0) if calculated_code_integer(normalized_code_with_zeroes) == 0
-      code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
+    if search_matches_start_with?(str, normalized_code_with_zeroes)
+      sticker_code_search_starting_with(normalized_code_with_zeroes)
+    else
       normalized_code = normalize_code(normalized_code_with_zeroes)
-
-      query_string = search_matches_start_with?(str, normalized_code_with_zeroes) ? "#{normalized_code}%" : "%#{normalized_code}%"
-      query_string = "%#{normalized_code}%"
-      pp query_string
-      of_length(code_number_length)
-        .where("code ILIKE ?", query_string)
+      where("code ILIKE ?", "%#{normalized_code}%")
     end
+  end
 
-    def self.next_unclaimed_code(after_id = nil)
-      after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
-      # If there aren't any claimed stickers, we need to include a number or this returns nil
-      unclaimed.reorder(:id).where("id > ?", after_id || 1).first
-    end
+  def self.next_unclaimed_code(after_id = nil)
+    after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
+    # If there aren't any claimed stickers, we need to include a number or this returns nil
+    unclaimed.reorder(:id).where("id > ?", after_id || 1).first
+  end
 
-    def self.user_can_claim_sticker?(user, bike_sticker = nil)
-      return false if user.blank?
-      return true if user.superuser?
-      unauthorized_sticker_ids = user.unauthorized_organization_update_bike_sticker_ids
-      if bike_sticker.present?
-        # If the user has already updated this sticker, they're allowed to update it again
-        return true if unauthorized_sticker_ids.include?(bike_sticker.id)
-        # if claimed, the sticker can only be updated if the user is authorized for the current bike
-        return bike_sticker.bike.authorized?(user) if bike_sticker.claimed?
-      end
-      unauthorized_sticker_ids.count < MAX_UNORGANIZED
+  def self.user_can_claim_sticker?(user, bike_sticker = nil)
+    return false if user.blank?
+    return true if user.superuser?
+    unauthorized_sticker_ids = user.unauthorized_organization_update_bike_sticker_ids
+    if bike_sticker.present?
+      # If the user has already updated this sticker, they're allowed to update it again
+      return true if unauthorized_sticker_ids.include?(bike_sticker.id)
+      # if claimed, the sticker can only be updated if the user is authorized for the current bike
+      return bike_sticker.bike.authorized?(user) if bike_sticker.claimed?
     end
+    unauthorized_sticker_ids.count < MAX_UNORGANIZED
+  end
 
   class << self
     def of_length(int)
@@ -133,6 +131,7 @@ class BikeSticker < ApplicationRecord
     end
 
     private
+
     def search_matches_start_with?(str = nil, normalized_code_with_zeroes = nil)
       normalized_code_with_zeroes ||= normalize_code(str, leading_zeros: true)
       return false if normalized_code_with_zeroes.blank?
@@ -141,6 +140,23 @@ class BikeSticker < ApplicationRecord
 
     def calculated_code_numbers(str)
       str&.to_s&.gsub(/\A\D+/, "")
+    end
+
+    def sticker_code_search_starting_with(normalized_code_with_zeroes)
+      code_integer = calculated_code_integer(normalized_code_with_zeroes)
+      code_prefix = calculated_code_prefix(normalized_code_with_zeroes)
+      results = self
+      results = results.where("code ILIKE ?", "%#{code_prefix}%") if code_prefix.present?
+      return results if code_integer.blank?
+      return results.where(code_integer: 0) if code_integer == 0
+      results = results.where("code_integer::text LIKE ?", "#{code_integer}%")
+      leading_zeros = normalized_code_with_zeroes.gsub(/\D/, "")[/\A0+/]
+      return results if leading_zeros.blank?
+      code_number_length = results.maximum(:code_number_length)
+      max_digits = code_number_length - leading_zeros.length
+
+      results.where("code_integer < ?", ("9" * max_digits).to_i)
+        .of_length(calculated_code_numbers(normalized_code_with_zeroes).length)
     end
   end
 
