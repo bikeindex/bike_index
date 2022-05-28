@@ -213,7 +213,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(BikeSticker.sticker_code_search("ca0112").pluck(:id)).to eq([sticker2.id])
         expect(BikeSticker.sticker_code_search("ca11").pluck(:id)).to eq([sticker2.id])
         expect(BikeSticker.sticker_code_search("CA99").pluck(:id)).to eq([sticker4.id])
-        expect(BikeSticker.sticker_code_search("CA00").pluck(:id)).to eq([sticker4.id])
+        expect(BikeSticker.sticker_code_search("CA009").pluck(:id)).to eq([sticker4.id])
 
         # Things that don't match
         expect(BikeSticker.sticker_code_search("ca12").pluck(:id)).to eq([])
