@@ -63,6 +63,7 @@ module Organized
       if current_organization.enabled?("avery_export")
         @export = Export.new(avery_export_parameters) # Note: avery export can't include partials
         bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
+
         if bike_sticker.present? && bike_sticker.claimed?
           flash[:error] = translation(:sticker_already_assigned)
         end
