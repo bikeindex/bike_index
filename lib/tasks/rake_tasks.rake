@@ -69,7 +69,6 @@ rescue
   Rails.logger.error("Database VACUUM error: #{exc.message}")
 end
 
-
 desc "migrate task"
 task add_code_number_length: :environment do
   BikeStickerBatch.where(code_number_length: nil).each do |batch|

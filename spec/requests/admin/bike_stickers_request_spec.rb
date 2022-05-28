@@ -158,7 +158,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         get "#{base_url}/reassign", params: selection_params
         expect(response.status).to eq(200)
         expect(response).to render_template(:reassign)
-        expect(assigns(:bike_stickers).count).to eq 3
+        expect(assigns(:bike_stickers).count).to eq 4
         expect(assigns(:valid_selection)).to be_truthy
         Sidekiq::Worker.clear_all
         get "#{base_url}/reassign", params: selection_params.merge(reassign_now: true)

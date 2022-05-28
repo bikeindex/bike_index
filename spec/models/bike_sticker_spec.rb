@@ -234,7 +234,6 @@ RSpec.describe BikeSticker, type: :model do
     end
   end
 
-
   describe "claimed?" do
     it "is not claimed if bike doesn't exist" do
       expect(BikeSticker.new(bike_id: 12123123).claimed?).to be_falsey

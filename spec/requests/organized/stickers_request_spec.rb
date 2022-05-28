@@ -64,7 +64,7 @@ RSpec.describe Organized::StickersController, type: :request do
             get base_url, params: {query: "lax12"}
             expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker2.id, bike_sticker_claimed.id])
             get base_url, params: {query: "lax0122"}
-            expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker2.id, bike_sticker_claimed.id])
+            expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker_claimed.id])
             get base_url, params: {query: "lax1222"}
             expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker_claimed.id])
           end
@@ -182,7 +182,7 @@ RSpec.describe Organized::StickersController, type: :request do
             expect(bike_sticker.claimed?).to be_falsey
             expect {
               put "#{base_url}/#{bike_sticker.code}", params: {bike_id: bike2.id, organization_id: current_organization.id},
-                  headers: {"HTTP_REFERER" => bike_path(bike2)}
+                headers: {"HTTP_REFERER" => bike_path(bike2)}
             }.to change(BikeStickerUpdate, :count).by 1
             expect(assigns(:current_organization)&.id).to eq current_organization.id
             expect(flash[:success]).to be_present

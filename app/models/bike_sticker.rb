@@ -51,7 +51,7 @@ class BikeSticker < ApplicationRecord
   # Pass in NOT normalized_code
   def self.code_integer_and_prefix_search(str, code_integer: nil)
     code_integer ||= calculated_code_integer(str)
-    return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
+    return none if code_integer.present? && code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
     lookup_query = {}
     lookup_query[:code_integer] = code_integer if code_integer.present?
     code_prefix = calculated_code_prefix(str)
