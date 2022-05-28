@@ -517,40 +517,6 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker3.claimable_by?(user, organization)).to be_falsey # user isn't authorized on the organization
       end
     end
-    # context "other organizations" do
-    #   let(:organization1) { FactoryBot.create(:organization) }
-    #   let(:organization2) { FactoryBot.create(:organization) }
-    #   let(:organization3) { FactoryBot.create(:organization) }
-    #   let(:user1) { FactoryBot.create(:organization_member, organization: organization1) }
-    #   let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
-    #   let(:user3) { FactoryBot.create(:organization_member, organization: organization2) }
-    #   let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization1) }
-    #   let(:bike) { FactoryBot.create(:bike) }
-    #   it "is falsey for claimed" do
-    #     expect(bike_sticker.reload.secondary_organization_id).to be_blank
-    #     expect(bike_sticker.organization_id).to eq organization1.id
-    #     expect(bike_sticker.claimable_by?(user1)).to be_truthy
-    #     expect(bike_sticker.claimable_by?(user2)).to be_truthy
-    #     expect(bike_sticker.claimable_by?(user3)).to be_truthy
-    #     expect(bike_sticker.claimable_by?(user1, organization1)).to be_truthy
-    #     expect(bike_sticker.claimable_by?(user2, organization2)).to be_truthy
-    #     expect(bike_sticker.claimable_by?(user3, organization3)).to be_truthy
-    #     expect(bike_sticker.organization_authorized?(organization1)).to be_truthy
-    #     expect(bike_sticker.organization_authorized?(organization2)).to be_truthy
-    #     expect(bike_sticker.organization_authorized?(organization3)).to be_truthy
-    #     # But with not-users org, it's not authorized
-    #     expect(bike_sticker.claimable_by?(user1, organization3)).to be_falsey
-    #     expect(bike_sticker.claimable_by?(user2, organization3)).to be_falsey
-    #     expect(bike_sticker.claimable_by?(user3, organization1)).to be_falsey
-    #     # claim, then watch the change
-    #     bike_sticker.claim_if_permitted(user: user3, bike: bike.id, organization: organization2)
-    #     expect(bike_sticker.reload.secondary_organization_id).to eq organization2.id
-    #     expect(bike_sticker.organization_id).to eq organization1.id
-    #     expect(bike_sticker.claimable_by?(user1)).to be_truthy
-    #     expect(bike_sticker.claimable_by?(user2)).to be_truthy
-    #     expect(bike_sticker.claimable_by?(user3)).to be_falsey
-    #   end
-    # end
   end
 
   describe "claim" do

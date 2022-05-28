@@ -48,7 +48,6 @@ class BikeSticker < ApplicationRecord
     str.present? ? str.gsub(/\d+\z/, "").upcase : nil
   end
 
-  # Pass in NOT normalized_code
   def self.code_integer_and_prefix_search(str, code_integer: nil)
     code_integer ||= calculated_code_integer(str)
     return none if code_integer.present? && code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
@@ -117,19 +116,19 @@ class BikeSticker < ApplicationRecord
     unauthorized_sticker_ids.count < MAX_UNORGANIZED
   end
 
+  def self.of_length(int)
+    where("bike_stickers.code_number_length >= ?", int)
+  end
+
+  def self.organization_search(organization_id)
+    if organization_id.present?
+      org = Organization.friendly_find(organization_id)
+      return where(organization_id: org.id).or(where(secondary_organization_id: org.id)) if org.present?
+    end
+    BikeSticker.none
+  end
+
   class << self
-    def of_length(int)
-      where("bike_stickers.code_number_length >= ?", int)
-    end
-
-    def organization_search(organization_id)
-      if organization_id.present?
-        org = Organization.friendly_find(organization_id)
-        return where(organization_id: org.id).or(where(secondary_organization_id: org.id)) if org.present?
-      end
-      BikeSticker.none
-    end
-
     private
 
     def search_matches_start_with?(str = nil, normalized_code_with_zeroes = nil)
@@ -153,7 +152,7 @@ class BikeSticker < ApplicationRecord
       leading_zeros = normalized_code_with_zeroes.gsub(/\D/, "")[/\A0+/]
       return results if leading_zeros.blank?
       code_number_length = results.maximum(:code_number_length)
-      max_digits = code_number_length - leading_zeros.length
+      max_digits = (code_number_length || 4) - leading_zeros.length
 
       results.where("code_integer < ?", ("9" * max_digits).to_i)
         .of_length(calculated_code_numbers(normalized_code_with_zeroes).length)
