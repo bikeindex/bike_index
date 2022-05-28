@@ -127,7 +127,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
 
   describe "reassign" do
     let!(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
-    let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, prefix: "V") }
+    let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, code_number_length: 6, prefix: "V") }
     let(:organization) { FactoryBot.create(:organization) }
     it "doesn't do invalid things" do
       get "#{base_url}/reassign"
@@ -158,7 +158,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         get "#{base_url}/reassign", params: selection_params
         expect(response.status).to eq(200)
         expect(response).to render_template(:reassign)
-        expect(assigns(:bike_stickers).count).to eq 4
+        expect(assigns(:bike_stickers).count).to eq 3
         expect(assigns(:valid_selection)).to be_truthy
         Sidekiq::Worker.clear_all
         get "#{base_url}/reassign", params: selection_params.merge(reassign_now: true)

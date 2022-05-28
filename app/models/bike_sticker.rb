@@ -119,7 +119,7 @@ class BikeSticker < ApplicationRecord
 
   class << self
     def of_length(int)
-      where("code_number_length >= ?", int)
+      where("bike_stickers.code_number_length >= ?", int)
     end
 
     def organization_search(organization_id)
