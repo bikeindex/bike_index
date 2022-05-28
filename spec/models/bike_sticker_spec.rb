@@ -282,6 +282,7 @@ RSpec.describe BikeSticker, type: :model do
         # It finds the first record in the database
         expect(BikeSticker.lookup_with_fallback("a0010")).to eq bike_sticker_initial
         expect(BikeSticker.lookup_with_fallback("0010")).to eq bike_sticker_initial
+        expect(BikeSticker.lookup_with_fallback("000010")).to eq bike_sticker_initial
         # If there is an organization passed, it finds matching that organization
         expect(BikeSticker.lookup_with_fallback("0010", organization_id: organization_duplicate.name)).to eq bike_sticker_duplicate
         expect(BikeSticker.lookup_with_fallback("A10", organization_id: "duplicateorg")).to eq bike_sticker_duplicate
@@ -293,7 +294,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(BikeSticker.lookup_with_fallback("a0010", organization_id: organization, user: user)).to eq bike_sticker_initial
         # It falls back to the user's organization bike codes if passed an organization that doesn't match any codes, or an org that doesn't exist
         expect(BikeSticker.lookup_with_fallback("A 00 10", organization_id: organization_no_match.id, user: user)).to eq bike_sticker_duplicate
-        expect(BikeSticker.lookup_with_fallback("A 000 10", organization_id: "dfddfdfs", user: user)).to eq bike_sticker_duplicate
+        expect(BikeSticker.lookup_with_fallback("A 00 10", organization_id: "dfddfdfs", user: user)).to eq bike_sticker_duplicate
       end
     end
     context "3 letter prefix" do

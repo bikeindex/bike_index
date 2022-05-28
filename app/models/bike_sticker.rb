@@ -48,32 +48,29 @@ class BikeSticker < ApplicationRecord
     str.present? ? str.gsub(/\d+\z/, "").upcase : nil
   end
 
-  def self.code_integer_and_prefix_search(str, code_integer: nil)
-    code_integer ||= calculated_code_integer(str)
+  def self.code_integer_and_prefix_search(str)
+    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    code_integer = calculated_code_integer(normalized_code_with_zeroes)
     return none if code_integer.present? && code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
+    code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
     lookup_query = {}
     lookup_query[:code_integer] = code_integer if code_integer.present?
-    code_prefix = calculated_code_prefix(str)
+    code_prefix = calculated_code_prefix(normalized_code_with_zeroes)
     lookup_query[:code_prefix] = code_prefix if code_prefix.present?
-    where(lookup_query).order(:id)
+    where(lookup_query).of_length(code_number_length).order(:id)
   end
 
   # organization_id can be any organization identifier (name, slug, id)
   # generally don't pass in normalized_code
   def self.lookup(str, organization_id: nil)
-    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
-    normalized_code = normalize_code(normalized_code_with_zeroes, one_zero: true)
-    code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
-
-    matching_codes = code_integer_and_prefix_search(normalized_code)
-    matching_codes = matching_codes.of_length(code_number_length)
+    matching_codes = code_integer_and_prefix_search(str)
     matching_codes.organization_search(organization_id).first || matching_codes.first
   end
 
+  # Similar to lookup, but attempts to find the sticker even if it isn't an exact match
   def self.lookup_with_fallback(str, organization_id: nil, user: nil)
     return nil unless str.present?
-    normalized_code = normalize_code(str)
-    matching_codes = code_integer_and_prefix_search(normalized_code)
+    matching_codes = code_integer_and_prefix_search(str)
     bike_sticker ||= matching_codes.organization_search(organization_id).first
     return bike_sticker if bike_sticker.present?
     user_organization_ids = user&.memberships&.pluck(:organization_id) || []
@@ -81,6 +78,8 @@ class BikeSticker < ApplicationRecord
       bike_sticker ||= matching_codes.where(organization_id: user_organization_ids).first
     end
     bike_sticker ||= matching_codes.first
+    return bike_sticker if bike_sticker.present?
+    normalized_code = normalize_code(str)
     bike_sticker ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
     bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
   end
