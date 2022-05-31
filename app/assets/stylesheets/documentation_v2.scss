@@ -18,6 +18,16 @@
   }
 }
 
+// style fixes for boolean fields (so it isn't a big text-area)
+.swagger-ui-wrap .boolean-param-row {
+  .body-textarea {
+    height: 1.75em;
+  }
+  .parameter-content-type {
+    display: none;
+  }
+}
+
 // Standard styles
 
 #grid-overlay {
