@@ -175,7 +175,6 @@ module API
         end
         post "/" do
           found_bike = find_owned_bike
-          pp "FOUND Bike: #{found_bike&.id}"
           # if a matching bike is and can be updated by the submitter, update
           # existing record instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
