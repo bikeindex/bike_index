@@ -1,7 +1,7 @@
 .mb-4
   %h1
     = t(".edit_sticker")
-    %em= @bike_sticker.pretty_code
+    %strong= @bike_sticker.pretty_code
   - if @bike_sticker.bike_id.present?
     %p.text-right
       = link_to t(".remove_bike_link"),

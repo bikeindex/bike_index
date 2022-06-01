@@ -263,10 +263,10 @@
                 - else
                   - bike.bike_stickers.each_with_index do |bike_sticker, index|
                     - if bike_sticker.organization.present? && bike_sticker.organization_id == current_organization.id
-                      = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param), class: "small"
+                      = link_to bike_sticker.pretty_code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param), class: "small"
                     - else
                       %small
-                        = bike_sticker.code
+                        = bike_sticker.pretty_code
                     - if index > 0
                       %br
             - if current_organization.enabled?("impound_bikes")
