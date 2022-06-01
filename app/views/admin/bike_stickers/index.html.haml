@@ -41,6 +41,36 @@
 .mt-2
   = render partial: "/shared/period_select"
 
+- if @bike_sticker_batch.present?
+  - if ParamsNormalizer.boolean(params[:search_show_problems])
+    .mt-4.mb-4
+      %h4
+        Showing Problem stickers
+        %small= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "less-strong"
+      - duplicated = @bike_sticker_batch.duplicated_integers
+      %span.d-block.strong Duplicates:
+      - if duplicated.any?
+        %ul
+          - duplicated.each do |int|
+            %li.small
+              %code
+                = int
+      - else
+        %em.less-strong None
+      %span.d-block.strong Non-sequential stickers:
+      - if @bike_sticker_batch.non_sequential_integers.any?
+        %ul
+          - @bike_sticker_batch.non_sequential_integers.each do |arr|
+            %li.small
+              #{arr[0]} > #{arr[1]}
+      - else
+        %em.less-strong none
+    %hr
+  - else
+    .text-center.pt-4
+      = link_to "Show problem stickers for Batch ##{@bike_sticker_batch.id}", url_for(sortable_search_params.merge(search_show_problems: true)), class: "btn btn-outline-warning btn-sm"
+      %em.ml-2.less-strong (duplicates and non-sequential stickers)
+
 .row.mt-4
   .col-md-6
     %p
@@ -67,26 +97,6 @@
         %small
           = link_to "view all batches", url_for(sortable_search_params.except(:search_bike_sticker_batch_id))
 
-      - duplicated = @bike_sticker_batch.duplicated_integers
-      - if duplicated.any?
-        %em
-          Duplicated:
-        %ul
-          - duplicated.each do |int|
-            %li.small
-              %code
-                = int
-    - if ParamsNormalizer.boolean(params[:search_show_non_sequential])
-      Non-sequential stickers:
-      - if @bike_sticker_batch.non_sequential_integers.any?
-        %ul
-          - @bike_sticker_batch.non_sequential_integers.each do |arr|
-            %li.small
-              #{arr[0]} > #{arr[1]}
-      - else
-        %em.less-strong none
-    - else
-      = link_to "Show Non Sequential stickers", url_for(sortable_search_params.merge(search_show_non_sequential: true)), class: "btn btn-outline-warning btn-sm"
   .col-md-6.mt-2
     = form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
@@ -98,6 +108,7 @@
         = text_field_tag :search_query, params[:search_query], placeholder: "search sticker", class: "form-control"
 
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
+
 .mt-2
 = paginate @bike_stickers, views_prefix: "admin"
 
