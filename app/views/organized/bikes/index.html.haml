@@ -13,7 +13,7 @@
     %h2
       %a{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) }
         = @bike_sticker.kind
-        %em= @bike_sticker.code
+        %strong= @bike_sticker.pretty_code
       = t(".isnt_linked_to_a_bike")
   %p
     = t(".enter_url_of_the_bike_html", bike_sticker_kind: @bike_sticker.kind)
