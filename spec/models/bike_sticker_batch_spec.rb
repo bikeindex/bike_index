@@ -76,4 +76,30 @@ RSpec.describe BikeStickerBatch, type: :model do
       end
     end
   end
+
+  describe "lookup with calculated_code_number_length" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:bike_sticker_batch) do
+      BikeStickerBatch.create(code_number_length: 6,
+        prefix: "CAL", organization: organization)
+    end
+    let(:bike_sticker1) { BikeSticker.order(:code_integer).first }
+    let(:bike_sticker2) { BikeSticker.order(:code_integer).last }
+    it "creates and finds" do
+      expect(bike_sticker_batch.reload.code_number_length).to eq 6
+      bike_sticker_batch.create_codes(1, initial_code_integer: 1)
+      bike_sticker_batch.create_codes(1, initial_code_integer: 14106)
+      expect(bike_sticker_batch.reload.bike_stickers.count).to eq 2
+      expect(bike_sticker1.code).to eq "CAL1"
+      expect(bike_sticker1.pretty_code).to eq "CAL 000 001"
+      expect(bike_sticker2.code).to eq "CAL14106"
+      expect(bike_sticker2.pretty_code).to eq "CAL 014 106"
+
+      expect(BikeSticker.lookup("CAL 01")&.id).to eq bike_sticker1.id
+      expect(BikeSticker.lookup_with_fallback("CAL 01")&.id).to eq bike_sticker1.id
+      expect(BikeSticker.lookup_with_fallback("CAL 1")&.id).to eq bike_sticker1.id
+      expect(BikeSticker.lookup("CAL 014 106")&.id).to eq bike_sticker2.id
+      expect(BikeSticker.lookup_with_fallback("CAL 014 106")&.id).to eq bike_sticker2.id
+    end
+  end
 end

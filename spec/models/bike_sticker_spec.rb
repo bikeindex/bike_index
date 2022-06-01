@@ -112,6 +112,7 @@ RSpec.describe BikeSticker, type: :model do
     let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
     let(:sticker) { FactoryBot.create(:bike_sticker, code: "000012", organization_id: organization.id) }
     let(:sticker2) { FactoryBot.create(:bike_sticker, code: "ca000112", organization_id: organization.id) }
+    let(:sticker_call) { FactoryBot.create(:bike_sticker, code: "CAL 044 106") }
     it "looks up correctly" do
       expect(sticker.reload.code_integer).to eq 12
       expect(sticker.code_number_length).to eq 6
