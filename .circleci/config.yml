@@ -3,7 +3,8 @@ version: 2.1
 parameters:
   cache_key:
     type: integer
-    default: 1 # Bump this number to invalidate the cache
+    default: 1 # Bump this to bust the cache
+    # NOTE: default is the ONLY place the cache key should be specified
 
 jobs:
   build:
@@ -36,7 +37,6 @@ jobs:
     resource_class: large
 
     steps:
-      # NOTE: << pipeline.parameters.cache_key >> requires version 2.1
       - run: echo "\n\ncache version - << pipeline.parameters.cache_key >> -- used {{ << pipeline.parameters.cache_key >> }}\n\n"
 
       - add_ssh_keys:
@@ -65,7 +65,7 @@ jobs:
             curl -sSL "https://nodejs.org/download/release/v16.13.1/node-v16.13.1-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v16.13.1-linux-x64/bin/node
             curl https://www.npmjs.com/install.sh | sudo bash
 
-      - type: cache-restore
+      - run:
         name: "Dockerize: cache restore"
         key: cache-<< pipeline.parameters.cache_key >>-dockerize-0.6.1
 
@@ -80,13 +80,13 @@ jobs:
             fi
             sudo tar -C /usr/local/bin -xzvf ${dockerize_tar}
 
-      - type: cache-save
+      - run:
         name: "Dockerize: cache save"
         key: cache-<< pipeline.parameters.cache_key >>-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
 
-      - type: cache-restore
+      - run:
         name: "Git: cache restore"
         key: cache-<< pipeline.parameters.cache_key >>-git-2.22.0
 
@@ -121,13 +121,13 @@ jobs:
   #           sudo make install
   #           sudo cp ${git_binary} /usr/local/bin/git
 
-  #     - type: cache-save
+  #     - run:
   #       name: "Git: cache save"
   #       key: cache-<< pipeline.parameters.cache_key >>-git-2.22.0
   #       paths:
   #         - ~/.cache/git/git-2.22.0
 
-  #     - type: cache-restore
+  #     - run:
   #       name: "Hub: cache restore"
   #       key: cache-<< pipeline.parameters.cache_key >>-hub-2.12.3
 
@@ -151,7 +151,7 @@ jobs:
 
   #           sudo cp ${hub_binary} /usr/local/bin/hub
 
-  #     - type: cache-restore
+  #     - run:
   #       name: "Hub: cache save"
   #       key: cache-<< pipeline.parameters.cache_key >>-hub-2.12.3
   #       paths:
@@ -161,7 +161,7 @@ jobs:
   #         name: "Bundler: install"
   #         command: gem install bundler -v 2.1.4
 
-  #     - type: cache-restore
+  #     - run:
   #       name: "Ruby dependencies: cache restore"
   #       key: cache-<< pipeline.parameters.cache_key >>-gems-{{ checksum "Gemfile.lock" }}
 
@@ -172,7 +172,7 @@ jobs:
   #           bundle check --path=~/.cache/bundle && use_local="--local"
   #           bundle install --deployment --frozen --path=~/.cache/bundle $use_local
 
-  #     - type: cache-save
+  #     - run:
   #       name: "Ruby dependencies: cache save"
   #       key: cache-<< pipeline.parameters.cache_key >>-gems-{{ checksum "Gemfile.lock" }}
   #       paths:
@@ -182,7 +182,7 @@ jobs:
   #         name: Sync translations (only on main by default)
   #         command: bin/check_translations
 
-  #     - type: cache-restore
+  #     - run:
   #       name: "Node dependencies: cache restore"
   #       key: cache-<< pipeline.parameters.cache_key >>-yarn-{{ checksum "yarn.lock" }}
 
@@ -193,13 +193,13 @@ jobs:
   #           [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
   #           yarn install --cache-folder ~/.cache/yarn $use_local
 
-  #     - type: cache-save
+  #     - run:
   #       name: "Node dependencies: cache save"
   #       key: cache-<< pipeline.parameters.cache_key >>-yarn-{{ checksum "yarn.lock" }}
   #       paths:
   #         - ~/.cache/yarn
 
-  #     - type: cache-restore
+  #     - run:
   #       name: "Assets: cache restore"
   #       key: cache-<< pipeline.parameters.cache_key >>-assets-{{ .Environment.CIRCLE_SHA1 }}
 
@@ -211,7 +211,7 @@ jobs:
   #           bin/webpack
   #           bundle exec rails assets:precompile assets:clean --trace
 
-  #     - type: cache-save
+  #     - run:
   #       name: "Assets: cache save"
   #       key: cache-<< pipeline.parameters.cache_key >>-assets-{{ .Environment.CIRCLE_SHA1 }}
   #       paths:
