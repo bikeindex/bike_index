@@ -21,6 +21,6 @@ class EmailUpdatedTermsWorker < ApplicationWorker
   end
 
   def redis
-    Redis.current
+    @redis ||= Redis.new # TODO: Switch to connection pool, preferred way of accessing redis
   end
 end
