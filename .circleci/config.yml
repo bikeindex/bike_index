@@ -169,8 +169,8 @@ jobs:
           name: "Ruby dependencies: install"
           command: |
             set -x
-            bundle check --path=~/.cache/bundle && use_local="--local"
-            bundle install --deployment --frozen --path=~/.cache/bundle $use_local
+            bundle config set --local path '~/.cache/bundle'
+            bundle install
 
       - type: cache-save
         name: "Ruby dependencies: cache save"
