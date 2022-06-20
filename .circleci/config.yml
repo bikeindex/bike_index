@@ -1,5 +1,3 @@
-version: 2.1
-
 parameters:
   cache_key:
     type: string
