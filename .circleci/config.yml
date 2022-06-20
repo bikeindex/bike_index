@@ -36,9 +36,7 @@ jobs:
     resource_class: large
 
     steps:
-      - run: echo "cache version - << pipeline.parameters.cache_key >> -- used {{ << pipeline.parameters.cache_key >> }}"
-
-      - run: echo "cache version - {{ .Environment.CACHE_VERSION }}"
+      - run: echo "\n\ncache version - << pipeline.parameters.cache_key >> -- used {{ << pipeline.parameters.cache_key >> }}\n\n"
 
       - add_ssh_keys:
           fingerprints:
