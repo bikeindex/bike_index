@@ -1,4 +1,10 @@
 version: 2
+
+parameters:
+  cache_version:
+    type: integer
+    default: 1 # Bump this number to invalidate the cache
+
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
@@ -27,6 +33,8 @@ jobs:
       - image: redis:4.0.9
 
     steps:
+      - run: echo "cache version tag used was << pipeline.parameters.cache_version >>"
+
       - add_ssh_keys:
           fingerprints:
             - "b7:01:89:de:d8:f8:77:cc:9e:5a:ca:ee:0c:24:57:13"
@@ -55,7 +63,7 @@ jobs:
 
       - type: cache-restore
         name: "Dockerize: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        key: cache-<< pipeline.parameters.cache_version >>-dockerize-0.6.1
 
       - run:
           name: "Dockerize: install"
@@ -70,13 +78,13 @@ jobs:
 
       - type: cache-save
         name: "Dockerize: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        key: cache-<< pipeline.parameters.cache_version >>-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
 
       - type: cache-restore
         name: "Git: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        key: cache-<< pipeline.parameters.cache_version >>-git-2.22.0
 
       - run:
           name: "Git: install"
@@ -111,13 +119,13 @@ jobs:
 
       - type: cache-save
         name: "Git: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        key: cache-<< pipeline.parameters.cache_version >>-git-2.22.0
         paths:
           - ~/.cache/git/git-2.22.0
 
       - type: cache-restore
         name: "Hub: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        key: cache-<< pipeline.parameters.cache_version >>-hub-2.12.3
 
       - run:
           name: "Hub: install"
@@ -141,7 +149,7 @@ jobs:
 
       - type: cache-restore
         name: "Hub: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        key: cache-<< pipeline.parameters.cache_version >>-hub-2.12.3
         paths:
           - ~/.cache/hub
 
@@ -151,7 +159,7 @@ jobs:
 
       - type: cache-restore
         name: "Ruby dependencies: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
+        key: cache-<< pipeline.parameters.cache_version >>-gems-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: "Ruby dependencies: install"
@@ -162,7 +170,7 @@ jobs:
 
       - type: cache-save
         name: "Ruby dependencies: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
+        key: cache-<< pipeline.parameters.cache_version >>-gems-{{ checksum "Gemfile.lock" }}
         paths:
           - ~/.cache/bundle
 
@@ -173,7 +181,7 @@ jobs:
 
       - type: cache-restore
         name: "Node dependencies: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        key: cache-<< pipeline.parameters.cache_version >>-yarn-{{ checksum "yarn.lock" }}
 
       - run:
           name: "Node dependencies: install"
@@ -184,13 +192,13 @@ jobs:
 
       - type: cache-save
         name: "Node dependencies: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        key: cache-<< pipeline.parameters.cache_version >>-yarn-{{ checksum "yarn.lock" }}
         paths:
           - ~/.cache/yarn
 
       - type: cache-restore
         name: "Assets: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: cache-<< pipeline.parameters.cache_version >>-assets-{{ .Environment.CIRCLE_SHA1 }}
 
       - run:
           name: "Assets: precompile"
@@ -202,7 +210,7 @@ jobs:
 
       - type: cache-save
         name: "Assets: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: cache-<< pipeline.parameters.cache_version >>-assets-{{ .Environment.CIRCLE_SHA1 }}
         paths:
           - .sass-cache
           - public/assets
