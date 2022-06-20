@@ -17,7 +17,7 @@
         %th
           = sortable "amount_cents_facebook_spent", "Fbook spent", render_sortable: render_sortable
         %th
-          = sortable "begin_at", "Start", render_sortable: render_sortable
+          = sortable "start_at", "Start", render_sortable: render_sortable
         %th
           = sortable "end_at", render_sortable: render_sortable
         %th
@@ -65,6 +65,8 @@
               - if theft_alert.bike.present?
                 = link_to theft_alert.bike.title_string, edit_admin_bike_path(theft_alert.bike)
           %td
+            - if theft_alert.admin
+              %small.text-info admin:
             = link_to theft_alert.user.display_name, edit_admin_user_path(theft_alert.user.to_param)
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
@@ -75,7 +77,7 @@
             - if theft_alert.amount_cents_facebook_spent.to_i > 0
               = theft_alert.amount_facebook_spent
           %td
-            %small.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
+            %small.convertTime= l(theft_alert.start_at, format: :convert_time) if theft_alert.start_at.present?
           %td
             %small.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
           %td

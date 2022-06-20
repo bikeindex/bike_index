@@ -72,7 +72,7 @@
     .form-submit-button
       = f.submit t(".save"), class: "btn btn-success btn-lg"
 
-  - if @organization.enabled?("show_bulk_import_impound_bikes")
+  - if @organization.enabled?("show_bulk_import_impound")
     .form-group.row.mt-4.pt-4.small-line-height
       %label.org-form-label Bulk Import
       .col-sm-4

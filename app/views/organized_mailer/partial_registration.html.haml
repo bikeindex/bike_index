@@ -7,8 +7,8 @@
 
 %p= t(".html.just_a_few_steps_away_html", color_and_brand: color_and_brand)
 
-- if @organization && @organization.mail_snippet_body("partial").present?
-  = @organization.mail_snippet_body("partial").html_safe
+- if @organization && @organization.mail_snippet_body("partial_registration").present?
+  = @organization.mail_snippet_body("partial_registration").html_safe
 
 %p= t(".html.click_below_to_complete_your_registration")
 

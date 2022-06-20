@@ -144,7 +144,7 @@ class Export < ApplicationRecord
 
   def bike_code_start=(val)
     return unless val.present?
-    self.options = options.merge(bike_code_start: BikeSticker.normalize_code(val))
+    self.options = options.merge(bike_code_start: BikeSticker.normalize_code(val, leading_zeros: true))
   end
 
   def custom_bike_ids=(val)

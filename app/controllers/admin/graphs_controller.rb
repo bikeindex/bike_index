@@ -71,7 +71,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def pos_search_kinds
-    %w[lightspeed_pos ascend_pos pos_not_lightspeed_ascend no_pos]
+    %w[lightspeed_pos ascend_pos does_not_need_pos no_pos]
   end
 
   def bike_chart_data

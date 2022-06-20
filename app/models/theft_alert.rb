@@ -24,12 +24,14 @@ class TheftAlert < ApplicationRecord
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :paid, -> { joins(:payment).where.not(payments: {first_payment_date: nil}) }
-  scope :posted, -> { where.not(begin_at: nil) }
+  scope :admin, -> { where(admin: true) }
+  scope :paid_or_admin, -> { paid.or(admin) }
+  scope :posted, -> { where.not(start_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
 
-  delegate :duration_days, :duration_days_facebook, :ad_radius_miles, :amount_cents, to: :theft_alert_plan
+  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   geocoded_by nil
@@ -40,6 +42,25 @@ class TheftAlert < ApplicationRecord
 
   def self.update_end_buffer
     Time.current - 2.days
+  end
+
+  def self.flatten_city(counted)
+    @countries ||= Country.pluck(:id, :name).to_h
+    @states ||= State.pluck(:id, :name).to_h
+
+    [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
+  end
+
+  def self.cities_count
+    joins(:stolen_record)
+      .group("stolen_records.country_id", "stolen_records.city", "stolen_records.state_id")
+      .count
+      .map { |c| flatten_city(c) }
+      .sort_by { |c| -c[3] }
+  end
+
+  def self.paid_cents
+    paid.sum("payments.amount_cents")
   end
 
   # Override because of recovered bikes not being in default scope
@@ -62,7 +83,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def notify?
-    return false if facebook_data.blank? || facebook_data&.dig("no_notify").present?
+    return false if admin? || facebook_data.blank? || facebook_data&.dig("no_notify").present?
     stolen_record.present? && stolen_record.receive_notifications?
   end
 
@@ -77,7 +98,7 @@ class TheftAlert < ApplicationRecord
 
   # Active or has been active
   def posted?
-    begin_at.present?
+    start_at.present?
   end
 
   def facebook_updateable?
@@ -92,7 +113,8 @@ class TheftAlert < ApplicationRecord
 
   # literally CAN NOT activate
   def activateable_except_approval?
-    !missing_photo? && !missing_location? && paid?
+    return false if missing_photo? || missing_location?
+    admin ? true : paid?
   end
 
   # Probably don't want to activate
@@ -175,21 +197,17 @@ class TheftAlert < ApplicationRecord
     facebook_data&.dig("engagement") || {}
   end
 
-  def ad_radius_miles
-    25
-  end
-
   def message
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
 
-  def calculated_begin_at
-    begin_at.present? ? begin_at : Time.current
+  def calculated_start_at
+    start_at.present? ? start_at : Time.current
   end
 
   # Default to 3 days, because something
   def calculated_end_at
-    calculated_begin_at + (duration_days_facebook || 3).days
+    calculated_start_at + (duration_days_facebook || 3).days
   end
 
   def set_calculated_attributes
@@ -198,19 +216,20 @@ class TheftAlert < ApplicationRecord
       self.longitude = stolen_record.longitude
     end
     self.bike_id = stolen_record&.bike_id
+    self.ad_radius_miles = theft_alert_plan&.ad_radius_miles unless admin
     self.amount_cents_facebook_spent = calculated_cents_facebook_spent
   end
 
   private
 
   def alert_cannot_begin_in_past_or_after_ends
-    return if begin_at.blank? && end_at.blank?
+    return if start_at.blank? && end_at.blank?
 
-    if begin_at.blank?
-      errors.add(:begin_at, :must_be_present)
+    if start_at.blank?
+      errors.add(:start_at, :must_be_present)
     elsif end_at.blank?
       errors.add(:end_at, :must_be_present)
-    elsif begin_at >= end_at
+    elsif start_at >= end_at
       errors.add(:end_at, :must_be_later_than_start_time)
     end
   end

@@ -83,7 +83,9 @@ module Organized
 
     def find_mail_snippets
       @organization = current_organization
-      @kind = viewable_email_kinds.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
+      @kind = MailSnippet.organization_emails_with_snippets.include?(params[:id]) ? params[:id] : viewable_email_kinds.first
+      # Allow superusers to view any email kind
+      @kind = viewable_email_kinds.first unless viewable_email_kinds.include?(@kind) || current_user.superuser?
       @impound_claim_kind = @kind.match?(/impound_claim/)
       # These are uneditable kinds:
       @can_edit = !%w[finished_registration partial_registration].include?(@kind)

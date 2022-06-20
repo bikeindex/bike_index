@@ -1,4 +1,6 @@
 class ActivateTheftAlertWorker < ApplicationWorker
+  sidekiq_options retry: 4 # It will retry because of UpdateTheftAlertFacebookWorker
+
   def perform(theft_alert_id, force_activate = false)
     theft_alert = TheftAlert.find(theft_alert_id)
     return false unless theft_alert.pending?
@@ -12,7 +14,7 @@ class ActivateTheftAlertWorker < ApplicationWorker
     Facebook::AdsIntegration.new.create_for(theft_alert)
     theft_alert.reload
     # And mark the theft alert active
-    theft_alert.update(begin_at: theft_alert.calculated_begin_at,
+    theft_alert.update(start_at: theft_alert.calculated_start_at,
       end_at: theft_alert.calculated_end_at,
       status: "active")
     # Generally, there is information that didn't get saved when the ad was created, so enqueue update

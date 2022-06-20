@@ -35,7 +35,7 @@
 
   - if @total_count.present?
     %p.mt-4
-      #{number_with_delimiter(@total_count)} matching #{@kind}
+      #{admin_number_display(@total_count)} matching #{@kind}
       %em
         = humanized_time_range(@time_range)
 
@@ -43,7 +43,9 @@
   = column_chart variable_admin_graphs_path(sortable_search_params), stacked: true, thousands: ","
 
   -# Don't render all the extra stuff if looking at a period that is longer than 1 year
-  - render_other_bike_graphs = group_by_method(@time_range) != :group_by_month
+  - render_other_bike_graphs = time_range_length(@time_range) < 367.days.to_i
+  - bike_ids = matching_bikes.pluck(:id)
+
   - if @kind == "bikes" && render_other_bike_graphs
     - bike_graph_kinds.each do |graph_kind|
       - if graph_kind == "stolen"
@@ -72,28 +74,47 @@
                   %tr
                     %td.text-left= origin.humanize
                     %td.text-right= admin_number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
+                -# TODO: make this actually work
+                -# %tr
+                -#   %td.text-left Transferred pre-registration
+                -#   %td.text-right= admin_number_display(Ownership.transferred_pre_registration.where(bike_id: bike_ids).count)
+                %tr
+                  %td.text-left Stolen records
+                  %td.text-right= admin_number_display(StolenRecord.unscoped.where(created_at: @time_range).where(bike_id: bike_ids).count)
+                %tr
+                  %td.text-left Recoveries
+                  %td.text-right= admin_number_display(StolenRecord.unscoped.where(recovered_at: @time_range).where(bike_id: bike_ids).count)
+
       .mt-4
       = column_chart variable_admin_graphs_path(sortable_search_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ","
 
-    .col-sm-6.offset-sm-3.mt-4
+    .col-sm-8.offset-sm-2.mt-4
       .full-screen-table
-        %table.table.table-striped.table-bordered.table-sm.text-center
+        %table.table.table-striped.table-bordered.table-sm
           %thead
             %th Organization
+            %th Kind
+            %th.small Integration
             %th Bikes
           %tbody
             - organization_ids = matching_bikes.distinct.pluck(:creation_organization_id)
             - organization_bikes = organization_ids.map {|org_id| [org_id, matching_bikes.where(creation_organization_id: org_id).count]}
-
+            - total_orgs = 0
+            - total_bikes = 0
             - organization_bikes.sort { |a, b| b[1] <=> a[1] }.each do |org_id, bike_count|
               - organization = Organization.unscoped.find_by_id(org_id)
               %tr
-                %td.text-left
+                %td
                   - if organization.present?
                     = link_to organization.name, admin_bikes_path(sortable_search_params.merge(organization_id: org_id, render_chart: true))
                   - else
                     %a.gray-link{href: admin_bikes_path(sortable_search_params.merge(organization_id: "false", render_chart: true)), title: "(id: #{org_id})"}
                       no organization
+                %td
+                  - if organization.present?
+                    = organization.kind.humanize
+                %td.small-less-strong
+                  - if organization.present?
+                    = organization.pos_kind.humanize
                 %td.text-right
-                  = number_with_delimiter(bike_count)
-
+                  = admin_number_display(bike_count)

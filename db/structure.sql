@@ -300,7 +300,8 @@ CREATE TABLE public.bike_sticker_updates (
     update_number integer,
     failed_claim_errors text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    bulk_import_id bigint
 );
 
 
@@ -341,7 +342,8 @@ CREATE TABLE public.bike_stickers (
     bike_sticker_batch_id integer,
     code_integer bigint,
     code_prefix character varying,
-    secondary_organization_id bigint
+    secondary_organization_id bigint,
+    code_number_length integer
 );
 
 
@@ -2782,6 +2784,41 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
+-- Name: superuser_abilities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.superuser_abilities (
+    id bigint NOT NULL,
+    user_id bigint,
+    kind integer DEFAULT 0,
+    controller_name character varying,
+    action_name character varying,
+    deleted_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: superuser_abilities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.superuser_abilities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: superuser_abilities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.superuser_abilities_id_seq OWNED BY public.superuser_abilities.id;
+
+
+--
 -- Name: theft_alert_plans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2832,7 +2869,7 @@ CREATE TABLE public.theft_alerts (
     payment_id integer,
     user_id integer,
     status integer DEFAULT 0 NOT NULL,
-    begin_at timestamp without time zone,
+    start_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2843,7 +2880,9 @@ CREATE TABLE public.theft_alerts (
     reach integer,
     bike_id bigint,
     facebook_updated_at timestamp without time zone,
-    amount_cents_facebook_spent integer
+    amount_cents_facebook_spent integer,
+    admin boolean DEFAULT false,
+    ad_radius_miles integer
 );
 
 
@@ -3690,6 +3729,13 @@ ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: superuser_abilities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.superuser_abilities ALTER COLUMN id SET DEFAULT nextval('public.superuser_abilities_id_seq'::regclass);
+
+
+--
 -- Name: theft_alert_plans id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4312,6 +4358,14 @@ ALTER TABLE ONLY public.stolen_notifications
 
 
 --
+-- Name: superuser_abilities superuser_abilities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.superuser_abilities
+    ADD CONSTRAINT superuser_abilities_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: theft_alert_plans theft_alert_plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4473,6 +4527,13 @@ CREATE INDEX index_bike_sticker_updates_on_bike_id ON public.bike_sticker_update
 --
 
 CREATE INDEX index_bike_sticker_updates_on_bike_sticker_id ON public.bike_sticker_updates USING btree (bike_sticker_id);
+
+
+--
+-- Name: index_bike_sticker_updates_on_bulk_import_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_sticker_updates_on_bulk_import_id ON public.bike_sticker_updates USING btree (bulk_import_id);
 
 
 --
@@ -5407,6 +5468,13 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
+-- Name: index_superuser_abilities_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_superuser_abilities_on_user_id ON public.superuser_abilities USING btree (user_id);
+
+
+--
 -- Name: index_theft_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6172,6 +6240,11 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220121230959'),
 ('20220124192245'),
 ('20220201213958'),
-('20220324004315');
+('20220324004315'),
+('20220405173312'),
+('20220411165641'),
+('20220420145734'),
+('20220520180217'),
+('20220527162543');
 
 

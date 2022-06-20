@@ -5,6 +5,8 @@ base_url = "/admin/theft_alerts"
 RSpec.describe Admin::TheftAlertsController, type: :request do
   context "given a logged-in superuser" do
     include_context :request_spec_logged_in_as_superuser
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, approved: true) }
+    let(:bike) { stolen_record.bike }
 
     describe "GET /admin/theft_alerts" do
       let!(:theft_alert) { FactoryBot.create(:theft_alert) }
@@ -56,9 +58,9 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
     describe "GET /admin/theft_alerts/:id/edit" do
       it "responds with 200 and the edit template" do
-        alert = FactoryBot.create(:theft_alert)
+        theft_alert = FactoryBot.create(:theft_alert)
 
-        get "/admin/theft_alerts/#{alert.id}/edit"
+        get "/admin/theft_alerts/#{theft_alert.id}/edit"
 
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
@@ -67,104 +69,18 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
     describe "PATCH /admin/theft_alerts/:id" do
       it "redirects to the index route on update success" do
-        alert = FactoryBot.create(:theft_alert)
-        expect(alert.status).to eq("pending")
+        theft_alert = FactoryBot.create(:theft_alert)
+        expect(theft_alert.status).to eq("pending")
 
-        patch "/admin/theft_alerts/#{alert.id}",
+        patch "/admin/theft_alerts/#{theft_alert.id}",
           params: {
-            theft_alert: {
-              status: "active",
-              theft_alert_plan_id: alert.theft_alert_plan.id,
-              notes: "Some notes"
-            }
+            theft_alert: {update_theft_alert: true, notes: "Some notes"}
           }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(flash[:success]).to match(/success/i)
         expect(flash[:errors]).to be_blank
-        expect(alert.reload.status).to eq("active")
-        expect(alert.notes).to eq("Some notes")
-      end
-
-      it "sets alert timestamps when beginning an alert" do
-        alert = FactoryBot.create(:theft_alert)
-        expect(alert.status).to eq("pending")
-        expect(alert.begin_at).to eq(nil)
-        expect(alert.end_at).to eq(nil)
-
-        patch "/admin/theft_alerts/#{alert.id}",
-          params: {
-            theft_alert: {
-              status: "active",
-              theft_alert_plan_id: alert.theft_alert_plan.id
-            }
-          }
-
-        expect(response).to redirect_to(admin_theft_alerts_path)
-        expect(alert.reload.status).to eq("active")
-        expect(alert.begin_at).to be_within(2.seconds).of(Time.current)
-        expect(alert.end_at).to be_within(2.seconds).of(Time.current + 7.days)
-      end
-
-      it "does not set alert timestamps when updating a pending alert" do
-        alert = FactoryBot.create(:theft_alert)
-        expect(alert.status).to eq("pending")
-        expect(alert.notes).to be_nil
-        expect(alert.begin_at).to be_nil
-        expect(alert.end_at).to be_nil
-
-        patch "/admin/theft_alerts/#{alert.id}",
-          params: {
-            theft_alert: {
-              status: "pending",
-              theft_alert_plan_id: alert.theft_alert_plan.id,
-              notes: "updated note"
-            }
-          }
-
-        expect(response).to redirect_to(admin_theft_alerts_path)
-        expect(alert.reload.status).to eq("pending")
-        expect(alert.notes).to eq("updated note")
-        expect(alert.begin_at).to be_nil
-        expect(alert.end_at).to be_nil
-      end
-
-      it "does not overwrite submitted timestamps when updating a non-pending alert" do
-        alert = FactoryBot.create(:theft_alert_begun)
-        now = Time.current
-        expect(alert.status).to eq("active")
-
-        patch "/admin/theft_alerts/#{alert.id}",
-          params: {
-            theft_alert: {
-              status: "active",
-              theft_alert_plan_id: alert.theft_alert_plan.id,
-              begin_at: now,
-              end_at: now + 1.day
-            }
-          }
-
-        expect(response).to redirect_to(admin_theft_alerts_path)
-        expect(alert.reload.status).to eq("active")
-        expect(alert.begin_at).to be_within(5.seconds).of(now)
-        expect(alert.end_at).to be_within(5.seconds).of(now + 1.day)
-      end
-
-      it "renders the edit template on update failure" do
-        alert = FactoryBot.create(:theft_alert, status: "pending")
-
-        patch "/admin/theft_alerts/#{alert.id}",
-          params: {
-            theft_alert: {
-              status: nil,
-              theft_alert_plan_id: alert.theft_alert_plan.id
-            }
-          }
-
-        expect(response.status).to eq(200)
-        expect(flash[:success]).to be_blank
-        expect(flash[:error]).to include("Status can't be blank")
-        expect(alert.reload.status).to eq("pending")
+        expect(theft_alert.reload.notes).to eq("Some notes")
       end
     end
 
@@ -188,6 +104,81 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           patch "/admin/theft_alerts/#{theft_alert.id}", params: {update_theft_alert: true}
           # expect(UpdateTheftAlertFacebookWorker.jobs.count).to eq 1
           expect(theft_alert.reload.activating_at).to be_blank
+        end
+      end
+    end
+
+    describe "new" do
+      let!(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }
+      it "renders" do
+        expect(stolen_record).to be_present
+        get "#{base_url}/new?bike_id=#{bike.id}"
+        expect(assigns(:stolen_record)&.id).to eq stolen_record.id
+        expect(response).to be_ok
+        expect(response).to render_template(:new)
+        get "#{base_url}/new"
+        expect(response).to redirect_to admin_theft_alerts_path
+        expect(flash[:info]).to match "bike"
+      end
+    end
+
+    describe "create" do
+      let!(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }
+      it "creates and activates" do
+        Sidekiq::Worker.clear_all
+        expect do
+          post "/admin/theft_alerts",
+            params: {
+              theft_alert: {
+                stolen_record_id: stolen_record.id,
+                theft_alert_plan_id: theft_alert_plan.id,
+                notes: "Some notes",
+                ad_radius_miles: 33
+              }
+            }
+        end.to change(TheftAlert, :count).by 1
+
+        expect(flash[:success]).to be_present
+        theft_alert = TheftAlert.last
+        expect(theft_alert.admin).to be_truthy
+        expect(theft_alert.user_id).to eq current_user.id
+        expect(theft_alert.stolen_record_id).to eq stolen_record.id
+        expect(theft_alert.bike_id).to eq bike.id
+        expect(theft_alert.ad_radius_miles).to eq 33
+        expect(theft_alert.notes).to eq "Some notes"
+        expect(theft_alert.status).to eq "pending"
+        expect(theft_alert.activateable?).to be_truthy
+        expect(ActivateTheftAlertWorker.jobs.count).to eq 1
+      end
+      context "not activateable" do
+        let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver) }
+        it "does not activate" do
+          Sidekiq::Worker.clear_all
+          expect(stolen_record.reload.approved?).to be_falsey
+          expect do
+            post "/admin/theft_alerts",
+              params: {
+                theft_alert: {
+                  stolen_record_id: stolen_record.id,
+                  theft_alert_plan_id: theft_alert_plan.id,
+                  notes: "Some notes",
+                  ad_radius_miles: 33
+                }
+              }
+          end.to change(TheftAlert, :count).by 1
+
+          expect(flash[:success]).to be_present
+          theft_alert = TheftAlert.last
+          expect(theft_alert.admin).to be_truthy
+          expect(theft_alert.user_id).to eq current_user.id
+          expect(theft_alert.stolen_record_id).to eq stolen_record.id
+          expect(theft_alert.bike_id).to eq bike.id
+          expect(theft_alert.ad_radius_miles).to eq 33
+          expect(theft_alert.notes).to eq "Some notes"
+          expect(theft_alert.status).to eq "pending"
+          expect(theft_alert.activateable?).to be_falsey
+          expect(theft_alert.activating?).to be_falsey
+          expect(ActivateTheftAlertWorker.jobs.count).to eq 0
         end
       end
     end

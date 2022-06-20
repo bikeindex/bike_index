@@ -1,7 +1,7 @@
 class UpdateMailchimpDatumWorker < ApplicationWorker
   sidekiq_options queue: "low_priority", retry: 2
 
-  UPDATE_MAILCHIMP = !ENV["SKIP_UPDATE_MAILCHIMP"].present? # Emergency brake to stop updating
+  UPDATE_MAILCHIMP = ENV["UPDATE_MAILCHIMP_ENABLED"] == "true"
 
   def perform(id, force_update = false)
     return false unless UPDATE_MAILCHIMP

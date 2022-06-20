@@ -96,12 +96,14 @@ class BulkImportWorker < ApplicationWorker
         frame_size: row[:frame_size],
         phone: row[:phone],
         address: row[:address],
+        bike_sticker: row[:bike_sticker],
         user_name: row[:owner_name],
         extra_registration_number: row[:secondary_serial],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
       },
       impound_record: impound_attrs || {},
+      stolen_record: @bulk_import.stolen_record_attrs,
       # Photo need to be an array - only include if photo has a value
       photos: row[:photo].present? ? [row[:photo]] : nil
     }

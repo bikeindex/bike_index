@@ -5,7 +5,7 @@
     %thead.thead-light.sortable
       %th
         = sortable "name", render_sortable: render_sortable
-      %th
+      %th.small
         = sortable "approved", render_sortable: render_sortable
       %th
         = sortable "created_at", render_sortable: render_sortable
@@ -28,6 +28,16 @@
               = link_to organization.name, admin_organization_url(organization)
               %small.less-strong
                 = "paid" if organization.paid?
+              - if organization.regional_parents.any?
+                - parent_names = organization.regional_parents.pluck(:short_name)
+                .small.mt-1
+                  %em.less-strong
+                    #{"region parent".pluralize(parent_names.count)}:
+                  = safe_join(parent_names.map { |c| link_to(c, admin_organization_url(c), class: "gray-link") }, ", ")
+              - if organization.parent_organization.present?
+                .small.mt-1
+                  %em.less-strong.text-warning parent:
+                  = link_to(organization.parent_organization.short_name, admin_organization_url(organization.parent_organization), class: "less-strong")
             %td.table-cell-check
               = check_mark if organization.approved
             %td

@@ -1162,10 +1162,13 @@ RSpec.describe Bike, type: :model do
     context "address set on bike" do
       it "returns bike_update" do
         expect(bike.reload.registration_address_source).to eq "initial_creation"
-        bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
+        bike.update(street: "1313 N Milwaukee Ave ", city: " Chicago", zipcode: " 66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
         expect(bike.registration_address_source).to eq "bike_update"
         expect(bike.latitude).to eq 43.9
         expect(bike.latitude_public).to eq 43.9
+        expect(bike.street).to eq "1313 N Milwaukee Ave"
+        expect(bike.city).to eq "Chicago"
+        expect(bike.zipcode).to eq "66666"
       end
     end
     context "b_param" do
@@ -1328,6 +1331,13 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
     it "is the simple_name" do
       expect(bike.reload.mnfg_name).to eq "SE Racing"
+    end
+    context "manufacturer_other blank" do
+      let(:bike) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: " ") }
+      it "is nil" do
+        expect(bike.manufacturer_other).to eq nil
+        expect(bike.mnfg_name).to eq "Other"
+      end
     end
   end
 
@@ -1578,6 +1588,9 @@ RSpec.describe Bike, type: :model do
             stolen_record.attributes = {street: "", city: "", zipcode: ""}
             expect(stolen_record.should_be_geocoded?).to be_truthy
             stolen_record.save
+            expect(stolen_record.street).to be_nil
+            expect(stolen_record.city).to be_nil
+            expect(stolen_record.zipcode).to be_nil
           end
           stolen_record.reload
           bike.reload

@@ -14,10 +14,21 @@ waypointer = ->
       $("#m_#{@element.id}").addClass('scrltrgt')
       return
 
+fixBooleanFields = ->
+  for span in document.querySelectorAll(".model-signature")
+    if span.textContent.includes("Grape::API::Boolean")
+      $(span).parents("tr").addClass("boolean-param-row")
+  for row in $(".boolean-param-row")
+    for td in row.querySelectorAll("td")
+      if td.textContent == "body"
+        td.textContent = "true/false"
+
+
 operationsAfterSwaggerLoads = ->
   # delayed, runs after swagger is loaded (hopefully)
   $('select[name="test"]').val('true')
   waypointer() if $('#navmenu-fixed').is(':visible')
+  fixBooleanFields()
 
 
 # This coffeescript is the js that is inlined on the swagger index page
@@ -56,6 +67,7 @@ $ ->
         return
 
       $('td:contains(query_items)').parents('tr').hide()
+
 
     onFailure: (data) ->
       log "Unable to Load SwaggerUI"

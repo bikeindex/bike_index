@@ -1,11 +1,14 @@
 class Admin::StolenNotificationsController < Admin::BaseController
+  include SortableTable
+  before_action :set_period, only: [:index]
   before_action :find_notification, only: [:show, :resend]
 
   def index
-    stolen_notifications = StolenNotification.order("created_at desc").includes(:bike)
     page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @stolen_notifications = stolen_notifications.page(page).per(per_page)
+    @stolen_notifications = searched_stolen_notifications
+      .reorder("#{sort_column} #{sort_direction}")
+      .includes(:bike).page(page).per(per_page)
   end
 
   def resend
@@ -25,5 +28,25 @@ class Admin::StolenNotificationsController < Admin::BaseController
 
   def find_notification
     @stolen_notification = StolenNotification.find(params[:id])
+  end
+
+  helper_method :searched_stolen_notifications
+
+  private
+
+  def sortable_columns
+    %w[created_at updated_at sender_id receiver_id bike_id]
+  end
+
+  def searched_stolen_notifications
+    stolen_notifications = StolenNotification
+
+    @time_range_column = if %w[updated_at].include?(sort_column)
+      sort_column
+    else
+      "created_at"
+    end
+
+    stolen_notifications.where(@time_range_column => @time_range)
   end
 end

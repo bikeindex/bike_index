@@ -10,7 +10,8 @@ module AdminHelper
       {title: "User Alerts", path: admin_user_alerts_path, match_controller: true},
       {title: "Ownerships", path: admin_ownerships_path, match_controller: true},
       {title: "User Registration Organizations", path: admin_user_registration_organizations_path, match_controller: true},
-      {title: "Notifications", path: admin_notifications_path, match_controller: true}
+      {title: "Notifications", path: admin_notifications_path, match_controller: true},
+      {title: "Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true}
     ]
   end
 

@@ -56,8 +56,8 @@ class Geohelper
       {street: addy_hash["street"],
        city: addy_hash["city"],
        zipcode: addy_hash["zipcode"],
-       country: Country.fuzzy_find(addy_hash["country"]),
-       state: State.fuzzy_find(addy_hash["state"]),
+       country: Country.friendly_find(addy_hash["country"]),
+       state: State.friendly_find(addy_hash["state"]),
        latitude: addy_hash["latitude"],
        longitude: addy_hash["longitude"]}
     end
@@ -84,8 +84,8 @@ class Geohelper
         city: result.city,
         latitude: result.latitude,
         longitude: result.longitude,
-        state_id: State.fuzzy_find(result.state_code)&.id,
-        country_id: Country.fuzzy_find(result.country_code)&.id,
+        state_id: State.friendly_find(result.state_code)&.id,
+        country_id: Country.friendly_find(result.country_code)&.id,
         zipcode: result.postal_code
       }
     end

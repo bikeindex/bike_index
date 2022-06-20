@@ -7,6 +7,7 @@ class Ownership < ApplicationRecord
     embed_partial: 3,
     api_v1: 4,
     api_v2: 5,
+    api_v3: 12, # added on 2022-4-20, prior to that v3 was reported as v2 :/
     bulk_import_worker: 6,
     organization_form: 7,
     creator_unregistered_parking_notification: 8,
@@ -41,6 +42,7 @@ class Ownership < ApplicationRecord
   scope :claimed, -> { where(claimed: true) }
   scope :initial, -> { where(previous_ownership_id: nil) }
   scope :transferred, -> { where.not(previous_ownership_id: nil) }
+  scope :transferred_pre_registration, -> { left_joins(:previous_ownership).where(previous_ownerships: {organization_pre_registration: true}) }
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create

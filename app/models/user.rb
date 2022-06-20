@@ -39,6 +39,7 @@ class User < ApplicationRecord
   has_many :user_emails, dependent: :destroy
   has_many :user_phones, dependent: :destroy
   has_many :user_alerts
+  has_many :superuser_abilities
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
@@ -49,7 +50,7 @@ class User < ApplicationRecord
   scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
-  scope :superusers, -> { where(superuser: true) }
+  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
   scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
 
@@ -348,7 +349,8 @@ class User < ApplicationRecord
   end
 
   def current_user_phone
-    user_phones.where(phone: phone).last
+    (user_phones.where(phone: phone).last ||
+      user_phones.confirmed.order(:updated_at)&.last)&.phone
   end
 
   def phone_confirmed?

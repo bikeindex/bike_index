@@ -12,6 +12,10 @@ RSpec.describe AfterUserChangeWorker, type: :job do
   describe "add_phones_for_verification" do
     let(:phone) { "4334445555" }
     let(:user) { FactoryBot.create(:user, phone: phone) }
+    before do
+      UserPhoneConfirmationWorker.new # instantiate before stubbing
+      stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+    end
     it "adds the phone, in a streamlined way without calling multiple times" do
       user.reload
       expect_any_instance_of(TwilioIntegration).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
@@ -52,6 +56,60 @@ RSpec.describe AfterUserChangeWorker, type: :job do
         expect(described_class.jobs.count).to eq 0
         user.reload
         expect(user.phone).to eq phone
+      end
+    end
+  end
+
+  # Currently, universal superuser_abilities follow
+  describe "superuser_abilities" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    it "does nothing" do
+      expect(user.superuser).to be_falsey
+      expect(user.superuser_abilities.count).to eq 0
+      instance.perform(user)
+      expect(user.reload.superuser_abilities.count).to eq 0
+    end
+    context "user is superuser" do
+      let(:user) { FactoryBot.create(:admin) }
+      it "does adds superuser_abilities" do
+        expect(user.superuser).to be_truthy
+        expect(user.superuser_abilities.count).to eq 0
+        instance.perform(user)
+        expect(user.reload.superuser_abilities.count).to eq 1
+        superuser_ability = user.superuser_abilities.first
+        expect(superuser_ability.kind).to eq "universal"
+        # Doing it again doesn't create another one
+        expect { instance.perform(user) }.to_not change(SuperuserAbility, :count)
+        # It removes duplicate abilities
+        SuperuserAbility.create(user: user)
+        expect(user.reload.superuser_abilities.count).to eq 2
+        instance.perform(user)
+        expect(user.reload.superuser_abilities.pluck(:id)).to eq([superuser_ability.id])
+      end
+    end
+    context "user no longer superuser" do
+      it "removes superuser_abilities" do
+        SuperuserAbility.create(user: user)
+        expect(user.reload.superuser).to be_falsey
+        expect(user.superuser_abilities.count).to eq 1
+        instance.perform(user)
+        expect(user.reload.superuser_abilities.count).to eq 0
+        superuser_ability = SuperuserAbility.unscoped.first
+        expect(superuser_ability.deleted?).to be_truthy
+        expect(superuser_ability.kind).to eq "universal"
+        user.update(superuser: true)
+        instance.perform(user)
+        expect(user.superuser_abilities.count).to eq 1
+        expect(superuser_ability.reload.deleted?).to be_truthy
+      end
+    end
+    context "non-universal superuser_ability" do
+      let!(:superuser_ability) { SuperuserAbility.create(user: user, controller_name: "graphs") }
+      it "doesn't update" do
+        expect(user.reload.superuser).to be_falsey
+        expect(user.superuser_abilities.count).to eq 1
+        instance.perform(user)
+        expect(user.reload.superuser_abilities.count).to eq 1
       end
     end
   end

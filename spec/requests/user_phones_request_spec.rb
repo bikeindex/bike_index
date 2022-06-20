@@ -3,6 +3,10 @@ require "rails_helper"
 RSpec.describe UserPhonesController, type: :request do
   let(:base_url) { "/user_phones" }
   let(:phone) { "7733234433" } # ensure it's a valid phone number to not get twilio error
+  before do
+    UserPhoneConfirmationWorker.new # Instantiate for stubbing
+    stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+  end
 
   it "redirects if user not present" do
     user_phone = FactoryBot.create(:user_phone)

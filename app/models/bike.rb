@@ -96,6 +96,7 @@ class Bike < ApplicationRecord
   scope :lightspeed_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "lightspeed_pos"}) }
   scope :ascend_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "ascend_pos"}) }
   scope :any_pos, -> { includes(:ownerships).where.not(ownerships: {pos_kind: "no_pos"}) }
+  scope :does_not_need_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "does_not_need_pos"}) }
   scope :pos_not_lightspeed_ascend, -> { includes(:ownerships).where.not(ownerships: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
   scope :example, -> { unscoped.where(example: true) }
@@ -749,6 +750,7 @@ class Bike < ApplicationRecord
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
+    self.manufacturer_other = nil if manufacturer_other.blank?
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.owner_email = normalized_email
     normalize_serial_number

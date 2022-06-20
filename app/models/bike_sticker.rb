@@ -22,7 +22,7 @@ class BikeSticker < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  def self.normalize_code(str = nil)
+  def self.normalize_code(str = nil, leading_zeros: false, one_zero: false)
     return nil unless str.present?
     code = str.to_s.upcase.strip.gsub(/\s*/, "")
     if code.match?(/BIKEINDEX.ORG/)
@@ -30,13 +30,18 @@ class BikeSticker < ApplicationRecord
       code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
     end
     # split into letters/numbers
-    code.scan(/[^\d]+|\d+/).map { |seg|
+    result = code.scan(/[^\d]+|\d+/).map { |seg|
+      next seg if leading_zeros
       seg.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them - wherever they occur
     }.join("")
+    return result unless one_zero && !result.match?(/\d/)
+    "#{result}0"
   end
 
   def self.calculated_code_integer(str)
-    str.present? ? str.gsub(/\A\D+/, "").to_i : nil
+    return str if str.is_a?(Integer)
+    numbers = calculated_code_numbers(str)
+    numbers.present? ? numbers.to_i : nil
   end
 
   def self.calculated_code_prefix(str)
@@ -44,31 +49,28 @@ class BikeSticker < ApplicationRecord
   end
 
   def self.code_integer_and_prefix_search(str)
-    code_integer = calculated_code_integer(str)
-    return none if code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
-    where(code_integer: code_integer, code_prefix: calculated_code_prefix(str))
-  end
-
-  def self.organization_search(organization_id)
-    if organization_id.present?
-      org = Organization.friendly_find(organization_id)
-      return where(organization_id: org.id).or(where(secondary_organization_id: org.id)) if org.present?
-    end
-    BikeSticker.none
+    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    code_integer = calculated_code_integer(normalized_code_with_zeroes)
+    return none if code_integer.present? && code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
+    code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
+    lookup_query = {}
+    lookup_query[:code_integer] = code_integer if code_integer.present?
+    code_prefix = calculated_code_prefix(normalized_code_with_zeroes)
+    lookup_query[:code_prefix] = code_prefix if code_prefix.present?
+    where(lookup_query).of_length(code_number_length).order(:id)
   end
 
   # organization_id can be any organization identifier (name, slug, id)
   # generally don't pass in normalized_code
   def self.lookup(str, organization_id: nil)
-    normalized_code = normalize_code(str)
-    matching_codes = code_integer_and_prefix_search(normalized_code)
+    matching_codes = code_integer_and_prefix_search(str)
     matching_codes.organization_search(organization_id).first || matching_codes.first
   end
 
+  # Similar to lookup, but attempts to find the sticker even if it isn't an exact match
   def self.lookup_with_fallback(str, organization_id: nil, user: nil)
     return nil unless str.present?
-    normalized_code = normalize_code(str)
-    matching_codes = code_integer_and_prefix_search(normalized_code)
+    matching_codes = code_integer_and_prefix_search(str)
     bike_sticker ||= matching_codes.organization_search(organization_id).first
     return bike_sticker if bike_sticker.present?
     user_organization_ids = user&.memberships&.pluck(:organization_id) || []
@@ -76,14 +78,22 @@ class BikeSticker < ApplicationRecord
       bike_sticker ||= matching_codes.where(organization_id: user_organization_ids).first
     end
     bike_sticker ||= matching_codes.first
+    return bike_sticker if bike_sticker.present?
+    normalized_code = normalize_code(str)
     bike_sticker ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
     bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
   end
 
-  def self.admin_text_search(str)
-    normalized_code = normalize_code(str)
-    return all unless normalized_code.present?
-    where("code ILIKE ?", "%#{normalized_code}%")
+  def self.sticker_code_search(str)
+    normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    return all unless normalized_code_with_zeroes.present?
+
+    if search_matches_start_with?(str, normalized_code_with_zeroes)
+      sticker_code_search_starting_with(normalized_code_with_zeroes)
+    else
+      normalized_code = normalize_code(normalized_code_with_zeroes)
+      where("code ILIKE ?", "%#{normalized_code}%")
+    end
   end
 
   def self.next_unclaimed_code(after_id = nil)
@@ -103,6 +113,49 @@ class BikeSticker < ApplicationRecord
       return bike_sticker.bike.authorized?(user) if bike_sticker.claimed?
     end
     unauthorized_sticker_ids.count < MAX_UNORGANIZED
+  end
+
+  def self.of_length(int)
+    where("bike_stickers.code_number_length >= ?", int)
+  end
+
+  def self.organization_search(organization_id)
+    if organization_id.present?
+      org = Organization.friendly_find(organization_id)
+      return where(organization_id: org.id).or(where(secondary_organization_id: org.id)) if org.present?
+    end
+    BikeSticker.none
+  end
+
+  class << self
+    private
+
+    def search_matches_start_with?(str = nil, normalized_code_with_zeroes = nil)
+      normalized_code_with_zeroes ||= normalize_code(str, leading_zeros: true)
+      return false if normalized_code_with_zeroes.blank?
+      normalized_code_with_zeroes.start_with?("0") || normalized_code_with_zeroes.match?(/\D\d/)
+    end
+
+    def calculated_code_numbers(str)
+      str&.to_s&.gsub(/\A\D+/, "")
+    end
+
+    def sticker_code_search_starting_with(normalized_code_with_zeroes)
+      code_integer = calculated_code_integer(normalized_code_with_zeroes)
+      code_prefix = calculated_code_prefix(normalized_code_with_zeroes)
+      results = self
+      results = results.where("code ILIKE ?", "%#{code_prefix}%") if code_prefix.present?
+      return results if code_integer.blank?
+      return results.where(code_integer: 0) if code_integer == 0
+      results = results.where("code_integer::text LIKE ?", "#{code_integer}%")
+      leading_zeros = normalized_code_with_zeroes.gsub(/\D/, "")[/\A0+/]
+      return results if leading_zeros.blank?
+      code_number_length = results.maximum(:code_number_length)
+      max_digits = (code_number_length || 4) - leading_zeros.length
+
+      results.where("code_integer < ?", ("9" * max_digits).to_i)
+        .of_length(calculated_code_numbers(normalized_code_with_zeroes).length)
+    end
   end
 
   def user_editable?
@@ -168,7 +221,7 @@ class BikeSticker < ApplicationRecord
     claiming_organization = claiming_organization_for_args(args)
     bike_sticker_update = BikeStickerUpdate.new(bike_sticker_id: id, user: args[:user],
       organization: claiming_organization, bike: claiming_bike,
-      safe_assign_creator_kind: args[:creator_kind], export_id: args[:export_id])
+      export_id: args[:export_id], safe_assign_creator_kind: args[:creator_kind])
     if claiming_bike.blank? && args[:bike].is_a?(String) && args[:bike].length > 0
       not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
       errors.add(:bike, "\"#{args[:bike]}\" #{not_found}")
@@ -209,12 +262,20 @@ class BikeSticker < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.code = self.class.normalize_code(code)
+    return if id.present? # no need to recalculate these every time
+    self.code_number_length = calculated_code_number_length
+    self.code = self.class.normalize_code(code, one_zero: true)
     self.code_integer = self.class.calculated_code_integer(code)
     self.code_prefix = self.class.calculated_code_prefix(code)
   end
 
   private
+
+  def calculated_code_number_length
+    return bike_sticker_batch.code_number_length if bike_sticker_batch&.code_number_length.present?
+    # In production, stickers should only be created with batches. This is really only for testing
+    code.gsub(/\D/, "").length
+  end
 
   def code_number_string
     str = code_integer.to_s

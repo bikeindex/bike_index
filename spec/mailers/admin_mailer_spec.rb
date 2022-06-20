@@ -3,14 +3,13 @@ require "rails_helper"
 RSpec.describe AdminMailer, type: :mailer do
   let(:feedback) { FactoryBot.create(:feedback) }
   describe "feedback_notification_email" do
-    before :each do
-      @mail = AdminMailer.feedback_notification_email(feedback)
-    end
+    let(:mail) { AdminMailer.feedback_notification_email(feedback) }
     it "renders email" do
-      expect(@mail.subject).to eq("New Feedback Submitted")
-      expect(@mail.to).to eq(["contact@bikeindex.org"])
-      expect(@mail.reply_to).to eq([feedback.email])
-      expect(@mail.tag).to eq("admin")
+      expect(mail.subject).to eq("New Feedback Submitted")
+      expect(mail.to).to eq(["contact@bikeindex.org"])
+      expect(mail.reply_to).to eq([feedback.email])
+      expect(mail.tag).to eq("admin")
+      expect(mail.body.encoded).to match "supported by"
     end
   end
 
