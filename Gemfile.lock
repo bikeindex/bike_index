@@ -52,8 +52,30 @@ GIT
       vegas (>= 0.1.0)
 
 GEM
-  remote: https://rubygems.org/
   remote: https://rails-assets.org/
+  specs:
+    rails-assets-Stickyfill (1.1.4)
+    rails-assets-jquery (3.4.1)
+    rails-assets-jquery.dirtyforms (2.0.0)
+      rails-assets-jquery (>= 1.4.2)
+    rails-assets-lodash (4.9.0)
+    rails-assets-mailcheck (1.1.2)
+    rails-assets-microplugin (0.0.3)
+    rails-assets-moment (2.18.1)
+    rails-assets-moment-timezone (0.5.25)
+      rails-assets-moment (>= 2.9.0)
+    rails-assets-mustache (2.2.1)
+    rails-assets-select2 (4.0.8)
+    rails-assets-selectize (0.12.6)
+      rails-assets-jquery (>= 1.7.0)
+      rails-assets-microplugin (~> 0.0.0)
+      rails-assets-sifter (~> 0.5.0)
+    rails-assets-sifter (0.5.3)
+    rails-assets-tether (1.1.1)
+    rails-assets-waypoints (3.1.1)
+
+GEM
+  remote: https://rubygems.org/
   specs:
     actioncable (6.1.5.1)
       actionpack (= 6.1.5.1)
@@ -516,25 +538,6 @@ GEM
       bundler (>= 1.15.0)
       railties (= 6.1.5.1)
       sprockets-rails (>= 2.0.0)
-    rails-assets-Stickyfill (1.1.4)
-    rails-assets-jquery (3.4.1)
-    rails-assets-jquery.dirtyforms (2.0.0)
-      rails-assets-jquery (>= 1.4.2)
-    rails-assets-lodash (4.9.0)
-    rails-assets-mailcheck (1.1.2)
-    rails-assets-microplugin (0.0.3)
-    rails-assets-moment (2.18.1)
-    rails-assets-moment-timezone (0.5.25)
-      rails-assets-moment (>= 2.9.0)
-    rails-assets-mustache (2.2.1)
-    rails-assets-select2 (4.0.8)
-    rails-assets-selectize (0.12.6)
-      rails-assets-jquery (>= 1.7.0)
-      rails-assets-microplugin (~> 0.0.0)
-      rails-assets-sifter (~> 0.5.0)
-    rails-assets-sifter (0.5.3)
-    rails-assets-tether (1.1.1)
-    rails-assets-waypoints (3.1.1)
     rails-controller-testing (1.0.4)
       actionpack (>= 5.0.1.x)
       actionview (>= 5.0.1.x)
