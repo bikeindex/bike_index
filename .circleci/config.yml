@@ -1,5 +1,5 @@
 # To bump cache:
-# Increment & Replace: 'CACHE_V1' in this config
+# Increment & Replace: 'CACHE_V3' in this config
 
 # NB: It would be great to use Pipeline parameters instead of search and replacing the cache key
 # ... but that doesn't work with this config version, and workflows don't work with version 2.1
@@ -67,7 +67,7 @@ jobs:
 
       - type: cache-restore
         name: "Dockerize: cache restore"
-        key: CACHE_V1-dockerize-0.6.1
+        key: CACHE_V3-dockerize-0.6.1
 
       - run:
           name: "Dockerize: install"
@@ -82,13 +82,13 @@ jobs:
 
       - type: cache-save
         name: "Dockerize: cache save"
-        key: CACHE_V1-dockerize-0.6.1
+        key: CACHE_V3-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
 
       - type: cache-restore
         name: "Git: cache restore"
-        key: CACHE_V1-git-2.22.0
+        key: CACHE_V3-git-2.22.0
 
       - run:
           name: "Git: install"
@@ -123,13 +123,13 @@ jobs:
 
       - type: cache-save
         name: "Git: cache save"
-        key: CACHE_V1-git-2.22.0
+        key: CACHE_V3-git-2.22.0
         paths:
           - ~/.cache/git/git-2.22.0
 
       - type: cache-restore
         name: "Hub: cache restore"
-        key: CACHE_V1-hub-2.12.3
+        key: CACHE_V3-hub-2.12.3
 
       - run:
           name: "Hub: install"
@@ -153,28 +153,28 @@ jobs:
 
       - type: cache-restore
         name: "Hub: cache save"
-        key: CACHE_V1-hub-2.12.3
+        key: CACHE_V3-hub-2.12.3
         paths:
           - ~/.cache/hub
 
       - run:
           name: "Bundler: install"
-          command: gem install bundler -v 2.1.4
+          command: gem install bundler -v 2.3.16
 
       - type: cache-restore
         name: "Ruby dependencies: cache restore"
-        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
+        key: CACHE_V3-gems-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: "Ruby dependencies: install"
           command: |
             set -x
-            bundle check --path=~/.cache/bundle && use_local="--local"
-            bundle install --deployment --frozen --path=~/.cache/bundle $use_local
+            bundle config set --local path '~/.cache/bundle'
+            bundle install
 
       - type: cache-save
         name: "Ruby dependencies: cache save"
-        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
+        key: CACHE_V3-gems-{{ checksum "Gemfile.lock" }}
         paths:
           - ~/.cache/bundle
 
@@ -184,7 +184,7 @@ jobs:
 
       - type: cache-restore
         name: "Node dependencies: cache restore"
-        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+        key: CACHE_V3-yarn-{{ checksum "yarn.lock" }}
 
       - run:
           name: "Node dependencies: install"
@@ -195,13 +195,13 @@ jobs:
 
       - type: cache-save
         name: "Node dependencies: cache save"
-        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+        key: CACHE_V3-yarn-{{ checksum "yarn.lock" }}
         paths:
           - ~/.cache/yarn
 
       - type: cache-restore
         name: "Assets: cache restore"
-        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: CACHE_V3-assets-{{ .Environment.CIRCLE_SHA1 }}
 
       - run:
           name: "Assets: precompile"
@@ -213,7 +213,7 @@ jobs:
 
       - type: cache-save
         name: "Assets: cache save"
-        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: CACHE_V3-assets-{{ .Environment.CIRCLE_SHA1 }}
         paths:
           - .sass-cache
           - public/assets
