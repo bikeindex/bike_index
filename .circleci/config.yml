@@ -36,8 +36,7 @@ jobs:
     resource_class: large
 
     steps:
-      - run: echo << pipeline.parameters.cache_key >>
-      - run: echo "cache version tag used was ${<< pipeline.parameters.cache_key >>}"
+      - run: echo "cache version - << pipeline.parameters.cache_key >> -- used ${<< pipeline.parameters.cache_key >>}"
 
       - add_ssh_keys:
           fingerprints:
