@@ -1,4 +1,4 @@
-version: 2.1
+version: 2
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
@@ -296,7 +296,7 @@ jobs:
             curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
-  version: 2.1
+  version: 2
   commit:
     jobs:
       - build
