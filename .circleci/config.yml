@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
@@ -14,12 +14,12 @@ jobs:
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
-      - image: circleci/ruby:2.7.5-node
+      - image: cimg/ruby:2.7.5-node
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root
           PSQL_PAGER: ""
-      - image: circleci/postgres:12.0-alpine-postgis
+      - image: cimg/postgres:13.5-postgis
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test
@@ -267,7 +267,7 @@ jobs:
 
   upload-coverage:
     docker:
-      - image: circleci/ruby:2.7.5-node
+      - image: cimg/ruby:2.7.5-node
     environment:
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
     working_directory: ~/bikeindex/bike_index
@@ -296,7 +296,7 @@ jobs:
             curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
-  version: 2
+  version: 2.1
   commit:
     jobs:
       - build
