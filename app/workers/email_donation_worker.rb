@@ -67,7 +67,7 @@ class EmailDonationWorker < ApplicationWorker
   def matching_stolen_bikes(payment)
     return [] if payment.user.blank?
     payment.user.bikes.status_stolen.map(&:current_stolen_record).reject(&:blank?)
-      .select { |s| relevant_period(payment).include?(s.date_stolen) }
+      .select { |s| relevant_period(payment).cover?(s.date_stolen) }
       .sort_by(&:date_stolen) # most recent stolen
       .map(&:bike)
   end
