@@ -89,11 +89,8 @@ class FileCacheMaintainer
       "#{Rails.env[0..2]}_tsv"
     end
 
-    # Should be the new cannonical way of using redis
-    def self.redis
-      # Basically, crib what is done in sidekiq
-      raise ArgumentError, "requires a block" unless block_given?
-      redis_pool.with { |conn| yield conn }
+    def redis
+      @redis ||= Redis.new # TODO: Switch to connection pool, preferred way of accessing redis
     end
 
     def uploader_from_filename(filename)
