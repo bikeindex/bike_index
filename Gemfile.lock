@@ -733,7 +733,6 @@ DEPENDENCIES
   bootsnap
   bootstrap (= 4.0.0.alpha4)
   bullet
-  bundler (>= 1.8.4)
   carrierwave (~> 0.11.2)
   carrierwave_backgrounder (~> 0.4.2)
   chartkick
