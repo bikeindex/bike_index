@@ -38,6 +38,8 @@ jobs:
     steps:
       - run: echo "cache version - << pipeline.parameters.cache_key >> -- used {{ << pipeline.parameters.cache_key >> }}"
 
+      - run: echo "cache version - {{ .Environment.CACHE_VERSION }}"
+
       - add_ssh_keys:
           fingerprints:
             - "b7:01:89:de:d8:f8:77:cc:9e:5a:ca:ee:0c:24:57:13"
