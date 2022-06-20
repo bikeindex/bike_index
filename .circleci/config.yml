@@ -2,7 +2,7 @@ version: 2
 
 parameters:
   cache_version:
-    type: integer
+    type: string
     default: 1 # Bump this number to invalidate the cache
 
 jobs:
@@ -31,6 +31,9 @@ jobs:
           POSTGRES_DB: bikeindex_test
           POSTGRES_PASSWORD: ""
       - image: redis:4.0.9
+
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
 
     steps:
       - run: echo "cache version tag used was {{<< pipeline.parameters.cache_version >>}}"
@@ -175,8 +178,7 @@ jobs:
           - ~/.cache/bundle
 
       - run:
-          name: Sync translations (only on main
-            by default)
+          name: Sync translations (only on main by default)
           command: bin/check_translations
 
       - type: cache-restore
