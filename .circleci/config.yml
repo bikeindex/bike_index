@@ -1,3 +1,5 @@
+version: 2
+
 parameters:
   cache_key:
     type: integer
@@ -34,6 +36,7 @@ jobs:
     resource_class: large
 
     steps:
+      # NOTE: << pipeline.parameters.cache_key >> requires version 2.1
       - run: echo "\n\ncache version - << pipeline.parameters.cache_key >> -- used {{ << pipeline.parameters.cache_key >> }}\n\n"
 
       - add_ssh_keys:
@@ -304,7 +307,6 @@ jobs:
             curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
-  version: 2
   commit:
     jobs:
       - build
