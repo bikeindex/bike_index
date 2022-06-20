@@ -167,8 +167,7 @@ jobs:
           - ~/.cache/bundle
 
       - run:
-          name: Sync translations (only on main
-            by default)
+          name: Sync translations (only on main by default)
           command: bin/check_translations
 
       - type: cache-restore
@@ -190,7 +189,8 @@ jobs:
 
       - type: cache-restore
         name: "Assets: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1
+          }}
 
       - run:
           name: "Assets: precompile"
@@ -202,7 +202,8 @@ jobs:
 
       - type: cache-save
         name: "Assets: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1
+          }}
         paths:
           - .sass-cache
           - public/assets
@@ -264,6 +265,8 @@ jobs:
 
       - store_artifacts:
           path: test-artifacts
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
 
   upload-coverage:
     docker:
