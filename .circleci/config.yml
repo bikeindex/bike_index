@@ -1,10 +1,12 @@
-version: 2.1
+# To bump cache:
+# Increment & Replace: 'CACHE_V1' in this config
 
-parameters:
-  cache_key:
-    type: integer
-    default: 1 # Bump this to bust the cache
-    # NOTE: default is the ONLY place the cache key should be specified
+# NB: It would be great to use Pipeline parameters instead of search and replacing the cache key
+# ... but that doesn't work with this config version, and workflows don't work with version 2.1
+# And circleci's documentation bounces between the two versions and everything is a pain.
+# See #2257
+
+version: 2
 
 jobs:
   build:
@@ -37,8 +39,6 @@ jobs:
     resource_class: large
 
     steps:
-      - run: echo "\n\ncache version - << pipeline.parameters.cache_key >> -- used {{ << pipeline.parameters.cache_key >> }}\n\n"
-
       - add_ssh_keys:
           fingerprints:
             - "b7:01:89:de:d8:f8:77:cc:9e:5a:ca:ee:0c:24:57:13"
@@ -65,9 +65,9 @@ jobs:
             curl -sSL "https://nodejs.org/download/release/v16.13.1/node-v16.13.1-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v16.13.1-linux-x64/bin/node
             curl https://www.npmjs.com/install.sh | sudo bash
 
-      - run:
+      - type: cache-restore
         name: "Dockerize: cache restore"
-        key: cache-<< pipeline.parameters.cache_key >>-dockerize-0.6.1
+        key: CACHE_V1-dockerize-0.6.1
 
       - run:
           name: "Dockerize: install"
@@ -80,201 +80,201 @@ jobs:
             fi
             sudo tar -C /usr/local/bin -xzvf ${dockerize_tar}
 
-      - run:
+      - type: cache-save
         name: "Dockerize: cache save"
-        key: cache-<< pipeline.parameters.cache_key >>-dockerize-0.6.1
+        key: CACHE_V1-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
 
-      - run:
+      - type: cache-restore
         name: "Git: cache restore"
-        key: cache-<< pipeline.parameters.cache_key >>-git-2.22.0
+        key: CACHE_V1-git-2.22.0
 
-  #     - run:
-  #         name: "Git: install"
-  #         environment:
-  #           GIT_VERSION: 2.22.0
-  #         command: |
-  #           set -x
+      - run:
+          name: "Git: install"
+          environment:
+            GIT_VERSION: 2.22.0
+          command: |
+            set -x
 
-  #           git_binary=~/.cache/git/git-${GIT_VERSION}/git
+            git_binary=~/.cache/git/git-${GIT_VERSION}/git
 
-  #           if [[ ! -f $git_binary ]]; then
-  #             rm -rf ~/.cache/git
-  #             mkdir -p ~/.cache/git
-  #             cd ~/.cache/git
+            if [[ ! -f $git_binary ]]; then
+              rm -rf ~/.cache/git
+              mkdir -p ~/.cache/git
+              cd ~/.cache/git
 
-  #             wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
-  #             tar -xzf git.tgz
-  #             cd git-${GIT_VERSION}
+              wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
+              tar -xzf git.tgz
+              cd git-${GIT_VERSION}
 
-  #             export DEFAULT_HELP_FORMAT="man"
-  #             autoconf
-  #             ./configure
+              export DEFAULT_HELP_FORMAT="man"
+              autoconf
+              ./configure
 
-  #             sudo make man
-  #             sudo make install-man
-  #           fi
+              sudo make man
+              sudo make install-man
+            fi
 
-  #           cd ~/.cache/git/git-${GIT_VERSION}
-  #           sudo make prefix=/usr/local all
-  #           sudo make install
-  #           sudo cp ${git_binary} /usr/local/bin/git
+            cd ~/.cache/git/git-${GIT_VERSION}
+            sudo make prefix=/usr/local all
+            sudo make install
+            sudo cp ${git_binary} /usr/local/bin/git
 
-  #     - run:
-  #       name: "Git: cache save"
-  #       key: cache-<< pipeline.parameters.cache_key >>-git-2.22.0
-  #       paths:
-  #         - ~/.cache/git/git-2.22.0
+      - type: cache-save
+        name: "Git: cache save"
+        key: CACHE_V1-git-2.22.0
+        paths:
+          - ~/.cache/git/git-2.22.0
 
-  #     - run:
-  #       name: "Hub: cache restore"
-  #       key: cache-<< pipeline.parameters.cache_key >>-hub-2.12.3
+      - type: cache-restore
+        name: "Hub: cache restore"
+        key: CACHE_V1-hub-2.12.3
 
-  #     - run:
-  #         name: "Hub: install"
-  #         environment:
-  #           HUB_VERSION: 2.12.3
-  #         command: |
-  #           set -x
+      - run:
+          name: "Hub: install"
+          environment:
+            HUB_VERSION: 2.12.3
+          command: |
+            set -x
 
-  #           hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
+            hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
 
-  #           if [[ ! -f ${hub_binary} ]]; then
-  #             rm -rf ~/.cache/hub
-  #             mkdir -p ~/.cache/hub
-  #             cd ~/.cache/hub
+            if [[ ! -f ${hub_binary} ]]; then
+              rm -rf ~/.cache/hub
+              mkdir -p ~/.cache/hub
+              cd ~/.cache/hub
 
-  #             wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-  #             tar -xzf hub.tgz
-  #           fi
+              wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+              tar -xzf hub.tgz
+            fi
 
-  #           sudo cp ${hub_binary} /usr/local/bin/hub
+            sudo cp ${hub_binary} /usr/local/bin/hub
 
-  #     - run:
-  #       name: "Hub: cache save"
-  #       key: cache-<< pipeline.parameters.cache_key >>-hub-2.12.3
-  #       paths:
-  #         - ~/.cache/hub
+      - type: cache-restore
+        name: "Hub: cache save"
+        key: CACHE_V1-hub-2.12.3
+        paths:
+          - ~/.cache/hub
 
-  #     - run:
-  #         name: "Bundler: install"
-  #         command: gem install bundler -v 2.1.4
+      - run:
+          name: "Bundler: install"
+          command: gem install bundler -v 2.1.4
 
-  #     - run:
-  #       name: "Ruby dependencies: cache restore"
-  #       key: cache-<< pipeline.parameters.cache_key >>-gems-{{ checksum "Gemfile.lock" }}
+      - type: cache-restore
+        name: "Ruby dependencies: cache restore"
+        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
 
-  #     - run:
-  #         name: "Ruby dependencies: install"
-  #         command: |
-  #           set -x
-  #           bundle check --path=~/.cache/bundle && use_local="--local"
-  #           bundle install --deployment --frozen --path=~/.cache/bundle $use_local
+      - run:
+          name: "Ruby dependencies: install"
+          command: |
+            set -x
+            bundle check --path=~/.cache/bundle && use_local="--local"
+            bundle install --deployment --frozen --path=~/.cache/bundle $use_local
 
-  #     - run:
-  #       name: "Ruby dependencies: cache save"
-  #       key: cache-<< pipeline.parameters.cache_key >>-gems-{{ checksum "Gemfile.lock" }}
-  #       paths:
-  #         - ~/.cache/bundle
+      - type: cache-save
+        name: "Ruby dependencies: cache save"
+        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
+        paths:
+          - ~/.cache/bundle
 
-  #     - run:
-  #         name: Sync translations (only on main by default)
-  #         command: bin/check_translations
+      - run:
+          name: Sync translations (only on main by default)
+          command: bin/check_translations
 
-  #     - run:
-  #       name: "Node dependencies: cache restore"
-  #       key: cache-<< pipeline.parameters.cache_key >>-yarn-{{ checksum "yarn.lock" }}
+      - type: cache-restore
+        name: "Node dependencies: cache restore"
+        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
 
-  #     - run:
-  #         name: "Node dependencies: install"
-  #         command: |
-  #           set -x
-  #           [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
-  #           yarn install --cache-folder ~/.cache/yarn $use_local
+      - run:
+          name: "Node dependencies: install"
+          command: |
+            set -x
+            [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
+            yarn install --cache-folder ~/.cache/yarn $use_local
 
-  #     - run:
-  #       name: "Node dependencies: cache save"
-  #       key: cache-<< pipeline.parameters.cache_key >>-yarn-{{ checksum "yarn.lock" }}
-  #       paths:
-  #         - ~/.cache/yarn
+      - type: cache-save
+        name: "Node dependencies: cache save"
+        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+        paths:
+          - ~/.cache/yarn
 
-  #     - run:
-  #       name: "Assets: cache restore"
-  #       key: cache-<< pipeline.parameters.cache_key >>-assets-{{ .Environment.CIRCLE_SHA1 }}
+      - type: cache-restore
+        name: "Assets: cache restore"
+        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
 
-  #     - run:
-  #         name: "Assets: precompile"
-  #         command: |
-  #           set -x
-  #           node --version
-  #           bin/webpack
-  #           bundle exec rails assets:precompile assets:clean --trace
+      - run:
+          name: "Assets: precompile"
+          command: |
+            set -x
+            node --version
+            bin/webpack
+            bundle exec rails assets:precompile assets:clean --trace
 
-  #     - run:
-  #       name: "Assets: cache save"
-  #       key: cache-<< pipeline.parameters.cache_key >>-assets-{{ .Environment.CIRCLE_SHA1 }}
-  #       paths:
-  #         - .sass-cache
-  #         - public/assets
-  #         - public/packs
-  #         - public/packs-test
-  #         - tmp/cache/assets
-  #         - tmp/cache/webpacker
+      - type: cache-save
+        name: "Assets: cache save"
+        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
+        paths:
+          - .sass-cache
+          - public/assets
+          - public/packs
+          - public/packs-test
+          - tmp/cache/assets
+          - tmp/cache/webpacker
 
-  #     - run:
-  #         name: Install Code Climate Test Reporter
-  #         command: |
-  #           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  #           chmod +x ./cc-test-reporter
+      - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
 
-  #     - run:
-  #         name: Wait for PostgreSQL to start
-  #         command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Wait for PostgreSQL to start
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
-  #     - run:
-  #         name: Setup Database
-  #         command: |
-  #           bundle exec rails db:structure:load --trace
+      - run:
+          name: Setup Database
+          command: |
+            bundle exec rails db:structure:load --trace
 
-  #     - run:
-  #         name: RSpec
-  #         command: |
-  #           mkdir -p test-results/rspec test-artifacts
-  #           ./cc-test-reporter before-build
-  #           TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-  #           bundle exec rspec --profile 10 \
-  #                             --color \
-  #                             --order random \
-  #                             --require rails_helper \
-  #                             --format RspecJunitFormatter \
-  #                             --out test-results/rspec/rspec.xml \
-  #                             --format progress \
-  #                             -- ${TESTFILES}
-  #     - run:
-  #         name: "Jest: Tests"
-  #         command: |
-  #           mkdir -p test-results/junit
-  #           yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
-  #         environment:
-  #           JEST_JUNIT_OUTPUT: "test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
-  #           JEST_JUNIT_OUTPUT_DIR: "test-results/junit/"
+      - run:
+          name: RSpec
+          command: |
+            mkdir -p test-results/rspec test-artifacts
+            ./cc-test-reporter before-build
+            TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+            bundle exec rspec --profile 10 \
+                              --color \
+                              --order random \
+                              --require rails_helper \
+                              --format RspecJunitFormatter \
+                              --out test-results/rspec/rspec.xml \
+                              --format progress \
+                              -- ${TESTFILES}
+      - run:
+          name: "Jest: Tests"
+          command: |
+            mkdir -p test-results/junit
+            yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT: "test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
+            JEST_JUNIT_OUTPUT_DIR: "test-results/junit/"
 
-  #     - run:
-  #         name: Code Climate Test Coverage
-  #         command: |
-  #           ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+      - run:
+          name: Code Climate Test Coverage
+          command: |
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
 
-  #     - persist_to_workspace:
-  #         root: coverage
-  #         paths:
-  #           - codeclimate.*.json
+      - persist_to_workspace:
+          root: coverage
+          paths:
+            - codeclimate.*.json
 
-  #     - store_test_results:
-  #         path: test-results
+      - store_test_results:
+          path: test-results
 
-  #     - store_artifacts:
-  #         path: test-artifacts
+      - store_artifacts:
+          path: test-artifacts
 
   upload-coverage:
     docker:
@@ -311,12 +311,12 @@ workflows:
   commit:
     jobs:
       - build
-      # - upload-coverage:
-      #     requires:
-      #       - build
-      # - deploy_production:
-      #     requires:
-      #       - build
-      #     filters:
-      #       branches:
-      #         only: main
+      - upload-coverage:
+          requires:
+            - build
+      - deploy_production:
+          requires:
+            - build
+          filters:
+            branches:
+              only: main
