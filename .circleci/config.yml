@@ -33,7 +33,7 @@ jobs:
       - image: redis:4.0.9
 
     steps:
-      - run: echo "cache version tag used was << pipeline.parameters.cache_version >>"
+      - run: echo "cache version tag used was {{<< pipeline.parameters.cache_version >>}}"
 
       - add_ssh_keys:
           fingerprints:
