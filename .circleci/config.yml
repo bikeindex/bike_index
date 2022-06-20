@@ -1,4 +1,13 @@
+# To bump cache:
+# Increment & Replace: 'CACHE_V1' in this config
+
+# NB: It would be great to use Pipeline parameters instead of search and replacing the cache key
+# ... but that doesn't work with this config version, and workflows don't work with version 2.1
+# And circleci's documentation bounces between the two versions and everything is a pain.
+# See #2257
+
 version: 2
+
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
@@ -25,6 +34,9 @@ jobs:
           POSTGRES_DB: bikeindex_test
           POSTGRES_PASSWORD: ""
       - image: redis:4.0.9
+
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
 
     steps:
       - add_ssh_keys:
@@ -55,7 +67,7 @@ jobs:
 
       - type: cache-restore
         name: "Dockerize: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        key: CACHE_V1-dockerize-0.6.1
 
       - run:
           name: "Dockerize: install"
@@ -70,13 +82,13 @@ jobs:
 
       - type: cache-save
         name: "Dockerize: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        key: CACHE_V1-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
 
       - type: cache-restore
         name: "Git: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        key: CACHE_V1-git-2.22.0
 
       - run:
           name: "Git: install"
@@ -111,13 +123,13 @@ jobs:
 
       - type: cache-save
         name: "Git: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        key: CACHE_V1-git-2.22.0
         paths:
           - ~/.cache/git/git-2.22.0
 
       - type: cache-restore
         name: "Hub: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        key: CACHE_V1-hub-2.12.3
 
       - run:
           name: "Hub: install"
@@ -141,7 +153,7 @@ jobs:
 
       - type: cache-restore
         name: "Hub: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        key: CACHE_V1-hub-2.12.3
         paths:
           - ~/.cache/hub
 
@@ -151,7 +163,7 @@ jobs:
 
       - type: cache-restore
         name: "Ruby dependencies: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
+        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: "Ruby dependencies: install"
@@ -162,7 +174,7 @@ jobs:
 
       - type: cache-save
         name: "Ruby dependencies: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
+        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
         paths:
           - ~/.cache/bundle
 
@@ -172,7 +184,7 @@ jobs:
 
       - type: cache-restore
         name: "Node dependencies: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
 
       - run:
           name: "Node dependencies: install"
@@ -183,14 +195,13 @@ jobs:
 
       - type: cache-save
         name: "Node dependencies: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
         paths:
           - ~/.cache/yarn
 
       - type: cache-restore
         name: "Assets: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1
-          }}
+        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
 
       - run:
           name: "Assets: precompile"
@@ -202,8 +213,7 @@ jobs:
 
       - type: cache-save
         name: "Assets: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1
-          }}
+        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
         paths:
           - .sass-cache
           - public/assets
@@ -265,8 +275,6 @@ jobs:
 
       - store_artifacts:
           path: test-artifacts
-    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
-    resource_class: large
 
   upload-coverage:
     docker:
