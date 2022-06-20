@@ -112,6 +112,10 @@ class GraduatedNotification < ApplicationRecord
       organization_id: organization_id).first
   end
 
+  def user_display_name
+    user&.display_name || email
+  end
+
   def current?
     self.class.current_statuses.include?(status)
   end
