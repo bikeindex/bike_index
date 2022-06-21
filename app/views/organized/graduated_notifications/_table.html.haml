@@ -3,38 +3,27 @@
 - render_remaining_at ||= false
 - skip_status ||= false
 - skip_email ||= false
-- separate_non_primary_notifications ||= false
+- separate_secondary_notifications ||= false
 
 - # TODO: add translations
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
-    %th
-      - if render_sortable
-        = sortable "created_at"
-      - else
-        Created
+    %th= sortable "created_at", render_sortable: render_sortable
     %th.small
-      - if render_sortable
-        = sortable "processed_at", "Sent"
-      - else
-        Sent
-    %th Bike(s)
+      = sortable "processed_at", "Sent", render_sortable: render_sortable
+    - if separate_secondary_notifications
+      %th Primary?
+    %th
+      = separate_secondary_notifications ? "Bike" : "Bike(s)"
     - unless skip_status
       %th
         Status
     - unless skip_email
-      %th
-        - if render_sortable
-          = sortable "email"
-        - else
-          email
+      %td= sortable "email", render_sortable: render_sortable
     - if render_remaining_at
-      %th
-        - if render_sortable
-          = sortable "marked_remaining_at"
-        - else
-          Marked remaining
+      %td= sortable "marked_remaining_at", render_sortable: render_sortable
+
   %tbody
     - graduated_notifications.each do |graduated_notification|
       %tr
@@ -52,10 +41,13 @@
               @
               %span.convertTime
                 = l(graduated_notification.pending_period_ends_at, format: :convert_time)
+        - if separate_secondary_notifications
+          %td
+            = check_mark if graduated_notification.primary_notification?
         %td
           - if graduated_notification.bike.present?
             = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id)
-          - if !separate_non_primary_notifications
+          - if !separate_secondary_notifications
             - graduated_notification.associated_notifications.each do |associated_notification|
               %small.d-block{ style: "padding-left: 0.5rem; line-height: 1.5" }
                 = link_to organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: associated_notification.organization_id)

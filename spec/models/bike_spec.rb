@@ -1570,7 +1570,7 @@ RSpec.describe Bike, type: :model do
       let!(:notification) { FactoryBot.create(:notification, kind: "bike_possibly_found", notifiable: bike) }
       let!(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, bike: bike) }
       let!(:feedback) { FactoryBot.create(:feedback_serial_update_request, bike: bike) }
-      let!(:user_alert) { FactoryBo.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
+      let!(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
       it "counts all them" do
         expect(bike.reload.messages_count).to eq 4
       end

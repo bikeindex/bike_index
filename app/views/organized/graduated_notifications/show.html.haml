@@ -4,6 +4,10 @@
     Graduated notification
     %small.less-strong for #{@graduated_notification.user_display_name}
 
+%h5.uncap.mb-4
+  View
+  = link_to "all user's graduated notifications", organization_graduated_notifications_path(organization_id: current_organization.to_param, user_id: @graduated_notification.user_id)
+
 .row
   .col-md-6
     %table.table-list
@@ -43,6 +47,7 @@
             - if @graduated_notification.user.present?
               %em
                 (#{@graduated_notification.user&.display_name})
+
   .col-md-6
     %h3.uncap User Bikes
     %table.table-list
@@ -58,7 +63,6 @@
                 %strong.less-strong Primary bike
               - if !@graduated_notification.primary_notification? && bike.id == @graduated_notification.bike_id
                 %strong.small - viewing this notification
-
 
 - if @graduated_notification.send_email?
   %h2.uncap.mt-4
