@@ -57,6 +57,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       expect(notification.calculated_email).to eq owner_email
       expect(notification.notifiable_id).to eq stolen_notification.id
       expect(notification.notifiable_type).to eq "StolenNotification"
+      expect(bike.reload.messages_count).to eq 1
     end
     context "with can_send_many_stolen_notifications" do
       let(:user) { FactoryBot.create(:user, can_send_many_stolen_notifications: true) }

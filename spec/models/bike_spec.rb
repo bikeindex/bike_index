@@ -1545,6 +1545,38 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "messages_count" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:owner) { bike.owner }
+    let(:user) { FactoryBot.create(:user) }
+    it "is 0" do
+      expect(bike.reload.messages_count).to eq 0
+    end
+    context "theft_survey" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record) }
+      let!(:notification) { Notification.create(user: user, kind: "theft_survey_4_2022", notifiable: bike.current_stolen_record) }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
+      end
+    end
+    context "graduated_notification" do
+      let!(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
+      let(:bike) { graduated_notification.bike }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
+      end
+    end
+    context "everything but graduated" do
+      let!(:notification) { FactoryBot.create(:notification, kind: "bike_possibly_found", notifiable: bike) }
+      let!(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, bike: bike) }
+      let!(:feedback) { FactoryBot.create(:feedback_serial_update_request, bike: bike) }
+      let!(:user_alert) { FactoryBo.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
+      it "counts all them" do
+        expect(bike.reload.messages_count).to eq 4
+      end
+    end
+  end
+
   describe "#set_location_info" do
     let!(:usa) { Country.united_states }
 
