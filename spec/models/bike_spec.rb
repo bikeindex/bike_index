@@ -1567,7 +1567,7 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "everything but graduated" do
-      let!(:notification) { FactoryBot.create(:notification, kind: "bike_possibly_found", notifiable: bike) }
+      let!(:notification) { FactoryBot.create(:notification, kind: "bike_possibly_found", bike: bike) }
       let!(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, bike: bike) }
       let!(:feedback) { FactoryBot.create(:feedback_serial_update_request, bike: bike) }
       let!(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
