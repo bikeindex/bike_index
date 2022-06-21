@@ -256,4 +256,27 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       end
     end
   end
+
+  describe "graduated_notification" do
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+    let(:bike) { graduated_notification.bike }
+    let(:user) { FactoryBot.create(:user_confirmed, email: bike.owner_email.upcase) }
+
+    it "assigns any that match the user email" do
+      expect(bike.reload.claimed?).to be_falsey
+      expect(bike.current_ownership.user&.id).to be_blank
+      expect(graduated_notification.active?).to be_truthy
+      expect(graduated_notification.primary_notification?).to be_truthy
+      expect(graduated_notification.user_id).to be_blank
+      og_updated_at = graduated_notification.updated_at
+      expect(user).to be_present
+
+      Sidekiq::Testing.inline! { instance.perform(user.id, "confirmed") }
+
+      expect(bike.reload.claimed?).to be_falsey
+      expect(bike.current_ownership.user&.id).to eq user.id
+      expect(graduated_notification.reload.user_id).to eq user.id
+      expect(graduated_notification.updated_at).to eq og_updated_at # Shouldn't have changed
+    end
+  end
 end

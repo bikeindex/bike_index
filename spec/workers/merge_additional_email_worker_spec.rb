@@ -59,7 +59,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(theft_alert).to be_present
       end
 
-      def expect_merged_bikes_and_memberships
+      def expect_merged_bikes_and_memberships(ownerships_count: 2)
         user.reload
         expect(user.memberships.count).to eq 1
         expect(user.ownerships.count).to eq 0
@@ -83,7 +83,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(Membership.where(id: old_membership.id)).to_not be_present # Deleted extra memberships
 
         expect(user_email.user).to eq user
-        expect(user.ownerships.count).to eq 2
+        expect(user.ownerships.count).to eq ownerships_count
         expect(user.memberships.count).to eq 3
         expect(user.organizations.pluck(:id)).to match_array([organization.id, second_organization.id, third_organization.id])
         expect(membership.user).to eq user
@@ -111,6 +111,17 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         it "merges and marks banned" do
           expect_merged_bikes_and_memberships
           expect(user.banned?).to be_truthy
+        end
+      end
+      context "graduated_notifications and parking_notifications" do
+        let(:graduated_notification) { FactoryBot.create(:graduated_notification, :with_user, user: old_user) }
+        let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, user: old_user) }
+        it "merges" do
+          expect(graduated_notification.reload.user_id).to eq old_user.id
+          expect(ParkingNotification.where(user_id: old_user.id).pluck(:id)).to eq([parking_notification.id])
+          expect_merged_bikes_and_memberships(ownerships_count: 3)
+          expect(ParkingNotification.where(user_id: user.id).pluck(:id)).to eq([parking_notification.id])
+          expect(GraduatedNotification.where(user_id: user.id).pluck(:id)).to eq([graduated_notification.id])
         end
       end
     end

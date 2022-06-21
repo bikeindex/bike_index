@@ -79,7 +79,10 @@
           %em
             = status_display(graduated_notification.status.humanize)
         %td
-          = graduated_notification.email
+          - if graduated_notification.user_id.present?
+            = link_to graduated_notification.email, admin_user_path(graduated_notification.user_id)
+          - else
+            = graduated_notification.email
         %td
           - if graduated_notification.marked_remaining_at.present?
             %span.convertTime
