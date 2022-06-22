@@ -29,7 +29,8 @@
         = link_to "with claims", url_for(sortable_search_params.merge(search_with_claims: !@with_claims)), class: "nav-link #{@with_claims ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: { viewing: "Impound Record" }
+
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Impound Record"}
 
 .row.mt-4.mb-4
   .col-sm-6

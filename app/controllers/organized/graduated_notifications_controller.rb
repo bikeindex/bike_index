@@ -19,6 +19,8 @@ module Organized
     def show
     end
 
+    helper_method :user_search_params_present?, :separate_secondary_notifications?
+
     private
 
     def graduated_notifications
@@ -29,8 +31,17 @@ module Organized
       %w[created_at processed_at email marked_remaining_at]
     end
 
-    def bike_search_params_present?
-      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:search_email].present?
+    def user_search_params_present?
+      %i[search_email user_id].any? { |k| params[k].present? }
+    end
+
+    def separate_secondary_notifications?
+      @separate_secondary_notifications ||= ParamsNormalizer.boolean(params[:search_secondary])
+    end
+
+    def search_params_present?
+      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? ||
+        params[:search_bike_id].present? || user_search_params_present?
     end
 
     def available_graduated_notifications
@@ -46,15 +57,19 @@ module Organized
       # Doesn't make sense to include unprocessed if sorting by processed_at
       a_graduated_notifications = a_graduated_notifications.processed if sort_column == "processed_at"
 
-      if bike_search_params_present?
-        @separate_non_primary_notifications = true # Because we need to match per bike things, show all potential notifications
+      if search_params_present?
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_and_name_search(params[:search_email]) if params[:search_email].present?
+        bikes = Bike.where(id: params[:search_bike_id]) if params[:search_bike_id].present?
+        if params[:search_email].present?
+          bikes = bikes.organized_email_and_name_search(params[:search_email])
+        elsif params[:user_id].present?
+          user = User.find_by_id(params[:user_id])
+          bikes = user.present? ? user.bikes : Bike.none
+        end
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
-      else
-        @separate_non_primary_notifications = false
-        a_graduated_notifications = a_graduated_notifications.primary_notification
       end
+
+      a_graduated_notifications = a_graduated_notifications.primary_notification unless separate_secondary_notifications?
 
       @available_graduated_notifications = a_graduated_notifications.where(created_at: @time_range)
     end

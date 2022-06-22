@@ -79,6 +79,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
       it "enqueues and creates" do
         # Couple of tests to ensure we're making the factories right
         expect(graduated_notification_remaining_expired.created_at).to be < graduated_notification_remaining_expired.marked_remaining_at
+        expect(graduated_notification_remaining_expired.most_recent?).to be_truthy
         expect(graduated_notification_active.processed_at).to be < Time.current
         expect(graduated_notification_active.status).to eq("active")
         # Really, testing bike_ids_to_notify ensures we're enqueueing the right things, but - just to be sure
@@ -95,6 +96,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
             instance.perform
           }.to change(GraduatedNotification, :count).by 1
         end
+        expect(graduated_notification_remaining_expired.reload.most_recent?).to be_falsey
         graduated_notification = GraduatedNotification.last
         expect(graduated_notification.status).to eq "pending"
         expect(graduated_notification.in_pending_period?).to be_truthy
@@ -102,6 +104,58 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         expect(graduated_notification.processed?).to be_falsey
         expect(graduated_notification.bike_id).to eq bike.id
         expect(graduated_notification.organization_id).to eq organization.id
+        expect(graduated_notification.most_recent?).to be_truthy
+      end
+    end
+
+    context "other existing graduated_notifications" do
+      let!(:graduated_notification_remaining_expired) do
+        FactoryBot.create(:graduated_notification,
+          :marked_remaining,
+          organization: organization,
+          bike: bike,
+          created_at: Time.current - (2 * graduated_notification_interval),
+          marked_remaining_at: Time.current - (2 * graduated_notification_interval))
+      end
+
+      let(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: Time.current - 5.years) }
+      let!(:graduated_notification2_remaining_expired) do
+        FactoryBot.create(:graduated_notification,
+          :marked_remaining,
+          organization: organization,
+          bike: bike2,
+          marked_remaining_at: Time.current - (2 * graduated_notification_interval))
+      end
+      let!(:graduated_notification2) do
+        FactoryBot.create(:graduated_notification,
+          bike: bike2,
+          created_at: Time.current - 3.weeks,
+          organization: organization)
+      end
+
+      # We were creating duplicate notifications! Test that we don't.
+      it "doesn't enqueue what shouldn't be enqueued" do
+        expect(graduated_notification_remaining_expired.most_recent?).to be_truthy
+        expect(graduated_notification_remaining_expired.status).to eq "marked_remaining"
+
+        expect(graduated_notification2_remaining_expired.reload.most_recent?).to be_falsey
+        graduated_notification2.mark_remaining!(resolved_at: Time.current - 2.weeks)
+        bike2.reload
+        expect(bike2.organizations.pluck(:id)).to eq([organization.id])
+        expect(bike2.graduated?(organization)).to be_falsey
+        expect(bike2.graduated_notifications(organization).pluck(:id)).to match_array([graduated_notification2_remaining_expired.id, graduated_notification2.id])
+
+        expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([])
+        expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to eq([bike.id])
+        expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike.id])
+
+        Sidekiq::Testing.inline! do
+          expect {
+            instance.perform
+            instance.perform
+          }.to change(GraduatedNotification, :count).by 1
+        end
+        expect(graduated_notification_remaining_expired.reload.most_recent?).to be_falsey
       end
     end
   end

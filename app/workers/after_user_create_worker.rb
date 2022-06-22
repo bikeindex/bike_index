@@ -42,7 +42,10 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_async_jobs(user, email)
     # These jobs don't need to happen immediately
     import_user_attributes(user)
-    associate_ownerships(user, email) if user.confirmed?
+    if user.confirmed?
+      associate_ownerships(user, email)
+      associate_graduated_notifications(user.reload)
+    end
   end
 
   def send_welcoming_email(user)
@@ -58,6 +61,11 @@ class AfterUserCreateWorker < ApplicationWorker
     Ownership.where(owner_email: email).each do |ownership|
       ownership.update(user_id: user.id)
     end
+  end
+
+  def associate_graduated_notifications(user)
+    GraduatedNotification.where(bike_id: user.bike_ids, user_id: nil)
+      .update_all(user_id: user.id)
   end
 
   def associate_membership_invites(user, email, skip_confirm: false)

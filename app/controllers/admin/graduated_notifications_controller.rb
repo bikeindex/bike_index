@@ -27,6 +27,10 @@ class Admin::GraduatedNotificationsController < Admin::BaseController
     else
       @search_status = "all"
     end
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
+      graduated_notifications = graduated_notifications.where(bike_id: params[:search_bike_id])
+    end
     graduated_notifications = graduated_notifications.marked_remaining if sort_column == "marked_remaining_at"
     graduated_notifications = graduated_notifications.where(organization_id: current_organization.id) if current_organization.present?
     @matching_graduated_notifications = graduated_notifications.where(created_at: @time_range)
