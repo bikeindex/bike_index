@@ -532,7 +532,7 @@ RSpec.describe GraduatedNotification, type: :model do
     end
   end
 
-  describe "update_not_most_recent" do
+  describe "mark_previous_notifications_not_most_recent" do
     let!(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization) }
     let(:bike) { graduated_notification.bike }
     let(:graduated_notification2) { FactoryBot.create(:graduated_notification, bike: bike, organization: organization) }

@@ -145,8 +145,6 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         expect(bike2.graduated?(organization)).to be_falsey
         expect(bike2.graduated_notifications(organization).pluck(:id)).to match_array([graduated_notification2_remaining_expired.id, graduated_notification2.id])
 
-        pp organization.bikes.includes(:graduated_notifications, :ownerships).where(graduated_notifications: {id: nil}).pluck(:id)
-
         expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([])
         expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to eq([bike.id])
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike.id])

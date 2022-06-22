@@ -41,7 +41,7 @@ module Organized
 
     def search_params_present?
       @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? ||
-          params[:search_bike_id].present? || user_search_params_present?
+        params[:search_bike_id].present? || user_search_params_present?
     end
 
     def available_graduated_notifications
