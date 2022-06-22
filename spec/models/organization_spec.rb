@@ -681,7 +681,7 @@ RSpec.describe Organization, type: :model do
     it "blocks naming something invalid" do
       expect(organization.save).to be_falsey
       expect(organization.id).to be_blank
-      organization.update(name: "something else", short_name: "something cool")
+      organization.update(name: "something else ", short_name: " something cool")
       expect(organization.valid?).to be_truthy
       expect(organization.id).to be_present
       valid_names = ["something else", "something cool", "something-cool"]
