@@ -529,8 +529,7 @@ RSpec.describe "BikesController#show", type: :request do
       expect(response).to redirect_to("#{base_url}/#{bike.id}.png")
     end
     describe "spokecard" do
-      it "renders spokecard" do
-        # And it renders spokecard, which is actually just the pn
+      it "renders spokecard (which actually renders .png internally)" do
         get "#{base_url}/#{bike.id}/spokecard"
         expect(response.status).to eq(200)
         expect(response).to render_template(:spokecard)
