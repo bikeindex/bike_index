@@ -41,7 +41,10 @@ class BikesController < Bikes::BaseController
     find_token
     respond_to do |format|
       format.html { render :show }
-      format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
+      format.png do
+        qrcode = RQRCode::QRCode.new(bike_url(@bike))
+        render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
+      end
     end
   end
 
@@ -84,7 +87,7 @@ class BikesController < Bikes::BaseController
   end
 
   def spokecard
-    @qrcode = "#{bike_url(Bike.find(params[:id]))}.gif"
+    @qrcode = "#{bike_url(Bike.find(params[:id]))}.png"
     render layout: false
   end
 
