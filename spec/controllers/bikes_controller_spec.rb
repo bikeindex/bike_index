@@ -167,12 +167,6 @@ RSpec.describe BikesController, type: :controller do
         }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
-    context "qr code gif" do
-      it "renders" do
-        get :show, params: {id: bike.id, format: :gif}
-        expect(response.status).to eq(200)
-      end
-    end
     context "bike is soft deleted" do
       include_context :logged_in_as_user
       it "redirects the user" do
@@ -194,14 +188,6 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to render_template(:show)
         end
       end
-    end
-  end
-
-  describe "spokecard" do
-    it "renders the page from bike id" do
-      bike = FactoryBot.create(:bike)
-      get :spokecard, params: {id: bike.id}
-      expect(response.code).to eq("200")
     end
   end
 
