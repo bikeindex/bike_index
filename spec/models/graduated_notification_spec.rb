@@ -569,6 +569,7 @@ RSpec.describe GraduatedNotification, type: :model do
 
         expect(graduated_notification.reload.most_recent?).to be_truthy
         expect(graduated_notification2.reload.most_recent?).to be_falsey
+        expect(graduated_notification2.most_recent_graduated_notification&.id).to eq graduated_notification3.id
       end
     end
     context "different org" do

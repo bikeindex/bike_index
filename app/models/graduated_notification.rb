@@ -130,6 +130,10 @@ class GraduatedNotification < ApplicationRecord
     !processed?
   end
 
+  def most_recent_graduated_notification
+    not_most_recent? ? same_notifications.most_recent.last : nil
+  end
+
   def most_recent?
     !not_most_recent?
   end
@@ -336,9 +340,12 @@ class GraduatedNotification < ApplicationRecord
     associated_bike_ids - associated_notification_bike_ids
   end
 
+  def same_notifications
+    GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
+  end
+
   def previous_notifications
-    p_notifications = GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
-      .where("id < ?", id)
+    p_notifications = same_notifications.where("id < ?", id)
     if user_id.present?
       p_notifications.where(user_id: user_id)
     else
