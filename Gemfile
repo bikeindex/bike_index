@@ -58,6 +58,7 @@ gem "omniauth-twitter"
 gem "sitemap_generator", "~> 6"
 
 # Making other files
+gem "mini_magick" # Required for image processing
 gem "carrierwave", "~> 0.11.2" # File uploader
 gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
