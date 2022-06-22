@@ -4,6 +4,16 @@
   %h1
     Graduated notifications
 
+- unless current_organization.deliver_graduated_notifications?
+  .row.mt-5.mb-5
+    .col-md-6
+      .alert.alert-info
+        %h3 Not delivering graduated notifications
+        #{current_organization.name} doesn't have a notification time period set,
+        %span.text-warning bikes are not being graduated.
+        %br
+        Please email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"} to set up graduated notifications.
+
 = render partial: "/shared/period_select"
 
 .mt-4

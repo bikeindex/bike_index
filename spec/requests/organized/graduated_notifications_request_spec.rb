@@ -44,6 +44,17 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
     end
   end
 
+  context "not-delivering organization" do
+    it "still renders" do
+      current_organization.update(graduated_notification_interval: nil)
+      expect(current_organization.reload.deliver_graduated_notifications?).to be_falsey
+      get base_url
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(assigns(:search_status)).to eq "current"
+    end
+  end
+
   describe "show" do
     let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
     it "renders" do
