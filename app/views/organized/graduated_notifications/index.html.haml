@@ -37,6 +37,9 @@
     - if user_search_params_present?
       %span.less-strong
         for searched user
+    - elsif params[:search_bike_id].present?
+      %span.less-strong
+        for searched bike
   .col-sm-6.text-right
     - if display_dev_info?
       %span.only-dev-visible.mr-2.pl-1.pr-1

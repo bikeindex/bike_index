@@ -16,18 +16,25 @@ class MergeAdditionalEmailWorker < ApplicationWorker
     old_user.created_ownerships.each { |i| i.update_attribute :creator_id, user_email.user_id }
     old_user.created_bikes.each { |i| i.update_attribute :creator_id, user_email.user_id }
 
+    old_user.user_phones.update_all(user_id: user_email.user_id)
     old_user.locks.update_all(user_id: user_email.user_id)
     old_user.payments.update_all(user_id: user_email.user_id)
     old_user.integrations.update_all(user_id: user_email.user_id)
     old_user.sent_stolen_notifications.update_all(sender_id: user_email.user_id)
     old_user.received_stolen_notifications.update_all(receiver_id: user_email.user_id)
     old_user.theft_alerts.update_all(user_id: user_email.user_id)
+    old_user.bike_sticker_updates.update_all(user_id: user_email.user_id)
+
+    BikeSticker.where(user_id: old_user.id).update_all(user_id: user_email.user_id)
     GraduatedNotification.where(user_id: old_user.id).update_all(user_id: user_email.user_id)
     ParkingNotification.where(user_id: old_user.id).update_all(user_id: user_email.user_id)
+
     Doorkeeper::Application.where(owner_id: old_user.id).each { |i| i.update_attribute :owner_id, user_email.user_id }
     CustomerContact.where(user_id: old_user.id).each { |i| i.update_attribute :user_id, user_email.user_id }
     CustomerContact.where(creator_id: old_user.id).each { |i| i.update_attribute :creator_id, user_email.user_id }
+
     user_email.user.update(banned: true) if old_user.banned?
+
     old_user.reload # so we don't trigger dependent destroys
     old_user.destroy
   end

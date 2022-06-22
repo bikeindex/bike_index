@@ -59,9 +59,9 @@ module Organized
 
       if search_params_present?
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)
+        bikes = Bike.where(id: params[:search_bike_id]) if params[:search_bike_id].present?
         if params[:search_email].present?
           bikes = bikes.organized_email_and_name_search(params[:search_email])
-          bikes = Bike.where(id: params[:search_bike_id]) if params[:search_bike_id].present?
         elsif params[:user_id].present?
           user = User.find_by_id(params[:user_id])
           bikes = user.present? ? user.bikes : Bike.none

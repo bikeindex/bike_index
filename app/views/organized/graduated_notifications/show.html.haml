@@ -6,7 +6,8 @@
 
 %h5.uncap.mb-4
   View
-  = link_to "all user's graduated notifications", organization_graduated_notifications_path(organization_id: current_organization.to_param, user_id: @graduated_notification.user_id)
+  - user_search_param = @graduated_notification.user_id.present? ? {user_id: @graduated_notification.user_id} : {search_email: @graduated_notification.email}
+  = link_to "all user's graduated notifications", organization_graduated_notifications_path(user_search_param.merge(organization_id: current_organization.to_param))
 
 .row
   .col-md-6
@@ -81,7 +82,7 @@
             = link_to "custom email content", edit_organization_email_path("graduated_notification", organization_id: current_organization.to_param)
             has changed since this graduated notification was sent!
           %span.text-danger This preview shows the current version of the custom email content,
-          not the version the user received
+          not the version the user received.
 
   .email-preview.parking-notification-email-preview
     <iframe src="#{organization_email_path("graduated_notification", graduated_notification_id: @graduated_notification.to_param, organization_id: current_organization.to_param)}"></iframe>

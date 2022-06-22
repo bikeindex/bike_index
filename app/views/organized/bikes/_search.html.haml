@@ -224,6 +224,7 @@
                 %br
               - if bike.email_visible_for?(current_organization)
                 = bike.owner_email
+                %small= link_to "🔎", url_for(sortable_search_params.merge(search_email: bike.owner_email))
               - else
                 %em.less-strong
                   = t(".email_hidden")

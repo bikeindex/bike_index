@@ -104,5 +104,45 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         expect(graduated_notification.organization_id).to eq organization.id
       end
     end
+
+    context "other existing graduated_notifications" do
+      let!(:graduated_notification_remaining_expired) do
+        FactoryBot.create(:graduated_notification,
+          :marked_remaining,
+          organization: organization,
+          bike: bike,
+          marked_remaining_at: Time.current - (2 * graduated_notification_interval))
+      end
+
+      let(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: Time.current - 5.years) }
+      let!(:graduated_notification2_remaining_expired) do
+        FactoryBot.create(:graduated_notification,
+          :marked_remaining,
+          organization: organization,
+          bike: bike,
+          marked_remaining_at: Time.current - (2 * graduated_notification_interval))
+      end
+      let!(:graduated_notification2) do
+        FactoryBot.create(:graduated_notification,
+          bike: bike2,
+          created_at: Time.current - 3.weeks,
+          organization: organization)
+      end
+
+      # We were creating duplicate notifications! Test that we don't.
+      it "doesn't enqueue what shouldn't be enqueued" do
+        graduated_notification2.mark_remaining!(resolved_at: Time.current - 2.weeks)
+        bike2.reload
+        expect(bike2.organizations.pluck(:id)).to eq([organization.id])
+        expect(bike2.graduated?(organization)).to be_falsey
+        expect(bike2.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification2.id])
+
+        pp organization.bikes.includes(:graduated_notifications, :ownerships).where(graduated_notifications: {id: nil}).pluck(:id)
+
+        expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([])
+        expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to eq([bike.id])
+        expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike.id])
+      end
+    end
   end
 end

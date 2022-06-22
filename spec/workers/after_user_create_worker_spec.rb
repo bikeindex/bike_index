@@ -268,7 +268,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       expect(graduated_notification.active?).to be_truthy
       expect(graduated_notification.primary_notification?).to be_truthy
       expect(graduated_notification.user_id).to be_blank
-      og_updated_at = graduated_notification.updated_at
+      og_updated_at = graduated_notification.reload.updated_at
       expect(user).to be_present
 
       Sidekiq::Testing.inline! { instance.perform(user.id, "confirmed") }

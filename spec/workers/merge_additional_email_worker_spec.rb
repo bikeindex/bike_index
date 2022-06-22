@@ -32,6 +32,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:integration) { FactoryBot.create(:integration, user: old_user, information: {"info" => {"email" => email, :name => "blargh"}}) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }
       let(:payment) { FactoryBot.create(:payment, user: old_user) }
+      let(:user_phone) { FactoryBot.create(:user_phone, user: old_user) }
       let(:customer_contact) { FactoryBot.create(:customer_contact, user: old_user, creator: old_user) }
       let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: old_user, receiver: old_user) }
       let(:oauth_application) { Doorkeeper::Application.create(name: "MyApp", redirect_uri: "https://app.com") }
@@ -42,7 +43,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(second_membership).to be_present
         expect(user_email.confirmed?).to be_truthy
         old_user_ownership.mark_claimed
-        expect(old_user.ownerships.pluck(:id)).to eq([ownership.id, old_user_ownership.id])
+        expect(old_user.reload.ownerships.pluck(:id)).to eq([ownership.id, old_user_ownership.id])
         expect(membership.user).to eq old_user
         expect(old_membership.user).to eq old_user
         expect(new_membership.user).to eq user
@@ -57,6 +58,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(customer_contact).to be_present
         expect(stolen_notification).to be_present
         expect(theft_alert).to be_present
+        expect(user_phone.user_id).to eq old_user.id
       end
 
       def expect_merged_bikes_and_memberships(ownerships_count: 2)
@@ -101,6 +103,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(Doorkeeper::Application.where(owner_id: user.id).count).to eq 1
         expect(bike.creator).to eq user
         expect(pre_created_ownership.creator_id).to eq user.id
+        expect(user_phone.reload.user_id).to eq user.id
       end
 
       it "merges bikes and memberships and deletes user" do
@@ -113,15 +116,21 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
           expect(user.banned?).to be_truthy
         end
       end
-      context "graduated_notifications and parking_notifications" do
+      context "graduated_notifications, parking_notifications, stickers" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification, :with_user, user: old_user) }
         let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, user: old_user) }
+        let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
         it "merges" do
           expect(graduated_notification.reload.user_id).to eq old_user.id
           expect(ParkingNotification.where(user_id: old_user.id).pluck(:id)).to eq([parking_notification.id])
+          bike_sticker.claim(user: old_user, bike: bike)
+          expect(bike_sticker.reload.user_id).to eq old_user.id
+          expect(bike_sticker.bike_sticker_updates.pluck(:user_id)).to eq([old_user.id]) # One update, from claiming
           expect_merged_bikes_and_memberships(ownerships_count: 3)
           expect(ParkingNotification.where(user_id: user.id).pluck(:id)).to eq([parking_notification.id])
           expect(GraduatedNotification.where(user_id: user.id).pluck(:id)).to eq([graduated_notification.id])
+          expect(bike_sticker.reload.user_id).to eq user.id
+          expect(bike_sticker.bike_sticker_updates.pluck(:user_id)).to eq([user.id]) # One update, from claiming
         end
       end
     end
