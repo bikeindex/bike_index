@@ -80,6 +80,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         # Couple of tests to ensure we're making the factories right
         expect(graduated_notification_remaining_expired.created_at).to be < graduated_notification_remaining_expired.marked_remaining_at
         expect(graduated_notification_remaining_expired.most_recent?).to be_truthy
+        expect(graduated_notification_remaining_expired.expired?).to be_truthy
         expect(graduated_notification_active.processed_at).to be < Time.current
         expect(graduated_notification_active.status).to eq("active")
         # Really, testing bike_ids_to_notify ensures we're enqueueing the right things, but - just to be sure
@@ -98,6 +99,9 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         end
         expect(graduated_notification_remaining_expired.reload.most_recent?).to be_falsey
         graduated_notification = GraduatedNotification.last
+        expect(graduated_notification.primary_notification?).to be_truthy
+        expect(graduated_notification.associated_notifications.pluck(:id)).to eq([])
+        expect(graduated_notification.send(:existing_sent_notification)&.id).to be_blank
         expect(graduated_notification.status).to eq "pending"
         expect(graduated_notification.in_pending_period?).to be_truthy
         expect(graduated_notification.processed?).to be_falsey

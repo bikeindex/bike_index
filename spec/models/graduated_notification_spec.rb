@@ -566,9 +566,14 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification3 = GraduatedNotification.create(bike: bike2, organization: organization)
         expect(graduated_notification3.reload.most_recent?).to be_truthy
         expect(graduated_notification3.primary_notification?).to be_falsey
+        expect(graduated_notification3.associated_bikes.map(&:id).sort).to eq([bike.id, bike2.id])
 
         expect(graduated_notification.reload.most_recent?).to be_truthy
+        expect(graduated_notification.most_recent_graduated_notification&.id).to eq graduated_notification.id
+        expect(graduated_notification.associated_bikes.map(&:id).sort).to eq([bike.id, bike2.id])
         expect(graduated_notification2.reload.most_recent?).to be_falsey
+        expect(graduated_notification2.most_recent_graduated_notification&.id).to eq graduated_notification3.id
+        expect(graduated_notification2.associated_bikes.map(&:id).sort).to eq([bike.id, bike2.id])
       end
     end
     context "different org" do
@@ -597,13 +602,21 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(bike.ownerships.count).to eq 1
         BikeUpdator.new(bike: bike, user: user2, b_params: {bike: {owner_email: user2.email}}.as_json).update_ownership
         expect(bike.reload.owner_email).to eq user2.email
+        expect(bike.user.id).to eq user2.id
         expect(bike.ownerships.count).to eq 2
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        expect(graduated_notification.reload.user_id).to be_blank
+        expect(graduated_notification.email).to_not eq user2.email
 
         graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
+        expect(graduated_notification2).to be_valid
         graduated_notification2.update_attribute :created_at, Time.current - 25.hours # Pending period
         expect(graduated_notification2).to be_valid
         expect(graduated_notification2.user_id).to eq user2.id
+        expect(graduated_notification2.email).to eq user2.email
+        expect(graduated_notification2.primary_bike_id).to eq bike.id
+
+        expect(graduated_notification2.send(:existing_sent_notification)&.id).to be_blank
         expect(graduated_notification2.primary_notification?).to be_truthy
         expect(graduated_notification2.processable?).to be_truthy
         graduated_notification2.process_notification

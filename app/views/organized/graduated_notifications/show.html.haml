@@ -7,7 +7,7 @@
 %h5.uncap.mb-4
   View
   - user_search_param = @graduated_notification.user_id.present? ? {user_id: @graduated_notification.user_id} : {search_email: @graduated_notification.email}
-  = link_to "all user's graduated notifications", organization_graduated_notifications_path(user_search_param.merge(organization_id: current_organization.to_param))
+  = link_to "all user's graduated notifications", organization_graduated_notifications_path(user_search_param.merge(organization_id: current_organization.to_param, search_status: "all"))
 
 .row
   .col-md-6
@@ -22,7 +22,7 @@
           %td Status
           %td= status_display(@graduated_notification.status.humanize)
 
-        - if @graduated_notification.processed?
+        - if @graduated_notification.processed? && @graduated_notification.processed_at.present?
           %tr
             %td Sent
             %td
@@ -50,7 +50,9 @@
                 (#{@graduated_notification.user&.display_name})
 
   .col-md-6
-    %h3.uncap User Bikes
+    %h3.uncap
+      User Bikes
+      %small.less-strong (#{@graduated_notification.associated_bikes.count})
     %table.table-list
       %tbody
         - @graduated_notification.associated_bikes.each do |bike|
