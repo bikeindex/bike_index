@@ -139,7 +139,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def most_recent_graduated_notification
-    not_most_recent? ? matching_notifications.most_recent.last : nil
+    most_recent? ? self : matching_notifications.most_recent.last
   end
 
   def most_recent?
@@ -317,12 +317,13 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def existing_sent_notification
-    if organization.graduated_notification_interval.present?
-      existing_notification = GraduatedNotification.where(created_at: potential_matching_period)
-        .where(GraduatedNotification.user_or_email_query(self)).email_success.first
+    existing_notification = if organization.graduated_notification_interval.present?
+      GraduatedNotification.where(created_at: potential_matching_period)
+        .where(GraduatedNotification.user_or_email_query(self))
+        .email_success.primary_notification.first
     end
-    existing_notification ||= associated_notifications_including_self.email_success.first
-    existing_notification
+    existing_notification ||
+      associated_notifications_including_self.email_success.primary_notification.first
   end
 
   def user_or_email_bikes
