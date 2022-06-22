@@ -26,6 +26,6 @@ class OrganizationNameValidator < ActiveModel::Validator
   def validate(record)
     # There's gotta be a way to put these attrs together, but too lazy to figure it out right now
     return true if [record[:name], record[:short_name], record[:slug]].all? { |str| self.class.valid?(str) }
-    record.errors[:base] << "Invalid name"
+    record.errors.add(:base, "Invalid name")
   end
 end

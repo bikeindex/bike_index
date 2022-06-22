@@ -435,7 +435,7 @@ class Organization < ApplicationRecord
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = (short_name || name).truncate(30)
+    self.short_name = (short_name || name).strip.truncate(30)
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
@@ -522,7 +522,7 @@ class Organization < ApplicationRecord
   end
 
   def strip_name_tags(str)
-    strip_tags(name).gsub("&amp;", "&")
+    strip_tags(name&.strip).gsub("&amp;", "&")
   end
 
   def calculated_enabled_feature_slugs
