@@ -19,6 +19,8 @@ class GraduatedNotification < ApplicationRecord
 
   attr_accessor :skip_update
 
+  scope :not_most_recent, -> { where(not_most_recent: true) }
+  scope :most_recent, -> { where(not_most_recent: false) }
   scope :current, -> { where(status: current_statuses) }
   scope :processed, -> { where(status: processed_statuses) }
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
@@ -73,7 +75,7 @@ class GraduatedNotification < ApplicationRecord
     organization.bikes.includes(:graduated_notifications, :ownerships)
       .where.not(graduated_notifications: {marked_remaining_at: nil})
       .where("graduated_notifications.marked_remaining_at < ?", Time.current - organization.graduated_notification_interval)
-      .where(graduated_notifications: {id: pluck(:id)})
+      .where(graduated_notifications: {id: pluck(:id), not_most_recent: false})
       .reorder("ownerships.created_at ASC") # Use ascending so older are processed first
   end
 
@@ -126,6 +128,10 @@ class GraduatedNotification < ApplicationRecord
 
   def unprocessed?
     !processed?
+  end
+
+  def most_recent?
+    !not_most_recent?
   end
 
   # Necessary to match parking_notification method
@@ -212,7 +218,9 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def update_associated_notifications
-    return true if skip_update || !primary_notification?
+    return true if skip_update
+    mark_previous_notifications_not_most_recent if most_recent?
+    return unless primary_notification?
     self.class.associated_notifications(self)
       .each { |n| n.update(updated_at: Time.current, skip_update: true) }
   end
@@ -296,9 +304,13 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def existing_sent_notification
-    if user_id.present? && organization.graduated_notification_interval.present?
-      existing_notification = GraduatedNotification.where(user_id: user_id, created_at: potential_matching_period)
-        .email_success.first
+    if organization.graduated_notification_interval.present?
+      existing_notification = GraduatedNotification.where(created_at: potential_matching_period)
+      existing_notification = if user_id.present?
+        existing_notification.where(user_id: user_id)
+      else
+        existing_notification.where(email: email)
+      end.email_success.first
     end
     existing_notification ||= associated_notifications_including_self.email_success.first
     existing_notification
@@ -322,5 +334,19 @@ class GraduatedNotification < ApplicationRecord
     associated_bike_ids = associated_bikes.pluck(:id)
     associated_notification_bike_ids = associated_notifications_including_self.pluck(:bike_id)
     associated_bike_ids - associated_notification_bike_ids
+  end
+
+  def previous_notifications
+    p_notifications = GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
+      .where("id < ?", id)
+    if user_id.present?
+      p_notifications.where(user_id: user_id)
+    else
+      p_notifications.where(email: email)
+    end
+  end
+
+  def mark_previous_notifications_not_most_recent
+    previous_notifications.most_recent.update_all(not_most_recent: true)
   end
 end

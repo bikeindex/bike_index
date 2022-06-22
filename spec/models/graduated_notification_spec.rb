@@ -350,7 +350,7 @@ RSpec.describe GraduatedNotification, type: :model do
 
       expect(bike2.user&.id).to eq user.id
       graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
-      expect(graduated_notification2.send(:potential_matching_period).include?(graduated_notification1.created_at)).to be_truthy
+      expect(graduated_notification2.send(:potential_matching_period).cover?(graduated_notification1.created_at)).to be_truthy
       expect(graduated_notification2.send(:calculated_primary_notification).id).to eq graduated_notification1.id
       expect(graduated_notification2.send(:existing_sent_notification)&.id).to eq graduated_notification1.id
       expect(graduated_notification2.primary_notification_id).to eq graduated_notification1.id
@@ -528,6 +528,90 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification2.reload
         expect(graduated_notification1.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect(graduated_notification2.associated_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+      end
+    end
+  end
+
+  describe "update_not_most_recent" do
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization) }
+    let(:bike) { graduated_notification.bike }
+    let(:graduated_notification2) { FactoryBot.create(:graduated_notification, bike: bike, organization: organization) }
+    it "matches and updates" do
+      expect(graduated_notification.reload.most_recent?).to be_truthy
+
+      expect(graduated_notification2.reload.most_recent?).to be_truthy
+
+      expect(graduated_notification2.send(:previous_notifications).pluck(:id)).to eq([graduated_notification.id])
+
+      expect(graduated_notification.send(:previous_notifications).pluck(:id)).to eq([])
+      expect(graduated_notification.reload.most_recent?).to be_falsey
+    end
+    context "non-primary" do
+      let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: bike.owner_email, created_at: Time.current - 2.years) }
+      let(:graduated_notification2) { FactoryBot.create(:graduated_notification, organization: organization, bike: bike2, created_at: graduated_notification.created_at + 1.day) }
+      it "updates it too" do
+        expect(graduated_notification.reload.most_recent?).to be_truthy
+        expect(graduated_notification.user_id).to be_blank
+
+        expect(graduated_notification2.user_id).to be_blank
+        expect(graduated_notification2.email).to eq graduated_notification.email
+        expect(graduated_notification2.reload.most_recent?).to be_truthy
+        expect(graduated_notification2.send(:existing_sent_notification)&.id).to eq graduated_notification.id
+        expect(graduated_notification2.primary_notification_id).to eq graduated_notification.id
+        expect(graduated_notification2.primary_notification?).to be_falsey
+
+        expect(graduated_notification.reload.primary_notification?).to be_truthy
+        expect(graduated_notification.primary_notification_id).to eq graduated_notification.id
+
+        graduated_notification3 = GraduatedNotification.create(bike: bike2, organization: organization)
+        expect(graduated_notification3.reload.most_recent?).to be_truthy
+        expect(graduated_notification3.primary_notification?).to be_falsey
+
+        expect(graduated_notification.reload.most_recent?).to be_truthy
+        expect(graduated_notification2.reload.most_recent?).to be_falsey
+      end
+    end
+    context "different org" do
+      let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
+      let!(:bike_organization2) { FactoryBot.create(:bike_organization, organization: organization2, bike: bike, created_at: Time.current - 1.year) }
+      it "doesn't match" do
+        expect(graduated_notification.reload.most_recent?).to be_truthy
+        expect(graduated_notification.status).to eq "marked_remaining"
+
+        expect(bike.bike_organizations.pluck(:organization_id)).to match_array([organization.id, organization2.id])
+        graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization2)
+        expect(graduated_notification2).to be_valid
+        graduated_notification2.process_notification
+        expect(graduated_notification2.reload.most_recent?).to be_truthy
+        expect(graduated_notification2.status).to eq "marked_remaining"
+
+        expect(graduated_notification.reload.most_recent?).to be_truthy
+      end
+    end
+    context "bike owner changes" do
+      let(:user2) { FactoryBot.create(:user_confirmed) }
+      it "doesn't update" do
+        expect(graduated_notification.reload.most_recent?).to be_truthy
+        expect(graduated_notification.user_id).to be_blank
+
+        expect(bike.ownerships.count).to eq 1
+        BikeUpdator.new(bike: bike, user: user2, b_params: {bike: {owner_email: user2.email}}.as_json).update_ownership
+        expect(bike.reload.owner_email).to eq user2.email
+        expect(bike.ownerships.count).to eq 2
+        expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+
+        graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
+        graduated_notification2.update_attribute :created_at, Time.current - 25.hours # Pending period
+        expect(graduated_notification2).to be_valid
+        expect(graduated_notification2.user_id).to eq user2.id
+        expect(graduated_notification2.primary_notification?).to be_truthy
+        expect(graduated_notification2.processable?).to be_truthy
+        graduated_notification2.process_notification
+        expect(graduated_notification2.reload.most_recent?).to be_truthy
+        expect(graduated_notification2.status).to eq "active"
+        expect(graduated_notification2.send(:existing_sent_notification)&.id).to eq graduated_notification2.id
+
+        expect(graduated_notification.reload.most_recent?).to be_truthy
       end
     end
   end
