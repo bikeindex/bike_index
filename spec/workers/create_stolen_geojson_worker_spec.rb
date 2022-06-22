@@ -10,7 +10,10 @@ RSpec.describe CreateStolenGeojsonWorker, type: :job do
 
   describe "perform" do
     let!(:bike) { FactoryBot.create(:stolen_bike) }
+    let!(:bike_no_lat) { FactoryBot.create(:stolen_bike) }
     it "creates geojson file" do
+      # Test that bikes with no coordinates don't cause errors
+      bike_no_lat.update_columns(latitude: nil, longitude: nil)
       instance.perform
       file = described_class.file
       expect(file.keys).to match_array(%w[path filename daily updated_at description])

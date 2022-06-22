@@ -1240,7 +1240,8 @@ CREATE TABLE public.graduated_notifications (
     email character varying,
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    not_most_recent boolean DEFAULT false
 );
 
 
@@ -6245,6 +6246,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220411165641'),
 ('20220420145734'),
 ('20220520180217'),
-('20220527162543');
+('20220527162543'),
+('20220622004930');
 
 

@@ -92,7 +92,7 @@
     %li
       = active_link t(".exports"), organization_exports_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
 
-  - if passed_organization.deliver_graduated_notifications?
+  - if passed_organization.enabled?("graduated_notifications")
     - additional_divider = true
     %li
       = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"

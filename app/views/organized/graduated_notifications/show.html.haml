@@ -2,6 +2,12 @@
 .organized-page-header
   %h1
     Graduated notification
+    %small.less-strong for #{@graduated_notification.user_display_name}
+
+%h5.uncap.mb-4
+  View
+  - user_search_param = @graduated_notification.user_id.present? ? {user_id: @graduated_notification.user_id} : {search_email: @graduated_notification.email}
+  = link_to "all user's graduated notifications", organization_graduated_notifications_path(user_search_param.merge(organization_id: current_organization.to_param))
 
 .row
   .col-md-6
@@ -42,8 +48,9 @@
             - if @graduated_notification.user.present?
               %em
                 (#{@graduated_notification.user&.display_name})
+
   .col-md-6
-    %h3.uncap Bikes
+    %h3.uncap User Bikes
     %table.table-list
       %tbody
         - @graduated_notification.associated_bikes.each do |bike|
@@ -56,8 +63,7 @@
               - if @graduated_notification.primary_bike_id == bike.id
                 %strong.less-strong Primary bike
               - if !@graduated_notification.primary_notification? && bike.id == @graduated_notification.bike_id
-                %small.text-warning viewing this notification
-
+                %strong.small - viewing this notification
 
 - if @graduated_notification.send_email?
   %h2.uncap.mt-4
@@ -76,22 +82,29 @@
             = link_to "custom email content", edit_organization_email_path("graduated_notification", organization_id: current_organization.to_param)
             has changed since this graduated notification was sent!
           %span.text-danger This preview shows the current version of the custom email content,
-          not the version the user received
+          not the version the user received.
 
   .email-preview.parking-notification-email-preview
     <iframe src="#{organization_email_path("graduated_notification", graduated_notification_id: @graduated_notification.to_param, organization_id: current_organization.to_param)}"></iframe>
+
 - else
-  %p.text-warning.mt-4
-    %em
+  .row.mt-4
+    .col-md-6
       - if @graduated_notification.primary_notification?
-        No email will be sent for unknown reason! Please contact support
-      - else
-        No email sent because this isn't the
-        - if @graduated_notification.primary_notification_id.present?
-          = link_to "primary notification", organization_graduated_notification_path(@graduated_notification.primary_notification, organization_id: current_organization.to_param)
-        - else
-          primary notification
-        - if @graduated_notification.primary_bike.present?
+        .alert.alert-danger
+          No email will be sent for unknown reason!
           %br
-          The primary notification is for
-          = link_to organized_bike_text(@graduated_notification.primary_bike), bike_path(@graduated_notification.primary_bike, organization_id: current_organization.id)
+          Please contact support
+      - else
+        .alert.alert-warning
+          This notification didn't send an email because it isn't the
+          - if @graduated_notification.primary_notification_id.present?
+            = link_to "primary notification", organization_graduated_notification_path(@graduated_notification.primary_notification, organization_id: current_organization.to_param), class: "text-underline"
+          - else
+            primary notification
+          for #{@graduated_notification.user_display_name}
+          - if !@graduated_notification.primary_notification? && @graduated_notification.primary_bike.present?
+            - primary_bike = @graduated_notification.primary_bike
+            .mt-4.text-muted
+              %strong The primary notification is for
+              = link_to organized_bike_text(primary_bike), bike_path(primary_bike, organization_id: current_organization.id)
