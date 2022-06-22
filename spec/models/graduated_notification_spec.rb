@@ -608,24 +608,15 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.reload.user_id).to be_blank
         expect(graduated_notification.email).to_not eq user2.email
 
-        pp "++++____________-"
-        graduated_notification2 = GraduatedNotification.new(bike: bike, organization: organization)
-        graduated_notification2.set_calculated_attributes
-        pp graduated_notification.id
-        expect(graduated_notification2.save).to be_truthy
-        # pp graduated_notification2.primary_notification
-
-        # graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
+        graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
         expect(graduated_notification2).to be_valid
         graduated_notification2.update_attribute :created_at, Time.current - 25.hours # Pending period
         expect(graduated_notification2).to be_valid
         expect(graduated_notification2.user_id).to eq user2.id
         expect(graduated_notification2.email).to eq user2.email
         expect(graduated_notification2.primary_bike_id).to eq bike.id
-        # expect(graduated_notification2.primary_notification_id).to eq graduated_notification2.id
-        pp "------"
+
         expect(graduated_notification2.send(:existing_sent_notification)&.id).to be_blank
-        expect(graduated_notification2.send(:calculated_primary_notification)&.id).to be_blank
         expect(graduated_notification2.primary_notification?).to be_truthy
         expect(graduated_notification2.processable?).to be_truthy
         graduated_notification2.process_notification

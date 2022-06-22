@@ -45,9 +45,18 @@ class GraduatedNotification < ApplicationRecord
     statuses - processed_statuses
   end
 
+  def self.user_or_email_query(graduated_notification)
+    if graduated_notification.user_id.present?
+      {user_id: graduated_notification.user_id}
+    else
+      {email: graduated_notification.email}
+    end
+  end
+
   def self.associated_notifications_including_self(graduated_notification)
     notification_matches = where(organization_id: graduated_notification.organization_id,
       primary_bike_id: graduated_notification.primary_bike_id)
+      .where(GraduatedNotification.user_or_email_query(graduated_notification))
     # Don't match all graduated_notifications with blank primary_notification_id
     return notification_matches if graduated_notification.primary_notification_id.blank?
     notification_matches.or(where(primary_notification_id: graduated_notification.primary_notification_id))
@@ -291,11 +300,9 @@ class GraduatedNotification < ApplicationRecord
     return primary_notification if primary_notification_id.present? # Use already calculated value
     # If an associated notification was already emailed out, use that notification
     return existing_sent_notification if existing_sent_notification.present?
-    # pp "hhhh #{primary_bike?} #{primary_notification_id.blank?} #{self.id}", self
     return self if primary_bike? && primary_notification_id.blank? # This is the primary notification
     notifications = GraduatedNotification.where(organization_id: organization_id, bike_id: primary_bike_id)
-    # pp "#{notifications.map(&:id)} for user: #{notifications_for_user(notifications).map(&:id)}"
-    notifications = notifications_for_user(notifications)
+      .where(GraduatedNotification.user_or_email_query(self))
     # If there aren't any notifications, return nil
     # Also - if the organization doesn't have an interval set, we can't do anything, so skip it
     return notifications&.first if organization.graduated_notification_interval.blank?
@@ -312,8 +319,7 @@ class GraduatedNotification < ApplicationRecord
   def existing_sent_notification
     if organization.graduated_notification_interval.present?
       existing_notification = GraduatedNotification.where(created_at: potential_matching_period)
-      pp "#{user_id.present?} -- #{notifications_for_user(existing_notification).map(&:id)}"
-      existing_notification = notifications_for_user(existing_notification).email_success.first
+        .where(GraduatedNotification.user_or_email_query(self)).email_success.first
     end
     existing_notification ||= associated_notifications_including_self.email_success.first
     existing_notification
@@ -341,18 +347,11 @@ class GraduatedNotification < ApplicationRecord
 
   def matching_notifications
     GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
-  end
-
-  def notifications_for_user(collection)
-    if user_id.present?
-      collection.where(user_id: user_id)
-    else
-      collection.where(email: email)
-    end
+      .where(GraduatedNotification.user_or_email_query(self))
   end
 
   def previous_notifications
-    notifications_for_user(matching_notifications).where("id < ?", id)
+    matching_notifications.where("id < ?", id)
   end
 
   def mark_previous_notifications_not_most_recent
