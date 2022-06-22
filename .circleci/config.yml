@@ -52,6 +52,8 @@ jobs:
             sudo apt-get -y install \
               curl \
               gettext \
+              ghostscript \
+              libgs-dev \
               imagemagick \
               libcurl4-gnutls-dev \
               libexpat1-dev \
