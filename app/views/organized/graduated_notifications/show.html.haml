@@ -7,7 +7,7 @@
 %h5.uncap.mb-4
   View
   - user_search_param = @graduated_notification.user_id.present? ? {user_id: @graduated_notification.user_id} : {search_email: @graduated_notification.email}
-  = link_to "all user's graduated notifications", organization_graduated_notifications_path(user_search_param.merge(organization_id: current_organization.to_param))
+  = link_to "all user's graduated notifications", organization_graduated_notifications_path(user_search_param.merge(organization_id: current_organization.to_param, search_status: "all"))
 
 .row
   .col-md-6
