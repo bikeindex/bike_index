@@ -90,7 +90,6 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         expect(bike.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification_remaining_expired.id])
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
-        pp [graduated_notification_active.id, graduated_notification_remaining_expired.id, graduated_notification_remaining.id]
         Sidekiq::Testing.inline! do
           expect {
             instance.perform
