@@ -57,6 +57,7 @@ class GraduatedNotification < ApplicationRecord
     notification_matches = where(organization_id: graduated_notification.organization_id,
       primary_bike_id: graduated_notification.primary_bike_id)
       .where(GraduatedNotification.user_or_email_query(graduated_notification))
+      .where(created_at: graduated_notification.associated_interval)
     # Don't match all graduated_notifications with blank primary_notification_id
     return notification_matches if graduated_notification.primary_notification_id.blank?
     notification_matches.or(where(primary_notification_id: graduated_notification.primary_notification_id))
@@ -138,10 +139,6 @@ class GraduatedNotification < ApplicationRecord
     !processed?
   end
 
-  def most_recent_graduated_notification
-    most_recent? ? self : matching_notifications.most_recent.last
-  end
-
   def most_recent?
     !not_most_recent?
   end
@@ -157,6 +154,22 @@ class GraduatedNotification < ApplicationRecord
 
   def secondary_notification?
     !primary_notification?
+  end
+
+  def expired?
+    return false if marked_remaining_at.blank? ||
+      organization.graduated_notification_interval.blank?
+    marked_remaining_at < (Time.current - organization.graduated_notification_interval)
+  end
+
+  def most_recent_graduated_notification
+    most_recent? ? self : matching_notifications.most_recent.last
+  end
+
+  def associated_interval
+    t = created_at || Time.current
+    interval = organization.graduated_notification_interval || 1.year
+    (t - interval)..(t + interval)
   end
 
   def associated_notifications
@@ -297,7 +310,6 @@ class GraduatedNotification < ApplicationRecord
 
   # THIS CAN BE NIL! - the primary_notification might not exist yet
   def calculated_primary_notification
-    return primary_notification if primary_notification_id.present? # Use already calculated value
     # If an associated notification was already emailed out, use that notification
     return existing_sent_notification if existing_sent_notification.present?
     return self if primary_bike? && primary_notification_id.blank? # This is the primary notification
