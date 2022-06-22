@@ -58,14 +58,13 @@ gem "omniauth-twitter"
 gem "sitemap_generator", "~> 6"
 
 # Making other files
+gem "mini_magick" # Required for image processing
 gem "carrierwave", "~> 0.11.2" # File uploader
 gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
-gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "rqrcode", "0.10.1" # QR Codes
-gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3" # QR codes more
 
 # API wrappers
 gem "twitter" # Twitter. For rendering tweets
