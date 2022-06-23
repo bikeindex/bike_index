@@ -7,7 +7,7 @@
 %p.center-text{ style: 'margin-bottom: 3em;' }
   = t(".html.user_would_like_to_merge", name: @user.display_name, email: @user.email)
 
-= link_to t(".html.verify_email"), confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token), class: 'binx-button'
+= link_to t(".html.verify_email"), confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token), "data-pm-no-track" => true, class: 'binx-button'
 
 %p.center-text.less-strong= t(".html.click_verify_email_html")
 

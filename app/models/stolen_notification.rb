@@ -11,6 +11,9 @@ class StolenNotification < ApplicationRecord
 
   after_create :notify_receiver
 
+  scope :status_stolen, -> { joins(:bike).where(bike: {status: "status_stolen"}) }
+  scope :status_with_owner, -> { joins(:bike).where(bike: {status: "status_with_owner"}) }
+
   def notify_receiver
     EmailStolenNotificationWorker.perform_async(id)
   end
