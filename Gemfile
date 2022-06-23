@@ -5,7 +5,7 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-# Update CircleCI config and Dockerfile if Ruby version is bumped
+# Update CircleCI config if Ruby version is bumped
 ruby "2.7.5"
 gem "rack", "2.2.3"
 gem "rails", "~> 6.0"
