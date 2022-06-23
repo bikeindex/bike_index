@@ -1961,27 +1961,10 @@ en:
           account (%{email})."
         verify_email: Verify email
       subject: Confirm your additional email
-      text:
-        go_to_this_url_if_you_want_to_confirm: 'Go to this url if you want to confirm
-          this email:'
-        if_you_didnt_request_this_merge: If you didn't request this merge please reply
-          to this email and tell us.
-        user_would_like_to_merge: "** %{name} would like to merge this email into
-          their account **"
     admin_contact_stolen_email:
       html:
         this_email_is_about: This email is about the %{bike} registered on Bike Index
           on %{registration_date}
-      text:
-        claim_the_bike: "* Claim the %{bike_type} here: %{bike_url} *"
-        color: 'Color:'
-        hopefully_you_find: Hopefully you find the %{bike_type} soon. Give us a heads
-          up when you do!
-        make: 'Make:'
-        serial: 'Serial:'
-        sign_up_or_in: >-
-          Sign up or sign in to BikeIndex.org to claim your %{bike_type} and edit
-          it, upload photos and make sure you never lose track of your trusty steed!
     bike_possibly_found_email:
       html:
         bike: 'Bike:'
@@ -2001,15 +1984,6 @@ en:
         verify_email: Verify email
         youre_almost_there: You're almost there!
       subject: Please confirm your Bike Index email!
-      text:
-        bike_index_team: Bike Index Team
-        good_thinking: Good thinking! We’re glad you’ve joined.
-        paste_url: 'Paste the following confirmation url into your internet browser:'
-        thanks: Thanks,
-        to_finish_signing_up: To finish signing up you have to confirm your email
-          address.
-        verify_email: Verify email
-        welcome_to_bike_index: "* Welcome to Bike Index! *"
     invoice_email:
       html:
         donation_will_help: Your donation of %{amount} really will help us rescue
@@ -2022,12 +1996,6 @@ en:
         we_really_appreciate_your_support: We really appreciate your support of Bike
           Index!
       subject: Thank you for supporting Bike Index!
-      text:
-        bike_index_management: Bike Index Management
-        donation_will_help: Your donation of $%{amount} just saved the bikes.
-        payment_received: Your payment of %{amount} has been received.
-        thanks: Thanks,
-        thanks_for_signing_up: "* Thank you so much for supporting Bike Index *"
     magic_login_link_email:
       html:
         click_the_button: Click the button below to sign in to Bike Index
@@ -2038,13 +2006,6 @@ en:
           minutes.
         sign_in: Sign in to Bike Index
       subject: Sign in to Bike Index
-      text:
-        here_is_your_login_url: Here is your passwordless sign in url
-        if_you_did_not_request: >-
-          If you did not request a passwordless sign in link, please reply to this
-          email and let us know.
-        this_link_is_only_valid_once: This link is only valid for one sign in. It
-          expires in 45 minutes.
     password_reset_email:
       html:
         if_you_did_not_request_a_new_password_html: If you did not request a new password,
@@ -2056,15 +2017,6 @@ en:
         whoops_it_appears_you_have_forgotten_your: Whoops! It appears you have forgotten
           your Bike Index password!
       subject: Instructions to reset your password
-      text:
-        bike_index_management: Bike Index Management
-        if_you_did_not_request_a_new_password_to_: >-
-          If you did not request a new password to be created, you should probably
-          hit us up: support@bikeindex.org
-        thanks: Thanks,
-        whoops_it_appears_you_have_forgotten_your: >-
-          Whoops! It appears you have forgotten your Bike Index password! Please click
-          the link below (or paste it into your browser) to create a new password.
     recovered_from_link:
       html:
         marked_recovered_by: 'Marked recovered by:'
@@ -2077,14 +2029,6 @@ en:
         your_bike_type_was_marked_recovered_on_bik: 'Your %{bike_type} was marked
           recovered on Bike Index:'
       subject: Your %{bike_type} has been marked recovered!
-      text:
-        if_you_didnt_recover_your_bike_or_marked_: >-
-          If you didn't recover your bike, or marked it recovered accidentally, reply
-          to this email and let us know!
-        were_so_glad_you_got_your_bike_type_back: We're so glad you got your %{bike_type}
-          back!
-        your_bike_type_was_marked_recovered: 'Your %{bike_type} was marked recovered
-          on Bike Index: %{bike_url}'
     stolen_bike_alert_email:
       html:
         alert_retweeted_by_html: Alert retweeted by %{retweets}
@@ -2132,10 +2076,6 @@ en:
           yet and it isn't marked stolen, so you have received this email to authorize
           contacting them.
       subject: Stolen bike contact
-      text:
-        message_about_stolen_bike: "** %{sender_email} sent a message about your stolen
-          %{bike_type}! **"
-        view_your_notification: 'View your %{bike_type} on Bike Index:'
     updated_terms_email:
       html:
         as_always_thanks_for_helping_register_bik: As always, thanks for helping register
@@ -2205,14 +2145,6 @@ en:
         good_thinking_were_glad_youve_joined: Good thinking! We’re glad you’ve joined.
         welcome_to_bike_index: Welcome to Bike Index
       subject: Welcome to Bike Index!
-      text:
-        add_some_information_about_your_bikes_whe: Add some information about your
-          bikes when you've got the chance!
-        bike_index_management: Bike Index Management
-        good_thinking_were_glad_youve_joined_you_: Good thinking! We’re glad you’ve
-          joined, you smarty pants.
-        thanks: Thanks,
-        welcome_to_bike_index: "* Welcome to Bike Index! *"
   date:
     abbr_day_names:
     - Sun
@@ -4858,7 +4790,7 @@ en:
           means of locking a bike in a city.
         claim_the_bike_type: Claim the %{bike_type}
         confirm_this_bike_type: Confirm this %{bike_type}
-        correctly_locking_a_bike: Correctly locking a bike
+        correctly_locking_a_bike: Image of a correctly locked a bike
         donating: donating
         give_us_a_heads_up: Give us a heads up
         hopefully_you_find_the_bike_html: Hopefully you find the %{bike_type} soon.
@@ -4894,38 +4826,6 @@ en:
         you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
         youre_almost_done_registering: You're almost done registering
       subject: Confirm your %{organization_name}Bike Index registration
-      text:
-        before_locking_check: "- Before locking, check that what you are locking to
-          can't be easily removed."
-        bike_colors: 'Color(s): %{frame_colors}'
-        bike_date: 'Date: %{date}'
-        bike_found_at: 'Found: %{address}'
-        bike_make: 'Make: %{bike_mnfg_name}'
-        bike_serial: 'Serial: %{bike_serial_number}'
-        bike_stolen_from: 'Stolen from: %{address}'
-        claim_the_bike_type_at_this_url: 'Claim the %{bike_type} at this URL: %{bike_url}'
-        color_may_be_incorrect: Color may be incorrect. Claim your bike and update
-          it if necessary!
-        edit_it_upload_photos: Edit it, upload photos and make sure you never lose
-          track of your trusty steed!
-        give_us_a_heads_up_when_you_do: Give us a heads up when you do (%{bike_edit_url})
-        hopefully_you_find_the_bike_type_soon: Hopefully you find the %{bike_type}
-          soon.
-        hopefully_you_find_the_owner_soon: Hopefully you find the owner soon.
-        org_added_a_bike: "%{org_name} added a %{bike_type} on Bike Index for you"
-        org_sent_a_bike: "%{org_name} sent you a %{bike_type} on Bike Index"
-        protect_your_bike: Protect your bike by following these locking guidelines.
-        read_more_here: 'Read more here: %{protect_your_bike_url}'
-        recovered_bike_type: recovered/found %{bike_type}
-        secure_both_wheels: >-
-          - Secure both wheels - either with two U-locks, or one U-lock and one heavy
-          duty cable.
-        sign_up_on_bikeindex_to_claim: Sign up on BikeIndex.org to claim your %{bike_type}
-        stolen_bike_type: stolen %{bike_type}
-        use_a_ulock: >-
-          - *Use a U-Lock.* Cable locks should never be used as a primary means of
-          locking a bike in a city.
-        you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
     finished_stolen_registration:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
@@ -4935,11 +4835,6 @@ en:
         welcome_to_bike_index: Welcome to Bike Index
         you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
       subject: Join %{organization_name}on Bike Index
-      text:
-        hello: Hello
-        hello_welcome_to_bike_index: Hello, welcome to Bike Index
-        sign_up_or_sign_in: Sign up or sign in to BikeIndex.org to join %{org_name}!
-        you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
     partial_registration:
       html:
         click_below_to_complete_your_registration: Click below to complete your registration
@@ -4949,12 +4844,6 @@ en:
           on the world's most comprehensive bike registry!
         youre_almost_done: You’re Almost Done!
       subject: Finish your %{organization_name}Bike Index registration!
-      text:
-        go_to_the_following_url_to_finish: 'Go to the following URL to finish:'
-        youre_almost_done: You're Almost Done!
-        youre_just_a_few_steps_away_from_register: >-
-          You're just a few steps away from registering your bike on the world's most
-          comprehensive bike registry.
   payments:
     form:
       donation_header: Help support our efforts!
