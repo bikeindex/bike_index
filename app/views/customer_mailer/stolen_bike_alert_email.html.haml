@@ -47,4 +47,4 @@
   - date = @bike.created_at.strftime("%m.%d.%y")
   = t(".html.this_email_is_about_the_stolen_bike", bike_type: @bike_type, date: date)
 
-= render partial: 'shared/email_bike_box', locals: { bike_url: bike_url(@bike) }
+= render partial: 'shared/email_bike_box', locals: {bike_url_path: bike_url(@bike)}

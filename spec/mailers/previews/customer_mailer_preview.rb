@@ -75,7 +75,12 @@ class CustomerMailerPreview < ActionMailer::Preview
   end
 
   def stolen_notification_email
-    stolen_notification = StolenNotification.last
+    stolen_notification = StolenNotification.status_stolen.last
+    CustomerMailer.stolen_notification_email(stolen_notification)
+  end
+
+  def stolen_notification_unstolen_email
+    stolen_notification = StolenNotification.status_with_owner.last
     CustomerMailer.stolen_notification_email(stolen_notification)
   end
 

@@ -96,7 +96,7 @@ gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
-gem "premailer-rails" # Inline styles for email
+gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
 gem "sass-rails"
 gem "sprockets", "4.0.0"
 gem "sprockets-rails"
