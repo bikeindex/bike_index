@@ -1,2 +1,2 @@
 ruby 2.7.6
-nodejs 16.13.1 # Also update in Dockerfile if changed
+nodejs 16.13.1
