@@ -10,11 +10,56 @@ module GrapeLogging
   end
 end
 
+# Heavily Influenced by winebouncer - antek-drzewiecki/wine_bouncer
+# To make an endpoint require a token, include an authorizations key in the endpoint.
+# authorizations: {oauth2: {scope: :public}}
+# If no scope key is included, it will use default scope
+require "doorkeeper/grape/authorization_decorator"
+module ApiAuthorization
+  class OAuth2 < Grape::Middleware::Base
+    # include Doorkeeper::Grape::Helpers
+
+    def auth_declaration
+      @endpoint_auth_declaration || {}
+    end
+
+    def endpoint_protected?
+      auth_declaration.key?(:oauth2)
+    end
+
+    def scope
+      auth_declaration&.dig(:oauth2, :scope)&.to_sym
+      # Currently not doing default scopes - but may in future: Doorkeeper.configuration.default_scopes
+    end
+
+    def doorkeeper_access_token
+      @doorkeeper_access_token ||= Doorkeeper::OAuth::Token.authenticate(
+        @doorkeeper_request,
+        *Doorkeeper.configuration.access_token_methods,
+      )
+    end
+
+    # config.define_resource_owner do
+    #   User.find(doorkeeper_access_token.resource_owner_id) if doorkeeper_access_token
+    # end
+
+    def before
+      # api_context = env["api.endpoint"]
+      @endpoint_auth_declaration = env["api.endpoint"]&.options&.dig(:route_options, :authorizations)
+      return unless endpoint_protected?
+      @request = ActionDispatch::Request.new(env)
+      @doorkeeper_request = Doorkeeper::Grape::AuthorizationDecorator.new(@request)
+      pp doorkeeper_access_token
+    end
+  end
+end
+
 module API
   class Base < Grape::API
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: "grape_key",
       include: [GrapeLogging::Loggers::BinxLogger.new,
         GrapeLogging::Loggers::FilterParameters.new]
+    use ::ApiAuthorization::OAuth2
     mount API::V3::RootV3
     mount API::V2::RootV2
 

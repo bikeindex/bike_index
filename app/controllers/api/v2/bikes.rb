@@ -115,7 +115,7 @@ module API
         end
 
         desc "Check if a bike is already registered", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+          authorizations: {oauth2: {scope: :write_bikes}},
           notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
         }
         params do
@@ -138,7 +138,7 @@ module API
         end
 
         desc "Add a bike to the Index!<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+          authorizations: {oauth2: {scope: :write_bikes}},
           notes: <<-NOTE
             **Requires** `write_bikes` **in the access token** you use to create the bike.
 
@@ -223,7 +223,7 @@ module API
         end
 
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+          authorizations: {oauth2: {scope: :write_bikes}},
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 
@@ -258,7 +258,7 @@ module API
         end
 
         desc "Add an image to a bike", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+          authorizations: {oauth2: {scope: :write_bikes}},
           notes: <<-NOTE
 
             To post a file to the API with curl:
@@ -287,7 +287,7 @@ module API
         end
 
         desc "Remove an image from a bike", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+          authorizations: {oauth2: {scope: :write_bikes}},
           notes: <<-NOTE
 
             Remove an image from the bike, specifying both the bike_id and the image id (which can be found in the public_images resopnse)
@@ -311,7 +311,7 @@ module API
         end
 
         desc "Send a stolen notification<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :read_user}]},
+          authorizations: {oauth2: {scope: :read_user}},
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 
