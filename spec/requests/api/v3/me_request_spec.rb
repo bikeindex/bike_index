@@ -122,8 +122,10 @@ RSpec.describe "Me API V3", type: :request do
 
     it "works if it's authorized" do
       token.update_attribute :scopes, "read_bikes"
-      get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
-      # get "/api/v3/me/bikes", {}, "Authorization" => "Basic #{Base64.encode64("#{token.token}:X")}"
+      get "/api/v3/me/bikes", headers: {
+        "Authorization" => "Bearer #{token.token}",
+        format: :json
+      }
       expect(json_result["bikes"].is_a?(Array)).to be_truthy
       expect(response.response_code).to eq(200)
     end

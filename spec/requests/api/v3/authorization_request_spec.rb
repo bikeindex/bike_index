@@ -5,21 +5,25 @@ require "rails_helper"
 RSpec.describe "API V3 Authorization specs", type: :request do
   include_context :existing_doorkeeper_app
 
-  describe "token bikes" do
+  describe "token positioning" do
     before { expect(doorkeeper_app).to be_present }
     context "token in params" do
       it "responds" do
-        get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
+        get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
-        expect(json_result[:user][:name]).to eq(user.name)
+        pp json_result
+        expect(json_result).to eq({"id" => user.id.to_s})
         expect(response.response_code).to eq(200)
       end
     end
     context "token in header" do
       it "responds" do
-        get "/api/v3/me/bikes", {}, "Authorization" => "Basic #{Base64.encode64("#{token.token}:X")}"
+        get "/api/v3/me", headers: {
+          "Authorization" => "Bearer #{token.token}",
+          format: :json
+        }
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
-        expect(json_result[:user][:name]).to eq(user.name)
+        expect(json_result).to eq({"id" => user.id.to_s})
         expect(response.response_code).to eq(200)
       end
     end
