@@ -1,7 +1,7 @@
 %h4{ style: 'margin-bottom: 2em;' }
   = t(".html.click_the_button")
 
-= link_to t(".html.sign_in"), @url, class: 'binx-button'
+= link_to t(".html.sign_in"), @url, "data-pm-no-track" => true, class: 'binx-button'
 
 %p
   %em.less-strong
