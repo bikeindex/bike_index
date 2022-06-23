@@ -12,7 +12,7 @@
 
 - if @retrieval_link_url.present?
   .mark-retrieved-box
-    = link_to @retrieval_link_url, class: "binx-button" do
+    = link_to @retrieval_link_url, "data-pm-no-track" => true, class: "binx-button" do
       Click to renew
     %p
       %em
