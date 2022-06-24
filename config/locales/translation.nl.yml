@@ -2444,27 +2444,10 @@ nl:
           (%{email})."
         verify_email: Verifieer Email
       subject: Bevestig uw extra e-mailadres
-      text:
-        go_to_this_url_if_you_want_to_confirm: 'Ga naar deze URL als u deze e-mail
-          wilt bevestigen:'
-        if_you_didnt_request_this_merge: Als u niet om deze samenvoeging hebt gevraagd,
-          beantwoordt u deze e-mail en laat het ons weten.
-        user_would_like_to_merge: "** %{name} wil deze e-mail samenvoegen met hun
-          account **"
     admin_contact_stolen_email:
       html:
         this_email_is_about: Deze e-mail gaat over de %{bike} geregistreerd op Bike
           Index op %{registration_date}
-      text:
-        claim_the_bike: "* Claim de %{bike_type} hier: %{bike_url} *"
-        color: 'Kleur:'
-        hopefully_you_find: Hopelijk vindt u de %{bike_type} binnenkort. Geef ons
-          een seintje als je dat doet!
-        make: 'Maken:'
-        serial: 'Serial:'
-        sign_up_or_in: Meld u aan of meld u aan bij BikeIndex.org om uw %{bike_type}
-          te claimen en te bewerken, foto's te uploaden en ervoor te zorgen dat u
-          nooit uw vertrouwde ros uit het oog verliest!
     confirmation_email:
       html:
         click_to_verify_html: Klik op de knop <em>E-mail verifiëren</em> om het aanmelden
@@ -2473,15 +2456,6 @@ nl:
         verify_email: Verifieer Email
         youre_almost_there: Je bent er bijna!
       subject: Bevestig uw e-mail met Bike Index!
-      text:
-        bike_index_team: Bike Index Team
-        good_thinking: Goed bedacht! We zijn blij dat je lid bent geworden.
-        paste_url: 'Plak de volgende bevestigings-URL in uw internetbrowser:'
-        thanks: Bedankt,
-        to_finish_signing_up: Om het aanmelden te voltooien, moet u uw e-mailadres
-          bevestigen.
-        verify_email: Verifieer Email
-        welcome_to_bike_index: "* Welkom bij Bike Index! *"
     invoice_email:
       html:
         donation_will_help: Uw gift van %{amount} zal ons echt helpen meer fietsen
@@ -2493,13 +2467,6 @@ nl:
         we_really_appreciate_your_support: We stellen uw steun aan Bike Index zeer
           op prijs!
       subject: Bedankt voor het ondersteunen van Bike Index!
-      text:
-        bike_index_management: Beheer van fietsindexen
-        donation_will_help: Uw donatie van € %{amount} heeft zojuist de fietsen gered.
-        payment_received: Uw betaling van %{amount} is ontvangen.
-        thanks: Bedankt,
-        thanks_for_signing_up: "* Heel erg bedankt voor het ondersteunen van Bike
-          Index *"
     magic_login_link_email:
       html:
         click_the_button: Klik op de onderstaande knop om u aan te melden bij Bike
@@ -2510,12 +2477,6 @@ nl:
           na 45 minuten.
         sign_in: Log in bij Bike Index
       subject: Log in bij Bike Index
-      text:
-        here_is_your_login_url: Hier is uw wachtwoordloze aanmeldings-URL
-        if_you_did_not_request: Als u niet om een wachtwoordloze aanmeldingslink heeft
-          gevraagd, beantwoordt u deze e-mail en laat u ons dit weten.
-        this_link_is_only_valid_once: Deze link is slechts geldig voor één aanmelding.
-          Deze verloopt na 45 minuten.
     password_reset_email:
       html:
         if_you_did_not_request_a_new_password_html: Als u geen nieuw wachtwoord hebt
@@ -2527,15 +2488,6 @@ nl:
         whoops_it_appears_you_have_forgotten_your: Whoops! Het lijkt erop dat u uw
           Bike Index-wachtwoord bent vergeten!
       subject: Instructies om uw wachtwoord opnieuw in te stellen
-      text:
-        bike_index_management: Beheer van fietsindexen
-        if_you_did_not_request_a_new_password_to_: 'Als u niet heeft gevraagd om een
-          nieuw wachtwoord aan te maken, zou u ons waarschijnlijk moeten bereiken:
-          support@bikeindex.org'
-        thanks: Bedankt,
-        whoops_it_appears_you_have_forgotten_your: Whoops! Het lijkt erop dat u uw
-          Bike Index-wachtwoord bent vergeten! Klik op de onderstaande link (of plak
-          deze in uw browser) om een nieuw wachtwoord te maken.
     recovered_from_link:
       html:
         marked_recovered_by: 'Gemarkeerd hersteld door:'
@@ -2547,14 +2499,6 @@ nl:
           terug hebt!
         your_bike_type_was_marked_recovered_on_bik: 'Je %{bike_type} is gemarkeerd
           als hersteld op Bike Index:'
-      text:
-        if_you_didnt_recover_your_bike_or_marked_: Als je je fiets niet hebt hersteld
-          of hebt gemarkeerd dat deze per ongeluk is hersteld, beantwoord je deze
-          e-mail en laat het ons weten!
-        were_so_glad_you_got_your_bike_type_back: We zijn zo blij dat je je %{bike_type}
-          terug hebt!
-        your_bike_type_was_marked_recovered: 'Je %{bike_type} is gemarkeerd als hersteld
-          op Bike Index: %{bike_url}'
       subject: Je %{bike_type} is gemarkeerd als hersteld!
     stolen_bike_alert_email:
       html:
@@ -2603,10 +2547,6 @@ nl:
           als gestolen, dus je hebt deze e-mail ontvangen om toestemming te geven
           contact met hem op te nemen.
       subject: Contact met gestolen fiets
-      text:
-        message_about_stolen_bike: "** %{sender_email} heeft een bericht verzonden
-          over uw gestolen %{bike_type}! **"
-        view_your_notification: 'Bekijk uw %{bike_type} op Bike Index:'
     updated_terms_email:
       html:
         as_always_thanks_for_helping_register_bik: Zoals altijd, bedankt voor het
@@ -2673,14 +2613,6 @@ nl:
           bent geworden.
         welcome_to_bike_index: Welkom bij Bike Index
       subject: Welkom bij Bike Index!
-      text:
-        add_some_information_about_your_bikes_whe: Voeg wat informatie over je fietsen
-          toe wanneer je de kans hebt!
-        bike_index_management: Beheer van fietsindexen
-        good_thinking_were_glad_youve_joined_you_: Goed bedacht! We zijn blij dat
-          je lid bent geworden, jij slimme broek.
-        thanks: Bedankt,
-        welcome_to_bike_index: "* Welkom bij Bike Index! *"
     bike_possibly_found_email:
       html:
         check_out_match_here: 'Bekijk hier de wedstrijd:'
@@ -4708,39 +4640,6 @@ nl:
           je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
           te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
       subject: Bevestig uw %{organization_name} Bike Index-registratie
-      text:
-        before_locking_check: "- Controleer voordat u vergrendelt of datgene waarnaar
-          u vergrendelt niet eenvoudig kan worden verwijderd."
-        bike_colors: 'Kleur (en): %{frame_colors}'
-        bike_date: 'Datum: %{date}'
-        bike_found_at: 'Gevonden: %{address}'
-        bike_make: 'Merk: %{bike_mnfg_name}'
-        bike_serial: 'Serieel: %{bike_serial_number}'
-        bike_stolen_from: 'Gestolen van: %{address}'
-        color_may_be_incorrect: Kleur is mogelijk onjuist. Claim je fiets en update
-          hem indien nodig!
-        edit_it_upload_photos: Bewerk het, upload foto's en zorg dat je nooit je vertrouwde
-          ros uit het oog verliest!
-        give_us_a_heads_up_when_you_do: Geef ons een waarschuwing als u dat doet (%{bike_edit_url})
-        hopefully_you_find_the_owner_soon: Hopelijk vind je snel de eigenaar.
-        org_added_a_bike: "%{org_name} heeft voor jou een %{bike_type} toegevoegd
-          op Bike Index"
-        org_sent_a_bike: "%{org_name} heeft u een %{bike_type} gestuurd op Bike Index"
-        protect_your_bike: Bescherm uw fiets door deze vergrendelingsrichtlijnen te
-          volgen.
-        read_more_here: 'Lees hier meer: %{protect_your_bike_url}'
-        secure_both_wheels: "- Beveilig beide wielen - hetzij met twee U-sloten, hetzij
-          één U-slot en één zware kabel."
-        use_a_ulock: "- * Gebruik een U-Lock. * Kabelsloten mogen nooit worden gebruikt
-          als primair middel om een fiets in een stad te vergrendelen."
-        you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
-          Bike Index
-        claim_the_bike_type_at_this_url: 'Claim de %{bike_type} op deze URL: %{bike_url}'
-        recovered_bike_type: hersteld / gevonden %{bike_type}
-        stolen_bike_type: gestolen %{bike_type}
-        hopefully_you_find_the_bike_type_soon: Hopelijk vindt u de %{bike_type} binnenkort.
-        sign_up_on_bikeindex_to_claim: Meld u aan op BikeIndex.org om uw %{bike_type}
-          te claimen
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
     organization_invitation:
@@ -4750,12 +4649,6 @@ nl:
         welcome_to_bike_index: Welkom bij Bike Index
         you_are_a_member: "%{sender_name} heeft aangegeven dat u lid bent van %{org_name}."
       subject: Doe mee met %{organization_name} op Bike Index
-      text:
-        hello: Hallo
-        hello_welcome_to_bike_index: Hallo, welkom bij Bike Index
-        sign_up_or_sign_in: Meld u aan of meld u aan bij BikeIndex.org om lid te worden
-          van %{org_name}!
-        you_are_a_member: "%{sender_name} heeft aangegeven dat u lid bent van %{org_name}."
     partial_registration:
       html:
         click_below_to_complete_your_registration: Klik hieronder om uw registratie
@@ -4766,12 +4659,6 @@ nl:
           meest uitgebreide <strong>fietsregister</strong> !
         youre_almost_done: Je bent bijna klaar!
       subject: Voltooi uw %{organization_name} registratie van de fietsindex!
-      text:
-        go_to_the_following_url_to_finish: 'Ga naar de volgende URL om te voltooien:'
-        youre_almost_done: Je bent bijna klaar!
-        youre_just_a_few_steps_away_from_register: U bent slechts een paar stappen
-          verwijderd van het registreren van uw fiets in het meest uitgebreide fietsregister
-          ter wereld.
   plan_features:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
