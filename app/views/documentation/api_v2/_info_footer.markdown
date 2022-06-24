@@ -40,7 +40,7 @@ Review the applications you've authorized at [/oauth/authorized_applications](/o
 
 ###Sending your access tokens in requests
 
-By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters. We recommend putting the authentication information in the header.
+By default we authenticate you with authentication in the header. If authentication is not found in the authorization header, then it falls back to post parameters. We recommend putting the authentication information in the header.
 
 All the authenticated requests in this documentation put the access token in the parameters for clarity
 
