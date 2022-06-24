@@ -10,14 +10,31 @@ module GrapeLogging
   end
 end
 
-# Heavily Influenced by winebouncer - antek-drzewiecki/wine_bouncer
-# To make an endpoint require a token, include an authorizations key in the endpoint.
-# authorizations: {oauth2: {scope: :public}}
-# If no scope key is included, it will use default scope
-require "doorkeeper/grape/authorization_decorator"
 module ApiAuthorization
+  module Errors
+    class OAuthUnauthorizedError < StandardError
+      attr_reader :response
+      def initialize(response)
+        super(response.try(:description))
+        @response = response
+      end
+    end
+
+    class OAuthForbiddenError < StandardError
+      attr_reader :response
+      def initialize(response)
+        super(response.try(:description))
+        @response = response
+      end
+    end
+  end
+
+  # Heavily Influenced by winebouncer - antek-drzewiecki/wine_bouncer
+  # To make an endpoint require a token, include an authorizations key in the endpoint.
+  # authorizations: {oauth2: {scope: :public}}
+  # If no scope key is included, it will use default scope
   class OAuth2 < Grape::Middleware::Base
-    # include Doorkeeper::Grape::Helpers
+    require "doorkeeper/grape/authorization_decorator"
 
     def auth_declaration
       @endpoint_auth_declaration || {}
@@ -27,29 +44,42 @@ module ApiAuthorization
       auth_declaration.key?(:oauth2)
     end
 
-    def scope
-      auth_declaration&.dig(:oauth2, :scope)&.to_sym
-      # Currently not doing default scopes - but may in future: Doorkeeper.configuration.default_scopes
+    # Currently, only allowing one scope per endpoint.
+    def endpoint_scopes
+      Array(auth_declaration&.dig(:oauth2, :scope)&.to_sym)
     end
 
     def doorkeeper_access_token
       @doorkeeper_access_token ||= Doorkeeper::OAuth::Token.authenticate(
-        @doorkeeper_request,
+        Doorkeeper::Grape::AuthorizationDecorator.new(@request),
         *Doorkeeper.configuration.access_token_methods,
       )
     end
 
-    # config.define_resource_owner do
-    #   User.find(doorkeeper_access_token.resource_owner_id) if doorkeeper_access_token
-    # end
+    def resource_owner
+      return @resource_owner if defined?(@resource_owner)
+      @resource_owner = User.find_by_id(doorkeeper_access_token&.resource_owner_id)
+    end
 
+    def doorkeeper_authorize!
+      return if doorkeeper_access_token&.acceptable?(endpoint_scopes) &&
+        resource_owner.present?
+
+      if doorkeeper_access_token.blank? || !doorkeeper_access_token.accessible?
+        error = Doorkeeper::OAuth::InvalidTokenResponse.from_access_token(doorkeeper_access_token)
+        raise ApiAuthorization::Errors::OAuthUnauthorizedError, error
+      else
+        error = Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
+        raise ApiAuthorization::Errors::OAuthForbiddenError, error
+      end
+    end
+
+    # Before grape actions happen
     def before
-      # api_context = env["api.endpoint"]
       @endpoint_auth_declaration = env["api.endpoint"]&.options&.dig(:route_options, :authorizations)
       return unless endpoint_protected?
       @request = ActionDispatch::Request.new(env)
-      @doorkeeper_request = Doorkeeper::Grape::AuthorizationDecorator.new(@request)
-      pp doorkeeper_access_token
+      doorkeeper_authorize!
     end
   end
 end
@@ -66,7 +96,7 @@ module API
     def self.respond_to_error(e)
       logger.error e unless Rails.env.test? # Breaks tests...
       eclass = e.class.to_s
-      message = "OAuth error: #{e}" if /WineBouncer::Errors/.match?(eclass)
+      message = "OAuth error: #{e}" if /ApiAuthorization::Errors/.match?(eclass)
       opts = {error: message || e.message}
       status_code = status_code_for(e, eclass)
       if Rails.env.production?

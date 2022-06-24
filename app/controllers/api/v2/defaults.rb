@@ -9,8 +9,10 @@ module API
         end
 
         helpers do
+          attr_reader :resource_owner
+
           def current_token
-            doorkeeper_access_token
+            @doorkeeper_access_token
           end
 
           def current_organization
@@ -21,13 +23,13 @@ module API
           end
 
           def current_user
+            return @resource_owner if @resource_owner&.confirmed?
             # If user isn't confirmed, raise error for us to manage
-            raise WineBouncer::Errors::OAuthForbiddenError, "User is unconfirmed" if resource_owner&.unconfirmed?
-            resource_owner
+            raise ApiAuthorization::Errors::OAuthForbiddenError, "User is unconfirmed"
           end
 
           def current_scopes
-            current_token.scopes
+            current_token&.scopes
           end
         end
       end

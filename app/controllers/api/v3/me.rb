@@ -6,12 +6,11 @@ module API
         helpers do
           # Because we respond with unconfirmed users here, provided it's permitted
           def valid_current_user
-            return resource_owner if unconfirmed_scope? && resource_owner.present?
-            current_user
+            unconfirmed_scope? ? @resource_owner : current_user
           end
 
           def unconfirmed_scope?
-            current_scopes.include?("unconfirmed")
+            current_scopes&.include?("unconfirmed")
           end
 
           def user_info

@@ -6,13 +6,45 @@ RSpec.describe "Me API V3", type: :request do
     before { expect(doorkeeper_app).to be_present }
     context "token in params" do
       it "responds" do
-        get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+        expect(token.reload.acceptable?(nil)).to be_truthy
+        expect(user.confirmed?).to be_truthy
         get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         pp response.body
         expect(json_result).to eq({"id" => user.id.to_s})
         expect(response.response_code).to eq(200)
-        fail
+      end
+      context "revoked_token" do
+        it "responds with 403" do
+          token.update(revoked_at: Time.current - 30.seconds)
+          expect(token.reload.acceptable?([])).to be_falsey
+          get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+          expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+          expect(json_result["error"]).to match(/revoked/i)
+          expect(response.response_code).to eq(401)
+        end
+      end
+      context "expired_token" do
+        it "responds with 403" do
+          token.update(created_at: Time.current - 2.days, expires_in: 3600)
+          expect(token.reload.acceptable?([])).to be_falsey
+          get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+          expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+          expect(json_result["error"]).to match(/expired/i)
+          expect(response.response_code).to eq(401)
+        end
+      end
+      context "unconfirmed user" do
+        let(:user) { FactoryBot.create(:user) }
+        it "responds with 403" do
+          expect(user.reload.confirmed?).to be_falsey
+          expect(token.reload.acceptable?([])).to be_truthy
+          get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+          expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+          pp json_result
+          expect(json_result["error"]).to match(/confirmed/i)
+          expect(response.response_code).to eq(403)
+        end
       end
     end
     context "token in header" do
