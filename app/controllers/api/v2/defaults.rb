@@ -10,7 +10,7 @@ module API
 
         helpers do
           def current_token
-            doorkeeper_access_token
+            env["doorkeeper_access_token"]
           end
 
           def current_organization
@@ -21,13 +21,25 @@ module API
           end
 
           def current_user
+            return nil unless resource_owner.present?
+            return resource_owner if resource_owner.confirmed? || permit_unconfirmed_user?
             # If user isn't confirmed, raise error for us to manage
-            raise WineBouncer::Errors::OAuthForbiddenError, "User is unconfirmed" if resource_owner&.unconfirmed?
-            resource_owner
+            raise ApiAuthorization::Errors::OAuthForbiddenError, OpenStruct.new(description: "User is unconfirmed")
           end
 
           def current_scopes
-            current_token.scopes
+            current_token&.scopes || []
+          end
+
+          private
+
+          # overridden in v3/me. All others require a confirmed user
+          def permit_unconfirmed_user?
+            false
+          end
+
+          def resource_owner
+            env["resource_owner"]
           end
         end
       end

@@ -83,7 +83,6 @@ gem "grape", "~> 1.3.0" # API DSL
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "hashie" # required for some Grape endpoints
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
-gem "wine_bouncer", github: "bikeindex/wine_bouncer", branch: "master" # Grape Authentication management
 
 # Secure things
 gem "rack-throttle" # Rate limiting

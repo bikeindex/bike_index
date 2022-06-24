@@ -12,7 +12,7 @@ module API
         end
 
         desc "Add an Organization to Bike Index<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_organizations}]},
+          authorizations: {oauth2: {scope: :write_organizations}},
           notes: <<-NOTES
           **Requires** `write_organizations` **in the access token** you use to create the organization.
           <hr>

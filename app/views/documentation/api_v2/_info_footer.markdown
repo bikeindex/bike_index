@@ -40,7 +40,9 @@ Review the applications you've authorized at [/oauth/authorized_applications](/o
 
 ###Sending your access tokens in requests
 
-We recommend putting the authentication information in the parameters, as done in the documentation, for clarity.
+By default we authenticate you with authentication in the header. If authentication is not found in the authorization header, then it falls back to the parameters. We recommend putting the authentication information in the header (<code>"Authorization" => "Bearer #{token}"</code>).
+
+All the authenticated requests in this documentation put the access token in the parameters for clarity, though.
 
 
 <a class="ref" id="ref_refresh_tokens">

@@ -6,15 +6,6 @@ GIT
     swagger-ui_rails (0.1.7)
 
 GIT
-  remote: https://github.com/bikeindex/wine_bouncer.git
-  revision: c82b88f73c7adc43a8e89ca73f7e18952ec30de4
-  branch: master
-  specs:
-    wine_bouncer (1.0.4)
-      doorkeeper (>= 1.4, < 6.0)
-      grape (>= 0.10)
-
-GIT
   remote: https://github.com/facebook/facebook-ruby-business-sdk.git
   revision: 0b02efae9cf57a7e326ba1b45d2692cb4d277736
   branch: main
@@ -837,7 +828,6 @@ DEPENDENCIES
   vcr
   webmock
   webpacker
-  wine_bouncer!
 
 RUBY VERSION
    ruby 2.7.6p219
