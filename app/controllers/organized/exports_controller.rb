@@ -80,7 +80,7 @@ module Organized
     def avery_export_parameters
       params.require(:export).permit(:timezone, :start_at, :end_at, :bike_code_start,
         :custom_bike_ids, :only_custom_bike_ids)
-        .merge(avery_export: true, user_id: current_user.id)
+        .merge(avery_export: true)
     end
 
     def find_export
