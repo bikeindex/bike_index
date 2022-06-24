@@ -1,6 +1,6 @@
 require "rails_helper"
 
-# This contains authorization tests. All the other request spec files should test authorization!
+# This contains authorization tests but all the other API request spec files should test authorization too!
 # This is for special authorization things.
 RSpec.describe "API V3 Authorization specs", type: :request do
   include_context :existing_doorkeeper_app
