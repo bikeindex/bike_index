@@ -172,11 +172,11 @@ class UserAlert < ApplicationRecord
 
   def create_notification?
     return false if inactive? || notification.present? ||
-      self.class.notify_period.exclude?(updated_at) ||
+      !self.class.notify_period.cover?(updated_at) ||
       self.class.notification_kinds.exclude?(kind)
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?
-      return false if bike.blank? || self.class.notify_period.exclude?(bike.updated_at) ||
+      return false if bike.blank? || !self.class.notify_period.cover?(bike.updated_at) ||
         !bike.current_stolen_record&.receive_notifications
     end
     # don't send a user alert notification if user has an outstanding user alert notification
