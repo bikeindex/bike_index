@@ -5,8 +5,8 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-# Update CircleCI config and Dockerfile if Ruby version is bumped
-ruby "2.7.5"
+# Update CircleCI config if Ruby version is bumped
+ruby "2.7.6"
 gem "rack", "2.2.3"
 gem "rails", "~> 6.0"
 
@@ -95,7 +95,7 @@ gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
-gem "premailer-rails" # Inline styles for email
+gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
 gem "sass-rails"
 gem "sprockets", "4.0.0"
 gem "sprockets-rails"

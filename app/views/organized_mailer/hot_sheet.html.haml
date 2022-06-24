@@ -1,6 +1,6 @@
 -# TODO: translations
 
-%h1.uncap{ style: "margin-bottom: 1rem;" }
+%h1.uncap{style: "margin-bottom: 1rem;"}
   = @hot_sheet.subject
 
 - @stolen_records.each do |stolen_record|
@@ -10,8 +10,8 @@
   - bike_link = bike_url(bike, organization_id: @organization.to_param, sign_in_if_not: true)
 
   - unless thumb_url.present?
-    - thumbclass = 'placeholder'
-    - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+    - thumbclass = "placeholder"
+    - thumb_url = "https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"
   .hot-sheet-bike-display
     %table.bike-display
       %tbody
