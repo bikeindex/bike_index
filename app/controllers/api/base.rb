@@ -29,12 +29,16 @@ module ApiAuthorization
     end
   end
 
-  # Heavily Influenced by winebouncer - antek-drzewiecki/wine_bouncer
+  # Pull out from (heavily influenced by) WineBouncer - antek-drzewiecki/wine_bouncer
   # To make an endpoint require a token, include an authorizations key in the endpoint.
   # authorizations: {oauth2: {scope: :public}}
   # If no scope key is included, it will use default scope
   class OAuth2 < Grape::Middleware::Base
     require "doorkeeper/grape/authorization_decorator"
+
+    class << self
+      attr_accessor :resource_owner
+    end
 
     def auth_declaration
       @endpoint_auth_declaration || {}
@@ -57,8 +61,7 @@ module ApiAuthorization
     end
 
     def resource_owner
-      return @resource_owner if defined?(@resource_owner)
-      @resource_owner = User.find_by_id(doorkeeper_access_token&.resource_owner_id)
+      self.class.resource_owner = User.find_by_id(doorkeeper_access_token&.resource_owner_id)
     end
 
     def doorkeeper_authorize!

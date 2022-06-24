@@ -9,8 +9,6 @@ module API
         end
 
         helpers do
-          attr_reader :resource_owner
-
           def current_token
             @doorkeeper_access_token
           end
@@ -23,13 +21,15 @@ module API
           end
 
           def current_user
-            return @resource_owner if @resource_owner&.confirmed?
+            return @current_user if defined?(@current_user)
+            @current_user = ApiAuthorization::OAuth2.resource_owner
+            return @current_user if @current_user&.confirmed?
             # If user isn't confirmed, raise error for us to manage
-            raise ApiAuthorization::Errors::OAuthForbiddenError, "User is unconfirmed"
+            raise ApiAuthorization::Errors::OAuthForbiddenError, OpenStruct.new(description: "User is unconfirmed")
           end
 
           def current_scopes
-            current_token&.scopes
+            current_token&.scopes || []
           end
         end
       end
