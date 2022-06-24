@@ -40,8 +40,13 @@
             %span
               = blog.title
 
-        %p.mb-2
+        %p.mb-1
           = blog.description
+
         %p.blog-topics-list
+          - if blog.published_at.present? # Should always be present, but just in case...
+            %em
+              %span.convertTime= l blog.published_at, format: :convert_time
+              \-
           Topics:
           = safe_join(blog.content_tags.commonness.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "gray-link") }, ", ")
