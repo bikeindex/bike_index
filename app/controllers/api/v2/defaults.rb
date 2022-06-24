@@ -10,7 +10,7 @@ module API
 
         helpers do
           def current_token
-            ApiAuthorization::OAuth2.doorkeeper_access_token
+            env["doorkeeper_access_token"]
           end
 
           def current_organization
@@ -20,10 +20,9 @@ module API
             end
           end
 
-          # v3/me allows responses for unconfirmed users. All othere require a confirmed user
-          def current_user(allow_unconfirmed = false)
+          def current_user
             return nil unless resource_owner.present?
-            return resource_owner if resource_owner.confirmed? || allow_unconfirmed
+            return resource_owner if resource_owner.confirmed? || permit_unconfirmed_user?
             # If user isn't confirmed, raise error for us to manage
             raise ApiAuthorization::Errors::OAuthForbiddenError, OpenStruct.new(description: "User is unconfirmed")
           end
@@ -34,8 +33,13 @@ module API
 
           private
 
+          # overridden in v3/me. All others require a confirmed user
+          def permit_unconfirmed_user?
+            false
+          end
+
           def resource_owner
-            ApiAuthorization::OAuth2.resource_owner
+            env["resource_owner"]
           end
         end
       end

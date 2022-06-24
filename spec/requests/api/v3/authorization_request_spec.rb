@@ -48,6 +48,16 @@ RSpec.describe "API V3 Authorization specs", type: :request do
           expect(json_result["error"]).to match(/confirmed/i)
           expect(response.response_code).to eq(403)
         end
+        context "with unconfirmed scope" do
+          it "responds" do
+            token.update(scopes: "unconfirmed")
+            expect(user.reload.confirmed?).to be_falsey
+            expect(token.reload.acceptable?([])).to be_truthy
+            get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+            expect(json_result).to eq({"id" => user.id.to_s})
+            expect(response.response_code).to eq(200)
+          end
+        end
       end
     end
     context "token in header" do

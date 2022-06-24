@@ -29,16 +29,12 @@ module ApiAuthorization
     end
   end
 
-  # Pull out from (heavily influenced by) WineBouncer - antek-drzewiecki/wine_bouncer
+  # Heavily influenced by WineBouncer - antek-drzewiecki/wine_bouncer
   # To make an endpoint require a token, include an authorizations hash in the endpoint.
   # authorizations: {oauth2: {scope: :public}}
   # If no scope key is included, it will use default scope
   class OAuth2 < Grape::Middleware::Base
     require "doorkeeper/grape/authorization_decorator"
-
-    class << self
-      attr_accessor :doorkeeper_access_token, :resource_owner
-    end
 
     def auth_declaration
       @endpoint_auth_declaration || {}
@@ -55,7 +51,7 @@ module ApiAuthorization
 
     def doorkeeper_access_token
       @doorkeeper_access_token ||= Doorkeeper::OAuth::Token.authenticate(
-        Doorkeeper::Grape::AuthorizationDecorator.new(@request),
+        Doorkeeper::Grape::AuthorizationDecorator.new(ActionDispatch::Request.new(env)),
         *Doorkeeper.configuration.access_token_methods,
       )
     end
@@ -81,10 +77,9 @@ module ApiAuthorization
     def before
       @endpoint_auth_declaration = env["api.endpoint"]&.options&.dig(:route_options, :authorizations)
       return unless endpoint_protected?
-      @request = ActionDispatch::Request.new(env)
       doorkeeper_authorize!
-      self.class.doorkeeper_access_token = doorkeeper_access_token
-      self.class.resource_owner = resource_owner
+      env["doorkeeper_access_token"] = doorkeeper_access_token
+      env["resource_owner"] = resource_owner
     end
   end
 end
