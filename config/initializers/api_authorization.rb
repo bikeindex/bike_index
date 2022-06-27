@@ -40,7 +40,7 @@ module ApiAuthorization
     def doorkeeper_access_token
       @doorkeeper_access_token ||= Doorkeeper::OAuth::Token.authenticate(
         Doorkeeper::Grape::AuthorizationDecorator.new(ActionDispatch::Request.new(env)),
-        *Doorkeeper.configuration.access_token_methods,
+        *Doorkeeper.configuration.access_token_methods
       )
     end
 
