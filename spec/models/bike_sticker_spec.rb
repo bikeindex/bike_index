@@ -120,7 +120,7 @@ RSpec.describe BikeSticker, type: :model do
       expect(sticker2.code).to eq "CA112" # Intended effect
       expect(sticker2.code_number_length).to eq 6
 
-      expect(BikeSticker.of_length(5).pluck(:id)).to eq([sticker.id, sticker2.id])
+      expect(BikeSticker.of_length(5).pluck(:id)).to match_array([sticker.id, sticker2.id])
 
       expect(BikeSticker.lookup("12")).to eq sticker
       expect(BikeSticker.lookup("12", organization_id: organization.id)).to eq sticker
