@@ -64,7 +64,7 @@ RSpec.describe "API V3 Authorization specs", type: :request do
       it "responds" do
         get "/api/v3/me", headers: {
           "Authorization" => "Bearer #{token.token}",
-          format: :json
+          :format => :json
         }
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(json_result).to eq({"id" => user.id.to_s})

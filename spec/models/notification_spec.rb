@@ -18,7 +18,8 @@ RSpec.describe Notification, type: :model do
 
   describe "notifications_sent_or_received_by" do
     let(:user) { FactoryBot.create(:user) }
-    let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: user) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+    let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: user, bike: bike) }
     let!(:notification1) { FactoryBot.create(:notification, user: user) }
     it "gets from and by" do
       expect {

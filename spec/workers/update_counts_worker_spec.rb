@@ -16,11 +16,11 @@ RSpec.describe UpdateCountsWorker, type: :lib do
     let!(:stolen_notification) { FactoryBot.create(:stolen_notification) }
 
     it "updates counts in the cache" do
-      expect(StolenRecord.count).to eq 1
-      expect(StolenRecord.current_and_not.count).to eq 2
+      expect(StolenRecord.count).to eq 2
+      expect(StolenRecord.current_and_not.count).to eq 3
       described_class.new.perform
       expect(Counts.total_bikes).to eq 4
-      expect(Counts.stolen_bikes).to eq 1
+      expect(Counts.stolen_bikes).to eq 2
       expect(Counts.recoveries).to eq 2041
       expect(Counts.week_creation_chart.is_a?(Hash)).to be_truthy
     end
