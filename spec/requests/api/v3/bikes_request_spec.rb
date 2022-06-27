@@ -114,6 +114,7 @@ RSpec.describe "Bikes API V3", type: :request do
       it "creates" do
         expect {
           post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
+          pp json_result unless json_result["bike"].present?
         }.to change(Bike, :count).by 1
         expect(json_result[:claim_url]).to match(/t=/)
 
@@ -335,6 +336,7 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(bike.year).to_not eq 2012
             expect {
               post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+              pp json_result unless json_result["bike"].present?
             }.to change(Bike, :count).by 1
 
             returned_bike = json_result["bike"]
@@ -680,6 +682,7 @@ RSpec.describe "Bikes API V3", type: :request do
             Sidekiq::Worker.clear_all
             expect {
               post tokenized_url, params: bike_attrs.to_json, headers: json_headers
+              pp json_result unless json_result["bike"].present?
             }.to change(Bike, :count).by 1
             result = json_result["bike"]
 
