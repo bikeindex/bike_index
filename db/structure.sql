@@ -2691,7 +2691,8 @@ CREATE TABLE public.stolen_notifications (
     receiver_email character varying(255),
     oauth_application_id integer,
     reference_url text,
-    send_dates json
+    send_dates json,
+    kind integer
 );
 
 
@@ -6247,6 +6248,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220420145734'),
 ('20220520180217'),
 ('20220527162543'),
-('20220622004930');
+('20220622004930'),
+('20220627165205');
 
 
