@@ -58,6 +58,7 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
           Sidekiq::Worker.clear_all
           expect(stolen_notification.reload.notifications.count).to eq 1
           expect(stolen_notification.send_dates_parsed.count).to eq 1
+          expect(stolen_notification.kind).to eq "stolen_blocked"
 
           expect {
             get "#{base_url}/#{stolen_notification.id}/resend"
