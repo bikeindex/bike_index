@@ -135,13 +135,13 @@ module Geocodeable
 
   # Separate from bike_index_geocode because some models handle geocoding independently
   def clean_state_and_street_data
-    self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
-    self.city = city.blank? ? nil : city.strip.gsub(/\s*,\z/, "")
-    self.zipcode = zipcode.blank? ? nil : Geocodeable.format_postal_code(zipcode, country_id)
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
     end
+    self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
+    self.city = city.blank? ? nil : clean_city(city)
+    self.zipcode = zipcode.blank? ? nil : Geocodeable.format_postal_code(zipcode, country_id)
   end
 
   def bike_index_geocode
@@ -189,5 +189,29 @@ module Geocodeable
 
   def metric_units?
     country.blank? || !country.united_states?
+  end
+
+  private
+
+  # remove ", CA" for things like "Sacramento, CA"
+  # Assign state if not assigned.
+  # Only works for USA because states only work in US :(
+  def clean_city(str)
+    if str.match?(/,|.\s?\w\w\s*\z/) && country_id == Country.united_states.id
+      str_state_abbr = str[/\s*\w\w\s*\z/].strip.downcase
+      str_no_state = str.gsub(/,|.\s?\w\w\s*\z/, "")
+      if state_id.present?
+        if state.abbreviation.downcase == str_state_abbr
+          str = str_no_state
+        end
+      else
+        citys_state = State.fuzzy_abbr_find(str_state_abbr)
+        if citys_state.present?
+          self.state_id = citys_state.id
+          str = str_no_state
+        end
+      end
+    end
+    str.strip.gsub(/\s*,\z/, "")
   end
 end

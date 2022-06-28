@@ -4,6 +4,13 @@ RSpec.describe Counts, type: :model do
   let(:redis) { Redis.new }
   before { redis.expire(Counts::STOREAGE_KEY, 0) }
 
+  describe "counts_keys" do
+    it "has things" do
+      expect(Counts.count_keys.count).to eq 6
+      expect(Counts.count_keys).to include("total_bikes")
+    end
+  end
+
   context "total_bikes" do
     it "saves things to redis" do
       Counts.assign_total_bikes

@@ -123,4 +123,47 @@ RSpec.shared_examples "geocodeable" do
       end
     end
   end
+
+  describe ".clean_state_and_street_data" do
+    let!(:state) { nil }
+    let(:object) { subject.class.new(street: " ", city: "\n", zipcode: "   ") }
+    before { object.clean_state_and_street_data }
+    it "removes blanks" do
+      expect(object.street).to eq nil
+      expect(object.city).to eq nil
+      expect(object.zipcode).to eq nil
+    end
+    describe "city name with state" do
+      let!(:state) { FactoryBot.create(:state_new_york) }
+      let(:object) { subject.class.new(country: Country.united_states, state: state, city: "New York, NY") }
+      it "removes state" do
+        expect(object.city).to eq "New York"
+        expect(object.state_id).to eq state.id
+      end
+      context "state not set" do
+        let(:object) { subject.class.new(country: Country.united_states, city: "New York, NY", state_id: nil) }
+        it "sets state" do
+          expect(object.city).to eq "New York"
+          expect(object.state_id).to eq state.id
+        end
+      end
+      context "larkspur" do
+        let!(:state) { FactoryBot.create(:state, name: "Colorado", abbreviation: "CO") }
+        let(:object) { subject.class.new(country: Country.united_states, state: state, city: " larkspur . co\n") }
+        it "removes co" do
+          expect(object.city).to eq "larkspur"
+          expect(object.state_id).to eq state.id
+        end
+      end
+      context "Alberta" do
+        let(:object) { subject.class.new(country: Country.canada, state: nil, city: " Edmonton, AB\n") }
+        # Currently, not handling states except US :(
+        # TODO: fix this!!!
+        it "does not remove ab" do
+          expect(object.city).to eq "Edmonton, AB"
+          expect(object.state_id).to be_blank
+        end
+      end
+    end
+  end
 end
