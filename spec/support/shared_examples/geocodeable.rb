@@ -141,7 +141,7 @@ RSpec.shared_examples "geocodeable" do
         expect(object.state_id).to eq state.id
       end
       context "state not set" do
-        let(:object) { subject.class.new(country: Country.united_states, city: "New York, NY", state_id: nil) }
+        let(:object) { subject.class.new(country: Country.united_states, city: "New York,NY", state_id: nil) }
         it "sets state" do
           expect(object.city).to eq "New York"
           expect(object.state_id).to eq state.id
