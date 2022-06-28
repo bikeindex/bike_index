@@ -42,4 +42,9 @@ class Country < ApplicationRecord
   def default?
     united_states?
   end
+
+  # consistency with state
+  def abbreviation
+    iso
+  end
 end
