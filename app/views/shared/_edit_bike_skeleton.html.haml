@@ -25,7 +25,7 @@
 
       - unless @bike.user?
         %p.mb-0
-          - if @bike.authorized_by_organization?(org: passive_organization)
+          - if @bike.authorized_by_organization?(u: current_user, org: passive_organization)
             = t(".owned_with_permission_to_edit_html", owner_email: @bike.owner_email, org_name: passive_organization&.short_name)
           - else # it's almost certainly because the user hasn't claimed it
             = t(".owned_but_hasnt_been_claimed_html", owner_email: @bike.owner_email)
