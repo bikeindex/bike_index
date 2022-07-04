@@ -1461,10 +1461,13 @@ en:
       other_organizations: Other organizations
       remove: Remove
     ownership:
+      enter_new_owner_email_to_transfer: Enter the new owner's email to transfer the
+        registration.
       impound_record_page: Impound record page
-      sell_trade_or_give_away_this_bike: Are you selling, trading or giving away this %{bike_type}?
-      enter_new_owner_email_to_transfer: Enter the new owner's email to transfer the registration.
-      new_email_assigned_save_to_update: A new email is entered, click "save changes" to transfer.
+      new_email_assigned_save_to_update: A new email is entered, click "save changes"
+        to transfer.
+      sell_trade_or_give_away_this_bike: Are you selling, trading or giving away this
+        %{bike_type}?
       this_bike_is_currently_impounded_html: >-
         This %{bike_type} is currently impounded with impound record <strong>#%{impound_record_id}</strong>.
         If you update the email address here, <em class="text-warning">the %{bike_type}

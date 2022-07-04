@@ -13,10 +13,10 @@ class Bikes::EditsController < Bikes::BaseController
         .where(imageable_type: "Bike")
         .where(imageable_id: @bike.id)
         .where(is_private: true)
-      elsif @edit_template == "ownership"
-        @new_email_assigned = params[:owner_email].present? && @bike.owner_email != params[:owner_email]
-        @bike.owner_email = params[:owner_email] if @new_email_assigned
-      end
+    elsif @edit_template == "ownership"
+      @new_email_assigned = params[:owner_email].present? && @bike.owner_email != params[:owner_email]
+      @bike.owner_email = params[:owner_email] if @new_email_assigned
+    end
 
     render "/bikes_edit/#{@edit_template}".to_sym
   end
