@@ -5798,6 +5798,10 @@ nl:
         wilt overdragen, werkt u deze bij met "Overgedragen aan nieuwe eigenaar" uit
         de %{link_to_impound_record_page}.
       transfer_ownership: Eigendom overdragen
+      enter_new_owner_email_to_transfer: Voer het e-mailadres van de nieuwe eigenaar
+        in om de registratie over te dragen.
+      new_email_assigned_save_to_update: Er is een nieuw e-mailadres ingevoerd, klik
+        op "wijzigingen opslaan" om over te zetten.
     photos:
       drag_and_drop_files_here_html: Sleep bestanden hier naartoe of gebruik de knop
         <strong>Foto's uploaden</strong>

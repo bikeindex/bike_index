@@ -20,7 +20,13 @@
                   - link_to_impound_record_page = link_to t(".impound_record_page"), organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization.to_param)
                   = t(".to_transfer_use_impound_record_page_html", link_to_impound_record_page: link_to_impound_record_page)
               - else
-                = t(".sell_trade_or_give_away_this_bike", bike_type: @bike.type)
+                %p
+                  = t(".sell_trade_or_give_away_this_bike", bike_type: @bike.type)
+                %p.pb-2
+                  - if @new_email_assigned
+                    %em= t(".new_email_assigned_save_to_update")
+                  - else
+                    = t(".enter_new_owner_email_to_transfer")
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input
