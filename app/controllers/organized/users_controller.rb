@@ -70,7 +70,7 @@ module Organized
     private
 
     def sortable_columns
-      %w[created_at invited_email sender_id claimed_at]
+      %w[created_at invited_email sender_id claimed_at role]
     end
 
     def matching_memberships
