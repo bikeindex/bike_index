@@ -28,7 +28,7 @@ def expect_hashes_to_match(hash1, hash2, inside = nil, match_time_within: nil)
       .flatten.compact
     # Make sure we've matched all the keys in the target hash
     unless hash2.keys & hash1.keys == hash2.keys
-      matching_errors += [{inside: inside, key: "key mismatch", value: "expected [#{hash2.keys.sort.join(", ")}],\n     got [#{hash1.keys.sort.join(", ")}]"}]
+      matching_errors += [{inside: inside, key: "key mismatch", value: "\n  expected [#{hash2.keys.sort.join(", ")}], got [#{hash1.keys.sort.join(", ")}]"}]
     end
   else
     matching_errors = [{inside: inside, key: "invalid hash", value: "expected a hash, got '#{hash2}'"}]
@@ -37,21 +37,18 @@ def expect_hashes_to_match(hash1, hash2, inside = nil, match_time_within: nil)
   return matching_errors unless inside.blank?
   # Return true if there are no errors
   return nil unless matching_errors.any?
-  puts "\nHash mismatches:"
+  puts red_text("\n\nHash mismatches:")
 
   # This is all displaying error stuff below here
   # group the errors by the insideness
   matching_errors.compact.map { |e| e[:inside] }.uniq.each do |inside_level|
-    puts inside_level.present? ? "#{inside_level}:" : "Top level:"
+    puts red_text(inside_level.present? ? " #{inside_level}:" : " Top level:")
     # Grab the matching insideness errors, turn key and values into a hash to make it better visible
-    msg = matching_errors.map { |merror|
+    matching_errors.each do |merror|
       next unless merror[:inside] == inside_level
-      [
-        merror[:key],
-        merror[:message].present? ? merror[:message] : merror[:value]
-      ]
-    }.compact.to_h
-    pp msg
+      error_message = merror[:message].present? ? merror[:message] : merror[:value]
+      puts "\"#{merror[:key]}\" => #{error_message}"
+    end
   end
   # give pretty format for failure if possible >
   expect(hash1).to eq hash2
@@ -96,4 +93,9 @@ def match_time_error(value, value2, match_time_within)
   t_value2 = value2.is_a?(Time) ? value2 : TimeParser.parse(value2)
   return nil if t_value.between?(t_value2 - match_time_within, t_value2 + match_time_within)
   "#{value} within #{match_time_within} of #{value2}"
+end
+
+# Prints out red text in the terminal
+def red_text(str)
+  "\e[31m#{str}\e[0m"
 end

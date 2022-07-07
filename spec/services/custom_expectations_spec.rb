@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "custom_expectations matcher" do
+RSpec.describe "custom_expectations spec" do
   describe "expect_hashes_to_match" do
     it "matches hash" do
       expect_hashes_to_match({something: true}, {something: true})
@@ -22,7 +22,7 @@ RSpec.describe "custom_expectations matcher" do
         expect_hashes_to_match({something: {else: true}}, {something: {else: true}})
         # Should make a nice error if it doesn't match
         expect {
-          expect_hashes_to_match({something: {else: true}}, {something: {else: false}})
+          expect_hashes_to_match({something: {else: true}}, {something: {else: false, thing: true}})
         }.to raise_error(/something/)
       end
     end
