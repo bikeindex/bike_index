@@ -8,10 +8,9 @@ def expect_attrs_to_match_hash(obj, hash, match_time_within: nil)
     # Just in case there are some type issues
     next if obj_value.to_s == value.to_s
     if match_time_within.present? && (obj_value.is_a?(Time) || value.is_a?(Time))
-      t_obj_value = obj_value.is_a?(Time) ? obj_value : TimeParser.parse(obj_value)
-      t_value = value.is_a?(Time) ? value : TimeParser.parse(value)
-      next if t_obj_value.between?(t_value - match_time_within, t_value + match_time_within)
-      unmatched_obj_attrs[key] = match_time_within_message(t_obj_value, t_value, match_time_within)
+      error_message = match_time_error(obj_value, value, match_time_within)
+      next if error_message.blank?
+      unmatched_obj_attrs[key] = error_message
     else
       unmatched_obj_attrs[key] = obj_value
     end
@@ -82,18 +81,19 @@ def match_hash_recursively(key, value, hash2_value, inside, match_time_within)
     end
   end
   if match_time_within.present? && (value.is_a?(Time) || hash2_value.is_a?(Time))
-    # Converting to time and comparing with #between?
-    # I believe this is the best option for the main expected values: Time object or a timestamp
-    t_value = value.is_a?(Time) ? value : TimeParser.parse(value)
-    t_hash2_value = hash2_value.is_a?(Time) ? hash2_value : TimeParser.parse(hash2_value)
-    return nil if t_value.between?(t_hash2_value - match_time_within, t_hash2_value + match_time_within)
-    {inside: inside, key: key, value: t_value, message: match_time_within_message(t_value, t_hash2_value, match_time_within)}
+    error_message = match_time_error(value, hash2_value, match_time_within)
+    return nil if error_message.blank?
+    {inside: inside, key: key, value: value, message: error_message}
   else
     value.to_s == hash2_value.to_s ? nil : {inside: inside, key: key, value: value}
   end
 end
 
-
-def match_time_within_message(value, value2, match_time_within)
-  "#{value.to_s} within #{match_time_within} of #{value2.to_s}"
+def match_time_error(value, value2, match_time_within)
+  # Converting to time and comparing with #between?
+  # I believe this is the best option for the main expected values: Time object or a timestamp
+  t_value = value.is_a?(Time) ? value : TimeParser.parse(value)
+  t_value2 = value2.is_a?(Time) ? value2 : TimeParser.parse(value2)
+  return nil if t_value.between?(t_value2 - match_time_within, t_value2 + match_time_within)
+  "#{value} within #{match_time_within} of #{value2}"
 end
