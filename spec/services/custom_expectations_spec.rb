@@ -59,17 +59,60 @@ RSpec.describe "custom_expectations spec" do
       }.to raise_error(/id/)
     end
 
+    context "boolean" do
+      let(:boolean_hash) { hash.merge(banned: "false") }
+      it "uses params normalizer" do
+        expect(obj.banned).to be_falsey
+        expect_attrs_to_match_hash(obj, boolean_hash)
+        expect_attrs_to_match_hash(obj, boolean_hash.merge(banned: nil))
+        expect_attrs_to_match_hash(obj, boolean_hash.merge(banned: "0"))
+        expect_attrs_to_match_hash(obj, boolean_hash, match_time_within: 1)
+      end
+      context "truthy boolean" do
+        let(:boolean_hash) { hash.merge(banned: "true") }
+        it "uses params normalizer" do
+          obj.banned = true
+          expect_attrs_to_match_hash(obj, boolean_hash)
+          expect_attrs_to_match_hash(obj, boolean_hash.merge(banned: "1"))
+        end
+      end
+    end
+
+
     context "match_time_within" do
       let(:time) { Time.current - 5.minutes }
       let(:obj) { User.new(email: "something@stuff.com", id: 12, updated_at: time + 0.2) }
       let(:hash) { {email: "something@stuff.com", id: "12", updated_at: time} }
       it "matches" do
-        expect_attrs_to_match_hash(obj, hash, match_time_within: 1)
+        expect_attrs_to_match_hash(obj, hash) # defaults to having match_time_within
         expect_attrs_to_match_hash(obj, hash.merge(updated_at: time.to_i + 5), match_time_within: 5)
         expect_attrs_to_match_hash(obj, hash.as_json, match_time_within: 1)
         expect {
           expect_attrs_to_match_hash(obj, hash.merge(updated_at: time + 12), match_time_within: 1)
         }.to raise_error(/within/)
+      end
+
+      it "defaults to match_time_within" do
+        expect_attrs_to_match_hash(obj, hash.as_json)
+        expect {
+          # Override to not match_time_within
+          expect_attrs_to_match_hash(obj, hash.as_json, match_time_within: false)
+        }.to raise_error(/updated_at/)
+      end
+
+      context "with timezone" do
+        let(:time) { Time.at(1657223244) } # 2022-07-07 14:47:24
+        let(:hash_with_timezone) { hash.merge(updated_at: "2022-07-07 19:47:24", timezone: "UTC") }
+        it "matches" do
+          time_utc = TimeParser.parse(hash_with_timezone[:updated_at], hash_with_timezone[:timezone])
+          expect(time_utc).to be_within(1).of time
+          expect_attrs_to_match_hash(obj, hash_with_timezone)
+
+          # If timezone isn't included, it raises because it parses without timezone
+          expect {
+            expect_attrs_to_match_hash(obj, hash_with_timezone.except(:timezone))
+          }.to raise_error(/updated_at/)
+        end
       end
 
       context "obj has timestamp stored" do

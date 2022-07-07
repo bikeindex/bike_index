@@ -1,19 +1,25 @@
 # frozen_string_literal: true
 
 # Define a way to check if an update hash matches an object. Particularly useful for request specs
-def expect_attrs_to_match_hash(obj, hash, match_time_within: nil)
+def expect_attrs_to_match_hash(obj, hash, match_time_within: 1)
   unmatched_obj_attrs = {}
+  # So far, not putting timezone on objects - so ignore it.
+  hash = hash.dup
+  timezone = hash&.delete(:timezone) || hash&.delete("timezone")
   hash.each do |key, value|
     obj_value = obj.send(key)
     # Just in case there are some type issues
     next if obj_value.to_s == value.to_s
+    expect_hashes_to_match({something: true, num: 12}, {something: "true", num: "12"})
     if match_time_within.present? && (obj_value.is_a?(Time) || value.is_a?(Time))
-      error_message = match_time_error(obj_value, value, match_time_within)
-      next if error_message.blank?
-      unmatched_obj_attrs[key] = error_message
-    else
-      unmatched_obj_attrs[key] = obj_value
+      error_message = match_time_error(obj_value, value, match_time_within, timezone)
+      unmatched_obj_attrs[key] = error_message if error_message.present?
+      next
+    elsif [true, false].include?(obj_value)
+      # If we're comparing a boolean, use params normalizer
+      next if obj_value == ParamsNormalizer.boolean(value)
     end
+    unmatched_obj_attrs[key] = obj_value
   end
   return true unless unmatched_obj_attrs.present?
   expect(unmatched_obj_attrs).to eq hash.slice(*unmatched_obj_attrs.keys)
@@ -71,7 +77,7 @@ def match_hash_recursively(key, value, hash2_value, inside, match_time_within)
       return nil unless expect(value).to match_array(hash2_value)
       # return nil # Because the arrays matched
     else
-      puts "\nFailure/Error: Tried to compare array to non-array ->"
+      puts red_text("\nFailure/Error: Tried to compare array to non-array ->")
       # pretty print so that the types are clear
       pp value, hash2_value
       raise "Unable to match array #{key} #{"- inside #{inside}" if inside.present?} - to non-array"
@@ -86,11 +92,11 @@ def match_hash_recursively(key, value, hash2_value, inside, match_time_within)
   end
 end
 
-def match_time_error(value, value2, match_time_within)
+def match_time_error(value, value2, match_time_within, timezone = nil)
   # Converting to time and comparing with #between?
   # I believe this is the best option for the main expected values: Time object or a timestamp
-  t_value = value.is_a?(Time) ? value : TimeParser.parse(value)
-  t_value2 = value2.is_a?(Time) ? value2 : TimeParser.parse(value2)
+  t_value = value.is_a?(Time) ? value : TimeParser.parse(value, timezone)
+  t_value2 = value2.is_a?(Time) ? value2 : TimeParser.parse(value2, timezone)
   return nil if t_value.between?(t_value2 - match_time_within, t_value2 + match_time_within)
   "#{value} within #{match_time_within} of #{value2}"
 end
