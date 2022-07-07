@@ -78,7 +78,6 @@ RSpec.describe "custom_expectations spec" do
       end
     end
 
-
     context "match_time_within" do
       let(:time) { Time.current - 5.minutes }
       let(:obj) { User.new(email: "something@stuff.com", id: 12, updated_at: time + 0.2) }
