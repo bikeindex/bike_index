@@ -1,34 +1,31 @@
 # frozen_string_literal: true
 
 # Define a way to check if an update hash matches an object. Particularly useful for request specs
-def expect_attrs_to_match_hash(obj, hash)
+def expect_attrs_to_match_hash(obj, hash, match_time_within: nil)
   unmatched_obj_attrs = {}
-  # So far, I don't want timezone from objects - so ignore it.
-  hash = hash.dup
-  timezone = hash&.delete(:timezone) || hash&.delete("timezone")
   hash.each do |key, value|
+    obj_value = obj.send(key)
     # Just in case there are some type issues
-    obj_val = obj.send(key)
-    next if obj_val.to_s == value.to_s
-    if [true, false].include?(obj_val)
-      # If we're comparing a boolean, use params normalizer
-      next if obj_val == ParamsNormalizer.boolean(value)
-    elsif obj_val.is_a?(Time) && value.is_a?(String)
-      # If we're comparing a date, use timeparser
-      next if obj_val.round(1).to_i == TimeParser.parse(value, timezone).round(1).to_i
+    next if obj_value.to_s == value.to_s
+    if match_time_within.present? && (obj_value.is_a?(Time) || value.is_a?(Time))
+      t_obj_value = obj_value.is_a?(Time) ? obj_value : TimeParser.parse(obj_value)
+      t_value = value.is_a?(Time) ? value : TimeParser.parse(value)
+      next if t_obj_value.between?(t_value - match_time_within, t_value + match_time_within)
+      unmatched_obj_attrs[key] = match_time_within_message(t_obj_value, t_value, match_time_within)
+    else
+      unmatched_obj_attrs[key] = obj_value
     end
-    unmatched_obj_attrs[key] = obj_val
   end
   return true unless unmatched_obj_attrs.present?
   expect(unmatched_obj_attrs).to eq hash.slice(*unmatched_obj_attrs.keys)
 end
 
 # Define a hash matchers to display better results and match more loosely (not on type, indifferent access)
-def expect_hashes_to_match(hash1, hash2, inside = nil)
+def expect_hashes_to_match(hash1, hash2, inside = nil, match_time_within: nil)
   hash1 = hash1.with_indifferent_access if hash1&.is_a?(Hash)
   if hash2.is_a?(Hash)
     hash2 = hash2.with_indifferent_access
-    matching_errors = hash1.map { |k, v| match_hash_recursively(k, v, hash2[k], inside) }
+    matching_errors = hash1.map { |k, v| match_hash_recursively(k, v, hash2[k], inside, match_time_within) }
       .flatten.compact
     # Make sure we've matched all the keys in the target hash
     unless hash2.keys & hash1.keys == hash2.keys
@@ -50,7 +47,10 @@ def expect_hashes_to_match(hash1, hash2, inside = nil)
     # Grab the matching insideness errors, turn key and values into a hash to make it better visible
     msg = matching_errors.map { |merror|
       next unless merror[:inside] == inside_level
-      [merror[:key], merror[:value]]
+      [
+        merror[:key],
+        merror[:message].present? ? merror[:message] : merror[:value]
+      ]
     }.compact.to_h
     pp msg
   end
@@ -59,14 +59,16 @@ def expect_hashes_to_match(hash1, hash2, inside = nil)
   raise # Backup to ensure this fails if it should (even if the hashes evaluate to equal)
 end
 
-def match_hash_recursively(key, value, hash2_value, inside)
+def match_hash_recursively(key, value, hash2_value, inside, match_time_within)
   if value.is_a?(Hash)
-    return expect_hashes_to_match(value, hash2_value, key)
+    return expect_hashes_to_match(value, hash2_value, key, match_time_within: match_time_within)
   elsif value.is_a?(Array) # We handle arrays differently
     # I Fucked this up in PR#62 - I wanted to make it work better, by adding match_array, but it doesn't work anymore at all
     # Someday I will fix this, just not right now
-    if (value.count == hash2_value&.count) && value.count < 2
-      return expect_hashes_to_match(value[0], hash2_value[0], key) if value.count > 0
+    if (value.count == hash2_value&.count) && value.count < 2 && value.first.is_a?(Hash)
+      if value.count > 0
+        return expect_hashes_to_match(value[0], hash2_value[0], key, match_time_within: match_time_within)
+      end
     elsif hash2_value.is_a?(Array)
       return nil if value == hash2_value # If they are the exact same, let it happen
       # This won't show the keys if it fails, but it's what we want anyway
@@ -79,5 +81,19 @@ def match_hash_recursively(key, value, hash2_value, inside)
       raise "Unable to match array #{key} #{"- inside #{inside}" if inside.present?} - to non-array"
     end
   end
-  value.to_s == hash2_value.to_s ? nil : {inside: inside, key: key, value: value}
+  if match_time_within.present? && (value.is_a?(Time) || hash2_value.is_a?(Time))
+    # Converting to time and comparing with #between?
+    # I believe this is the best option for the main expected values: Time object or a timestamp
+    t_value = value.is_a?(Time) ? value : TimeParser.parse(value)
+    t_hash2_value = hash2_value.is_a?(Time) ? hash2_value : TimeParser.parse(hash2_value)
+    return nil if t_value.between?(t_hash2_value - match_time_within, t_hash2_value + match_time_within)
+    {inside: inside, key: key, value: t_value, message: match_time_within_message(t_value, t_hash2_value, match_time_within)}
+  else
+    value.to_s == hash2_value.to_s ? nil : {inside: inside, key: key, value: value}
+  end
+end
+
+
+def match_time_within_message(value, value2, match_time_within)
+  "#{value.to_s} within #{match_time_within} of #{value2.to_s}"
 end
