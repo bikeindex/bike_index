@@ -69,7 +69,9 @@ RSpec.describe Counts, type: :model do
       expect(Counts.organization_type_key("ascend_pos")).to eq "org_type-ascend_pos-#{Time.current.to_date}"
       expect(Counts.retrieve_for(Counts.organization_type_key("law_enforcement"))).to eq 1
       expect(Counts.retrieve_for(Counts.organization_type_key("no_pos"))).to eq 2
-      expect(Counts.retrieve_for(Counts.organization_type_key("lightspeed"))).to eq 1
+      expect(Counts.retrieve_for(Counts.organization_type_key("lightspeed_pos"))).to eq 1
+      expect(Counts.retrieve_for(Counts.organization_type_key("broken_lightspeed_pos"))).to eq 1
+      expect(Counts.retrieve_organization_type_counts_for(Time.current).keys.count).to be > 15
     end
   end
 end
