@@ -117,7 +117,6 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       end
     end
 
-
     describe "client_credentials flow" do
       it "gets a token and makes an authorized request" do
         expect(current_user.confirmed?).to be_truthy

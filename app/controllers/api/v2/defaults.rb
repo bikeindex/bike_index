@@ -17,7 +17,7 @@ module API
             return @current_organization if defined?(@current_organization)
             organization = Organization.friendly_find(params[:organization_slug])
             if organization.present? && current_user.authorized?(organization)
-              return @current_organization = organization
+              @current_organization = organization
             end
           end
 
