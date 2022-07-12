@@ -37,10 +37,6 @@ module ApiAuthorization
       Array(auth_declaration&.dig(:oauth2, :scope)&.to_sym)
     end
 
-    def endpoint_client_credentials?
-      auth_declaration&.dig(:oauth2, :allow_client_credentials) == true
-    end
-
     def doorkeeper_access_token
       @doorkeeper_access_token ||= Doorkeeper::OAuth::Token.authenticate(
         Doorkeeper::Grape::AuthorizationDecorator.new(ActionDispatch::Request.new(env)),
@@ -48,10 +44,19 @@ module ApiAuthorization
       )
     end
 
+    def endpoint_client_credentials?
+      auth_declaration&.dig(:oauth2, :allow_client_credentials) == true
+    end
+
     # This is probably a client_credentials request
-    def doorkeeper_access_token_no_user
-      @doorkeeper_access_token_no_user ||= doorkeeper_access_token&.accessible? &&
+    def doorkeeper_access_token_no_user?
+      doorkeeper_access_token&.accessible? &&
         doorkeeper_access_token.resource_owner_id.blank?
+    end
+
+    def authorized_access_token_no_user?
+      endpoint_client_credentials? && doorkeeper_access_token_no_user? &&
+        doorkeeper_access_token.acceptable?(endpoint_scopes)
     end
 
     def resource_owner
@@ -61,13 +66,14 @@ module ApiAuthorization
     def doorkeeper_authorize!
       return if doorkeeper_access_token&.acceptable?(endpoint_scopes) &&
         resource_owner.present?
+
       if doorkeeper_access_token.blank? || !doorkeeper_access_token.accessible?
         error = Doorkeeper::OAuth::InvalidTokenResponse.from_access_token(doorkeeper_access_token)
         raise ApiAuthorization::Errors::OAuthUnauthorizedError, error
-      elsif doorkeeper_access_token_no_user && endpoint_client_credentials?
+      elsif authorized_access_token_no_user?
         @resource_owner = doorkeeper_access_token.application.owner
       else
-        error = if doorkeeper_access_token_no_user
+        error = if doorkeeper_access_token_no_user?
           OpenStruct.new(description: "User required; no user associated with token")
         else
           Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
@@ -83,7 +89,7 @@ module ApiAuthorization
       doorkeeper_authorize!
       # Assign the access_token and the user to the request object, so it can be accessed
       env["doorkeeper_access_token"] = doorkeeper_access_token
-      env["doorkeeper_access_token_no_user"] = doorkeeper_access_token_no_user
+      env["doorkeeper_authorized_no_user"] = authorized_access_token_no_user?
       env["resource_owner"] = resource_owner
     end
   end

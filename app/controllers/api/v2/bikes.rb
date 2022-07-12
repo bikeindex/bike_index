@@ -61,11 +61,11 @@ module API
         end
 
         def creation_user_id
-          if current_user&.id == ENV["V2_ACCESSOR_ID"].to_i || token_authorized_with_no_user
+          if current_user&.id == ENV["V2_ACCESSOR_ID"].to_i || doorkeeper_authorized_no_user
             return current_organization.auto_user_id if current_organization.present? &&
               current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
 
-            if token_authorized_with_no_user
+            if doorkeeper_authorized_no_user
               error!("Access tokens with no user can only be used to create bikes for organizations you're an admin of", 403)
             else
               error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)

@@ -32,8 +32,9 @@ module API
             current_token&.scopes || []
           end
 
-          def token_authorized_with_no_user
-            env["doorkeeper_access_token_no_user"]
+          # client_credentials flow. See #2282
+          def doorkeeper_authorized_no_user
+            env["doorkeeper_authorized_no_user"]
           end
 
           private
