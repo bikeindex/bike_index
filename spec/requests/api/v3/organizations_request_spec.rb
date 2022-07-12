@@ -108,6 +108,7 @@ RSpec.describe "Organization API V3", type: :request do
               name: "Geoff's Bike Shop",
               website: "https://bikes.geoffereth.com",
               kind: "bike_shop",
+              slug: "geoffs-bike-shop",
               locations: [
                 {address: "1111 SE Belmont Street, Portland, OR 97215, United States"}.merge(location_1),
                 {address: "2222 SE Morrison Street, Portland, OR 97214, United States"}.merge(location_2)
