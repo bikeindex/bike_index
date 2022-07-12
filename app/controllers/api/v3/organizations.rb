@@ -7,7 +7,8 @@ module API
         helpers do
           def allowed_write_organizations
             application_uid = current_token&.application&.uid
-            ENV["ALLOWED_WRITE_ORGANIZATIONS"].split(",").any?(application_uid)
+            allowed_write_organizations = ENV["ALLOWED_WRITE_ORGANIZATIONS"]&.split(",") || []
+            allowed_write_organizations.any?(application_uid)
           end
         end
 

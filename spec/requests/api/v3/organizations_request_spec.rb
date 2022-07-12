@@ -104,16 +104,14 @@ RSpec.describe "Organization API V3", type: :request do
       context "successful" do
         let(:target_response) do
           {
-            organization: {
-              name: "Geoff's Bike Shop",
-              website: "https://bikes.geoffereth.com",
-              kind: "bike_shop",
-              slug: "geoffs-bike-shop",
-              locations: [
-                {address: "1111 SE Belmont Street, Portland, OR 97215, United States"}.merge(location_1),
-                {address: "2222 SE Morrison Street, Portland, OR 97214, United States"}.merge(location_2)
-              ]
-            }
+            name: "Geoff's Bike Shop",
+            website: "https://bikes.geoffereth.com",
+            kind: "bike_shop",
+            slug: "geoffs-bike-shop",
+            locations: [
+              {address: "1111 SE Belmont Street, Portland, OR 97215, United States"}.merge(location_1),
+              {address: "2222 SE Morrison Street, Portland, OR 97214, United States"}.merge(location_2)
+            ]
           }
         end
         it "creates a new organization with locations" do
@@ -122,7 +120,17 @@ RSpec.describe "Organization API V3", type: :request do
           }.to change(Organization, :count).by 1
           expect(response).to be_created
           expect(response.code).to eq("201")
-          expect(json_result).to eq target_response.as_json
+          expect(json_result["organization"]).to be_present
+          expect_hashes_to_match(json_result["organization"], target_response)
+        end
+        describe "with no ALLOWED_WRITE_ORGANIZATIONS" do
+          it "creates an organization" do
+            ENV["ALLOWED_WRITE_ORGANIZATIONS"] = nil
+            expect {
+              post url, params: organization_attrs.to_json, headers: json_headers
+            }.to change(Organization, :count).by 0
+            expect(json_result["error"]).to match(/not.*organization/i)
+          end
         end
       end
 
