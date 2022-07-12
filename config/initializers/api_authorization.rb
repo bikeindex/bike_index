@@ -44,20 +44,28 @@ module ApiAuthorization
       )
     end
 
+    # This is probably a client_credentials request
+    def doorkeeper_access_token_no_user?
+      @doorkeeper_access_token_no_user ||= doorkeeper_access_token&.accessible? &&
+        doorkeeper_access_token.resource_owner_id.blank?
+    end
+
     def resource_owner
-      @resource_owner = User.find_by_id(doorkeeper_access_token&.resource_owner_id)
+      @resource_owner ||= User.find_by_id(doorkeeper_access_token&.resource_owner_id)
     end
 
     def doorkeeper_authorize!
       return if doorkeeper_access_token&.acceptable?(endpoint_scopes) &&
         resource_owner.present?
-
       if doorkeeper_access_token.blank? || !doorkeeper_access_token.accessible?
         error = Doorkeeper::OAuth::InvalidTokenResponse.from_access_token(doorkeeper_access_token)
         raise ApiAuthorization::Errors::OAuthUnauthorizedError, error
+      elsif doorkeeper_access_token_no_user? && endpoint_scopes == [:write_bikes]
+        # If all that's required is write_bikes scope, request is authorized.
+        # This is the same as a permanent bike token
+        @resource_owner = doorkeeper_access_token.application.owner
       else
-        error = if doorkeeper_access_token&.resource_owner_id.blank?
-          # Probably client credentials grant_type
+        error = if doorkeeper_access_token_no_user?
           OpenStruct.new(description: "User required; no user associated with token")
         else
           Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
@@ -73,6 +81,7 @@ module ApiAuthorization
       doorkeeper_authorize!
       # Assign the access_token and the user to the request object, so it can be accessed
       env["doorkeeper_access_token"] = doorkeeper_access_token
+      env["doorkeeper_access_token_no_user"] = doorkeeper_access_token_no_user?
       env["resource_owner"] = resource_owner
     end
   end

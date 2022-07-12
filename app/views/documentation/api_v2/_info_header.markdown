@@ -60,7 +60,7 @@ Bike Index API V2 displays everything in <a href="https://en.wikipedia.org/wiki/
 
 The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Create an application</a> and use an access token for any requests that need authorization.
 
-Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use.
+Endpoints with Red Stars (<span class="accstr">*</span>) require an access token with a user to use.
 
 <!-- <img alt="example of a protected endpoint" src="updated/documentation/protected_endpoint.png" class="protected-endpoint-img"> -->
 

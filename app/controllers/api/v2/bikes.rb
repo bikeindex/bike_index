@@ -66,6 +66,10 @@ module API
               current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
 
             error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
+          elsif env["doorkeeper_access_token_no_user"]
+            pp "fffffffff"
+            return current_organization.auto_user_id if current_organization.present? &&
+              current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
           end
           current_user.id
         end
@@ -114,7 +118,7 @@ module API
           BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
         end
 
-        desc "Check if a bike is already registered", {
+        desc "Check if a bike is already registered <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes}},
           notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
         }
@@ -137,7 +141,7 @@ module API
           end
         end
 
-        desc "Add a bike to the Index!<span class='accstr'>*</span>", {
+        desc "Add a bike to the Index! <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes}},
           notes: <<-NOTE
             **Requires** `write_bikes` **in the access token** you use to create the bike.
@@ -257,7 +261,7 @@ module API
           BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
-        desc "Add an image to a bike", {
+        desc "Add an image to a bike <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes}},
           notes: <<-NOTE
 
@@ -286,7 +290,7 @@ module API
           end
         end
 
-        desc "Remove an image from a bike", {
+        desc "Remove an image from a bike <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes}},
           notes: <<-NOTE
 
@@ -310,7 +314,7 @@ module API
           BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
-        desc "Send a stolen notification<span class='accstr'>*</span>", {
+        desc "Send a stolen notification <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :read_user}},
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
