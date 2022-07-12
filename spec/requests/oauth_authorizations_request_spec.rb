@@ -103,16 +103,39 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         post "/oauth/token?grant_type=authorization_code&code=#{auth_code}&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}&client_secret=#{doorkeeper_app.secret}&scope=write_bikes+read_bikes"
         expect(Doorkeeper::AccessToken.count).to eq 1
         access_token = Doorkeeper::AccessToken.last
+        expect(access_token.reload.acceptable?(nil)).to be_truthy
+        expect(access_token.resource_owner_id).to eq current_user.id
+        expect(access_token.scopes).to match_array(%w[write_bikes read_bikes])
+
         expect(json_result["access_token"]).to eq access_token.token
         expect(json_result["token_type"]).to eq "Bearer"
         expect(json_result["refresh_token"]).to be_present
-        expect(access_token.reload.acceptable?(nil)).to be_truthy
-        expect(User.find(token.resource_owner_id).confirmed?).to be_truthy
-        expect(access_token.scopes).to match_array(%w[write_bikes read_bikes])
         # And then test that you can make an authorized reques with the token
         get "/api/v3/me", params: {access_token: access_token.token}, headers: {format: :json}
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect_hashes_to_match(json_result, {id: current_user.id.to_s, bike_ids: []})
+      end
+    end
+
+
+    describe "client_credentials flow" do
+      it "gets a token and makes an authorized request" do
+        expect(current_user.confirmed?).to be_truthy
+        expect(Doorkeeper::AccessToken.count).to eq 0
+        post "/oauth/token?grant_type=client_credentials&client_id=#{doorkeeper_app.uid}&client_secret=#{doorkeeper_app.secret}&scope=write_bikes+read_bikes"
+        expect(Doorkeeper::AccessToken.count).to eq 1
+        access_token = Doorkeeper::AccessToken.last
+        expect(access_token.reload.acceptable?(nil)).to be_truthy
+        expect(access_token.resource_owner_id).to be_blank
+        expect(access_token.scopes).to match_array(%w[write_bikes read_bikes])
+
+        expect(json_result["access_token"]).to eq access_token.token
+        expect(json_result["token_type"]).to eq "Bearer"
+        expect(json_result["refresh_token"]).to be_blank
+        # And then test that you can make an authorized reques with the token
+        get "/api/v3/me", params: {access_token: access_token.token}, headers: {format: :json}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(json_result["error"]).to match(/no user.*token/i)
       end
     end
   end

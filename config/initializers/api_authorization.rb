@@ -56,7 +56,12 @@ module ApiAuthorization
         error = Doorkeeper::OAuth::InvalidTokenResponse.from_access_token(doorkeeper_access_token)
         raise ApiAuthorization::Errors::OAuthUnauthorizedError, error
       else
-        error = Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
+        error = if doorkeeper_access_token&.resource_owner_id.blank?
+          # Probably client credentials grant_type
+          OpenStruct.new(description: "User required; no user associated with token")
+        else
+          Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
+        end
         raise ApiAuthorization::Errors::OAuthForbiddenError, error
       end
     end
