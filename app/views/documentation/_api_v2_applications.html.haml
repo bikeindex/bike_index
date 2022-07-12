@@ -20,8 +20,9 @@
                 %span.less-strong
                   use to create bikes for
                   = current_user.organizations.map(&:name).to_sentence
+
                 %br
-                %span.less-strong
+                %em.less-strong
                   ** You must include an 
                   %code
                     organization_slug

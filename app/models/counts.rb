@@ -91,7 +91,7 @@ class Counts
     end
 
     def organization_type_key(kind, time = Time.current)
-      "org_type-#{kind}-#{time.to_date.to_s}"
+      "org_type-#{kind}-#{time.to_date}"
     end
 
     def retrieve_organization_type_counts_for(time)

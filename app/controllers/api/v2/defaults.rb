@@ -14,9 +14,10 @@ module API
           end
 
           def current_organization
+            return @current_organization if defined?(@current_organization)
             organization = Organization.friendly_find(params[:organization_slug])
             if organization.present? && current_user.authorized?(organization)
-              organization
+              @current_organization = organization
             end
           end
 
@@ -24,11 +25,16 @@ module API
             return nil unless resource_owner.present?
             return resource_owner if resource_owner.confirmed? || permit_unconfirmed_user?
             # If user isn't confirmed, raise error for us to manage
-            raise ApiAuthorization::Errors::OAuthForbiddenError, OpenStruct.new(description: "User is unconfirmed")
+            error!("User is unconfirmed", 403)
           end
 
           def current_scopes
             current_token&.scopes || []
+          end
+
+          # client_credentials flow. See #2282
+          def doorkeeper_authorized_no_user
+            env["doorkeeper_authorized_no_user"]
           end
 
           private

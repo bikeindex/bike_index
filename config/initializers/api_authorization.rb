@@ -44,8 +44,23 @@ module ApiAuthorization
       )
     end
 
+    def endpoint_client_credentials?
+      auth_declaration&.dig(:oauth2, :allow_client_credentials) == true
+    end
+
+    # This is probably a client_credentials request
+    def doorkeeper_access_token_no_user?
+      doorkeeper_access_token&.accessible? &&
+        doorkeeper_access_token.resource_owner_id.blank?
+    end
+
+    def authorized_access_token_no_user?
+      endpoint_client_credentials? && doorkeeper_access_token_no_user? &&
+        doorkeeper_access_token.acceptable?(endpoint_scopes)
+    end
+
     def resource_owner
-      @resource_owner = User.find_by_id(doorkeeper_access_token&.resource_owner_id)
+      @resource_owner ||= User.find_by_id(doorkeeper_access_token&.resource_owner_id)
     end
 
     def doorkeeper_authorize!
@@ -55,8 +70,14 @@ module ApiAuthorization
       if doorkeeper_access_token.blank? || !doorkeeper_access_token.accessible?
         error = Doorkeeper::OAuth::InvalidTokenResponse.from_access_token(doorkeeper_access_token)
         raise ApiAuthorization::Errors::OAuthUnauthorizedError, error
+      elsif authorized_access_token_no_user?
+        @resource_owner = doorkeeper_access_token.application.owner
       else
-        error = Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
+        error = if doorkeeper_access_token_no_user?
+          OpenStruct.new(description: "User required; no user associated with token")
+        else
+          Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
+        end
         raise ApiAuthorization::Errors::OAuthForbiddenError, error
       end
     end
@@ -68,6 +89,7 @@ module ApiAuthorization
       doorkeeper_authorize!
       # Assign the access_token and the user to the request object, so it can be accessed
       env["doorkeeper_access_token"] = doorkeeper_access_token
+      env["doorkeeper_authorized_no_user"] = authorized_access_token_no_user?
       env["resource_owner"] = resource_owner
     end
   end
