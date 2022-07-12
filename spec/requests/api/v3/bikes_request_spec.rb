@@ -798,16 +798,17 @@ RSpec.describe "Bikes API V3", type: :request do
     end
     context "application creator is admin of organization" do
       let(:application_owner) { FactoryBot.create(:organization_admin, organization: organization) }
-      let(:oragnization2) { FactoryBot.create(:organization) }
+
       it "creates" do
+        expect(application_owner.reload.admin_of?(organization)).to be_truthy
         expect(client_credentials_token.application.owner.id).to_not eq auto_user.id
         post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
         pp json_result unless json_result["bike"].present?
 
         bike = Bike.last
-        expect(json_result.dig("bike", "id"))
+        expect(json_result.dig("bike", "id")).to eq bike.id
         expect(bike.creation_organization&.id).to eq(organization.id)
-        expect(bike.creator&.id).to eq(application_owner.id)
+        expect(bike.creator&.id).to eq(auto_user.id)
         expect(bike.secondary_frame_color).to be_nil
         expect(bike.pos?).to be_falsey
         expect(bike.owner_email).to eq email
@@ -815,24 +816,51 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(ownership.new_registration?).to be_truthy
         expect(ownership.send_email).to be_truthy
         expect(ownership.owner_email).to eq email
-        expect(ownership.creator_id).to eq application_owner.id
+        expect(ownership.creator_id).to eq auto_user.id
         expect(ownership.organization_pre_registration?).to be_falsey
-        expect(response.code).to eq("201")
 
+        expect(response.code).to eq("201")
         expect(Bike.count).to eq 1
-        # It doesn't create for a different organization
-      end
-      context "member - not admin" do
-        it "fails"
+
+        # It doesn't duplicate
+        expect {
+          post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
+          expect(json_result.dig("bike", "id")).to eq bike.id
+        }.to_not change(Bike, :count)
       end
       context "application creator is auto_user of organization" do
+        let(:application_owner) { auto_user }
+        before { application_owner.memberships.first.update(role: "admin") }
         it "creates" do
+          expect(application_owner.reload.admin_of?(organization)).to be_truthy
           expect(client_credentials_token.application.owner.id).to eq auto_user.id
           post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
           bike = Bike.last
-          expect(json_result.dig("bike", "id"))
+          expect(json_result.dig("bike", "id")).to eq bike.id
           expect(bike.creation_organization&.id).to eq(organization.id)
           expect(bike.creator&.id).to eq(auto_user.id)
+          bike.current_ownership
+        end
+      end
+      context "different organization" do
+        let(:organization2) { FactoryBot.create(:organization) }
+        it "fails" do
+          expect(application_owner.reload.admin_of?(organization)).to be_truthy
+          expect(application_owner.reload.admin_of?(organization2)).to be_falsey
+          expect(client_credentials_token.application.owner.id).to eq application_owner.id
+          post url, params: bike_attrs.merge(organization_slug: organization2.slug).to_json, headers: json_headers
+          expect(json_result[:error]).to match(/organization/i)
+          expect(Bike.count).to eq 0
+        end
+      end
+      context "member - not admin" do
+        let(:application_owner) { FactoryBot.create(:user, :with_organization, organization: organization) }
+        it "fails" do
+          expect(application_owner.reload.admin_of?(organization)).to be_falsey
+          expect(client_credentials_token.application.owner.id).to eq application_owner.id
+          post url, params: bike_attrs.to_json, headers: json_headers
+          expect(json_result[:error]).to match(/organization/i)
+          expect(Bike.count).to eq 0
         end
       end
     end

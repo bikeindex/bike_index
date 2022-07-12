@@ -14,9 +14,10 @@ module API
           end
 
           def current_organization
+            return @current_organization if defined?(@current_organization)
             organization = Organization.friendly_find(params[:organization_slug])
             if organization.present? && current_user.authorized?(organization)
-              organization
+              return @current_organization = organization
             end
           end
 
@@ -29,6 +30,10 @@ module API
 
           def current_scopes
             current_token&.scopes || []
+          end
+
+          def token_authorized_with_no_user
+            env["doorkeeper_access_token_no_user"]
           end
 
           private
