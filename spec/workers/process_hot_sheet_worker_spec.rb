@@ -19,8 +19,11 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
       Sidekiq::Worker.clear_all
       ActionMailer::Base.deliveries = []
       expect(instance.organizations.pluck(:id)).to eq([organization1.id])
+      # Skip timezone concerns, it's always send time!
+      allow_any_instance_of(HotSheetConfiguration).to receive(:send_today_at) { 0 }
+      expect(organization1.hot_sheet_configuration.send_today_now?).to be_truthy
       expect {
-        expect(instance.perform)
+        instance.perform
       }.to change(ProcessHotSheetWorker.jobs, :count).by 1
       expect(HotSheet.count).to eq 0
       expect(ProcessHotSheetWorker.jobs.count).to eq 1
