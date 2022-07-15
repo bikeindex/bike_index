@@ -208,7 +208,11 @@ module ControllerHelpers
 
   # This is overridden in FeedbacksController and InfoController
   def page_id
-    @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
+    @page_id ||= [
+      controller_namespace,
+      controller_name == "manages" ? "manage" : controller_name, # HACK: remove pluralization
+      action_name
+    ].compact.join("_")
   end
 
   def set_passive_organization(organization)

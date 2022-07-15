@@ -57,6 +57,7 @@ RSpec.describe LandingPagesController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template("show")
       expect(title).to eq "University Bike Registration"
+      expect(assigns(:page_id)).to eq "landing_pages_show"
     end
 
     context "xml request format" do
