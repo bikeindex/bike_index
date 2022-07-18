@@ -447,7 +447,7 @@ class Organization < ApplicationRecord
       # If the organization exists, don't invalidate because of it's own slug
       orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
       # Force update the deleted short_names and slugs
-      orgs.deleted.where.not("short_name ILIKE ?", "%deleted")
+      orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
         .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }
       while orgs.where(slug: new_slug).exists?
         i = i.present? ? i + 1 : 2
