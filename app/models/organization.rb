@@ -435,7 +435,7 @@ class Organization < ApplicationRecord
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = (short_name || name).strip.truncate(30)
+    self.short_name = short_name_fixer(short_name || name)
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
@@ -446,6 +446,9 @@ class Organization < ApplicationRecord
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
       orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
+      # Force update the deleted short_names and slugs
+      orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
+        .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }
       while orgs.where(slug: new_slug).exists?
         i = i.present? ? i + 1 : 2
         new_slug = "#{new_slug}-#{i}"
@@ -523,6 +526,12 @@ class Organization < ApplicationRecord
 
   def strip_name_tags(str)
     strip_tags(name&.strip).gsub("&amp;", "&")
+  end
+
+  def short_name_fixer(str)
+    str = str.strip.truncate(30)
+    return str unless deleted_at.present?
+    str.match?("-deleted") ? str : "#{str}-deleted"
   end
 
   def calculated_enabled_feature_slugs

@@ -1,0 +1,16 @@
+
+- if @organization.suspended? || @organization.deleted?
+  .row.mt-5.mb-5
+    .col-md-6
+      .alert.alert-danger
+        - if @organization.suspended?
+          %h4.text-danger
+            Organization is suspended
+        - if @organization.deleted?
+          %h4
+            %span.text-danger
+              Organization deleted
+            %small.convertTime.preciseTime.withPreposition
+              = l @organization.deleted_at, format: :convert_time
+
+

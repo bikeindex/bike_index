@@ -478,11 +478,20 @@ RSpec.describe Organization, type: :model do
         org1.id = org1.id
         expect(org1.short_name).to eq "buckshot"
         org1.delete
-        org1.reload
-        expect(org1.deleted_at).to be_present
-        expect(org1.slug).to eq "buckshot"
-        FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
-        expect(org1.slug).to eq "buckshot"
+        expect(org1.reload.deleted_at).to be_present
+        org2 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        expect(org2.short_name).to eq "buckshot"
+        expect(org2.slug).to eq "buckshot"
+        expect(org1.reload.slug).to eq "buckshot-deleted"
+        expect(org1.short_name).to eq "buckshot-deleted"
+
+        org2.delete
+        expect(org2.reload.deleted_at).to be_present
+        org2.update(updated_at: Time.current)
+        expect(org2.reload.short_name).to eq "buckshot-deleted"
+        expect(org2.slug).to eq "buckshot-deleted-2"
+        expect(org1.reload.slug).to eq "buckshot-deleted"
+        expect(org1.short_name).to eq "buckshot-deleted"
       end
     end
 

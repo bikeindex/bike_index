@@ -158,17 +158,8 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def find_organization
-    @organization = Organization.friendly_find(params[:id])
-    return true if @organization.present?
-    raise ActiveRecord::RecordNotFound # Because by all rights, this should have been raised
-  rescue ActiveRecord::RecordNotFound
     @organization = Organization.unscoped.friendly_find(params[:id])
-    if @organization.present?
-      flash[:error] = "This organization is deleted! Things might not work correctly in here"
-      true
-    else
-      flash[:error] = "Sorry! That organization doesn't exist"
-      redirect_to(admin_organizations_url) && return
-    end
+    return true if @organization.present?
+    raise ActiveRecord::RecordNotFound # Because this should have been raised
   end
 end
