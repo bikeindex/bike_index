@@ -376,5 +376,7 @@ Rails.application.routes.draw do
     resources :impounded_bikes, only: %i[index]
   end
 
+
+  get "/bikes/:scanned_id", to: "bikes#scanned", constraints: {scanned_id: /scanned\[a-z]+\d+/i}
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
 end

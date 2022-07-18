@@ -123,7 +123,7 @@ class Bikes::BaseController < ApplicationController
   end
 
   def scanned_id
-    params[:id] || params[:scanned_id] || params[:card_id]
+    (params[:id] || params[:scanned_id] || params[:card_id])&.gsub(/scanned/i, "")
   end
 
   def permitted_bike_params
