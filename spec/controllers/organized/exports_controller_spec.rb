@@ -152,7 +152,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           headers: %w[link registered_at manufacturer model registered_by]
         }
       end
-      let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221C ") }
+      let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221 ") }
       it "creates the expected export" do
         expect {
           post :create, params: {
@@ -254,7 +254,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           expect(export.custom_bike_ids).to eq([1222, 999])
         end
         context "with IE 11 datetime params" do
-          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a221C") }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a221") }
           let(:crushed_datetime_attrs) do
             {
               start_at: "08/25/2018",
@@ -302,12 +302,12 @@ RSpec.describe Organized::ExportsController, type: :controller do
             expect(export.start_at.to_i).to be_within(1).of start_at
             expect(export.end_at.to_i).to be_within(1).of end_at
             expect(export.options["partial_registrations"]).to be_falsey # Avery exports can't include partials
-            expect(export.bike_code_start).to eq "A221C"
+            expect(export.bike_code_start).to eq "A221"
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
           context "avery export with already assigned bike_sticker" do
-            let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: organization, code: "a221C") }
-            it "makes the avery export" do
+            let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: organization, code: "a0221") }
+            it "fails to make the avery export" do
               expect(bike_sticker.claimed?).to be_truthy
               expect {
                 post :create, params: {export: avery_params, organization_id: organization.to_param}

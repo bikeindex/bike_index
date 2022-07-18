@@ -90,7 +90,7 @@ class FileCacheMaintainer
     end
 
     def redis
-      Redis.current
+      @redis ||= Redis.new # TODO: Switch to connection pool, preferred way of accessing redis
     end
 
     def uploader_from_filename(filename)

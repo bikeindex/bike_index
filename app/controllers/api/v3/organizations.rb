@@ -7,12 +7,13 @@ module API
         helpers do
           def allowed_write_organizations
             application_uid = current_token&.application&.uid
-            ENV["ALLOWED_WRITE_ORGANIZATIONS"].split(",").any?(application_uid)
+            allowed_write_organizations = ENV["ALLOWED_WRITE_ORGANIZATIONS"]&.split(",") || []
+            allowed_write_organizations.any?(application_uid)
           end
         end
 
         desc "Add an Organization to Bike Index<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_organizations}]},
+          authorizations: {oauth2: {scope: :write_organizations}},
           notes: <<-NOTES
           **Requires** `write_organizations` **in the access token** you use to create the organization.
           <hr>

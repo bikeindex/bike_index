@@ -20,10 +20,10 @@
               %span.partner-logo-wrapper
                 = image_tag "https://files.bikeindex.org/email_assets/bikehub_logo_plus.png",
                   height: "50",
-                  alt: "BikeHub Logo",
                   class: "partner-header-logo"
 
-            %img.bike-index-logo{src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo"}
+            -# Not including an alt tag because it renders in the text version
+            %img.bike-index-logo{src: "https://files.bikeindex.org/email_assets/logo.png", height: "70"}
 
       .binx-body
         -# We only render snippets for organized messages - or if we're doing a preview

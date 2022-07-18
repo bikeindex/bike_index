@@ -28,7 +28,13 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
 
     describe "resend" do
       let(:sender) { FactoryBot.create(:user) }
+      let(:stolen_notification_pre1) { FactoryBot.create(:stolen_notification, sender: sender) }
+      let(:stolen_notification_pre2) { FactoryBot.create(:stolen_notification, sender: sender) }
       let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: sender) }
+      before do
+        EmailStolenNotificationWorker.new.perform(stolen_notification_pre1.id)
+        EmailStolenNotificationWorker.new.perform(stolen_notification_pre2.id)
+      end
       it "resends the stolen notification" do
         # To create the failed notification, happens async normally
         EmailStolenNotificationWorker.new.perform(stolen_notification.id)
@@ -38,13 +44,15 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
         expect(stolen_notification.notifications.delivered.count).to eq 1 # Because admin email was sent
         expect(stolen_notification.send_dates_parsed.count).to eq 0
         expect(stolen_notification.permitted_send?).to be_falsey
+        expect(stolen_notification.kind).to eq "stolen_blocked"
+        expect(Notification.count).to eq 3
 
         expect {
           get "#{base_url}/#{stolen_notification.id}/resend"
         }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
 
         EmailStolenNotificationWorker.drain
-        expect(Notification.count).to eq 2
+        expect(Notification.count).to eq 4
         expect(stolen_notification.reload.notifications.count).to eq 2
         expect(stolen_notification.notifications.stolen_notification_sent.count).to eq 1
         expect(stolen_notification.send_dates_parsed.count).to eq 1
@@ -58,6 +66,7 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
           Sidekiq::Worker.clear_all
           expect(stolen_notification.reload.notifications.count).to eq 1
           expect(stolen_notification.send_dates_parsed.count).to eq 1
+          expect(stolen_notification.kind).to eq "stolen_blocked"
 
           expect {
             get "#{base_url}/#{stolen_notification.id}/resend"

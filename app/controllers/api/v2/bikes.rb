@@ -61,11 +61,15 @@ module API
         end
 
         def creation_user_id
-          if current_user.id == ENV["V2_ACCESSOR_ID"].to_i
+          if current_user&.id == ENV["V2_ACCESSOR_ID"].to_i || doorkeeper_authorized_no_user
             return current_organization.auto_user_id if current_organization.present? &&
               current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
 
-            error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
+            if doorkeeper_authorized_no_user
+              error!("Access tokens with no user can only be used to create bikes for organizations you're an admin of", 403)
+            else
+              error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
+            end
           end
           current_user.id
         end
@@ -114,8 +118,8 @@ module API
           BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
         end
 
-        desc "Check if a bike is already registered", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Check if a bike is already registered <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
         }
         params do
@@ -137,8 +141,8 @@ module API
           end
         end
 
-        desc "Add a bike to the Index!<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Add a bike to the Index! <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
             **Requires** `write_bikes` **in the access token** you use to create the bike.
 
@@ -223,7 +227,7 @@ module API
         end
 
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 
@@ -257,8 +261,8 @@ module API
           BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
-        desc "Add an image to a bike", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Add an image to a bike <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
 
             To post a file to the API with curl:
@@ -286,8 +290,8 @@ module API
           end
         end
 
-        desc "Remove an image from a bike", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Remove an image from a bike <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
 
             Remove an image from the bike, specifying both the bike_id and the image id (which can be found in the public_images resopnse)
@@ -310,8 +314,8 @@ module API
           BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
-        desc "Send a stolen notification<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :read_user}]},
+        desc "Send a stolen notification <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :read_user}},
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 

@@ -53,6 +53,8 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response).to render_template :show
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
+        expect(assigns(:controller_namespace)).to eq "organized"
+        expect(assigns(:page_id)).to eq "organized_manage_show"
       end
     end
 
@@ -62,6 +64,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
+        expect(assigns(:page_id)).to eq "organized_manage_landing"
       end
     end
 

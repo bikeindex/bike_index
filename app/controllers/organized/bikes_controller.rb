@@ -213,7 +213,8 @@ module Organized
         organization_id: current_organization.id,
         custom_bike_ids: @available_bikes.pluck(:id),
         only_custom_bike_ids: true,
-        headers: Export.permitted_headers(current_organization)
+        headers: Export.permitted_headers(current_organization),
+        user_id: current_user.id
       }
     end
   end

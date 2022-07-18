@@ -25,7 +25,7 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:search_status)).to eq "current"
-      expect(assigns(:separate_non_primary_notifications)).to be_falsey
+      expect(assigns(:separate_secondary_notifications)).to be_falsey
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_active.id])
 
       get "#{base_url}?search_status=all"
@@ -36,7 +36,22 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       get "#{base_url}?search_email=testly%40univer"
       expect(response.status).to eq(200)
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id])
-      expect(assigns(:separate_non_primary_notifications)).to be_truthy
+
+      get "#{base_url}?search_email=testly%40univer&search_secondary=true"
+      expect(response.status).to eq(200)
+      expect(assigns(:separate_secondary_notifications)).to be_truthy
+      expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id])
+    end
+  end
+
+  context "not-delivering organization" do
+    it "still renders" do
+      current_organization.update(graduated_notification_interval: nil)
+      expect(current_organization.reload.deliver_graduated_notifications?).to be_falsey
+      get base_url
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(assigns(:search_status)).to eq "current"
     end
   end
 

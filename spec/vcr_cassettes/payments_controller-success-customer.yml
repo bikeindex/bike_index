@@ -12,7 +12,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_ug5egxa4hu2sgZ","request_duration_ms":3279}}'
+      - '{"last_request_metrics":{"request_id":"req_p21QGxuyFvUylr","request_duration_ms":237}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Wed, 20 Apr 2022 18:30:13 GMT
+      - Tue, 12 Jul 2022 06:57:58 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -45,7 +45,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_Fh304sjEFqJzcT
+      - req_M72JIYomqFDH0e
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -120,7 +120,7 @@ http_interactions:
           "url": null
         }
     http_version: 
-  recorded_at: Wed, 20 Apr 2022 18:30:13 GMT
+  recorded_at: Tue, 12 Jul 2022 06:57:58 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmR9ccDp8JD2Mo
@@ -133,7 +133,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_Fh304sjEFqJzcT","request_duration_ms":259}}'
+      - '{"last_request_metrics":{"request_id":"req_M72JIYomqFDH0e","request_duration_ms":310}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -146,11 +146,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Wed, 20 Apr 2022 18:30:13 GMT
+      - Tue, 12 Jul 2022 06:57:58 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1498'
+      - '1529'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -166,7 +166,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_bNBJOMEYxauP07
+      - req_A7d22I0ZxJ2gi1
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -208,7 +208,8 @@ http_interactions:
           "invoice_settings": {
             "custom_fields": null,
             "default_payment_method": null,
-            "footer": null
+            "footer": null,
+            "rendering_options": null
           },
           "livemode": false,
           "metadata": {
@@ -253,5 +254,5 @@ http_interactions:
           "test_clock": null
         }
     http_version: 
-  recorded_at: Wed, 20 Apr 2022 18:30:13 GMT
+  recorded_at: Tue, 12 Jul 2022 06:57:58 GMT
 recorded_with: VCR 5.0.0

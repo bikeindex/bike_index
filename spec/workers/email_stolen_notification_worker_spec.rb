@@ -39,28 +39,49 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
   end
 
   context "second notification sent notifications" do
-    let!(:stolen_notification2) { FactoryBot.create(:stolen_notification, sender: user) }
+    let!(:stolen_notification0) { FactoryBot.create(:stolen_notification, sender: user) }
+    let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record) }
+    let(:stolen_notification2) { FactoryBot.create(:stolen_notification, sender: user, bike: bike2) }
     it "sends blocked message to admin" do
+      expect(stolen_notification.reload.kind).to eq "stolen_permitted"
+      instance.perform(stolen_notification.id)
       expect(bike.user_id).to eq ownership.user_id
       expect(bike.current_ownership_id).to eq ownership.id
+      expect(bike.status).to eq "status_stolen"
       expect(ownership.user_id).to be_present
       expect(ownership.claimed?).to be_truthy
-      expect(stolen_notification.receiver_id).to eq ownership.user_id
+      expect(user.reload.sent_stolen_notifications.count).to eq 2
+      expect(stolen_notification.reload.receiver_id).to eq ownership.user_id
+      expect(stolen_notification.sender_id).to eq user.id
+      expect(stolen_notification.reload.kind).to eq "stolen_permitted"
+      expect(Notification.count).to eq 1
+      expect(stolen_notification2.reload.sender_id).to eq user.id
+      expect(stolen_notification2.send(:unstolen_blocked?)).to be_falsey
+      expect(stolen_notification2.permitted_send?).to be_falsey
+      expect(stolen_notification2.notifications.count).to eq 0
+      expect(stolen_notification2.send(:calculated_kind)).to eq "stolen_blocked"
+      expect(stolen_notification2.kind).to eq "stolen_blocked"
+      expect(bike2.reload.claimed?).to be_truthy
+      expect(bike2.user&.id).to be_present
       expect {
-        instance.perform(stolen_notification.id)
+        instance.perform(stolen_notification2.id)
       }.to change(Notification, :count).by 1
-      expect_notification_blocked(stolen_notification.sender.email)
+      expect_notification_blocked(stolen_notification2.sender.email)
       notification = Notification.last
       expect(notification.kind).to eq "stolen_notification_blocked"
-      expect(notification.bike_id).to eq bike.id
-      expect(notification.user_id).to eq ownership.user_id
-      expect(notification.calculated_email).to eq owner_email
-      expect(notification.notifiable_id).to eq stolen_notification.id
+      expect(notification.bike_id).to eq bike2.id
+      expect(notification.user_id).to eq bike2.user&.id
+      expect(notification.calculated_email).to eq bike2.owner_email
+      expect(notification.notifiable_id).to eq stolen_notification2.id
       expect(notification.notifiable_type).to eq "StolenNotification"
+      expect(bike2.reload.messages_count).to eq 1
+      expect(stolen_notification2.reload.notifications.count).to eq 1
     end
     context "with can_send_many_stolen_notifications" do
       let(:user) { FactoryBot.create(:user, can_send_many_stolen_notifications: true) }
       it "sends customer an email" do
+        expect(stolen_notification.reload.kind).to eq "stolen_permitted"
+        expect(stolen_notification2.reload.kind).to eq "stolen_permitted"
         expect {
           instance.perform(stolen_notification.id)
         }.to change(Notification, :count).by 1
@@ -90,6 +111,8 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
         expect(notification.user_id).to eq ownership.user_id
         user.reload
         expect(user.enabled?("unstolen_notifications")).to be_truthy
+        expect(stolen_notification.reload.kind).to eq "stolen_permitted"
+        expect(stolen_notification2.reload.kind).to eq "stolen_permitted"
         expect {
           instance.perform(stolen_notification.id)
         }.to change(Notification, :count).by 0
@@ -105,7 +128,8 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
     it "sends to admin" do
       expect(bike.claimed?).to be_truthy
       expect(stolen_notification.permitted_send?).to be_falsey
-      expect(stolen_notification.unstolen_blocked?).to be_truthy
+      expect(stolen_notification.send(:unstolen_blocked?)).to be_truthy
+      expect(stolen_notification.kind).to eq "unstolen_blocked"
       instance.perform(stolen_notification.id)
       expect_notification_blocked(stolen_notification.sender.email)
     end
@@ -114,6 +138,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       it "sends to customer" do
         instance.perform(stolen_notification.id)
         expect_notification_sent(stolen_notification.sender.email)
+        expect(stolen_notification.reload.kind).to eq "unstolen_claimed_permitted"
       end
     end
     context "user belongs to organization with unstolen_notifications" do
@@ -123,8 +148,10 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
         expect(user.enabled?("unstolen_notifications")).to be_truthy
       end
       it "sends to customer" do
+        expect(bike.reload.claimed?).to be_truthy
         instance.perform(stolen_notification.id)
         expect_notification_sent(stolen_notification.sender.email)
+        expect(stolen_notification.reload.kind).to eq "unstolen_claimed_permitted"
       end
       context "bike is unclaimed" do
         let(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: creator) }
@@ -132,6 +159,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
           expect(bike.claimed?).to be_falsey
           instance.perform(stolen_notification.id)
           expect_notification_sent(stolen_notification.sender.email, creator.email)
+          expect(stolen_notification.reload.kind).to eq "unstolen_unclaimed_permitted"
         end
       end
     end

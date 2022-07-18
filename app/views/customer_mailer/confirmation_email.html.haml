@@ -5,7 +5,7 @@
 %h3.center-text{ style: "margin: 2rem 0 3rem;" }
   = t(".html.please_confirm_your_email_address")
 
-= link_to t(".html.verify_email"), confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner), class: "binx-button"
+= link_to t(".html.verify_email"), confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner), "data-pm-no-track" => true, class: "binx-button"
 
 - unless @partner
   %p.less-strong.center-text

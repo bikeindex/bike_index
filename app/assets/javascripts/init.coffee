@@ -59,6 +59,7 @@ class BikeIndex.Init extends BikeIndex
       bike_versions_index: BikeIndex.BikesIndex
       organized_bikes_index: BikeIndex.BikesIndex
       orgpublic_impounded_bikes_index: BikeIndex.BikesIndex
+      organized_graduated_notifications_index: BikeIndex.BikesIndex
       manufacturers_index: BikeIndex.InfoManufacturers
       my_accounts_edit: BikeIndex.UsersEdit
       my_accounts_update: BikeIndex.UsersEdit

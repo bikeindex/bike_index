@@ -88,7 +88,8 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       placeholder: $query_field.attr('placeholder') # Pull placeholder from HTML
       dropdownParent: $('.bikes-search-form') # Append to search for for easier css access
       templateResult: formatSearchText # let custom formatter work
-      escapeMarkup: (markup) -> markup # Allow our
+      selectOnClose: true # Select the options when the dropdown is closed (e.g. clicked outside)
+      escapeMarkup: (markup) -> markup # Allow our fancy display of options
       ajax:
         url: '/api/autocomplete'
         dataType: 'json'

@@ -3,12 +3,12 @@ class EmailBikePossiblyFoundNotificationWorker < ApplicationWorker
 
   def perform(bike_id, match_class, match_id)
     bike = Bike.find(bike_id)
-    match = match_class.to_s.constantize.find(match_id)
+    matched_bike = match_class.to_s.constantize.find(match_id)
 
-    return if bike == match
-    return if CustomerContact.possibly_found_notification_sent?(bike, match)
+    return if bike == matched_bike
+    return if CustomerContact.possibly_found_notification_sent?(bike, matched_bike)
 
-    contact = CustomerContact.build_bike_possibly_found_notification(bike, match)
+    contact = CustomerContact.build_bike_possibly_found_notification(bike, matched_bike)
     return unless contact.receives_stolen_bike_notifications?
 
     email = CustomerMailer.bike_possibly_found_email(contact)

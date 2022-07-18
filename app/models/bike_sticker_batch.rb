@@ -20,9 +20,8 @@ class BikeStickerBatch < ApplicationRecord
     raise "Prefix required to create sequential codes!" unless prefix.present?
     initial_code_integer ||= max_code_integer
     initial_code_integer += 1 if bike_stickers.where(code_integer: initial_code_integer).present?
-    clength = code_number_length_or_default # Assign so it isn't recalculated in loop
     number_to_create.times do |i|
-      code_integer_with_padding = (i + initial_code_integer).to_s.rjust(clength, "0")
+      code_integer_with_padding = (i + initial_code_integer).to_s.rjust(code_number_length, "0")
       bike_stickers.create!(
         organization: organization,
         kind: kind,
@@ -32,10 +31,13 @@ class BikeStickerBatch < ApplicationRecord
     touch # Bump
   end
 
-  def code_number_length_or_default
+  def calculated_code_number_length
     return code_number_length if code_number_length.present?
+    to_create_count = stickers_to_create_count&.to_i || 0
+    estimated_finish_integer = (initial_code_integer&.to_i || max_code_integer) + to_create_count
+    estimated_code_length = estimated_finish_integer.to_s.length
     # minimum of 4. Return a larger number if there's a larger code in the batch
-    max_code_integer.to_s.length > 4 ? max_code_integer.to_s.length : 4
+    estimated_code_length > 4 ? estimated_code_length : 4
   end
 
   # Shouldn't occur anymore, but included for legacy diagnostic purposes
@@ -64,6 +66,7 @@ class BikeStickerBatch < ApplicationRecord
     self.prefix = prefix&.upcase&.strip
     # Set this because we calculate off it in Admin controller
     self.initial_code_integer = initial_code_integer&.to_i
+    self.code_number_length = calculated_code_number_length
   end
 
   private

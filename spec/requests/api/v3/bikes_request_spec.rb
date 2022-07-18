@@ -3,6 +3,23 @@ require "rails_helper"
 RSpec.describe "Bikes API V3", type: :request do
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
+  let(:organization) { nil }
+  let(:auto_user) { organization&.reload&.auto_user }
+  let(:email) { "fun_times@examples.com" }
+  let(:bike_attrs) do
+    {
+      serial: "69 non-example",
+      manufacturer: manufacturer.name,
+      rear_tire_narrow: "true",
+      rear_wheel_bsd: "559",
+      color: color.name,
+      year: "1969",
+      owner_email: email,
+      frame_material: "steel",
+      organization_slug: organization&.slug,
+      cycle_type: "bike"
+    }
+  end
   include_context :existing_doorkeeper_app
 
   describe "find by id" do
@@ -27,37 +44,28 @@ RSpec.describe "Bikes API V3", type: :request do
   end
 
   describe "check_if_registered" do
-    let(:bike_attrs) do
-      {
-        organization_slug: organization.id,
-        serial: "69 non-example",
-        manufacturer: manufacturer.name,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: color.name,
-        year: "1969",
+    let(:bike_phone_attrs) do
+      bike_attrs.merge(organization_slug: organization.id,
         owner_email: phone,
-        frame_material: "steel",
-        owner_email_is_phone_number: true
-      }
+        owner_email_is_phone_number: true)
     end
     let(:phone) { "2221114444" }
     let(:organization) { FactoryBot.create(:organization) }
-    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_attrs[:serial]) }
+    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_phone_attrs[:serial]) }
     let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, bike: bike) }
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes read_organization_membership") }
     it "returns 401" do
-      post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+      post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.to_json, headers: json_headers
       expect(response.code).to eq("401")
     end
     context "user is organization member" do
       let(:user) { FactoryBot.create(:organization_member) }
       let!(:organization) { user.organizations.first }
       it "returns success" do
-        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect(json_result[:registered].to_s).to eq "true"
-        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_attrs.merge(serial: "ffff").to_json, headers: json_headers
+        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.merge(serial: "ffff").to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect(json_result[:registered].to_s).to eq "false"
       end
@@ -65,18 +73,6 @@ RSpec.describe "Bikes API V3", type: :request do
   end
 
   describe "create" do
-    let(:bike_attrs) do
-      {
-        serial: "69 non-example",
-        manufacturer: manufacturer.name,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: color.name,
-        year: "1969",
-        owner_email: "fun_times@examples.com",
-        frame_material: "steel"
-      }
-    end
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
     before { FactoryBot.create(:wheel_size, iso_bsd: 559) }
@@ -114,6 +110,7 @@ RSpec.describe "Bikes API V3", type: :request do
       it "creates" do
         expect {
           post "/api/v3/bikes?access_token=#{token.token}", params: phone_bike.to_json, headers: json_headers
+          pp json_result unless json_result["bike"].present?
         }.to change(Bike, :count).by 1
         expect(json_result[:claim_url]).to match(/t=/)
 
@@ -335,6 +332,7 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(bike.year).to_not eq 2012
             expect {
               post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+              pp json_result unless json_result["bike"].present?
             }.to change(Bike, :count).by 1
 
             returned_bike = json_result["bike"]
@@ -440,14 +438,14 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "creates a non example bike, with components" do
-      manufacturer = FactoryBot.create(:manufacturer)
+      manufacturer2 = FactoryBot.create(:manufacturer)
       FactoryBot.create(:ctype, name: "wheel")
       FactoryBot.create(:ctype, name: "Headset")
       front_gear_type = FactoryBot.create(:front_gear_type)
       handlebar_type_slug = "bmx"
       components = [
         {
-          manufacturer: manufacturer.name,
+          manufacturer: manufacturer2.name,
           year: "1999",
           component_type: "headset",
           description: "yeah yay!",
@@ -484,7 +482,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.serial_unknown?).to be_falsey
       expect(bike.serial_normalized).to eq "69 N0N EXAMP1E"
       expect(bike.components.count).to eq(3)
-      expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
+      expect(bike.components.pluck(:manufacturer_id).include?(manufacturer2.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
@@ -547,51 +545,50 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.serial_normalized).to be_blank
       end
     end
-
-    it "creates a stolen bike through an organization and uses the passed phone" do
-      organization = FactoryBot.create(:organization)
-      user.update_attribute :phone, "0987654321"
-      FactoryBot.create(:membership, user: user, organization: organization)
-      FactoryBot.create(:country, iso: "US")
-      FactoryBot.create(:state, abbreviation: "NY")
-      organization.save
-      bike_attrs[:organization_slug] = organization.slug
-      date_stolen = 1357192800
-      bike_attrs[:serial] = "unknown"
-      bike_attrs[:stolen_record] = {
-        phone: "1234567890",
-        date_stolen: date_stolen,
-        theft_description: "This bike was stolen and that's no fair.",
-        country: "US",
-        city: "New York",
-        street: "278 Broadway",
-        zipcode: "10007",
-        show_address: true,
-        state: "NY",
-        police_report_number: "99999999",
-        police_report_department: "New York"
-      }
-      expect {
-        post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
-      expect(json_result).to include("bike")
-      expect(json_result["bike"]["serial"]).to eq "Unknown"
-      expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
-      expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
-      bike = Bike.find(json_result["bike"]["id"])
-      expect(bike.creation_organization).to eq(organization)
-      expect(bike.bike_organizations.count).to eq 1
-      expect(bike.serial_unknown?).to be_truthy
-      expect(bike.serial_normalized).to be_blank
-      bike_organization = bike.bike_organizations.first
-      expect(bike_organization.organization_id).to eq organization.id
-      expect(bike_organization.can_edit_claimed).to be_truthy
-      expect(bike.current_ownership.origin).to eq "api_v3"
-      expect(bike.current_ownership.organization).to eq organization
-      expect(bike.current_stolen_record_id).to be_present
-      expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
-      expect(bike.current_stolen_record.phone).to eq("1234567890")
-      expect(bike.current_stolen_record.show_address).to be_falsey
+    context "organization" do
+      let(:organization) { FactoryBot.create(:organization) }
+      it "creates a stolen bike through an organization and uses the passed phone" do
+        user.update_attribute :phone, "0987654321"
+        FactoryBot.create(:membership, user: user, organization: organization)
+        FactoryBot.create(:country, iso: "US")
+        FactoryBot.create(:state, abbreviation: "NY")
+        date_stolen = 1357192800
+        bike_attrs[:serial] = "unknown"
+        bike_attrs[:stolen_record] = {
+          phone: "1234567890",
+          date_stolen: date_stolen,
+          theft_description: "This bike was stolen and that's no fair.",
+          country: "US",
+          city: "New York",
+          street: "278 Broadway",
+          zipcode: "10007",
+          show_address: true,
+          state: "NY",
+          police_report_number: "99999999",
+          police_report_department: "New York"
+        }
+        expect {
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+        expect(json_result).to include("bike")
+        expect(json_result["bike"]["serial"]).to eq "Unknown"
+        expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+        expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
+        bike = Bike.find(json_result["bike"]["id"])
+        expect(bike.creation_organization).to eq(organization)
+        expect(bike.bike_organizations.count).to eq 1
+        expect(bike.serial_unknown?).to be_truthy
+        expect(bike.serial_normalized).to be_blank
+        bike_organization = bike.bike_organizations.first
+        expect(bike_organization.organization_id).to eq organization.id
+        expect(bike_organization.can_edit_claimed).to be_truthy
+        expect(bike.current_ownership.origin).to eq "api_v3"
+        expect(bike.current_ownership.organization).to eq organization
+        expect(bike.current_stolen_record_id).to be_present
+        expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
+        expect(bike.current_stolen_record.phone).to eq("1234567890")
+        expect(bike.current_stolen_record.show_address).to be_falsey
+      end
     end
 
     it "does not register a stolen bike unless attrs are present" do
@@ -619,23 +616,10 @@ RSpec.describe "Bikes API V3", type: :request do
     end
   end
 
-  describe "create v3_accessor" do
+  describe "create v2_accessor" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:bike_attrs) do
-      {
-        serial: "69 non-example",
-        manufacturer: manufacturer.name,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: color.name,
-        year: "1969",
-        owner_email: email,
-        organization_slug: organization.slug,
-        cycle_type: "bike"
-      }
-    end
     let(:email) { "fun_times@examples.com" }
-    let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
+    let!(:tokenized_url) { "/api/v3/bikes?access_token=#{v2_access_token.token}" }
     before { FactoryBot.create(:wheel_size, iso_bsd: 559) }
 
     context "with membership" do
@@ -680,6 +664,7 @@ RSpec.describe "Bikes API V3", type: :request do
             Sidekiq::Worker.clear_all
             expect {
               post tokenized_url, params: bike_attrs.to_json, headers: json_headers
+              pp json_result unless json_result["bike"].present?
             }.to change(Bike, :count).by 1
             result = json_result["bike"]
 
@@ -702,7 +687,6 @@ RSpec.describe "Bikes API V3", type: :request do
 
       context "organization_pre_registration" do
         let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
-        let(:auto_user) { organization.auto_user }
         let(:email) { auto_user.email }
         before { Sidekiq::Testing.inline! }
         after { Sidekiq::Testing.fake! }
@@ -743,7 +727,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
           # Updating to send to a new owner, the new ownership is through the organization
           # (needs to use a new token)
-          put "/api/v2/bikes/#{bike.id}?access_token=#{v2_access_token.token}",
+          put "/api/v3/bikes/#{bike.id}?access_token=#{v2_access_token.token}",
             params: {owner_email: "newperson@stuff.com"}.to_json,
             headers: json_headers
 
@@ -784,6 +768,101 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["error"]).to match(/permanent token/i)
       EmailOwnershipInvitationWorker.drain
       expect(ActionMailer::Base.deliveries).to be_empty
+    end
+  end
+
+  describe "create client credentials" do
+    let(:client_credentials_token) do
+      post "/oauth/token", params: {
+        grant_type: "client_credentials",
+        client_id: doorkeeper_app.uid,
+        client_secret: doorkeeper_app.secret,
+        scope: "write_bikes read_bikes"
+      }
+      expect(Doorkeeper::AccessToken.count).to eq 1
+      Doorkeeper::AccessToken.last
+    end
+    let(:url) { "/api/v3/bikes?access_token=#{client_credentials_token.token}" }
+    let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_manufacturer") }
+
+    it "errors" do
+      expect(client_credentials_token.reload.acceptable?(nil)).to be_truthy
+      expect(application_owner.organizations.pluck(:id)).to eq([])
+      post url, params: bike_attrs.except(:organization_slug).to_json, headers: json_headers
+      expect(json_result[:error]).to match(/no user/i)
+      expect(Bike.count).to eq 0
+      # Posting with an organization doesn't help
+      post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
+      expect(json_result[:error]).to match(/no user/i)
+      expect(Bike.count).to eq 0
+    end
+    context "application creator is admin of organization" do
+      let(:application_owner) { FactoryBot.create(:organization_admin, organization: organization) }
+
+      it "creates" do
+        expect(application_owner.reload.admin_of?(organization)).to be_truthy
+        expect(client_credentials_token.application.owner.id).to_not eq auto_user.id
+        post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
+        pp json_result unless json_result["bike"].present?
+
+        bike = Bike.last
+        expect(json_result.dig("bike", "id")).to eq bike.id
+        expect(bike.creation_organization&.id).to eq(organization.id)
+        expect(bike.creator&.id).to eq(auto_user.id)
+        expect(bike.secondary_frame_color).to be_nil
+        expect(bike.pos?).to be_falsey
+        expect(bike.owner_email).to eq email
+        ownership = bike.current_ownership
+        expect(ownership.new_registration?).to be_truthy
+        expect(ownership.send_email).to be_truthy
+        expect(ownership.owner_email).to eq email
+        expect(ownership.creator_id).to eq auto_user.id
+        expect(ownership.organization_pre_registration?).to be_falsey
+
+        expect(response.code).to eq("201")
+        expect(Bike.count).to eq 1
+
+        # It doesn't duplicate
+        expect {
+          post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
+          expect(json_result.dig("bike", "id")).to eq bike.id
+        }.to_not change(Bike, :count)
+      end
+      context "application creator is auto_user of organization" do
+        let(:application_owner) { auto_user }
+        before { application_owner.memberships.first.update(role: "admin") }
+        it "creates" do
+          expect(application_owner.reload.admin_of?(organization)).to be_truthy
+          expect(client_credentials_token.application.owner.id).to eq auto_user.id
+          post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
+          bike = Bike.last
+          expect(json_result.dig("bike", "id")).to eq bike.id
+          expect(bike.creation_organization&.id).to eq(organization.id)
+          expect(bike.creator&.id).to eq(auto_user.id)
+          bike.current_ownership
+        end
+      end
+      context "different organization" do
+        let(:organization2) { FactoryBot.create(:organization) }
+        it "fails" do
+          expect(application_owner.reload.admin_of?(organization)).to be_truthy
+          expect(application_owner.reload.admin_of?(organization2)).to be_falsey
+          expect(client_credentials_token.application.owner.id).to eq application_owner.id
+          post url, params: bike_attrs.merge(organization_slug: organization2.slug).to_json, headers: json_headers
+          expect(json_result[:error]).to match(/organization/i)
+          expect(Bike.count).to eq 0
+        end
+      end
+      context "member - not admin" do
+        let(:application_owner) { FactoryBot.create(:user, :with_organization, organization: organization) }
+        it "fails" do
+          expect(application_owner.reload.admin_of?(organization)).to be_falsey
+          expect(client_credentials_token.application.owner.id).to eq application_owner.id
+          post url, params: bike_attrs.to_json, headers: json_headers
+          expect(json_result[:error]).to match(/organization/i)
+          expect(Bike.count).to eq 0
+        end
+      end
     end
   end
 

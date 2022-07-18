@@ -5,7 +5,6 @@ module API
       version %w[v3 v2]
       default_error_formatter :json
       content_type :json, "application/json"
-      use ::WineBouncer::OAuth2
 
       rescue_from :all do |e|
         API::Base.respond_to_error(e)

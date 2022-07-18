@@ -29,10 +29,10 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(response).to render_template("admin/organizations/show")
     end
     context "unknown organization" do
-      it "redirects" do
-        get "#{base_url}/d89safdf"
-        expect(flash[:error]).to be_present
-        expect(response).to redirect_to(:admin_organizations)
+      it "raises" do
+        expect {
+          get "#{base_url}/d89safdf"
+         }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

@@ -56,7 +56,7 @@
   %h3.mt-3
     Graduated Notifications
     %strong
-      = link_to admin_number_display(@bike.graduated_notifications.count), admin_graduated_notifications_path(search_bike_id: @bike.id)
+      = link_to admin_number_display(GraduatedNotification.where(bike_id: @bike.id).count), admin_graduated_notifications_path(search_bike_id: @bike.id)
 
 - elsif @active_tab == "recoveries"
   = render partial: "/admin/recoveries/table", locals: {recoveries: @bike.recovered_records, skip_bike: true}

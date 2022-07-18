@@ -1,10 +1,11 @@
 require "rails_helper"
 
+base_url = "/api/v2"
 RSpec.describe "Me API V2", type: :request do
   include_context :existing_doorkeeper_app
   describe "unauthorized current" do
     it "Sends correct error code when no user present" do
-      get "/api/v2/me"
+      get "#{base_url}/me"
       expect(response.response_code).to eq(401)
       expect(response.body.match("OAuth")).to be_present
       expect(response.headers["Content-Type"].match("json")).to be_present
@@ -18,7 +19,7 @@ RSpec.describe "Me API V2", type: :request do
 
     it "responds with all available attributes with full scoped token" do
       token.update_attribute :scopes, all_scopes
-      get "/api/v2/me", params: {access_token: token.token, format: :json}
+      get "#{base_url}/me", params: {access_token: token.token, format: :json}
       result = JSON.parse(response.body)
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(result["user"]["name"]).to eq(user.name)
@@ -32,7 +33,7 @@ RSpec.describe "Me API V2", type: :request do
 
     it "responds with all available attributes with full scoped token" do
       token.update_attribute :scopes, all_scopes
-      get "/api/v2/me", params: {access_token: token.token, format: :json}
+      get "#{base_url}/me", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
@@ -44,7 +45,7 @@ RSpec.describe "Me API V2", type: :request do
 
     it "doesn't include bikes if no bikes scoped" do
       expect(token.scopes.to_s.match("read_bikes").present?).to be_falsey
-      get "/api/v2/me", params: {access_token: token.token, format: :json}
+      get "#{base_url}/me", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)
       expect(result["id"]).to eq(user.id.to_s)
@@ -53,7 +54,7 @@ RSpec.describe "Me API V2", type: :request do
 
     it "doesn't include memberships if no memberships scoped" do
       expect(token.scopes.to_s.match("read_organization_membership").present?).to be_falsey
-      get "/api/v2/me", params: {access_token: token.token, format: :json}
+      get "#{base_url}/me", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)
       expect(result["id"]).to eq(user.id.to_s)
@@ -61,11 +62,34 @@ RSpec.describe "Me API V2", type: :request do
     end
 
     it "doesn't include memberships if no memberships scoped" do
-      get "/api/v2/me", params: {access_token: token.token, format: :json}
+      get "#{base_url}/me", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)
       expect(result["id"]).to eq(user.id.to_s)
       expect(result["user"].present?).to be_falsey
+    end
+
+    context "unconfirmed user" do
+      let(:user) { FactoryBot.create(:user) }
+      it "responds with 403" do
+        expect(user.reload.confirmed?).to be_falsey
+        expect(token.reload.acceptable?([])).to be_truthy
+        get "#{base_url}/me", params: {access_token: token.token}, headers: {format: :json}
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(json_result["error"]).to match(/confirmed/i)
+        expect(response.response_code).to eq(403)
+      end
+      context "with unconfirmed scope" do
+        it "responds" do
+          token.update(scopes: "unconfirmed")
+          expect(user.reload.confirmed?).to be_falsey
+          expect(token.reload.acceptable?([])).to be_truthy
+          get "#{base_url}/me", params: {access_token: token.token}, headers: {format: :json}
+          expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+          expect(json_result["error"]).to match(/confirmed/i)
+          expect(response.response_code).to eq(403)
+        end
+      end
     end
   end
 
@@ -74,14 +98,14 @@ RSpec.describe "Me API V2", type: :request do
 
     it "works if it's authorized" do
       token.update_attribute :scopes, "read_bikes"
-      get "/api/v2/me/bikes", params: {access_token: token.token, format: :json}
-      # get '/api/v2/me/bikes', {}, 'Authorization' => "Basic #{Base64.encode64("#{token.token}:X")}"
+      get "#{base_url}/me/bikes", params: {access_token: token.token, format: :json}
+      # get '#{base_url}/me/bikes', {}, 'Authorization' => "Basic #{Base64.encode64("#{token.token}:X")}"
       result = JSON.parse(response.body)
       expect(result["bikes"].is_a?(Array)).to be_truthy
       expect(response.response_code).to eq(200)
     end
     it "403s if read_bikes_spec isn't in token" do
-      get "/api/v2/me/bikes", params: {access_token: token.token, format: :json}
+      get "#{base_url}/me/bikes", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(403)
     end
   end
