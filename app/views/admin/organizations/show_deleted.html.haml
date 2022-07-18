@@ -29,8 +29,9 @@
               = organization.id
           %td.convertTime
             = l organization.created_at, format: :convert_time
-          %td.convertTime
-            = link_to l(organization.deleted_at, format: :convert_time), admin_organization_url(organization.id)
+          %td
+            %a.convertTime{href: admin_organization_url(organization.id)}
+              = l(organization.deleted_at, format: :convert_time)
           %td{ style: "width: 30%; word-break: break-all" }
             = organization.name
           %td
