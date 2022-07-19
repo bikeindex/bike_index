@@ -121,9 +121,6 @@ RSpec.describe "BikesController#show", type: :request do
       # Scanning sticker should redirect to bike path
       get "#{base_url}/scanned/#{bike_sticker.code}/?organization_id=#{organization2.slug}"
       expect(response).to redirect_to(bike_path(bike, scanned_id: bike_sticker.code, organization_id: organization2.to_param))
-      # Fix issue with sticker batch that was missing a slash
-      get "#{base_url}/scanned#{bike_sticker.code}/?organization_id=#{organization2.slug}"
-      expect(response).to redirect_to(bike_path(bike, scanned_id: bike_sticker.code, organization_id: organization2.to_param))
       # ... test the response that is redirects
       get "#{base_url}/#{bike.to_param}?scanned_id=#{bike_sticker.code}&organization_id=#{organization2.to_param}"
       expect(assigns(:bike).id).to eq bike.id
