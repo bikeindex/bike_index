@@ -334,6 +334,8 @@ RSpec.describe BikesController, type: :request do
       get "/bikes/scanned/UC01101"
       expect(response).to render_template("scanned")
       expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      # Note: this MUST always work from here on out - it fixes urls from batch #35 and #38
+      # We have to assume these stickers are always around
       get "/bikes/scannedUC01101"
       expect(response).to redirect_to("/bikes/UC01101/scanned")
       get "/bikes/scannedUC01101?organization_id=UCLA"

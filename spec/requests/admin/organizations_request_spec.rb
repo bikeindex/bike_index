@@ -32,7 +32,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "raises" do
         expect {
           get "#{base_url}/d89safdf"
-         }.to raise_error(ActiveRecord::RecordNotFound)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
