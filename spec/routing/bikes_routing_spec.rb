@@ -31,17 +31,18 @@ RSpec.describe "bikes routing", type: :routing do
     end
     context "missing a slash" do
       it "directs ucla to scanned" do
-        expect(get: "bikes/scanneducla00001").to route_to(
+        expect(get: "bikes/scanneduc00001").to route_to(
           controller: "bikes",
-          action: "scanned",
-          scanned_id: "scanneducla00001"
+          action: "show",
+          id: "scanneduc00001"
         )
       end
-      it "directs other to scanned" do
+      it "directs UI to scanned" do
         expect(get: "bikes/scannedUI0001?organization_id=university-of-hogwarts").to route_to(
           controller: "bikes",
-          action: "scanned",
-          scanned_id: "scannedUI0001"
+          action: "show",
+          id: "scannedUI0001",
+          organization_id: "university-of-hogwarts"
         )
       end
     end

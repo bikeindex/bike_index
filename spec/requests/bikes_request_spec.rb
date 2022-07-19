@@ -319,4 +319,47 @@ RSpec.describe BikesController, type: :request do
       end
     end
   end
+
+  describe "scanned" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization2) { FactoryBot.create(:organization) }
+    let!(:bike_sticker1) { FactoryBot.create(:bike_sticker, code: "UC1101", organization: organization) }
+    it "redirects to scanned" do
+      get "/bikes/scanned/UC1101"
+      expect(response).to render_template("scanned")
+      expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      get "/bikes/scanned/uc1101"
+      expect(response).to render_template("scanned")
+      expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      get "/bikes/scanned/UC01101"
+      expect(response).to render_template("scanned")
+      expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      get "/bikes/scannedUC01101"
+      expect(response).to redirect_to("/bikes/UC01101/scanned")
+      get "/bikes/scannedUC01101?organization_id=UCLA"
+      expect(response).to redirect_to("/bikes/UC01101/scanned?organization_id=UCLA")
+    end
+    context "UI" do
+      let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "UI1101", organization: organization) }
+      let!(:bike_sticker3) { FactoryBot.create(:bike_sticker, code: "U1101", organization: organization2) }
+      it "redirects" do
+        # And UI
+        get "/bikes/scanned/UI01101"
+        expect(response).to render_template("scanned")
+        expect(assigns(:bike_sticker)&.id).to eq bike_sticker2.id
+        get "/bikes/scanned/Ui01101"
+        expect(response).to render_template("scanned")
+        expect(assigns(:bike_sticker)&.id).to eq bike_sticker2.id
+        get "/bikes/scannedUI001101?organization_id=UCLA"
+        expect(response).to redirect_to("/bikes/UI001101/scanned?organization_id=UCLA")
+        # And final sticker
+        get "/bikes/scanned/U01101"
+        expect(response).to render_template("scanned")
+        expect(assigns(:bike_sticker)&.id).to eq bike_sticker3.id
+        expect {
+          get "/bikes/scannedU01101"
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
 end
