@@ -136,25 +136,3 @@
 .alert-error {
   @include binx-alert-variant($red, $red);
 }
-
-.global-alert {
-  position: absolute;
-  bottom: -2rem;
-  z-index: -10;
-  width: 60%;
-  left: 20%;
-  margin: 0;
-  padding: 0.5rem;
-  font-size: 80%;
-  line-height: 1.25;
-  text-align: center;
-}
-
-@media (max-width: $grid-breakpoint-lg - 1px) {
-  .global-alert {
-    margin-top: 2rem;
-    bottom: -3rem;
-    width: 96%;
-    left: 2%;
-  }
-}
