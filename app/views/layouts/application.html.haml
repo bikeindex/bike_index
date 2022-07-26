@@ -21,7 +21,7 @@
   %body{id: page_id, class:  body_class}
     - show_downtime_alert = ENV["DOWNTIME_ALERT"].present?
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main-navbar", show_downtime_alert, page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar", show_downtime_alert, page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
           %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
@@ -115,7 +115,7 @@
 
 
     - cache(["footer", page_id, current_user_or_unconfirmed_user, passive_organization]) do
-      = render 'shared/footer_revised'
+      = render "shared/footer_revised"
 
 :javascript
   I18n.defaultLocale = "#{I18n.default_locale}"
