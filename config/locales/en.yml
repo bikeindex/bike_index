@@ -4643,6 +4643,7 @@ en:
       show:
         abbreviation: Abbreviation
         choose_file: Choose file...
+        contact_to_update_html: Contact %{link} to update abbreviation
         delete_organization: Delete organization
         i_would_like_to_terminate_my_account: I would like to terminate my account
           with Bike Index

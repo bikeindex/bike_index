@@ -4566,6 +4566,8 @@ nl:
         update: Bijwerken
         org_settings: Instellingen
         square_image: Gebruik een vierkante afbeelding voor het beste resultaat
+        contact_to_update_html: Neem contact op met %{link} om de afkorting bij te
+          werken
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen

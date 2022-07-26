@@ -21,7 +21,10 @@
 .row
   .col-md-6
     .form-group
-      = f.label :short_name, "Short name (30 letters or less)"
+      = f.label :short_name do
+        Short name (30 letters or less)
+        - if @organization.block_short_name_edit?
+          %small.em.text-danger warning - will change org URLs (landing pages, embeds)
       = f.text_field :short_name, class: "form-control"
   .col-md-6
     .form-group

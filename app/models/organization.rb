@@ -378,6 +378,10 @@ class Organization < ApplicationRecord
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
+  def block_short_name_edit?
+    paid? # Prevent url changes breaking landing pages, etc
+  end
+
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
   end
