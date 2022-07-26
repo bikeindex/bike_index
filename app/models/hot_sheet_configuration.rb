@@ -52,9 +52,13 @@ class HotSheetConfiguration < ApplicationRecord
     send_seconds_past_midnight / 3600
   end
 
+  def current_date
+    time_in_zone.to_date
+  end
+
   def send_today_now?
-    return false if off?
-    return false if hot_sheets.where(sheet_date: time_in_zone.to_date).email_success.any?
+    return false if off? ||
+      hot_sheets.where(sheet_date: current_date).email_success.any?
     time_in_zone > send_today_at
   end
 
