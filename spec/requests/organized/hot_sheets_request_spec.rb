@@ -118,7 +118,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         end
         context "already sent today" do
           let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: current_organization, is_on: false, timezone_str: "America/Los_Angeles") }
-          let!(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: current_organization, delivery_status: "email_success") }
+          let!(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: current_organization, delivery_status: "email_success", sheet_date: hot_sheet_configuration.time_in_zone.to_date) }
           it "does not send again" do
             expect(current_organization.hot_sheet_configuration).to eq hot_sheet_configuration
             Sidekiq::Worker.clear_all
