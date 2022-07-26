@@ -19,9 +19,9 @@
     = yield :header
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   %body{id: page_id, class:  body_class}
-    - show_downtime_alert = ENV["DOWNTIME_ALERT"].present?
+
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache([show_downtime_alert, page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache([page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
           %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
@@ -88,17 +88,6 @@
               = active_link t(".blog"), news_index_path, class: 'nav-link', match_controller: true
             %li.primary-nav-item.d-none.d-lg-block
               = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", match_controller: true
-        - if show_downtime_alert
-          - time = Time.at(1658811600) # 2022-07-26 00:00:00
-          .alert.alert-warning.global-alert
-            Bike Index will be offline between
-            %span.convertTime
-              = l(time, format: :convert_time)
-            and
-            %span.convertTime
-              = l(time + 15.minutes, format: :convert_time)
-            %small.less-strong.convertTimezone
-            as we do upgrades to make things faster.
     = render 'layouts/revised_messages'
 
     - if current_page_skeleton.present?
