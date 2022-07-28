@@ -104,7 +104,7 @@ class UsersController < ApplicationController
       redirect_to(my_account_url, notice: translation(:user_not_sharing)) && return
     end
     @page = params[:page] || 1
-    @per_page = params[:per_page] || 9
+    @per_page = params[:per_page] || 15
     @bikes = user.bikes(true).page(@page).per(@per_page)
   end
 
