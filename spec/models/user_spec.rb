@@ -648,6 +648,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "userlink" do
+    it "is nil" do
+      expect(User.new.userlink).to be_nil
+    end
+
     it "returns user path if user show" do
       user = User.new(show_bikes: true, username: "coolstuff")
       expect(user.userlink).to eq("/users/coolstuff")
