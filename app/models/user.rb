@@ -389,8 +389,6 @@ class User < ApplicationRecord
       "/users/#{username}"
     elsif twitter.present?
       "https://twitter.com/#{twitter}"
-    else
-      ""
     end
   end
 

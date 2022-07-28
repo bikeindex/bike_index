@@ -10,8 +10,11 @@
     - unless @blog.canonical_url?
       %h4
         = t(".by")
-        %a.blog-poster{href: blogger.userlink}
-          = blogger.name.presence
+        - if blogger.userlink.present?
+          %a{href: blogger.userlink}
+            = blogger.name
+        - else
+          %em= blogger.name
     %h4.pub-date
       %span.convertTime= l @blog.published_at, format: :convert_time
 
