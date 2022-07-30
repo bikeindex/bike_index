@@ -22,11 +22,13 @@ RSpec.describe OrganizationsController, type: :request do
 
   describe "create" do
     include_context :request_spec_logged_in_as_user
+    let(:location_attrs) { {street: "",city: "San Francisco",zipcode: "94119",country_id: Country.united_states.id} }
     let(:org_attrs) do
       {
         name: "a new org",
         kind: "bike_shop",
-        website: "http://example.com"
+        website: "http://example.com",
+        locations_attributes: {"0" => location_attrs}
       }
     end
     it "creates org, membership, filters approved attrs & redirect to org with current_user" do
@@ -43,8 +45,8 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.kind).to eq "bike_shop"
       expect(organization.website).to eq "http://example.com"
 
-      # expect(organization.locations.count).to eq 1
-
+      expect(organization.locations.count).to eq 1
+      expect_attrs_to_match_hash(organization.locations.first, location_attrs)
     end
 
     it "creates org, membership, filters approved attrs & redirect to org with current_user and mails" do
@@ -73,21 +75,14 @@ RSpec.describe OrganizationsController, type: :request do
         expect {
           post base_url, params: {organization: org_attrs}
         }.to_not change(Organization, :count)
-        expect(assigns(:organization).errors.full_messages).to eq([target_error])
+        rendered_organization = assigns(:organization)
+        expect(rendered_organization.errors.full_messages).to eq([target_error])
+        expect(rendered_organization.name).to eq "a new org"
+        expect(rendered_organization.locations.first).to be_present
 
         expect(organization_existing.reload.slug).to eq "a-new-org"
         expect(organization_existing.name).to eq "some name"
         expect(organization_existing.short_name).to eq "A NEW org"
-      end
-    end
-
-    context "missing location" do
-      let(:org_attrs) { {name: "new name", kind: "bike_shop", website: "http://example.com"} }
-      it "errors" do
-        expect {
-          post base_url, params: {organization: org_attrs}
-        }.to_not change(Organization, :count)
-        expect(flash[:error]).to be_present
       end
     end
 

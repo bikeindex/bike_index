@@ -95,8 +95,12 @@ class OrganizationsController < ApplicationController
     approved_kind = params.dig(:organization, :kind)
     approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
     params.require(:organization)
-      .permit(:name, :website)
+      .permit(:name, :website, locations_attributes: permitted_locations_params)
       .merge(auto_user_id: current_user.id, kind: approved_kind)
+  end
+
+  def permitted_locations_params
+    %i[name zipcode city state_id country_id street phone publicly_visible]
   end
 
   def find_organization
