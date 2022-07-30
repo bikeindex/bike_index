@@ -30,6 +30,26 @@ RSpec.describe Location, type: :model do
     end
   end
 
+  describe "no name" do
+    let(:organization) { FactoryBot.create(:organization) }
+    it "uses the org name" do
+      location = FactoryBot.build(:location, name: nil, organization: organization)
+      expect(location.name).to be_blank
+      location.save
+      expect(location).to be_valid
+      expect(location.name).to eq organization.name
+    end
+    context "with multiple locations" do
+      let!(:location_pre) { FactoryBot.create(:location, organization: organization) }
+      it "is invalid" do
+        location = FactoryBot.build(:location, name: nil, organization: organization)
+        expect(location.name).to be_blank
+        location.save
+        expect(location).to_not be_valid
+      end
+    end
+  end
+
   describe "shown, not_publicly_visible" do
     let(:organization) { FactoryBot.create(:organization, show_on_map: true, approved: false) }
     let(:location) { FactoryBot.create(:location, organization: organization) }

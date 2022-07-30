@@ -8,16 +8,17 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
     loadFancySelects = @loadFancySelects
     updateVisibilityChecks = @updateVisibilityChecks
     updateImpoundedChecks = @updateImpoundedChecks
-    hideRemoveIfLast = @hideRemoveIfLast
+    hideRemoveIfOnlyOne = @hideRemoveIfOnlyOne
     updateVisibilityChecks()
     updateImpoundedChecks()
+    hideRemoveIfOnlyOne()
 
     $("form").on "click", ".remove_fields", (event) ->
       # We don't need to do anything except slide the input up, because the label is on it.
       $form = $(this).closest("fieldset").parents(".collapse")
       $form.collapse("hide")
       $form.find("input:required").attr("required", false)
-      hideRemoveIfLast()
+      hideRemoveIfOnlyOne()
       true
 
     $("form").on "click", ".add_fields", (event) ->
@@ -27,7 +28,7 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       $("#fieldsetend").before($(this).data("fields").replace(regexp, time))
       loadFancySelects()
       updateVisibilityChecks()
-      hideRemoveIfLast()
+      hideRemoveIfOnlyOne()
       true
 
     # When checking the "organization show on map", hide/show publicly visible
@@ -45,6 +46,21 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
         unless $check.attr("id") == targetID
           $check.prop("checked", false)
       updateImpoundedChecks()
+
+    # This is pulled from ToggleHiddenOther
+    # It's different because it delegates so it works for dynamically generated locations
+    if window.unitedStatesID # This var is defined in location_fields template
+      $("form").on "change", ".country-select-input", (e) ->
+        $target = $(e.target)
+        return true unless $target.hasClass 'form-control'
+        $other_field = $target.parents('.countrystatezip').find('.hidden-other')
+        if "#{$target.val()}" == "#{window.unitedStatesID}"
+          $other_field.slideDown 'fast', ->
+            $other_field.addClass('unhidden').removeClass('currently-hidden')
+        else
+          $other_field.slideUp 'fast', ->
+            $other_field.removeClass('unhidden').addClass('currently-hidden')
+            $other_field.find('.form-control').val('')
 
   updateImpoundedChecks: ->
     # Hide the default impound location checks if there isn't more than one impound location
@@ -68,7 +84,7 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       visibility = "hide"
     $(".publiclyVisibilyCheck").collapse(visibility)
 
-  hideRemoveIfLast: ->
+  hideRemoveIfOnlyOne: ->
     # Give the fields a chance to show up, because collapse stuff
     setTimeout ( =>
       # We don't want to allow removing the final location, so hide remove if there is only one location

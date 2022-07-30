@@ -50,14 +50,11 @@
                   = f.radio_button :kind, kind
                   = kind.humanize
 
-        - location = @organization.locations.first || @organization.locations.build
-        - default_country = location.country_id || Country.united_states.id
-        - default_name = "DEFAULT"
 
-        .locations-fieldset-wrapper#locations_fieldsets{data: {country: default_country, name: default_name}}
-          = f.fields_for :locations do |builder|
-            = render "organized/manages/location_fields", f: builder
-          %span#fieldsetend
+        - @organization.locations.build unless @organization.locations.first.present?
+
+        = f.fields_for :locations do |builder|
+          = render "organized/manages/location_fields", f: builder, initial_location_form: true
 
         .form-group.row
           .col-sm-4.col-sm-push-4

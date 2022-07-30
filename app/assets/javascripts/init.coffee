@@ -12,12 +12,13 @@ class window.BikeIndex
       # onBlur: ->
       #   console.log(self.$activeItem)
       #   # console.log(self.getFirstItemMatchedByTextContent(value))
-
     $('.unfancy.fancy-select select').selectize
       create: false
+      selectOnTab: true
       plugins: ['restore_on_backspace']
     $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
       create: false
+      selectOnTab: true
       plugins: ['restore_on_backspace', 'selectable_placeholder']
     # Remove them so we don't initialize twice
     $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
@@ -75,6 +76,8 @@ class BikeIndex.Init extends BikeIndex
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
       organized_manage_locations: BikeIndex.OrganizedManageLocations
+      organizations_create: BikeIndex.OrganizedManageLocations # Because it has location fields
+      organized_manage_show: BikeIndex.OrganizedManageLocations # it CAN location fields
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
       locks_create: BikeIndex.LocksForm
