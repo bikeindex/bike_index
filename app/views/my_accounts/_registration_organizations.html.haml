@@ -49,22 +49,30 @@
           - next if registration_field == "reg_bike_sticker"
           - if registration_field == "reg_organization_affiliation"
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
-              = label_tag "reg_field-organization_affiliation_#{organization.id}", registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name), class: "form-well-label"
+              = label_tag "reg_field-organization_affiliation_#{organization.id}",
+                registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name),
+                class: "form-well-label"
               .form-well-input
                 = select_tag "reg_field-organization_affiliation_#{organization.id}", options_for_select(organization.organization_affiliation_options, user_registration_organization.organization_affiliation(organization.id)), required: true, class: "form-control"
-          - if registration_field == "reg_organization_affiliation"
+          - if registration_field == "reg_student_id"
             .form-group.row.unnested-field.no-divider-row
-              = label_tag "reg_field-student_id_#{organization.id}", registration_field_label(@organization, "student_id") || t(".student_id"), class: "form-well-label"
+              = label_tag "reg_field-student_id_#{organization.id}",
+                registration_field_label(organization, "reg_student_id") || t(".student_id"),
+                class: "form-well-label"
               .form-well-input
                 = text_field_tag "reg_field-student_id_#{organization.id}", user_registration_organization.student_id(organization.id), autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: true, class: "form-control"
           - elsif registration_field == "reg_address"
             .form-group.row.unnested-field.no-divider-row
-              = label_tag "reg_field-eg_address_#{organization.id}", registration_field_label(organization, "reg_address") || t(".mailing_address"), class: "form-well-label"
+              = label_tag "reg_field-eg_address_#{organization.id}",
+                registration_field_label(organization, "reg_address") || t(".mailing_address"),
+                class: "form-well-label"
               .form-well-input-large.mt-1
                 = t(".update_your_address_on_html", user_settings_link: link_to(@edit_templates["root"], edit_my_account_path(edit_template: "root"), class: "strong"))
           - elsif registration_field == "reg_phone"
             .form-group.row.unnested-field.no-divider-row
-              = label_tag "reg_field-reg_phone_#{organization.id}", registration_field_label(organization, "reg_phone") || t(".phone"), class: "form-well-label"
+              = label_tag "reg_field-reg_phone_#{organization.id}",
+                registration_field_label(organization, "reg_phone") || t(".phone"),
+                class: "form-well-label"
               .form-well-input-large.mt-1
                 = t(".update_your_phone_on_html", user_settings_link: link_to(@edit_templates["root"], edit_my_account_path(edit_template: "root"), class: "strong"))
 

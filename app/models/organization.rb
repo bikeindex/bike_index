@@ -78,7 +78,7 @@ class Organization < ApplicationRecord
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
-  scope :unpaid, -> { where(is_paid: true) }
+  scope :unpaid, -> { where(is_paid: false) }
   scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
