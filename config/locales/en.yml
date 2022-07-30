@@ -465,7 +465,7 @@ en:
         public_images: Public images
         recovered_records: Recovered records
         registration_field_labels: Registration field labels
-        short_name: Short name
+        short_name: Abbreviated name
         show_on_map: Show on map
         slug: Slug
         users: Users
@@ -732,6 +732,8 @@ en:
         other_style: Other style
         sail: Sail
     errors:
+      organization:
+        duplicate_short_name: "already in use by another organization. If you don't think that should be the case, contact support@bikeindex.org"
       messages:
         access_denied: The resource owner or authorization server denied the request.
         admin_authenticator_not_configured: >-

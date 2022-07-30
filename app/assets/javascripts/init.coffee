@@ -68,7 +68,7 @@ class BikeIndex.Init extends BikeIndex
       my_account_show: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
-      organized_manages_locations: BikeIndex.OrganizedManageLocations
+      organized_manage_locations: BikeIndex.OrganizedManageLocations
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
       locks_create: BikeIndex.LocksForm

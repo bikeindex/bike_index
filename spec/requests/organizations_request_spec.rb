@@ -25,7 +25,8 @@ RSpec.describe OrganizationsController, type: :request do
     let(:org_attrs) do
       {
         name: "a new org",
-        kind: "bike_shop"
+        kind: "bike_shop",
+        website: "http://example.com"
       }
     end
     it "creates org, membership, filters approved attrs & redirect to org with current_user" do
@@ -40,6 +41,10 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.memberships.count).to eq(1)
       expect(organization.memberships.first.user_id).to eq(current_user.id)
       expect(organization.kind).to eq "bike_shop"
+      expect(organization.website).to eq "http://example.com"
+
+      # expect(organization.locations.count).to eq 1
+
     end
 
     it "creates org, membership, filters approved attrs & redirect to org with current_user and mails" do
@@ -57,6 +62,32 @@ RSpec.describe OrganizationsController, type: :request do
         expect(organization.memberships.count).to eq(1)
         expect(organization.memberships.first.user_id).to eq(current_user.id)
         expect(organization.kind).to eq "property_management"
+      end
+    end
+
+    context "existing org with name" do
+      let!(:organization_existing) { FactoryBot.create(:organization, name: "some name", short_name: "A NEW org", kind: :bike_advocacy) }
+      let(:target_error) { "Abbreviated name already in use by another organization. If you don't think that should be the case, contact support@bikeindex.org" }
+      it "creates with a different name" do
+        expect(organization_existing.reload.slug).to eq "a-new-org"
+        expect {
+          post base_url, params: {organization: org_attrs}
+        }.to_not change(Organization, :count)
+        expect(assigns(:organization).errors.full_messages).to eq([target_error])
+
+        expect(organization_existing.reload.slug).to eq "a-new-org"
+        expect(organization_existing.name).to eq "some name"
+        expect(organization_existing.short_name).to eq "A NEW org"
+      end
+    end
+
+    context "missing location" do
+      let(:org_attrs) { {name: "new name", kind: "bike_shop", website: "http://example.com"} }
+      it "errors" do
+        expect {
+          post base_url, params: {organization: org_attrs}
+        }.to_not change(Organization, :count)
+        expect(flash[:error]).to be_present
       end
     end
 

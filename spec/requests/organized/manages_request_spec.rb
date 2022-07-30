@@ -200,6 +200,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.show_on_map).to be_truthy
             expect(current_organization.kind).to_not eq "ambassador"
             expect(current_organization.lightspeed_register_with_phone).to be_truthy
+            expect(assigns(:page_id)).to eq "organized_manage_location"
             # Existing location is updated
             location1.reload
             expect(location1.organization).to eq current_organization
