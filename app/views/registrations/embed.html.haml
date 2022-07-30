@@ -12,7 +12,7 @@
     %span.below-input-help
       = t(".select_other_if_manufacturer_doesnt_show")
 
-  .form-group.fancy-select.unfancy
+  .form-group.fancy-select.unfancy.short-fancy-select
     = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: t(".primary_frame_color"), class: "form-control")
 
   - if @selectable_child_organizations.any?

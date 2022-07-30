@@ -10,11 +10,12 @@ class OrganizationFeature < ApplicationRecord
 
   # NOTE: reg_bike_sticker is automatically added if the org has stickers, no need to manually add
   REG_FIELDS = %w[
+    reg_address
+    reg_bike_sticker
+    reg_email_placeholder
     reg_extra_registration_number
     reg_organization_affiliation
-    reg_address
     reg_phone
-    reg_bike_sticker
     reg_student_id
   ].freeze
 

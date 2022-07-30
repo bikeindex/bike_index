@@ -328,6 +328,11 @@ img {
     width: 100%;
   }
 
+  // Otherwise this overflows the iframe on landing pages
+  .short-fancy-select .selectize-dropdown-content {
+    max-height: 120px;
+  }
+
   label {
     line-height: 1.2em;
   }
