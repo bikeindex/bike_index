@@ -77,7 +77,8 @@
   .input-group
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
-        = t(".owners_email_address")
+        = registration_field_label(@organization, "owner_email") || t(".owners_email_address")
+      .controls
         = f.email_field :owner_email, required: true
   -# Note: Don't check display_edit_address_fields? because current_user is probably not owner
   - if include_field_reg_address?(@organization)

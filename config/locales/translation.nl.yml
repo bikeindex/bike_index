@@ -219,7 +219,6 @@ nl:
           user_not_authorized: heeft geen toestemming om deze fiets in beslag te nemen
         bike:
           not_found: niet gevonden
-          suspended: geschorst en kan niet worden gebruikt
         export:
           required: verplicht
         manufacturer:
@@ -611,7 +610,6 @@ nl:
         deleted_at: Verwijderd om
         invoices: Facturen
         is_paid: Is betaald
-        is_suspended: Is geschorst
         kind: Soort
         landing_html: Landing html
         locations: Locaties
@@ -1815,6 +1813,7 @@ nl:
       enter_found_bike_type_details: Voer de gevonden %{bike_type} -gegevens in
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
+      owner_email: E-mailadres eigenaar
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'

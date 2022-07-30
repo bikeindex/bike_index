@@ -195,13 +195,10 @@ class BikeCreator
     organization_id = b_param.params.dig("creation_organization_id").presence ||
       b_param.params.dig("bike", "creation_organization_id")
     organization = Organization.friendly_find(organization_id)
-    if organization.present? && !organization.suspended?
+    if organization.present?
       bike.creation_organization_id = organization.id
       bike.creator_id ||= organization.auto_user_id
     else
-      if organization&.suspended?
-        bike.errors.add(:creation_organization, "Oh no! #{organization.name} is currently suspended. Contact us if this is a surprise.")
-      end
       # Since there wasn't a valid organization, blank the organization
       bike.creation_organization_id = nil
     end

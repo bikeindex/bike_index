@@ -196,13 +196,16 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
     context "updating registration labels" do
-      let(:target) { {reg_student_id: "party label", reg_address: "useful label"} }
+      let(:target) { {reg_student_id: "party label", reg_address: "useful label", owner_email: "<p>stuff</p> again", unknown_attr: "Whoop"} }
       let(:update_params) do
         {
           :organization => {name: "new name"},
           "reg_label-reg_student_id" => "party label",
           "reg_label-reg_address" => "useful label",
-          "reg_label-reg_organization_affiliation" => "  "
+          "reg_label-reg_organization_affiliation" => "  ",
+          "reg_label-owner_email" => "<p>stuff</p> again ",
+          "reg_label-unknown_attr" => "Whoop"
+
         }
       end
       it "updates the registration_field_label" do

@@ -65,4 +65,14 @@ RSpec.describe OrganizationFeature, type: :model do
       end
     end
   end
+
+  describe "reg_fields_with_customizable_labels" do
+    let(:organization) { FactoryBot.build(:organization) }
+    it "includes expected" do
+      labeled_fields = OrganizationFeature.reg_fields_with_customizable_labels
+      expect(labeled_fields.count).to eq OrganizationFeature::REG_FIELDS.count
+      expect(labeled_fields).to include("owner_email")
+      expect(labeled_fields).to_not include("reg_bike_sticker")
+    end
+  end
 end
