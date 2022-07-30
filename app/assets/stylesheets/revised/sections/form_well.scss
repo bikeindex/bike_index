@@ -84,6 +84,10 @@
   // To not cover up select pointer
   .form-well-label {
     @extend .form-control-label;
+    code {
+      color: $body-font-color; // Used in registration_field_label
+      background: none;
+    }
 
     line-height: 1.2em;
     padding-top: 0.65rem;

@@ -180,7 +180,7 @@
   .input-group.form-foot
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
-        = registration_field_label(current_organization, "owner_email") || t(".your_email_address")
+        = registration_field_label(@organization, "owner_email") || t(".your_email_address")
       .controls
         = f.email_field :owner_email
     .submit-registration
