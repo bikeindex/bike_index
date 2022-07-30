@@ -1078,7 +1078,6 @@ en:
       additional_serial_sticker_number: Additional serial/sticker number
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
-      owner_email: Owner email
       city: City
       enter_bike_type_details: Enter %{bike_type} details
       enter_found_bike_type_details: Enter Found %{bike_type} details
@@ -1097,6 +1096,7 @@ en:
       or: or
       other_manufacturer: Other manufacturer
       our_serial_page: our serial page
+      owner_email: Owner email
       phone: Phone
       read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a separate
         window)</small>

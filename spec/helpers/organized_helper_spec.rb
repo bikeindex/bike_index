@@ -248,5 +248,3 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
   end
 end
-
-
