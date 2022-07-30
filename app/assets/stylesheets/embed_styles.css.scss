@@ -1,15 +1,15 @@
-@import 'legacy_includes/selectize_bootstrap3.scss';
+@import "legacy_includes/selectize_bootstrap3.scss";
 
 .control-group .selectize-control {
   width: 210px;
 }
 
-@import 'legacy_includes/_colors.scss';
-@import 'legacy_includes/_variables.scss';
-@import 'legacy_includes/_mixins.scss';
-@import 'legacy_includes/component-animations.scss';
-@import 'legacy_includes/dropdowns.scss';
-@import 'legacy_includes/embed_form_styles.scss';
+@import "legacy_includes/_colors.scss";
+@import "legacy_includes/_variables.scss";
+@import "legacy_includes/_mixins.scss";
+@import "legacy_includes/component-animations.scss";
+@import "legacy_includes/dropdowns.scss";
+@import "legacy_includes/embed_form_styles.scss";
 
 $newStolenColor: #d25627;
 
@@ -40,20 +40,20 @@ $newStolenColor: #d25627;
 
   select,
   textarea,
-  input[type='text'],
-  input[type='password'],
-  input[type='datetime'],
-  input[type='datetime-local'],
-  input[type='date'],
-  input[type='month'],
-  input[type='time'],
-  input[type='week'],
-  input[type='number'],
-  input[type='email'],
-  input[type='url'],
-  input[type='search'],
-  input[type='tel'],
-  input[type='color'],
+  input[type="text"],
+  input[type="password"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="month"],
+  input[type="time"],
+  input[type="week"],
+  input[type="number"],
+  input[type="email"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="color"],
   .uneditable-input {
     @include border-radius(2px);
 
