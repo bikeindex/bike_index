@@ -363,6 +363,8 @@ img {
   &.uc-davis .submit-wrapper .btn {
     background: #022851;
   }
+  // UIowa has waffled on their abbreviation
+  &.uiowa .submit-wrapper .btn,
   &.university-of-iowa .submit-wrapper .btn {
     background: #ffcd00;
   }
