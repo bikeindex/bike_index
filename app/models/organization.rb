@@ -79,7 +79,7 @@ class Organization < ApplicationRecord
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
-  scope :approved, -> { where(is_suspended: false, approved: true) }
+  scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
@@ -272,10 +272,6 @@ class Organization < ApplicationRecord
 
   def display_avatar?
     avatar.present?
-  end
-
-  def suspended?
-    is_suspended?
   end
 
   def fetch_impound_configuration

@@ -98,7 +98,6 @@ class Admin::OrganizationsController < Admin::BaseController
         :avatar,
         :avatar_cache,
         :embedable_user_email,
-        :is_suspended,
         :passwordless_user_domain,
         :graduated_notification_interval_days,
         :lock_show_on_map,

@@ -451,7 +451,6 @@ en:
         enabled_feature_slugs: Enabled feature slugs
         invoices: Invoices
         is_paid: Is paid
-        is_suspended: Is suspended
         kind: Kind
         landing_html: Landing html
         locations: Locations
@@ -791,7 +790,6 @@ en:
       models:
         bike:
           not_found: not found
-          suspended: suspended and can't be used
         bike_sticker:
           not_found: not found
           unauthorized_to_claim: does not have permission to claim this

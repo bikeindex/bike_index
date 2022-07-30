@@ -12,7 +12,6 @@ class OrganizationFeature < ApplicationRecord
   REG_FIELDS = %w[
     reg_address
     reg_bike_sticker
-    reg_email_placeholder
     reg_extra_registration_number
     reg_organization_affiliation
     reg_phone
@@ -89,7 +88,7 @@ class OrganizationFeature < ApplicationRecord
 
   def self.reg_fields_with_customizable_labels
     # Can't rename bike_stickers
-    reg_fields - %w[reg_bike_sticker]
+    %w[owner_email] + reg_fields - %w[reg_bike_sticker]
   end
 
   def self.reg_fields_organization_uniq
