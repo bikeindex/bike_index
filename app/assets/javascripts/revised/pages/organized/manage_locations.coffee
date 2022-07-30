@@ -48,7 +48,7 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       updateImpoundedChecks()
 
     # This is pulled from ToggleHiddenOther
-    # It's different because it delegates so it works for dynamically generated locations
+    # It's different because it delegates so it works for dynamically generated location fields
     if window.unitedStatesID # This var is defined in location_fields template
       $("form").on "change", ".country-select-input", (e) ->
         $target = $(e.target)
@@ -85,7 +85,7 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
     $(".publiclyVisibilyCheck").collapse(visibility)
 
   hideRemoveIfOnlyOne: ->
-    # Give the fields a chance to show up, because collapse stuff
+    # Lazy HACK: wait for fields to finish collapsing
     setTimeout ( =>
       # We don't want to allow removing the final location, so hide remove if there is only one location
       if $(".locations-fieldset-wrapper .location-card:visible").length < 2
