@@ -74,6 +74,9 @@
 
   .locations-fieldset-wrapper {
     @extend .row;
+    .card-block {
+      width: 100%;
+    }
 
     fieldset {
       display: flex;

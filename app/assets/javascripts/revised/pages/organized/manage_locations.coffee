@@ -1,16 +1,14 @@
 class BikeIndex.OrganizedManageLocations extends BikeIndex
   $locations_fieldsets = $('#locations_fieldsets')
-  default_country = $locations_fieldsets.data('country')
-  default_name = $locations_fieldsets.data('name')
 
   constructor: ->
     @initializeEventListeners()
 
   initializeEventListeners: ->
-    setDefaultCountryAndName = @setDefaultCountryAndName
     loadFancySelects = @loadFancySelects
     updateVisibilityChecks = @updateVisibilityChecks
     updateImpoundedChecks = @updateImpoundedChecks
+    hideRemoveIfLast = @hideRemoveIfLast
     updateVisibilityChecks()
     updateImpoundedChecks()
 
@@ -19,15 +17,18 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       $form = $(this).closest("fieldset").parents(".collapse")
       $form.collapse("hide")
       $form.find("input:required").attr("required", false)
+      hideRemoveIfLast()
+      true
 
     $("form").on "click", ".add_fields", (event) ->
       event.preventDefault()
       time = new Date().getTime()
       regexp = new RegExp($(this).data("id"), "g")
       $("#fieldsetend").before($(this).data("fields").replace(regexp, time))
-      setDefaultCountryAndName()
       loadFancySelects()
       updateVisibilityChecks()
+      hideRemoveIfLast()
+      true
 
     # When checking the "organization show on map", hide/show publicly visible
     $("#organization_show_on_map").on "change", (event) ->
@@ -67,13 +68,12 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       visibility = "hide"
     $(".publiclyVisibilyCheck").collapse(visibility)
 
-  setDefaultCountryAndName: ->
-    for country in $locations_fieldsets.find('.location-country-select select')
-      $country = $(country)
-      return true if $country.val().length > 0
-      country_selectize = $country.selectize()[0].selectize
-      index = _.indexOf(Object.keys(country_selectize.options), "#{default_country}")
-      country_selectize.setValue Object.keys(country_selectize.options)[index]
-    for name in $locations_fieldsets.find('.location-name-field')
-      $name = $(name)
-      $name.val(default_name) unless $name.val().length > 0
+  hideRemoveIfLast: ->
+    # Give the fields a chance to show up, because collapse stuff
+    setTimeout ( =>
+      # We don't want to allow removing the final location, so hide remove if there is only one location
+      if $(".locations-fieldset-wrapper .location-card:visible").length < 2
+        $(".locations-fieldset-wrapper .location-card .remove-control").collapse("hide")
+      else
+        $(".locations-fieldset-wrapper .location-card .remove-control").collapse("show")
+    ), 500

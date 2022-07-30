@@ -6,7 +6,13 @@ class window.BikeIndex
   loadFancySelects: ->
     $(".unfancy.fancy-select.no-restore-on-backspace select").selectize
       create: false
+      selectOnTab: true
       plugins: []
+      # TODO: Make it select on blur (select close) - but not change if there is already a value
+      # onBlur: ->
+      #   console.log(self.$activeItem)
+      #   # console.log(self.getFirstItemMatchedByTextContent(value))
+
     $('.unfancy.fancy-select select').selectize
       create: false
       plugins: ['restore_on_backspace']
