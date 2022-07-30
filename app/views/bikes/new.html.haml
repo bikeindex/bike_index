@@ -191,7 +191,9 @@
             = f.hidden_field :owner_email, value: @bike.owner_email || current_user&.email
           - else
             .form-group.row.unnested-field.no-divider-row
-              = f.label :owner_email, class: 'form-well-label'
+              = f.label :owner_email,
+                registration_field_label(@organization, "owner_email") || t(".owner_email"),
+                class: 'form-well-label'
               .form-well-input
                 = f.email_field :owner_email,
                   value: @bike.owner_email || current_user&.email,

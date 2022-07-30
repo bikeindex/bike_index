@@ -1,8 +1,7 @@
 = form_for @b_param, { url: registrations_path, action: "create" } do |f|
   .form-group
-    - email_owner = current_organization&.school? ? current_organization.slug : t(".your")
-    - email_placeholder = t(".owner_email", owner: email_owner)
-
+    - email_placeholder = registration_field_label(current_organization, "owner_email", strip_tags: true)
+    - email_placeholder ||= t(".owner_email", owner: current_organization&.school? ? current_organization.slug : t(".your"))
     = f.email_field :owner_email, required: true, value: @owner_email, placeholder: email_placeholder, class: "form-control"
 
   .form-group
