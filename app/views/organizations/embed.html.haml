@@ -177,11 +177,10 @@
         = f.label :bike_sticker, t(".sticker_id_html"), class: "control-label"
         .controls
           = f.text_field :bike_sticker, value: @b_param.bike_sticker_code
-
   .input-group.form-foot
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
-        = t(".your_email_address")
+        = registration_field_label(current_organization, "owner_email") || t(".your_email_address")
       .controls
         = f.email_field :owner_email
     .submit-registration
