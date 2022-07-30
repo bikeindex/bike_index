@@ -49,6 +49,11 @@
                 %label
                   = f.radio_button :kind, kind
                   = kind.humanize
+
+        - @organization.locations.build unless @organization.locations.first.present?
+        = f.fields_for :locations do |builder|
+          = render "organized/manages/location_fields", f: builder, initial_location_form: true
+
         .form-group.row
           .col-sm-4.col-sm-push-4
             = f.submit t(".add_organization"), class: 'btn btn-success'

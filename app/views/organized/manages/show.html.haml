@@ -56,6 +56,12 @@
     .col-sm-4
       = f.text_field :website, class: 'form-control'
 
+  - if @organization.locations.first.blank?
+    - @organization.locations.build
+    = f.fields_for :locations do |builder|
+      = render "organized/manages/location_fields", f: builder, initial_location_form: true
+    .mb-5
+
   .form-group.row.avatar-upload-wrapper
     %label.org-form-label
       = t(".organization_logo")

@@ -22,10 +22,13 @@ RSpec.describe OrganizationsController, type: :request do
 
   describe "create" do
     include_context :request_spec_logged_in_as_user
+    let(:location_attrs) { {street: "", city: "San Francisco", zipcode: "94119", country_id: Country.united_states.id} }
     let(:org_attrs) do
       {
         name: "a new org",
-        kind: "bike_shop"
+        kind: "bike_shop",
+        website: "http://example.com",
+        locations_attributes: {"0" => location_attrs}
       }
     end
     it "creates org, membership, filters approved attrs & redirect to org with current_user" do
@@ -40,6 +43,10 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.memberships.count).to eq(1)
       expect(organization.memberships.first.user_id).to eq(current_user.id)
       expect(organization.kind).to eq "bike_shop"
+      expect(organization.website).to eq "http://example.com"
+
+      expect(organization.locations.count).to eq 1
+      expect_attrs_to_match_hash(organization.locations.first, location_attrs)
     end
 
     it "creates org, membership, filters approved attrs & redirect to org with current_user and mails" do
@@ -57,6 +64,25 @@ RSpec.describe OrganizationsController, type: :request do
         expect(organization.memberships.count).to eq(1)
         expect(organization.memberships.first.user_id).to eq(current_user.id)
         expect(organization.kind).to eq "property_management"
+      end
+    end
+
+    context "existing org with name" do
+      let!(:organization_existing) { FactoryBot.create(:organization, name: "some name", short_name: "A NEW org", kind: :bike_advocacy) }
+      let(:target_error) { "Abbreviated name already in use by another organization. If you don't think that should be the case, contact support@bikeindex.org" }
+      it "creates with a different name" do
+        expect(organization_existing.reload.slug).to eq "a-new-org"
+        expect {
+          post base_url, params: {organization: org_attrs}
+        }.to_not change(Organization, :count)
+        rendered_organization = assigns(:organization)
+        expect(rendered_organization.errors.full_messages).to eq([target_error])
+        expect(rendered_organization.name).to eq "a new org"
+        expect(rendered_organization.locations.first).to be_present
+
+        expect(organization_existing.reload.slug).to eq "a-new-org"
+        expect(organization_existing.name).to eq "some name"
+        expect(organization_existing.short_name).to eq "A NEW org"
       end
     end
 

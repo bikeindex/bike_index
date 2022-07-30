@@ -74,6 +74,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template :locations
         expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:page_id)).to eq "organized_manage_locations"
       end
     end
 

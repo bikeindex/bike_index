@@ -465,7 +465,7 @@ en:
         public_images: Public images
         recovered_records: Recovered records
         registration_field_labels: Registration field labels
-        short_name: Short name
+        short_name: Abbreviated name
         show_on_map: Show on map
         slug: Slug
         users: Users
@@ -815,6 +815,10 @@ en:
         user:
           email_already_exists: That email is already signed up on Bike Index.
           not_an_available_language: not an available language
+      organization:
+        duplicate_short_name: >-
+          already in use by another organization. If you don't think that should be
+          the case, contact support@bikeindex.org
     models:
       ad: Ad
       ambassador: Ambassador

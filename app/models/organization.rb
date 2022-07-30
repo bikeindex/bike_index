@@ -68,7 +68,7 @@ class Organization < ApplicationRecord
   enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
 
   validates_presence_of :name
-  validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
+  validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_with OrganizationNameValidator

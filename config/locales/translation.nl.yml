@@ -241,6 +241,9 @@ nl:
           unauthorized_to_claim: hebben geen toestemming om dit te claimen
         parking_notification:
           address_required: "(of locatie) van deze verlaten fiets vereist"
+      organization:
+        duplicate_short_name: al in gebruik bij een andere organisatie. Als je denkt
+          dat dat niet het geval zou moeten zijn, neem dan contact op met support@bikeindex.org
     attributes:
       doorkeeper/application:
         name: Naam
