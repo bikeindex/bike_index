@@ -33,6 +33,16 @@ class OrganizationStolenMessage < ApplicationRecord
     %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
   end
 
+  def self.update_for(organization)
+    if organization.enabled?("organization_stolen_message")
+      if organization.organization_stolen_message.blank?
+        OrganizationStolenMessage.create!(organization: organization)
+      end
+    elsif organization.organization_stolen_message&.enabled?
+      organization.organization_stolen_message.update(enabled: false)
+    end
+  end
+
   def disabled?
     !enabled?
   end

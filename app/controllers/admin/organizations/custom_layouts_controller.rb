@@ -12,13 +12,21 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
   end
 
   def update
-    if @organization.update(permitted_parameters)
+    if layout_kind == "organization_stolen_message"
+      if @organization.update(permitted_parameters)
+        flash[:success] = "Layout Saved!"
+        redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
+        return
+      end
+    elsif @organization.update(permitted_parameters)
       flash[:success] = "Layout Saved!"
       redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
-    else
-      render action: :edit, id: params[:id]
+      return
     end
+    render action: :edit, id: params[:id]
   end
+
+  helper_method :layout_kind
 
   protected
 
@@ -29,6 +37,12 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def edit_layout_pages
     @edit_layout_pages ||= MailSnippet.organization_snippet_kinds + %w[landing_page]
+  end
+
+  def layout_kind
+    return "landing_page" if params[:id] == "landing_page"
+    return "organization_stolen_message" if params[:id] == "organization_stolen_message"
+    "mail_snippet"
   end
 
   def find_and_authorize_organization

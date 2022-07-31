@@ -33,6 +33,25 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           get "#{base_url}/landing_page/edit"
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
+          expect(response).to render_template("_landing_page")
+        end
+      end
+      context "organization_stolen_message" do
+        it "redirects with flash error" do
+          expect(organization.organization_stolen_message).to_not be_present
+          get "#{base_url}/organization_stolen_message/edit"
+          expect(response).to redirect_to(admin_organization_custom_layouts_path(organization_id: organization.to_param))
+          expect(flash[:error]).to match(/enabled/)
+        end
+        context "with organization_stolen_message" do
+          let!(:organization_stolen_message) { OrganizationStolenMessage.update_for(organization) }
+          it "renders" do
+            expect(organization.organization_stolen_message).to_not be_present
+            get "#{base_url}/organization_stolen_message/edit"
+            expect(response.status).to eq(200)
+            expect(response).to render_template(:edit)
+            expect(response).to render_template("_organization_stolen_message")
+          end
         end
       end
       describe "mail_snippets" do
@@ -43,6 +62,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
               get "#{base_url}/#{snippet_kind}/edit"
               expect(response.status).to eq(200)
               expect(response).to render_template(:edit)
+              expect(response).to render_template("_mail_snippet")
               organization.reload
               expect(organization.mail_snippets.count).to eq 1
               expect(organization.mail_snippets.where(kind: snippet_kind).count).to eq 1

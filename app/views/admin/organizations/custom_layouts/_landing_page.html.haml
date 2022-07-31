@@ -1,7 +1,8 @@
 
 - if @organization.errors.any?
   = render partial: "/shared/errors", locals: { name: "Organization", obj: @organization  }
-= form_for @organization, { as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update' } do |f|
+= form_for @organization, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update'} do |f|
+  = hidden_field_tag :kind, "landing_page"
   .form-group
     = f.text_area :landing_html, placeholder: 'Landing page (html)', rows: 20, class: "form-control"
   .row.justify-content-end
