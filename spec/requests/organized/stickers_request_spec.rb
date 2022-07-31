@@ -67,6 +67,9 @@ RSpec.describe Organized::StickersController, type: :request do
             expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker_claimed.id])
             get base_url, params: {query: "lax1222"}
             expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker_claimed.id])
+            # And check that it redirects to the sticker path
+            get "/bikes/scanned/#{bike_sticker2.code}"
+            expect(response).to redirect_to(organization_bikes_path(bike_sticker: bike_sticker2.code, organization_id: current_organization.to_param))
           end
         end
         context "with bike_query" do

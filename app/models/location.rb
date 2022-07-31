@@ -17,7 +17,7 @@ class Location < ApplicationRecord
   scope :default_impound_locations, -> { impound_locations.where(default_impound_location: true) }
   # scope :international, where("country_id IS NOT #{Country.united_states.id}")
 
-  before_save :set_calculated_attributes
+  before_validation :set_calculated_attributes
   after_commit :update_associations
   before_destroy :ensure_destroy_permitted!
 
@@ -54,6 +54,9 @@ class Location < ApplicationRecord
   end
 
   def set_calculated_attributes
+    if name.blank? && organization.present? && organization.locations.count == 0
+      self.name = organization.name
+    end
     self.phone = Phonifyer.phonify(phone)
     self.shown = calculated_shown
   end

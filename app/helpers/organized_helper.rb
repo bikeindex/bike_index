@@ -130,8 +130,9 @@ module OrganizedHelper
     user.user_registration_organizations.with_student_id(organization.id).none?
   end
 
-  def registration_field_label(organization = nil, field_slug = nil)
-    return nil unless organization&.registration_field_labels.present?
-    organization.registration_field_labels[field_slug.to_s]
+  def registration_field_label(organization = nil, field_slug = nil, strip_tags: false)
+    txt = organization&.registration_field_labels&.dig(field_slug.to_s)
+    return nil unless txt.present?
+    strip_tags ? strip_tags(txt) : txt.html_safe
   end
 end

@@ -11,8 +11,10 @@
   .form-group.row
     = f.label :short_name, t(".abbreviation"), class: 'org-form-label'
     .col-sm-4
-      = f.text_field :short_name, class: 'form-control'
-
+      = f.text_field :short_name, class: 'form-control', disabled: @organization.block_short_name_edit?
+      - if @organization.block_short_name_edit?
+        - email_link = link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"
+        %span.below-input-help= t(".contact_to_update_html", link: email_link)
   .form-group.row.fancy-select.unfancy
     = f.label :embedable_user_email, class: 'org-form-label' do
       = t(".registration_email")
@@ -53,6 +55,12 @@
     = f.label :website, class: 'org-form-label'
     .col-sm-4
       = f.text_field :website, class: 'form-control'
+
+  - if @organization.locations.first.blank?
+    - @organization.locations.build
+    = f.fields_for :locations do |builder|
+      = render "organized/manages/location_fields", f: builder, initial_location_form: true
+    .mb-5
 
   .form-group.row.avatar-upload-wrapper
     %label.org-form-label

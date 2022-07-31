@@ -219,7 +219,6 @@ nl:
           user_not_authorized: heeft geen toestemming om deze fiets in beslag te nemen
         bike:
           not_found: niet gevonden
-          suspended: geschorst en kan niet worden gebruikt
         export:
           required: verplicht
         manufacturer:
@@ -242,6 +241,9 @@ nl:
           unauthorized_to_claim: hebben geen toestemming om dit te claimen
         parking_notification:
           address_required: "(of locatie) van deze verlaten fiets vereist"
+      organization:
+        duplicate_short_name: al in gebruik bij een andere organisatie. Als je denkt
+          dat dat niet het geval zou moeten zijn, neem dan contact op met support@bikeindex.org
     attributes:
       doorkeeper/application:
         name: Naam
@@ -611,7 +613,6 @@ nl:
         deleted_at: Verwijderd om
         invoices: Facturen
         is_paid: Is betaald
-        is_suspended: Is geschorst
         kind: Soort
         landing_html: Landing html
         locations: Locaties
@@ -1815,6 +1816,7 @@ nl:
       enter_found_bike_type_details: Voer de gevonden %{bike_type} -gegevens in
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
+      owner_email: E-mailadres eigenaar
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'
@@ -4566,6 +4568,8 @@ nl:
         update: Bijwerken
         org_settings: Instellingen
         square_image: Gebruik een vierkante afbeelding voor het beste resultaat
+        contact_to_update_html: Neem contact op met %{link} om de afkorting bij te
+          werken
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen

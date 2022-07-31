@@ -451,7 +451,6 @@ en:
         enabled_feature_slugs: Enabled feature slugs
         invoices: Invoices
         is_paid: Is paid
-        is_suspended: Is suspended
         kind: Kind
         landing_html: Landing html
         locations: Locations
@@ -466,7 +465,7 @@ en:
         public_images: Public images
         recovered_records: Recovered records
         registration_field_labels: Registration field labels
-        short_name: Short name
+        short_name: Abbreviated name
         show_on_map: Show on map
         slug: Slug
         users: Users
@@ -791,7 +790,6 @@ en:
       models:
         bike:
           not_found: not found
-          suspended: suspended and can't be used
         bike_sticker:
           not_found: not found
           unauthorized_to_claim: does not have permission to claim this
@@ -817,6 +815,10 @@ en:
         user:
           email_already_exists: That email is already signed up on Bike Index.
           not_an_available_language: not an available language
+      organization:
+        duplicate_short_name: >-
+          already in use by another organization. If you don't think that should be
+          the case, contact support@bikeindex.org
     models:
       ad: Ad
       ambassador: Ambassador
@@ -1098,6 +1100,7 @@ en:
       or: or
       other_manufacturer: Other manufacturer
       our_serial_page: our serial page
+      owner_email: Owner email
       phone: Phone
       read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a separate
         window)</small>
@@ -4643,6 +4646,7 @@ en:
       show:
         abbreviation: Abbreviation
         choose_file: Choose file...
+        contact_to_update_html: Contact %{link} to update abbreviation
         delete_organization: Delete organization
         i_would_like_to_terminate_my_account: I would like to terminate my account
           with Bike Index

@@ -99,7 +99,6 @@ class Admin::OrganizationsController < Admin::BaseController
         :avatar_cache,
         :embedable_user_email,
         :graduated_notification_interval_days,
-        :is_suspended,
         :lightspeed_register_with_phone,
         :lock_show_on_map,
         :manufacturer_id,
@@ -150,7 +149,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def registration_field_labels_val
     # Get just the reg labels with values
     params.select { |k, v| k.match?("reg_label-") && v.present? }.as_json
-      .map { |k, v| [k.gsub("reg_label-", ""), v] }.to_h
+      .map { |k, v| [k.gsub("reg_label-", ""), v.strip] }.to_h
   end
 
   def permitted_locations_params

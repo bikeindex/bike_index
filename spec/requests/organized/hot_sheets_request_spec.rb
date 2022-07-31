@@ -118,7 +118,9 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         end
         context "already sent today" do
           let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: current_organization, is_on: false, timezone_str: "America/Los_Angeles") }
-          let!(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: current_organization, delivery_status: "email_success") }
+          # At certain times of the day, the timezone can cause the sheet_date to be different
+          let(:sheet_date) { Time.current.in_time_zone(ActiveSupport::TimeZone["America/Guatemala"]).to_date }
+          let!(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: current_organization, delivery_status: "email_success", sheet_date: sheet_date) }
           it "does not send again" do
             expect(current_organization.hot_sheet_configuration).to eq hot_sheet_configuration
             Sidekiq::Worker.clear_all
@@ -128,6 +130,8 @@ RSpec.describe Organized::HotSheetsController, type: :request do
             expect(flash[:success]).to be_present
             current_organization.reload
             hot_sheet_configuration.reload
+            expect(hot_sheet.reload.hot_sheet_configuration.id).to eq hot_sheet_configuration.id
+            expect(hot_sheet_configuration.current_date).to eq hot_sheet.sheet_date
             expect(current_organization.hot_sheet_on?).to be_truthy
             expect(hot_sheet_configuration.send_hour).to eq current_hour.floor
             expect(hot_sheet_configuration.send_today_at).to be < Time.current

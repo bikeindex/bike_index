@@ -21,7 +21,7 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache([page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
           %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
@@ -102,8 +102,9 @@
     - elsif show_general_alert
       = render "/shared/user_general_alert"
 
-    -# This used to be cached, but causes problems because of some current_user stuff in there
-    = render 'shared/footer_revised'
+
+    - cache(["footer", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+      = render "shared/footer_revised"
 
 :javascript
   I18n.defaultLocale = "#{I18n.default_locale}"

@@ -2272,7 +2272,6 @@ CREATE TABLE public.organizations (
     short_name character varying(255),
     show_on_map boolean,
     deleted_at timestamp without time zone,
-    is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,
     access_token character varying(255),
     api_access_approved boolean DEFAULT false NOT NULL,
@@ -6325,6 +6324,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220520180217'),
 ('20220527162543'),
 ('20220622004930'),
-('20220627165205');
+('20220627165205'),
+('20220730171652');
 
 

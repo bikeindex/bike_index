@@ -69,7 +69,7 @@ class Organization < ApplicationRecord
   enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
 
   validates_presence_of :name
-  validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
+  validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_with OrganizationNameValidator
@@ -79,8 +79,8 @@ class Organization < ApplicationRecord
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
-  scope :unpaid, -> { where(is_paid: true) }
-  scope :approved, -> { where(is_suspended: false, approved: true) }
+  scope :unpaid, -> { where(is_paid: false) }
+  scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
@@ -275,10 +275,6 @@ class Organization < ApplicationRecord
     avatar.present?
   end
 
-  def suspended?
-    is_suspended?
-  end
-
   def fetch_impound_configuration
     impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
   end
@@ -377,6 +373,10 @@ class Organization < ApplicationRecord
 
     %w[student employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
+  end
+
+  def block_short_name_edit?
+    paid? # Prevent url changes breaking landing pages, etc
   end
 
   def bike_actions?

@@ -74,6 +74,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template :locations
         expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:page_id)).to eq "organized_manage_locations"
       end
     end
 
@@ -82,7 +83,6 @@ RSpec.describe Organized::ManagesController, type: :request do
         let(:org_attributes) do
           {
             available_invitation_count: 10,
-            is_suspended: false,
             embedable_user_email: current_user.email,
             auto_user_id: current_user.id,
             show_on_map: false,
@@ -99,7 +99,6 @@ RSpec.describe Organized::ManagesController, type: :request do
             # slug: 'short_name',
             slug: "cool name and stuffffff",
             available_invitation_count: "20",
-            is_suspended: true,
             auto_user_id: current_user.id,
             embedable_user_email: user2.email,
             api_access_approved: true,

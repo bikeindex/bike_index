@@ -10,11 +10,11 @@ class OrganizationFeature < ApplicationRecord
 
   # NOTE: reg_bike_sticker is automatically added if the org has stickers, no need to manually add
   REG_FIELDS = %w[
+    reg_address
+    reg_bike_sticker
     reg_extra_registration_number
     reg_organization_affiliation
-    reg_address
     reg_phone
-    reg_bike_sticker
     reg_student_id
   ].freeze
 
@@ -89,7 +89,7 @@ class OrganizationFeature < ApplicationRecord
 
   def self.reg_fields_with_customizable_labels
     # Can't rename bike_stickers
-    reg_fields - %w[reg_bike_sticker]
+    %w[owner_email] + reg_fields - %w[reg_bike_sticker]
   end
 
   def self.reg_fields_organization_uniq

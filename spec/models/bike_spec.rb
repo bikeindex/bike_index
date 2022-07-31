@@ -1467,14 +1467,6 @@ RSpec.describe Bike, type: :model do
         end
       end
     end
-    context "suspended organization" do
-      let(:organization) { FactoryBot.create(:organization, is_suspended: true) }
-      it "adds an error to the bike" do
-        expect(bike.validated_organization_id(organization.id)).to be_nil
-        expect(bike.errors[:organizations].to_s).to match(/suspended/)
-        expect(bike.errors[:organizations].to_s).to match(organization.id.to_s)
-      end
-    end
     context "unable to find organization" do
       it "adds an error to the bike" do
         expect(bike.validated_organization_id("some org")).to be_nil
@@ -1501,13 +1493,6 @@ RSpec.describe Bike, type: :model do
 
         bike.bike_organization_ids = [organization.id]
         expect(bike.reload.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
-      end
-    end
-    context "invalid organization_id" do
-      let(:organization_invalid) { FactoryBot.create(:organization, is_suspended: true) }
-      it "adds valid organization but not invalid one" do
-        bike.bike_organization_ids = [organization.id, organization2.id, organization_invalid.id]
-        expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
       end
     end
     context "different organization" do
