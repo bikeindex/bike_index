@@ -208,7 +208,7 @@
               - message_kind_opts = [["Association: Evey associated stolen bike sees message. Default for schools", "association"], ["Area: seen by bikes stolen in radius. Default for law enforcement, advocacy", "area"]]
               = select_tag :organization_stolen_message_kind, options_for_select(message_kind_opts, selected: organization_stolen_message.kind), {class: "form-control"}
               - if organization_stolen_message.area?
-                .form-group.mt-2
+                .form-group.mt-2.collapse#areaField
                   = label_tag :organization_stolen_message_radius_miles do
                     Stolen Message radius (mi)
                     %small
