@@ -37,17 +37,21 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
         end
       end
       context "organization_stolen_message" do
-        it "redirects with flash error" do
+        xit "redirects with flash error" do
           expect(organization.organization_stolen_message).to_not be_present
           get "#{base_url}/organization_stolen_message/edit"
-          expect(response).to redirect_to(admin_organization_custom_layouts_path(organization_id: organization.to_param))
-          expect(flash[:error]).to match(/enabled/)
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+          expect(response).to render_template("_organization_stolen_message")
+          expect(organization.organization_stolen_message).to be_present
         end
         context "with organization_stolen_message" do
-          let!(:organization_stolen_message) { OrganizationStolenMessage.update_for(organization) }
+          let!(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
           it "renders" do
-            expect(organization.organization_stolen_message).to_not be_present
-            get "#{base_url}/organization_stolen_message/edit"
+            expect(organization.organization_stolen_message).to be_present
+            expect {
+              get "#{base_url}/organization_stolen_message/edit"
+            }.to_not change(OrganizationStolenMessage, :count)
             expect(response.status).to eq(200)
             expect(response).to render_template(:edit)
             expect(response).to render_template("_organization_stolen_message")
@@ -91,7 +95,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
             kind: snippet_kind,
             is_enabled: false)
         end
-        let(:update) do
+        let(:update_params) do
           {
             mail_snippets_attributes: {
               "0" => {
@@ -106,7 +110,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
         it "updates the mail snippets" do
           expect(mail_snippet.is_enabled).to be_falsey
           expect {
-            put "#{base_url}/#{snippet_kind}", params: {organization: update}
+            put "#{base_url}/#{snippet_kind}", params: {organization: update_params}
           }.to change(MailSnippet, :count).by 0
           target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: snippet_kind)
           expect(response).to redirect_to target
@@ -114,6 +118,34 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(mail_snippet.body).to eq "<p>html for snippet 1</p>"
           expect(mail_snippet.organization).to eq organization
           expect(mail_snippet.is_enabled).to be_truthy
+        end
+      end
+      context "organization_stolen_message" do
+        let!(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
+        let(:update_params) do
+          {
+            organization_stolen_message_attributes: {
+              "0" => {
+                id: organization_stolen_message.id,
+                body: "text for stolen message",
+                organization_id: 844,
+                enabled: true
+              }
+            }
+          }
+        end
+        it "updates" do
+          expect(organization_stolen_message.body).to be_blank
+          expect(organization_stolen_message.is_enabled).to be_falsey
+          expect {
+            put "#{base_url}/organization_stolen_message", params: {organization: update_params}
+          }.to change(MailSnippet, :count).by 0
+          target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: "organization_stolen_message")
+          expect(response).to redirect_to target
+          organization_stolen_message.reload
+          expect(organization_stolen_message.body).to eq "text for stolen message"
+          expect(organization_stolen_message.organization).to eq organization
+          expect(organization_stolen_message.enabled).to be_truthy
         end
       end
     end

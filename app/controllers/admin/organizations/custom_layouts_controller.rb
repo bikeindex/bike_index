@@ -6,24 +6,20 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def edit
     @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-    unless @edit_template == "landing_page" # Otherwise, we're rendering a snippet
+    if @edit_template == "organization_stolen_message"
+      @organization_stolen_message = OrganizationStolenMessage.for(@organization)
+    elsif @edit_template != "landing_page" # we're rendering a snippet
       @mail_snippet = @organization.mail_snippets.where(kind: @edit_template).first_or_create
     end
   end
 
   def update
-    if layout_kind == "organization_stolen_message"
-      if @organization.update(permitted_parameters)
-        flash[:success] = "Layout Saved!"
-        redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
-        return
-      end
-    elsif @organization.update(permitted_parameters)
+    if @organization.update(permitted_parameters)
       flash[:success] = "Layout Saved!"
       redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
-      return
+    else
+      render action: :edit, id: params[:id]
     end
-    render action: :edit, id: params[:id]
   end
 
   helper_method :layout_kind
@@ -32,11 +28,13 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def permitted_parameters
     params.require(:organization)
-      .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
+      .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id],
+        organization_stolen_message: [:body, :is_enabled, :id])
   end
 
   def edit_layout_pages
-    @edit_layout_pages ||= MailSnippet.organization_snippet_kinds + %w[landing_page]
+    @edit_layout_pages ||= MailSnippet.organization_snippet_kinds +
+      %w[landing_page organization_stolen_message]
   end
 
   def layout_kind

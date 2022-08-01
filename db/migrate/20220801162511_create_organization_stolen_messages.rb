@@ -6,9 +6,9 @@ class CreateOrganizationStolenMessages < ActiveRecord::Migration[6.1]
       t.float :latitude
       t.float :longitude
       t.float :radius_miles
-      t.text :message
+      t.text :body
       t.references :updator, index: true
-      t.boolean :enabled, default: false
+      t.boolean :is_enabled, default: false
 
       t.timestamps
     end

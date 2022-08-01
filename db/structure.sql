@@ -2230,9 +2230,9 @@ CREATE TABLE public.organization_stolen_messages (
     latitude double precision,
     longitude double precision,
     radius_miles double precision,
-    message text,
+    body text,
     updator_id bigint,
-    enabled boolean DEFAULT false,
+    is_enabled boolean DEFAULT false,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -6319,12 +6319,12 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220324004315'),
 ('20220405173312'),
 ('20220411165641'),
-('20220412151420'),
 ('20220420145734'),
 ('20220520180217'),
 ('20220527162543'),
 ('20220622004930'),
 ('20220627165205'),
-('20220730171652');
+('20220730171652'),
+('20220801162511');
 
 

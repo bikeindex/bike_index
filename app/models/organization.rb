@@ -62,6 +62,7 @@ class Organization < ApplicationRecord
   has_one :impound_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
+  accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true
 
   enum kind: KIND_ENUM
