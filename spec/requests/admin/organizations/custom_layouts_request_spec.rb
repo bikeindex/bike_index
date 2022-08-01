@@ -37,13 +37,13 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
         end
       end
       context "organization_stolen_message" do
-        xit "redirects with flash error" do
+        it "renders" do
           expect(organization.organization_stolen_message).to_not be_present
           get "#{base_url}/organization_stolen_message/edit"
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
           expect(response).to render_template("_organization_stolen_message")
-          expect(organization.organization_stolen_message).to be_present
+          expect(organization.reload.organization_stolen_message).to be_present
         end
         context "with organization_stolen_message" do
           let!(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
@@ -125,12 +125,10 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
         let(:update_params) do
           {
             organization_stolen_message_attributes: {
-              "0" => {
-                id: organization_stolen_message.id,
-                body: "text for stolen message",
-                organization_id: 844,
-                enabled: true
-              }
+              id: organization_stolen_message.id,
+              body: "text for stolen message",
+              organization_id: 844,
+              is_enabled: true
             }
           }
         end
@@ -145,7 +143,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           organization_stolen_message.reload
           expect(organization_stolen_message.body).to eq "text for stolen message"
           expect(organization_stolen_message.organization).to eq organization
-          expect(organization_stolen_message.enabled).to be_truthy
+          expect(organization_stolen_message.is_enabled).to be_truthy
         end
       end
     end

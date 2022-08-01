@@ -29,7 +29,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
   def permitted_parameters
     params.require(:organization)
       .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id],
-        organization_stolen_message: [:body, :is_enabled, :id])
+        organization_stolen_message_attributes: [:body, :is_enabled, :id])
   end
 
   def edit_layout_pages
