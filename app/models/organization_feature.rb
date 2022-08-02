@@ -102,6 +102,10 @@ class OrganizationFeature < ApplicationRecord
       %w[regional_bike_counts passwordless_users graduated_notifications organization_stolen_message]
   end
 
+  def self.feature_slugs
+    pluck(:feature_slugs).flatten.uniq
+  end
+
   def one_time?
     standard_one_time? || custom_one_time?
   end

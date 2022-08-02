@@ -46,8 +46,25 @@
   = column_chart time_range_counts(collection: matching_organizations, column: @time_range_column), stacked: true, thousands: ","
 = render partial: "/shared/period_select"
 
-.row.mb-4
-  .col-md-5
+-# Minor style adjustment for selectize
+<style>.form-control.selectize-control { width: 100%; }</style>
+
+.row.mt-4
+  .col-12
+    = form_tag admin_organizations_path, method: :get, class: "form-inline" do
+      = render partial: "/shared/hidden_search_fields"
+      = hidden_field_tag :search_paid, @search_paid
+      = hidden_field_tag :search_kind, params[:search_kind]
+      = hidden_field_tag :search_pos, params[:search_pos]
+      .form-group.align-self-end.fancy-select.no-restore-on-backspace.unfancy{style: "margin-bottom: -0.4rem; min-width: 300px;"}
+        - opt_vals = OrganizationFeature.order(name: :desc).pluck(:name, :id)
+        = select_tag :search_organization_features, options_for_select(opt_vals, selected: @organization_features.map(&:id)), placeholder: "With organization features", class: "form-control", include_blank: true, multiple: true
+      .form-group.align-self-end.ml-2
+        = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location", class: "form-control", style: "min-width: 300px;"
+      .form-group
+        = submit_tag "Search", name: "search", class: "btn btn-primary ml-2"
+
+  .col-md-12.mt-4
     %p
       = number_with_delimiter(matching_organizations.count)
       - if sortable_search_params?
@@ -56,16 +73,6 @@
       organizations
       %em
         (#{matching_organizations.where("organizations.created_at >= ?", Time.current.beginning_of_day).count} today)
-  .col-md-7
-    = form_tag admin_organizations_path, method: :get, class: "form-inline" do
-      = render partial: "/shared/hidden_search_fields"
-      = hidden_field_tag :search_paid, @search_paid
-      = hidden_field_tag :search_kind, params[:search_kind]
-      = hidden_field_tag :search_pos, params[:search_pos]
-      .form-group.ml-auto.align-self-end.mt-4
-        = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location#{current_user.developer? ? '/Organization features' : '' }", class: "form-control", style: "min-width: 300px;"
-      .form-group.mt-4
-        = submit_tag "Search", name: "search", class: "btn btn-primary ml-2"
 
 = paginate @organizations, views_prefix: "admin"
 

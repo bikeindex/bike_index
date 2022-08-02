@@ -1,18 +1,4 @@
-.admin-subnav
-  .col-md-4
-    %h1
-      = @organization.name
-  .col-md-8
-    %ul
-      %li.nav-item
-        = link_to "organization's view", organization_root_path(organization_id: @organization.to_param), class: "btn btn-outline-success btn-sm"
-      %li.nav-item
-        = link_to "Edit organization", edit_admin_organization_url(@organization), class: "nav-link"
-      - if display_dev_info?
-        %li.nav-item.only-dev-visible
-          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "nav-link less-strong"
-
-= render partial: "organization_suspended_deleted"
+= render partial: "/admin/organizations/display_header", locals: {organization: @organization, current_action: "", show_custom_layouts: true, show_organization_view: true, show_edit: true}
 
 - if @organization.law_enforcement_missing_verified_features?
   .alert.alert-info
@@ -167,14 +153,12 @@
 .row.mt-4
   .col-md-6
     %p
-      %strong
-        = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
-      %em.less-strong
-        #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
       - if @organization.invoices.count > 0
-        and
         %strong
           #{@organization.invoices.active.count} active
+        and
+      %em.less-strong
+        #{pluralize(@organization.invoices.count, "invoice")} total
     - if @organization.parent_organization.present?
       %p
         Parent

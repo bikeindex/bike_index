@@ -122,6 +122,10 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
+    @organization_features = OrganizationFeature.where(id: params[:search_organization_features])
+    if @organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
+      matching_organizations = matching_organizations.with_enabled_feature_slugs(@organization_features.feature_slugs)
+    end
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
