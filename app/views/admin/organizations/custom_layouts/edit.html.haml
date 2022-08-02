@@ -1,13 +1,13 @@
-
 %h1
-  = link_to "#{@organization.short_name} custom layouts", admin_organization_custom_layouts_path(@organization)
+  = link_to @organization.short_name, admin_organization_url(@organization)
+  \-
+  = link_to "custom layouts", admin_organization_custom_layouts_path(@organization)
   - if (layout_kind == "mail_snippet")
     %strong
       = @edit_template.titleize
     email snippet
   - else
     = layout_kind.titleize
-
 
 = render layout_kind
 .mt-4

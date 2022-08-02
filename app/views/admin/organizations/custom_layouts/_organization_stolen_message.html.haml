@@ -1,30 +1,21 @@
-.form.form-horizontal.clearfix
+.form.form-horizontal.clearfix.mt-4
   - if @organization_stolen_message.errors.any?
     = render partial: "/shared/errors", locals: {name: "Organization Stolen Message", obj: @organization_stolen_message}
-/   = form_for @organization_stolen_message, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update' } do |f|
-/     = f.fields_for :mail_snippets do |snippet|
-/       - snippet_kind = snippet.object.kind
-/       - next unless snippet_kind == @edit_template
-/       - snippet_description = MailSnippet.organization_snippets.dig(snippet.object.kind.to_sym, :description)
-/       .form-group
-/         = snippet.label :body, "#{snippet.object.kind.titleize} snippet"
-/         = snippet.text_area :body, placeholder: snippet_description, rows: 10, class: "form-control"
-/       .row
-/         .col-md-6
-/           .form-check
-/             %label
-/               = snippet.check_box :is_enabled, class: "form-check-input"
-/               Enable
-/               %strong
-/                 #{@edit_template.titleize} snippet
-/               %em
-/                 only possible if there is content
-/         .col-md-6
-/           = f.submit 'Save', class: 'btn btn-success float-right'
-/   .mt-4
-
-/ %ul.list-unstyled#public_images.mt-4.not-blog-public-images{ :"data-order-url" => order_public_images_url }
-/   - if @mail_snippet.public_images
-/     = render partial: 'public_images/admin_public_image', collection: @mail_snippet.public_images, as: :public_image, locals: { skip_order: true }
-/ %section.custom-layouts
-/   = render partial: 'public_images/admin_new_form', locals: { imageable_type: 'MailSnippet' }
+  = form_for @organization_stolen_message, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: "update" } do |f|
+    = f.fields_for :organization_stolen_message do |osm|
+      .form-group
+        = osm.label :body, "Stolen Message text"
+        = osm.text_area :body, rows: 5, class: "form-control"
+      .row
+        .col-md-6
+          .form-check
+            %label
+              = osm.check_box :is_enabled, class: "form-check-input"
+              Enable
+              %strong
+                = @edit_template.titleize
+              %em
+                only possible if there is content
+        .col-md-6
+          = f.submit 'Save', class: 'btn btn-success float-right'
+  .mt-4
