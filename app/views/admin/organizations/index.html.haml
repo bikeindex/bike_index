@@ -46,8 +46,8 @@
   = column_chart time_range_counts(collection: matching_organizations, column: @time_range_column), stacked: true, thousands: ","
 = render partial: "/shared/period_select"
 
-:css
-  .form-control.selectize-control { width: 100%; }
+-# Minor style adjustment for selectize
+<style>.form-control.selectize-control { width: 100%; }</style>
 
 .row.mt-4
   .col-12
