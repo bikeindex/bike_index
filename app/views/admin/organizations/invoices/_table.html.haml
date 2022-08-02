@@ -46,7 +46,8 @@
         Features
     %tbody
       - invoices.each do |invoice|
-        - organization = Organization.unscoped.find(invoice.organization_id)
+        - organization = Organization.unscoped.find_by_id(invoice.organization_id)
+        - next if organization.blank?
         %tr
           %td
             - if organization.present?

@@ -1,8 +1,4 @@
-%h1.mt-4
-  Edit
-  = link_to @organization.name, admin_organization_url(@organization)
-
-= render partial: "organization_suspended_deleted"
+= render partial: "/admin/organizations/display_header", locals: {organization: @organization}
 
 = form_for [:admin, @organization] do |f|
   = render partial: 'form', locals: { f: f }

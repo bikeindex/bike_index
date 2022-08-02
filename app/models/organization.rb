@@ -160,8 +160,6 @@ class Organization < ApplicationRecord
 
   def self.admin_text_search(n)
     return nil unless n.present?
-    # Only search for organization features if the text is organization features
-    return with_enabled_feature_slugs(n) if OrganizationFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
     match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")

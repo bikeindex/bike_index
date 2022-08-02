@@ -95,6 +95,10 @@ class OrganizationFeature < ApplicationRecord
     %w[reg_organization_affiliation reg_student_id]
   end
 
+  def self.feature_slugs
+    pluck(:feature_slugs).flatten.uniq
+  end
+
   def one_time?
     standard_one_time? || custom_one_time?
   end
