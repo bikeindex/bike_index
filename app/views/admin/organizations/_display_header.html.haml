@@ -1,15 +1,36 @@
 - organization ||= @organization
+- current_action ||= action_name.humanize
+- additional_link ||= nil
+
+- show_edit = false
+- show_organization_view ||= false
+- show_custom_layouts ||= false
+- skip_invoices ||= false
+
 .admin-subnav
   .col-md-4
     %h1
-      = organization.name
+      = current_action
+      %small
+        - if controller_name == "organizations" &&  action_name == "show"
+          = organization.name
+        - else
+          = link_to organization.name, admin_organization_url(organization.to_param)
   .col-md-8
     %ul
-      %li.nav-item
-        = link_to "organization's view", organization_root_path(organization_id: organization.to_param), class: "btn btn-outline-success btn-sm"
-      %li.nav-item
-        = link_to "Edit organization", edit_admin_organization_url(organization), class: "nav-link"
-      - if display_dev_info?
+      - if additional_link.present?
+        %li.nav-item
+          = additional_link
+      - if show_organization_view
+        %li.nav-item
+          = link_to "organization's view", organization_root_path(organization_id: organization.to_param), class: "btn btn-outline-info btn-sm nav-link"
+      - if show_edit
+        %li.nav-item
+          = link_to "Edit", edit_admin_organization_url(organization), class: "nav-link"
+      - unless skip_invoices
+        %li.nav-item
+          = link_to "Org invoices", admin_organization_invoices_path(organization_id: @organization.to_param), class: "nav-link"
+      - if display_dev_info? && show_custom_layouts
         %li.nav-item.only-dev-visible
           = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: organization.to_param), class: "nav-link less-strong"
   - if organization.deleted?

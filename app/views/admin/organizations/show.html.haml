@@ -1,4 +1,4 @@
-= render partial: "/admin/organizations/display_header", locals: {organization: @organization}
+= render partial: "/admin/organizations/display_header", locals: {organization: @organization, current_action: "", show_custom_layouts: true, show_organization_view: true, show_edit: true}
 
 - if @organization.law_enforcement_missing_verified_features?
   .alert.alert-info
@@ -153,14 +153,12 @@
 .row.mt-4
   .col-md-6
     %p
-      %strong
-        = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
-      %em.less-strong
-        #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
       - if @organization.invoices.count > 0
-        and
         %strong
           #{@organization.invoices.active.count} active
+        and
+      %em.less-strong
+        #{pluralize(@organization.invoices.count, "invoice")} total
     - if @organization.parent_organization.present?
       %p
         Parent
