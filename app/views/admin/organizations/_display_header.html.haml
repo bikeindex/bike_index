@@ -1,0 +1,26 @@
+- organization ||= @organization
+.admin-subnav
+  .col-md-4
+    %h1
+      = organization.name
+  .col-md-8
+    %ul
+      %li.nav-item
+        = link_to "organization's view", organization_root_path(organization_id: organization.to_param), class: "btn btn-outline-success btn-sm"
+      %li.nav-item
+        = link_to "Edit organization", edit_admin_organization_url(organization), class: "nav-link"
+      - if display_dev_info?
+        %li.nav-item.only-dev-visible
+          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: organization.to_param), class: "nav-link less-strong"
+  - if organization.deleted?
+    .row.mt-5.mb-5
+      .col-md-6
+        .alert.alert-danger
+          %h4
+            %span.text-danger
+              Organization deleted
+            %small.convertTime.preciseTime.withPreposition
+              = l @organization.deleted_at, format: :convert_time
+
+
+

@@ -1,18 +1,4 @@
-.admin-subnav
-  .col-md-4
-    %h1
-      = @organization.name
-  .col-md-8
-    %ul
-      %li.nav-item
-        = link_to "organization's view", organization_root_path(organization_id: @organization.to_param), class: "btn btn-outline-success btn-sm"
-      %li.nav-item
-        = link_to "Edit organization", edit_admin_organization_url(@organization), class: "nav-link"
-      - if display_dev_info?
-        %li.nav-item.only-dev-visible
-          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "nav-link less-strong"
-
-= render partial: "organization_suspended_deleted"
+= render partial: "/admin/organizations/display_header", locals: {organization: @organization}
 
 - if @organization.law_enforcement_missing_verified_features?
   .alert.alert-info
