@@ -1,4 +1,4 @@
-= render partial: "/admin/organizations/display_header", locals: {organization: @organization, current_action: "", skip_invoices: true, additional_link: link_to("New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link btn btn-success btn-sm mr-2")}
+= render partial: "/admin/organizations/display_header", locals: {current_action: "", skip_invoices: true, additional_link: link_to("New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link btn btn-success btn-sm mr-2")}
 
 = render partial: "/admin/organizations/invoices/table", locals: {invoices: @invoices}
 

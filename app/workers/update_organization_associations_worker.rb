@@ -70,8 +70,8 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
       if organization.organization_stolen_message.blank?
         OrganizationStolenMessage.create!(organization: organization)
       end
-    elsif organization.organization_stolen_message&.enabled?
-      organization.organization_stolen_message.update(enabled: false)
+    elsif organization.organization_stolen_message&.is_enabled?
+      organization.organization_stolen_message.update(is_enabled: false)
     end
   end
 end

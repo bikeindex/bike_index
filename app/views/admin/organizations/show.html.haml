@@ -1,4 +1,4 @@
-= render partial: "/admin/organizations/display_header", locals: {organization: @organization, current_action: "", show_custom_layouts: true, show_organization_view: true, show_edit: true}
+= render partial: "/admin/organizations/display_header", locals: {current_action: "", show_custom_layouts: true, organization_view_path: organization_root_path(organization_id: @organization.to_param), show_edit: true}
 
 - if @organization.law_enforcement_missing_verified_features?
   .alert.alert-info

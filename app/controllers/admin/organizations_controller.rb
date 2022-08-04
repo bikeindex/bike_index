@@ -70,7 +70,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
     else
-      render action: :create
+      render action: :new
     end
   end
 

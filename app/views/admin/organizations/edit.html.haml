@@ -1,4 +1,4 @@
-= render partial: "/admin/organizations/display_header", locals: {organization: @organization}
+= render partial: "/admin/organizations/display_header", locals: {}
 
 = form_for [:admin, @organization] do |f|
   = render partial: 'form', locals: { f: f }
