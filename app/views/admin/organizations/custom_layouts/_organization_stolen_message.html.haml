@@ -4,8 +4,13 @@
   = form_for @organization_stolen_message, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: "update" } do |f|
     = f.fields_for :organization_stolen_message do |osm|
       .form-group
-        = osm.label :body, "Stolen Message text"
-        = osm.text_area :body, rows: 5, class: "form-control"
+        = osm.label :body do
+          Stolen Message text
+          %small.less-strong
+            max length:
+            %strong= OrganizationStolenMessage::MAX_BODY_LENGTH
+            characters
+        = osm.text_area :body, rows: 4, maxlength: OrganizationStolenMessage::MAX_BODY_LENGTH, class: "form-control"
       .row
         .col-md-6
           .form-check

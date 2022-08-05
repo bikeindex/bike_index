@@ -1,5 +1,5 @@
 class OrganizationStolenMessage < ApplicationRecord
-  MAX_body_LENGTH = 300
+  MAX_BODY_LENGTH = 300
   KIND_ENUM = {area: 0, association: 1}
 
   belongs_to :organization
@@ -30,7 +30,7 @@ class OrganizationStolenMessage < ApplicationRecord
   def self.clean_body(str)
     return nil if str.blank?
     ActionController::Base.helpers.strip_tags(str).gsub("&amp;", "&")
-      .strip.gsub(/\s+/, " ").truncate(MAX_body_LENGTH, omission: "")
+      .strip.gsub(/\s+/, " ").truncate(MAX_BODY_LENGTH, omission: "")
   end
 
   def self.default_kind_for_organization_kind(org_kind)

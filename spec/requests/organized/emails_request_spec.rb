@@ -6,9 +6,9 @@ RSpec.describe Organized::EmailsController, type: :request do
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
   let(:all_viewable_email_kinds) do
     %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification graduated_notification
-      impound_notification impound_claim_approved impound_claim_denied]
+      impound_notification impound_claim_approved impound_claim_denied organization_stolen_message]
   end
-  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes] }
+  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes organization_stolen_message] }
 
   context "logged_in_as_organization_member" do
     include_context :request_spec_logged_in_as_organization_member
@@ -154,6 +154,28 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration graduated_notification])
         end
       end
+      context "partial_registration" do
+        let(:enabled_feature_slugs) { %w[customize_emails organization_stolen_message] }
+        it "renders" do
+          get "#{base_url}/organization_stolen_message"
+          expect(response.status).to eq(200)
+          expect(response).to render_template("organized_mailer/organization_stolen_message")
+          expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
+          expect(assigns(:bike).id).to be_blank
+        end
+        context "with a stolen bike" do
+          let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+          it "renders that bike" do
+            expect(bike.reload.status).to eq "status_stolen"
+            expect(organization.bikes.pluck(:id)).to eq([bike.id])
+            get "#{base_url}/organization_stolen_message"
+            expect(response.status).to eq(200)
+            expect(response).to render_template("organized_mailer/organization_stolen_message")
+            expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
+            expect(assigns(:bike).id).to eq bike.id
+          end
+        end
+      end
     end
 
     describe "edit" do
@@ -232,7 +254,7 @@ RSpec.describe Organized::EmailsController, type: :request do
     include_context :request_spec_logged_in_as_superuser
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     # Also defined in controller
-    let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied] }
+    let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied organization_stolen_message] }
     describe "edit" do
       it "renders" do
         viewable_kinds.each do |kind|

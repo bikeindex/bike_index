@@ -58,6 +58,9 @@ RSpec.describe MailSnippet, type: :model do
         expect(mail_snippet.in_email?(email)).to be_truthy
       end
     end
+    it "is finished_registration_stolen for organization_stolen_message" do
+      expect(MailSnippet.organization_email_for("organization_stolen_message")).to eq "finished_registration_stolen"
+    end
     context "organization_message_kinds" do
       it "is kind" do
         MailSnippet.organization_message_kinds.each do |kind|

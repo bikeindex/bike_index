@@ -71,12 +71,21 @@ module Organized
       bike
     end
 
+    def default_stolen_bike
+      bike = current_organization.bikes.status_stolen.last
+      return bike if bike.present?
+      default_bike
+      bike.current_stolen_record = StolenRecord.new(date_stolen: Time.current - 1.day)
+      bike
+    end
+
     def viewable_email_kinds
       return @viewable_email_kinds if defined?(@viewable_email_kinds)
       viewable_email_kinds = ["finished_registration"]
       viewable_email_kinds += ["partial_registration"] if current_organization.enabled?("show_partial_registrations")
       viewable_email_kinds += ParkingNotification.kinds if current_organization.enabled?("parking_notifications")
       viewable_email_kinds += ["graduated_notification"] if current_organization.enabled?("graduated_notifications")
+      viewable_email_kinds += ["organization_stolen_message"] if current_organization.enabled?("organization_stolen_message")
       viewable_email_kinds += %w[impound_claim_approved impound_claim_denied] if current_organization.enabled?("impound_bikes")
       @viewable_email_kinds = viewable_email_kinds
     end
@@ -90,8 +99,12 @@ module Organized
       # These are uneditable kinds:
       @can_edit = !%w[finished_registration partial_registration].include?(@kind)
       if @can_edit
-        @mail_snippet = mail_snippets.where(kind: @kind).first
-        @mail_snippet ||= current_organization.mail_snippets.build(kind: @kind)
+        if @kind = "organization_stolen_message"
+          @object = current_organization.organization_stolen_message
+        else
+          @object = mail_snippets.where(kind: @kind).first
+          @object ||= current_organization.mail_snippets.build(kind: @kind)
+        end
       end
     end
 
@@ -105,7 +118,7 @@ module Organized
     end
 
     def build_finished_email
-      @bike = default_bike
+      @bike = @kind == "organization_stolen_message" ? default_stolen_bike : default_bike
       @ownership ||= @bike.current_ownership # Gross things to make default_bike work
       @user = @ownership.owner
       @vars = {
