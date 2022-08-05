@@ -36,13 +36,13 @@
           = check_mark if LandingPages::ORGANIZATIONS.include?(@organization.slug)
       %tr
         %td
-          = link_to "Organization Stolen Message", edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: "organization_stolen_message")
+          = link_to "Organization Stolen Message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
         %td.small
-          = link_to "Organization Stolen Message", "#"
+          = link_to "preview message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
         %td.table-cell-check
-          = check_mark if false
+          = check_mark if @organization.organization_stolen_message&.body.present?
         %td.table-cell-check
-          = check_mark if false
+          = check_mark if @organization.organization_stolen_message&.is_enabled
       - MailSnippet.organization_snippets.each do |kind, snippet_attrs|
         - snippet = @organization.mail_snippets.where(kind: kind).first
         %tr

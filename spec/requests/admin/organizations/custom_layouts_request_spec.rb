@@ -36,28 +36,6 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(response).to render_template("_landing_page")
         end
       end
-      context "organization_stolen_message" do
-        it "renders" do
-          expect(organization.organization_stolen_message).to_not be_present
-          get "#{base_url}/organization_stolen_message/edit"
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:edit)
-          expect(response).to render_template("_organization_stolen_message")
-          expect(organization.reload.organization_stolen_message).to be_present
-        end
-        context "with organization_stolen_message" do
-          let!(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
-          it "renders" do
-            expect(organization.organization_stolen_message).to be_present
-            expect {
-              get "#{base_url}/organization_stolen_message/edit"
-            }.to_not change(OrganizationStolenMessage, :count)
-            expect(response.status).to eq(200)
-            expect(response).to render_template(:edit)
-            expect(response).to render_template("_organization_stolen_message")
-          end
-        end
-      end
       describe "mail_snippets" do
         MailSnippet.organization_snippet_kinds.each do |snippet_kind|
           context snippet_kind do
@@ -118,32 +96,6 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(mail_snippet.body).to eq "<p>html for snippet 1</p>"
           expect(mail_snippet.organization).to eq organization
           expect(mail_snippet.is_enabled).to be_truthy
-        end
-      end
-      context "organization_stolen_message" do
-        let!(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
-        let(:update_params) do
-          {
-            organization_stolen_message_attributes: {
-              id: organization_stolen_message.id,
-              body: "text for stolen message",
-              organization_id: 844,
-              is_enabled: true
-            }
-          }
-        end
-        it "updates" do
-          expect(organization_stolen_message.body).to be_blank
-          expect(organization_stolen_message.is_enabled).to be_falsey
-          expect {
-            put "#{base_url}/organization_stolen_message", params: {organization: update_params}
-          }.to change(MailSnippet, :count).by 0
-          target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: "organization_stolen_message")
-          expect(response).to redirect_to target
-          organization_stolen_message.reload
-          expect(organization_stolen_message.body).to eq "text for stolen message"
-          expect(organization_stolen_message.organization).to eq organization
-          expect(organization_stolen_message.is_enabled).to be_truthy
         end
       end
     end
