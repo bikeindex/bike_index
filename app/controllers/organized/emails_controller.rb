@@ -34,11 +34,11 @@ module Organized
     end
 
     def update
-      if @mail_snippet.update(permitted_parameters)
+      if @object.update(permitted_parameters)
         flash[:success] = "Email updated"
         redirect_to edit_organization_email_path(@kind, organization_id: current_organization.to_param)
       else
-        flash[:error] = "Unable to update your custom email - #{@mail_snippet.errors.full_messages}"
+        flash[:error] = "Unable to update your custom email - #{@object.errors.full_messages}"
         render :edit
       end
     end

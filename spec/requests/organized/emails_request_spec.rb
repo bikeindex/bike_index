@@ -154,14 +154,15 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration graduated_notification])
         end
       end
-      context "partial_registration" do
+      context "organization_stolen_message" do
         let(:enabled_feature_slugs) { %w[customize_emails organization_stolen_message] }
         it "renders" do
           get "#{base_url}/organization_stolen_message"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/organization_stolen_message")
+          expect(response).to render_template("organized_mailer/finished_registration")
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
-          expect(assigns(:bike).id).to be_blank
+          expect(assigns(:bike).id).to eq 42
+          expect(assigns(:bike).current_stolen_record&.id).to be_blank
         end
         context "with a stolen bike" do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
@@ -170,7 +171,7 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
             get "#{base_url}/organization_stolen_message"
             expect(response.status).to eq(200)
-            expect(response).to render_template("organized_mailer/organization_stolen_message")
+            expect(response).to render_template("organized_mailer/finished_registration")
             expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
             expect(assigns(:bike).id).to eq bike.id
           end
@@ -275,6 +276,41 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response).to render_template(:edit)
           expect(assigns(:kind)).to eq "partial_registration"
         end
+      end
+    end
+    describe "update" do
+      context "organization_stolen_message" do
+        let(:update_params) do
+          {
+            organization_stolen_message_attributes: {
+              id: organization_stolen_message.id,
+              body: "text for stolen message",
+              organization_id: 844,
+              is_enabled: true
+            }
+          }
+        end
+        # it "updates" do
+        #   expect(current_organization.kind).to eq "bike_shop"
+        #   expect(current_organization.organization_stolen_message).to be_blank
+        #   get "#{base_url}/organization_stolen_message/edit"
+        #   expect(response.status).to eq(200)
+        #   expect(response).to render_template(:edit)
+        #   organization_stolen_message = current_organization.organization_stolen_message
+        #   expect(organization_stolen_message).to be_present
+        #   expect(organization_stolen_message).to eq "area"
+        #   expect(organization_stolen_message.body).to be_blank
+        #   expect(organization_stolen_message.is_enabled).to be_falsey
+        #   expect {
+        #     put "#{base_url}/organization_stolen_message", params: {organization: update_params}
+        #   }.to change(MailSnippet, :count).by 0
+
+        #   expect(response).to redirect_to target
+        #   organization_stolen_message.reload
+        #   expect(organization_stolen_message.body).to eq "text for stolen message"
+        #   expect(organization_stolen_message.organization).to eq organization
+        #   expect(organization_stolen_message.is_enabled).to be_truthy
+        # end
       end
     end
   end
