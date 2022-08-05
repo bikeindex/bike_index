@@ -11,6 +11,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       expect(organization_stolen_message.is_enabled).to be_falsey
       expect(organization_stolen_message.body).to eq nil
       expect(organization_stolen_message.latitude).to be_blank
+      expect(organization_stolen_message.content_added_at).to be_blank
     end
     context "organization with location" do
       let(:organization) { FactoryBot.create(:organization, :in_nyc, kind: "bike_manufacturer", search_radius_miles: 94) }
@@ -26,6 +27,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(organization_stolen_message.body).to eq "Something PARTy"
         expect(organization_stolen_message.radius_miles).to eq 12
         expect(organization_stolen_message.is_enabled).to be_truthy
+        expect(organization_stolen_message.content_added_at).to be_present
       end
     end
     context "overly long body" do

@@ -2233,6 +2233,7 @@ CREATE TABLE public.organization_stolen_messages (
     body text,
     updator_id bigint,
     is_enabled boolean DEFAULT false,
+    content_added_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

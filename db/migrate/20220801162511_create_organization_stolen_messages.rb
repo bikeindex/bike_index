@@ -9,6 +9,7 @@ class CreateOrganizationStolenMessages < ActiveRecord::Migration[6.1]
       t.text :body
       t.references :updator, index: true
       t.boolean :is_enabled, default: false
+      t.datetime :content_added_at
 
       t.timestamps
     end

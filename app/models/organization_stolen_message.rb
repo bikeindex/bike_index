@@ -37,6 +37,10 @@ class OrganizationStolenMessage < ApplicationRecord
     %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
   end
 
+  def editable_subject?
+    false # match mail_snippet method
+  end
+
   def disabled?
     !is_enabled?
   end
@@ -47,6 +51,7 @@ class OrganizationStolenMessage < ApplicationRecord
     self.longitude = organization&.location_longitude
     self.radius_miles ||= organization.search_radius_miles
     self.kind ||= self.class.default_kind_for_organization_kind(organization&.kind)
+    self.content_added_at ||= Time.current if body.present?
     self.is_enabled = false unless can_enable?
   end
 

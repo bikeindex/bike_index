@@ -11,6 +11,7 @@
     This email isn't normally viewable by normal users, it isn't part of the organizations permitted viewable kinds
 
 - if @can_edit
+  - created_at = @kind == "organization_stolen_message" ? @object.content_added_at : @object.created_at
   .row
     .col-md-6
       %table.table-list
@@ -18,15 +19,15 @@
           %tr
             %td Created
             %td
-              - if @object.id.present?
+              - if created_at.present?
                 %span.convertTime.preciseTime
-                  = l(@object.created_at, format: :convert_time)
+                  = l(created_at, format: :convert_time)
               - else
-                not created
+                %span.less-strong not created
           %tr
             %td Last updated
             %td
-              - if @object.id.present?
+              - if created_at.present?
                 %span.convertTime.preciseTime
                   = l(@object.updated_at, format: :convert_time)
     .col-md-6
@@ -48,10 +49,15 @@
 
 
   %h3.uncap.mt-4
-    Edit the email
+    Edit the
+    = @kind == "organization_stolen_message" ? "stolen message" : "email"
   = form_for @object, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
-    - if @kind == "organization_stolen_message"
+    - if @object.editable_subject?
       .form-group
+        = f.label :subject, "Custom email subject", class: "control-label"
+        = f.text_field :subject, class: "form-control"
+    .form-group
+      - if @kind == "organization_stolen_message"
         = f.label :body, class: "control-label" do
           Custom alert message to add to stolen bikes
           %small
@@ -63,13 +69,8 @@
               max length:
               %strong= OrganizationStolenMessage::MAX_BODY_LENGTH
               characters
-        = f.text_area :body, rows: 4, maxlength: OrganizationStolenMessage::MAX_BODY_LENGTH, class: "form-control"
-    - else
-      - if @object.editable_subject?
-        .form-group
-          = f.label :subject, "Custom email subject", class: "control-label"
-          = f.text_field :subject, class: "form-control"
-      .form-group
+        = f.text_area :body, rows: 4, maxlength: nil, class: "form-control"
+      - else
         = f.label :body, class: "control-label" do
           Custom HTML message to add to the email
           %small
@@ -86,7 +87,9 @@
       = f.check_box :is_enabled
       = f.label :is_enabled, class: "org-form-label" do
         Enabled
-        %em.less-strong customizations won't show up unless checked
+        %em.less-strong
+          = @kind == "organization_stolen_message" ? "stolen message" : "customizations"
+          won't show up unless checked
 
     .mt-2
       = submit_tag "Save", class: "btn btn-success btn-md-lg"

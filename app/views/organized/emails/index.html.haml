@@ -44,11 +44,13 @@
           - organization_stolen_message = current_organization.organization_stolen_message
           %td= check_mark if organization_stolen_message.is_enabled
           %td
-            %span.convertTime
-              = l(organization_stolen_message.created_at, format: :convert_time)
+            - if organization_stolen_message.content_added_at.present?
+              %span.convertTime
+                = l(organization_stolen_message.content_added_at, format: :convert_time)
           %td
-            %span.convertTime
-              = l(organization_stolen_message.updated_at, format: :convert_time)
+            - if organization_stolen_message.content_added_at.present?
+              %span.convertTime
+                = l(organization_stolen_message.updated_at, format: :convert_time)
           %td
             %small
               = truncate(organization_stolen_message.body, length: 100)
