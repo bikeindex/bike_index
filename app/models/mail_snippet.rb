@@ -59,18 +59,13 @@ class MailSnippet < ApplicationRecord
 
   def self.organization_email_for(kind)
     kind = kind&.to_s
-    return kind.to_s
-    if organization_snippet_kinds.include?(kind)
-      organization_snippets.dig(kind, :emails)
-    else
-      kind == "organization_stolen_message" ? "finished_registration_stolen" : kind
-    end
+    return kind.to_s unless organization_snippet_kinds.include?(kind)
+    organization_snippets.dig(kind, :emails)
   end
 
   def self.organization_emails_with_snippets
-    # Worth noting: no snippet is named "finished_registration" or ""
-    ParkingNotification.kinds +
-    %w[finished_registration finished_registration_stolen partial_registration
+    # Worth noting: no snippet is named "finished_registration"
+    ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
        graduated_notification impound_claim_approved impound_claim_denied]
   end
 

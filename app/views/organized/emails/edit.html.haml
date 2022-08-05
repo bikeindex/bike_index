@@ -49,11 +49,22 @@
 
   %h3.uncap.mt-4
     Edit the email
-
-  - if @kind == "organization_stolen_message"
-    FORM HERE
-  - else
-    = form_for @object, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
+  = form_for @object, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
+    - if @kind == "organization_stolen_message"
+      .form-group
+        = f.label :body, class: "control-label" do
+          Custom alert message to add to stolen bikes
+          %small
+            - if @object.area?
+              Stolen bikes within the area of your organization will see this message
+            - else
+              Stolen Bikes registered through your organization will see this message
+            %em.less-strong.d-block{ style: "line-height: 1;" }
+              max length:
+              %strong= OrganizationStolenMessage::MAX_BODY_LENGTH
+              characters
+        = f.text_area :body, rows: 4, maxlength: OrganizationStolenMessage::MAX_BODY_LENGTH, class: "form-control"
+    - else
       - if @object.editable_subject?
         .form-group
           = f.label :subject, "Custom email subject", class: "control-label"
@@ -71,14 +82,14 @@
               \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"}.
         = f.text_area :body, rows: 4, placeholder: "Custom text", class: "form-control"
 
-      .form-group
-        = f.check_box :is_enabled
-        = f.label :is_enabled, class: "org-form-label" do
-          Enabled
-          %em.less-strong customizations won't show up unless checked
+    .form-group
+      = f.check_box :is_enabled
+      = f.label :is_enabled, class: "org-form-label" do
+        Enabled
+        %em.less-strong customizations won't show up unless checked
 
-      .mt-2
-        = submit_tag "Save", class: "btn btn-success btn-md-lg"
+    .mt-2
+      = submit_tag "Save", class: "btn btn-success btn-md-lg"
 - else
   .alert.alert-info.mt-4.mb-4
     %h3.uncap.less-strong Not customizable directly

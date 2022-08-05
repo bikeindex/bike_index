@@ -56,7 +56,7 @@ RSpec.describe Organized::EmailsController, type: :request do
         get base_url
         expect(response).to render_template(:index)
         # Sanity check
-        expect(all_viewable_email_kinds).to match_array(MailSnippet.organization_message_kinds + %w[finished_registration partial_registration])
+        expect(all_viewable_email_kinds).to match_array(MailSnippet.organization_message_kinds + %w[finished_registration partial_registration organization_stolen_message])
         expect(assigns(:viewable_email_kinds)).to match_array(all_viewable_email_kinds)
       end
     end
@@ -167,7 +167,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
           it "renders that bike" do
             expect(bike.reload.status).to eq "status_stolen"
-            expect(organization.bikes.pluck(:id)).to eq([bike.id])
+            expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
             get "#{base_url}/organization_stolen_message"
             expect(response.status).to eq(200)
             expect(response).to render_template("organized_mailer/organization_stolen_message")
