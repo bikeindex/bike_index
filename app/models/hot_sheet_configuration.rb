@@ -10,7 +10,7 @@ class HotSheetConfiguration < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  delegate :search_coordinates, to: :organization, allow_nil: true
+  delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
 
   scope :on, -> { where(is_on: true) }
 

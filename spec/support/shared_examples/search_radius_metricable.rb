@@ -3,7 +3,9 @@ require "rails_helper"
 RSpec.shared_examples "search_radius_metricable" do
   let(:model_sym) { subject.class.name.underscore.to_sym }
   let(:instance) do
-    if model_sym == :organization_stolen_message # No factory
+    if model_sym == :organization
+      organization
+    elsif model_sym == :organization_stolen_message # No factory
       OrganizationStolenMessage.create(organization: organization)
     else
       FactoryBot.create(model_sym, organization: organization)

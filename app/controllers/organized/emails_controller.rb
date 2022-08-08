@@ -112,7 +112,11 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:mail_snippet).permit(:body, :is_enabled, :subject)
+      if params[:organization_stolen_message].present?
+        params.require(:organization_stolen_message).permit(:body, :is_enabled)
+      else
+        params.require(:mail_snippet).permit(:body, :is_enabled, :subject)
+      end
     end
 
     def build_partial_email

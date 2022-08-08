@@ -3,6 +3,8 @@
 module SearchRadiusMetricable
   extend ActiveSupport::Concern
 
+  DEFAULT_RADIUS_MILES = 50
+
   included do
     before_validation :set_search_radius
   end
@@ -12,8 +14,12 @@ module SearchRadiusMetricable
   end
 
   def search_radius_metric_units?
-    @search_radius_metric_units ||=
-      self.class == Organization ? metric_units? : organization&.metric_units?
+    @search_radius_metric_units ||= metric_units? # assign because through multiple tables
+  end
+
+  def initial_search_radius_miles
+    search_rad = organization&.search_radius_miles if self.class != Organization
+    search_rad || DEFAULT_RADIUS_MILES
   end
 
   def search_radius_kilometers
@@ -36,9 +42,9 @@ module SearchRadiusMetricable
 
   def set_search_radius
     if search_radius_miles.blank? || search_radius_miles < 1
-      self.search_radius_miles = organization&.search_radius_miles || 50
+      self.search_radius_miles = initial_search_radius_miles
       # switch km default to 100
-      self.search_radius_kilometers = 100 if search_radius_metric_units? && search_radius_miles == 50
+      self.search_radius_kilometers = 100 if search_radius_metric_units? && search_radius_miles == DEFAULT_RADIUS_MILES
     end
   end
 end

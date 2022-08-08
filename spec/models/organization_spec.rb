@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Organization, type: :model do
+  it_behaves_like "search_radius_metricable"
+
   describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
       FactoryBot.create(:bike, :in_los_angeles)

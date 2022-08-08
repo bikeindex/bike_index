@@ -283,7 +283,7 @@ RSpec.describe Organized::EmailsController, type: :request do
         let(:organization_stolen_message) { current_organization.organization_stolen_message }
         let(:update_params) do
           {
-            organization_stolen_message_attributes: {
+            organization_stolen_message: {
               id: organization_stolen_message.id,
               body: "text for stolen message",
               organization_id: 844,
@@ -302,7 +302,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(organization_stolen_message.body).to be_blank
           expect(organization_stolen_message.is_enabled).to be_falsey
           expect {
-            put "#{base_url}/organization_stolen_message", params: {organization: update_params}
+            put "#{base_url}/organization_stolen_message", params: update_params
           }.to change(MailSnippet, :count).by 0
           organization_stolen_message.reload
           expect(organization_stolen_message.body).to eq "text for stolen message"

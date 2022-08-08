@@ -11,6 +11,8 @@ class OrganizationStolenMessage < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
+  delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
+
   enum kind: KIND_ENUM
 
   scope :enabled, -> { where(is_enabled: true) }

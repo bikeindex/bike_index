@@ -307,10 +307,6 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil
   end
 
-  def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles)
-  end
-
   # Try for publicly_visible, fall back to whatever - TODO: make this configurable
   def default_location
     locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first
