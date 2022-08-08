@@ -97,9 +97,14 @@ RSpec.describe "BikesController#create", type: :request do
     before { expect(BParam.all.count).to eq 0 }
     context "successful creation" do
       include_context :geocoder_real
-      it "creates a bike and doesn't create a b_param" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["organization_stolen_message"], search_radius_miles: search_radius_miles) }
+      let(:organization_stolen_message) { OrganizationStolenMessage.create(organization: organization, is_enabled: true, kind: "area", body: "Something cool") }
+      let(:search_radius_miles) { 5 }
+      def expect_created_stolen_bike
         bike_user = FactoryBot.create(:user_confirmed, email: "something@stuff.com")
         VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:method]) do
+          expect(organization_stolen_message.reload.search_radius_miles).to eq search_radius_miles
+          expect(organization_stolen_message.is_enabled).to be_truthy
           bb_data = {bike: {rear_wheel_bsd: wheel_size.iso_bsd.to_s}, components: []}.as_json
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're
@@ -123,6 +128,16 @@ RSpec.describe "BikesController#create", type: :request do
           expect(bike.current_ownership.status).to eq "status_stolen"
           stolen_record = bike.current_stolen_record
           chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+        end
+      end
+      it "creates a bike and doesn't create a b_param" do
+        expect_created_stolen_bike
+        expect(organization_stolen_message.reload.stolen_records.count).to eq 1
+      end
+      context "outside of area" do
+        it "doesn't assign organization_stolen_message" do
+          expect_created_stolen_bike
+          expect(organization_stolen_message.reload.stolen_records.count).to eq 0
         end
       end
     end

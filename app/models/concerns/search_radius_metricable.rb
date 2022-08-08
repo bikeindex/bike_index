@@ -5,6 +5,16 @@ module SearchRadiusMetricable
 
   DEFAULT_RADIUS_MILES = 50
 
+  class_methods do
+    def miles_to_kilometers(num)
+      (num.to_f * "1.609344".to_f)
+    end
+
+    def kilometers_to_miles(num)
+      num.to_f / "1.609344".to_f
+    end
+  end
+
   included do
     before_validation :set_search_radius
   end
@@ -23,13 +33,11 @@ module SearchRadiusMetricable
   end
 
   def search_radius_kilometers
-    (search_radius_miles.to_f * "1.609344".to_f).to_i
+    self.class.miles_to_kilometers(search_radius_miles).to_i
   end
 
   def search_radius_kilometers=(val)
-    if val.present?
-      self.search_radius_miles = val.to_f / "1.609344".to_f
-    end
+    self.search_radius_miles = self.class.kilometers_to_miles(val) if val.present?
   end
 
   def search_radius_display

@@ -31,6 +31,8 @@ class Ownership < ApplicationRecord
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
 
+  has_many :notifications, as: :notifiable
+
   enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM
   enum origin: ORIGIN_ENUM

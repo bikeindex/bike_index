@@ -33,6 +33,7 @@ class StolenRecord < ApplicationRecord
   belongs_to :bike
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
+  belongs_to :organization_stolen_message
 
   has_many :impound_claims
   has_many :tweets

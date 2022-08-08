@@ -1,10 +1,12 @@
 class OrganizationStolenMessage < ApplicationRecord
   MAX_BODY_LENGTH = 300
   KIND_ENUM = {area: 0, association: 1}
+  MAX_SEARCH_RADIUS = 1000
 
   include SearchRadiusMetricable
 
   belongs_to :organization
+
   has_many :stolen_records
 
   validates :organization_id, presence: true, uniqueness: true
@@ -18,13 +20,27 @@ class OrganizationStolenMessage < ApplicationRecord
   scope :enabled, -> { where(is_enabled: true) }
   scope :disabled, -> { where(is_enabled: false) }
 
+  geocoded_by nil, latitude: :latitude, longitude: :longitude
+
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
   end
 
-  def self.for_coordinates(latitude, longitude)
-    # area.
-    # Geocoder::Calculations.bounding_box([to_coordinates], search_radius_miles)
+  def self.max_search_radius_kilometers
+    miles_to_kilometers(MAX_SEARCH_RADIUS)
+  end
+
+  def self.for_stolen_record(stolen_record)
+    return stolen_record.organization_stolen_message if stolen_record.organization_stolen_message.present?
+    area_result = for_coordinates(stolen_record.to_coordinates)
+    return area_result if area_result.present?
+    stolen_record.bike.bike_organizations.includes(:organization).order(:id)
+      .detect { |bo| bo.organization.organization_stolen_message&.is_enabled? }
+      &.organization&.organization_stolen_message
+  end
+
+  def self.for_coordinates(coordinates)
+    enabled.area.near(coordinates, MAX_SEARCH_RADIUS).first
   end
 
   def self.clean_body(str)
@@ -35,6 +51,11 @@ class OrganizationStolenMessage < ApplicationRecord
 
   def self.default_kind_for_organization_kind(org_kind)
     %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
+  end
+
+  # never geocode, use organization lat/long
+  def should_be_geocoded?
+    false
   end
 
   def editable_subject?
@@ -56,6 +77,7 @@ class OrganizationStolenMessage < ApplicationRecord
     self.kind ||= self.class.default_kind_for_organization_kind(organization&.kind)
     self.content_added_at ||= Time.current if body.present?
     self.is_enabled = false unless can_enable?
+    self.search_radius_miles = MAX_SEARCH_RADIUS if search_radius_miles > MAX_SEARCH_RADIUS
   end
 
   private

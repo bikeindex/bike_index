@@ -211,20 +211,27 @@
               = label_tag :organization_stolen_message_kind do
                 Stolen Message type
                 %small
-                  <span class="text-success">Organization Stolen Message setting</span>, edit message in the #{link_to "orgs own edit page", "#"} TODO: Link
+                  <span class="text-success">Organization Stolen Message setting</span>, edit message in the #{link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)}
               - message_kind_opts = [["Association: Evey associated stolen bike sees message. Default for schools", "association"], ["Area: seen by bikes stolen in radius. Default for law enforcement, advocacy", "area"]]
               = select_tag :organization_stolen_message_kind, options_for_select(message_kind_opts, selected: organization_stolen_message.kind), {class: "form-control"}
-              - if organization_stolen_message.area?
-                .form-group.mt-2.collapse#areaField
-                  - if organization_stolen_message.search_radius_metric_units?
-                    = f.label :organization_stolen_message_radius_kilometers do
-                      Stolen Message radius (km)
-                      %small
-                        <span class="text-success">Organization Stolen Message setting</span> - only available for area type
-                    = number_field_tag :organization_stolen_message_radius_kilometers, organization_stolen_message.search_radius_kilometers, {class: "form-control"}
-                  - else
-                    = label_tag :organization_stolen_message_search_radius_miles do
-                      Stolen Message radius (mi)
-                      %small
-                        <span class="text-success">Organization Stolen Message setting</span> - only available for area type
-                    = number_field_tag :organization_stolen_message_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}
+              .form-group.mt-2.collapse#areaField
+                - if organization_stolen_message.search_radius_metric_units?
+                  = f.label :organization_stolen_message_search_radius_kilometers do
+                    Stolen Message radius (km)
+                    %small
+                      <span class="text-success">Organization Stolen Message setting</span> - only available for area type
+                      %span.less-strong
+                        max
+                        = OrganizationStolenMessage.max_search_radius_kilometers
+                        km
+                  = number_field_tag :organization_stolen_message_search_radius_kilometers, organization_stolen_message.search_radius_kilometers, {class: "form-control"}
+                - else
+                  = label_tag :organization_stolen_message_search_radius_miles do
+                    Stolen Message radius (mi)
+                    %small
+                      <span class="text-success">Organization Stolen Message setting</span> - only available for area type
+                      %span.less-strong
+                        max
+                        = OrganizationStolenMessage::MAX_SEARCH_RADIUS
+                        miles
+                  = number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}

@@ -14,6 +14,9 @@
   - if @bike.status_impounded?
     %h1= t(".html.thanks_for_adding_this_bike_type_you_found", bike_type: @bike.type )
   - elsif @bike.status_stolen?
+    - if @bike.current_stolen_record.organization_stolen_message.present?
+      .alert.alert-danger
+        = @bike.current_stolen_record.organization_stolen_message.body
     %h1= t(".html.bike_type_thieves_are_jerks", bike_type: @bike.type )
     %p= t(".html.were_sorry_your_bike_type_was_stolen", bike_type: @bike.type )
   - else
