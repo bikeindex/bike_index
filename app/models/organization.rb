@@ -1,5 +1,6 @@
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
+  include SearchRadiusMetricable
 
   KIND_ENUM = {
     bike_shop: 0,

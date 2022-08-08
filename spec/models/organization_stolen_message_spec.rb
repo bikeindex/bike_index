@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe OrganizationStolenMessage, type: :model do
+  it_behaves_like "search_radius_metricable"
+
   describe "calculated_attributes" do
     let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
     let(:organization_stolen_message) { OrganizationStolenMessage.create(organization_id: organization.id) }
@@ -18,14 +20,14 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       it "uses location" do
         expect(organization_stolen_message.reload.latitude).to eq organization.location_latitude
         expect(organization_stolen_message.longitude).to eq organization.location_longitude
-        expect(organization_stolen_message.radius_miles).to eq 94
+        expect(organization_stolen_message.search_radius_miles).to eq 94
         expect(organization_stolen_message.kind).to eq "association"
         expect(organization_stolen_message.is_enabled).to be_falsey
-        organization_stolen_message.update(is_enabled: true, body: "  Something\n<strong> PARTy</strong>  ", radius_miles: 12, latitude: 22, longitude: 22)
+        organization_stolen_message.update(is_enabled: true, body: "  Something\n<strong> PARTy</strong>  ", search_radius_miles: 12, latitude: 22, longitude: 22)
         expect(organization_stolen_message.reload.latitude).to eq organization.location_latitude
         expect(organization_stolen_message.longitude).to eq organization.location_longitude
         expect(organization_stolen_message.body).to eq "Something PARTy"
-        expect(organization_stolen_message.radius_miles).to eq 12
+        expect(organization_stolen_message.search_radius_miles).to eq 12
         expect(organization_stolen_message.is_enabled).to be_truthy
         expect(organization_stolen_message.content_added_at).to be_present
       end

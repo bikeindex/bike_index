@@ -107,6 +107,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :passwordless_user_domain,
         :previous_slug,
         :search_radius_miles,
+        :search_radius_kilometers,
         :short_name,
         :show_on_map,
         :slug,
@@ -162,8 +163,9 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def update_organization_stolen_message
-    message_params = {radius_miles: params[:organization_stolen_message_radius_miles],
-      kind: params[:organization_stolen_message_kind]}
+    message_params = {search_radius_miles: params[:organization_stolen_message_search_radius_miles],
+      kind: params[:organization_stolen_message_kind],
+      search_radius_kilometers: params[:organization_stolen_message_search_radius_kilometers]}
     return unless @organization.organization_stolen_message.present? &&
       message_params.values.present?
     @organization.organization_stolen_message.update(message_params)

@@ -57,21 +57,21 @@
         = f.label :subject, "Custom email subject", class: "control-label"
         = f.text_field :subject, class: "form-control"
     .form-group
-      - if @kind == "organization_stolen_message"
-        = f.label :body, class: "control-label" do
+      = f.label :body, class: "control-label" do
+        - if @kind == "organization_stolen_message"
           Custom alert message to add to stolen bikes
           %small
             - if @object.area?
-              Stolen bikes within the area of your organization will see this message
+              Stolen bikes within
+              %em= @object.search_radius_display
+              of your organization will see this message
             - else
               Stolen Bikes registered through your organization will see this message
             %em.less-strong.d-block{ style: "line-height: 1;" }
               max length:
-              %strong= OrganizationStolenMessage::MAX_BODY_LENGTH
+              %strong= @object.max_body_length
               characters
-        = f.text_area :body, rows: 4, maxlength: nil, class: "form-control"
-      - else
-        = f.label :body, class: "control-label" do
+        - else
           Custom HTML message to add to the email
           %small
             %strong.text-warning
@@ -81,14 +81,14 @@
               Need help with HTML? Check out
               = link_to "this tutorial", "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started"
               \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"}.
-        = f.text_area :body, rows: 4, placeholder: "Custom text", class: "form-control"
+      = f.text_area :body, rows: 4, maxlength: @object.max_body_length, placeholder: "Custom text", class: "form-control"
 
     .form-group
       = f.check_box :is_enabled
       = f.label :is_enabled, class: "org-form-label" do
         Enabled
         %em.less-strong
-          = @kind == "organization_stolen_message" ? "stolen message" : "customizations"
+          = @kind == "organization_stolen_message" ? "message" : "customizations"
           won't show up unless checked
 
     .mt-2

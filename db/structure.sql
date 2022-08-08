@@ -2229,7 +2229,7 @@ CREATE TABLE public.organization_stolen_messages (
     kind integer,
     latitude double precision,
     longitude double precision,
-    radius_miles double precision,
+    search_radius_miles double precision,
     body text,
     updator_id bigint,
     is_enabled boolean DEFAULT false,

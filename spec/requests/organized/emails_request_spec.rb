@@ -253,7 +253,7 @@ RSpec.describe Organized::EmailsController, type: :request do
 
   context "logged_in_as_super_admin" do
     include_context :request_spec_logged_in_as_superuser
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
+    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs, kind: "bike_shop") }
     # Also defined in controller
     let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied organization_stolen_message] }
     describe "edit" do
@@ -280,6 +280,7 @@ RSpec.describe Organized::EmailsController, type: :request do
     end
     describe "update" do
       context "organization_stolen_message" do
+        let(:organization_stolen_message) { current_organization.organization_stolen_message }
         let(:update_params) do
           {
             organization_stolen_message_attributes: {
@@ -290,27 +291,24 @@ RSpec.describe Organized::EmailsController, type: :request do
             }
           }
         end
-        # it "updates" do
-        #   expect(current_organization.kind).to eq "bike_shop"
-        #   expect(current_organization.organization_stolen_message).to be_blank
-        #   get "#{base_url}/organization_stolen_message/edit"
-        #   expect(response.status).to eq(200)
-        #   expect(response).to render_template(:edit)
-        #   organization_stolen_message = current_organization.organization_stolen_message
-        #   expect(organization_stolen_message).to be_present
-        #   expect(organization_stolen_message).to eq "area"
-        #   expect(organization_stolen_message.body).to be_blank
-        #   expect(organization_stolen_message.is_enabled).to be_falsey
-        #   expect {
-        #     put "#{base_url}/organization_stolen_message", params: {organization: update_params}
-        #   }.to change(MailSnippet, :count).by 0
-
-        #   expect(response).to redirect_to target
-        #   organization_stolen_message.reload
-        #   expect(organization_stolen_message.body).to eq "text for stolen message"
-        #   expect(organization_stolen_message.organization).to eq organization
-        #   expect(organization_stolen_message.is_enabled).to be_truthy
-        # end
+        it "updates" do
+          expect(current_organization.kind).to eq "bike_shop"
+          # exists because UpdateOrganizationAssociationsWorker, destroy to test a weird state
+          expect(organization_stolen_message).to be_present
+          get "#{base_url}/organization_stolen_message/edit"
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+          expect(organization_stolen_message.kind).to eq "association"
+          expect(organization_stolen_message.body).to be_blank
+          expect(organization_stolen_message.is_enabled).to be_falsey
+          expect {
+            put "#{base_url}/organization_stolen_message", params: {organization: update_params}
+          }.to change(MailSnippet, :count).by 0
+          organization_stolen_message.reload
+          expect(organization_stolen_message.body).to eq "text for stolen message"
+          expect(organization_stolen_message.organization_id).to eq current_organization.id
+          expect(organization_stolen_message.is_enabled).to be_truthy
+        end
       end
     end
   end

@@ -236,15 +236,25 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "updates the organization attributes" do
         expect(organization_stolen_message).to be_present # Because of organization feature
         expect(organization_stolen_message.kind).to eq "area"
-        expect(organization_stolen_message.radius_miles).to eq 50.0
+        expect(organization_stolen_message.search_radius_miles).to eq 50.0
         put "#{base_url}/#{organization.to_param}", params: {
           organization: update_params,
-          organization_stolen_message_radius_miles: 44,
+          organization_stolen_message_search_radius_miles: 44,
           organization_stolen_message_kind: "association",
         }
         expect_attrs_to_match_hash(organization.reload, update_params)
         expect(organization_stolen_message.reload.kind).to eq "association"
-        expect(organization_stolen_message.radius_miles).to eq 44
+        expect(organization_stolen_message.search_radius_miles).to eq 44
+        # And it works with kilometers too
+        put "#{base_url}/#{organization.to_param}", params: {
+          organization: {search_radius_kilometers: 33},
+          organization_stolen_message_search_radius_kilometers: 44,
+          organization_stolen_message_kind: "area",
+        }
+        organization.reload
+        expect(organization.reload.search_radius_kilometers).to eq 33
+        expect(organization_stolen_message.reload.kind).to eq "area"
+        expect(organization_stolen_message.search_radius_kilometers).to eq 44
       end
     end
     context "not updating manual_pos_kind" do

@@ -102,6 +102,10 @@ class MailSnippet < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
+  def max_body_length
+    nil # match mail_snippet method
+  end
+
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
     self.kind ||= "custom"
