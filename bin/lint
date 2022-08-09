@@ -11,6 +11,5 @@ def system!(*args)
 end
 
 chdir APP_ROOT do
-  system! "standardrb"
-  system! "yarn lint"
+  system!("bundle exec standardrb --fix")
 end
