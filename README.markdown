@@ -94,6 +94,8 @@ We use the following tools to automate code formatting and linting:
 - [StandardRB](https://github.com/testdouble/standard)
 - [ESlint](https://eslint.org/)
 
+Run `bin/lint` to automatically lint the files and/or add auto formatters to your text editor (e.g. [prettier-standard](https://github.com/sheerun/prettier-standard))
+
 ### EditorConfig
 
 EditorConfig ensures whitespace consistency. See the [Download a
