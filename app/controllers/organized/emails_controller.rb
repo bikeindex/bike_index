@@ -115,7 +115,7 @@ module Organized
 
     def permitted_parameters
       if params[:organization_stolen_message].present?
-        params.require(:organization_stolen_message).permit(:body, :is_enabled)
+        params.require(:organization_stolen_message).permit(:body, :is_enabled, :report_url)
       else
         params.require(:mail_snippet).permit(:body, :is_enabled, :subject)
       end

@@ -292,7 +292,9 @@ RSpec.describe Organized::EmailsController, type: :request do
               id: organization_stolen_message.id,
               body: "text for stolen message",
               organization_id: 844,
-              is_enabled: true
+              is_enabled: true,
+              report_url: "something.com/stuff=true?utm=fffff",
+              report_phone: "111222333"
             }
           }
         end
@@ -313,6 +315,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(organization_stolen_message.body).to eq "text for stolen message"
           expect(organization_stolen_message.organization_id).to eq current_organization.id
           expect(organization_stolen_message.is_enabled).to be_truthy
+          expect(organization_stolen_message.report_url).to eq "http://something.com/stuff=true?utm=fffff"
         end
       end
     end

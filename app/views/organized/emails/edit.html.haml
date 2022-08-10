@@ -45,13 +45,21 @@
                 Impound claims are not currently enabled
                 %small To turn on impound claims, you must enable the #{link_to "publicly accessible impound page", edit_organization_manage_impounding_path(organization_id: current_organization.to_param)}
 
-
-
-
-  %h3.uncap.mt-4
-    Edit the
-    = @kind == "organization_stolen_message" ? "stolen message" : "email"
   = form_for @object, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
+    - if @kind == "organization_stolen_message"
+      .form-group.mb-5.mt-4
+        = f.label :report_url, "URL to make a stolen bike report in your jurisdiction", class: "control-label"
+        = f.text_field :report_url, class: "form-control"
+
+    %h3.uncap.mt-4
+      Edit the
+      = @kind == "organization_stolen_message" ? "stolen message" : "email"
+
+    - if @object.editable_subject?
+      .form-group
+        = f.label :subject, "Custom email subject", class: "control-label"
+        = f.text_field :subject, class: "form-control"
+
     - if @object.editable_subject?
       .form-group
         = f.label :subject, "Custom email subject", class: "control-label"

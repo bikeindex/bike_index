@@ -84,6 +84,7 @@ class OrganizationStolenMessage < ApplicationRecord
     self.content_added_at ||= Time.current if body.present?
     self.is_enabled = false unless can_enable?
     self.search_radius_miles = MAX_SEARCH_RADIUS if search_radius_miles > MAX_SEARCH_RADIUS
+    self.report_url = Urlifyer.urlify(report_url)
   end
 
   private

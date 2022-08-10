@@ -11,6 +11,9 @@ class CreateOrganizationStolenMessages < ActiveRecord::Migration[6.1]
       t.boolean :is_enabled, default: false
       t.datetime :content_added_at
 
+      t.string :report_url
+      t.string :report_phone
+
       t.timestamps
     end
     add_reference :stolen_records, :organization_stolen_message
