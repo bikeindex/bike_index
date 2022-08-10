@@ -33,9 +33,9 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       end
     end
     context "overly long body" do
-      let(:target) { "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cill" }
+      let(:target) { "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qu" }
       it "truncates" do
-        organization_stolen_message.update(is_enabled: true, body: " #{target} um dolore eu fugiat nulla pariatur.")
+        organization_stolen_message.update(is_enabled: true, body: " #{target} i officia deserunt mollit anim id est laborum.")
         expect(organization_stolen_message.reload.is_enabled).to be_falsey
         expect(organization_stolen_message.body).to eq target
       end
@@ -49,7 +49,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
   end
 
   describe "for stolen_record" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, kind: "bike_shop", enabled_feature_slugs: ["organization_stolen_message"]) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "bike_shop", enabled_feature_slugs: ["organization_stolen_message"]) }
+    let!(:organization_default_location) { FactoryBot.create(:location_nyc, organization: organization) }
     let!(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
     let(:attrs) { {kind: "association", is_enabled: true, body: "Something cool"} }
     before { organization_stolen_message.update(attrs) }
@@ -103,7 +104,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
       end
     end
-    context "with an areaorganization_stolen_message" do
+    context "with an area organization_stolen_message" do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["organization_stolen_message"]) }
       let(:area_attrs) { {kind: "area", is_enabled: true, body: "Something cool", search_radius_miles: 100} }
       let!(:organization_stolen_message2) { OrganizationStolenMessage.where(organization_id: organization2.id).first_or_create }
@@ -115,28 +116,36 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(stolen_record).to be_valid
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         expect(stolen_record.organization_stolen_message_id).to eq nil
+        expect(OrganizationStolenMessage.for_coordinates(stolen_record.to_coordinates)&.id).to eq organization_stolen_message2.id
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message2.id
         expect(stolen_record.reload.organization_stolen_message_id).to eq nil
-        # Not association bike doesn't match
-        expect(bike2.current_stolen_record).to be_valid
-        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq nil
+        # Associated bike also matches
+        expect(bike2.reload.current_stolen_record_id).to be_present
+        expect(bike2.bike_organizations.pluck(:organization_id)).to eq([organization2.id])
+        expect(OrganizationStolenMessage.for_coordinates(bike2.current_stolen_record.to_coordinates)&.id).to eq organization_stolen_message2.id
+        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
       end
 
       context "2 area organization_stolen_message" do
+        let(:prospect_park) { {latitude: 40.655135, longitude: -73.9648107} }
+        let(:williamsburg) { {latitude: 40.7031836, longitude: -73.9639495} }
         let(:attrs) { area_attrs } # Assigns it to be first
+        let!(:organization_default_location) { FactoryBot.create(:location_nyc, {organization: organization, skip_geocoding: true}.merge(williamsburg)) }
         it "returns the closer area" do
+          expect(organization.reload.default_location.to_coordinates).to eq(williamsburg.values)
+          stolen_record.update(prospect_park.merge(skip_geocoding: true))
+          expect(stolen_record.reload.to_coordinates).to eq(prospect_park.values)
           expect(organization_stolen_message.id).to be_present
           expect(OrganizationStolenMessage.count).to eq 2
           expect(OrganizationStolenMessage.area.pluck(:id)).to eq([organization_stolen_message.id, organization_stolen_message2.id])
+          expect(organization_stolen_message.reload.to_coordinates).to_not eq(organization_stolen_message2.reload.to_coordinates)
           expect(stolen_record).to be_valid
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
           expect(stolen_record.organization_stolen_message_id).to eq nil
-          expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message2.id
-          expect(stolen_record.reload.organization_stolen_message_id).to eq nil
-          # Not association bike doesn't match
+          expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
+          # Closer to the Manhattan location
           expect(bike2.current_stolen_record).to be_valid
-          expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq nil
-          fail
+          expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
         end
       end
     end

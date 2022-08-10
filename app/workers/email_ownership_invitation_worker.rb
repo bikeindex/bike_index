@@ -11,6 +11,12 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
       return ownership.update_attribute(:send_email, ownership.calculated_send_email)
     end
     if ownership.bike.current_stolen_record.present?
+      stolen_record = ownership.bike.current_stolen_record
+      stolen_record.organization_stolen_message ||= OrganizationStolenMessage.for_stolen_record(stolen_record)
+      if stolen_record.changed?
+        stolen_record.save!
+        ownership.reload
+      end
     end
     notification = Notification.find_or_create_by(notifiable: ownership,
       kind: "finished_registration")

@@ -1,5 +1,5 @@
 class OrganizationStolenMessage < ApplicationRecord
-  MAX_BODY_LENGTH = 300
+  MAX_BODY_LENGTH = 400
   KIND_ENUM = {area: 0, association: 1}
   MAX_SEARCH_RADIUS = 1000
 

@@ -156,13 +156,16 @@ RSpec.describe Organized::EmailsController, type: :request do
       end
       context "organization_stolen_message" do
         let(:enabled_feature_slugs) { %w[customize_emails organization_stolen_message] }
+        let(:organization_stolen_message) { current_organization.organization_stolen_message }
         it "renders" do
+          expect(organization_stolen_message.id).to be_present
           get "#{base_url}/organization_stolen_message"
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/finished_registration")
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
           expect(assigns(:bike).id).to eq 42
-          expect(assigns(:bike).current_stolen_record&.id).to be_blank
+          expect(assigns(:bike).current_stolen_record).to be_present
+          expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
         end
         context "with a stolen bike" do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
@@ -174,6 +177,8 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response).to render_template("organized_mailer/finished_registration")
             expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
             expect(assigns(:bike).id).to eq bike.id
+            expect(assigns(:bike).current_stolen_record).to be_present
+            expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
           end
         end
       end

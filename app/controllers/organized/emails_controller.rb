@@ -73,9 +73,11 @@ module Organized
 
     def default_stolen_bike
       bike = current_organization.bikes.status_stolen.last
-      return bike if bike.present?
-      bike = default_bike
-      bike.current_stolen_record = StolenRecord.new(date_stolen: Time.current - 1.day)
+      if bike.blank?
+        bike = default_bike
+        bike.current_stolen_record = StolenRecord.new(date_stolen: Time.current - 1.day)
+      end
+      bike.current_stolen_record.organization_stolen_message = current_organization.organization_stolen_message
       bike
     end
 

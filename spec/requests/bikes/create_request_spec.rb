@@ -140,6 +140,13 @@ RSpec.describe "BikesController#create", type: :request do
           expect(organization_stolen_message.reload.stolen_records.count).to eq 0
         end
       end
+      context "association message" do
+        it "it assigns organization_stolen_message" do
+          expect(organization_stolen_message.reload.kind).to eq "association"
+          expect_created_stolen_bike
+          expect(organization_stolen_message.reload.stolen_records.count).to eq 1
+        end
+      end
     end
     context "failure" do
       it "assigns a bike and a stolen record with the attrs passed" do
@@ -292,7 +299,7 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
     context "no address passed" do
-      it "does not have address" do
+      it "does not have address, has association" do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           expect {
