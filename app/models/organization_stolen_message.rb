@@ -40,7 +40,13 @@ class OrganizationStolenMessage < ApplicationRecord
   end
 
   def self.for_coordinates(coordinates)
-    enabled.area.near(coordinates, MAX_SEARCH_RADIUS).first
+    searched_radius = 0
+    enabled.area.near(coordinates, MAX_SEARCH_RADIUS).detect do |org_stolen_message|
+      # Ignore stolen_messages with have a search radius smaller than nearer ones
+      next if searched_radius > org_stolen_message.search_radius_miles
+      searched_radius = org_stolen_message.search_radius_miles
+      org_stolen_message.distance_to(coordinates) < org_stolen_message.search_radius_miles
+    end
   end
 
   def self.clean_body(str)

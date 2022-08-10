@@ -113,14 +113,14 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(organization.reload.enabled_feature_slugs).to eq(["organization_stolen_message"])
       organization_stolen_message = organization.reload.organization_stolen_message
       expect(organization_stolen_message).to be_present
-      expect(organization_stolen_message.enabled?).to be_falsey
+      expect(organization_stolen_message.is_enabled).to be_falsey
       expect(organization_stolen_message.kind).to eq "association"
-      organization_stolen_message.update(message: "stuff", enabled: true)
-      expect(organization_stolen_message.reload.enabled?).to be_truthy
+      organization_stolen_message.update(body: "stuff", is_enabled: true)
+      expect(organization_stolen_message.reload.is_enabled).to be_truthy
       invoice.update(subscription_end_at: Time.current - 1.day)
       instance.perform(organization.id)
       expect(organization.reload.enabled_feature_slugs).to eq([])
-      expect(organization_stolen_message.reload.enabled?).to be_falsey
+      expect(organization_stolen_message.reload.is_enabled).to be_falsey
     end
   end
 end

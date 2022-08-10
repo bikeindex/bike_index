@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe BikesController, type: :controller do
-  let!(:state) { FactoryBot.create(:state_illinois) }
+  let!(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
   let!(:country) { state.country }
 
   let(:manufacturer) { FactoryBot.create(:manufacturer) }

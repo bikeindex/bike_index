@@ -322,7 +322,7 @@ RSpec.describe Organized::ManagesController, type: :request do
               publicly_visible: false
             }
           end
-          let(:state) { FactoryBot.create(:state_illinois) }
+          let(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
           include_context :geocoder_real
           it "still updates the organization" do
             expect(current_organization.locations.count).to eq 0

@@ -146,6 +146,12 @@ RSpec.describe OrganizationStolenMessage, type: :model do
           # Closer to the Manhattan location
           expect(bike2.current_stolen_record).to be_valid
           expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+          # And change the search_radius, so the closer location one no longer contains the area
+          organization_stolen_message.update(search_radius_miles: 1)
+          # Verify that organization_stolen_message is the closer one
+          expect(OrganizationStolenMessage.near(bike.current_stolen_record.to_coordinates).map(&:id)).to eq([organization_stolen_message.id, organization_stolen_message2.id])
+          expect(organization_stolen_message.reload.distance_to(stolen_record.to_coordinates)).to be > organization_stolen_message.search_radius_miles
+          expect(OrganizationStolenMessage.for_stolen_record(bike.current_stolen_record)&.id).to eq organization_stolen_message2.id
         end
       end
     end
