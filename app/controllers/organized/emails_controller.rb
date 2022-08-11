@@ -77,7 +77,9 @@ module Organized
         bike = default_bike
         bike.current_stolen_record = StolenRecord.new(date_stolen: Time.current - 1.day)
       end
-      bike.current_stolen_record.organization_stolen_message = current_organization.organization_stolen_message
+      if current_organization.organization_stolen_message&.body.present?
+        bike.current_stolen_record.organization_stolen_message = current_organization.organization_stolen_message
+      end
       bike
     end
 
@@ -115,8 +117,7 @@ module Organized
 
     def permitted_parameters
       if params[:organization_stolen_message].present?
-        params.require(:organization_stolen_message).permit(:body, :is_enabled,
-          :report_url, :report_phone)
+        params.require(:organization_stolen_message).permit(:body, :is_enabled, :report_url)
       else
         params.require(:mail_snippet).permit(:body, :is_enabled, :subject)
       end
