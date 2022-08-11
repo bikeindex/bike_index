@@ -48,7 +48,9 @@
   = form_for @object, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
     - if @kind == "organization_stolen_message"
       .form-group.mb-5.mt-4
-        = f.label :report_url, "URL to make a stolen bike report in your jurisdiction", class: "control-label"
+        = f.label :report_url, class: "control-label" do
+          URL to make a stolen bike report in your jurisdiction
+          %small.less-strong shown to all users who report a stolen bike
         = f.text_field :report_url, class: "form-control"
 
     %h3.uncap.mt-4
