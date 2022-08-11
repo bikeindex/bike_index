@@ -2,7 +2,7 @@
   - additional_link = link_to("Delete invoice", admin_organization_invoice_path(organization_id: @organization.to_param, id: @invoice.to_param), method: :delete, data: { confirm: "Are you sure you want to delete this? This can't be undone" }, class: "btn btn-danger btn-sm float-right")
 - else
   - additional_link = nil
-= render partial: "/admin/organizations/display_header", locals: {organization: @organization, current_action: "Edit #{@invoice.display_name} for", additional_link: additional_link}
+= render partial: "/admin/organizations/display_header", locals: {current_action: "Edit #{@invoice.display_name} for", additional_link: additional_link}
 
 .row
   .col-sm-6

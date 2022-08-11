@@ -6,7 +6,7 @@ RSpec.describe "BikesController#create", type: :request do
   let(:current_user) { FactoryBot.create(:user_confirmed) }
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color, name: "black") }
-  let(:state) { FactoryBot.create(:state_illinois) }
+  let(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
   let(:country) { state.country }
   let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug, :manufacturer_id) }
   let(:basic_bike_params) do
@@ -97,20 +97,32 @@ RSpec.describe "BikesController#create", type: :request do
     before { expect(BParam.all.count).to eq 0 }
     context "successful creation" do
       include_context :geocoder_real
-      it "creates a bike and doesn't create a b_param" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"], search_radius_miles: search_radius_miles) }
+      let!(:organization_default_location) { FactoryBot.create(:location_chicago, organization: organization) }
+      let(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
+      let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "area", body: "Something cool"} }
+      let(:search_radius_miles) { 5 }
+      before { organization_stolen_message.update(organization_stolen_message_attrs) }
+      def expect_created_stolen_bike(bike_params: nil, stolen_params: {})
         bike_user = FactoryBot.create(:user_confirmed, email: "something@stuff.com")
         VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:method]) do
+          expect(organization_stolen_message.reload.search_radius_miles).to eq search_radius_miles
+          expect(organization_stolen_message.is_enabled).to be_truthy
           bb_data = {bike: {rear_wheel_bsd: wheel_size.iso_bsd.to_s}, components: []}.as_json
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're
           # This is also where we're testing bikebook assignment
           expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+          ActionMailer::Base.deliveries = []
           expect {
             # Test that we can still pass show_address - because API backward compatibility
-            post base_url, params: {bike: bike_params, stolen_record: chicago_stolen_params.merge(show_address: true)}
+            post base_url, params: {bike: bike_params, stolen_record: stolen_params}
           }.to change(Bike, :count).by(1)
           expect(flash[:success]).to be_present
           expect(BParam.all.count).to eq 0
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+          EmailOwnershipInvitationWorker.drain
+          expect(ActionMailer::Base.deliveries.count).to eq 1
           bike = Bike.last
           bike_params.except(:manufacturer_id, :phone, :date_stolen).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
           expect(bike.manufacturer).to eq manufacturer
@@ -123,6 +135,35 @@ RSpec.describe "BikesController#create", type: :request do
           expect(bike.current_ownership.status).to eq "status_stolen"
           stolen_record = bike.current_stolen_record
           chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+        end
+      end
+      it "creates a bike and doesn't create a b_param" do
+        expect(organization_stolen_message.reload.is_enabled).to be_truthy
+        expect(OrganizationStolenMessage.for_coordinates([41.9, -87.68])&.id).to eq organization_stolen_message.id
+        expect_created_stolen_bike(bike_params: bike_params, stolen_params: chicago_stolen_params.merge(show_address: true))
+        expect(organization_stolen_message.reload.stolen_records.count).to eq 1
+      end
+      context "outside of area" do
+        let!(:organization_default_location) { FactoryBot.create(:location_nyc, organization: organization) }
+        it "doesn't assign organization_stolen_message" do
+          expect(organization_stolen_message.reload.longitude).to be_within(2).of(-74)
+          expect(organization_stolen_message.reload.search_radius_miles).to eq 5
+          expect(OrganizationStolenMessage.for_coordinates([41.9, -87.68])&.id).to be_blank
+          expect_created_stolen_bike(bike_params: bike_params, stolen_params: chicago_stolen_params.merge(show_address: true))
+          expect(organization_stolen_message.reload.stolen_records.count).to eq 0
+        end
+        context "association message" do
+          let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool"} }
+          it "it assigns organization_stolen_message" do
+            expect(organization_stolen_message.reload.kind).to eq "association"
+            expect_created_stolen_bike(bike_params: bike_params.merge(creation_organization_id: organization.id), stolen_params: chicago_stolen_params.merge(show_address: true))
+            bike = Bike.last
+            expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+            expect(bike.current_stolen_record).to be_present
+            expect(OrganizationStolenMessage.for_coordinates([41.9, -87.68])&.id).to be_blank
+            expect(OrganizationStolenMessage.for_stolen_record(bike.current_stolen_record)&.id).to eq organization_stolen_message.id
+            expect(organization_stolen_message.reload.stolen_records.count).to eq 1
+          end
         end
       end
     end
@@ -277,7 +318,7 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
     context "no address passed" do
-      it "does not have address" do
+      it "does not have address, has association" do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           expect {

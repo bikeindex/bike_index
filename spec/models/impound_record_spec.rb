@@ -330,7 +330,7 @@ RSpec.describe ImpoundRecord, type: :model do
   describe "geocoding" do
     context "real geocoding" do
       include_context :geocoder_real
-      let!(:state) { FactoryBot.create(:state_illinois) }
+      let!(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
       let(:latitude) { 41.9202384 }
       let(:longitude) { -87.7158185 }
       let(:impound_record) { FactoryBot.build(:impound_record, street: "3554 W Shakespeare Ave, 60647") }

@@ -210,7 +210,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
       it "updates the registration_field_label" do
         put "#{base_url}/#{organization.to_param}", params: update_params
-        organization.reload
+        expect(organization.reload.name).to eq "new name"
         expect(organization.registration_field_labels).to eq target.as_json
       end
       context "with existing registration_field_label" do
@@ -220,6 +220,41 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization.reload
           expect(organization.registration_field_labels).to eq target.as_json
         end
+      end
+    end
+    context "updating with_admin_organization_attributes" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "bike_advocacy", enabled_feature_slugs: ["organization_stolen_message"]) }
+      let(:organization_stolen_message) { organization.reload.organization_stolen_message }
+      let(:update_params) do
+        {
+          name: "other namE",
+          search_radius_miles: "1222.2",
+          graduated_notification_interval_days: 4444,
+          passwordless_user_domain: "stuff.com"
+        }
+      end
+      it "updates the organization attributes" do
+        expect(organization_stolen_message).to be_present # Because of organization feature
+        expect(organization_stolen_message.kind).to eq "area"
+        expect(organization_stolen_message.search_radius_miles).to eq 50.0
+        put "#{base_url}/#{organization.to_param}", params: {
+          organization: update_params,
+          organization_stolen_message_search_radius_miles: 44,
+          organization_stolen_message_kind: "association"
+        }
+        expect_attrs_to_match_hash(organization.reload, update_params)
+        expect(organization_stolen_message.reload.kind).to eq "association"
+        expect(organization_stolen_message.search_radius_miles).to eq 44
+        # And it works with kilometers too
+        put "#{base_url}/#{organization.to_param}", params: {
+          organization: {search_radius_kilometers: 33},
+          organization_stolen_message_search_radius_kilometers: 44,
+          organization_stolen_message_kind: "area"
+        }
+        organization.reload
+        expect(organization.reload.search_radius_kilometers).to eq 33
+        expect(organization_stolen_message.reload.kind).to eq "area"
+        expect(organization_stolen_message.search_radius_kilometers).to eq 44
       end
     end
     context "not updating manual_pos_kind" do

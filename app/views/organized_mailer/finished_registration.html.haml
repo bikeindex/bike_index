@@ -3,19 +3,23 @@
   = @organization.mail_snippet_body('welcome').html_safe
 
 - if @ownership.claim_message.present?
-  = render partial: "/shared/claim_message", locals: { bike: @bike, skip_to_see: true }
+  - if @bike.current_stolen_record&.organization_stolen_message.present? # NOTE: duplicates in claim message
+    .organization-stolen-message= @bike.current_stolen_record.organization_stolen_message.body
+  = render partial: "/shared/claim_message", locals: {bike: @bike, skip_to_see: true}
 
 - else
   - if @vars[:new_user]
-    %h2{ style: 'margin-bottom: 12px;' }
+    %h2{style: 'margin-bottom: 12px;'}
       = t(".html.welcome_to_bike_index")
 
   -# used to be logic in here, but the @ownership.claim_message should mostly take this over
   - if @bike.status_impounded?
-    %h1= t(".html.thanks_for_adding_this_bike_type_you_found", bike_type: @bike.type )
+    %h1= t(".html.thanks_for_adding_this_bike_type_you_found", bike_type: @bike.type)
   - elsif @bike.status_stolen?
-    %h1= t(".html.bike_type_thieves_are_jerks", bike_type: @bike.type )
-    %p= t(".html.were_sorry_your_bike_type_was_stolen", bike_type: @bike.type )
+    %h1= t(".html.bike_type_thieves_are_jerks", bike_type: @bike.type)
+    - if @bike.current_stolen_record&.organization_stolen_message.present? # NOTE: duplicates in claim message
+      .organization-stolen-message= @bike.current_stolen_record.organization_stolen_message.body
+    %p= t(".html.were_sorry_your_bike_type_was_stolen", bike_type: @bike.type)
   - else
     %h1.uncap
       - if @organization.present?
@@ -98,6 +102,6 @@
         - protecting_your_bike_link = link_to t(".html.protecting_your_bike_here"), protect_your_bike_url
         = t(".html.read_more_about_protecting_html", link: protecting_your_bike_link)
       .locking-demonstration
-        %img{ alt: t(".html.correctly_locking_a_bike"), src: 'https://files.bikeindex.org/email_assets/locking.gif', title: t(".html.pink_power_ulocks_tm") }
+        %img{alt: t(".html.correctly_locking_a_bike"), src: 'https://files.bikeindex.org/email_assets/locking.gif', title: t(".html.pink_power_ulocks_tm")}
       %p.center-text
         %em= t(".html.a_correctly_locked_bike")

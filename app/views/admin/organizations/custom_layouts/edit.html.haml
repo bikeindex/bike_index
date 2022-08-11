@@ -1,13 +1,20 @@
-
-%h1
-  = link_to "#{@organization.short_name} custom layouts", admin_organization_custom_layouts_path(@organization)
-  - if (@edit_template == 'landing_page')
-    Landing page
-  - else
+- current_action = capture_haml do
+  - if (layout_kind == "mail_snippet")
     %strong
       = @edit_template.titleize
     email snippet
+  - else
+    = layout_kind.titleize
 
+- classes = "nav-link btn btn-sm btn-outline-info"
 
-= render (@edit_template == 'landing_page') ? 'landing_page' : 'mail_snippet'
+- if layout_kind == "landing_page"
+  - additional_link = link_to("landing page preview", organization_landing_path(organization_id: @organization.to_param), class: classes)
+- else
+  - snippet_kind = @mail_snippet.which_organization_email
+  - additional_link = link_to("#{snippet_kind.titleize} email", edit_organization_email_path(snippet_kind, organization_id: @organization.to_param), class: classes)
+
+= render partial: "/admin/organizations/display_header", locals: {current_action: current_action, additional_link: additional_link, show_custom_layouts: true}
+
+= render layout_kind
 .mt-4

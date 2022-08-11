@@ -1,5 +1,5 @@
-%h1
-  Edit #{ link_to @organization.name, admin_organization_path(@organization) } custom layouts
+= render partial: "/admin/organizations/display_header", locals: {current_action: "Edit custom layouts for", organization_view_path: organization_emails_path(organization_id: @organization.to_param)}
+
 .row
   .col-lg-6
     %p
@@ -27,13 +27,22 @@
     %tbody
       %tr
         %td
-          = link_to 'Landing page', edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: 'landing_page')
+          = link_to "Landing page", edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: "landing_page")
         %td.small
-          = link_to 'landing page preview', organization_landing_path(organization_id: @organization.to_param)
+          = link_to "landing page preview", organization_landing_path(organization_id: @organization.to_param)
         %td.table-cell-check
           = check_mark if @organization.landing_html.present?
         %td.table-cell-check
           = check_mark if LandingPages::ORGANIZATIONS.include?(@organization.slug)
+      %tr
+        %td
+          = link_to "Organization Stolen Message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
+        %td.small
+          = link_to "preview message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
+        %td.table-cell-check
+          = check_mark if @organization.organization_stolen_message&.body.present?
+        %td.table-cell-check
+          = check_mark if @organization.organization_stolen_message&.is_enabled
       - MailSnippet.organization_snippets.each do |kind, snippet_attrs|
         - snippet = @organization.mail_snippets.where(kind: kind).first
         %tr

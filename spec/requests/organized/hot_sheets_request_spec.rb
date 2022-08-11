@@ -170,7 +170,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           # We round kms here, for display ease
           expect(hot_sheet_configuration.search_radius_kilometers).to eq 401
           # Because we don't actually store rounded numbers
-          expect(hot_sheet_configuration.search_radius_miles).to be_within(0.01).of(646.15)
+          expect(hot_sheet_configuration.search_radius_miles).to be_within(0.1).of(249.5)
           expect(hot_sheet_configuration.timezone_str).to be_blank
 
           expect(ProcessHotSheetWorker.jobs.count).to eq 0

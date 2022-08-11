@@ -1,4 +1,3 @@
-%h1
-  New invoice for #{link_to @invoice.organization.short_name, admin_organization_invoices_path(@invoice.organization)}
+= render partial: "/admin/organizations/display_header", locals: {current_action: "New Invoice for"}
 
 = render "form"

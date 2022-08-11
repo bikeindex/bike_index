@@ -89,3 +89,10 @@ $alert-warning-color: #ffc107;
     margin: 10px 0 0 0;
   }
 }
+
+.organization-stolen-message {
+  margin: 2 * $vertical-height 0;
+  padding: $vertical-height;
+  border: 2px solid $alert-warning-color;
+  line-height: 1.5;
+}

@@ -75,4 +75,15 @@ RSpec.describe OrganizationFeature, type: :model do
       expect(labeled_fields).to_not include("reg_bike_sticker")
     end
   end
+
+  describe "with_admin_organization_attributes" do
+    let(:target_kinds) do
+      %w[regional_bike_counts passwordless_users graduated_notifications
+        organization_stolen_message reg_extra_registration_number
+        reg_organization_affiliation reg_address reg_phone reg_student_id owner_email]
+    end
+    it "is expected" do
+      expect(OrganizationFeature.with_admin_organization_attributes).to match_array target_kinds
+    end
+  end
 end

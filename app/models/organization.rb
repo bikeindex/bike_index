@@ -1,5 +1,6 @@
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
+  include SearchRadiusMetricable
 
   KIND_ENUM = {
     bike_shop: 0,
@@ -58,9 +59,11 @@ class Organization < ApplicationRecord
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
+  has_one :organization_stolen_message
   has_one :impound_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
+  accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true
 
   enum kind: KIND_ENUM
@@ -302,10 +305,6 @@ class Organization < ApplicationRecord
 
   def default_impound_location
     enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil
-  end
-
-  def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles)
   end
 
   # Try for publicly_visible, fall back to whatever - TODO: make this configurable
