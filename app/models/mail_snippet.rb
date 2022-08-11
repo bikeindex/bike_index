@@ -66,7 +66,7 @@ class MailSnippet < ApplicationRecord
   def self.organization_emails_with_snippets
     # Worth noting: no snippet is named "finished_registration"
     ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
-       graduated_notification impound_claim_approved impound_claim_denied]
+      graduated_notification impound_claim_approved impound_claim_denied]
   end
 
   def self.organization_message_kinds

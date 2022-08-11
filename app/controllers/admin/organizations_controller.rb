@@ -164,8 +164,8 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def update_organization_stolen_message
     message_params = {search_radius_miles: params[:organization_stolen_message_search_radius_miles],
-      kind: params[:organization_stolen_message_kind],
-      search_radius_kilometers: params[:organization_stolen_message_search_radius_kilometers]}
+                      kind: params[:organization_stolen_message_kind],
+                      search_radius_kilometers: params[:organization_stolen_message_search_radius_kilometers]}
     return unless @organization.organization_stolen_message.present? &&
       message_params.values.present?
     @organization.organization_stolen_message.update(message_params)

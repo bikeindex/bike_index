@@ -240,7 +240,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         put "#{base_url}/#{organization.to_param}", params: {
           organization: update_params,
           organization_stolen_message_search_radius_miles: 44,
-          organization_stolen_message_kind: "association",
+          organization_stolen_message_kind: "association"
         }
         expect_attrs_to_match_hash(organization.reload, update_params)
         expect(organization_stolen_message.reload.kind).to eq "association"
@@ -249,7 +249,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         put "#{base_url}/#{organization.to_param}", params: {
           organization: {search_radius_kilometers: 33},
           organization_stolen_message_search_radius_kilometers: 44,
-          organization_stolen_message_kind: "area",
+          organization_stolen_message_kind: "area"
         }
         organization.reload
         expect(organization.reload.search_radius_kilometers).to eq 33
