@@ -10,7 +10,9 @@ RSpec.describe StolenRecord, type: :model do
       it "removes alert_image" do
         expect(stolen_record.alert_image).to be_present
 
-        stolen_record.update_attribute(:bike, nil)
+        Sidekiq::Testing.inline! do
+          stolen_record.update_attribute(:bike, nil)
+        end
 
         stolen_record.reload
         expect(stolen_record.bike).to be_blank
@@ -28,7 +30,9 @@ RSpec.describe StolenRecord, type: :model do
         expect(bike.current_stolen_record_id).to eq stolen_record.id
         expect(bike.occurred_at).to be_present
 
-        stolen_record.add_recovery_information
+        Sidekiq::Testing.inline! do
+          stolen_record.add_recovery_information
+        end
         stolen_record.reload
         bike.reload
 
@@ -47,7 +51,9 @@ RSpec.describe StolenRecord, type: :model do
       it "does not removes alert_image" do
         expect(stolen_record.alert_image).to be_present
 
-        stolen_record.run_callbacks(:commit)
+        Sidekiq::Testing.inline! do
+          stolen_record.run_callbacks(:commit)
+        end
 
         expect(stolen_record.alert_image).to be_present
       end
