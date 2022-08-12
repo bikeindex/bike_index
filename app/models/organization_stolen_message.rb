@@ -34,7 +34,9 @@ class OrganizationStolenMessage < ApplicationRecord
     return stolen_record.organization_stolen_message if stolen_record.organization_stolen_message.present?
     area_result = for_coordinates(stolen_record.to_coordinates)
     return area_result if area_result.present?
-    stolen_record.bike.bike_organizations.includes(:organization).order(:id)
+    bike = Bike.unscoped.find_by_id(stolen_record.bike_id)
+    return nil if bike.blank?
+    bike.bike_organizations.includes(:organization).order(:id)
       .detect { |bo| bo.organization.organization_stolen_message&.is_enabled? }
       &.organization&.organization_stolen_message
   end

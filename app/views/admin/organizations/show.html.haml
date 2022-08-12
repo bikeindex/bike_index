@@ -188,7 +188,7 @@
                 %strong.text-warning Previously paid!
               - else
                 False
-            %em.less-strong
+            %em.small.less-strong
               Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
 
         - if @organization.paid?
@@ -199,7 +199,7 @@
                 Yes
               - else
                 %small.less-strong
-                  No
+                  no
           %tr
             %td Templates
             %td
@@ -207,7 +207,7 @@
                 = @organization.mail_snippets.pluck(:kind).to_sentence
               - else
                 %small.less-strong
-                  None
+                  none
           %tr
             %td Landing Page
             %td
@@ -218,13 +218,13 @@
                   landing page is not public - #{ link_to 'landing page', organization_landing_path(organization_id: @organization.to_param) }
               - else
                 %small.less-strong
-                  no landing page
+                  no
           %tr
             %td Additional Fields
             %td
               - additional_fields = @organization.additional_registration_fields.map { |i| OrganizationFeature.reg_field_to_bike_attrs(i)&.titleize(keep_id_suffix: true) }
               - if additional_fields.none?
-                %small.less-strong None
+                %small.less-strong none
               - else
                 %small= additional_fields.join(", ")
                 %br
@@ -246,9 +246,22 @@
                   %em.less-strong
                     = "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count)
                 - else
-                  %span.less-strong not enabled
+                  %small.less-strong not enabled
                 %small
                   = link_to "configuration", edit_organization_hot_sheet_path(organization_id: @organization.to_param)
+          - if @organization.enabled?("organization_stolen_message")
+            - organization_stolen_message = @organization.organization_stolen_message
+            %tr
+              %td Stolen Message
+              %td
+                - if organization_stolen_message.is_enabled
+                  %strong Enabled
+                - elsif organization_stolen_message.body.present?
+                  has content, not enabled
+                - else
+                  %small.less-strong no
+                - if organization_stolen_message.report_url.present?
+                  %strong Report URL present
           %tr
             %td Stickers
             %td

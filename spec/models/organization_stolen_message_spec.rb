@@ -58,6 +58,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
     let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, :in_nyc, creation_organization: organization) }
     let(:stolen_record) { bike.reload.current_stolen_record }
     let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization2) }
+    let(:stolen_record2) { bike2.current_stolen_record }
     it "returns organization_stolen_message, doesn't assign" do
       expect(organization_stolen_message.id).to be_present
       expect(OrganizationStolenMessage.count).to eq 1
@@ -67,8 +68,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
       expect(stolen_record.reload.organization_stolen_message_id).to eq nil
       # Not association bike doesn't match
-      expect(bike2.current_stolen_record).to be_valid
-      expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq nil
+      expect(stolen_record2).to be_valid
+      expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq nil
     end
     context "assigned organization_stolen_message_id" do
       let(:organization2) { FactoryBot.create(:organization) }
@@ -97,11 +98,11 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
         expect(stolen_record.reload.organization_stolen_message_id).to eq nil
         # And then test the reverse order
-        expect(bike2.current_stolen_record).to be_valid
-        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+        expect(stolen_record2).to be_valid
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
         bike2.bike_organizations.create(organization: organization)
         expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization2.id, organization.id])
-        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
       end
     end
     context "with an area organization_stolen_message" do
@@ -122,8 +123,12 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         # Associated bike also matches
         expect(bike2.reload.current_stolen_record_id).to be_present
         expect(bike2.bike_organizations.pluck(:organization_id)).to eq([organization2.id])
-        expect(OrganizationStolenMessage.for_coordinates(bike2.current_stolen_record.to_coordinates)&.id).to eq organization_stolen_message2.id
-        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+        expect(OrganizationStolenMessage.for_coordinates(stolen_record2.to_coordinates)&.id).to eq organization_stolen_message2.id
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
+        # Associated bike outside of area still matches
+        stolen_record2.update(latitude: 41.86, longitude: -87.65, skip_geocoding: true)
+        expect(OrganizationStolenMessage.for_coordinates(stolen_record2.to_coordinates)&.id).to be_blank
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
       end
 
       context "2 area organization_stolen_message" do
@@ -144,8 +149,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
           expect(stolen_record.organization_stolen_message_id).to eq nil
           expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
           # Closer to the Manhattan location
-          expect(bike2.current_stolen_record).to be_valid
-          expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+          expect(stolen_record2).to be_valid
+          expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
           # And change the search_radius, so the closer location one no longer contains the area
           organization_stolen_message.update(search_radius_miles: 1)
           # Verify that organization_stolen_message is the closer one

@@ -31,5 +31,15 @@ RSpec.describe AfterStolenRecordSaveWorker, type: :job do
       mail = ActionMailer::Base.deliveries.last
       expect(mail.body.encoded).to match "Alert numbers! 222"
     end
+    context "hidden bike" do
+      it "updates" do
+        bike.update(marked_user_hidden: true)
+        expect(bike.reload.user_hidden).to be_truthy
+        expect(Bike.pluck(:id)).to eq([])
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
+        instance.perform(stolen_record.id)
+        expect(stolen_record.reload.organization_stolen_message_id).to eq organization_stolen_message.id
+      end
+    end
   end
 end
