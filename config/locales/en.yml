@@ -1279,6 +1279,9 @@ en:
       you_scanned_this_sticker_html: >-
         You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
+    organization_stolen_message:
+      report_link_text: at this link
+      report_the_theft_to_the_organization_html: <span class="text-warning">Report the theft</span> to %{organization} <strong>%{report_link}</strong> to get a police report number
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
       add: Add

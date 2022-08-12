@@ -66,6 +66,12 @@ class OrganizationStolenMessage < ApplicationRecord
     %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
   end
 
+  # NOTE: doesn't calculate. Only checks stolen record attributes
+  def self.shown_to?(stolen_record = nil)
+    stolen_record&.organization_stolen_message.present? &&
+      stolen_record.organization_stolen_message.shown_to?(stolen_record)
+  end
+
   # never geocode, use organization lat/long
   def should_be_geocoded?
     false
@@ -87,6 +93,12 @@ class OrganizationStolenMessage < ApplicationRecord
     !is_enabled?
   end
 
+  def shown_to?(stolen_record)
+    return false if disabled?
+    return true if body.present?
+    report_url.present? && stolen_record.police_report_number.blank?
+  end
+
   def set_calculated_attributes
     self.body = self.class.clean_body(body)
     self.latitude = organization&.location_latitude
@@ -98,10 +110,8 @@ class OrganizationStolenMessage < ApplicationRecord
     self.report_url = Urlifyer.urlify(report_url)
   end
 
-  private
-
   def can_enable?
-    return false if body.blank?
+    return false if body.blank? && report_url.blank?
     return true if association?
     latitude.present? && longitude.present? && search_radius_miles.present?
   end

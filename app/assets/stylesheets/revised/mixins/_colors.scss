@@ -58,3 +58,8 @@ $unregistered-color: #f0ad4e; // text-warning color
 .unregistered-color {
   color: $unregistered-color;
 }
+
+// current boostrap has this class, do something similar
+.text-dark {
+  color: $body-font-color !important;
+}

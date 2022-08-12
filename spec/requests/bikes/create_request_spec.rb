@@ -100,7 +100,7 @@ RSpec.describe "BikesController#create", type: :request do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"], search_radius_miles: search_radius_miles) }
       let!(:organization_default_location) { FactoryBot.create(:location_chicago, organization: organization) }
       let(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
-      let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "area", body: "Something cool"} }
+      let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "area", body: "Something cool", search_radius_miles: search_radius_miles} }
       let(:search_radius_miles) { 5 }
       before { organization_stolen_message.update(organization_stolen_message_attrs) }
       def expect_created_stolen_bike(bike_params: nil, stolen_params: {})
@@ -154,7 +154,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(organization_stolen_message.reload.stolen_records.count).to eq 0
         end
         context "association message" do
-          let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool"} }
+          let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool", search_radius_miles: search_radius_miles} }
           it "it assigns organization_stolen_message" do
             expect(organization_stolen_message.reload.kind).to eq "association"
             expect_created_stolen_bike(bike_params: bike_params.merge(creation_organization_id: organization.id), stolen_params: chicago_stolen_params.merge(show_address: true))

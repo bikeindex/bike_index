@@ -5,7 +5,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
 
   describe "calculated_attributes" do
     let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
-    let(:organization_stolen_message) { OrganizationStolenMessage.create(organization_id: organization.id) }
+    let(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
     it "uses attributes" do
       expect(organization.search_radius_miles).to eq 50
       expect(organization_stolen_message.reload.organization_id).to eq organization.id
@@ -40,6 +40,17 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         organization_stolen_message.update(is_enabled: true, body: " #{target} i officia deserunt mollit anim id est laborum.")
         expect(organization_stolen_message.reload.is_enabled).to be_falsey
         expect(organization_stolen_message.body).to eq target
+      end
+    end
+    context "report_url present" do
+      let(:organization_stolen_message) { OrganizationStolenMessage.create!(organization_id: organization.id, report_url: "https://example.com", kind: "association") }
+      it "also can enable" do
+        expect(organization_stolen_message).to be_valid
+        expect(organization_stolen_message.can_enable?).to be_truthy
+        organization_stolen_message.update(is_enabled: true)
+        expect(organization_stolen_message.reload.is_enabled).to be_truthy
+        organization_stolen_message.update(is_enabled: false)
+        expect(organization_stolen_message.reload.is_enabled).to be_falsey
       end
     end
     context "max search_radius" do

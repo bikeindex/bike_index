@@ -255,13 +255,13 @@
               %td Stolen Message
               %td
                 - if organization_stolen_message.is_enabled
-                  %strong Enabled
+                  = link_to "Enabled", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
                 - elsif organization_stolen_message.body.present?
                   has content, not enabled
                 - else
                   %small.less-strong no
                 - if organization_stolen_message.report_url.present?
-                  %strong Report URL present
+                  %small Report URL present
           %tr
             %td Stickers
             %td
