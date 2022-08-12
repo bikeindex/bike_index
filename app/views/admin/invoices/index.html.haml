@@ -16,6 +16,13 @@
         = link_to "active", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "nav-link #{params[:query] == 'active' ? 'active' : ''}"
       %li.nav-item
         = link_to "inactive", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "nav-link #{params[:query] == 'inactive' ? 'active' : ''}"
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@time_range_column == 'created_at' ? '' : 'active') }
+          #{humanized_time_range_column(@time_range_column, return_value_for_all: true)} in timerange
+        .dropdown-menu
+          = link_to "Created in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "created_at")), class: "dropdown-item #{@time_range_column == 'created_at' ? 'active' : ''}"
+          = link_to "Subscription ends in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_end_at")), class: "dropdown-item #{@time_range_column == 'subscription_end_at' ? 'active' : ''}"
+          = link_to "Subscription starts in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_start_at")), class: "dropdown-item #{@time_range_column == 'subscription_start_at' ? 'active' : ''}"
 
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_endless.present? ? "active" : "") }
