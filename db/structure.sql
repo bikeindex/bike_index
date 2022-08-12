@@ -2235,7 +2235,6 @@ CREATE TABLE public.organization_stolen_messages (
     is_enabled boolean DEFAULT false,
     content_added_at timestamp without time zone,
     report_url character varying,
-    report_phone character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -6328,6 +6327,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220622004930'),
 ('20220627165205'),
 ('20220730171652'),
-('20220801162511');
+('20220801162511'),
+('20220811174115');
 
 

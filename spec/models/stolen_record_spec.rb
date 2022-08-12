@@ -10,7 +10,9 @@ RSpec.describe StolenRecord, type: :model do
       it "removes alert_image" do
         expect(stolen_record.alert_image).to be_present
 
-        stolen_record.update_attribute(:bike, nil)
+        Sidekiq::Testing.inline! do
+          stolen_record.update_attribute(:bike, nil)
+        end
 
         stolen_record.reload
         expect(stolen_record.bike).to be_blank
@@ -28,7 +30,9 @@ RSpec.describe StolenRecord, type: :model do
         expect(bike.current_stolen_record_id).to eq stolen_record.id
         expect(bike.occurred_at).to be_present
 
-        stolen_record.add_recovery_information
+        Sidekiq::Testing.inline! do
+          stolen_record.add_recovery_information
+        end
         stolen_record.reload
         bike.reload
 
@@ -47,7 +51,9 @@ RSpec.describe StolenRecord, type: :model do
       it "does not removes alert_image" do
         expect(stolen_record.alert_image).to be_present
 
-        stolen_record.run_callbacks(:commit)
+        Sidekiq::Testing.inline! do
+          stolen_record.run_callbacks(:commit)
+        end
 
         expect(stolen_record.alert_image).to be_present
       end
@@ -55,13 +61,15 @@ RSpec.describe StolenRecord, type: :model do
     describe "update_not_current_records" do
       it "marks all the records that are not current, not current" do
         bike = FactoryBot.create(:bike)
-        stolen_record1 = FactoryBot.create(:stolen_record, bike: bike)
-        bike.reload
-        expect(bike.current_stolen_record_id).to eq(stolen_record1.id)
-        stolen_record2 = FactoryBot.create(:stolen_record, bike: bike)
-        expect(stolen_record1.reload.current).to be_falsey
-        expect(stolen_record2.reload.current).to be_truthy
-        expect(bike.reload.current_stolen_record_id).to eq stolen_record2.id
+        Sidekiq::Testing.inline! do
+          stolen_record1 = FactoryBot.create(:stolen_record, bike: bike)
+          bike.reload
+          expect(bike.current_stolen_record_id).to eq(stolen_record1.id)
+          stolen_record2 = FactoryBot.create(:stolen_record, bike: bike)
+          expect(stolen_record1.reload.current).to be_falsey
+          expect(stolen_record2.reload.current).to be_truthy
+          expect(bike.reload.current_stolen_record_id).to eq stolen_record2.id
+        end
       end
     end
   end

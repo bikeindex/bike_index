@@ -100,7 +100,7 @@ RSpec.describe "BikesController#create", type: :request do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"], search_radius_miles: search_radius_miles) }
       let!(:organization_default_location) { FactoryBot.create(:location_chicago, organization: organization) }
       let(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
-      let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "area", body: "Something cool"} }
+      let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "area", body: "Something cool", search_radius_miles: search_radius_miles} }
       let(:search_radius_miles) { 5 }
       before { organization_stolen_message.update(organization_stolen_message_attrs) }
       def expect_created_stolen_bike(bike_params: nil, stolen_params: {})
@@ -114,14 +114,15 @@ RSpec.describe "BikesController#create", type: :request do
           # This is also where we're testing bikebook assignment
           expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
+          Sidekiq::Worker.clear_all
           expect {
-            # Test that we can still pass show_address - because API backward compatibility
-            post base_url, params: {bike: bike_params, stolen_record: stolen_params}
+            Sidekiq::Testing.inline! do
+              # Test that we can still pass show_address - because API backward compatibility
+              post base_url, params: {bike: bike_params, stolen_record: stolen_params}
+            end
           }.to change(Bike, :count).by(1)
           expect(flash[:success]).to be_present
           expect(BParam.all.count).to eq 0
-          expect(ActionMailer::Base.deliveries.count).to eq 0
-          EmailOwnershipInvitationWorker.drain
           expect(ActionMailer::Base.deliveries.count).to eq 1
           bike = Bike.last
           bike_params.except(:manufacturer_id, :phone, :date_stolen).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
@@ -153,7 +154,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(organization_stolen_message.reload.stolen_records.count).to eq 0
         end
         context "association message" do
-          let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool"} }
+          let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool", search_radius_miles: search_radius_miles} }
           it "it assigns organization_stolen_message" do
             expect(organization_stolen_message.reload.kind).to eq "association"
             expect_created_stolen_bike(bike_params: bike_params.merge(creation_organization_id: organization.id), stolen_params: chicago_stolen_params.merge(show_address: true))

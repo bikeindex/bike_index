@@ -1,0 +1,11 @@
+- organization_stolen_message = stolen_record.organization_stolen_message
+- shown_report_url = stolen_record.police_report_number.blank? && organization_stolen_message.report_url.present?
+.alert.alert-warning.text-dark.organization-stolen-message-alert
+  - if organization_stolen_message.body.present?
+    %span.d-block{style: "line-height: 1.2;"}
+      = organization_stolen_message.body
+    - if shown_report_url
+      .mb-2
+  - if shown_report_url
+    - report_link = link_to(t(".report_link_text"), organization_stolen_message.report_url, target: "_blank")
+    %span.d-block= t(".report_the_theft_to_the_organization_html", organization: organization_stolen_message.organization.name, report_link: report_link)

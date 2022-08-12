@@ -2,9 +2,10 @@
 - if @organization&.mail_snippet_body('welcome').present?
   = @organization.mail_snippet_body('welcome').html_safe
 
+
 - if @ownership.claim_message.present?
-  - if @bike.current_stolen_record&.organization_stolen_message.present? # NOTE: duplicates in claim message
-    .organization-stolen-message= @bike.current_stolen_record.organization_stolen_message.body
+  - if OrganizationStolenMessage.shown_to?(@bike.current_stolen_record)
+    = render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @bike.current_stolen_record}
   = render partial: "/shared/claim_message", locals: {bike: @bike, skip_to_see: true}
 
 - else
@@ -17,8 +18,8 @@
     %h1= t(".html.thanks_for_adding_this_bike_type_you_found", bike_type: @bike.type)
   - elsif @bike.status_stolen?
     %h1= t(".html.bike_type_thieves_are_jerks", bike_type: @bike.type)
-    - if @bike.current_stolen_record&.organization_stolen_message.present? # NOTE: duplicates in claim message
-      .organization-stolen-message= @bike.current_stolen_record.organization_stolen_message.body
+    - if OrganizationStolenMessage.shown_to?(@bike.current_stolen_record)
+      = render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @bike.current_stolen_record}
     %p= t(".html.were_sorry_your_bike_type_was_stolen", bike_type: @bike.type)
   - else
     %h1.uncap

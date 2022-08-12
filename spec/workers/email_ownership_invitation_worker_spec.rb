@@ -97,30 +97,4 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
   end
-
-  context "organization_stolen_message" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "bike_shop", enabled_feature_slugs: ["organization_stolen_message"]) }
-    let!(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
-    let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
-    let(:stolen_record) { bike.reload.current_stolen_record }
-    before { organization_stolen_message.update(is_enabled: true, kind: "association", body: "Alert numbers! 222") }
-    it "includes organization_stolen_message" do
-      expect(stolen_record.organization_stolen_message_id).to be_blank
-      expect(organization_stolen_message.reload.kind).to eq "association"
-      expect(organization_stolen_message.id).to be_present
-      expect(organization_stolen_message.is_enabled).to be_truthy
-      expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
-      ActionMailer::Base.deliveries = []
-      expect {
-        EmailOwnershipInvitationWorker.new.perform(ownership.id)
-        EmailOwnershipInvitationWorker.new.perform(ownership.id)
-      }.to change(Notification, :count).by(1)
-      expect(ActionMailer::Base.deliveries.count).to eq 1
-      ownership.reload
-      expect(ownership.notifications.count).to eq 1
-      expect(stolen_record.reload.organization_stolen_message_id).to eq organization_stolen_message.id
-      mail = ActionMailer::Base.deliveries.last
-      expect(mail.body.encoded).to match "Alert numbers! 222"
-    end
-  end
 end

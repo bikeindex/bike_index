@@ -37,25 +37,19 @@
             %small
               = truncate(mail_snippets.first.body, length: 100)
     - if current_organization.enabled?("organization_stolen_message")
+      - organization_stolen_message = OrganizationStolenMessage.for(current_organization)
       %tr
         %td
           = link_to "Organization Stolen Message", edit_organization_email_path("organization_stolen_message", organization_id: current_organization.to_param)
-        - if current_organization.organization_stolen_message.present?
-          - organization_stolen_message = current_organization.organization_stolen_message
-          %td= check_mark if organization_stolen_message.is_enabled
-          %td
-            - if organization_stolen_message.content_added_at.present?
-              %span.convertTime
-                = l(organization_stolen_message.content_added_at, format: :convert_time)
-          %td
-            - if organization_stolen_message.content_added_at.present?
-              %span.convertTime
-                = l(organization_stolen_message.updated_at, format: :convert_time)
-          %td
-            %small
-              = truncate(organization_stolen_message.body, length: 100)
-        - else
-          %td
-          %td
-          %td
-          %td
+        %td= check_mark if organization_stolen_message.is_enabled
+        %td
+          - if organization_stolen_message.content_added_at.present?
+            %span.convertTime
+              = l(organization_stolen_message.content_added_at, format: :convert_time)
+        %td
+          - if organization_stolen_message.content_added_at.present?
+            %span.convertTime
+              = l(organization_stolen_message.updated_at, format: :convert_time)
+        %td
+          %small
+            = truncate(organization_stolen_message.body, length: 100)

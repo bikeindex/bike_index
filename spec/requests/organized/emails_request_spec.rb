@@ -156,20 +156,23 @@ RSpec.describe Organized::EmailsController, type: :request do
       end
       context "organization_stolen_message" do
         let(:enabled_feature_slugs) { %w[customize_emails organization_stolen_message] }
-        let(:organization_stolen_message) { current_organization.organization_stolen_message }
+        let(:organization_stolen_message) { OrganizationStolenMessage.for(current_organization) }
         it "renders" do
           expect(organization_stolen_message.id).to be_present
+          expect(organization_stolen_message.body).to be_blank
           get "#{base_url}/organization_stolen_message"
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/finished_registration")
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
           expect(assigns(:bike).id).to eq 42
           expect(assigns(:bike).current_stolen_record).to be_present
-          expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
+          # Because the stolen_message is blank
+          expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to be_blank
         end
         context "with a stolen bike" do
           let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
           it "renders that bike" do
+            organization_stolen_message.update(body: "something here", is_enabled: true)
             expect(bike.reload.status).to eq "status_stolen"
             expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
             get "#{base_url}/organization_stolen_message"
@@ -285,7 +288,7 @@ RSpec.describe Organized::EmailsController, type: :request do
     end
     describe "update" do
       context "organization_stolen_message" do
-        let(:organization_stolen_message) { current_organization.organization_stolen_message }
+        let(:organization_stolen_message) { OrganizationStolenMessage.for(current_organization) }
         let(:update_params) do
           {
             organization_stolen_message: {
@@ -293,8 +296,7 @@ RSpec.describe Organized::EmailsController, type: :request do
               body: "text for stolen message",
               organization_id: 844,
               is_enabled: true,
-              report_url: "something.com/stuff=true?utm=fffff",
-              report_phone: "111222333"
+              report_url: "something.com/stuff=true?utm=fffff"
             }
           }
         end

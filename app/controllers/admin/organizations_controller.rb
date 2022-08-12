@@ -166,9 +166,8 @@ class Admin::OrganizationsController < Admin::BaseController
     message_params = {search_radius_miles: params[:organization_stolen_message_search_radius_miles],
                       kind: params[:organization_stolen_message_kind],
                       search_radius_kilometers: params[:organization_stolen_message_search_radius_kilometers]}
-    return unless @organization.organization_stolen_message.present? &&
-      message_params.values.present?
-    @organization.organization_stolen_message.update(message_params)
+    return unless message_params.values.reject(&:blank?).any?
+    OrganizationStolenMessage.for(@organization).update(message_params)
   end
 
   def find_organization

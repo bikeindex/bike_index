@@ -77,7 +77,9 @@ module Organized
         bike = default_bike
         bike.current_stolen_record = StolenRecord.new(date_stolen: Time.current - 1.day)
       end
-      bike.current_stolen_record.organization_stolen_message = current_organization.organization_stolen_message
+      if OrganizationStolenMessage.for(current_organization).is_enabled
+        bike.current_stolen_record.organization_stolen_message = OrganizationStolenMessage.for(current_organization)
+      end
       bike
     end
 
@@ -106,7 +108,7 @@ module Organized
       @can_edit = !%w[finished_registration partial_registration].include?(@kind)
       return unless @can_edit
       if @kind == "organization_stolen_message"
-        @object = current_organization.organization_stolen_message
+        @object = OrganizationStolenMessage.for(current_organization)
       else
         @object = mail_snippets.where(kind: @kind).first
         @object ||= current_organization.mail_snippets.build(kind: @kind)

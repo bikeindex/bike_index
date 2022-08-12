@@ -35,14 +35,16 @@
         %td.table-cell-check
           = check_mark if LandingPages::ORGANIZATIONS.include?(@organization.slug)
       %tr
+        -# If there is a message, or organization_stolen_message is enabled, grab it. But don't create one otherwise
+        - organization_stolen_message = @organization.enabled?("organization_stolen_message") ? OrganizationStolenMessage.for(@organization) : @organization.organization_stolen_message
         %td
           = link_to "Organization Stolen Message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
         %td.small
           = link_to "preview message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
         %td.table-cell-check
-          = check_mark if @organization.organization_stolen_message&.body.present?
+          = check_mark if organization_stolen_message&.body.present?
         %td.table-cell-check
-          = check_mark if @organization.organization_stolen_message&.is_enabled
+          = check_mark if organization_stolen_message&.is_enabled
       - MailSnippet.organization_snippets.each do |kind, snippet_attrs|
         - snippet = @organization.mail_snippets.where(kind: kind).first
         %tr

@@ -67,9 +67,7 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
 
   def update_organization_stolen_message(organization)
     if organization.enabled?("organization_stolen_message")
-      if organization.organization_stolen_message.blank?
-        OrganizationStolenMessage.create!(organization: organization)
-      end
+      OrganizationStolenMessage.for(organization) # Create if it doesn't exist
     elsif organization.organization_stolen_message&.is_enabled?
       organization.organization_stolen_message.update(is_enabled: false)
     end

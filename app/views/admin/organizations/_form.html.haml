@@ -205,8 +205,8 @@
                     leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred
                 = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), {class: "form-control"}
 
-          - if @organization.enabled?("organization_stolen_message") && @organization.organization_stolen_message.present?
-            - organization_stolen_message = @organization.organization_stolen_message
+          - if @organization.enabled?("organization_stolen_message")
+            - organization_stolen_message = OrganizationStolenMessage.for(@organization)
             .form-group.mt-4
               = label_tag :organization_stolen_message_kind do
                 Stolen Message type

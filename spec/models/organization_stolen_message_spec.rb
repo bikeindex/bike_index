@@ -5,10 +5,12 @@ RSpec.describe OrganizationStolenMessage, type: :model do
 
   describe "calculated_attributes" do
     let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
-    let(:organization_stolen_message) { OrganizationStolenMessage.create(organization_id: organization.id) }
+    let(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
     it "uses attributes" do
+      expect(organization.search_radius_miles).to eq 50
       expect(organization_stolen_message.reload.organization_id).to eq organization.id
       expect(organization_stolen_message.kind).to eq "area"
+      expect(organization_stolen_message.search_radius_miles).to eq OrganizationStolenMessage::DEFAULT_RADIUS_MILES
       organization_stolen_message.update(is_enabled: true, body: "  ", kind: "association")
       expect(organization_stolen_message.is_enabled).to be_falsey
       expect(organization_stolen_message.body).to eq nil
@@ -20,7 +22,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       it "uses location" do
         expect(organization_stolen_message.reload.latitude).to eq organization.location_latitude
         expect(organization_stolen_message.longitude).to eq organization.location_longitude
-        expect(organization_stolen_message.search_radius_miles).to eq 94
+        expect(organization_stolen_message.search_radius_miles).to eq 10
         expect(organization_stolen_message.kind).to eq "association"
         expect(organization_stolen_message.is_enabled).to be_falsey
         organization_stolen_message.update(is_enabled: true, body: "  Something\n<strong> PARTy</strong>  ", search_radius_miles: 12, latitude: 22, longitude: 22)
@@ -38,6 +40,17 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         organization_stolen_message.update(is_enabled: true, body: " #{target} i officia deserunt mollit anim id est laborum.")
         expect(organization_stolen_message.reload.is_enabled).to be_falsey
         expect(organization_stolen_message.body).to eq target
+      end
+    end
+    context "report_url present" do
+      let(:organization_stolen_message) { OrganizationStolenMessage.create!(organization_id: organization.id, report_url: "https://example.com", kind: "association") }
+      it "also can enable" do
+        expect(organization_stolen_message).to be_valid
+        expect(organization_stolen_message.can_enable?).to be_truthy
+        organization_stolen_message.update(is_enabled: true)
+        expect(organization_stolen_message.reload.is_enabled).to be_truthy
+        organization_stolen_message.update(is_enabled: false)
+        expect(organization_stolen_message.reload.is_enabled).to be_falsey
       end
     end
     context "max search_radius" do
@@ -58,6 +71,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
     let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, :in_nyc, creation_organization: organization) }
     let(:stolen_record) { bike.reload.current_stolen_record }
     let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization2) }
+    let(:stolen_record2) { bike2.current_stolen_record }
     it "returns organization_stolen_message, doesn't assign" do
       expect(organization_stolen_message.id).to be_present
       expect(OrganizationStolenMessage.count).to eq 1
@@ -67,8 +81,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
       expect(stolen_record.reload.organization_stolen_message_id).to eq nil
       # Not association bike doesn't match
-      expect(bike2.current_stolen_record).to be_valid
-      expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq nil
+      expect(stolen_record2).to be_valid
+      expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq nil
     end
     context "assigned organization_stolen_message_id" do
       let(:organization2) { FactoryBot.create(:organization) }
@@ -97,11 +111,11 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
         expect(stolen_record.reload.organization_stolen_message_id).to eq nil
         # And then test the reverse order
-        expect(bike2.current_stolen_record).to be_valid
-        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+        expect(stolen_record2).to be_valid
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
         bike2.bike_organizations.create(organization: organization)
         expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization2.id, organization.id])
-        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
       end
     end
     context "with an area organization_stolen_message" do
@@ -122,8 +136,12 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         # Associated bike also matches
         expect(bike2.reload.current_stolen_record_id).to be_present
         expect(bike2.bike_organizations.pluck(:organization_id)).to eq([organization2.id])
-        expect(OrganizationStolenMessage.for_coordinates(bike2.current_stolen_record.to_coordinates)&.id).to eq organization_stolen_message2.id
-        expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+        expect(OrganizationStolenMessage.for_coordinates(stolen_record2.to_coordinates)&.id).to eq organization_stolen_message2.id
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
+        # Associated bike outside of area still matches
+        stolen_record2.update(latitude: 41.86, longitude: -87.65, skip_geocoding: true)
+        expect(OrganizationStolenMessage.for_coordinates(stolen_record2.to_coordinates)&.id).to be_blank
+        expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
       end
 
       context "2 area organization_stolen_message" do
@@ -144,8 +162,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
           expect(stolen_record.organization_stolen_message_id).to eq nil
           expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
           # Closer to the Manhattan location
-          expect(bike2.current_stolen_record).to be_valid
-          expect(OrganizationStolenMessage.for_stolen_record(bike2.current_stolen_record)&.id).to eq organization_stolen_message2.id
+          expect(stolen_record2).to be_valid
+          expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
           # And change the search_radius, so the closer location one no longer contains the area
           organization_stolen_message.update(search_radius_miles: 1)
           # Verify that organization_stolen_message is the closer one

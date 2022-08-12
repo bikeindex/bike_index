@@ -1125,6 +1125,11 @@ en:
       without_serial_number: This %{bike_type} was made without a serial number
       your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
+    organization_stolen_message:
+      report_link_text: at this link
+      report_the_theft_to_the_organization_html: >-
+        <span class="text-warning">Report the theft</span> to %{organization} <strong>%{report_link}</strong>
+        to get a police report number
     organized_access_panel:
       access_panel: Access Panel
       added_to_track_parking_notification: >-
@@ -5257,6 +5262,7 @@ en:
       resources: Resources
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
+      stolen_message: Stolen Message
       super_admin_view: Super Admin for %{org_name}
     organized_skeleton:
       additional_features_html: >-

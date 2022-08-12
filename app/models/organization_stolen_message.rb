@@ -2,6 +2,7 @@ class OrganizationStolenMessage < ApplicationRecord
   MAX_BODY_LENGTH = 400
   KIND_ENUM = {area: 0, association: 1}
   MAX_SEARCH_RADIUS = 1000
+  DEFAULT_RADIUS_MILES = 10
 
   include SearchRadiusMetricable
 
@@ -30,11 +31,17 @@ class OrganizationStolenMessage < ApplicationRecord
     miles_to_kilometers(MAX_SEARCH_RADIUS)
   end
 
+  def self.for(organization)
+    where(organization_id: organization.id).first_or_create
+  end
+
   def self.for_stolen_record(stolen_record)
     return stolen_record.organization_stolen_message if stolen_record.organization_stolen_message.present?
     area_result = for_coordinates(stolen_record.to_coordinates)
     return area_result if area_result.present?
-    stolen_record.bike.bike_organizations.includes(:organization).order(:id)
+    bike = Bike.unscoped.find_by_id(stolen_record.bike_id)
+    return nil if bike.blank?
+    bike.bike_organizations.includes(:organization).order(:id)
       .detect { |bo| bo.organization.organization_stolen_message&.is_enabled? }
       &.organization&.organization_stolen_message
   end
@@ -59,6 +66,12 @@ class OrganizationStolenMessage < ApplicationRecord
     %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
   end
 
+  # NOTE: doesn't calculate. Only checks stolen record attributes
+  def self.shown_to?(stolen_record = nil)
+    stolen_record&.organization_stolen_message.present? &&
+      stolen_record.organization_stolen_message.shown_to?(stolen_record)
+  end
+
   # never geocode, use organization lat/long
   def should_be_geocoded?
     false
@@ -68,12 +81,22 @@ class OrganizationStolenMessage < ApplicationRecord
     false # match mail_snippet method
   end
 
+  def default_search_radius_miles
+    DEFAULT_RADIUS_MILES
+  end
+
   def max_body_length
     MAX_BODY_LENGTH
   end
 
   def disabled?
     !is_enabled?
+  end
+
+  def shown_to?(stolen_record)
+    return false if disabled?
+    return true if body.present?
+    report_url.present? && stolen_record.police_report_number.blank?
   end
 
   def set_calculated_attributes
@@ -87,10 +110,8 @@ class OrganizationStolenMessage < ApplicationRecord
     self.report_url = Urlifyer.urlify(report_url)
   end
 
-  private
-
   def can_enable?
-    return false if body.blank?
+    return false if body.blank? && report_url.blank?
     return true if association?
     latitude.present? && longitude.present? && search_radius_miles.present?
   end
