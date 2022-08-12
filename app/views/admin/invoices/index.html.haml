@@ -9,13 +9,19 @@
       Invoices
   .col-md-6
     %ul
-      - if sortable_search_params?
-        %li.nav-item
-          = link_to "view all", admin_invoices_path, class: "nav-link"
       %li.nav-item
-        = link_to "active", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "nav-link #{params[:query] == 'active' ? 'active' : ''}"
-      %li.nav-item
-        = link_to "inactive", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "nav-link #{params[:query] == 'inactive' ? 'active' : ''}"
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@query.present? ? 'active' : '') }
+          - if @query.present?
+            #{@query.titleize} only
+          - else
+            All invoices
+        .dropdown-menu
+          = link_to "All", admin_invoices_path(sortable_search_params.merge(query: nil)), class: "dropdown-item #{@query.blank? ? 'active' : ''}"
+          .dropdown-divider
+          = link_to "Active only", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "dropdown-item #{@query == 'active' ? 'active' : ''}"
+          = link_to "Inactive only", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "dropdown-item #{@query == 'inactive' ? 'active' : ''}"
+          = link_to "First invoices only", admin_invoices_path(sortable_search_params.merge(query: "first_invoice")), class: "dropdown-item #{@query == 'first_invoice' ? 'active' : ''}"
+          = link_to "Renewal invoices only", admin_invoices_path(sortable_search_params.merge(query: "renewal_invoice")), class: "dropdown-item #{@query == 'renewal_invoice' ? 'active' : ''}"
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@time_range_column == 'created_at' ? '' : 'active') }
           #{humanized_time_range_column(@time_range_column, return_value_for_all: true)} in timerange
@@ -38,6 +44,51 @@
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_invoices, column: @time_range_column), stacked: true, thousands: ","
+  - unless params[:query].present?
+    .row.mb-4.mt-4
+      .col-sm-8.offset-sm-2
+        .full-screen-table
+          %table.table.table-striped.table-bordered.table-sm.text-center
+            %thead
+              %tr.text-left
+                %th
+                %th count
+                %th amount due
+                %th amount paid
+            %tbody
+              %tr.text-left
+                - payments = matching_invoices.first_invoice
+                %td First invoice
+                %td= admin_number_display(payments.count)
+                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+              %tr.text-left
+                - payments = matching_invoices.renewal_invoice
+                %td Renewals
+                %td= admin_number_display(payments.count)
+                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+              %tr.text-left
+                - payments = matching_invoices.free
+                %td Free invoices
+                %td= admin_number_display(payments.count)
+                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+              %tr.text-left
+                - payments = matching_invoices.paid
+                %td Not free
+                %td= admin_number_display(payments.count)
+                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+              %tr.text-left
+                %td
+                  %strong All
+                %td
+                  %strong= admin_number_display(matching_invoices.count)
+                %td
+                  %strong= MoneyFormater.money_format(matching_invoices.sum(:amount_due_cents))
+                %td
+                  %strong= MoneyFormater.money_format(matching_invoices.sum(:amount_paid_cents))
 
 .mt-2
   = render partial: "/shared/period_select", locals: { include_future: true }

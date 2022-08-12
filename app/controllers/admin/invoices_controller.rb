@@ -30,12 +30,23 @@ class Admin::InvoicesController < Admin::BaseController
   end
 
   def matching_invoices
-    invoices = if params[:query] == "active"
+    @query = params[:query]
+    invoices = if @query == "active"
       Invoice.active
-    elsif params[:query] == "inactive"
+    elsif @query == "inactive"
       Invoice.inactive
+    elsif @query == "first_invoice"
+      Invoice.first_invoice
+    elsif @query == "renewal_invoice"
+      Invoice.renewal_invoice
     else
+      @query = nil
       Invoice
+    end
+
+    if %w[only_paid only_free].include?(params[:search_paid])
+      @search_paid = params[:search_paid]
+      invoices = @search_paid == "only_paid" ? invoices.paid : invoices.free
     end
 
     if %w[subscription_start_at subscription_end_at].include?(params[:time_range_column])

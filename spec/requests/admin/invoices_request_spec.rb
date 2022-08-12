@@ -27,7 +27,6 @@ RSpec.describe Admin::InvoicesController, type: :request do
         get "/admin/invoices?direction=desc&period=custom&start_time=#{(Time.current - 1.year).to_s}&end_time=#{Time.current.to_s}&sort=subscription_start_at"
         expect(response).to render_template(:index)
         expect(assigns(:time_range).last).to be_within(1.day).of(Time.current)
-        expect(assigns(:invoices).pluck(:id)).to eq([invoice.id])
       end
     end
   end
