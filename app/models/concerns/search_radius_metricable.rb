@@ -27,7 +27,7 @@ module SearchRadiusMetricable
     @search_radius_metric_units ||= metric_units? # assign because through multiple tables
   end
 
-  def initial_search_radius_miles
+  def default_search_radius_miles
     search_rad = organization&.search_radius_miles if self.class != Organization
     search_rad || DEFAULT_RADIUS_MILES
   end
@@ -50,9 +50,9 @@ module SearchRadiusMetricable
 
   def set_search_radius
     if search_radius_miles.blank? || search_radius_miles < 1
-      self.search_radius_miles = initial_search_radius_miles
+      self.search_radius_miles = default_search_radius_miles
       # switch km default to 100
-      self.search_radius_kilometers = 100 if search_radius_metric_units? && search_radius_miles == DEFAULT_RADIUS_MILES
+      self.search_radius_kilometers = 100 if search_radius_metric_units? && search_radius_miles == default_search_radius_miles
     end
   end
 end

@@ -296,7 +296,7 @@ RSpec.describe Organized::EmailsController, type: :request do
               body: "text for stolen message",
               organization_id: 844,
               is_enabled: true,
-              report_url: "something.com/stuff=true?utm=fffff",
+              report_url: "something.com/stuff=true?utm=fffff"
             }
           }
         end

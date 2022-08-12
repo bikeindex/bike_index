@@ -7,8 +7,10 @@ RSpec.describe OrganizationStolenMessage, type: :model do
     let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
     let(:organization_stolen_message) { OrganizationStolenMessage.create(organization_id: organization.id) }
     it "uses attributes" do
+      expect(organization.search_radius_miles).to eq 50
       expect(organization_stolen_message.reload.organization_id).to eq organization.id
       expect(organization_stolen_message.kind).to eq "area"
+      expect(organization_stolen_message.search_radius_miles).to eq OrganizationStolenMessage::DEFAULT_RADIUS_MILES
       organization_stolen_message.update(is_enabled: true, body: "  ", kind: "association")
       expect(organization_stolen_message.is_enabled).to be_falsey
       expect(organization_stolen_message.body).to eq nil
@@ -20,7 +22,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       it "uses location" do
         expect(organization_stolen_message.reload.latitude).to eq organization.location_latitude
         expect(organization_stolen_message.longitude).to eq organization.location_longitude
-        expect(organization_stolen_message.search_radius_miles).to eq 94
+        expect(organization_stolen_message.search_radius_miles).to eq 10
         expect(organization_stolen_message.kind).to eq "association"
         expect(organization_stolen_message.is_enabled).to be_falsey
         organization_stolen_message.update(is_enabled: true, body: "  Something\n<strong> PARTy</strong>  ", search_radius_miles: 12, latitude: 22, longitude: 22)

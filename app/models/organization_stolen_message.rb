@@ -2,6 +2,7 @@ class OrganizationStolenMessage < ApplicationRecord
   MAX_BODY_LENGTH = 400
   KIND_ENUM = {area: 0, association: 1}
   MAX_SEARCH_RADIUS = 1000
+  DEFAULT_RADIUS_MILES = 10
 
   include SearchRadiusMetricable
 
@@ -72,6 +73,10 @@ class OrganizationStolenMessage < ApplicationRecord
 
   def editable_subject?
     false # match mail_snippet method
+  end
+
+  def default_search_radius_miles
+    DEFAULT_RADIUS_MILES
   end
 
   def max_body_length

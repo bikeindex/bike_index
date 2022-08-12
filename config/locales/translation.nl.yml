@@ -5040,6 +5040,7 @@ nl:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
       super_admin_view: Superbeheerder voor %{org_name}
+      stolen_message: Gestolen bericht
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>

@@ -5235,7 +5235,6 @@ en:
       ascend_imports: Ascend Imports
       bulk_imports: Bulk Imports
       custom_emails: Custom emails
-      stolen_message: Stolen Message
       discuss: Discuss
       exports: Exports
       getting_started: Getting started
@@ -5258,6 +5257,7 @@ en:
       resources: Resources
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
+      stolen_message: Stolen Message
       super_admin_view: Super Admin for %{org_name}
     organized_skeleton:
       additional_features_html: >-
