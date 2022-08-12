@@ -38,10 +38,9 @@ class Admin::InvoicesController < Admin::BaseController
       Invoice
     end
 
-    if %w[subscription_start_at subscription_end_at].include?(params[:time_range_column])
-      @time_range_column = params[:time_range_column]
-      @search_endless = "not_endless"
-      invoices = invoices.not_endless if @time_range_column == "subscription_end_at"
+    if %w[subscription_start_at subscription_end_at].include?(params[:sort])
+      @time_range_column = params[:sort]
+      @search_endless = "not_endless" if @time_range_column == "subscription_end_at"
     else
       @time_range_column = "created_at"
     end
