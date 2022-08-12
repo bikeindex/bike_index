@@ -52,6 +52,9 @@
     %strong
       = humanized_time_range_column(@time_range_column)
     = humanized_time_range(@time_range)
+  %br
+  Total paid:
+  %strong= MoneyFormater.money_format(matching_invoices.sum(:amount_paid_cents))
 
 %p.less-strong
   Go to individual organizations to create new invoices
