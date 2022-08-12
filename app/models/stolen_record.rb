@@ -316,15 +316,8 @@ class StolenRecord < ApplicationRecord
     if current || bike&.current_stolen_record_id == id
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
-    AfterStolenRecordSaveWorker.perform_async(id)
+    AfterStolenRecordSaveWorker.perform_async(id, @alert_location_changed)
     AfterUserChangeWorker.perform_async(bike.user_id) if bike&.user_id.present?
-  end
-
-  # If the bike has been recovered, remove the alert_image
-  def remove_outdated_alert_images
-    no_longer_around = bike.blank? || !bike.status_stolen? || recovered?
-    return true unless no_longer_around || @alert_location_changed
-    alert_image&.destroy
   end
 
   private

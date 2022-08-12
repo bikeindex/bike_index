@@ -1,11 +1,14 @@
 class AfterStolenRecordSaveWorker < ApplicationWorker
   sidekiq_options retry: false
 
-  def perform(stolen_record_id)
+  def perform(stolen_record_id, remove_alert_image = false)
     stolen_record = StolenRecord.unscoped.find_by_id(stolen_record_id)
     return if stolen_record.blank?
-    pp "fasdfasdfs"
-    stolen_record.remove_outdated_alert_images
+    # If the bike has been recovered (or alert_location_changed - which causes remove_alert_image to be true)
+    if remove_alert_image || stolen_record.bike.blank? || !stolen_record.bike.status_stolen? || stolen_record.recovered?
+      stolen_record.alert_image&.destroy
+    end
+
     stolen_record.theft_alerts.each { |t| t.update(updated_at: Time.current) }
     if stolen_record.current
       StolenRecord.unscoped.where(bike_id: stolen_record.bike_id).where.not(id: stolen_record.id)
