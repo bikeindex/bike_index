@@ -229,7 +229,7 @@ module ControllerHelpers
     if @period == "custom"
       if params[:start_time].present?
         @start_time = TimeParser.parse(params[:start_time], @timezone)
-        @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
+        @end_time = TimeParser.parse(params[:end_time], @timezone) || latest_period_date
         if @start_time > @end_time
           new_end_time = @start_time
           @start_time = @end_time
@@ -421,8 +421,9 @@ module ControllerHelpers
       @end_time = Time.current.beginning_of_day + 1.week
     when "all"
       @start_time = earliest_period_date
+      @end_time = latest_period_date
     end
-    @end_time ||= latest_period_date
+    @end_time ||= Time.current
   end
 
   # Separate method so it can be overridden on per controller basis

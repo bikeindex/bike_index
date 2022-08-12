@@ -19,6 +19,8 @@ class Invoice < ApplicationRecord
   scope :renewal_invoice, -> { where.not(first_invoice_id: nil) }
   scope :active, -> { where(is_active: true) }
   scope :inactive, -> { where(is_active: false) }
+  scope :paid, -> { where.not(amount_due_cents: 0) }
+  scope :free, -> { where(amount_due_cents: 0) }
   scope :current, -> { active.where("subscription_end_at > ? AND subscription_start_at < ?", Time.current, Time.current) }
   scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.current) }
   scope :future, -> { where("subscription_start_at > ?", Time.current) }
