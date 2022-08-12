@@ -30,6 +30,10 @@ class OrganizationStolenMessage < ApplicationRecord
     miles_to_kilometers(MAX_SEARCH_RADIUS)
   end
 
+  def self.for(organization)
+    where(organization_id: organization.id).first_or_create
+  end
+
   def self.for_stolen_record(stolen_record)
     return stolen_record.organization_stolen_message if stolen_record.organization_stolen_message.present?
     area_result = for_coordinates(stolen_record.to_coordinates)

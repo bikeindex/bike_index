@@ -250,7 +250,7 @@
                 %small
                   = link_to "configuration", edit_organization_hot_sheet_path(organization_id: @organization.to_param)
           - if @organization.enabled?("organization_stolen_message")
-            - organization_stolen_message = @organization.organization_stolen_message
+            - organization_stolen_message = OrganizationStolenMessage.for(@organization)
             %tr
               %td Stolen Message
               %td
