@@ -495,7 +495,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker1.claimable_by?(user)).to be_truthy
         expect(bike_sticker1.claimable_by?(user, organization_other)).to be_truthy
         expect(bike_sticker2.claimable_by?(user, organization_regional)).to be_truthy
-        expect(bike_sticker2.claimable_by?(user, organization)).to be_falsey # user not authorized on organization
+        expect(bike_sticker2.claimable_by?(user, organization)).to be_truthy # user not authorized on organization, but still is authorized
         expect(bike_sticker3.claimable_by?(user, organization_other)).to be_truthy
         FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1, bike: bike1, organization: organization_regional)
         FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker2, bike: bike1, organization: organization_regional)
@@ -511,7 +511,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(user.unauthorized_organization_update_bike_sticker_ids).to match_array([bike_sticker1.id, bike_sticker2.id])
         expect(bike_sticker1.claimable_by?(user, organization_other)).to be_truthy # user already claimed bike_sticker already edited
         expect(bike_sticker2.claimable_by?(user, organization_other)).to be_truthy # user already claimed bike_sticker already edited
-        expect(bike_sticker2.claimable_by?(user, organization)).to be_falsey # user isn't authorized on the organization
+        expect(bike_sticker2.claimable_by?(user, organization)).to be_truthy # User still has authorization
         expect(bike_sticker3.claimable_by?(user)).to be_truthy # authorized by the regional organization
         expect(bike_sticker3.claimable_by?(user, organization_regional)).to be_truthy
         expect(bike_sticker3.organization_authorized?(organization_other)).to be_falsey
@@ -556,7 +556,7 @@ RSpec.describe BikeSticker, type: :model do
         # Manually passing unauthorized organization in
         expect(bike_sticker1.claimed?).to be_falsey
         expect(bike_sticker1.claimable_by?(user)).to be_truthy
-        expect(bike_sticker1.claimable_by?(user, organization)).to be_falsey # Because user isn't authorized on that org
+        expect(bike_sticker1.claimable_by?(user, organization)).to be_truthy # Because user isn't authorized on that org
         expect(bike_sticker1.organization_authorized?(organization)).to be_falsey
         expect { bike_sticker1.claim(user: user, bike: bike1, organization: organization) }.to change(BikeStickerUpdate, :count).by 1
         bike_sticker1.reload

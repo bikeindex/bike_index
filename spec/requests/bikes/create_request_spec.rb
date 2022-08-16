@@ -79,6 +79,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
         bike_sticker_update = bike_sticker.bike_sticker_updates.last
         expect(bike_sticker_update.kind).to eq "initial_claim"
+        expect(bike_sticker_update.failed_claim_errors).to be_blank
         expect(bike_sticker.claimed?).to be_truthy
         expect(new_bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
       end
