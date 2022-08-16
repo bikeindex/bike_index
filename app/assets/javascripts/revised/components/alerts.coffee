@@ -12,7 +12,7 @@ class @Alerts
   # If a modal is around, we need to display alerts in the modal
   alertWrapperClass: ->
     if $(".modal.fade.in").length
-      # Add an alert
+      # Add an alert wrapper to the modal
       unless $(".modal.fade.in .alert-wrapper").length
         $(".modal.fade.in .modal-content").append("<div class='modal-alert-wrapper'></div>")
       ".modal.fade.in .modal-alert-wrapper"
@@ -27,7 +27,7 @@ class @Alerts
     attrs =
       alert_type: alert_type
       alert_body: alert_body
-      seconds: 1000
+      seconds: seconds
     $(alert_wrapper_class).append(Mustache.render(template, attrs))
     @fadeOutAlerts()
 
