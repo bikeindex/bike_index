@@ -26,6 +26,25 @@ RSpec.describe BikesController, type: :request do
       # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
       expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
+    context "with bike_sticker" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "UC1101", organization: organization) }
+      it "renders with bike sticker" do
+        get "#{base_url}/new?bike_sticker=uc1101"
+        expect(response.code).to eq("200")
+        b_param = assigns(:b_param)
+        expect(b_param.revised_new?).to be_truthy
+        expect(b_param.origin).to eq "scanned_sticker"
+        expect(b_param.bike_sticker_code).to eq "UC1101"
+        expect(b_param.creation_organization&.id).to eq organization.id
+        bike = assigns(:bike)
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.stolen_records.last).to be_blank
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.bike_sticker&.id).to eq bike_sticker.id
+        expect(response).to render_template(:new)
+      end
+    end
     context "stolen from params" do
       it "renders a new stolen bike" do
         get "#{base_url}/new?stolen=true"

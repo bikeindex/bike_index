@@ -202,7 +202,8 @@
                   class: 'form-control'
 
       .new-bike-submit-wrapper
-        = submit_tag t(".register"), class: 'btn btn-lg btn-primary'
+        - register_text = @bike.creation_organization.present? ? t(".register_with", organization_name: @bike.creation_organization.short_name) : t(".register")
+        = submit_tag register_text, class: 'btn btn-lg btn-primary'
 
 - modal_body = capture_haml do
   .modal-body
