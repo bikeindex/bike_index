@@ -9,23 +9,35 @@ class @Alerts
     else
       @displayAlert(alert_type, alert_body)
 
+  # If a modal is around, we need to display alerts in the modal
+  alertWrapperClass: ->
+    if $(".modal.fade.in").length
+      # Add an alert
+      unless $(".modal.fade.in .alert-wrapper").length
+        $(".modal.fade.in .modal-content").append("<div class='modal-alert-wrapper'></div>")
+      ".modal.fade.in .modal-alert-wrapper"
+    else
+      ".primary-alert-block"
+
   displayAlert: (alert_type, alert_body, seconds = 7) ->
-    $('.primary-alert-block').removeClass('faded')
+    alert_wrapper_class = @alertWrapperClass()
+    $(alert_wrapper_class).removeClass('faded')
     template = $('#alert-template').html()
     # Mustache.parse(template) # Probably not useful for performance to call it every time...
     attrs =
       alert_type: alert_type
       alert_body: alert_body
-      seconds: seconds
-    $('.primary-alert-block').append(Mustache.render(template, attrs))
+      seconds: 1000
+    $(alert_wrapper_class).append(Mustache.render(template, attrs))
     @fadeOutAlerts()
 
   fadeOutAlerts: ->
+    alert_wrapper_class = @alertWrapperClass()
     # Currently alerts have a fade out time of never - they all have seconds of 0
     #  - But -
     # We fade success alerts manually after 5 seconds, they don't provide actionable info
-    if $('.primary-alert-block .alert').length > 0
-      for alert in $('.primary-alert-block .in')
+    if $("#{alert_wrapper_class} .alert").length > 0
+      for alert in $("#{alert_wrapper_class} .in")
         $alert = $(alert)
         # Set seconds to 0 to display forever
         if $alert.data('seconds') > 0
@@ -37,17 +49,18 @@ class @Alerts
           @fadeAlert($alert, 10)
     else
       # There aren't any alerts, so remove the fixed position block
-      $('.primary-alert-block').addClass('faded')
+      $(alert_wrapper_class).addClass('faded')
 
 
   fadeAlert: ($alert, seconds) ->
+    alert_wrapper_class = @alertWrapperClass()
     setTimeout (->
       $alert.fadeOut 'slow', ->
         $alert.slideUp 'fast', ->
           # To reduce the number of divs that have fixed positioning
           $alert.remove() # Remove the alert so we can check if there are any alerts
-          unless $('.primary-alert-block .alert').length > 0
-            $('.primary-alert-block').addClass('faded')
+          unless $("#{alert_wrapper_class} .alert").length > 0
+            $(alert_wrapper_class).addClass('faded')
     ), seconds*1000
 
   storeAlert: (alert_type, alert_body, callback) ->
