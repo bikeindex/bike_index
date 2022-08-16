@@ -13,7 +13,8 @@ class Ownership < ApplicationRecord
     creator_unregistered_parking_notification: 8,
     impound_import: 9,
     impound_process: 11,
-    transferred_ownership: 10
+    transferred_ownership: 10,
+    sticker: 13
   }.freeze
 
   validates_presence_of :owner_email

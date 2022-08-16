@@ -42,6 +42,7 @@ class BikeCreator
     bike = check_organization(b_param, bike)
     bike = check_example(b_param, bike)
     bike.attributes = default_parking_notification_attrs(b_param, bike) if b_param.unregistered_parking_notification?
+    bike.bike_sticker = b_param.bike_sticker_code
     if bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
       bike.attributes = {front_wheel_size_id: bike.rear_wheel_size_id, front_tire_narrow: bike.rear_tire_narrow}
     end
@@ -148,8 +149,7 @@ class BikeCreator
     AfterBikeSaveWorker.perform_async(bike.id)
     if b_param.bike_sticker_code.present? && bike.creation_organization.present?
       bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
-      bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
-        organization: bike.creation_organization, creator_kind: "creator_bike_creation")
+      bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id, creator_kind: "creator_bike_creation")
     end
     if b_param.unregistered_parking_notification?
       # We skipped setting address, with default_parking_notification_attrs, notification will update it

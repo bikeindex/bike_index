@@ -56,6 +56,33 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.serial_number).to eq "unknown"
       expect(new_bike.normalized_serial_segments).to eq([])
     end
+    context "scanned_sticker" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
+      it "assigns scanned_sticker" do
+        expect(current_user.bikes.count).to eq 0
+        expect(bike_sticker.reload.bike_sticker_updates.count).to eq 0
+        expect {
+          post base_url, params: {bike: bike_params, bike_sticker: bike_sticker.pretty_code}
+        }.to change(Ownership, :count).by(1)
+        expect(current_user.reload.bikes.count).to eq 1
+        new_bike = current_user.bikes.first
+        expect(new_bike.claimed?).to be_truthy
+        expect(new_bike.no_serial?).to be_truthy
+        expect(new_bike.made_without_serial?).to be_falsey
+        expect(new_bike.current_ownership.origin).to eq "sticker"
+        expect(new_bike.serial_unknown?).to be_truthy
+        expect(new_bike.serial_number).to eq "unknown"
+        expect(new_bike.normalized_serial_segments).to eq([])
+        expect(new_bike.creation_organization_id).to eq organization.id
+        expect(new_bike.creator_id).to eq current_user.id
+        expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
+        bike_sticker_update = bike_sticker.bike_sticker_updates.last
+        expect(bike_sticker_update.kind).to eq "initial_claim"
+        expect(bike_sticker.claimed?).to be_truthy
+        expect(new_bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+      end
+    end
     context "made_without_serial" do
       it "creates, is made_without_serial" do
         expect(current_user.bikes.count).to eq 0

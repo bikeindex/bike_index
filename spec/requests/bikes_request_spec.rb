@@ -34,14 +34,14 @@ RSpec.describe BikesController, type: :request do
         expect(response.code).to eq("200")
         b_param = assigns(:b_param)
         expect(b_param.revised_new?).to be_truthy
-        expect(b_param.origin).to eq "scanned_sticker"
-        expect(b_param.bike_sticker_code).to eq "UC1101"
+        expect(b_param.origin).to eq "sticker"
+        expect(b_param.bike_sticker_code).to eq bike_sticker.pretty_code
         expect(b_param.creation_organization&.id).to eq organization.id
         bike = assigns(:bike)
         expect(bike.status).to eq "status_with_owner"
         expect(bike.stolen_records.last).to be_blank
         expect(bike.creation_organization_id).to eq organization.id
-        expect(bike.bike_sticker&.id).to eq bike_sticker.id
+        expect(bike.bike_sticker).to eq "UC 110 1" # pretty code
         expect(response).to render_template(:new)
       end
     end

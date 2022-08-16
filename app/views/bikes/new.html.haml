@@ -12,6 +12,9 @@
 
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
+  - if @bike_sticker.present?
+    -# Hacky way to assign sticker during creation
+    = hidden_field_tag :bike_sticker, value: @bike_sticker.id
   - if @organization.present?
     = f.hidden_field :creation_organization_id, value: @organization.id
   - if @bike.status_stolen?
