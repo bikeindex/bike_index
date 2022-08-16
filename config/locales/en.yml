@@ -1243,14 +1243,13 @@ en:
       mnfg_model_color_html: mnfg, model, <span class="less-strong">color</span>
       model: Model
       new_bike_link_text: A new bike
-      register_a_new_bike_html: >-
-        Register %{new_bike_link} with this sticker
       or_click_html: >-
         Or, click <em>link it</em> on of your bikes to connect it to this %{bike_sticker_kind}:
       please_email_support_html: >-
         Please email %{support_email_link} if you don't understand why you're seeing
         this message or if you need an exception made.
       please_sign_in: please sign in
+      register_a_new_bike_html: Register %{new_bike_link} with this sticker
       to_link_that_card_with_a_bike: To link that card with a bike,
       update: Update
       you_can_enter_the_url: >-

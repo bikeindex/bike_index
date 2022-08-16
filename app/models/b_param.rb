@@ -47,7 +47,7 @@ class BParam < ApplicationRecord
     b.creator_id ||= user_id
     if bike_sticker.present?
       b.origin = "sticker"
-      b.params.merge!("bike" => b.bike.merge("bike_sticker" => bike_sticker.pretty_code))
+      b.params["bike"] = b.bike.merge("bike_sticker" => bike_sticker.pretty_code)
       organization_id = bike_sticker.organization_id if bike_sticker.organization_id.present?
     end
     # If the org_id is present, add it to the params. Only save it if the b_param is created_at
