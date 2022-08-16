@@ -55,20 +55,21 @@
           .full-screen-table
             %table.table.table-striped.table-bordered.table-sm.text-center
               %thead
-                %th Kind
-                %th Bikes
+                %th.text-left Kind
+                %th.text-right Bikes
               %tbody
                 - pos_search_kinds.each do |pos_kind|
                   %tr
-                    %td.text-left= pos_kind.humanize
+                    %td.text-left
+                      = link_to pos_kind.humanize, admin_bikes_path(sortable_search_params.merge(search_pos: pos_kind))
                     %td.text-right= admin_number_display(matching_bikes.send(pos_kind).count)
       - elsif graph_kind == "origin"
         .col-sm-6.offset-sm-3.mt-4
           .full-screen-table
             %table.table.table-striped.table-bordered.table-sm.text-center
               %thead
-                %th Kind
-                %th Bikes
+                %th.text-left Kind
+                %th.text-right Bikes
               %tbody
                 - Ownership.origins.each do |origin|
                   %tr
