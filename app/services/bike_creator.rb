@@ -42,6 +42,7 @@ class BikeCreator
     bike = check_organization(b_param, bike)
     bike = check_example(b_param, bike)
     bike.attributes = default_parking_notification_attrs(b_param, bike) if b_param.unregistered_parking_notification?
+    bike.bike_sticker = b_param.bike_sticker_code
     if bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
       bike.attributes = {front_wheel_size_id: bike.rear_wheel_size_id, front_tire_narrow: bike.rear_tire_narrow}
     end

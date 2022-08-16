@@ -197,8 +197,8 @@ class BikeSticker < ApplicationRecord
   def claimable_by?(passed_user, passed_organization = nil)
     return false unless passed_user.present?
     if passed_organization.present?
-      return false unless passed_user.authorized?(passed_organization)
-      return true if organization_authorized?(passed_organization)
+      return true if passed_user.authorized?(passed_organization) &&
+        organization_authorized?(passed_organization)
     elsif passed_user.organizations.detect { |o| organization_authorized?(o) }
       return true
     end

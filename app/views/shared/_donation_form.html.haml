@@ -21,27 +21,27 @@
   %ul.row.amount-list
     - if is_payment # If payment, have one non-arbitrary button
       %li.col-xs-6.offset-sm-3
-        %a.btn.btn-secondary.active{ data: { amount: initial_amount * 100 } }
-          #{ initial_amount }$
+        %a.btn.btn-secondary.active{data: {amount: initial_amount * 100}}
+          #{initial_amount}$
     - else
       - numbers = [5, 15, 25, 50, 100, 200, 500]
       - arbitrary_initial_value = numbers.include?(initial_amount) ? nil : initial_amount
       - numbers.each do |amount|
         %li.col-xs-4
-          %a.btn.btn-secondary{ class: (amount == initial_amount ? "active" : ""), data: { amount: amount * 100 } }
+          %a.btn.btn-secondary{class: (amount == initial_amount ? "active" : ""), data: {amount: amount * 100}}
             = number_to_currency(amount, precision: 0)
       %li.col-xs-8
         .input-group
           .input-group-addon
             = t("number.currency.format.unit")
 
-          %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: t('.other_amount'), step: 0.01, value: arbitrary_initial_value, class: ('active' if arbitrary_initial_value.present?) }
+          %input#arbitrary-amount.form-control{type: 'number', min: '0', placeholder: t('.other_amount'), step: 0.01, value: arbitrary_initial_value, class: ('active' if arbitrary_initial_value.present?)}
 
     - if kind == "modal"
       %li.col-xs-6.text-left.next-steps
-        %a.btn.btn-secondary.no-donate-btn{ "aria-label" => "Close", "data-dismiss" => "modal" }
+        %a.btn.btn-secondary.no-donate-btn{"aria-label" => "Close", "data-dismiss" => "modal"}
           %small= t(".skip")
-    %li.next-steps{ class: (kind == "modal" ? "col-xs-6 text-right" : "col-xs-12 text-center") }
+    %li.next-steps{class: (kind == "modal" ? "col-xs-6 text-right" : "col-xs-12 text-center")}
       = submit_tag t(".next"), class: 'btn btn-primary d-inline-block'
 
 .nfp-info.mt-2

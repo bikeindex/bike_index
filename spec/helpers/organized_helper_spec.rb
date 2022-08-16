@@ -45,6 +45,14 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(origin_display("Lightspeed")).to eq target
       end
     end
+    context "scanned_sticker" do
+      let(:target) { "<span title=\"Registered via sticker\">sticker</span>" }
+      let(:ownership) { Ownership.new(origin: "sticker") }
+      it "renders with title" do
+        expect(ownership.creation_description).to eq "sticker"
+        expect(origin_display(ownership.creation_description)).to eq target
+      end
+    end
   end
 
   describe "status_display" do

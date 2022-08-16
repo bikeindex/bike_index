@@ -1817,6 +1817,7 @@ nl:
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
       owner_email: E-mailadres eigenaar
+      register_with: Registreer bij %{organization_name}
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'
@@ -1938,6 +1939,8 @@ nl:
       you_have_claimed_the_maximum_permitted: U hebt het maximaal toegestane aantal
         fietscodes geclaimd.
       link_bike_sticker_kind: Link %{bike_sticker_kind}
+      new_bike_link_text: Een nieuwe fiets
+      register_a_new_bike_html: Registreer %{new_bike_link} met deze sticker
     show:
       contact_the_owner: Neem contact op met de eigenaar
       hidden_by_owner: VERBORGEN door eigenaar

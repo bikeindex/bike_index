@@ -40,14 +40,19 @@ class BParam < ApplicationRecord
     h
   end
 
-  def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
+  def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
     b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
     b ||= with_organization_or_no_creator(toke)
     b ||= BParam.new(creator_id: user_id, params: {revised_new: true}.as_json)
     b.creator_id ||= user_id
+    if bike_sticker.present?
+      b.origin = "sticker"
+      b.params["bike"] = b.bike.merge("bike_sticker" => bike_sticker.pretty_code)
+      organization_id = bike_sticker.organization_id if bike_sticker.organization_id.present?
+    end
     # If the org_id is present, add it to the params. Only save it if the b_param is created_at
     if organization_id.present? && b.creation_organization_id != organization_id
-      b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
+      b.params = b.params.merge("bike" => b.bike.merge("creation_organization_id" => organization_id))
       b.update_attribute :params, b.params if b.id.present?
     end
     # Assign the correct user if user is part of the org (for embed submissions)
