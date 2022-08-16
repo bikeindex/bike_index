@@ -81,6 +81,13 @@
   }
 }
 
+// When there is a modal visible (this happens with the donation modal)
+.modal-alert-wrapper {
+  .alert {
+    margin: 0;
+  }
+}
+
 // Alternate styles
 //
 // Generate contextual modifier classes for colorizing the alert.
