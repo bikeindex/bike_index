@@ -20,12 +20,12 @@
             = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
         .col-sm-4.col-lg-2
           = submit_tag t(".update"), class: "btn btn-success"
-      %p{ style: "margin: 24px 0;" }
-        - new_bike_link = link_to(t(".new_bike_link_text"), new_bike_url(bike_sticker: @bike_sticker.code), class: "btn ml-2 mr-2 btn-outline-primary")
+      %p.mt-5.mb-5
+        - new_bike_link = link_to(t(".new_bike_link_text"), new_bike_url(bike_sticker: @bike_sticker.code), class: "btn ml-1 mr-1 btn-primary")
         = t(".register_a_new_bike_html", new_bike_link: new_bike_link)
 
       - if current_user.bikes.any?
-        %p{ style: "margin-top: 24px;" }
+        %p
           = t(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
 
         %table.table.table-striped.table-bordered.table-sm.without-exterior-border
