@@ -150,6 +150,28 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
   end
 
+  describe "retrieval_link_url" do
+    let(:graduated_notification) { FactoryBot.create(:graduated_notification) }
+    it "is present" do
+      expect(graduated_notification.marked_remaining_link_token).to be_present
+      expect(retrieval_link_url(graduated_notification)).to match(graduated_notification.marked_remaining_link_token)
+    end
+    context "parking_notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification) }
+      it "is present" do
+        expect(parking_notification.retrieval_link_token).to be_present
+        expect(retrieval_link_url(parking_notification)).to match(parking_notification.retrieval_link_token)
+      end
+      context "unregistered" do
+        let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
+        it "is nil" do
+          expect(parking_notification.retrieval_link_token).to be_blank
+          expect(retrieval_link_url(parking_notification)).to be_nil
+        end
+      end
+    end
+  end
+
   describe "include_fields" do
     let(:organization) { Organization.new }
     let(:user) { User.new }

@@ -10,9 +10,10 @@
 - if bikes.count >= 1
   = render partial: "shared/email_bike_box"
 
-- if @retrieval_link_url.present?
+- tokenized_url = @email_preview ? @email_preview_tokenized_url : retrieval_link_url(@graduated_notification)
+- if tokenized_url.present?
   .mark-retrieved-box
-    = link_to @retrieval_link_url, "data-pm-no-track" => true, class: "binx-button" do
+    = link_to tokenized_url, "data-pm-no-track" => true, class: "binx-button" do
       Click to renew
     %p
       %em

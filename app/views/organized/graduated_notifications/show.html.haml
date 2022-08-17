@@ -87,6 +87,7 @@
           not the version the user received.
 
   .email-preview.parking-notification-email-preview
+    .text-center.small.less-strong email for preview only
     <iframe src="#{organization_email_path("graduated_notification", graduated_notification_id: @graduated_notification.to_param, organization_id: current_organization.to_param)}"></iframe>
 
 - else

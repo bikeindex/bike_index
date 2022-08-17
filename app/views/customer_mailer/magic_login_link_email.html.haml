@@ -1,7 +1,8 @@
 %h4{ style: 'margin-bottom: 2em;' }
   = t(".html.click_the_button")
 
-= link_to t(".html.sign_in"), @url, "data-pm-no-track" => true, class: 'binx-button'
+- tokenized_url = @email_preview ? @email_preview_tokenized_url : @url
+= link_to t(".html.sign_in"), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
 
 %p
   %em.less-strong
