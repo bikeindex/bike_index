@@ -12,13 +12,19 @@
         = f.label :avery_export, "Avery Label Export", class: "org-form-label"
         .col-sm-4
           = f.check_box :avery_export
+    - elsif current_organization.enabled?("bike_stickers")
+      .form-group.row
+        = f.label :assign_bike_codes, "Assign bike stickers", class: "org-form-label"
+        .col-sm-4
+          = f.check_box :assign_bike_codes
+    - if current_organization.enabled?("avery_export") || current_organization.enabled?("bike_stickers")
       .form-group.row.shownOnAssignBikeCodes
         = f.label :bike_code_start, "Initial Sticker #", class: 'org-form-label'
         .col-sm-6
           = f.text_field :bike_code_start, value: current_organization.bike_stickers.next_unclaimed_code&.pretty_code, class: "form-control"
           %span.below-input-help
             Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
-    .row.mt-2.hiddenOnAssignBikeCodes
+    .row.mt-2.hiddenOnAveryExport
       .col-lg-4
         %p.export-included-columns-label
           Included columns:
@@ -54,11 +60,11 @@
           - if current_organization.enabled?("show_partial_registrations")
             - include_full = @export.partial_registrations != "only"
             - include_partial = @export.partial_registrations != false
-            .col-xs-4.mb-0.hiddenOnAssignBikeCodes{style: "line-height: 1.25;"}
+            .col-xs-4.mb-0.hiddenOnAveryExport{style: "line-height: 1.25;"}
               %label.checkbox
                 = check_box_tag :include_full_registrations, true, include_full
                 Registered bikes
-            .col-xs-4.mb-0.hiddenOnAssignBikeCodes.hiddenOnOnlyCustom{style: "line-height: 1.25;"}
+            .col-xs-4.mb-0.hiddenOnAveryExport.hiddenOnOnlyCustom{style: "line-height: 1.25;"}
               %label.checkbox
                 = check_box_tag :include_partial_registrations, true, include_partial
                 Incomplete registrations
@@ -72,7 +78,7 @@
           %label.checkbox.mt-0
             = f.check_box :only_custom_bike_ids
             <em>Only</em> include specific bikes
-    .form-group.row.mt-2.hiddenOnAssignBikeCodes
+    .form-group.row.mt-2.hiddenOnAveryExport
       = f.label :format, "Export file format", class: "org-form-label"
       .col-sm-4
         = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"

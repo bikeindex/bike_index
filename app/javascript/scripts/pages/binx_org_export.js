@@ -38,7 +38,7 @@ export default class BinxAppOrgExport {
     // Show avery
     this.showOrHideAssignBikeCode()
     // and on future changes, trigger the update
-    $('#export_avery_export, #export_assign_stickers').on('change', e => {
+    $('#export_avery_export, #export_assign_bike_codes').on('change', e => {
       this.showOrHideAssignBikeCode()
     })
 
@@ -51,18 +51,24 @@ export default class BinxAppOrgExport {
   }
 
   showOrHideAssignBikeCode () {
-    let isAvery = $('#export_avery_export, #export_assign_stickers').is(
+    let isAssignCodes = $('#export_avery_export, #export_assign_bike_codes').is(
       ':checked'
     )
-    if (isAvery) {
-      $('.hiddenOnAssignBikeCodes').slideUp('fast')
+    let isAvery = $('#export_avery_export').length
+
+    if (isAssignCodes) {
+      if (isAvery) {
+        $('.hiddenOnAveryExport').slideUp('fast')
+      }
       $('.shownOnAssignBikeCodes')
         .slideDown('fast')
         .css('display', 'flex')
     } else {
-      $('.hiddenOnAssignBikeCodes')
-        .slideDown('fast')
-        .css('display', 'flex')
+      if (isAvery) {
+        $('.hiddenOnAveryExport')
+          .slideDown('fast')
+          .css('display', 'flex')
+      }
       $('.shownOnAssignBikeCodes').slideUp('fast')
     }
   }

@@ -172,6 +172,19 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "assign_bike_stickers" do
+    let(:export) { Export.new }
+    it "is true if assign_bike_stickers" do
+      expect(export.assign_bike_codes?).to be_falsey
+      export.assign_bike_codes = true
+      expect(export.assign_bike_codes?).to be_truthy
+      export.options = {}
+      expect(export.assign_bike_codes?).to be_falsey
+      export.bike_code_start = "34324"
+      expect(export.assign_bike_codes?).to be_truthy
+    end
+  end
+
   describe "bikes_scoped" do
     # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
     # But we eventually want to add stolen tsv's into here
