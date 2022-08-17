@@ -80,7 +80,7 @@ class Export < ApplicationRecord
   end
 
   def assign_bike_codes
-    bike_code_start.present? || options["assign_bike_codes"]
+    bike_code_start.present? || options["assign_bike_codes"].present?
   end
 
   def assign_bike_codes?
