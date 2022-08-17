@@ -10,7 +10,7 @@ module Organized
     def show
       @email_preview = true
       # NOTE: This is a bad hack, but there isn't a good place to define this method
-      @email_preview_tokenized_url = "#"
+      @email_preview_tokenized_url = "/404"
       if ParkingNotification.kinds.include?(@kind)
         find_or_build_parking_notification
         render template: "/organized_mailer/parking_notification", layout: "email"
