@@ -58,7 +58,8 @@
     - else
       = t(".html.hopefully_you_find_the_bike_html", bike_type: @bike.type)
       %strong
-        - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.fetch_current_stolen_record.find_or_create_recovery_link_token), "data-pm-no-track" => true)
+        - tokenized_url = @email_preview ? @email_preview_tokenized_url : edit_bike_recovery_url(bike_id: @bike.id, token: @bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
+        - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), tokenized_url, "data-pm-no-track" => true)
         = t(".html.mark_recovered_link_html", mark_recovered_link: mark_recovered_link)
 
 - if @vars[:donation_message]
@@ -72,9 +73,11 @@
 
 - unless @ownership.claimed?
   - if @vars[:registered_by_owner]
-    = link_to t(".html.claim_the_bike_type", bike_type: @bike.type), bike_url(@bike, email: @vars[:email]), "data-pm-no-track" => true, class: 'binx-button'
+    - tokenized_url = @email_preview ? @email_preview_tokenized_url : bike_url(@bike, t: @ownership.token, email: @vars[:email])
+    = link_to t(".html.claim_the_bike_type", bike_type: @bike.type), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
   - else
-    = link_to t(".html.confirm_this_bike_type", bike_type: @bike.type), bike_url(@bike, t: @ownership.token, email: @vars[:email]), "data-pm-no-track" => true, class: 'binx-button'
+    - tokenized_url = @email_preview ? @email_preview_tokenized_url : bike_url(@bike, t: @ownership.token, email: @vars[:email])
+    = link_to t(".html.confirm_this_bike_type", bike_type: @bike.type), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
 
   - if @bike.status_stolen?
     %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: @bike.type)

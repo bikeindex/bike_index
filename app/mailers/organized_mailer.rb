@@ -65,9 +65,6 @@ class OrganizedMailer < ApplicationMailer
     @organization = @parking_notification.organization
     @bike = @parking_notification.bike
     @sender = @parking_notification.user
-    @retrieval_link_url = if @parking_notification.retrieval_link_token.present?
-      bike_url(@bike.to_param, parking_notification_retrieved: @parking_notification.retrieval_link_token)
-    end
 
     I18n.with_locale(@sender&.preferred_language) do
       mail(reply_to: @parking_notification.reply_to_email,
@@ -84,9 +81,6 @@ class OrganizedMailer < ApplicationMailer
     @graduated_notification = graduated_notification
     @organization = @graduated_notification.organization
     @bike = @graduated_notification.bike
-    @retrieval_link_url = if @graduated_notification.marked_remaining_link_token.present?
-      bike_url(@bike.to_param, graduated_notification_remaining: @graduated_notification.marked_remaining_link_token)
-    end
 
     I18n.with_locale(@user&.preferred_language) do
       mail(reply_to: reply_to,

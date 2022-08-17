@@ -146,7 +146,6 @@ module Organized
       @graduated_notification ||= graduated_notifications.last
       @graduated_notification ||= GraduatedNotification.new(organization_id: current_organization.id, bike: default_bike)
       @bike = @graduated_notification.bike || default_bike
-      @retrieval_link_url = "#"
       @graduated_notification
     end
 
@@ -176,7 +175,6 @@ module Organized
         @parking_notification.set_location_from_organization
       end
       @bike = @parking_notification.bike || default_bike
-      @retrieval_link_url = "#"
       @parking_notification
     end
   end

@@ -34,7 +34,8 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/parking_notification")
           expect(assigns(:parking_notification)).to eq parking_notification
-          expect(assigns(:retrieval_link_url)).to eq "#"
+          expect(assigns(:email_preview)).to be_truthy
+          expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
       end
     end
@@ -72,7 +73,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response).to render_template("organized_mailer/parking_notification")
           expect(assigns(:parking_notification).is_a?(ParkingNotification)).to be_truthy
           expect(assigns(:parking_notification).retrieval_link_token).to be_blank
-          expect(assigns(:retrieval_link_url)).to eq "#"
+          expect(assigns(:email_preview)).to be_truthy
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -85,8 +86,9 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/parking_notification")
           expect(assigns(:parking_notification)).to eq parking_notification
-          expect(assigns(:retrieval_link_url)).to eq "#"
+          expect(assigns(:email_preview)).to be_truthy
           expect(assigns(:kind)).to eq "parked_incorrectly_notification"
+          expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
         context "different org" do
           let!(:parking_notification) { FactoryBot.create(:parking_notification) }
@@ -106,7 +108,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response).to render_template("organized_mailer/parking_notification")
           expect(assigns(:parking_notification).is_a?(ParkingNotification)).to be_truthy
           expect(assigns(:parking_notification).retrieval_link_token).to be_blank
-          expect(assigns(:retrieval_link_url)).to eq "#"
+          expect(assigns(:email_preview)).to be_truthy
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -119,7 +121,8 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template("organized_mailer/graduated_notification")
           expect(assigns(:graduated_notification).id).to eq graduated_notification.id
-          expect(assigns(:retrieval_link_url)).to eq "#"
+          expect(assigns(:email_preview)).to be_truthy
+          expect(response.body).to_not match(graduated_notification.marked_remaining_link_token)
           expect(assigns(:kind)).to eq "graduated_notification"
         end
         context "different org" do
@@ -174,6 +177,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           it "renders that bike" do
             organization_stolen_message.update(body: "something here", is_enabled: true)
             expect(bike.reload.status).to eq "status_stolen"
+            expect(bike.current_ownership.token).to be_present
             expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
             get "#{base_url}/organization_stolen_message"
             expect(response.status).to eq(200)
@@ -182,6 +186,7 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(assigns(:bike).id).to eq bike.id
             expect(assigns(:bike).current_stolen_record).to be_present
             expect(assigns(:bike).current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
+            expect(response.body).to_not match(bike.current_ownership.token)
           end
         end
       end

@@ -92,6 +92,16 @@ module OrganizedHelper
     l datetime, format: :dotted
   end
 
+  def retrieval_link_url(obj)
+    if obj.is_a?(ParkingNotification)
+      return nil if obj.retrieval_link_token.blank?
+      bike_url(obj.bike.to_param, parking_notification_retrieved: obj.retrieval_link_token)
+    elsif obj.is_a?(GraduatedNotification)
+      return nil if obj.marked_remaining_link_token.blank?
+      bike_url(obj.bike.to_param, graduated_notification_remaining: obj.marked_remaining_link_token)
+    end
+  end
+
   def include_field_reg_extra_registration_number?(organization = nil, user = nil)
     organization.present? &&
       organization.additional_registration_fields.include?("reg_extra_registration_number")
