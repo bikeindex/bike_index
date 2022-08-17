@@ -178,7 +178,7 @@ RSpec.describe Organized::ExportsController, type: :request do
         it "creates with partial only export" do
           expect {
             post base_url, params: {
-              export: valid_attrs,
+              export: valid_attrs.merge(bike_code_start: "1"),
               include_partial_registrations: "true"
             }
           }.to change(Export, :count).by 1
