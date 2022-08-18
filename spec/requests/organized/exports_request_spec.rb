@@ -220,7 +220,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: current_organization, code: "a221") }
           it "assigns bike codes" do
             expect {
-            post base_url, params: {
+              post base_url, params: {
                 export: valid_attrs.merge(assign_bike_codes: "1", bike_code_start: "1"),
                 include_partial_registrations: "0"
               }

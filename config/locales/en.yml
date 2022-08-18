@@ -4584,7 +4584,6 @@ en:
     exports:
       index:
         bikes_in_export: Bikes in export
-        stickers_assigned: Stickers assigned?
         created: Created
         creator: Creator
         delete: Delete
@@ -4593,6 +4592,7 @@ en:
         new_export: New Export
         org_exports_html: "%{org_name} Exports"
         progress: Progress
+        stickers_assigned: Stickers assigned?
       show:
         avery_export: Avery Export
         bikes_exported: Bikes exported
