@@ -23,7 +23,10 @@
         .col-sm-6
           = f.text_field :bike_code_start, value: current_organization.bike_stickers.next_unclaimed_code&.pretty_code, class: "form-control"
           %span.below-input-help
-            Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
+            Starting with given input, stickers will be incrementally assigned to bikes.
+            -# For avery, we assign bike stickers unless they leave blank. Otherwise, unselect "assign_bike_codes"
+            - if current_organization.enabled?("avery_export")
+              Leave blank to skip assigning stickers to bikes
     .row.mt-2.hiddenOnAveryExport
       .col-lg-4
         %p.export-included-columns-label
