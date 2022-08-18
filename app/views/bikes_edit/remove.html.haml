@@ -30,13 +30,13 @@
                   %span.less-strong (only visible by you)
 
             .col-sm-12.pb-4
-              = render "shared/form_well_footer_save"
+              = render "/shared/form_well_footer_save"
 
             %hr
 
             .delete-from-index.no-divider-row
               = link_to bike_version_path(@bike_version), method: :delete, confirm: "Are you sure?" do
-                = render "shared/trash_icon"
+                = render "/shared/trash_icon"
                 = t(".delete_this_version_html", version_name: @bike.display_name)
           - else
             .related-fields.hide-this-bike.no-divider-row
@@ -70,7 +70,7 @@
 
             .delete-from-index.no-divider-row
               %a{data: { toggle: "modal", target: "#request-delete" } }
-                = render "shared/trash_icon"
+                = render "/shared/trash_icon"
                 = t(".delete_this_bike", bike_type: @bike.type)
 
 -# Explicitly redirect to my_account - other locations (e.g. admin) don't include js for rendering BikeIndexAlerts
@@ -97,4 +97,4 @@
           %button.btn.btn-secondary{ "data-dismiss" => "modal", type: "button" }
             = t(".nevermind")
 
-= render partial: "shared/modal", locals: { title: modal_title, id: "request-delete", modal_body: modal_body }
+= render partial: "/shared/modal", locals: { title: modal_title, id: "request-delete", modal_body: modal_body }
