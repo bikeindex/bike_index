@@ -1,7 +1,7 @@
 %h1#top
   = t(".help_with_bike_index")
 
-= render "shared/faq"
+= render "/shared/faq"
 
 %hr
 
@@ -15,7 +15,7 @@
 
 - if current_user.present?
   %article
-    = render "feedbacks/form"
+    = render "/feedbacks/form"
 - else
   %h3
     = link_to t(".log_in_to_send_a_comment"),
