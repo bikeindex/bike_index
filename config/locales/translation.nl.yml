@@ -4404,6 +4404,7 @@ nl:
         new_export: Nieuwe export
         org_exports_html: "%{org_name} Exporteert"
         progress: Vooruitgang
+        stickers_assigned: Stickers toegewezen?
       show:
         avery_export: Avery Export
         bikes_exported: Fietsen geëxporteerd

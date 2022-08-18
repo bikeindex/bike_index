@@ -107,6 +107,7 @@
               %strong= link_to(t(".view_avery_labels"), @export.avery_export_url, class: "avery_export_url")
             - else
               %em.text-success= t(".pending")
+      - if @export.assign_bike_codes? || @export.avery_export?
         %tr
           %td= t(".stickers")
           %td

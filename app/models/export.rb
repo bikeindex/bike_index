@@ -79,8 +79,12 @@ class Export < ApplicationRecord
     options["bike_code_start"]
   end
 
+  def assign_bike_codes
+    bike_code_start.present? || options["assign_bike_codes"].present?
+  end
+
   def assign_bike_codes?
-    bike_code_start.present?
+    assign_bike_codes
   end
 
   def bike_codes_removed?
@@ -133,6 +137,12 @@ class Export < ApplicationRecord
   def assign_exported_bike_ids
     # Store the first 100 bike ids that were exported, for diagnostic purposes
     self.options = options.merge("exported_bike_ids" => bikes_scoped.limit(100).pluck(:id))
+  end
+
+  def assign_bike_codes=(val)
+    if val
+      self.options = options.merge(assign_bike_codes: true)
+    end
   end
 
   def avery_export=(val)
