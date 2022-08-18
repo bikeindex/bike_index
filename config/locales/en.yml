@@ -4584,6 +4584,7 @@ en:
     exports:
       index:
         bikes_in_export: Bikes in export
+        stickers_assigned: Stickers assigned?
         created: Created
         creator: Creator
         delete: Delete

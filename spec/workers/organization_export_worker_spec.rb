@@ -233,6 +233,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address city state zipcode assigned_sticker] }
         let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
+          expect(export.reload.avery_export?).to be_falsey
           VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
             bike.reload
             bike_sticker.reload
