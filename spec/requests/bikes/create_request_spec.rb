@@ -447,10 +447,9 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.current_ownership.organization&.id).to be_blank
         expect(new_bike.current_ownership.origin).to eq "embed_extended"
 
-        expect(new_bike.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
-        expect(bike_sticker.reload.claimed?).to be_truthy
-        expect(bike_sticker.bike&.id).to eq new_bike.id
-        expect(bike_sticker.bike_sticker_updates.count).to eq 1
+        expect(new_bike.bike_stickers.pluck(:id)).to eq([])
+        expect(bike_sticker.bike&.id).to eq bike.id
+        expect(bike_sticker.bike_sticker_updates.count).to eq 0
       end
     end
   end
