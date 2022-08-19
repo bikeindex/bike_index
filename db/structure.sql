@@ -2490,7 +2490,8 @@ CREATE TABLE public.payments (
     invoice_id integer,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
-    stripe_kind integer
+    stripe_kind integer,
+    referral_source text
 );
 
 
@@ -6328,6 +6329,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220627165205'),
 ('20220730171652'),
 ('20220801162511'),
-('20220811174115');
+('20220811174115'),
+('20220819205834');
 
 

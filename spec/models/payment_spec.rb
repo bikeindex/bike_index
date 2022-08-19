@@ -2,10 +2,21 @@ require "rails_helper"
 
 RSpec.describe Payment, type: :model do
   it_behaves_like "amountable"
+
+  describe "admin_search" do
+    let!(:payment1) { FactoryBot.create(:payment, referral_source: "something_special") }
+    let!(:payment2) { FactoryBot.create(:payment, referral_source: "something_else_special") }
+    it "searches by referral_source" do
+      expect(Payment.admin_search("special").pluck(:id)).to match_array([payment1.id, payment2.id])
+      expect(Payment.admin_search("something_special").pluck(:id)).to match_array([payment1.id])
+      expect(Payment.admin_search("\nsomething ").pluck(:id)).to match_array([payment1.id, payment2.id])
+    end
+  end
+
   describe "create" do
     context "stripe" do
       let(:user) { FactoryBot.create(:user) }
-      let(:payment) { FactoryBot.create(:payment, user: nil, email: user.email) }
+      let(:payment) { FactoryBot.create(:payment, user: nil, email: user.email, referral_source: "\n") }
       it "enqueues an email job, associates the user" do
         expect {
           payment
@@ -13,6 +24,7 @@ RSpec.describe Payment, type: :model do
         payment.reload
         expect(payment.id).to be_present
         expect(payment.user_id).to eq user.id
+        expect(payment.referral_source).to be_nil
       end
       context "theft_alert" do
         let(:payment) { FactoryBot.create(:payment, user: nil, kind: "theft_alert", email: user.email) }
