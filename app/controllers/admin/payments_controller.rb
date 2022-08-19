@@ -99,7 +99,7 @@ class Admin::PaymentsController < Admin::BaseController
   def valid_invoice_parameters?
     invoice_parameters # To parse the invoice params
     return true unless @params_invoice.present?
-    return true if @params_invoice.organization_id == invoice_parameters[:organization_id]
+    return true if @params_invoice.organization_id.to_s == invoice_parameters[:organization_id].to_s
     organization_name = Organization.friendly_find(invoice_parameters[:organization_id])&.short_name
     flash[:error] = "Invoice #{invoice_parameters[:invoice_id]} is not owned by #{organization_name}"
     false
@@ -107,18 +107,18 @@ class Admin::PaymentsController < Admin::BaseController
 
   def invoice_parameters
     return @invoice_parameters if defined?(@invoice_parameters)
-    iparams = params.require(:payment).permit(:organization_id, :invoice_id)
+    iparams = params.require(:payment).permit(:organization_id, :invoice_id, :referral_source)
     @params_invoice = Invoice.friendly_find(iparams[:invoice_id])
     if @params_invoice.present?
       iparams[:organization_id] = @params_invoice.organization_id unless iparams[:organization_id].present?
     end
-    @invoice_parameters = {invoice_id: @params_invoice&.id, organization_id: iparams[:organization_id]&.to_i}
+    @invoice_parameters = iparams.slice(:organization_id, :referral_source).merge(invoice_id: @params_invoice&.id)
   end
 
   def permitted_create_parameters
     params
       .require(:payment)
-      .permit(:payment_method, :amount, :email, :currency, :created_at)
+      .permit(:payment_method, :amount, :email, :currency, :created_at, :referral_source)
       .merge(invoice_parameters)
   end
 
