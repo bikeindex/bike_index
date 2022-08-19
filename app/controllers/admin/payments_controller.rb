@@ -55,30 +55,36 @@ class Admin::PaymentsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at user_id organization_id kind payment_method invoice_id amount_cents]
+    %w[created_at user_id organization_id kind payment_method invoice_id amount_cents referral_source]
   end
 
   def matching_payments
     return @matching_payments if defined?(@matching_payments)
-    @matching_payments = Payment
+    matching_payments = Payment
     if sort_column == "invoice_id"
-      @matching_payments = matching_payments.where.not(invoice_id: nil)
+      matching_payments = matching_payments.where.not(invoice_id: nil)
     elsif sort_column == "organization_id"
-      @matching_payments = matching_payments.where.not(organization_id: nil)
+      matching_payments = matching_payments.where.not(organization_id: nil)
     end
+    matching_payments = matching_payments.where(organization_id: current_organization.id) if current_organization.present?
+
     if %w[all incomplete].include?(params[:search_incompleteness])
       @incompleteness = params[:search_incompleteness]
-      @matching_payments = @matching_payments.incomplete if @incompleteness == "only_incomplete"
+      matching_payments = matching_payments.incomplete if @incompleteness == "only_incomplete"
     else
       @incompleteness ||= "paid" # Default to only completed
-      @matching_payments = @matching_payments.paid
+      matching_payments = matching_payments.paid
     end
-    @matching_payments = @matching_payments.where(kind: params[:search_kind]) if params[:search_kind].present?
+    if params[:search_kind].present?
+      @kind = params[:search_kind]
+      matching_payments = matching_payments.where(kind: @kind)
+    end
+    matching_payments = matching_payments.admin_search(params[:query]) if params[:query].present?
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])
-      @matching_payments = @matching_payments.where(user_id: @user.id) if @user.present?
+      matching_payments = matching_payments.where(user_id: @user.id) if @user.present?
     end
-    @matching_payments = @matching_payments.where(created_at: @time_range)
+    @matching_payments = matching_payments.where(created_at: @time_range)
   end
 
   # Override earliest period date, to use 1 week before first feedback created

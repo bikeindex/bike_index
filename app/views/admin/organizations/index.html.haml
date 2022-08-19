@@ -54,7 +54,6 @@
     = form_tag admin_organizations_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_paid, @search_paid
-      = hidden_field_tag :search_kind, params[:search_kind]
       = hidden_field_tag :search_pos, params[:search_pos]
       .form-group.align-self-end.fancy-select.no-restore-on-backspace.unfancy{style: "margin-bottom: -0.4rem; min-width: 300px;"}
         - opt_vals = OrganizationFeature.order(name: :desc).pluck(:name, :id)

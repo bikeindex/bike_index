@@ -1,60 +1,39 @@
 - render_sortable ||= false
 - skip_user ||= false
 - skip_paid_at ||= false
+- skip_kind ||= false
+- render_method ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.sortable.table-sm
     %thead.thead-light
       %th
-        - if render_sortable
-          = sortable "created_at"
-        - else
-          Created
+        = sortable "created_at", render_sortable: render_sortable
       - unless skip_paid_at
         %th.small
-          - if render_sortable
-            = sortable "first_payment_date", "Paid"
-          - else
-            Paid
+          = sortable "first_payment_date", "Paid", render_sortable: render_sortable
       - unless skip_user
+        %th= sortable "user_id", render_sortable: render_sortable
+        %th.small email
+      %th= sortable "referral_source", render_sortable: render_sortable
+      - unless skip_kind
         %th
-          - if render_sortable
-            = sortable "user_id"
-          - else
-            User
-      %th
-        - if render_sortable
-          = sortable "kind"
-        - else
-          Kind
+          = sortable "kind", render_sortable: render_sortable
       %th
         %small
-          - if render_sortable
-            = sortable "organization_id"
-          - else
-            Organization
+          = sortable "organization_id", render_sortable: render_sortable
       %th
         %small
-          - if render_sortable
-            = sortable "invoice_id"
-          - else
-            Invoice
+          = sortable "invoice_id", render_sortable: render_sortable
+      - if render_method
+        %th.small= sortable "payment_method", "method", render_sortable: render_sortable
       %th
-        %small
-          - if render_sortable
-            = sortable "payment_method", "method"
-          - else
-            Method
-      %th
-        - if render_sortable
-          = sortable "amount_cents", "Amount"
-        - else
-          Amount
+        = sortable "amount_cents", "Amount", render_sortable: render_sortable
     %tbody
       - payments.each do |payment|
         %tr
           %td
-            %a.convertTime{ href: edit_admin_payment_path(payment) }
+            %a.convertTime{href: edit_admin_payment_path(payment)}
               = l payment.created_at, format: :convert_time
           - unless skip_paid_at
             %td
@@ -69,25 +48,38 @@
                 = payment.email
                 %small.less-strong
                   no user
+            %td.small
+              = payment.email
           %td
-            - if payment.theft_alert?
-              = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
-            - else
-              = payment.kind_humanized
+            - if payment.referral_source.present?
+              %code.small= payment.referral_source
+              - if render_sortable
+                = link_to search_emoji, url_for(sortable_search_params.merge(query: payment.referral_source))
+          - unless skip_kind
+            %td
+              - if payment.theft_alert?
+                = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+              - else
+                = payment.kind_humanized
+              - if render_sortable
+                = link_to search_emoji, url_for(sortable_search_params.merge(search_kind: payment.kind))
           %td
             - if payment.organization.present?
               = link_to payment.organization.short_name, admin_organization_path(payment.organization)
+              - if render_sortable && current_organization.blank?
+                = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: payment.organization_id))
           %td
             - if payment.invoice.present? && payment.organization.present?
               #{link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: payment.organization.to_param, id: payment.invoice.id)}
               - if payment.invoice.subscription_start_at
                 %small.convertTime
                   = l payment.invoice.subscription_start_at, format: :convert_time
-          %td
-            %small
-              - if payment.stripe?
-                = link_to "stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
-              - else
-                = payment.payment_method.humanize.downcase
+          - if render_method
+            %td
+              %small
+                - if payment.stripe?
+                  = link_to "stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+                - else
+                  = payment.payment_method.humanize.downcase
           %td
             = payment.amount_formatted

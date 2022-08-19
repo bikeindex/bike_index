@@ -50,7 +50,6 @@
     = form_tag admin_tweets_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_twitter_account_id, params[:search_twitter_account_id]
-      = hidden_field_tag :search_kind, params[:search_kind]
       .form-group.ml-auto.mr-2.mb-2
         = text_field_tag :query, params[:query], placeholder: "Search tweets", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"

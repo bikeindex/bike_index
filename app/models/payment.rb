@@ -47,6 +47,12 @@ class Payment < ApplicationRecord
     kind&.humanize
   end
 
+  # NOTE: Currently only searches by referral_source - in the future it might do other stuff
+  def self.admin_search(str)
+    return all if str.blank?
+     where("referral_source ilike ?", "%#{str.strip}%")
+  end
+
   def paid?
     first_payment_date.present?
   end
@@ -118,6 +124,7 @@ class Payment < ApplicationRecord
     end
     self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
     self.organization_id ||= invoice&.organization_id
+    self.referral_source = nil if referral_source.blank?
   end
 
   def stripe_session

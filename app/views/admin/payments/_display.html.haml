@@ -50,3 +50,8 @@
             = payment.email
             %em.small.less-strong
               no matching user
+      %tr
+        %td Referral source
+        %td
+          - if payment.referral_source.present?
+            %code.small= payment.referral_source
