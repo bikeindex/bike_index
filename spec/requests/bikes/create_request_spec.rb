@@ -381,28 +381,29 @@ RSpec.describe "BikesController#create", type: :request do
     let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, bike: bike, code: "ED00001") }
     # Created the same way that organizations controller creates a b_param
     let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true, bike: {}}) }
+    let(:bike_params) do
+      {
+        b_param_id_token: b_param.id_token,
+        embeded: "true",
+        creation_organization_id: organization.id,
+        embeded_extended: true,
+        serial_number: "example serial",
+        manufacturer_id: manufacturer.slug,
+        manufacturer_other: "",
+        primary_frame_color_id: color.id.to_s,
+        secondary_frame_color_id: "",
+        tertiary_frame_color_id: "",
+        owner_email: "something@stuff.COM   ",
+        phone: "312.379.9513",
+        student_id: " ",
+        bike_code: "ed001"
+      }
+    end
     it "creates and adds the bike code" do
       b_param.reload
       expect(b_param.created_bike_id).to be_blank
       expect {
-        post base_url, params: {
-          bike: {
-            b_param_id_token: b_param.id_token,
-            embeded: "true",
-            creation_organization_id: organization.id,
-            embeded_extended: true,
-            serial_number: "example serial",
-            manufacturer_id: manufacturer.slug,
-            manufacturer_other: "",
-            primary_frame_color_id: color.id.to_s,
-            secondary_frame_color_id: "",
-            tertiary_frame_color_id: "",
-            owner_email: "something@stuff.COM   ",
-            phone: "312.379.9513",
-            student_id: " ",
-            bike_code: "ed001"
-          }
-        }
+        post base_url, params: {bike: bike_params}
       }.to change(Bike, :count).by(1)
       expect(flash[:success]).to be_present
 
@@ -423,6 +424,33 @@ RSpec.describe "BikesController#create", type: :request do
       expect(bike_sticker.reload.claimed?).to be_truthy
       expect(bike_sticker.bike&.id).to eq new_bike.id
       expect(bike_sticker.bike_sticker_updates.count).to eq 1
+    end
+    context "no organization" do
+      it "registers" do
+        b_param.reload
+        expect(b_param.created_bike_id).to be_blank
+        expect {
+          post base_url, params: {bike: bike_params.merge(creation_organization_id: nil)}
+        }.to change(Bike, :count).by(1)
+        expect(flash[:success]).to be_present
+
+        b_param.reload
+        expect(b_param.bike_sticker_code).to eq "ed001"
+        expect(b_param.created_bike_id).to be_present
+        new_bike = b_param.created_bike
+        expect(new_bike.owner_email).to eq "something@stuff.com"
+        expect(new_bike.user).to be_blank
+        expect(new_bike.status).to eq "status_with_owner"
+        expect(new_bike.phone).to eq "3123799513"
+        expect(new_bike.student_id).to eq nil
+
+        expect(new_bike.current_ownership.organization&.id).to be_blank
+        expect(new_bike.current_ownership.origin).to eq "embed_extended"
+
+        expect(new_bike.bike_stickers.pluck(:id)).to eq([])
+        expect(bike_sticker.bike&.id).to eq bike.id
+        expect(bike_sticker.bike_sticker_updates.count).to eq 0
+      end
     end
   end
   context "existing b_param, no bike" do
