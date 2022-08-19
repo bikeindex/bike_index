@@ -123,10 +123,12 @@ class BikesController < Bikes::BaseController
       @bike = BikeCreator.new(location: request.safe_location).create_bike(@b_param)
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
+        # Protect from nil errors.
+        org_param = (@bike.creation_organization || current_organization || @b_param.organization)&.slug
         if params[:bike][:embeded_extended]
-          redirect_to(embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token)) && return
+          redirect_to(embed_extended_organization_url(id: org_param, b_param_id_token: @b_param.id_token)) && return
         else
-          redirect_to(embed_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token)) && return
+          redirect_to(embed_organization_url(id: org_param, b_param_id_token: @b_param.id_token)) && return
         end
       elsif params[:bike][:embeded_extended]
         flash[:success] = translation(:bike_was_sent_to, bike_type: @bike.type, owner_email: @bike.owner_email)
