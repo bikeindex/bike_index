@@ -99,7 +99,7 @@ class Admin::PaymentsController < Admin::BaseController
   def valid_invoice_parameters?
     invoice_parameters # To parse the invoice params
     return true unless @params_invoice.present?
-    return true if @params_invoice.organization_id.to_s == invoice_parameters[:organization_id].to_s
+    return true if @params_invoice.organization_id&.to_s == invoice_parameters[:organization_id]&.to_s
     organization_name = Organization.friendly_find(invoice_parameters[:organization_id])&.short_name
     flash[:error] = "Invoice #{invoice_parameters[:invoice_id]} is not owned by #{organization_name}"
     false

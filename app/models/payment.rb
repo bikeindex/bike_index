@@ -50,7 +50,7 @@ class Payment < ApplicationRecord
   # NOTE: Currently only searches by referral_source - in the future it might do other stuff
   def self.admin_search(str)
     return all if str.blank?
-     where("referral_source ilike ?", "%#{str.strip}%")
+    where("referral_source ilike ?", "%#{str.strip}%")
   end
 
   def paid?
