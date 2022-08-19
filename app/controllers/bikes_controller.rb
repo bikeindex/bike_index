@@ -111,7 +111,9 @@ class BikesController < Bikes::BaseController
 
   def create
     find_or_new_b_param
-    if params[:bike][:embeded] # NOTE: if embeded, doesn't verify csrf token
+    # Protect from missing organization errors. Seems to come mainly from fuzzing tho
+    org_param = (@b_param.organization || current_organization)&.slug
+    if params[:bike][:embeded].present? && org_param.present? # NOTE: if embeded, doesn't verify csrf token
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
@@ -123,8 +125,6 @@ class BikesController < Bikes::BaseController
       @bike = BikeCreator.new(location: request.safe_location).create_bike(@b_param)
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
-        # Protect from nil errors.
-        org_param = (@bike.creation_organization || current_organization || @b_param.organization)&.slug
         if params[:bike][:embeded_extended]
           redirect_to(embed_extended_organization_url(id: org_param, b_param_id_token: @b_param.id_token)) && return
         else
@@ -133,9 +133,9 @@ class BikesController < Bikes::BaseController
       elsif params[:bike][:embeded_extended]
         flash[:success] = translation(:bike_was_sent_to, bike_type: @bike.type, owner_email: @bike.owner_email)
         @persist_email = ParamsNormalizer.boolean(params[:persist_email])
-        redirect_to(embed_extended_organization_url(@bike.creation_organization, email: @persist_email ? @bike.owner_email : nil)) && return
+        redirect_to(embed_extended_organization_url(org_param, email: @persist_email ? @bike.owner_email : nil)) && return
       else
-        redirect_to(controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id) && return
+        redirect_to(controller: :organizations, action: :embed_create_success, id: org_param, bike_id: @bike.id) && return
       end
     elsif verified_request?
       if @b_param.created_bike.present?
