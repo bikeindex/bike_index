@@ -1,0 +1,12 @@
+- render_search ||= false
+- email ||= nil
+- user ||= nil
+
+%small
+  - if user.present?
+    = link_to email, admin_user_path(email)
+  - else
+    = email
+= user_icon(user)
+- if render_search && email.present?
+  = link_to search_emoji, url_for(search_email: email), class: "display-sortable-link small"
