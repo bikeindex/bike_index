@@ -10,7 +10,7 @@
   %span{title: email}
     = email_display
 
-%small= user_icon(user)
+= user_icon(user)
 - if render_search && email.present?
   - search_url ||= user.present? ? url_for(sortable_search_params.merge(user_id: user.id)) : url_for(sortable_search_params.merge(search_email: email))
   = link_to search_emoji, search_url, class: "display-sortable-link small"

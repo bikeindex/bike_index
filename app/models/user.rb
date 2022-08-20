@@ -213,7 +213,7 @@ class User < ApplicationRecord
       orgs.paid.limit(1).first ||
       orgs.law_enforcement.limit(1).first ||
       orgs.bike_shop.limit(1).first ||
-      orgs.limit(1)
+      orgs.limit(1).first
   end
 
   def paid_org?

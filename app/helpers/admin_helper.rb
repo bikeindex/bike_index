@@ -128,6 +128,7 @@ module AdminHelper
   def user_icon(user = nil, full_text: false)
     icon_hash = user_icon_hash(user)
     return "" if icon_hash[:tags].empty?
+    # TODO: return individual tags, so you can show them e.g. for organizations
     content_tag :span do
       if icon_hash[:tags].include?(:donor)
         concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
