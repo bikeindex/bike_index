@@ -5,7 +5,7 @@
 
 - email_display = email.truncate(30)
 - if user.present?
-  = link_to email_display, admin_user_path(user.to_param), title: email
+  = link_to email_display, admin_user_path(user.to_param), title: email, class: "text-link"
 - else
   %span{title: email}
     = email_display

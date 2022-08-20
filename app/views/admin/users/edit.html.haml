@@ -220,6 +220,12 @@
   %small= link_to admin_number_display(notifications.count), admin_notifications_path(user_id: @user.id)
 - if notifications.count > 0
   = render partial: "/admin/notifications/table", locals: {notifications: notifications, skip_user: true}
+- feedbacks = Feedback.where(user_id: @user.id)
+%h4.mt-4
+  Feedbacks
+  %small= link_to admin_number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)
+- if feedbacks.count > 0
+  = render partial: "/admin/feedbacks/table", locals: {feedbacks: feedbacks, skip_user: true}
 
 
 %h4.mt-4 User emails
