@@ -1,54 +1,42 @@
 - render_sortable ||= false
 - skip_bike ||= false
+- skip_user ||= false
 
 .full-screen-table
   %table.table.table-bordered.table-striped.table-sm
     %thead.thead-light
       %tr
         %th
-          - if render_sortable
-            = sortable "created_at"
-          - else
-            Created
+          = sortable "created_at", render_sortable: render_sortable
+        - unless skip_user
+          %th User
+          %th Name
         %th
-          User
-        %th
-          - if render_sortable
-            = sortable "feedback_type", "Type"
-          - else
-            Type
+          = sortable "feedback_type", "Type", render_sortable: render_sortable
         - unless skip_bike
-          %th
-            Bike
-        %th
-          Name
-        %th.w-25
-          Body
+          %th Bike
+        %th.w-25 Body
     %tbody
       - feedbacks.each do |feedback|
         %tr
           %td
             %a.convertTime{ href: admin_feedback_url(feedback) }
               = l feedback.created_at, format: :convert_time
+          - unless skip_user
+            %td
+              = render partial: "/shared/admin_user_cell", locals: {email: feedback.email, user: feedback.user, render_search: render_sortable, cache: true}
+            %td
+              = feedback.name
           %td
-            - if feedback.user_id.present?
-              - display_name = feedback.user&.display_name || feedback.user_id
-              = link_to display_name, admin_user_path(feedback.user_id)
-              - unless params[:user_id].present?
-                %small
-                  = link_to "matching messages", admin_feedbacks_path(sortable_search_params.merge(user_id: feedback.user_id)), class: "gray-link"
-            - else
-              = link_to feedback.email, admin_users_path(user_query: feedback.email)
-          %td
-            = link_to feedback.humanized_type, admin_feedbacks_path(sortable_search_params.merge(search_kind: feedback.feedback_type))
+            = feedback.humanized_type
+            - if render_sortable && params[:search_kind].blank?
+              = link_to search_emoji, admin_feedbacks_path(sortable_search_params.merge(search_kind: feedback.feedback_type)), class: "small"
           - unless skip_bike
             %td
               - if feedback.bike_id.present?
-                = link_to "#{feedback.bike_id}", admin_bike_path(feedback.bike_id), class: "less-strong"
-                - unless params[:search_bike_id].present?
+                %code= link_to "#{feedback.bike_id}", admin_bike_path(feedback.bike_id), class: "less-strong"
+                - if render_sortable && params[:search_bike_id].blank?
                   %small
-                    = link_to "matching messages", admin_feedbacks_path(sortable_search_params.merge(search_bike_id: feedback.bike_id)), class: "gray-link"
-          %td
-            = feedback.name
+                    = link_to search_emoji, admin_feedbacks_path(sortable_search_params.merge(search_bike_id: feedback.bike_id)), class: "small"
           %td
             = feedback.body.truncate(100)

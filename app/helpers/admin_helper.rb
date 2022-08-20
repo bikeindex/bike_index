@@ -107,20 +107,54 @@ module AdminHelper
     content_tag(:span, number_with_delimiter(number), class: (number == 0 ? "less-less-strong" : ""))
   end
 
+  def user_icon_hash(user = nil)
+    icon_hash = {tags: []}
+    return icon_hash if user&.id.blank?
+    if user.superuser?
+      icon_hash[:tags] = [:superuser]
+      return icon_hash
+    end
+    icon_hash[:tags] += [:donor] if user.donor?
+    icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
+    icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
+    org = user.organization_prioritized
+    if org.present?
+      icon_hash[:tags] += [:organization_member]
+      icon_hash[:organization] = {kind: org.kind.to_sym, paid: org.paid?}
+    end
+    icon_hash
+  end
+
   def user_icon(user = nil, full_text: false)
-    return "" if user.blank? || !user.donor? && !user.paid_org? && !user.theft_alert_purchaser?
+    icon_hash = user_icon_hash(user)
+    return "" if icon_hash[:tags].empty?
+    # TODO: return individual tags, so you can show them e.g. for organizations
     content_tag :span do
-      if user.donor?
-        concat(content_tag(:span, "D", class: "donor-icon ml-1", title: "Donor"))
+      if icon_hash[:tags].include?(:donor)
+        concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
         concat(content_tag(:span, "onor", class: "less-strong")) if full_text
       end
-      if user.theft_alert_purchaser?
-        concat(content_tag(:span, "P", class: "theft-alert-icon ml-1", title: "Promoted alert purchaser"))
-        concat(content_tag(:span, "romoted alert", class: "less-strong")) if full_text
+      if icon_hash[:tags].include?(:organization_member)
+        org_full_text = [
+          icon_hash[:organization][:paid] ? "Paid" : nil,
+          "organization member -",
+          Organization.kind_humanized(icon_hash[:organization][:kind])
+        ].compact.join(" ")
+        concat(content_tag(:span, org_icon_text(icon_hash[:organization]), class: "org-member-icon user-icon ml-1", title: org_full_text))
+        concat(content_tag(:span, org_full_text, class: "ml-1 less-strong")) if full_text
       end
-      if user.paid_org?
-        concat(content_tag(:span, "O", class: "paid-org-icon ml-1", title: "Paid organization member"))
-        concat(content_tag(:span, "rganization member", class: "less-strong")) if full_text
+
+      if icon_hash[:tags].include?(:recovery)
+        concat(content_tag(:span, "R", class: "recovery-icon user-icon ml-1", title: "Recovered bike"))
+        concat(content_tag(:span, "ecovered bike", class: "less-strong")) if full_text
+      end
+      if icon_hash[:tags].include?(:superuser)
+        concat(content_tag(:span, "S", class: "superuser-icon user-icon ml-1", title: "Superuser"))
+        concat(content_tag(:span, "uperuser", class: "less-strong")) if full_text
+      end
+      if icon_hash[:tags].include?(:theft_alert)
+        concat(content_tag(:span, "P", class: "theft-alert-icon user-icon ml-1", title: "Promoted alert purchaser"))
+        concat(content_tag(:span, "romoted alert", class: "less-strong")) if full_text
       end
     end
   end
@@ -138,5 +172,23 @@ module AdminHelper
     else
       "/admin/#{obj.class.to_s.underscore.pluralize}/#{obj.id}"
     end
+  end
+
+  private
+
+  def org_icon_text(kind:, paid:)
+    kind_letter = {
+      bike_shop: "BS",
+      bike_advocacy: "V",
+      law_enforcement: "P",
+      school: "S",
+      bike_manufacturer: "M",
+      ambassador: "A"
+    }
+    [
+      paid ? "$" : nil,
+      "O ",
+      kind_letter[kind] || "O" # Other
+    ].compact.join("")
   end
 end

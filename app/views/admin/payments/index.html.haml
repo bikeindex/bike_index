@@ -8,10 +8,8 @@
     %ul
       %li.nav-item
         = link_to "New payment", new_admin_payment_url, class: "nav-link"
-      %li.nav-item
-        = link_to "Show method", url_for(sortable_search_params.merge(search_render_method: !render_method)), class: "nav-link small #{render_method ? 'active' : ''}"
-      %li.nav-item.dropdown.dropleft
-        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@incompleteness != "paid" ? "active" : "")}
+      %li.nav-item.dropdown
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind.present? ? "active" : "")}
           - if @kind.blank?
             All kinds
           - else
@@ -22,7 +20,7 @@
           - Payment.kinds.each do |kind|
             = link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : ''}"
 
-      %li.nav-item.dropdown.dropleft
+      %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@incompleteness != "paid" ? "active" : "")}
           - if @incompleteness == "all"
             Paid and Incomplete
@@ -34,13 +32,15 @@
           = link_to "Paid only", url_for(sortable_search_params.merge(search_incompleteness: "paid")), class: "dropdown-item #{@incompleteness == 'paid' ? 'active' : ''}"
           = link_to "Incomplete only", url_for(sortable_search_params.merge(search_incompleteness: "incomplete")), class: "dropdown-item #{@incompleteness == 'incomplete' ? 'active' : ''}"
       %li.nav-item
+        = link_to "Show method", url_for(sortable_search_params.merge(search_render_method: !render_method)), class: "nav-link #{render_method ? 'active' : ''}"
+      %li.nav-item
         = link_to "graph", admin_payments_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   = render partial: "/shared/admin_current_header", locals: {viewing: "Payments"}
 
 :ruby
   payments_counts = Payment.kinds.map do |kind|
+    next if @kind.present? && kind != kind
     payments_of_kind = matching_payments.where(kind: kind)
-    next unless payments_of_kind.count > 0
     {
       kind: kind,
       name: Payment.kind_humanized(kind),
@@ -50,12 +50,13 @@
       money: MoneyFormater.money_format(payments_of_kind.sum(:amount_cents)),
     }
   end.compact
+  payments_counts_nozero = payments_counts.reject { |c| c[:count] < 1 }
 
 - if @render_chart
   %h4.mt-2 Counts
-  = column_chart payments_counts.map { |c| {name: c[:name], data: c[:data]} }, stacked: true, thousands: ","
+  = column_chart payments_counts_nozero.map { |c| {name: c[:name], data: c[:data]} }, stacked: true, thousands: ","
   %h4.mt-2 Amounts
-  = column_chart payments_counts.map { |c| {name: c[:name], data: c[:data_money]} }, stacked: true, thousands: ",", prefix: "$", round: 2
+  = column_chart payments_counts_nozero.reject { |c| c[:count] < 1 }.map { |c| {name: c[:name], data: c[:data_money]} }, stacked: true, thousands: ",", prefix: "$", round: 2
 
 .mt-4.mb-4
   = render partial: "/shared/period_select"
@@ -95,12 +96,14 @@
                     %br
                     %small.text-warning There shouldn't be payments without invoices
 
-.row
-  .col-md-5
+.row.mb-4
+  .col
     = form_tag admin_payments_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_render_method, params[:search_render_method]
       = hidden_field_tag :search_incompleteness, params[:search_incompleteness]
+      .form-group.mr-2.mb-2
+        = text_field_tag :search_email, params[:search_email], placeholder: "Search by email", class: "form-control"
       .form-group.mr-2.mb-2
         = text_field_tag :query, params[:query], placeholder: "Search by referral", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"

@@ -38,8 +38,7 @@
                 = l user.updated_at, format: :convert_time
             %td
               .less-strong-hold
-                = link_to user.email, edit_admin_user_url(user.id)
-                = user_icon(user)
+                = render partial: "/shared/admin_user_cell", locals: {email: user.email, user: user, render_search: false, cache: true}
                 %small.less-strong-right
                   &nbsp;#{user.id}
             %td

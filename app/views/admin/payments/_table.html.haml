@@ -14,7 +14,6 @@
           = sortable "first_payment_date", "Paid", render_sortable: render_sortable
       - unless skip_user
         %th= sortable "user_id", render_sortable: render_sortable
-        %th.small email
       %th= sortable "referral_source", render_sortable: render_sortable
       - unless skip_kind
         %th
@@ -42,19 +41,12 @@
                   = l payment.first_payment_date, format: :convert_time
           - unless skip_user
             %td
-              - if payment.user.present?
-                = link_to payment.user.display_name, edit_admin_user_path(payment.user)
-              - elsif payment.email.present?
-                = payment.email
-                %small.less-strong
-                  no user
-            %td.small
-              = payment.email
+              = render partial: "/shared/admin_user_cell", locals: {email: payment.email, user: payment.user, render_search: render_sortable, cache: true}
           %td
             - if payment.referral_source.present?
               %code.small= payment.referral_source
               - if render_sortable
-                = link_to search_emoji, url_for(sortable_search_params.merge(query: payment.referral_source))
+                %small= link_to search_emoji, url_for(sortable_search_params.merge(query: payment.referral_source))
           - unless skip_kind
             %td
               - if payment.theft_alert?
@@ -62,12 +54,12 @@
               - else
                 = payment.kind_humanized
               - if render_sortable
-                = link_to search_emoji, url_for(sortable_search_params.merge(search_kind: payment.kind))
+                %small= link_to search_emoji, url_for(sortable_search_params.merge(search_kind: payment.kind))
           %td
             - if payment.organization.present?
               = link_to payment.organization.short_name, admin_organization_path(payment.organization)
               - if render_sortable && current_organization.blank?
-                = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: payment.organization_id))
+                %small= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: payment.organization_id))
           %td
             - if payment.invoice.present? && payment.organization.present?
               #{link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: payment.organization.to_param, id: payment.invoice.id)}

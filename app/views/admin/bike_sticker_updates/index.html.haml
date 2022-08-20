@@ -5,7 +5,7 @@
   .col-md-7
     %ul
       %li.nav-item
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind != "all" ? "active" : "") }
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind != "all" ? "active" : "")}
           - if @search_kind == "all"
             All Kinds
           - else
@@ -16,7 +16,7 @@
             - kind_active = @search_kind == kind
             = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
       %li.nav-item
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_organization_kind != "all" ? "active" : "") }
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_organization_kind != "all" ? "active" : "")}
           - if @search_organization_kind == "all"
             Organization Kinds
           - else
@@ -27,7 +27,7 @@
             - kind_active = @search_organization_kind == kind
             = link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
       %li.nav-item
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_creator_kind != "all" ? "active" : "") }
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_creator_kind != "all" ? "active" : "")}
           - if @search_creator_kind == "all"
             All creators
           - else
@@ -40,12 +40,12 @@
       %li.nav-item
         = link_to "graph", admin_bike_sticker_updates_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-  = render partial: "/shared/admin_current_header", locals: { viewing: "Sticker updates" }
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Sticker updates"}
 
 - if @render_chart
   - if @search_kind == "all"
-    - counts_by_kind = BikeStickerUpdate.kinds.map { |kind| { name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind)) } }
-    -# colors, if ever necessary to include the other response types: { green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0" }
+    - counts_by_kind = BikeStickerUpdate.kinds.map { |kind| {name: kind.humanize, data: time_range_counts(collection: matching_bike_sticker_updates.where(kind: kind))} }
+    -# colors, if ever necessary to include the other response types: {green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0"}
     = column_chart counts_by_kind, stacked: true, thousands: ",", colors: ["#5cb85c", "#3498db", "#ffc281", "#d12310"]
   - else
     = column_chart time_range_counts(collection: matching_bike_sticker_updates), stacked: true, thousands: ","
@@ -65,7 +65,7 @@
         %tbody
           - matching_org_ids = matching_bike_sticker_updates.distinct.pluck(:organization_id)
           - if @search_kinds == "all"
-            - matching_sticker_per_org_id = matching_org_ids.map { |id| [id, {total:  matching_bike_sticker_updates.where(organization_id: id).count }] }
+            - matching_sticker_per_org_id = matching_org_ids.map { |id| [id, {total:  matching_bike_sticker_updates.where(organization_id: id).count}] }
           - else
             -# Do some crazy ruby inline shit
             :ruby
@@ -117,7 +117,7 @@
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
 
 - if @searched_bike_stickers.present?
-  .row.matching-bike-stickers.mt-4.mb-4{ style: "background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc;" }
+  .row.matching-bike-stickers.mt-4.mb-4{style: "background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc;"}
     .col-12.pt-4.pb-2
       %h2
         Matching
@@ -128,7 +128,7 @@
         %small= admin_number_display(@searched_bike_stickers.count)
       - if @searched_bike_stickers.count > 100
         %h3 More than 100 matching stickers, just showing the first 100
-      = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @searched_bike_stickers.limit(100) }
+      = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)}
 
 .row
   .col-sm-6.offset-sm-6
@@ -163,14 +163,13 @@
         - bike_sticker = bike_sticker_update.bike_sticker
         %tr
           %td
-            %a.convertTime{ href: "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" }
+            %a.convertTime{href: "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}"}
               = l bike_sticker_update.created_at, format: :convert_time
             - if display_dev_info?
               %small.only-dev-visible= bike_sticker_update.id
           %td
             - if bike_sticker_update.user_id.present?
-              - user_name = bike_sticker_update.user&.name || bike_sticker_update.user_id
-              = link_to user_name, admin_bike_sticker_updates_path(sortable_search_params.merge(user_id: bike_sticker_update.user_id))
+              = render partial: "/shared/admin_user_cell", locals: {user: bike_sticker_update.user, render_search: true, cache: true}
           %td
             %strong
               = link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code))

@@ -75,11 +75,12 @@
   .col-12
     = form_tag url_for, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
-
+      .form-group.mr-2.mb-2
+        = text_field_tag :search_email, params[:search_email], placeholder: "Search by email", class: "form-control"
       .form-group.mr-2.mb-2
         = text_field_tag :search_bike_id, params[:search_bike_id], placeholder: "Search for Bike ID", class: "form-control"
       .form-group.mr-2.mb-2
-        = select_tag :search_kind, options_for_select(Feedback.kinds.map { |t| [Feedback.kind_humanized(t), t] }, selected: params[:search_kind]), { prompt: "Kind", class: "form-control" }
+        = select_tag :search_kind, options_for_select(Feedback.kinds.map { |t| [Feedback.kind_humanized(t), t] }, selected: params[:search_kind]), {prompt: "Search Kind", class: "form-control"}
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 = paginate @feedbacks, views_prefix: 'admin'

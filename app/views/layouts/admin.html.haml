@@ -45,7 +45,7 @@
           = select(:admin, :other_navigation, options_for_select(admin_nav_select_links.map { |l| [l[:title], l[:path]] }), { prompt: admin_nav_select_prompt }, { class: "form-control" })
 
       = link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block"
-    = render 'layouts/revised_messages'
+    = render "/layouts/revised_messages"
 
     %section#admin-content.pb-4.mb-4
       .container-fluid.mt-4.pb-4

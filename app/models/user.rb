@@ -177,7 +177,7 @@ class User < ApplicationRecord
   end
 
   def ambassador?
-    memberships.ambassador_organizations.any?
+    memberships.ambassador_organizations.limit(1).any?
   end
 
   def to_param
@@ -201,11 +201,23 @@ class User < ApplicationRecord
   end
 
   def theft_alert_purchaser?
-    theft_alerts.paid.any?
+    theft_alerts.paid.limit(1).any?
+  end
+
+  def organization_prioritized
+    return nil if memberships.limit(1).none?
+    orgs = organizations.reorder(:created_at)
+    # Prioritization of organizations
+    orgs.ambassador.limit(1).first ||
+      orgs.paid_money.limit(1).first ||
+      orgs.paid.limit(1).first ||
+      orgs.law_enforcement.limit(1).first ||
+      orgs.bike_shop.limit(1).first ||
+      orgs.limit(1).first
   end
 
   def paid_org?
-    organizations.paid.any?
+    organizations.paid.limit(1).any?
   end
 
   def authorized?(obj, no_superuser_override: false)
@@ -224,7 +236,7 @@ class User < ApplicationRecord
     features = OrganizationFeature.matching_slugs(slugs)
     return false if features.blank?
     return true if !no_superuser_override && superuser?
-    organizations.with_enabled_feature_slugs(features).any?
+    organizations.with_enabled_feature_slugs(features).limit(1).any?
   end
 
   def auth_token_time(auth_token_type)
@@ -284,26 +296,26 @@ class User < ApplicationRecord
 
   def member_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).any?
+    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).limit(1).any?
     superuser? && !no_superuser_override
   end
 
   def admin_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).any?
+    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).limit(1).any?
     superuser? && !no_superuser_override
   end
 
   def has_membership?
-    memberships.any?
+    memberships.limit(1).any?
   end
 
   def has_police_membership?
-    organizations.law_enforcement.any?
+    organizations.law_enforcement.limit(1).any?
   end
 
   def has_shop_membership?
-    organizations.bike_shop.any?
+    organizations.bike_shop.limit(1).any?
   end
 
   def default_organization
@@ -340,12 +352,12 @@ class User < ApplicationRecord
   end
 
   def render_donation_request
-    return nil unless has_police_membership? && !organizations.law_enforcement.paid.any?
+    return nil unless has_police_membership? && !organizations.law_enforcement.paid.limit(1).any?
     "law_enforcement"
   end
 
   def phone_waiting_confirmation?
-    user_phones.waiting_confirmation.any?
+    user_phones.waiting_confirmation.limit(1).any?
   end
 
   def current_user_phone
@@ -354,7 +366,7 @@ class User < ApplicationRecord
   end
 
   def phone_confirmed?
-    user_phones.confirmed.any?
+    user_phones.confirmed.limit(1).any?
   end
 
   def set_calculated_attributes

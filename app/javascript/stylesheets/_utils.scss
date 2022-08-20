@@ -35,6 +35,19 @@
   }
 }
 
+.text-link {
+  a,
+  & {
+    color: $dark !important;
+    text-decoration: underline;
+  }
+  &:hover,
+  &:active,
+  &.active {
+    color: $primary !important;
+  }
+}
+
 .text-underline {
   text-decoration: underline;
 }

@@ -42,7 +42,7 @@
         %td
           Kind
         %td
-          = @organization.kind.humanize
+          = @organization.kind_humanized
           - if @organization.enabled?("official_manufacturer")
             - unless @organization.kind == "bike_manufacturer"
               %span.text-warning Kind should be "Bike Manufacturer"
