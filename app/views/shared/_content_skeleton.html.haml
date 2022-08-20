@@ -14,7 +14,7 @@
       -# check if this is a donation info page
       - if render_why_donate
         - referral_source = params[:source].present? if params[:source].present?
-        - referral_source ||= "why_donate" if @blog.title_slug == Blog.why_donate_slug
+        - referral_source ||= "why-donate" if @blog.title_slug == Blog.why_donate_slug
         - referral_source ||= @blog.title_slug
         .next-steps-wrap.donation
           %header

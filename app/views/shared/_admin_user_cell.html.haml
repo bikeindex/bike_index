@@ -1,7 +1,7 @@
 - search_url ||= nil
 - render_search ||= search_url.present?
 - user ||= nil
-- email ||= user&.email || nil
+- email ||= user&.email
 
 - email_display = email&.truncate(30)
 - if user.present?
