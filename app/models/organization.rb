@@ -81,6 +81,7 @@ class Organization < ApplicationRecord
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
+  scope :paid_money, -> { where(is_paid: true) } # TODO: make this actually show paid money, rather than just paid
   scope :unpaid, -> { where(is_paid: false) }
   scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
@@ -142,6 +143,10 @@ class Organization < ApplicationRecord
 
   def self.user_creatable_kinds
     kinds - admin_required_kinds
+  end
+
+  def self.kind_humanized(str)
+    str.blank? ? nil : str.to_s.titleize
   end
 
   def self.friendly_find(n)
@@ -220,6 +225,10 @@ class Organization < ApplicationRecord
 
   def remaining_invitation_count
     available_invitation_count - sent_invitation_count
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   # Enable this if they have paid for showing it, or if they use ascend

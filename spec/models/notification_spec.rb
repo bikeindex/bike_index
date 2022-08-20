@@ -7,7 +7,6 @@ RSpec.describe Notification, type: :model do
     it "is payment" do
       expect(notification.sender_display_name).to eq "auto"
     end
-    end
   end
 
   describe "notifications_sent_or_received_by" do

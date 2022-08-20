@@ -32,8 +32,7 @@
                 = membership.id
           %td
             - if membership.user.present?
-              = link_to membership.invited_email || membership.user.display_name,
-                admin_user_path(membership.user.to_param)
+              = render partial: "/shared/admin_user_cell", locals: {user: membership.user, render_search: false, cache: true}
             - else
               = membership.invited_email
           - unless skip_organization
@@ -45,7 +44,7 @@
                 = l membership.claimed_at, format: :convert_time
           %td
             - if membership.sender.present?
-              = link_to membership.sender.display_name, admin_user_path(membership.sender_id)
+              = render partial: "/shared/admin_user_cell", locals: {user: membership.sender, render_search: false, cache: true}
             - else
               = membership.sender_id
           %td
