@@ -5,8 +5,9 @@ RSpec.describe Payment, type: :model do
 
   describe "admin_search" do
     let!(:payment1) { FactoryBot.create(:payment, referral_source: "something_special") }
-    let!(:payment2) { FactoryBot.create(:payment, referral_source: "something_else_special") }
+    let!(:payment2) { FactoryBot.create(:payment, referral_source: "something_else_special", email: "sTUFF@things.com ", user: nil) }
     it "searches by referral_source" do
+      expect(payment2.email).to eq "stuff@things.com"
       expect(Payment.admin_search("special").pluck(:id)).to match_array([payment1.id, payment2.id])
       expect(Payment.admin_search("something_special").pluck(:id)).to match_array([payment1.id])
       expect(Payment.admin_search("\nsomething ").pluck(:id)).to match_array([payment1.id, payment2.id])
@@ -40,7 +41,7 @@ RSpec.describe Payment, type: :model do
     end
     context "check with organization_id but no user or email" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:payment) { FactoryBot.create(:payment_check, user: nil, email: nil, organization: organization) }
+      let(:payment) { FactoryBot.create(:payment_check, user: nil, email: " ", organization: organization) }
       it "does not enqueue an email" do
         expect {
           payment # it is created here
@@ -48,6 +49,7 @@ RSpec.describe Payment, type: :model do
         expect(payment.valid?).to be_truthy
         payment.reload
         expect(payment.id).to be_present
+        expect(payment.email).to be_nil
       end
     end
   end

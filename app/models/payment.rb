@@ -119,8 +119,9 @@ class Payment < ApplicationRecord
     self.kind = calculated_kind
     if user.present?
       self.email ||= user.email
-    elsif email.present?
-      self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    else
+      self.email = EmailNormalizer.normalize(email)
+      self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email) if email.present?
     end
     self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
     self.organization_id ||= invoice&.organization_id

@@ -80,6 +80,9 @@ class Admin::PaymentsController < Admin::BaseController
       matching_payments = matching_payments.where(kind: @kind)
     end
     matching_payments = matching_payments.admin_search(params[:query]) if params[:query].present?
+    if params[:search_email].present?
+      matching_payments = matching_payments.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%")
+    end
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])
       matching_payments = matching_payments.where(user_id: @user.id) if @user.present?

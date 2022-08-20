@@ -1,15 +1,22 @@
+-# NOTE: Can't use url_for because of caching!
+-# TODO: make it possible, using JS
+
 - bikes ||= @bikes
 - no_show_header ||= false
 - show_serial ||= params[:show_serial].present?
 - render_sortable ||= false
+- skip_user ||= false
 
+-# require inline CSS setting because of caching
 - unless display_dev_info?
-  -# required because of caching
   <style>.only-dev-visible { display: none !important; } </style>
-
 - skip_manufacturer_link = params[:search_manufacturer].present?
 - if skip_manufacturer_link
-  <style>.display-mnfg-link { display: none; }</style>
+  <style>.display-mnfg-link { display: none !important; }</style>
+- if skip_user
+  <style>.user-cell { display: none !important; }</style>
+- unless render_sortable
+  <style>.display-sortable-link { display: none !important; }</style>
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.bikeTable{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
@@ -19,7 +26,7 @@
           = sortable "id", "Added", render_sortable: render_sortable
         %th.small.d-none.d-xl-table-cell
           = sortable "updated_by_user_at", "Updated", render_sortable: render_sortable
-        %th.d-none.d-md-table-cell
+        %th.d-none.d-md-table-cell.user-cell
           .less-strong-hold
             = sortable "owner_email", "Sent to", render_sortable: render_sortable
             %small.d-none.d-lg-block.text-info{style: "position: absolute; right: 0.25em; top: 0.4em;"}
@@ -55,9 +62,9 @@
             %td.d-none.d-xl-table-cell
               %small.convertTime
                 = l bike.updated_by_user_fallback, format: :convert_time
-            %td.d-none.d-md-table-cell
+            %td.d-none.d-md-table-cell.user-cell
               .less-strong-hold
-                = render partial: "/shared/admin_user_cell", locals: {email: bike.owner_email, user: bike.user, render_search: render_sortable, cache: true}
+                = render partial: "/shared/admin_user_cell", locals: {email: bike.owner_email, user: bike.user, render_search: true, cache: true, search_url: admin_bikes_path(search_email: bike.owner_email)}
                 - if bike.claimed?
                   %span.less-strong-right.text-info= check_mark
             %td
@@ -66,7 +73,7 @@
                   = bike.manufacturer_other
               - else
                 = bike.mnfg_name
-              %small= link_to search_emoji, admin_bikes_path(search_manufacturer: bike.mnfg_name), class: "gray-link display-mnfg-link"
+              %small= link_to search_emoji, admin_bikes_path(search_manufacturer: bike.mnfg_name), class: "display-mnfg-link display-sortable-link"
             %td.d-none.d-lg-table-cell
               .less-strong-hold
                 = [bike.year, bike.frame_model_truncated].join(' ')
@@ -91,8 +98,7 @@
               .less-strong-hold
                 - if bike.creation_organization.present?
                   = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param)
-                  - if render_sortable
-                    = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: bike.creation_organization.to_param)), class: "small"
+                  = link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "small display-sortable-link"
                 - if bike.creation_description
                   %span.less-strong-right
                     - if bike.bulk_import.present?
