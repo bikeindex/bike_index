@@ -121,6 +121,22 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(bike_organization.reload.organization_id).to eq organization.id
         expect(bike_organization.overridden_by_user_registration?).to be_falsey
       end
+      context "deleted organization" do
+        it "doesn't create" do
+          expect(bike.reload.user&.id).to be_present
+          expect(bike.bike_organizations.count).to eq 1
+          organization.destroy
+          expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+          expect(UserRegistrationOrganization.unscoped.count).to eq 0
+          Sidekiq::Worker.clear_all
+          instance.perform(bike.id)
+          expect(Sidekiq::Worker.jobs.count).to eq 1
+          expect(Sidekiq::Worker.jobs.count { |j| j["class"] != "DuplicateBikeFinderWorker" }).to eq 0
+          expect(UserRegistrationOrganization.unscoped.count).to eq 0
+          expect(bike.reload.bike_organizations.count).to eq 1
+          expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
+        end
+      end
       context "with deleted user_registration_organization" do
         it "does not create" do
           expect(bike.reload.user&.id).to be_present
