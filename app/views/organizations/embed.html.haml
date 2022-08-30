@@ -195,7 +195,9 @@
         = t(".image_has_been_uploaded")
     - else
       .filefield-button
-        = f.file_field :image
+        = f.file_field :image, accept: ImageUploader.permitted_extensions.join(",")
       #filepath
       %span
         = t(".optional_upload_a_photo")
+        %small.less-strong
+          (#{ImageUploader.permitted_extensions_display.join(", ")})

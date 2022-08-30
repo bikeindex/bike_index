@@ -31,7 +31,7 @@ class CircularImageUploader < ApplicationUploader
   end
 
   def extension_white_list
-    %w[jpg jpeg gif png tiff tif]
+    IMAGE_EXT_WHITE_LIST
   end
 
   def round_image

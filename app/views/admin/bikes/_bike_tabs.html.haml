@@ -49,7 +49,7 @@
                 %td
                   Serial number
                 %td
-                  = bike.serial_number
+                  %code= bike.serial_display(current_user)
               %tr
                 %td
                   Colors

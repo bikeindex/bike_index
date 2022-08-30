@@ -1,4 +1,6 @@
 class ApplicationUploader < CarrierWave::Uploader::Base
+  IMAGE_EXT_WHITE_LIST = %w[jpg jpeg gif png tiff tif].freeze
+
   after :remove, :delete_empty_upstream_dirs
 
   def delete_empty_upstream_dirs
