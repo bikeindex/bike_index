@@ -70,7 +70,7 @@
         = link_to image_tag(@organization.avatar_url(:thumb)), @organization.avatar_url
 
       %label.file
-        = f.file_field :avatar, class: 'avatar-upload-field'
+        = f.file_field :avatar, class: 'avatar-upload-field', accept: ImageUploader.permitted_extensions.join(",")
         %span.file-custom
           %span.file-upload-text= t(".choose_file")
         = f.hidden_field :avatar_cache

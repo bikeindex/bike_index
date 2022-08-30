@@ -27,7 +27,7 @@
               %h5.light-italic
                 = t(".drag_and_drop_files_here_html")
               %label.file
-                = f.file_field :image, multiple: true, name: "public_image[image]"
+                = f.file_field :image, multiple: true, name: "public_image[image]", accept: ImageUploader.permitted_extensions.join(",")
                 %span.file-custom
         = render "/shared/form_well_footer_save"
 

@@ -1,68 +1,68 @@
-import log from "../../utils/log";
+import log from '../../utils/log'
 
 // required for uppy file upload
-import "es6-promise/auto";
-import "whatwg-fetch";
-require("@uppy/core/dist/style.css");
-require("@uppy/dashboard/dist/style.css");
-window.Uppy = require("@uppy/core");
-window.XHRUpload = require("@uppy/xhr-upload");
-window.Dashboard = require("@uppy/dashboard");
-window.DragDrop = require("@uppy/drag-drop");
-window.Tus = require("@uppy/tus");
-window.ProgressBar = require("@uppy/progress-bar");
-window.FileInput = require("@uppy/file-input");
-window.Form = require("@uppy/form");
+import 'es6-promise/auto'
+import 'whatwg-fetch'
+require('@uppy/core/dist/style.css')
+require('@uppy/dashboard/dist/style.css')
+window.Uppy = require('@uppy/core')
+window.XHRUpload = require('@uppy/xhr-upload')
+window.Dashboard = require('@uppy/dashboard')
+window.DragDrop = require('@uppy/drag-drop')
+window.Tus = require('@uppy/tus')
+window.ProgressBar = require('@uppy/progress-bar')
+window.FileInput = require('@uppy/file-input')
+window.Form = require('@uppy/form')
 
-function BinxAdminImageUploader() {
+function BinxAdminImageUploader () {
   return {
-    init() {
-      this.uppyFileUpload();
+    init () {
+      this.uppyFileUpload()
     },
 
-    uppyFileUpload() {
+    uppyFileUpload () {
       const uppyOne = new Uppy({
         debug: true,
-        autoProceed: true,
-      });
+        autoProceed: true
+      })
       uppyOne
         .use(FileInput, {
-          target: ".UppyForm",
-          inputName: "public_image[image]",
+          target: '.UppyForm',
+          inputName: 'public_image[image]'
         })
         .use(XHRUpload, {
-          endpoint: "/public_images",
+          endpoint: '/public_images',
           formData: true,
-          fieldName: "file",
-          method: "post",
+          fieldName: 'file',
+          method: 'post'
         })
         .use(Dashboard, {
-          target: ".UppyDragDrop-One",
-          inline: true,
+          target: '.UppyDragDrop-One',
+          inline: true
         })
         .use(ProgressBar, {
-          target: ".UppyDragDrop-One-Progress",
-          hideAfterFinish: false,
-        });
+          target: '.UppyDragDrop-One-Progress',
+          hideAfterFinish: false
+        })
       uppyOne.use(Form, {
-        target: "#new_public_image",
+        target: '#new_public_image',
         getMetaFromForm: true,
         addResultToForm: true,
         multipleResults: false,
         submitOnSuccess: false,
-        triggerUploadOnSubmit: false,
-      });
-      uppy.on("upload-success", (file, response) => {
-        $("ul#public_images").append(
+        triggerUploadOnSubmit: false
+      })
+      uppy.on('upload-success', (file, response) => {
+        $('ul#public_images').append(
           this.publicImageTemplate(response.body.public_image)
-        );
-      });
+        )
+      })
     },
 
-    publicImageTemplate(image) {
-      const alt = image.name;
-      const src = image.image.url;
-      const id = image.id;
+    publicImageTemplate (image) {
+      const alt = image.name
+      const src = image.image.url
+      const id = image.id
       return `<li class="admin-public-image collapse show mt-1 col-xl-4 col-sm-6" id="image-${id}" data-imageid="${id}">
           <div class='card bg-light'>
             <div class='card-body'>
@@ -91,9 +91,9 @@ function BinxAdminImageUploader() {
             </div>
           </div>
         </div>
-      </li>`;
-    },
-  };
+      </li>`
+    }
+  }
 }
 
-export default BinxAdminImageUploader;
+export default BinxAdminImageUploader

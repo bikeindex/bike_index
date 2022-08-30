@@ -19,7 +19,7 @@
       %p
         No picture!
   .form-group
-    = f.file_field :image, class: "w-100"
+    = f.file_field :image, class: "w-100", accept: ImageUploader.permitted_extensions.join(",")
     = f.hidden_field :image_cache
 
   .mt-4

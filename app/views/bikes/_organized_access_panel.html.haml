@@ -398,7 +398,7 @@
             .col-sm-6.mt-4
               .avatar-upload-wrapper
                 %label.file
-                  = f.file_field :image, class: "avatar-upload-field"
+                  = f.file_field :image, class: "avatar-upload-field", accept: ImageUploader.permitted_extensions.join(",")
                   %span.file-custom
                     %span.file-upload-text Choose file
                   = f.hidden_field :image_cache

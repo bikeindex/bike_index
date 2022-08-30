@@ -34,7 +34,7 @@
     - else
       %p
         No logo!
-    = f.file_field :logo
+    = f.file_field :logo, accept: ImageUploader.permitted_extensions.join(",")
     = f.hidden_field :logo_cache
 
   .form-group
