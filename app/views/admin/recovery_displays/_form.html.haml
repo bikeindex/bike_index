@@ -89,7 +89,7 @@
         .input-group.mb-3
           .custom-file
             = f.label :image, "Choose file", class: "custom-file-label"
-            = f.file_field :image, class: "custom-file-input"
+            = f.file_field :image, class: "custom-file-input", accept: ImageUploader.permitted_extensions.join(",")
         .form-check
           = f.check_box :remove_image, class: "form-check-input"
           = f.label :remove_image, class: "form-check-label"

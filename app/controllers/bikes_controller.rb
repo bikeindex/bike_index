@@ -112,7 +112,7 @@ class BikesController < Bikes::BaseController
   def create
     find_or_new_b_param
     org_param = (@b_param.organization || current_organization)&.slug # Protect from nil - see #2308
-    if params[:bike][:embeded].present? && org_param.present? # NOTE: if embeded, doesn't verify csrf token
+    if params.dig(:bike, :embeded).present? && org_param.present? # NOTE: if embeded, doesn't verify csrf token
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end

@@ -14,7 +14,7 @@
       No picture!
     .form-group
       = f.label :image
-      = f.file_field :image, class: "btn btn-light"
+      = f.file_field :image, class: "btn btn-light", accept: ImageUploader.permitted_extensions.join(",")
       = f.hidden_field :image_cache
     .form-group
       = f.label :live, class: "mr-2"

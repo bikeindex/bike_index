@@ -30,7 +30,7 @@
                   .input-group
                     .custom-file
                     = f.label :image, "Tweet Image", class: "custom-file-label"
-                    = f.file_field :image, class: "custom-file-input"
+                    = f.file_field :image, class: "custom-file-input", accept: ImageUploader.permitted_extensions.join(",")
           .col-md-6
             .form-group#characterCounterField
               = f.label :body do
