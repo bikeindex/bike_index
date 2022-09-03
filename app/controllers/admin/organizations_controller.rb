@@ -103,6 +103,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :lock_show_on_map,
         :manufacturer_id,
         :name,
+        :direct_unclaimed_notifications,
         :parent_organization_id,
         :passwordless_user_domain,
         :previous_slug,

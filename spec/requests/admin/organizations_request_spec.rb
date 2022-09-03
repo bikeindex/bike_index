@@ -91,6 +91,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         manual_pos_kind: "lightspeed_pos",
         graduated_notification_interval_days: " ",
         lightspeed_register_with_phone: "true",
+        direct_unclaimed_notifications: true,
         locations_attributes: {
           "0" => {
             id: location1.id,
@@ -148,6 +149,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(organization.pos_kind).to eq "lightspeed_pos"
       expect(organization.graduated_notification_interval).to be_blank
       expect(organization.lightspeed_register_with_phone).to be_truthy
+      expect(organization.direct_unclaimed_notifications).to be_truthy
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization

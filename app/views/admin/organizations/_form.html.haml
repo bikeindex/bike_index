@@ -56,15 +56,9 @@
 .row
   .col-md-6
     .form-group#js-organization-type
-      %strong
-        %label
-          Organization Type
-      .row
-        - Organization.kinds.each do |kind|
-          .col-6
-            .form-check
-              = f.radio_button "kind", kind, class: "form-check-input"
-              = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
+      = f.label :kind, "Organization Type"
+      - select_opts = Organization.kinds.map { |k| [Organization.kind_humanized(k), k] }
+      = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control"
       - if @organization.bike_shop?
         .form-group.mt-2
           = f.check_box :lightspeed_register_with_phone
@@ -72,8 +66,8 @@
             Lightspeed POS registrations include phone
             %small.less-strong originally for Edmonton
 
-    %hr
-    .form-group
+
+    .form-group.mt-4
       = f.check_box :show_on_map
       = f.label :show_on_map
     .form-group
@@ -89,6 +83,11 @@
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
+    .form-group
+      = f.check_box :direct_unclaimed_notifications
+      = f.label :direct_unclaimed_notifications do
+        Send emails directly to unclaimed bike owners
+        %small.less-strong don't require org to forward
     .form-group.fancy-select.unfancy.no-restore-on-backspace
       = f.label :parent_organization_id do
         Parent organization

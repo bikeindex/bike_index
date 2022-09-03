@@ -2299,7 +2299,7 @@ CREATE TABLE public.organizations (
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
-    pass_through_stolen_notifications boolean DEFAULT false
+    direct_unclaimed_notifications boolean DEFAULT false
 );
 
 

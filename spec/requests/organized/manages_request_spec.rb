@@ -90,12 +90,13 @@ RSpec.describe Organized::ManagesController, type: :request do
             approved: false,
             access_token: "stuff7",
             lock_show_on_map: true,
-            is_paid: false
+            is_paid: false,
           }
         end
         let(:user2) { FactoryBot.create(:organization_member, organization: current_organization) }
         let(:update) do
           {
+            direct_unclaimed_notifications: true,
             # slug: 'short_name',
             slug: "cool name and stuffffff",
             available_invitation_count: "20",
@@ -114,7 +115,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           }
         end
         # Website is also permitted, but we're manually setting it
-        let(:permitted_update_keys) { [:kind, :auto_user_id, :embedable_user_email, :name, :website] }
+        let(:permitted_update_keys) { [:kind, :auto_user_id, :embedable_user_email, :name, :website, :direct_unclaimed_notifications] }
         before do
           expect(user2).to be_present
           current_organization.update(org_attributes)
@@ -125,7 +126,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect_attrs_to_match_hash(current_organization, update.slice(:name))
+          expect_attrs_to_match_hash(current_organization, update.slice(:name, :direct_unclaimed_notifications))
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")

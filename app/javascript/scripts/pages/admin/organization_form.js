@@ -2,25 +2,18 @@ class BinxAdminOrganizationForm {
   constructor ($form) {
     this.$form = $form
 
-    const $selectedType = $form
-      .find('#js-organization-type')
-      .find('input:checked')
-      .first()
-
-    this.toggleAmbassadorFields($selectedType)
+    this.toggleAmbassadorFields(
+      $form.find('#js-organization-type select').val()
+    )
     this.toggleStolenMessageArea()
 
     this.setEventListeners()
   }
 
   setEventListeners () {
-    this.$form.on(
-      'change',
-      '#js-organization-type input.form-check-input',
-      e => {
-        this.toggleAmbassadorFields(e.target)
-      }
-    )
+    this.$form.on('change', '#js-organization-type select', e => {
+      this.toggleAmbassadorFields($(e.target).val())
+    })
     this.$form.on('change', '#organization_stolen_message_kind', e => {
       this.toggleStolenMessageArea()
     })
@@ -34,7 +27,7 @@ class BinxAdminOrganizationForm {
     }
   }
 
-  toggleAmbassadorFields (target) {
+  toggleAmbassadorFields (orgType) {
     const inputFields = [
       'organization_ascend_name',
       'organization_website',
@@ -59,8 +52,7 @@ class BinxAdminOrganizationForm {
       }
     )
 
-    const $orgType = $(target)
-    const isAmbassadorOrgSelected = $orgType.val() === 'ambassador'
+    const isAmbassadorOrgSelected = orgType === 'ambassador'
 
     if (isAmbassadorOrgSelected) {
       this.disableFields({ inputFields, selectizedFields })

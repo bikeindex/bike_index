@@ -32,11 +32,8 @@
       %label.org-form-label
         = t(".organization_type")
       .col-sm-4
-        - Organization.user_creatable_kinds.each do |kind|
-          .radio
-            %label
-              = f.radio_button :kind, kind
-              = kind.humanize
+        - select_opts = Organization.user_creatable_kinds.map { |k| [Organization.kind_humanized(k), k] }
+        = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control"
 
   - if @organization.bike_shop? && @organization.lightspeed_pos?
     .form-group.row
@@ -81,6 +78,18 @@
   .form-group.row.mt-4
     .form-submit-button
       = f.submit t(".update"), class: 'btn btn-success btn-lg'
+
+  .form-group.row.mt-5
+    %label.org-form-label
+      Stolen emails
+    .col-sm-4
+      .checkbox{style: "line-height: 1.5em;"}
+        %label
+          = f.check_box :direct_unclaimed_notifications
+          Send emails directly to unclaimed bike owners
+        %span.below-input-help
+          When checked, "I found your bike" stolen alert emails go directly to the owners of unclaimed bike.
+          %em.less-strong By default, emails sent to unclaimed bikes (bikes registered to users who don't have a Bike Index account) are sent to your organization to review and forward on to the final user, since those users haven't opted in to our notifications.
 
 - unless current_organization.paid?
   %hr.delete-organization-section
