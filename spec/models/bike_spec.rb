@@ -958,11 +958,7 @@ RSpec.describe Bike, type: :model do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:user_unorganized) { User.new }
       let(:owner) { User.new }
-      let(:organization_unstolen) do
-        o = FactoryBot.create(:organization)
-        o.update_attribute :enabled_feature_slugs, %w[unstolen_notifications]
-        o
-      end
+      let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
       let(:membership) { FactoryBot.create(:membership, user: user, organization: organization_unstolen) }
       it "is truthy for the organization with unstolen" do
         allow(bike).to receive(:owner) { owner }
@@ -1002,6 +998,7 @@ RSpec.describe Bike, type: :model do
           # Check superusers
           expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be false
           expect(bike.contact_owner?(admin, organization)).to be false
+          expect(bike.current_ownership.organization_direct_unclaimed_notifications?).to be false
           expect(bike.contact_owner_user?(admin, organization)).to be true
           # Add user to the unstolen org
           expect(membership.reload).to be_present
@@ -1014,7 +1011,7 @@ RSpec.describe Bike, type: :model do
 
           # And now for the direct owner
           expect(bike2.reload.current_ownership.claimed?).to be false
-          expect(bike2.current_ownership.organization.direct_unclaimed_notifications?).to be true
+          expect(bike2.current_ownership.organization_direct_unclaimed_notifications?).to be true
           expect(bike2.contact_owner?(user)).to be true
           expect(bike2.contact_owner?(user, organization_unstolen)).to be true
           expect(BikeDisplayer.display_contact_owner?(bike2, user)).to be false # Handled through org panel

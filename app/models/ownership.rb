@@ -106,6 +106,10 @@ class Ownership < ApplicationRecord
     Organization.pos?(pos_kind)
   end
 
+  def organization_direct_unclaimed_notifications?
+    organization.present? && organization.direct_unclaimed_notifications?
+  end
+
   def creation_description
     if pos?
       pos_kind.to_s.gsub("_pos", "").humanize

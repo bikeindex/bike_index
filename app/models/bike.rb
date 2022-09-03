@@ -470,7 +470,7 @@ class Bike < ApplicationRecord
   # _organization parameter not used - included to match .contact_owner? args
   def contact_owner_user?(u = nil, _organization = nil)
     return true if user? || status_stolen? || u&.superuser?
-    !!current_ownership&.organization&.direct_unclaimed_notifications?
+    current_ownership&.organization_direct_unclaimed_notifications?
   end
 
   # _organization parameter not used - included to match .contact_owner? args

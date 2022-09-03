@@ -4,7 +4,8 @@ class StolenNotification < ApplicationRecord
     stolen_blocked: 1,
     unstolen_blocked: 2,
     unstolen_claimed_permitted: 3,
-    unstolen_unclaimed_permitted: 4
+    unstolen_unclaimed_permitted: 4,
+    unstolen_unclaimed_permitted_direct: 5
   }.freeze
 
   belongs_to :bike
@@ -39,7 +40,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.receiver_email ||= bike&.contact_owner_email
+    self.receiver_email ||= bike&.contact_owner_email(sender)
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
     self.kind ||= calculated_kind
@@ -63,7 +64,12 @@ class StolenNotification < ApplicationRecord
       permitted_send? ? "stolen_permitted" : "stolen_blocked"
     else
       return "unstolen_blocked" unless permitted_send?
-      bike&.claimed? ? "unstolen_claimed_permitted" : "unstolen_unclaimed_permitted"
+      return "unstolen_claimed_permitted" if bike&.claimed?
+      if bike&.current_ownership&.organization_direct_unclaimed_notifications?
+        "unstolen_unclaimed_permitted_direct"
+      else
+        "unstolen_unclaimed_permitted"
+      end
     end
   end
 end

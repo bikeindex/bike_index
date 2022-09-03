@@ -79,19 +79,18 @@
     .form-submit-button
       = f.submit t(".update"), class: "btn btn-success btn-lg"
 
-  -# TODO: Translate after wording improvements
   .form-group.row.mt-5
     %label.org-form-label
-      Stolen emails
+      = t(".stolen_emails")
     .col-sm-4
       .checkbox{style: "line-height: 1.5em;"}
         %label
           = f.check_box :direct_unclaimed_notifications
-          Send emails directly to unclaimed bike owners.
-        %span.d-block Registrations where the user doesn't have a Bike Index account yet are "unclaimed"
+          = t(".send_emails_directly")
+        %span.d-block= t(".unclaimed_registration_definition")
         %span.below-input-help.mt-2
-          When checked, "I found your bike" stolen alert emails go directly to the owners of unclaimed bike.
-          %em.less-strong By default, emails to unclaimed bikes are sent to your organization to review and forward to the final user, because those users haven't opted in to Bike Index notifications.
+          = t(".when_checked_go_direct")
+          %em.less-strong= t(".why_no_direct_by_default")
 
 - unless current_organization.paid?
   %hr.delete-organization-section
