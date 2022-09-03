@@ -64,8 +64,9 @@ class StolenNotification < ApplicationRecord
       permitted_send? ? "stolen_permitted" : "stolen_blocked"
     else
       return "unstolen_blocked" unless permitted_send?
-      return "unstolen_claimed_permitted" if bike&.claimed?
-      if bike&.current_ownership&.organization_direct_unclaimed_notifications?
+      if bike&.claimed?
+        "unstolen_claimed_permitted"
+      elsif bike&.current_ownership&.organization_direct_unclaimed_notifications?
         "unstolen_unclaimed_permitted_direct"
       else
         "unstolen_unclaimed_permitted"

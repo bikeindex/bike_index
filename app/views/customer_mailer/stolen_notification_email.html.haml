@@ -29,7 +29,7 @@
         - if @bike.current_ownership.organization.present?
           %span.less-strong{style: "font-size: 75%; display: block; line-height: 1.5; margin: 0.75em 0; opacity: 0.75;"}
             - organization = @bike.current_ownership.organization
-            = t(".html.update_organization_direct_message_html", link: link_to("#{organization.short_name}", organization_manage_url(organization.to_param)))
+            = t(".html.update_organization_direct_message_html", link: link_to(organization.short_name, organization_manage_url(organization.to_param)))
 
 
       %small.less-strong{style: "display: block; line-height: 1; margin: 1em 0 -0.5rem; font-style: normal;"}
