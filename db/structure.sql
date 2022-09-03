@@ -2298,7 +2298,8 @@ CREATE TABLE public.organizations (
     passwordless_user_domain character varying,
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
-    manufacturer_id bigint
+    manufacturer_id bigint,
+    pass_through_stolen_notifications boolean DEFAULT false
 );
 
 
@@ -6330,6 +6331,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220730171652'),
 ('20220801162511'),
 ('20220811174115'),
-('20220819205834');
+('20220819205834'),
+('20220903183420');
 
 
