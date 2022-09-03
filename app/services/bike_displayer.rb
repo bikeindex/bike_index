@@ -8,6 +8,7 @@ class BikeDisplayer
       bike.pos? && bike.paint.present?
     end
 
+    # If users have the ability to send unstolen notifications, they do it through the org
     def display_contact_owner?(bike, user = nil)
       bike.current_stolen_record.present?
     end
