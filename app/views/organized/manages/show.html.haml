@@ -86,10 +86,11 @@
       .checkbox{style: "line-height: 1.5em;"}
         %label
           = f.check_box :direct_unclaimed_notifications
-          Send emails directly to unclaimed bike owners
-        %span.below-input-help
+          Send emails directly to unclaimed bike owners.
+        %span.d-block Registrations where the user doesn't have a Bike Index account yet are "unclaimed"
+        %span.below-input-help.mt-2
           When checked, "I found your bike" stolen alert emails go directly to the owners of unclaimed bike.
-          %em.less-strong By default, emails sent to unclaimed bikes (bikes registered to users who don't have a Bike Index account) are sent to your organization to review and forward on to the final user, since those users haven't opted in to our notifications.
+          %em.less-strong By default, emails to unclaimed bikes are sent to your organization to review and forward to the final user, because those users haven't opted in to Bike Index notifications.
 
 - unless current_organization.paid?
   %hr.delete-organization-section
