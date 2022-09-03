@@ -90,7 +90,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             approved: false,
             access_token: "stuff7",
             lock_show_on_map: true,
-            is_paid: false,
+            is_paid: false
           }
         end
         let(:user2) { FactoryBot.create(:organization_member, organization: current_organization) }

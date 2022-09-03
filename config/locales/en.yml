@@ -2083,15 +2083,16 @@ en:
         they_believe_it_is_stolen: They believe it is stolen!
         this_email_is_about_the_bike_type_register: This email is about the %{bike_type}
           registered on Bike Index on %{date}
+        update_organization_direct_message_html: >-
+          Update the "Stolen emails" setting in %{link} on Bike Index to have these
+          emails sent directly to the owner of the bike, without having to forward
+          them.
         you_can_just_forward_this_message_to: >-
           You can just forward this message to the owner's email address: %{bikeowner_email}
-        update_organization_direct_message_html: 
-          Update the "Stolen emails" setting in %{link} on Bike Index to have these emails sent directly to the owner of the bike, without having to forward them.
         you_registered_this_bike_type_on: >-
           You registered this %{bike_type} on %{date}. The owner hasn't claimed it
           yet and it isn't marked stolen, so you have received this email to authorize
           contacting them.
-        
       subject: Stolen bike contact
     updated_terms_email:
       html:
@@ -4672,13 +4673,19 @@ en:
         removal_confirmation: Are you positive you want to remove %{org_name} from
           Bike Index?
         select_email: Select email
+        send_emails_directly: Send emails directly to unclaimed bike owners.
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
-        send_emails_directly: Send emails directly to unclaimed bike owners.
-        unclaimed_registration_definition: Registrations where the user doesn't have a Bike Index account yet are "unclaimed"
-        when_checked_go_direct: When checked, "I found your bike" stolen alert emails go directly to the owners of unclaimed bike.
-        why_no_direct_by_default: By default, emails to unclaimed bikes are sent to your organization to review and forward to the final user, because those users haven't opted in to Bike Index notifications.
+        unclaimed_registration_definition: >-
+          Registrations where the user doesn't have a Bike Index account yet are "unclaimed"
         update: Update
+        when_checked_go_direct: >-
+          When checked, "I found your bike" stolen alert emails go directly to the
+          owners of unclaimed bike.
+        why_no_direct_by_default: >-
+          By default, emails to unclaimed bikes are sent to your organization to review
+          and forward to the final user, because those users haven't opted in to Bike
+          Index notifications.
     parking_notifications:
       index:
         matches_visible: visible

@@ -467,15 +467,13 @@ class Bike < ApplicationRecord
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 
-  # _organization parameter not used - included to match .contact_owner? args
-  def contact_owner_user?(u = nil, _organization = nil)
+  def contact_owner_user?(u = nil, organization = nil)
     return true if user? || status_stolen? || u&.superuser?
     current_ownership&.organization_direct_unclaimed_notifications?
   end
 
-  # _organization parameter not used - included to match .contact_owner? args
-  def contact_owner_email(u = nil, _organization = nil)
-    contact_owner_user?(u, _organization) ? owner_email : creator&.email
+  def contact_owner_email(u = nil, organization = nil)
+    contact_owner_user?(u, organization) ? owner_email : creator&.email
   end
 
   def phone_registration?

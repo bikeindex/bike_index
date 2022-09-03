@@ -2556,6 +2556,9 @@ nl:
           op %{date}. De eigenaar heeft het nog niet geclaimd en het is niet gemarkeerd
           als gestolen, dus je hebt deze e-mail ontvangen om toestemming te geven
           contact met hem op te nemen.
+        update_organization_direct_message_html: Werk de instelling 'Gestolen e-mails'
+          in %{link} op Bike Index bij om deze e-mails rechtstreeks naar de eigenaar
+          van de fiets te laten sturen, zonder ze door te hoeven sturen.
       subject: Contact met gestolen fiets
     updated_terms_email:
       html:
@@ -4579,6 +4582,16 @@ nl:
         square_image: Gebruik een vierkante afbeelding voor het beste resultaat
         contact_to_update_html: Neem contact op met %{link} om de afkorting bij te
           werken
+        send_emails_directly: Stuur e-mails rechtstreeks naar niet-geclaimde fietsbezitters.
+        stolen_emails: Gestolen e-mails
+        unclaimed_registration_definition: Registraties waarbij de gebruiker nog geen
+          Bike Index-account heeft, zijn "niet opgeëist"
+        when_checked_go_direct: Wanneer aangevinkt, gaan de e-mails met gestolen waarschuwingen
+          van "Ik heb je fiets gevonden" rechtstreeks naar de eigenaren van de niet-opgeëiste
+          fiets.
+        why_no_direct_by_default: Standaard worden e-mails naar niet-geclaimde fietsen
+          naar uw organisatie verzonden om te bekijken en door te sturen naar de eindgebruiker,
+          omdat die gebruikers zich niet hebben aangemeld voor Bike Index-meldingen.
     impound_records:
       index:
         search_bike_descriptions: Zoek fietsbeschrijvingen
