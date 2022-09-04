@@ -930,6 +930,7 @@ RSpec.describe Bike, type: :model do
     let(:creator) { FactoryBot.create(:user, email: "notparty@party.com") }
     let(:bike) { FactoryBot.create(:bike, owner_email: owner_email, creator: creator) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, owner_email: owner_email, creator: creator) }
+    let(:admin) { User.new(superuser: true) }
     it "is true" do
       expect(bike.reload.contact_owner_user?).to be_truthy
       expect(bike.contact_owner_email).to eq owner_email
@@ -937,14 +938,17 @@ RSpec.describe Bike, type: :model do
     context "ownership not claimed" do
       let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: owner_email, creator: creator) }
       it "is false" do
-        expect(bike.contact_owner_user?).to be_falsey
+        expect(bike.reload.current_ownership.claimed?).to be_falsey
+        expect(bike.contact_owner_user?).to be false
         expect(bike.contact_owner_email).to eq "notparty@party.com"
+        expect(bike.contact_owner_user?(admin)).to be true
+        expect(bike.contact_owner_email(admin)).to eq "party@party.com"
       end
       context "registered as stolen" do
         let(:bike) { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
         it "is truthy" do
           expect(bike.status_stolen?).to be_truthy
-          expect(bike.contact_owner_user?).to be_truthy
+          expect(bike.contact_owner_user?).to be true
           expect(bike.contact_owner_email).to eq owner_email
         end
       end
@@ -954,19 +958,17 @@ RSpec.describe Bike, type: :model do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:user_unorganized) { User.new }
       let(:owner) { User.new }
-      let(:organization_unstolen) do
-        o = FactoryBot.create(:organization)
-        o.update_attribute :enabled_feature_slugs, %w[unstolen_notifications]
-        o
-      end
-      it "is truthy for the organization with unstollen" do
+      let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+      let(:membership) { FactoryBot.create(:membership, user: user, organization: organization_unstolen) }
+      it "is truthy for the organization with unstolen" do
         allow(bike).to receive(:owner) { owner }
         expect(bike.contact_owner?).to be_falsey
         expect(bike.contact_owner?(user)).to be_falsey
         expect(bike.contact_owner?(user, organization)).to be_falsey
         expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
+
         # Add user to the unstolen org
-        FactoryBot.create(:membership, user: user, organization: organization_unstolen)
+        expect(membership.reload).to be_present
         user.reload
         expect(bike.contact_owner?(user)).to be_truthy
         expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
@@ -981,15 +983,55 @@ RSpec.describe Bike, type: :model do
         owner.notification_unstolen = false
         expect(bike.contact_owner?(user, organization_unstolen)).to be_falsey
       end
+      context "organization direct_unclaimed_notifications registration" do
+        let(:organization_direct_email) { FactoryBot.create(:organization, direct_unclaimed_notifications: true) }
+        let!(:ownership) { nil } # Block duplicate ownership creation
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization_unstolen, owner_email: owner_email, creator: creator) }
+        let(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization_direct_email, owner_email: owner_email, creator: creator) }
+        it "is truthy" do
+          expect(bike.reload.current_ownership.claimed?).to be false
+          expect(bike.current_ownership.organization.direct_unclaimed_notifications?).to be false
+          expect(bike.contact_owner?).to be false
+          expect(bike.contact_owner?(user)).to be false
+          expect(bike.contact_owner?(user, organization)).to be false
+          expect(BikeDisplayer.display_contact_owner?(bike, user)).to be false
+          # Check superusers
+          expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be false
+          expect(bike.contact_owner?(admin, organization)).to be false
+          expect(bike.current_ownership.organization_direct_unclaimed_notifications?).to be false
+          expect(bike.contact_owner_user?(admin, organization)).to be true
+          # Add user to the unstolen org
+          expect(membership.reload).to be_present
+          user.reload
+          expect(bike.contact_owner?(user)).to be true
+          expect(bike.contact_owner?(user, organization_unstolen)).to be true
+          expect(BikeDisplayer.display_contact_owner?(bike, user)).to be false # Handled through org panel
+          expect(bike.contact_owner_user?(user, organization)).to be false
+          expect(bike.contact_owner_email(user)).to eq "notparty@party.com"
+
+          # And now for the direct owner
+          expect(bike2.reload.current_ownership.claimed?).to be false
+          expect(bike2.current_ownership.organization_direct_unclaimed_notifications?).to be true
+          expect(bike2.contact_owner?(user)).to be true
+          expect(bike2.contact_owner?(user, organization_unstolen)).to be true
+          expect(BikeDisplayer.display_contact_owner?(bike2, user)).to be false # Handled through org panel
+          expect(bike2.contact_owner_user?(user, organization)).to be true
+          expect(bike2.contact_owner_email(user)).to eq "party@party.com"
+          # Random user doesn't have contact_owner? - but still directed to user email, because direct_unclaimed_notification
+          other_user = User.new
+          expect(bike2.contact_owner?(other_user, organization_unstolen)).to be false
+          expect(bike2.contact_owner_user?(other_user, organization)).to be true
+          expect(bike2.contact_owner_email(other_user)).to eq "party@party.com"
+        end
+      end
     end
     context "with owner with notification_unstolen false" do
-      let(:admin) { User.new(superuser: true) }
       it "is falsey" do
         allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }
-        expect(bike.contact_owner?).to be_falsey
-        expect(bike.contact_owner?(User.new)).to be_falsey
-        expect(bike.contact_owner?(admin)).to be_falsey
-        expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be_falsey
+        expect(bike.contact_owner?).to be false
+        expect(bike.contact_owner?(User.new)).to be false
+        expect(bike.contact_owner?(admin)).to be false
+        expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be false
       end
     end
   end
