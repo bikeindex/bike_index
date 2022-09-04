@@ -26,15 +26,15 @@
   = render partial: "/shared/period_select"
 
 = form_tag admin_users_path, method: :get do
-  .mt-4.mb-4.d-flex.justify-content-end
-    = render partial: "/shared/hidden_search_fields"
-    = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
-    = hidden_field_tag :search_superusers, params[:search_superusers]
-    .mt-2.d-flex
+  = render partial: "/shared/hidden_search_fields"
+  = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
+  = hidden_field_tag :search_superusers, params[:search_superusers]
+  .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
+    .mt-2.mr-2
       = text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control"
-    .ml-2.mt-2
+    .mt-2.mr-2
       = text_field_tag :query, params[:query], placeholder: "Find by name or email", class: "form-control"
-    .mt-2.ml-2
+    .mt-2.mr-2
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
 = render partial: "/shared/pagination", locals: {collection: @users, count: matching_users.count, name: "User", views_prefix: "admin"}

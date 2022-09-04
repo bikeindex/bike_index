@@ -29,19 +29,19 @@
 = render partial: "/shared/period_select"
 
 - unless @only_without_location
-  .row.mb-3.mt-3
-    .col
-      = form_tag admin_stolen_bikes_path, method: :get, class: "form-inline" do
-        = hidden_field_tag :search_unapproved, params[:search_unapproved]
-        = render partial: "/shared/hidden_search_fields"
+  = form_tag admin_stolen_bikes_path, method: :get do
+    .mt-4.mb-4.d-flex.justify-content-end
+      = hidden_field_tag :search_unapproved, params[:search_unapproved]
+      = render partial: "/shared/hidden_search_fields"
 
-        .form-group.ml-auto.mr-1.mb-2
-          %em.small.less-strong.mr-1.d-md-inline.d-none within
-          = number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;"
-          %em.small.less-strong.ml-1.mr-1.d-md-inline.d-none miles of
-        .form-group.mr-2.mb-2
-          = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
-        = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+      .mt-2
+        %em.small.less-strong.mr-1.d-md-inline.d-none within
+        = number_field_tag :search_distance, @distance, class: "form-control d-inline-block", style: "width: 5rem;"
+        %em.small.less-strong.ml-1.mr-1.d-md-inline.d-none miles of
+      .mt-2.ml-2
+        = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
+      .mt-2.ml-2
+        = submit_tag "Search", name: "search", class: "btn btn-primary"
 - if @unapproved_only
   %p.mt-4.mb-0
     Showing only unapproved records

@@ -96,17 +96,17 @@
                     %br
                     %small.text-warning There shouldn't be payments without invoices
 
-.row.mb-4
-  .col
-    = form_tag admin_payments_path, method: :get, class: "form-inline" do
-      = render partial: "/shared/hidden_search_fields"
-      = hidden_field_tag :search_render_method, params[:search_render_method]
-      = hidden_field_tag :search_incompleteness, params[:search_incompleteness]
-      .form-group.mr-2.mb-2
-        = text_field_tag :search_email, params[:search_email], placeholder: "Search by email", class: "form-control"
-      .form-group.mr-2.mb-2
-        = text_field_tag :query, params[:query], placeholder: "Search by referral", class: "form-control"
-      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+= form_tag admin_payments_path, method: :get do
+  = render partial: "/shared/hidden_search_fields"
+  = hidden_field_tag :search_render_method, params[:search_render_method]
+  = hidden_field_tag :search_incompleteness, params[:search_incompleteness]
+  .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
+    .mt-2.mr-2
+      = text_field_tag :search_email, params[:search_email], placeholder: "Search by email", class: "form-control"
+    .mt-2.mr-2
+      = text_field_tag :query, params[:query], placeholder: "Search by referral", class: "form-control"
+    .mt-2.mr-2
+      = submit_tag "Search", name: "search", class: "btn btn-primary"
 
 
 = paginate @payments, views_prefix: "admin"
