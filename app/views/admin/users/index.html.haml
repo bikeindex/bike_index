@@ -25,17 +25,17 @@
 .mt-2
   = render partial: "/shared/period_select"
 
-.row.mt-4.mb-4
-  .col-md-6.offset-md-3
-    = form_tag admin_users_path, method: :get, class: "form-inline" do
-      = render partial: "/shared/hidden_search_fields"
-      = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
-      = hidden_field_tag :search_superusers, params[:search_superusers]
-      .form-group.ml-auto.mr-2.mb-2
-        = text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control"
-      .form-group.mr-2.mb-2
-        = text_field_tag :query, params[:query], placeholder: "Find by name or email", class: "form-control"
-      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+= form_tag admin_users_path, method: :get do
+  = render partial: "/shared/hidden_search_fields"
+  = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
+  = hidden_field_tag :search_superusers, params[:search_superusers]
+  .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
+    .mt-2.mr-2
+      = text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control"
+    .mt-2.mr-2
+      = text_field_tag :query, params[:query], placeholder: "Find by name or email", class: "form-control"
+    .mt-2.mr-2
+      = submit_tag "Search", name: "search", class: "btn btn-primary"
 
 = render partial: "/shared/pagination", locals: {collection: @users, count: matching_users.count, name: "User", views_prefix: "admin"}
 = render partial: "/admin/users/table", locals: {render_sortable: true}
