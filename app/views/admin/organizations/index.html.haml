@@ -49,19 +49,18 @@
 -# Minor style adjustment for selectize
 <style>.form-control.selectize-control { width: 100%; }</style>
 
-.row.mt-4
-  .col-12
-    = form_tag admin_organizations_path, method: :get, class: "form-inline" do
-      = render partial: "/shared/hidden_search_fields"
-      = hidden_field_tag :search_paid, @search_paid
-      = hidden_field_tag :search_pos, params[:search_pos]
-      .form-group.align-self-end.fancy-select.no-restore-on-backspace.unfancy{style: "margin-bottom: -0.4rem; min-width: 300px;"}
-        - opt_vals = OrganizationFeature.order(name: :desc).pluck(:name, :id)
-        = select_tag :search_organization_features, options_for_select(opt_vals, selected: @organization_features.map(&:id)), placeholder: "With organization features", class: "form-control", include_blank: true, multiple: true
-      .form-group.align-self-end.ml-2
-        = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location", class: "form-control", style: "min-width: 300px;"
-      .form-group
-        = submit_tag "Search", name: "search", class: "btn btn-primary ml-2"
+= form_tag admin_organizations_path, method: :get do
+  .mt-4.mb-4.d-flex.justify-content-end
+    = render partial: "/shared/hidden_search_fields"
+    = hidden_field_tag :search_paid, @search_paid
+    = hidden_field_tag :search_pos, params[:search_pos]
+    .fancy-select.no-restore-on-backspace.unfancy.mt-2{style: "margin-bottom: -0.4rem; "}
+      - opt_vals = OrganizationFeature.order(name: :desc).pluck(:name, :id)
+      = select_tag :search_organization_features, options_for_select(opt_vals, selected: @organization_features.map(&:id)), placeholder: "with features", class: "form-control", include_blank: true, multiple: true
+    .align-self-end.ml-2.mt-2
+      = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location", class: "form-control", style: ""
+    .mt-2.ml-2
+      = submit_tag "Search", name: "search", class: "btn btn-primary"
 
   .col-md-12.mt-4
     %p
