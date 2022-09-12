@@ -35,6 +35,23 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
           }.to_not change(described_class.jobs, :count)
         end
       end
+      context "organization member bike" do
+        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let!(:ownership) { FactoryBot.create(:ownership_claimed, user: user, creator: user, bike: bike, organization: organization) }
+        it "does not enqueue" do
+          expect(bike.reload.current_ownership&.id).to eq ownership.id
+          expect(bike.ownerships.count).to eq 2
+          expect(bike.ownerships.current.count).to eq 1
+          expect(organization.reload.bikes.pluck(:id)).to eq([bike.id])
+          expect(organization.bikes_member.pluck(:id)).to eq([bike.id])
+          expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([])
+          expect(organization.deliver_graduated_notifications?).to be_truthy
+          Sidekiq::Worker.clear_all
+          expect {
+            instance.perform
+          }.to change(described_class.jobs, :count).by 0
+        end
+      end
     end
 
     describe "create notification" do

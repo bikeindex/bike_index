@@ -59,6 +59,30 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "bikes member and not_member" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:user) { FactoryBot.create(:user) }
+    let!(:bike_not_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, creator: member) }
+    let!(:bike_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, creator: member, user: member) }
+    let!(:bike_transferred) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: member, creation_organization: organization) }
+    let(:ownership_transfer) { FactoryBot.create(:ownership, bike: bike_transferred, creator: member, owner_email: "newemail@bikeindex.org", organization: organization) }
+    it "selects the bikes correctly" do
+      expect(ownership_transfer.reload.organization_id).to eq organization.id
+      expect(ownership_transfer.origin).to eq "transferred_ownership"
+      expect(bike_transferred.reload.current_ownership&.id).to eq ownership_transfer.id
+      expect(bike_transferred.owner&.id).to eq member.id
+      expect(bike_transferred.user&.id).to be_blank
+      expect(bike_not_member.reload.owner&.id).to eq user.id
+      expect(bike_not_member.user&.id).to eq user.id
+      expect(bike_member.reload.user&.id).to eq member.id
+      expect(organization.users.pluck(:id)).to eq([member.id])
+      expect(organization.bikes.pluck(:id)).to match_array([bike_not_member.id, bike_member.id, bike_transferred.id])
+      expect(organization.bikes_member.pluck(:id)).to match_array([bike_member.id])
+      expect(organization.bikes_not_member.pluck(:id)).to match_array([bike_not_member.id, bike_transferred.id])
+    end
+  end
+
   describe "nearby_organizations inclusion/exclusion" do
     # LAPD has precincts as child organizations - we need to make the individual organizations have search areas, and have that bubble up
     include_context :geocoder_real
