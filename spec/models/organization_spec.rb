@@ -78,7 +78,7 @@ RSpec.describe Organization, type: :model do
       expect(bike_member.reload.user&.id).to eq member.id
       expect(organization.users.pluck(:id)).to eq([member.id])
       expect(organization.bikes.pluck(:id)).to match_array([bike_not_member.id, bike_member.id, bike_transferred.id])
-      expect(organization.bikes_member.pluck(:id)).to match_array([bike_not_member.id, bike_transferred.id])
+      expect(organization.bikes_member.pluck(:id)).to match_array([bike_member.id])
       expect(organization.bikes_not_member.pluck(:id)).to match_array([bike_not_member.id, bike_transferred.id])
     end
   end

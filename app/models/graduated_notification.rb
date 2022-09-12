@@ -74,7 +74,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def self.bikes_to_notify_without_notifications(organization)
-    organization.bikes.includes(:graduated_notifications, :ownerships)
+    organization.bikes_not_member.includes(:graduated_notifications, :ownerships)
       .where(graduated_notifications: {id: nil})
       .where("ownerships.created_at < ?", Time.current - organization.graduated_notification_interval)
       .reorder("ownerships.created_at ASC") # Use ascending so older are processed first
