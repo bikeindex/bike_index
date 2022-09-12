@@ -397,6 +397,16 @@ class Organization < ApplicationRecord
       !official_manufacturer?
   end
 
+  # bikes_member is slow - it's for graduated_notifications and shouldn't be called inline
+  def bikes_member
+    bikes.left_joins(:ownerships).where("bikes.ownerships" => {user_id: users.pluck(:id)})
+  end
+
+  # bikes_not_member is slow - it's for graduated_notifications and shouldn't be called inline
+  def bikes_not_member
+    bikes.where.not(user_id: users.pluck(:id))
+  end
+
   # Bikes geolocated within `search_radius` miles.
   def nearby_bikes
     return Bike.none unless regional? && search_coordinates_set?
