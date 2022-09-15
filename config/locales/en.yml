@@ -3724,13 +3724,13 @@ en:
       sign_up_for_free: Sign up for free
       trusted_by_law_enforcement_everywhere: Trusted by law enforcement everywhere
       used_by_law_enforcement_everywhere: Used by law enforcement everywhere
-      with_over_215000_registries_and_almost_55: >-
-        With over 215,000 registries and almost 5,500 stolen bicycle recoveries, we
-        know how to help.
       with_over_600_partnerships_html: >-
         With %{organization_counts} partnerships, Bike Index is the industry leader
         in bicycle registration. Join our network for free %{link}, or ask us to put
         you in touch with an existing partner in law enforcement.
+      with_over_registrations_and_almost: >-
+        With over %{registrations} registrations and %{stolen_recoveries} stolen bicycle
+        recoveries, we know how to help.
       you_have_the_authority_to_bring_html: >-
         You have the authority to bring bikes back - that’s no small responsibility.
         That’s why we have tools - such as our integration with LeadsOnline and %{automated_tweets_link}

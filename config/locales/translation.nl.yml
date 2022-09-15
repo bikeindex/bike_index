@@ -3926,8 +3926,6 @@ nl:
       related_articles: 'Gerelateerde artikelen:'
       sign_up_for_free: Gratis inschrijven
       trusted_by_law_enforcement_everywhere: Overal vertrouwd door wetshandhavers
-      with_over_215000_registries_and_almost_55: Met meer dan 215.000 registers en
-        bijna 5.500 gestolen fietsherstel weten we hoe we kunnen helpen.
       with_over_600_partnerships_html: Met meer dan 600 partnerships is Bike Index
         de marktleider op het gebied van fietsregistratie. Word gratis lid van ons
         netwerk %{link}, of vraag ons om u in contact te brengen met een bestaande
@@ -3948,6 +3946,8 @@ nl:
       check_out: Bekijk onze
       law_enforcement_deck: partnerdeck voor wetshandhaving
       used_by_law_enforcement_everywhere: Overal gebruikt door wetshandhavers
+      with_over_registrations_and_almost: Met meer dan %{registrations} registraties
+        en %{stolen_recoveries} gestolen fietsen weten we hoe we kunnen helpen.
     for_organizations_photo_list:
       bike_shops: Fietsenwinkels
       cities: Steden
