@@ -226,7 +226,7 @@ module Organized
     # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
     def set_pagination_headers(collection, page, per_page)
       url = request.base_url + request.path_info
-      pages = APIPagination.pages_from(collection)
+      pages = ApiPagination.pages_from(collection)
       links = []
 
       pages.each do |k, v|
