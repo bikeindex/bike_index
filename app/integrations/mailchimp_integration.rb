@@ -49,7 +49,7 @@ class MailchimpIntegration
     begin
       client.lists.get_list_member(self.class.list_id(list),
         mailchimp_datum.subscriber_hash)
-    rescue MailchimpMarketing::ApiError => e
+    rescue MailchimpMarketing::APIError => e
       return if e.status == 404
       raise e # re-raise if it isn't a 404
     end
@@ -59,7 +59,7 @@ class MailchimpIntegration
     client.lists.set_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash,
       member_update_hash(mailchimp_datum, list))
       .except("_links")
-  rescue MailchimpMarketing::ApiError => e
+  rescue MailchimpMarketing::APIError => e
     if e.status == 400 && e.to_s.match(/looks fake/i)
       # SHIT method to get error detail. e.detail returns nil
       return {"error" => e.to_s.gsub(/\A.*detail/, "").gsub(/",.*/, "").gsub(/\\+/, "")}
@@ -84,7 +84,7 @@ class MailchimpIntegration
 
   def archive_member(mailchimp_datum, list)
     client.lists.delete_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash)
-  rescue MailchimpMarketing::ApiError => e
+  rescue MailchimpMarketing::APIError => e
     return if e.status == 404
     raise e # re-raise if it isn't a 404
   end

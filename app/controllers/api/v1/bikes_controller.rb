@@ -1,6 +1,6 @@
-module Api
+module API
   module V1
-    class BikesController < ApiV1Controller
+    class BikesController < APIV1Controller
       before_action :cors_preflight_check
       before_action :authenticate_organization, only: [:create, :stolen_ids]
       skip_before_action :verify_authenticity_token

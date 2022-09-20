@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::ComponentTypesController, type: :controller do
+RSpec.describe API::V1::ComponentTypesController, type: :controller do
   describe "index" do
     it "loads the request" do
       FactoryBot.create(:ctype)

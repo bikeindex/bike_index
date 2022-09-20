@@ -1,6 +1,6 @@
-module Api
+module API
   module V1
-    class StolenLockingResponseSuggestionsController < ApiV1Controller
+    class StolenLockingResponseSuggestionsController < APIV1Controller
       before_action :cors_preflight_check
       after_action :cors_set_access_control_headers
 
