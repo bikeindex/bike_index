@@ -402,7 +402,7 @@ RSpec.describe User, type: :model do
       expect(time).to be > Time.current - 1.minutes
     end
     it "haves before create callback" do
-      expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth)).to eq(true)
+      expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:generate_username_confirmation_and_auth)).to eq(true)
     end
   end
 

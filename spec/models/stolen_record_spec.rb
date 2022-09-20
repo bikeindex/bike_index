@@ -323,7 +323,7 @@ RSpec.describe StolenRecord, type: :model do
   describe "set_calculated_attributes" do
     let(:stolen_record) { FactoryBot.create(:stolen_record) }
     it "has before_save_callback_method defined as before_save callback" do
-      expect(stolen_record._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_calculated_attributes)).to eq(true)
+      expect(stolen_record._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:set_calculated_attributes)).to eq(true)
     end
   end
 

@@ -40,7 +40,7 @@ RSpec.describe RecoveryDisplay, type: :model do
       expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
     end
     it "has before_validation_callback_method defined" do
-      expect(RecoveryDisplay._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_time)).to eq(true)
+      expect(RecoveryDisplay._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:set_time)).to eq(true)
     end
   end
 

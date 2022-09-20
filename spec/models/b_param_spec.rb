@@ -42,7 +42,7 @@ RSpec.describe BParam, type: :model do
     end
 
     it "has before_save_callback_method of clean_params" do
-      expect(BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_params)).to eq(true)
+      expect(BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:clean_params)).to eq(true)
     end
 
     it "cleans params idempotently if invoked multiple times" do
@@ -346,7 +346,7 @@ RSpec.describe BParam, type: :model do
       expect(b_param.id_token.length).to be > 10
     end
     it "haves before create callback" do
-      expect(BParam._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_id_token)).to eq(true)
+      expect(BParam._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:generate_id_token)).to eq(true)
     end
   end
 
