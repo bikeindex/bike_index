@@ -7,6 +7,7 @@ RSpec.describe ExchangeRateAPIClient, type: :model, vcr: true do
     it "returns a hash with :base and :rates keys" do
       client = ExchangeRateAPIClient.new("CAD")
       response = client.latest
+      pp response unless response.key?(:base)
       expect(response).to have_key(:base)
       expect(response).to have_key(:rates)
       expect(response).to have_key(:date)
