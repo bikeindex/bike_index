@@ -8,7 +8,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 # Update CircleCI config if Ruby version is bumped
 ruby "2.7.6"
 gem "rack", "2.2.3"
-gem "rails", "~> 6.0"
+gem "rails", "~> 7.0"
 
 gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
@@ -25,7 +25,6 @@ gem "multi_json" # TODO: use this more
 
 # Feature flagging
 gem "flipper"
-gem "flipper-active_record"
 gem "flipper-ui"
 
 # I18n - localization/translation
