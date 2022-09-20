@@ -1,6 +1,6 @@
-module Api
+module API
   module V1
-    class OrganizationsController < ApiV1Controller
+    class OrganizationsController < APIV1Controller
       before_action :verify_organizations_token, only: [:show]
       skip_before_action :verify_authenticity_token
 

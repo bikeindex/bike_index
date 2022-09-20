@@ -46,7 +46,7 @@ class AdminMailer < ApplicationMailer
     @organization = organization
     @api_key = api_key
     mail(to: "admin@bikeindex.org",
-      subject: "Api Notification sent!")
+      subject: "API Notification sent!")
   end
 
   def theft_alert_notification(theft_alert, notification_type: nil)

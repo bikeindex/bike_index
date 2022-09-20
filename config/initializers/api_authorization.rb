@@ -2,7 +2,7 @@
 # To make an endpoint require a token, include an authorizations hash in the endpoint.
 # authorizations: {oauth2: {scope: :public}}
 # If no scope key is included, it will use default scope
-module ApiAuthorization
+module APIAuthorization
   module Errors
     class OAuthUnauthorizedError < StandardError
       attr_reader :response
@@ -69,7 +69,7 @@ module ApiAuthorization
 
       if doorkeeper_access_token.blank? || !doorkeeper_access_token.accessible?
         error = Doorkeeper::OAuth::InvalidTokenResponse.from_access_token(doorkeeper_access_token)
-        raise ApiAuthorization::Errors::OAuthUnauthorizedError, error
+        raise APIAuthorization::Errors::OAuthUnauthorizedError, error
       elsif authorized_access_token_no_user?
         @resource_owner = doorkeeper_access_token.application.owner
       else
@@ -78,7 +78,7 @@ module ApiAuthorization
         else
           Doorkeeper::OAuth::ForbiddenTokenResponse.from_scopes(endpoint_scopes)
         end
-        raise ApiAuthorization::Errors::OAuthForbiddenError, error
+        raise APIAuthorization::Errors::OAuthForbiddenError, error
       end
     end
 

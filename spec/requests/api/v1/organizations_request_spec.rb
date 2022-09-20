@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::OrganizationsController, type: :request do
+RSpec.describe API::V1::OrganizationsController, type: :request do
   base_url = "/api/v1/organizations"
 
   describe "show" do

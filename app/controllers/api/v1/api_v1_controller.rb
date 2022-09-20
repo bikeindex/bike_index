@@ -1,6 +1,6 @@
-module Api
+module API
   module V1
-    class ApiV1Controller < ApplicationController
+    class APIV1Controller < ApplicationController
       respond_to :json
 
       def not_found
