@@ -2,7 +2,7 @@
 
 class ExchangeRateUpdator
   def self.update
-    payload = ExchangeRateApiClient.new.latest
+    payload = ExchangeRateAPIClient.new.latest
     rates = payload.fetch(:rates)
     base_iso = payload.fetch(:base)
 
