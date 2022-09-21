@@ -590,18 +590,15 @@ class Bike < ApplicationRecord
       SerialNormalizer.unknown_and_absent_corrected(serial_number)
     end
 
-    case serial_number
-    when "made_without_serial"
+    if %w[made_without_serial unknown].include?(serial_number)
+      self.made_without_serial = serial_number == "made_without_serial"
       self.serial_normalized = nil
-      self.made_without_serial = true
-    when "unknown"
-      self.serial_normalized = nil
-      self.made_without_serial = false
+      self.serial_normalized_no_space = nil
     else
-      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
       self.made_without_serial = false
+      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      self.serial_normalized_no_space = serial_normalized.gsub(/\s/, "")
     end
-    self.serial_normalized_no_space = serial_normalized.present? ? serial_normalized.gsub(/\s/, "") : nil
     true
   end
 
