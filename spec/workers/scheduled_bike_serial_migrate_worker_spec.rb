@@ -23,18 +23,23 @@ RSpec.describe ScheduledBikeSerialMigrateWorker, type: :job do
       expect(instance.potential_bikes.pluck(:id)).to eq([])
     end
     context "deleted bike" do
+      let(:serial) { "TBD" }
       it "still updates" do
         bike_id = bike.id
         bike.destroy
         expect(Bike.pluck(:id)).to eq([])
         bike = Bike.unscoped.find(bike_id)
-        bike.update_columns(serial_number: serial, serial_normalized_no_space: nil, updated_at: time)
-        expect(bike.serial_normalized_no_space).to be_blank
+        bike.update_columns(serial_number: serial,
+          serial_normalized: "tbd",
+          updated_at: time)
+        expect(bike.serial_normalized_no_space).to eq nil
         expect(bike.serial_number).to eq serial
         expect(instance.potential_bikes.pluck(:id)).to eq([bike.id])
         instance.perform(bike.id)
-        expect(bike.reload.serial_normalized_no_space).to eq "50ME5ER1A15TUFF"
-        expect(bike.serial_number).to eq serial.gsub("  ", " ")
+        expect(bike.reload.serial_normalized_no_space).to eq nil
+        expect(bike.serial_normalized).to eq nil
+        expect(bike.serial_number).to eq "unknown"
+        expect(bike.made_without_serial).to be_falsey
         expect(bike.updated_at).to be_within(1).of time
         expect(instance.potential_bikes.pluck(:id)).to eq([])
         expect(bike.deleted?).to be_truthy

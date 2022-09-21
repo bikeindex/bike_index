@@ -1,7 +1,7 @@
 class ScheduledBikeSerialMigrateWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
-  BIKE_COUNT = (ENV["BIKE_COUNT"].presence || 100).to_i
+  BIKE_COUNT = 10_000
 
   def self.frequency
     90.seconds
@@ -12,12 +12,11 @@ class ScheduledBikeSerialMigrateWorker < ScheduledWorker
 
     bike = Bike.unscoped.find_by_id(bike_id)
     return if bike.blank?
-    serial_number = SerialNormalizer.unknown_and_absent_corrected(bike.serial_number)
-    serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
-    serial_normalized_no_space = serial_normalized.gsub(/\s/, "")
-    bike.update_columns(serial_number: serial_number,
-      serial_normalized: serial_normalized,
-      serial_normalized_no_space: serial_normalized_no_space)
+    bike.normalize_serial_number
+    bike.update_columns(serial_number: bike.serial_number,
+      serial_normalized: bike.serial_normalized,
+      made_without_serial: bike.made_without_serial,
+      serial_normalized_no_space: bike.serial_normalized_no_space)
   end
 
   def enqueue_workers(enqueue_limit)

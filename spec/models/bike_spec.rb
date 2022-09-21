@@ -299,6 +299,17 @@ RSpec.describe Bike, type: :model do
         end
       end
 
+      context "unknown" do
+        let(:serial_number) { "TBD" }
+        let(:bike) { Bike.new(serial_number: serial_number, serial_normalized_no_space: "something") }
+        it "removes serial_normalized_no_space" do
+          expect(bike.serial_number).to eq("unknown")
+          expect(bike.made_without_serial).to eq(false)
+          expect(bike.serial_normalized).to eq(nil)
+          expect(bike.serial_normalized_no_space).to eq(nil)
+        end
+      end
+
       context "serials with spaces" do
         let(:serial_number) { "\n11 11  22 2  2 2 " }
         it "stores with spaces and without" do
