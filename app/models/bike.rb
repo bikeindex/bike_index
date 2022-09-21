@@ -592,7 +592,6 @@ class Bike < ApplicationRecord
 
     case serial_number
     when "made_without_serial"
-      self.serial_number = "made_without_serial"
       self.serial_normalized = nil
       self.made_without_serial = true
     when "unknown"

@@ -10,7 +10,6 @@ RSpec.describe ScheduledBikeSerialMigrateWorker, type: :job do
     let(:time) { Time.current - 1.week }
     let!(:bike) { FactoryBot.create(:bike, serial_number: serial, updated_at: time) }
     it "updates the serial number" do
-      og_updated_at = bike.updated_at
       bike.update_columns(serial_number: serial, serial_normalized_no_space: nil)
       expect(bike.reload.serial_normalized_no_space).to be_blank
       expect(bike.serial_number).to eq serial
