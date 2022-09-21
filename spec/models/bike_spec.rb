@@ -308,7 +308,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_normalized_no_space).to eq "111122222"
         end
         context "special characters" do
-          let(:serial_number) { "Some-Serial. .Stuf?f" }
+          let(:serial_number) { "Some-Serial.  .Stuf?f" }
           it "stores with spaces and without" do
             expect(bike.serial_number).to eq("Some-Serial. .Stuf?f")
             expect(bike.made_without_serial).to eq(false)
