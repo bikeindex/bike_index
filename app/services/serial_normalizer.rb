@@ -5,7 +5,7 @@ class SerialNormalizer
     return "unknown" if str.blank? || str.gsub(/\s|\?/, "").blank? || str.downcase == "absent"
     return "made_without_serial" if str == "made_without_serial" || looks_like_made_without?(str.downcase)
     return "unknown" if looks_like_unknown?(str.downcase)
-    str
+    str.gsub(/\s+/, " ")
   end
 
   def self.looks_like_made_without?(str_downcase)

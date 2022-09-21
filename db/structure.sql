@@ -503,7 +503,8 @@ CREATE TABLE public.bikes (
     current_impound_record_id bigint,
     current_ownership_id bigint,
     updated_by_user_at timestamp without time zone,
-    occurred_at timestamp without time zone
+    occurred_at timestamp without time zone,
+    serial_normalized_no_space character varying
 );
 
 
@@ -6332,6 +6333,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220801162511'),
 ('20220811174115'),
 ('20220819205834'),
-('20220903183420');
+('20220903183420'),
+('20220921170820');
 
 
