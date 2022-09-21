@@ -19,6 +19,11 @@ RSpec.describe SerialNormalizer do
       expect(SerialNormalizer.unknown_and_absent_corrected("   missing \n")).to eq "unknown"
     end
 
+    it "removes double spaces" do
+      expect(SerialNormalizer.unknown_and_absent_corrected(" 1  3   \n")).to eq "1 3"
+      expect(SerialNormalizer.unknown_and_absent_corrected(" 2 3\n 4\t\t5")).to eq "2 3 4 5"
+    end
+
     context "misentries" do
       let(:sample_misentries) do
         [

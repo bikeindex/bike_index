@@ -601,6 +601,7 @@ class Bike < ApplicationRecord
       self.made_without_serial = false
     else
       self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      self.serial_normalized_no_space = serial_normalized.gsub(/\s/, "")
       self.made_without_serial = false
     end
 

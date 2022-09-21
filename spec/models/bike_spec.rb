@@ -252,6 +252,9 @@ RSpec.describe Bike, type: :model do
     end
 
     describe "#normalize_serial_number" do
+      let(:bike) { Bike.new(serial_number: serial_number) }
+      before { bike.normalize_serial_number }
+
       context "given a bike made with no serial number" do
         no_serials = [
           "custom bike no serial has a unique frame design",
@@ -259,9 +262,8 @@ RSpec.describe Bike, type: :model do
           "custom"
         ]
         no_serials.each do |value|
+          let(:serial_number) { value }
           it "('#{value}') sets the 'made_without_serial' state correctly" do
-            bike = FactoryBot.build(:bike, serial_number: value)
-            bike.normalize_serial_number
             expect(bike.serial_number).to eq("made_without_serial")
             expect(bike.made_without_serial).to eq(true)
             expect(bike.serial_normalized).to eq(nil)
@@ -287,12 +289,31 @@ RSpec.describe Bike, type: :model do
           "unknown"
         ]
         unknown_serials.each do |value|
+          let(:serial_number) { value }
           it "('#{value}') sets the 'unknown' state correctly" do
-            bike = FactoryBot.build(:bike, serial_number: value)
-            bike.normalize_serial_number
             expect(bike.serial_number).to eq("unknown")
             expect(bike.made_without_serial).to eq(false)
             expect(bike.serial_normalized).to eq(nil)
+            expect(bike.serial_normalized_no_space).to eq(nil)
+          end
+        end
+      end
+
+      context "serials with spaces" do
+        let(:serial_number) { "\n11 11  22 2  2 2 " }
+        it "stores with spaces and without" do
+          expect(bike.serial_number).to eq("11 11 22 2 2 2")
+          expect(bike.made_without_serial).to eq(false)
+          expect(bike.serial_normalized).to eq "11 11 22 2 2 2"
+          expect(bike.serial_normalized_no_space).to eq "111122222"
+        end
+        context "special characters" do
+          let(:serial_number) { "Some-Serial. .Stuf?f" }
+          it "stores with spaces and without" do
+            expect(bike.serial_number).to eq("Some-Serial. .Stuf?f")
+            expect(bike.made_without_serial).to eq(false)
+            expect(bike.serial_normalized).to eq("50ME 5ER1A1 5TUF F")
+            expect(bike.serial_normalized_no_space).to eq("50ME5ER1A15TUFF")
           end
         end
       end
