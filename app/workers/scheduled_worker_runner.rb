@@ -48,7 +48,6 @@ class ScheduledWorkerRunner < ScheduledWorker
       ProcessHotSheetWorker,
       ScheduleBikePossiblyFoundNotificationWorker,
       ScheduleSearchForExternalRegistryBikesWorker,
-      ScheduledBikeSerialMigrateWorker,
       ScheduledEmailSurveyWorker,
       TsvCreatorWorker,
       UnusedOwnershipRemovalWorker,
