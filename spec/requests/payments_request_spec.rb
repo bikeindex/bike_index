@@ -122,6 +122,7 @@ RSpec.describe PaymentsController, type: :request do
             post base_url, params: {
               is_arbitrary: false,
               payment: {
+                referral_source: "stuffffffff",
                 amount_cents: 4000,
                 currency: "USD",
                 kind: "payment"
@@ -139,6 +140,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.first_payment_date).to be_blank # Ensure this gets set
         expect(payment.last_payment_date).to be_blank
         expect(payment.paid?).to be_falsey
+        expect(payment.referral_source).to eq "stuffffffff"
 
         # No deliveries, because the payment hasn't been completed
         expect(ActionMailer::Base.deliveries.count).to eq 0

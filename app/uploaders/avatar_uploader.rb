@@ -17,7 +17,7 @@ class AvatarUploader < ApplicationUploader
   process :validate_dimensions
 
   def extension_white_list
-    %w[jpg jpeg gif png]
+    IMAGE_EXT_WHITE_LIST
   end
 
   def auto_orient

@@ -45,6 +45,14 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(origin_display("Lightspeed")).to eq target
       end
     end
+    context "scanned_sticker" do
+      let(:target) { "<span title=\"Registered via sticker\">sticker</span>" }
+      let(:ownership) { Ownership.new(origin: "sticker") }
+      it "renders with title" do
+        expect(ownership.creation_description).to eq "sticker"
+        expect(origin_display(ownership.creation_description)).to eq target
+      end
+    end
   end
 
   describe "status_display" do
@@ -142,6 +150,28 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
   end
 
+  describe "retrieval_link_url" do
+    let(:graduated_notification) { FactoryBot.create(:graduated_notification) }
+    it "is present" do
+      expect(graduated_notification.marked_remaining_link_token).to be_present
+      expect(retrieval_link_url(graduated_notification)).to match(graduated_notification.marked_remaining_link_token)
+    end
+    context "parking_notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification) }
+      it "is present" do
+        expect(parking_notification.retrieval_link_token).to be_present
+        expect(retrieval_link_url(parking_notification)).to match(parking_notification.retrieval_link_token)
+      end
+      context "unregistered" do
+        let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
+        it "is nil" do
+          expect(parking_notification.retrieval_link_token).to be_blank
+          expect(retrieval_link_url(parking_notification)).to be_nil
+        end
+      end
+    end
+  end
+
   describe "include_fields" do
     let(:organization) { Organization.new }
     let(:user) { User.new }
@@ -159,6 +189,7 @@ RSpec.describe OrganizedHelper, type: :helper do
       expect(registration_field_label(nil, "organization_affiliation")).to be_nil
       expect(registration_field_label(nil, "reg_student_id")).to be_nil
       expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
+      expect(registration_field_label(organization, "owner_email")).to be_nil
     end
     context "with enabled features" do
       let(:labels) { {reg_phone: "You have to put this in, jerk", reg_extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
@@ -178,6 +209,7 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(registration_field_label(organization, "reg_organization_affiliation")).to be_nil
         expect(registration_field_label(organization, "reg_student_id")).to eq "PUT in student ID!"
         expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
+        expect(registration_field_label(organization, "owner_email")).to be_nil
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }
@@ -219,6 +251,15 @@ RSpec.describe OrganizedHelper, type: :helper do
               expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
             end
           end
+        end
+      end
+      context "owner_email with tags" do
+        let(:labels) { {reg_address: "ADDY!!", owner_email: "<code>bikeindex.org</code> email"}.as_json }
+        it "includes the thing" do
+          expect(registration_field_label(organization, "reg_address")).to eq "ADDY!!"
+          expect(registration_field_label(organization, "reg_phone")).to be_nil
+          expect(registration_field_label(organization, "owner_email")).to eq "<code>bikeindex.org</code> email"
+          expect(registration_field_label(organization, "owner_email", strip_tags: true)).to eq "bikeindex.org email"
         end
       end
       context "stickers" do

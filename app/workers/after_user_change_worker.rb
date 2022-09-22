@@ -6,6 +6,7 @@ class AfterUserChangeWorker < ApplicationWorker
     return false unless user.present?
     # Bump updated_at to bust cache
     user.update(updated_at: Time.current, skip_update: true)
+    update_superuser_abilities(user)
 
     add_phones_for_verification(user)
 
@@ -33,7 +34,7 @@ class AfterUserChangeWorker < ApplicationWorker
     end
 
     # Activate activateable theft alerts!
-    user.theft_alerts.paid.where(begin_at: nil).each do |theft_alert|
+    user.theft_alerts.paid.where(start_at: nil).each do |theft_alert|
       next unless theft_alert.activateable?
       ActivateTheftAlertWorker.perform_async(theft_alert.id)
     end
@@ -111,5 +112,19 @@ class AfterUserChangeWorker < ApplicationWorker
 
   def process_bikes(user)
     user.bike_ids.each { |id| AfterBikeSaveWorker.perform_async(id, true, true) }
+  end
+
+  def update_superuser_abilities(user)
+    universal_abilities = user.superuser_abilities.universal.order(:id)
+    if user.superuser?
+      if universal_abilities.count > 1
+        kept_ability = universal_abilities.first
+        universal_abilities.where.not(id: kept_ability.id).destroy_all
+      elsif universal_abilities.none?
+        SuperuserAbility.create(user: user)
+      end
+    elsif universal_abilities.any?
+      universal_abilities.destroy_all
+    end
   end
 end

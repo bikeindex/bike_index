@@ -7,9 +7,10 @@
 
 %p= t(".html.just_a_few_steps_away_html", color_and_brand: color_and_brand)
 
-- if @organization && @organization.mail_snippet_body("partial").present?
-  = @organization.mail_snippet_body("partial").html_safe
+- if @organization && @organization.mail_snippet_body("partial_registration").present?
+  = @organization.mail_snippet_body("partial_registration").html_safe
 
 %p= t(".html.click_below_to_complete_your_registration")
 
-= link_to t(".html.finish_it"), new_bike_url(b_param_token: @b_param.id_token), class: 'binx-button'
+- tokenized_url = @email_preview ? @email_preview_tokenized_url : new_bike_url(b_param_token: @b_param.id_token)
+= link_to t(".html.finish_it"), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'

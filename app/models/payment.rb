@@ -47,6 +47,18 @@ class Payment < ApplicationRecord
     kind&.humanize
   end
 
+  def self.normalize_referral_source(str)
+    return nil if str.blank?
+    str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").gsub(/\/|_/, "-")
+    Slugifyer.slugify(str)
+  end
+
+  # NOTE: Currently only searches by referral_source - in the future it might do other stuff
+  def self.admin_search(str)
+    return all if str.blank?
+    where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
+  end
+
   def paid?
     first_payment_date.present?
   end
@@ -113,11 +125,13 @@ class Payment < ApplicationRecord
     self.kind = calculated_kind
     if user.present?
       self.email ||= user.email
-    elsif email.present?
-      self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    else
+      self.email = EmailNormalizer.normalize(email)
+      self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email) if email.present?
     end
     self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
     self.organization_id ||= invoice&.organization_id
+    self.referral_source = self.class.normalize_referral_source(referral_source)
   end
 
   def stripe_session

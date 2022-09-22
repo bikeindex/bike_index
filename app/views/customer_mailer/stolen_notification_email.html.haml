@@ -8,7 +8,7 @@
       = t(".html.sender_email_sent_you_a_message_html", sender_email: sender_email, link: link)
 
     - else
-      - if @bike.contact_owner_user?
+      - if @bike.contact_owner_user?(@stolen_notification.sender)
         = t(".html.sender_email_sent_you_a_message_html", sender_email: sender_email, link: link_to(@bike.type, bike_url(@bike)))
         %br
         %strong.stolen-color= t(".html.they_believe_it_is_stolen")
@@ -18,15 +18,21 @@
         = t(".html.please_help_sender_html", sender_name: sender_name, link: link_to(@bike.type, bike_url(@bike)))
         %br
 
-        %span{ style: "display: block; line-height: 1.5; margin-top: 0.5rem; font-style: normal;" }
+        %span{style: "display: block; line-height: 1.5; margin-top: 0.5rem; font-style: normal;"}
           = t(".html.you_can_just_forward_this_message_to", bikeowner_email: @bike.owner_email)
 
         %br
-        %small.less-strong{ style: "display: block; line-height: 1.5;" }
+        %small.less-strong{style: "font-style: normal; display: block; line-height: 1.5;"}
           - date = l @bike.current_ownership.created_at, format: :dotted
           = t(".html.you_registered_this_bike_type_on", bike_type: @bike.type, date: date)
 
-      %small.less-strong{ style: "display: block; line-height: 1; margin: 1em 0 -0.5rem;" }
+        - if @bike.current_ownership.organization.present?
+          %span.less-strong{style: "font-size: 75%; display: block; line-height: 1.5; margin: 0.75em 0; opacity: 0.75;"}
+            - organization = @bike.current_ownership.organization
+            = t(".html.update_organization_direct_message_html", link: link_to(organization.short_name, organization_manage_url(organization.to_param)))
+
+
+      %small.less-strong{style: "display: block; line-height: 1; margin: 1em 0 -0.5rem; font-style: normal;"}
         = t(".html.if_you_believe_this_email_is_illegitimate")
 
 %p
@@ -38,10 +44,10 @@
     = link_to(@stolen_notification.reference_url, @stolen_notification.reference_url)
 
 - if @stolen_notification.sender.name.present?
-  %p{ style: 'color: #ccc; margin: 1em 0 2em 1em;' }
+  %p{style: 'color: #ccc; margin: 1em 0 2em 1em;'}
     = @stolen_notification.sender.name
 
-%hr{ style: 'margin: 40px 0;' }
+%hr{style: 'margin: 40px 0;'}
 
 %p.less-strong.center-text
   - date = l @bike.created_at, format: :dotted
@@ -50,6 +56,6 @@
 
 = render partial: 'shared/email_bike_box'
 
-.less-strong{ style: "line-height: 1.25em; text-align: center;" }
+.less-strong{style: "line-height: 1.25em; text-align: center;"}
   %em
     = t(".html.no_one_should_be_extorted")

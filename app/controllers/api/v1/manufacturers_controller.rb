@@ -1,6 +1,6 @@
-module Api
+module API
   module V1
-    class ManufacturersController < ApiV1Controller
+    class ManufacturersController < APIV1Controller
       before_action :cors_preflight_check
       after_action :cors_set_access_control_headers
 

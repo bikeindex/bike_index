@@ -1,5 +1,6 @@
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
+  include SearchRadiusMetricable
 
   KIND_ENUM = {
     bike_shop: 0,
@@ -58,9 +59,11 @@ class Organization < ApplicationRecord
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
+  has_one :organization_stolen_message
   has_one :impound_configuration
   has_many :hot_sheets
   accepts_nested_attributes_for :mail_snippets
+  accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true
 
   enum kind: KIND_ENUM
@@ -68,7 +71,7 @@ class Organization < ApplicationRecord
   enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
 
   validates_presence_of :name
-  validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
+  validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_with OrganizationNameValidator
@@ -78,8 +81,9 @@ class Organization < ApplicationRecord
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
-  scope :unpaid, -> { where(is_paid: true) }
-  scope :approved, -> { where(is_suspended: false, approved: true) }
+  scope :paid_money, -> { where(is_paid: true) } # TODO: make this actually show paid money, rather than just paid
+  scope :unpaid, -> { where(is_paid: false) }
+  scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
@@ -141,6 +145,10 @@ class Organization < ApplicationRecord
     kinds - admin_required_kinds
   end
 
+  def self.kind_humanized(str)
+    str.blank? ? nil : str.to_s.titleize
+  end
+
   def self.friendly_find(n)
     return nil unless n.present?
     return n if n.is_a?(Organization)
@@ -160,8 +168,6 @@ class Organization < ApplicationRecord
 
   def self.admin_text_search(n)
     return nil unless n.present?
-    # Only search for organization features if the text is organization features
-    return with_enabled_feature_slugs(n) if OrganizationFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
     match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
@@ -221,9 +227,13 @@ class Organization < ApplicationRecord
     available_invitation_count - sent_invitation_count
   end
 
+  def kind_humanized
+    self.class.kind_humanized(kind)
+  end
+
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
-    enabled?("show_bulk_import") || ascend_pos? || enabled?("show_bulk_import_impound_bikes")
+    ascend_pos? || any_enabled?(%w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen])
   end
 
   def show_multi_serial?
@@ -274,10 +284,6 @@ class Organization < ApplicationRecord
     avatar.present?
   end
 
-  def suspended?
-    is_suspended?
-  end
-
   def fetch_impound_configuration
     impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
   end
@@ -308,10 +314,6 @@ class Organization < ApplicationRecord
 
   def default_impound_location
     enabled?("impound_bikes_locations") ? locations.default_impound_locations.first : nil
-  end
-
-  def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles)
   end
 
   # Try for publicly_visible, fall back to whatever - TODO: make this configurable
@@ -378,6 +380,10 @@ class Organization < ApplicationRecord
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
+  def block_short_name_edit?
+    paid? # Prevent url changes breaking landing pages, etc
+  end
+
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
   end
@@ -389,6 +395,18 @@ class Organization < ApplicationRecord
   def bike_shop_display_integration_alert?
     bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind) &&
       !official_manufacturer?
+  end
+
+  # bikes_member is slow - it's for graduated_notifications and shouldn't be called inline
+  def bikes_member
+    bikes.left_joins(:ownerships).where(ownerships: {current: true, user_id: users.pluck(:id)})
+  end
+
+  # bikes_not_member is slow - it's for graduated_notifications and shouldn't be called inline
+  def bikes_not_member
+    bikes.joins(:ownerships).where(ownerships: {current: true})
+      .where.not(ownerships: {user_id: users.pluck(:id)})
+      .or(bikes.joins(:ownerships).where(ownerships: {current: true, user_id: nil}))
   end
 
   # Bikes geolocated within `search_radius` miles.
@@ -435,7 +453,7 @@ class Organization < ApplicationRecord
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = (short_name || name).truncate(30)
+    self.short_name = short_name_fixer(short_name || name)
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
@@ -446,6 +464,9 @@ class Organization < ApplicationRecord
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
       orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
+      # Force update the deleted short_names and slugs
+      orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
+        .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }
       while orgs.where(slug: new_slug).exists?
         i = i.present? ? i + 1 : 2
         new_slug = "#{new_slug}-#{i}"
@@ -522,7 +543,13 @@ class Organization < ApplicationRecord
   end
 
   def strip_name_tags(str)
-    strip_tags(name).gsub("&amp;", "&")
+    strip_tags(name&.strip).gsub("&amp;", "&")
+  end
+
+  def short_name_fixer(str)
+    str = str.strip.truncate(30)
+    return str unless deleted_at.present?
+    str.match?("-deleted") ? str : "#{str}-deleted"
   end
 
   def calculated_enabled_feature_slugs

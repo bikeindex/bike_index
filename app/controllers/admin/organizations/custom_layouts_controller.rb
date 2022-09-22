@@ -6,7 +6,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def edit
     @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-    unless @edit_template == "landing_page" # Otherwise, we're rendering a snippet
+    if @edit_template != "landing_page" # we're rendering a snippet
       @mail_snippet = @organization.mail_snippets.where(kind: @edit_template).first_or_create
     end
   end
@@ -20,6 +20,8 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
     end
   end
 
+  helper_method :layout_kind
+
   protected
 
   def permitted_parameters
@@ -29,6 +31,11 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def edit_layout_pages
     @edit_layout_pages ||= MailSnippet.organization_snippet_kinds + %w[landing_page]
+  end
+
+  def layout_kind
+    return "landing_page" if params[:id] == "landing_page"
+    "mail_snippet"
   end
 
   def find_and_authorize_organization

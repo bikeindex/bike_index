@@ -20,15 +20,15 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def finished_registration_stolen
-    render_finished_registration(Bike.unscoped.stolen)
+    render_finished_registration(Bike.unscoped.status_stolen)
   end
 
   def finished_registration_abandoned
-    render_finished_registration(Bike.where(abandoned: true))
+    render_finished_registration(Bike.status_abandoned)
   end
 
   def organization_invitation
-    OrganizedMailer.organization_invitation(OrganizationInvitation.last)
+    OrganizedMailer.organization_invitation(Membership.last)
   end
 
   def parking_notification

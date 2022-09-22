@@ -1,0 +1,16 @@
+- search_url ||= nil
+- render_search ||= search_url.present?
+- user ||= nil
+- email ||= user&.email
+
+- email_display = email&.truncate(30)
+- if user.present?
+  = link_to email_display, admin_user_path(user.to_param), title: email, class: "text-link"
+- else
+  %span{title: email}
+    = email_display
+
+= user_icon(user)
+- if render_search && email.present?
+  - search_url ||= user.present? ? url_for(sortable_search_params.merge(user_id: user.id)) : url_for(sortable_search_params.merge(search_email: email))
+  = link_to search_emoji, search_url, class: "display-sortable-link small"

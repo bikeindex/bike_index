@@ -1,24 +1,18 @@
 require "rails_helper"
 
 RSpec.describe Notification, type: :model do
-  describe "notifiable_display_name" do
-    let(:notification) { FactoryBot.create(:notification) }
-    it "is blank" do
-      expect(notification.notifiable_display_name).to be_blank
-    end
-    context "donation" do
-      let(:payment) { FactoryBot.create(:payment) }
-      let(:notification) { FactoryBot.create(:notification, kind: "donation_stolen", notifiable: payment, user: payment.user) }
-      it "is payment" do
-        expect(notification.notifiable_display_name).to eq "Payment ##{payment.id}"
-        expect(notification.sender_display_name).to eq "auto"
-      end
+  describe "sender_display_name" do
+    let(:payment) { FactoryBot.create(:payment) }
+    let(:notification) { FactoryBot.create(:notification, kind: "donation_stolen", notifiable: payment, user: payment.user) }
+    it "is payment" do
+      expect(notification.sender_display_name).to eq "auto"
     end
   end
 
   describe "notifications_sent_or_received_by" do
     let(:user) { FactoryBot.create(:user) }
-    let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: user) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+    let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: user, bike: bike) }
     let!(:notification1) { FactoryBot.create(:notification, user: user) }
     it "gets from and by" do
       expect {
@@ -82,6 +76,16 @@ RSpec.describe Notification, type: :model do
       it "is auto" do
         expect(notification.sender).to be_blank
       end
+    end
+  end
+
+  describe "theft_survey_4_2022" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record) }
+    let(:user) { bike.owner }
+    it "is valid" do
+      expect(bike.reload.status).to eq "status_stolen"
+      notification = Notification.create(user: user, kind: "theft_survey_4_2022", notifiable: bike.current_stolen_record)
+      expect(notification).to be_valid
     end
   end
 end

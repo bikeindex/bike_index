@@ -55,7 +55,7 @@
         %span.checklist-checkbox
           &#10003;
         %span.checklist-text
-          Verified purchase (registered at Point Of Sale by #{bike_submitting.current_ownership.organization.display_name})
+          Verified purchase (registered at Point Of Sale by #{bike_submitting.current_ownership.organization&.display_name})
           - if render_optional
             %em.small.less-strong
               optional

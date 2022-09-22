@@ -180,7 +180,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         [
           "http://test.host/bikes/#{bike.id}",
           bike.created_at.utc,
-          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;",
+          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;",
           "\",,,\"<script>XSSSSS</script>",
           "Black, #{secondary_color.name}",
           bike.serial_number,
@@ -194,7 +194,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           nil # assigned_sticker
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
         expect(bike.reload.owner_name).to eq "George Smith"
         instance.perform(export.id)
@@ -233,6 +233,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address city state zipcode assigned_sticker] }
         let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
+          expect(export.reload.avery_export?).to be_falsey
           VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
             bike.reload
             bike_sticker.reload
@@ -320,9 +321,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
             registered_by: nil,
             owner_email: bike.owner_email,
             owner_name: nil,
+            bike_sticker: "FF 333 333",
             organization_affiliation: "community_member",
             phone: "7177423423",
-            bike_sticker: "FF 333 333",
             student_id: "XX9999",
             address: "717 Market St",
             city: "San Francisco",
@@ -430,9 +431,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
               registered_by: nil,
               owner_email: bike.owner_email,
               owner_name: nil,
+              bike_sticker: nil,
               organization_affiliation: "community_member",
               phone: "7177423423",
-              bike_sticker: nil,
               student_id: "XX9999",
               address: "717 Market St",
               city: "San Francisco",

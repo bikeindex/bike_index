@@ -26,6 +26,25 @@ RSpec.describe BikesController, type: :request do
       # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
       expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
+    context "with bike_sticker" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "UC1101", organization: organization) }
+      it "renders with bike sticker" do
+        get "#{base_url}/new?bike_sticker=uc1101"
+        expect(response.code).to eq("200")
+        b_param = assigns(:b_param)
+        expect(b_param.revised_new?).to be_truthy
+        expect(b_param.origin).to eq "sticker"
+        expect(b_param.bike_sticker_code).to eq bike_sticker.pretty_code
+        expect(b_param.creation_organization&.id).to eq organization.id
+        bike = assigns(:bike)
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.stolen_records.last).to be_blank
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.bike_sticker).to eq "UC 110 1" # pretty code
+        expect(response).to render_template(:new)
+      end
+    end
     context "stolen from params" do
       it "renders a new stolen bike" do
         get "#{base_url}/new?stolen=true"
@@ -316,6 +335,51 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieved?).to be_falsey
           expect(parking_notification.retrieved?).to be_falsey
         end
+      end
+    end
+  end
+
+  describe "scanned" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization2) { FactoryBot.create(:organization) }
+    let!(:bike_sticker1) { FactoryBot.create(:bike_sticker, code: "UC1101", organization: organization) }
+    it "redirects to scanned" do
+      get "/bikes/scanned/UC1101"
+      expect(response).to render_template("scanned")
+      expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      get "/bikes/scanned/uc1101"
+      expect(response).to render_template("scanned")
+      expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      get "/bikes/scanned/UC01101"
+      expect(response).to render_template("scanned")
+      expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      # Note: this MUST always work from here on out - it fixes urls from batch #35 and #38
+      # We have to assume these stickers are always around
+      get "/bikes/scannedUC01101"
+      expect(response).to redirect_to("/bikes/UC01101/scanned")
+      get "/bikes/scannedUC01101?organization_id=UCLA"
+      expect(response).to redirect_to("/bikes/UC01101/scanned?organization_id=UCLA")
+    end
+    context "UI" do
+      let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "UI1101", organization: organization) }
+      let!(:bike_sticker3) { FactoryBot.create(:bike_sticker, code: "U1101", organization: organization2) }
+      it "redirects" do
+        # And UI
+        get "/bikes/scanned/UI01101"
+        expect(response).to render_template("scanned")
+        expect(assigns(:bike_sticker)&.id).to eq bike_sticker2.id
+        get "/bikes/scanned/Ui01101"
+        expect(response).to render_template("scanned")
+        expect(assigns(:bike_sticker)&.id).to eq bike_sticker2.id
+        get "/bikes/scannedUI001101?organization_id=UCLA"
+        expect(response).to redirect_to("/bikes/UI001101/scanned?organization_id=UCLA")
+        # And final sticker
+        get "/bikes/scanned/U01101"
+        expect(response).to render_template("scanned")
+        expect(assigns(:bike_sticker)&.id).to eq bike_sticker3.id
+        expect {
+          get "/bikes/scannedU01101"
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

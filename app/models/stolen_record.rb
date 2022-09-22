@@ -33,10 +33,13 @@ class StolenRecord < ApplicationRecord
   belongs_to :bike
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
+  belongs_to :organization_stolen_message
 
   has_many :impound_claims
   has_many :tweets
   has_many :theft_alerts
+  has_many :notifications, as: :notifiable
+  has_many :theft_surveys, -> { theft_survey }, as: :notifiable, class_name: "Notification"
   has_one :alert_image
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
@@ -307,16 +310,13 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  # TODO: maybe background some of this stuff?
   def update_associations
     return true if skip_update
-    remove_outdated_alert_images
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current || bike&.current_stolen_record_id == id
-      update_not_current_records
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
-    theft_alerts.each { |t| t.update(updated_at: Time.current) }
+    AfterStolenRecordSaveWorker.perform_async(id, @alert_location_changed)
     AfterUserChangeWorker.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
@@ -329,19 +329,7 @@ class StolenRecord < ApplicationRecord
       .perform_async(theft_alerts.last.id, "theft_alert_recovered")
   end
 
-  # If the bike has been recovered, remove the alert_image
-  def remove_outdated_alert_images
-    no_longer_around = bike.blank? || !bike.status_stolen? || recovered?
-    return true unless no_longer_around || @alert_location_changed
-    alert_image&.destroy
-  end
-
   def fix_date
     self.date_stolen = self.class.corrected_date_stolen(date_stolen)
-  end
-
-  def update_not_current_records
-    StolenRecord.unscoped.where(bike_id: bike_id).where.not(id: id)
-      .each { |s| s.update(current: false, skip_update: true) }
   end
 end

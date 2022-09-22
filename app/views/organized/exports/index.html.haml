@@ -12,6 +12,8 @@
       %strong
         = pluralize(number_with_delimiter(@exports.total_count), t(".export"))
 
+    - show_assigned_bike_codes = current_organization.enabled?("avery_export") || @exports.any? { |e| e.assign_bike_codes? }
+
     %table.table.table-striped.table-bordered.table-sm.without-exterior-border
       %thead.small-header
         %th
@@ -19,6 +21,12 @@
           %small.convertTimezone
         %th= t(".creator")
         %th= t(".progress")
+        - if show_assigned_bike_codes
+          %td.small.text-center
+            - if current_organization.enabled?("avery_export")
+              Avery Export
+            - else
+              = t(".stickers_assigned")
         %th= t(".bikes_in_export")
         %td= t(".download")
         %td
@@ -33,8 +41,11 @@
             %td
               %span{ class: export_progress_class(export) }
                 = export.calculated_progress
+            - if show_assigned_bike_codes
+              %td.text-center
+                = check_mark if (export.avery_export? || export.assign_bike_codes?)
             %td
-              = number_with_delimiter(export.rows) if export.finished?
+              = admin_number_display(export.rows) if export.finished?
             %td
               = link_to(t(".download"), export.file.url) if export.file.url.present?
             %td

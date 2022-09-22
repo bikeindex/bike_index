@@ -63,6 +63,7 @@ module Organized
       if current_organization.enabled?("avery_export")
         @export = Export.new(avery_export_parameters) # Note: avery export can't include partials
         bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
+
         if bike_sticker.present? && bike_sticker.claimed?
           flash[:error] = translation(:sticker_already_assigned)
         end
@@ -72,8 +73,13 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:export).permit(:timezone, :start_at, :end_at, :file_format,
-        :custom_bike_ids, :only_custom_bike_ids, headers: [])
+      params.require(:export).permit(*params_with_assigned_codes)
+    end
+
+    def params_with_assigned_codes
+      attrs = %i[timezone start_at end_at file_format custom_bike_ids only_custom_bike_ids]
+      attrs += [:bike_code_start] if ParamsNormalizer.boolean(params.dig(:export, :assign_bike_codes))
+      attrs + [headers: []]
     end
 
     def avery_export_parameters

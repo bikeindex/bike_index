@@ -197,21 +197,20 @@ Rails.application.routes.draw do
       :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
       :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
       :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data, :user_alerts,
-      :notifications, :user_registration_organizations
+      :notifications, :user_registration_organizations, :theft_alerts, :superuser_abilities
 
     resources :bike_stickers do
       collection { get :reassign }
     end
     resources :invoices, only: [:index]
-    resources :theft_alerts, only: %i[show index edit update]
     resources :theft_alert_plans, only: %i[index edit update new create]
 
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
+      collection { get :show_deleted }
     end
     get "recover_organization", to: "organizations#recover"
-    get "show_deleted_organizations", to: "organizations#show_deleted"
 
     resources :stolen_bikes do
       member { post :approve }

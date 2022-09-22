@@ -12,6 +12,9 @@
 
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
+  - if @bike_sticker.present?
+    -# Hacky way to assign sticker during creation
+    = hidden_field_tag :bike_sticker, @bike_sticker.code
   - if @organization.present?
     = f.hidden_field :creation_organization_id, value: @organization.id
   - if @bike.status_stolen?
@@ -191,7 +194,9 @@
             = f.hidden_field :owner_email, value: @bike.owner_email || current_user&.email
           - else
             .form-group.row.unnested-field.no-divider-row
-              = f.label :owner_email, class: 'form-well-label'
+              = f.label :owner_email,
+                registration_field_label(@organization, "owner_email") || t(".owner_email"),
+                class: 'form-well-label'
               .form-well-input
                 = f.email_field :owner_email,
                   value: @bike.owner_email || current_user&.email,
@@ -200,7 +205,8 @@
                   class: 'form-control'
 
       .new-bike-submit-wrapper
-        = submit_tag t(".register"), class: 'btn btn-lg btn-primary'
+        - register_text = @bike.creation_organization.present? ? t(".register_with", organization_name: @bike.creation_organization.short_name) : t(".register")
+        = submit_tag register_text, class: 'btn btn-lg btn-primary'
 
 - modal_body = capture_haml do
   .modal-body

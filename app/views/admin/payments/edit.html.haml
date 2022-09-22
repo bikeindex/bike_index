@@ -3,12 +3,12 @@
     %h1
       Edit Payment
 
-= render partial: "/admin/payments/display", locals: { payment: @payment }
+= render partial: "/admin/payments/display", locals: {payment: @payment}
 
 
 = form_for [:admin, @payment] do |f|
   - if @payment.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Payment", obj: @payment }
+    = render partial: "/shared/errors", locals: {name: "Payment", obj: @payment}
 
   - organizations = Organization.approved
   .row

@@ -10,11 +10,11 @@ class OrganizationFeature < ApplicationRecord
 
   # NOTE: reg_bike_sticker is automatically added if the org has stickers, no need to manually add
   REG_FIELDS = %w[
+    reg_address
+    reg_bike_sticker
     reg_extra_registration_number
     reg_organization_affiliation
-    reg_address
     reg_phone
-    reg_bike_sticker
     reg_student_id
   ].freeze
 
@@ -40,12 +40,14 @@ class OrganizationFeature < ApplicationRecord
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
-    official_manufacturer
     no_address
+    official_manufacturer
+    organization_stolen_message
     passwordless_users
     regional_bike_counts
     show_bulk_import
-    show_bulk_import_impound_bikes
+    show_bulk_import_impound
+    show_bulk_import_stolen
     show_multi_serial
     show_partial_registrations
     show_recoveries
@@ -87,11 +89,21 @@ class OrganizationFeature < ApplicationRecord
 
   def self.reg_fields_with_customizable_labels
     # Can't rename bike_stickers
-    reg_fields - %w[reg_bike_sticker]
+    %w[owner_email] + reg_fields - %w[reg_bike_sticker]
   end
 
   def self.reg_fields_organization_uniq
     %w[reg_organization_affiliation reg_student_id]
+  end
+
+  # These are attributes that add fields to admin organization edit
+  def self.with_admin_organization_attributes
+    reg_fields_with_customizable_labels +
+      %w[regional_bike_counts passwordless_users graduated_notifications organization_stolen_message]
+  end
+
+  def self.feature_slugs
+    pluck(:feature_slugs).flatten.uniq
   end
 
   def one_time?

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ExchangeRateApiClient
+class ExchangeRateAPIClient
   attr_accessor :base_iso, :base_url, :cache_key
 
   BASE_URL = ENV.fetch("EXCHANGE_RATE_API_BASE_URL", "https://api.exchangeratesapi.io")
@@ -19,7 +19,7 @@ class ExchangeRateApiClient
       }
 
       unless resp.status == 200 && resp.body.is_a?(Hash)
-        raise ExchangeRateApiError, resp.body
+        raise ExchangeRateAPIError, resp.body
       end
 
       resp.body.with_indifferent_access
@@ -42,4 +42,4 @@ class ExchangeRateApiClient
   end
 end
 
-class ExchangeRateApiError < StandardError; end
+class ExchangeRateAPIError < StandardError; end

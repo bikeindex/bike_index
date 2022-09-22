@@ -49,7 +49,7 @@
                 %td
                   Serial number
                 %td
-                  = bike.serial_number
+                  %code= bike.serial_display(current_user)
               %tr
                 %td
                   Colors
@@ -123,23 +123,14 @@
                 = bike.owner_email
                 - if bike.claimed?
                   %small.text-info claimed
-            - if bike.user.present?
-              %tr
-                %td
-                  Owner
-                %td
-                  = link_to bike.user.display_name, edit_admin_user_url(bike.user.id)
-                  %small.less-strong= bike.user.email
-              %tr
-                %td
-                  Donor
-                %td
-                  = user_icon(bike.user)
-            - else
-              %tr
-                %td
-                  Owner
-                %td
+            %tr
+              %td
+                Owner
+
+              %td
+                - if bike.user.present?
+                  = render partial: "/shared/admin_user_cell", locals: {user: bike.user, search_url: admin_bikes_path(user_id: bike.user&.id)}
+                - else
                   Unclaimed
             %tr
               %td

@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe HotSheetConfiguration, type: :model do
+  it_behaves_like "search_radius_metricable"
+
   describe "factory" do
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration) }
     it "is valid" do
@@ -29,34 +31,6 @@ RSpec.describe HotSheetConfiguration, type: :model do
       expect(hot_sheet_configuration.send_hour).to eq 0
       hot_sheet_configuration.send_hour = -1
       expect(hot_sheet_configuration.send_hour).to eq 0
-    end
-  end
-
-  describe "search_radius_metric_units?" do
-    let(:hot_sheet_configuration) { HotSheetConfiguration.new }
-    it "is false, but you can still set kilometers" do
-      expect(hot_sheet_configuration.search_radius_metric_units?).to be_falsey
-      hot_sheet_configuration.search_radius_kilometers = 400
-      expect(hot_sheet_configuration.search_radius_kilometers).to eq 400
-    end
-    context "not US organization" do
-      let(:organization) { FactoryBot.create(:organization, :in_edmonton) }
-      let(:location) { organization.locations.first }
-      let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization) }
-      it "is truthy" do
-        expect(location.country).to eq Country.canada
-        expect(location.state).to be_blank # Because we're fucking this up :(
-        expect(location.latitude).to be_within(0.1).of 53.5069377
-
-        expect(hot_sheet_configuration.search_radius_metric_units?).to be_truthy
-        hot_sheet_configuration.search_radius_kilometers = 400
-        expect(hot_sheet_configuration.search_radius_kilometers).to eq 400
-
-        # Also, set default to a round number
-        hot_sheet_configuration.search_radius_miles = nil
-        hot_sheet_configuration.set_calculated_attributes
-        expect(hot_sheet_configuration.search_radius_kilometers).to eq 100
-      end
     end
   end
 

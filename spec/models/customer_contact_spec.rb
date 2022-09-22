@@ -170,7 +170,7 @@ RSpec.describe CustomerContact, type: :model do
         CustomerContact
           ._save_callbacks
           .select { |cb| cb.kind.eql?(:before) }
-          .map(&:raw_filter)
+          .map(&:filter)
 
       expect(callback_names).to include(:normalize_emails_and_find_users)
     end

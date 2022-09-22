@@ -81,7 +81,7 @@ class AfterBikeSaveWorker < ApplicationWorker
     return unless bike.reload.user.present?
     bike.bike_organizations.each do |bike_organization|
       organization = bike_organization.organization
-      next if UserRegistrationOrganization.unscoped
+      next if organization.blank? || UserRegistrationOrganization.unscoped
         .where(user_id: bike.user.id, organization_id: organization.id).any?
       user_registration_organization = UserRegistrationOrganization.new(user_id: bike.user.id, organization_id: organization.id)
       user_registration_organization.all_bikes = organization.user_registration_all_bikes?

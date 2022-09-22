@@ -1,7 +1,7 @@
 .container
   %h2
     = @bike_sticker.kind
-    %em= @bike_sticker.code
+    %em= @bike_sticker.pretty_code
     = t(".isnt_linked_to_a_bike")
   %hr.mb-4.mb-4
 
@@ -20,46 +20,50 @@
             = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
         .col-sm-4.col-lg-2
           = submit_tag t(".update"), class: "btn btn-success"
+      %p.mt-5.mb-5
+        - new_bike_link = link_to(t(".new_bike_link_text"), new_bike_url(bike_sticker: @bike_sticker.code), class: "btn ml-1 mr-1 btn-primary")
+        = t(".register_a_new_bike_html", new_bike_link: new_bike_link)
 
-      %p{ style: "margin-top: 24px;" }
-        = t(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
+      - if current_user.bikes.any?
+        %p
+          = t(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
 
-      %table.table.table-striped.table-bordered.table-sm.without-exterior-border
-        %thead.small-header
-          %tr
-            %th.date-added
-              = t(".added")
-              %small.convertTimezone
-            %th.hidden-xs-down= t(".manufacturer")
-            %th.hidden-xs-down= t(".model")
-            %th.hidden-xs-down= t(".color")
-            %th.hidden-sm-up.hidden-sm-up
-              %small
-                = t(".mnfg_model_color_html")
-            %th
-              = t(".link_it")
-        %tbody
-          - @bikes.each do |bike|
+        %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+          %thead.small-header
             %tr
-              %td
+              %th.date-added
+                = t(".added")
+                %small.convertTimezone
+              %th.hidden-xs-down= t(".manufacturer")
+              %th.hidden-xs-down= t(".model")
+              %th.hidden-xs-down= t(".color")
+              %th.hidden-sm-up.hidden-sm-up
                 %small
-                  %a.convertTime{ href: bike_path(bike) }
-                    = l bike.created_at, format: :convert_time
-              %td.hidden-xs-down
-                = bike.mnfg_name
-              %td.hidden-xs-down
-                = bike.frame_model
-              %td.hidden-xs-down
-                = bike.frame_colors.to_sentence
-              %td.hidden-sm-up
-                %small
-                  = [bike.mnfg_name, bike.frame_model].select(&:present?).join(", ")
-                  %span.less-strong
-                    = bike.frame_colors.to_sentence
-                  %br
-              %td
-                %small
-                  = link_to t(".link_bike_sticker_kind", bike_sticker_kind: @bike_sticker.kind), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: :put
+                  = t(".mnfg_model_color_html")
+              %th
+                = t(".link_it")
+          %tbody
+            - @bikes.each do |bike|
+              %tr
+                %td
+                  %small
+                    %a.convertTime{ href: bike_path(bike) }
+                      = l bike.created_at, format: :convert_time
+                %td.hidden-xs-down
+                  = bike.mnfg_name
+                %td.hidden-xs-down
+                  = bike.frame_model
+                %td.hidden-xs-down
+                  = bike.frame_colors.to_sentence
+                %td.hidden-sm-up
+                  %small
+                    = [bike.mnfg_name, bike.frame_model].select(&:present?).join(", ")
+                    %span.less-strong
+                      = bike.frame_colors.to_sentence
+                    %br
+                %td
+                  %small
+                    = link_to t(".link_bike_sticker_kind", bike_sticker_kind: @bike_sticker.kind), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: :put
   - else
     %p{ style: "margin-top: 24px;" }
       = t(".to_link_that_card_with_a_bike")

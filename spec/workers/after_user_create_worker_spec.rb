@@ -148,9 +148,6 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
       expect(membership1.claimed?).to be_falsey
 
-      UpdateMailchimpDatumWorker.new # So that it's present post stubbing
-      stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
-
       Sidekiq::Testing.inline! { user.save }
 
       expect(membership1.created_at < user.created_at).to be_truthy
@@ -241,8 +238,6 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           membership = FactoryBot.create(:membership, user: user, sender: nil, organization: organization, role: "admin")
           expect(membership.claimed?).to be_truthy
           user.reload
-          UpdateMailchimpDatumWorker.new # So that it's present post stubbing
-          stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
           expect(user.mailchimp_datum).to be_blank
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
@@ -259,6 +254,29 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           expect(user.mailchimp_datum).to be_present
         end
       end
+    end
+  end
+
+  describe "graduated_notification" do
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+    let(:bike) { graduated_notification.bike }
+    let(:user) { FactoryBot.create(:user_confirmed, email: bike.owner_email.upcase) }
+
+    it "assigns any that match the user email" do
+      expect(bike.reload.claimed?).to be_falsey
+      expect(bike.current_ownership.user&.id).to be_blank
+      expect(graduated_notification.active?).to be_truthy
+      expect(graduated_notification.primary_notification?).to be_truthy
+      expect(graduated_notification.user_id).to be_blank
+      og_updated_at = graduated_notification.reload.updated_at
+      expect(user).to be_present
+
+      Sidekiq::Testing.inline! { instance.perform(user.id, "confirmed") }
+
+      expect(bike.reload.claimed?).to be_falsey
+      expect(bike.current_ownership.user&.id).to eq user.id
+      expect(graduated_notification.reload.user_id).to eq user.id
+      expect(graduated_notification.updated_at).to eq og_updated_at # Shouldn't have changed
     end
   end
 end

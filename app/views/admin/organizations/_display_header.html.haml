@@ -1,0 +1,47 @@
+- organization ||= @organization
+- current_action ||= action_name.humanize
+- additional_link ||= nil
+
+- show_edit ||= false
+- organization_view_path ||= nil
+- show_custom_layouts ||= false
+- skip_invoices ||= false
+
+.admin-subnav
+  .col-md-4
+    %h1
+      = current_action
+      %small
+        - if controller_name == "organizations" &&  action_name == "show"
+          = organization.name
+        - else
+          = link_to organization.name, admin_organization_url(organization.to_param)
+  .col-md-8
+    %ul
+      - if additional_link.present?
+        %li.nav-item
+          = additional_link
+      - if show_edit
+        %li.nav-item
+          = link_to "Edit", edit_admin_organization_url(organization), class: "btn btn-outline-secondary btn-sm nav-link mr-2 ml-2"
+      - if organization_view_path.present?
+        %li.nav-item
+          = link_to "organization's view", organization_view_path, class: "btn btn-outline-info btn-sm nav-link"
+      - unless skip_invoices
+        %li.nav-item
+          = link_to "Org invoices", admin_organization_invoices_path(organization_id: @organization.to_param), class: "nav-link"
+      - if display_dev_info? && show_custom_layouts
+        %li.nav-item.only-dev-visible
+          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: organization.to_param), class: "nav-link less-strong"
+  - if organization.deleted?
+    .row.mt-5.mb-5
+      .col-md-6
+        .alert.alert-danger
+          %h4
+            %span.text-danger
+              Organization deleted
+            %small.convertTime.preciseTime.withPreposition
+              = l @organization.deleted_at, format: :convert_time
+
+
+

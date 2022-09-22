@@ -326,8 +326,8 @@ class Bike < ApplicationRecord
   end
 
   def messages_count
-    notifications.count + parking_notifications.count + graduated_notifications.count +
-      Feedback.bike(id).count + UserAlert.where(bike_id: id).count
+    notifications.count + parking_notifications.count + Feedback.bike(id).count +
+      UserAlert.where(bike_id: id).count + GraduatedNotification.where(bike_id: id).count
   end
 
   # The appropriate edit template to use in the edit view.
@@ -467,12 +467,13 @@ class Bike < ApplicationRecord
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 
-  def contact_owner_user?
-    user? || status_stolen?
+  def contact_owner_user?(u = nil, organization = nil)
+    return true if user? || status_stolen? || u&.superuser?
+    current_ownership&.organization_direct_unclaimed_notifications?
   end
 
-  def contact_owner_email
-    contact_owner_user? ? owner_email : creator&.email
+  def contact_owner_email(u = nil, organization = nil)
+    contact_owner_user?(u, organization) ? owner_email : creator&.email
   end
 
   def phone_registration?
@@ -564,16 +565,10 @@ class Bike < ApplicationRecord
     return nil unless organization_id.present?
 
     organization = Organization.friendly_find(organization_id)
-    return organization.id if organization && !organization.suspended?
+    return organization.id if organization.present?
 
-    if organization.present?
-      suspended = I18n.t(:suspended, scope: %i[activerecord errors models bike])
-      errors.add(:organizations, "#{organization_id} #{suspended}")
-    else
-      not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
-      errors.add(:organizations, "#{organization_id} #{not_found}")
-    end
-
+    not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
+    errors.add(:organizations, "#{organization_id} #{not_found}")
     nil
   end
 
@@ -589,26 +584,21 @@ class Bike < ApplicationRecord
   end
 
   def normalize_serial_number
-    if made_without_serial?
-      self.serial_number = "made_without_serial"
-      self.serial_normalized = nil
-      return true
-    end
-
-    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
-
-    case serial_number
-    when "made_without_serial"
-      self.serial_normalized = nil
-      self.made_without_serial = true
-    when "unknown"
-      self.serial_normalized = nil
-      self.made_without_serial = false
+    self.serial_number = if made_without_serial?
+      "made_without_serial"
     else
-      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
-      self.made_without_serial = false
+      SerialNormalizer.unknown_and_absent_corrected(serial_number)
     end
 
+    if %w[made_without_serial unknown].include?(serial_number)
+      self.made_without_serial = serial_number == "made_without_serial"
+      self.serial_normalized = nil
+      self.serial_normalized_no_space = nil
+    else
+      self.made_without_serial = false
+      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      self.serial_normalized_no_space = serial_normalized.gsub(/\s/, "")
+    end
     true
   end
 
@@ -750,6 +740,7 @@ class Bike < ApplicationRecord
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
+    self.manufacturer_other = nil if manufacturer_other.blank?
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.owner_email = normalized_email
     normalize_serial_number

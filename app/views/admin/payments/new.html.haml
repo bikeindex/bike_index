@@ -31,5 +31,9 @@
       .form-group.fancy-select.unfancy
         = f.label :organization_id, class: "control-label"
         = collection_select(:payment, :organization_id, organizations, :id, :name, prompt: "Choose organization")
+    .col-md-6
+      .form-group.fancy-select.unfancy
+        = f.label :referral_source, class: "control-label"
+        = f.text_field :referral_source, class: "form-control"
     .col-md-6.mt-4
       = f.submit "Submit", class: 'btn btn-success float-right'

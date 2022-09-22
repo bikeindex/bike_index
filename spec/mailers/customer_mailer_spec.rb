@@ -10,6 +10,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "welcome_email"
+      expect(mail.body.encoded).to match(/supported by/i)
     end
   end
 
@@ -200,6 +201,23 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to eq "We may have found your stolen #{bike.title_string}"
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq("contact@bikeindex.org")
+      expect(mail.message_stream).to eq "outbound"
+    end
+  end
+
+  describe "theft_survey" do
+    let(:stolen_record) { FactoryBot.create(:stolen_bike, :with_ownership_claimed).current_stolen_record }
+    let!(:notification) { Notification.create(kind: "theft_survey_4_2022", notifiable: stolen_record, user: user) }
+    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_4_2022", subject: "Survey!", body: "Dear Bike Index Registrant, XXXvvvvCCC", is_enabled: true) }
+    it "renders the mail" do
+      mail = CustomerMailer.theft_survey(notification)
+
+      expect(mail.from).to eq(["gavin@bikeindex.org"])
+      expect(mail.to).to eq([user.email])
+      expect(mail.tag).to eq "theft_survey_4_2022"
+      expect(mail.body.encoded).to match "Dear #{user.name}, XXXvvvvCCC"
+      expect(mail.body.encoded).to_not match "supported by"
+      expect(mail.message_stream).to eq "outbound"
     end
   end
 end

@@ -16,8 +16,8 @@
                 = t(".this_users_bikes")
             %p.sharing-links
               = show_sharing_links(@user)
-      .col-md-6.ad-col
-        .ad-block.ad-binx.ad468x60
+      -# .col-md-6.ad-col
+      -#   .ad-block.ad-binx.ad468x60
     - if @user.description
       .row
         .col-md-12
@@ -34,7 +34,7 @@
           .card-deck-wrapper
             .card-deck
               - @bikes.each do |bike|
-                .card
+                .card.mt-3
                   %a.bike-list-image{ href: bike_url(bike) }
                     = bike_thumb_image(bike)
                     - if bike.status_stolen?

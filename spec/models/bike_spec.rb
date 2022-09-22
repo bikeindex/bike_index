@@ -87,6 +87,7 @@ RSpec.describe Bike, type: :model do
       let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
       let(:bike2) { stolen_record3.bike }
       it "finds by stolen_record" do
+        AfterStolenRecordSaveWorker.new.perform(stolen_record2.id)
         expect(stolen_record1.reload.current?).to be_falsey
         stolen_record1.update_column :current, true
         bike1.reload
@@ -251,6 +252,9 @@ RSpec.describe Bike, type: :model do
     end
 
     describe "#normalize_serial_number" do
+      let(:bike) { Bike.new(serial_number: serial_number) }
+      before { bike.normalize_serial_number }
+
       context "given a bike made with no serial number" do
         no_serials = [
           "custom bike no serial has a unique frame design",
@@ -258,9 +262,8 @@ RSpec.describe Bike, type: :model do
           "custom"
         ]
         no_serials.each do |value|
+          let(:serial_number) { value }
           it "('#{value}') sets the 'made_without_serial' state correctly" do
-            bike = FactoryBot.build(:bike, serial_number: value)
-            bike.normalize_serial_number
             expect(bike.serial_number).to eq("made_without_serial")
             expect(bike.made_without_serial).to eq(true)
             expect(bike.serial_normalized).to eq(nil)
@@ -286,12 +289,42 @@ RSpec.describe Bike, type: :model do
           "unknown"
         ]
         unknown_serials.each do |value|
+          let(:serial_number) { value }
           it "('#{value}') sets the 'unknown' state correctly" do
-            bike = FactoryBot.build(:bike, serial_number: value)
-            bike.normalize_serial_number
             expect(bike.serial_number).to eq("unknown")
             expect(bike.made_without_serial).to eq(false)
             expect(bike.serial_normalized).to eq(nil)
+            expect(bike.serial_normalized_no_space).to eq(nil)
+          end
+        end
+      end
+
+      context "unknown" do
+        let(:serial_number) { "TBD" }
+        let(:bike) { Bike.new(serial_number: serial_number, serial_normalized_no_space: "something") }
+        it "removes serial_normalized_no_space" do
+          expect(bike.serial_number).to eq("unknown")
+          expect(bike.made_without_serial).to eq(false)
+          expect(bike.serial_normalized).to eq(nil)
+          expect(bike.serial_normalized_no_space).to eq(nil)
+        end
+      end
+
+      context "serials with spaces" do
+        let(:serial_number) { "\n11 11  22 2  2 2 " }
+        it "stores with spaces and without" do
+          expect(bike.serial_number).to eq("11 11 22 2 2 2")
+          expect(bike.made_without_serial).to eq(false)
+          expect(bike.serial_normalized).to eq "11 11 22 2 2 2"
+          expect(bike.serial_normalized_no_space).to eq "111122222"
+        end
+        context "special characters" do
+          let(:serial_number) { "Some-Serial.  .Stuf?f" }
+          it "stores with spaces and without" do
+            expect(bike.serial_number).to eq("Some-Serial. .Stuf?f")
+            expect(bike.made_without_serial).to eq(false)
+            expect(bike.serial_normalized).to eq("50ME 5ER1A1 5TUF F")
+            expect(bike.serial_normalized_no_space).to eq("50ME5ER1A15TUFF")
           end
         end
       end
@@ -929,6 +962,7 @@ RSpec.describe Bike, type: :model do
     let(:creator) { FactoryBot.create(:user, email: "notparty@party.com") }
     let(:bike) { FactoryBot.create(:bike, owner_email: owner_email, creator: creator) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, owner_email: owner_email, creator: creator) }
+    let(:admin) { User.new(superuser: true) }
     it "is true" do
       expect(bike.reload.contact_owner_user?).to be_truthy
       expect(bike.contact_owner_email).to eq owner_email
@@ -936,14 +970,17 @@ RSpec.describe Bike, type: :model do
     context "ownership not claimed" do
       let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: owner_email, creator: creator) }
       it "is false" do
-        expect(bike.contact_owner_user?).to be_falsey
+        expect(bike.reload.current_ownership.claimed?).to be_falsey
+        expect(bike.contact_owner_user?).to be false
         expect(bike.contact_owner_email).to eq "notparty@party.com"
+        expect(bike.contact_owner_user?(admin)).to be true
+        expect(bike.contact_owner_email(admin)).to eq "party@party.com"
       end
       context "registered as stolen" do
         let(:bike) { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
         it "is truthy" do
           expect(bike.status_stolen?).to be_truthy
-          expect(bike.contact_owner_user?).to be_truthy
+          expect(bike.contact_owner_user?).to be true
           expect(bike.contact_owner_email).to eq owner_email
         end
       end
@@ -953,19 +990,17 @@ RSpec.describe Bike, type: :model do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:user_unorganized) { User.new }
       let(:owner) { User.new }
-      let(:organization_unstolen) do
-        o = FactoryBot.create(:organization)
-        o.update_attribute :enabled_feature_slugs, %w[unstolen_notifications]
-        o
-      end
-      it "is truthy for the organization with unstollen" do
+      let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+      let(:membership) { FactoryBot.create(:membership, user: user, organization: organization_unstolen) }
+      it "is truthy for the organization with unstolen" do
         allow(bike).to receive(:owner) { owner }
         expect(bike.contact_owner?).to be_falsey
         expect(bike.contact_owner?(user)).to be_falsey
         expect(bike.contact_owner?(user, organization)).to be_falsey
         expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
+
         # Add user to the unstolen org
-        FactoryBot.create(:membership, user: user, organization: organization_unstolen)
+        expect(membership.reload).to be_present
         user.reload
         expect(bike.contact_owner?(user)).to be_truthy
         expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
@@ -980,15 +1015,55 @@ RSpec.describe Bike, type: :model do
         owner.notification_unstolen = false
         expect(bike.contact_owner?(user, organization_unstolen)).to be_falsey
       end
+      context "organization direct_unclaimed_notifications registration" do
+        let(:organization_direct_email) { FactoryBot.create(:organization, direct_unclaimed_notifications: true) }
+        let!(:ownership) { nil } # Block duplicate ownership creation
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization_unstolen, owner_email: owner_email, creator: creator) }
+        let(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization_direct_email, owner_email: owner_email, creator: creator) }
+        it "is truthy" do
+          expect(bike.reload.current_ownership.claimed?).to be false
+          expect(bike.current_ownership.organization.direct_unclaimed_notifications?).to be false
+          expect(bike.contact_owner?).to be false
+          expect(bike.contact_owner?(user)).to be false
+          expect(bike.contact_owner?(user, organization)).to be false
+          expect(BikeDisplayer.display_contact_owner?(bike, user)).to be false
+          # Check superusers
+          expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be false
+          expect(bike.contact_owner?(admin, organization)).to be false
+          expect(bike.current_ownership.organization_direct_unclaimed_notifications?).to be false
+          expect(bike.contact_owner_user?(admin, organization)).to be true
+          # Add user to the unstolen org
+          expect(membership.reload).to be_present
+          user.reload
+          expect(bike.contact_owner?(user)).to be true
+          expect(bike.contact_owner?(user, organization_unstolen)).to be true
+          expect(BikeDisplayer.display_contact_owner?(bike, user)).to be false # Handled through org panel
+          expect(bike.contact_owner_user?(user, organization)).to be false
+          expect(bike.contact_owner_email(user)).to eq "notparty@party.com"
+
+          # And now for the direct owner
+          expect(bike2.reload.current_ownership.claimed?).to be false
+          expect(bike2.current_ownership.organization_direct_unclaimed_notifications?).to be true
+          expect(bike2.contact_owner?(user)).to be true
+          expect(bike2.contact_owner?(user, organization_unstolen)).to be true
+          expect(BikeDisplayer.display_contact_owner?(bike2, user)).to be false # Handled through org panel
+          expect(bike2.contact_owner_user?(user, organization)).to be true
+          expect(bike2.contact_owner_email(user)).to eq "party@party.com"
+          # Random user doesn't have contact_owner? - but still directed to user email, because direct_unclaimed_notification
+          other_user = User.new
+          expect(bike2.contact_owner?(other_user, organization_unstolen)).to be false
+          expect(bike2.contact_owner_user?(other_user, organization)).to be true
+          expect(bike2.contact_owner_email(other_user)).to eq "party@party.com"
+        end
+      end
     end
     context "with owner with notification_unstolen false" do
-      let(:admin) { User.new(superuser: true) }
       it "is falsey" do
         allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }
-        expect(bike.contact_owner?).to be_falsey
-        expect(bike.contact_owner?(User.new)).to be_falsey
-        expect(bike.contact_owner?(admin)).to be_falsey
-        expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be_falsey
+        expect(bike.contact_owner?).to be false
+        expect(bike.contact_owner?(User.new)).to be false
+        expect(bike.contact_owner?(admin)).to be false
+        expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be false
       end
     end
   end
@@ -1162,10 +1237,13 @@ RSpec.describe Bike, type: :model do
     context "address set on bike" do
       it "returns bike_update" do
         expect(bike.reload.registration_address_source).to eq "initial_creation"
-        bike.update(street: "1313 N Milwaukee Ave", city: "Chicago", zipcode: "66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
+        bike.update(street: "1313 N Milwaukee Ave ", city: " Chicago", zipcode: " 66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
         expect(bike.registration_address_source).to eq "bike_update"
         expect(bike.latitude).to eq 43.9
         expect(bike.latitude_public).to eq 43.9
+        expect(bike.street).to eq "1313 N Milwaukee Ave"
+        expect(bike.city).to eq "Chicago"
+        expect(bike.zipcode).to eq "66666"
       end
     end
     context "b_param" do
@@ -1329,6 +1407,13 @@ RSpec.describe Bike, type: :model do
     it "is the simple_name" do
       expect(bike.reload.mnfg_name).to eq "SE Racing"
     end
+    context "manufacturer_other blank" do
+      let(:bike) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: " ") }
+      it "is nil" do
+        expect(bike.manufacturer_other).to eq nil
+        expect(bike.mnfg_name).to eq "Other"
+      end
+    end
   end
 
   describe "cache_photo" do
@@ -1457,14 +1542,6 @@ RSpec.describe Bike, type: :model do
         end
       end
     end
-    context "suspended organization" do
-      let(:organization) { FactoryBot.create(:organization, is_suspended: true) }
-      it "adds an error to the bike" do
-        expect(bike.validated_organization_id(organization.id)).to be_nil
-        expect(bike.errors[:organizations].to_s).to match(/suspended/)
-        expect(bike.errors[:organizations].to_s).to match(organization.id.to_s)
-      end
-    end
     context "unable to find organization" do
       it "adds an error to the bike" do
         expect(bike.validated_organization_id("some org")).to be_nil
@@ -1491,13 +1568,6 @@ RSpec.describe Bike, type: :model do
 
         bike.bike_organization_ids = [organization.id]
         expect(bike.reload.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
-      end
-    end
-    context "invalid organization_id" do
-      let(:organization_invalid) { FactoryBot.create(:organization, is_suspended: true) }
-      it "adds valid organization but not invalid one" do
-        bike.bike_organization_ids = [organization.id, organization2.id, organization_invalid.id]
-        expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
       end
     end
     context "different organization" do
@@ -1531,6 +1601,38 @@ RSpec.describe Bike, type: :model do
       it "returns the alert_image url" do
         bike = FactoryBot.create(:stolen_bike, :with_image)
         expect(bike.alert_image_url).to match(%r{https?://.+/bike-#{bike.id}.jpg})
+      end
+    end
+  end
+
+  describe "messages_count" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:owner) { bike.owner }
+    let(:user) { FactoryBot.create(:user) }
+    it "is 0" do
+      expect(bike.reload.messages_count).to eq 0
+    end
+    context "theft_survey" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record) }
+      let!(:notification) { Notification.create(user: user, kind: "theft_survey_4_2022", notifiable: bike.current_stolen_record) }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
+      end
+    end
+    context "graduated_notification" do
+      let!(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining) }
+      let(:bike) { graduated_notification.bike }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
+      end
+    end
+    context "everything but graduated" do
+      let!(:notification) { FactoryBot.create(:notification, kind: "bike_possibly_found", bike: bike) }
+      let!(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, bike: bike) }
+      let!(:feedback) { FactoryBot.create(:feedback_serial_update_request, bike: bike) }
+      let!(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
+      it "counts all them" do
+        expect(bike.reload.messages_count).to eq 4
       end
     end
   end
@@ -1578,6 +1680,9 @@ RSpec.describe Bike, type: :model do
             stolen_record.attributes = {street: "", city: "", zipcode: ""}
             expect(stolen_record.should_be_geocoded?).to be_truthy
             stolen_record.save
+            expect(stolen_record.street).to be_nil
+            expect(stolen_record.city).to be_nil
+            expect(stolen_record.zipcode).to be_nil
           end
           stolen_record.reload
           bike.reload

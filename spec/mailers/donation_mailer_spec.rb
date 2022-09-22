@@ -10,6 +10,7 @@ RSpec.describe DonationMailer, type: :mailer do
       expect(mail.to).to eq([payment.email])
       expect(mail.body.encoded).to match(/gavin/i)
       expect(mail.tag).to eq "donation"
+      expect(mail.body.encoded).to_not match(/supported by/i)
     end
   end
 

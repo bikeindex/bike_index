@@ -316,6 +316,8 @@ RSpec.describe User, type: :model do
       expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
     end
     it "adds user phone, if blank" do
+      UserPhoneConfirmationWorker.new # Instantiate for stubbing
+      stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
       user.reload
       user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
       expect(user.user_phones.count).to eq 0
@@ -400,7 +402,7 @@ RSpec.describe User, type: :model do
       expect(time).to be > Time.current - 1.minutes
     end
     it "haves before create callback" do
-      expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth)).to eq(true)
+      expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:generate_username_confirmation_and_auth)).to eq(true)
     end
   end
 
@@ -646,6 +648,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "userlink" do
+    it "is nil" do
+      expect(User.new.userlink).to be_nil
+    end
+
     it "returns user path if user show" do
       user = User.new(show_bikes: true, username: "coolstuff")
       expect(user.userlink).to eq("/users/coolstuff")

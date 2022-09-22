@@ -40,7 +40,7 @@ class StolenRecordUpdator
     end
 
     if @stolen_params["country"].present?
-      stolen_record.country = Country.fuzzy_find(@stolen_params["country"])
+      stolen_record.country = Country.friendly_find(@stolen_params["country"])
     end
 
     stolen_record.state_id = State.fuzzy_abbr_find(@stolen_params["state"])&.id if @stolen_params["state"].present?

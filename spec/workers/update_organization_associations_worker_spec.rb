@@ -67,8 +67,6 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(organization.reload.admins.pluck(:id)).to eq([user.id])
       mailchimp_datum.update(updated_at: Time.current - 1.hour)
       user.reload
-      UpdateMailchimpDatumWorker.new # So that it's present post stubbing
-      stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
       expect(UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP).to be_falsey
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
@@ -100,6 +98,29 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(organization_manufacturer.manufacturer_id).to eq manufacturer.id
       expect(organization_manufacturer.can_view_counts).to be_falsey
       expect { instance.perform(bike_shop.id) }.to_not change(OrganizationManufacturer, :count)
+    end
+  end
+
+  describe "organization_stolen_message" do
+    let(:organization) { FactoryBot.create(:organization, :in_nyc) }
+    # Have to do this whole dance because factories inline sidekiq processing of this job
+    let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: ["organization_stolen_message"]) }
+    let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization, subscription_start_at: Time.current - 6.months) }
+    it "adds it and disables it" do
+      expect(organization.reload.organization_stolen_message).to be_blank
+      invoice.update(organization_feature_ids: [organization_feature.id])
+      instance.perform(organization.id)
+      expect(organization.reload.enabled_feature_slugs).to eq(["organization_stolen_message"])
+      organization_stolen_message = organization.reload.organization_stolen_message
+      expect(organization_stolen_message).to be_present
+      expect(organization_stolen_message.is_enabled).to be_falsey
+      expect(organization_stolen_message.kind).to eq "association"
+      organization_stolen_message.update(body: "stuff", is_enabled: true)
+      expect(organization_stolen_message.reload.is_enabled).to be_truthy
+      invoice.update(subscription_end_at: Time.current - 1.day)
+      instance.perform(organization.id)
+      expect(organization.reload.enabled_feature_slugs).to eq([])
+      expect(organization_stolen_message.reload.is_enabled).to be_falsey
     end
   end
 end

@@ -99,9 +99,7 @@
 }
 
 // Donor icons and references
-.donor-icon,
-.paid-org-icon,
-.theft-alert-icon {
+.user-icon {
   display: inline-block;
   color: white;
   font-size: 75%;
@@ -114,8 +112,14 @@
   &.donor-icon {
     background: #2ecc71;
   }
-  &.paid-org-icon {
+  &.org-member-icon {
     background: #2980b9;
+  }
+  &.superuser-icon {
+    background: #563d7c;
+  }
+  &.recovery-icon {
+    background: #ffc107;
   }
   &.theft-alert-icon {
     background: #17a2b8;

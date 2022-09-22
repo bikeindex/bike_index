@@ -92,6 +92,16 @@ module OrganizedHelper
     l datetime, format: :dotted
   end
 
+  def retrieval_link_url(obj)
+    if obj.is_a?(ParkingNotification)
+      return nil if obj.retrieval_link_token.blank?
+      bike_url(obj.bike.to_param, parking_notification_retrieved: obj.retrieval_link_token)
+    elsif obj.is_a?(GraduatedNotification)
+      return nil if obj.marked_remaining_link_token.blank?
+      bike_url(obj.bike.to_param, graduated_notification_remaining: obj.marked_remaining_link_token)
+    end
+  end
+
   def include_field_reg_extra_registration_number?(organization = nil, user = nil)
     organization.present? &&
       organization.additional_registration_fields.include?("reg_extra_registration_number")
@@ -130,8 +140,9 @@ module OrganizedHelper
     user.user_registration_organizations.with_student_id(organization.id).none?
   end
 
-  def registration_field_label(organization = nil, field_slug = nil)
-    return nil unless organization&.registration_field_labels.present?
-    organization.registration_field_labels[field_slug.to_s]
+  def registration_field_label(organization = nil, field_slug = nil, strip_tags: false)
+    txt = organization&.registration_field_labels&.dig(field_slug.to_s)
+    return nil unless txt.present?
+    strip_tags ? strip_tags(txt) : txt.html_safe
   end
 end

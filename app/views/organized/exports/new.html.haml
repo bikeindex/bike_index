@@ -5,19 +5,28 @@
         = current_organization.name
       new export
 
-  = form_for @export, { url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+  = form_for @export, {url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}} do |f|
     = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
     - if current_organization.enabled?("avery_export")
       .form-group.row
         = f.label :avery_export, "Avery Label Export", class: "org-form-label"
         .col-sm-4
           = f.check_box :avery_export
-      .form-group.row.shownOnAveryExport
+    - elsif current_organization.enabled?("bike_stickers")
+      .form-group.row
+        = f.label :assign_bike_codes, "Assign bike stickers", class: "org-form-label"
+        .col-sm-4
+          = f.check_box :assign_bike_codes
+    - if current_organization.enabled?("avery_export") || current_organization.enabled?("bike_stickers")
+      .form-group.row.shownOnAssignBikeCodes
         = f.label :bike_code_start, "Initial Sticker #", class: 'org-form-label'
         .col-sm-6
-          = f.text_field :bike_code_start, value: current_organization.bike_stickers.next_unclaimed_code&.code, class: "form-control"
+          = f.text_field :bike_code_start, value: current_organization.bike_stickers.next_unclaimed_code&.pretty_code, class: "form-control"
           %span.below-input-help
-            Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
+            Starting with given input, stickers will be incrementally assigned to bikes.
+            -# For avery, we assign bike stickers unless they leave blank. Otherwise, unselect "assign_bike_codes"
+            - if current_organization.enabled?("avery_export")
+              Leave blank to skip assigning stickers to bikes
     .row.mt-2.hiddenOnAveryExport
       .col-lg-4
         %p.export-included-columns-label
@@ -27,25 +36,25 @@
           - Export.permitted_headers(current_organization).each do |header|
             .form-group.col-xs-6.col-md-4
               %label.checkbox
-                = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
+                = f.check_box :headers, {multiple: true, checked: Export.default_headers.include?(header)}, header, 1
                 = header.titleize(keep_id_suffix: true)
     .form-group.row.mt-4.hiddenOnOnlyCustom
       = f.label :start_at, "Registered after", class: "org-form-label"
       .col-sm-4
-        %a.field-expander{ href: "#" }
+        %a.field-expander{href: "#"}
           Set after time
         .collapsed-fields
           = f.datetime_local_field :start_at, step: 60, class: "form-control"
-          %a.field-collapser{ href: "#" }
+          %a.field-collapser{href: "#"}
             remove
     .form-group.row.hiddenOnOnlyCustom
       = f.label :end_at, "Registered before", class: "org-form-label"
       .col-sm-4
-        %a.field-expander{ href: "#" }
+        %a.field-expander{href: "#"}
           Set before time
         .collapsed-fields
           = f.datetime_local_field :end_at, step: 60, class: "form-control"
-          %a.field-collapser{ href: "#" }
+          %a.field-collapser{href: "#"}
             remove
     .form-group.row
       = f.label :custom_bike_ids, "Bikes to export", class: "org-form-label"
@@ -54,16 +63,16 @@
           - if current_organization.enabled?("show_partial_registrations")
             - include_full = @export.partial_registrations != "only"
             - include_partial = @export.partial_registrations != false
-            .col-xs-4.mb-0.hiddenOnAveryExport{ style: "line-height: 1.25;" }
+            .col-xs-4.mb-0.hiddenOnAveryExport{style: "line-height: 1.25;"}
               %label.checkbox
                 = check_box_tag :include_full_registrations, true, include_full
                 Registered bikes
-            .col-xs-4.mb-0.hiddenOnAveryExport.hiddenOnOnlyCustom{ style: "line-height: 1.25;" }
+            .col-xs-4.mb-0.hiddenOnAveryExport.hiddenOnOnlyCustom{style: "line-height: 1.25;"}
               %label.checkbox
                 = check_box_tag :include_partial_registrations, true, include_partial
                 Incomplete registrations
           .col-xs-4.mb-0
-            %a.field-expander{ href: "#expandCustomBikeIds" }
+            %a.field-expander{href: "#expandCustomBikeIds"}
               Add specific bikes to export
         .collapsed-fields
           = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"

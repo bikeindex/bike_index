@@ -75,6 +75,17 @@ module Geocodeable
     ].reject(&:blank?).join(", ")
   end
 
+  # For testing, look it up, otherwise use static
+  def self.canada_id
+    Rails.env.test? ? Country.canada.id : 38
+  end
+
+  def self.format_postal_code(str, country_id = nil)
+    str = str.strip.upcase.gsub(/\s*,\z/, "")
+    return str unless country_id == canada_id && str.gsub(/\s+/, "").length == 6
+    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+  end
+
   def address(**kwargs)
     Geocodeable.address(self, **kwargs)
   end
@@ -124,11 +135,13 @@ module Geocodeable
 
   # Separate from bike_index_geocode because some models handle geocoding independently
   def clean_state_and_street_data
-    self.street = nil if street.blank?
     # remove state if it's not for the same country - we currently only handle us states
     if country_id.present? && state_id.present?
       self.state_id = nil unless state&.country_id == country_id
     end
+    self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
+    self.city = city.blank? ? nil : clean_city(city)
+    self.zipcode = zipcode.blank? ? nil : Geocodeable.format_postal_code(zipcode, country_id)
   end
 
   def bike_index_geocode
@@ -152,7 +165,7 @@ module Geocodeable
   # Override assignment to enable friendly finding state and country
   def state=(val)
     if val.is_a?(String)
-      self.state = State.fuzzy_find(val)
+      self.state = State.friendly_find(val)
     else
       super
     end
@@ -164,7 +177,7 @@ module Geocodeable
 
   def country=(val)
     if val.is_a?(String)
-      self.country = Country.fuzzy_find(val)
+      self.country = Country.friendly_find(val)
     else
       super
     end
@@ -176,5 +189,29 @@ module Geocodeable
 
   def metric_units?
     country.blank? || !country.united_states?
+  end
+
+  private
+
+  # remove ", CA" for things like "Sacramento, CA"
+  # Assign state if not assigned.
+  # Only works for USA because states only work in US :(
+  def clean_city(str)
+    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states.id
+      str_state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
+      str_no_state = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
+      if state_id.present?
+        if state.abbreviation.downcase == str_state_abbr
+          str = str_no_state
+        end
+      else
+        citys_state = State.fuzzy_abbr_find(str_state_abbr)
+        if citys_state.present?
+          self.state_id = citys_state.id
+          str = str_no_state
+        end
+      end
+    end
+    str.strip.gsub(/\s*,\z/, "")
   end
 end

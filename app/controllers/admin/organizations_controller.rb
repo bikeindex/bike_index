@@ -54,6 +54,7 @@ class Admin::OrganizationsController < Admin::BaseController
       end
     end
     if @organization.update(permitted_parameters)
+      update_organization_stolen_message
       flash[:success] = "Organization Saved!"
       UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)
@@ -69,7 +70,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
     else
-      render action: :create
+      render action: :new
     end
   end
 
@@ -90,7 +91,6 @@ class Admin::OrganizationsController < Admin::BaseController
       .permit(
         :access_token,
         :api_access_approved,
-        :lightspeed_register_with_phone,
         :approved,
         :ascend_name,
         :auto_user_id,
@@ -98,15 +98,17 @@ class Admin::OrganizationsController < Admin::BaseController
         :avatar,
         :avatar_cache,
         :embedable_user_email,
-        :is_suspended,
-        :passwordless_user_domain,
         :graduated_notification_interval_days,
+        :lightspeed_register_with_phone,
         :lock_show_on_map,
         :manufacturer_id,
         :name,
+        :direct_unclaimed_notifications,
         :parent_organization_id,
+        :passwordless_user_domain,
         :previous_slug,
         :search_radius_miles,
+        :search_radius_kilometers,
         :short_name,
         :show_on_map,
         :slug,
@@ -122,6 +124,10 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
+    @organization_features = OrganizationFeature.where(id: params[:search_organization_features])
+    if @organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
+      matching_organizations = matching_organizations.with_enabled_feature_slugs(@organization_features.feature_slugs)
+    end
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
@@ -149,7 +155,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def registration_field_labels_val
     # Get just the reg labels with values
     params.select { |k, v| k.match?("reg_label-") && v.present? }.as_json
-      .map { |k, v| [k.gsub("reg_label-", ""), v] }.to_h
+      .map { |k, v| [k.gsub("reg_label-", ""), v.strip] }.to_h
   end
 
   def permitted_locations_params
@@ -157,18 +163,17 @@ class Admin::OrganizationsController < Admin::BaseController
       impound_location default_impound_location]
   end
 
+  def update_organization_stolen_message
+    message_params = {search_radius_miles: params[:organization_stolen_message_search_radius_miles],
+                      kind: params[:organization_stolen_message_kind],
+                      search_radius_kilometers: params[:organization_stolen_message_search_radius_kilometers]}
+    return unless message_params.values.reject(&:blank?).any?
+    OrganizationStolenMessage.for(@organization).update(message_params)
+  end
+
   def find_organization
-    @organization = Organization.friendly_find(params[:id])
-    return true if @organization.present?
-    raise ActiveRecord::RecordNotFound # Because by all rights, this should have been raised
-  rescue ActiveRecord::RecordNotFound
     @organization = Organization.unscoped.friendly_find(params[:id])
-    if @organization.present?
-      flash[:error] = "This organization is deleted! Things might not work correctly in here"
-      true
-    else
-      flash[:error] = "Sorry! That organization doesn't exist"
-      redirect_to(admin_organizations_url) && return
-    end
+    return true if @organization.present?
+    raise ActiveRecord::RecordNotFound # Because this should have been raised
   end
 end

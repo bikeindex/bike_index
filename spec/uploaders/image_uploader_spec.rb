@@ -4,6 +4,15 @@ require "carrierwave/test/matchers"
 RSpec.describe ImageUploader do
   include CarrierWave::Test::Matchers
 
+  describe "permitted_extensions" do
+    let(:target) { [".jpg", ".jpeg", ".gif", ".png", ".tiff", ".tif"] }
+    let(:target_display) { [".jpeg", ".gif", ".png", ".tiff"] }
+    it "is expected" do
+      expect(ImageUploader.permitted_extensions).to eq target
+      expect(ImageUploader.permitted_extensions_display).to eq target_display
+    end
+  end
+
   # TODO: Test this!
 
   # before do

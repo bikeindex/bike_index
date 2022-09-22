@@ -12,13 +12,13 @@ FactoryBot.define do
 
     trait :begun do
       status { "active" }
-      begin_at { Time.current }
-      end_at { begin_at + theft_alert_plan.duration_days.days }
+      start_at { Time.current }
+      end_at { start_at + theft_alert_plan.duration_days.days }
     end
 
     trait :ended do
       status { "inactive" }
-      begin_at { end_at - theft_alert_plan.duration_days.days }
+      start_at { end_at - theft_alert_plan.duration_days.days }
       end_at { Time.current }
     end
 

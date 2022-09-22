@@ -4,9 +4,14 @@
   %h1
     Edit
     %em
-      = @kind.humanize
+      = MailSnippet.kind_humanized(@kind)
+
+- unless viewable_email_kinds.include?(@kind)
+  .alert.alert-warning.mb-4
+    This email isn't normally viewable by normal users, it isn't part of the organizations permitted viewable kinds
 
 - if @can_edit
+  - created_at = @kind == "organization_stolen_message" ? @object.content_added_at : @object.created_at
   .row
     .col-md-6
       %table.table-list
@@ -14,24 +19,24 @@
           %tr
             %td Created
             %td
-              - if @mail_snippet.id.present?
+              - if created_at.present?
                 %span.convertTime.preciseTime
-                  = l(@mail_snippet.created_at, format: :convert_time)
+                  = l(created_at, format: :convert_time)
               - else
-                not created
+                %span.less-strong not created
           %tr
             %td Last updated
             %td
-              - if @mail_snippet.id.present?
+              - if created_at.present?
                 %span.convertTime.preciseTime
-                  = l(@mail_snippet.updated_at, format: :convert_time)
+                  = l(@object.updated_at, format: :convert_time)
     .col-md-6
       %table.table-list
         %tbody
           %tr
             %td Enabled?
             %td
-              - if @mail_snippet.is_enabled
+              - if @object.is_enabled
                 = check_mark
               - else
                 %small.less-strong false
@@ -40,34 +45,61 @@
                 Impound claims are not currently enabled
                 %small To turn on impound claims, you must enable the #{link_to "publicly accessible impound page", edit_organization_manage_impounding_path(organization_id: current_organization.to_param)}
 
+  = form_for @object, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
+    - if @kind == "organization_stolen_message"
+      .form-group.mb-5.mt-4
+        = f.label :report_url, class: "control-label" do
+          URL to make a stolen bike report in your jurisdiction
+          %small.less-strong shown to all users who report a stolen bike
+        = f.text_field :report_url, class: "form-control"
 
+    %h3.uncap.mt-4
+      Edit the
+      = @kind == "organization_stolen_message" ? "stolen message" : "email"
 
+    - if @object.editable_subject?
+      .form-group
+        = f.label :subject, "Custom email subject", class: "control-label"
+        = f.text_field :subject, class: "form-control"
 
-  %h3.uncap.mt-4
-    Edit the email
-
-  = form_for @mail_snippet, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
-    .form-group
-      = f.label :subject, "Custom email subject", class: "control-label"
-      = f.text_field :subject, class: "form-control"
+    - if @object.editable_subject?
+      .form-group
+        = f.label :subject, "Custom email subject", class: "control-label"
+        = f.text_field :subject, class: "form-control"
     .form-group
       = f.label :body, class: "control-label" do
-        Custom HTML message to add to the email
-        %small
-          %strong.text-warning
-            HTML is required
-          to do <em>any</em> formatting (for instance line breaks).
-          %em.less-strong.d-block{ style: "line-height: 1;" }
-            Need help with HTML? Check out
-            = link_to "this tutorial", "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started"
-            \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"}.
-      = f.text_area :body, rows: 4, placeholder: "Custom text", class: "form-control"
+        - if @kind == "organization_stolen_message"
+          Custom alert message to add to stolen bikes
+          %small
+            - if @object.area?
+              Stolen bikes within
+              %em= @object.search_radius_display
+              of your organization will see this message
+            - else
+              Stolen Bikes registered through your organization will see this message
+            %em.less-strong.d-block{style: "line-height: 1;"}
+              max length:
+              %strong= @object.max_body_length
+              characters
+        - else
+          Custom HTML message to add to the email
+          %small
+            %strong.text-warning
+              HTML is required
+            to do <em>any</em> formatting (for instance line breaks).
+            %em.less-strong.d-block{style: "line-height: 1;"}
+              Need help with HTML? Check out
+              = link_to "this tutorial", "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started"
+              \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"}.
+      = f.text_area :body, rows: 4, maxlength: @object.max_body_length, placeholder: "Custom text", class: "form-control"
 
     .form-group
       = f.check_box :is_enabled
       = f.label :is_enabled, class: "org-form-label" do
         Enabled
-        %em.less-strong customizations won't show up unless checked
+        %em.less-strong
+          = @kind == "organization_stolen_message" ? "message" : "customizations"
+          won't show up unless checked
 
     .mt-2
       = submit_tag "Save", class: "btn btn-success btn-md-lg"
@@ -85,8 +117,8 @@
 - else
   #emailPreview.collapse.show.in
     %h3.uncap.mt-4 Preview of email sent:
-
     .email-preview.parking-notification-email-preview
+      .text-center.small.less-strong email for preview only
       <iframe src="#{organization_email_url(@kind, organization_id: current_organization.to_param)}"></iframe>
 
   #emailPreviewUpdated.collapse

@@ -6,12 +6,19 @@ class window.BikeIndex
   loadFancySelects: ->
     $(".unfancy.fancy-select.no-restore-on-backspace select").selectize
       create: false
+      selectOnTab: true
       plugins: []
+      # TODO: Make it select on blur (select close) - but not change if there is already a value
+      # onBlur: ->
+      #   console.log(self.$activeItem)
+      #   # console.log(self.getFirstItemMatchedByTextContent(value))
     $('.unfancy.fancy-select select').selectize
       create: false
+      selectOnTab: true
       plugins: ['restore_on_backspace']
     $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
       create: false
+      selectOnTab: true
       plugins: ['restore_on_backspace', 'selectable_placeholder']
     # Remove them so we don't initialize twice
     $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
@@ -39,6 +46,10 @@ class BikeIndex.Init extends BikeIndex
     if body_id.match 'bikes_theft_alerts'
       return window.pageScript = new BikeIndex.BikesEdit
 
+    # When save fails, it can render create or update (eg bikes_create) - but really, it's bikes_new
+    # Make the body_id _new and _edit (rather than _create or _update)
+    body_id = body_id.replace(/_create$/g, '_new').replace(/_update$/g, '_edit')
+
     # All the rest per-page javascripts
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
@@ -48,29 +59,28 @@ class BikeIndex.Init extends BikeIndex
       info_donate: BikeIndex.Payments
       payments_new: BikeIndex.Payments
       bikes_new: BikeIndex.BikesNew
-      bikes_create: BikeIndex.BikesNew
       bikes_edits_show: BikeIndex.BikesEdit
-      bikes_update: BikeIndex.BikesEdit
+      bikes_edit: BikeIndex.BikesEdit # only happens from _update conversion
       bike_versions_edits_show: BikeIndex.BikesEdit
-      bike_versions_update: BikeIndex.BikesEdit
+      bike_versions_edit: BikeIndex.BikesEdit
       bikes_show: BikeIndex.BikesShow
       bike_versions_show: BikeIndex.BikesShow
       bikes_index: BikeIndex.BikesIndex
       bike_versions_index: BikeIndex.BikesIndex
       organized_bikes_index: BikeIndex.BikesIndex
       orgpublic_impounded_bikes_index: BikeIndex.BikesIndex
+      organized_graduated_notifications_index: BikeIndex.BikesIndex
       manufacturers_index: BikeIndex.InfoManufacturers
       my_accounts_edit: BikeIndex.UsersEdit
-      my_accounts_update: BikeIndex.UsersEdit
       users_new: BikeIndex.UsersNew
-      users_create: BikeIndex.UsersNew
       my_account_show: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
-      organized_manages_locations: BikeIndex.OrganizedManageLocations
+      organized_manage_locations: BikeIndex.OrganizedManageLocations
+      organizations_new: BikeIndex.OrganizedManageLocations # Because it has location fields
+      organized_manage_show: BikeIndex.OrganizedManageLocations # it CAN location fields
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
-      locks_create: BikeIndex.LocksForm
       stolen_bike_listings_index: BikeIndex.StolenBikeListing
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 

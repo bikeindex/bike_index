@@ -13,17 +13,20 @@
     .col-md-4.primary-content-menu
       -# check if this is a donation info page
       - if render_why_donate
+        - referral_source = params[:source].present? if params[:source].present?
+        - referral_source ||= "why-donate" if @blog.title_slug == Blog.why_donate_slug
+        - referral_source ||= @blog.title_slug
         .next-steps-wrap.donation
           %header
             = t(".make_a_difference")
-            = link_to t(".donate_today"), donate_path, class: "btn btn-primary"
+            = link_to t(".donate_today"), donate_path(source: referral_source), class: "btn btn-primary"
           %ul
             %li.mt-3
-              = link_to "Donate $5", donate_path(initial_amount: 5), class: "btn btn-secondary donate-btn"
+              = link_to "Donate $5", donate_path(initial_amount: 5, source: referral_source), class: "btn btn-secondary donate-btn"
             %li.mt-2
-              = link_to "Donate $50", donate_path(initial_amount: 50), class: "btn btn-secondary donate-btn"
+              = link_to "Donate $50", donate_path(initial_amount: 50, source: referral_source), class: "btn btn-secondary donate-btn"
             %li.mt-2.mb-2
-              = link_to "Donate $200", donate_path(initial_amount: 200), class: "btn btn-secondary donate-btn"
+              = link_to "Donate $200", donate_path(initial_amount: 200, source: referral_source), class: "btn btn-secondary donate-btn"
         :scss
           .next-steps-wrap .btn.donate-btn {
             display: inline-block !important;

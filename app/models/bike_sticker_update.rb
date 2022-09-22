@@ -1,6 +1,6 @@
 class BikeStickerUpdate < ApplicationRecord
   KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
-  CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2}.freeze
+  CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_bike_creation: 3, creator_import: 4}.freeze
   ORGANIZATION_KIND_ENUM = {no_organization: 0, primary_organization: 1, regional_organization: 2, other_organization: 3, other_paid_organization: 4}.freeze
 
   belongs_to :bike_sticker
@@ -8,6 +8,7 @@ class BikeStickerUpdate < ApplicationRecord
   belongs_to :user
   belongs_to :organization
   belongs_to :export
+  belongs_to :bulk_import
 
   enum kind: KIND_ENUM
   enum creator_kind: CREATOR_KIND_ENUM
@@ -50,6 +51,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def self.creator_kind_humanized(str)
     return "" unless str.present?
+    return "bike registration" if str == "creator_bike_creation"
     str.gsub("creator_", "").tr("_", " ")
   end
 
@@ -88,14 +90,30 @@ class BikeStickerUpdate < ApplicationRecord
 
   def safe_assign_creator_kind=(val)
     return unless CREATOR_KIND_ENUM.keys.map(&:to_s).include?(val.to_s)
-    self.creator_kind = val
+    if val == "creator_bike_creation"
+      set_creator_kind!
+    else
+      self.creator_kind = val
+    end
   end
 
   def set_calculated_attributes
-    self.creator_kind ||= export_id.present? ? "creator_export" : "creator_user"
+    self.creator_kind ||= "creator_user"
     self.organization_kind ||= calculated_organization_kind
     self.kind ||= calculated_kind
     self.update_number ||= previous_successful_updates.count + 1
+  end
+
+  def set_creator_kind!
+    if bike&.current_ownership.present?
+      self.organization_id ||= bike.current_ownership.organization_id
+      self.creator_kind = "creator_pos" if bike.current_ownership.pos?
+      if bike.current_ownership.bulk?
+        self.creator_kind ||= "creator_import"
+        self.bulk_import_id = bike.current_ownership.bulk_import_id
+      end
+    end
+    self.creator_kind ||= "creator_bike_creation"
   end
 
   private
@@ -115,7 +133,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def calculated_kind
     return "failed_claim" if failed_claim_errors.present?
-    return "un_claim" if bike_id.blank?
+    return "un_claim" if bike.blank? && bike_id.blank?
     previous_successful_updates.any? ? "re_claim" : "initial_claim"
   end
 end

@@ -23,6 +23,7 @@ module API
           optional :is_for_sale, type: Boolean
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
           optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
+          optional :bike_sticker, type: String, desc: "Bike Sticker code"
 
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
@@ -60,12 +61,15 @@ module API
         end
 
         def creation_user_id
-          if current_user.id == ENV["V2_ACCESSOR_ID"].to_i
-            org = params[:organization_slug].present? && Organization.friendly_find(params[:organization_slug])
-            if org && current_token.application.owner.present? && current_token.application.owner.admin_of?(org)
-              return org.auto_user_id
+          if current_user&.id == ENV["V2_ACCESSOR_ID"].to_i || doorkeeper_authorized_no_user
+            return current_organization.auto_user_id if current_organization.present? &&
+              current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
+
+            if doorkeeper_authorized_no_user
+              error!("Access tokens with no user can only be used to create bikes for organizations you're an admin of", 403)
+            else
+              error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
             end
-            error!("Permanent tokens can only be used to create bikes for organizations your are an admin of", 403)
           end
           current_user.id
         end
@@ -99,6 +103,10 @@ module API
           return true if @bike.authorize_and_claim_for_user(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
+
+        def origin_api_version
+          request.path_info.to_s&.match?("v3") ? "api_v3" : "api_v2"
+        end
       end
 
       resource :bikes do
@@ -110,8 +118,8 @@ module API
           BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
         end
 
-        desc "Check if a bike is already registered", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Check if a bike is already registered <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
         }
         params do
@@ -126,16 +134,15 @@ module API
           use :bike_attrs
         end
         post "check_if_registered" do
-          organization = Organization.friendly_find(params[:organization_slug])
-          if organization.present? && current_user.authorized?(organization)
+          if current_organization.present?
             {registered: find_owned_bike.present?}
           else
             error!("You are not authorized for that organization", 401)
           end
         end
 
-        desc "Add a bike to the Index!<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Add a bike to the Index! <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
             **Requires** `write_bikes` **in the access token** you use to create the bike.
 
@@ -177,7 +184,7 @@ module API
           if found_bike.present? && found_bike.authorized?(current_user)
             # prepare params
             declared_p = {"declared_params" => declared(params, include_missing: false)}
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
             b_param.clean_params
             @bike = found_bike
             authorize_bike_for_user
@@ -185,7 +192,13 @@ module API
             if b_param.params.dig("bike", "external_image_urls").present?
               @bike.load_external_images(b_param.params["bike"]["external_image_urls"])
             end
-
+            if b_param.bike_sticker_code.present?
+              bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: current_organization&.id)
+              # Don't reclaim an already claimed sticker
+              if bike_sticker.present? && bike_sticker.bike_id != found_bike.id
+                bike_sticker.claim_if_permitted(user: found_bike.creator, bike: found_bike.id, organization: current_organization)
+              end
+            end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
               bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone))
@@ -201,9 +214,8 @@ module API
           end
 
           declared_p = {"declared_params" => declared(params, include_missing: false).merge(creation_state_params)}
-          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
           b_param.save
-
           bike = BikeCreator.new.create_bike(b_param)
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
@@ -215,7 +227,7 @@ module API
         end
 
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 
@@ -237,7 +249,7 @@ module API
           declared_p = {"declared_params" => declared(params, include_missing: false)}
           find_bike
           authorize_bike_for_user
-          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: origin_api_version)
           b_param.clean_params
           hash = b_param.params
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
@@ -249,8 +261,8 @@ module API
           BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
-        desc "Add an image to a bike", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Add an image to a bike <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
 
             To post a file to the API with curl:
@@ -278,8 +290,8 @@ module API
           end
         end
 
-        desc "Remove an image from a bike", {
-          authorizations: {oauth2: [{scope: :write_bikes}]},
+        desc "Remove an image from a bike <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
 
             Remove an image from the bike, specifying both the bike_id and the image id (which can be found in the public_images resopnse)
@@ -302,8 +314,8 @@ module API
           BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 
-        desc "Send a stolen notification<span class='accstr'>*</span>", {
-          authorizations: {oauth2: [{scope: :read_user}]},
+        desc "Send a stolen notification <span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :read_user}},
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
 

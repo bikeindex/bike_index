@@ -102,6 +102,28 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response).to render_template(:versions)
     end
   end
+  context "with owner_email" do
+    it "renders with owner_email in ownership" do
+      get "#{base_url}?owner_email=new_email@stuff.com"
+      expect(response.status).to eq 200
+      expect(response).to render_template(:bike_details)
+      expect(assigns(:new_email_assigned)).to be_blank
+      expect(assigns(:bike).owner_email).to eq bike.owner_email
+      get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      expect(response.status).to eq 200
+      expect(response).to render_template(:ownership)
+      expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
+      expect(assigns(:new_email_assigned)).to be_truthy
+      expect {
+        put "/bikes/#{bike.to_param}", params: {bike: {owner_email: "new_email@stuff.com"}}
+      }.to change(Ownership, :count).by 1
+      get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      expect(response.status).to eq 200
+      expect(response).to render_template(:ownership)
+      expect(assigns(:new_email_assigned)).to be_falsey
+      expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
+    end
+  end
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
     it "renders" do

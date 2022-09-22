@@ -53,6 +53,8 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response).to render_template :show
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
+        expect(assigns(:controller_namespace)).to eq "organized"
+        expect(assigns(:page_id)).to eq "organized_manage_show"
       end
     end
 
@@ -62,6 +64,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
+        expect(assigns(:page_id)).to eq "organized_manage_landing"
       end
     end
 
@@ -71,6 +74,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template :locations
         expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:page_id)).to eq "organized_manage_locations"
       end
     end
 
@@ -79,7 +83,6 @@ RSpec.describe Organized::ManagesController, type: :request do
         let(:org_attributes) do
           {
             available_invitation_count: 10,
-            is_suspended: false,
             embedable_user_email: current_user.email,
             auto_user_id: current_user.id,
             show_on_map: false,
@@ -93,10 +96,10 @@ RSpec.describe Organized::ManagesController, type: :request do
         let(:user2) { FactoryBot.create(:organization_member, organization: current_organization) }
         let(:update) do
           {
+            direct_unclaimed_notifications: true,
             # slug: 'short_name',
             slug: "cool name and stuffffff",
             available_invitation_count: "20",
-            is_suspended: true,
             auto_user_id: current_user.id,
             embedable_user_email: user2.email,
             api_access_approved: true,
@@ -112,7 +115,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           }
         end
         # Website is also permitted, but we're manually setting it
-        let(:permitted_update_keys) { [:kind, :auto_user_id, :embedable_user_email, :name, :website] }
+        let(:permitted_update_keys) { [:kind, :auto_user_id, :embedable_user_email, :name, :website, :direct_unclaimed_notifications] }
         before do
           expect(user2).to be_present
           current_organization.update(org_attributes)
@@ -123,7 +126,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect_attrs_to_match_hash(current_organization, update.slice(:name))
+          expect_attrs_to_match_hash(current_organization, update.slice(:name, :direct_unclaimed_notifications))
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")
@@ -320,13 +323,11 @@ RSpec.describe Organized::ManagesController, type: :request do
               publicly_visible: false
             }
           end
-          let(:state) { FactoryBot.create(:state_illinois) }
+          let(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
           include_context :geocoder_real
           it "still updates the organization" do
             expect(current_organization.locations.count).to eq 0
             expect(current_organization.search_coordinates_set?).to be_falsey
-            UpdateMailchimpDatumWorker.new # So that it's present post stubbing
-            stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
 
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
               Sidekiq::Worker.clear_all

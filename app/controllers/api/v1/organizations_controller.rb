@@ -1,6 +1,6 @@
-module Api
+module API
   module V1
-    class OrganizationsController < ApiV1Controller
+    class OrganizationsController < APIV1Controller
       before_action :verify_organizations_token, only: [:show]
       skip_before_action :verify_authenticity_token
 
@@ -22,7 +22,7 @@ module Api
             end
             render json: organization_serialized(@organization)
           else
-            message = {'406': "Not permitted POS kind"}
+            message = {"406": "Not permitted POS kind"}
             render(json: message, status: 406) && return
           end
         else
@@ -39,7 +39,7 @@ module Api
           return true if params[:access_token] == ENV["ORGANIZATIONS_API_ACCESS_TOKEN"]
           return true if params[:access_token] == @organization.access_token
         end
-        message = {'401': "Not permitted"}
+        message = {"401": "Not permitted"}
         respond_with(message, status: :unauthorized) && return
       end
 

@@ -8,7 +8,7 @@ class State < ApplicationRecord
 
   default_scope { order(:name) }
 
-  def self.fuzzy_find(str)
+  def self.friendly_find(str)
     return nil unless str.present?
     fuzzy_abbr_find(str) || where("lower(name) = ?", str.downcase.strip).first
   end

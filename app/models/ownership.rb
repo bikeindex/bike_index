@@ -7,12 +7,14 @@ class Ownership < ApplicationRecord
     embed_partial: 3,
     api_v1: 4,
     api_v2: 5,
+    api_v3: 12, # added on 2022-4-20, prior to that v3 was reported as v2 :/
     bulk_import_worker: 6,
     organization_form: 7,
     creator_unregistered_parking_notification: 8,
     impound_import: 9,
     impound_process: 11,
-    transferred_ownership: 10
+    transferred_ownership: 10,
+    sticker: 13
   }.freeze
 
   validates_presence_of :owner_email
@@ -30,6 +32,8 @@ class Ownership < ApplicationRecord
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
 
+  has_many :notifications, as: :notifiable
+
   enum status: Bike::STATUS_ENUM
   enum pos_kind: Organization::POS_KIND_ENUM
   enum origin: ORIGIN_ENUM
@@ -41,7 +45,9 @@ class Ownership < ApplicationRecord
   scope :claimed, -> { where(claimed: true) }
   scope :initial, -> { where(previous_ownership_id: nil) }
   scope :transferred, -> { where.not(previous_ownership_id: nil) }
-  scope :transferred_pre_registration, -> { left_joins(:previous_ownership).where(previous_ownerships: {organization_pre_registration: true})}
+  scope :transferred_pre_registration, -> { left_joins(:previous_ownership).where(previous_ownerships: {organization_pre_registration: true}) }
+  scope :self_made, -> { where("user_id = creator_id") }
+  scope :not_self_made, -> { where("user_id != creator_id").or(where(user_id: nil)) }
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
@@ -98,6 +104,10 @@ class Ownership < ApplicationRecord
 
   def pos?
     Organization.pos?(pos_kind)
+  end
+
+  def organization_direct_unclaimed_notifications?
+    organization.present? && organization.direct_unclaimed_notifications?
   end
 
   def creation_description

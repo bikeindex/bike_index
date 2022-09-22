@@ -5,8 +5,8 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-# Update CircleCI config and Dockerfile if Ruby version is bumped
-ruby "2.7.5"
+# Update CircleCI config if Ruby version is bumped
+ruby "2.7.6"
 gem "rack", "2.2.3"
 gem "rails", "~> 6.0"
 
@@ -58,14 +58,13 @@ gem "omniauth-twitter"
 gem "sitemap_generator", "~> 6"
 
 # Making other files
+gem "mini_magick" # Required for image processing
 gem "carrierwave", "~> 0.11.2" # File uploader
 gem "carrierwave_backgrounder", "~> 0.4.2"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
-gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "rqrcode", "0.10.1" # QR Codes
-gem "rqrcode-rails3", github: "bikeindex/rqrcode-rails3" # QR codes more
 
 # API wrappers
 gem "twitter" # Twitter. For rendering tweets
@@ -84,7 +83,6 @@ gem "grape", "~> 1.3.0" # API DSL
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "hashie" # required for some Grape endpoints
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
-gem "wine_bouncer", github: "bikeindex/wine_bouncer", branch: "master" # Grape Authentication management
 
 # Secure things
 gem "rack-throttle" # Rate limiting
@@ -97,7 +95,7 @@ gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
-gem "premailer-rails" # Inline styles for email
+gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
 gem "sass-rails"
 gem "sprockets", "4.0.0"
 gem "sprockets-rails"
@@ -113,8 +111,8 @@ gem "stackprof", require: false
 gem "responders"
 gem "thor"
 
-gem "bundler", ">= 1.8.4" # required for rails-assets.org - JS and CSS assets
 source "https://rails-assets.org" do # JS land is crazy, so lock everything
+  gem "rails-assets-jquery", "~> 3.4.1"
   gem "rails-assets-jquery.dirtyforms", "~> 2.0.0" # Alert on attempts to leave with dirt on forms
   gem "rails-assets-lodash", "~> 4.9.0"
   gem "rails-assets-mailcheck", "~> 1.1.2" # Check for common email errors
@@ -144,9 +142,8 @@ group :development do
   # Extra faraday response logging. Used in exchange rate api client and external registry
   # Commented out because of facebook upgrade
   # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
-  gem "guard"
+  gem "guard", require: false
   gem "guard-rspec", require: false
-  gem "guard-rubocop", require: false
   gem "letter_opener"
   gem "rerun"
   gem "terminal-notifier"

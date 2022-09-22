@@ -74,6 +74,12 @@ RSpec.describe GraphingHelper, type: :helper do
         expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 2020-1-5"
       end
     end
+    context "6 months" do
+      let(:start_time) { end_time - 6.months }
+      it "is weekday month-date" do
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "2020-1-5"
+      end
+    end
     context "13 months" do
       let(:start_time) { end_time - 13.months }
       it "is year-month" do

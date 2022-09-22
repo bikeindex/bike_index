@@ -34,6 +34,13 @@ class Bikes::BaseController < ApplicationController
   end
 
   def find_bike
+    # Fix issue with sticker batches #35 & #38
+    if params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
+      permitted_params = params.except(:action, :controller, :id).as_json
+        .merge(id: params[:id].gsub("scanned", ""))
+      redirect_to(scanned_bike_path(permitted_params))
+      return
+    end
     begin
       @bike = Bike.unscoped.find(params[:bike_id] || params[:id])
     rescue ActiveRecord::StatementInvalid => e
@@ -46,7 +53,8 @@ class Bikes::BaseController < ApplicationController
   def find_or_new_b_param
     token = params[:b_param_token]
     token ||= params.dig(:bike, :b_param_id_token)
-    @b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id)
+    @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], user: current_user)
+    @b_param = BParam.find_or_new_from_token(token, user_id: current_user&.id, bike_sticker: @bike_sticker)
   end
 
   def ensure_user_allowed_to_edit

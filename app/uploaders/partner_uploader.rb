@@ -10,7 +10,7 @@ class PartnerUploader < ApplicationUploader
   end
 
   def extension_white_list
-    %w[jpg jpeg gif png tiff]
+    IMAGE_EXT_WHITE_LIST
   end
 
   process :fix_exif_rotation

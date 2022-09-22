@@ -5,21 +5,6 @@
 class RakeDevConfiguration
   require "fileutils"
   class << self
-    def toggle_dev_caching
-      file = "tmp/caching-dev.txt"
-      FileUtils.mkdir_p("tmp")
-
-      if File.exist?(file)
-        delete_toggle_file(file)
-        puts "Development mode is no longer being cached."
-      else
-        create_toggle_file(file)
-        puts "Development mode is now being cached."
-      end
-
-      FileUtils.touch "tmp/restart.txt" # Might not do anything right now, but whatever
-    end
-
     def toggle_letter_opener
       file = "tmp/skip-letter_opener.txt"
       FileUtils.mkdir_p("tmp")

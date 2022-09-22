@@ -11,5 +11,5 @@
               = hidden_field_tag :organization_id, @organization.id
             - elsif imageable_type == 'MailSnippet'
               = hidden_field_tag :mail_snippet_id, @mail_snippet.id
-            = f.file_field :image, html: {name: "public_image[image]"}, class: "d-none"
+            = f.file_field :image, class: "d-none", name: "public_image[image]", accept: ImageUploader.permitted_extensions.join(",")
         .UppyDragDrop-One-Progress

@@ -138,6 +138,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.first?).to be_truthy
           expect(ownership.previous_ownership_id).to be_blank
           expect(ownership.organization_pre_registration?).to be_truthy
+          expect(ownership.send_email).to be_truthy # still defaults to true
           # Before save, still works
           expect(ownership2.current).to be_truthy
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
@@ -149,6 +150,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.current?).to be_falsey
           expect(ownership.first?).to be_truthy
           expect(ownership2.current?).to be_truthy
+          expect(ownership2.self_made?).to be_falsey
           expect(ownership2.first?).to be_falsey
           expect(ownership2.second?).to be_truthy
           expect(ownership2.organization_pre_registration?).to be_falsey
@@ -170,6 +172,10 @@ RSpec.describe Ownership, type: :model do
           expect(ownership3.first?).to be_falsey
           expect(ownership3.second?).to be_falsey
           expect(ownership3.new_registration?).to be_falsey
+          expect(ownership3.self_made?).to be_falsey
+
+          expect(Ownership.self_made.pluck(:id)).to eq([ownership.id])
+          expect(Ownership.not_self_made.pluck(:id)).to match_array([ownership2.id, ownership3.id])
         end
       end
     end

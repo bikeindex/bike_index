@@ -1,17 +1,6 @@
-.admin-subnav
-  .col-md-6
-    %h1
-      %em
-        = @organization.name
-      Invoices
-  .col-md-6
-    %ul
-      %li.nav-item
-        = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link btn btn-outline-success btn-sm"
-  %p.subtitle
-    View #{link_to @organization.name, admin_organization_path(@organization.to_param)} admin page
+= render partial: "/admin/organizations/display_header", locals: {current_action: "", skip_invoices: true, additional_link: link_to("New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link btn btn-success btn-sm mr-2")}
 
-= render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices }
+= render partial: "/admin/organizations/invoices/table", locals: {invoices: @invoices}
 
 %h2.mt-4
   #{@organization.name} has #{pluralize(@organization.payments.count, "payment")}

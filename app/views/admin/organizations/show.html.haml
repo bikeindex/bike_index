@@ -1,20 +1,4 @@
-.admin-subnav
-  .col-md-4
-    %h1
-      = @organization.name
-  .col-md-8
-    %ul
-      %li.nav-item
-        = link_to "organization's view", organization_root_path(organization_id: @organization.to_param), class: "btn btn-outline-success btn-sm"
-      %li.nav-item
-        = link_to "Edit organization", edit_admin_organization_url(@organization), class: "nav-link"
-      - if display_dev_info?
-        %li.nav-item.only-dev-visible
-          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "nav-link less-strong"
-
-- if @organization.suspended?
-  %h2.text-danger
-    Organization is suspended
+= render partial: "/admin/organizations/display_header", locals: {current_action: "", show_custom_layouts: true, organization_view_path: organization_root_path(organization_id: @organization.to_param), show_edit: true}
 
 - if @organization.law_enforcement_missing_verified_features?
   .alert.alert-info
@@ -58,7 +42,7 @@
         %td
           Kind
         %td
-          = @organization.kind.humanize
+          = @organization.kind_humanized
           - if @organization.enabled?("official_manufacturer")
             - unless @organization.kind == "bike_manufacturer"
               %span.text-warning Kind should be "Bike Manufacturer"
@@ -169,14 +153,12 @@
 .row.mt-4
   .col-md-6
     %p
-      %strong
-        = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
-      %em.less-strong
-        #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
       - if @organization.invoices.count > 0
-        and
         %strong
           #{@organization.invoices.active.count} active
+        and
+      %em.less-strong
+        #{pluralize(@organization.invoices.count, "invoice")} total
     - if @organization.parent_organization.present?
       %p
         Parent
@@ -187,7 +169,7 @@
           = pluralize(@organization.parent_organization.invoices.count, "invoice")
         %small.less-strong
           which may add features to this organization
-    = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
+    = render partial: "/admin/organizations/invoices/table", locals: {invoices: @organization.invoices.order(id: :desc).limit(3), skip_discount_due: true}
   .col-md-6
     %table.table-list
       %tbody
@@ -206,7 +188,7 @@
                 %strong.text-warning Previously paid!
               - else
                 False
-            %em.less-strong
+            %em.small.less-strong
               Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
 
         - if @organization.paid?
@@ -217,7 +199,7 @@
                 Yes
               - else
                 %small.less-strong
-                  No
+                  no
           %tr
             %td Templates
             %td
@@ -225,7 +207,7 @@
                 = @organization.mail_snippets.pluck(:kind).to_sentence
               - else
                 %small.less-strong
-                  None
+                  none
           %tr
             %td Landing Page
             %td
@@ -236,13 +218,13 @@
                   landing page is not public - #{ link_to 'landing page', organization_landing_path(organization_id: @organization.to_param) }
               - else
                 %small.less-strong
-                  no landing page
+                  no
           %tr
             %td Additional Fields
             %td
               - additional_fields = @organization.additional_registration_fields.map { |i| OrganizationFeature.reg_field_to_bike_attrs(i)&.titleize(keep_id_suffix: true) }
               - if additional_fields.none?
-                %small.less-strong None
+                %small.less-strong none
               - else
                 %small= additional_fields.join(", ")
                 %br
@@ -264,9 +246,22 @@
                   %em.less-strong
                     = "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count)
                 - else
-                  %span.less-strong not enabled
+                  %small.less-strong not enabled
                 %small
                   = link_to "configuration", edit_organization_hot_sheet_path(organization_id: @organization.to_param)
+          - if @organization.enabled?("organization_stolen_message")
+            - organization_stolen_message = OrganizationStolenMessage.for(@organization)
+            %tr
+              %td Stolen Message
+              %td
+                - if organization_stolen_message.is_enabled
+                  = link_to "Enabled", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
+                - elsif organization_stolen_message.body.present?
+                  has content, not enabled
+                - else
+                  %small.less-strong no
+                - if organization_stolen_message.report_url.present?
+                  %small Report URL present
           %tr
             %td Stickers
             %td
@@ -329,9 +324,9 @@
             %td
               = @organization.default_location&.address
           %tr
-            %td Search radius (mi)
+            %td Search radius
             %td
-              = @organization.search_radius_miles
+              = @organization.search_radius_display
               %small.less-strong
                 This controls which organizations are regional sub organizations
         - if @organization.regional_parents.any?

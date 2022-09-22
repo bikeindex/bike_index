@@ -16,12 +16,11 @@
     .col-sm-6.text-right.mt-2
       = link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
 
-  - default_country = @organization.locations.first && @organization.locations.first.country && @organization.locations.first.country.id || Country.united_states.id
-  - default_name = @organization.name
+  - @organization.locations.build unless @organization.locations.first.present?
 
-  .locations-fieldset-wrapper#locations_fieldsets{ data: { country: default_country, name: default_name } }
+  .locations-fieldset-wrapper#locations_fieldsets
     = f.fields_for :locations do |builder|
-      = render "location_fields", f: builder
+      = render "organized/manages/location_fields", f: builder
     %span#fieldsetend
 
   .form-group.row

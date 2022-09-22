@@ -19,6 +19,7 @@ class BikesController < Bikes::BaseController
   end
 
   def show
+    redirect_to(format: "png") && return if request.format == "gif"
     @components = @bike.components
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
@@ -41,7 +42,10 @@ class BikesController < Bikes::BaseController
     find_token
     respond_to do |format|
       format.html { render :show }
-      format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
+      format.png do
+        qrcode = RQRCode::QRCode.new(bike_url(@bike))
+        render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
+      end
     end
   end
 
@@ -84,7 +88,7 @@ class BikesController < Bikes::BaseController
   end
 
   def spokecard
-    @qrcode = "#{bike_url(Bike.find(params[:id]))}.gif"
+    @qrcode = "#{bike_url(Bike.find(params[:id]))}.png"
     render layout: false
   end
 
@@ -107,7 +111,8 @@ class BikesController < Bikes::BaseController
 
   def create
     find_or_new_b_param
-    if params[:bike][:embeded] # NOTE: if embeded, doesn't verify csrf token
+    org_param = (@b_param.organization || current_organization)&.slug # Protect from nil - see #2308
+    if params.dig(:bike, :embeded).present? && org_param.present? # NOTE: if embeded, doesn't verify csrf token
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
@@ -120,16 +125,16 @@ class BikesController < Bikes::BaseController
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
-          redirect_to(embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token)) && return
+          redirect_to(embed_extended_organization_url(id: org_param, b_param_id_token: @b_param.id_token)) && return
         else
-          redirect_to(embed_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token)) && return
+          redirect_to(embed_organization_url(id: org_param, b_param_id_token: @b_param.id_token)) && return
         end
       elsif params[:bike][:embeded_extended]
         flash[:success] = translation(:bike_was_sent_to, bike_type: @bike.type, owner_email: @bike.owner_email)
         @persist_email = ParamsNormalizer.boolean(params[:persist_email])
-        redirect_to(embed_extended_organization_url(@bike.creation_organization, email: @persist_email ? @bike.owner_email : nil)) && return
+        redirect_to(embed_extended_organization_url(org_param, email: @persist_email ? @bike.owner_email : nil)) && return
       else
-        redirect_to(controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id) && return
+        redirect_to(controller: :organizations, action: :embed_create_success, id: org_param, bike_id: @bike.id) && return
       end
     elsif verified_request?
       if @b_param.created_bike.present?

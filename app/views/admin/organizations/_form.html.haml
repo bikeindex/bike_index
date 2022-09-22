@@ -1,5 +1,5 @@
 - if @organization.errors.any?
-  = render partial: "/shared/errors", locals: { name: "Organization", obj: @organization}
+  = render partial: "/shared/errors", locals: {name: "Organization", obj: @organization}
 
 
 .row
@@ -21,7 +21,10 @@
 .row
   .col-md-6
     .form-group
-      = f.label :short_name, "Short name (30 letters or less)"
+      = f.label :short_name do
+        Short name (30 letters or less)
+        - if @organization.block_short_name_edit?
+          %small.em.text-danger warning - will change org URLs (landing pages, embeds)
       = f.text_field :short_name, class: "form-control"
   .col-md-6
     .form-group
@@ -34,32 +37,28 @@
       = f.label :website
       = f.text_field :website, class: "form-control"
   .col-6.col-lg-3
-    %fieldset{:disabled => "disabled"}
+    %fieldset{disabled: true}
       .form-group
         = f.label :slug, "Slug:"
         %p.less-strong
           = @organization.slug
-  - if display_dev_info?
-    .col-6.col-lg-3.only-dev-visible
-      .form-group
-        = f.label :previous_slug do
-          Previous Slug
-          %em.small.text-warning
-            Rarely unnecessary
-        = f.text_field :previous_slug, class: "form-control"
-
+  .col-6.col-lg-3
+    .form-group{disabled: !display_dev_info?}
+      = f.label :previous_slug do
+        Previous Slug
+        %em.small.text-warning
+          Rarely unnecessary
+      - if display_dev_info?
+        = f.text_field :previous_slug, class: "form-control only-dev-visible"
+      - else
+        %p.less-strong
+          = @organization.previous_slug
 .row
   .col-md-6
     .form-group#js-organization-type
-      %strong
-        %label
-          Organization Type
-      .row
-        - Organization.kinds.each do |kind|
-          .col-6
-            .form-check
-              = f.radio_button "kind", kind, class: "form-check-input"
-              = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
+      = f.label :kind, "Organization Type"
+      - select_opts = Organization.kinds.map { |k| [Organization.kind_humanized(k), k] }
+      = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control"
       - if @organization.bike_shop?
         .form-group.mt-2
           = f.check_box :lightspeed_register_with_phone
@@ -67,8 +66,8 @@
             Lightspeed POS registrations include phone
             %small.less-strong originally for Edmonton
 
-    %hr
-    .form-group
+
+    .form-group.mt-4
       = f.check_box :show_on_map
       = f.label :show_on_map
     .form-group
@@ -84,6 +83,11 @@
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
+    .form-group
+      = f.check_box :direct_unclaimed_notifications
+      = f.label :direct_unclaimed_notifications do
+        Send emails directly to unclaimed bike owners
+        %small.less-strong don't require org to forward
     .form-group.fancy-select.unfancy.no-restore-on-backspace
       = f.label :parent_organization_id do
         Parent organization
@@ -91,7 +95,7 @@
           %strong.text-danger (probably) do not add parents!
           Parents must be part of the same organization
 
-      = f.collection_select(:parent_organization_id, Organization.with_enabled_feature_slugs("child_organizations"), :id, :name, { prompt: "Choose organization", required: false }, class: "form-control")
+      = f.collection_select(:parent_organization_id, Organization.with_enabled_feature_slugs("child_organizations"), :id, :name, {prompt: "Choose organization", required: false}, class: "form-control")
       %small
         %strong Use the "regional" feature instead.
         %em To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.
@@ -118,7 +122,7 @@
         = f.label :embedable_user_email do
           Auto user email
           %small.less-strong embed registration email
-        = f.select :embedable_user_email, emails, { prompt: "Select email", selected: @embedable_email }, class: "form-control"
+        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
         %small.less-strong
           - if @organization.memberships.count == 0
             You can use #{ENV['AUTO_ORG_MEMBER']} if
@@ -127,13 +131,12 @@
     - if @organization.official_manufacturer?
       .form-group.fancy-select.unfancy
         = f.label :manufacturer
-        = collection_select(:organization, :manufacturer_id, Manufacturer.frame_makers, :id, :name, {}, { required: true, class: "form-control" })
+        = collection_select(:organization, :manufacturer_id, Manufacturer.frame_makers, :id, :name, {}, {required: true, class: "form-control"})
         %small
           %strong This organization has <code>Official manufacturer organization</code> enabled.
           Select a manufacturer to give them manufacturer access.
 
-    - enabled_features_with_admin_forms = %w[regional_bike_counts passwordless_users graduated_notifications] + OrganizationFeature.reg_fields_with_customizable_labels
-    - if @organization.any_enabled?(enabled_features_with_admin_forms)
+    - if @organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
       .card
         .card-body
           %h4.mb-4 Settings for organization features
@@ -143,17 +146,24 @@
                 Interval for send graduated notifications, in days
                 %small
                   <span class="text-success">graduated_notifications setting</span>
-              = f.number_field :graduated_notification_interval_days, { class: "form-control" }
+              = f.number_field :graduated_notification_interval_days, {class: "form-control"}
               .text-warning.p-1
                 %em.small
                   Unless this is set, the organization will not send graduated notifications - even if they have the feature enabled
           - if @organization.enabled?("regional_bike_counts")
             .form-group
-              = f.label :search_radius_miles do
-                Search radius (mi)
-                %small
-                  <span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations
-              = f.number_field :search_radius_miles, { class: "form-control" }
+              - if @organization.search_radius_metric_units?
+                = f.label :search_radius_kilometers do
+                  Search radius (km)
+                  %small
+                    <span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations
+                = f.number_field :search_radius_kilometers, {class: "form-control"}
+              - else
+                = f.label :search_radius_miles do
+                  Search radius (mi)
+                  %small
+                    <span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations
+                = f.number_field :search_radius_miles, {class: "form-control"}
               .text-warning.p-1
                 %em.small
                   %code.d-inline nearby_organizations
@@ -174,7 +184,16 @@
                 %span.small.less-strong Ask Seth for help changing this, it's delicate
 
           - OrganizationFeature.reg_fields_with_customizable_labels.each do |reg_field|
-            - if @organization.enabled?(reg_field)
+            -# Separate handling for owner_email
+            - if reg_field == "owner_email" && @organization.paid?
+              .form-group.small
+                = label_tag "reg_label-#{reg_field}" do
+                  Custom Label for
+                  %em Owner Email
+                  (e.g. "uiowa.edu email")
+                  %small.less-strong often desired by universities
+                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), {class: "form-control"}
+            - elsif @organization.enabled?(reg_field)
               - reg_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
               - reg_attr_title = reg_attr.titleize(keep_id_suffix: true)
               .form-group.small
@@ -183,12 +202,35 @@
                   %em= reg_attr_title
                   %small.less-strong
                     leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred
-                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), { class: "form-control" }
+                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), {class: "form-control"}
 
-
-
-  / .control-group.padded
-  /   .control-label
-  /     = f.label :is_suspended
-  /   .controls
-  /     = f.check_box :is_suspended
+          - if @organization.enabled?("organization_stolen_message")
+            - organization_stolen_message = OrganizationStolenMessage.for(@organization)
+            .form-group.mt-4
+              = label_tag :organization_stolen_message_kind do
+                Stolen Message type
+                %small
+                  <span class="text-success">Organization Stolen Message setting</span>, edit message in the #{link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)}
+              - message_kind_opts = [["Association: Evey associated stolen bike sees message. Default for schools", "association"], ["Area: seen by bikes stolen in radius. Default for law enforcement, advocacy", "area"]]
+              = select_tag :organization_stolen_message_kind, options_for_select(message_kind_opts, selected: organization_stolen_message.kind), {class: "form-control"}
+              .form-group.mt-2.collapse#areaField
+                - if organization_stolen_message.search_radius_metric_units?
+                  = f.label :organization_stolen_message_search_radius_kilometers do
+                    Stolen Message radius (km)
+                    %small
+                      <span class="text-success">Organization Stolen Message setting</span> - only available for area type
+                      %span.less-strong
+                        max
+                        = OrganizationStolenMessage.max_search_radius_kilometers
+                        km
+                  = number_field_tag :organization_stolen_message_search_radius_kilometers, organization_stolen_message.search_radius_kilometers, {class: "form-control"}
+                - else
+                  = label_tag :organization_stolen_message_search_radius_miles do
+                    Stolen Message radius (mi)
+                    %small
+                      <span class="text-success">Organization Stolen Message setting</span> - only available for area type
+                      %span.less-strong
+                        max
+                        = OrganizationStolenMessage::MAX_SEARCH_RADIUS
+                        miles
+                  = number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}

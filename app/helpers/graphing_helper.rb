@@ -33,14 +33,13 @@ module GraphingHelper
   end
 
   def group_by_method(time_range)
-    range_length = time_range_length(time_range)
-    if range_length < 3601 # 1.hour + 1 second
+    if time_range.last - time_range.first < 3601 # 1.hour + 1 second
       :group_by_minute
-    elsif range_length < 500_000 # around 6 days
+    elsif time_range.last - time_range.first < 500_000 # around 6 days
       :group_by_hour
-    elsif range_length < 5_000_000 # around 60 days
+    elsif time_range.last - time_range.first < 5_000_000 # around 60 days
       :group_by_day
-    elsif range_length < 31470552 # 1.year - 1.day
+    elsif time_range.last - time_range.first < 31449600 # 364 days (52 weeks)
       :group_by_week
     else
       :group_by_month
@@ -53,6 +52,8 @@ module GraphingHelper
       "%l:%M %p"
     elsif group_period == :group_by_hour
       "%a%l %p"
+    elsif group_period == :group_by_week
+      "%Y-%-m-%-d"
     elsif %i[group_by_day group_by_week].include?(group_period) || time_range.present? && time_range.last - time_range.first < 2.weeks.to_i
       "%a %Y-%-m-%-d"
     elsif group_period == :group_by_month

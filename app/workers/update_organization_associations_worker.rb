@@ -11,6 +11,7 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
       organization.reload # Just in case default location has changed
       organization.update(skip_update: true, updated_at: Time.current)
       add_organization_manufacturers(organization)
+      update_organization_stolen_message(organization)
 
       if organization.enabled?("impound_bikes_locations")
         # If there is isn't a default impound bikes location and there should be, set one
@@ -61,6 +62,14 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
       next unless organization.bikes.where(manufacturer_id: manufacturer_id).any?
       OrganizationManufacturer.create(manufacturer_id: manufacturer_id,
         organization_id: organization.id)
+    end
+  end
+
+  def update_organization_stolen_message(organization)
+    if organization.enabled?("organization_stolen_message")
+      OrganizationStolenMessage.for(organization) # Create if it doesn't exist
+    elsif organization.organization_stolen_message&.is_enabled?
+      organization.organization_stolen_message.update(is_enabled: false)
     end
   end
 end

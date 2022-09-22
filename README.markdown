@@ -50,30 +50,11 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 | Toggle in development | command                      | default  |
 | ---------             | -------                      | -------  |
-| Caching               | `bin/rake dev:cache`         | disabled |
+| Caching               | `bundle exec rails dev:cache`         | disabled |
 | [letter_opener][]     | `bin/rake dev:letter_opener` | enabled  |
 | logging with lograge  | `bin/rake dev:lograge`       | enabled  |
 
 [letter_opener]: https://github.com/ryanb/letter_opener
-
-## Running Bike Index with Docker
-
-For running you need to have [docker](https://docs.docker.com/engine/install/) and [docker compose](https://docs.docker.com/compose/install/) installed.
-
-- `docker-compose up` build and download containers:
-  - Install Ruby and Javascript dependencies
-  - Starts all servers (you need to setup the application on the first time, see bellow)
-
-- `docker-compose run app bin/setup` sets up the application and seeds:
-  - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
-  - Gives user@example.com 50 bikes
-
-- Add `docker-compose run app` before any other rails command, f.e.:
-  - `docker-compose run app rails console` for Rails console
-  - `docker-compose run app bundle exec rspec` for running tests
-  - `docker-compose run app yarn install` to install or update JS dependencies
-
-- Go to [localhost:3001](http://localhost:3001)
 
 ## Internationalization
 
@@ -112,6 +93,8 @@ We use the following tools to automate code formatting and linting:
 - [EditorConfig](https://editorconfig.org/)
 - [StandardRB](https://github.com/testdouble/standard)
 - [ESlint](https://eslint.org/)
+
+Run `bin/lint` to automatically lint the files and/or add auto formatters to your text editor (e.g. [prettier-standard](https://github.com/sheerun/prettier-standard))
 
 ### EditorConfig
 

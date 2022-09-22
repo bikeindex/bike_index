@@ -7,23 +7,23 @@
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
     %th Kind
-    %th Enabled?
+    %th.small Customized content enabled?
     %th Created
     %th Last updated
     %th Body
   %tbody
-    - viewable_email_kinds.each do |kind|
+    - (viewable_email_kinds - ["organization_stolen_message"]).each do |kind|
       - if kind == "finished_registration"
-        - mail_snippets = current_organization.mail_snippets.where(kind: MailSnippet.finished_registration_kinds)
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("finished_registration") }
       - elsif kind == "partial_registration"
-        - mail_snippets = current_organization.mail_snippets.where(kind: "partial")
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("partial_registration") }
       - else
         - mail_snippets = current_organization.mail_snippets.where(kind: kind)
       %tr
         %td
-          = link_to kind.humanize, edit_organization_email_path(kind, organization_id: current_organization.to_param)
+          = link_to MailSnippet.kind_humanized(kind), edit_organization_email_path(kind, organization_id: current_organization.to_param)
         %td
-          = check_mark if mail_snippets.any? && mail_snippets.enabled.any?
+          = check_mark if mail_snippets.any? { |mail_snippet| mail_snippet.is_enabled }
         %td
           - if mail_snippets.any?
             %span.convertTime
@@ -36,3 +36,20 @@
           - if mail_snippets.any?
             %small
               = truncate(mail_snippets.first.body, length: 100)
+    - if current_organization.enabled?("organization_stolen_message")
+      - organization_stolen_message = OrganizationStolenMessage.for(current_organization)
+      %tr
+        %td
+          = link_to "Organization Stolen Message", edit_organization_email_path("organization_stolen_message", organization_id: current_organization.to_param)
+        %td= check_mark if organization_stolen_message.is_enabled
+        %td
+          - if organization_stolen_message.content_added_at.present?
+            %span.convertTime
+              = l(organization_stolen_message.content_added_at, format: :convert_time)
+        %td
+          - if organization_stolen_message.content_added_at.present?
+            %span.convertTime
+              = l(organization_stolen_message.updated_at, format: :convert_time)
+        %td
+          %small
+            = truncate(organization_stolen_message.body, length: 100)

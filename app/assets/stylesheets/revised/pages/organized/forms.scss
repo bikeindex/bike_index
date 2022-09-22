@@ -74,6 +74,9 @@
 
   .locations-fieldset-wrapper {
     @extend .row;
+    .card-block {
+      width: 100%;
+    }
 
     fieldset {
       display: flex;
@@ -117,6 +120,8 @@
 
 .countrystatezip {
   @include media-breakpoint-up(sm) {
+    // Sometimes displaying just fields two on a row, in that case only remove padding on the right one
+    .col-sm-6:first-of-type,
     .col-sm-4:first-of-type {
       padding-right: 0;
     }

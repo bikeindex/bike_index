@@ -2,20 +2,25 @@
 - if @organization&.mail_snippet_body('welcome').present?
   = @organization.mail_snippet_body('welcome').html_safe
 
+
 - if @ownership.claim_message.present?
-  = render partial: "/shared/claim_message", locals: { bike: @bike, skip_to_see: true }
+  - if OrganizationStolenMessage.shown_to?(@bike.current_stolen_record)
+    = render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @bike.current_stolen_record}
+  = render partial: "/shared/claim_message", locals: {bike: @bike, skip_to_see: true}
 
 - else
   - if @vars[:new_user]
-    %h2{ style: 'margin-bottom: 12px;' }
+    %h2{style: 'margin-bottom: 12px;'}
       = t(".html.welcome_to_bike_index")
 
   -# used to be logic in here, but the @ownership.claim_message should mostly take this over
   - if @bike.status_impounded?
-    %h1= t(".html.thanks_for_adding_this_bike_type_you_found", bike_type: @bike.type )
+    %h1= t(".html.thanks_for_adding_this_bike_type_you_found", bike_type: @bike.type)
   - elsif @bike.status_stolen?
-    %h1= t(".html.bike_type_thieves_are_jerks", bike_type: @bike.type )
-    %p= t(".html.were_sorry_your_bike_type_was_stolen", bike_type: @bike.type )
+    %h1= t(".html.bike_type_thieves_are_jerks", bike_type: @bike.type)
+    - if OrganizationStolenMessage.shown_to?(@bike.current_stolen_record)
+      = render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @bike.current_stolen_record}
+    %p= t(".html.were_sorry_your_bike_type_was_stolen", bike_type: @bike.type)
   - else
     %h1.uncap
       - if @organization.present?
@@ -43,7 +48,7 @@
   - unless @ownership.claimed
     %h2= t(".html.youre_almost_done_registering")
 
-= render partial: 'shared/email_bike_box', locals: { bike_url: bike_url(@bike, t: @ownership.token, email: @vars[:email]) }
+= render partial: 'shared/email_bike_box', locals: {bike_url_path: bike_url(@bike, t: @ownership.token, email: @vars[:email])}
 
 - if @bike.status_stolen_or_impounded?
   %p
@@ -51,9 +56,10 @@
       - edit_bike_link = link_to t(".html.give_us_a_heads_up"), edit_bike_url(@bike)
       = t(".html.hopefully_you_find_the_owner_html", edit_bike_link: edit_bike_link)
     - else
-      = t(".html.hopefully_you_find_the_bike_html", bike_type: @bike.type )
+      = t(".html.hopefully_you_find_the_bike_html", bike_type: @bike.type)
       %strong
-        - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.fetch_current_stolen_record.find_or_create_recovery_link_token))
+        - tokenized_url = @email_preview ? @email_preview_tokenized_url : edit_bike_recovery_url(bike_id: @bike.id, token: @bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
+        - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), tokenized_url, "data-pm-no-track" => true)
         = t(".html.mark_recovered_link_html", mark_recovered_link: mark_recovered_link)
 
 - if @vars[:donation_message]
@@ -67,9 +73,11 @@
 
 - unless @ownership.claimed?
   - if @vars[:registered_by_owner]
-    = link_to t(".html.claim_the_bike_type", bike_type: @bike.type), bike_url(@bike, email: @vars[:email]), class: 'binx-button'
+    - tokenized_url = @email_preview ? @email_preview_tokenized_url : bike_url(@bike, t: @ownership.token, email: @vars[:email])
+    = link_to t(".html.claim_the_bike_type", bike_type: @bike.type), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
   - else
-    = link_to t(".html.confirm_this_bike_type", bike_type: @bike.type), bike_url(@bike, t: @ownership.token, email: @vars[:email]), class: 'binx-button'
+    - tokenized_url = @email_preview ? @email_preview_tokenized_url : bike_url(@bike, t: @ownership.token, email: @vars[:email])
+    = link_to t(".html.confirm_this_bike_type", bike_type: @bike.type), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
 
   - if @bike.status_stolen?
     %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: @bike.type)
@@ -98,6 +106,6 @@
         - protecting_your_bike_link = link_to t(".html.protecting_your_bike_here"), protect_your_bike_url
         = t(".html.read_more_about_protecting_html", link: protecting_your_bike_link)
       .locking-demonstration
-        %img{ alt: t(".html.correctly_locking_a_bike"), src: 'https://files.bikeindex.org/email_assets/locking.gif', title: t(".html.pink_power_ulocks_tm") }
+        %img{alt: t(".html.correctly_locking_a_bike"), src: 'https://files.bikeindex.org/email_assets/locking.gif', title: t(".html.pink_power_ulocks_tm")}
       %p.center-text
         %em= t(".html.a_correctly_locked_bike")

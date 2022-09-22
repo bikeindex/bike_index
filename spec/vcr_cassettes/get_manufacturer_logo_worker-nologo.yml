@@ -25,26 +25,24 @@ http_interactions:
       Connection:
       - keep-alive
       Date:
-      - Sat, 26 Feb 2022 01:01:14 GMT
+      - Tue, 12 Jul 2022 06:57:59 GMT
       Server:
       - envoy
       Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
+      - max-age=63072000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Content-Security-Policy-Report-Only:
-      - 'default-src: ''self''; report-uri https://o13610.ingest.sentry.io/api/6173537/security/?sentry_key=7ac906c405c04da0bad984892f88d1bb'
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 dd8f9d87a6d86878defca85ee01d6d4e.cloudfront.net (CloudFront)
+      - 1.1 1f6e68152880a39d72e6bf2996cd6a60.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
-      - SFO5-C1
+      - SEA19-C1
       X-Amz-Cf-Id:
-      - 4wQy1g2yAyxPbaZLMsrbgt3uNMjOVVVV3OTal_zYk0QmXP6qcLtoLw==
+      - njbx_pmFVK13MPX7TIEMe7oGW30bCkKGiR6-Arfd75iJ2hy3R4xwNQ==
     body:
       encoding: UTF-8
       string: "\n"
     http_version: 
-  recorded_at: Sat, 26 Feb 2022 01:01:14 GMT
+  recorded_at: Tue, 12 Jul 2022 06:57:59 GMT
 recorded_with: VCR 5.0.0

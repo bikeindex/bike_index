@@ -1,16 +1,60 @@
 require "rails_helper"
 
 RSpec.describe EmailOwnershipInvitationWorker, type: :job do
+  let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+  let(:ownership) { bike.ownerships.first }
   it "sends an email" do
-    ownership = FactoryBot.create(:ownership)
+    expect(ownership.reload.notifications.count).to eq 0
+    expect(ownership.user).to be_blank
     ActionMailer::Base.deliveries = []
-    EmailOwnershipInvitationWorker.new.perform(ownership.id)
-    expect(ActionMailer::Base.deliveries).not_to be_empty
+    expect {
+      EmailOwnershipInvitationWorker.new.perform(ownership.id)
+      EmailOwnershipInvitationWorker.new.perform(ownership.id)
+      EmailOwnershipInvitationWorker.new.perform(ownership.id)
+    }.to change(Notification, :count).by(1)
+    expect(ActionMailer::Base.deliveries.count).to eq 1
+    expect(ownership.reload.notifications.count).to eq 1
+    notification = Notification.last
+    expect(notification.kind).to eq "finished_registration"
+    expect(notification.delivery_status).to eq "email_success"
+    expect(notification.notifiable).to eq ownership
+    expect(notification.bike_id).to eq bike.id
+    expect(notification.user_id).to be_blank
+  end
+  context "notification already exists" do
+    let!(:notification) { FactoryBot.create(:notification, notifiable: ownership, kind: "finished_registration", delivery_status: delivery_status) }
+    let(:delivery_status) { "email_success" }
+    it "does not send an email" do
+      expect(ownership.reload.notifications.count).to eq 1
+      ActionMailer::Base.deliveries = []
+      expect {
+        EmailOwnershipInvitationWorker.new.perform(ownership.id)
+        EmailOwnershipInvitationWorker.new.perform(ownership.id)
+      }.to change(Notification, :count).by(0)
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+      expect(ownership.reload.notifications.pluck(:id)).to eq([notification.id])
+    end
+    context "delivery_status nil" do
+      let(:delivery_status) { nil }
+      it "sends an email" do
+        expect(ownership.reload.notifications.count).to eq 1
+        ActionMailer::Base.deliveries = []
+        expect {
+          EmailOwnershipInvitationWorker.new.perform(ownership.id)
+          EmailOwnershipInvitationWorker.new.perform(ownership.id)
+        }.to change(Notification, :count).by(0)
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect(ownership.reload.notifications.pluck(:id)).to eq([notification.id])
+        expect(notification.reload.delivery_status).to eq "email_success"
+      end
+    end
   end
   context "ownership does not exist" do
     it "does not send an email" do
       ActionMailer::Base.deliveries = []
-      EmailOwnershipInvitationWorker.new.perform(129291912)
+      expect {
+        EmailOwnershipInvitationWorker.new.perform(129291912)
+      }.to change(Notification, :count).by(0)
       expect(ActionMailer::Base.deliveries).to be_empty
     end
   end
@@ -34,7 +78,9 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
     it "doesn't send email, updates to be send_email false, sends email to the second ownership" do
       ActionMailer::Base.deliveries = []
       expect(ownership.send_email).to be_truthy
-      EmailOwnershipInvitationWorker.new.perform(ownership.id)
+      expect {
+        EmailOwnershipInvitationWorker.new.perform(ownership.id)
+      }.to change(Notification, :count).by(0)
       expect(ActionMailer::Base.deliveries).to be_empty
       ownership.reload
       expect(ownership.send_email).to be_falsey

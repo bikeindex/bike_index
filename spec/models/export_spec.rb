@@ -172,6 +172,19 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "assign_bike_stickers" do
+    let(:export) { Export.new }
+    it "is true if assign_bike_stickers" do
+      expect(export.assign_bike_codes?).to be_falsey
+      export.assign_bike_codes = true
+      expect(export.assign_bike_codes?).to be_truthy
+      export.options = {}
+      expect(export.assign_bike_codes?).to be_falsey
+      export.bike_code_start = "34324"
+      expect(export.assign_bike_codes?).to be_truthy
+    end
+  end
+
   describe "bikes_scoped" do
     # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
     # But we eventually want to add stolen tsv's into here
@@ -197,7 +210,7 @@ RSpec.describe Export, type: :model do
     let(:organization_reg_phone) { Organization.new(enabled_feature_slugs: ["reg_phone"]) }
     let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
-    let(:additional_headers) { %w[organization_affiliation address phone bike_sticker student_id] }
+    let(:additional_headers) { %w[address bike_sticker organization_affiliation phone student_id] }
     let(:all_headers) { permitted_headers + additional_headers }
     it "returns the array we expect" do
       expect(permitted_headers.count).to eq 13

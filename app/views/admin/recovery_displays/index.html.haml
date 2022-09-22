@@ -1,5 +1,5 @@
 - if @bike.present?
-  = render partial: "/admin/bikes/bike_tabs", locals: { bike: @bike, active_tab: "recovery_displays", display_recovery: true }
+  = render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "recovery_displays", display_recovery: true}
   %h1.mt-5.mb-4 Recovery displays
 
 - else
@@ -35,33 +35,26 @@
 .full-screen-table
   %table.table.table-striped.table-bordered.padded.table-sm
     %thead.thead-light
-      %th.small.less-strong
-        = sortable "created_at"
-      %th
-        = sortable "recovered_at"
-      %th.small
-        = sortable "updated_at"
-      %th
-        Quote
-      %th
-        Quoter
-      %th
-        %small
-          image?
-      %th
-        %small
-          Association?
+      %th= sortable "recovered_at"
+      %th.small.less-strong= sortable "created_at"
+      %th.small= sortable "updated_at"
+      %th Quote
+      %th Quoter
+      %th.small image?
+      %th.large-screens.small Association?
     %tbody
       - @recovery_displays.each do |recovery_display|
         %tr
           %td
             .less-strong-hold
-              %a.convertTime{ href: edit_admin_recovery_display_url(recovery_display) }
+              %a.convertTime.mr-2{href: edit_admin_recovery_display_url(recovery_display)}
                 = l recovery_display.recovered_at, format: :convert_time
-              %small.less-strong-right
-                = recovery_display.id
+              %code.small.less-strong-right= recovery_display.id
           %td
             %small.convertTime
+              = l recovery_display.created_at, format: :convert_time
+          %td
+            %small.convertTime.less-strong
               = l recovery_display.updated_at, format: :convert_time
           %td
             = truncate(recovery_display.quote, length: 140)

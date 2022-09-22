@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Organization, type: :model do
+  it_behaves_like "search_radius_metricable"
+
   describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
       FactoryBot.create(:bike, :in_los_angeles)
@@ -54,6 +56,30 @@ RSpec.describe Organization, type: :model do
       # Make sure we get the bikes from the org or from nearby
       expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids))
         .to(match_array([chi_bike1, nyc_bike2, nyc_bike3]))
+    end
+  end
+
+  describe "bikes member and not_member" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:user) { FactoryBot.create(:user) }
+    let!(:bike_not_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, creator: member) }
+    let!(:bike_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, creator: member, user: member) }
+    let!(:bike_transferred) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: member, creation_organization: organization) }
+    let(:ownership_transfer) { FactoryBot.create(:ownership, bike: bike_transferred, creator: member, owner_email: "newemail@bikeindex.org", organization: organization) }
+    it "selects the bikes correctly" do
+      expect(ownership_transfer.reload.organization_id).to eq organization.id
+      expect(ownership_transfer.origin).to eq "transferred_ownership"
+      expect(bike_transferred.reload.current_ownership&.id).to eq ownership_transfer.id
+      expect(bike_transferred.owner&.id).to eq member.id
+      expect(bike_transferred.user&.id).to be_blank
+      expect(bike_not_member.reload.owner&.id).to eq user.id
+      expect(bike_not_member.user&.id).to eq user.id
+      expect(bike_member.reload.user&.id).to eq member.id
+      expect(organization.users.pluck(:id)).to eq([member.id])
+      expect(organization.bikes.pluck(:id)).to match_array([bike_not_member.id, bike_member.id, bike_transferred.id])
+      expect(organization.bikes_member.pluck(:id)).to match_array([bike_member.id])
+      expect(organization.bikes_not_member.pluck(:id)).to match_array([bike_not_member.id, bike_transferred.id])
     end
   end
 
@@ -136,6 +162,8 @@ RSpec.describe Organization, type: :model do
         expect(org).to be_approved
         expect(org.website).to be_present
         expect(org.ascend_name).to be_present
+        expect(org.pos_kind).to eq "no_pos"
+        expect(org.show_bulk_import?).to be_falsey
         expect(org.parent_organization).to be_present
         expect(org.enabled?("unstolen_notifications")).to be_falsey
         expect(org.enabled_feature_slugs).to eq([])
@@ -150,6 +178,7 @@ RSpec.describe Organization, type: :model do
         expect(org.website).to be_blank
         expect(org.ascend_name).to be_blank
         expect(org.parent_organization).to be_blank
+        expect(org.show_bulk_import?).to be_falsey
         expect(org.enabled?("unstolen_notifications")).to be_truthy
         expect(org.enabled_feature_slugs).to eq(["unstolen_notifications"])
       end
@@ -200,8 +229,6 @@ RSpec.describe Organization, type: :model do
         expect(Organization.with_enabled_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
         expect(Organization.with_enabled_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
         expect(Organization.with_any_enabled_feature_slugs("show_bulk_import reg_phone show_recoveries no_address").pluck(:id)).to match_array([organization1.id, organization2.id])
-        expect(Organization.admin_text_search(" show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
-        expect(Organization.admin_text_search(" show_bulk_import show_recoveries").pluck(:id)).to eq([organization2.id])
       end
     end
   end
@@ -375,10 +402,12 @@ RSpec.describe Organization, type: :model do
     it "is falsey" do
       expect(organization.show_bulk_import?).to be_falsey
     end
-    context "paid_for" do
-      let(:organization) { Organization.new(enabled_feature_slugs: ["show_bulk_import"]) }
-      it "is truthy" do
-        expect(organization.show_bulk_import?).to be_truthy
+    context "enabled" do
+      %w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen].each do |slug|
+        let(:organization) { Organization.new(enabled_feature_slugs: [slug]) }
+        it "is truthy" do
+          expect(organization.show_bulk_import?).to be_truthy
+        end
       end
     end
   end
@@ -473,11 +502,20 @@ RSpec.describe Organization, type: :model do
         org1.id = org1.id
         expect(org1.short_name).to eq "buckshot"
         org1.delete
-        org1.reload
-        expect(org1.deleted_at).to be_present
-        expect(org1.slug).to eq "buckshot"
-        FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
-        expect(org1.slug).to eq "buckshot"
+        expect(org1.reload.deleted_at).to be_present
+        org2 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        expect(org2.short_name).to eq "buckshot"
+        expect(org2.slug).to eq "buckshot"
+        expect(org1.reload.slug).to eq "buckshot-deleted"
+        expect(org1.short_name).to eq "buckshot-deleted"
+
+        org2.delete
+        expect(org2.reload.deleted_at).to be_present
+        org2.update(updated_at: Time.current)
+        expect(org2.reload.short_name).to eq "buckshot-deleted"
+        expect(org2.slug).to eq "buckshot-deleted-2"
+        expect(org1.reload.slug).to eq "buckshot-deleted"
+        expect(org1.short_name).to eq "buckshot-deleted"
       end
     end
 
@@ -597,7 +635,7 @@ RSpec.describe Organization, type: :model do
       end
     end
     context "non-enabled snippet type" do
-      let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, kind: "partial", is_enabled: false) }
+      let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, kind: "partial_registration", is_enabled: false) }
       it "returns nil for not-enabled snippet" do
         expect(organization.mail_snippet_body("partial")).to be nil
       end
@@ -676,7 +714,7 @@ RSpec.describe Organization, type: :model do
     it "blocks naming something invalid" do
       expect(organization.save).to be_falsey
       expect(organization.id).to be_blank
-      organization.update(name: "something else", short_name: "something cool")
+      organization.update(name: "something else ", short_name: " something cool")
       expect(organization.valid?).to be_truthy
       expect(organization.id).to be_present
       valid_names = ["something else", "something cool", "something-cool"]

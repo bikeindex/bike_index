@@ -197,7 +197,7 @@
 
           -# need to check if any stickers, because maybe it has some that aren't user editable
           - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
-            = render "shared/form_well_footer_save"
+            = render "/shared/form_well_footer_save"
 
           - else
             %hr.d-none.d-md-block
@@ -221,7 +221,7 @@
                     - bike_code_from_org = @bike.organizations.with_enabled_feature_slugs("bike_stickers").last&.bike_stickers&.claimed&.reorder(:code_integer)&.second&.pretty_code
                     = text_field_tag :bike_sticker, nil, class: 'form-control', placeholder: bike_code_from_org || "A0 100"
 
-              = render "shared/form_well_footer_save"
+              = render "/shared/form_well_footer_save"
 
 - serial_correction_body = capture_haml do
   = form_tag do |t|

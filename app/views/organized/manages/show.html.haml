@@ -1,20 +1,22 @@
 %h1.mb-4.uncap
   = t(".org_settings", org_name: @organization.short_name)
 
-= form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
+= form_for @organization, {url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: {class: "organized-form"}} do |f|
 
   .form-group.row
-    = f.label :name, t(".name"), class: 'org-form-label'
+    = f.label :name, t(".name"), class: "org-form-label"
     .col-sm-4
-      = f.text_field :name, required: true, class: 'form-control'
+      = f.text_field :name, required: true, class: "form-control"
 
   .form-group.row
-    = f.label :short_name, t(".abbreviation"), class: 'org-form-label'
+    = f.label :short_name, t(".abbreviation"), class: "org-form-label"
     .col-sm-4
-      = f.text_field :short_name, class: 'form-control'
-
+      = f.text_field :short_name, class: "form-control", disabled: @organization.block_short_name_edit?
+      - if @organization.block_short_name_edit?
+        - email_link = link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"
+        %span.below-input-help= t(".contact_to_update_html", link: email_link)
   .form-group.row.fancy-select.unfancy
-    = f.label :embedable_user_email, class: 'org-form-label' do
+    = f.label :embedable_user_email, class: "org-form-label" do
       = t(".registration_email")
     .col-sm-4
       = f.select :embedable_user_email,
@@ -30,11 +32,8 @@
       %label.org-form-label
         = t(".organization_type")
       .col-sm-4
-        - Organization.user_creatable_kinds.each do |kind|
-          .radio
-            %label
-              = f.radio_button :kind, kind
-              = kind.humanize
+        - select_opts = Organization.user_creatable_kinds.map { |k| [Organization.kind_humanized(k), k] }
+        = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control"
 
   - if @organization.bike_shop? && @organization.lightspeed_pos?
     .form-group.row
@@ -42,7 +41,7 @@
         Lightspeed POS
       .col-sm-4
         .checkbox
-          %label{ style: "line-height: 1.5em;" }
+          %label{style: "line-height: 1.5em;"}
             = f.check_box :lightspeed_register_with_phone
             -# not translating because POS integration isn't translated, so whatever
             Add phone to registrations
@@ -50,9 +49,15 @@
               if checked, bikes from Lightspeed POS will be registered with their phone number (if one is available)
 
   .form-group.row
-    = f.label :website, class: 'org-form-label'
+    = f.label :website, class: "org-form-label"
     .col-sm-4
-      = f.text_field :website, class: 'form-control'
+      = f.text_field :website, class: "form-control"
+
+  - if @organization.locations.first.blank?
+    - @organization.locations.build
+    = f.fields_for :locations do |builder|
+      = render "organized/manages/location_fields", f: builder, initial_location_form: true
+    .mb-5
 
   .form-group.row.avatar-upload-wrapper
     %label.org-form-label
@@ -62,7 +67,7 @@
         = link_to image_tag(@organization.avatar_url(:thumb)), @organization.avatar_url
 
       %label.file
-        = f.file_field :avatar, class: 'avatar-upload-field'
+        = f.file_field :avatar, class: "avatar-upload-field", accept: ImageUploader.permitted_extensions.join(",")
         %span.file-custom
           %span.file-upload-text= t(".choose_file")
         = f.hidden_field :avatar_cache
@@ -72,17 +77,30 @@
 
   .form-group.row.mt-4
     .form-submit-button
-      = f.submit t(".update"), class: 'btn btn-success btn-lg'
+      = f.submit t(".update"), class: "btn btn-success btn-lg"
+
+  .form-group.row.mt-5
+    %label.org-form-label
+      = t(".stolen_emails")
+    .col-sm-4
+      .checkbox{style: "line-height: 1.5em;"}
+        %label
+          = f.check_box :direct_unclaimed_notifications
+          = t(".send_emails_directly")
+        %span.d-block= t(".unclaimed_registration_definition")
+        %span.below-input-help.mt-2
+          = t(".when_checked_go_direct")
+          %em.less-strong= t(".why_no_direct_by_default")
 
 - unless current_organization.paid?
   %hr.delete-organization-section
   %p.text-md-center
-    %a.collapsed{ href: '#', data: { toggle: 'collapse', target: '#delete-organization' } }
+    %a.collapsed{href: "#", data: {toggle: "collapse", target: "#delete-organization"}}
       = t(".i_would_like_to_terminate_my_account")
   #delete-organization.collapse
     .text-md-center
       = link_to t(".delete_organization"),
         organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
         method: :delete,
-        data: { confirm: t(".removal_confirmation", org_name: current_organization.name) },
-        class: 'btn btn-danger'
+        data: {confirm: t(".removal_confirmation", org_name: current_organization.name)},
+        class: "btn btn-danger"

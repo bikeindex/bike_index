@@ -208,7 +208,11 @@ module ControllerHelpers
 
   # This is overridden in FeedbacksController and InfoController
   def page_id
-    @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
+    @page_id ||= [
+      controller_namespace,
+      controller_name == "manages" ? "manage" : controller_name, # HACK: remove pluralization
+      action_name
+    ].compact.join("_")
   end
 
   def set_passive_organization(organization)
@@ -225,7 +229,7 @@ module ControllerHelpers
     if @period == "custom"
       if params[:start_time].present?
         @start_time = TimeParser.parse(params[:start_time], @timezone)
-        @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
+        @end_time = TimeParser.parse(params[:end_time], @timezone) || latest_period_date
         if @start_time > @end_time
           new_end_time = @start_time
           @start_time = @end_time
@@ -342,7 +346,10 @@ module ControllerHelpers
   end
 
   def require_index_admin!
-    return true if current_user.present? && current_user.superuser?
+    if current_user.present?
+      return true if current_user.superuser?
+      return true if current_user.superuser_abilities.can_access?(controller_name: controller_name, action_name: action_name)
+    end
     flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(user_root_url) && return
   end
@@ -414,8 +421,9 @@ module ControllerHelpers
       @end_time = Time.current.beginning_of_day + 1.week
     when "all"
       @start_time = earliest_period_date
+      @end_time = latest_period_date
     end
-    @end_time ||= latest_period_date
+    @end_time ||= Time.current
   end
 
   # Separate method so it can be overridden on per controller basis
