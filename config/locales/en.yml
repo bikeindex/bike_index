@@ -1031,7 +1031,7 @@ en:
       all: All
       anywhere: Anywhere
       miles_of: miles of
-      no_bikes_matched: No serial numbers exactly matched your search
+      no_bikes_matched: No bikes exactly matched your search
       not_marked_stolen: Not marked stolen
       search_bike_descriptions: Search bike descriptions
       search_for_serial_number: Search for serial number

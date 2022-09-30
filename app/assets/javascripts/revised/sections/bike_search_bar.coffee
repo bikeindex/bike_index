@@ -6,6 +6,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     @initializeEventListeners()
 
   initializeEventListeners: ->
+    window.setCategories = @setCategories
     # Submit form on clicking one of the stolenness tabs -
     # ... So that if user enters new information then clicks, the new info is applied
     $('#stolenness_tabs a').click (e) =>
@@ -79,6 +80,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
     processedResults = @processedResults # Custom data processor
     formatSearchText = @formatSearchText # Custom formatter
+    @setCategories()
     $desc_search = $query_field.select2
       allowClear: true
       tags: true
@@ -98,6 +100,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           q: params.term
           page: params.page
           per_page: per_page
+          categories: window.searchBarCategories
         processResults: (data, page) ->
           results: processedResults(data.matches)
           pagination:
@@ -119,6 +122,9 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         $('#bikes_search_form').submit()
       else
         window.bike_search_submit = true
+
+    $query_field.on 'change', (e) =>
+      @setCategories()
 
   processedResults: (items) ->
     _.map(items, (item) ->
@@ -143,3 +149,14 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       else
         'Search for'
     "#{prefix} <span class=\'label\'>" + item.text + '</span>'
+
+  # Don't include manufacturers if there is a manufacturer selected
+  setCategories: ->
+    query = $("#bikes_search_form #query_items").val()
+    query = [] if !query # Assign query to a string if it's blank
+    # if query is present and matches m_, it's a manufacturer
+    window.searchBarCategories = if / m_/.test(" #{query.join(" ")} ")
+      "colors"
+    else
+      ""
+    console.log("Setting categories - #{window.searchBarCategories}")
