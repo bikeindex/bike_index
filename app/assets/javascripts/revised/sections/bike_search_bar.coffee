@@ -1,12 +1,12 @@
 class BikeIndex.BikeSearchBar extends BikeIndex
   constructor: (target_selector = '#bikes_search_form #query_items') ->
+    @setCategories() # Set the categories for the query
     @initializeHeaderSearch($(target_selector))
     $location = $('#location')
     @setSearchProximity($location) if $location.length > 0
     @initializeEventListeners()
 
   initializeEventListeners: ->
-    window.setCategories = @setCategories
     # Submit form on clicking one of the stolenness tabs -
     # ... So that if user enters new information then clicks, the new info is applied
     $('#stolenness_tabs a').click (e) =>
@@ -80,7 +80,6 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
     processedResults = @processedResults # Custom data processor
     formatSearchText = @formatSearchText # Custom formatter
-    @setCategories()
     $desc_search = $query_field.select2
       allowClear: true
       tags: true
@@ -123,6 +122,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       else
         window.bike_search_submit = true
 
+    # Every time the select changes, check the categories
     $query_field.on 'change', (e) =>
       @setCategories()
 
@@ -159,4 +159,3 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       "colors"
     else
       ""
-    console.log("Setting categories - #{window.searchBarCategories}")
