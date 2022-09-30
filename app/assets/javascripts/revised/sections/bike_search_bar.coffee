@@ -1,5 +1,6 @@
 class BikeIndex.BikeSearchBar extends BikeIndex
   constructor: (target_selector = '#bikes_search_form #query_items') ->
+    @setCategories() # Set the categories for the query
     @initializeHeaderSearch($(target_selector))
     $location = $('#location')
     @setSearchProximity($location) if $location.length > 0
@@ -98,6 +99,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           q: params.term
           page: params.page
           per_page: per_page
+          categories: window.searchBarCategories
         processResults: (data, page) ->
           results: processedResults(data.matches)
           pagination:
@@ -119,6 +121,10 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         $('#bikes_search_form').submit()
       else
         window.bike_search_submit = true
+
+    # Every time the select changes, check the categories
+    $query_field.on 'change', (e) =>
+      @setCategories()
 
   processedResults: (items) ->
     _.map(items, (item) ->
@@ -143,3 +149,13 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       else
         'Search for'
     "#{prefix} <span class=\'label\'>" + item.text + '</span>'
+
+  # Don't include manufacturers if there is a manufacturer selected
+  setCategories: ->
+    query = $("#bikes_search_form #query_items").val()
+    query = [] if !query # Assign query to a string if it's blank
+    # if query is present and matches m_, it's a manufacturer
+    window.searchBarCategories = if / m_/.test(" #{query.join(" ")} ")
+      "colors"
+    else
+      ""
