@@ -422,4 +422,26 @@ RSpec.shared_examples "bike_searchable" do
       end
     end
   end
+
+  describe "search_serials_containing" do
+    let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|ILSZB-111JJJG8", manufacturer: manufacturer) }
+    let(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJJ") }
+    before do
+      expect([non_stolen_bike, stolen_bike].size).to eq 2
+    end
+    context "non-matching" do
+      let(:no_serial) { {query_items: [manufacturer.search_id], stolenness: "non"} }
+      let(:exact_normalized) { {serial: "11I528-111JJJJJ", stolenness: "all"} } # Because drops leading zeros
+      it "returns nil" do
+        expect(Bike.search_serials_containing(no_serial)).to be_blank
+        expect(Bike.search_serials_containing(exact_normalized).pluck(:id)).to be_blank
+      end
+    end
+    # context "exact normalized serial" do
+    #   let(:query_params) { {serial: "11I528-111JJJJJ", stolenness: "all"} } # Because drops leading zeros
+    #   it "matches only non-exact" do
+    #     expect(Bike.search_serials_containing(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
+    #   end
+    # end
+  end
 end
