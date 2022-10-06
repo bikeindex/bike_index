@@ -17,6 +17,9 @@
         = sortable "origin", render_sortable: render_sortable
       %th
         = sortable "owner_email", render_sortable: render_sortable
+      - if display_dev_info?
+        %th
+          %small.only-dev-visible send email?
       %th
         = sortable "organization_id", render_sortable: render_sortable
       %th
@@ -59,6 +62,8 @@
             %small= ownership.creation_description
           %td
             = ownership.owner_email
+          - if display_dev_info?
+            %td= check_mark if ownership.send_email
           %td
             = ownership.organization&.name
           %td.table-cell-check
