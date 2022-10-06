@@ -1,6 +1,7 @@
 - memberships ||= @memberships
 - skip_organization ||= false
 - render_sortable ||= false
+- render_deleted ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
@@ -20,6 +21,10 @@
       %th
         %small
           = sortable "role", "Admin?", render_sortable: render_sortable
+      - if render_deleted
+        %th
+          %small
+            = sortable "deleted_at", render_sortable: render_sortable
 
     %tbody
       - memberships.each do |membership|
@@ -49,3 +54,8 @@
               = membership.sender_id
           %td
             = check_mark if membership.admin?
+          - if render_deleted
+            %td
+              - if membership.deleted_at.present?
+                %small.convertTime
+                  = l membership.deleted_at, format: :convert_time

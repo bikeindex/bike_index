@@ -1,0 +1,46 @@
+-# Requires locals: collection, name
+- count ||= collection.total_count
+- skip_total ||= false
+- skip_pagination ||= false
+-# override added to convert Created to Imported - for clarity in payroll_times
+- humanized_time_range_column_override ||= nil
+
+.mt-4.mb-4
+- unless skip_total
+  %p.pagination-number
+    %strong= number_with_delimiter(count)
+    Matching #{name.pluralize(count)}
+
+    -# Almost all have time range...
+    - if defined?(@time_range) && @period != "all"
+      %em
+        - if defined?(@time_range_column)
+          %strong
+            - if humanized_time_range_column_override.present?
+              = humanized_time_range_column_override
+            - else
+              = humanized_time_range_column(@time_range_column)
+        = humanized_time_range(@time_range)
+  - if current_organization.present?
+    %p.mt-2
+      %strong
+        Viewing #{name.pluralize} for
+        = link_to current_organization.name, admin_organization_path(current_organization)
+      %small.less-strong
+        View #{name} for
+        = link_to "all organizations", url_for(sortable_search_params.merge(organization_id: ""))
+      - if current_organization.deleted?
+        %em.d-block.mt-1
+          = current_organization.name
+          was
+          %span.text-danger deleted
+          %small.convertTime.preciseTime.withPreposition
+            = l current_organization.deleted_at, format: :convert_time
+
+- unless skip_pagination
+  .row.mt-4
+    .pagination-flex.justify-content-md-end{class: (skip_total ? "col-12" : "col-md-7")}
+      = paginate collection, views_prefix: 'admin'
+      - if count > @per_page.to_i
+        - per_pages = [10, 25, 50, 100, @per_page.to_i].uniq.sort
+        = select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {class: "form-control per-page-select"}

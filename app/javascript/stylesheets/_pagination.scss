@@ -1,0 +1,36 @@
+.pagination-flex {
+  display: flex;
+  flex-wrap: wrap;
+  opacity: 0.65; // Make it a little less prominent, it isn't the most important thing on the page
+  .pagination {
+    margin: 0.5rem 0.5rem 0 0;
+  }
+  &.pagination-sm a.page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  .pagination-number,
+  .per-page {
+    display: flex;
+    flex-basis: 0;
+    flex-grow: 1;
+    margin-top: 0.5rem;
+  }
+  .per-page {
+    min-width: 9rem;
+    max-width: 9rem;
+  }
+  .pagination-number {
+    margin-left: 0.5rem;
+  }
+
+  .per-page-select {
+    margin-top: 0.5rem; // Align with the pagination part
+    width: 8rem;
+    display: inline-block;
+  }
+}
+
+.pagination-number {
+  margin: 1rem 0 0;
+}

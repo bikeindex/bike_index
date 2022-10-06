@@ -49,7 +49,7 @@ class Admin::MembershipsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at invited_email sender_id claimed_at organization_id role]
+    %w[created_at invited_email sender_id claimed_at organization_id role deleted_at]
   end
 
   def permitted_parameters
@@ -65,10 +65,12 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def matching_memberships
-    if current_organization.present?
+    memberships = if current_organization.present?
       current_organization.memberships
     else
       Membership.all
     end
+    @deleted_memberships = current_organization.deleted? || ParamsNormalizer.boolean(params[:search_deleted])
+    @deleted_memberships ? memberships.deleted : memberships
   end
 end
