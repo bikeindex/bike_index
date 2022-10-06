@@ -149,13 +149,12 @@
         = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-.row.mt-4
-  .col
-    = paginate @bikes, views_prefix: "admin"
+
+= render partial: "/admin/kaminari/admin_pagination", locals: {collection: @memberships, count: @memberships.total_count, name: "Membership"}
 
 - if params[:multi_delete]
   = render partial: "/admin/bikes/table_multidelete"
 - else
   = render partial: "/admin/bikes/table", locals: {render_sortable: true}
 
-= paginate @bikes, views_prefix: "admin"
+= render partial: "/admin/kaminari/admin_pagination", locals: {collection: @memberships, count: @memberships.total_count, name: "Membership", skip_total: true}

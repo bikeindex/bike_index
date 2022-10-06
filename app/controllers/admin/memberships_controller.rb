@@ -70,7 +70,7 @@ class Admin::MembershipsController < Admin::BaseController
     else
       Membership.all
     end
-    @deleted_memberships = current_organization.deleted? || ParamsNormalizer.boolean(params[:search_deleted])
+    @deleted_memberships = current_organization&.deleted? || ParamsNormalizer.boolean(params[:search_deleted])
     @deleted_memberships ? memberships.deleted : memberships
   end
 end

@@ -432,6 +432,6 @@
   .col-6.text-right
     - if @organization.deleted?
 
-      = link_to "Un-Delete organization", admin_recover_organization_path(id: organization.id), data: {confirm: "Are you sure?"}, class: "btn btn-outline-warning"
+      = link_to "Un-Delete organization", admin_recover_organization_path(id: @organization.id), data: {confirm: "Are you sure?"}, class: "btn btn-outline-warning"
     - else
       = link_to "Delete", admin_organization_url(@organization), method: :delete, data: {confirm: "Are you sure?"}, class: "btn btn-danger"
