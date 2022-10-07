@@ -1,6 +1,9 @@
 class UserBan < ApplicationRecord
   REASON_ENUM = {
-    something: 0
+    abuse: 0,
+    extortion: 1,
+    known_criminal: 2,
+    bad_actor: 3
   }.freeze
 
   acts_as_paranoid
@@ -10,5 +13,5 @@ class UserBan < ApplicationRecord
   belongs_to :user
   belongs_to :creator, class_name: "User"
 
-  validates_presence_of :reason, :user_id, :creator_id
+  validates_presence_of :reason, :user_id
 end
