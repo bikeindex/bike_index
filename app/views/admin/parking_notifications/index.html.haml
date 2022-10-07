@@ -20,17 +20,6 @@
 
   = render partial: "/shared/admin_current_header", locals: { viewing: "Parking notifications" }
 
-.row.mt-4.mb-4
-  .col-sm-6
-    = number_with_delimiter(@parking_notifications.total_count)
-    matching parking notifications
-    %em
-      = humanized_time_range(@time_range)
-    - if current_organization.present?
-      %strong
-        from
-        = link_to current_organization.short_name, admin_organization_path(current_organization)
-
 - if @render_chart
   = column_chart time_range_counts(collection: matching_parking_notifications), stacked: true, thousands: ","
   - unless params[:organization_id].present?
@@ -53,6 +42,6 @@
 .mt-4.mb-4
   = render partial: "/shared/period_select"
 
-= paginate @parking_notifications, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @parking_notifications}
 
 = render partial: "/admin/parking_notifications/table", locals: {parking_notifications: @parking_notifications, render_sortable: true}

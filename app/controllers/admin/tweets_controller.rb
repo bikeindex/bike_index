@@ -5,12 +5,12 @@ class Admin::TweetsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @tweets = matching_tweets
       .includes(:twitter_account, :public_images, :stolen_record, :retweets, :original_tweet)
       .reorder(sort_column + " " + sort_direction)
       .page(page)
-      .per(per_page)
+      .per(@per_page)
   end
 
   def show

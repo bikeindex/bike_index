@@ -53,6 +53,7 @@
       .form-group.ml-auto.mr-2.mb-2
         = text_field_tag :query, params[:query], placeholder: "Search tweets", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
-= paginate @tweets, views_prefix: "admin"
+
+= render partial: "/shared/pagination", locals: {collection: @tweets}
 
 = render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true }

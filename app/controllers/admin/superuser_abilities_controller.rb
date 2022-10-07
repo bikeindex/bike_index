@@ -4,10 +4,10 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @superuser_abilities = searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
       .includes(:user)
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   helper_method :searched_superuser_abilities, :permitted_kinds

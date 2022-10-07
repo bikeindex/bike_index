@@ -7,10 +7,10 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @recoveries = available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
       .includes(:bike)
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   def show

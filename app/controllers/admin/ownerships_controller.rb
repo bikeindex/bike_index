@@ -5,10 +5,10 @@ class Admin::OwnershipsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @ownerships = matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
       .includes(:bike, :organization, :creator, :user)
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   def edit

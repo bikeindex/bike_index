@@ -5,10 +5,10 @@ class Admin::MailchimpDataController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @mailchimp_data = matching_mailchimp_data.includes(:user, :feedbacks)
       .order(sort_column + " " + sort_direction)
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   helper_method :matching_mailchimp_data
