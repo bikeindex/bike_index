@@ -1,7 +1,7 @@
 - viewing ||= controller_name.humanize
 
 
-- header_present = params[:user_id].present? || params[:organization_id].present? || params[:search_bike_id].present?
+- header_present = params[:user_id].present? || params[:organization_id].present? || params[:search_bike_id].present? || params[:search_kind].present?
 
 - if header_present
   .col-12.mt-4
@@ -9,7 +9,7 @@
       - user_subject = @user || User.unscoped.find_by_id(params[:user_id])
       %p
         - if user_subject.present?
-          #{viewing} for
+          #{viewing.pluralize} for
           = link_to user_subject.display_name, admin_user_path(user_subject)
         - else
           %span.text-danger
@@ -21,7 +21,7 @@
       - bike_subject = @bike || Bike.unscoped.find_by_id(params[:search_bike_id])
       %p
         - if bike_subject.present?
-          #{viewing} for
+          #{viewing.pluralize} for
           = link_to bike_subject.title_string, admin_bike_path(bike_subject)
           - if bike_subject.deleted?
             = render partial: "/admin/bikes/deleted_alert", locals: { bike: bike_subject }
@@ -33,7 +33,7 @@
 
     - if params[:organization_id].present?
       %p
-        #{viewing} for
+        #{viewing.pluralize} for
         - if current_organization.present?
           %em
             = link_to current_organization.short_name, admin_organization_path(current_organization)
@@ -46,3 +46,11 @@
             (#{current_organization.short_name} is <em class="text-danger">deleted</em>) - at
             %span.convertTime.preciseTime
               = l current_organization.deleted_at, format: :convert_time
+
+    - if params[:search_kind].present?
+      - kind_humanized ||= params[:search_kind].humanize
+      %p
+        #{viewing.pluralize} for
+        %strong= kind_humanized
+
+        = link_to "view for all kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "gray-link small"

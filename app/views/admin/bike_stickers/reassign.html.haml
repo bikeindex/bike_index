@@ -84,9 +84,8 @@
         = number_with_delimiter(matching_bike_stickers.claimed.count)
         claimed
 
-.mt-2
-= paginate @bike_stickers, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @bike_stickers, name: "Sticker"}
 
 = render partial: "table", locals: { bike_stickers: @bike_stickers, render_sortable: true }
 
-= paginate @bike_stickers, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @bike_stickers, name: "Sticker", skip_total: true}

@@ -130,10 +130,8 @@
         %h3 More than 100 matching stickers, just showing the first 100
       = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)}
 
-.row
-  .col-sm-6.offset-sm-6
-    = paginate @bike_sticker_updates, views_prefix: "admin"
 
+= render partial: "/shared/pagination", locals: {collection: @bike_sticker_updates, name: "Sticker Update"}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border

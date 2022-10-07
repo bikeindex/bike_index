@@ -72,9 +72,8 @@
       %em
         (#{matching_organizations.where("organizations.created_at >= ?", Time.current.beginning_of_day).count} today)
 
-= paginate @organizations, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @organizations}
 
 = render partial: "/admin/organizations/table", locals: { render_sortable: true }
 
-= paginate @organizations, views_prefix: "admin"
-
+= render partial: "/shared/pagination", locals: {collection: @organizations}

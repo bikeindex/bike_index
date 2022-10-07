@@ -70,14 +70,6 @@
 
 = render partial: "/shared/period_select"
 
-.row.mb-4.mt-4
-  .col-sm-6.col-lg-4.mt-4
-    = number_with_delimiter(matching_user_alerts.count)
-    = "matching User Alert".pluralize(matching_user_alerts.count)
-    %em
-      = humanized_time_range_column(@time_range_column)
-      = humanized_time_range(@time_range)
-  .col-lg-4
-    = paginate @user_alerts, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @user_alerts}
 
 = render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user.present?}

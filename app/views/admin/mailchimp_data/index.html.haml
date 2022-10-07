@@ -45,13 +45,7 @@
     = column_chart time_range_counts(collection: matching_mailchimp_data, column: @time_range_column), stacked: true, thousands: ","
 
 .row.mb-4.mt-4
-  .col-sm-6.col-lg-4.mt-4
-    = number_with_delimiter(matching_mailchimp_data.count)
-    matching Mailchimp Data
-    %em
-      = humanized_time_range_column(@time_range_column)
-      = humanized_time_range(@time_range)
-  .col-sm-6.col-lg-4.mt-3
+  .col-sm-12
     = form_tag admin_mailchimp_data_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_list, params[:search_list]
@@ -59,8 +53,8 @@
       .form-group.ml-auto.mb-0
         = text_field_tag :query, params[:query], placeholder: "Search email", class: "form-control ml-auto"
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
-  .col-lg-4
-    = paginate @mailchimp_data, views_prefix: "admin"
+
+= render partial: "/shared/pagination", locals: {collection: @mailchimp_data}
 
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable

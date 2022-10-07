@@ -94,22 +94,12 @@
   = render partial: "/shared/period_select", locals: { include_future: true }
 
 %p
-  = @invoices.total_count
-  = "matching invoice".pluralize(@invoices.total_count)
-  -# show where if sorting by certain columns, makes more sense
-  - if @period != "all" && %w[subscription_end_at subscription_start_at].include?(@time_range_column)
-    where
-  %em
-    %strong
-      = humanized_time_range_column(@time_range_column)
-    = humanized_time_range(@time_range)
-  %br
   Total paid:
   %strong= MoneyFormater.money_format(matching_invoices.sum(:amount_paid_cents))
 
 %p.less-strong
   Go to individual organizations to create new invoices
 
-= paginate @invoices, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @invoices}
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }
