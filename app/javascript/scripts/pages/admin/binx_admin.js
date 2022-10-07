@@ -73,6 +73,13 @@ function BinxAdmin () {
         this.fixStolenBikeImageWidth(this)
       }
 
+      if ($('#userBanFields').length) {
+        $('#user_banned').on('change', e => {
+          this.toggleUserBanFields()
+        })
+        this.toggleUserBanFields() // In case the user is already banned
+      }
+
       this.initPerPageSelect()
     },
 
@@ -144,6 +151,17 @@ function BinxAdmin () {
 
       const $imageEditLength = $('#stolenBikeImageEditing li').length
       $('#stolenBikeImageEditing').css('width', `${190 * $imageEditLength}px`)
+    },
+
+    toggleUserBanFields () {
+      log.debug('toggling')
+      if ($('#user_banned').prop('checked')) {
+        $('#userBanFields').collapse('show')
+        $('.userBanReasonSelect').attr('required', true)
+      } else {
+        $('.userBanReasonSelect').attr('required', false)
+        $('#userBanFields').collapse('hide')
+      }
     },
 
     initPerPageSelect () {

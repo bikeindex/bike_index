@@ -4,7 +4,7 @@ class CreateUserBans < ActiveRecord::Migration[6.1]
       t.references :user
       t.references :creator
       t.integer :reason
-      t.text :notes
+      t.text :description
 
       t.datetime :deleted_at
 

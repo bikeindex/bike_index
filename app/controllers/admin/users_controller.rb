@@ -5,8 +5,8 @@ class Admin::UsersController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    @per_page = params[:per_page] || 25
-    @users = matching_users.reorder("users.#{sort_column} #{sort_direction}").page(page).per(@per_page)
+    per_page = params[:per_page] || 25
+    @users = matching_users.reorder("users.#{sort_column} #{sort_direction}").page(page).per(per_page)
       .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :memberships, :ambassador_tasks)
   end
 
@@ -29,8 +29,11 @@ class Admin::UsersController < Admin::BaseController
       @user.name = params[:user][:name]
       @user.email = params[:user][:email]
       @user.superuser = params[:user][:superuser]
-      @user.developer = params[:user][:developer] if current_user.developer?
+      @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
       @user.banned = params[:user][:banned]
+      if @user.banned && permitted_ban_parameters[:reason].present?
+        UserBan.create!(permitted_ban_parameters)
+      end
       @user.username = params[:user][:username]
       @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
       @user.phone = params[:user][:phone]
@@ -65,6 +68,12 @@ class Admin::UsersController < Admin::BaseController
   def find_user
     @user = User.username_friendly_find(params[:id])
     raise ActiveRecord::RecordNotFound unless @user.present?
+  end
+
+  def permitted_ban_parameters
+    params.require(:user).permit(user_ban_attributes: %i[reason description])
+      &.dig(:user_ban_attributes)
+      .merge(creator_id: current_user.id, user_id: @user.id)
   end
 
   def force_merge_users(email)

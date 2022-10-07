@@ -3090,7 +3090,7 @@ CREATE TABLE public.user_bans (
     user_id bigint,
     creator_id bigint,
     reason integer,
-    notes text,
+    description text,
     deleted_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
