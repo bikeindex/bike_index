@@ -73,7 +73,7 @@ class Admin::UsersController < Admin::BaseController
   def permitted_ban_parameters
     params.require(:user).permit(user_ban_attributes: %i[reason description])
       &.dig(:user_ban_attributes)
-      .merge(creator_id: current_user.id, user_id: @user.id)
+      &.merge(creator_id: current_user.id, user_id: @user.id)
   end
 
   def force_merge_users(email)

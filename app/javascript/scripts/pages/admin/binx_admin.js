@@ -154,7 +154,6 @@ function BinxAdmin () {
     },
 
     toggleUserBanFields () {
-      log.debug('toggling')
       if ($('#user_banned').prop('checked')) {
         $('#userBanFields').collapse('show')
         $('.userBanReasonSelect').attr('required', true)
