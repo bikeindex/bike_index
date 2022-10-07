@@ -26,15 +26,10 @@
 
 = column_chart time_range_counts(collection: matching_bulk_imports), stacked: true, thousands: ","
 
-= render partial: "/shared/period_select"
+.mt-4
+  = render partial: "/shared/period_select"
 
-%p
-  = number_with_delimiter(@bulk_imports.total_count)
-  = "matching bulk import".pluralize(@bulk_imports.total_count)
-  %em
-    = humanized_time_range(@time_range)
-
-= paginate @bulk_imports, views_prefix: 'admin'
+= render partial: "/shared/pagination", locals: {collection: @bulk_imports}
 
 .full-screen-table.pt-2
   %table.table.table-striped.table-bordered.sortable
@@ -91,4 +86,3 @@
                   = bulk_import.file_filename
             %td
               = admin_number_display bulk_import.ownerships.count # Don't need to do bikes through ownerships
-= paginate @bulk_imports, views_prefix: 'admin'

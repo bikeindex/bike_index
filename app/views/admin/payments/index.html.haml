@@ -64,15 +64,8 @@
 .row.mb-4
   .col-sm
     %p.mt-2
-      %strong
-        = number_with_delimiter(matching_payments.count)
-        = "matching payment".pluralize(matching_payments.count)
-      %em
-        = humanized_time_range_column(@time_range_column)
-        = humanized_time_range(@time_range)
-      %small
-        for a total of
-        = MoneyFormater.money_format(matching_payments.sum(:amount_cents))
+      A total of
+      = MoneyFormater.money_format(matching_payments.sum(:amount_cents))
   - if payments_counts.present?
     .col-sm
       .full-screen-table
@@ -109,8 +102,8 @@
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
 
-= paginate @payments, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @payments}
 
 = render partial: "table", locals: {payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid", render_method: render_method}
 
-= paginate @payments, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @payments, skip_total: true}

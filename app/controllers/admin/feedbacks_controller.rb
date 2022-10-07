@@ -4,9 +4,9 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @feedbacks = available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
     @render_kind_counts = ParamsNormalizer.boolean(params[:search_kind_counts])
   end
 

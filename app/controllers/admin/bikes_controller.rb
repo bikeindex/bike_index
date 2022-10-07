@@ -5,17 +5,17 @@ class Admin::BikesController < Admin::BaseController
 
   def index
     @page = params[:page] || 1
-    per_page = params[:per_page] || 100
+    @per_page = params[:per_page] || 100
     @bikes = available_bikes.includes(:creation_organization, :current_ownership, :paint)
       .reorder("bikes.#{sort_column} #{sort_direction}")
-      .page(@page).per(per_page)
+      .page(@page).per(@per_page)
   end
 
   def missing_manufacturer
     @page = params[:page] || 1
-    per_page = params[:per_page] || 100
+    @per_page = params[:per_page] || 100
     @bikes = missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .page(@page).per(per_page)
+      .page(@page).per(@per_page)
   end
 
   def update_manufacturers
@@ -38,8 +38,8 @@ class Admin::BikesController < Admin::BaseController
       DuplicateBikeGroup.unignored.order("created_at desc")
     end
     @page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    @duplicate_groups = duplicate_groups.page(@page).per(per_page)
+    @per_page = params[:per_page] || 25
+    @duplicate_groups = duplicate_groups.page(@page).per(@per_page)
   end
 
   def ignore_duplicate_toggle

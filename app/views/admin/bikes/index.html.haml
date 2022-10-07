@@ -61,7 +61,6 @@
         = link_to "Detailed graphs", admin_graphs_path(sortable_search_params.merge(search_kind: "bikes", period: search_period)), class: "nav-link"
       %li.nav-item
         = link_to "graph", admin_bikes_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Bikes"}
 
 - if @render_chart
   .col-12.mt-2.mb-4
@@ -89,14 +88,8 @@
 
 .row.mt-4
   .col-md-7
-    %p
-      %strong
-        = number_with_delimiter(available_bikes.count)
-      Matching Bikes
-      %em
-        = humanized_time_range(@time_range)
-
-    = render partial: "/shared/admin_current_header", locals: {viewing: "Bikes"}
+    .row
+      = render partial: "/shared/admin_current_header", locals: {viewing: "Bikes"}
     - if (params.keys & %w[user_id search_manufacturer]).any? || current_organization.present?
       %ul.mt-0
         - if current_organization.present?
@@ -149,13 +142,12 @@
         = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-.row.mt-4
-  .col
-    = paginate @bikes, views_prefix: "admin"
+
+= render partial: "/shared/pagination", locals: {collection: @bikes, count: @bikes.total_count}
 
 - if params[:multi_delete]
   = render partial: "/admin/bikes/table_multidelete"
 - else
   = render partial: "/admin/bikes/table", locals: {render_sortable: true}
 
-= paginate @bikes, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @bikes, count: @bikes.total_count, name: "Bike", skip_total: true}

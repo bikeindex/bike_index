@@ -5,10 +5,10 @@ class Admin::StolenNotificationsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 100
+    @per_page = params[:per_page] || 100
     @stolen_notifications = searched_stolen_notifications
       .reorder("#{sort_column} #{sort_direction}")
-      .includes(:bike).page(page).per(per_page)
+      .includes(:bike).page(page).per(@per_page)
   end
 
   def resend

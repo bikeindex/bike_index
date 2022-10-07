@@ -137,11 +137,11 @@ class Admin::BikeStickersController < Admin::BaseController
 
   def scoped_bike_stickers(stickers)
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
+    @per_page = params[:per_page] || 25
     stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
       .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike)
       .page(page)
-      .per(per_page)
+      .per(@per_page)
   end
 
   def permitted_parameters

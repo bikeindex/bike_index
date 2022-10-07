@@ -5,18 +5,19 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
+    @per_page = params[:per_page] || 25
     @organizations = if sort_column == "bikes"
       matching_organizations.left_joins(:bikes).group(:id)
         .order("COUNT(bikes.id) #{sort_direction}")
     else
       matching_organizations
         .reorder("organizations.#{sort_column} #{sort_direction}")
-    end.page(page).per(per_page)
+    end.page(page).per(@per_page)
   end
 
   def show
     @locations = @organization.locations
+    @deleted_memberships = @organization.deleted? || ParamsNormalizer.boolean(params[:deleted_memberships])
     @bikes = @organization.bikes.reorder("created_at desc").page(1).per(10)
   end
 

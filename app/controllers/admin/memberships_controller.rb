@@ -5,9 +5,9 @@ class Admin::MembershipsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @memberships = matching_memberships.includes(:user, :sender, :organization).reorder("memberships.#{sort_column} #{sort_direction}")
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   def show
@@ -49,7 +49,7 @@ class Admin::MembershipsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at invited_email sender_id claimed_at organization_id role]
+    %w[created_at invited_email sender_id claimed_at organization_id role deleted_at]
   end
 
   def permitted_parameters
@@ -65,10 +65,12 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def matching_memberships
-    if current_organization.present?
+    memberships = if current_organization.present?
       current_organization.memberships
     else
       Membership.all
     end
+    @deleted_memberships = current_organization&.deleted? || ParamsNormalizer.boolean(params[:search_deleted])
+    @deleted_memberships ? memberships.deleted : memberships
   end
 end

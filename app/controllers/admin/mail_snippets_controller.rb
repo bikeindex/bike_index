@@ -6,9 +6,9 @@ class Admin::MailSnippetsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
+    @per_page = params[:per_page] || 25
     @mail_snippets = matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
       .includes(:organization)
   end
 

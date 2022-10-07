@@ -28,13 +28,7 @@
       = link_to organization.name, admin_organization_path(organization.to_param)
 
 .row.mb-4.mt-4
-  .col-md-8
-    %p
-      %strong
-        = number_with_delimiter(@bikes.total_count)
-      matching
-      = "bike".pluralize(@bikes)
-  .col-md-4
+  .col-md-12
     = form_tag missing_manufacturer_admin_bikes_path, method: :get, class: "form-inline" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_exclude_organization_ids, params[:search_exclude_organization_ids]
@@ -49,7 +43,9 @@
         = select_tag :manufacturer_id, options_from_collection_for_select(Manufacturer.frame_makers, :id, :name), prompt: "Choose manufacturer"
     .col-md-2
       = submit_tag 'Update selected', class: 'btn btn-primary'
-  = paginate @bikes, views_prefix: "admin"
+
+  = render partial: "/shared/pagination", locals: {collection: @bikes}
+
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
@@ -114,4 +110,4 @@
                     pos
 
 
-  = paginate @bikes, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @bikes}
