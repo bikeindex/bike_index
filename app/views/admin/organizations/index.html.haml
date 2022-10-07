@@ -76,4 +76,4 @@
 
 = render partial: "/admin/organizations/table", locals: { render_sortable: true }
 
-= render partial: "/shared/pagination", locals: {collection: @organizations}
+= render partial: "/shared/pagination", locals: {collection: @organizations, skip_total: true}
