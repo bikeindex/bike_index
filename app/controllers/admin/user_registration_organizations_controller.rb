@@ -4,11 +4,11 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 50
     @user_registration_organizations = matching_user_registration_organizations
       .reorder("user_registration_organizations.#{sort_column} #{sort_direction}")
       .includes(:user, :organization)
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
     @render_org_counts = ParamsNormalizer.boolean(params[:search_org_counts])
   end
 

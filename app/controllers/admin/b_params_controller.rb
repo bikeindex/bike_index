@@ -4,13 +4,13 @@ class Admin::BParamsController < Admin::BaseController
 
   def index
     page = params.fetch(:page, 1)
-    per_page = params.fetch(:per_page, 25)
+    @per_page = params.fetch(:per_page, 25)
 
     @b_params = matching_b_params
       .includes(:creator, :organization)
       .reorder("b_params.#{sort_column} #{sort_direction}")
       .page(page)
-      .per(per_page)
+      .per(@per_page)
   end
 
   def show

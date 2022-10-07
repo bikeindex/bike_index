@@ -15,8 +15,8 @@
 
 = render partial: "/shared/admin_current_header", locals: {viewing: "Membership"}
 
-= render partial: "/admin/kaminari/admin_pagination", locals: {collection: @memberships, count: @memberships.total_count, name: "Membership"}
+= render partial: "/shared/pagination", locals: {collection: @memberships}
 
-= render partial: "/admin/memberships/table", locals: { memberships: @memberships, render_sortable: true, render_deleted: @deleted_memberships}
+= render partial: "/admin/memberships/table", locals: {memberships: @memberships, render_sortable: true, render_deleted: @deleted_memberships}
 
-= paginate @memberships, views_prefix: 'admin'
+= render partial: "/shared/pagination", locals: {collection: @memberships, skip_total: true}

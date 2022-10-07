@@ -1,11 +1,6 @@
 class Admin::BaseController < ApplicationController
   before_action :require_index_admin!
   layout "admin"
-  before_action :assign_default_per_page
-
-  def assign_default_per_page
-    @per_page = 25 # Lazy hack
-  end
 
   # Permit viewing deleted organizations
   def current_organization

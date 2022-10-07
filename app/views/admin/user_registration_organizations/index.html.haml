@@ -35,15 +35,7 @@
   = column_chart time_range_counts(collection: matching_user_registration_organizations, column: @time_range_column), stacked: true, thousands: ","
 = render partial: "/shared/period_select"
 
-.row.mb-4.mt-4
-  .col-sm-6.col-lg-4.mt-4
-    = admin_number_display(matching_user_registration_organizations.count)
-    = "matching User Registration Organizations".pluralize(matching_user_registration_organizations.count)
-    %em
-      = humanized_time_range_column(@time_range_column)
-      = humanized_time_range(@time_range)
-  .col-lg-4
-    = paginate @user_registration_organizations, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @user_registration_organizations}
 
 - render_sortable ||= true
 .full-screen-table

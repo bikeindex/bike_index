@@ -369,13 +369,21 @@
   .col-6
     %h4
       = number_with_delimiter(memberships.count)
-      = "Deleted" if @deleted_memberships
+      - if @deleted_memberships
+        %span.text-danger Deleted
       = "Membership".pluralize(memberships.count)
       %small
         - if @deleted_memberships
           %small
             = number_with_delimiter(memberships.claimed.count)
             claimed
+          - unless @organization.deleted?
+            \-
+            %small.less-strong
+              = link_to admin_organization_path(@organization, deleted_memberships: false), class: "gray-link" do
+                = number_with_delimiter(@organization.memberships.count)
+                %strong NOT
+                deleted membership
         - else
           %small
             = number_with_delimiter(@organization.memberships.claimed.count)
@@ -385,9 +393,8 @@
             = link_to admin_organization_path(@organization, deleted_memberships: true), class: "gray-link" do
               = number_with_delimiter(@organization.memberships.deleted.count)
               deleted
-          \-
           %small
-            = link_to "new membership", new_admin_membership_url(organization_id: @organization.to_param), class: "gray-link"
+            = link_to "new membership", new_admin_membership_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3"
   .col-6.text-right
     = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
 
