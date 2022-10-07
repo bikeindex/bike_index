@@ -41,6 +41,8 @@ class AfterUserChangeWorker < ApplicationWorker
 
     process_user_registration_organizations(user)
 
+    user.user_ban.delete if user.user_ban.present? && !user.banned?
+
     process_bikes(user) unless skip_bike_update
   end
 

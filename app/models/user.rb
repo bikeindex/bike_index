@@ -45,7 +45,10 @@ class User < ApplicationRecord
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
   has_many :theft_alerts
   has_many :feedbacks
+
   has_one :mailchimp_datum
+  has_one :user_ban
+  accepts_nested_attributes_for :user_ban
 
   scope :banned, -> { where(banned: true) }
   scope :confirmed, -> { where(confirmed: true) }

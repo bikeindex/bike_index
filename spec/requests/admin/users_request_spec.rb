@@ -55,10 +55,13 @@ RSpec.describe Admin::UsersController, type: :request do
             email: "newemailexample.com",
             confirmed: true,
             superuser: true,
-            developer: true,
+            developer: "1",
             can_send_many_stolen_notifications: true,
             banned: true,
-            phone: "9876543210"
+            phone: "9876543210",
+            user_ban_attributes: {
+              reason: "known_criminal", description: "something here"
+            }
           }
         }
         expect(user_subject.reload.name).to eq("New Name")
@@ -69,6 +72,11 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
+        user_ban = user_subject.user_ban
+        expect(user_ban).to be_valid
+        expect(user_ban.creator_id).to eq current_user.id
+        expect(user_ban.reason).to eq "known_criminal"
+        expect(user_ban.description).to eq "something here"
         # Bump the auth token, because we want to sign out the user
         expect(user_subject.auth_token).to_not eq og_auth_token
         expect(AfterUserChangeWorker.jobs.count).to be > 0

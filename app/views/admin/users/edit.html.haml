@@ -1,3 +1,29 @@
+- if @user.banned?
+  - user_ban = @user.user_ban
+  .row.mt-4.mb-4
+    .col-md-8.offset-md-2
+      %h4.text-danger
+        %strong User banned
+      %table.table-list
+        %tbody
+          %tr
+            %td Banned at
+            %td.convertTime.preciseTime
+              - time = user_ban.created_at || @user.updated_at
+              = l time, format: :convert_time
+          %tr
+            %td By
+            %td
+              - if user_ban&.creator.present?
+                = user_ban.creator.display_name
+              - elsif user_ban&.creator_id.present?
+                User ##{user_ban.creator_id} (unknown user)
+          %tr
+            %td Reason
+            %td= user_ban&.reason&.humanize
+          %tr
+            %td Notes
+            %td= user_ban&.description
 .row
   .col-md-6
     %h1
@@ -332,10 +358,6 @@
           = f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input"
           = f.label :confirmed, class: "form-check-label"
       .form-group
-        .form-check
-          = f.check_box :banned, class: "form-check-input"
-          = f.label :banned, class: "form-check-label"
-      .form-group
         .form-check.form-check-inline
           = f.check_box :can_send_many_stolen_notifications, class: "form-check-input"
           = f.label :can_send_many_stolen_notifications, class: "form-check-label"
@@ -349,11 +371,36 @@
           .form-check.form-check-inline.only-dev-visible
             = f.check_box :developer, class: "form-check-input"
             = f.label :developer, class: "form-check-label"
+  .row.mt-3
     .col-6
-      .form-group.mt-2
+      .form-group
         = f.submit 'Save', class: 'btn btn-success'
+    .col-6.pt-2
+      .form-group
+        .form-check
+          = f.check_box :banned, class: "form-check-input"
+          = f.label :banned, class: "form-check-label"
 
-%hr{ style: "margin-top: 60px;" }
+  - unless @user.user_ban&.reason.present?
+    - @user.build_user_ban unless @user.user_ban.present?
+    = f.fields_for :user_ban do |user_ban|
+      .row.collapse#userBanFields
+        .col-md-8.offset-md-2.mt-3
+          .card.bg-light
+            .card-body
+              .row
+                .col-sm-6
+                  %h4 Ban information
+                .col-sm-6
+                  .form-group
+                    - opt_vals = UserBan.reasons.map { |b| [b.humanize, b]  }
+                    = user_ban.select :reason, options_for_select(opt_vals), {prompt: "Reason for ban"}, class: 'form-control userBanReasonSelect'
+              .form-group
+                = user_ban.label :description, "Description/notes"
+                = user_ban.text_area :description, class: "form-control"
+
+
+%hr{style: "margin-top: 60px;"}
 .mt-4.mb-4.row
   .col-sm-6.mb-4
     = link_to "Delete #{@user.email}!", admin_user_url(@user.to_param), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger less-strong"
