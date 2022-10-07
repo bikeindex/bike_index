@@ -9,7 +9,7 @@
           %tr
             %td Banned at
             %td.convertTime.preciseTime
-              - time = user_ban.created_at || @user.updated_at
+              - time = user_ban&.created_at || @user.updated_at
               = l time, format: :convert_time
           %tr
             %td By
