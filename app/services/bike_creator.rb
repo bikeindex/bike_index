@@ -72,14 +72,6 @@ class BikeCreator
     bike.reload
   end
 
-  def find_duplicate_bike(b_param, bike)
-    return nil unless b_param.no_duplicate?
-    return nil if bike.serial_normalized.blank?
-    Bike.with_user_hidden
-      .where(serial_normalized: bike.serial_normalized, owner_email: bike.owner_email)
-      .where.not(id: bike.id).order(:id).first
-  end
-
   private
 
   # Previously all of this stuff was public.
@@ -166,11 +158,17 @@ class BikeCreator
     return b_param.created_bike if b_param&.created_bike&.present?
     bike = build_bike(b_param)
     bike.set_calculated_unassociated_attributes
-    # If a dupe is found, return that rather than the just built bike
-    dupe = find_duplicate_bike(b_param, bike)
-    return bike unless dupe.present?
-    b_param.update(created_bike_id: dupe.id)
-    dupe
+
+    if b_param.no_duplicate?
+      # If a dupe is found, return that rather than the just built bike
+      dupe = OwnerDuplicateBikeFinder.find_matching(serial: bike.serial_normalized,
+        owner_email: bike.owner_email)
+      if dupe.present?
+        b_param.update(created_bike_id: dupe.id)
+        return dupe
+      end
+    end
+    bike
   end
 
   def default_parking_notification_attrs(b_param, bike)

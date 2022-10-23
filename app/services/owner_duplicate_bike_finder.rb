@@ -46,4 +46,6 @@ module OwnerDuplicateBikeFinder
       users.where("users.phone = ? OR user_phones.phone = ?", phone, phone)
     end.distinct.pluck(:id)
   end
+
+  private_class_method :find_matching_user_ids
 end

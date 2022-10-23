@@ -115,9 +115,9 @@ RSpec.describe OwnerDuplicateBikeFinder do
         expect(bike1.creator.id).to_not eq user1.id
         expect(bike2.phone_registration?).to be_truthy
         expect(bike2.serial_normalized).to eq "AN0THER 5ER1A1 NUM8ER"
-        expect(described_class.find_matching_user_ids(bike1.creator.email)).to eq([bike1.creator.id])
-        expect(described_class.find_matching_user_ids(bike1.creator.email, "92929292")).to eq([bike1.creator.id])
-        expect(described_class.find_matching_user_ids("s@stuff.com", phone1)).to eq([user1.id])
+        expect(described_class.send(:find_matching_user_ids, bike1.creator.email)).to eq([bike1.creator.id])
+        expect(described_class.send(:find_matching_user_ids, bike1.creator.email, "92929292")).to eq([bike1.creator.id])
+        expect(described_class.send(:find_matching_user_ids, "s@stuff.com", phone1)).to eq([user1.id])
 
         expect(described_class.find_matching(serial: "50C001", phone: " #{phone1}  ")&.id).to eq bike1.id
         expect(described_class.find_matching(serial: serial1, owner_email: "a@b.com", phone: phone1)&.id).to eq bike1.id
@@ -185,13 +185,13 @@ RSpec.describe OwnerDuplicateBikeFinder do
       expect(user2.confirmed?).to be_falsey
       expect(user_email.confirmed?).to be_falsey
       expect(user2.email).to_not eq email
-      expect(described_class.find_matching_user_ids(email)).to eq([user2.id])
-      expect(described_class.find_matching_user_ids("something@stuff.com")).to eq([user2.id])
-      expect(described_class.find_matching_user_ids(email, "1234567890")).to eq([user2.id])
-      expect(described_class.find_matching_user_ids(nil, phone)).to eq([user1.id])
-      expect(described_class.find_matching_user_ids(nil, "7273824888")).to eq([user1.id])
-      expect(described_class.find_matching_user_ids("example@example.com", phone)).to eq([user1.id])
-      expect(described_class.find_matching_user_ids(email, phone)).to match_array([user2.id, user1.id])
+      expect(described_class.send(:find_matching_user_ids, email)).to eq([user2.id])
+      expect(described_class.send(:find_matching_user_ids, "something@stuff.com")).to eq([user2.id])
+      expect(described_class.send(:find_matching_user_ids, email, "1234567890")).to eq([user2.id])
+      expect(described_class.send(:find_matching_user_ids, nil, phone)).to eq([user1.id])
+      expect(described_class.send(:find_matching_user_ids, nil, "7273824888")).to eq([user1.id])
+      expect(described_class.send(:find_matching_user_ids, "example@example.com", phone)).to eq([user1.id])
+      expect(described_class.send(:find_matching_user_ids, email, phone)).to match_array([user2.id, user1.id])
     end
     context "confirmed email and phone" do
       let(:user1) { FactoryBot.create(:user_confirmed, phone: phone2) }
@@ -208,16 +208,16 @@ RSpec.describe OwnerDuplicateBikeFinder do
         expect(user_phone.confirmed?).to be_truthy
         expect(user2.confirmed?).to be_truthy
         expect(user_email.confirmed?).to be_truthy
-        expect(described_class.find_matching_user_ids(email)).to eq([user2.id])
-        expect(described_class.find_matching_user_ids(email2)).to eq([user2.id])
-        expect(described_class.find_matching_user_ids(email, "1234567890")).to eq([user2.id])
-        expect(described_class.find_matching_user_ids(email2, "1234567890")).to eq([user2.id])
-        expect(described_class.find_matching_user_ids(nil, phone)).to eq([user1.id])
-        expect(described_class.find_matching_user_ids(nil, phone2)).to eq([user1.id])
-        expect(described_class.find_matching_user_ids("example@example.com", phone)).to eq([user1.id])
-        expect(described_class.find_matching_user_ids("example@example.com", phone2)).to eq([user1.id])
-        expect(described_class.find_matching_user_ids(email, phone)).to match_array([user2.id, user1.id])
-        expect(described_class.find_matching_user_ids(email2, phone2)).to match_array([user2.id, user1.id])
+        expect(described_class.send(:find_matching_user_ids, email)).to eq([user2.id])
+        expect(described_class.send(:find_matching_user_ids, email2)).to eq([user2.id])
+        expect(described_class.send(:find_matching_user_ids, email, "1234567890")).to eq([user2.id])
+        expect(described_class.send(:find_matching_user_ids, email2, "1234567890")).to eq([user2.id])
+        expect(described_class.send(:find_matching_user_ids, nil, phone)).to eq([user1.id])
+        expect(described_class.send(:find_matching_user_ids, nil, phone2)).to eq([user1.id])
+        expect(described_class.send(:find_matching_user_ids, "example@example.com", phone)).to eq([user1.id])
+        expect(described_class.send(:find_matching_user_ids, "example@example.com", phone2)).to eq([user1.id])
+        expect(described_class.send(:find_matching_user_ids, email, phone)).to match_array([user2.id, user1.id])
+        expect(described_class.send(:find_matching_user_ids, email2, phone2)).to match_array([user2.id, user1.id])
       end
     end
   end
