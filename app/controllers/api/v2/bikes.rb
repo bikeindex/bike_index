@@ -86,9 +86,9 @@ module API
           @bike = Bike.unscoped.find(params[:id])
         end
 
-        # Search for a bike matching the provided serial number / owner email
-        def find_owned_bike
-          BikeFinder.find_matching(serial: params[:serial],
+        # Search for a duplicate bike - a bike matching the provided serial number / owner email
+        def find_owner_duplicate_bike
+          OwnerDuplicateBikeFinder.find_matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil)
         end
@@ -135,7 +135,7 @@ module API
         end
         post "check_if_registered" do
           if current_organization.present?
-            {registered: find_owned_bike.present?}
+            {registered: find_owner_duplicate_bike.present?}
           else
             error!("You are not authorized for that organization", 401)
           end
@@ -178,7 +178,7 @@ module API
           end
         end
         post "/" do
-          found_bike = find_owned_bike
+          found_bike = find_owner_duplicate_bike
           # if a matching bike is and can be updated by the submitter, update
           # existing record instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)

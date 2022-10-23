@@ -17,6 +17,7 @@ RSpec.describe SerialNormalizer do
       expect(SerialNormalizer.unknown_and_absent_corrected(" absenT   \n")).to eq "unknown"
       expect(SerialNormalizer.unknown_and_absent_corrected("   UNKNOWN \n")).to eq "unknown"
       expect(SerialNormalizer.unknown_and_absent_corrected("   missing \n")).to eq "unknown"
+      expect(SerialNormalizer.normalized_and_corrected("   missing \n")).to be_nil
     end
 
     it "removes double spaces" do
@@ -36,6 +37,7 @@ RSpec.describe SerialNormalizer do
         sample_misentries.each do |serial|
           expect(SerialNormalizer.unknown_and_absent_corrected(serial)).to eq("unknown"), "Failure: '#{serial}'"
         end
+        expect(SerialNormalizer.normalized_and_corrected("   unkown \n")).to be_nil
       end
     end
   end
@@ -52,7 +54,8 @@ RSpec.describe SerialNormalizer do
       entries = [
         "custom bike no serial has a unique frame design",
         "custom built ",
-        " custom "
+        " custom ",
+        "Made Without Serial"
       ]
       entries.each do |entry|
         it "normalizes '#{entry}' to 'made_without_serial'" do

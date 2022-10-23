@@ -245,6 +245,45 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
         end
       end
+      context "no_duplicate" do
+        it "creates the bikes, doesn't have any errors" do
+          expect(bike_sticker.reload.claimed?).to be_falsey
+          expect(bike_sticker.bike_sticker_updates.count).to eq 0
+          allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
+          # In production, we actually use remote files rather than local files.
+          # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
+          VCR.use_cassette("bulk_import-perform-success") do
+            expect {
+              instance.perform(bulk_import.id)
+              # This test is being flaky! Add debug printout #2101 (actually after, but still...)
+              pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+            }.to change(Bike, :count).by 2
+          end
+          # It doesn't duplicate if no duplicate is true
+          bulk_import.update(no_duplicate: true, progress: "pending")
+          expect(bulk_import.reload.no_duplicate).to be_truthy
+          VCR.use_cassette("bulk_import-perform-success") do
+            expect {
+              instance.perform(bulk_import.id)
+              pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+            }.to change(Bike, :count).by 0
+          end
+          expect(bike_sticker.reload.claimed?).to be_truthy
+          expect(bike_sticker.bike_sticker_updates.count).to eq 1
+
+          # But with no_duplicate false, it does duplicate
+          bulk_import.update(no_duplicate: false, progress: "pending")
+          expect(bulk_import.reload.no_duplicate).to be_falsey
+          VCR.use_cassette("bulk_import-perform-success") do
+            expect {
+              instance.perform(bulk_import.id)
+              pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+            }.to change(Bike, :count).by 2
+          end
+          expect(bike_sticker.reload.claimed?).to be_truthy
+          expect(bike_sticker.bike_sticker_updates.count).to eq 2
+        end
+      end
       context "valid file, kind: impounded" do
         let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
         let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
@@ -439,7 +478,8 @@ RSpec.describe BulkImportWorker, type: :job do
           user_name: nil,
           send_email: true,
           creation_organization_id: nil,
-          bike_sticker: nil
+          bike_sticker: nil,
+          no_duplicate: false
         }
       end
       describe "row_to_b_param_hash" do
@@ -479,7 +519,8 @@ RSpec.describe BulkImportWorker, type: :job do
             user_name: nil,
             send_email: true,
             creation_organization_id: nil,
-            bike_sticker: nil
+            bike_sticker: nil,
+            no_duplicate: false
           }
         end
         let(:target_impound) do
