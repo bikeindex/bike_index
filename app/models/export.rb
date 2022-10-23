@@ -1,5 +1,5 @@
 class Export < ApplicationRecord
-  VALID_PROGRESSES = %i[pending ongoing finished errored].freeze
+  PROGRESS_ENUM = %i[pending ongoing finished errored].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
@@ -10,7 +10,7 @@ class Export < ApplicationRecord
 
   belongs_to :organization
   belongs_to :user # Creator of export
-  enum progress: VALID_PROGRESSES
+  enum progress: PROGRESS_ENUM
   enum kind: VALID_KINDS
   enum file_format: VALID_FILE_FORMATS
 

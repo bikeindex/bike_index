@@ -1031,6 +1031,7 @@ en:
       all: All
       anywhere: Anywhere
       miles_of: miles of
+      doesnt_look_like_serial: The serial you entered doesn't look like a serial number, so it isn't being used to search.
       no_bikes_matched: No bikes exactly matched your search
       not_marked_stolen: Not marked stolen
       search_bike_descriptions: Search bike descriptions

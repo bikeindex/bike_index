@@ -1,5 +1,5 @@
 class BulkImport < ApplicationRecord
-  VALID_PROGRESSES = {pending: 0, ongoing: 1, finished: 2}.freeze
+  PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
   mount_uploader :file, BulkImportUploader
 
@@ -9,7 +9,7 @@ class BulkImport < ApplicationRecord
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
-  enum progress: VALID_PROGRESSES
+  enum progress: PROGRESS_ENUM
   enum kind: KIND_ENUM
 
   scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
@@ -29,7 +29,7 @@ class BulkImport < ApplicationRecord
   end
 
   def self.progresses
-    VALID_PROGRESSES.keys.map(&:to_s)
+    PROGRESS_ENUM.keys.map(&:to_s)
   end
 
   def self.kind_humanized(str)
@@ -96,9 +96,13 @@ class BulkImport < ApplicationRecord
     !no_notify
   end
 
-  # May add the ability to exclude duplicates in the future. Ascend by default
+  def no_duplicate=(val)
+    self.data ||= {}
+    self.data["no_duplicate"] = ParamsNormalizer.boolean(val)
+  end
+
   def no_duplicate
-    ascend?
+    ascend? || ParamsNormalizer.boolean(data&.dig("no_duplicate"))
   end
 
   def creator

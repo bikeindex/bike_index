@@ -64,8 +64,26 @@ RSpec.describe Admin::BulkImportsController, type: :request do
         expect(bulk_import.progress).to eq "pending"
         expect(bulk_import.organization).to eq current_organization
         expect(bulk_import.send_email).to be_falsey
+        expect(bulk_import.no_duplicate).to be_falsey
         expect(bulk_import.kind).to eq "organization_import"
         expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+      end
+      context "no_duplicate" do
+        it "creates" do
+          expect {
+            post base_url, params: {bulk_import: valid_attrs.merge(no_duplicate: "1", no_notify: "false")}
+          }.to change(BulkImport, :count).by 1
+
+          bulk_import = BulkImport.last
+          expect(bulk_import.user).to eq current_user
+          expect(bulk_import.file_url).to be_present
+          expect(bulk_import.progress).to eq "pending"
+          expect(bulk_import.organization).to eq current_organization
+          expect(bulk_import.send_email).to be_truthy
+          expect(bulk_import.no_duplicate).to be_truthy
+          expect(bulk_import.kind).to eq "organization_import"
+          expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+        end
       end
     end
   end
