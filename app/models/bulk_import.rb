@@ -96,6 +96,11 @@ class BulkImport < ApplicationRecord
     !no_notify
   end
 
+  # May add the ability to exclude duplicates in the future. Ascend by default
+  def no_duplicate
+    ascend?
+  end
+
   def creator
     organization&.auto_user || user
   end

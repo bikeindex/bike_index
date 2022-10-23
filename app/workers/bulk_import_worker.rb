@@ -100,7 +100,8 @@ class BulkImportWorker < ApplicationWorker
         user_name: row[:owner_name],
         extra_registration_number: row[:secondary_serial],
         send_email: @bulk_import.send_email,
-        creation_organization_id: @bulk_import.organization_id
+        creation_organization_id: @bulk_import.organization_id,
+        no_duplicate: @bulk_import.no_duplicate
       },
       impound_record: impound_attrs || {},
       stolen_record: @bulk_import.stolen_record_attrs,
