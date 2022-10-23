@@ -1769,6 +1769,8 @@ nl:
       submit: Voorleggen
       within: binnen
       you: jou
+      doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
+        een serienummer en wordt dus niet gebruikt om te zoeken.
     new:
       additional_serial_sticker_number: Extra framenummer / stickernummer
       affiliation: "%{org_name} aansluiting"
