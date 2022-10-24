@@ -35,7 +35,9 @@
                       %h5.title-link
                         = link_to bike_title_html(bike, include_status: true), bike_path(bike)
                       %ul.attr-list
-                        = attr_list_item(bike.serial_display(current_user), t(".serial"))
+                        %li
+                          %strong.attr-title #{t(".serial")}:
+                          = render_serial_display(bike, current_user, skip_explanation: true)
                         = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                         %li.less-strong
                           %strong.attr-title #{t(".registered")}:

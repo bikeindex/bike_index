@@ -15,14 +15,9 @@
       %li
         %strong.attr-title #{t(".serial")}:
         - if !skip_cache
-          = bike.serial_display
+          = render_serial_display(bike)
         - else # Show the user specific info
-          = bike.serial_display(current_user)
-          - if bike.serial_hidden?
-            %em.small.less-strong
-              - if bike.authorized?(current_user)
-                = t(".hidden_for_unauthorized_users")
-              = t(".hidden_because_status", bike_type: bike.type, status: bike.status_humanized_translated)
+          = render_serial_display(bike, current_user)
       = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
     - if bike.occurred_at.present?
       %ul.attr-list
