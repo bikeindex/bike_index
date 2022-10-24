@@ -2323,6 +2323,12 @@ en:
       you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
         your message right here.
   helpers:
+    bike_helper:
+      hidden: hidden
+      hidden_because_status: because %{bike_type} is %{status}
+      hidden_for_unauthorized_users: hidden for unauthorized users
+      made_without_serial: made without serial
+      unknown: unknown
     page_entries_info:
       more_pages:
         display_entries: >-
@@ -2333,12 +2339,6 @@ en:
           one: Displaying <b>1</b> %{entry_name}
           other: Displaying <b>all %{count}</b> %{entry_name}
           zero: No %{entry_name} found
-    bike_helper:
-      hidden: hidden
-      unknown: unknown
-      made_without_serial: made without serial
-      hidden_because_status: because %{bike_type} is %{status}
-      hidden_for_unauthorized_users: hidden for unauthorized users
   info:
     about:
       about_bike_index: About Bike Index
@@ -4191,11 +4191,6 @@ en:
     precision:
       format:
         delimiter: ''
-  org_public:
-    impounded_bikes:
-      index:
-        search_bike_descriptions: Search bike descriptions
-        search_for_serial_number: Search for serial number
   organization_invitations:
     not_available:
       contact_us: Contact us
@@ -4485,9 +4480,6 @@ en:
         owner_name: Owner name
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
-        search_bike_descriptions: Search bike descriptions
-        search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email and name
         sent_to: Sent to
         settings: settings
         status: 'Status:'
@@ -4620,14 +4612,6 @@ en:
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
         view_avery_labels: View Avery Labels
-    graduated_notifications:
-      index:
-        search_owner_email: Search owner email and name
-    impound_records:
-      index:
-        search_bike_descriptions: Search bike descriptions
-        search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email and name
     manage_impoundings:
       edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings
@@ -4684,9 +4668,6 @@ en:
       index:
         matches_visible: visible
         parking_notifications: Parking notifications
-        search_bike_descriptions: Search bike descriptions
-        search_for_serial_number: Search for serial number
-        search_owner_email: Search owner email and name
       show_details:
         address: Address
         bike: Bike
@@ -5011,11 +4992,9 @@ en:
       miles_of: miles of
       search_bike_descriptions: Search bike descriptions
       search_for_serial_number: Search for serial number
-      search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
-      stolen_anywhere: Stolen anywhere
+      search_owner_email: Search owner email and name
       submit: submit
       within: within
-      search_owner_email: Search owner email and name
     claim_message:
       public_resource_reunited_value_html: >-
         Bike Index is a public resource for registering bikes. We've reunited over
@@ -5404,10 +5383,6 @@ en:
       your_local_police_department_will_do_what: >-
         Your local police department will do what it does to help recover your bike.
         Stay in communication with them.
-  stolen_bike_listings:
-    index:
-      search_bike_descriptions: Search bike descriptions
-      submit: Submit
   support:
     array:
       last_word_connector: ", and "
