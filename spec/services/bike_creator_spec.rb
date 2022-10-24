@@ -363,9 +363,10 @@ RSpec.describe BikeCreator do
       let(:email) { "something@gmail.com" }
       let(:new_email) { "Something@GMAIL.com" }
       before { new_bike.set_calculated_attributes }
+      let(:found_duplicate) { OwnerDuplicateBikeFinder.find_matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email]) }
       it "finds a duplicate" do
         expect(b_param.no_duplicate?).to be_truthy
-        expect(instance.find_duplicate_bike(b_param, new_bike)&.id).to eq existing_bike.id
+        expect(found_duplicate&.id).to eq existing_bike.id
         expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
         b_param.reload
         expect(b_param.created_bike_id).to eq existing_bike.id
@@ -376,7 +377,7 @@ RSpec.describe BikeCreator do
         let(:new_email) { "newsomething@gmail.com" }
         it "does not find a non-duplicate" do
           expect(b_param.no_duplicate?).to be_truthy
-          expect(instance.find_duplicate_bike(b_param, new_bike)&.id).to be_blank
+          expect(found_duplicate&.id).to be_blank
           bike = instance.create_bike(b_param)
           expect(bike.id).to_not eq existing_bike.id
           b_param.reload
@@ -398,7 +399,7 @@ RSpec.describe BikeCreator do
           expect(existing_bike.serial_normalized).to be_blank
           expect(new_bike.serial_normalized).to be_blank
           expect(b_param.no_duplicate?).to be_truthy
-          expect(instance.find_duplicate_bike(b_param, new_bike)&.id).to be_blank
+          expect(found_duplicate&.id).to be_blank
           bike = instance.create_bike(b_param)
           expect(bike.id).to_not eq existing_bike.id
           b_param.reload
@@ -414,7 +415,7 @@ RSpec.describe BikeCreator do
           expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
           expect(Bike.with_user_hidden.pluck(:id)).to match_array([existing_bike.id])
           expect(Ownership.count).to eq 1
-          expect(instance.find_duplicate_bike(b_param, new_bike)&.id).to eq existing_bike.id
+          expect(found_duplicate&.id).to eq existing_bike.id
           expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
           expect(b_param.reload.created_bike_id).to eq existing_bike.id
           expect(Ownership.count).to eq 1

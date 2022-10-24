@@ -5,10 +5,10 @@ class Admin::PaintsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 100
+    @per_page = params[:per_page] || 100
     @paints = matching_paints.reorder("paints.#{sort_column} #{sort_direction}")
       .includes(:color, :secondary_color, :tertiary_color)
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   def show
@@ -17,10 +17,10 @@ class Admin::PaintsController < Admin::BaseController
 
   def edit
     page = params[:page] || 1
-    per_page = params[:per_page] || 20
+    @per_page = params[:per_page] || 20
     @bikes = Bike.unscoped.default_includes.includes(:paint)
       .where(paint_id: @paint.id).order("created_at desc")
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   def update

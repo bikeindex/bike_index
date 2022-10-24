@@ -36,6 +36,16 @@
             - else
               = link_to @bulk_import.file_url, @bulk_import.file_url
       %tr
+        %td Send email?
+        %td
+          = check_mark if @bulk_import.send_email
+          %small.less-strong Email is sent by default
+      %tr
+        %td No dupe
+        %td
+          = check_mark if @bulk_import.send_email
+          %small.less-strong Only true by default for Ascend
+      %tr
         %td
           Errors
         %td

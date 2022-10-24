@@ -22,15 +22,7 @@
 
   = render partial: "/shared/period_select"
 
-  .row.mb-4.mt-4
-    .col-sm-6.col-lg-4.mt-4
-      = admin_number_display(matching_recovery_displays.count)
-      = "recovery display".pluralize(matching_recovery_displays.count)
-      %em
-        = humanized_time_range_column(@time_range_column)
-        = humanized_time_range(@time_range)
-    .col-lg-4
-      = paginate @recovery_displays, views_prefix: "admin"
+  = render partial: "/shared/pagination", locals: {collection: @recovery_displays}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.padded.table-sm
@@ -65,4 +57,4 @@
           %td.large-screens.table-cell-check
             = check_mark if recovery_display.stolen_record_id.present?
 
-= paginate @recovery_displays, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @recovery_displays}

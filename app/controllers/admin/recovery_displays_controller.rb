@@ -7,8 +7,8 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
-    @recovery_displays = matching_recovery_displays.page(page).per(per_page)
+    @per_page = params[:per_page] || 50
+    @recovery_displays = matching_recovery_displays.page(page).per(@per_page)
       .order(@time_range_column => sort_direction)
   end
 

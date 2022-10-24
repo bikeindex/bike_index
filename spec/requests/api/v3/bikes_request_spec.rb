@@ -170,7 +170,7 @@ RSpec.describe "Bikes API V3", type: :request do
           user_email = FactoryBot.create(:user_email, user: user, email: "something@stuff.com", confirmation_token: "fake")
           user_email.reload
           expect(user_email.confirmed?).to be_falsey
-          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(owner_email: user.email).to_json, headers: json_headers
 
           expect(response.status).to eq(201)
           expect(response.status_message).to eq("Created")
@@ -182,7 +182,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(response.status_message).to eq("Found")
           expect(bike1_result["id"]).to eq(bike2_result["id"])
           bike = Bike.find bike1_result["id"]
-          expect(bike.owner_email).to eq bike_attrs[:owner_email]
+          expect(bike.owner_email).to eq user.email
         end
 
         it "updates the pre-existing record" do
@@ -399,7 +399,7 @@ RSpec.describe "Bikes API V3", type: :request do
     context "given a bike with a pre-existing match by an owning user's secondary email" do
       it "responds with the match instead of creating a duplicate" do
         user.user_emails.create(email: "secondary-email@example.com")
-        bike = FactoryBot.create(:ownership, creator: user).bike
+        bike = FactoryBot.create(:ownership, user: user).bike
 
         bike_attrs = {
           serial: bike.serial_display,

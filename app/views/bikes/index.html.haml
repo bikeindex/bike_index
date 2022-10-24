@@ -29,6 +29,10 @@
           %span
             = t(".within")
           = hidden_field_tag :stolenness, params[:stolenness]
+      - if @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
+        .alert.alert-warning.mt-4
+          = t(".doesnt_look_like_serial")
+
       .search-type-tabs
         %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
           %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }

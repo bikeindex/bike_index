@@ -3082,6 +3082,41 @@ ALTER SEQUENCE public.user_alerts_id_seq OWNED BY public.user_alerts.id;
 
 
 --
+-- Name: user_bans; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_bans (
+    id bigint NOT NULL,
+    user_id bigint,
+    creator_id bigint,
+    reason integer,
+    description text,
+    deleted_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_bans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_bans_id_seq OWNED BY public.user_bans.id;
+
+
+--
 -- Name: user_emails; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3823,6 +3858,13 @@ ALTER TABLE ONLY public.user_alerts ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: user_bans id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_bans ALTER COLUMN id SET DEFAULT nextval('public.user_bans_id_seq'::regclass);
+
+
+--
 -- Name: user_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4463,6 +4505,14 @@ ALTER TABLE ONLY public.twitter_accounts
 
 ALTER TABLE ONLY public.user_alerts
     ADD CONSTRAINT user_alerts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_bans user_bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_bans
+    ADD CONSTRAINT user_bans_pkey PRIMARY KEY (id);
 
 
 --
@@ -5675,6 +5725,20 @@ CREATE INDEX index_user_alerts_on_user_phone_id ON public.user_alerts USING btre
 
 
 --
+-- Name: index_user_bans_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_bans_on_creator_id ON public.user_bans USING btree (creator_id);
+
+
+--
+-- Name: index_user_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id);
+
+
+--
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6334,6 +6398,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220811174115'),
 ('20220819205834'),
 ('20220903183420'),
-('20220921170820');
+('20220921170820'),
+('20221007123638');
 
 

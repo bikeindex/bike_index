@@ -24,7 +24,7 @@ class ExternalRegistryBike < ApplicationRecord
     end
 
     def find_or_search_registry_for(serial_number:)
-      serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      serial_normalized = SerialNormalizer.normalized_and_corrected(serial_number)
 
       matches = ExternalRegistryBike.where(serial_normalized: serial_normalized)
       return matches if matches.any?
@@ -115,6 +115,6 @@ class ExternalRegistryBike < ApplicationRecord
 
   def set_calculated_attributes
     self.status ||= "status_with_owner"
-    self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+    self.serial_normalized = SerialNormalizer.normalized_and_corrected(serial_number)
   end
 end

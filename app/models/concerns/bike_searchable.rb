@@ -17,7 +17,7 @@ module BikeSearchable
       params = {}
 
       if query_params[:serial].present?
-        params[:serial] = SerialNormalizer.new(serial: query_params[:serial]).normalized
+        params[:serial] = SerialNormalizer.normalized_and_corrected(query_params[:serial])
         params[:raw_serial] = query_params[:serial]
       end
 
@@ -175,7 +175,7 @@ module BikeSearchable
     end
 
     def search_matching_serial(interpreted_params)
-      return all unless interpreted_params[:serial]
+      return all unless interpreted_params[:serial].present?
       # Note: @@ is postgres fulltext search
       where("serial_normalized @@ ?", interpreted_params[:serial])
     end

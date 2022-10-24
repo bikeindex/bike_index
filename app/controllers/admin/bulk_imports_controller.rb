@@ -5,10 +5,10 @@ class Admin::BulkImportsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 10
+    @per_page = params[:per_page] || 10
     @bulk_imports = matching_bulk_imports.includes(:organization, :user, :ownerships)
       .reorder(sort_column + " " + sort_direction)
-      .page(page).per(per_page)
+      .page(page).per(@per_page)
   end
 
   def show
@@ -45,7 +45,7 @@ class Admin::BulkImportsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:bulk_import).permit(:organization_id, :file, :no_notify)
+    params.require(:bulk_import).permit(:organization_id, :file, :no_notify, :no_duplicate)
   end
 
   def default_period

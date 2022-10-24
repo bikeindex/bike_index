@@ -5,13 +5,13 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
+    @per_page = params[:per_page] || 25
     @bike_sticker_updates =
       matching_bike_sticker_updates
         .reorder("bike_sticker_updates.#{sort_column} #{sort_direction}")
         .includes(:organization, :user, :bike)
         .page(page)
-        .per(per_page)
+        .per(@per_page)
   end
 
   helper_method :matching_bike_sticker_updates

@@ -62,7 +62,6 @@
 .mt-4.mb-4
   = render partial: "/shared/period_select"
 
-= paginate @impound_claims, views_prefix: "admin"
-
+= render partial: "/shared/pagination", locals: {collection: @impound_claims}
 
 = render partial: "table", locals: {impound_claims: @impound_claims, render_sortable: true, skip_organization: current_organization.present?}

@@ -1030,6 +1030,9 @@ en:
     index:
       all: All
       anywhere: Anywhere
+      doesnt_look_like_serial: >-
+        The serial you entered doesn't look like a serial number, so it isn't being
+        used to search.
       miles_of: miles of
       no_bikes_matched: No bikes exactly matched your search
       not_marked_stolen: Not marked stolen

@@ -364,20 +364,42 @@
     = link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param), class: "gray-link mt-3 d-inline-block"
 = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
+- memberships = @deleted_memberships ? @organization.memberships.deleted.reorder(deleted_at: :asc) : @organization.memberships.reorder(created_at: :asc)
 .row.mt-4
   .col-6
     %h4
-      = number_with_delimiter(@organization.memberships.count)
-      = "Membership".pluralize(@organization.memberships.count)
+      = number_with_delimiter(memberships.count)
+      - if @deleted_memberships
+        %span.text-danger Deleted
+      = "Membership".pluralize(memberships.count)
       %small
-        = number_with_delimiter(@organization.memberships.claimed.count)
-        claimed
-        %small
-          = link_to "new membership", new_admin_membership_url(organization_id: @organization.to_param), class: "gray-link"
+        - if @deleted_memberships
+          %small
+            = number_with_delimiter(memberships.claimed.count)
+            claimed
+          - unless @organization.deleted?
+            \-
+            %small.less-strong
+              = link_to admin_organization_path(@organization, deleted_memberships: false), class: "gray-link" do
+                = number_with_delimiter(@organization.memberships.count)
+                %strong NOT
+                deleted membership
+        - else
+          %small
+            = number_with_delimiter(@organization.memberships.claimed.count)
+            claimed
+          \-
+          %small.less-strong
+            = link_to admin_organization_path(@organization, deleted_memberships: true), class: "gray-link" do
+              = number_with_delimiter(@organization.memberships.deleted.count)
+              deleted
+          %small
+            = link_to "new membership", new_admin_membership_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3"
   .col-6.text-right
     = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
-- if @organization.memberships.count > 0
-  = render partial: "/admin/memberships/table", locals: { memberships: @organization.memberships.reorder(created_at: :asc).limit(25), skip_organization: true }
+
+- if memberships.count > 0
+  = render partial: "/admin/memberships/table", locals: { memberships: memberships.limit(25), skip_organization: true, render_deleted: @deleted_memberships}
 
 %hr.mt-4
 %h4
@@ -414,6 +436,9 @@
 .row
   .col-6
     = link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success"
-  - unless @organization.deleted?
-    .col-6.text-right
-      = link_to "Delete", admin_organization_url(@organization), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"
+  .col-6.text-right
+    - if @organization.deleted?
+
+      = link_to "Un-Delete organization", admin_recover_organization_path(id: @organization.id), data: {confirm: "Are you sure?"}, class: "btn btn-outline-warning"
+    - else
+      = link_to "Delete", admin_organization_url(@organization), method: :delete, data: {confirm: "Are you sure?"}, class: "btn btn-danger"

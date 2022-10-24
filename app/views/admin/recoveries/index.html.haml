@@ -81,6 +81,7 @@
       .form-group.mr-2.mb-2
         = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
-= paginate @recoveries, views_prefix: "admin"
+
+= render partial: "/shared/pagination", locals: {collection: @recoveries}
 = render partial: "table", locals: { recoveries: @recoveries, render_sortable: true }
-= paginate @recoveries, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @recoveries, skip_total: true}

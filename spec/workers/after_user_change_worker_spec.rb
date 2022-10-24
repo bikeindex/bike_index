@@ -114,6 +114,17 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
   end
 
+  describe "user_ban" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:user_ban) { UserBan.create(user: user, reason: :extortion) }
+    it "deletes if not banned" do
+      expect(user_ban).to be_valid
+      instance.perform(user.id)
+      expect(user.reload.banned?).to be_falsey
+      expect(UserBan.deleted.pluck(:user_id)).to eq([user.id])
+    end
+  end
+
   describe "phone_waiting_confirmation" do
     let(:user) { FactoryBot.create(:admin) } # Confirm that superadmins still get this alert, because we want them to
     let!(:user_phone) { FactoryBot.create(:user_phone, user: user) }
