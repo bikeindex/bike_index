@@ -6,9 +6,8 @@
       %h1
         Search for bike versions
 
-  .row
-    .col-md-12
-      = render partial: "/shared/bike_search_form", locals: {search_path: bike_versions_path, skip_serial_field: true}
+  .mt-3.mb-4
+    = render partial: "/shared/bike_search_form", locals: {search_path: bike_versions_path, skip_serial_field: true}
 
   .row
     .col-md-12

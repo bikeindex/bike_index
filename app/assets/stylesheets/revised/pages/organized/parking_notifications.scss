@@ -66,6 +66,7 @@
   #placeSearch {
     max-width: 60%;
     display: none;
+    position: absolute;
 
     &.searchOnMap {
       display: block;

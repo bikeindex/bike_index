@@ -1,266 +1,266 @@
-import log from "../utils/log";
-import _ from "lodash";
+import log from '../utils/log'
+import _ from 'lodash'
 
 export default class BinxMapping {
   // The page instance of this class is modified to store the current list of points for rendering
-  constructor(kind) {
-    this.kind = kind;
-    this.searchBox = null;
-    this.searchMarkers = [];
-    this.markerPointsToRender = [];
-    this.markersRendered = [];
-    this.mapRendered = false;
+  constructor (kind) {
+    this.kind = kind
+    this.searchBox = null
+    this.searchMarkers = []
+    this.markerPointsToRender = []
+    this.markersRendered = []
+    this.mapRendered = false
   }
 
-  loadMap(callback) {
+  loadMap (callback) {
     if (window.googleMapInjected || this.googleMapsLoaded()) {
-      return true;
+      return true
     }
     // Add google maps script
-    var js_file = document.createElement("script");
-    js_file.type = "text/javascript";
-    js_file.src = `https://maps.googleapis.com/maps/api/js?callback=${callback}&key=${window.pageInfo.google_maps_key}&libraries=places`;
-    document.getElementsByTagName("head")[0].appendChild(js_file);
-    window.googleMapInjected = true;
+    var js_file = document.createElement('script')
+    js_file.type = 'text/javascript'
+    js_file.src = `https://maps.googleapis.com/maps/api/js?callback=${callback}&key=${window.pageInfo.google_maps_key}&libraries=places`
+    document.getElementsByTagName('head')[0].appendChild(js_file)
+    window.googleMapInjected = true
   }
 
-  render(lat, lng, zoom = null) {
+  render (lat, lng, zoom = null) {
     if (zoom == null) {
-      zoom = 13;
+      zoom = 13
     }
-    this.zoom = zoom;
+    this.zoom = zoom
     let myOptions = {
       zoom: zoom,
       center: new google.maps.LatLng(lat, lng),
-      gestureHandling: "cooperative",
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
-    };
+      gestureHandling: 'cooperative',
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
     if (!window.infoWindow) {
-      window.infoWindow = new google.maps.InfoWindow();
+      window.infoWindow = new google.maps.InfoWindow()
     }
     window.binxMap = new google.maps.Map(
-      document.getElementById("map"),
+      document.getElementById('map'),
       myOptions
-    );
+    )
   }
 
-  googleMapsLoaded() {
-    return typeof google === "object" && typeof google.maps === "object";
+  googleMapsLoaded () {
+    return typeof google === 'object' && typeof google.maps === 'object'
   }
 
-  fitMap() {
-    let bounds = new google.maps.LatLngBounds();
+  fitMap () {
+    let bounds = new google.maps.LatLngBounds()
     // Fit to markers
     for (let marker of Array.from(this.markersRendered)) {
       if (marker) {
-        bounds.extend(marker.getPosition());
+        bounds.extend(marker.getPosition())
       }
     }
-    binxMap.fitBounds(bounds);
+    binxMap.fitBounds(bounds)
 
     // Finish rendering map, then check - if too zoomed in (e.g. on one point), zoom out
     window.setTimeout(function () {
       if (binxMap.zoom > 16) {
-        binxMap.setZoom(16);
+        binxMap.setZoom(16)
       }
-    }, 500);
+    }, 500)
   }
 
-  boundingBoxParams() {
+  boundingBoxParams () {
     if (!binxMapping.mapRendered) {
-      return [];
+      return []
     }
-    let bounds = binxMap.getBounds();
+    let bounds = binxMap.getBounds()
     return [
-      ["search_southwest_coords", bounds.getSouthWest().toUrlValue()],
-      ["search_northeast_coords", bounds.getNorthEast().toUrlValue()],
-    ];
+      ['search_southwest_coords', bounds.getSouthWest().toUrlValue()],
+      ['search_northeast_coords', bounds.getNorthEast().toUrlValue()]
+    ]
   }
 
-  renderAddressSearch() {
+  renderAddressSearch () {
     if (this.searchBox != null) {
-      return true;
+      return true
     }
-    $("#map").before(
+    $('#map').before(
       '<input id="placeSearch" class="controls form-control" type="text" placeholder="Search map">'
-    );
-    let input = document.getElementById("placeSearch");
-    this.searchBox = new google.maps.places.SearchBox(input);
-    window.binxMap.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
-    $(input).addClass("searchOnMap"); // search box is initially hidden - display it when rendered on map
+    )
+    let input = document.getElementById('placeSearch')
+    this.searchBox = new google.maps.places.SearchBox(input)
+    window.binxMap.controls[google.maps.ControlPosition.TOP_RIGHT].push(input)
     // Bias SearchBox results towards current map's viewport.
-    binxMap.addListener("bounds_changed", () =>
+    binxMap.addListener('bounds_changed', () =>
       binxMapping.searchBox.setBounds(binxMap.getBounds())
-    );
+    )
 
-    this.searchBox.addListener("places_changed", function () {
-      let places = binxMapping.searchBox.getPlaces();
+    this.searchBox.addListener('places_changed', function () {
+      let places = binxMapping.searchBox.getPlaces()
       if (places.length === 0) {
-        log.debug("Unable to find that address");
+        log.debug('Unable to find that address')
       }
       // For each place, get the icon, name and location.
-      let bounds = new google.maps.LatLngBounds();
+      let bounds = new google.maps.LatLngBounds()
       places.forEach(function (place) {
         if (!place.geometry) {
-          log.debug("Returned place contains no geometry");
+          log.debug('Returned place contains no geometry')
         }
         // Create a marker for each place
         binxMapping.searchMarkers.push(
           new google.maps.Marker({
             map: binxMap,
             icon:
-              "http://maps.google.com/mapfiles/ms/micons/purple-pushpin.png",
+              'http://maps.google.com/mapfiles/ms/micons/purple-pushpin.png',
             title: place.name,
-            position: place.geometry.location,
+            position: place.geometry.location
           })
-        );
-        bounds.extend(place.geometry.location);
-      });
-      binxMap.fitBounds(bounds);
-    });
+        )
+        bounds.extend(place.geometry.location)
+      })
+      binxMap.fitBounds(bounds)
+    })
+    $(input).addClass('searchOnMap') // search box is initially hidden - display it when rendered on map
   }
 
-  removeMarkersWithoutMatchingIds(markers) {
+  removeMarkersWithoutMatchingIds (markers) {
     if (!binxMapping.markersRendered) {
-      binxMapping.markersRendered = [];
+      binxMapping.markersRendered = []
     }
 
-    const newIds = markers.map((m) => m.id);
+    const newIds = markers.map(m => m.id)
 
     if (window.infoWindow != null) {
-      window.infoWindow.close();
+      window.infoWindow.close()
     }
 
-    let markersToKeep = [];
+    let markersToKeep = []
 
     while (binxMapping.markersRendered.length > 0) {
-      const marker = binxMapping.markersRendered.pop();
+      const marker = binxMapping.markersRendered.pop()
       // If marker isn't around, ignore it
       if (marker != null) {
         // If the id is a match, move it to the new array, otherwise remove it from the map
         if (
-          typeof marker.binxId != "undefined" &&
+          typeof marker.binxId != 'undefined' &&
           newIds.includes(marker.binxId)
         ) {
-          markersToKeep.push(marker);
+          markersToKeep.push(marker)
         } else {
-          marker.setMap(null);
+          marker.setMap(null)
         }
       }
     }
-    binxMapping.markersRendered = markersToKeep;
+    binxMapping.markersRendered = markersToKeep
 
     // Ids make sure we aren't double rendering
-    return (window.renderedMarkerIds = newIds);
+    return (window.renderedMarkerIds = newIds)
   }
 
-  clearMarkers() {
+  clearMarkers () {
     if (!binxMapping.markersRendered) {
-      binxMapping.markersRendered = [];
+      binxMapping.markersRendered = []
     }
 
     if (window.infoWindow != null) {
-      window.infoWindow.close();
+      window.infoWindow.close()
     }
     // Useful when the page reloads without fully reloading
     if (binxMapping.markersRendered.length) {
       for (let i of Array.from(binxMapping.markersRendered)) {
-        i != null && i.setMap(null);
+        i != null && i.setMap(null)
       }
     }
     // Empty the array
-    binxMapping.markersRendered = [];
+    binxMapping.markersRendered = []
     // Ids make sure we aren't double rendering
-    return (window.renderedMarkerIds = []);
+    return (window.renderedMarkerIds = [])
   }
 
-  markersInViewport() {
-    let bounds = binxMap.getBounds();
+  markersInViewport () {
+    let bounds = binxMap.getBounds()
     return _.filter(binxMapping.markersRendered, function (m) {
-      return bounds.contains(m.getPosition());
-    });
+      return bounds.contains(m.getPosition())
+    })
   }
 
-  renderMarker(point) {
-    let popupContent = "";
-    if (binxMapping.kind == "parking_notifications") {
-      popupContent = binxAppOrgParkingNotificationMapping.mapPopup(point);
+  renderMarker (point) {
+    let popupContent = ''
+    if (binxMapping.kind == 'parking_notifications') {
+      popupContent = binxAppOrgParkingNotificationMapping.mapPopup(point)
     } else {
-      log.debug(binxMapping.kind);
-      popupContent = "Missing template!";
+      log.debug(binxMapping.kind)
+      popupContent = 'Missing template!'
     }
-    window.infoWindow.setContent(popupContent);
+    window.infoWindow.setContent(popupContent)
     // Ensure things are rendered before setting times, pause for a hot sec
-    window.setTimeout(() => window.timeParser.localize(), 50);
+    window.setTimeout(() => window.timeParser.localize(), 50)
   }
 
-  openInfoWindow(marker, markerId, point) {
-    window.infoWindow.setContent("");
-    window.infoWindow.open(window.binxMap, marker);
-    binxMapping.enableEscapeForInfoWindows();
+  openInfoWindow (marker, markerId, point) {
+    window.infoWindow.setContent('')
+    window.infoWindow.open(window.binxMap, marker)
+    binxMapping.enableEscapeForInfoWindows()
     // For an unclear reason, this needs to return the rendered marker
-    return binxMapping.renderMarker(point);
+    return binxMapping.renderMarker(point)
   }
 
-  enableEscapeForInfoWindows() {
+  enableEscapeForInfoWindows () {
     // Enable using escape key to close info windows
     // Make sure we aren't adding duplicate handlers, sometimes we don't catch the close event
-    $(window).off("keyup");
+    $(window).off('keyup')
     // Add the trigger for the escape closing the window
-    $(window).on("keyup", function (e) {
+    $(window).on('keyup', function (e) {
       if (e.keyCode === 27) {
-        window.infoWindow.close();
+        window.infoWindow.close()
         // Escape was pressed, infoWindow is closed, so remove the keyup handler
-        $(window).off("keyup");
+        $(window).off('keyup')
       }
-      return true; // allow bubbling up
-    });
+      return true // allow bubbling up
+    })
     // on infowindow close, remove keyup handler - aka clean up after yourself
-    google.maps.event.addListener(window.infoWindow, "closeclick", function () {
-      $(window).off("keyup");
-    });
+    google.maps.event.addListener(window.infoWindow, 'closeclick', function () {
+      $(window).off('keyup')
+    })
   }
 
-  addMarkers({ fitMap = false, renderAddressSearch = true }) {
-    log.debug(`adding markers - fitMap: ${fitMap}`);
+  addMarkers ({ fitMap = false, renderAddressSearch = true }) {
+    log.debug(`adding markers - fitMap: ${fitMap}`)
     while (binxMapping.markerPointsToRender.length > 0) {
-      let point = binxMapping.markerPointsToRender.shift();
-      let markerId = point.id;
-      let markerOpacity = binxMapping.kind == "parking_notifications" ? 0.6 : 1;
+      let point = binxMapping.markerPointsToRender.shift()
+      let markerId = point.id
+      let markerOpacity = binxMapping.kind == 'parking_notifications' ? 0.6 : 1
       // Only render if the point isn't already rendered
-      if (!_.find(binxMapping.markersRendered, ["binxId", point.id])) {
+      if (!_.find(binxMapping.markersRendered, ['binxId', point.id])) {
         let marker = new google.maps.Marker({
           position: new google.maps.LatLng(point.lat, point.lng),
           map: window.binxMap,
           binxId: markerId,
-          opacity: markerOpacity,
-        });
+          opacity: markerOpacity
+        })
 
         google.maps.event.addListener(
           marker,
-          "click",
+          'click',
           ((marker, markerId) =>
             function () {
-              return binxMapping.openInfoWindow(marker, markerId, point);
+              return binxMapping.openInfoWindow(marker, markerId, point)
             })(marker, markerId)
-        );
-        binxMapping.markersRendered.push(marker);
+        )
+        binxMapping.markersRendered.push(marker)
       }
     }
     // If we're suppose to fit the map to the markers - and if there are markers that have been rendered - fit it
     if (fitMap == true && binxMapping.markersRendered.length > 0) {
-      binxMapping.fitMap();
+      binxMapping.fitMap()
     }
     // If we're suppose to include the address search, do it
     if (renderAddressSearch == true) {
-      binxMapping.renderAddressSearch();
+      binxMapping.renderAddressSearch()
     }
     if (binxMapping.mapRendered) {
-      return true;
+      return true
     }
     // If map isn't rendered, give the page a second to catch up
     window.setTimeout(function () {
-      binxMapping.mapRendered = true;
-    }, 1000);
+      binxMapping.mapRendered = true
+    }, 1000)
   }
 }
