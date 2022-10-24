@@ -977,7 +977,6 @@ en:
   bike_versions:
     index:
       primary_colors: Primary colors
-      search_bike_descriptions: Search bike descriptions
   bikes:
     bike:
       hidden_because_status: because %{bike_type} is %{status}
@@ -1029,20 +1028,12 @@ en:
       your_bike: Your %{bike_type}
     index:
       all: All
-      anywhere: Anywhere
-      doesnt_look_like_serial: >-
-        The serial you entered doesn't look like a serial number, so it isn't being
-        used to search.
       miles_of: miles of
       no_bikes_matched: No bikes exactly matched your search
       not_marked_stolen: Not marked stolen
-      search_bike_descriptions: Search bike descriptions
-      search_for_serial_number: Search for serial number
       search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
       stolen_anywhere: Stolen anywhere
       stolen_within: Stolen within
-      submit: submit
-      within: within
       you: you
     main_show_block:
       bike_photo: "%{bike_type} photo"
@@ -4629,8 +4620,6 @@ en:
         view_avery_labels: View Avery Labels
     graduated_notifications:
       index:
-        search_bike_descriptions: Search bike descriptions
-        search_for_serial_number: Search for serial number
         search_owner_email: Search owner email and name
     impound_records:
       index:
@@ -5012,6 +5001,19 @@ en:
       sign_in_using_strava: Sign in using Strava
       sign_up: sign up
   shared:
+    bike_search_form:
+      anywhere: Anywhere
+      doesnt_look_like_serial: >-
+        The serial you entered doesn't look like a serial number, so it isn't being
+        used to search.
+      miles_of: miles of
+      search_bike_descriptions: Search bike descriptions
+      search_for_serial_number: Search for serial number
+      search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
+      stolen_anywhere: Stolen anywhere
+      submit: submit
+      within: within
+      you: you
     claim_message:
       public_resource_reunited_value_html: >-
         Bike Index is a public resource for registering bikes. We've reunited over
