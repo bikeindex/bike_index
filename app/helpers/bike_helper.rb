@@ -1,5 +1,27 @@
 # There is also BikeDisplayer for things that aren't only used in view files
 module BikeHelper
+  def render_serial_display(bike, user = nil, skip_explanation: false)
+    serial_text = bike.serial_display(user).downcase
+    serial_html = if ["hidden", "unknown", "made without serial"].include?(serial_text)
+      content_tag(:span, serial_text, class: "less-strong")
+    else
+      content_tag(:code, bike.serial_display(user), class: "bike-serial")
+    end
+    return serial_html unless bike.serial_hidden? && !skip_explanation
+    serial_html << " "
+    serial_html << content_tag(:em, class: "small less-strong") do
+      if bike.authorized?(user)
+        # t(".hidden_for_unauthorized_users")
+        # I18n.t(key, **kwargs, scope: scope.compact)
+        I18n.t("hidden_for_unauthorized_users", scope: %i[helpers bike_helper])
+      else
+        I18n.t("hidden_because_status",
+          bike_type: bike.type, status: bike.status_humanized_translated,
+          scope: %i[helpers bike_helper])
+      end
+    end
+  end
+
   def bike_status_span(bike)
     return "" if bike.status_with_owner?
     content_tag(:strong,

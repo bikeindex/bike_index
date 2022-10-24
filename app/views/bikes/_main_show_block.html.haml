@@ -34,12 +34,7 @@
       - unless @bike.version?
         %li
           %strong.attr-title #{t(".serial")}:
-          = @bike.serial_display(current_user)
-          - if @bike.serial_hidden?
-            %em.small.less-strong
-              - if @bike.authorized?(current_user)
-                = t(".hidden_for_unauthorized_users")
-              = t(".hidden_because_status", bike_type: @bike.type, status: @bike.status_humanized_translated)
+          = render_serial_display(@bike, current_user)
         - unless @bike.serial_hidden?
           = attr_list_item(@bike.extra_registration_number, t(".other_serial"))
       - unless @bike.type == "bike"

@@ -979,8 +979,6 @@ en:
       primary_colors: Primary colors
   bikes:
     bike:
-      hidden_because_status: because %{bike_type} is %{status}
-      hidden_for_unauthorized_users: hidden for unauthorized users
       location: Location
       primary_colors: Primary colors
       serial: Serial
@@ -1050,8 +1048,6 @@ en:
       front_rear: Front & rear
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
-      hidden_because_status: because %{bike_type} is %{status}
-      hidden_for_unauthorized_users: hidden for unauthorized users
       impounded_at: Impounded
       location: Location
       locking_circumvented: Locking circumvented
@@ -2337,6 +2333,9 @@ en:
           one: Displaying <b>1</b> %{entry_name}
           other: Displaying <b>all %{count}</b> %{entry_name}
           zero: No %{entry_name} found
+    bike_helper:
+        hidden_because_status: because %{bike_type} is %{status}
+        hidden_for_unauthorized_users: hidden for unauthorized users
   info:
     about:
       about_bike_index: About Bike Index
@@ -5013,7 +5012,7 @@ en:
       stolen_anywhere: Stolen anywhere
       submit: submit
       within: within
-      you: you
+      search_owner_email: Search owner email and name
     claim_message:
       public_resource_reunited_value_html: >-
         Bike Index is a public resource for registering bikes. We've reunited over
