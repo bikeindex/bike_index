@@ -1,7 +1,8 @@
 # There is also BikeDisplayer for things that aren't only used in view files
 module BikeHelper
   def render_serial_display(bike, user = nil, skip_explanation: false)
-    serial_text = bike.serial_display(user).downcase
+    serial_text = bike.serial_display(user)&.downcase
+    return "" if serial_text.blank?
     serial_html = if ["hidden", "unknown", "made without serial"].include?(serial_text)
       content_tag(:span,
         I18n.t(serial_text.tr(" ", "_"), scope: %i[helpers bike_helper]),

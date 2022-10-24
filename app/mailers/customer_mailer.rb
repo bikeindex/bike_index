@@ -2,6 +2,8 @@ class CustomerMailer < ApplicationMailer
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
+  helper :bike
+
   def welcome_email(user)
     @user = user
 
