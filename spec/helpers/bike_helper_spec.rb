@@ -7,10 +7,16 @@ RSpec.describe BikeHelper, type: :helper do
     it "is in a code element" do
       expect(render_serial_display(bike)).to eq("<code class=\"bike-serial\">fff333</code>")
     end
+    context "unknown" do
+      let(:serial_number) { "unknown" }
+      it "is in a span element" do
+        expect(render_serial_display(bike)).to eq("<span class=\"less-strong\">unknown</span>")
+      end
+    end
     context "hidden" do
-      let(:target) { "<span class=\"less-strong\">hidden</span> <em class=\"small less-strong\">because tandem is impounded</em>" }
-      let(:target_authorized) { "<code class=\"bike-serial\">fff333</code> <em class=\"small less-strong\">hidden for unauthorized users</em>" }
-      it "returns hidden" do
+      let(:target) { "<span class=\"less-strong\">hidden</span> <em class=\"small less-less-strong\">because tandem is impounded</em>" }
+      let(:target_authorized) { "<code class=\"bike-serial\">fff333</code> <em class=\"small less-less-strong\">hidden for unauthorized users</em>" }
+      it "returns target" do
         bike.status = "status_impounded"
         expect(render_serial_display(bike)).to eq target
         expect(render_serial_display(bike, skip_explanation: true)).to eq "<span class=\"less-strong\">hidden</span>"

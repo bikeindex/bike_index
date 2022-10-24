@@ -12,7 +12,7 @@
  */
 
 // Core variables and mixins
-@import "bootstrap/variables";
+@import 'bootstrap/variables';
 
 $enable-flex: true;
 
@@ -25,22 +25,22 @@ $border-radius: 1px;
 $border-radius-lg: 1px;
 $border-radius-sm: 1px;
 
-@import "revised/mixins/colors";
+@import 'revised/mixins/colors';
 
 //
 // More bootstrap
-@import "bootstrap/mixins";
+@import 'bootstrap/mixins';
 
 // Reset and dependencies
-@import "bootstrap/normalize";
-@import "bootstrap/print";
+@import 'bootstrap/normalize';
+@import 'bootstrap/print';
 
 // Core CSS
-@import "bootstrap/reboot";
+@import 'bootstrap/reboot';
 
 // @import "bootstrap/type";
-@import "bootstrap/images";
-@import "bootstrap/code";
+@import 'bootstrap/images';
+@import 'bootstrap/code';
 
 .code {
   .code-label {
@@ -63,38 +63,38 @@ $border-radius-sm: 1px;
   }
 }
 
-@import "bootstrap/grid";
-@import "bootstrap/tables";
+@import 'bootstrap/grid';
+@import 'bootstrap/tables';
 
 .table-compact-long {
   line-height: 1.2em;
 }
 
-@import "bootstrap/forms";
+@import 'bootstrap/forms';
 
 // @import "bootstrap/buttons"; // Override buttons with our own buttons
 
 // Components
-@import "bootstrap/animation";
-@import "bootstrap/dropdown";
-@import "bootstrap/button-group";
-@import "bootstrap/input-group";
-@import "bootstrap/custom-forms";
-@import "bootstrap/nav";
-@import "bootstrap/navbar";
-@import "bootstrap/card";
-@import "bootstrap/breadcrumb";
+@import 'bootstrap/animation';
+@import 'bootstrap/dropdown';
+@import 'bootstrap/button-group';
+@import 'bootstrap/input-group';
+@import 'bootstrap/custom-forms';
+@import 'bootstrap/nav';
+@import 'bootstrap/navbar';
+@import 'bootstrap/card';
+@import 'bootstrap/breadcrumb';
 
 // @import "bootstrap/pagination"; // Overriden with our own
 // @import "bootstrap/tags";
-@import "bootstrap/jumbotron";
+@import 'bootstrap/jumbotron';
 
 // @import "bootstrap/alert"; // Overriden with our own
-@import "bootstrap/progress";
-@import "bootstrap/media";
-@import "bootstrap/list-group";
-@import "bootstrap/responsive-embed";
-@import "bootstrap/close";
+@import 'bootstrap/progress';
+@import 'bootstrap/media';
+@import 'bootstrap/list-group';
+@import 'bootstrap/responsive-embed';
+@import 'bootstrap/close';
 
 // Components w/ JavaScript
 $modal-backdrop-bg: $blue-dark;
@@ -105,20 +105,20 @@ $modal-backdrop-opacity: 0.8;
   margin-bottom: 20px;
 }
 
-@import "bootstrap/modal";
-@import "bootstrap/tooltip";
-@import "bootstrap/popover";
-@import "bootstrap/carousel";
+@import 'bootstrap/modal';
+@import 'bootstrap/tooltip';
+@import 'bootstrap/popover';
+@import 'bootstrap/carousel';
 
 // Utility classes
-@import "bootstrap/utilities";
+@import 'bootstrap/utilities';
 
 //
 // Other (non-bootstrap) external styles
-@import "legacy_includes/zoom.scss";
+@import 'legacy_includes/zoom.scss';
 
 // Backport of future bootstrap utilities
-@import "revised/mixins/bootstrap_utilities";
+@import 'revised/mixins/bootstrap_utilities';
 
 $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 
@@ -136,132 +136,132 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
  */
 
 // Settings
-@import "revised/vars";
-@import "revised/fonts";
+@import 'revised/vars';
+@import 'revised/fonts';
 
 // Bootstrap overrides
-@import "revised/mixins/buttons";
-@import "revised/sections/modals";
-@import "revised/sections/alerts";
-@import "revised/sections/forms";
-@import "revised/sections/custom_selects";
+@import 'revised/mixins/buttons';
+@import 'revised/sections/modals';
+@import 'revised/sections/alerts';
+@import 'revised/sections/forms';
+@import 'revised/sections/custom_selects';
 
 // Bike Index mixins
-@import "revised/mixins/trash_can_icon";
-@import "revised/mixins/textoverflow";
-@import "revised/mixins/nav_tabs";
+@import 'revised/mixins/trash_can_icon';
+@import 'revised/mixins/textoverflow';
+@import 'revised/mixins/nav_tabs';
 
 // Shared styles
-@import "revised/sections/primary_header_nav";
-@import "revised/sections/primary_footer";
-@import "revised/sections/content_menu";
-@import "revised/sections/form_well";
-@import "revised/sections/form_well_additional_field";
-@import "revised/sections/form_well_menu";
-@import "revised/sections/form_well_header";
-@import "revised/sections/pagination";
-@import "revised/sections/horizontal_lines";
-@import "revised/sections/legal";
-@import "revised/sections/sharing";
-@import "revised/sections/attr_list";
-@import "revised/sections/sign_in_up";
-@import "revised/sections/bikehub_sign_in_up";
-@import "revised/sections/sign_out";
-@import "revised/sections/ad_blocks";
-@import "revised/sections/bike_search_form";
-@import "revised/sections/bike_boxes";
-@import "revised/sections/side_boxes";
-@import "../../javascript/stylesheets/table_extensions"; // Import from new scss files!
-@import "revised/sections/embeded_tweet";
-@import "revised/sections/general_alerts";
+@import 'revised/sections/primary_header_nav';
+@import 'revised/sections/primary_footer';
+@import 'revised/sections/content_menu';
+@import 'revised/sections/form_well';
+@import 'revised/sections/form_well_additional_field';
+@import 'revised/sections/form_well_menu';
+@import 'revised/sections/form_well_header';
+@import 'revised/sections/pagination';
+@import 'revised/sections/horizontal_lines';
+@import 'revised/sections/legal';
+@import 'revised/sections/sharing';
+@import 'revised/sections/attr_list';
+@import 'revised/sections/sign_in_up';
+@import 'revised/sections/bikehub_sign_in_up';
+@import 'revised/sections/sign_out';
+@import 'revised/sections/ad_blocks';
+@import 'revised/sections/bike_search_form';
+@import 'revised/sections/bike_boxes';
+@import 'revised/sections/side_boxes';
+@import '../../javascript/stylesheets/table_extensions'; // Import from new scss files!
+@import 'revised/sections/embeded_tweet';
+@import 'revised/sections/general_alerts';
 
 // Shared organized styles
-@import "revised/pages/organized/forms";
-@import "revised/pages/organized/shared";
-@import "revised/pages/organized/parking_notifications";
-@import "revised/pages/organized/exports";
-@import "revised/pages/organized/bikes";
-@import "revised/pages/organized/dashboard";
-@import "revised/pages/organized/hot_sheet";
-@import "revised/sections/organized_menu"; // left hand organized menu
-@import "revised/sections/period_selection"; // mostly copies pack styles
+@import 'revised/pages/organized/forms';
+@import 'revised/pages/organized/shared';
+@import 'revised/pages/organized/parking_notifications';
+@import 'revised/pages/organized/exports';
+@import 'revised/pages/organized/bikes';
+@import 'revised/pages/organized/dashboard';
+@import 'revised/pages/organized/hot_sheet';
+@import 'revised/sections/organized_menu'; // left hand organized menu
+@import 'revised/sections/period_selection'; // mostly copies pack styles
 
 // Organization public
-@import "revised/pages/organized/impounded_bikes";
+@import 'revised/pages/organized/impounded_bikes';
 
 //
 // Page styles
 //
 // Bike form pages
-@import "revised/pages/bikes/new";
-@import "revised/pages/bikes/edit_bike_details";
-@import "revised/pages/bikes/edit_bike_groups";
-@import "revised/pages/bikes/edit_remove";
-@import "revised/pages/bikes/edit_accessories";
-@import "revised/pages/bikes/edit_photos";
-@import "revised/pages/bikes/stolen_checklist";
-@import "revised/pages/bikes/edit_publicize";
-@import "revised/pages/bikes/edit_alert";
+@import 'revised/pages/bikes/new';
+@import 'revised/pages/bikes/edit_bike_details';
+@import 'revised/pages/bikes/edit_bike_groups';
+@import 'revised/pages/bikes/edit_remove';
+@import 'revised/pages/bikes/edit_accessories';
+@import 'revised/pages/bikes/edit_photos';
+@import 'revised/pages/bikes/stolen_checklist';
+@import 'revised/pages/bikes/edit_publicize';
+@import 'revised/pages/bikes/edit_alert';
 
 // Bike registration page styles
-@import "revised/pages/bikes/choose_registration";
+@import 'revised/pages/bikes/choose_registration';
 
 // Bike show & search pages
-@import "revised/pages/bikes/index";
-@import "revised/pages/bikes/show";
-@import "revised/pages/bikes/show_photo";
-@import "revised/pages/bikes/stolen_bike_listings"; // Sorta fits here...
+@import 'revised/pages/bikes/index';
+@import 'revised/pages/bikes/show';
+@import 'revised/pages/bikes/show_photo';
+@import 'revised/pages/bikes/stolen_bike_listings'; // Sorta fits here...
 
 // separated because it's a lot
-@import "revised/pages/bikes/multi_serial_search";
+@import 'revised/pages/bikes/multi_serial_search';
 
 // My Account pages
-@import "revised/pages/my_accounts/show";
-@import "revised/pages/my_accounts/edit";
+@import 'revised/pages/my_accounts/show';
+@import 'revised/pages/my_accounts/edit';
 
 // public user show page
-@import "revised/pages/user/show";
+@import 'revised/pages/user/show';
 
 // Error pages
-@import "revised/pages/errors";
+@import 'revised/pages/errors';
 
 // Info pages
-@import "revised/pages/info/where";
-@import "revised/pages/info/about";
-@import "revised/pages/info/protect_your_bike";
-@import "revised/pages/payments/payments";
+@import 'revised/pages/info/where';
+@import 'revised/pages/info/about';
+@import 'revised/pages/info/protect_your_bike';
+@import 'revised/pages/payments/payments';
 
 // Support pages
-@import "revised/pages/support/faq";
+@import 'revised/pages/support/faq';
 
 // Locks pages
-@import "revised/pages/locks/lock_styles";
+@import 'revised/pages/locks/lock_styles';
 
 // News pages
-@import "revised/pages/news/index";
-@import "revised/pages/news/show";
+@import 'revised/pages/news/index';
+@import 'revised/pages/news/show';
 
 // Landing page styles
-@import "revised/pages/landing/organizations";
-@import "revised/pages/landing/signup";
-@import "revised/pages/landing/ambassadors";
-@import "revised/pages/landing/point_of_sale";
-@import "revised/pages/landing/packages";
-@import "revised/pages/landing/footer";
+@import 'revised/pages/landing/organizations';
+@import 'revised/pages/landing/signup';
+@import 'revised/pages/landing/ambassadors';
+@import 'revised/pages/landing/point_of_sale';
+@import 'revised/pages/landing/packages';
+@import 'revised/pages/landing/footer';
 
 // Home styles
-@import "legacy_includes/slick.scss";
-@import "revised/pages/landing/home";
-@import "revised/pages/landing/recoveries";
+@import 'legacy_includes/slick.scss';
+@import 'revised/pages/landing/home';
+@import 'revised/pages/landing/recoveries';
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
-@import "revised/sections/legacy_content";
+@import 'revised/sections/legacy_content';
 
 // general legacy content styles
-@import "revised/pages/legacy_stolen";
+@import 'revised/pages/legacy_stolen';
 
 // legacy stolen page - including multi-serial search
-@import "revised/sections/oauth";
+@import 'revised/sections/oauth';
 
 html {
   background: $black-off;
@@ -352,6 +352,11 @@ body {
   &.form-control:focus {
     opacity: 1;
   }
+}
+
+.less-less-strong {
+  @extend .less-strong;
+  opacity: 0.4;
 }
 
 .gray-link {
