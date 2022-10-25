@@ -71,8 +71,13 @@
                   - if bike.creation_organization.present?
                     = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
                   - else
-                    %small.less-strong
-                      self reg
+                    - if bike.creator != bike.user
+                      - if bike.creator.blank?
+                        %small.text-danger Creator missing
+                      - else
+                        = render partial: "/shared/admin_user_cell", locals: {user: bike.creator, search_url: admin_bikes_path(user_id: bike.creator_id)}
+                    - else
+                      %small.less-strong self reg
                   - if bike.creation_description.present?
                     \-
                     %em
@@ -121,15 +126,16 @@
                 Owner Email
               %td
                 = bike.owner_email
+                - bike_search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email)
+                = link_to search_emoji, bike_search_url, class: "ml-1 mr-1"
                 - if bike.claimed?
                   %small.text-info claimed
             %tr
               %td
                 Owner
-
               %td
                 - if bike.user.present?
-                  = render partial: "/shared/admin_user_cell", locals: {user: bike.user, search_url: admin_bikes_path(user_id: bike.user&.id)}
+                  = render partial: "/shared/admin_user_cell", locals: {user: bike.user}
                 - else
                   Unclaimed
             %tr
