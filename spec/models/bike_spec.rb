@@ -2234,7 +2234,7 @@ RSpec.describe Bike, type: :model do
     end
     context "spaces" do
       it "matches only non-exact" do
-        # pp non_stolen_bike.serial_normalized, SerialNormalizer.normalized_and_corrected(query_params[:serial])
+        pp non_stolen_bike.serial_normalized, SerialNormalizer.normalized_and_corrected(query_params[:serial])
         # no spaces
         expect(Bike.search_serials_containing(i_params("011I528111JJJJJ")).pluck(:id)).to match_array([non_stolen_bike.id, stolen_bike.id])
         # Extra spaces

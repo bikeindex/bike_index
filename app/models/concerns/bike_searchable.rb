@@ -40,7 +40,7 @@ module BikeSearchable
     def search_close_serials(interpreted_params)
       return Bike.none unless interpreted_params[:serial]
 
-      # if WHERE_NOT_PLUCK
+      # TODO: if WHERE_NOT_PLUCK
       # Skip the exact match ids
       where.not(id: search(interpreted_params).pluck(:id))
         .non_serial_matches(interpreted_params)
@@ -51,7 +51,7 @@ module BikeSearchable
       serial_normalized = interpreted_params[:serial]
       return Bike.none if serial_normalized.blank?
 
-      # if WHERE_NOT_PLUCK
+      # TODO: if WHERE_NOT_PLUCK
       where
         .not(id: search(interpreted_params).pluck(:id))
         .non_serial_matches(interpreted_params)
@@ -204,7 +204,7 @@ module BikeSearchable
     end
 
     def search_matching_close_serials(serial, serial_no_space)
-      # if WHERE_NOT_PLUCK
+      # TODO: if WHERE_NOT_PLUCK
       where("LEVENSHTEIN(serial_normalized, ?) < 3", serial)
         .or(where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", serial_no_space))
         .where.not(id: search_serials_containing(serial: serial).select(:id))
