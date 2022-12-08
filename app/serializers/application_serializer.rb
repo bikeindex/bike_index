@@ -1,5 +1,7 @@
 class ApplicationSerializer < ActiveModel::Serializer
-  delegate :cache_key, to: :object
+  def cache_key
+    object.cache_key_with_version
+  end
 
   def perform_caching
     true
