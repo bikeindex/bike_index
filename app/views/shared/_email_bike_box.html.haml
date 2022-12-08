@@ -22,7 +22,7 @@
 
           %li
             %strong= t(".serial")
-            = @bike.serial_display
+            = render_serial_display(@bike, skip_explanation: true)
 
           %li
             %strong

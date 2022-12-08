@@ -27,24 +27,8 @@
 
 .container
   .mt-4
-    = form_tag stolen_bike_listings_path, id: "bikes_search_form", class: "bikes-search-form single-search-input", method: :get do
-      .query-field-wrap.nojs
-        - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i["text"], i["search_id"]]  }
-        = select_tag :query_items,                                      |
-          options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
-          placeholder: t(".search_bike_descriptions"),                  |
-          class: 'form-control query-field',                            |
-          multiple: true
+    = render partial: "/shared/bike_search_form", locals: {search_path: bike_versions_path, skip_serial_field: true, include_hidden_search_fields: true}
 
-        = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: "form-control query-field"
-
-      .search-button-wrap
-        = button_tag(type: t(".submit"), class: 'searchit btn btn-primary') do
-          :plain
-            <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
-
-      -# Skipping rendering these for now - they aren't strictly necessary
-      = render partial: "/shared/hidden_search_fields", locals: {kind: "stolen_bike_listings"}
 
 
   #timeSelectionBtnGroup.mt-4.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "#{false}" }

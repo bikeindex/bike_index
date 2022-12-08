@@ -12,27 +12,7 @@
 = render partial: "/shared/period_select"
 
 .mt-4
-  = form_tag organization_impound_records_path(organization_id: current_organization.to_param), id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
-    .query-field-wrap.nojs
-      - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
-      = select_tag :query_items,                                      |
-        options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
-        placeholder: t(".search_bike_descriptions"),                  |
-        class: 'form-control query-field',                            |
-        multiple: true
-
-      = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
-      .sidebyside-queries
-        = text_field_tag :search_email, params[:search_email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
-        = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field email-field-too'
-
-    .search-button-wrap
-      = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
-        :plain
-          <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
-
-    = render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search"}
-    = hidden_field_tag :search_status, @search_status
+  = render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_impound_records_path(organization_id: current_organization.to_param)}
 
 .row.mt-4.mb-4
   .col-sm-9

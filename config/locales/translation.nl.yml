@@ -1097,6 +1097,12 @@ nl:
       more_pages:
         display_entries: "%{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> van de
           <b>%{total}</b> getoond"
+    bike_helper:
+      hidden: verborgen
+      hidden_because_status: omdat %{bike_type} %{status} is
+      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
+      made_without_serial: gemaakt zonder serie
+      unknown: Onbekend
   i18n_tasks:
     add_missing:
       added:
@@ -1709,8 +1715,6 @@ nl:
       location: Plaats
       primary_colors: Primaire kleuren
       serial: Serie
-      hidden_because_status: omdat %{bike_type} %{status} is
-      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
     bike_show_overlays:
       add_a_picture_of_it: Voeg er een foto van toe, zodat iedereen de schoonheid
         ervan kan bewonderen!
@@ -1757,20 +1761,13 @@ nl:
       whoa_this_awesome_version_is_yours: Wauw, %{version_name} is van jou!
     index:
       all: Alle
-      anywhere: Overal
       miles_of: mijl van
       no_bikes_matched: Er zijn geen serienummers die exact overeenkomen met uw zoekopdracht
       not_marked_stolen: Niet gemarkeerd als gestolen
-      search_bike_descriptions: Zoek fietsbeschrijvingen
-      search_for_serial_number: Zoek naar framenummer
       search_for_stolenness_desc_bikes: Zoek naar %{stolenness_desc} fietsen
       stolen_anywhere: Overal gestolen
       stolen_within: Gestolen binnen
-      submit: Voorleggen
-      within: binnen
       you: jou
-      doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
-        een serienummer en wordt dus niet gebruikt om te zoeken.
     new:
       additional_serial_sticker_number: Extra framenummer / stickernummer
       affiliation: "%{org_name} aansluiting"
@@ -2054,8 +2051,6 @@ nl:
       front_rear: Voor en achter
       front_wheel_diameter: Diameter voorwiel
       handlebar_type: Type stuur
-      hidden_because_status: omdat %{bike_type} %{status} is
-      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
       impounded_at: In beslag genomen bij
       location: Plaats
       locking_circumvented: Vergrendeling omzeild
@@ -4291,9 +4286,6 @@ nl:
         owner_name: Eigenaar naam
         registered: Geregistreerd
         registered_bikes_html: "<strong>%{bikes}</strong> geregistreerd bij %{org_name}"
-        search_bike_descriptions: Zoek fietsbeschrijvingen
-        search_for_serial_number: Zoek naar framenummer
-        search_owner_email: Zoek eigenaar e-mail
         sent_to: Verzonden naar
         settings: Instellingen
         sticker: Sticker
@@ -4528,9 +4520,6 @@ nl:
       index:
         parking_notifications: Verlaten records
         matches_visible: Zichtbaar
-        search_bike_descriptions: Zoek fietsbeschrijvingen
-        search_for_serial_number: Zoek naar framenummer
-        search_owner_email: Zoek eigenaar e-mail
       table:
         bike: Fiets
         by: Door
@@ -4594,16 +4583,6 @@ nl:
         why_no_direct_by_default: Standaard worden e-mails naar niet-geclaimde fietsen
           naar uw organisatie verzonden om te bekijken en door te sturen naar de eindgebruiker,
           omdat die gebruikers zich niet hebben aangemeld voor Bike Index-meldingen.
-    impound_records:
-      index:
-        search_bike_descriptions: Zoek fietsbeschrijvingen
-        search_for_serial_number: Zoek naar framenummer
-        search_owner_email: Zoek eigenaar e-mail
-    graduated_notifications:
-      index:
-        search_bike_descriptions: Zoek fietsbeschrijvingen
-        search_for_serial_number: Zoek naar framenummer
-        search_owner_email: Zoek eigenaar e-mail
     manage_impoundings:
       edit:
         impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
@@ -5065,6 +5044,16 @@ nl:
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
       super_admin_view: Superbeheerder voor %{org_name}
       stolen_message: Gestolen bericht
+    bike_search_form:
+      anywhere: Overal
+      doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
+        een serienummer en wordt dus niet gebruikt om te zoeken.
+      miles_of: mijl van
+      search_bike_descriptions: Zoek fietsbeschrijvingen
+      search_for_serial_number: Zoek naar framenummer
+      search_owner_email: Zoek eigenaar e-mail
+      submit: Voorleggen
+      within: binnen
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5701,15 +5690,6 @@ nl:
       update_your_phone_on_html: Update je telefoon in %{user_settings_link}
       when_not_selected: Indien niet aangevinkt, beheer via de pagina "Groepen en
         organisaties" van elke fiets.
-  org_public:
-    impounded_bikes:
-      index:
-        search_bike_descriptions: Zoek fietsbeschrijvingen
-        search_for_serial_number: Zoek naar framenummer
-  stolen_bike_listings:
-    index:
-      search_bike_descriptions: Zoek fietsbeschrijvingen
-      submit: Voorleggen
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -5926,4 +5906,3 @@ nl:
   bike_versions:
     index:
       primary_colors: Primaire kleuren
-      search_bike_descriptions: Zoek fietsbeschrijvingen
