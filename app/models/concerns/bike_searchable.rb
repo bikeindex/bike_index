@@ -1,6 +1,7 @@
 module BikeSearchable
   extend ActiveSupport::Concern
 
+  # TODO: add a flipper to test searching with and without pluck, for performance
   WHERE_NOT_PLUCK = ENV["BIKESEARCH_WHERE_NOT_PLUCK"].blank?
 
   module ClassMethods
@@ -20,7 +21,7 @@ module BikeSearchable
 
       if query_params[:serial].present?
         params[:serial] = SerialNormalizer.normalized_and_corrected(query_params[:serial])
-        params[:serial_no_space] = params[:serial].gsub(/\s/, "")
+        params[:serial_no_space] = SerialNormalizer.no_space(params[:serial])
         params[:raw_serial] = query_params[:serial]
       end
 
@@ -38,24 +39,24 @@ module BikeSearchable
     end
 
     def search_close_serials(interpreted_params)
-      return Bike.none unless interpreted_params[:serial]
+      return none if interpreted_params[:serial].blank? # normalized_serial blank
 
       # TODO: if WHERE_NOT_PLUCK
-      # Skip the exact match ids
-      where.not(id: search(interpreted_params).pluck(:id))
+      where
+        .not(id: serials_containing(interpreted_params).pluck(:id))
         .non_serial_matches(interpreted_params)
-        .search_matching_close_serials(interpreted_params[:serial], interpreted_params[:serial_no_space])
+        .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
+        # TODO: seems like we don't need the with-space search
+        # .or(where("LEVENSHTEIN(serial_normalized, ?) < 3", interpreted_params[:serial]).where.not(id: serial_containing_ids))
     end
 
     def search_serials_containing(interpreted_params)
-      serial_normalized = interpreted_params[:serial]
-      return Bike.none if serial_normalized.blank?
+      return none if interpreted_params[:serial].blank? # normalized_serial blank
 
       # TODO: if WHERE_NOT_PLUCK
       where
         .not(id: search(interpreted_params).pluck(:id))
-        .non_serial_matches(interpreted_params)
-        .where("serial_normalized LIKE ?", "%#{serial_normalized}%")
+        .serials_containing(interpreted_params)
     end
 
     # Initial autocomplete options hashes for the main select search input
@@ -77,7 +78,9 @@ module BikeSearchable
       [:query, :manufacturer, :location, :distance, :serial, :stolenness, query_items: [], colors: []].freeze
     end
 
+    # TODO: actually make private?
     # Private (internal only) methods below here, as defined at the start
+    # private
 
     def non_serial_matches(interpreted_params)
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
@@ -186,6 +189,12 @@ module BikeSearchable
       where("serial_normalized @@ ?", serial)
     end
 
+    def serials_containing(interpreted_params)
+      non_serial_matches(interpreted_params)
+        # .where("serial_normalized LIKE ?", "%#{interpreted_params[:serial]}%")
+        .where("serial_normalized_no_space LIKE ?", "%#{interpreted_params[:serial_no_space]}%")
+    end
+
     def search_matching_stolenness(interpreted_params)
       case interpreted_params[:stolenness]
       when "all"
@@ -201,13 +210,6 @@ module BikeSearchable
       else
         stolen_or_impounded
       end
-    end
-
-    def search_matching_close_serials(serial, serial_no_space)
-      # TODO: if WHERE_NOT_PLUCK
-      where("LEVENSHTEIN(serial_normalized, ?) < 3", serial)
-        .or(where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", serial_no_space))
-        .where.not(id: search_serials_containing(serial: serial).select(:id))
     end
   end
 end

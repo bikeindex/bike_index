@@ -2151,11 +2151,8 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "search_close_serials" do
-    let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|ILSZB-111JJJG8", manufacturer: manufacturer) }
-    let(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJJ") }
-    before do
-      expect([non_stolen_bike, stolen_bike].size).to eq 2
-    end
+    let!(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|ILSZB-111JJJG8", manufacturer: manufacturer) }
+    let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJJ") }
     context "no serial param" do
       let(:query_params) { {query_items: [manufacturer.search_id], stolenness: "non"} }
       it "returns nil" do
@@ -2175,26 +2172,39 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "spaces" do
-      let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|I LSZB 111J JJJJ", manufacturer: manufacturer) }
-      context "dashes not spaces" do
-        let(:query_params) { {serial: "011-I528-111J-JJJJ", stolenness: "all"} }
-        it "matches only non-exact" do
-          expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to match_array([non_stolen_bike.id])
-          # Inexact serial searched
-          expect(Bike.search_close_serials(i_params("011I-52811-1JJ-JJJ")).pluck(:id)).to match_array([non_stolen_bike.id, stolen_bike.id])
-        end
-      end
-      context "no spaces" do
-        let(:query_params) { {serial: "11I528111JJJJJ", stolenness: "all"} }
-        it "matches only non-exact" do
-          expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to match_array([stolen_bike.id, non_stolen_bike.id])
-          # Inexact serial searched
-          expect(Bike.search_close_serials(i_params("1I528111JJJJJ")).pluck(:id)).to match_array([non_stolen_bike.id, stolen_bike.id])
-        end
+      let!(:non_stolen_bike_n) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJN") }
+      let(:query_params) { {serial: "011-I528-111J-J", stolenness: "all"} }
+      let(:interpreted_params_g) { i_params("011 I528-111J JJg") }
+      let(:interpreted_params_n) { i_params("11 1JJ JJn") } # just segment 2
+      let(:interpreted_params_no_space) { i_params("011I528111JJ") }
+      let(:interpreted_params_first_segment) { i_params("111529") }
+      let(:all_ids) { [stolen_bike.id, non_stolen_bike.id, non_stolen_bike_n.id] }
+      it "matches only non-exact" do
+        # serial contained in - don't match
+        expect(non_stolen_bike.reload.serial_normalized_no_space).to match interpreted_params[:serial_no_space]
+        expect(non_stolen_bike_n.reload.serial_normalized_no_space).to match interpreted_params[:serial_no_space]
+        expect(stolen_bike.reload.serial_normalized_no_space).to match interpreted_params[:serial_no_space]
+        expect(Bike.search_serials_containing(interpreted_params).pluck(:id)).to match_array(all_ids)
+        expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([])
+        # Inexact serial searched
+        expect(stolen_bike.serial_normalized_no_space).to match interpreted_params_g[:serial_no_space]
+        expect(Bike.serials_containing(interpreted_params_g).pluck(:id)).to match_array([stolen_bike.id])
+        expect(Bike.search_close_serials(interpreted_params_g).pluck(:id)).to match_array([non_stolen_bike.id, non_stolen_bike_n.id])
+        # Another inexact serial
+        expect(non_stolen_bike_n.serial_normalized_no_space).to match interpreted_params_n[:serial_no_space]
+        expect(Bike.serials_containing(interpreted_params_n).pluck(:id)).to match_array([non_stolen_bike_n.id])
+        expect(Bike.search_close_serials(interpreted_params_n).pluck(:id)).to match_array([stolen_bike.id, non_stolen_bike.id])
+        # No space - same result
+        expect(non_stolen_bike.serial_normalized_no_space).to match interpreted_params_no_space[:serial_no_space]
+        expect(Bike.serials_containing(interpreted_params_no_space).pluck(:id)).to match_array(all_ids)
+        expect(Bike.search_close_serials(interpreted_params_no_space).pluck(:id)).to eq([])
+        # first segment mismatch
+        expect(Bike.serials_containing(interpreted_params_first_segment).pluck(:id)).to match_array([])
+        expect(Bike.search_close_serials(interpreted_params_first_segment).pluck(:id)).to match_array(all_ids)
       end
     end
     context "close serial with stolenness" do
-      let(:query_params) { {serial: "011I528-111JJJk", stolenness: "non"} }
+      let(:query_params) { {serial: "011I528-111JJJJk", stolenness: "non"} }
       it "returns matching stolenness" do
         expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([non_stolen_bike.id])
       end
@@ -2219,27 +2229,25 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "search_serials_containing" do
-    let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|ILSZB-111JJJG8", manufacturer: manufacturer) }
-    let(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJJ") }
-    before do
-      expect([non_stolen_bike, stolen_bike].size).to eq 2
-    end
-    context "non-matching" do
-      let(:no_serial) { i_params(nil, query_items: [manufacturer.search_id], stolenness: "non") }
-      it "returns nil" do
-        expect(Bike.search_serials_containing(no_serial).pluck(:id)).to eq([])
-        expect(Bike.search_serials_containing(i_params("11I528-111JJJJJ")).pluck(:id)).to eq([])
-      end
-    end
-    context "spaces" do
-      it "matches only non-exact" do
-        pp non_stolen_bike.serial_normalized, SerialNormalizer.normalized_and_corrected(query_params[:serial])
-        # no spaces
-        expect(Bike.search_serials_containing(i_params("011I528111JJJJJ")).pluck(:id)).to match_array([non_stolen_bike.id, stolen_bike.id])
-        # Extra spaces
-        expect(Bike.search_serials_containing(i_params("01 1 I5 28 111 J JJ JJ")).pluck(:id)).to match_array([non_stolen_bike.id, stolen_bike.id])
-      end
-    end
-  end
+  # describe "search_serials_containing" do
+  #   let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|ILSZB-111JJJG8", manufacturer: manufacturer) }
+  #   let(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJJ") }
+  #   before { expect([non_stolen_bike, stolen_bike].size).to eq 2 }
+  #   context "non-matching" do
+  #     let(:no_serial) { i_params(nil, query_items: [manufacturer.search_id], stolenness: "non") }
+  #     it "returns nil" do
+  #       expect(Bike.search_serials_containing(no_serial).pluck(:id)).to eq([])
+  #       expect(Bike.search_serials_containing(i_params("11I528-111JJJJJ")).pluck(:id)).to eq([])
+  #     end
+  #   end
+  #   context "spaces" do
+  #     it "matches only non-exact" do
+  #       # pp non_stolen_bike.serial_normalized #, SerialNormalizer.normalized_and_corrected(query_params[:serial])
+  #       # no spaces
+  #       expect(Bike.search_serials_containing(i_params("011I528111JJJJJ")).pluck(:id)).to match_array([non_stolen_bike.id, stolen_bike.id])
+  #       # Extra spaces
+  #       expect(Bike.search_serials_containing(i_params("01 1 I5 28 111 J JJ JJ")).pluck(:id)).to match_array([non_stolen_bike.id, stolen_bike.id])
+  #     end
+  #   end
+  # end
 end

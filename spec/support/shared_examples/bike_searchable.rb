@@ -437,11 +437,11 @@ RSpec.shared_examples "bike_searchable" do
         expect(Bike.search_serials_containing(exact_normalized).pluck(:id)).to be_blank
       end
     end
-    # context "exact normalized serial" do
-    #   let(:query_params) { {serial: "11I528-111JJJJJ", stolenness: "all"} } # Because drops leading zeros
-    #   it "matches only non-exact" do
-    #     expect(Bike.search_serials_containing(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
-    #   end
-    # end
+    context "exact normalized serial" do
+      let(:query_params) { {serial: "11I528-111JJJJJ", stolenness: "all"} } # Because drops leading zeros
+      it "matches only non-exact" do
+        expect(Bike.search_serials_containing(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
+      end
+    end
   end
 end
