@@ -46,8 +46,6 @@ module BikeSearchable
         .not(id: serials_containing(interpreted_params).pluck(:id))
         .non_serial_matches(interpreted_params)
         .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
-        # TODO: seems like we don't need the with-space search
-        # .or(where("LEVENSHTEIN(serial_normalized, ?) < 3", interpreted_params[:serial]).where.not(id: serial_containing_ids))
     end
 
     def search_serials_containing(interpreted_params)
