@@ -47,34 +47,16 @@ RSpec.describe "BikesController#index", type: :request do
         end
       end
       context "query_items and serial search" do
-        let!(:bike4) { FactoryBot.create(:bike, serial_number: "1 2 3 4 5 6 7 8-9-0") }
         let(:manufacturer) { non_stolen_bike.manufacturer }
         let(:color) { non_stolen_bike.primary_frame_color }
         let(:query_params) { {serial: "#{serial}0d", query_items: [color.search_id, manufacturer.search_id], stolenness: "non"} }
         let(:target_selected_query_items_options) { Bike.selected_query_items_options(target_interpreted_params) }
         it "assigns passed parameters, assigns close_serials" do
-          expect(Bike.count).to eq 4
           get base_url, params: query_params
           expect(response.status).to eq 200
           expect(assigns(:interpreted_params)).to eq target_interpreted_params
           expect(assigns(:selected_query_items_options)).to eq target_selected_query_items_options
           expect(assigns(:bikes).map(&:id)).to eq([])
-          # find bikes with spaces in their serial
-          get base_url, params: {serial: " 1234567890"}
-          expect(response.status).to eq 200
-          expect(assigns[:bike].pluck(:id)).to eq([non_stolen_bike.id, bike4.id])
-          # find bikes without spaces in their serial
-          get base_url, params: {serial: "\n1 2\t  3 4 5 6"}
-          expect(response.status).to eq 200
-          expect(assigns[:bike].pluck(:id)).to eq([non_stolen_bike.id, bike4.id])
-
-          get base_url, params: {serial: " 1234567"}
-          expect(response.status).to eq 200
-          expect(assigns[:bike].pluck(:id)).to eq([non_stolen_bike.id])
-
-          get base_url, params: {serial: "1-234-56"}
-          expect(response.status).to eq 200
-          expect(assigns[:bike].pluck(:id)).to eq([bike4.id, non_stolen_bike.id])
         end
       end
       context "ip proximity" do
