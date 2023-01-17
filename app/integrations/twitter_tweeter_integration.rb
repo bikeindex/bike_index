@@ -23,8 +23,8 @@ class TwitterTweeterIntegration
   def initialize(bike)
     self.bike = bike
     self.stolen_record = bike.current_stolen_record
-    if bike.public_images.first.present?
-      self.bike_photo_url = bike.public_images.first.image_url(:large)
+    if bike.image_url.present?
+      self.bike_photo_url = bike.image_url(:large)
     end
     self.close_twitter_accounts = TwitterAccount.in_proximity(stolen_record)
     self.nearest_twitter_account = close_twitter_accounts.find { |i| i.not_national? } || close_twitter_accounts.first

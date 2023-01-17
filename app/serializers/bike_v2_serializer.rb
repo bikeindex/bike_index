@@ -58,19 +58,11 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def thumb
-    image = object.public_images&.first&.image_url(:small)
-    return image if image.present?
-
-    if object.stock_photo_url.present?
-      small = object.stock_photo_url.split("/")
-      ext = "/small_" + small.pop
-      small.join("/") + ext
-    end
+    @thumb ||= BikeDisplayer.thumb_image_url(object)
   end
 
   def large_img
-    object.public_images&.first&.image_url(:large).presence ||
-      object.stock_photo_url
+    object.image_url.presence || object.stock_photo_url
   end
 
   def url
@@ -78,7 +70,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def is_stock_img
-    object.public_images.blank? && object.stock_photo_url.present?
+    object.image_url.blank? && object.stock_photo_url.present?
   end
 
   def stolen_location

@@ -1551,6 +1551,31 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "image_url" do
+    it "is nil" do
+      expect(Bike.new.image_url).to be_blank
+    end
+    context "with stock photo" do
+      let(:bike) { Bike.new(stock_photo_url: stock_photo_url) }
+      let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg" }
+      it "is stock_photo_url small" do
+        expect(bike.image_url).to eq stock_photo_url
+        expect(bike.image_url(:small)).to eq stock_photo_url # Doesn't do sizes for stock photos
+      end
+    end
+    context "with public_images" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+      before { bike.update(updated_at: Time.current) } # bump thumb path
+      it "is the public image" do
+        expect(bike.reload.thumb_path).to be_present
+        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
+        expect(bike.image_url).to eq public_image.image_url
+        expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
+      end
+    end
+  end
+
   describe "assignment of bike_organization_ids" do
     let(:bike) { FactoryBot.create(:bike_organized) }
     let(:organization) { bike.organizations.first }

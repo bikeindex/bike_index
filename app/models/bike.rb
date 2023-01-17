@@ -282,7 +282,7 @@ class Bike < ApplicationRecord
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
     t = (updated_by_user_fallback || Time.current).to_i / 10000
-    stock_photo_url.present? || public_images.present? ? t : t / 100
+    stock_photo_url.present? || public_images.limit(1).present? ? t : t / 100
   end
 
   def credibility_scorer
@@ -361,6 +361,21 @@ class Bike < ApplicationRecord
     end
     return serial_number.humanize if no_serial?
     serial_number
+  end
+
+  # development with remote image url fix
+  REMOTE_IMAGE_FALLBACK_URLS = Rails.env.development?
+
+  def image_url(size = nil)
+    if thumb_path.blank?
+      return stock_photo_url.present? ? stock_photo_url : nil
+    end
+    image_col = public_images.limit(1).first&.image
+    image_url = image_col.send(:url, size)
+    # Return the image_url if we aren't falling back to remote image urls or the image is present
+    return image_url if !REMOTE_IMAGE_FALLBACK_URLS || image_col.present?
+    # Create a image_url using the aws path
+    "https://files.bikeindex.org" + image_url.gsub(ENV["BASE_URL"], "")
   end
 
   # Prevent returning ip address, rather than the TLD URL
@@ -761,7 +776,7 @@ class Bike < ApplicationRecord
     set_user_hidden
     # cache_bike
     self.all_description = cached_description_and_stolen_description
-    self.thumb_path = public_images&.first&.image_url(:small)
+    self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
   end
 

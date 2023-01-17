@@ -31,14 +31,11 @@ module BikeHelper
   end
 
   def bike_thumb_image(bike)
-    if bike.thumb_path
-      image_tag(bike.thumb_path, alt: bike.title_string, skip_pipeline: true)
-    elsif bike.stock_photo_url.present?
-      small = bike.stock_photo_url.split("/")
-      ext = "/small_" + small.pop
-      image_tag(small.join("/") + ext, alt: bike.title_string)
+    thumb_image_url = BikeDisplayer.thumb_image_url(bike)
+    if thumb_image_url.present?
+      image_tag(thumb_image_url, alt: bike.title_string, skip_pipeline: true)
     else
-      image_tag("revised/bike_photo_placeholder.svg", alt: bike.title_string, title: "No image", class: "no-image")
+      image_tag(bike_placeholder_image_path, alt: bike.title_string, title: "No image", class: "no-image")
     end
   end
 
@@ -55,5 +52,9 @@ module BikeHelper
         concat(content_tag(:em, " #{bike.type&.titleize}"))
       end
     end
+  end
+
+  def bike_placeholder_image_path
+    image_path("revised/bike_photo_placeholder.svg")
   end
 end
