@@ -62,7 +62,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def large_img
-    object.image_url.presence || object.stock_photo_url
+    object.image_url(:large).presence || object.stock_photo_url
   end
 
   def url

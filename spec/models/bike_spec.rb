@@ -1565,11 +1565,11 @@ RSpec.describe Bike, type: :model do
     end
     context "with public_images" do
       let(:bike) { FactoryBot.create(:bike) }
-      let(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
       before { bike.update(updated_at: Time.current) } # bump thumb path
       it "is the public image" do
         expect(bike.reload.thumb_path).to be_present
-        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
+        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.image_url).to eq public_image.image_url
         expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
       end
