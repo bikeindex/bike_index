@@ -282,7 +282,7 @@ class Bike < ApplicationRecord
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
     t = (updated_by_user_fallback || Time.current).to_i / 10000
-    stock_photo_url.present? || public_images.present? ? t : t / 100
+    stock_photo_url.present? || public_images.limit(1).present? ? t : t / 100
   end
 
   def credibility_scorer
@@ -761,7 +761,7 @@ class Bike < ApplicationRecord
     set_user_hidden
     # cache_bike
     self.all_description = cached_description_and_stolen_description
-    self.thumb_path = public_images&.first&.image_url(:small)
+    self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
   end
 

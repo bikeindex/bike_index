@@ -1,10 +1,11 @@
 .col-md-8
   .bike-photos.horizontal-thumbnails
+    - bike_image_url = @bike.image_url(:large) # corrects the URL for remote images in development
     - bike_image = @bike.public_images.first
-    - if bike_image.present? && bike_image.image_url.present?
+    - if bike_image_url.present? && bike_image.present?
       #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
         .current-photo{ id: "image#{bike_image.id}"}
-          = image_tag(bike_image.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: bike_image.image_url })
+          = image_tag(bike_image_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: bike_image_url })
       - if @bike.public_images.count > 1
         %span.thumbnail-shadow
         %span.thumbnail-shadow-r

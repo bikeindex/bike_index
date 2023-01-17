@@ -57,7 +57,7 @@
                   .selection-preview.text-center.w-100#js-selection-preview.mb-2
                     .selection-preview-image-template
                       .selection-preview-image#js-selection-preview-image
-                        = image_tag @bike.public_images.first.image_url(:medium)
+                        = image_tag @bike.image_url(:medium)
                       .selection-preview-caption
                         -# Display a generic location "City, State - Country"
                            since users may see this preview before having

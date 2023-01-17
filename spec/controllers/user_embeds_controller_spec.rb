@@ -15,7 +15,6 @@ RSpec.describe UserEmbedsController, type: :controller do
     it "renders the most recent bikes with images if it doesn't find the user" do
       public_image = FactoryBot.create(:public_image)
       bike = public_image.imageable
-      allow_any_instance_of(Bike).to receive(:public_images) { [public_image] }
       bike.save && bike.reload
       expect(bike.thumb_path).to be_present
       get :show, params: {id: "NOT A USER"}

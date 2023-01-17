@@ -240,8 +240,4 @@ module ApplicationHelper
     end
     CodeRay.scan(JSON.pretty_generate(cleaned_data), :json).div.html_safe
   end
-
-  def bike_placeholder_image_path
-    image_path("revised/bike_photo_placeholder.svg")
-  end
 end

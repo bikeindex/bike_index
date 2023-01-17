@@ -99,7 +99,6 @@
             - if @recovery_display.image_processing?
               %span.text-warning
                 Image is still processing - please check back in a few minutes before reuploading an image
-            - bike_image_url = @bike.public_images.present? ? @bike.public_images.first.image_url : @bike.stock_photo_url
             = f.hidden_field :remote_image_url
             %p#recovery-bike-image-text
               %span.using-bike-image
@@ -110,7 +109,7 @@
                   has image
                 - else
                   has stock image
-              %a.btn.btn-outline-success#use_image_for_display{ href: '#', data: { url: bike_image_url } }
+              %a.btn.btn-outline-success#use_image_for_display{href: '#', data: {url: @bike.image_url}}
                 %span.not-using-bike-image
                   Use first image
                 %span.using-bike-image
