@@ -372,7 +372,8 @@ class Bike < ApplicationRecord
     end
     image_col = public_images.limit(1).first&.image
     image_url = image_col.send(:url, size)
-    # Return the image_url if we aren't falling back to remote image urls or the image is present
+    # The image is not present if it's not there - returns false for remote images in dev
+    # Return the image_url if we aren't falling back to remote image urls or if the image is present
     return image_url if !REMOTE_IMAGE_FALLBACK_URLS || image_col.present?
     # Create a image_url using the aws path
     "https://files.bikeindex.org" + image_url.gsub(ENV["BASE_URL"], "")
