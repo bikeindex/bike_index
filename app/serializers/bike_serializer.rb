@@ -71,21 +71,11 @@ class BikeSerializer < ApplicationSerializer
   end
 
   def photo
-    if object.public_images.present?
-      object.public_images.first.image_url(:large)
-    elsif object.stock_photo_url.present?
-      object.stock_photo_url
-    end
+    object.image_url(:large)
   end
 
   def thumb
-    if object.public_images.present?
-      object.public_images.first.image_url(:small)
-    elsif object.stock_photo_url.present?
-      small = object.stock_photo_url.split("/")
-      ext = "/small_" + small.pop
-      small.join("/") + ext
-    end
+    BikeDisplayer.thumb_image_url(object)
   end
 
   def frame_material

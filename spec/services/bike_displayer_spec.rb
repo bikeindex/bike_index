@@ -399,4 +399,25 @@ RSpec.describe BikeDisplayer do
       end
     end
   end
+
+  describe "thumb_image_url" do
+    let(:bike) { FactoryBot.create(:bike, stock_photo_url: stock_photo_url) }
+    let(:stock_photo_url) { nil }
+    it "is nil" do
+      expect(BikeDisplayer.thumb_image_url(bike)).to be_nil
+    end
+    context "with stock photo" do
+      let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg" }
+      let(:target) { "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/small_12_codacomp_bl.jpg" }
+      it "is stock_photo_url small" do
+        expect(BikeDisplayer.thumb_image_url(bike)).to eq target
+      end
+      context "with thumb_path" do
+        it "is thumb path" do
+          allow(bike).to receive(:thumb_path).and_return("pathy")
+          expect(BikeDisplayer.thumb_image_url(bike)).to eq "pathy"
+        end
+      end
+    end
+  end
 end

@@ -133,10 +133,8 @@ module HeaderTagHelper
         self.page_image = @bike.alert_image_url(:square)
         self.twitter_image = @bike.alert_image_url(:twitter)
         self.facebook_image = @bike.alert_image_url(:facebook)
-      elsif @bike.thumb_path.present? && @bike.public_images.present?
-        self.page_image = @bike.public_images.first.image_url
-      elsif @bike.stock_photo_url.present?
-        self.page_image = @bike.stock_photo_url
+      elsif @bike.image_url.present?
+        self.page_image = @bike.image_url(:large)
       end
       if @bike.owner&.show_twitter && @bike.owner.twitter.present?
         meta_overrides["twitter:creator"] = "@#{@bike.owner.twitter}"

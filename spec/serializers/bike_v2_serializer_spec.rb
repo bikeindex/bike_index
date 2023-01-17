@@ -5,6 +5,7 @@ RSpec.describe BikeV2Serializer do
   describe "standard validations" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership, year: 2011) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+    before { bike.update(updated_at: Time.current) } # set thumb_path
 
     let(:target) do
       {

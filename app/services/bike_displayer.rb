@@ -68,5 +68,13 @@ class BikeDisplayer
       return false if bike.user&.no_address? || bike.creation_organization&.enabled?("no_address")
       bike.street.present? || bike.creation_organization&.enabled?("reg_address")
     end
+
+    def thumb_image_url(bike)
+      return bike.thumb_path if bike.thumb_path.present?
+      return nil if bike.stock_photo_url.blank?
+      small = bike.stock_photo_url.split("/")
+      ext = "/small_" + small.pop
+      small.join("/") + ext
+    end
   end
 end
