@@ -52,10 +52,11 @@ class BikeSearch extends Component {
 
   render () {
     const { serial } = this.props.interpretedParams
+    const { wrapperClassName } = 'row bikes-searched-' // + this.props.searchName
 
     if (this.state.loading === null) {
       return (
-        <div className='row'>
+        <div className={wrapperClassName}>
           <div className='col-md-12'>
             <h3 className='no-exact-results'>
               {this.props.t('no_matches_found_html', { serial })}
@@ -67,7 +68,7 @@ class BikeSearch extends Component {
 
     if (this.state.loading) {
       return (
-        <div className='row'>
+        <div className={wrapperClassName}>
           <div className='col-md-12'>
             <h3 className='secondary-matches'>
               {this.props.t('searching_html', { serial })}
@@ -90,7 +91,7 @@ class BikeSearch extends Component {
     console.log(this.state.results)
 
     return (
-      <div className='row'>
+      <div className={wrapperClassName}>
         <div className='col-md-12'>
           <h3 className='secondary-matches'>
             {this.props.t('matches_found_html', { serial, stolenness })}
