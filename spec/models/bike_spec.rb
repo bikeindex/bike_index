@@ -1574,6 +1574,14 @@ RSpec.describe Bike, type: :model do
         expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
       end
     end
+    context "with missing public_image" do
+      let(:bike) { FactoryBot.create(:bike) }
+      # This happens sometimes when images are deleted
+      before { bike.update_column(:thumb_path, "https://files.bikeindex.org/uploads/Pu/33333/adsf.jpg") }
+      it "is nil" do
+        expect(bike.reload.image_url).to be_blank
+      end
+    end
   end
 
   describe "assignment of bike_organization_ids" do
