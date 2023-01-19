@@ -149,6 +149,7 @@ module BikeAttributable
       return stock_photo_url.present? ? stock_photo_url : nil
     end
     image_col = public_images.limit(1).first&.image
+    return nil if image_col.blank?
     image_url = image_col.send(:url, size)
     # The image is not present if it's not there - returns false for remote images in dev
     # Return the image_url if we aren't falling back to remote image urls or if the image is present
