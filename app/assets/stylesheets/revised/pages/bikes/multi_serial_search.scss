@@ -83,54 +83,55 @@ $multserial-textheight: 8em;
         }
       }
     }
+  }
 
-    .multiserial-fuzzy-box {
-      text-align: center;
+  .multiserial-fuzzy-box {
+    text-align: center;
 
-      a {
+    a {
+      display: none;
+
+      span {
         display: none;
+      }
 
-        span {
-          display: none;
-        }
-
-        .ms-short-fuzzy {
-          display: inline-block;
-        }
+      .ms-short-fuzzy {
+        display: inline-block;
       }
     }
+  }
 
-    .multiserial-results {
-      @include clearfix;
+  .multiserial-results {
+    @include clearfix;
 
-      position: relative;
-      border: 1px solid $gray-lighter;
-      padding: 20px 10px;
-      margin: 1em 0;
+    position: relative;
+    border: 1px solid $gray-lighter;
+    padding: 20px 10px;
+    margin: 1em 0;
 
-      h3 {
-        margin-top: 0;
-      }
+    h3 {
+      margin-top: 0;
+    }
+  }
+
+  .serial-text {
+    font-size: 0.9em;
+    margin-left: 0.25rem;
+    color: $less-strong-font-color;
+  }
+
+  li .serial-text {
+    padding-left: 0.5em;
+  }
+
+  .multiserial-fuzzy-result {
+    margin-right: 0;
+
+    h3 {
+      color: $less-strong-font-color;
 
       .serial-text {
-        font-size: 0.9em;
-        color: $less-strong-font-color;
-      }
-
-      li .serial-text {
-        padding-left: 0.5em;
-      }
-
-      .multiserial-fuzzy-result {
-        margin-right: 0;
-
-        h3 {
-          color: $less-strong-font-color;
-
-          .serial-text {
-            color: $gray-lighter;
-          }
-        }
+        color: $gray-light;
       }
     }
   }
