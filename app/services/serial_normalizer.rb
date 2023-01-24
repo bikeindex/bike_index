@@ -44,6 +44,11 @@ class SerialNormalizer
     normed.gsub(/^0+/, "").gsub(/\s+/, " ").strip # remove leading zeros and multiple spaces
   end
 
+  # This is simple - but let's make sure it's consistent
+  def self.no_space(serial)
+    serial.gsub(/\s/, "")
+  end
+
   def initialize(serial: nil, bike_id: nil)
     @serial = serial&.strip&.upcase
     @bike_id = bike_id
