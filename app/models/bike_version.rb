@@ -131,7 +131,7 @@ class BikeVersion < ApplicationRecord
       self.attributes = bike_overridden_attributes
     end
     self.listing_order = calculated_listing_order
-    self.thumb_path = public_images&.limit(1).first&.image_url(:small)
+    self.thumb_path = public_images&.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
     self.name = name.present? ? name.strip : nil
   end

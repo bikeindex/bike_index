@@ -4,6 +4,7 @@ import React, { Fragment, Component } from 'react'
 
 import Loading from '../Loading'
 import TimeParser from '../utils/time_parser.js'
+import log from '../utils/log.js'
 import honeybadger from '../utils/honeybadger'
 
 class BikeSearch extends Component {
@@ -14,7 +15,9 @@ class BikeSearch extends Component {
 
   state = {
     loading: null,
-    results: []
+    results: [],
+    total: null,
+    link: null
   }
 
   componentDidMount () {
@@ -36,10 +39,10 @@ class BikeSearch extends Component {
     this.setState({ loading: true })
   }
 
-  resultsFetched = ({ bikes, error }) => {
-    const results = bikes || []
+  resultsFetched = (result, error) => {
+    const results = result.bikes || []
     const loading = !results.length ? null : false
-    this.setState({ results, loading })
+    this.setState({ results, loading, total: result.total, link: result.link })
     if (error) {
       this.setState({ results, loading })
       this.handleError(error)
@@ -47,12 +50,30 @@ class BikeSearch extends Component {
   }
 
   handleError = error => {
-    // honeybadger.notify(error, { component: this.props.searchName })
+    honeybadger.notify(error, { component: this.props.searchName })
+  }
+
+  paginationLink () {
+    if (!this.state.link) {
+      return null
+    }
+
+    // TODO: This pagination functionality isn't finished! it needs to to re-render just the new page
+    // return (
+    //   <div className='js-paginate mt-2 mb-2'>
+    //     {Object.keys(this.state.link).map(page => (
+    //       <a key={page} href="#" className='btn btn-outline-primary'>
+    //         {page}
+    //       </a>
+    //     ))}
+    //   </div>
+    // )
   }
 
   render () {
     const { serial } = this.props.interpretedParams
-    const { wrapperClassName } = 'row bikes-searched-' // + this.props.searchName
+    const wrapperClassName =
+      'row bikes-searched bikes-searched-' + this.props.searchName
 
     if (this.state.loading === null) {
       return (
@@ -88,12 +109,13 @@ class BikeSearch extends Component {
       proximity: 'stolen'
     }[this.props.interpretedParams.stolenness]
 
-    console.log(this.state.results)
+    const totalDisplay = Number(this.state.total).toLocaleString()
 
     return (
       <div className={wrapperClassName}>
         <div className='col-md-12'>
           <h3 className='secondary-matches'>
+            <strong>{totalDisplay}</strong>{' '}
             {this.props.t('matches_found_html', { serial, stolenness })}
           </h3>
           <ul className='bike-boxes'>
@@ -102,6 +124,7 @@ class BikeSearch extends Component {
             ))}
           </ul>
         </div>
+        {this.paginationLink()}
       </div>
     )
   }

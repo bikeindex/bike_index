@@ -70,7 +70,7 @@ const MultiSerialSearch = () => {
         parallel request fuzzy serials and merge
       */
       const fuzzyAll = await Promise.all(
-        serialResults.map(({ serial }) => api.fetchFuzzyResults(serial))
+        serialResults.map(({ serial }) => api.fetchFuzzyResults(serial)).json
       );
       const updatedResults = fuzzyAll.map(({ bikes: fuzzyBikes }, index) => {
         const serialResult = serialResults[index];

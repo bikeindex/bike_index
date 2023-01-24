@@ -49,6 +49,7 @@ RSpec.describe "Search API V3", type: :request do
       get "/api/v3/search/serials_containing", params: {serial: "s-e-r-ia\nln\num", stolenness: "non", format: :json}
       expect(json_result[:bikes]).to be_present
       expect(json_result[:bikes].map { |b| b["id"] }).to eq([bike.id])
+      expect(response.header["Total"]).to eq "1"
     end
   end
 

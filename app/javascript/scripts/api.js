@@ -24,11 +24,28 @@ const serialExternalSearchUrl = ({ serial }) => {
   return url(`api/v3/search/external_registries?${query}`)
 }
 
+const parseLinkHeader = linkHeader => {
+  if (!linkHeader) {
+    return null
+  }
+  const linkHeadersArray = linkHeader
+    .split(', ')
+    .map(header => header.split('; '))
+  const linkHeadersMap = linkHeadersArray.map(header => {
+    const thisHeaderRel = header[1].replace(/"/g, '').replace('rel=', '')
+    const thisHeaderUrl = header[0].slice(1, -1)
+    return [thisHeaderRel, thisHeaderUrl]
+  })
+  return Object.fromEntries(linkHeadersMap)
+}
+
 const request = async url => {
   const resp = await fetch(url)
-  console.log(resp)
-  const json = await resp.json()
-  return json
+  let result = await resp.json()
+
+  result.total = resp.headers.get('Total')
+  result.link = parseLinkHeader(resp.headers.get('Link'))
+  return result
 }
 
 const queryString = ({ serial, stolenness, location, query, query_items }) => {

@@ -9,7 +9,7 @@ RSpec.shared_examples "bike_searchable" do
   include_context :geocoder_stubbed_bounding_box
 
   def i_params(serial = nil, ip_address: nil, query_items: [], stolenness: "all")
-    Bike.searchable_interpreted_params({serial: serial, stolenness: stolenness, query_items: query_items, stolenness: stolenness}, ip: ip_address)
+    Bike.searchable_interpreted_params({serial: serial, stolenness: stolenness, query_items: query_items}, ip: ip_address)
   end
 
   describe "searchable_interpreted_params" do
