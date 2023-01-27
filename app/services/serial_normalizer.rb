@@ -46,7 +46,7 @@ class SerialNormalizer
 
   # This is simple - but let's make sure it's consistent
   def self.no_space(serial)
-    serial.gsub(/\s/, "")
+    serial&.gsub(/\s/, "")
   end
 
   def initialize(serial: nil, bike_id: nil)
