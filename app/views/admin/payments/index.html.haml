@@ -1,5 +1,3 @@
-- render_method = ParamsNormalizer.boolean(params[:search_render_method])
-
 .admin-subnav
   .col-md-5
     %h1
@@ -16,7 +14,7 @@
             #{@kind.titleize} only
         .dropdown-menu
           = link_to "All kinds", url_for(sortable_search_params.merge(search_kind: "all")), class: "dropdown-item #{@kind.present? ? 'active' : ''}"
-          = link_to "organization only", url_for(sortable_search_params.merge(search_kind: "organization")), class: "dropdown-item #{@kind == 'organization' ? 'active' : ''}"
+          = link_to "Organization only", url_for(sortable_search_params.merge(search_kind: "organization")), class: "dropdown-item #{@kind == 'organization' ? 'active' : ''}"
           .dropdown-divider
           - Payment.kinds.each do |kind|
             = link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : ''}"
@@ -32,8 +30,23 @@
           .dropdown-divider
           = link_to "Paid only", url_for(sortable_search_params.merge(search_incompleteness: "paid")), class: "dropdown-item #{@incompleteness == 'paid' ? 'active' : ''}"
           = link_to "Incomplete only", url_for(sortable_search_params.merge(search_incompleteness: "incomplete")), class: "dropdown-item #{@incompleteness == 'incomplete' ? 'active' : ''}"
-      %li.nav-item
-        = link_to "Show method", url_for(sortable_search_params.merge(search_render_method: !render_method)), class: "nav-link #{render_method ? 'active' : ''}"
+      %li.nav-item.dropdown
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@payment_method != "all" ? "active" : "")}
+          - if @payment_method == "all"
+            All methods
+          - elsif @payment_method == "show"
+            All methods, shown
+          - else
+            #{@payment_method.titleize} only
+        .dropdown-menu
+          - if @render_method
+            = link_to "All methods", url_for(sortable_search_params.merge(search_payment_method: "all")), class: "nav-link"
+          - else
+            = link_to "All methods, shown", url_for(sortable_search_params.merge(search_payment_method: "show")), class: "nav-link"
+          .dropdown-divider
+          - Payment.payment_methods.each do |payment_method|
+            = link_to "#{payment_method.titleize} only", url_for(sortable_search_params.merge(search_payment_method: payment_method)), class: "dropdown-item #{@payment_method == payment_method ? 'active' : ''}"
+
       %li.nav-item
         = link_to "graph", admin_payments_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   = render partial: "/shared/admin_current_header", locals: {viewing: "Payments"}
@@ -92,7 +105,7 @@
 
 = form_tag admin_payments_path, method: :get do
   = render partial: "/shared/hidden_search_fields"
-  = hidden_field_tag :search_render_method, params[:search_render_method]
+  = hidden_field_tag :search_payment_method, params[:search_payment_method]
   = hidden_field_tag :search_incompleteness, params[:search_incompleteness]
   .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
     .mt-2.mr-2
@@ -105,6 +118,6 @@
 
 = render partial: "/shared/pagination", locals: {collection: @payments}
 
-= render partial: "table", locals: {payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid", render_method: render_method}
+= render partial: "table", locals: {payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid", render_method: @render_method}
 
 = render partial: "/shared/pagination", locals: {collection: @payments, skip_total: true}
