@@ -2300,7 +2300,8 @@ CREATE TABLE public.organizations (
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
-    direct_unclaimed_notifications boolean DEFAULT false
+    direct_unclaimed_notifications boolean DEFAULT false,
+    spam_registrations boolean DEFAULT false
 );
 
 
@@ -6399,6 +6400,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220819205834'),
 ('20220903183420'),
 ('20220921170820'),
-('20221007123638');
+('20221007123638'),
+('20230224234148');
 
 

@@ -109,6 +109,13 @@ RSpec.describe CredibilityScorer do
           expect(instance.badges).to eq([:created_at_point_of_sale])
           expect(instance.score).to eq 100
         end
+        context "embed registration" do
+          it "returns" do
+            pp ownership
+            # ownership.update()
+            fail
+          end
+        end
       end
       context "deleted organization, long_time_registration" do
         let(:created_at) { Time.current - 366.days }
