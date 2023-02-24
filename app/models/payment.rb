@@ -29,6 +29,8 @@ class Payment < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
+  attr_accessor :skip_update
+
   def self.payment_methods
     PAYMENT_METHOD_ENUM.keys.map(&:to_s)
   end
@@ -165,6 +167,7 @@ class Payment < ApplicationRecord
   end
 
   def update_associations
+    return if skip_update
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
     if payment_method == "stripe" && paid? && email.present? && !theft_alert?
       EmailReceiptWorker.perform_async(id)
