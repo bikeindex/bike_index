@@ -77,7 +77,11 @@ class Admin::PaymentsController < Admin::BaseController
     end
     if params[:search_kind].present?
       @kind = params[:search_kind]
-      matching_payments = matching_payments.where(kind: @kind)
+      matching_payments = if @kind == "organization"
+        matching_payments.where.not(organization_id: nil)
+      else
+        matching_payments.where(kind: @kind)
+      end
     end
     matching_payments = matching_payments.admin_search(params[:query]) if params[:query].present?
     if params[:search_email].present?
