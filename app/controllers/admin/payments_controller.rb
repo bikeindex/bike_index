@@ -35,6 +35,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
+    @payment.first_payment_date = @payment.created_at
     valid_method = Payment.admin_creatable_payment_methods.include?(permitted_create_parameters[:payment_method])
 
     if valid_method && valid_invoice_parameters? && @payment.save
@@ -56,6 +57,10 @@ class Admin::PaymentsController < Admin::BaseController
 
   def sortable_columns
     %w[created_at user_id organization_id kind payment_method invoice_id amount_cents referral_source]
+  end
+
+  def searchable_payment_methods
+    ["show"] + Payment.payment_methods
   end
 
   def matching_payments
@@ -82,6 +87,15 @@ class Admin::PaymentsController < Admin::BaseController
       else
         matching_payments.where(kind: @kind)
       end
+    end
+    if searchable_payment_methods.include?(params[:search_payment_method])
+      @render_method = true
+      @payment_method = params[:search_payment_method]
+      if @payment_method != "show"
+        matching_payments = matching_payments.where(payment_method: @payment_method)
+      end
+    else
+      @payment_method = "all"
     end
     matching_payments = matching_payments.admin_search(params[:query]) if params[:query].present?
     if params[:search_email].present?
