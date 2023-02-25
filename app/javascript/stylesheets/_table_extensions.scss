@@ -37,6 +37,7 @@
   @extend .table-striped;
   @extend .table-bordered;
   @extend .table-sm;
+  word-break: break-word;
   tr td {
     line-height: 1.5;
     &:first-child {
