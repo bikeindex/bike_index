@@ -53,7 +53,7 @@
 
 :ruby
   payments_counts = Payment.kinds.map do |kind|
-    next if @kind.present? && kind != kind
+    next if @kind.present? && kind != @kind
     payments_of_kind = matching_payments.where(kind: kind)
     {
       kind: kind,
