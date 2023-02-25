@@ -63,6 +63,10 @@ class Admin::PaymentsController < Admin::BaseController
     ["show"] + Payment.payment_methods
   end
 
+  def searchable_kinds
+    ["organization"] + Payment.kinds
+  end
+
   def matching_payments
     return @matching_payments if defined?(@matching_payments)
     matching_payments = Payment
@@ -80,8 +84,9 @@ class Admin::PaymentsController < Admin::BaseController
       @incompleteness ||= "paid" # Default to only completed
       matching_payments = matching_payments.paid
     end
-    if params[:search_kind].present?
+    if searchable_kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
+
       matching_payments = if @kind == "organization"
         matching_payments.where.not(organization_id: nil)
       else
