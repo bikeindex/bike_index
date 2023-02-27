@@ -6,7 +6,11 @@ class UpdateCredibilityScoreWorker < ScheduledWorker
   sidekiq_options retry: false
 
   def self.frequency
-    10.minutes
+    9.minutes
+  end
+
+  def self.unscored_bikes
+    Bike.unscoped.where(credibility_score: nil).order(created_at: :desc)
   end
 
   def perform(bike_id = nil)
@@ -16,7 +20,7 @@ class UpdateCredibilityScoreWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    Bike.unscoped.where(credibility_score: nil).order(created_at: :desc).limit(500)
+    self.class.unscored_bikes.limit(500)
       .pluck(:id).each { |i| UpdateCredibilityScoreWorker.perform_async(i) }
   end
 end
