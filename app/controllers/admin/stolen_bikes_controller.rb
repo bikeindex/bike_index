@@ -18,7 +18,7 @@ class Admin::StolenBikesController < Admin::BaseController
         stolen_record_ids.each do |id|
           stolen_record = StolenRecord.unscoped.find(id)
           stolen_record.update_attribute :approved, true
-          pp ApproveStolenListingWorker.perform_async(stolen_record.bike_id)
+          ApproveStolenListingWorker.perform_async(stolen_record.bike_id)
         end
         # Lazy pluralize hack
         flash[:success] = "#{stolen_record_ids.count} stolen #{stolen_record_ids.count == 1 ? "bike" : "bikes"} approved!"
