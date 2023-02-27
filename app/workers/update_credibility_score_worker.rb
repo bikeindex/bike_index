@@ -10,7 +10,7 @@ class UpdateCredibilityScoreWorker < ScheduledWorker
   end
 
   def perform(bike_id = nil)
-    return enqueue_workers if bike_id == nil
+    return enqueue_workers if bike_id.nil?
     bike = Bike.unscoped.where(id: bike_id).first
     bike.update_column :credibility_score, bike.credibility_scorer.score
   end

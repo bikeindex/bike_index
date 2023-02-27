@@ -103,7 +103,7 @@ module AdminHelper
     "#28a745"
   end
 
-  def credibility_scorer_color_only_low(score)
+  def credibility_scorer_color_table(score)
     score < 31 ? credibility_scorer_color(score) : ""
   end
 

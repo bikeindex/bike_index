@@ -12,7 +12,7 @@
 - body ||= ''
 
 - unless body.include? '<' # Ensure we make it html
-  - body = content_tag(:p, body)
+  - body = content_tag(:p, body, class: "mb-0")
 
 .alert.in{ class: class_names, data: { seconds: seconds } }
   %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}

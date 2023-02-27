@@ -154,6 +154,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
           expect(response.code).to eq("200")
           bike = Bike.where(serial_number: "SSOMESERIAL").first
           expect_matching_created_bike(bike)
+          expect(bike.credibility_score).to eq 100
 
           expect {
             # And do it a couple more times

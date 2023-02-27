@@ -239,5 +239,33 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(flash[:success]).to match(/deleted/i)
       expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
     end
+    context "get_destroy" do
+      it "destroys" do
+        bike.current_ownership
+        expect {
+          get "#{base_url}/#{bike.id}/get_destroy"
+        }.to change(Bike, :count).by(-1)
+        expect(response).to redirect_to(:admin_bikes)
+        expect(flash[:success]).to match(/deleted/i)
+        expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+      end
+    end
+    context "multi_destroy" do
+      it "destroys the all" do
+        bike1 = FactoryBot.create(:bike)
+        bike2 = FactoryBot.create(:bike, example: true)
+        bike3 = FactoryBot.create(:bike)
+        expect(Bike.pluck(:id)).to eq([bike1.id, bike3.id])
+        expect {
+          get "#{base_url}/multi_delete/get_destroy", params: {
+            id: "multi_destroy",
+            bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
+          }
+        }.to change(Bike, :count).by(-1)
+        expect(flash[:success]).to be_present
+        expect(Bike.pluck(:id)).to eq([bike3.id])
+        expect(Bike.unscoped.where.not(deleted_at: nil).pluck(:id)).to eq([bike1.id, bike2.id])
+      end
+    end
   end
 end

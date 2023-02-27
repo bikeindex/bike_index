@@ -1,6 +1,6 @@
 class Admin::BikesController < Admin::BaseController
   include SortableTable
-  before_action :find_bike, only: %i[edit destroy update get_destroy show]
+  before_action :find_bike, only: %i[edit update show]
   before_action :set_period, only: %i[index missing_manufacturer]
 
   def index
@@ -55,7 +55,22 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def get_destroy
-    destroy_bike
+    if params[:id] == "multi_delete"
+      bike_ids = defined?(params[:bikes_selected].keys) ? params[:bikes_selected].keys : params[:bikes_selected]
+      if bike_ids.any?
+        bike_ids.each do |id|
+          Bike.unscoped.find(id).destroy!
+          AfterBikeSaveWorker.perform_async(id)
+        end
+        # Lazy pluralize hack
+        flash[:success] = "#{bike_ids.count} #{bike_ids.count == 1 ? 'bike' : 'bikes'} deleted!"
+      else
+        flash[:error] = "No bikes selected to delete!"
+      end
+      redirect_back(fallback_location: admin_bikes_url)
+    else
+      destroy_bike
+    end
   end
 
   def show
@@ -118,15 +133,11 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def destroy_bike
+    find_bike
     @bike.destroy
     AfterBikeSaveWorker.perform_async(@bike.id)
     flash[:success] = "Bike deleted!"
-    if params[:multi_delete]
-      redirect_to admin_root_url
-      # redirect_to admin_bikes_url(page: params[:multi_delete], multi_delete: 1)
-    else
-      redirect_to admin_bikes_url
-    end
+    redirect_to admin_bikes_url
   end
 
   def find_bike
@@ -173,6 +184,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
     bikes = bikes.includes(:ownerships).where(ownerships: {origin: @origin_search_type}) if @origin_search_type.present?
+    @multi_delete = ParamsNormalizer.boolean(params[:search_multi_delete])
     bikes
   end
 
