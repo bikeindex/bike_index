@@ -273,7 +273,8 @@ class Ownership < ApplicationRecord
   def spam_risky_email?
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
-    pos?
+    return true if pos?
+    embed? && organization&.spam_registrations?
   end
 
   # Some organizations pre-register bikes and then transfer them.

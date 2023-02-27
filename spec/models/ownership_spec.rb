@@ -331,6 +331,7 @@ RSpec.describe Ownership, type: :model do
       let(:ownership) { Ownership.new(send_email: false, bike: bike) }
       it "is false" do
         expect(ownership.calculated_send_email).to be_falsey
+        expect(ownership.send(:spam_risky_email?)).to be_falsey
       end
     end
     context "example bike" do
@@ -363,7 +364,8 @@ RSpec.describe Ownership, type: :model do
     # hotmail and yahoo have been delaying our emails. In an effort to ensure delivery of really important emails (e.g. password resets)
     # skip sending ownership invitations for POS registrations, just in case
     let(:bike) { FactoryBot.create(:bike, owner_email: email) }
-    let(:ownership) { Ownership.new(bike: bike, owner_email: email, pos_kind: pos_kind) }
+    let(:ownership) { Ownership.new(bike: bike, owner_email: email, pos_kind: pos_kind, origin: origin) }
+    let(:origin) { "web" }
     let(:pos_kind) { "lightspeed_pos" }
     context "gmail email" do
       let(:email) { "test@gmail.com" }
@@ -390,6 +392,22 @@ RSpec.describe Ownership, type: :model do
         it "sends" do
           expect(ownership.send(:spam_risky_email?)).to be_falsey
           expect(ownership.calculated_send_email).to be_truthy
+        end
+      end
+      context "embed registration" do
+        let(:pos_kind) { "no_pos" }
+        let(:origin) { "embed" }
+        it "sends" do
+          expect(ownership.send(:spam_risky_email?)).to be_falsey
+          expect(ownership.calculated_send_email).to be_truthy
+        end
+        context "spam_registrations organization" do
+          let(:organization) { FactoryBot.create(:organization, approved: true, spam_registrations: true) }
+          it "doesn't send" do
+            ownership.organization = organization
+            expect(ownership.send(:spam_risky_email?)).to be_truthy
+            expect(ownership.calculated_send_email).to be_falsey
+          end
         end
       end
     end
