@@ -36,7 +36,9 @@
         = text_field_tag :search_other_name, params[:search_other_name], placeholder: "Search Other mnfg", class: "form-control"
         = submit_tag "Search", name: "search", class: "btn btn-primary ml-2"
 
-= form_tag update_manufacturers_admin_bikes_path, id: 'multi_bike_manufacturer_update' do
+= render partial: "/shared/pagination", locals: {collection: @bikes}
+
+= form_tag update_manufacturers_admin_bikes_path do
   .row
     .col-md-4
       .fancy-select.unfancy
@@ -44,13 +46,11 @@
     .col-md-2
       = submit_tag 'Update selected', class: 'btn btn-primary'
 
-  = render partial: "/shared/pagination", locals: {collection: @bikes}
-
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
-        %th.table-cell-check
-          %a#multi-mnfg-selector{ href: "#" }
+        %th.table-checkbox-select
+          %a#multi-checkbox-selector{ href: "#" }
             = check_mark
         %th
           Date indexed
@@ -64,7 +64,7 @@
       %tbody
         - @bikes.each do |bike|
           %tr
-            %td.table-cell-check.update-mnfg-select
+            %td.table-checkbox-select
               = check_box_tag "bikes_selected[#{bike.id}]", bike.id
             %td
               .less-strong-hold

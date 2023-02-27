@@ -57,8 +57,8 @@ function BinxAdmin () {
         new BinxAdminOrganizationForm($organizationForm)
       }
 
-      if ($('#multi-mnfg-selector').length) {
-        this.bikesMultiManufacturerUpdate()
+      if ($('#multi-checkbox-selector').length) {
+        this.multiCheckboxSelector()
       }
 
       if ($('#blog-image-form').length > 0) {
@@ -133,12 +133,12 @@ function BinxAdmin () {
       })
     },
 
-    bikesMultiManufacturerUpdate () {
+    multiCheckboxSelector () {
       window.toggleAllChecked = false
-      $('#multi-mnfg-selector').on('click', function (event) {
+      $('#multi-checkbox-selector').on('click', function (event) {
         event.preventDefault()
         window.toggleAllChecked = !window.toggleAllChecked
-        $('.update-mnfg-select input').prop('checked', window.toggleAllChecked)
+        $('.table-checkbox-select input').prop('checked', window.toggleAllChecked)
       })
     },
 

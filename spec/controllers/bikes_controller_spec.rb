@@ -562,6 +562,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.cycle_type_name).to eq "Pedi Cab (rickshaw)"
             expect(bike.manufacturer).to eq manufacturer
             expect(bike.public_images.count).to eq 1
+            expect(bike.credibility_score).to eq 50
           end
         end
       end

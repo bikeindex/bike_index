@@ -504,7 +504,8 @@ CREATE TABLE public.bikes (
     current_ownership_id bigint,
     updated_by_user_at timestamp without time zone,
     occurred_at timestamp without time zone,
-    serial_normalized_no_space character varying
+    serial_normalized_no_space character varying,
+    credibility_score integer
 );
 
 
@@ -2300,7 +2301,8 @@ CREATE TABLE public.organizations (
     graduated_notification_interval bigint,
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
-    direct_unclaimed_notifications boolean DEFAULT false
+    direct_unclaimed_notifications boolean DEFAULT false,
+    spam_registrations boolean DEFAULT false
 );
 
 
@@ -6399,6 +6401,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220819205834'),
 ('20220903183420'),
 ('20220921170820'),
-('20221007123638');
+('20221007123638'),
+('20230224234148');
 
 

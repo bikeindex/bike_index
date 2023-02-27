@@ -92,6 +92,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         graduated_notification_interval_days: " ",
         lightspeed_register_with_phone: "true",
         direct_unclaimed_notifications: true,
+        spam_registrations: "0",
         locations_attributes: {
           "0" => {
             id: location1.id,
@@ -150,6 +151,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(organization.graduated_notification_interval).to be_blank
       expect(organization.lightspeed_register_with_phone).to be_truthy
       expect(organization.direct_unclaimed_notifications).to be_truthy
+      expect(organization.spam_registrations).to be_falsey
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization
@@ -195,6 +197,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         organization.reload
         expect(organization.graduated_notification_interval).to eq 365.days.to_i
         expect(organization.registration_field_labels).to eq({})
+      end
+    end
+    context "updating spam_registrations" do
+      it "updates" do
+        put "#{base_url}/#{organization.to_param}", params: {organization: {spam_registrations: "1"}}
+        organization.reload
+        expect(organization.spam_registrations).to be_truthy
       end
     end
     context "updating registration labels" do

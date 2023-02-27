@@ -21,6 +21,8 @@
             %span.badge.badge-success.ml-2 Trusted credibility
           - elsif CredibilityScorer.organization_suspicious?(@organization)
             %span.badge.badge-warning.ml-2 Suspicious credibility
+          - if @organization.spam_registrations
+            %small.ml-1.text-danger high spam registrations
       %tr
         %td
           Map

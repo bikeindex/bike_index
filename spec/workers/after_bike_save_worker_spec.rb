@@ -22,13 +22,14 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
     instance.perform(96)
   end
 
-  describe "update listing order" do
+  describe "update listing order and credibility score" do
     it "updates the listing order" do
       bike = FactoryBot.create(:bike)
       bike.update_attribute :listing_order, -22
       instance.perform(bike.id)
       bike.reload
       expect(bike.listing_order).to eq bike.calculated_listing_order
+      expect(bike.credibility_score).to eq 50
     end
 
     context "unchanged listing order" do

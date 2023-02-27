@@ -113,6 +113,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :short_name,
         :show_on_map,
         :slug,
+        :spam_registrations,
         :website,
         [locations_attributes: permitted_locations_params]
       ).merge(kind: approved_kind)

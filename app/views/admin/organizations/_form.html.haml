@@ -72,14 +72,21 @@
       = f.label :show_on_map
     .form-group
       = f.check_box :lock_show_on_map
-      = f.label :lock_show_on_map, 'Lock shown on map'
-      %small.less-strong
-        Restrict org from updating show on map above (e.g. they're known bad actors)
+      = f.label :lock_show_on_map do
+        Lock shown on map
+        %small.less-strong
+          restrict org from updating show on map above (e.g. they're known bad actors)
+    .form-group
+      = f.check_box :spam_registrations
+      = f.label :spam_registrations do
+        High spam registrations
+        %small.less-strong quarantine suspicious registrations
     .form-group
       = f.check_box :api_access_approved
-      = f.label :api_access_approved
-      %small.less-strong
-        to be able to post updates via API (rarely necessary)
+      = f.label :api_access_approved do
+        API V1 access approved
+        %small.less-strong
+          to be able to post updates via legacy API (rarely necessary)
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
