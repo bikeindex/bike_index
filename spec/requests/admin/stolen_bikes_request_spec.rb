@@ -88,6 +88,29 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(ActivateTheftAlertWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
         end
       end
+      context "multi_approve" do
+        let(:stolen_record2) { FactoryBot.create(:stolen_record) }
+        let!(:stolen_record3) { FactoryBot.create(:stolen_record) }
+        it "approves them all" do
+          bike.reload
+          stolen_record.reload
+          expect(stolen_record.approved).to be_falsey
+          expect(stolen_record2.approved).to be_falsey
+          Sidekiq::Worker.clear_all
+          post "#{base_url}/multi_approve/approve", params: {
+            sr_selected: {stolen_record.id => stolen_record.id, stolen_record2.id => stolen_record2.id}
+          }
+          bike.reload
+          stolen_record.reload
+          expect(stolen_record.approved).to be_truthy
+          expect(stolen_record2.reload.approved).to be_truthy
+          # Sanity check!
+          expect(stolen_record3.reload.approved).to be_falsey
+          expect(flash[:success]).to be_present
+          expect(ApproveStolenListingWorker.jobs.count).to eq 2
+          expect(ApproveStolenListingWorker.jobs.map { |j| j["args"] }.flatten).to eq([bike.id, stolen_record2.bike_id])
+        end
+      end
     end
 
     describe "update" do

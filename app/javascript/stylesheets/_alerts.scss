@@ -26,6 +26,6 @@
   @extend .alert-info;
 }
 
-.alert p:first-of-type {
-  margin-top: 0.5rem;
+.alert p:last-of-type {
+  margin-bottom: 0;
 }
