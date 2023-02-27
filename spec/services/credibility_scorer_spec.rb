@@ -84,37 +84,70 @@ RSpec.describe CredibilityScorer do
       end
     end
     context "with organization" do
-      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: created_at) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: created_at, creator: auto_user) }
       let(:created_at) { Time.current - 20.days }
+      let(:auto_user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 3.years) }
+      let!(:auto_user_membership) do
+        FactoryBot.create(:membership_claimed, user: auto_user, organization: organization)
+        organization.update(auto_user: auto_user)
+      end
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
       let(:ownership) { bike.current_ownership }
       it "returns created this month" do
         expect(ownership).to be_present
         expect(subject.creation_badges(ownership)).to eq([:created_this_month])
+        expect(bike.creator&.id).to eq auto_user.id
+        expect(organization.auto_user_id).to eq auto_user.id
+        expect(subject.user_badges(bike.creator)).to eq([:long_time_user])
       end
       context "bike shop with does_not_need_pos" do
         let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "does_not_need_pos") }
-        it "returns with trusted organization" do
-          expect(subject.creation_badges(ownership)).to match_array([:created_at_point_of_sale])
+        it "returns with created_at_point_of_sale" do
+          expect(subject.relevant_bike_ownership_users(bike.reload).map(&:id)).to eq([auto_user.id])
+          expect(subject.creation_badges(ownership)).to match_array(%i[created_at_point_of_sale])
+        end
+        context "with embed" do
+          before { ownership.update(origin: "embed", pos_kind: "does_not_need_pos") }
+          it "returns with created_at_point_of_sale" do
+            # Organization's marked "does_not_need_pos" regularly register bikes manually for customers
+            expect(subject.relevant_bike_ownership_users(bike.reload).map(&:id)).to eq([auto_user.id])
+            expect(subject.creation_badges(ownership)).to match_array(%i[created_at_point_of_sale])
+          end
         end
       end
       context "paid organization" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         it "returns with trusted organization" do
           expect(organization.is_paid).to be_truthy
-          expect(subject.creation_badges(ownership)).to match_array([:creation_organization_trusted, :created_this_month])
+          expect(subject.creation_badges(ownership)).to match_array(%i[creation_organization_trusted created_this_month])
           # It doesn't return anything but created_at_point_of_sale
           ownership.update(pos_kind: "other_pos")
           expect(subject.creation_badges(ownership)).to eq([:created_at_point_of_sale])
-          expect(instance.badges).to eq([:created_at_point_of_sale])
+          expect(instance.badges).to eq(%i[created_at_point_of_sale user_trusted_organization_member long_time_user])
           expect(instance.score).to eq 100
         end
-        context "embed registration" do
-          it "returns" do
-            pp ownership
-            # ownership.update()
-            fail
+      end
+      context "embed registration" do
+        before { ownership.update(origin: "embed") }
+        it "returns" do
+          expect(bike.reload.user).to be_nil
+          expect(bike.creator&.id).to eq auto_user.id
+          expect(subject.relevant_bike_ownership_users(bike.reload).map(&:id)).to eq([])
+          expect(subject.creation_badges(ownership, bike)).to eq(%i[created_this_month])
+          expect(instance.badges).to eq(%i[created_this_month])
+        end
+        context "with spam_registrations" do
+          let(:organization) { FactoryBot.create(:organization, approved: true, spam_registrations: true) }
+          it "returns with spam_registrations" do
+            expect(instance.badges).to eq(%i[created_this_month creation_organization_spam_registrations])
           end
+        end
+      end
+      context "spam_registrations not embed" do
+        let(:organization) { FactoryBot.create(:organization, approved: true, spam_registrations: true) }
+        it "returns without spam_registrations" do
+          expect(subject.organization_trusted?(organization)).to be_falsey
+          expect(instance.badges).to eq(%i[created_this_month long_time_user])
         end
       end
       context "deleted organization, long_time_registration" do

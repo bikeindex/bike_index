@@ -12,6 +12,7 @@ class CredibilityScorer
       created_this_month: -10,
       creation_organization_trusted: 30,
       creation_organization_suspicious: -10,
+      creation_organization_spam_registrations: -10,
       long_time_registration: 10,
       no_creator: -10
     },
@@ -73,7 +74,11 @@ class CredibilityScorer
       organization = Organization.unscoped.find_by_id(ownership.organization_id)
       return [:created_at_point_of_sale] if organization&.does_not_need_pos?
       c_badges << :creation_organization_suspicious if organization_suspicious?(organization)
-      c_badges << :creation_organization_trusted if organization_trusted?(organization)
+      if ownership.origin == "embed" && organization.spam_registrations?
+        c_badges << :creation_organization_spam_registrations
+      elsif organization_trusted?(organization)
+        c_badges << :creation_organization_trusted
+      end
     end
     c_badges
   end
@@ -87,7 +92,7 @@ class CredibilityScorer
   end
 
   def self.bike_user_badges(bike)
-    users = bike.ownerships.map { |o| [o.creator, o.user] }.flatten.reject(&:blank?).uniq
+    users = relevant_bike_ownership_users(bike)
     badges = users.map { |u| user_badges(u) }.flatten.uniq
     return [:user_banned] if badges.include?(:user_banned)
     return [:user_ambassador] if badges.include?(:user_ambassador)
@@ -153,6 +158,18 @@ class CredibilityScorer
     return true if str.match?("5150") || str.match?("shady")
     return true if BadWordCleaner.clean(str).count("*") > str.count("*")
     str.length < 4
+  end
+
+  def self.relevant_bike_ownership_users(bike)
+    bike.ownerships.map do |ownership|
+      # organizations with "does_not_need_pos" regularly register bikes using embed, for customers
+      # But for most orgs, embed means anyone could have registered it
+      if ownership.origin == "embed" && ownership.pos_kind != "does_not_need_pos"
+        [ownership.user]
+      else
+        [ownership.creator, ownership.user]
+      end
+    end.flatten.reject(&:blank?).uniq
   end
 
   def initialize(bike)
