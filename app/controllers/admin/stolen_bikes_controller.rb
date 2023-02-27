@@ -1,6 +1,6 @@
 class Admin::StolenBikesController < Admin::BaseController
   include SortableTable
-  before_action :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image]
+  before_action :find_bike, only: [:edit, :destroy, :update, :regenerate_alert_image]
   before_action :set_period, only: [:index]
   helper_method :available_stolen_records
 
@@ -12,10 +12,27 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def approve
-    @bike.current_stolen_record.update_attribute :approved, true
-    ApproveStolenListingWorker.perform_async(@bike.id)
-    flash[:success] = "Stolen Bike was approved"
-    redirect_to edit_admin_stolen_bike_url(@bike)
+    if params[:id] == "multi_approve"
+      stolen_record_ids = defined?(params[:sr_selected].keys) ? params[:sr_selected].keys : params[:sr_selected]
+      if stolen_record_ids.any?
+        stolen_record_ids.each do |id|
+          stolen_record = StolenRecord.unscoped.find(id)
+          stolen_record.update_attribute :approved, true
+          pp ApproveStolenListingWorker.perform_async(stolen_record.bike_id)
+        end
+        # Lazy pluralize hack
+        flash[:success] = "#{stolen_record_ids.count} stolen #{stolen_record_ids.count == 1 ? "bike" : "bikes"} approved!"
+      else
+        flash[:error] = "No stolen records selected to approve!"
+      end
+      redirect_back(fallback_location: admin_stolen_bikes_url)
+    else
+      find_bike
+      @bike.current_stolen_record.update_attribute :approved, true
+      ApproveStolenListingWorker.perform_async(@bike.id)
+      flash[:success] = "Stolen Bike was approved"
+      redirect_to edit_admin_stolen_bike_url(@bike)
+    end
   end
 
   def show
