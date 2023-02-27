@@ -12,7 +12,7 @@ class CredibilityScorer
       created_this_month: -10,
       creation_organization_trusted: 30,
       creation_organization_suspicious: -10,
-      creation_organization_spam_registrations: -10,
+      creation_organization_spam_registrations: -20,
       long_time_registration: 10,
       no_creator: -10
     },

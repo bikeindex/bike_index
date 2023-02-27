@@ -52,6 +52,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       TsvCreatorWorker,
       UnusedOwnershipRemovalWorker,
       UpdateCountsWorker,
+      UpdateCredibilityScoreWorker,
       UpdateExchangeRatesWorker,
       UpdateInvoiceWorker,
       UpdateOrganizationPosKindWorker,

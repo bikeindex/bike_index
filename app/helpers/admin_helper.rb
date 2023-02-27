@@ -103,6 +103,10 @@ module AdminHelper
     "#28a745"
   end
 
+  def credibility_scorer_color_only_low(score)
+    score < 31 ? credibility_scorer_color(score) : ""
+  end
+
   def admin_number_display(number)
     content_tag(:span, number_with_delimiter(number), class: (number == 0 ? "less-less-strong" : ""))
   end

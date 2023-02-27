@@ -504,7 +504,8 @@ CREATE TABLE public.bikes (
     current_ownership_id bigint,
     updated_by_user_at timestamp without time zone,
     occurred_at timestamp without time zone,
-    serial_normalized_no_space character varying
+    serial_normalized_no_space character varying,
+    credibility_score integer
 );
 
 

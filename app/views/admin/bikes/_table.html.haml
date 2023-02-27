@@ -6,6 +6,7 @@
 - show_serial ||= params[:show_serial].present?
 - render_sortable ||= false
 - skip_user ||= false
+- render_multi_check ||= false
 
 -# require inline CSS setting because of caching
 - unless display_dev_info?
@@ -17,11 +18,15 @@
   <style>.user-cell { display: none !important; }</style>
 - unless render_sortable
   <style>.display-sortable-link { display: none !important; }</style>
+- unless render_multi_check
+  <style>.display-multi-check { display: none !important; }</style>
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.bikeTable{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
     - unless no_show_header
       %thead.thead-light.sortable
+        %th.display-multi-check
+          Check
         %th
           = sortable "id", "Added", render_sortable: render_sortable
         %th.small.d-none.d-xl-table-cell
@@ -39,11 +44,14 @@
           Serial
         %th.d-sm-table-cell
           Created by
-
+        %th.d-none.d-md-table-cell.small
+          Credibility
     %tbody
       - bikes.each do |bike|
         - cache(bike) do
           %tr
+            %td.display-multi-check
+              Check
             %td
               .less-strong-hold
                 %a.small.convertTime{ href: edit_admin_bike_url(bike) }
@@ -105,3 +113,7 @@
                       = link_to origin_display(bike.creation_description), admin_bulk_import_path(bike.bulk_import), class: "less-strong"
                     - else
                       = origin_display(bike.creation_description)
+            %td.d-none.d-md-table-cell.text-right
+              - if bike.credibility_score.present?
+                %small{style: "color: #{credibility_scorer_color_only_low(bike.credibility_score)};"}
+                  = bike.credibility_score
