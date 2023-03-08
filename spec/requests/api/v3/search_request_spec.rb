@@ -20,6 +20,26 @@ RSpec.describe "Search API V3", type: :request do
     end
   end
 
+  describe "/" do
+    let!(:bike) { FactoryBot.create(:bike, updated_at: Time.now - 1.day) }
+    let!(:bike_old) { FactoryBot.create(:bike, updated_at: Time.now - 1.year) }
+    let!(:bike_stolen_old) { FactoryBot.create(:older_stolen_bike) }
+    let!(:bike_stolen) { FactoryBot.create(:stolen_bike, updated_at: Time.now - 1.day) }
+    let(:query_params) { {updated_since: (Time.now - 1.week).to_i, stolenness: "all"} }
+    context "with per_page" do
+      it "returns all matching bikes" do
+        expect(Bike.count).to eq 4
+        get "/api/v3/search", params: query_params.merge(format: :json)
+        expect(response.header["Total"]).to eq("2")
+        result = JSON.parse(response.body)
+        expect(result["bikes"][0]["id"]).to eq bike_stolen.id
+        expect(result["bikes"][1]["id"]).to eq bike.id
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+      end
+    end
+  end
+
   describe "/close_serials" do
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "something") }
     let(:query_params) { {serial: "somethind", stolenness: "non"} }

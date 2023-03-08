@@ -21,6 +21,7 @@ RSpec.describe StolenBikeListing, type: :model do
       let(:stolen_bike_listing1) { FactoryBot.create(:stolen_bike_listing, primary_frame_color: color, listed_at: Time.current - 3.months) }
       let(:stolen_bike_listing2) { FactoryBot.create(:stolen_bike_listing, secondary_frame_color: color, tertiary_frame_color: color2, listed_at: Time.current - 2.weeks) }
       let(:stolen_bike_listing3) { FactoryBot.create(:stolen_bike_listing, tertiary_frame_color: color, manufacturer: manufacturer) }
+      let(:stolen_bike_listing4) { FactoryBot.create(:stolen_bike_listing, updated_at: Date.today - 1.year)}
       let(:all_color_ids) do
         [
           stolen_bike_listing1.primary_frame_color_id,
@@ -55,6 +56,13 @@ RSpec.describe StolenBikeListing, type: :model do
         let(:query_params) { {colors: [color.id], manufacturer: manufacturer.id, stolenness: "all"} }
         it "matches just the bike with the matching manufacturer" do
           expect(StolenBikeListing.search(interpreted_params).pluck(:id)).to eq([stolen_bike_listing3.id])
+        end
+      end
+      context "updated_since" do
+        let(:query_params) { {updated_since: Date.today - 1.week, stolenness: "all"} }
+        it "matches just the bikes updated in the past week" do
+          expect(StolenBikeListing.search(interpreted_params).count === 3)
+          expect(StolenBikeListing.search(interpreted_params).pluck(:id)).to eq([stolen_bike_listing3.id, stolen_bike_listing2.id, stolen_bike_listing1.id])
         end
       end
     end
