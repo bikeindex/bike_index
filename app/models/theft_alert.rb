@@ -1,6 +1,6 @@
 # Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
-  STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
+  STATUS_ENUM = {pending: 0, active: 1, inactive: 2, end_early: 3}.freeze
   # Timestamp 1s before first alert was automated
   AUTOMATION_START = 1625586988 # 2021-7-6
 
@@ -94,6 +94,11 @@ class TheftAlert < ApplicationRecord
   def live?
     posted? && facebook_data&.dig("effective_object_story_id").present? &&
       end_at > Time.current
+  end
+
+  def canceling?
+    return false unless posted? && facebook_updateable?
+    end_at
   end
 
   # Active or has been active

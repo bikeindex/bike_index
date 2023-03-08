@@ -28,6 +28,11 @@ class Admin::TheftAlertsController < Admin::BaseController
       ActivateTheftAlertWorker.perform_async(@theft_alert.id, true)
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
+    elsif ParamsNormalizer.boolean(params[:cancel_theft_alert])
+      @theft_alert.update(status: "canceled")
+      UpdateTheftAlertFacebookWorker.new.perform(@theft_alert.id)
+      flash[:success] = "Canceling alert"
+      redirect_to admin_theft_alerts_path
     elsif ParamsNormalizer.boolean(params[:update_theft_alert])
       UpdateTheftAlertFacebookWorker.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"

@@ -141,4 +141,29 @@ RSpec.describe TheftAlert, type: :model do
       end
     end
   end
+
+  describe "canceled" do
+    let!(:theft_alert) { FactoryBot.create(:theft_alert, :begun) }
+    it "cancels" do
+      expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([])
+      expect(theft_alert.end_at).to be > Time.current + 24.hours
+      theft_alert.update(status: "canceled")
+      expect(theft_alert.reload.status).to eq "canceled"
+      expect(theft_alert.end_at).to be_within(1).of Time.current
+      expect(theft_alert.canceling?).to be_falsey
+      expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([])
+    end
+    context "with facebook data" do
+      let!(:theft_alert) { FactoryBot.create(:theft_alert, :begun, facebook_updated_at: Time.current - 5.minutes, facebook_data: {campaign_id: "test"}) }
+      it "cancels" do
+        expect(theft_alert.end_at).to be > Time.current + 24.hours
+        expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
+        theft_alert.update(status: "canceled", )
+        expect(theft_alert.reload.status).to eq "canceled"
+        expect(theft_alert.end_at).to be_within(1).of Time.current
+        expect(theft_alert.canceling?).to be_falsey
+        expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
+      end
+    end
+  end
 end
