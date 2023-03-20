@@ -74,7 +74,6 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
-  validates_with OrganizationNameValidator
   validates_uniqueness_of :manufacturer_id, allow_blank: true
 
   default_scope { order(:name) }
