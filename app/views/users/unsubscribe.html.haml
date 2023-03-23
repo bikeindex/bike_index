@@ -5,5 +5,5 @@
     %p= t(".if_not_click_button")
     = form_tag unsubscribe_update_user_path(@user.to_param), id: "unsubscribe_update", method: "post" do
       %input{ type: "submit", value: t(".unsubscribe"), class: 'btn btn-success btn-lg' }
-    / :javascript
-    /   document.forms["unsubscribe_update"].submit()
+    :javascript
+      document.forms["unsubscribe_update"].submit()

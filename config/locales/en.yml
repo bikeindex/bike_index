@@ -4776,10 +4776,6 @@ en:
         user: user
         you_have_a_permitted_domain: You have a permitted domain
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
-      unsubscribe:
-        you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
-        if_not_click_button: If you are not, please click the button below
-        unsubscribe: Unsubscribe
   organized_mailer:
     custom_message:
       subject: "%{org_name} - the location of your %{mnfg_name}"
@@ -5485,6 +5481,10 @@ en:
         %{better_password_link}.
       update_password: Update password
       update_your_password: Update your password
+    unsubscribe:
+      you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
+      if_not_click_button: If you are not, please click the button below
+      unsubscribe: Unsubscribe
   views:
     pagination:
       first: "&laquo;"
