@@ -159,7 +159,7 @@ class UsersController < ApplicationController
 
   def unsubscribe
     @user = current_user || User.find_by_username(params[:id])
-    # If unable to find a user, everything is probably fine
+    # If unable to find a user, everything is probably fine ;)
     if @user.blank?
       flash[:success] = translation(:successfully_unsubscribed)
       redirect_to(user_root_url) && return

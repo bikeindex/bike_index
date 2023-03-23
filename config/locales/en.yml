@@ -5471,6 +5471,10 @@ en:
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes
+    unsubscribe:
+      if_not_click_button: If you are not, please click the button below
+      unsubscribe: Unsubscribe
+      you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
     update_password_form_with_reset_token:
       and_try_not_to_forget_it: and try not to forget it...
       better_password: better
@@ -5481,10 +5485,6 @@ en:
         %{better_password_link}.
       update_password: Update password
       update_your_password: Update your password
-    unsubscribe:
-      you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
-      if_not_click_button: If you are not, please click the button below
-      unsubscribe: Unsubscribe
   views:
     pagination:
       first: "&laquo;"
