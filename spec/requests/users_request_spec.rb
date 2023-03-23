@@ -419,4 +419,149 @@ RSpec.describe UsersController, type: :request do
       end
     end
   end
+
+  describe "show" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    it "404s if the user doesn't exist" do
+      expect {
+        get "#{base_url}/fake_user-extra-stuff"
+      }.to raise_error(ActionController::RoutingError)
+    end
+
+    it "redirects to user home url if the user exists but doesn't want to show their page" do
+      user.show_bikes = false
+      user.save
+      get "#{base_url}/#{user.username}"
+      expect(response).to redirect_to my_account_url
+    end
+
+    it "shows the page if the user exists and wants to show their page" do
+      user.show_bikes = true
+      user.save
+      get "#{base_url}/#{user.username}?page=1&per_page=1"
+      expect(response).to render_template :show
+      expect(assigns(:per_page)).to eq "1"
+      expect(assigns(:page)).to eq "1"
+    end
+  end
+
+  describe "unsubscribe" do
+    let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
+    it "renders" do
+      expect(user.notification_newsletters).to be_truthy
+      expect(user.confirmed?).to be_truthy
+      get "#{base_url}/#{user.username}/unsubscribe"
+      expect(assigns(:user)&.id).to eq user.id
+      expect(response.code).to eq("200")
+      expect(response).to render_template("users/unsubscribe")
+      expect(flash).to be_blank
+      expect(user.reload.notification_newsletters).to be_truthy
+    end
+    context "current_user" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
+      it "renders current user instead" do
+        expect(user.notification_newsletters).to be_truthy
+        expect(user.confirmed?).to be_truthy
+        expect(current_user.notification_newsletters).to be_truthy
+        get "#{base_url}/#{user.username}/unsubscribe"
+        expect(assigns(:user)&.id).to eq current_user.id
+        expect(response.code).to eq("200")
+        expect(response).to render_template("users/unsubscribe")
+        expect(flash).to be_blank
+        expect(user.reload.notification_newsletters).to be_truthy
+        expect(current_user.reload.notification_newsletters).to be_truthy
+      end
+    end
+    context "subscribed unconfirmed user" do
+      let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
+      it "renders" do
+        expect(user.notification_newsletters).to be_truthy
+        expect(user.confirmed?).to be_falsey
+        get "#{base_url}/#{user.username}/unsubscribe"
+        expect(assigns(:user)&.id).to eq user.id
+        expect(response.code).to eq("200")
+        expect(response).to render_template("users/unsubscribe")
+        expect(flash).to be_blank
+        expect(user.reload.notification_newsletters).to be_truthy
+      end
+    end
+    context "user not present" do
+      it "does not error, shows same flash success (to prevent email enumeration)" do
+        get "#{base_url}/cvxvxxxxx/unsubscribe"
+        expect(response.code).to eq("302")
+        expect(flash[:success]).to be_present
+      end
+    end
+    context "user already unsubscribed" do
+      let(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: false) }
+      it "renders" do
+        expect(user.notification_newsletters).to be_falsey
+        get "#{base_url}/#{user.username}/unsubscribe"
+        expect(assigns(:user)&.id).to eq user.id
+        expect(response.code).to eq("200")
+        expect(response).to render_template("users/unsubscribe")
+        expect(flash).to be_blank
+        expect(user.reload.notification_newsletters).to be_falsey
+      end
+    end
+  end
+
+  describe "unsubscribe" do
+    let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
+    it "unsubscribes" do
+      expect(user.notification_newsletters).to be_truthy
+      expect(user.confirmed?).to be_truthy
+      post "#{base_url}/#{user.username}/unsubscribe_update"
+      expect(response.code).to eq("302")
+      expect(flash[:success]).to be_present
+      user.reload
+      expect(user.notification_newsletters).to be_falsey
+    end
+    context "current_user" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
+      it "unsubscribes current user instead" do
+        expect(user.notification_newsletters).to be_truthy
+        expect(user.confirmed?).to be_truthy
+        expect(current_user.notification_newsletters).to be_truthy
+        post "#{base_url}/#{user.username}/unsubscribe_update"
+        expect(response.code).to eq("302")
+        expect(flash[:success]).to be_present
+        expect(user.reload.notification_newsletters).to be_truthy
+        expect(current_user.reload.notification_newsletters).to be_falsey
+      end
+    end
+    context "subscribed unconfirmed user" do
+      let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
+      it "updates notification_newsletters" do
+        expect(user.notification_newsletters).to be_truthy
+        expect(user.confirmed?).to be_falsey
+        post "#{base_url}/#{user.username}/unsubscribe_update"
+        expect(response.code).to eq("302")
+        expect(flash[:success]).to be_present
+        user.reload
+        expect(user.notification_newsletters).to be_falsey
+        expect(user.confirmed).to be_falsey
+      end
+    end
+    context "user not present" do
+      it "does not error, shows same flash success (to prevent email enumeration)" do
+        post "#{base_url}/cvxvxxxxx/unsubscribe_update"
+        expect(response.code).to eq("302")
+        expect(flash[:success]).to be_present
+      end
+    end
+    context "user already unsubscribed" do
+      let(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: false) }
+      it "does nothing" do
+        expect(user.notification_newsletters).to be_falsey
+        post "#{base_url}/#{user.username}/unsubscribe_update"
+        expect(response.code).to eq("302")
+        expect(flash[:success]).to be_present
+        user.reload
+        expect(user.notification_newsletters).to be_falsey
+      end
+    end
+  end
 end

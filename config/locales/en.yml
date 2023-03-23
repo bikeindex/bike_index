@@ -1938,6 +1938,8 @@ en:
         user_not_sharing: Sorry, that user isn't sharing their bikes.
       unsubscribe:
         successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
+      unsubscribe_update:
+        successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
       update:
         accept_tos: You have to accept the Terms of Service if you would like to use
           Bike Index.
@@ -5469,6 +5471,10 @@ en:
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes
+    unsubscribe:
+      if_not_click_button: If you are not, please click the button below
+      unsubscribe: Unsubscribe
+      you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
     update_password_form_with_reset_token:
       and_try_not_to_forget_it: and try not to forget it...
       better_password: better

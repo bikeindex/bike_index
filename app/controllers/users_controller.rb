@@ -158,7 +158,16 @@ class UsersController < ApplicationController
   end
 
   def unsubscribe
-    user = User.find_by_username(params[:id])
+    @user = current_user || User.find_by_username(params[:id])
+    # If unable to find a user, everything is probably fine ;)
+    if @user.blank?
+      flash[:success] = translation(:successfully_unsubscribed)
+      redirect_to(user_root_url) && return
+    end
+  end
+
+  def unsubscribe_update
+    user = current_user || User.find_by_username(params[:id])
     user.update_attribute :notification_newsletters, false if user.present?
     flash[:success] = translation(:successfully_unsubscribed)
     redirect_to(user_root_url) && return

@@ -2274,6 +2274,8 @@ nl:
       update_password_with_reset_token:
         password_reset_successfully: Wachtwoord opnieuw instellen. U bent aangemeld
           bij Bike Index.
+      unsubscribe_update:
+        successfully_unsubscribed: U bent afgemeld voor updates van Bike Index.
     concerns:
       controller_helpers:
         authenticate_user:
@@ -5126,6 +5128,10 @@ nl:
         is %{better_password_link}.
       update_password: password-update
       update_your_password: Update uw wachtwoord
+    unsubscribe:
+      if_not_click_button: Zo niet, klik dan op de onderstaande knop
+      unsubscribe: Afmelden
+      you_should_be_unsubscribed_automatically: U zou automatisch moeten worden afgemeld
   welcome:
     choose_registration:
       add_a_bike_through: Voeg een fiets toe door

@@ -107,7 +107,10 @@ Rails.application.routes.draw do
       get :update_password_form_with_reset_token
       post :update_password_with_reset_token
     end
-    member { get "unsubscribe" }
+    member do
+      get "unsubscribe"
+      post "unsubscribe_update"
+    end
   end
   resource :my_account, only: %i[show update]
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
