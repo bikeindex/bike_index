@@ -1938,6 +1938,8 @@ en:
         user_not_sharing: Sorry, that user isn't sharing their bikes.
       unsubscribe:
         successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
+      unsubscribe_update:
+        successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
       update:
         accept_tos: You have to accept the Terms of Service if you would like to use
           Bike Index.
@@ -4774,6 +4776,10 @@ en:
         user: user
         you_have_a_permitted_domain: You have a permitted domain
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+      unsubscribe:
+        you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
+        if_not_click_button: If you are not, please click the button below
+        unsubscribe: Unsubscribe
   organized_mailer:
     custom_message:
       subject: "%{org_name} - the location of your %{mnfg_name}"
