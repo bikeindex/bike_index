@@ -105,10 +105,18 @@ $active-bike-edit-border-width: 2px;
     }
   }
 }
-
+.mobile-nonfloating-menu {
+  display: none;
+  line-height: 1.5;
+  margin-top: 90px; // oof. Lots of top padding on the form well
+  a.active {
+    color: $body-font-color;
+  }
+}
 //
 // Small screen styles
 @media (max-width: $grid-breakpoint-md - 1px) {
+  .mobile-nonfloating-menu { display: block; }
   // Menu fixed to bottom of the screen
   .primary-edit-form-well-menu {
     z-index: $zindex-navbar-fixed + 1;
@@ -140,6 +148,7 @@ $active-bike-edit-border-width: 2px;
 // Medium and up screen styles
 @media (min-width: $grid-breakpoint-md) {
   .primary-edit-form-well-menu {
+    display: block;
     float: left;
     width: 33.33333%;
     position: -webkit-sticky;

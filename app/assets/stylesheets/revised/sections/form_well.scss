@@ -158,7 +158,11 @@
   }
 
   .extra-footer-save {
-    display: none;
+    padding-top: 60px;
+    .btn {
+      display: block;
+      margin: 0 auto 0;
+    }
   }
 
   hr {
@@ -273,8 +277,10 @@
     .form-well {
       width: 100%;
     }
+    .extra-footer-save {
+      display: none;
+    }
   }
-
   // This is the selector we put everything under, don't overpower by including in
   // .form-well-container.container above - that's for a special case
   // .form-well { }
@@ -293,15 +299,6 @@
   .form-well .full-width-section {
     padding-left: 2 * $row-side-padding;
     padding-right: 2 * $row-side-padding;
-  }
-
-  .form-well .extra-footer-save {
-    display: block;
-    padding-top: 60px;
-    .btn {
-      display: block;
-      margin: 0 auto 0;
-    }
   }
 
   // because we have to use floats instead of flex with sticky (affixing edit menu)
@@ -334,6 +331,11 @@
 
   // Remove some padding between the forms
   .form-well {
+    .extra-footer-save {
+      padding: 0 0 2*$vertical-height;
+      margin-top: -20px;
+    }
+
     .form-wrap.secondary-form-wrap {
       padding-top: 0;
       margin-top: -2 * $vertical-height;

@@ -1,7 +1,10 @@
 - no_save_button ||= false
 - purchase_plan_button ||= false
+- footer_menu ||= false
 
-%nav.primary-edit-form-well-menu{class: (no_save_button ? "no-save-button" : "")}
+- primary_classes = footer_menu ? "secondary-edit-form-well-menu" : "primary-edit-form-well-menu"
+- primary_classes += (no_save_button ? " no-save-button" : "")
+%nav{class: primary_classes}
   - if @permitted_return_to.present?
     %span#permittedReturnTo{ "data-path" => @permitted_return_to }
   - if @bike.status_stolen?
@@ -21,17 +24,17 @@
         - is_active = 'active' if @edit_template.match(/#{template}/)
         %a{ href: edit_bike_template_path_for(@bike, template), class: is_active }
           %h4= description
+  - unless footer_menu
+    .form-well-edit-page-select
+      -# ignore this select in dirty forms
+      %select.dirtyignore
+        - @edit_templates.each do |template, description|
+          %option{ selected: (@edit_template == template), value: edit_bike_template_path_for(@bike, template) }
+            = description
 
-  .form-well-edit-page-select
-    -# ignore this select in dirty forms
-    %select.dirtyignore
-      - @edit_templates.each do |template, description|
-        %option{ selected: (@edit_template == template), value: edit_bike_template_path_for(@bike, template) }
-          = description
-
-  .edit-form-well-submit-wrapper
-    = hidden_field_tag :edit_template, @edit_template
-    - if purchase_plan_button
-      = submit_tag t(".purchase_alert"), class: 'btn btn-lg btn-primary'
-    - else
-      = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'
+    .edit-form-well-submit-wrapper
+      = hidden_field_tag :edit_template, @edit_template
+      - if purchase_plan_button
+        = submit_tag t(".purchase_alert"), class: 'btn btn-lg btn-primary'
+      - else
+        = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'
