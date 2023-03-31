@@ -43,6 +43,5 @@
     - @edit_templates.each_with_index do |t_d, i|
       - template, description = t_d[0], t_d[1]
       - is_active = 'active' if @edit_template.match(/#{template}/)
-      -# next if is_active
       %a.ml-1.mr-1.d-inline-block.text-underline{href: edit_bike_template_path_for(@bike, template), class: is_active}
         = description

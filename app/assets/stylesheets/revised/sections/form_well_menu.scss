@@ -2,7 +2,6 @@ $active-bike-edit-border-width: 2px;
 
 .primary-edit-form-well-menu {
   z-index: 1;
-  display: none;
 
   ul {
     display: none;
@@ -120,7 +119,6 @@ $active-bike-edit-border-width: 2px;
   .mobile-nonfloating-menu { display: block; }
   // Menu fixed to bottom of the screen
   .primary-edit-form-well-menu {
-    display: block;
     z-index: $zindex-navbar-fixed + 1;
     padding: 0;
     position: fixed;
