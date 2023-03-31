@@ -109,11 +109,7 @@ $active-bike-edit-border-width: 2px;
 .mobile-nonfloating-menu {
   display: none;
   line-height: 1.5;
-  &.bottom-menu {
-    margin-top: 90px; // oof. Lots of top padding on the form well
-    font-size: 110%;
-  }
-
+  margin-top: 90px; // oof. Lots of top padding on the form well
   a.active {
     color: $body-font-color;
   }
@@ -123,30 +119,28 @@ $active-bike-edit-border-width: 2px;
 @media (max-width: $grid-breakpoint-md - 1px) {
   .mobile-nonfloating-menu { display: block; }
   // Menu fixed to bottom of the screen
-  .show_floating_menu {
-    .primary-edit-form-well-menu {
+  .primary-edit-form-well-menu {
+    display: block;
+    z-index: $zindex-navbar-fixed + 1;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 -1px 2px rgba(black, 0.2);
+    background: white;
+
+    .form-well-edit-page-select {
       display: block;
-      z-index: $zindex-navbar-fixed + 1;
-      padding: 0;
-      position: fixed;
-      width: 100%;
-      bottom: 0;
-      left: 0;
-      box-shadow: 0 -1px 2px rgba(black, 0.2);
-      background: white;
+    }
 
-      .form-well-edit-page-select {
-        display: block;
-      }
+    .edit-form-well-submit-wrapper {
+      width: 50%;
+      float: left;
 
-      .edit-form-well-submit-wrapper {
-        width: 50%;
-        float: left;
-
-        .btn {
-          border-radius: 0;
-          border: none;
-        }
+      .btn {
+        border-radius: 0;
+        border: none;
       }
     }
   }

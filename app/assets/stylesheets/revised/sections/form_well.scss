@@ -270,11 +270,6 @@
 }
 
 @media (max-width: $grid-breakpoint-md - 1px) {
-  .show_floating_menu { padding-bottom: (4 * $vertical-height) }
-  .form-well .form-wrap {
-    padding-bottom: 2 * $vertical-height;
-  }
-
   .form-well-container.container {
     max-width: 100%;
     background: $form-well-background;
@@ -282,11 +277,10 @@
     .form-well {
       width: 100%;
     }
+    .extra-footer-save {
+      display: none;
+    }
   }
-  .show_floating_menu .extra-footer-save {
-    display: none;
-  }
-
   // This is the selector we put everything under, don't overpower by including in
   // .form-well-container.container above - that's for a special case
   // .form-well { }
@@ -337,6 +331,11 @@
 
   // Remove some padding between the forms
   .form-well {
+    .extra-footer-save {
+      padding: 0 0 2*$vertical-height;
+      margin-top: -20px;
+    }
+
     .form-wrap.secondary-form-wrap {
       padding-top: 0;
       margin-top: -2 * $vertical-height;
