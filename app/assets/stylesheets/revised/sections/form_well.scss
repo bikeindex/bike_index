@@ -158,7 +158,11 @@
   }
 
   .extra-footer-save {
-    display: none;
+    padding-top: 60px;
+    .btn {
+      display: block;
+      margin: 0 auto 0;
+    }
   }
 
   hr {
@@ -266,6 +270,11 @@
 }
 
 @media (max-width: $grid-breakpoint-md - 1px) {
+  .show_floating_menu { padding-bottom: (4 * $vertical-height) }
+  .form-well .form-wrap {
+    padding-bottom: 2 * $vertical-height;
+  }
+
   .form-well-container.container {
     max-width: 100%;
     background: $form-well-background;
@@ -273,6 +282,9 @@
     .form-well {
       width: 100%;
     }
+  }
+  .show_floating_menu .extra-footer-save {
+    display: none;
   }
 
   // This is the selector we put everything under, don't overpower by including in
@@ -293,15 +305,6 @@
   .form-well .full-width-section {
     padding-left: 2 * $row-side-padding;
     padding-right: 2 * $row-side-padding;
-  }
-
-  .form-well .extra-footer-save {
-    display: block;
-    padding-top: 60px;
-    .btn {
-      display: block;
-      margin: 0 auto 0;
-    }
   }
 
   // because we have to use floats instead of flex with sticky (affixing edit menu)

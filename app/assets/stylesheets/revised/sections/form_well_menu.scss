@@ -106,33 +106,40 @@ $active-bike-edit-border-width: 2px;
     }
   }
 }
-
+.mobile-nonfloating-menu {
+  display: none;
+  margin-top: 90px; // oof. Lots of top padding on the form well
+}
 //
 // Small screen styles
 @media (max-width: $grid-breakpoint-md - 1px) {
+  .mobile-nonfloating-menu { display: block; }
   // Menu fixed to bottom of the screen
-  .primary-edit-form-well-menu.show_floating_menu {
-    display: block;
-    z-index: $zindex-navbar-fixed + 1;
-    padding: 0;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    box-shadow: 0 -1px 2px rgba(black, 0.2);
-    background: white;
-
-    .form-well-edit-page-select {
+  .show_floating_menu {
+    .mobile-nonfloating-menu { display: none; }
+    .primary-edit-form-well-menu {
       display: block;
-    }
+      z-index: $zindex-navbar-fixed + 1;
+      padding: 0;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      box-shadow: 0 -1px 2px rgba(black, 0.2);
+      background: white;
 
-    .edit-form-well-submit-wrapper {
-      width: 50%;
-      float: left;
+      .form-well-edit-page-select {
+        display: block;
+      }
 
-      .btn {
-        border-radius: 0;
-        border: none;
+      .edit-form-well-submit-wrapper {
+        width: 50%;
+        float: left;
+
+        .btn {
+          border-radius: 0;
+          border: none;
+        }
       }
     }
   }
