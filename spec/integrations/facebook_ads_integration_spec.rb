@@ -39,7 +39,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
 
     context "with theft_alert" do
       let(:campaign_id) { "6309006915414" }
-      let(:adset_id) { "6309019174214" }
+      let(:adset_id) { "6316675713414" }
       let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 999) }
       let(:bike) { Bike.new(id: 32, mnfg_name: "Surly") } # Manually stubbing so test has a valid URL
       let(:canada) { Country.canada }
