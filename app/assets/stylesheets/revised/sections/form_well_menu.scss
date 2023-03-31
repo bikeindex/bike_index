@@ -111,7 +111,8 @@ $active-bike-edit-border-width: 2px;
 // Small screen styles
 @media (max-width: $grid-breakpoint-md - 1px) {
   // Menu fixed to bottom of the screen
-  .primary-edit-form-well-menu {
+  .primary-edit-form-well-menu.show_floating_menu {
+    display: block;
     z-index: $zindex-navbar-fixed + 1;
     padding: 0;
     position: fixed;

@@ -1,7 +1,11 @@
+- show_floating_menu = ParamsNormalizer.boolean(params[:show_floating_menu])
+- primary_classes = "show_floating_menu" # we haven't implemented non-floating yet
+/ - primary_classes = show_floating_menu ? "show_floating_menu" : ""
+
 = form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
   .form-well-container.container
     .row
-      %nav.primary-edit-form-well-menu
+      %nav.primary-edit-form-well-menu{class: primary_classes}
         %ul
           - @edit_templates.each do |template, description|
             %li
