@@ -37,19 +37,25 @@
           = link_to t(".view_bike_version", bike_type: @bike.type_titleize), bike_version_path(@bike), class: "gray-link"
         - else
           = link_to t(".view_bike", bike_type: @bike.type_titleize), bike_path(@bike), class: "gray-link"
+      -# - unless show_floating_menu
+      -#   .mobile-nonfloating-menu.pl-1.pr-1
+      -#     %span.d-inline-block other edit pages:
+      -#     - menu_link_count = @edit_templates.keys.count
+      -#     - @edit_templates.each_with_index do |t_d, i|
+      -#       - template, description = t_d[0], t_d[1]
+      -#       - is_active = 'active' if @edit_template.match(/#{template}/)
+      -#       - next if is_active # %a.btn.btn-sm.btn-secondary.uncap
+      -#       %a.ml-1.mr-1.d-inline-block.text-underline{href: edit_bike_template_path_for(@bike, template), class: is_active}
+      -#         = description
   = yield
 
-  - unless show_floating_menu
-    .mobile-nonfloating-menu.pl-2.pr-2
-      %span.d-inline-block Edit
-      - menu_link_count = @edit_templates.keys.count
-      - @edit_templates.each_with_index do |t_d, i|
-        - template, description = t_d[0], t_d[1]
-        - is_active = 'active' if @edit_template.match(/#{template}/)
-        -# next if is_active # %a.btn.btn-sm.btn-secondary.uncap
-        %a.ml-1.mr-1.d-inline-block.text-underline{href: edit_bike_template_path_for(@bike, template), class: is_active}
-          = description
-        -#- unless i == menu_link_count - 1
-        -#  |
-
-    -# render partial: "/bikes_edit/primary_menu", locals: {footer_menu: true}
+  -# unless show_floating_menu
+  .mobile-nonfloating-menu.pl-1.pr-1.text-center.bottom-menu
+    %span.d-inline-block other edit pages:
+    - menu_link_count = @edit_templates.keys.count
+    - @edit_templates.each_with_index do |t_d, i|
+      - template, description = t_d[0], t_d[1]
+      - is_active = 'active' if @edit_template.match(/#{template}/)
+      - next if is_active
+      %a.ml-1.mr-1.d-inline-block.text-underline{href: edit_bike_template_path_for(@bike, template), class: is_active}
+        = description

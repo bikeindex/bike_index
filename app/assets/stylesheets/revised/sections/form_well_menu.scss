@@ -108,7 +108,15 @@ $active-bike-edit-border-width: 2px;
 }
 .mobile-nonfloating-menu {
   display: none;
-  margin-top: 90px; // oof. Lots of top padding on the form well
+  line-height: 1.5;
+  &.bottom-menu {
+    margin-top: 90px; // oof. Lots of top padding on the form well
+    font-size: 110%;
+  }
+
+  a.active {
+    color: $body-font-color;
+  }
 }
 //
 // Small screen styles
@@ -116,7 +124,6 @@ $active-bike-edit-border-width: 2px;
   .mobile-nonfloating-menu { display: block; }
   // Menu fixed to bottom of the screen
   .show_floating_menu {
-    .mobile-nonfloating-menu { display: none; }
     .primary-edit-form-well-menu {
       display: block;
       z-index: $zindex-navbar-fixed + 1;
