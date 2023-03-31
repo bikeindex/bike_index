@@ -1,7 +1,10 @@
 - no_save_button ||= false
 - purchase_plan_button ||= false
+- show_floating_menu = ParamsNormalizer.boolean(params[:floating_mobile_menu])
 
-%nav.primary-edit-form-well-menu{class: (no_save_button ? "no-save-button" : "")}
+- primary_classes = (no_save_button ? "no-save-button" : "")
+- primary_classes += " show-floating-menu" if show_floating_menu
+%nav.primary-edit-form-well-menu{class: primary_classes}
   - if @permitted_return_to.present?
     %span#permittedReturnTo{ "data-path" => @permitted_return_to }
   - if @bike.status_stolen?

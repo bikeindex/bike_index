@@ -2,6 +2,7 @@ $active-bike-edit-border-width: 2px;
 
 .primary-edit-form-well-menu {
   z-index: 1;
+  display: none;
 
   ul {
     display: none;
@@ -140,6 +141,7 @@ $active-bike-edit-border-width: 2px;
 // Medium and up screen styles
 @media (min-width: $grid-breakpoint-md) {
   .primary-edit-form-well-menu {
+    display: block;
     float: left;
     width: 33.33333%;
     position: -webkit-sticky;
