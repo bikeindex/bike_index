@@ -62,8 +62,12 @@ module API
 
         def creation_user_id
           if current_user&.id == ENV["V2_ACCESSOR_ID"].to_i || doorkeeper_authorized_no_user
-            return current_organization.auto_user_id if current_organization.present? &&
-              current_token&.application&.owner.present? && current_token.application.owner.admin_of?(current_organization)
+            # current_organization requires token user to be authorized - V2_ACCESSOR is not
+            organization = Organization.friendly_find(params[:organization_slug])
+            if organization.present? && current_token&.application&.owner&.admin_of?(organization)
+              @current_organization = organization
+              return current_organization.auto_user_id
+            end
 
             if doorkeeper_authorized_no_user
               error!("Access tokens with no user can only be used to create bikes for organizations you're an admin of", 403)
