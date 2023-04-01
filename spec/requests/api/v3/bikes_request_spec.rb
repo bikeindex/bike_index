@@ -750,13 +750,30 @@ RSpec.describe "Bikes API V3", type: :request do
         end
       end
 
-      it "doesn't create a bike without an organization with v3_accessor" do
-        post tokenized_url, params: bike_attrs.except(:organization_slug).to_json, headers: json_headers
-        expect(response.code).to eq("403")
-        expect(json_result["error"].is_a?(String)).to be_truthy
-        expect(json_result["error"]).to match(/permanent token/i)
-        EmailOwnershipInvitationWorker.drain
-        expect(ActionMailer::Base.deliveries).to be_empty
+      # This is how it actually occurs in the real world.
+      context "v2_accessor is not the application owner" do
+        let(:other_user) { FactoryBot.create(:user_confirmed) }
+        let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = other_user.id.to_s }
+        it "v2_accessor" do
+          expect(v2_access_token.resource_owner_id).to eq other_user.id
+          expect(v2_access_token.resource_owner_id).to_not eq user.id
+          expect(v2_access_token.application.owner.admin_of?(organization)).to be_truthy
+          expect(other_user.admin_of?(organization)).to be_falsey
+          post tokenized_url, params: bike_attrs.to_json, headers: json_headers
+          expect(response.code).to eq("201")
+          bike = Bike.find(json_result.dig("bike", "id"))
+          expect(bike.creation_organization).to eq(organization)
+          expect(bike.creator).to eq(user)
+          expect(bike.secondary_frame_color).to be_nil
+          expect(bike.rear_wheel_size.iso_bsd).to eq 559
+          expect(bike.front_wheel_size.iso_bsd).to eq 559
+          expect(bike.rear_tire_narrow).to be_truthy
+          expect(bike.front_tire_narrow).to be_truthy
+          # expect(bike.current_ownership.origin).to eq 'api_v3'
+          expect(bike.current_ownership.organization).to eq organization
+          EmailOwnershipInvitationWorker.drain
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+        end
       end
     end
 
