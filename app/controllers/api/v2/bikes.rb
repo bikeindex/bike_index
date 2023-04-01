@@ -62,7 +62,7 @@ module API
 
         def creation_user_id
           if current_user&.id == ENV["V2_ACCESSOR_ID"].to_i || doorkeeper_authorized_no_user
-            # current_organization depends on token user being authorized - the V2_ACCESSOR is not
+            # current_organization requires token user to be authorized - V2_ACCESSOR is not
             organization = Organization.friendly_find(params[:organization_slug])
             if organization.present? && current_token&.application&.owner&.admin_of?(organization)
               @current_organization = organization
