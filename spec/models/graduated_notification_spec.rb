@@ -27,6 +27,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification.bike_organization.deleted?).to be_truthy
       expect(graduated_notification.email_success?).to be_truthy
       expect(graduated_notification.status).to eq "active"
+      expect(graduated_notification.status_humanized).to eq "bike graduated"
       expect(graduated_notification.processed?).to be_truthy
       expect(graduated_notification.user).to be_blank
       expect(graduated_notification.email).to eq bike.owner_email
@@ -77,6 +78,7 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification.reload
         expect(graduated_notification).to be_valid
         expect(graduated_notification.status).to eq "marked_remaining"
+        expect(graduated_notification.status_humanized).to eq "marked not graduated"
         expect(graduated_notification.active?).to be_falsey
         expect(graduated_notification.processed?).to be_truthy
         expect(graduated_notification.user).to be_blank

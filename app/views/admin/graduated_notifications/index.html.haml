@@ -14,7 +14,7 @@
         .dropdown-menu
           - (["all"] + GraduatedNotification.statuses).each do |kind|
             - kind_active = @search_status == kind
-            - kind_display = "#{kind.humanize} notifications"
+            - kind_display = "#{GraduatedNotification.status_humanized(kind)} notifications"
             = link_to kind_display, url_for(sortable_search_params.merge(search_status: (kind_active ? nil : kind))), class: "dropdown-item #{kind_active ? 'active' : ''}"
             - if kind == "all" # Add a divider after all
               .dropdown-divider
@@ -76,7 +76,7 @@
             = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id)
         %td
           %em
-            = status_display(graduated_notification.status.humanize)
+            = status_display(graduated_notification.status_humanized)
         %td
           - if graduated_notification.user_id.present?
             = link_to graduated_notification.email, admin_user_path(graduated_notification.user_id)

@@ -45,6 +45,13 @@ class GraduatedNotification < ApplicationRecord
     statuses - processed_statuses
   end
 
+  def self.status_humanized(str)
+    return nil unless str.present?
+    str = str.to_s
+    return "bike graduated" if str == "active"
+    str.humanize
+  end
+
   def self.user_or_email_query(graduated_notification)
     if graduated_notification.user_id.present?
       {user_id: graduated_notification.user_id}
@@ -96,6 +103,10 @@ class GraduatedNotification < ApplicationRecord
 
   def message
     nil # for parity with parking_notifications
+  end
+
+  def status_humanized
+    self.class.status_humanized(status)
   end
 
   # Get it unscoped, because we really want it

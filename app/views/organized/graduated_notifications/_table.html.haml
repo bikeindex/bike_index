@@ -55,7 +55,7 @@
         - unless skip_status
           %td
             %em
-              = status_display(graduated_notification.status.humanize)
+              = status_display(graduated_notification.status_humanize)
         - unless skip_email
           %td
             = graduated_notification.email
