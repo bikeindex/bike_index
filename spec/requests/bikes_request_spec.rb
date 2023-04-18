@@ -112,7 +112,31 @@ RSpec.describe BikesController, type: :request do
         expect(bike.graduated?(organization)).to be_falsey
         expect(graduated_notification.marked_remaining?).to be_truthy
         expect(graduated_notification.marked_remaining_at).to be_within(2).of Time.current
+        expect(graduated_notification.marked_remaining_by&.id).to be_blank
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+      end
+      context "current_user present" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "marked_remaining_by user" do
+          graduated_notification.reload
+          bike.reload
+          expect(graduated_notification.processed?).to be_truthy
+          expect(graduated_notification.marked_remaining_link_token).to be_present
+          expect(bike.graduated?(organization)).to be_truthy
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
+          put "#{base_url}/#{bike.id}/resolve_token?token=#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
+          expect(response).to redirect_to(bike_path(bike.id))
+          expect(flash[:success]).to be_present
+          bike.reload
+          graduated_notification.reload
+          expect(bike.graduated?(organization)).to be_falsey
+          expect(graduated_notification.marked_remaining?).to be_truthy
+          expect(graduated_notification.marked_remaining_at).to be_within(2).of Time.current
+          expect(graduated_notification.marked_remaining_by&.id).to eq current_user.id
+          expect(graduated_notification.user_id).to_not eq current_user.id
+          expect(graduated_notification.marked_remaining_by&.id).to eq current_user.id
+          expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
+        end
       end
       context "with associated_notifications" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification) } # so that it isn't processed prior to second creation
@@ -173,6 +197,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.graduated?(organization)).to be_falsey
           expect(graduated_notification.marked_remaining?).to be_truthy
           expect(graduated_notification.marked_remaining_at).to eq og_marked_remaining_at
+          expect(graduated_notification.marked_remaining_by_id).to be_blank
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         end
       end

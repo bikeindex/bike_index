@@ -7,6 +7,7 @@ class GraduatedNotification < ApplicationRecord
   belongs_to :organization
   belongs_to :primary_bike, class_name: "Bike"
   belongs_to :primary_notification, class_name: "GraduatedNotification"
+  belongs_to :marked_remaining_by, class_name: "User"
 
   has_many :secondary_notifications, class_name: "GraduatedNotification", foreign_key: :primary_notification_id
 
@@ -221,9 +222,10 @@ class GraduatedNotification < ApplicationRecord
     pending_period_ends_at > Time.current
   end
 
-  def mark_remaining!(resolved_at: nil)
-    return true unless marked_remaining_at.blank?
+  def mark_remaining!(resolved_at: nil, marked_remaining_by_id: nil)
+    return true if marked_remaining_at.present?
     self.marked_remaining_at ||= resolved_at || Time.current
+    self.marked_remaining_by_id ||= marked_remaining_by_id
     # We don't want to re-mark remaining
     update(updated_at: Time.current)
     bike_organization.update(deleted_at: nil)

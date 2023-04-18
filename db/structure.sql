@@ -1243,7 +1243,8 @@ CREATE TABLE public.graduated_notifications (
     delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    not_most_recent boolean DEFAULT false
+    not_most_recent boolean DEFAULT false,
+    marked_remaining_by_id bigint
 );
 
 
@@ -5013,6 +5014,13 @@ CREATE INDEX index_graduated_notifications_on_bike_organization_id ON public.gra
 
 
 --
+-- Name: index_graduated_notifications_on_marked_remaining_by_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_graduated_notifications_on_marked_remaining_by_id ON public.graduated_notifications USING btree (marked_remaining_by_id);
+
+
+--
 -- Name: index_graduated_notifications_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6402,6 +6410,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220903183420'),
 ('20220921170820'),
 ('20221007123638'),
-('20230224234148');
+('20230224234148'),
+('20230418192859');
 
 
