@@ -38,7 +38,7 @@
   = yield
 
   .mobile-nonfloating-menu.pl-1.pr-1.text-center
-    %span.d-inline-block edit pages:
+    %strong.d-inline-block edit pages:
     - menu_link_count = @edit_templates.keys.count
     - @edit_templates.each_with_index do |t_d, i|
       - template, description = t_d[0], t_d[1]
