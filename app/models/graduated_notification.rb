@@ -1,6 +1,7 @@
 class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
-  PENDING_PERIOD = 24.hours
+  PENDING_PERIOD = 24.hours.freeze
+
   belongs_to :bike
   belongs_to :bike_organization
   belongs_to :user
@@ -100,6 +101,10 @@ class GraduatedNotification < ApplicationRecord
     return Bike.nil unless organization&.graduated_notification_interval&.present?
     bikes_to_notify_without_notifications(organization).pluck(:id) +
       bikes_to_notify_expired_notifications(organization).pluck(:id)
+  end
+
+  def self.marked_remaining_by_recording_started_at
+    Time.at(1681847660) # 2023-04-18 14:54 - adding this to make it easier to check whether it's pre recording or not
   end
 
   def message
