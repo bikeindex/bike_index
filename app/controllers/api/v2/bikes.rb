@@ -233,7 +233,7 @@ module API
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
           notes: <<-NOTE
-            **Requires** `read_user` **in the access token** you use to send the notification.
+            **Requires** `write_bikes` **in the access token** you use to send the notification.
 
             Update a bike owned by the access token you're using.
 
@@ -262,6 +262,32 @@ module API
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end
+          BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
+        end
+
+        desc "Mark a bike recovered that is owned by the access token<span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
+          notes: <<-NOTE
+            **Requires** `write_bikes` **in the access token** you use to send the notification.
+
+            Update a bike owned by the access token you're using.
+
+          NOTE
+        }
+        params do
+          requires :id, type: Integer, desc: "Bike ID"
+          optional :recovered_at, type: Integer, desc: "Timestamp when the bike was recovered (defaults to current time)"
+          requires :recovered_description, type: String, desc: "Description of the recovery"
+          optional :index_helped_recovery, type: Boolean, desc: "Did Bike Index help recover this bike?"
+          optional :can_share_recovery, type: Boolean, desc: "Can Bike Index share information about this recovery?"
+        end
+        put ":id/recover" do
+          find_bike
+          authorize_bike_for_user
+          error!("Bike is not stolen", 400) unless @bike.present? && @bike.status_stolen?
+          declared_p = declared(params, include_missing: false)
+          @bike.current_stolen_record.add_recovery_information(declared_p)
+
           BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
         end
 

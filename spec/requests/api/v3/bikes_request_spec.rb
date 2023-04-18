@@ -1188,6 +1188,84 @@ RSpec.describe "Bikes API V3", type: :request do
     end
   end
 
+  describe "recover" do
+    let(:url) { "/api/v3/bikes/#{bike.id}/recover?access_token=#{token.token}" }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user: user) }
+    let!(:stolen_record) { bike.reload.current_stolen_record }
+    let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
+    let(:valid_params) do
+      {
+        index_helped_recovery: true,
+        recovered_description: "It was recovered nicely!",
+        can_share_recovery: false,
+        recovered_at: Time.current.to_i.to_s
+      }
+    end
+
+    it "marks unstolen" do
+      expect(bike.reload.user&.id).to eq user.id
+      expect(stolen_record).to be_present
+      expect(bike.status).to eq "status_stolen"
+      expect(bike.owner_email).to eq user.email
+      expect(bike.claimed?).to be_truthy
+      expect(bike.authorized?(user)).to be_truthy
+      put url, params: valid_params.to_json, headers: json_headers
+      expect(response.code).to eq("200")
+      expect(json_result["bike"]["id"]).to eq bike.id
+      bike.reload
+      expect(bike.status).to eq "status_with_owner"
+      expect(stolen_record.reload.current?).to be_falsey
+      expect(stolen_record.index_helped_recovery?).to be_truthy
+      expect(stolen_record.recovered_description).to eq valid_params[:recovered_description]
+      expect(stolen_record.can_share_recovery).to be_falsey
+    end
+
+    context "not stolen" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
+      it "errors for a non-stolen bike" do
+        expect(bike.reload.user&.id).to eq user.id
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.owner_email).to eq user.email
+        expect(bike.claimed?).to be_truthy
+        expect(bike.authorized?(user)).to be_truthy
+        put url, params: valid_params.to_json, headers: json_headers
+        expect(response.code).to eq("400")
+        expect(json_result["error"].present?).to be_truthy
+        expect(json_result["error"]).to match(/stolen/i)
+      end
+    end
+
+    context "token not write_bikes" do
+      let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes") }
+      it "errors" do
+        expect(token.reload.scopes.to_s).to_not match(/write_bikes/)
+        expect(bike.reload.user&.id).to eq user.id
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.owner_email).to eq user.email
+        expect(bike.claimed?).to be_truthy
+        expect(bike.authorized?(user)).to be_truthy
+        put url, params: valid_params.to_json, headers: json_headers
+        expect(response.code).to eq("403")
+        expect(json_result["error"].present?).to be_truthy
+        expect(json_result["error"]).to match(/permission/i)
+      end
+    end
+
+    context "not authorized" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, creator: user) }
+      it "errors" do
+        expect(bike.reload.user&.id).to be_present
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.claimed?).to be_truthy
+        expect(bike.authorized?(user)).to be_falsey
+        put url, params: valid_params.to_json, headers: json_headers
+        expect(response.code).to eq("403")
+        expect(json_result["error"].present?).to be_truthy
+        expect(json_result["error"]).to match(/own/i)
+      end
+    end
+  end
+
   describe "post id/image" do
     let!(:token) { create_doorkeeper_token(scopes: "read_user write_bikes") }
     it "doesn't post an image to a bike if the bike isn't owned by the user" do
