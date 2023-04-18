@@ -31,7 +31,7 @@ FactoryBot.define do
       end
     end
 
-    factory :graduated_notification_active do
+    factory :graduated_notification_bike_graduated do
       transient do
         bike_created_at { Time.current - 1.day - graduated_notification_interval }
       end

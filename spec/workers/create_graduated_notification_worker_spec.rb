@@ -77,7 +77,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
     end
 
     context "with existing graduated_notification" do
-      let!(:graduated_notification_active) { FactoryBot.create(:graduated_notification_active, organization: organization) }
+      let!(:graduated_notification_bike_graduated) { FactoryBot.create(:graduated_notification_bike_graduated, organization: organization) }
 
       let!(:graduated_notification_remaining_expired) do
         FactoryBot.create(:graduated_notification,
@@ -98,8 +98,8 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         expect(graduated_notification_remaining_expired.created_at).to be < graduated_notification_remaining_expired.marked_remaining_at
         expect(graduated_notification_remaining_expired.most_recent?).to be_truthy
         expect(graduated_notification_remaining_expired.expired?).to be_truthy
-        expect(graduated_notification_active.processed_at).to be < Time.current
-        expect(graduated_notification_active.status).to eq("active")
+        expect(graduated_notification_bike_graduated.processed_at).to be < Time.current
+        expect(graduated_notification_bike_graduated.status).to eq("bike_graduated")
         # Really, testing bike_ids_to_notify ensures we're enqueueing the right things, but - just to be sure
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to match_array([bike.id])
         expect(bike.organizations.pluck(:id)).to eq([organization.id])

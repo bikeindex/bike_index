@@ -399,7 +399,7 @@ class Bike < ApplicationRecord
   end
 
   def graduated?(org = nil)
-    graduated_notifications(org).active.any?
+    graduated_notifications(org).bike_graduated.any?
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably

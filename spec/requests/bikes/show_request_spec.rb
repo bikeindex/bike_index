@@ -250,7 +250,7 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
   describe "graduated_notification_remaining param" do
-    let(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+    let(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated) }
     let!(:bike) { graduated_notification.bike }
     let(:ownership) { bike.current_ownership }
     let(:organization) { graduated_notification.organization }
@@ -301,7 +301,7 @@ RSpec.describe "BikesController#show", type: :request do
         bike.reload
         graduated_notification.reload
         expect(bike.graduated?(organization)).to be_truthy
-        expect(graduated_notification.status).to eq("active")
+        expect(graduated_notification.status).to eq("bike_graduated")
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
       end
     end

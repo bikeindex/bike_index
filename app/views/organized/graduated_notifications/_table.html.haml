@@ -23,7 +23,7 @@
     - unless skip_email
       %td= sortable "email", render_sortable: render_sortable
     - if render_remaining_at
-      %td= sortable "marked_remaining_at", render_sortable: render_sortable
+      %td= sortable "marked_remaining_at", "Marked Not Graduated", render_sortable: render_sortable
 
   %tbody
     - graduated_notifications.each do |graduated_notification|
@@ -55,7 +55,7 @@
         - unless skip_status
           %td
             %em
-              = status_display(graduated_notification.status_humanize)
+              = status_display(graduated_notification.status_humanized&.titleize)
         - unless skip_email
           %td
             = graduated_notification.email

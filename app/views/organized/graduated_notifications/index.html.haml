@@ -35,15 +35,15 @@
       %span.only-dev-visible.mr-2.pl-1.pr-1.pt-1.pb-2
         = link_to "separate secondary", url_for(sortable_search_params.merge(search_secondary: !separate_secondary_notifications?)), class: (separate_secondary_notifications? ? "active btn btn-primary btn-sm" : "less-strong small")
     %a.dropdown-toggle.btn.btn-outline-primary{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-      = @search_status.humanize || "All statuses"
+      = GraduatedNotification.status_humanized(@search_status) || "All statuses"
     .dropdown-menu
       - (GraduatedNotification.statuses + %w[current all]).each do |status|
         - if status == "current" # Add a divider before all
           .dropdown-divider
         - status_active = @search_status == status
         - status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status))
-        - display_status = "Current (pending & active)" if status == "current"
-        - display_status ||= status.humanize || "All statuses"
+        - display_status = "Current (pending & graduated)" if status == "current"
+        - display_status ||= GraduatedNotification.status_humanized(status)&.titleize || "All statuses"
         = link_to display_status, organization_graduated_notifications_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}"
 
 
