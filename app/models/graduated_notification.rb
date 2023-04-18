@@ -1,12 +1,14 @@
 class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
-  PENDING_PERIOD = 24.hours
+  PENDING_PERIOD = 24.hours.freeze
+
   belongs_to :bike
   belongs_to :bike_organization
   belongs_to :user
   belongs_to :organization
   belongs_to :primary_bike, class_name: "Bike"
   belongs_to :primary_notification, class_name: "GraduatedNotification"
+  belongs_to :marked_remaining_by, class_name: "User"
 
   has_many :secondary_notifications, class_name: "GraduatedNotification", foreign_key: :primary_notification_id
 
@@ -99,6 +101,10 @@ class GraduatedNotification < ApplicationRecord
     return Bike.nil unless organization&.graduated_notification_interval&.present?
     bikes_to_notify_without_notifications(organization).pluck(:id) +
       bikes_to_notify_expired_notifications(organization).pluck(:id)
+  end
+
+  def self.marked_remaining_by_recording_started_at
+    Time.at(1681847660) # 2023-04-18 14:54 - adding this to make it easier to check whether it's pre recording or not
   end
 
   def message
@@ -221,9 +227,10 @@ class GraduatedNotification < ApplicationRecord
     pending_period_ends_at > Time.current
   end
 
-  def mark_remaining!(resolved_at: nil)
-    return true unless marked_remaining_at.blank?
+  def mark_remaining!(resolved_at: nil, marked_remaining_by_id: nil)
+    return true if marked_remaining_at.present?
     self.marked_remaining_at ||= resolved_at || Time.current
+    self.marked_remaining_by_id ||= marked_remaining_by_id
     # We don't want to re-mark remaining
     update(updated_at: Time.current)
     bike_organization.update(deleted_at: nil)
