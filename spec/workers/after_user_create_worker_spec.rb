@@ -258,14 +258,14 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   end
 
   describe "graduated_notification" do
-    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated) }
     let(:bike) { graduated_notification.bike }
     let(:user) { FactoryBot.create(:user_confirmed, email: bike.owner_email.upcase) }
 
     it "assigns any that match the user email" do
       expect(bike.reload.claimed?).to be_falsey
       expect(bike.current_ownership.user&.id).to be_blank
-      expect(graduated_notification.active?).to be_truthy
+      expect(graduated_notification.bike_graduated?).to be_truthy
       expect(graduated_notification.primary_notification?).to be_truthy
       expect(graduated_notification.user_id).to be_blank
       og_updated_at = graduated_notification.reload.updated_at

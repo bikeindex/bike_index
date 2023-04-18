@@ -26,7 +26,8 @@ RSpec.describe GraduatedNotification, type: :model do
       graduated_notification.reload
       expect(graduated_notification.bike_organization.deleted?).to be_truthy
       expect(graduated_notification.email_success?).to be_truthy
-      expect(graduated_notification.status).to eq "active"
+      expect(graduated_notification.status).to eq "bike_graduated"
+      expect(graduated_notification.status_humanized).to eq "bike graduated"
       expect(graduated_notification.processed?).to be_truthy
       expect(graduated_notification.user).to be_blank
       expect(graduated_notification.email).to eq bike.owner_email
@@ -41,7 +42,7 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification.reload
         expect(organization.deliver_graduated_notifications?).to be_falsey
         expect(graduated_notification).to be_valid
-        expect(graduated_notification.active?).to be_falsey
+        expect(graduated_notification.bike_graduated?).to be_falsey
         expect(graduated_notification.processed?).to be_falsey
         expect(graduated_notification.user).to be_blank
         expect(graduated_notification.send_email?).to be_falsey
@@ -66,7 +67,7 @@ RSpec.describe GraduatedNotification, type: :model do
       end
     end
     context "manually marked_remaining" do
-      it "is not active" do
+      it "is not bike_graduated" do
         expect(graduated_notification.processed?).to be_falsey
         graduated_notification.process_notification
         graduated_notification.reload
@@ -77,7 +78,8 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification.reload
         expect(graduated_notification).to be_valid
         expect(graduated_notification.status).to eq "marked_remaining"
-        expect(graduated_notification.active?).to be_falsey
+        expect(graduated_notification.status_humanized).to eq "marked not graduated"
+        expect(graduated_notification.bike_graduated?).to be_falsey
         expect(graduated_notification.processed?).to be_truthy
         expect(graduated_notification.user).to be_blank
         expect(graduated_notification.send_email?).to be_truthy
@@ -89,8 +91,8 @@ RSpec.describe GraduatedNotification, type: :model do
     end
     context "marked_remaining" do
       let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization, bike_created_at: Time.current - 1.year) }
-      it "is not active" do
-        expect(graduated_notification.active?).to be_falsey
+      it "is not bike_graduated" do
+        expect(graduated_notification.bike_graduated?).to be_falsey
         expect(graduated_notification.processed?).to be_truthy
         expect(graduated_notification.email_success?).to be_truthy
         expect(graduated_notification.marked_remaining_at).to be < Time.current
@@ -151,7 +153,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification1.created_at).to be < interval_start
       expect(graduated_notification1.marked_remaining_at).to be < interval_start
       expect(GraduatedNotification.count).to eq 1
-      expect(GraduatedNotification.active.count).to eq 0
+      expect(GraduatedNotification.bike_graduated.count).to eq 0
       expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike2.id])
       expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to match_array([bike1.id])
       expect(GraduatedNotification.bike_ids_to_notify(organization)).to match_array([bike1.id, bike2.id])
@@ -457,7 +459,7 @@ RSpec.describe GraduatedNotification, type: :model do
           expect(graduated_notification1.process_notification).to be_truthy
         }.to change(CreateGraduatedNotificationWorker.jobs, :count).by 0
         graduated_notification1.reload
-        expect(graduated_notification1.status).to eq "active"
+        expect(graduated_notification1.status).to eq "bike_graduated"
         expect(graduated_notification1.processed?).to be_truthy
         expect(graduated_notification1.send_email?).to be_truthy
         Sidekiq::Testing.inline! do
@@ -517,10 +519,10 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(ActionMailer::Base.deliveries.count).to eq 1
         graduated_notification1.reload
         expect(graduated_notification1.processed?).to be_truthy
-        expect(graduated_notification1.active?).to be_truthy
+        expect(graduated_notification1.bike_graduated?).to be_truthy
         graduated_notification2.reload
         expect(graduated_notification2.processed?).to be_truthy
-        expect(graduated_notification2.active?).to be_truthy
+        expect(graduated_notification2.bike_graduated?).to be_truthy
 
         # And then we create another bike after the notification has been processed - it's no longer added in there
         _bike3 = FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization)
@@ -621,7 +623,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.processable?).to be_truthy
         graduated_notification2.process_notification
         expect(graduated_notification2.reload.most_recent?).to be_truthy
-        expect(graduated_notification2.status).to eq "active"
+        expect(graduated_notification2.status).to eq "bike_graduated"
         expect(graduated_notification2.send(:existing_sent_notification)&.id).to eq graduated_notification2.id
 
         expect(graduated_notification.reload.most_recent?).to be_truthy

@@ -285,7 +285,7 @@
   - graduated_notifications = @bike.graduated_notifications(passive_organization).order(id: :desc)
   - if graduated_notifications.any?
     .parking-notifications-wrap
-      %h3.mt-2.mb-2 Graduated notifications
+      %h3.mt-2.mb-3 Graduated notifications
       = render partial: "/organized/graduated_notifications/table", locals: {graduated_notifications: graduated_notifications, skip_email: true, render_remaining_at: true}
 
 

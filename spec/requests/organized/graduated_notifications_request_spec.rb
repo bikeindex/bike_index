@@ -9,8 +9,8 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
   let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: current_organization, serial_number: "sameserialnumber12111", owner_email: "testly@university.edu", created_at: earliest_time) }
 
   describe "index" do
-    let!(:graduated_notification_pending) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
-    let!(:graduated_notification_active) { FactoryBot.create(:graduated_notification_active, organization: current_organization) }
+    let!(:graduated_notification_pending) { FactoryBot.create(:graduated_notification_bike_graduated, organization: current_organization, bike: bike1) }
+    let!(:graduated_notification_bike_graduated) { FactoryBot.create(:graduated_notification_bike_graduated, organization: current_organization) }
     let!(:graduated_notification_remaining) do
       FactoryBot.create(:graduated_notification,
         :marked_remaining,
@@ -18,20 +18,20 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
         marked_remaining_at: Time.current - current_organization.graduated_notification_interval + 2.days)
     end
     it "renders with correct things" do
-      expect(graduated_notification_pending.reload.status).to eq "active"
-      expect(GraduatedNotification.current.pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_active.id])
+      expect(graduated_notification_pending.reload.status).to eq "bike_graduated"
+      expect(GraduatedNotification.current.pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_bike_graduated.id])
 
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:search_status)).to eq "current"
       expect(assigns(:separate_secondary_notifications)).to be_falsey
-      expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_active.id])
+      expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_bike_graduated.id])
 
       get "#{base_url}?search_status=all"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_active.id, graduated_notification_remaining.id])
+      expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_bike_graduated.id, graduated_notification_remaining.id])
 
       get "#{base_url}?search_email=testly%40univer"
       expect(response.status).to eq(200)
@@ -56,7 +56,7 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
   end
 
   describe "show" do
-    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active, organization: current_organization, bike: bike1) }
+    let!(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated, organization: current_organization, bike: bike1) }
     it "renders" do
       get "#{base_url}/#{graduated_notification.id}"
       expect(response.status).to eq(200)
@@ -64,7 +64,7 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(assigns(:graduated_notification)).to eq graduated_notification
     end
     context "different organization's" do
-      let!(:graduated_notification) { FactoryBot.create(:graduated_notification_active) }
+      let!(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated) }
       it "raises not found" do
         expect {
           get "#{base_url}/#{graduated_notification.id}"

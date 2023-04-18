@@ -1,5 +1,5 @@
 class GraduatedNotification < ApplicationRecord
-  STATUS_ENUM = {pending: 0, active: 1, marked_remaining: 2}.freeze
+  STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours
   belongs_to :bike
   belongs_to :bike_organization
@@ -38,11 +38,18 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def self.processed_statuses
-    %w[active marked_remaining]
+    %w[bike_graduated marked_remaining]
   end
 
   def self.unprocessed_statuses
     statuses - processed_statuses
+  end
+
+  def self.status_humanized(str)
+    return nil unless str.present?
+    str = str.to_s
+    return "marked not graduated" if str == "marked_remaining"
+    str.humanize.downcase
   end
 
   def self.user_or_email_query(graduated_notification)
@@ -96,6 +103,10 @@ class GraduatedNotification < ApplicationRecord
 
   def message
     nil # for parity with parking_notifications
+  end
+
+  def status_humanized
+    self.class.status_humanized(status)
   end
 
   # Get it unscoped, because we really want it
@@ -218,7 +229,7 @@ class GraduatedNotification < ApplicationRecord
     bike_organization.update(deleted_at: nil)
     associated_notifications.each { |n| n.mark_remaining!(resolved_at: marked_remaining_at) } if primary_notification?
     # Long shot - but update any graduated notifications that might have been missed, just in case
-    organization.graduated_notifications.where(bike_id: bike_id).active.each do |pre_notification|
+    organization.graduated_notifications.where(bike_id: bike_id).bike_graduated.each do |pre_notification|
       if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
         # remove the newer bike_organization, keep the older one
         bike_organization.destroy if bike_organization.created_at > pre_notification.bike_organization.created_at
@@ -295,7 +306,7 @@ class GraduatedNotification < ApplicationRecord
     # Because prior to commit, the value for the current notification isn't set
     return "marked_remaining" if marked_remaining_at.present? || associated_notifications_including_self.marked_remaining.any?
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
-    email_success? || primary_notification.present? && primary_notification.email_success? ? "active" : "pending"
+    email_success? || primary_notification.present? && primary_notification.email_success? ? "bike_graduated" : "pending"
   end
 
   def calculated_email
