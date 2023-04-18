@@ -36,15 +36,18 @@
                 = l(@graduated_notification.pending_period_ends_at, format: :convert_time)
         - if @graduated_notification.processed?
           %tr
-            %td Marked remaining
+            %td Marked not graduated
             %td
               - if @graduated_notification.marked_remaining_at.present?
                 %span.convertTime.preciseTime
                   = l(@graduated_notification.marked_remaining_at, format: :convert_time)
+                - if @graduated_notification.marked_remaining_by.present?
+                  %small.less-strong
+                    by #{@graduated_notification.marked_remaining_by.display_name}
               - elsif @graduated_notification.bike_graduated? && current_user.admin_of?(current_organization)
                 %small.less-strong
                   Mark #{@graduated_notification.bike.type}
-                  = link_to "not graduated", retrieval_link_url(@graduated_notification)
+                  = link_to "not graduated", retrieval_link_url(@graduated_notification), data: {confirm: "Are you sure? It's better for the user do this. You should only mark it not graduated if the user has lost the email."}
                   for the user
         %tr
           %td Email
