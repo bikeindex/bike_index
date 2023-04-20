@@ -104,6 +104,7 @@ class AfterUserChangeWorker < ApplicationWorker
   def process_user_registration_organizations(user)
     # Process user_registration_organizations
     user.user_registration_organizations.order(:id).each do |u|
+      pp "heeeee"
       # Delete dupe user_registration_organizations
       user.user_registration_organizations
         .where(organization_id: u.organization_id).where("id > ?", u.id)

@@ -26,7 +26,6 @@ class GraduatedNotification < ApplicationRecord
   scope :current, -> { where(status: current_statuses) }
   scope :processed, -> { where(status: processed_statuses) }
   scope :unprocessed, -> { where(status: unprocessed_statuses) }
-  scope :not_marked_remaining, -> { where.not(status: "marked_remaining") }
   scope :primary_notification, -> { where("primary_notification_id = id") }
   scope :secondary_notification, -> { where.not("primary_notification_id  = id") }
   scope :email_success, -> { where(delivery_status: "email_success") }
@@ -50,7 +49,7 @@ class GraduatedNotification < ApplicationRecord
   def self.status_humanized(str)
     return nil unless str.present?
     str = str.to_s
-    return "remains registered" if str == "marked_remaining"
+    return "marked not graduated" if str == "marked_remaining"
     str.humanize.downcase
   end
 
@@ -262,6 +261,7 @@ class GraduatedNotification < ApplicationRecord
 
   def update_associated_notifications
     return true if skip_update
+    pp "update_associated_notifications #{id} - '#{@skip_update}'"
     mark_previous_notifications_not_most_recent if most_recent?
     return unless primary_notification?
     self.class.associated_notifications(self)
@@ -289,16 +289,24 @@ class GraduatedNotification < ApplicationRecord
     return true if email_success?
     return false unless processable?
 
-    user_registration_organization&.destroy!
+    pp "destroying! #{id}"
+    user_registration_organization&.destroy_for_graduated_notification!
     bike_organization&.destroy!
 
     # deliver email before everything, so if fails, we send when we try again
     OrganizedMailer.graduated_notification(self).deliver_now if send_email?
-    update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
 
+    pp "----"
+    @skip_update = true
+    update(processed_at: Time.current, delivery_status: "email_success", skip_update: true)
+    pp "vvvv"
     return true unless primary_notification?
+    pp "cccc"
     # Update the associated notifications after updating the primary notification, so if we fail, they can be updated by the worker
-    associated_notifications.each { |notification| notification.process_notification }
+    associated_notifications.each do |notification|
+      pp "notification: #{notification.id}"
+      notification.process_notification
+    end
     true
   end
 

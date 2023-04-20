@@ -78,11 +78,19 @@ class UserRegistrationOrganization < ApplicationRecord
     self.can_not_edit_claimed = !val
   end
 
+  def destroy_for_graduated_notification!
+    @skip_update_associations = true
+    destroy!
+  end
+
   def set_calculated_attributes
     self.registration_info ||= {}
   end
 
   def update_associations
+    pp "update_associations skip: '#{@skip_update_associations}', persist: #{persisted?} #{deleted_at}"
+    return true if @skip_update_associations
+    pp "below"
     create_or_update_bike_organizations
     return true if skip_after_user_change_worker
     AfterUserChangeWorker.perform_async(user_id)
