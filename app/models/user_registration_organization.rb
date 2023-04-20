@@ -88,9 +88,7 @@ class UserRegistrationOrganization < ApplicationRecord
   end
 
   def update_associations
-    pp "update_associations skip: '#{@skip_update_associations}', persist: #{persisted?} #{deleted_at}"
     return true if @skip_update_associations
-    pp "below"
     create_or_update_bike_organizations
     return true if skip_after_user_change_worker
     AfterUserChangeWorker.perform_async(user_id)

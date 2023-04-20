@@ -501,7 +501,6 @@ RSpec.describe GraduatedNotification, type: :model do
           ActionMailer::Base.deliveries = []
           expect(GraduatedNotification.count).to eq 2
           Sidekiq::Testing.inline! do
-            pp "HEEEEERRRREEEEEEEE"
             expect(graduated_notification1.process_notification).to be_truthy
           end
           graduated_notification1.reload
