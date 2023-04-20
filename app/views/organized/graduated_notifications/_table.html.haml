@@ -54,8 +54,7 @@
                 = link_to organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: associated_notification.organization_id)
         - unless skip_status
           %td
-            %em
-              = status_display(graduated_notification.status_humanized&.titleize)
+            = status_display(graduated_notification.status_humanized&.titleize)
         - unless skip_email
           %td
             = graduated_notification.email

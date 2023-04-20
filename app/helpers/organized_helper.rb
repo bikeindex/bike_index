@@ -69,21 +69,26 @@ module OrganizedHelper
     ].include?([controller_name, action_name])
   end
 
-  # This is duplicated in parking_notifications.js
-  def status_display(status)
-    status_str = status.tr("_", " ")
+  def status_display_class(status)
     case status.downcase
     when "current", "paging", "being_helped"
-      content_tag(:span, status_str, class: "text-success")
+      "text-success"
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated"
-      content_tag(:span, status_str.gsub("otherwise", ""), class: "text-info")
+      "text-info"
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/
-      content_tag(:span, status_str, class: "text-danger")
+      "text-danger"
     when "stolen"
-      content_tag(:span, status_str, class: "text-warning")
+      "text-warning"
     else
-      content_tag(:span, status_str, class: "less-strong")
+      "less-strong"
     end
+  end
+
+  # This is (roughly) duplicated in parking_notifications.js
+  def status_display(status)
+    status_str = status.tr("_", " ")
+    status_str.gsub!(/ otherwise/i, "") if status_str.match?(/resolved otherwise/i)
+    content_tag(:span, status_str, class: status_display_class(status))
   end
 
   # Might make this more fancy sometime, but... for now, good enough

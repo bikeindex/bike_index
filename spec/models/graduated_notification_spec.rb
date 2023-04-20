@@ -466,6 +466,9 @@ RSpec.describe GraduatedNotification, type: :model do
           AfterUserChangeWorker.new.perform(user.id)
         end
         expect(bike1.reload.bike_organizations.count).to eq 0
+        expect(bike1.graduated?).to be_truthy
+        expect(bike1.graduated?(organization)).to be_truthy
+        expect(bike1.graduated?(Organization.new)).to be_falsey
         expect(UserRegistrationOrganization.count).to eq 0
         expect(graduated_notification1.user_registration_organization&.id).to eq user_registration_organization.id
         graduated_notification1.mark_remaining!
