@@ -92,8 +92,8 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
     context "graduated_notification" do
       it "info for approved, red for denied" do
-        expect(status_display("marked not graduated")).to eq "<span class=\"less-strong\">marked not graduated</span>"
-        expect(status_display("Marked NOT Graduated")).to eq "<span class=\"less-strong\">Marked NOT Graduated</span>"
+        expect(status_display("remains registered")).to eq "<span class=\"less-strong\">remains registered</span>"
+        expect(status_display("REMAINS registered")).to eq "<span class=\"less-strong\">REMAINS registered</span>"
         expect(status_display("bike Graduated")).to eq "<span class=\"text-info\">bike Graduated</span>"
       end
     end

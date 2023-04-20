@@ -50,7 +50,7 @@ class GraduatedNotification < ApplicationRecord
   def self.status_humanized(str)
     return nil unless str.present?
     str = str.to_s
-    return "marked not graduated" if str == "marked_remaining"
+    return "remains registered" if str == "marked_remaining"
     str.humanize.downcase
   end
 

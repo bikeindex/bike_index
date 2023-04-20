@@ -78,7 +78,7 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification.reload
         expect(graduated_notification).to be_valid
         expect(graduated_notification.status).to eq "marked_remaining"
-        expect(graduated_notification.status_humanized).to eq "marked not graduated"
+        expect(graduated_notification.status_humanized).to eq "remains registered"
         expect(graduated_notification.bike_graduated?).to be_falsey
         expect(graduated_notification.processed?).to be_truthy
         expect(graduated_notification.user).to be_blank
