@@ -20,7 +20,14 @@
               = l(@graduated_notification.created_at, format: :convert_time)
         %tr
           %td Status
-          %td= status_display(@graduated_notification.status_humanized)
+          %td
+            %span{class: status_display_class(@graduated_notification.status_humanized)}
+              = @graduated_notification.status_humanized.titleize
+              - if @graduated_notification.status == "marked_remaining"
+                \- remained registered with #{@graduated_notification.organization&.short_name || "organization"}
+            - if @graduated_notification.status == "bike_graduated"
+              %small.less-strong
+                no longer registered with #{@graduated_notification.organization&.short_name || "organization"}
 
         - if @graduated_notification.processed? && @graduated_notification.processed_at.present?
           %tr

@@ -1,5 +1,11 @@
 - show_sticker_modal = false
-
+- if passive_organization.enabled?("graduated_notifications") && @bike.graduated?(passive_organization)
+  %h5.mt-4
+    %strong.text-warning This is a graduated #{@bike.type}
+    %span.text-dark
+      \- it is no longer registered with #{passive_organization.short_name}
+    %em.small.less-strong
+      it was registered with #{passive_organization.short_name} previously
 .card.organized-access-panel
   .card-block
     .card-title
@@ -280,7 +286,6 @@
           %strong Previously impounded
           \- #{link_to "view impound records", organization_impound_records_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id, search_status: "all")}!
 
-- # TODO: add translations
 - if passive_organization.enabled?("graduated_notifications")
   - graduated_notifications = @bike.graduated_notifications(passive_organization).order(id: :desc)
   - if graduated_notifications.any?

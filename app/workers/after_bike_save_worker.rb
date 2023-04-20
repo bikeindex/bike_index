@@ -79,8 +79,9 @@ class AfterBikeSaveWorker < ApplicationWorker
   end
 
   def create_user_registration_organizations(bike)
-    return unless bike.reload.user.present?
+    return if bike.reload.user.blank?
     bike.bike_organizations.each do |bike_organization|
+      # If there is notification that is graduated for the organization, don't create new reg organizations
       organization = bike_organization.organization
       next if organization.blank? || UserRegistrationOrganization.unscoped
         .where(user_id: bike.user.id, organization_id: organization.id).any?

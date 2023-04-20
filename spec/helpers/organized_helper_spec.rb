@@ -59,6 +59,7 @@ RSpec.describe OrganizedHelper, type: :helper do
     it "renders text-success" do
       expect(status_display("current")).to eq "<span class=\"text-success\">current</span>"
       expect(status_display("Current")).to eq "<span class=\"text-success\">Current</span>"
+      expect(status_display_class("Current")).to eq "text-success"
     end
     it "renders text-warning" do
       expect(status_display("stolen")).to eq "<span class=\"text-warning\">stolen</span>"
@@ -67,7 +68,7 @@ RSpec.describe OrganizedHelper, type: :helper do
       it "is blue" do
         expect(status_display("retrieved_by_owner")).to eq "<span class=\"text-info\">retrieved by owner</span>"
         expect(status_display("Retrieved")).to eq "<span class=\"text-info\">Retrieved</span>"
-        expect(status_display("resolved_otherwise")).to eq "<span class=\"text-info\">resolved </span>"
+        expect(status_display("resolved_otherwise")).to eq "<span class=\"text-info\">resolved</span>"
       end
     end
     context "removed_from_bike_index, trashed or Removed from Bike Index" do
@@ -92,9 +93,10 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
     context "graduated_notification" do
       it "info for approved, red for denied" do
-        expect(status_display("marked not graduated")).to eq "<span class=\"less-strong\">marked not graduated</span>"
-        expect(status_display("Marked NOT Graduated")).to eq "<span class=\"less-strong\">Marked NOT Graduated</span>"
+        expect(status_display("remains registered")).to eq "<span class=\"less-strong\">remains registered</span>"
+        expect(status_display("REMAINS registered")).to eq "<span class=\"less-strong\">REMAINS registered</span>"
         expect(status_display("bike Graduated")).to eq "<span class=\"text-info\">bike Graduated</span>"
+        expect(status_display_class("bike Graduated")).to eq "text-info"
       end
     end
   end

@@ -452,6 +452,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification1.processed?).to be_falsey
         expect(graduated_notification1.send_email?).to be_truthy
         expect(graduated_notification1.user_registration_organization&.id).to eq user_registration_organization.id
+        expect(bike1.reload.bike_organizations.count).to eq 1
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
         expect(GraduatedNotification.count).to eq 1
@@ -466,6 +467,9 @@ RSpec.describe GraduatedNotification, type: :model do
           AfterUserChangeWorker.new.perform(user.id)
         end
         expect(bike1.reload.bike_organizations.count).to eq 0
+        expect(bike1.graduated?).to be_truthy
+        expect(bike1.graduated?(organization)).to be_truthy
+        expect(bike1.graduated?(Organization.new)).to be_falsey
         expect(UserRegistrationOrganization.count).to eq 0
         expect(graduated_notification1.user_registration_organization&.id).to eq user_registration_organization.id
         graduated_notification1.mark_remaining!
@@ -475,6 +479,52 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(bike1.reload.bike_organizations.count).to eq 1
         expect(UserRegistrationOrganization.count).to eq 1
         expect(UserRegistrationOrganization.unscoped.count).to eq 1
+      end
+      context "two bikes" do
+        let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, created_at: bike1.created_at + 1.hour) }
+        it "removes all_bikes" do
+          expect(user_registration_organization.reload.bikes.pluck(:id)).to eq([bike1.id, bike2.id])
+          AfterUserChangeWorker.new.perform(user.id)
+          graduated_notification1.save
+          # Manually create graduated_notification2 because whateves
+          graduated_notification2 = GraduatedNotification.create(bike_id: bike2.id, organization_id: organization.id)
+          expect(graduated_notification1.reload.user).to be_present
+          expect(graduated_notification1.processed?).to be_falsey
+          expect(graduated_notification1.primary_notification?).to be_truthy
+          expect(graduated_notification1.send_email?).to be_truthy
+          expect(graduated_notification1.user_registration_organization&.id).to eq user_registration_organization.id
+          expect(graduated_notification2.reload.primary_notification?).to be_falsey
+          expect(graduated_notification2.user_registration_organization&.id).to eq user_registration_organization.id
+          expect(bike1.reload.bike_organizations.count).to eq 1
+          expect(bike2.reload.bike_organizations.count).to eq 1
+          Sidekiq::Worker.clear_all
+          ActionMailer::Base.deliveries = []
+          expect(GraduatedNotification.count).to eq 2
+          Sidekiq::Testing.inline! do
+            expect(graduated_notification1.process_notification).to be_truthy
+          end
+          graduated_notification1.reload
+          expect(graduated_notification1.status).to eq "bike_graduated"
+          expect(graduated_notification1.processed?).to be_truthy
+          expect(graduated_notification1.send_email?).to be_truthy
+          # This was failing, fixed in #2346
+          expect(bike1.reload.bike_organizations.count).to eq 0
+          expect(bike1.graduated?(organization)).to be_truthy
+          expect(bike2.reload.bike_organizations.count).to eq 0
+          expect(bike2.graduated?(organization)).to be_truthy
+          expect(UserRegistrationOrganization.count).to eq 0
+          expect(graduated_notification1.user_registration_organization&.id).to eq user_registration_organization.id
+          graduated_notification1.mark_remaining!
+          Sidekiq::Testing.inline! do
+            graduated_notification1.mark_remaining!
+          end
+          expect(bike1.reload.bike_organizations.count).to eq 1
+          expect(bike1.graduated?(organization)).to be_falsey
+          expect(bike2.reload.bike_organizations.count).to eq 1
+          expect(bike2.graduated?(organization)).to be_falsey
+          expect(UserRegistrationOrganization.count).to eq 1
+          expect(UserRegistrationOrganization.unscoped.count).to eq 1
+        end
       end
     end
     context "bike created inside of notification interval" do
@@ -514,6 +564,9 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.user_id).to eq user.id
         expect(graduated_notification2.status).to eq "pending"
         expect(graduated_notification2.processed?).to be_falsey
+        expect(graduated_notification1.user_registration_organization&.id).to be_blank
+        expect(bike1.reload.bike_organizations.count).to eq 1
+        expect(bike2.reload.bike_organizations.count).to eq 1
 
         graduated_notification1.process_notification
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -523,6 +576,8 @@ RSpec.describe GraduatedNotification, type: :model do
         graduated_notification2.reload
         expect(graduated_notification2.processed?).to be_truthy
         expect(graduated_notification2.bike_graduated?).to be_truthy
+        expect(bike1.reload.bike_organizations.count).to eq 0
+        expect(bike2.reload.bike_organizations.count).to eq 0
 
         # And then we create another bike after the notification has been processed - it's no longer added in there
         _bike3 = FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization)

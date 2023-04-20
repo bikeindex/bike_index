@@ -399,7 +399,8 @@ class Bike < ApplicationRecord
   end
 
   def graduated?(org = nil)
-    graduated_notifications(org).bike_graduated.any?
+    g_notifications = org.present? ? graduated_notifications(org) : GraduatedNotification.where(bike_id: id)
+    g_notifications.bike_graduated.any?
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably
