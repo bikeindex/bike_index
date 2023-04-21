@@ -90,13 +90,11 @@
 
       strong {
         @extend .header-font;
+        @extend .uncap;
 
         color: white;
       }
     }
-  }
-  #write_them_a_message .btn {
-    display: block;
   }
 
   .claim-message-org-avatar {
