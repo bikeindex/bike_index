@@ -1148,7 +1148,7 @@ en:
       choose_country: Choose country
       city: City
       claimed: Claimed
-      contact_the_owner: Contact the owner
+      contact_the_owner_it_is_stolen: "to the owner of this %{bike_type} that you believe is stolen."
       creation_description: Source
       creator: Creator
       edit: Edit
@@ -1190,7 +1190,7 @@ en:
       where_did_you_see_this_bike: >-
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
-      write_them_a_message: Write them a message
+      write_them_a_message: Write a message
       zipcode: Postal code
     pdf:
       bike_description: 'Bike description:'
