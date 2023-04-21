@@ -29,6 +29,9 @@
     - graduated_notifications.each do |graduated_notification|
       %tr
         %td
+          - if display_dev_info?
+            -# Render the actual ID, so it can be compared with the linked id
+            %small.only-dev-visible= graduated_notification.id
           -# NOTE: we permit viewing the non-primary notifications, but only link to the primary ones here
           - notification_link = graduated_notification.primary_notification_id.present? ? graduated_notification.primary_notification_id : graduated_notification.id
           %a.convertTime.preciseTime{href: organization_graduated_notification_path(notification_link.to_param, organization_id: graduated_notification.organization_id)}
