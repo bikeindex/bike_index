@@ -180,25 +180,25 @@
                 = t(".unable_to_display_additional_information", bike_type: @bike.type, org_name: passive_organization.name)
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
-            %p
+            %p.mb-2
               %em= t(".bike_not_marked_stolen", bike_type: @bike.type_titleize)
               %strong= t(".believe_it_is_anyway")
             - if @bike.contact_owner?(current_user)
               - redirect = new_session_url(return_to: bike_path(@bike, params: {contact_owner: true})) unless current_user.present?
               #write_them_a_message.collapse{class: ("in" unless @contact_owner_open), data: {redirect: redirect}}
                 %a{href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse'}
-                  = t(".write_them_a_message")
+                  = t(".write_a_message")
                 = t(".contact_the_owner_it_is_stolen", bike_type: @bike.type)
 
               .collapse#new_stolen_message{class: ("in" if @contact_owner_open)}
                 - @stolen_notification ||= StolenNotification.new(bike: @bike, sender: current_user)
                 = form_for @stolen_notification do |f|
                   = f.hidden_field :bike_id, value: @bike.id
-                  = f.text_field :reference_url, placeholder: t(".link_url_for_online_sighting"), class: "form-control additional-field"
                   - if current_user.ambassador?
                     = f.text_area :message, required: true, value: @stolen_notification.default_message, rows: 6, class: "form-control"
                   - else
                     = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
+                  = f.text_field :reference_url, placeholder: t(".link_url_for_online_sighting"), class: "form-control additional-field"
 
                   .send-message
                     = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
