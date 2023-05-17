@@ -15,7 +15,7 @@ RSpec.describe BikeGeojsoner do
           type: "Feature",
           properties: {
             id: bike.id,
-            color: "#BD1622"
+            at: date_stolen.strftime("%Y-%m-%d")
           },
           geometry: {
             type: "Point",
