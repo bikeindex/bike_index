@@ -35,7 +35,7 @@ class BikeIndex.BikesShow extends BikeIndex
       $('#initial-open-modal').modal('show')
 
     # Hide the message button after click
-    $('#write_them_a_message').click (e) ->
+    $('#write_them_a_message a').click (e) ->
       $target = $(e.target).parents('#write_them_a_message')
       if $target.data('redirect')
         window.location = $target.data('redirect')

@@ -1830,7 +1830,6 @@ nl:
       bike_is_registered: Deze %{bike_type} is geregistreerd bij %{org_name}
       bike_not_marked_stolen: "%{bike_type} is niet gemarkeerd als gestolen."
       claimed: beweerde
-      contact_the_owner: Neem contact op met de eigenaar
       creator: Schepper
       edit: Bewerken
       email_to_deal_with_this_html: E-mail %{support_link} om dit aan te pakken.
@@ -1865,7 +1864,6 @@ nl:
       where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als u contact
         opneemt over een advertentie die u online hebt gevonden, neemt u een link
         op in het onderstaande veld
-      write_them_a_message: Schrijf ze een bericht
       organization_child: Child organisatie
       organization_registered: Organisatie
       address_or_intersection: Adres of kruispunt
@@ -1886,6 +1884,9 @@ nl:
       additional_registrations_registered_at: Geregistreerd bij
       additional_registrations_this_bike: Deze %{bike_type}
       creation_description: Bron
+      contact_the_owner_it_is_stolen: aan de eigenaar van deze %{bike_type} waarvan
+        u denkt dat deze is gestolen.
+      write_a_message: Schrijf een bericht
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
