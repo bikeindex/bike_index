@@ -312,6 +312,21 @@ RSpec.describe BikeSticker, type: :model do
         expect(BikeSticker.lookup_with_fallback("CAL 99 9 8", organization_id: organization2.id)).to eq bike_sticker2
       end
     end
+    context "organization_id in code" do
+      # NOTE: this fixes batch #42, which was printed without the ? between the code and organization_id
+      let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "SB0001") }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "SB0001", organization: organization) }
+      it "finds the sticker" do
+        expect(bike_sticker2).to be_valid
+        expect(bike_sticker2.organization_id).to_not eq bike_sticker.organization_id
+        expect(BikeSticker.lookup_with_fallback("SB0001")&.id).to eq bike_sticker2.id
+        expect(BikeSticker.lookup_with_fallback("SB0001")&.id).to eq bike_sticker2.id
+        expect(BikeSticker.lookup_with_fallback("SB0001", organization_id: organization.id)&.id).to eq bike_sticker.id
+        expect(BikeSticker.lookup_with_fallback("SB1", organization_id: organization.id)&.id).to eq bike_sticker.id
+        expect(BikeSticker.lookup_with_fallback("SB0001organization_id=#{organization.id}")&.id).to eq bike_sticker.id
+        expect(BikeSticker.lookup_with_fallback("SB01organization_id=#{organization.id}")&.id).to eq bike_sticker.id
+      end
+    end
   end
 
   describe "duplication and integers" do

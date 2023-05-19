@@ -384,6 +384,12 @@ RSpec.describe BikesController, type: :request do
       expect(response).to redirect_to("/bikes/UC01101/scanned")
       get "/bikes/scannedUC01101?organization_id=UCLA"
       expect(response).to redirect_to("/bikes/UC01101/scanned?organization_id=UCLA")
+      # NOTE: this fixes batch #42, which was another printing fuckup
+      # We have to assume these stickers will always be around too :/
+      get "/bikes/scanned/UC01101organization_id=UCLA"
+      expect(response).to render_template("scanned")
+      expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
+      expect(assigns(:organization))
     end
     context "UI" do
       let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "UI1101", organization: organization) }
