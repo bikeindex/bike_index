@@ -70,6 +70,10 @@ class BikeSticker < ApplicationRecord
   # Similar to lookup, but attempts to find the sticker even if it isn't an exact match
   def self.lookup_with_fallback(str, organization_id: nil, user: nil)
     return nil unless str.present?
+    # Fix sticker misprint
+    if organization_id.blank? && str.match?(/organization_id=/)
+      str, organization_id = str.split("organization_id=")
+    end
     matching_codes = code_integer_and_prefix_search(str)
     bike_sticker ||= matching_codes.organization_search(organization_id).first
     return bike_sticker if bike_sticker.present?
