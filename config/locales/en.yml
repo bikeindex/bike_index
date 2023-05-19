@@ -698,7 +698,8 @@ en:
         e_skateboard: E-Skateboard
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: Personal mobility device (electric scooter, etc)
+        personal-mobility: Personal mobility device (electric scooter, etc)
+        non-e-scooter: "Non-electric Scooter"
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike

@@ -351,12 +351,12 @@ RSpec.describe "BikesController#create", type: :request do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           expect {
-            post base_url, params: {bike: bike_params}
+            post base_url, params: {bike: bike_params.merge(cycle_type: "non-e-scooter")}
           }.to change(Bike, :count).by(1)
         end
         expect(flash[:success]).to be_present
         new_bike = Bike.last
-        expect_attrs_to_match_hash(new_bike, testable_bike_params)
+        expect_attrs_to_match_hash(new_bike, testable_bike_params.merge(cycle_type: "non-e-scooter"))
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.user_id).to eq current_user.id
         expect(new_bike.ownerships.count).to eq 1
@@ -396,6 +396,7 @@ RSpec.describe "BikesController#create", type: :request do
         owner_email: "something@stuff.COM   ",
         phone: "312.379.9513",
         student_id: " ",
+        cycle_type: "personal-mobility",
         bike_code: "ed001"
       }
     end
@@ -416,6 +417,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.status).to eq "status_with_owner"
       expect(new_bike.phone).to eq "3123799513"
       expect(new_bike.student_id).to eq nil
+      expect(new_bike.cycle_type).to eq "personal-mobility"
 
       expect(new_bike.current_ownership.organization&.id).to eq organization.id
       expect(new_bike.current_ownership.origin).to eq "embed_extended"
