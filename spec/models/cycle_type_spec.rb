@@ -19,4 +19,19 @@ RSpec.describe CycleType, type: :model do
       end
     end
   end
+
+  describe "enum vals" do
+    it "has all different values" do
+      values = CycleType::SLUGS.values
+      expect(values.uniq).to eq values
+    end
+  end
+
+  describe "slugify" do
+    CycleType::SLUGS.keys.each do |slug|
+      it "finds" do
+        expect(Slugifyer.slugify(slug)).to eq slug.to_s
+      end
+    end
+  end
 end
