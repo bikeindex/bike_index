@@ -44,7 +44,7 @@ class CycleType
     "e-scooter": "E-Scooter",
     "e-skateboard": "E-skateboard",
     "personal-mobility": "Personal mobility device (electric unicycle, etc)",
-    "non-e-scooter": "Non-electric Scooter"
+    "non-e-scooter": "Scooter (Not electric)"
   }.freeze
 
   def initialize(slug)
