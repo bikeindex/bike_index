@@ -104,7 +104,7 @@ RSpec.describe GraduatedNotification, type: :model do
         bike.reload
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         expect(bike.graduated?(organization)).to be_falsey
-        expect(bike.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification.id])
+        expect(bike.organization_graduated_notifications(organization).pluck(:id)).to eq([graduated_notification.id])
       end
     end
   end
@@ -141,7 +141,7 @@ RSpec.describe GraduatedNotification, type: :model do
     let!(:graduated_notification1) { FactoryBot.create(:graduated_notification, :marked_remaining, bike: bike1, organization: organization) }
     it "finds bikes to notify" do
       bike1.reload
-      expect(bike1.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification1.id])
+      expect(bike1.organization_graduated_notifications(organization).pluck(:id)).to eq([graduated_notification1.id])
       expect(bike3.organizations.pluck(:organization_id).count).to eq 1
       expect(bike3.organizations.pluck(:organization_id).first).to_not eq organization.id
       bike_organization1.reload

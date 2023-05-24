@@ -104,7 +104,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to match_array([bike.id])
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         expect(bike.graduated?(organization)).to be_falsey
-        expect(bike.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification_remaining_expired.id])
+        expect(bike.organization_graduated_notifications(organization).pluck(:id)).to eq([graduated_notification_remaining_expired.id])
         Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
@@ -164,7 +164,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         bike2.reload
         expect(bike2.organizations.pluck(:id)).to eq([organization.id])
         expect(bike2.graduated?(organization)).to be_falsey
-        expect(bike2.graduated_notifications(organization).pluck(:id)).to match_array([graduated_notification2_remaining_expired.id, graduated_notification2.id])
+        expect(bike2.organization_graduated_notifications(organization).pluck(:id)).to match_array([graduated_notification2_remaining_expired.id, graduated_notification2.id])
 
         expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([])
         expect(GraduatedNotification.bikes_to_notify_expired_notifications(organization).pluck(:id)).to eq([bike.id])

@@ -49,6 +49,7 @@ class Bike < ApplicationRecord
   has_many :impound_records
   has_many :impound_claims_claimed, through: :impound_records, source: :impound_claims
   has_many :parking_notifications
+  has_many :graduated_notifications
   has_many :notifications
   has_many :theft_alerts
 
@@ -392,13 +393,13 @@ class Bike < ApplicationRecord
     end
   end
 
-  def graduated_notifications(org = nil)
+  def organization_graduated_notifications(org = nil)
     g_notifications = GraduatedNotification.where(bike_id: id)
     org.present? ? g_notifications.where(organization_id: org.id) : g_notifications
   end
 
   def graduated?(org = nil)
-    graduated_notifications(org).bike_graduated.any?
+    organization_graduated_notifications(org).bike_graduated.any?
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably
