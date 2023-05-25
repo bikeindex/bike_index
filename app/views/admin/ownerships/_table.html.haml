@@ -25,7 +25,7 @@
       %th
         %small Current?
       %th
-        %small Claimed?
+        %small Claimed
       %th.d-none.d-md-table-cell
         %small User&nbsp;hidden
     %tbody
@@ -68,7 +68,12 @@
             = ownership.organization&.name
           %td.table-cell-check
             = check_mark if ownership.current
-          %td.table-cell-check
-            = check_mark if ownership.claimed
+          %td
+            - if ownership.claimed
+              - if ownership.claimed_at.present?
+                %span.convertTime
+                  = l ownership.claimed_at, format: :convert_time
+              - else
+                %small.less-strong unknown time
           %td.table-cell-check.d-none.d-md-table-cell
             = check_mark if ownership.user_hidden

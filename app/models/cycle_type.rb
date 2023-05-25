@@ -20,7 +20,8 @@ class CycleType
     "pedi-cab": 15,
     "e-scooter": 16,
     "e-skateboard": 17,
-    personal_mobility: 18
+    "personal-mobility": 18,
+    "non-e-scooter": 19
   }.freeze
 
   NAMES = {
@@ -42,7 +43,8 @@ class CycleType
     "pedi-cab": "Pedi Cab (rickshaw)",
     "e-scooter": "E-Scooter",
     "e-skateboard": "E-skateboard",
-    personal_mobility: "Personal mobility device (electric unicycle, etc)"
+    "personal-mobility": "Personal mobility device (electric unicycle, etc)",
+    "non-e-scooter": "Scooter (Not electric)"
   }.freeze
 
   def initialize(slug)
