@@ -3,8 +3,9 @@ class MigrateBlankExtraRegistrationNumberWorker < ApplicationWorker
 
   def perform(bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)
-    updated_extra_registration_number = ParamsNormalizer.strip_or_nil_if_blank(bike.extra_registration_number)
-    return if bike.extra_registration_number == updated_extra_registration_number
-    bike.update_column(:extra_registration_number, updated_extra_registration_number)
+
+    if bike.extra_registration_number.match?(/(serial.)?#{bike.serial_number}/i)
+      bike.update_column(extra_registration_number: nil)
+    end
   end
 end
