@@ -5,7 +5,7 @@ class MigrateBlankExtraRegistrationNumberWorker < ApplicationWorker
     bike = Bike.unscoped.find_by_id(bike_id)
     return if bike.extra_registration_number.blank?
     if bike.extra_registration_number.match?(/(serial.)?#{bike.serial_number}/i)
-      bike.update_column(extra_registration_number: nil)
+      bike.update_column :extra_registration_number, nil
     end
   end
 end
