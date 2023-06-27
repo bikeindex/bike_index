@@ -749,7 +749,7 @@ class Bike < ApplicationRecord
     self.name = name.present? ? name.strip : nil
     self.extra_registration_number = ParamsNormalizer.strip_or_nil_if_blank(extra_registration_number)
     if extra_registration_number.present?
-      self.extra_registration_number = nil if extra_registration_number.downcase == "serial:#{serial_number.downcase}"
+      self.extra_registration_number = nil if extra_registration_number.match?(/(serial.)?#{serial_number}/i)
     end
   end
 
