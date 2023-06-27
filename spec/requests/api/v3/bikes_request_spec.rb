@@ -464,7 +464,7 @@ RSpec.describe "Bikes API V3", type: :request do
         is_for_sale: true,
         is_bulk: true,
         is_new: true,
-        extra_registration_number: " ",
+        extra_registration_number: "serial:#{bike_attrs[:serial]}",
         is_pos: true,
         bike_sticker: bike_sticker.code.downcase,
         external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
@@ -503,10 +503,14 @@ RSpec.describe "Bikes API V3", type: :request do
 
     it "doesn't send an email" do
       ActionMailer::Base.deliveries = []
-      post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(no_notify: true).to_json, headers: json_headers
+      post "/api/v3/bikes?access_token=#{token.token}",
+        params: bike_attrs.merge(no_notify: true, extra_registration_number: " ").to_json,
+        headers: json_headers
       EmailOwnershipInvitationWorker.drain
       expect(ActionMailer::Base.deliveries).to be_empty
       expect(response.code).to eq("201")
+      bike = Bike.last
+      expect(bike.extra_registration_number).to be_nil
     end
 
     it "creates an example bike" do
