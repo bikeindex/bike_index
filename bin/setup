@@ -23,7 +23,7 @@ chdir APP_ROOT do
   system('bin/yarn')
 
   puts "\n== Preparing and seeding database =="
-  system "bin/rake db:create db:structure:load db:seed"
+  system "bin/rake db:create db:schema:load db:seed"
   system "bin/rake seed_test_users_and_bikes"
   system "bin/rake dev:seed_counts"
 
