@@ -16,6 +16,7 @@ class BulkImport < ApplicationRecord
 
   scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
   scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
+  scope :ascend_errors, -> { where("(import_errors -> 'ascend') is not null") }
   scope :import_errors, -> { file_errors.or(line_errors) }
   scope :no_import_errors, -> { where("(import_errors -> 'line') is null").where("(import_errors -> 'file') is null") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }

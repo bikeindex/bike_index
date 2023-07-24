@@ -70,14 +70,20 @@ class Admin::BulkImportsController < Admin::BaseController
       bulk_imports = bulk_imports.not_ascend
     end
 
+    def error_kinds
+      %w[file_error line_error no_error ascend_error]
+    end
+
     if params[:search_errors].present?
-      @search_errors = %w[file_error line_error no_error].include?(params[:search_errors]) ? params[:search_errors] : "any_error"
+      @search_errors = error_kinds.include?(params[:search_errors]) ? params[:search_errors] : "any_error"
       bulk_imports = if params[:search_errors] == "file_error"
         bulk_imports.file_errors
       elsif params[:search_errors] == "line_error"
         bulk_imports.line_errors
       elsif params[:search_errors] == "no_error"
         bulk_imports.no_import_errors
+      elsif params[:search_errors] == "ascend_error"
+        bulk_imports.ascend_errors
       else
         bulk_imports.import_errors
       end

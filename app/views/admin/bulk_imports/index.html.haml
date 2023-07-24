@@ -16,6 +16,7 @@
           .dropdown-divider
           = link_to "File Error (fully blocks import)", url_for(sortable_search_params.merge(search_errors: "file_error")), class: "dropdown-item #{@search_errors == 'file_error' ? 'active' : ''}"
           = link_to "Line Error", url_for(sortable_search_params.merge(search_errors: "line_error")), class: "dropdown-item #{@search_errors == 'line_error' ? 'active' : ''}"
+          = link_to "Ascend error", url_for(sortable_search_params.merge(search_errors: "ascend_error")), class: "dropdown-item #{@search_errors == 'ascend_error' ? 'active' : ''}"
           = link_to "Any Error", url_for(sortable_search_params.merge(search_errors: "any_error")), class: "dropdown-item #{@search_errors == 'any_error' ? 'active' : ''}"
       %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@progress != "all" ? "active" : "") }
@@ -25,9 +26,6 @@
           .dropdown-divider
           - BulkImport.progresses.each do |progress|
             = link_to progress.humanize, url_for(sortable_search_params.merge(search_progress: progress)), class: "dropdown-item #{@progress == progress ? 'active' : '' }"
-      %li.nav-item
-        - all_active = (params.keys & %w[search_ascend search_not_ascend organization_id search_errors]).blank?
-        = link_to "All", admin_bulk_imports_path(sortable_search_params), class: "nav-link #{all_active ? 'active' : ''}"
       %li.nav-item
         = link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
       %li.nav-item
