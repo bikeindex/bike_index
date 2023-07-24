@@ -4,6 +4,8 @@
       Bulk Imports
   .col-md-6
     %ul
+      %li.nav-item
+        = link_to "org count", url_for(sortable_search_params.merge(search_org_count: !@org_count)), class: "nav-link #{@org_count ? 'active' : ''}"
       %li.nav-item.dropdown
         - search_errors_text = @search_errors || "With and without errors"
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_errors.present? ? "active" : "") }
@@ -36,6 +38,26 @@
   = render partial: "/shared/admin_current_header", locals: { viewing: "Bulk imports" }
 
 = column_chart time_range_counts(collection: matching_bulk_imports), stacked: true, thousands: ","
+
+- if @org_count
+  .col-sm-6.offset-sm-3.mt-4
+    .full-screen-table
+      %table.table.table-striped.table-bordered.table-sm
+        %thead
+          %th.text-left Organization
+          %th.text-right Imports
+        %tbody
+          - matching_bulk_imports.distinct.pluck(:organization_id).each do |id|
+            %tr
+              %td
+                - if id.present?
+                  - organization = Organization.find_by_id(id)
+                  = organization&.name || id
+                  = link_to link_emoji, admin_organization_path(id)
+                - else
+                  No organization
+              %td
+                = link_to admin_number_display(matching_bulk_imports.where(organization_id: id).count), url_for(sortable_search_params.merge(organization_id: id))
 
 .mt-4
   = render partial: "/shared/period_select"
