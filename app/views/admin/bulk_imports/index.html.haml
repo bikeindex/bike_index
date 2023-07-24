@@ -5,11 +5,12 @@
   .col-md-6
     %ul
       %li.nav-item.dropdown
-        - search_errors_text = @search_errors || "With and without error"
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_errors != "all" ? "active" : "") }
+        - search_errors_text = @search_errors || "With and without errors"
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_errors.present? ? "active" : "") }
           #{search_errors_text.titleize}
         .dropdown-menu
-          = link_to "With and without error", url_for(sortable_search_params.merge(search_errors: nil)), class: "dropdown-item #{@search_errors.blank? ? 'active' : ''}"
+          = link_to "With and without errors", url_for(sortable_search_params.merge(search_errors: nil)), class: "dropdown-item #{@search_errors.blank? ? 'active' : ''}"
+          = link_to "Without errors", url_for(sortable_search_params.merge(search_errors: "no_error")), class: "dropdown-item #{@search_errors == 'no_error' ? 'active' : ''}"
           .dropdown-divider
           = link_to "File Error (fully blocks import)", url_for(sortable_search_params.merge(search_errors: "file_error")), class: "dropdown-item #{@search_errors == 'file_error' ? 'active' : ''}"
           = link_to "Line Error", url_for(sortable_search_params.merge(search_errors: "line_error")), class: "dropdown-item #{@search_errors == 'line_error' ? 'active' : ''}"
