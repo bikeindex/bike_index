@@ -50,12 +50,13 @@
               %td
                 - if id.present?
                   - organization = Organization.find_by_id(id)
-                  = organization&.name || id
+                  = link_to organization&.name || id, url_for(sortable_search_params.merge(organization_id: id))
                   = link_to link_emoji, admin_organization_path(id)
                 - else
-                  No organization
+                  = link_to "No organization", url_for(sortable_search_params.merge(organization_id: "none"))
+                  %span.text-danger missing org!
               %td
-                = link_to admin_number_display(matching_bulk_imports.where(organization_id: id).count), url_for(sortable_search_params.merge(organization_id: id))
+                = admin_number_display(matching_bulk_imports.where(organization_id: id).count)
 
 .mt-4
   = render partial: "/shared/period_select"

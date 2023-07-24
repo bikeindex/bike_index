@@ -97,7 +97,11 @@ class Admin::BulkImportsController < Admin::BaseController
     end
 
     if params[:organization_id].present?
-      bulk_imports = bulk_imports.where(organization_id: current_organization.id)
+      bulk_imports = if current_organization.present?
+        bulk_imports.where(organization_id: current_organization.id)
+      else
+        bulk_imports.where(organization_id: nil)
+      end
     end
     @matching_bulk_imports = bulk_imports.where(created_at: @time_range)
   end
