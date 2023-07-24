@@ -137,6 +137,9 @@ class BulkImport < ApplicationRecord
       self.organization_id = organization_for_ascend_name&.id
       save if organization_id.present?
     end
+    if invalid_extension?
+      InvalidExtensionForAscendImportWorker.perform_async(id)
+    end
     return true if organization_id.present?
     import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
     save
@@ -172,12 +175,9 @@ class BulkImport < ApplicationRecord
     true
   end
 
-  def ensure_valid_file_type
+  def invalid_extension?
     extension = (local_file? ? file.path : file.url)&.split(".")&.last
-    if extension.present?
-      return true if VALID_FILE_EXTENSIONS.include?(extension)
-      add_file_error("Invalid file extension, must be .csv or .tsv")
-    end
+    extension.blank? || !VALID_FILE_EXTENSIONS.include?(extension)
   end
 
   # Because the way we load the file is different if it's remote or local
@@ -200,5 +200,11 @@ class BulkImport < ApplicationRecord
   def calculated_kind
     return "unorganized" if organization_id.blank?
     "organization_import" # Default
+  end
+
+  def ensure_valid_file_type
+    if invalid_extension?
+      add_file_error("Invalid file extension, must be .csv or .tsv")
+    end
   end
 end

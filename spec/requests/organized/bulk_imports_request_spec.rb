@@ -398,6 +398,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               # Make sure that the worker doesn't explode
               BulkImportWorker.drain
               expect(bulk_import.file_import_errors.join).to match(/file extension/)
+              expect(UnknownOrganizationForAscendImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              expect(InvalidExtensionForAscendImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
             end
           end
         end
