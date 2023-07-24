@@ -127,7 +127,7 @@ class BulkImport < ApplicationRecord
   end
 
   def ascend_name
-    file_filename.split("_-_").last.gsub(".csv", "")
+    file_filename.split("_-_").last.gsub(/\.\w{3,5}\z/, "")
   end
 
   def check_ascend_import_processable!

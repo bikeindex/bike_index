@@ -391,6 +391,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.user).to be_blank
               expect(bulk_import.file_url).to be_present
               expect(bulk_import.progress).to eq "finished"
+              expect(bulk_import.ascend_name).to eq "powered-by-bike-index"
               expect(bulk_import.organization).to be_blank
               expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
               expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
