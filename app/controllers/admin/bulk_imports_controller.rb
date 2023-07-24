@@ -63,10 +63,21 @@ class Admin::BulkImportsController < Admin::BaseController
   def matching_bulk_imports
     return @matching_bulk_imports if defined?(@matching_bulk_imports)
     bulk_imports = BulkImport
-    if params[:ascend].present?
+    if params[:search_ascend].present?
       bulk_imports = bulk_imports.ascend
-    elsif params[:not_ascend].present?
+    elsif params[:search_not_ascend].present?
       bulk_imports = bulk_imports.not_ascend
+    end
+
+    if params[:search_errors].present?
+      @search_errors = %w[file_error line_error].include?(params[:search_errors]) ? params[:search_errors] : "any_error"
+      bulk_imports = if params[:search_errors] == "file_error"
+        bulk_imports.file_errors
+      elsif params[:search_errors] == "line_error"
+        bulk_imports.line_errors
+      else
+        bulk_imports.file_or_line_errors
+      end
     end
 
     if BulkImport.progresses.include?(params[:search_progress])
