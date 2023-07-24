@@ -1,11 +1,13 @@
 class BulkImport < ApplicationRecord
   PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
+  VALID_FILE_EXTENSIONS = %(csv tsv).freeze
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
   belongs_to :user
   validates_presence_of :file, unless: :file_cleaned
+  validate :ensure_valid_file_type
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
@@ -14,6 +16,7 @@ class BulkImport < ApplicationRecord
 
   scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
   scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
+  scope :file_or_line_errors, -> { file_errors.or(line_errors) }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
   scope :not_ascend, -> { where.not(kind: "ascend") }
@@ -161,6 +164,14 @@ class BulkImport < ApplicationRecord
       import_errors["bikes"] = "none_imported"
     end
     true
+  end
+
+  def ensure_valid_file_type
+    extension = (local_file? ? file.path : file.url)&.split(".")&.last
+    if extension.present?
+      return true if VALID_FILE_EXTENSIONS.include?(extension)
+      add_file_error("Invalid file extension, must be .csv or .tsv")
+    end
   end
 
   # Because the way we load the file is different if it's remote or local

@@ -179,4 +179,4 @@ group :test do
   gem "webmock" # mocking for VCR
 end
 
-gem "dockerfile-rails", ">= 1.5", :group => :development
+gem "dockerfile-rails", ">= 1.5", group: :development
