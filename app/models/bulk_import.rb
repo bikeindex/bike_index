@@ -132,7 +132,10 @@ class BulkImport < ApplicationRecord
 
   def check_ascend_import_processable!
     self.import_errors = (import_errors || {}).except("ascend")
-    self.organization_id ||= organization_for_ascend_name&.id
+    if organization_id.blank?
+      self.organization_id = organization_for_ascend_name&.id
+      save if organization_id.present?
+    end
     return true if organization_id.present?
     import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
     save
