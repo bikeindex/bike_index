@@ -80,6 +80,7 @@ class BulkImport < ApplicationRecord
 
   def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
+    return if file_import_errors.present? && file_import_errors.include?(error_msg)
     updated_file_error_data = {
       "file" => [file_import_errors, error_msg.to_s].compact.flatten,
       "file_lines" => [file_import_error_lines, line_error].flatten

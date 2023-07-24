@@ -22,6 +22,9 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.finished?).to be_truthy
         expect(bulk_import.file_import_errors).to eq(["HTTP 404"])
         expect(bulk_import.starting_line).to eq 1 # If error doesn't have a line, it's still 1
+        # It doesn't do it again
+        bulk_import.add_file_error "HTTP 404"
+        expect(bulk_import.reload.file_import_errors).to eq(["HTTP 404"])
       end
     end
     context "existing errors - unlikely, but worth just to make sure" do
