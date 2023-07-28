@@ -65,9 +65,9 @@ jobs:
             curl -sSL "https://nodejs.org/download/release/v16.20.1/node-v16.20.1-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v16.20.1-linux-x64/bin/node
             # curl https://www.npmjs.com/install.sh | sudo bash
 
-      - type: cache-restore
-        name: "Dockerize: cache restore"
-        key: CACHE_V3-dockerize-0.6.1
+      - restore_cache:
+          name: "Dockerize: cache restore"
+          key: CACHE_V3-dockerize-0.6.1
 
       - run:
           name: "Dockerize: install"
@@ -86,9 +86,9 @@ jobs:
         paths:
           - ~/.cache/dockerize
 
-      - type: cache-restore
-        name: "Git: cache restore"
-        key: CACHE_V3-git-2.22.0
+      - restore_cache:
+          name: "Git: cache restore"
+          key: CACHE_V3-git-2.22.0
 
       - run:
           name: "Git: install"
@@ -127,9 +127,9 @@ jobs:
         paths:
           - ~/.cache/git/git-2.22.0
 
-      - type: cache-restore
-        name: "Hub: cache restore"
-        key: CACHE_V3-hub-2.12.3
+      - restore_cache:
+          name: "Hub: cache restore"
+          key: CACHE_V3-hub-2.12.3
 
       - run:
           name: "Hub: install"
@@ -151,11 +151,11 @@ jobs:
 
             sudo cp ${hub_binary} /usr/local/bin/hub
 
-      - type: cache-restore
-        name: "Hub: cache save"
-        key: CACHE_V3-hub-2.12.3
-        paths:
-          - ~/.cache/hub
+      - restore_cache:
+          name: "Hub: cache save"
+          key: CACHE_V3-hub-2.12.3
+          paths:
+            - ~/.cache/hub
 
       - run:
           name: "Bundler: install"
@@ -185,9 +185,9 @@ jobs:
           name: Sync translations (only on main by default)
           command: bin/check_translations
 
-      - type: cache-restore
-        name: "Node dependencies: cache restore"
-        key: CACHE_V3-yarn-{{ checksum "yarn.lock" }}
+      - restore_cache:
+          name: "Node dependencies: cache restore"
+          key: CACHE_V3-yarn-{{ checksum "yarn.lock" }}
 
       - run:
           name: "Node dependencies: install"
@@ -202,9 +202,9 @@ jobs:
         paths:
           - ~/.cache/yarn
 
-      - type: cache-restore
-        name: "Assets: cache restore"
-        key: CACHE_V3-assets-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          name: "Assets: cache restore"
+          key: CACHE_V3-assets-{{ .Environment.CIRCLE_SHA1 }}
 
       - run:
           name: "Assets: precompile"
