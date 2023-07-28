@@ -12,7 +12,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_f3b8CRpiEynZb9","request_duration_ms":197}}'
+      - '{"last_request_metrics":{"request_id":"req_6HZmrd0Bf4s3zY","request_duration_ms":173}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 26 Jun 2023 16:08:38 GMT
+      - Fri, 28 Jul 2023 20:24:46 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -45,7 +45,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_7OGie6UntCaAeh
+      - req_cKWka33YFOqavk
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-Routing-Context-Priority-Tier:
@@ -126,7 +126,7 @@ http_interactions:
           "url": null
         }
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:08:38 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:46 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmR9ccDp8JD2Mo
@@ -139,7 +139,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_7OGie6UntCaAeh","request_duration_ms":204}}'
+      - '{"last_request_metrics":{"request_id":"req_cKWka33YFOqavk","request_duration_ms":198}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -152,7 +152,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 26 Jun 2023 16:08:39 GMT
+      - Fri, 28 Jul 2023 20:24:46 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -172,7 +172,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_Ge0PpeysrQfape
+      - req_2peHFTYtXj1L1I
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-Routing-Context-Priority-Tier:
@@ -252,5 +252,5 @@ http_interactions:
           "test_clock": null
         }
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:08:39 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:46 GMT
 recorded_with: VCR 5.0.0

@@ -12,7 +12,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_8HbErvitZpOHRM","request_duration_ms":198}}'
+      - '{"last_request_metrics":{"request_id":"req_AfEbUlSLUri8aX","request_duration_ms":197}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 26 Jun 2023 16:08:41 GMT
+      - Fri, 28 Jul 2023 20:24:49 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -45,11 +45,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Idempotency-Key:
-      - f31283f2-1d4d-4bb6-a240-835eec20eb4a
+      - d2813bcf-fe56-4a5b-8ee5-4d19886ee0e3
       Original-Request:
-      - req_tYF342du8msiUl
+      - req_b6RIyV2ng5kl0o
       Request-Id:
-      - req_tYF342du8msiUl
+      - req_b6RIyV2ng5kl0o
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -62,7 +62,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1kU1Vgtt5V1fvgFqFZHTTcdnEEg7wEowkkVKBSFwrTyrvaCalud3NnAlh",
+          "id": "cs_test_a1sLfFOjNRhc9NBz5wMoclJ6j2cm6RLeFjkBN0niXnYL6lP9vfmaRzbVJx",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -77,7 +77,7 @@ http_interactions:
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1687795721,
+          "created": 1690575888,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -96,7 +96,7 @@ http_interactions:
             "tax_ids": null
           },
           "customer_email": null,
-          "expires_at": 1687882121,
+          "expires_at": 1690662288,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -113,7 +113,7 @@ http_interactions:
           "locale": null,
           "metadata": {},
           "mode": "payment",
-          "payment_intent": "pi_2NNHy1m0T0GBfX0v0fYXcvo5",
+          "payment_intent": "pi_2NYxDQm0T0GBfX0v1EjUFEla",
           "payment_link": null,
           "payment_method_collection": "always",
           "payment_method_options": {},
@@ -139,13 +139,13 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1kU1Vgtt5V1fvgFqFZHTTcdnEEg7wEowkkVKBSFwrTyrvaCalud3NnAlh#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1sLfFOjNRhc9NBz5wMoclJ6j2cm6RLeFjkBN0niXnYL6lP9vfmaRzbVJx#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:08:41 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:49 GMT
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1kU1Vgtt5V1fvgFqFZHTTcdnEEg7wEowkkVKBSFwrTyrvaCalud3NnAlh
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1sLfFOjNRhc9NBz5wMoclJ6j2cm6RLeFjkBN0niXnYL6lP9vfmaRzbVJx
     body:
       encoding: US-ASCII
       string: ''
@@ -155,7 +155,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_tYF342du8msiUl","request_duration_ms":553}}'
+      - '{"last_request_metrics":{"request_id":"req_b6RIyV2ng5kl0o","request_duration_ms":706}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -168,7 +168,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 26 Jun 2023 16:08:41 GMT
+      - Fri, 28 Jul 2023 20:24:49 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -188,7 +188,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_If4tetgT1QjLvV
+      - req_LMtFLWaq5mDjQQ
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-Routing-Context-Priority-Tier:
@@ -199,7 +199,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1kU1Vgtt5V1fvgFqFZHTTcdnEEg7wEowkkVKBSFwrTyrvaCalud3NnAlh",
+          "id": "cs_test_a1sLfFOjNRhc9NBz5wMoclJ6j2cm6RLeFjkBN0niXnYL6lP9vfmaRzbVJx",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -214,7 +214,7 @@ http_interactions:
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1687795721,
+          "created": 1690575888,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -233,7 +233,7 @@ http_interactions:
             "tax_ids": null
           },
           "customer_email": null,
-          "expires_at": 1687882121,
+          "expires_at": 1690662288,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -250,7 +250,7 @@ http_interactions:
           "locale": null,
           "metadata": {},
           "mode": "payment",
-          "payment_intent": "pi_2NNHy1m0T0GBfX0v0fYXcvo5",
+          "payment_intent": "pi_2NYxDQm0T0GBfX0v1EjUFEla",
           "payment_link": null,
           "payment_method_collection": "always",
           "payment_method_options": {},
@@ -276,10 +276,10 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1kU1Vgtt5V1fvgFqFZHTTcdnEEg7wEowkkVKBSFwrTyrvaCalud3NnAlh#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1sLfFOjNRhc9NBz5wMoclJ6j2cm6RLeFjkBN0niXnYL6lP9vfmaRzbVJx#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:08:41 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:49 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmR9ccDp8JD2Mo
@@ -292,7 +292,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_If4tetgT1QjLvV","request_duration_ms":212}}'
+      - '{"last_request_metrics":{"request_id":"req_LMtFLWaq5mDjQQ","request_duration_ms":206}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -305,7 +305,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 26 Jun 2023 16:08:41 GMT
+      - Fri, 28 Jul 2023 20:24:49 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -325,7 +325,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_rrTw2f46oqsVY2
+      - req_evyZ0u7GDcCm7Y
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-Routing-Context-Priority-Tier:
@@ -405,5 +405,5 @@ http_interactions:
           "test_clock": null
         }
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:08:41 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:49 GMT
 recorded_with: VCR 5.0.0

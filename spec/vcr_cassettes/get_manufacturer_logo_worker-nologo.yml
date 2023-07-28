@@ -24,28 +24,27 @@ http_interactions:
       - '1'
       Connection:
       - keep-alive
-      X-Content-Type-Options:
-      - nosniff
-      - nosniff
       Date:
-      - Mon, 26 Jun 2023 16:09:01 GMT
+      - Fri, 28 Jul 2023 20:24:42 GMT
       X-Envoy-Response-Flags:
       - "-"
       Server:
       - envoy
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 bc4ea6bb0c34991c678d2ee30fe9418e.cloudfront.net (CloudFront)
+      - 1.1 5e9f822a188dc082efd0a9d3918e7402.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
-      - SFO53-C1
+      - SFO53-P5
       X-Amz-Cf-Id:
-      - uewhLKtDgLqjl-0cf0xicXiCOJW9eY05WWVad7flCCQg0VgAW7_cCw==
+      - g-8syKyiBq3NP3ScjJii2941UMlrwWYzNkjrGqTXxDALc0CEWe82fQ==
     body:
       encoding: UTF-8
       string: "\n"
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:09:01 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:42 GMT
 recorded_with: VCR 5.0.0
