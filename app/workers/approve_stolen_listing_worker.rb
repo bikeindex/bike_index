@@ -1,7 +1,10 @@
 class ApproveStolenListingWorker < ApplicationWorker
   sidekiq_options queue: "notify", retry: 1
 
+  TWEETING_DISABLED = ENV["TWITTER_IS_FUCKED"].present?
+
   def perform(bike_id)
+    return if TWEETING_DISABLED
     bike = Bike.find(bike_id)
     new_tweet = TwitterTweeterIntegration.new(bike).create_tweet
     send_stolen_bike_alert_email(bike, new_tweet)
