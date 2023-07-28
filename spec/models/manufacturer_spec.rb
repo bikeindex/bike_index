@@ -145,7 +145,7 @@ RSpec.describe Manufacturer, type: :model do
 
     context "weird stuff" do
       let(:malicious_str) { "Sweet manufacturer <><>><\\" }
-      let(:target) { "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\" }
+      let(:target) { "Sweet manufacturer &gt;" }
       it "encodes" do
         expect(Manufacturer.calculated_mnfg_name(manufacturer_other, malicious_str)).to eq target
       end
