@@ -161,7 +161,7 @@ jobs:
           name: "Bundler: install"
           command: gem install bundler -v 2.3.16
 
-      restore_cache:
+      - restore_cache:
         name: "Ruby dependencies: cache restore"
         keys:
           - CACHE_V3-gems-{{ checksum "Gemfile.lock" }}
