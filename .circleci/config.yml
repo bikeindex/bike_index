@@ -163,7 +163,7 @@ jobs:
 
       - type: cache-restore
         name: "Ruby dependencies: cache restore"
-        key: CACHE_V3x-gems-{{ checksum "Gemfile.lock" }}
+        key: CACHE_V3-gems-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: "Ruby dependencies: install"
@@ -174,7 +174,7 @@ jobs:
 
       - type: cache-save
         name: "Ruby dependencies: cache save"
-        key: CACHE_V3x-gems-{{ checksum "Gemfile.lock" }}
+        key: CACHE_V3-gems-{{ checksum "Gemfile.lock" }}
         paths:
           - ~/.cache/bundle
 
