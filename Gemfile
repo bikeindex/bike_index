@@ -60,8 +60,7 @@ gem "sitemap_generator", "~> 6"
 # Making other files
 gem "mini_magick" # Required for image processing
 gem "carrierwave", "~> 0.11.2" # File uploader
-# On 2023-7-28, 0.4.2 (current version of carrierwave_backgrounder, released in 2015) raises a bunch of warnings
-# PR: github.com/lardawge/carrierwave_backgrounder/pull/307 fixes them. This is the version from that PR
+# See PR#2364 for more explanation, 2023-7-28
 gem "carrierwave_backgrounder", github: "bookingexperts/carrierwave_backgrounder", ref: "112ae70"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
