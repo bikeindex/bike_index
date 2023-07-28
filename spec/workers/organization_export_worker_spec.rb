@@ -180,7 +180,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         [
           "http://test.host/bikes/#{bike.id}",
           bike.created_at.utc,
-          "Sweet manufacturer &gt;",
+          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\",
           "\",,,\"<script>XSSSSS</script>",
           "Black, #{secondary_color.name}",
           bike.serial_number,
@@ -194,7 +194,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           nil # assigned_sticker
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
         expect(bike.reload.owner_name).to eq "George Smith"
         expect(bike.mnfg_name).to eq "Sweet manufacturer &gt;"
