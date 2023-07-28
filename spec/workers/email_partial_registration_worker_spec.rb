@@ -8,7 +8,7 @@ RSpec.describe EmailPartialRegistrationWorker, type: :job do
     ActionMailer::Base.deliveries = []
     EmailPartialRegistrationWorker.new.perform(b_param.id)
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
-    exect(Notification.count).to eq 1
+    expect(Notification.count).to eq 1
     notification = Notification.last
     expect(notification.notifiable).to eq b_param
     # expect(notification.creator_id).to eq b_param.creator_id

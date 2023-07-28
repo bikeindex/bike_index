@@ -9,6 +9,7 @@ class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
     finished_registration: 6,
+    partial_registration: 7,
     receipt: 1,
     stolen_notification_sent: 3,
     stolen_notification_blocked: 4,
