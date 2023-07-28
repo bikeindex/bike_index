@@ -147,6 +147,7 @@ RSpec.describe Manufacturer, type: :model do
       let(:malicious_str) { "Sweet manufacturer <><>><\\" }
       let(:target) { "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\" }
       it "encodes" do
+        # NOTE: this only seems to fail on the mac version of nokogiri, see PR#2366
         expect(Manufacturer.calculated_mnfg_name(manufacturer_other, malicious_str)).to eq target
       end
     end

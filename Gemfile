@@ -182,4 +182,4 @@ end
 
 gem "dockerfile-rails", ">= 1.5", group: :development
 
-gem "nokogiri", "~> 1.13.10"
+gem "nokogiri", "~> 1.13.10" # Force nokogir version

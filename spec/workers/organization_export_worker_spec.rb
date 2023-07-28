@@ -202,6 +202,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         export.reload
         expect(export.progress).to eq "finished"
         generated_csv_string = export.file.read
+        # NOTE: this only seems to fail on the mac version of nokogiri, see PR#2366
         # Ensure we actually match the exact thing with correct escaping
         expect(generated_csv_string.split("\n").last).to eq target_csv_line
         # And matching the whole thing
