@@ -203,6 +203,9 @@ RSpec.describe OrganizationExportWorker, type: :job do
         generated_csv_string = export.file.read
         # NOTE: this only seems to fail on the mac version of nokogiri, see PR#2366
         # Ensure we actually match the exact thing with correct escaping
+        pp "HERHERHER"
+        pp generated_csv_string.split("\n").last
+        pp target_csv_line
         expect(generated_csv_string.split("\n").last).to eq target_csv_line
         # And matching the whole thing
         expect(generated_csv_string).to eq(csv_string)
