@@ -147,6 +147,7 @@ RSpec.describe Manufacturer, type: :model do
       let(:malicious_str) { "Sweet manufacturer <><>><\\" }
       let(:target) { "Sweet manufacturer &gt;" }
       it "encodes" do
+        pp "NOKOGIRI Version: #{Nokogiri::VERSION}"
         expect(Manufacturer.calculated_mnfg_name(manufacturer_other, malicious_str)).to eq target
       end
     end
