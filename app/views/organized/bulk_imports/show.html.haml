@@ -49,8 +49,7 @@
 - if @bulk_import.import_errors?
   %h2= t(".errors")
   - if @bulk_import.import_errors.present?
-    %pre
-      = @bulk_import.import_errors
+    = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
   %hr
 
 .paginate-container

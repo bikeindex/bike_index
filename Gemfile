@@ -178,3 +178,5 @@ group :test do
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
 end
+
+gem "dockerfile-rails", ">= 1.5", group: :development

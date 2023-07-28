@@ -4,6 +4,20 @@
       Bulk Imports
   .col-md-6
     %ul
+      %li.nav-item
+        = link_to "org count", url_for(sortable_search_params.merge(search_org_count: !@org_count)), class: "nav-link #{@org_count ? 'active' : ''}"
+      %li.nav-item.dropdown
+        - search_errors_text = @search_errors || "With and without errors"
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_errors.present? ? "active" : "") }
+          #{search_errors_text.titleize}
+        .dropdown-menu
+          = link_to "With and without errors", url_for(sortable_search_params.merge(search_errors: nil)), class: "dropdown-item #{@search_errors.blank? ? 'active' : ''}"
+          = link_to "Without errors", url_for(sortable_search_params.merge(search_errors: "no_error")), class: "dropdown-item #{@search_errors == 'no_error' ? 'active' : ''}"
+          .dropdown-divider
+          = link_to "File Error (fully blocks import)", url_for(sortable_search_params.merge(search_errors: "file_error")), class: "dropdown-item #{@search_errors == 'file_error' ? 'active' : ''}"
+          = link_to "Line Error", url_for(sortable_search_params.merge(search_errors: "line_error")), class: "dropdown-item #{@search_errors == 'line_error' ? 'active' : ''}"
+          = link_to "Ascend error", url_for(sortable_search_params.merge(search_errors: "ascend_error")), class: "dropdown-item #{@search_errors == 'ascend_error' ? 'active' : ''}"
+          = link_to "Any Error", url_for(sortable_search_params.merge(search_errors: "any_error")), class: "dropdown-item #{@search_errors == 'any_error' ? 'active' : ''}"
       %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@progress != "all" ? "active" : "") }
           #{@progress.titleize} #{@progress == "all" ? "progresses" : ""}
@@ -13,18 +27,36 @@
           - BulkImport.progresses.each do |progress|
             = link_to progress.humanize, url_for(sortable_search_params.merge(search_progress: progress)), class: "dropdown-item #{@progress == progress ? 'active' : '' }"
       %li.nav-item
-        - all_active = (params.keys & %w[ascend not_ascend organization_id]).blank?
-        = link_to "All", admin_bulk_imports_path(sortable_search_params), class: "nav-link #{all_active ? 'active' : ''}"
+        = link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
       %li.nav-item
-        = link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(ascend: true)), class: "nav-link #{params[:ascend].present? ? 'active' : ''}"
-      %li.nav-item
-        = link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(not_ascend: true)), class: "nav-link #{params[:not_ascend].present? ? 'active' : ''}"
+        = link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_not_ascend: true)), class: "nav-link #{params[:search_not_ascend].present? ? 'active' : ''}"
       %li.nav-item
         = link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link"
 
   = render partial: "/shared/admin_current_header", locals: { viewing: "Bulk imports" }
 
 = column_chart time_range_counts(collection: matching_bulk_imports), stacked: true, thousands: ","
+
+- if @org_count
+  .col-sm-6.offset-sm-3.mt-4
+    .full-screen-table
+      %table.table.table-striped.table-bordered.table-sm
+        %thead
+          %th.text-left Organization
+          %th.text-right Imports
+        %tbody
+          - matching_bulk_imports.distinct.pluck(:organization_id).each do |id|
+            %tr
+              %td
+                - if id.present?
+                  - organization = Organization.find_by_id(id)
+                  = link_to organization&.name || id, url_for(sortable_search_params.merge(organization_id: id))
+                  = link_to link_emoji, admin_organization_path(id)
+                - else
+                  = link_to "No organization", url_for(sortable_search_params.merge(organization_id: "none"))
+                  %span.text-danger missing org!
+              %td
+                = admin_number_display(matching_bulk_imports.where(organization_id: id).count)
 
 .mt-4
   = render partial: "/shared/period_select"

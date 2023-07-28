@@ -1,11 +1,13 @@
 class BulkImport < ApplicationRecord
   PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
+  VALID_FILE_EXTENSIONS = %(csv tsv).freeze
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
   belongs_to :user
   validates_presence_of :file, unless: :file_cleaned
+  validate :ensure_valid_file_type
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
@@ -14,6 +16,9 @@ class BulkImport < ApplicationRecord
 
   scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
   scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
+  scope :ascend_errors, -> { where("(import_errors -> 'ascend') is not null") }
+  scope :import_errors, -> { file_errors.or(line_errors) }
+  scope :no_import_errors, -> { where("(import_errors -> 'line') is null").where("(import_errors -> 'file') is null") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
   scope :not_ascend, -> { where.not(kind: "ascend") }
@@ -77,6 +82,7 @@ class BulkImport < ApplicationRecord
 
   def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
+    return if file_import_errors.present? && file_import_errors.include?(error_msg)
     updated_file_error_data = {
       "file" => [file_import_errors, error_msg.to_s].compact.flatten,
       "file_lines" => [file_import_error_lines, line_error].flatten
@@ -122,12 +128,18 @@ class BulkImport < ApplicationRecord
   end
 
   def ascend_name
-    file_filename.split("_-_").last.gsub(".csv", "")
+    file_filename.split("_-_").last.gsub(/\.\w{3,5}\z/, "")
   end
 
   def check_ascend_import_processable!
     self.import_errors = (import_errors || {}).except("ascend")
-    self.organization_id ||= organization_for_ascend_name&.id
+    if organization_id.blank?
+      self.organization_id = organization_for_ascend_name&.id
+      save if organization_id.present?
+    end
+    if invalid_extension?
+      InvalidExtensionForAscendImportWorker.perform_async(id)
+    end
     return true if organization_id.present?
     import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
     save
@@ -163,6 +175,11 @@ class BulkImport < ApplicationRecord
     true
   end
 
+  def invalid_extension?
+    extension = (local_file? ? file.path : file.url)&.split(".")&.last
+    extension.blank? || !VALID_FILE_EXTENSIONS.include?(extension)
+  end
+
   # Because the way we load the file is different if it's remote or local
   # This is hacky, but whatever
   def local_file?
@@ -183,5 +200,11 @@ class BulkImport < ApplicationRecord
   def calculated_kind
     return "unorganized" if organization_id.blank?
     "organization_import" # Default
+  end
+
+  def ensure_valid_file_type
+    if invalid_extension?
+      add_file_error("Invalid file extension, must be .csv or .tsv")
+    end
   end
 end

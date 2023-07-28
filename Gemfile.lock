@@ -177,6 +177,8 @@ GEM
     database_cleaner (1.7.0)
     diff-lcs (1.4.4)
     docile (1.3.2)
+    dockerfile-rails (1.5.0)
+      rails
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.2.6)
@@ -434,6 +436,8 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.13.7)
       mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
+    nokogiri (1.13.7-x86_64-linux)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -718,6 +722,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-linux
 
 DEPENDENCIES
   MailchimpMarketing!
@@ -734,6 +739,7 @@ DEPENDENCIES
   coderay
   coffee-rails
   database_cleaner
+  dockerfile-rails (>= 1.5)
   doorkeeper (~> 5.2.5)
   doorkeeper-i18n
   dotenv-rails
