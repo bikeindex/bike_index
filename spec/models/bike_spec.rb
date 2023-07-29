@@ -1594,12 +1594,19 @@ RSpec.describe Bike, type: :model do
         expect(bike.image_url).to eq public_image.image_url
         expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
       end
+      it "with REMOTE_IMAGE_FALLBACK_URLS true return URL" do
+        stub_const("BikeAttributable::REMOTE_IMAGE_FALLBACK_URLS", true)
+        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
+        image_url = public_image.image_url
+        expect(bike.reload.image_url).to eq image_url.gsub("http://test.host", "https://files.bikeindex.org")
+      end
     end
     context "with missing public_image" do
       let(:bike) { FactoryBot.create(:bike) }
       # This happens sometimes when images are deleted
       before { bike.update_column(:thumb_path, "https://files.bikeindex.org/uploads/Pu/33333/adsf.jpg") }
       it "is nil" do
+        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.reload.image_url).to be_blank
       end
     end

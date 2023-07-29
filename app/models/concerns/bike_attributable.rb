@@ -151,9 +151,8 @@ module BikeAttributable
     image_col = public_images.limit(1).first&.image
     return nil if image_col.blank?
     image_url = image_col.send(:url, size)
-    # The image is not present if it's not there - returns false for remote images in dev
     # Return the image_url if we aren't falling back to remote image urls or if the image is present
-    return image_url if !REMOTE_IMAGE_FALLBACK_URLS || image_col.present?
+    return image_url unless REMOTE_IMAGE_FALLBACK_URLS
     # Create a image_url using the aws path
     "https://files.bikeindex.org" + image_url.gsub(ENV["BASE_URL"], "")
   end
