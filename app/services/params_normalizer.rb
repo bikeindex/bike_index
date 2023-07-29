@@ -11,4 +11,8 @@ class ParamsNormalizer
   def self.strip_or_nil_if_blank(val)
     val.present? ? val.strip : nil
   end
+
+  def self.sanitize(str)
+    Rails::Html::FullSanitizer.new.sanitize(str)&.strip
+  end
 end

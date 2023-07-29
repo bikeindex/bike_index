@@ -45,7 +45,7 @@
         %strong.attr-title #{t(".manufacturer")}:
         -# We want to display the whole manufacturer name here, not just the
         -# simple name. So only use mnfg_name if it's other (which sanitizes)
-        - if @bike.manufacturer&.name == "Other"
+        - if @bike.manufacturer&.other?
           = @bike.mnfg_name
         - else
           = @bike.manufacturer&.name

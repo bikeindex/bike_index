@@ -7,12 +7,8 @@ class Lock < ApplicationRecord
   validates_presence_of :manufacturer
   validates_presence_of :lock_type
 
-  def manufacturer_name
-    return "Other" if manufacturer.blank?
-    if manufacturer.name == "Other" && manufacturer_other.present?
-      manufacturer_other
-    else
-      manufacturer.name
-    end
+  def mnfg_name
+    Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other) ||
+      "Other" # Weird legacy behavior, shrug
   end
 end

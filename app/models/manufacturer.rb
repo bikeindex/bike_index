@@ -70,8 +70,8 @@ class Manufacturer < ApplicationRecord
 
   def self.calculated_mnfg_name(manufacturer, manufacturer_other)
     return nil if manufacturer.blank?
-    if manufacturer.name == "Other" && manufacturer_other.present?
-      Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
+    if manufacturer.other? && manufacturer_other.present?
+      ParamsNormalizer.sanitize(manufacturer_other)
     else
       manufacturer.simple_name
     end.strip.truncate(60)

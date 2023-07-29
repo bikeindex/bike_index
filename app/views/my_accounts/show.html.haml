@@ -112,7 +112,7 @@
                     %td
                       = lock.lock_type&.name
                       = link_to(t(".edit"), edit_lock_path(lock))
-                    %td= lock.manufacturer_name
+                    %td= lock.mnfg_name
                     %td= lock.key_serial
                     %td= lock.combination
           - else
