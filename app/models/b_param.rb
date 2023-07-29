@@ -459,12 +459,7 @@ class BParam < ApplicationRecord
   end
 
   def mnfg_name
-    return nil unless manufacturer.present?
-    if manufacturer.other? && bike["manufacturer_other"].present?
-      Rails::Html::FullSanitizer.new.sanitize(bike["manufacturer_other"].to_s)
-    else
-      manufacturer.simple_name
-    end.strip.truncate(60)
+    Manufacturer.calculated_mnfg_name(manufacturer, bike["manufacturer_other"])
   end
 
   def generate_id_token

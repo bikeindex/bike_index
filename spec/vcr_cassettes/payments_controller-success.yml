@@ -23,7 +23,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 26 Jun 2023 16:08:37 GMT
+      - Fri, 28 Jul 2023 20:24:46 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -43,7 +43,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_m2GDeKwzsSPFAr
+      - req_assL3oL8aIBOpI
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-Routing-Context-Priority-Tier:
@@ -124,7 +124,7 @@ http_interactions:
           "url": null
         }
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:08:37 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:45 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -137,7 +137,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_m2GDeKwzsSPFAr","request_duration_ms":224}}'
+      - '{"last_request_metrics":{"request_id":"req_assL3oL8aIBOpI","request_duration_ms":230}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -150,7 +150,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 26 Jun 2023 16:08:38 GMT
+      - Fri, 28 Jul 2023 20:24:46 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -170,7 +170,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_f3b8CRpiEynZb9
+      - req_6HZmrd0Bf4s3zY
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-Routing-Context-Priority-Tier:
@@ -250,5 +250,5 @@ http_interactions:
           "test_clock": null
         }
     http_version: 
-  recorded_at: Mon, 26 Jun 2023 16:08:38 GMT
+  recorded_at: Fri, 28 Jul 2023 20:24:46 GMT
 recorded_with: VCR 5.0.0
