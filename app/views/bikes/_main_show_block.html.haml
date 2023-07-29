@@ -5,7 +5,7 @@
     - if bike_image_url.present? && bike_image.present?
       #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
         .current-photo{ id: "image#{bike_image.id}"}
-          = image_tag(bike_image_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: bike_image_url })
+          = image_tag(bike_image_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: @bike.image_url })
       - if @bike.public_images.count > 1
         %span.thumbnail-shadow
         %span.thumbnail-shadow-r
@@ -19,7 +19,7 @@
         :plain
           <script id="current-photo-template" type="x-tmpl-mustache">
             <div id="{{id}}" style="display: none;">
-              <img alt="{{alt}}" src="{{src}}" id="{{image_id}}" data-action="zoom" data-fullsize="{{fullsize}}" class="initially-hidden">
+              <img alt="{{alt}}" src="{{src}}" id="{{image_id}}" data-action="zoom" data-original="{{original}}" class="initially-hidden">
             </div>
           </script>
     - elsif @bike.stock_photo_url.present?
