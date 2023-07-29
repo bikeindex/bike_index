@@ -1597,6 +1597,8 @@ RSpec.describe Bike, type: :model do
       it "with REMOTE_IMAGE_FALLBACK_URLS true return URL" do
         stub_const("BikeAttributable::REMOTE_IMAGE_FALLBACK_URLS", true)
         expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
+        # Approximates what happens for local dev with remote images
+        allow_any_instance_of(ImageUploader).to receive(:blank?) { true }
         image_url = public_image.image_url
         expect(bike.reload.image_url).to eq image_url.gsub("http://test.host", "https://files.bikeindex.org")
       end
