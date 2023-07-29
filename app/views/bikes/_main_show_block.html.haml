@@ -19,7 +19,7 @@
         :plain
           <script id="current-photo-template" type="x-tmpl-mustache">
             <div id="{{id}}" style="display: none;">
-              <img alt="{{alt}}" src="{{src}}" id="{{image_id}}" data-action="zoom" data-fullsize="{{fullsize}}" class="initially-hidden">
+              <img alt="{{alt}}" src="{{src}}" id="{{image_id}}" data-action="zoom" data-original="{{original}}" class="initially-hidden">
             </div>
           </script>
     - elsif @bike.stock_photo_url.present?
