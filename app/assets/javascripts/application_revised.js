@@ -35,6 +35,7 @@
 //= require external_scripts/jquery.ui.widget.js
 //= require external_scripts/jquery.iframe-transport.js
 //= require external_scripts/jquery.fileupload.js
+//= require external_scripts/time_parser-coffeeimport.js
 
 // Our actual scripts:
 //= require init

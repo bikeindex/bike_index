@@ -1,29 +1,18 @@
-// 2023-7-30 - Added setDateInputField
-
-import moment from "moment-timezone";
-
-// TimeParser updates all HTML elements with class '.convertTime', making them:
-// - Human readable
-// - Displayed with time in provided timezone
-// - With context relevant data (e.g. today shows hour, last month just date)
-// - Gives the element a title of the precise time with seconds (so hovering shows it)
-// - If elements have classes '.preciseTime' or '.preciseTimeSeconds', includes extra specificity in output
-// - If elements have class '.withPreposition' it includes preposition (to make time fit better in a sentence)
-// - Requires elements have HTML content of a time string (e.g. a unix timestamp)
-// - if the window has timeParserSingleFormat truthy, all times are a single format, for consistency
-//   ... except elements that have classes '.variableFormat'
+// This COPIES app/javascript/scripts/utils/time_parser.js
+// ... with a two modifications:
 //
-// Imported and initialized like this:
-// if (!window.timeParser) { window.timeParser = new TimeParser() }
-// window.timeParser.localize() // updates all the elements on the page with the localized time
+// - It relies on rails-assets-moment-timezone (not package.js)
+// - It doesn't use 'export default' (not supported by sprockets)
 //
-// To get span with the localized time:
-// localizedTimeHtml("1604337131", {})
 //
-// You can add this to a react component:
-// componentDidUpdate() { window.timeParser.localize() }
+// To re-import time_parser.js:
+//
+// 1. Copy the contents of that file below
+// 2. Delete everything before "class TimeParser"
+//    (specifically "import ..." and "export default")
+//
 
-export default class TimeParser {
+class TimeParser {
   constructor() {
     if (!window.localTimezone) {
       window.localTimezone = moment.tz.guess();
