@@ -478,7 +478,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_notification_pre_tracking?
-    (created_at || Time.current) > EmailPartialRegistrationWorker::NOTIFICATION_STARTED
+    (created_at || Time.current) < EmailPartialRegistrationWorker::NOTIFICATION_STARTED
   end
 
   def partial_notification_resends
