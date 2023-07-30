@@ -557,4 +557,27 @@ RSpec.describe BParam, type: :model do
       end
     end
   end
+
+  describe "partial_resent_notifications" do
+    let(:b_param) { FactoryBot.create(:b_param_partial_registration, created_at: created_at) }
+    let(:created_at) { Time.current }
+    before { EmailPartialRegistrationWorker.new.perform(b_param.id) }
+    it "doesn't include initial notification" do
+      expect(b_param.partial_notification_pre_tracking?).to be_falsey
+      expect(b_param.partial_notifications.count).to eq 1
+      expect(b_param.partial_notification_resends.count).to eq 0
+      EmailPartialRegistrationWorker.new.perform(b_param.id)
+      b_param.reload
+      expect(b_param.partial_notifications.count).to eq 2
+      expect(b_param.partial_notification_resends.count).to eq 1
+    end
+    context "pre time" do
+      let(:created_at) { Time.at(1690590595) } # 2023-07-28 19:29:55
+      it "includes initial notification" do
+        expect(b_param.partial_notification_pre_tracking?).to be_truthy
+        expect(b_param.partial_notifications.count).to eq 1
+        expect(b_param.partial_notification_resends.count).to eq 1
+      end
+    end
+  end
 end
