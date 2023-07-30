@@ -30,7 +30,7 @@ module ApplicationHelper
       status
     end
 
-    content_tag(:span, text, title: status&.titleize)
+    content_tag(:span, text, title: status&.titleize, style: "cursor:default;")
   end
 
   def attr_list_item(desc, title)
