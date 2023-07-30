@@ -61,6 +61,10 @@ class Admin::BulkImportsController < Admin::BaseController
     %w[created_at progress user_id]
   end
 
+  def error_kinds
+    %w[file_error line_error no_error ascend_error]
+  end
+
   def matching_bulk_imports
     return @matching_bulk_imports if defined?(@matching_bulk_imports)
     bulk_imports = BulkImport
@@ -68,10 +72,6 @@ class Admin::BulkImportsController < Admin::BaseController
       bulk_imports = bulk_imports.ascend
     elsif params[:search_not_ascend].present?
       bulk_imports = bulk_imports.not_ascend
-    end
-
-    def error_kinds
-      %w[file_error line_error no_error ascend_error]
     end
 
     if params[:search_errors].present?
