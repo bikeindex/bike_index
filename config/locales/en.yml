@@ -4429,6 +4429,7 @@ en:
         search: Search
         search_emails: Search emails
         sent: Sent
+        re_sent: Re-Sent
         through_org: through %{org_name}
       index:
         connected_to_bike_html: It is connected to this %{bike_link}.

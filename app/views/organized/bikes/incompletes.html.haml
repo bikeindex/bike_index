@@ -33,6 +33,7 @@
     %th
       = t(".sent")
       %small.convertTimezone
+    %th= t(".re_sent")
     %th= t(".bike")
     %th= t(".email")
   %tbody
@@ -41,6 +42,12 @@
         %td
           %span.convertTime
             = l b_param.created_at, format: :convert_time
+        %td
+          - b_param.partial_notification_resends.pluck(:created_at, :delivery_status).each do |resend|
+            %small.convertTime
+              = l resend[0], format: :convert_time
+            = notification_delivery_display(resend[1])
+          = link_to "re-send", resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: { confirm: "Are you sure you want to resend this partial registration? Please don't resend without their permission" }, class: "small gray-link"
         %td
           %strong
             = b_param.primary_frame_color
