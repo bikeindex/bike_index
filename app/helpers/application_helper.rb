@@ -24,7 +24,7 @@ module ApplicationHelper
   def notification_delivery_display(status)
     text = if status == "email_success"
       check_mark
-    elsif status == nil
+    elsif status.nil?
       "..."
     else
       status
