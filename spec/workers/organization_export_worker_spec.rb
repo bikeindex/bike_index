@@ -180,7 +180,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
         [
           "http://test.host/bikes/#{bike.id}",
           bike.created_at.utc,
-          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;",
+          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\",
           "\",,,\"<script>XSSSSS</script>",
           "Black, #{secondary_color.name}",
           bike.serial_number,
@@ -201,7 +201,11 @@ RSpec.describe OrganizationExportWorker, type: :job do
         export.reload
         expect(export.progress).to eq "finished"
         generated_csv_string = export.file.read
+        # NOTE: this only seems to fail on the mac version of nokogiri, see PR#2366
         # Ensure we actually match the exact thing with correct escaping
+        pp "HERHERHER"
+        pp generated_csv_string.split("\n").last
+        pp target_csv_line
         expect(generated_csv_string.split("\n").last).to eq target_csv_line
         # And matching the whole thing
         expect(generated_csv_string).to eq(csv_string)

@@ -6,7 +6,7 @@
     %ul
       %li.nav-item.dropdown.dropleft
         %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_origin != "all" ? "active" : "")}
-          - if @search_origin = "all"
+          - if @search_origin == "all"
             All origins
           - elsif @search_origin == "only_initial"
             Only initial

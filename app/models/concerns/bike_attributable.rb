@@ -90,7 +90,7 @@ module BikeAttributable
   def title_string
     t = [year, mnfg_name, frame_model_truncated].join(" ")
     t += " #{type}" if type != "bike"
-    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
+    ParamsNormalizer.sanitize(t.gsub(/\s+/, " "))
   end
 
   def video_embed_src

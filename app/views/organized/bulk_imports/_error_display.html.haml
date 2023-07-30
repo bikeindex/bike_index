@@ -1,0 +1,24 @@
+
+- if bulk_import.line_import_errors.present?
+  %strong
+    %span.text-danger Line errors:
+  %ul
+    - bulk_import.line_import_errors.each do |le|
+      %li= le
+
+- if bulk_import.file_import_errors.present?
+  %strong
+    %span.text-danger
+      File errors:
+  %ul
+    - bulk_import.file_import_errors.each_with_index do |ie, ind|
+      - file_line_error = bulk_import.file_import_error_lines[ind]
+      %li
+        = ie
+        - if file_line_error.present?
+          (line: #{file_line_error})
+
+- other_errors = bulk_import.import_errors.except("file", "file_lines", "line")
+- if other_errors.present?
+  = pretty_print_json(other_errors)
+

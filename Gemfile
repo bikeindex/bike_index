@@ -60,7 +60,8 @@ gem "sitemap_generator", "~> 6"
 # Making other files
 gem "mini_magick" # Required for image processing
 gem "carrierwave", "~> 0.11.2" # File uploader
-gem "carrierwave_backgrounder", "~> 0.4.2"
+# See PR#2364 for more explanation, 2023-7-28
+gem "carrierwave_backgrounder", github: "bookingexperts/carrierwave_backgrounder", ref: "112ae70"
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
@@ -178,3 +179,7 @@ group :test do
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
 end
+
+gem "dockerfile-rails", ">= 1.5", group: :development
+
+gem "nokogiri", "~> 1.13.10" # Force nokogir version

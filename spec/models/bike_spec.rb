@@ -1479,6 +1479,27 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "set_calculated_unassociated_attributes extra_registration_number" do
+    let(:bike) { FactoryBot.create(:bike, serial_number: serial, extra_registration_number: extra_registration_number) }
+    let(:serial) { "xxxx-zzzzz-VVVVVV" }
+    let(:extra_registration_number) { " extra " }
+    it "strips extra_registration_number" do
+      expect(bike.extra_registration_number).to eq "extra"
+    end
+    context "same as serial" do
+      let(:extra_registration_number) { " #{serial.downcase}" }
+      it "removes extra_registration_number" do
+        expect(bike.extra_registration_number).to be_nil
+      end
+    end
+    context "is serial:serial as serial" do
+      let(:extra_registration_number) { "SERIAL:#{serial.upcase}" }
+      it "removes extra_registration_number" do
+        expect(bike.extra_registration_number).to be_nil
+      end
+    end
+  end
+
   describe "calculated_listing_order" do
     let(:bike) { Bike.new }
     it "is 1/1000 of the current timestamp" do

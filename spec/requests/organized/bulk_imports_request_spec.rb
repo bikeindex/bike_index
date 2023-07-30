@@ -373,6 +373,35 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
             end
           end
+          context "invalid file type" do
+            let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "powered-by-bike-index.png"))) }
+            it "creates but adds an error" do
+              Sidekiq::Worker.clear_all
+              expect {
+                post "/o/ascend/bulk_imports", params: {file: file}, headers: {"Authorization" => "XXXZZZ"}
+              }.to change(BulkImport, :count).by 1
+              expect(response.status).to eq(201)
+              expect(json_result["success"]).to be_present
+
+              bulk_import = BulkImport.last
+              expect(bulk_import.kind).to eq "ascend"
+              expect(bulk_import.import_errors?).to be_present
+              expect(bulk_import.file_import_errors.join).to match(/file extension/)
+              expect(bulk_import.user).to be_blank
+              expect(bulk_import.user).to be_blank
+              expect(bulk_import.file_url).to be_present
+              expect(bulk_import.progress).to eq "finished"
+              expect(bulk_import.ascend_name).to eq "powered-by-bike-index"
+              expect(bulk_import.organization).to be_blank
+              expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
+              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              # Make sure that the worker doesn't explode
+              BulkImportWorker.drain
+              expect(bulk_import.file_import_errors.join).to match(/file extension/)
+              expect(UnknownOrganizationForAscendImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              expect(InvalidExtensionForAscendImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+            end
+          end
         end
       end
     end

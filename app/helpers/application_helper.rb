@@ -17,6 +17,10 @@ module ApplicationHelper
     "🔎"
   end
 
+  def link_emoji
+    image_tag("link.svg", class: "link-emoji")
+  end
+
   def attr_list_item(desc, title)
     return nil unless desc.present?
     content_tag(:li) do

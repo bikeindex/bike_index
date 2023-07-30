@@ -7,4 +7,12 @@ class ParamsNormalizer
   def self.present_or_false?(val)
     val.to_s.present?
   end
+
+  def self.strip_or_nil_if_blank(val)
+    val.present? ? val.strip : nil
+  end
+
+  def self.sanitize(str)
+    Rails::Html::FullSanitizer.new.sanitize(str)&.strip
+  end
 end

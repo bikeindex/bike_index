@@ -464,6 +464,7 @@ RSpec.describe "Bikes API V3", type: :request do
         is_for_sale: true,
         is_bulk: true,
         is_new: true,
+        extra_registration_number: "serial:#{bike_attrs[:serial]}",
         is_pos: true,
         bike_sticker: bike_sticker.code.downcase,
         external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
@@ -486,6 +487,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
+      expect(bike.extra_registration_number).to be_nil
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
       ownership = bike.current_ownership
       expect(ownership.pos?).to be_truthy
@@ -501,10 +503,14 @@ RSpec.describe "Bikes API V3", type: :request do
 
     it "doesn't send an email" do
       ActionMailer::Base.deliveries = []
-      post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(no_notify: true).to_json, headers: json_headers
+      post "/api/v3/bikes?access_token=#{token.token}",
+        params: bike_attrs.merge(no_notify: true, extra_registration_number: " ").to_json,
+        headers: json_headers
       EmailOwnershipInvitationWorker.drain
       expect(ActionMailer::Base.deliveries).to be_empty
       expect(response.code).to eq("201")
+      bike = Bike.last
+      expect(bike.extra_registration_number).to be_nil
     end
 
     it "creates an example bike" do
@@ -526,7 +532,7 @@ RSpec.describe "Bikes API V3", type: :request do
       let(:bike_attrs) do
         {
           serial: "made_without_serial",
-          extra_registration_number: "Another Serial",
+          extra_registration_number: "Another Serial ",
           manufacturer: manufacturer.name,
           color: color.name,
           owner_email: user.email
@@ -543,6 +549,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike_response["extra_registration_number"]).to eq "Another Serial"
         expect(bike.made_without_serial?).to be_truthy
         expect(bike.serial_normalized).to be_blank
+        expect(bike.extra_registration_number).to eq "Another Serial"
       end
     end
     context "organization" do

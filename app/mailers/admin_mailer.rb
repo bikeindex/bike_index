@@ -42,6 +42,12 @@ class AdminMailer < ApplicationMailer
       subject: "Unknown organization for ascend import")
   end
 
+  def invalid_extension_for_ascend_import(bulk_import)
+    @bulk_import = bulk_import
+    mail(to: ["gavin@bikeindex.org", "craig@bikeindex.org"],
+      subject: "Invalid extension for ascend import")
+  end
+
   def lightspeed_notification_email(organization, api_key)
     @organization = organization
     @api_key = api_key

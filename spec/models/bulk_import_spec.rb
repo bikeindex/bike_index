@@ -22,6 +22,9 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.finished?).to be_truthy
         expect(bulk_import.file_import_errors).to eq(["HTTP 404"])
         expect(bulk_import.starting_line).to eq 1 # If error doesn't have a line, it's still 1
+        # It doesn't do it again
+        bulk_import.add_file_error "HTTP 404"
+        expect(bulk_import.reload.file_import_errors).to eq(["HTTP 404"])
       end
     end
     context "existing errors - unlikely, but worth just to make sure" do
@@ -117,14 +120,16 @@ RSpec.describe BulkImport, type: :model do
     end
     context "organization with matching ascend_name" do
       let!(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKE_LANE_CHIC") }
-      it "sets attributes, removes error, doesn't save (because worker will save)" do
+      it "sets attributes, removes error and saves (even though worker will save)" do
         bulk_import.import_errors["ascend"] = "Unable to find an Organization with ascend_name"
         expect(bulk_import.import_errors?).to be_truthy
+        expect(bulk_import.organization_id).to_not be_present
         expect {
           expect(bulk_import.check_ascend_import_processable!).to be_truthy
         }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
         expect(bulk_import.organization_id).to eq organization.id
         expect(bulk_import.creator).to eq organization.auto_user
+        expect(bulk_import.reload.organization_id).to be_present
       end
     end
   end

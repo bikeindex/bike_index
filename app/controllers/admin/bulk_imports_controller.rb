@@ -6,6 +6,7 @@ class Admin::BulkImportsController < Admin::BaseController
   def index
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
+    @org_count = ParamsNormalizer.boolean(params[:search_org_count])
     @bulk_imports = matching_bulk_imports.includes(:organization, :user, :ownerships)
       .reorder(sort_column + " " + sort_direction)
       .page(page).per(@per_page)
@@ -63,10 +64,29 @@ class Admin::BulkImportsController < Admin::BaseController
   def matching_bulk_imports
     return @matching_bulk_imports if defined?(@matching_bulk_imports)
     bulk_imports = BulkImport
-    if params[:ascend].present?
+    if params[:search_ascend].present?
       bulk_imports = bulk_imports.ascend
-    elsif params[:not_ascend].present?
+    elsif params[:search_not_ascend].present?
       bulk_imports = bulk_imports.not_ascend
+    end
+
+    def error_kinds
+      %w[file_error line_error no_error ascend_error]
+    end
+
+    if params[:search_errors].present?
+      @search_errors = error_kinds.include?(params[:search_errors]) ? params[:search_errors] : "any_error"
+      bulk_imports = if params[:search_errors] == "file_error"
+        bulk_imports.file_errors
+      elsif params[:search_errors] == "line_error"
+        bulk_imports.line_errors
+      elsif params[:search_errors] == "no_error"
+        bulk_imports.no_import_errors
+      elsif params[:search_errors] == "ascend_error"
+        bulk_imports.ascend_errors
+      else
+        bulk_imports.import_errors
+      end
     end
 
     if BulkImport.progresses.include?(params[:search_progress])
@@ -77,7 +97,11 @@ class Admin::BulkImportsController < Admin::BaseController
     end
 
     if params[:organization_id].present?
-      bulk_imports = bulk_imports.where(organization_id: current_organization.id)
+      bulk_imports = if current_organization.present?
+        bulk_imports.where(organization_id: current_organization.id)
+      else
+        bulk_imports.where(organization_id: nil)
+      end
     end
     @matching_bulk_imports = bulk_imports.where(created_at: @time_range)
   end
