@@ -117,6 +117,8 @@ source "https://rails-assets.org" do # JS land is crazy, so lock everything
   gem "rails-assets-jquery.dirtyforms", "~> 2.0.0" # Alert on attempts to leave with dirt on forms
   gem "rails-assets-lodash", "~> 4.9.0"
   gem "rails-assets-mailcheck", "~> 1.1.2" # Check for common email errors
+  gem "rails-assets-moment", "~> 2.18.1" # Javascript Time - localizing :)
+  gem "rails-assets-moment-timezone", "~> 0.5.13" # Timezones for moment
   gem "rails-assets-mustache", "~> 2.2.1"
   gem "rails-assets-select2", "~> 4.0.3" # Use select2 for a few things, it's a bit better sometimes
   gem "rails-assets-selectize", "~> 0.12.1" # Manually configured scss
