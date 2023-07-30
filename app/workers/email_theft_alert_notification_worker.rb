@@ -18,6 +18,6 @@ class EmailTheftAlertNotificationWorker < ApplicationWorker
     else
       CustomerMailer.theft_alert_email(theft_alert, notification).deliver_now
     end
-    notification.update(delivery_status: "email_success", message_channel: "email")
+    notification.update(delivery_status: "email_success")
   end
 end

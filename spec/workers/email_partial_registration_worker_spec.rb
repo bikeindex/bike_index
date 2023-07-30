@@ -13,5 +13,9 @@ RSpec.describe EmailPartialRegistrationWorker, type: :job do
     expect(notification.notifiable).to eq b_param
     # expect(notification.creator_id).to eq b_param.creator_id
     expect(notification.kind).to eq "partial_registration"
+    expect(notification.user_id).to be_blank
+    expect(notification.delivery_status).to eq "email_success"
+    expect(notification.b_param?).to be_truthy
+    expect(notification.calculated_email).to eq b_param.email
   end
 end
