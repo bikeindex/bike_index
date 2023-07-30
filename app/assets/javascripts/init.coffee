@@ -125,6 +125,7 @@ class BikeIndex.Init extends BikeIndex
     if withPreposition then "on #{str}" else str
 
   localizeTimes: ->
+    # NOTE: This uses time_parser-coffeeimport.js - not time_parser.js
     window.timeParser ||= new TimeParser()
     window.timeParser.localize()
 

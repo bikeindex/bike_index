@@ -5,10 +5,11 @@
 // - It doesn't use 'export default' (not supported by sprockets)
 //
 //
-// To import time_parser.js:
+// To re-import time_parser.js:
 //
-// 1. Copy the contents of that file
+// 1. Copy the contents of that file below
 // 2. Delete everything before "class TimeParser"
+//    (specifically "import ..." and "export default")
 //
 
 class TimeParser {
