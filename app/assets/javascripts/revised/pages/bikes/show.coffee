@@ -193,7 +193,7 @@ class BikeIndex.BikesShow extends BikeIndex
       id: target_photo_id
       alt: $target_photo.attr('alt')
       src: $target_photo.data('img')
-      fullsize: $target_photo.data('link')
+      original: $target_photo.data('link')
       image_id: $target_photo.find('img').prop('id')
     $('#selected-photo').append(Mustache.render(window.current_photo_template, attrs))
 
