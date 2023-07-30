@@ -66,7 +66,7 @@ module Organized
       @b_param = current_organization.incomplete_b_params.find_by_id(params[:id])
       if @b_param.present?
         EmailPartialRegistrationWorker.perform_async(@b_param.id)
-        flash[:success] = "Registration re-sent!"
+        flash[:success] = "Incomplete registration re-sent!"
       else
         flash[:error] = "Unable to find that incomplete bike"
       end
