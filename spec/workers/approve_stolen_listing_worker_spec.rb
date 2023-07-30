@@ -24,12 +24,12 @@ RSpec.describe ApproveStolenListingWorker, type: :job, vcr: true do
   end
 
   context "given a bike with a current stolen record and a nearby twitter account" do
-    let!(:twitter_account) { FactoryBot.create(:twitter_account_1, :active, :in_nyc)}
+    let!(:twitter_account) { FactoryBot.create(:twitter_account_1, :active, :in_nyc) }
     let!(:bike) { FactoryBot.create(:stolen_bike) }
     it "creates twitter stolen bike alert" do
       expect {
-      ApproveStolenListingWorker.new.perform(bike.id)
-    }.to change(Tweet, :count).by 1
+        ApproveStolenListingWorker.new.perform(bike.id)
+      }.to change(Tweet, :count).by 1
     end
     it "skips if tweeting disabled" do
       stub_const("ApproveStolenListingWorker::TWEETING_DISABLED", true)
