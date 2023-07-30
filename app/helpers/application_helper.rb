@@ -29,7 +29,6 @@ module ApplicationHelper
     else
       status
     end
-
     content_tag(:span, text, title: status&.titleize, style: "cursor:default;")
   end
 

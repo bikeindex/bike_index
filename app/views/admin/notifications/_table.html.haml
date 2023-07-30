@@ -44,10 +44,7 @@
               -# Avoid using calculated_email because it calculates in line rather than in the cached template
               = render partial: "/shared/admin_user_cell", locals: {user: notification.user, email: notification.user_id.present? ? nil : notification.calculated_email, render_search: render_sortable, cache: true}
           %td.text-center
-            - if notification.delivered?
-              %small.less-strong= check_mark
-            - else
-              %span.text-danger= notification.delivered?
+            = notification_delivery_display(notification.delivery_status)
           - unless skip_bike
             %td
               - if notification.bike_id.present?
