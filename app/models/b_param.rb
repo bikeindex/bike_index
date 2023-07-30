@@ -477,6 +477,19 @@ class BParam < ApplicationRecord
       use_entered_address: ParamsNormalizer.boolean(attrs[:use_entered_address]))
   end
 
+  def partial_notification_pre_tracking?
+    (created_at || Time.current) < EmailPartialRegistrationWorker::NOTIFICATION_STARTED
+  end
+
+  def partial_notification_resends
+    return partial_notifications if partial_notification_pre_tracking?
+    partial_notifications.offset(1)
+  end
+
+  def partial_notifications
+    Notification.partial_registration.where(notifiable: self).order(:id)
+  end
+
   # Below here is revised setup
 
   def safe_bike_attrs(new_attrs)

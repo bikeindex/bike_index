@@ -4247,6 +4247,9 @@ nl:
         search_emails: Zoeken in e-mails
         sent: verzonden
         through_org: door %{org_name}
+        only_resend_with_permission: Deelregistraties alleen opnieuw verzenden met
+          toestemming van de gebruiker! Anders kwalificeren de e-mails als spam.
+        re_send: opnieuw versturen
       index:
         connected_to_bike_html: Het is hiermee verbonden %{bike_link}.
         enter_url_of_the_bike_html: 'U kunt de URL invoeren van de fiets waaraan u

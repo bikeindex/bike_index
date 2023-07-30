@@ -4424,7 +4424,11 @@ en:
         email: email
         incomplete: incomplete
         matching: matching
+        only_resend_with_permission: >-
+          Only re-send partial registrations with the user's permission! Otherwise
+          the emails qualify as spam.
         org_incomplete_registrations_html: "<em>%{org_name}</em> Incomplete Registrations"
+        re_send: re-send
         registration: registration
         search: Search
         search_emails: Search emails

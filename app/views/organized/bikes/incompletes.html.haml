@@ -50,6 +50,18 @@
           - if include_child_org && b_param.organization != current_organization
             %small.less-strong{ style: "display: block; line-height: 1;" }
               = t(".through_org", org_name: b_param.organization.short_name)
+        %td
+          - resend_notifications = b_param.partial_notification_resends.pluck(:created_at, :delivery_status)
+          .less-strong-hold{style: "min-width:2rem;"}
+            - resend_notifications.each do |resend|
+              %span.d-block{style: "line-height:1.2;"}
+                %small.convertTime
+                  = l resend[0], format: :convert_time
+                = notification_delivery_display(resend[1])
+            -# Hacky restriction on the number of resends you can do
+            - unless resend_notifications.count > 3
+              %span.less-strong-right
+                = link_to t(".re_send"), resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: {confirm: t(".only_resend_with_permission")}, class: "gray-link"
 
 .paginate-container.paginate-container-bottom
   = paginate @b_params
