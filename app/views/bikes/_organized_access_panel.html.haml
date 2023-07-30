@@ -287,7 +287,7 @@
           \- #{link_to "view impound records", organization_impound_records_path(organization_id: passive_organization.to_param, search_bike_id: @bike.id, search_status: "all")}!
 
 - if passive_organization.enabled?("graduated_notifications")
-  - graduated_notifications = @bike.organization_graduated_notifications(passive_organization).order(id: :desc)
+  - graduated_notifications = @bike.graduated_notifications(passive_organization).order(id: :desc)
   - if graduated_notifications.any?
     .parking-notifications-wrap
       %h3.mt-2.mb-3 Graduated notifications
