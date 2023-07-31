@@ -17,8 +17,20 @@ module Enumable
       slugs.map { |slug| {slug: slug, name: slug_translation(slug)} }
     end
 
+    def slugs_sym
+      self::SLUGS.keys
+    end
+
     def slugs
-      self::SLUGS.keys.map(&:to_s)
+      slugs_sym.map(&:to_s)
+    end
+
+    def all
+      slugs.map { |s| new(s) }
+    end
+
+    def find(str)
+      new(self::SLUGS.key(str))
     end
 
     def friendly_find(str)

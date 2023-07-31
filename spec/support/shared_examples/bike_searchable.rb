@@ -28,6 +28,13 @@ RSpec.shared_examples "bike_searchable" do
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
         end
       end
+      context "with vehicle_type" do
+        let(:query_params) { {query_items: multi_query_items + ["v_1"]} }
+        let(:target_with_cycle_type) { target.merge(cycle_type: :tandem) }
+        it "returns" do
+          expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_cycle_type
+        end
+      end
       context "with passed ids" do
         let(:query_params) { {manufacturer: manufacturer.slug, colors: [color.name], query: "some other string another string"} }
         it "uses the passed ids" do

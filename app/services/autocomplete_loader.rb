@@ -13,10 +13,15 @@ class AutocompleteLoader
     clear
     load_colors
     load_manufacturers
+    load_cycle_types
   end
 
   def load_colors
     Soulheart::Loader.new.load(Color.all.map { |c| c.autocomplete_hash })
+  end
+
+  def load_cycle_types
+    Soulheart::Loader.new.load(CycleType.all.map { |c| c.autocomplete_hash })
   end
 
   def load_manufacturers

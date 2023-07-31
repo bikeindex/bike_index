@@ -34,4 +34,28 @@ RSpec.describe CycleType, type: :model do
       end
     end
   end
+
+  describe "find" do
+    it "finds" do
+      expect(CycleType.find(3).as_json).to eq CycleType.new(:tricycle).as_json
+    end
+  end
+
+  describe "autocomplete_hash" do
+    let(:target) do
+      {
+        id: 0,
+        text: "Bike",
+        priority: 900,
+        category: "cycle_type",
+        data: {priority: 900, slug: :bike, search_id: "v_0"}
+      }
+    end
+    let(:cycle_type) { CycleType.find(0) }
+    it "is target" do
+      expect_hashes_to_match(cycle_type.autocomplete_hash, target)
+      target_result_hash = target.except(:data).merge(target[:data])
+      expect(cycle_type.autocomplete_result_hash).to eq target_result_hash.as_json
+    end
+  end
 end
