@@ -12,8 +12,8 @@ class AutocompleteLoader
   def reset
     clear
     load_colors
-    load_manufacturers
     load_cycle_types
+    load_manufacturers
   end
 
   def load_colors

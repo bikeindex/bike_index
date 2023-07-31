@@ -137,6 +137,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
 
   formatSearchText: (item) ->
     return item.text if item.loading
+    return "<span>Search only for <strong>#{ item.text }</strong></span>" if item.category == 'cycle_type'
     prefix = switch
       when item.category == 'colors'
         p = "<span class=\'sch_\'>Bikes that are </span>"
@@ -144,6 +145,8 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           p + "<span class=\'sclr\' style=\'background: #{item.display};\'></span>"
         else
           p + "<span class=\'sclr\'>stckrs</span>"
+      when item.category == 'cycle_type'
+        "<span class=\'sch_\'>only for</span>"
       when item.category == 'mnfg' || item.category == 'frame_mnfg'
         "<span class=\'sch_\'>Bikes made by</span>"
       else
