@@ -35,6 +35,7 @@ module Enumable
 
     def friendly_find(str)
       return unless str.present?
+      return new(str) if str.is_a?(Symbol) && self::SLUGS.key?(str)
       str = str.downcase.strip
       slug = (slugs & [str]).first
       slug ||= self::NAMES.detect do |k, v|

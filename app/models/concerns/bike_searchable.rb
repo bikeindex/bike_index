@@ -7,7 +7,7 @@ module BikeSearchable
   module ClassMethods
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
-    #   query_items: array of select2 query items. Parsed into query, manufacturer and color
+    #   query_items: array of select2 query items. Parsed into query, manufacturer and color\
     #   serial: required for search_close_serials
     #   query: full text search string. Overrides query_items if passed explicitly
     #   colors: array of colors, friendly found, faster if integers. Overrides query_items if passed explicitly
@@ -29,6 +29,7 @@ module BikeSearchable
         .merge(searchable_query_items_query(query_params)) # query if present
         .merge(searchable_query_items_manufacturer(query_params)) # manufacturer if present
         .merge(searchable_query_items_colors(query_params)) # color if present
+        .merge(searchable_query_items_cycle_type(query_params)) # color if present
         .merge(searchable_query_stolenness(query_params, ip))
         .to_h
     end
@@ -69,6 +70,9 @@ module BikeSearchable
       if interpreted_params[:colors].present?
         items += interpreted_params[:colors].map { |id| Color.friendly_find(id)&.autocomplete_result_hash }.compact
       end
+      if interpreted_params[:cycle_type].present?
+        items += [CycleType.friendly_find(interpreted_params[:cycle_type]).autocomplete_result_hash]
+      end
       items.flatten.compact
     end
 
@@ -86,6 +90,7 @@ module BikeSearchable
         .reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
         .search_matching_stolenness(interpreted_params)
         .search_matching_query(interpreted_params[:query])
+        .search_matching_cycle_type(interpreted_params[:cycle_type])
         .where(interpreted_params[:manufacturer] ? {manufacturer_id: interpreted_params[:manufacturer]} : {})
     end
 
@@ -124,6 +129,18 @@ module BikeSearchable
       color_ids ? {colors: color_ids} : {}
     end
 
+    def searchable_query_items_cycle_type(query_params)
+      # we expect a singular cycle_type but deal with arrays because the multi-select search
+      cycle_type_id = extracted_query_items_cycle_type_id(query_params)
+      if cycle_type_id && !cycle_type_id.is_a?(Integer)
+        cycle_type_id = [cycle_type_id].flatten.map { |c_id|
+          c_id.is_a?(Integer) ? c_id : c_id.strip.to_i
+        }.compact
+        cycle_type_id = cycle_type_id.first if cycle_type_id.count == 1
+      end
+      cycle_type_id ? {cycle_type: CycleType::SLUGS.key(cycle_type_id)} : {}
+    end
+
     def searchable_query_stolenness(query_params, ip)
       if query_params[:stolenness] && %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
@@ -137,6 +154,13 @@ module BikeSearchable
       manufacturer_id = query_params[:query_items]&.select { |i| i.start_with?(/m_/) }
       return nil unless manufacturer_id&.any?
       manufacturer_id.map { |i| i.gsub(/m_/, "").to_i }
+    end
+
+    def extracted_query_items_cycle_type_id(query_params)
+      return query_params[:cycle_type] if query_params[:cycle_type].present?
+      cycle_type_id = query_params[:query_items]&.select { |i| i.start_with?(/v_/) }
+      return nil unless cycle_type_id&.any?
+      cycle_type_id.map { |i| i.gsub(/v_/, "").to_i }
     end
 
     def extracted_query_items_color_ids(query_params)
@@ -175,6 +199,11 @@ module BikeSearchable
     def search_matching_color_ids(color_id)
       return all unless color_id # So we can chain this if we don't have any colors
       where("primary_frame_color_id=? OR secondary_frame_color_id=? OR tertiary_frame_color_id =?", color_id, color_id, color_id)
+    end
+
+    def search_matching_cycle_type(cycle_type)
+      return all unless cycle_type
+      where(cycle_type: cycle_type)
     end
 
     def search_matching_query(query)
