@@ -6,14 +6,6 @@ GIT
     swagger-ui_rails (0.1.7)
 
 GIT
-  remote: https://github.com/bookingexperts/carrierwave_backgrounder.git
-  revision: 112ae70991e42a1e50a3f16240f23376c4cb1062
-  ref: 112ae70
-  specs:
-    carrierwave_backgrounder (0.4.2)
-      carrierwave (>= 0.5, < 2.2)
-
-GIT
   remote: https://github.com/facebook/facebook-ruby-business-sdk.git
   revision: c64b51f862c2359d289a9aea6d317cf1218595aa
   branch: main
@@ -24,6 +16,13 @@ GIT
       faraday (~> 1.0)
       json (~> 2.2)
       money (~> 6.13)
+
+GIT
+  remote: https://github.com/lardawge/carrierwave_backgrounder.git
+  revision: 98ceb0acf17e7272bf8049da3887f9ba681d5764
+  specs:
+    carrierwave_backgrounder (0.4.2)
+      carrierwave (>= 0.5, < 2.2)
 
 GIT
   remote: https://github.com/mailchimp/mailchimp-marketing-ruby.git
