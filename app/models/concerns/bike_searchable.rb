@@ -29,7 +29,7 @@ module BikeSearchable
         .merge(searchable_query_items_query(query_params)) # query if present
         .merge(searchable_query_items_manufacturer(query_params)) # manufacturer if present
         .merge(searchable_query_items_colors(query_params)) # color if present
-        .merge(searchable_query_items_cycle_type(query_params)) # color if present
+        .merge(searchable_query_items_cycle_type(query_params)) # cycle_type if present
         .merge(searchable_query_stolenness(query_params, ip))
         .to_h
     end
@@ -178,8 +178,7 @@ module BikeSearchable
         return false unless ip.present?
         location = Geocoder.search(ip)
         if defined?(location.first.data) && location.first.data.is_a?(Array)
-          # TODO: use match? instead of match...present?
-          location = location.first.data.reverse.compact.select { |i| i.match(/\A\D+\z/).present? }
+          location = location.first.data.reverse.compact.select { |i| i.match?(/\A\D+\z/) }
         end
       end
 

@@ -26,7 +26,7 @@ module Enumable
     end
 
     def all
-      slugs.map { |s| new(s) }
+      slugs_sym.map { |s| new(s) }
     end
 
     def find(str)
