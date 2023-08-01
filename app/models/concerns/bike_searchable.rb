@@ -78,7 +78,7 @@ module BikeSearchable
 
     def permitted_search_params
       [:cycle_type, :distance, :location, :manufacturer, :query,
-       :serial, :stolenness, colors: [], query_items: []].freeze
+        :serial, :stolenness, colors: [], query_items: []].freeze
     end
 
     # TODO: actually make private?

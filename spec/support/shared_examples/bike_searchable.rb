@@ -227,11 +227,11 @@ RSpec.shared_examples "bike_searchable" do
       let(:target) do
         {
           category: "cycle_type",
-           id: 15,
-           priority: 900,
+          id: 15,
+          priority: 900,
           search_id: "v_15",
-           slug: "pedi-cab",
-           text: "Pedi Cab (rickshaw)"
+          slug: "pedi-cab",
+          text: "Pedi Cab (rickshaw)"
         }
       end
       it "returns target" do
@@ -501,4 +501,3 @@ RSpec.shared_examples "bike_searchable" do
     end
   end
 end
-
