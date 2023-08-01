@@ -135,11 +135,7 @@ module BikeSearchable
       cycle_type_id = extracted_query_items_cycle_type_id(query_params)
       if cycle_type_id.present?
         cycle_type_id = cycle_type_id.first if cycle_type_id.is_a?(Array)
-        cycle_type = if cycle_type_id.is_a?(Integer)
-          CycleType::SLUGS.key(cycle_type_id)
-        else
-          cycle_type_id.to_sym
-        end
+        cycle_type = CycleType.find_sym(cycle_type_id)
       end
       cycle_type ? {cycle_type: cycle_type} : {}
     end
@@ -182,6 +178,7 @@ module BikeSearchable
         return false unless ip.present?
         location = Geocoder.search(ip)
         if defined?(location.first.data) && location.first.data.is_a?(Array)
+          # TODO: use match? instead of match...present?
           location = location.first.data.reverse.compact.select { |i| i.match(/\A\D+\z/).present? }
         end
       end

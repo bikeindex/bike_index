@@ -14,8 +14,20 @@ RSpec.describe CycleType, type: :model do
     context "slug" do
       let(:name) { "Trailer " }
       it "tries to find the slug, given a name" do
+        expect(CycleType.find_sym(name)).to eq :trailer
+        expect(CycleType.find_sym(:trailer)).to eq :trailer
         finder = CycleType.friendly_find(name)
         expect(finder.slug).to eq :trailer
+      end
+    end
+    context "name" do
+      let(:name) { "Cargo Bike (front storage)" }
+      it "tries to find the slug, given a name" do
+        expect(CycleType.find_sym(name)).to eq :cargo
+        expect(CycleType.find_sym(8)).to eq :cargo
+        expect(CycleType.find_sym("8 ")).to eq :cargo
+        finder = CycleType.friendly_find(name)
+        expect(finder.slug).to eq :cargo
       end
     end
   end

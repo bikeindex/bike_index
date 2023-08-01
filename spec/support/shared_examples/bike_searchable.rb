@@ -34,8 +34,8 @@ RSpec.shared_examples "bike_searchable" do
         it "returns" do
           expect(Bike.searchable_query_items_cycle_type({query_items: ["v_1"]})).to eq({cycle_type: :tandem})
           expect(Bike.searchable_query_items_cycle_type({query_items: ["v_1", "v_0"]})).to eq({cycle_type: :tandem})
-          expect(Bike.searchable_query_items_cycle_type({cycle_type: "tandem"})).to eq({cycle_type: :tandem})
           expect(Bike.searchable_query_items_cycle_type({cycle_type: :tandem})).to eq({cycle_type: :tandem})
+          expect(Bike.searchable_query_items_cycle_type({cycle_type: "Cargo Bike (front storage)"})).to eq({cycle_type: :cargo})
           expect(Bike.searchable_query_items_cycle_type(query_params)).to eq({cycle_type: :tandem})
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_cycle_type
         end

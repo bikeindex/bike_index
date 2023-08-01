@@ -48,6 +48,10 @@ class CycleType
     "non-e-scooter": "Scooter (Not electric)"
   }.freeze
 
+  def self.searchable_names
+    slugs
+  end
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
