@@ -1,5 +1,7 @@
 require "rails_helper"
 
+# Add test for searching for cycle type HERE
+
 RSpec.describe "BikesController#index", type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bikes" }

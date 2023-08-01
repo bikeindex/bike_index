@@ -7,7 +7,7 @@ module BikeSearchable
   module ClassMethods
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
-    #   query_items: array of select2 query items. Parsed into query, manufacturer and color\
+    #   query_items: array of select2 query items. Parsed into query, manufacturer and color
     #   serial: required for search_close_serials
     #   query: full text search string. Overrides query_items if passed explicitly
     #   colors: array of colors, friendly found, faster if integers. Overrides query_items if passed explicitly
@@ -77,7 +77,8 @@ module BikeSearchable
     end
 
     def permitted_search_params
-      [:query, :manufacturer, :location, :distance, :serial, :stolenness, query_items: [], colors: []].freeze
+      [:cycle_type, :distance, :location, :manufacturer, :query,
+       :serial, :stolenness, colors: [], query_items: []].freeze
     end
 
     # TODO: actually make private?
@@ -96,7 +97,7 @@ module BikeSearchable
 
     def searchable_query_items_query(query_params)
       return {query: query_params[:query]} if query_params[:query].present?
-      query = query_params[:query_items]&.select { |i| !(/\A[cm]_/ =~ i) }&.join(" ")
+      query = query_params[:query_items]&.select { |i| !(/\A[cmv]_/ =~ i) }&.join(" ")
       query.present? ? {query: query} : {}
     end
 
@@ -132,13 +133,15 @@ module BikeSearchable
     def searchable_query_items_cycle_type(query_params)
       # we expect a singular cycle_type but deal with arrays because the multi-select search
       cycle_type_id = extracted_query_items_cycle_type_id(query_params)
-      if cycle_type_id && !cycle_type_id.is_a?(Integer)
-        cycle_type_id = [cycle_type_id].flatten.map { |c_id|
-          c_id.is_a?(Integer) ? c_id : c_id.strip.to_i
-        }.compact
-        cycle_type_id = cycle_type_id.first if cycle_type_id.count == 1
+      if cycle_type_id.present?
+        cycle_type_id = cycle_type_id.first if cycle_type_id.is_a?(Array)
+        cycle_type = if cycle_type_id.is_a?(Integer)
+          CycleType::SLUGS.key(cycle_type_id)
+        else
+          cycle_type_id.to_sym
+        end
       end
-      cycle_type_id ? {cycle_type: CycleType::SLUGS.key(cycle_type_id)} : {}
+      cycle_type ? {cycle_type: cycle_type} : {}
     end
 
     def searchable_query_stolenness(query_params, ip)

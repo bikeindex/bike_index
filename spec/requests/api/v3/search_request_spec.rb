@@ -1,5 +1,7 @@
 require "rails_helper"
 
+# Add test for searching for cycle type HERE
+
 RSpec.describe "Search API V3", type: :request do
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
