@@ -212,7 +212,7 @@ module ApplicationHelper
 
   def websiteable(user)
     if user.show_website && user.website
-      link_to user.my_bikes_link_target, user.website
+      link_to user.my_bikes_link_target ? "Website", user.website
     end
   end
 
