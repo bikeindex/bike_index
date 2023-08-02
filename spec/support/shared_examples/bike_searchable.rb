@@ -28,6 +28,18 @@ RSpec.shared_examples "bike_searchable" do
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
         end
       end
+      context "with vehicle_type" do
+        let(:query_params) { {query_items: multi_query_items + ["v_1"]} }
+        let(:target_with_cycle_type) { target.merge(cycle_type: :tandem) }
+        it "returns" do
+          expect(Bike.searchable_query_items_cycle_type({query_items: ["v_1"]})).to eq({cycle_type: :tandem})
+          expect(Bike.searchable_query_items_cycle_type({query_items: ["v_1", "v_0"]})).to eq({cycle_type: :tandem})
+          expect(Bike.searchable_query_items_cycle_type({cycle_type: :tandem})).to eq({cycle_type: :tandem})
+          expect(Bike.searchable_query_items_cycle_type({cycle_type: "Cargo Bike (front storage)"})).to eq({cycle_type: :cargo})
+          expect(Bike.searchable_query_items_cycle_type(query_params)).to eq({cycle_type: :tandem})
+          expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_cycle_type
+        end
+      end
       context "with passed ids" do
         let(:query_params) { {manufacturer: manufacturer.slug, colors: [color.name], query: "some other string another string"} }
         it "uses the passed ids" do
@@ -211,13 +223,31 @@ RSpec.shared_examples "bike_searchable" do
         expect(Bike.selected_query_items_options(interpreted_params)).to eq target
       end
     end
+    context "cycle_type" do
+      let(:target) do
+        {
+          category: "cycle_type",
+          id: 15,
+          priority: 900,
+          search_id: "v_15",
+          slug: "pedi-cab",
+          text: "Pedi Cab (rickshaw)"
+        }
+      end
+      it "returns target" do
+        result = Bike.selected_query_items_options({cycle_type: "pedi-cab", stolenness: "all"})
+        expect(result.count).to eq 1
+        expect_hashes_to_match(result.first, target)
+      end
+    end
   end
+
   describe "search" do
     context "color_ids of primary, secondary and tertiary" do
       let(:color2) { FactoryBot.create(:color) }
-      let(:bike1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 3.months) }
-      let(:bike2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color2, updated_at: Time.current - 2.weeks) }
-      let(:bike3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
+      let(:bike1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 3.months, cycle_type: :cargo) }
+      let(:bike2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color2, updated_at: Time.current - 2.weeks, cycle_type: :cargo) }
+      let(:bike3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer, cycle_type: :stroller) }
       let(:all_color_ids) do
         [
           bike1.primary_frame_color_id,
@@ -252,6 +282,14 @@ RSpec.shared_examples "bike_searchable" do
         let(:query_params) { {colors: [color.id], manufacturer: manufacturer.id, stolenness: "all"} }
         it "matches just the bike with the matching manufacturer" do
           expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike3.id])
+        end
+      end
+      context "and cycle_type" do
+        let(:query_params) { {colors: [color.id], stolenness: "all", cycle_type: "cargo"} }
+        it "matches just the bikes with the cycle_type" do
+          expect(Bike.search(interpreted_params).pluck(:id)).to match_array([bike1.id, bike2.id])
+          expect(Bike.search(interpreted_params.merge(colors: [color.id, color2.id])).pluck(:id)).to eq([bike2.id])
+          expect(Bike.search({stolenness: "all", cycle_type: "stroller"}).pluck(:id)).to eq([bike3.id])
         end
       end
     end

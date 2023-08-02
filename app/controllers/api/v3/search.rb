@@ -7,10 +7,11 @@ module API
         params :non_serial_search_params do
           optional :query, type: String, desc: "Full text search"
           optional :manufacturer
-          optional :colors, desc: "Color slugs or ids, comma delineated"
-          optional :location, type: String, desc: "Location for proximity search", default: "IP"
-          optional :distance, type: String, desc: "Distance in miles from `location` for proximity search", default: 10
-          optional :stolenness, type: String, values: %w[non stolen proximity all] + [""], default: "stolen"
+          optional :cycle_type, type: String, desc: "Cycle Type slug or name (see **Selections: cycle_types**)"
+          optional :colors, desc: "Color slugs or ids, comma delineated (see **Selections: colors**)"
+          optional :location, type: String, desc: "Location for proximity search (must set stolenness to `proximity`)", default: "IP"
+          optional :distance, type: String, desc: "Distance in miles from `location` for proximity search (must set stolenness to `proximity`)", default: 10
+          optional :stolenness, type: String, desc: "Bikes matching Stolen status", values: %w[non stolen proximity all] + [""], default: "stolen"
           optional :query_items, type: Array, desc: "Our Fancy select query items, DO NOT USE, may change without notice", documentation: {hidden: true}
         end
         params :search do
