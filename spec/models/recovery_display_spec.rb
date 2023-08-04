@@ -43,24 +43,12 @@ RSpec.describe RecoveryDisplay, type: :model do
       expect(RecoveryDisplay._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:set_time)).to eq(true)
     end
   end
-
   describe "from_stolen_record" do
     it "doesn't break if stolen record isn't present" do
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(69)
       expect(recovery_display.errors).not_to be_present
       expect(recovery_display.calculated_owner_name).to be_nil
-    end
-    it "sets attrs from stolen record" do
-      t = Time.current
-      stolen_record = FactoryBot.create(:stolen_record_recovered, recovered_at: t, recovered_description: "stuff", current: false)
-      recovery_display = RecoveryDisplay.new
-      recovery_display.from_stolen_record(stolen_record.id)
-      expect(recovery_display.quote).to eq("stuff")
-      expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
-      expect(recovery_display.calculated_owner_name).to be_nil
-      expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
-      expect(recovery_display.quote_by).to be_nil
     end
     it "sets first name from stolen record" do
       user = FactoryBot.create(:user, name: "somebody Special")
@@ -70,6 +58,34 @@ RSpec.describe RecoveryDisplay, type: :model do
       recovery_display.from_stolen_record(stolen_record.id)
       expect(recovery_display.calculated_owner_name).to eq "somebody Special"
       expect(recovery_display.quote_by).to eq("somebody")
+    end
+    context "stolen record" do
+      let(:t) { Time.current }
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovered_at: t, recovered_description: "stuff", bike: bike) }
+      let(:recovery_display) { RecoveryDisplay.new }
+      it "sets attrs from stolen record" do
+        recovery_display.from_stolen_record(stolen_record.id)
+        expect(recovery_display.quote).to eq("stuff")
+        expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
+        expect(recovery_display.calculated_owner_name).to be_nil
+        expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
+        expect(recovery_display.quote_by).to be_nil
+      end
+      context "bike hidden" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+        before { bike.update(marked_user_hidden: true) }
+        it "still works expected" do
+          expect(bike.reload.user_hidden).to be_truthy
+          recovery_display.from_stolen_record(stolen_record.id)
+          expect(recovery_display.quote).to eq("stuff")
+          expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
+          expect(recovery_display.calculated_owner_name).to eq bike.current_ownership.user.display_name
+          expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
+          expect(recovery_display.quote_by).to eq "User"
+          expect(recovery_display.bike&.id).to eq bike.id
+        end
+      end
     end
   end
 end
