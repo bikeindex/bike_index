@@ -97,7 +97,7 @@
             = builder.label :date_stolen, t(".when_was_it_stolen"), class: "control-label"
             - builder.object.date_stolen = TimeParser.round(builder.object.date_stolen || Time.current)
             = builder.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-            = builder.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 3600, required: true, class: 'form-control', style: "font-size: 90%; width: 100%;"
+            = builder.datetime_local_field :date_stolen, max: TimeParser.round(Time.current + 1.day), required: true, class: 'form-control', style: "font-size: 90%; width: 100%;"
         #stolen-bike-location.input-group
           .control-group.special-select-single
             = builder.label :street, t(".where_was_it_stolen"), class: 'control-label'
