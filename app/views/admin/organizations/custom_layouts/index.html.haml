@@ -1,4 +1,4 @@
-= render partial: "/admin/organizations/display_header", locals: {current_action: "Edit custom layouts for", organization_view_path: organization_emails_path(organization_id: @organization.to_param)}
+= render partial: "/admin/organizations/display_header", locals: {current_action: "Custom layouts", organization_view_path: organization_emails_path(organization_id: @organization.to_param)}
 
 .row
   .col-lg-6
@@ -65,3 +65,8 @@
             = check_mark if snippet&.body.present?
           %td.table-cell-check
             = check_mark if snippet&.is_enabled
+
+.mt-4
+  %strong
+    Note:
+  Custom Layouts (other than landing pages), are #{link_to "Mail Snippets", admin_mail_snippets_path}. You can view and edit all the active ones there.
