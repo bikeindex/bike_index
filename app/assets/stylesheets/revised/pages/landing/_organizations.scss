@@ -77,12 +77,12 @@
 }
 
 // Organization landing pages base styles
-.org-landing-icon-list {
+ul.org-landing-icon-list {
   @include list-unstyled;
 
   margin: 0;
 
-  li {
+  &>li {
     min-height: 96px;
 
     img {
@@ -93,7 +93,7 @@
   }
 
   @include media-breakpoint-up(md) {
-    li {
+    &>li {
       @include make-row;
 
       margin-top: 2 * $vertical-height;
@@ -122,7 +122,7 @@
   }
 
   @include media-breakpoint-down(md) {
-    li {
+    &>li {
       .org-landing-icon-list-icon {
         width: 16.66667%;
 
