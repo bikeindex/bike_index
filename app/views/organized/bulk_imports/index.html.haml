@@ -63,10 +63,7 @@
             %span{ class: bulk_import_progress_class }
               = bulk_import.progress
         %td
-          - if bulk_import.line_import_errors.present?
-            %span.text-danger= t(".line")
-          - if bulk_import.file_import_errors.present?
-            %span.text-danger= t(".file")
+          = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
         %td
           = bulk_import.user.display_name if bulk_import.user_id.present?
         %td

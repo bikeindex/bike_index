@@ -80,7 +80,7 @@
         Bikes
     %tbody
       - @bulk_imports.each do |bulk_import|
-        - cache(bulk_import) do
+        - cache(["admin_bulk_import", bulk_import]) do
           %tr
             %td
               %a.convertTime{ href: admin_bulk_import_url(bulk_import) }
@@ -93,10 +93,7 @@
               %span{ class: bulk_import_progress_class }
                 = bulk_import.progress
             %td
-              - if bulk_import.line_import_errors.present?
-                <span class="text-danger">Line</span>
-              - if bulk_import.file_import_errors.present?
-                <span class="text-danger">File!</span>
+              = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
             %td
               - if bulk_import.user_id.present?
                 = bulk_import.user.display_name
@@ -104,13 +101,13 @@
                 %small.less-strong
                   ascend
                 - if bulk_import.ascend_unprocessable?
-                  %span.text-danger
-                    Missing Ascend Organization!
+                  %small.text-warning
+                    missing Ascend Organization!
             %td
               - if bulk_import.organization.present?
                 = link_to bulk_import.organization.name, admin_bulk_imports_url(sortable_search_params.merge(organization_id: bulk_import.organization.to_param))
               - else
-                = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
+                = link_to "no org", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
               %small
                 - if bulk_import.file_cleaned?
                   %em.text-warning file removed

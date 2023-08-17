@@ -54,6 +54,10 @@ class BulkImport < ApplicationRecord
     import_errors["line"]
   end
 
+  def ascend_errors
+    import_errors["ascend"]
+  end
+
   def file_import_errors_with_lines
     return nil unless file_import_errors.present?
     [file_import_errors].flatten.zip(file_import_error_lines)
@@ -69,7 +73,8 @@ class BulkImport < ApplicationRecord
   end
 
   def blocking_error?
-    file_import_errors.present? || pending? && created_at && created_at < Time.current - 5.minutes
+    ascend_errors? || file_import_errors.present? ||
+      pending? && created_at && created_at < Time.current - 5.minutes
   end
 
   def no_bikes?
@@ -77,7 +82,7 @@ class BulkImport < ApplicationRecord
   end
 
   def ascend_errors?
-    import_errors["ascend"].present?
+    ascend_errors.present?
   end
 
   def ascend_unprocessable?
@@ -147,7 +152,7 @@ class BulkImport < ApplicationRecord
     return true if organization_id.present?
     add_ascend_import_error!
     UnknownOrganizationForAscendImportWorker.perform_async(id)
-    false
+    false # must return false, otherwise BulkImportWorker enqueues processing
   end
 
   def organization_for_ascend_name
@@ -213,6 +218,6 @@ class BulkImport < ApplicationRecord
 
   def add_ascend_import_error!
     import_errors["ascend"] = ["Unable to find an Organization with ascend_name = #{ascend_name}"]
-    pp save
+    save
   end
 end
