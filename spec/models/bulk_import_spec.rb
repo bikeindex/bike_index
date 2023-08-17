@@ -121,7 +121,8 @@ RSpec.describe BulkImport, type: :model do
     context "organization with matching ascend_name" do
       let!(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKE_LANE_CHIC") }
       it "sets attributes, removes error and saves (even though worker will save)" do
-        bulk_import.import_errors["ascend"] = "Unable to find an Organization with ascend_name"
+        bulk_import.send(:add_ascend_import_error!)
+        bulk_import.reload
         expect(bulk_import.import_errors?).to be_truthy
         expect(bulk_import.organization_id).to_not be_present
         expect {

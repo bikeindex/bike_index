@@ -76,6 +76,10 @@ class BulkImport < ApplicationRecord
     import_errors["bikes"] == "none_imported"
   end
 
+  def ascend_errors?
+    import_errors["ascend"].present?
+  end
+
   def ascend_unprocessable?
     ascend? && organization_id.blank?
   end
@@ -141,8 +145,7 @@ class BulkImport < ApplicationRecord
       InvalidExtensionForAscendImportWorker.perform_async(id)
     end
     return true if organization_id.present?
-    import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
-    save
+    add_ascend_import_error!
     UnknownOrganizationForAscendImportWorker.perform_async(id)
     false
   end
@@ -206,5 +209,10 @@ class BulkImport < ApplicationRecord
     if invalid_extension?
       add_file_error("Invalid file extension, must be .csv or .tsv")
     end
+  end
+
+  def add_ascend_import_error!
+    import_errors["ascend"] = ["Unable to find an Organization with ascend_name = #{ascend_name}"]
+    pp save
   end
 end
