@@ -4519,7 +4519,7 @@ en:
         unable_to_process: Unable to process
       error_type:
         line: Line
-        file: File!
+        file: File
       new:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:

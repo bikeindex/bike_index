@@ -47,7 +47,7 @@ class BulkImport < ApplicationRecord
   end
 
   def file_import_errors
-    import_errors["file"] || import_errors["ascend"]
+    import_errors["file"]
   end
 
   def line_import_errors

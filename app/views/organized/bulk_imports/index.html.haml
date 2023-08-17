@@ -59,9 +59,7 @@
             %span.text-danger
               = t(".unable_to_process")
           - else
-            - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
-            %span{ class: bulk_import_progress_class }
-              = bulk_import.progress
+            = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
         %td
           = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
         %td

@@ -1,9 +1,27 @@
+- if bulk_import.ascend_unprocessable?
+  %p.mt-2
+    Bulk Import <span class="text-danger">failed to process</span> because no organization was found with the ascend name of <strong>#{@bulk_import.ascend_name}</strong>
+  %p
+    Fix this by:
+  %ol
+    %li Go to #{link_to "organizations", admin_organizations_path}
+    %li Find the organization this bulk import should have been assigned to
+    %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
+    %li Return here and click the "reprocess import" button below
+  %hr
 - if bulk_import.line_import_errors.present?
   %strong
     %span.text-danger Line errors:
   %ul
     - bulk_import.line_import_errors.each do |le|
-      %li= le
+      %li
+        - if le.is_a?(Array) && le.first.is_a?(Integer)
+          %span.d-block
+            Line:
+            %strong #{le.first}
+          %code= le[1..-1].join(", ")
+        - else
+          = le
 
 - if bulk_import.file_import_errors.present?
   %strong
@@ -17,7 +35,7 @@
         - if file_line_error.present?
           (line: #{file_line_error})
 
-- other_errors = bulk_import.import_errors.except("file", "file_lines", "line")
+- other_errors = bulk_import.import_errors.except("file", "file_lines", "line", "ascend", "bikes")
 - if other_errors.present?
   = pretty_print_json(other_errors)
 

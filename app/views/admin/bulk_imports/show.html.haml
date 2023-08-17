@@ -24,8 +24,7 @@
         %td
           Progress
         %td
-          %span{ class: @bulk_import.progress == "finished" ? "text-success" : "" }
-            = @bulk_import.progress
+          = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: @bulk_import}
       %tr
         %td
           File
@@ -89,19 +88,7 @@
   - else
     .card.mb-5
       .card-body.pb-1
-        - if @bulk_import.ascend_unprocessable?
-          %p.mt-2
-            Bulk Import <span class="text-danger">failed to process</span> because no organization was found with the ascend name of <strong>#{@bulk_import.ascend_name}</strong>
-          %p
-            Fix this by:
-          %ol
-            %li Go to #{link_to "organizations", admin_organizations_path}
-            %li Find the organization this bulk import should have been assigned to
-            %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
-            %li Return here and click the "reprocess import" button below
-          %hr
-        - if @bulk_import.import_errors.present?
-          = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
+        = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
 
 
 - if @bulk_import.ownerships.count < 1 || params[:show_reprocess]

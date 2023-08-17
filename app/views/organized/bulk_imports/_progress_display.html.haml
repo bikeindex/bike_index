@@ -1,0 +1,7 @@
+- if bulk_import.blocking_error?
+  %span.text-danger{title: "Blocking error"}
+    Failed
+- else
+  - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
+  %span{ class: bulk_import_progress_class }
+    = bulk_import.progress
