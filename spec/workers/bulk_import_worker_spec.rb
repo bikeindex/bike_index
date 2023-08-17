@@ -181,7 +181,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect {
             instance.perform(bulk_import.id)
             # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-            pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+            pp "Error line: 184", bulk_import.import_errors if bulk_import.reload.blocking_error?
           }.to change(Bike, :count).by 2
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
@@ -256,7 +256,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-              pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error line: 259", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
           end
           # It doesn't duplicate if no duplicate is true
@@ -361,7 +361,7 @@ RSpec.describe BulkImportWorker, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101
-              pp bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error line: 364", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
             bulk_import.reload
             expect(bulk_import.progress).to eq "finished"
@@ -557,7 +557,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect {
             bike = instance.register_bike(instance.row_to_b_param_hash(passed_row))
             # This test is being flaky! Add debug printout #2101
-            pp bike.errors unless bike.errors.none?
+            pp "Error line: 560", bike.errors unless bike.errors.none?
           }.to change(Bike, :count).by 1
           bike = Bike.last
 
