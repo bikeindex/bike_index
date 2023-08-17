@@ -1,6 +1,6 @@
-- if bulk_import.line_import_errors.present?
-  %span.d-block.text-warning= t(".line")
 - if bulk_import.file_import_errors.present?
-  %span.d-block.text-danger= t(".file")
-- if bulk_import.ascend_errors?
-  %span.d-block.text-danger Ascend!
+  %small.d-block.text-danger= t(".file")
+- if bulk_import.ascend_errors.present?
+  %small.d-block.text-danger Ascend
+- if bulk_import.line_import_errors.present?
+  %small.d-block.text-warning= t(".line")

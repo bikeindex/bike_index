@@ -69,20 +69,16 @@ class BulkImport < ApplicationRecord
   end
 
   def import_errors?
-    line_import_errors.present? || file_import_errors.present?
+    line_import_errors.present? || file_import_errors.present? || ascend_errors.present?
   end
 
   def blocking_error?
-    ascend_errors? || file_import_errors.present? ||
+    ascend_errors.present? || file_import_errors.present? ||
       pending? && created_at && created_at < Time.current - 5.minutes
   end
 
   def no_bikes?
     import_errors["bikes"] == "none_imported"
-  end
-
-  def ascend_errors?
-    ascend_errors.present?
   end
 
   def ascend_unprocessable?
