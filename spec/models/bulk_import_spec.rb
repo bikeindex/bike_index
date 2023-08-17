@@ -15,16 +15,16 @@ RSpec.describe BulkImport, type: :model do
       it "adds a new error" do
         expect(bulk_import.pending?).to be_truthy
         expect(bulk_import.starting_line).to eq 1
-        expect(bulk_import.file_import_errors_with_lines).to be_nil
+        expect(bulk_import.file_errors_with_lines).to be_nil
         bulk_import.add_file_error "HTTP 404"
         bulk_import.reload
         expect(bulk_import.kind).to eq "unorganized"
         expect(bulk_import.finished?).to be_truthy
-        expect(bulk_import.file_import_errors).to eq(["HTTP 404"])
+        expect(bulk_import.file_errors).to eq(["HTTP 404"])
         expect(bulk_import.starting_line).to eq 1 # If error doesn't have a line, it's still 1
         # It doesn't do it again
         bulk_import.add_file_error "HTTP 404"
-        expect(bulk_import.reload.file_import_errors).to eq(["HTTP 404"])
+        expect(bulk_import.reload.file_errors).to eq(["HTTP 404"])
       end
     end
     context "existing errors - unlikely, but worth just to make sure" do
@@ -33,14 +33,14 @@ RSpec.describe BulkImport, type: :model do
       it "adds a new error" do
         expect(bulk_import.starting_line).to eq 2
         bulk_import.reload
-        expect(bulk_import.file_import_errors_with_lines).to eq([["Wrong place wrong time", 1]])
+        expect(bulk_import.file_errors_with_lines).to eq([["Wrong place wrong time", 1]])
         bulk_import.add_file_error "HTTP 404", 101
         bulk_import.reload
         expect(bulk_import.kind).to eq "organization_import"
         expect(bulk_import.progress).to eq "finished"
-        expect(bulk_import.line_import_errors).to eq([2, "Nobody loves you"])
-        expect(bulk_import.file_import_errors).to eq(["Wrong place wrong time", "HTTP 404"])
-        expect(bulk_import.file_import_errors_with_lines).to eq([["Wrong place wrong time", 1], ["HTTP 404", 101]])
+        expect(bulk_import.line_errors).to eq([2, "Nobody loves you"])
+        expect(bulk_import.file_errors).to eq(["Wrong place wrong time", "HTTP 404"])
+        expect(bulk_import.file_errors_with_lines).to eq([["Wrong place wrong time", 1], ["HTTP 404", 101]])
         expect(bulk_import.starting_line).to eq 102
       end
     end

@@ -9,11 +9,11 @@
     %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
     %li Return here and click the "reprocess import" button below
   %hr
-- if bulk_import.line_import_errors.present?
+- if bulk_import.line_errors.present?
   %strong
     %span.text-danger Line errors:
   %ul
-    - bulk_import.line_import_errors.each do |le|
+    - bulk_import.line_errors.each do |le|
       %li
         - if le.is_a?(Array) && le.first.is_a?(Integer)
           %span.d-block
@@ -23,12 +23,12 @@
         - else
           = le
 
-- if bulk_import.file_import_errors.present?
+- if bulk_import.file_errors.present?
   %strong
     %span.text-danger
       File errors:
   %ul
-    - bulk_import.file_import_errors.each_with_index do |ie, ind|
+    - bulk_import.file_errors.each_with_index do |ie, ind|
       - file_line_error = bulk_import.file_import_error_lines[ind]
       %li
         = ie

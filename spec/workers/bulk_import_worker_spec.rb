@@ -85,7 +85,7 @@ RSpec.describe BulkImportWorker, type: :job do
             instance.perform(bulk_import.id)
           }.to change(Bike, :count).by 1
           bulk_import.reload
-          expect(bulk_import.line_import_errors).to eq([target_line_error])
+          expect(bulk_import.line_errors).to eq([target_line_error])
           expect(bulk_import.headers).to eq(%w[description vendor manufacturer color frame_size serial_number customer_last_name customer_first_name owner_email])
           expect(bulk_import.import_errors).to eq({line: [target_line_error]}.as_json)
           expect(bulk_import.bikes.count).to eq 1
@@ -108,8 +108,8 @@ RSpec.describe BulkImportWorker, type: :job do
           }.to change(Bike, :count).by 0
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
-          expect(bulk_import.line_import_errors).to be_nil
-          expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
+          expect(bulk_import.line_errors).to be_nil
+          expect(bulk_import.file_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
           # Note: we don't have auto-resume built in right now. You have to manually go in through the console
           # and set the progress to be "ongoing", then re-enqueue
           bulk_import.update_attribute :progress, "ongoing"
@@ -119,8 +119,8 @@ RSpec.describe BulkImportWorker, type: :job do
           bulk_import.reload
           expect(bulk_import.bikes.count).to eq 1
           bike_matches_target(bulk_import.bikes.first)
-          # And make sure it hasn't updated the file_import_errors
-          expect(bulk_import.file_import_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
+          # And make sure it hasn't updated the file_errors
+          expect(bulk_import.file_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
           expect(bulk_import.progress).to eq "finished"
         end
       end
@@ -186,7 +186,7 @@ RSpec.describe BulkImportWorker, type: :job do
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
           expect(bulk_import.bikes.count).to eq 2
-          expect(bulk_import.file_import_errors).to_not be_present
+          expect(bulk_import.file_errors).to_not be_present
 
           bike1 = bulk_import.bikes.reorder(:created_at).first
           expect(bike1.primary_frame_color).to eq color_green
@@ -366,7 +366,7 @@ RSpec.describe BulkImportWorker, type: :job do
             bulk_import.reload
             expect(bulk_import.progress).to eq "finished"
             expect(bulk_import.bikes.count).to eq 2
-            expect(bulk_import.file_import_errors).to_not be_present
+            expect(bulk_import.file_errors).to_not be_present
             expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size bike_sticker photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
 
             bike1 = bulk_import.bikes.reorder(:created_at).first
@@ -419,7 +419,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(instance).to_not receive(:register_bike)
           instance.process_csv(File.open(tempfile.path, "r"))
           bulk_import.reload
-          expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
+          expect(bulk_import.file_errors.to_s).to match(/invalid csv headers/i)
           expect(bulk_import.progress).to eq "finished"
         end
       end
@@ -429,7 +429,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(instance).to_not receive(:register_bike)
           instance.process_csv(File.open(tempfile.path, "r"))
           bulk_import.reload
-          expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
+          expect(bulk_import.file_errors.to_s).to match(/invalid csv headers/i)
           expect(bulk_import.progress).to eq "finished"
         end
       end

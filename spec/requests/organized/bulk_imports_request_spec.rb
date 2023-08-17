@@ -375,8 +375,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.reload.ascend_errors).to be_present
               expect(bulk_import.import_errors?).to be_truthy
               expect(bulk_import.blocking_error?).to be_truthy
-              expect(bulk_import.file_import_errors).to be_blank
-              expect(bulk_import.line_import_errors).to be_blank
+              expect(bulk_import.file_errors).to be_blank
+              expect(bulk_import.line_errors).to be_blank
             end
           end
           context "invalid file type" do
@@ -392,8 +392,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               bulk_import = BulkImport.last
               expect(bulk_import.kind).to eq "ascend"
               expect(bulk_import.import_errors?).to be_present
-              expect(bulk_import.file_import_errors).to be_an_instance_of(Array)
-              expect(bulk_import.file_import_errors.join).to match(/file extension/)
+              expect(bulk_import.file_errors).to be_an_instance_of(Array)
+              expect(bulk_import.file_errors.join).to match(/file extension/)
               expect(bulk_import.user).to be_blank
               expect(bulk_import.user).to be_blank
               expect(bulk_import.file_url).to be_present
@@ -404,16 +404,16 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
               # Make sure that the worker doesn't explode
               BulkImportWorker.drain
-              expect(bulk_import.file_import_errors.join).to match(/file extension/)
+              expect(bulk_import.file_errors.join).to match(/file extension/)
               expect(UnknownOrganizationForAscendImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
               expect(InvalidExtensionForAscendImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
               expect(ActionMailer::Base.deliveries.empty?).to be_truthy
               # Test errors are processed correctly
               UnknownOrganizationForAscendImportWorker.drain
               InvalidExtensionForAscendImportWorker.drain
-              expect(bulk_import.reload.file_import_errors).to be_an_instance_of(Array)
+              expect(bulk_import.reload.file_errors).to be_an_instance_of(Array)
               expect(bulk_import.ascend_errors).to be_present
-              expect(bulk_import.file_import_errors.join).to match(/file extension/)
+              expect(bulk_import.file_errors.join).to match(/file extension/)
               expect(ActionMailer::Base.deliveries.empty?).to be_falsey
               expect(bulk_import.progress).to eq "finished"
               expect(bulk_import.blocking_error?).to be_truthy

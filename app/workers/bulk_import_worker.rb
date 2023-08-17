@@ -18,7 +18,7 @@ class BulkImportWorker < ApplicationWorker
   end
 
   def process_csv(open_file)
-    @line_errors = @bulk_import.line_import_errors || [] # We always need line_import_errors
+    @line_errors = @bulk_import.line_errors || [] # We always need line_errors
     return false if @bulk_import.finished? # If url fails to load, this will catch
 
     # Grab the first line of the csv (which is the header line) and transform it

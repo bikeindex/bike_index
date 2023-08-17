@@ -46,11 +46,11 @@ class BulkImport < ApplicationRecord
     data&.dig("headers")
   end
 
-  def file_import_errors
+  def file_errors
     import_errors["file"]
   end
 
-  def line_import_errors
+  def line_errors
     import_errors["line"]
   end
 
@@ -58,9 +58,9 @@ class BulkImport < ApplicationRecord
     import_errors["ascend"]
   end
 
-  def file_import_errors_with_lines
-    return nil unless file_import_errors.present?
-    [file_import_errors].flatten.zip(file_import_error_lines)
+  def file_errors_with_lines
+    return nil unless file_errors.present?
+    [file_errors].flatten.zip(file_import_error_lines)
   end
 
   # Always return an array, because it's simpler to deal with - NOTE: different from above error methods which return nil
@@ -69,11 +69,11 @@ class BulkImport < ApplicationRecord
   end
 
   def import_errors?
-    line_import_errors.present? || file_import_errors.present? || ascend_errors.present?
+    line_errors.present? || file_errors.present? || ascend_errors.present?
   end
 
   def blocking_error?
-    ascend_errors.present? || file_import_errors.present? ||
+    ascend_errors.present? || file_errors.present? ||
       pending? && created_at && created_at < Time.current - 5.minutes
   end
 
@@ -87,9 +87,9 @@ class BulkImport < ApplicationRecord
 
   def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
-    return if file_import_errors.present? && file_import_errors.include?(error_msg)
+    return if file_errors.present? && file_errors.include?(error_msg)
     updated_file_error_data = {
-      "file" => [file_import_errors, error_msg.to_s].compact.flatten,
+      "file" => [file_errors, error_msg.to_s].compact.flatten,
       "file_lines" => [file_import_error_lines, line_error].flatten
     }
     return true if skip_save # Don't get stuck in a loop during creation
