@@ -4504,6 +4504,9 @@ en:
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
     bulk_imports:
+      error_type:
+        file: File
+        line: Line
       index:
         added: Added
         bikes: Bikes
@@ -4517,9 +4520,6 @@ en:
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
         progress: Progress
         unable_to_process: Unable to process
-      error_type:
-        line: Line
-        file: File
       new:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:

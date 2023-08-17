@@ -4325,9 +4325,7 @@ nl:
         creator: Schepper
         errors: fouten
         exclude_empty_imports: Lege invoer uitsluiten
-        file: Het dossier!
         include_empty_imports: Inclusief lege invoer
-        line: Lijn
         new_import: Nieuwe import
         org_ascend_imports_html: "<em>%{org_name}</em> Importeren <em>ascenderen</em>"
         org_bulk_imports_html: "<em>%{org_name} Bulkimport</em>"
@@ -4397,6 +4395,9 @@ nl:
         bulk_import_impounded: In beslag genomen bulkimport
         impounded_at: In beslag genomen bij
         impounded_id: In beslag genomen identiteitsbewijs
+      error_type:
+        file: file
+        line: Lijn
     exports:
       index:
         bikes_in_export: Fietsen in export
