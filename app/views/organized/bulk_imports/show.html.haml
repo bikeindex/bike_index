@@ -20,7 +20,7 @@
       %td
         = t(".progress")
       %td
-        = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: @bulk_import}
+        = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: @bulk_import, show_extended: true}
     %tr
       %td
         = t(".file")
