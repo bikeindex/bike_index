@@ -206,6 +206,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(organization.spam_registrations).to be_truthy
       end
     end
+    context "updating ascend_name" do
+      it "updates" do
+        expect(organization.reload.ascend_name).to be_nil
+        put "#{base_url}/#{organization.to_param}", params: {organization: {ascend_name: "Party name"}}
+        expect(organization.reload.ascend_name).to eq "Party name"
+        put "#{base_url}/#{organization.to_param}", params: {organization: {ascend_name: ""}}
+        expect(organization.reload.ascend_name).to be_nil
+      end
+    end
     context "updating registration labels" do
       let(:target) { {reg_student_id: "party label", reg_address: "useful label", owner_email: "<p>stuff</p> again", unknown_attr: "Whoop"} }
       let(:update_params) do

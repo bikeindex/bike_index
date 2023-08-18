@@ -4504,16 +4504,17 @@ en:
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
     bulk_imports:
+      error_type:
+        file: File
+        line: Line
       index:
         added: Added
         bikes: Bikes
         creator: Creator
         errors: Errors
         exclude_empty_imports: Exclude Empty imports
-        file: File!
         include_empty_imports: Include Empty imports
         kind: Kind
-        line: Line
         new_import: New import
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
