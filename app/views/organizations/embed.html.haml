@@ -138,7 +138,7 @@
                   = t(".eg_if_we_tweet_about_or_someone_searches")
   -# Note: Don't check display_edit_address_fields? because current_user is probably not owner
   - if include_field_reg_address?(@organization)
-    - label_address = registration_field_label(@organization, "reg_address") || t(".owners_street_address")
+    - label_address = registration_field_label(@organization, "reg_address") || t(".owners_mailing_address")
     - label_address_class = registration_field_label(@organization, "reg_address").present? ? "strong" : ""
     / Set all the bike address attrs
     - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state"), country: @b_param.address("country") }
@@ -147,7 +147,7 @@
       #address-fields
         = f.label :street, label_address, class: label_address_class
         .street-control
-          = f.text_field :street, required: true, placeholder: t(".address")
+          = f.text_field :street, required: true, placeholder: registration_field_address_placeholder(@organization)
         .control-group
           = f.text_field :city, required: true, placeholder: t(".city")
         .control-group

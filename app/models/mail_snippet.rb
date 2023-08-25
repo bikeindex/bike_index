@@ -41,7 +41,7 @@ class MailSnippet < ApplicationRecord
       after_welcome: {emails: "finished_registration", description: "After \"Congrats\", in \"Finished registration\""},
       footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
       partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
-      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""},
+      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""}
     }.with_indifferent_access.freeze
   end
 

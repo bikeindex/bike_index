@@ -29,7 +29,7 @@
     - hot_sheet_organizations.each do |organization|
       .form-group.row
         %label.form-well-label
-        %label.form-well-input{ style: "line-height: 1.5em;" }
+        %label.form-well-input{style: "line-height: 1.5em;"}
           = check_box_tag "hot_sheet_notifications[#{organization.id}]", true, @user.memberships.where(organization_id: organization.id).first&.notification_daily?
           - hot_sheets_link = link_to(t(".stolen_hot_sheets"),  organization_hot_sheet_path(organization_id: organization.to_param))
           = t(".daily_hot_sheet_notifications_html", org_name: organization.short_name, hot_sheets_link: hot_sheets_link)
@@ -59,38 +59,47 @@
                   = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
 
   .related-fields
-    .form-group.row.fancy-select.no-restore-on-backspace.unfancy
-      = f.label :country_id, class: "form-well-label" do
-        = t(".address")
-      .form-well-input#us_id_data{ data: { usid: Country.united_states.id } }
-        = f.select(:country_id, Country.select_options, { prompt: t(".choose_country") }, { class: "country-select-input form-control" } )
+    - address_org = @user.uro_organization_reg_address
+    - address_label = registration_field_label(address_org, "reg_address") || t(".address")
+
     - unless @user.no_address?
       .form-group.row
-        %label.form-well-label
+        = f.label :street, address_label, class: "form-well-label"
         .form-well-input
-          = f.text_field :street, placeholder: t(".address"), class: "form-control"
+          = f.text_field :street, placeholder: registration_field_address_placeholder(address_org), class: "form-control"
+          = registration_address_required_below_helper(address_org)
+
     .form-group.row
-      %label.form-well-label
+      - if @user.no_address?
+        = f.label :city, address_label, class: "form-well-label"
+      - else
+        %label.form-well-label
       .form-well-input
         = f.text_field :city, placeholder: t(".city"), class: "form-control"
+
+    .form-group.row.fancy-select.no-restore-on-backspace.unfancy
+      %label.form-well-label
+      .form-well-input#us_id_data{data: {usid: Country.united_states.id}}
+        = f.select(:country_id, Country.select_options, {prompt: t(".choose_country")}, {class: "country-select-input form-control"})
+
     - state_class = (@user.country_id == Country.united_states.id) ? "unhidden" : ""
-    .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
+    .form-group.row.fancy-select-placeholder.unfancy.hidden-other{class: state_class}
       %label.form-well-label
       .form-well-input
-        = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
+        = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
     .form-group.row.mb-4
       %label.form-well-label
       .form-well-input
         = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
 
   .form-group.row.fancy-select.unfancy
-    = f.label :country_id, class: "form-well-label" do
+    = f.label :preferred_language, class: "form-well-label" do
       = t(".preferred_language")
     .form-well-input
       = f.select(:preferred_language,
         options_for_select(language_choices, selected: current_user.preferred_language),
-        { prompt: t(".choose_language"), include_blank: true },
-        { class: "language-select-input form-control" } )
+        {prompt: t(".choose_language"), include_blank: true},
+        {class: "language-select-input form-control"} )
 
   .col-xs-12.mt-4
     %p
@@ -117,7 +126,7 @@
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post, class: "d-block"
-              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: { confirm: "Are you sure you want to remove #{user_email.email}?" }, class: 'delete-email'
+              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: {confirm: "Are you sure you want to remove #{user_email.email}?"}, class: 'delete-email'
     - if @user.user_emails.unconfirmed.count > 0
       .related-fields.no-divider-row
         - labeled = false
@@ -131,7 +140,7 @@
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".resend_confirmation"), resend_confirmation_user_email_path(user_email.id), method: :post, class: "d-block"
-              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: { confirm: "Are you sure you want to remove #{user_email.email}?" }, class: 'delete-email'
+              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: {confirm: "Are you sure you want to remove #{user_email.email}?"}, class: 'delete-email'
 
   .related-fields#additional_email_fields
     = f.hidden_field :additional_emails, value: nil
@@ -154,7 +163,7 @@
       </script>
 
   .add-additional-fields-block.no-divider-row
-    %a.add_fields#add_additional_email{ href: '#', role: 'button' }
+    %a.add_fields#add_additional_email{href: '#', role: 'button'}
       %span.context-display-help
         +
       = t(".add_additional_email")

@@ -160,7 +160,7 @@
           #{@organization.invoices.active.count} active
         and
       %em.less-strong
-        #{pluralize(@organization.invoices.count, "invoice")} total
+        = link_to "#{pluralize(@organization.invoices.count, 'invoice')} total", admin_organization_invoices_path(organization_id: @organization)
     - if @organization.parent_organization.present?
       %p
         Parent

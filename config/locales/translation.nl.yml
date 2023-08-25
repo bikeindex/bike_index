@@ -1104,6 +1104,10 @@ nl:
       hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
       made_without_serial: gemaakt zonder serie
       unknown: Onbekend
+    organization_helper:
+      address: Adres
+      address_school: Postadres van de campus
+      your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
   i18n_tasks:
     add_missing:
       added:
@@ -1799,7 +1803,6 @@ nl:
         ze geïdentificeerd. Voor meer informatie of enkele voorbeelden, ga naar %{serial_page_link}
         <small>(opent in een apart venster)</small> .
       state: Staat
-      street_address: Adres
       this_is_a: Dit is een
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
@@ -1808,7 +1811,6 @@ nl:
       was_made_before_1970: Werd vóór 1970 gemaakt
       without_serial: Deze %{bike_type} is zonder framenummer gemaakt
       without_serial_number: Deze %{bike_type} is gemaakt zonder framenummer
-      your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
       zipcode: Postcode
       manufacturer: Fabrikant
       enter_stolen_bike_type_details: Voer de gegevens voor Gestolen %{bike_type}
@@ -5279,7 +5281,6 @@ nl:
     embed:
       add_a_color: Voeg een kleur toe
       additional_serial: Extra framenummer / stickernummer
-      address: Adres
       choose_color: Kies een kleur
       choose_country: Kies land
       city: City
@@ -5299,7 +5300,6 @@ nl:
       model_year: Modeljaar
       optional_upload_a_photo: Optioneel - upload een foto
       other_manufacturer: Andere fabrikant
-      owners_street_address: Straatnaam van de eigenaar
       police_report_number: Nummer politie rapport
       receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
         gestolen %{bike_type}
@@ -5323,6 +5323,7 @@ nl:
       zipcode: Postcode
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
+      owners_mailing_address: Het postadres van de eigenaar
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} is bij u geregistreerd via <strong>%{org_name}</strong>
         ."
@@ -5332,7 +5333,6 @@ nl:
     embed_extended:
       add_a_color: Voeg een kleur toe
       additional_serial: Extra framenummer / stickernummer
-      address: Adres
       any_extra_words: Nog extra woorden?
       choose_color: Kies een kleur
       choose_handlebar: Kies stuur
@@ -5349,7 +5349,6 @@ nl:
       other_manufacturer: Andere fabrikant
       owners_email_address: E-mailadres van de eigenaar
       owners_phone: Telefoon van de eigenaar
-      owners_street_address: Straatnaam van de eigenaar
       primary_frame_material: Primair framemateriaal
       register_this: Registreer dit
       remove_color: Verwijder kleur
@@ -5364,6 +5363,7 @@ nl:
       zipcode: Postcode
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
+      owners_mailing_address: Het postadres van de eigenaar
     new:
       bike_index_for_organizations: Bike Index voor organisaties
     new_form:
