@@ -42,7 +42,7 @@
               = membership.invited_email
           - unless skip_organization
             %td
-              = link_to membership.organization.name, admin_organization_path(membership.organization)
+              = link_to membership.organization&.name, admin_organization_path(membership.organization)
           %td
             - if membership.claimed_at.present?
               %span.convertTime
