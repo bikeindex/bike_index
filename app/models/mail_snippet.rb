@@ -5,6 +5,7 @@ class MailSnippet < ApplicationRecord
     custom: 0,
     header: 1,
     welcome: 2,
+    after_welcome: 14,
     footer: 3,
     security: 4,
     partial_registration: 6,
@@ -37,9 +38,10 @@ class MailSnippet < ApplicationRecord
     {
       header: {emails: "all", description: "Top of email block"},
       welcome: {emails: "finished_registration", description: "Below header"},
+      after_welcome: {emails: "finished_registration", description: "After \"Congrats\", in \"Finished registration\""},
       footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
       partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
-      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""}
+      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""},
     }.with_indifferent_access.freeze
   end
 
