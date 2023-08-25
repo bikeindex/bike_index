@@ -91,7 +91,7 @@
       #address-fields
         = f.label :street, label_address, class: label_address_class
         .street-control
-          = f.text_field :street, required: true, placeholder: t(".address")
+          = f.text_field :street, required: true, placeholder: registration_field_address_placeholder(@organization)
         .control-group
           = f.text_field :city, required: true, placeholder: t(".city")
         .control-group

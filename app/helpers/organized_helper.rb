@@ -150,4 +150,8 @@ module OrganizedHelper
     return nil unless txt.present?
     strip_tags ? strip_tags(txt) : txt.html_safe
   end
+
+  def registration_field_address_placeholder(organization = nil)
+    I18n.t(organization&.school? ? :address_school : :address, scope: %i[helpers organization_helper])
+  end
 end

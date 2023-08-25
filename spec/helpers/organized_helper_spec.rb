@@ -286,4 +286,19 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
   end
+
+  describe "registration_field_address_placeholder" do
+    let(:organization) { Organization.new(kind: kind) }
+    let(:kind) { :bike_shop }
+    it "is complete address" do
+      expect(registration_field_address_placeholder).to eq "Complete address"
+      expect(registration_field_address_placeholder(organization)).to eq "Complete address"
+    end
+    context "school" do
+      let(:kind) { :school }
+      it "is Campus address" do
+        expect(registration_field_address_placeholder(organization)).to eq "Campus address"
+      end
+    end
+  end
 end
