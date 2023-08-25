@@ -354,6 +354,11 @@ class User < ApplicationRecord
     bike_sticker_updates.successful.unauthorized_organization.distinct.pluck(:bike_sticker_id)
   end
 
+  # Used to render organization address fields on user root, if present. Method here for testing
+  def uro_organization_reg_address
+    uro_organizations.with_enabled_feature_slugs("reg_address").first
+  end
+
   def render_donation_request
     return nil unless has_police_membership? && !organizations.law_enforcement.paid.limit(1).any?
     "law_enforcement"

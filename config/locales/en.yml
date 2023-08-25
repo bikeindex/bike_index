@@ -1114,7 +1114,6 @@ en:
       was_made_before_1970: Was made before 1970
       without_serial: This %{bike_type} was made without a serial
       without_serial_number: This %{bike_type} was made without a serial number
-      your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organization_stolen_message:
       report_link_text: at this link
@@ -2333,8 +2332,9 @@ en:
       made_without_serial: made without serial
       unknown: unknown
     organization_helper:
-      street_address: Street address
-      street_address_school: Campus street address
+      address: Street address
+      address_school: Campus mailing address
+      your_full_address_is_required: Your full address is required by %{org_name}
     page_entries_info:
       more_pages:
         display_entries: >-
@@ -4232,7 +4232,7 @@ en:
       model_year: Model year
       optional_upload_a_photo: Optional - upload a photo
       other_manufacturer: Other manufacturer
-      owners_street_address: Owner's Street address
+      owners_mailing_address: Owner's mailing address
       police_report_number: Police report number
       receive_notifications_from_bike_index: Receive notifications from the Index
         about this stolen %{bike_type}
@@ -4281,8 +4281,8 @@ en:
       other_defining_features: Other defining features
       other_manufacturer: Other manufacturer
       owners_email_address: Owner's email address
+      owners_mailing_address: Owner's mailing address
       owners_phone: Owner's phone
-      owners_street_address: Owner's Street address
       primary_frame_material: Primary frame material
       register_this: Register this
       remove_color: Remove color

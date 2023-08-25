@@ -288,6 +288,7 @@ RSpec.describe BikeDisplayer do
         let(:user) { FactoryBot.create(:user, :in_amsterdam, address_set_manually: true) }
         it "is falsey" do
           expect(user.reload.address_set_manually).to be_truthy
+          expect(user.uro_organization_reg_address&.id).to be_nil
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
           expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey
@@ -303,6 +304,7 @@ RSpec.describe BikeDisplayer do
           expect(user.user_registration_organizations.pluck(:id)).to eq([user_registration_organization.id])
           expect(user.uro_organizations.pluck(:id)).to eq([organization.id])
           expect(user.uro_organizations.first.additional_registration_fields).to eq(["reg_address"])
+          expect(user.uro_organization_reg_address&.id).to eq organization.id
           expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_falsey
           expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
           expect(BikeDisplayer.edit_street_address?(bike, user)).to be_falsey

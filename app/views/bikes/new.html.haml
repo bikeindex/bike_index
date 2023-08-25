@@ -119,8 +119,7 @@
                     placeholder: registration_field_address_placeholder(@organization),
                     class: 'form-control'
 
-                  %span.below-input-help.text-warning
-                    = t(".your_full_address_is_required", org_name: @organization.short_name)
+                  = registration_address_required_below_helper(address_org)
 
               .form-group.row
                 %label.form-well-label
