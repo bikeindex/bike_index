@@ -152,6 +152,6 @@ module OrganizedHelper
   end
 
   def registration_field_address_placeholder(organization = nil)
-    I18n.t(organization&.school? ? :address_school : :address, scope: %i[helpers organization_helper])
+    I18n.t(organization&.school? ? :street_address_school : :street_address, scope: %i[helpers organization_helper])
   end
 end
