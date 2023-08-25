@@ -169,7 +169,7 @@
           - if include_field_reg_student_id?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
               = f.label :student_id,
-                registration_field_label(@organization, "student_id") || t(".student_id"),
+                registration_field_label(@organization, "reg_student_id") || t(".student_id"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :student_id,
