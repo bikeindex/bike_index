@@ -1024,6 +1024,7 @@ nl:
           community_member: Gemeenschap lid
           employee: Werknemer
           student: Student
+          graduate_student: Afgestudeerde student
     status_humanized:
       bike:
         abandoned: Verlaten

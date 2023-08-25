@@ -45,7 +45,7 @@ class CycleType
     "e-scooter": "E-Scooter",
     "personal-mobility": "E-Skateboard (E-Unicycle, Personal mobility device, etc)",
     "non-e-scooter": "Scooter (Not electric)",
-    "non-e-skateboard": "Skateboard (Not electric)",
+    "non-e-skateboard": "Skateboard (Not electric)"
   }.freeze
 
   def self.searchable_names
