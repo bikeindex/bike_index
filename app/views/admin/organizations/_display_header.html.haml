@@ -8,7 +8,7 @@
 - skip_invoices ||= false
 
 .admin-subnav
-  .col-md-4
+  .col
     %h1
       = current_action
       %small
@@ -16,7 +16,7 @@
           = organization.name
         - else
           = link_to organization.name, admin_organization_url(organization.to_param)
-  .col-md-8
+  .col
     %ul
       - if additional_link.present?
         %li.nav-item
