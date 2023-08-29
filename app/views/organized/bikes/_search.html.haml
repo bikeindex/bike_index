@@ -225,7 +225,9 @@
                     %small{style: "line-height: 1.5;"}
                       = bike.address_hash["street"]
                 - elsif bike_attr == "organization_affiliation"
-                  = bike.organization_affiliation&.humanize
+                  = bike.organization_affiliation(current_organization)&.humanize
+                - elsif bike_attr == "student_id"
+                  = bike.student_id(current_organization)&.humanize
                 - else
                   = bike.send(bike_attr)
             -# All organizations can see additional serial#

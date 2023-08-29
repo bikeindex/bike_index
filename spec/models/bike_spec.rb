@@ -368,6 +368,22 @@ RSpec.describe Bike, type: :model do
             expect(bike.organization_affiliation).to eq "student"
             expect(bike.registration_info).to eq target_registration_info.merge(organization_affiliation: "student").as_json
           end
+          context "multiple organizations" do
+            # Look in user_registration_organization_spec
+            let(:organization1) { FactoryBot.create(:organization) }
+            let(:organization2) { FactoryBot.create(:organization) }
+            let(:registration_info) do
+              {"organization_affiliation_#{organization1.id}" => "graduate_student",
+               "organization_affiliation_#{organization2.id}" => "community_member"}
+            end
+            it "uses correct values" do
+              bike.reload
+              # expect(bike.registration_info).to eq target_registration_info
+              expect(bike.organization_affiliation(organization1)).to eq "graduate_student"
+              expect(bike.organization_affiliation(organization2.id)).to eq "community_member"
+              expect(bike.registration_info).to eq registration_info
+            end
+          end
         end
       end
 
