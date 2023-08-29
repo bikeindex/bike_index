@@ -74,7 +74,7 @@
 
 
 - if display_dev_info?
-  .row
+  .row.mt-5
     .col-md-6
-      %h4.only-dev-visible Registration info
+      %h5.only-dev-visible Registration info
       = pretty_print_json(@ownership.registration_info, true)

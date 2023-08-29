@@ -374,7 +374,7 @@ RSpec.describe Bike, type: :model do
             let(:organization2) { FactoryBot.create(:organization) }
             let(:registration_info) do
               {"organization_affiliation_#{organization1.id}" => "graduate_student",
-                "organization_affiliation_#{organization2.id}" => "community_member"}
+               "organization_affiliation_#{organization2.id}" => "community_member"}
             end
             it "uses correct values" do
               bike.reload
@@ -383,7 +383,6 @@ RSpec.describe Bike, type: :model do
               expect(bike.organization_affiliation(organization2.id)).to eq "community_member"
               expect(bike.registration_info).to eq registration_info
             end
-
           end
         end
       end
