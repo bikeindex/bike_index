@@ -64,4 +64,17 @@
       %tr
         %td Claim message
         %td= @ownership.claim_message&.humanize
+      %tr
+        %td Pre-registration?
+        %td= check_mark if @ownership.organization_pre_registration
+      %tr
+        %td Origin
+        %td
+          %code= @ownership.origin
 
+
+- if display_dev_info?
+  .row
+    .col-md-6
+      %h4.only-dev-visible Registration info
+      = pretty_print_json(@ownership.registration_info, true)
