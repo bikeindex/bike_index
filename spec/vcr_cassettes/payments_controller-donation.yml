@@ -5,14 +5,14 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=donate&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer_email=user45s%40bikeiasdndex.org
+      string: submit_type=donate&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer_email=user308s%40bikeiasdndex.org
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_zf2aNb7Tao0iUT","request_duration_ms":581}}'
+      - '{"last_request_metrics":{"request_id":"req_WkvXuFZ8ftMPBj","request_duration_ms":664}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 28 Jul 2023 20:24:48 GMT
+      - Tue, 29 Aug 2023 17:22:07 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2240'
+      - '2242'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -45,11 +45,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Idempotency-Key:
-      - bce82673-602e-4c42-a78e-de79bccd9714
+      - 159c66ad-c343-4ec6-87a5-23eba2a93f39
       Original-Request:
-      - req_chnNtJWBR34aaC
+      - req_84nFH4Sg9Ukati
       Request-Id:
-      - req_chnNtJWBR34aaC
+      - req_84nFH4Sg9Ukati
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -62,7 +62,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1Rr1oP6MeVPGJVoq60Qt6vd93VNCuror9YK0qT4SmCIyQkpsWbrybtzUb",
+          "id": "cs_test_a1hpJArVL4Fb3fOR55iqC2YQJHofaBAqF1bAznt8snGINzcUoS7vTbU2fn",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -77,7 +77,7 @@ http_interactions:
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1690575888,
+          "created": 1693329727,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -89,14 +89,14 @@ http_interactions:
           "customer_creation": "always",
           "customer_details": {
             "address": null,
-            "email": "user45s@bikeiasdndex.org",
+            "email": "user308s@bikeiasdndex.org",
             "name": null,
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": null
           },
-          "customer_email": "user45s@bikeiasdndex.org",
-          "expires_at": 1690662287,
+          "customer_email": "user308s@bikeiasdndex.org",
+          "expires_at": 1693416127,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -113,7 +113,7 @@ http_interactions:
           "locale": null,
           "metadata": {},
           "mode": "payment",
-          "payment_intent": "pi_2NYxDQm0T0GBfX0v0ORRHAuP",
+          "payment_intent": "pi_2NkVcBm0T0GBfX0v0E5LoQGX",
           "payment_link": null,
           "payment_method_collection": "always",
           "payment_method_options": {},
@@ -139,13 +139,13 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1Rr1oP6MeVPGJVoq60Qt6vd93VNCuror9YK0qT4SmCIyQkpsWbrybtzUb#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1hpJArVL4Fb3fOR55iqC2YQJHofaBAqF1bAznt8snGINzcUoS7vTbU2fn#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
     http_version: 
-  recorded_at: Fri, 28 Jul 2023 20:24:48 GMT
+  recorded_at: Tue, 29 Aug 2023 17:22:07 GMT
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1Rr1oP6MeVPGJVoq60Qt6vd93VNCuror9YK0qT4SmCIyQkpsWbrybtzUb
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1hpJArVL4Fb3fOR55iqC2YQJHofaBAqF1bAznt8snGINzcUoS7vTbU2fn
     body:
       encoding: US-ASCII
       string: ''
@@ -155,7 +155,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_chnNtJWBR34aaC","request_duration_ms":585}}'
+      - '{"last_request_metrics":{"request_id":"req_84nFH4Sg9Ukati","request_duration_ms":664}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -168,11 +168,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 28 Jul 2023 20:24:48 GMT
+      - Tue, 29 Aug 2023 17:22:07 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2240'
+      - '2242'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -188,7 +188,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_AfEbUlSLUri8aX
+      - req_vqT9iVzMP6bmAD
       Stripe-Version:
       - '2014-12-08'
       X-Stripe-Routing-Context-Priority-Tier:
@@ -199,7 +199,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1Rr1oP6MeVPGJVoq60Qt6vd93VNCuror9YK0qT4SmCIyQkpsWbrybtzUb",
+          "id": "cs_test_a1hpJArVL4Fb3fOR55iqC2YQJHofaBAqF1bAznt8snGINzcUoS7vTbU2fn",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -214,7 +214,7 @@ http_interactions:
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1690575888,
+          "created": 1693329727,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -226,14 +226,14 @@ http_interactions:
           "customer_creation": "always",
           "customer_details": {
             "address": null,
-            "email": "user45s@bikeiasdndex.org",
+            "email": "user308s@bikeiasdndex.org",
             "name": null,
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": null
           },
-          "customer_email": "user45s@bikeiasdndex.org",
-          "expires_at": 1690662287,
+          "customer_email": "user308s@bikeiasdndex.org",
+          "expires_at": 1693416127,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -250,7 +250,7 @@ http_interactions:
           "locale": null,
           "metadata": {},
           "mode": "payment",
-          "payment_intent": "pi_2NYxDQm0T0GBfX0v0ORRHAuP",
+          "payment_intent": "pi_2NkVcBm0T0GBfX0v0E5LoQGX",
           "payment_link": null,
           "payment_method_collection": "always",
           "payment_method_options": {},
@@ -276,8 +276,8 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1Rr1oP6MeVPGJVoq60Qt6vd93VNCuror9YK0qT4SmCIyQkpsWbrybtzUb#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1hpJArVL4Fb3fOR55iqC2YQJHofaBAqF1bAznt8snGINzcUoS7vTbU2fn#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
     http_version: 
-  recorded_at: Fri, 28 Jul 2023 20:24:48 GMT
+  recorded_at: Tue, 29 Aug 2023 17:22:07 GMT
 recorded_with: VCR 5.0.0
