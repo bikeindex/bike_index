@@ -125,37 +125,9 @@ class BikeIndex.Init extends BikeIndex
     if withPreposition then "on #{str}" else str
 
   localizeTimes: ->
-    window.localTimezone ||= moment.tz.guess()
-    moment.tz.setDefault(window.localTimezone)
-    window.yesterday = moment().subtract(1, "day").startOf("day")
-    window.today = moment().startOf("day")
-    window.tomorrow = moment().endOf("day")
-    # Update any hidden fields with current timezone
-    $(".hiddenFieldTimezone").val(window.localTimezone)
-
-    displayLocalDate = @displayLocalDate
-
-    # Write local time (format: 2018-07-14T01:00:00-0500)
-    $(".convertTime").each ->
-      $this = $(this)
-      $this.removeClass("convertTime")
-      text = $this.text().trim()
-      return unless text.length > 0
-      time = moment(text, moment.ISO_8601)
-      return unless time.isValid
-      $this.text(displayLocalDate(time, $this.hasClass("preciseTime"), $this.hasClass("withPreposition")))
-
-    # Write timezone
-    $(".convertTimezone").each ->
-      $this = $(this)
-      $this.text(moment().format("z"))
-      $this.removeClass("convertTimezone")
-
-    # Write local time in fields
-    $(".dateInputUpdateZone").each ->
-      $this = $(this)
-      time = moment($this.attr("data-initialtime"), moment.ISO_8601)
-      $this.val(time.format("YYYY-MM-DDTHH:mm")) # Format that at least Chrome expects for field
+    # NOTE: This uses time_parser-coffeeimport.js - not time_parser.js
+    window.timeParser ||= new TimeParser()
+    window.timeParser.localize()
 
   # copy of bike_index_utilities.js function
   enableFullscreenOverflow: ->

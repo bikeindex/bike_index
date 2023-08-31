@@ -116,11 +116,10 @@
                 .form-well-input
                   = f.text_field :street,
                     required: true,
-                    placeholder: t(".street_address"),
+                    placeholder: registration_field_address_placeholder(@organization),
                     class: 'form-control'
 
-                  %span.below-input-help.text-warning
-                    = t(".your_full_address_is_required", org_name: @organization.short_name)
+                  = registration_address_required_below_helper(@organization)
 
               .form-group.row
                 %label.form-well-label
@@ -170,7 +169,7 @@
           - if include_field_reg_student_id?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
               = f.label :student_id,
-                registration_field_label(@organization, "student_id") || t(".student_id"),
+                registration_field_label(@organization, "reg_student_id") || t(".student_id"),
                 class: "form-well-label"
               .form-well-input
                 = f.text_field :student_id,

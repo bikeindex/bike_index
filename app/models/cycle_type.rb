@@ -1,5 +1,6 @@
 class CycleType
   include Enumable
+  include AutocompleteHashable
 
   SLUGS = {
     bike: 0,
@@ -42,10 +43,14 @@ class CycleType
     "trail-behind": "Trail behind (half bike)",
     "pedi-cab": "Pedi Cab (rickshaw)",
     "e-scooter": "E-Scooter",
-    "e-skateboard": "E-skateboard",
-    "personal-mobility": "Personal mobility device (electric unicycle, etc)",
-    "non-e-scooter": "Scooter (Not electric)"
+    "personal-mobility": "E-Skateboard (E-Unicycle, Personal mobility device, etc)",
+    "non-e-scooter": "Scooter (Not electric)",
+    "non-e-skateboard": "Skateboard (Not electric)"
   }.freeze
+
+  def self.searchable_names
+    slugs
+  end
 
   def initialize(slug)
     @slug = slug&.to_sym
@@ -53,4 +58,26 @@ class CycleType
   end
 
   attr_reader :slug, :id
+
+  def priority
+    900
+  end
+
+  def search_id
+    "v_#{id}"
+  end
+
+  def autocomplete_hash
+    {
+      id: id,
+      text: name,
+      category: "cycle_type",
+      priority: priority,
+      data: {
+        priority: priority,
+        slug: slug,
+        search_id: search_id
+      }
+    }.as_json
+  end
 end

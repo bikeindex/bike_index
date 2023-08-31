@@ -106,7 +106,7 @@ function BinxAdmin () {
           return $(this).outerWidth()
         })
         .get()
-      log.debug(width)
+      // log.debug(width)
       const widthSum = width.reduce((a, b) => a + b + 5, 0)
 
       $('#bike-tab-wrapper .nav-tabs').css('min-width', `${widthSum + 22}px`)

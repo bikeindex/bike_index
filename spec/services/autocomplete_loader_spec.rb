@@ -7,6 +7,7 @@ RSpec.describe AutocompleteLoader do
       expect(autocomplete_loader).to receive(:clear)
       expect(autocomplete_loader).to receive(:load_colors)
       expect(autocomplete_loader).to receive(:load_manufacturers)
+      expect(autocomplete_loader).to receive(:load_cycle_types)
       autocomplete_loader.reset
     end
   end

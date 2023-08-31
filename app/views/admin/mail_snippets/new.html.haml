@@ -4,6 +4,5 @@
   .col-md-6
     = form_for [:admin, @mail_snippet] do |f|
       = render partial: 'form', locals: { f: f }
-      = f.hidden_field :is_location_triggered, value: true
 
       = f.submit "Create", class: 'btn btn-success float-right'

@@ -949,7 +949,8 @@ en:
         organization_affiliation_options:
           community_member: Community Member
           employee: Employee
-          student: Student
+          graduate_student: Graduate Student
+          student: Student (Undergraduate)
       stolen_record:
         bike_was_not_locked: Bike was not locked
         cable_lock: Cable lock
@@ -1105,7 +1106,6 @@ en:
         window)</small>.
       state: State
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
-      street_address: Street address
       student_id: Student ID
       this_is_a: This is a
       unknown_year: Unknown year
@@ -1115,7 +1115,6 @@ en:
       was_made_before_1970: Was made before 1970
       without_serial: This %{bike_type} was made without a serial
       without_serial_number: This %{bike_type} was made without a serial number
-      your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organization_stolen_message:
       report_link_text: at this link
@@ -2333,6 +2332,10 @@ en:
       hidden_for_unauthorized_users: hidden for unauthorized users
       made_without_serial: made without serial
       unknown: unknown
+    organization_helper:
+      address: Street address
+      address_school: Campus mailing address
+      your_full_address_is_required: Your full address is required by %{org_name}
     page_entries_info:
       more_pages:
         display_entries: >-
@@ -4210,7 +4213,6 @@ en:
     embed:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
-      address: Complete address
       choose_color: Choose color
       choose_country: Choose country
       city: City
@@ -4231,7 +4233,7 @@ en:
       model_year: Model year
       optional_upload_a_photo: Optional - upload a photo
       other_manufacturer: Other manufacturer
-      owners_street_address: Owner's Street address
+      owners_mailing_address: Owner's mailing address
       police_report_number: Police report number
       receive_notifications_from_bike_index: Receive notifications from the Index
         about this stolen %{bike_type}
@@ -4265,7 +4267,6 @@ en:
     embed_extended:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
-      address: Complete address
       any_extra_words: Any extra words?
       choose_color: Choose color
       choose_handlebar: Choose handlebar
@@ -4281,8 +4282,8 @@ en:
       other_defining_features: Other defining features
       other_manufacturer: Other manufacturer
       owners_email_address: Owner's email address
+      owners_mailing_address: Owner's mailing address
       owners_phone: Owner's phone
-      owners_street_address: Owner's Street address
       primary_frame_material: Primary frame material
       register_this: Register this
       remove_color: Remove color
@@ -4424,7 +4425,11 @@ en:
         email: email
         incomplete: incomplete
         matching: matching
+        only_resend_with_permission: >-
+          Only re-send partial registrations with the user's permission! Otherwise
+          the emails qualify as spam.
         org_incomplete_registrations_html: "<em>%{org_name}</em> Incomplete Registrations"
+        re_send: re-send
         registration: registration
         search: Search
         search_emails: Search emails
@@ -4500,16 +4505,17 @@ en:
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
     bulk_imports:
+      error_type:
+        file: File
+        line: Line
       index:
         added: Added
         bikes: Bikes
         creator: Creator
         errors: Errors
         exclude_empty_imports: Exclude Empty imports
-        file: File!
         include_empty_imports: Include Empty imports
         kind: Kind
-        line: Line
         new_import: New import
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"

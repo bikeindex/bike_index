@@ -21,6 +21,17 @@ module ApplicationHelper
     image_tag("link.svg", class: "link-emoji")
   end
 
+  def notification_delivery_display(status)
+    text = if status == "email_success"
+      check_mark
+    elsif status.nil?
+      "..."
+    else
+      status
+    end
+    content_tag(:span, text, title: status&.titleize, style: "cursor:default;")
+  end
+
   def attr_list_item(desc, title)
     return nil unless desc.present?
     content_tag(:li) do

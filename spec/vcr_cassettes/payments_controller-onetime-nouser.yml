@@ -11,8 +11,6 @@ http_interactions:
       - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
-      X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_2peHFTYtXj1L1I","request_duration_ms":185}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,7 +23,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 28 Jul 2023 20:24:47 GMT
+      - Tue, 29 Aug 2023 17:22:07 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -45,11 +43,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Idempotency-Key:
-      - b7a57687-a02a-41c3-a673-7a3759c2025b
+      - 0b7a0363-7c86-408f-84a4-9fb6401b82e4
       Original-Request:
-      - req_zf2aNb7Tao0iUT
+      - req_WkvXuFZ8ftMPBj
       Request-Id:
-      - req_zf2aNb7Tao0iUT
+      - req_WkvXuFZ8ftMPBj
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -62,7 +60,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a15VpuNWL5I6Go5jssDW7NfYqEHyvENdtugLnK9Mj3CmQM50t4SDcWBRsb",
+          "id": "cs_test_a1zzNa1XZ7FQEXTx00hgDNFxxfKa2c3ud0VrFx4zqSgpLqvViHqcAPwcSA",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -77,7 +75,7 @@ http_interactions:
           "client_reference_id": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1690575887,
+          "created": 1693329726,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -89,7 +87,7 @@ http_interactions:
           "customer_creation": "always",
           "customer_details": null,
           "customer_email": null,
-          "expires_at": 1690662287,
+          "expires_at": 1693416126,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -106,7 +104,7 @@ http_interactions:
           "locale": null,
           "metadata": {},
           "mode": "payment",
-          "payment_intent": "pi_2NYxDPm0T0GBfX0v0WLxvU0i",
+          "payment_intent": "pi_2NkVcAm0T0GBfX0v1R3n1ClI",
           "payment_link": null,
           "payment_method_collection": "always",
           "payment_method_options": {},
@@ -132,8 +130,8 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a15VpuNWL5I6Go5jssDW7NfYqEHyvENdtugLnK9Mj3CmQM50t4SDcWBRsb#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1zzNa1XZ7FQEXTx00hgDNFxxfKa2c3ud0VrFx4zqSgpLqvViHqcAPwcSA#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
     http_version: 
-  recorded_at: Fri, 28 Jul 2023 20:24:47 GMT
+  recorded_at: Tue, 29 Aug 2023 17:22:07 GMT
 recorded_with: VCR 5.0.0

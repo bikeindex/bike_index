@@ -1,8 +1,8 @@
-= render partial: "/admin/organizations/display_header", locals: {current_action: "", skip_invoices: true, additional_link: link_to("New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link btn btn-success btn-sm mr-2")}
+= render partial: "/admin/organizations/display_header", locals: {current_action: "Invoices for", skip_invoices: true, additional_link: link_to("New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link btn btn-success btn-sm mr-2")}
 
 = render partial: "/admin/organizations/invoices/table", locals: {invoices: @invoices}
 
-%h2.mt-4
+%h2.mt-5
   #{@organization.name} has #{pluralize(@organization.payments.count, "payment")}
 
 %p.less-strong

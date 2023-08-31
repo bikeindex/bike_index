@@ -9,6 +9,7 @@ class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
     finished_registration: 6,
+    partial_registration: 7,
     receipt: 1,
     stolen_notification_sent: 3,
     stolen_notification_blocked: 4,
@@ -85,6 +86,10 @@ class Notification < ApplicationRecord
     kinds.select { |k| k.start_with?("user_alert_") }.freeze
   end
 
+  def self.b_param_kinds
+    %w[partial_registration].freeze
+  end
+
   def self.customer_contact_kinds
     %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
   end
@@ -118,6 +123,10 @@ class Notification < ApplicationRecord
     self.class.theft_alert_kinds.include?(kind)
   end
 
+  def b_param?
+    self.class.b_param_kinds.include?(kind)
+  end
+
   def stolen_notification?
     self.class.stolen_notification_kinds.include?(kind)
   end
@@ -139,6 +148,7 @@ class Notification < ApplicationRecord
   end
 
   def calculated_email
+    return notifiable&.email if b_param?
     return notifiable&.receiver_email if stolen_notification?
     return user&.email if user.present?
     notifiable&.user_email if customer_contact?

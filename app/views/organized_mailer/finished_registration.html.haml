@@ -27,7 +27,8 @@
         = t(".html.bike_register_with_bike_index_and_org", bike_type: @bike.type, org_name: @organization.short_name)
       - else
         = t(".html.bike_register_with_bike_index", bike_type: @bike.type)
-
+  - if @organization&.mail_snippet_body('after_welcome').present?
+    = @organization.mail_snippet_body('after_welcome').html_safe
   %p
     - org_name = @creation_org&.name || @ownership&.creator&.display_name
 

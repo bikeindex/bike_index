@@ -368,6 +368,22 @@ RSpec.describe Bike, type: :model do
             expect(bike.organization_affiliation).to eq "student"
             expect(bike.registration_info).to eq target_registration_info.merge(organization_affiliation: "student").as_json
           end
+          context "multiple organizations" do
+            # Look in user_registration_organization_spec
+            let(:organization1) { FactoryBot.create(:organization) }
+            let(:organization2) { FactoryBot.create(:organization) }
+            let(:registration_info) do
+              {"organization_affiliation_#{organization1.id}" => "graduate_student",
+               "organization_affiliation_#{organization2.id}" => "community_member"}
+            end
+            it "uses correct values" do
+              bike.reload
+              # expect(bike.registration_info).to eq target_registration_info
+              expect(bike.organization_affiliation(organization1)).to eq "graduate_student"
+              expect(bike.organization_affiliation(organization2.id)).to eq "community_member"
+              expect(bike.registration_info).to eq registration_info
+            end
+          end
         end
       end
 
@@ -1594,12 +1610,21 @@ RSpec.describe Bike, type: :model do
         expect(bike.image_url).to eq public_image.image_url
         expect(bike.image_url(:medium)).to eq public_image.image_url(:medium)
       end
+      it "with REMOTE_IMAGE_FALLBACK_URLS true return URL" do
+        stub_const("BikeAttributable::REMOTE_IMAGE_FALLBACK_URLS", true)
+        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
+        # Approximates what happens for local dev with remote images
+        allow_any_instance_of(ImageUploader).to receive(:blank?) { true }
+        image_url = public_image.image_url
+        expect(bike.reload.image_url).to eq image_url.gsub("http://test.host", "https://files.bikeindex.org")
+      end
     end
     context "with missing public_image" do
       let(:bike) { FactoryBot.create(:bike) }
       # This happens sometimes when images are deleted
       before { bike.update_column(:thumb_path, "https://files.bikeindex.org/uploads/Pu/33333/adsf.jpg") }
       it "is nil" do
+        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.reload.image_url).to be_blank
       end
     end
