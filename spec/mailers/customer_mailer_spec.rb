@@ -206,17 +206,19 @@ RSpec.describe CustomerMailer, type: :mailer do
   end
 
   describe "theft_survey" do
-    let(:stolen_record) { FactoryBot.create(:stolen_bike, :with_ownership_claimed).current_stolen_record }
-    let!(:notification) { Notification.create(kind: "theft_survey_4_2022", notifiable: stolen_record, user: user) }
-    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_4_2022", subject: "Survey!", body: "Dear Bike Index Registrant, XXXvvvvCCC", is_enabled: true) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:notification) { Notification.create(kind: "theft_survey_2023", notifiable: bike, user: user) }
+    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_2023", subject: "Survey!", body: "Dear Bike Index Registrant, view survey: https://example.com?respid=SURVEY_LINK_ID", is_enabled: true) }
     it "renders the mail" do
+      Notification.create(kind: "theft_survey_2023")
+      expect(notification.survey_id).to eq 2
+
       mail = CustomerMailer.theft_survey(notification)
 
       expect(mail.from).to eq(["gavin@bikeindex.org"])
       expect(mail.to).to eq([user.email])
-      expect(mail.tag).to eq "theft_survey_4_2022"
-      expect(mail.body.encoded).to match "Dear #{user.name}, XXXvvvvCCC"
-      expect(mail.body.encoded).to_not match "supported by"
+      expect(mail.tag).to eq "theft_survey_2023"
+      expect(mail.body.encoded.strip).to eq "Dear #{user.name}, view survey: https://example.com?respid=2"
       expect(mail.message_stream).to eq "outbound"
     end
   end

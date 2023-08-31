@@ -88,4 +88,15 @@ RSpec.describe Notification, type: :model do
       expect(notification).to be_valid
     end
   end
+
+  describe "theft_survey_2023" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:user) { bike.owner }
+    it "is valid" do
+      notification = Notification.create(user: user, kind: "theft_survey_2023", notifiable: bike)
+      expect(notification).to be_valid
+      expect(notification.survey_id).to eq 1
+    end
+
+  end
 end

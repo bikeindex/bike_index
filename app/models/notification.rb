@@ -29,7 +29,8 @@ class Notification < ApplicationRecord
     bike_possibly_found: 23,
     user_alert_theft_alert_without_photo: 24,
     user_alert_stolen_bike_without_location: 25,
-    theft_survey_4_2022: 26
+    theft_survey_4_2022: 26,
+    theft_survey_2023: 27
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -55,7 +56,7 @@ class Notification < ApplicationRecord
   scope :theft_alert, -> { where(kind: theft_alert_kinds) }
   scope :impound_claim, -> { where(kind: impound_claim_kinds) }
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
-  scope :theft_survey, -> { where(kind: "theft_survey_4_2022") }
+  scope :theft_survey, -> { where(kind: theft_survey_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -84,6 +85,10 @@ class Notification < ApplicationRecord
 
   def self.user_alert_kinds
     kinds.select { |k| k.start_with?("user_alert_") }.freeze
+  end
+
+  def self.theft_survey_kinds
+    %w[theft_survey_4_2022 theft_survey_2023].freeze
   end
 
   def self.b_param_kinds
@@ -143,6 +148,10 @@ class Notification < ApplicationRecord
     self.class.customer_contact_kinds.include?(kind)
   end
 
+  def theft_survey?
+    self.class.theft_survey_kinds.include?(kind)
+  end
+
   def kind_humanized
     self.class.kind_humanized(kind)
   end
@@ -185,6 +194,12 @@ class Notification < ApplicationRecord
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
     self.delivery_status = nil if delivery_status.blank?
+  end
+
+  def survey_id
+    raise "Not a theft survey!" unless theft_survey?
+    id_searched = id || self.class.where(kind: kind).maximum(:id)
+    self.class.where(kind: kind).where("id < ?", id_searched).count + 1
   end
 
   private

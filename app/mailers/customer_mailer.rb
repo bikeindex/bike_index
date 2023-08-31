@@ -58,8 +58,9 @@ class CustomerMailer < ApplicationMailer
   end
 
   def theft_survey(notification)
-    mail_snippet = MailSnippet.theft_survey_4_2022.first
+    mail_snippet = MailSnippet.theft_survey_2023.first
     mail_body = mail_snippet.body.gsub(/Bike Index Registrant/i, notification.user.name)
+      .gsub(/SURVEY_LINK_ID/, notification.survey_id.to_s)
 
     mail(to: notification.user.email, from: "gavin@bikeindex.org",
       subject: mail_snippet.subject, body: mail_body + "\n\n\n\n", tag: notification.kind)
