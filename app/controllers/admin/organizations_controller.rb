@@ -98,13 +98,14 @@ class Admin::OrganizationsController < Admin::BaseController
         :available_invitation_count,
         :avatar,
         :avatar_cache,
+        :direct_unclaimed_notifications,
         :embedable_user_email,
         :graduated_notification_interval_days,
         :lightspeed_register_with_phone,
         :lock_show_on_map,
         :manufacturer_id,
         :name,
-        :direct_unclaimed_notifications,
+        :opted_into_theft_survey_2023,
         :parent_organization_id,
         :passwordless_user_domain,
         :previous_slug,
@@ -133,6 +134,8 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
+    @search_theft_survey = ParamsNormalizer.boolean(params[:search_theft_survey])
+    matching_organizations = matching_organizations.where(opted_into_theft_survey_2023: true) if @search_theft_survey
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
     @matching_organizations = matching_organizations.where(@time_range_column => @time_range)
