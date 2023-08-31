@@ -51,6 +51,7 @@ class Bike < ApplicationRecord
   has_many :parking_notifications
   has_many :graduated_notifications, foreign_key: :bike_id
   has_many :notifications
+  has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
   has_many :theft_alerts
 
   accepts_nested_attributes_for :stolen_records
