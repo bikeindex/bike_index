@@ -39,7 +39,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       expect(instance.send_survey?(bike3)).to be_falsey
       # But the notification is still valid
       notification3 = Notification.create(kind: "theft_survey_2023", bike: bike3)
-      expect(notification).to be_valid
+      expect(notification3).to be_valid
     end
   end
 

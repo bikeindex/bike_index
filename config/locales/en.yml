@@ -4037,6 +4037,7 @@ en:
         When not checked, manage through the "Groups and Organizations" page of each
         bike.
     root:
+      absolutely_no_notifications: Absolutely no email
       add_additional_email: Add additional email
       add_new_phone_number: Add a new phone number
       additional_email: Additional email
@@ -4055,13 +4056,14 @@ en:
       have_multiple_emails: Have multiple emails? Consolidate them into one account
         here
       make_primary_email: Make primary email
+      no_notifications_explanation: >-
+        blocks all email except password resets and theft notifications (for instance,
+        you will stop receiving new registration emails)
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
       preferred_language: Preferred language
       primary_email: Primary email
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
-      absolutely_no_notifications: Absolutely no email
-      no_notifications_explanation: blocks all email except password resets and theft notifications (for instance, you will stop receiving new registration emails)
       remove_email: Remove email
       remove_number: remove number
       resend_confirmation: Resend confirmation

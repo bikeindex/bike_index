@@ -96,7 +96,7 @@ RSpec.describe Notification, type: :model do
       notification = Notification.create(user: user, kind: "theft_survey_2023", bike: bike)
       expect(notification).to be_valid
       expect(notification.survey_id).to eq 1
-      expect(bike.reload.theft_surveys.pluck(:id)).to eq ([notification.id])
+      expect(bike.reload.theft_surveys.pluck(:id)).to eq([notification.id])
     end
   end
 end
