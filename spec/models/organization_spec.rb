@@ -460,8 +460,10 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "set_calculated_attributes" do
+    let(:organization) { Organization.new(name: name) }
+    let(:name) { "something" }
+
     it "sets the short_name and the slug on save" do
-      organization = Organization.new(name: "something")
       organization.set_calculated_attributes
       expect(organization.short_name).to be_present
       expect(organization.slug).to be_present
@@ -470,29 +472,70 @@ RSpec.describe Organization, type: :model do
       expect(organization.slug).to eq(slug)
     end
 
-    it "doesn't xss" do
-      org = Organization.new(name: "<script>alert(document.cookie)</script>",
-        website: "<script>alert(document.cookie)</script>")
-      org.set_calculated_attributes
-      expect(org.name).to match(/stop messing about/i)
-      expect(org.website).to eq("http://<script>alert(document.cookie)</script>")
-      expect(org.short_name).to match(/stop messing about/i)
+    context "tags" do
+      let(:name) { "<script>alert(document.cookie)</script>" }
+      it "doesn't xss" do
+        organization.website = "<script>alert(document.cookie)</script>"
+        organization.set_calculated_attributes
+        expect(organization.name).to match(/stop messing about/i)
+        expect(organization.website).to eq("http://<script>alert(document.cookie)</script>")
+        expect(organization.short_name).to match(/stop messing about/i)
+      end
     end
 
-    it "permits & in names" do
-      organization = Organization.new(name: "Bikes & Trikes")
-      organization.set_calculated_attributes
-      expect(organization.slug).to eq "bikes-amp-trikes"
-      expect(organization.name).to eq "Bikes & Trikes"
+    context "&" do
+      let(:name) { "Bikes & Trikes" }
+      it "permits & in names" do
+        organization.set_calculated_attributes
+        expect(organization.name).to eq "Bikes & Trikes"
+        expect(organization.short_name).to eq "Bikes & Trikes"
+        expect(organization.slug).to eq "bikes-amp-trikes"
+      end
     end
 
-    it "protects from name collisions, without erroring because of it's own slug" do
-      org1 = Organization.create(name: "Bicycle shop")
-      org1.reload.save
-      expect(org1.reload.slug).to eq("bicycle-shop")
-      organization = Organization.new(name: "Bicycle shop")
-      organization.set_calculated_attributes
-      expect(organization.slug).to eq("bicycle-shop-2")
+    context "& parens in short name" do
+      let(:name) { "Bikes (& Trikes)" }
+      it "permits & and parens in names" do
+        organization.set_calculated_attributes
+        expect(organization.name).to eq "Bikes (& Trikes)"
+        expect(organization.short_name).to eq "Bikes (& Trikes)"
+        # only ampersands surrounded by spaces are kept
+        expect(organization.slug).to eq "bikes--trikes"
+      end
+    end
+
+    context "name collisions" do
+      let(:name) { "Bicycle shop" }
+      let(:org1) { FactoryBot.create(:organization, name: name) }
+      it "protects from name collisions, without erroring because of it's own slug" do
+        expect(org1).to be_valid
+        expect(org1.reload.slug).to eq("bicycle-shop")
+
+        organization.set_calculated_attributes
+        expect(organization.slug).to eq("bicycle-shop-2")
+      end
+    end
+
+    context "long names" do
+      let(:name) { "Banff RCMP - Royal Canadian Mounted Police" }
+      it "truncates without ellipse" do
+        organization.set_calculated_attributes
+        expect(organization.short_name).to eq "Banff RCMP - Royal Canadian"
+        expect(organization.slug).to eq "banff-rcmp---royal-canadian"
+        expect(organization.name).to eq name
+      end
+      context "with parens" do
+        let(:name) { "Banff RCMP (Royal Canadian Mounted Police)" }
+        it "removes parens" do
+          organization.set_calculated_attributes
+          expect(organization.short_name).to eq "Banff RCMP"
+          expect(organization.slug).to eq "banff-rcmp"
+          expect(organization.name).to eq name
+          # And test something with an extra long name and a parens
+          xtra_long = "#{name} and something that goes on forever"
+          expect(organization.send(:name_shortener, xtra_long)).to eq "Banff RCMP and something that"
+        end
+      end
     end
 
     context "deleted things" do
