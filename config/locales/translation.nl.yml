@@ -851,6 +851,7 @@ nl:
         e_scooter: E-scooter
         e_skateboard: E-skateboard
         non_e_scooter: Scooter (niet elektrisch)
+        non_e_skateboard: Skateboard (niet elektrisch)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
