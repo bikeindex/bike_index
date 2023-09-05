@@ -209,18 +209,30 @@ RSpec.describe CustomerMailer, type: :mailer do
     let(:organization) { FactoryBot.create(:organization, name: "Wheelageddon") }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creation_organization: organization) }
     let(:notification) { Notification.create(kind: "theft_survey_2023", bike: bike, user: user) }
-    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_2023", subject: "Survey!", body: "Dear Bike Index Registrant, a bike from a Bike Shop, view survey: https://example.com?respid=SURVEY_LINK_ID", is_enabled: true) }
-    it "renders the mail" do
-      Notification.create(kind: "theft_survey_2023")
-      expect(notification.survey_id).to eq 2
+    it "raises" do
+      expect(MailSnippet.count).to eq 0
+      expect(notification).to be_valid
+      expect {
+        mail = CustomerMailer.theft_survey(notification)
+        expect(mail).to be_blank
+      }.to raise_error(/mail.snippet/i)
+    end
+    context "with mail_snippet" do
+      let(:mail_snippet) { MailSnippet.create(kind: "theft_survey_2023", subject: "Survey!", body: "Dear Bike Index Registrant, a bike from a Bike Shop, view survey: https://example.com?respid=SURVEY_LINK_ID", is_enabled: true) }
+      it "renders the mail" do
+        expect(mail_snippet).to be_valid
+        # Create a notification to verify survey_id increments
+        Notification.create(kind: "theft_survey_2023")
+        expect(notification.survey_id).to eq 2
 
-      mail = CustomerMailer.theft_survey(notification)
+        mail = CustomerMailer.theft_survey(notification)
 
-      expect(mail.from).to eq(["gavin@bikeindex.org"])
-      expect(mail.to).to eq([user.email])
-      expect(mail.tag).to eq "theft_survey_2023"
-      expect(mail.body.encoded.strip).to eq "Dear #{user.name}, a bike from Wheelageddon, view survey: https://example.com?respid=2"
-      expect(mail.message_stream).to eq "outbound"
+        expect(mail.from).to eq(["gavin@bikeindex.org"])
+        expect(mail.to).to eq([user.email])
+        expect(mail.tag).to eq "theft_survey_2023"
+        expect(mail.body.encoded.strip).to eq "Dear #{user.name}, a bike from Wheelageddon, view survey: https://example.com?respid=2"
+        expect(mail.message_stream).to eq "outbound"
+      end
     end
   end
 end

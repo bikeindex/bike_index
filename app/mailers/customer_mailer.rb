@@ -59,6 +59,7 @@ class CustomerMailer < ApplicationMailer
 
   def theft_survey(notification)
     mail_snippet = MailSnippet.theft_survey_2023.first
+    raise "Missing theft survey mail snippet" if mail_snippet.blank?
     mail_body = mail_snippet.body.gsub(/Bike Index Registrant/i, notification.user.name)
       .gsub(/SURVEY_LINK_ID/, notification.survey_id.to_s)
     # Also replace organization if it's present

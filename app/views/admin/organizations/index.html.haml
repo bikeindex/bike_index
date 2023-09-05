@@ -6,7 +6,7 @@
     %ul
       %li.nav-item
         - active_kind = params[:search_kind]
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: ((active_kind.present? || @search_theft_survey) ? "active" : "") }
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: ((active_kind.present? || @search_theft_survey) ? "active" : "")}
           - if active_kind.present?
             = active_kind.humanize
           - elsif @search_theft_survey

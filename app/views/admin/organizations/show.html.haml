@@ -154,7 +154,7 @@
               %strong= @organization.opted_into_theft_survey_2023
 
           - if display_dev_info? && @organization.manual_pos_kind.present?
-            %small.only-dev-visible.d-inline-block
+            %small.only-dev-visible.d-inline-block.ml-2
               %em.less-strong manual POS kind set:
               = @organization.manual_pos_kind
 .row.mt-4
