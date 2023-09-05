@@ -157,9 +157,9 @@ group :development, :test do
   # the gem version hasn't been updated in a long time github.com/pry/pry-coolline/issues/22
   # https://github.com/pry/pry-coolline/commit/f3a130c9829969732977015a04e90b9fb5d281b2
   # gem "jazz_fingers"
+  # gem "pry-byebug" # Commented out for Ruby 3 upgrade, PR#2374
+  # gem "pry-rails" # Commented out for Ruby 3 upgrade, PR#2374
   gem "parallel_tests"
-  gem "pry-byebug"
-  gem "pry-rails"
   gem "rb-fsevent", "~> 0.10.3"
   gem "rspec", "~> 3.4"
   gem "rspec-rails", "~> 4.0"
