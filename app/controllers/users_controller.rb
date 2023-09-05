@@ -108,9 +108,6 @@ class UsersController < ApplicationController
     @bikes = user.bikes(true).page(@page).per(@per_page)
   end
 
-  def edit
-  end
-
   # this action should only be for terms of service (or vendor_terms_of_service)
   def update
     @user = current_user

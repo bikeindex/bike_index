@@ -148,8 +148,13 @@
           - if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any?
             = link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}"
 
+          - if @organization.bike_shop?
+            %small.ml-2
+              theft survey?
+              %strong= @organization.opted_into_theft_survey_2023
+
           - if display_dev_info? && @organization.manual_pos_kind.present?
-            %small.only-dev-visible.d-inline-block
+            %small.only-dev-visible.d-inline-block.ml-2
               %em.less-strong manual POS kind set:
               = @organization.manual_pos_kind
 .row.mt-4

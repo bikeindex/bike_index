@@ -15,6 +15,7 @@ RSpec.describe MailSnippet, type: :model do
 
   describe "kinds" do
     it "includes all the ParkingNotification kinds" do
+      expect(MailSnippet.kinds.count).to eq MailSnippet::KIND_ENUM.values.uniq.count
       expect((MailSnippet.kinds & ParkingNotification.kinds).count).to eq(ParkingNotification.kinds.count)
     end
   end

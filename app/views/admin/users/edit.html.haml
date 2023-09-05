@@ -42,23 +42,6 @@
             = user_icon(@user, full_text: true)
         %tr
           %td
-            Email: Newsletters
-          %td
-            = check_mark if @user.notification_newsletters
-        %tr
-          %td
-            Vendor terms?
-          %td
-            - if @user.when_vendor_terms_of_service.present?
-              %span.convertTime.preciseTime
-                = l @user.when_vendor_terms_of_service, format: :convert_time
-        %tr
-          %td
-            Email: Unstolen
-          %td
-            = check_mark if @user.notification_unstolen
-        %tr
-          %td
             Created
           %td.convertTime.preciseTime
             = l @user.created_at, format: :convert_time
@@ -113,37 +96,59 @@
                         %em= superuser_ability.action_name
                         in
                       = superuser_ability.controller_name
+        %tr
+          %td Emails
+          %td
+            .row
+              .col-4
+                %small.d-block.border-bottom{title: "Receive Bike Index newsletters"}
+                  Newsletters
+                - if @user.notification_newsletters
+                  = check_mark
+                - else
+                  %small.less-strong false
+              .col-4
+                %small.d-block.border-bottom{title: "Receive non-stolen theft emails"}
+                  Unstolen
+                - if @user.notification_unstolen
+                  = check_mark
+                - else
+                  %small.text-danger.less-strong false
+              .col-4
+                %small.d-block.border-bottom{title: "No non theft emails"}
+                  NONE
+                - if @user.no_non_theft_notification
+                  %span.text-danger= check_mark
+                - else
+                  %small.less-strong false
 
   .col-md-6.mt-auto
     %table.table-list
       %tr
-        %td
-          Confirmed?
+        %td Confirmed?
         %td
           - if @user.confirmed?
             = check_mark
+          - else
+            %small.less-strong false
       %tr
-        %td
-          email
+        %td email
         %td
           = @user.email
           - if @user.secondary_emails.any?
             %small
               = @user.secondary_emails.join(", ")
       %tr
-        %td
-          Name
+        %td Name
         %td
           = @user.name
       %tr
-        %td
-          Photo
+        %td Photo
         %td
           - if @user.avatar?
             = @user.avatar
       %tr
-        %td
-          Social
+        %td Social
         %td
           %small
             - if @user.show_bikes?
@@ -153,13 +158,7 @@
             - if @user.twitter.present?
               Twitter: #{link_to @user.twitter, "https://twitter.com/#{@user.twitter}"}
       %tr
-        %td
-          Ambassador?
-        %td
-          = check_mark if @user.ambassador?
-      %tr
-        %td
-          Phone
+        %td Phone
         %td
           - display_phone = @user.phone.present?
           - if display_phone || @user.user_phones.any?
@@ -178,18 +177,23 @@
                   = phone_display(@user.phone)
                   %small.less-strong.text-warning unconfirmed
       %tr
-        %td
-          Website
+        %td Website
         %td
           = @user.website
       %tr
-        %td
-          Address
+        %td Address
         %td
           %small= @user.address
+      %tr
+        %td Vendor terms?
+        %td
+          - if @user.when_vendor_terms_of_service.present?
+            %span.convertTime.preciseTime
+              = l @user.when_vendor_terms_of_service, format: :convert_time
+
 
 - if @user.ambassador?
-  %h2 Ambassador Tasks
+  %h4.mt-4 Ambassador Tasks
   - ambassador = Ambassador.find(@user.id)
   %p
     %strong= "#{ambassador.progress_count} complete"
@@ -207,6 +211,10 @@
           %td
             - if task.completed_at
               %span.convertTime= l task.completed_at, format: :convert_time
+- else
+  %h4.mt-4
+    Ambassador
+    %small.less-strong false
 
 %h4.mt-4
   Bikes
@@ -284,9 +292,15 @@
                 = l user_email.created_at, format: :convert_time
           %td= user_email.email
           %td
-            = check_mark if user_email.confirmed?
+            - if user_email.confirmed?
+              = check_mark
+            - else
+              %small.less-strong false
           %td
-            = check_mark if user_email.primary?
+            - if user_email.primary?
+              = check_mark
+            - else
+              %small.less-strong false
           %td
             = user_email.old_user_id
 
