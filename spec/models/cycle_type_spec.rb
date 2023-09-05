@@ -69,5 +69,11 @@ RSpec.describe CycleType, type: :model do
       target_result_hash = target.except(:data).merge(target[:data])
       expect(cycle_type.autocomplete_result_hash).to eq target_result_hash.as_json
     end
+    context "all autocomplete_hashes" do
+      it "has text" do
+        autocomplete_hashes = CycleType.all.map { |c| c.autocomplete_hash }
+        expect(autocomplete_hashes.map { |h| h["text"] }).to_not include(nil)
+      end
+    end
   end
 end

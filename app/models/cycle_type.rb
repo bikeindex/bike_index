@@ -20,9 +20,9 @@ class CycleType
     "trail-behind": 14,
     "pedi-cab": 15,
     "e-scooter": 16,
-    "e-skateboard": 17,
     "personal-mobility": 18,
-    "non-e-scooter": 19
+    "non-e-scooter": 19,
+    "non-e-skateboard": 20
   }.freeze
 
   NAMES = {

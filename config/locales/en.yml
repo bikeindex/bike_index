@@ -697,6 +697,7 @@ en:
         e_scooter: E-Scooter
         e_skateboard: E-Skateboard
         non_e_scooter: Scooter (not electric)
+        non_e_skateboard: Skateboard (Not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
         personal_mobility: Personal mobility device (electric scooter, etc)
