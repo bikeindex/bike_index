@@ -22,6 +22,7 @@ gem "fast_blank", "~> 1.0"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
+gem "net-smtp" # Required for
 
 # Feature flagging
 gem "flipper"
