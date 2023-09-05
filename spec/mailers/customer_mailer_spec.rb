@@ -206,9 +206,10 @@ RSpec.describe CustomerMailer, type: :mailer do
   end
 
   describe "theft_survey" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-    let(:notification) { Notification.create(kind: "theft_survey_2023", notifiable: bike, user: user) }
-    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_2023", subject: "Survey!", body: "Dear Bike Index Registrant, view survey: https://example.com?respid=SURVEY_LINK_ID", is_enabled: true) }
+    let(:organization) { FactoryBot.create(:organization, name: "Wheelageddon") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creation_organization: organization) }
+    let(:notification) { Notification.create(kind: "theft_survey_2023", bike: bike, user: user) }
+    let!(:mail_snippet) { MailSnippet.create(kind: "theft_survey_2023", subject: "Survey!", body: "Dear Bike Index Registrant, a bike from a Bike Shop, view survey: https://example.com?respid=SURVEY_LINK_ID", is_enabled: true) }
     it "renders the mail" do
       Notification.create(kind: "theft_survey_2023")
       expect(notification.survey_id).to eq 2
@@ -218,7 +219,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["gavin@bikeindex.org"])
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "theft_survey_2023"
-      expect(mail.body.encoded.strip).to eq "Dear #{user.name}, view survey: https://example.com?respid=2"
+      expect(mail.body.encoded.strip).to eq "Dear #{user.name}, a bike from Wheelageddon, view survey: https://example.com?respid=2"
       expect(mail.message_stream).to eq "outbound"
     end
   end

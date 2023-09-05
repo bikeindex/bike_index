@@ -11,14 +11,16 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     return enqueue_workers(SURVEY_COUNT) if bike_id.blank?
     bike = Bike.unscoped.find(bike_id)
     return if !force_send && no_survey?(bike)
-    notification = Notification.create(kind: :theft_survey_2023, notifiable: bike, user: bike.user)
+    notification = Notification.create(kind: :theft_survey_2023, bike: bike, user: bike.user)
     CustomerMailer.theft_survey(notification).deliver_now
     notification.update(delivery_status: "email_success", message_channel: "email")
   end
 
   def send_survey?(bike = nil)
-    return false unless bike.present? && bike.owner.present?
-    bike.owner.notifications.theft_survey.none?
+    return false if bike.blank? || bike.user.blank? ||
+      bike.user.no_non_theft_notification
+
+    bike.user.notifications.theft_survey.none?
   end
 
   def no_survey?(bike)

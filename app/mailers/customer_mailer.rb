@@ -61,6 +61,9 @@ class CustomerMailer < ApplicationMailer
     mail_snippet = MailSnippet.theft_survey_2023.first
     mail_body = mail_snippet.body.gsub(/Bike Index Registrant/i, notification.user.name)
       .gsub(/SURVEY_LINK_ID/, notification.survey_id.to_s)
+    # Also replace organization if it's present
+    organization = notification.bike.creation_organization
+    mail_body = mail_body.gsub(/a Bike Shop/, organization.name) if organization.present?
 
     mail(to: notification.user.email, from: "gavin@bikeindex.org",
       subject: mail_snippet.subject, body: mail_body + "\n\n\n\n", tag: notification.kind)
