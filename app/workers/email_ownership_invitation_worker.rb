@@ -6,10 +6,13 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
     return true unless ownership.present? && ownership.bike.present?
     ownership.bike&.update(updated_at: Time.current)
     ownership.reload
-    unless ownership.calculated_send_email
+
+    if ownership.calculated_send_email != ownership.send_email
       # Update the ownership to have send email set
-      return ownership.update_attribute(:send_email, ownership.calculated_send_email)
+      ownership.update_attribute(:skip_email, !ownership.calculated_send_email)
     end
+    return if ownership.skip_email
+
     notification = Notification.find_or_create_by(notifiable: ownership,
       kind: "finished_registration")
     unless notification.delivered?

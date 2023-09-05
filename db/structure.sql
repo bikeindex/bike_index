@@ -3279,7 +3279,8 @@ CREATE TABLE public.users (
     address_set_manually boolean DEFAULT false,
     no_address boolean DEFAULT false,
     show_instagram boolean DEFAULT false,
-    instagram character varying
+    instagram character varying,
+    no_non_theft_notification boolean DEFAULT false
 );
 
 

@@ -71,6 +71,21 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       expect(ownership.calculated_send_email).to be_falsey
     end
   end
+  context "user has no_non_theft_notification" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:user) { FactoryBot.create(:user, no_non_theft_notification: true) }
+    let(:ownership) { FactoryBot.create(:ownership, bike: bike, user: user) }
+    it "does not send, updates ownership to be send_email false" do
+      ownership.reload
+      expect(ownership.calculated_send_email).to be_falsey
+      expect(ownership.skip_email).to be_falsey
+      ActionMailer::Base.deliveries = []
+      EmailOwnershipInvitationWorker.new.perform(ownership.id)
+      expect(ActionMailer::Base.deliveries).to be_empty
+      ownership.reload
+      expect(ownership.reload.skip_email).to be_truthy
+    end
+  end
   context "creation organization has skip_email" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["skip_ownership_email"]) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }

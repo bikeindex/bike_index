@@ -42,29 +42,6 @@
             = user_icon(@user, full_text: true)
         %tr
           %td
-            Email: Newsletters
-          %td
-            - if @user.notification_newsletters
-              = check_mark
-            - else
-              %small.less-strong false
-        %tr
-          %td
-            Vendor terms?
-          %td
-            - if @user.when_vendor_terms_of_service.present?
-              %span.convertTime.preciseTime
-                = l @user.when_vendor_terms_of_service, format: :convert_time
-        %tr
-          %td
-            Email: Unstolen
-          %td
-            - if @user.notification_unstolen
-              = check_mark
-            - else
-              %small.less-strong false
-        %tr
-          %td
             Created
           %td.convertTime.preciseTime
             = l @user.created_at, format: :convert_time
@@ -124,14 +101,6 @@
     %table.table-list
       %tr
         %td
-          Confirmed?
-        %td
-          - if @user.confirmed?
-            = check_mark
-          - else
-            %small.less-strong false
-      %tr
-        %td
           email
         %td
           = @user.email
@@ -162,14 +131,6 @@
               Twitter: #{link_to @user.twitter, "https://twitter.com/#{@user.twitter}"}
       %tr
         %td
-          Ambassador?
-        %td
-          - if @user.ambassador?
-            = check_mark
-          - else
-            %small.less-strong false
-      %tr
-        %td
           Phone
         %td
           - display_phone = @user.phone.present?
@@ -198,6 +159,48 @@
           Address
         %td
           %small= @user.address
+      %tr
+        %td
+          Vendor terms?
+        %td
+          - if @user.when_vendor_terms_of_service.present?
+            %span.convertTime.preciseTime
+              = l @user.when_vendor_terms_of_service, format: :convert_time
+
+%table.table.table-bordered.table-sm.without-exterior-border
+  %thead
+    %th.small Confirmed?
+    %th.small Ambassador?
+    %th.small Email: NONE
+    %th.small Email: Newsletters
+    %th.small Email: Unstolen
+  %tbody
+    %tr
+      %td
+        - if @user.confirmed?
+          = check_mark
+        - else
+          %small.less-strong false
+      %td
+        - if @user.ambassador?
+          = check_mark
+        - else
+          %small.less-strong false
+      %td
+        - if @user.no_non_theft_notification
+          %span.text-danger= check_mark
+        - else
+          %small.less-strong false
+      %td
+        - if @user.notification_newsletters
+          = check_mark
+        - else
+          %small.less-strong false
+      %td
+        - if @user.notification_unstolen
+          = check_mark
+        - else
+          %small.less-strong false
 
 - if @user.ambassador?
   %h2 Ambassador Tasks
