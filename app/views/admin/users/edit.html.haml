@@ -44,7 +44,10 @@
           %td
             Email: Newsletters
           %td
-            = check_mark if @user.notification_newsletters
+            - if @user.notification_newsletters
+              = check_mark
+            - else
+              %small.less-strong false
         %tr
           %td
             Vendor terms?
@@ -56,7 +59,10 @@
           %td
             Email: Unstolen
           %td
-            = check_mark if @user.notification_unstolen
+            - if @user.notification_unstolen
+              = check_mark
+            - else
+              %small.less-strong false
         %tr
           %td
             Created
@@ -122,6 +128,8 @@
         %td
           - if @user.confirmed?
             = check_mark
+          - else
+            %small.less-strong false
       %tr
         %td
           email
@@ -156,7 +164,10 @@
         %td
           Ambassador?
         %td
-          = check_mark if @user.ambassador?
+          - if @user.ambassador?
+            = check_mark
+          - else
+            %small.less-strong false
       %tr
         %td
           Phone
@@ -284,9 +295,15 @@
                 = l user_email.created_at, format: :convert_time
           %td= user_email.email
           %td
-            = check_mark if user_email.confirmed?
+            - if user_email.confirmed?
+              = check_mark
+            - else
+              %small.less-strong false
           %td
-            = check_mark if user_email.primary?
+            - if user_email.primary?
+              = check_mark
+            - else
+              %small.less-strong false
           %td
             = user_email.old_user_id
 
