@@ -2303,7 +2303,8 @@ CREATE TABLE public.organizations (
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
     direct_unclaimed_notifications boolean DEFAULT false,
-    spam_registrations boolean DEFAULT false
+    spam_registrations boolean DEFAULT false,
+    opted_into_theft_survey_2023 boolean DEFAULT false
 );
 
 
@@ -3278,7 +3279,8 @@ CREATE TABLE public.users (
     address_set_manually boolean DEFAULT false,
     no_address boolean DEFAULT false,
     show_instagram boolean DEFAULT false,
-    instagram character varying
+    instagram character varying,
+    no_non_theft_notification boolean DEFAULT false
 );
 
 
@@ -6411,6 +6413,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220921170820'),
 ('20221007123638'),
 ('20230224234148'),
-('20230418192859');
+('20230418192859'),
+('20230831222013');
 
 

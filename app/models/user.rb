@@ -387,6 +387,10 @@ class User < ApplicationRecord
     self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?
     self.website = Urlifyer.urlify(website)
+    if no_non_theft_notification
+      self.notification_newsletters = false
+      memberships.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }
+    end
     if my_bikes_link_target.present? || my_bikes_link_title.present?
       mbh = my_bikes_hash || {}
       mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
