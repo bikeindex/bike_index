@@ -452,7 +452,7 @@ class Organization < ApplicationRecord
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = short_name_fixer(short_name || name)
+    self.short_name = name_shortener(short_name || name)
     self.ascend_name = nil if ascend_name.blank?
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
@@ -546,8 +546,12 @@ class Organization < ApplicationRecord
     strip_tags(name&.strip).gsub("&amp;", "&")
   end
 
-  def short_name_fixer(str)
-    str = str.strip.truncate(30)
+  def name_shortener(str)
+    # Remove parens if the name is too long
+    if str.length > 30 && str.match?(/\(.*\)/)
+      str = str.gsub(/\(.*\)/, "")
+    end
+    str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     return str unless deleted_at.present?
     str.match?("-deleted") ? str : "#{str}-deleted"
   end
