@@ -29,7 +29,9 @@ class TwilioIntegration
       notification.update(delivery_status: result.status)
     else
       result = send_message(to: to, body: body)
-      notification.update(twilio_sid: result.sid, delivery_status: result.status)
+      notification.update(message_channel_target: to,
+        twilio_sid: result.sid,
+        delivery_status: result.status)
     end
     result
   end

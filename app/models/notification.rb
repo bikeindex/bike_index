@@ -156,14 +156,6 @@ class Notification < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
-  def calculated_email
-    return notifiable&.email if b_param?
-    return notifiable&.receiver_email if stolen_notification?
-    return user&.email if user.present?
-    notifiable&.user_email if customer_contact?
-    bike&.owner_email if bike.present?
-  end
-
   def twilio_response
     return nil unless twilio_sid.present?
     TwilioIntegration.new.get_message(twilio_sid)
@@ -195,6 +187,7 @@ class Notification < ApplicationRecord
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
     self.delivery_status = nil if delivery_status.blank?
+    self.message_channel_target ||= calculated_message_channel_target if delivery_status.present?
   end
 
   def survey_id
@@ -203,7 +196,28 @@ class Notification < ApplicationRecord
     self.class.where(kind: kind).where("id < ?", id_searched).count + 1
   end
 
+  def calculated_message_channel_target
+    if message_channel == "text" || phone_verification?
+      calculated_phone
+    else
+      calculated_email
+    end
+  end
+
   private
+
+  def calculated_phone
+    notifiable&.phone
+  end
+
+  def calculated_email
+    c_email = notifiable&.email if b_param?
+    c_email ||= notifiable&.receiver_email if stolen_notification?
+    c_email ||= user&.email if user_id.present?
+    c_email ||= notifiable&.user_email if customer_contact?
+    c_email ||= bike&.owner_email if bike.present?
+    c_email
+  end
 
   def calculated_user_id
     return notifiable&.receiver_id if notifiable_type == "StolenNotification"

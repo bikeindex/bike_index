@@ -27,14 +27,39 @@ RSpec.describe Notification, type: :model do
     end
   end
 
-  describe "calculated_email" do
+  describe "message_channel_target and calculated_email" do
     let(:notification) { FactoryBot.create(:notification, user: user) }
     let(:user) { FactoryBot.create(:user, email: "stuff@party.eu") }
-    it "returns email if user deleted" do
-      expect(notification.calculated_email).to eq "stuff@party.eu"
+    it "returns email, if possible" do
+      expect(notification.reload.message_channel_target).to be_nil
+      expect(notification.send(:calculated_email)).to eq "stuff@party.eu"
+      expect(notification.send(:calculated_message_channel_target)).to eq "stuff@party.eu"
+      expect(notification.message_channel_target).to be_nil
       user.destroy
-      notification.reload
-      expect(notification.calculated_email).to be_blank
+      expect(notification.reload.send(:calculated_email)).to be_nil
+      expect(notification.message_channel_target).to be_nil
+    end
+    context "email delivered" do
+      before { notification.update(delivery_status: "email_success", message_channel: "email") }
+      it "returns email" do
+        expect(notification.reload.delivered?).to be_truthy
+        expect(notification.send(:calculated_email)).to eq "stuff@party.eu"
+        expect(notification.message_channel_target).to eq "stuff@party.eu"
+      end
+    end
+    context "email delivered" do
+      let(:user_phone) { FactoryBot.create(:user_phone, user: user) }
+      let(:notification) { FactoryBot.create(:notification, kind: :phone_verification, notifiable: user_phone) }
+      it "returns email" do
+        expect(notification).to be_valid
+        expect(notification.send(:calculated_message_channel_target)).to eq user_phone.phone
+        expect(notification.message_channel_target).to be_nil
+
+        notification.update(delivery_status: "text_success", message_channel: "email")
+        expect(notification.reload.delivered?).to be_truthy
+        expect(notification.send(:calculated_message_channel_target)).to eq user_phone.phone
+        expect(notification.message_channel_target).to eq user_phone.phone
+      end
     end
   end
 
@@ -104,7 +129,7 @@ RSpec.describe Notification, type: :model do
         notification = Notification.create(kind: "theft_survey_2023", bike: bike)
         expect(notification).to be_valid
         expect(notification.survey_id).to eq 1
-        expect(notification.calculated_email).to eq "something@stuff.com"
+        expect(notification.send(:calculated_message_channel_target)).to eq "something@stuff.com"
         expect(bike.reload.theft_surveys.pluck(:id)).to eq([notification.id])
       end
     end

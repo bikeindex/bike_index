@@ -71,7 +71,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       expect(notification.kind).to eq "stolen_notification_blocked"
       expect(notification.bike_id).to eq bike2.id
       expect(notification.user_id).to eq bike2.user&.id
-      expect(notification.calculated_email).to eq bike2.owner_email
+      expect(notification.message_channel_target).to eq bike2.owner_email
       expect(notification.notifiable_id).to eq stolen_notification2.id
       expect(notification.notifiable_type).to eq "StolenNotification"
       expect(bike2.reload.messages_count).to eq 1
@@ -91,7 +91,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
         expect(notification.kind).to eq "stolen_notification_sent"
         expect(notification.bike_id).to eq bike.id
         expect(notification.user_id).to eq ownership.user_id
-        expect(notification.calculated_email).to eq owner_email
+        expect(notification.message_channel_target).to eq owner_email
         expect(notification.notifiable_id).to eq stolen_notification.id
         expect(notification.notifiable_type).to eq "StolenNotification"
         expect(ActionMailer::Base.deliveries.count).to eq 1

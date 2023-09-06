@@ -2017,7 +2017,8 @@ CREATE TABLE public.notifications (
     notifiable_id bigint,
     message_channel integer DEFAULT 0,
     twilio_sid text,
-    bike_id bigint
+    bike_id bigint,
+    message_channel_target character varying
 );
 
 
@@ -6414,6 +6415,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230224234148'),
 ('20230418192859'),
 ('20230831222013'),
-('20230906000736');
+('20230906000736'),
+('20230906180600');
 
 
