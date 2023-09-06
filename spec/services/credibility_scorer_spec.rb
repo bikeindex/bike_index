@@ -141,6 +141,12 @@ RSpec.describe CredibilityScorer do
           it "returns with spam_registrations" do
             expect(instance.badges).to eq(%i[created_this_month creation_organization_spam_registrations])
           end
+          context "likely_spam" do
+            before { bike.update(likely_spam: true) }
+            it "returns likely_spam" do
+              expect(instance.badges).to eq(%i[created_this_month likely_spam])
+            end
+          end
         end
       end
       context "spam_registrations not embed" do
@@ -176,6 +182,15 @@ RSpec.describe CredibilityScorer do
         expect(subject.creation_age_badge(ownership)).to eq :long_time_registration
         expect(subject.creation_badges(ownership)).to eq([:long_time_registration])
         expect(instance.score).to eq(60)
+      end
+      context "likely_spam" do
+        it "returns long_time_registration and likely_spam" do
+          bike.update(likely_spam: true)
+          bike.reload
+          expect(subject.creation_age_badge(ownership)).to eq :long_time_registration
+          expect(subject.creation_badges(ownership, bike)).to eq([:long_time_registration, :likely_spam])
+          expect(instance.score).to eq(10)
+        end
       end
     end
   end

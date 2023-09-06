@@ -175,6 +175,10 @@ class User < ApplicationRecord
     developer
   end
 
+  def su_option?(opt)
+    superuser_abilities.with_su_option(opt).limit(1).any?
+  end
+
   def banned?
     banned
   end

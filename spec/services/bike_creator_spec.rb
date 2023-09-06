@@ -89,6 +89,21 @@ RSpec.describe BikeCreator do
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect_attrs_to_match_hash(bike, target_created_attrs)
         end
+        context "with organization" do
+          # TODO: likely_spam here
+          it "creates the bike_organization" do
+            expect {
+              instance.create_bike(b_param)
+            }.to change(BikeOrganization, :count).by 1
+            bike = Bike.last
+            expect(bike.creator&.id).to eq user.id
+            expect(bike.current_ownership&.id).to be_present
+            expect(bike.likely_spam).to be_truthy
+            expect(bike.bike_organizations.first.organization).to eq organization
+            expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+            expect_attrs_to_match_hash(bike, target_created_attrs)
+          end
+        end
       end
       context "child organization" do
         let(:organization_parent) { FactoryBot.create(:organization) }

@@ -1,6 +1,7 @@
 class Admin::SuperuserAbilitiesController < Admin::BaseController
   include SortableTable
   before_action :set_period, only: [:index]
+  before_action :find_superuser_ability, except: [:index]
 
   def index
     page = params[:page] || 1
@@ -10,9 +11,19 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
       .page(page).per(@per_page)
   end
 
+  def edit
+  end
+
+  def update
+  end
+
   helper_method :searched_superuser_abilities, :permitted_kinds
 
   private
+
+  def find_superuser_ability
+    @superuser_ability = SuperuserAbility.find(params[:id])
+  end
 
   def sortable_columns
     %w[created_at updated_at kind user_id controller_name action_name]

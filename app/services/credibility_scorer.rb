@@ -4,6 +4,7 @@ class CredibilityScorer
 
   BADGES = {
     overrides: {
+      example_bike: -100,
       created_at_point_of_sale: 100,
       user_banned: -200
     },
@@ -13,6 +14,7 @@ class CredibilityScorer
       creation_organization_trusted: 30,
       creation_organization_suspicious: -10,
       creation_organization_spam_registrations: -20,
+      likely_spam: -50,
       long_time_registration: 10,
       no_creator: -10
     },
@@ -67,15 +69,19 @@ class CredibilityScorer
 
   def self.creation_badges(ownership = nil, bike = nil)
     return [] unless ownership.present?
+    return [:example_bike] if bike&.example?
     return [:created_at_point_of_sale] if ownership.pos?
     c_badges = [creation_age_badge(bike || ownership.bike)].compact
     c_badges << :no_creator if ownership.creator.blank?
+    c_badges << :likely_spam if bike&.likely_spam?
     if ownership.organization_id.present?
       organization = Organization.unscoped.find_by_id(ownership.organization_id)
       return [:created_at_point_of_sale] if organization&.does_not_need_pos?
       c_badges << :creation_organization_suspicious if organization_suspicious?(organization)
       if ownership.origin == "embed" && organization.spam_registrations?
-        c_badges << :creation_organization_spam_registrations
+        unless bike&.likely_spam?
+          c_badges << :creation_organization_spam_registrations
+        end
       elsif organization_trusted?(organization)
         c_badges << :creation_organization_trusted
       end

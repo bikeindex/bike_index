@@ -505,7 +505,8 @@ CREATE TABLE public.bikes (
     updated_by_user_at timestamp without time zone,
     occurred_at timestamp without time zone,
     serial_normalized_no_space character varying,
-    credibility_score integer
+    credibility_score integer,
+    likely_spam boolean DEFAULT false
 );
 
 
@@ -2845,7 +2846,8 @@ CREATE TABLE public.superuser_abilities (
     action_name character varying,
     deleted_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    su_options jsonb DEFAULT '[]'::jsonb
 );
 
 
@@ -3280,7 +3282,8 @@ CREATE TABLE public.users (
     no_address boolean DEFAULT false,
     show_instagram boolean DEFAULT false,
     instagram character varying,
-    no_non_theft_notification boolean DEFAULT false
+    no_non_theft_notification boolean DEFAULT false,
+    admin_options jsonb
 );
 
 
@@ -6416,6 +6419,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230418192859'),
 ('20230831222013'),
 ('20230906000736'),
-('20230906180600');
+('20230906180600'),
+('20230906200524'),
+('20230906203110');
 
 
