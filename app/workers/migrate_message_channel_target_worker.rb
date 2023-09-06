@@ -4,7 +4,7 @@ class MigrateMessageChannelTargetWorker < ScheduledWorker
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
-    9.minutes
+    4.minutes
   end
 
   def self.potential_notifications
