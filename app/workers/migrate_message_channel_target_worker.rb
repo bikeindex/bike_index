@@ -1,4 +1,6 @@
 class MigrateMessageChannelTargetWorker < ScheduledWorker
+  prepend ScheduledWorkerRecorder
+
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
@@ -19,7 +21,7 @@ class MigrateMessageChannelTargetWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    self.class.potential_notifications.limit(500)
+    self.class.potential_notifications.limit(1_000)
       .pluck(:id).each { |i| MigrateMessageChannelTargetWorker.perform_async(i) }
   end
 end
