@@ -16,11 +16,18 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     notification.update(delivery_status: "email_success", message_channel: "email")
   end
 
-  def send_survey?(bike = nil)
-    return false if bike.blank? || bike.user.blank? ||
-      bike.user.no_non_theft_notification
+  def notifications
+    Notification.theft_survey_2023
+  end
 
-    bike.user.notifications.theft_survey.none?
+  def send_survey?(bike = nil)
+    return false if bike.blank?
+    if bike.user_id.present?
+      return false if notifications.where(user_id: bike.user_id).limit(1).any?
+      return false if bike.user&.no_non_theft_notification
+    end
+    # Verify there are no theft survey notifications with the email
+    notifications.where(message_channel_target: bike.owner_email).limit(1).none?
   end
 
   def no_survey?(bike)
@@ -28,7 +35,14 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   end
 
   def enqueue_workers(enqueue_limit)
-    potential_bikes.limit(enqueue_limit).find_each do |bike|
+    # There are some "potential" bikes that are no_survey, so add 200 to cover
+    unclaimed_count = enqueue_limit + 200 - potential_bikes.claimed.count
+    potential_bikes.claimed.limit(enqueue_limit).find_each do |bike|
+      next if no_survey?(bike)
+      ScheduledEmailSurveyWorker.perform_async(bike.id)
+    end
+    return if unclaimed_count < 0
+    potential_bikes.unclaimed.limit(unclaimed_count).find_each do |bike|
       next if no_survey?(bike)
       ScheduledEmailSurveyWorker.perform_async(bike.id)
     end
