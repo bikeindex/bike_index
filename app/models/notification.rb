@@ -196,15 +196,12 @@ class Notification < ApplicationRecord
     self.class.where(kind: kind).where("id < ?", id_searched).count + 1
   end
 
-  def calculated_message_channel_target
-    if message_channel == "text" || phone_verification?
-      calculated_phone
-    else
-      calculated_email
-    end
-  end
-
   private
+
+  def calculated_message_channel_target
+    return calculated_phone if message_channel == "text" || phone_verification?
+    calculated_email
+  end
 
   def calculated_phone
     notifiable&.phone
