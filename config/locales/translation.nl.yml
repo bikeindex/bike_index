@@ -5657,7 +5657,6 @@ nl:
         en diefstalmeldingen (u ontvangt bijvoorbeeld geen nieuwe registratie-e-mails
         meer)
     sharing:
-      additional_link: Aanvullende link
       choose_file: Kies bestand...
       create_page: Creëer pagina
       create_public_page: Maak een openbare pagina
@@ -5688,6 +5687,8 @@ nl:
       instagram_handle: Instagram-handvat
       no_instagram: Geen Instagram
       show_instagram: Toon Instagram
+      will_not_show_up: Uw website wordt niet weergegeven omdat u niet op 'persoonlijke
+        website weergeven' heeft geklikt
     registration_organizations:
       affiliation: "%{org_name} aansluiting"
       all_bikes_with_organization: Al uw fietsen zijn geregistreerd bij deze organisatie

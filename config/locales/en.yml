@@ -4076,7 +4076,6 @@ en:
       why_you_should_text: Read why you should
       zipcode: Postal code
     sharing:
-      additional_link: Additional Link
       choose_file: Choose file...
       create_page: Create page
       create_public_page: Create public page
@@ -4103,6 +4102,8 @@ en:
       this_users_bikes: This user's bikes
       title_for_link: Title for link
       twitter_handle: Twitter handle
+      will_not_show_up: Your website won't show up because you haven't clicked "show
+        personal website"
       your_username_is_the_url_for_your_sharing: >-
         Your username is the URL for your sharing page and the bike embed form. Update
         it if you care about those things.

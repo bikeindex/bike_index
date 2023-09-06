@@ -110,7 +110,7 @@ class MyAccountsController < ApplicationController
       .permit(:name, :username, :notification_newsletters, :notification_unstolen, :no_non_theft_notification,
         :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
         :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :instagram, :show_instagram,
-        :website, :show_website, :show_bikes, :show_phone, :my_bikes_link_target,
+        :show_website, :show_bikes, :show_phone, :my_bikes_link_target,
         :my_bikes_link_title, :password, :password_confirmation, :preferred_language,
         user_registration_organization_attributes: [:all_bikes, :can_edit_claimed])
     if pparams.key?("username")

@@ -270,12 +270,12 @@ RSpec.describe User, type: :model do
   describe "set_calculated_attributes" do
     describe "title, urls" do
       it "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
-        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org")
+        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, my_bikes_link_target: "somewhere.org")
         user.set_calculated_attributes
-        expect(user.website).to eq("http://somewhere.org")
+        expect(user.mb_link_target).to eq("http://somewhere.org")
       end
       it "does not add http:// to twitter if it's already there" do
-        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere", my_bikes_link_target: "https://something.com")
+        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, my_bikes_link_target: "https://something.com")
         user.set_calculated_attributes
         expect(user.my_bikes_hash["link_target"]).to eq("https://something.com")
         expect(user.mb_link_target).to eq("https://something.com")

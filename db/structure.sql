@@ -3245,7 +3245,6 @@ CREATE TABLE public.users (
     zipcode character varying(255),
     twitter character varying(255),
     show_twitter boolean DEFAULT false NOT NULL,
-    website character varying(255),
     show_website boolean DEFAULT false NOT NULL,
     show_phone boolean DEFAULT true,
     show_bikes boolean DEFAULT false NOT NULL,
@@ -6414,6 +6413,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221007123638'),
 ('20230224234148'),
 ('20230418192859'),
-('20230831222013');
+('20230831222013'),
+('20230906000736');
 
 
