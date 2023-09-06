@@ -386,7 +386,6 @@ class User < ApplicationRecord
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?
-    self.website = Urlifyer.urlify(website)
     if no_non_theft_notification
       self.notification_newsletters = false
       memberships.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }
@@ -405,7 +404,7 @@ class User < ApplicationRecord
   end
 
   def mb_link_title
-    (my_bikes_hash && my_bikes_hash["link_title"]) || mb_link_target
+    (my_bikes_hash && my_bikes_hash["link_title"])
   end
 
   def userlink
