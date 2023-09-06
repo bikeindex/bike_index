@@ -206,12 +206,12 @@ class Notification < ApplicationRecord
     bike || Bike.unscoped.find_by_id(bike_id)
   end
 
-  private
-
   def calculated_message_channel_target
     return calculated_phone if message_channel == "text" || phone_verification?
     calculated_email
   end
+
+  private
 
   def calculated_phone
     notifiable&.phone
