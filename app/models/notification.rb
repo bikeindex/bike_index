@@ -161,6 +161,7 @@ class Notification < ApplicationRecord
     return notifiable&.receiver_email if stolen_notification?
     return user&.email if user.present?
     notifiable&.user_email if customer_contact?
+    bike&.owner_email if bike.present?
   end
 
   def twilio_response
