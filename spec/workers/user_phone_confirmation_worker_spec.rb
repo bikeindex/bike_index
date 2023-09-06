@@ -18,6 +18,12 @@ RSpec.describe UserPhoneConfirmationWorker, type: :job do
     user_phone.reload
     expect(user_phone.confirmed?).to be_falsey
     expect(user_phone.notifications.count).to eq 1
+
+    notification = user_phone.notifications.first
+    expect(notification.user_id).to eq user.id
+    expect(notification.notifiable).to eq user_phone
+    expect(notification.kind).to eq "phone_verification"
+
     user.reload
     expect(user.phone_waiting_confirmation?).to be_truthy
 

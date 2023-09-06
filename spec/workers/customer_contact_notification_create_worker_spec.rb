@@ -20,7 +20,7 @@ RSpec.describe CustomerContactNotificationCreateWorker, type: :job do
       expect(notification.kind).to eq customer_contact.kind
       expect(notification.delivered?).to be_truthy
       expect(notification.bike_id).to eq customer_contact.bike_id
-      expect(notification.calculated_email).to eq customer_contact.user_email
+      expect(notification.message_channel_target).to eq customer_contact.user_email
       expect(notification.sender).to eq customer_contact.creator
       expect(notification.sender_display_name).to eq customer_contact.creator.display_name
     end

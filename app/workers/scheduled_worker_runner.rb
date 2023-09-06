@@ -44,6 +44,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       FileCacheMaintenanceWorker,
       GetManufacturerLogoWorker,
       ImpoundExpirationWorker,
+      MigrateMessageChannelTargetWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
       ScheduleBikePossiblyFoundNotificationWorker,
