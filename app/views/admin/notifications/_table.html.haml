@@ -45,8 +45,8 @@
                 - if notification.user_id.present?
                   = render partial: "/shared/admin_user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
                 - else
-                  %small no user
                   = notification.message_channel_target
+                  %small.less-strong no user
             %td.text-center
               = notification_delivery_display(notification.delivery_status)
             - unless skip_bike

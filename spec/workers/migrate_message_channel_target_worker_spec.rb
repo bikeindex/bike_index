@@ -5,7 +5,7 @@ RSpec.describe MigrateMessageChannelTargetWorker, type: :job do
   include_examples :scheduled_worker_tests
 
   describe "perform" do
-    let(:user) { FactoryBot.create(:user, email: "wat@example.com")}
+    let(:user) { FactoryBot.create(:user, email: "wat@example.com") }
     let(:notification) { FactoryBot.create(:notification, user: user) }
     it "schedules all the workers" do
       notification.update_column :delivery_status, "email_success"

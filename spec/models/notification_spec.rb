@@ -34,10 +34,20 @@ RSpec.describe Notification, type: :model do
       expect(notification.reload.message_channel_target).to be_nil
       expect(notification.send(:calculated_email)).to eq "stuff@party.eu"
       expect(notification.send(:calculated_message_channel_target)).to eq "stuff@party.eu"
-      expect(notification.message_channel_target).to be_nil
       user.destroy
       expect(notification.reload.send(:calculated_email)).to be_nil
       expect(notification.message_channel_target).to be_nil
+    end
+    context "bike deleted" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:notification) { FactoryBot.create(:notification, kind: :finished_registration, bike: bike, user: nil) }
+      it "still finds" do
+        expect(notification.reload.message_channel_target).to be_nil
+        expect(notification.send(:calculated_message_channel_target)).to eq bike.owner_email
+        bike.destroy
+        expect(notification.reload.message_channel_target).to be_nil
+        expect(notification.send(:calculated_message_channel_target)).to eq bike.owner_email
+      end
     end
     context "email delivered" do
       before { notification.update(delivery_status: "email_success", message_channel: "email") }

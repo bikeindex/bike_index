@@ -104,6 +104,11 @@ class Notification < ApplicationRecord
       %w[stolen_twitter_alerter bike_possibly_found]
   end
 
+  def self.search_message_channel_target(str)
+    return none unless str.present?
+    where("message_channel_target ILIKE ?", "%#{str.strip.downcase}%")
+  end
+
   def self.notifications_sent_or_received_by(user_or_id)
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     # TODO: THIS IS SHITTY
@@ -196,6 +201,11 @@ class Notification < ApplicationRecord
     self.class.where(kind: kind).where("id < ?", id_searched).count + 1
   end
 
+  def bike_with_fallback
+    return nil if bike_id.blank?
+    bike || Bike.unscoped.find_by_id(bike_id)
+  end
+
   private
 
   def calculated_message_channel_target
@@ -212,7 +222,7 @@ class Notification < ApplicationRecord
     c_email ||= notifiable&.receiver_email if stolen_notification?
     c_email ||= user&.email if user_id.present?
     c_email ||= notifiable&.user_email if customer_contact?
-    c_email ||= bike&.owner_email if bike.present?
+    c_email ||= bike_with_fallback&.owner_email
     c_email
   end
 
