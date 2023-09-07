@@ -7,6 +7,17 @@ class SuperuserAbility < ApplicationRecord
     action: 2
   }.freeze
 
+  SU_OPTIONS = [
+    :no_always_show_credibility,
+    :no_hide_spam
+  ].freeze
+
+  # These are the default - because they're empty
+  SU_INVERSE_OPTIONS = {
+    always_show_credibility: :no_always_show_credibility,
+    hide_spam: :no_hide_spam
+  }.freeze
+
   acts_as_paranoid
 
   belongs_to :user
@@ -26,8 +37,36 @@ class SuperuserAbility < ApplicationRecord
       action.where(controller_name: controller_name, action_name: action_name).any?
   end
 
+  def self.su_inverse_option?(option)
+    SU_INVERSE_OPTIONS.key?(option.to_sym)
+  end
+
+  def self.su_inverse_option(option)
+    SU_INVERSE_OPTIONS[option.to_sym]
+  end
+
+  def self.with_su_option(option)
+    inverse = su_inverse_option(option)
+    if inverse
+      where.not("su_options ?& array[:keys]", keys: [inverse.to_s])
+    else
+      where("su_options ?& array[:keys]", keys: [option.to_s])
+    end
+  end
+
+  def su_option?(option)
+    inverse_option = self.class.su_inverse_option(option)
+    if inverse_option
+      su_options.exclude?(inverse_option.to_s)
+    else
+      su_options.include?(option.to_s)
+    end
+  end
+
   def set_calculated_attributes
     self.kind = calculated_kind
+    self.su_options ||= []
+    self.su_options = su_options.sort
   end
 
   private

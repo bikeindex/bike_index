@@ -1,6 +1,7 @@
 class Admin::SuperuserAbilitiesController < Admin::BaseController
   include SortableTable
   before_action :set_period, only: [:index]
+  before_action :find_superuser_ability, except: [:index]
 
   def index
     page = params[:page] || 1
@@ -10,9 +11,25 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
       .page(page).per(@per_page)
   end
 
+  def edit
+  end
+
+  def update
+    if @superuser_ability.update(permitted_parameters)
+      flash[:success] = "Superuser Ability saved!"
+      redirect_to edit_admin_superuser_ability_path(@superuser_ability)
+    else
+      render action: :edit
+    end
+  end
+
   helper_method :searched_superuser_abilities, :permitted_kinds
 
   private
+
+  def find_superuser_ability
+    @superuser_ability = SuperuserAbility.find(params[:id])
+  end
 
   def sortable_columns
     %w[created_at updated_at kind user_id controller_name action_name]
@@ -43,5 +60,11 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
     superuser_abilities.where(@time_range_column => @time_range)
+  end
+
+  def permitted_parameters
+    su_options = params.permit(*SuperuserAbility::SU_OPTIONS)
+      .select { |so| ParamsNormalizer.boolean(params[so]) }
+    {su_options: su_options.keys}
   end
 end

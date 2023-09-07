@@ -15,7 +15,7 @@
           %tr
             %td
               %small
-                = badge.to_s.humanize
+                = CredibilityScorer.humanize_badge(badge)
             %td.text-right
               %span{ class: (value < 0 ? "text-danger" : "") }
                 = value

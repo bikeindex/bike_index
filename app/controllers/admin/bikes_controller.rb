@@ -180,6 +180,9 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.status_stolen if params[:search_stolen] == "stolen_only"
       bikes = bikes.not_stolen if params[:search_stolen] == "non_stolen_only"
     end
+    unless params[:search_spam] || current_user.su_option?(:no_hide_spam)
+      bikes = bikes.not_spam
+    end
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
