@@ -81,7 +81,7 @@ RSpec.describe SpamEstimator do
       context "garbage" do
         let(:str) { "efgBz9pNdd7" }
         it "is 51" do
-          expect(described_class.estimate_bike(bike)).to eq 51
+          expect(described_class.estimate_bike(bike)).to eq 31
         end
       end
     end
@@ -102,7 +102,7 @@ RSpec.describe SpamEstimator do
       context "garbage" do
         let(:street) { "efgBz9pNdd7" }
         it "is 51" do
-          expect(described_class.estimate_bike(bike, stolen_record)).to eq 51
+          expect(described_class.estimate_bike(bike, stolen_record)).to eq 21
         end
       end
     end

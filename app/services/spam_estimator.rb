@@ -3,7 +3,7 @@ class SpamEstimator
     def estimate_bike(bike, stolen_record = nil)
       estimate = 0
       return estimate if bike.blank?
-      estimate += 51 if suspicious_string?(bike.frame_model)
+      estimate += 31 if suspicious_string?(bike.frame_model)
       if bike.manufacturer_other
         estimate += 51 if suspicious_string?(bike.manufacturer_other)
       end
@@ -16,7 +16,7 @@ class SpamEstimator
       estimate = 0
       return estimate if stolen_record.blank?
       estimate += 51 if suspicious_string?(stolen_record.theft_description)
-      estimate += 51 if suspicious_string?(stolen_record.street)
+      estimate += 21 if suspicious_string?(stolen_record.street)
       estimate
     end
 
