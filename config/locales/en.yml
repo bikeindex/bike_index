@@ -1261,7 +1261,8 @@ en:
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
-      no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index
+      test_registration: test registration
+      no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
         admins) can see it
       not_registered_by_user: Not registered to a user
       or_call: Or call

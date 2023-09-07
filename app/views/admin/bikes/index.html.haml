@@ -18,6 +18,7 @@
           = link_to "Non Stolen only", url_for(sortable_search_params.merge(search_stolen: non_stolen_only_active ? nil : "non_stolen_only")), class: "dropdown-item #{non_stolen_only_active ? 'active' : ''}"
 
       - if !@user.present?
+        -# TODO add search deleted/not deleted/spam
         %li.nav-item
           %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (params[:search_example].present? ? "active" : "")}
             = params[:search_example].present? ? params[:search_example].humanize : "Exampleness"
