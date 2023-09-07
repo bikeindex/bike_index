@@ -1261,7 +1261,6 @@ en:
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
-      test_registration: test registration
       no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
         admins) can see it
       not_registered_by_user: Not registered to a user
@@ -1271,6 +1270,7 @@ en:
       share_it: Share it!
       spread_the_word: Spread the word!
       switch_to_new_bike_id: Switch to a new bike ID
+      test_registration: test registration
       update: Update
       view_users_other_registrations: View user's other registrations
       where_did_you_see_this_bike: >-

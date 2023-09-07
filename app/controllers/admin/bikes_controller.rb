@@ -153,8 +153,6 @@ class Admin::BikesController < Admin::BaseController
     else
       # This unscopes, so it doesn't work with anything above
       bikes = Bike.unscoped
-      # do example here because it doesn't work w/ @user and also unscopes
-      bikes = bikes.example if params[:search_example] == "example_only"
     end
     if params[:search_manufacturer].present?
       @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer])
@@ -175,14 +173,29 @@ class Admin::BikesController < Admin::BaseController
       # Have to include deleted_at or else we get nil
       bikes = bikes.includes(:ownerships).where(deleted_at: nil, ownerships: {organization_id: nil})
     end
-    bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
-    if params[:search_stolen].present?
-      bikes = bikes.status_stolen if params[:search_stolen] == "stolen_only"
-      bikes = bikes.not_stolen if params[:search_stolen] == "non_stolen_only"
+    # Get a query error if both are passed
+    if params[:search_email].present? && @user.blank?
+      @search_email = params[:search_email]
+      bikes = bikes.admin_text_search(@search_email)
     end
-    unless params[:search_spam] || current_user.su_option?(:no_hide_spam)
-      bikes = bikes.not_spam
+
+    statuses = []
+    params.each do |k, v|
+      statuses << k if k.match?(/\Asearch_status/) && ParamsNormalizer.boolean(v)
     end
+    @statuses_search = true if statuses.any? # Actually should be default_statuses
+    # example might not work w/ @user ? TODO: Check
+    bikes = bikes.where(example: true) if statuses.include?("search_status_example")
+    bikes = bikes.where(likely_spam: true) if statuses.include?("search_status_spam")
+    #   if params[:search_stolen].present?
+    #     bikes = bikes.status_stolen if params[:search_stolen] == "stolen_only"
+    #     bikes = bikes.not_stolen if params[:search_stolen] == "non_stolen_only"
+    #   end
+    #   unless params[:search_spam] || current_user.su_option?(:no_hide_spam)
+    #     bikes = bikes.not_spam
+    #   end
+    # end
+
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
