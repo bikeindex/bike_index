@@ -56,7 +56,7 @@ RSpec.describe BikeCreator do
     end
 
     describe "with organization" do
-      let(:bike_params) do
+      let(:default_params) do
         {
           primary_frame_color_id: color.id,
           creation_organization_id: organization&.id,
@@ -64,6 +64,7 @@ RSpec.describe BikeCreator do
           owner_email: "something@stuff.com"
         }
       end
+      let(:bike_params) { default_params }
       let(:target_created_attrs) { bike_params.merge(cycle_type: "bike", propulsion_type: "foot-pedal") }
       context "no organization" do
         let(:organization) { nil }
@@ -89,13 +90,15 @@ RSpec.describe BikeCreator do
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect_attrs_to_match_hash(bike, target_created_attrs)
         end
-        context "with organization" do
-          # TODO: likely_spam here
+        context "with spam_registrations" do
+          let(:organization) { FactoryBot.create(:organization, spam_registrations: true) }
+          let(:bike_params) { default_params.merge(frame_model: "2yynzfIfyiDCltHWjDDgWPr") }
           it "creates the bike_organization" do
             expect {
               instance.create_bike(b_param)
             }.to change(BikeOrganization, :count).by 1
-            bike = Bike.last
+            bike = Bike.unscoped.last
+            expect(SpamEstimator.estimate_bike(bike)).to eq 51
             expect(bike.creator&.id).to eq user.id
             expect(bike.current_ownership&.id).to be_present
             expect(bike.likely_spam).to be_truthy
@@ -126,20 +129,18 @@ RSpec.describe BikeCreator do
       context "extra attributes" do
         let(:wheel_size) { FactoryBot.create(:wheel_size) }
         let(:bike_params) do
-          {
+          default_params.merge(
             creation_organization_id: organization.id,
             propulsion_type: "sail",
             cycle_type: "stroller",
             serial_number: "BIKE TOKENd",
-            manufacturer_id: manufacturer.id,
             rear_tire_narrow: false,
             rear_wheel_size_id: wheel_size.id,
-            primary_frame_color_id: color.id,
             handlebar_type: "bmx",
             owner_email: "stuff@stuff.com",
             user_name: "Sally",
             street: "Somewhere Ville"
-          }
+          )
         end
         it "creates" do
           expect { instance.create_bike(b_param) }.to change(Bike, :count).by(1)
