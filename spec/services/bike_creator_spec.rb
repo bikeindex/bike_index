@@ -92,13 +92,19 @@ RSpec.describe BikeCreator do
         end
         context "with spam_registrations" do
           let(:organization) { FactoryBot.create(:organization, spam_registrations: true) }
-          let(:bike_params) { default_params.merge(frame_model: "2yynzfIfyiDCltHWjDDgWPr") }
+          let(:bike_params) do
+            default_params.merge(
+              frame_model: "2yynzfIfyiDCltHWjDDgWPr",
+              manufacturer_id: Manufacturer.other.id,
+              manufacturer_other: "qetasdgf8asdf00af"
+            )
+          end
           it "creates the bike_organization" do
             expect {
               instance.create_bike(b_param)
             }.to change(BikeOrganization, :count).by 1
             bike = Bike.unscoped.last
-            expect(SpamEstimator.estimate_bike(bike)).to eq 51
+            expect(SpamEstimator.estimate_bike(bike)).to eq 82
             expect(bike.creator&.id).to eq user.id
             expect(bike.current_ownership&.id).to be_present
             expect(bike.likely_spam).to be_truthy
