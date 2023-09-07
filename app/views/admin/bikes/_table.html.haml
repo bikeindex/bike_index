@@ -66,6 +66,9 @@
                     - if bike.example
                       %span.text-danger{title: "example (aka test)"}
                         = bike.id
+                    - elsif bike.likely_spam?
+                      %span.text-danger{title: "Likely SPAM"}
+                        = bike.id
                     - else
                       = bike.id
                 - if bike.deleted?
