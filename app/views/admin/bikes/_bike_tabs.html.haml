@@ -7,14 +7,23 @@
     %h1.text-danger
       No Bike present
   - else
-    - if bike.deleted?
+    - if bike.deleted? || bike.likely_spam? || bike.example?
       .row.mb-4
         .col-sm-6.offset-sm-3
-          .alert.alert-danger
-            %h4.text-danger #{bike.type_titleize} Deleted
-            Deleted:
-            %span.convertTime.preciseTime
-              = l bike.deleted_at, format: :convert_time
+          - if bike.deleted?
+            .alert.alert-danger.mb-4
+              %h4.text-danger #{bike.type_titleize} Deleted
+              Deleted:
+              %span.convertTime.preciseTime
+                = l bike.deleted_at, format: :convert_time
+          - if bike.likely_spam?
+            .alert.alert-danger.mb-4
+              %h4.text-danger This #{bike.type_titleize} is likely spam
+              No need to remove, this doesn't show up in searches and will be deleted, automatically
+          - if bike.example?
+            .alert.alert-warning.mb-4
+              %h4.text-warning #{bike.type_titleize} is an test registration
+              No need to remove, this doesn't show up in searches and will be deleted, automatically
     .row
       - cache(["admin_bike_main", bike, stolen_record]) do
         .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb

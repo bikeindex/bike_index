@@ -14,7 +14,7 @@ class CredibilityScorer
       creation_organization_trusted: 30,
       creation_organization_suspicious: -10,
       creation_organization_spam_registrations: -20,
-      likely_spam: -50,
+      likely_spam: -70,
       long_time_registration: 10,
       no_creator: -10
     },

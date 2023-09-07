@@ -197,7 +197,7 @@ RSpec.describe CredibilityScorer do
           bike.reload
           expect(subject.creation_age_badge(ownership)).to eq :long_time_registration
           expect(subject.creation_badges(ownership, bike)).to eq([:long_time_registration, :likely_spam])
-          expect(instance.score).to eq(10)
+          expect(instance.score).to eq(0)
         end
       end
     end
