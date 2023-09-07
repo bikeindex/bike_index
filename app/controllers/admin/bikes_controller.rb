@@ -173,6 +173,7 @@ class Admin::BikesController < Admin::BaseController
       # Have to include deleted_at or else we get nil
       bikes = bikes.includes(:ownerships).where(deleted_at: nil, ownerships: {organization_id: nil})
     end
+
     # Get a query error if both are passed
     if params[:search_email].present? && @user.blank?
       @search_email = params[:search_email]
@@ -189,19 +190,33 @@ class Admin::BikesController < Admin::BaseController
     bikes
   end
 
+  # Separated out purely to make logic easier to follow
   def search_bike_statuses(bikes)
-    @searched_statuses = []
-    params.each do |k, v|
-      next unless k.match?(/\Asearch_status_/) && ParamsNormalizer.boolean(v)
-      @searched_statuses << k.gsub(/\Asearch_status_/, "")
-    end
+    @searched_statuses = params.keys.select do |k|
+      k.match?(/\Asearch_status_/) && ParamsNormalizer.boolean(params[k])
+    end.map { |k| k.gsub(/\Asearch_status_/, "") }
+
     @searched_statuses = default_statuses if @searched_statuses.blank?
     @not_default_statuses = @searched_statuses != default_statuses
 
     # example might not work w/ @user ? TODO: Check
-    bikes = bikes.where(example: false) unless @searched_statuses.include?("example")
-    bikes = bikes.where(likely_spam: false) unless @searched_statuses.include?("spam")
-    bikes = bikes.where(deleted_at: nil) unless @searched_statuses.include?("deleted")
+    if @searched_statuses.include?("example_only")
+      bikes = bikes.where(example: true)
+    elsif !@searched_statuses.include?("example")
+      bikes = bikes.where(example: false)
+    end
+
+    if @searched_statuses.include?("spam_only")
+      bikes = bikes.where(likely_spam: true)
+    elsif !@searched_statuses.include?("spam")
+      bikes = bikes.where(likely_spam: false)
+    end
+
+    if @searched_statuses.include?("deleted_only")
+      bikes = bikes.where.not(deleted_at: nil)
+    elsif !@searched_statuses.include?("deleted")
+      bikes = bikes.where(deleted_at: nil)
+    end
 
     bike_statuses = (%w[stolen with_owner abandoned impounded] & @searched_statuses)
       .map { |k| "status_#{k}" }
