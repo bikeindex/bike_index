@@ -4,8 +4,8 @@ class CredibilityScorer
 
   BADGES = {
     overrides: {
-      example_bike: -100,
       created_at_point_of_sale: 100,
+      example_bike: -100,
       user_banned: -200
     },
 
@@ -50,6 +50,7 @@ class CredibilityScorer
 
   def self.permitted_badges_array(badges_array)
     badges_array = Array(badges_array)
+    return %i[example_bike] if badges_array.include?(:example_bike)
     if (badges_array & %i[user_ambassador creation_organization_trusted]).count == 2
       badges_array -= [:creation_organization_trusted]
     end
@@ -176,6 +177,14 @@ class CredibilityScorer
         [ownership.creator, ownership.user]
       end
     end.flatten.reject(&:blank?).uniq
+  end
+
+  def self.humanize_badge(badge)
+    if badge == :example_bike
+      "Test bike"
+    else
+      badge.to_s.humanize
+    end
   end
 
   def initialize(bike)

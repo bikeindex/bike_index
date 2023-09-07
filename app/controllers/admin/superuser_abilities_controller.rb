@@ -15,6 +15,12 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   end
 
   def update
+    if @superuser_ability.update(permitted_parameters)
+      flash[:success] = "Superuser Ability saved!"
+      redirect_to edit_admin_superuser_ability_path(@superuser_ability)
+    else
+      render action: :edit
+    end
   end
 
   helper_method :searched_superuser_abilities, :permitted_kinds
@@ -54,5 +60,11 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
     superuser_abilities.where(@time_range_column => @time_range)
+  end
+
+  def permitted_parameters
+    su_options = params.permit(*SuperuserAbility::SU_OPTIONS)
+      .select { |so| ParamsNormalizer.boolean(params[so]) }
+    {su_options:  su_options.keys}
   end
 end

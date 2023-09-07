@@ -3,17 +3,21 @@
 .container
   -# If there's a passive organization, display bike title at the top too, otherwise you can't tell what bike you're looking at without scrolling down
   - if current_user.present?
-    - if (passive_organization.present? && current_user.authorized?(passive_organization)) || current_user.superuser
+    - if current_user.su_option?(:always_show_credibility) || passive_organization.present? && current_user.authorized?(passive_organization)
       .row
-        - col_classes = passive_organization&.enabled?("credibility_badges") ? "col-md-7" : "col-xs-12"
-        .clearfix{ class: col_classes }
+        - show_credibility_badges = current_user.su_option?(:always_show_credibility) || passive_organization&.enabled?("credibility_badges")
+        - col_classes = show_credibility_badges ? "col-md-7" : "col-xs-12"
+        .clearfix{class: col_classes}
           - if current_user.superuser
             = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info less-strong superuser-bike-button"
           - if passive_organization.present?
-            %h3.secondary-bike-title.mb-2= bike_title_html(@bike)
-        - if passive_organization&.enabled?("credibility_badges")
+            %h3.secondary-bike-title.mb-2
+              = bike_title_html(@bike)
+              - if @bike.likely_spam?
+                %small.text-warning likely spam
+        - if show_credibility_badges
           .col-md-5.text-right
-            = render partial: "/bikes/credibility_score", locals: { bike: @bike }
+            = render partial: "/bikes/credibility_score", locals: {bike: @bike}
 
 
 
@@ -74,6 +78,8 @@
       %h1.bike-title
         = bike_status_span(@bike)
         %span.uncap= bike_title_html(@bike)
+        - if @bike.example?
+          %small.text-warning.uncap test registration
 
       - if @bike.status_impounded?
         %strong.text-warning= t(".looking_for_correct_owner", bike_type: @bike.type)

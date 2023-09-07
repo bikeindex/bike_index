@@ -18,6 +18,8 @@
         = sortable "controller_name", render_sortable: render_sortable
       %th
         = sortable "action_name", render_sortable: render_sortable
+      %th
+        Options
       - if render_deleted
         %th
           = sortable "deleted_at", render_sortable: render_sortable
@@ -25,7 +27,7 @@
       - superuser_abilities.each do |superuser_ability|
         %tr
           %td
-            %span.convertTime
+            %a.convertTime{href: edit_admin_superuser_ability_path(superuser_ability.to_param)}
               = l(superuser_ability.created_at, format: :convert_time)
             - if display_dev_info?
               %code.small.only-dev-visible= superuser_ability.id
@@ -35,21 +37,14 @@
           - unless skip_user
             %td
               - if superuser_ability.user_id.present?
-                - if superuser_ability.user.present?
-                  = link_to superuser_ability.user.email, admin_user_path(superuser_ability.user_id)
-                - else # Handle deleted users
-                  - user = User.unscoped.find_by_id(superuser_ability.user_id)
-                  - if user.present?
-                    = link_to user.email, admin_user_path(superuser_ability.user_id)
-                    %small.text-danger user deleted
-                  - else
-                    %small.text-danger missing user: #{superuser_ability.user_id}
-                = link_to "superuser_abilities", url_for(sortable_search_params.merge(user_id: superuser_ability.user_id)), class: "small gray-link"
+                = render partial: "/shared/admin_user_cell", locals: {user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable, cache: true}
           %td= superuser_ability.kind.titleize
           %td
             = superuser_ability.controller_name
           %td
             = superuser_ability.action_name
+          %td
+            = superuser_ability.su_options.join(", ")
           - if render_deleted
             %td
               - if superuser_ability.deleted_at.present?

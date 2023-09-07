@@ -55,6 +55,14 @@ RSpec.describe CredibilityScorer do
         expect(subject.badge_value(badge_array)).to eq(30)
       end
     end
+    context "with example_bike and creation_organization_trusted" do
+      let(:badge_array) { %i[example_bike creation_organization_trusted] }
+      it "it returns just example_bike" do
+        expect(subject.permitted_badges_array(badge_array)).to eq([:example_bike])
+        expect(subject.permitted_badges_hash(badge_array)).to eq({example_bike: -100})
+        expect(subject.badge_value(badge_array)).to eq(-100)
+      end
+    end
   end
 
   describe "bike badges and score" do

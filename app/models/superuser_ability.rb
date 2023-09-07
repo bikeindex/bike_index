@@ -66,6 +66,7 @@ class SuperuserAbility < ApplicationRecord
   def set_calculated_attributes
     self.kind = calculated_kind
     self.su_options ||= []
+    self.su_options = su_options.sort
   end
 
   private
