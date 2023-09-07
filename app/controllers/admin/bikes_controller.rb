@@ -179,22 +179,7 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.admin_text_search(@search_email)
     end
 
-    statuses = []
-    params.each do |k, v|
-      statuses << k if k.match?(/\Asearch_status/) && ParamsNormalizer.boolean(v)
-    end
-    @statuses_search = true if statuses.any? # Actually should be default_statuses
-    # example might not work w/ @user ? TODO: Check
-    bikes = bikes.where(example: true) if statuses.include?("search_status_example")
-    bikes = bikes.where(likely_spam: true) if statuses.include?("search_status_spam")
-    #   if params[:search_stolen].present?
-    #     bikes = bikes.status_stolen if params[:search_stolen] == "stolen_only"
-    #     bikes = bikes.not_stolen if params[:search_stolen] == "non_stolen_only"
-    #   end
-    #   unless params[:search_spam] || current_user.su_option?(:no_hide_spam)
-    #     bikes = bikes.not_spam
-    #   end
-    # end
+    bikes = search_bike_statuses(bikes)
 
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
@@ -202,6 +187,35 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.includes(:ownerships).where(ownerships: {origin: @origin_search_type}) if @origin_search_type.present?
     @multi_delete = ParamsNormalizer.boolean(params[:search_multi_delete])
     bikes
+  end
+
+  def search_bike_statuses(bikes)
+    @searched_statuses = []
+    params.each do |k, v|
+      next unless k.match?(/\Asearch_status_/) && ParamsNormalizer.boolean(v)
+      @searched_statuses << k.gsub(/\Asearch_status_/, "")
+    end
+    @searched_statuses = default_statuses if @searched_statuses.blank?
+    @not_default_statuses = @searched_statuses != default_statuses
+
+    # example might not work w/ @user ? TODO: Check
+    bikes = bikes.where(example: false) unless @searched_statuses.include?("example")
+    bikes = bikes.where(likely_spam: false) unless @searched_statuses.include?("spam")
+    bikes = bikes.where(deleted_at: nil) unless @searched_statuses.include?("deleted")
+
+    bike_statuses = (%w[stolen with_owner abandoned impounded] & @searched_statuses)
+      .map { |k| "status_#{k}" }
+    if @searched_statuses.include?("unregistered_parking_notification")
+      bike_statuses << "unregistered_parking_notification"
+    end
+    bikes = bikes.where(status: bike_statuses)
+
+    bikes
+  end
+
+  def default_statuses
+    %w[stolen with_owner abandoned impounded unregistered_parking_notification] +
+      (current_user.su_option?(:no_hide_spam) ? ["spam"] : [])
   end
 
   def available_bikes
