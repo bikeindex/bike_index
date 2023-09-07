@@ -193,13 +193,12 @@ class Admin::BikesController < Admin::BaseController
   # Separated out purely to make logic easier to follow
   def search_bike_statuses(bikes)
     @searched_statuses = params.keys.select do |k|
-      k.match?(/\Asearch_status_/) && ParamsNormalizer.boolean(params[k])
+      k.start_with?("search_status_") && ParamsNormalizer.boolean(params[k])
     end.map { |k| k.gsub(/\Asearch_status_/, "") }
 
     @searched_statuses = default_statuses if @searched_statuses.blank?
     @not_default_statuses = @searched_statuses != default_statuses
 
-    # example might not work w/ @user ? TODO: Check
     if @searched_statuses.include?("example_only")
       bikes = bikes.where(example: true)
     elsif !@searched_statuses.include?("example")
@@ -223,9 +222,7 @@ class Admin::BikesController < Admin::BaseController
     if @searched_statuses.include?("unregistered_parking_notification")
       bike_statuses << "unregistered_parking_notification"
     end
-    bikes = bikes.where(status: bike_statuses)
-
-    bikes
+    bikes.where(status: bike_statuses)
   end
 
   def default_statuses
