@@ -140,8 +140,8 @@
               = check_box_tag :search_status_deleted, true, @searched_statuses.include?("deleted"), class: "form-check-input"
               = label_tag :search_status_deleted, "Deleted"
             .form-check
-              = check_box_tag :search_status_unregistered_parking_notifications, true, @searched_statuses.include?("unregistered_parking_notifications"), class: "form-check-input"
-              = label_tag :search_status_unregistered_parking_notifications, "Parking Notifications"
+              = check_box_tag :search_status_unregistered_parking_notification, true, @searched_statuses.include?("unregistered_parking_notification"), class: "form-check-input"
+              = label_tag :search_status_unregistered_parking_notification, "Parking Notifications"
             .form-check
               = check_box_tag :search_status_spam, true, @searched_statuses.include?("spam"), class: "form-check-input"
               = label_tag :search_status_spam, "Likely Spam"
