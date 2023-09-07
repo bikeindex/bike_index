@@ -65,6 +65,6 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   def permitted_parameters
     su_options = params.permit(*SuperuserAbility::SU_OPTIONS)
       .select { |so| ParamsNormalizer.boolean(params[so]) }
-    {su_options:  su_options.keys}
+    {su_options: su_options.keys}
   end
 end

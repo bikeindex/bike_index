@@ -8,7 +8,7 @@ RSpec.describe Bike, type: :model do
   describe "scopes and searching" do
     describe "scopes" do
       it "default scopes to created_at desc" do
-        expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, user_hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
+        expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false).order(listing_order: :desc).to_sql)
       end
       it "recovered_records default scopes to created_at desc" do
         bike = FactoryBot.create(:bike)

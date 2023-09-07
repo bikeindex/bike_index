@@ -101,7 +101,8 @@ class Bike < ApplicationRecord
   scope :does_not_need_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "does_not_need_pos"}) }
   scope :pos_not_lightspeed_ascend, -> { includes(:ownerships).where.not(ownerships: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
-  scope :spam, -> { unscoped.where(spam: true) }
+  scope :spam, -> { unscoped.where(likely_spam: true) }
+  scope :not_spam, -> { where(likely_spam: false) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
   scope :with_user_hidden, -> { unscoped.non_example.without_deleted }

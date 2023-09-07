@@ -51,5 +51,3 @@ RSpec.describe SuperuserAbility, type: :model do
     end
   end
 end
-
-
