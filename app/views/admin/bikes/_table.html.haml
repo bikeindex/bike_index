@@ -63,23 +63,14 @@
                   -# Add a space so that the id doesn't get grouped with the time
                   &nbsp;
                   %span.less-strong-right.d-none.d-md-block.only-dev-visible
-                    - if bike.example
-                      %span.text-danger{title: "example (aka test)"}
-                        = bike.id
-                    - elsif bike.likely_spam?
-                      %span.text-danger{title: "Likely SPAM"}
-                        = bike.id
-                    - else
-                      = bike.id
-                - if bike.deleted?
-                  .small.text-danger
-                    Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
+                    = bike.id
               %td.d-none.d-xl-table-cell
                 %small.convertTime
                   = l bike.updated_by_user_fallback, format: :convert_time
               %td.d-none.d-md-table-cell.user-cell
                 .less-strong-hold
-                  = render partial: "/shared/admin_user_cell", locals: {email: bike.owner_email, user: bike.user, render_search: true, cache: true, search_url: admin_bikes_path(search_email: bike.owner_email)}
+                  = render partial: "/shared/admin_user_cell", locals: {email: bike.owner_email, user: bike.user, render_search: true, cache: true}
+                  -# Previously, was passing in search_url with search_email: owner_email - which is more inclusive and MUCH SLOWER
                   - if bike.claimed?
                     %span.less-strong-right.text-info= check_mark
               %td
@@ -91,6 +82,15 @@
                 %small= link_to search_emoji, admin_bikes_path(search_manufacturer: bike.mnfg_name), class: "display-mnfg-link display-sortable-link"
               %td.d-none.d-lg-table-cell
                 .less-strong-hold
+                  - if bike.example
+                    %small.mr-1.text-danger{title: "example (aka test)"}
+                      test
+                  - if bike.likely_spam?
+                    %small.mr-1.text-danger{title: "Likely SPAM"}
+                      spam
+                  - if bike.deleted?
+                    %small.mr-1.text-danger
+                      Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
                   = [bike.year, bike.frame_model_truncated].join(' ')
                   = "(#{bike.type})" unless bike.type == 'bike'
                   - if bike.stolen_recovery?

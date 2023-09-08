@@ -80,6 +80,10 @@ function BinxAdmin () {
         this.toggleUserBanFields() // In case the user is already banned
       }
 
+      if ($("#showStatusesSearch").length) {
+        this.initBikeStatusesSearch()
+      }
+
       this.initPerPageSelect()
     },
 
@@ -110,6 +114,22 @@ function BinxAdmin () {
       const widthSum = width.reduce((a, b) => a + b + 5, 0)
 
       $('#bike-tab-wrapper .nav-tabs').css('min-width', `${widthSum + 22}px`)
+    },
+
+    initBikeStatusesSearch() {
+      $("#showStatusesSearch").on("click", function (event) {
+        event.preventDefault()
+        // Only let status search be toggled if it's default
+        if (window.statusesSearchDefault) {
+          $("#showStatusesSearch").toggleClass("active")
+          $(".search-statuses").collapse("toggle")
+        }
+        return false
+      })
+      $('.search-statuses input').on('change', function (event) {
+        log.debug('search-statuses changed!')
+        window.statusesSearchDefault = false
+      })
     },
 
     // Orgs location adding method

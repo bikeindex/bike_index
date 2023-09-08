@@ -5,28 +5,12 @@
   .col-md-7
     %ul
       %li.nav-item
+        %a.nav-link#showStatusesSearch{href: "#", class: (@not_default_statuses ? "active" : "")}
+          Search statuses
+      %li.nav-item
         = link_to "multi-delete", url_for(sortable_search_params.merge(search_multi_delete: !@multi_delete)), class: "nav-link #{@multi_delete ? 'active' : ''}"
       %li.nav-item
         = link_to "Unknown Mnfgs", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
-      %li.nav-item
-        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (params[:search_stolen].present? ? "active" : "")}
-          = params[:search_stolen].present? ? params[:search_stolen].humanize : "Stolenness"
-        .dropdown-menu
-          - stolen_only_active = params[:search_stolen] == 'stolen_only'
-          = link_to "Stolen only", url_for(sortable_search_params.merge(search_stolen: stolen_only_active ? nil : "stolen_only")), class: "dropdown-item #{stolen_only_active ? 'active' : ''}"
-          - non_stolen_only_active = params[:search_stolen] == 'non_stolen_only'
-          = link_to "Non Stolen only", url_for(sortable_search_params.merge(search_stolen: non_stolen_only_active ? nil : "non_stolen_only")), class: "dropdown-item #{non_stolen_only_active ? 'active' : ''}"
-
-      - if !@user.present?
-        %li.nav-item
-          %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (params[:search_example].present? ? "active" : "")}
-            = params[:search_example].present? ? params[:search_example].humanize : "Exampleness"
-          .dropdown-menu
-            - example_only_active = params[:search_example] == 'example_only'
-            = link_to "Example only", url_for(sortable_search_params.merge(search_example: example_only_active ? nil : "example_only")), class: "dropdown-item #{example_only_active ? 'active' : ''}"
-            - non_example_only_active = params[:search_example] == 'non_example_only'
-            = link_to "Non Stolen only", url_for(sortable_search_params.merge(search_example: non_example_only_active ? nil : "non_example_only")), class: "dropdown-item #{non_example_only_active ? 'active' : ''}"
-
       %li.nav-item
         - any_origin_active = @origin_search_type.blank?
         %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (any_origin_active ? "" : "active")}
@@ -66,7 +50,7 @@
 
 - if @render_chart
   .col-12.mt-2.mb-4
-    - if params[:search_email] || params[:user_id].present?
+    - if @user || @search_email
       %hr
       %h2.mt-4.text-warning Can't graph with user search
     - else
@@ -89,61 +73,122 @@
     are claimed
 
 .row.mt-4
-  .col-md-7
+  .col-md-6.order-2.order-md-1
     .row
       = render partial: "/shared/admin_current_header", locals: {viewing: "Bikes"}
-    - if (params.keys & %w[user_id search_manufacturer]).any? || current_organization.present?
-      %ul.mt-0
-        - if current_organization.present?
-          %li
-            - if params[:search_only_creation_organization].present?
-              Viewing only bikes created by
-              %em= current_organization.name
-              = link_to "view all associated bikes", url_for(sortable_search_params.merge(search_only_creation_organization: nil))
-            - else
-              Viewing all associated
-              %em= current_organization.name
-              bikes -
-              = link_to "view only bikes created by", url_for(sortable_search_params.merge(search_only_creation_organization: true))
-            \| #{link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param)}
-        - if params[:user_id].present?
-          %li
-            - if @user.present?
-              Owned by
-              = link_to "#{@user.email}", admin_user_path(@user)
-            - else
-              No user found for
-              %code
-                = params[:user_id]
-        - if params[:search_manufacturer].present?
-          %li
-            - if @manufacturer.present?
-              Made by
-              = link_to @manufacturer.name, admin_manufacturer_path(@manufacturer)
-              - if @manufacturer.official_organization.present?
-                %small.less-strong
-                  (view #{link_to "official org", admin_organization_path(@manufacturer.official_organization.to_param)})
-            - else
-              No manufacturer found for
-              %code
-                = params[:search_manufacturer]
-            = link_to "view all manufacturer bikes", url_for(sortable_search_params.merge(search_manufacturer: nil)), class: "gray-link small"
-  .col-md-5
-    = form_tag admin_bikes_path, method: :get, class: "form-inline" do
+    - if current_organization.present?
+      %p
+        - if params[:search_only_creation_organization].present?
+          Viewing only bikes created by
+          %em= current_organization.name
+          = link_to "view all associated bikes", url_for(sortable_search_params.merge(search_only_creation_organization: nil))
+        - else
+          Viewing all associated
+          %em= current_organization.name
+          bikes -
+          = link_to "view only bikes created by", url_for(sortable_search_params.merge(search_only_creation_organization: true))
+        \| #{link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param)}
+    - if @search_email.present?
+      %p
+        Viewing only bikes
+        %strong sent to
+        %code= @search_email
+        = link_to "view sent to any emails", url_for(sortable_search_params.merge(search_email: nil)), class: "gray-link small"
+    - if params[:search_manufacturer].present?
+      %p
+        - if @manufacturer.present?
+          Made by
+          = link_to @manufacturer.name, admin_manufacturer_path(@manufacturer)
+          - if @manufacturer.official_organization.present?
+            %small.less-strong
+              (view #{link_to "official org", admin_organization_path(@manufacturer.official_organization.to_param)})
+        - else
+          No manufacturer found for
+          %code
+            = params[:search_manufacturer]
+        = link_to "view all manufacturer bikes", url_for(sortable_search_params.merge(search_manufacturer: nil)), class: "gray-link small"
+  .col-md-6.order-1.order-md-2
+    = form_tag admin_bikes_path, method: :get, class: "" do
       = render partial: "/shared/hidden_search_fields"
       = hidden_field_tag :search_example, params[:search_example]
-      = hidden_field_tag :search_non_example, params[:search_non_example]
-      = hidden_field_tag :search_stolen, params[:search_stolen]
+
       = hidden_field_tag :search_pos, params[:search_pos]
       = hidden_field_tag :search_origin, params[:search_origin]
       = hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization]
+      .search-statuses.mb-1{class: (@not_default_statuses ? "" : "collapse")}
+        :javascript
+          window.statusesSearchDefault = #{!@not_default_statuses};
+        %p.mb-1
+          %em Include bikes that are:
+        .row
+          .col-6
+            .form-check
+              = check_box_tag :search_status_stolen, true, @searched_statuses.include?("stolen"), class: "form-check-input"
+              = label_tag :search_status_stolen, "Stolen"
+            .form-check
+              = check_box_tag :search_status_with_owner, true, @searched_statuses.include?("with_owner"), class: "form-check-input"
+              = label_tag :search_status_with_owner do
+                With owner
+                %small.less-strong (not stolen)
+            .form-check
+              = check_box_tag :search_status_abandoned, true, @searched_statuses.include?("abandoned"), class: "form-check-input"
+              = label_tag :search_status_abandoned, "Abandoned"
+            .form-check
+              = check_box_tag :search_status_impounded, true, @searched_statuses.include?("impounded"), class: "form-check-input"
+              = label_tag :search_status_impounded, "Impounded"
+            .form-check
+              = check_box_tag :search_status_unregistered_parking_notification, true, @searched_statuses.include?("unregistered_parking_notification"), class: "form-check-input"
+              = label_tag :search_status_unregistered_parking_notification, "Parking Notifications"
 
-      .form-group.ml-auto.mr-2.mb-2
-        = text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control"
-      .form-group.mr-2.mb-2
-        = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
-      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+          .col-6
+            .form-check
+              - if @searched_statuses.include?("deleted_only")
+                = check_box_tag :search_status_deleted_only, true, @searched_statuses.include?("deleted_only"), class: "form-check-input"
+                = label_tag :search_status_deleted_only do
+                  Deleted
+                  %strong Only
+              - else
+                = check_box_tag :search_status_deleted, true, @searched_statuses.include?("deleted"), class: "form-check-input"
+                = label_tag :search_status_deleted, "Deleted"
+                = link_to "only", url_for(sortable_search_params.merge(search_status_deleted: nil, search_status_deleted_only: true)), class: "gray-link"
+            .form-check
+              - if @searched_statuses.include?("spam_only")
+                = check_box_tag :search_status_spam_only, true, @searched_statuses.include?("spam_only"), class: "form-check-input"
+                = label_tag :search_status_spam_only do
+                  likely Spam
+                  %strong Only
+              - else
+                = check_box_tag :search_status_spam, true, @searched_statuses.include?("spam"), class: "form-check-input"
+                = label_tag :search_status_spam, "Likely Spam"
+                = link_to "only", url_for(sortable_search_params.merge(search_status_spam: nil, search_status_spam_only: true)), class: "gray-link"
+                - if current_user.su_option?(:no_hide_spam) && display_dev_info?
+                  %small.less-strong.only-dev-visible
+                    on by default because <code>su_option</code>
+            .form-check
+              - if @searched_statuses.include?("example_only")
+                = check_box_tag :search_status_example_only, true, @searched_statuses.include?("example_only"), class: "form-check-input"
+                = label_tag :search_status_example_only do
+                  Test / Example
+                  %strong Only
+              - else
+                = check_box_tag :search_status_example, true, @searched_statuses.include?("example"), class: "form-check-input"
+                = label_tag :search_status_example, "Test / Example"
+                = link_to "only", url_for(sortable_search_params.merge(search_status_example: nil, search_status_example_only: true)), class: "gray-link"
 
+            - if @not_default_statuses
+              - status_keys = sortable_search_params.keys.select { |k| k.match?(/\Asearch_status/) }
+              .text-right.small
+                = link_to "reset to default statuses", url_for(sortable_search_params.merge(status_keys.map { |k| [k, nil] }.to_h))
+
+      .form-inline
+        .form-group.ml-auto.mr-2.mb-2
+          = text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control"
+        .form-group.mr-2.mb-2
+          = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
+        = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+
+-# %code= @searched_statuses
+-# %pre.small= pretty_print_json(sortable_search_params.as_json)
 
 = render partial: "/shared/pagination", locals: {collection: @bikes, count: @bikes.total_count}
 

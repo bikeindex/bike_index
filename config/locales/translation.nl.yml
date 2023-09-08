@@ -1976,6 +1976,7 @@ nl:
       not_registered_by_user: Niet geregistreerd door een gebruiker
       in: in
       looking_for_correct_owner: Op zoek naar de juiste eigenaar van deze %{bike_type}!
+      test_registration: proefregistratie
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen

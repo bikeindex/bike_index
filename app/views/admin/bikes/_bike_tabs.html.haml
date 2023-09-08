@@ -7,9 +7,9 @@
     %h1.text-danger
       No Bike present
   - else
-    - if bike.deleted? || bike.likely_spam? || bike.example?
+    - if bike.deleted? || bike.likely_spam? || bike.example? || bike.user_hidden
       .row.mb-4
-        .col-sm-6.offset-sm-3
+        .col-sm-10.offset-sm-1.col-md-6.offset-md-3
           - if bike.deleted?
             .alert.alert-danger.mb-4
               %h4.text-danger #{bike.type_titleize} Deleted
@@ -21,9 +21,26 @@
               %h4.text-danger This #{bike.type_titleize} is likely spam
               No need to remove, this doesn't show up in searches and will be deleted, automatically
           - if bike.example?
-            .alert.alert-warning.mb-4
-              %h4.text-warning #{bike.type_titleize} is an test registration
+            .alert.alert-danger.mb-4
+              %h4.text-danger #{bike.type_titleize} is a test registration
               No need to remove, this doesn't show up in searches and will be deleted, automatically
+              %small.d-block.mt-1 This is also known as an <em>example bike</em>
+          - if bike.user_hidden
+            .alert.alert-warning.mb-4
+              %h4.text-warning
+                Marked HIDDEN
+              - if @bike.unregistered_parking_notification?
+                %span.d-block.mb-2
+                  %strong Hidden because it was created by parking notification.
+                  Only members of the organization (and Bike Index superadmins) can see it.
+                Creation notification:
+                - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first
+                = link_to unregistered_parking_notification.kind_humanized.downcase, organization_parking_notification_path(unregistered_parking_notification, organization_id: unregistered_parking_notification.organization.to_param), class: "text-underline"
+                %small.d-block.mt-2 This is also known as an <span class="text-warning">unregistered</span> bike
+
+              - else
+                %strong.d-block.mb-1 Hidden by the user
+                No one but the user (and Bike Index superadmins) can see it
     .row
       - cache(["admin_bike_main", bike, stolen_record]) do
         .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
