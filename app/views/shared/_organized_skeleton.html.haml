@@ -25,6 +25,12 @@
           %span{'aria-hidden' => 'true' } &times;
         %p
           = t(".additional_features_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org"))
+    - if OrganizationDisplayer.subscription_expired_alert?(current_organization)
+      .organization-wide-alert.alert.alert-info.in
+        %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
+          %span{'aria-hidden' => 'true' } &times;
+        %p
+          = t(".subscription_expired_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org"))
     - if OrganizationDisplayer.bike_shop_display_integration_alert?(current_organization)
       .organization-wide-alert.alert.alert-info.in
         %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}

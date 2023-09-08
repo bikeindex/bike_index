@@ -64,4 +64,42 @@ RSpec.describe OrganizationDisplayer do
       end
     end
   end
+
+  describe "subscription_expired_alert?" do
+    let(:organization) { Organization.new }
+    it "is falsey" do
+      expect(OrganizationDisplayer.subscription_expired_alert?(organization)).to be_falsey
+      organization.is_paid = true
+      expect(OrganizationDisplayer.subscription_expired_alert?(organization)).to be_falsey
+    end
+    context "with current invoice" do
+      let(:invoice) { FactoryBot.create(:invoice_with_payment, start_at: Time.current - 1.year, end_at: end_at) }
+      let!(:organization) { invoice.organization }
+      let(:end_at) { Time.current + 1.week }
+      let(:invoice2) { FactoryBot.create(:invoice_paid, organization: organization) }
+      it "is falsey" do
+        expect(OrganizationDisplayer.subscription_expired_alert?(organization)).to be_falsey
+        # With an active free invoice, the result is the same
+        expect(invoice2.reload.active?).to be_truthy
+        expect(invoice2.paid_money_in_full?).to be_falsey
+        expect(OrganizationDisplayer.subscription_expired_alert?(organization.reload)).to be_falsey
+      end
+      context "expired last week" do
+        let(:end_at) { Time.current - 1.week }
+        it "is truthy" do
+          expect(OrganizationDisplayer.subscription_expired_alert?(organization)).to be_truthy
+          # With an active free invoice, the result is the same
+          expect(invoice2.reload.active?).to be_truthy
+          expect(invoice2.paid_money_in_full?).to be_falsey
+          expect(OrganizationDisplayer.subscription_expired_alert?(organization.reload)).to be_truthy
+        end
+      end
+      context "expired last year" do
+        let(:end_at) { Time.current - 1.year }
+        it "is falsey" do
+          expect(OrganizationDisplayer.subscription_expired_alert?(organization)).to be_falsey
+        end
+      end
+    end
+  end
 end
