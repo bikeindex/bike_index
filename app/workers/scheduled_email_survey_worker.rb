@@ -37,14 +37,14 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   def enqueue_workers(enqueue_limit)
     # There are some "potential" bikes that are no_survey, so add 200 to cover
     unclaimed_count = enqueue_limit + 200 - potential_bikes.claimed.count
-    potential_bikes.claimed.limit(enqueue_limit).find_each do |bike|
+    potential_bikes.claimed.limit(enqueue_limit).each_with_index do |bike, index|
       next if no_survey?(bike)
-      ScheduledEmailSurveyWorker.perform_async(bike.id)
+      ScheduledEmailSurveyWorker.perform_in(index * 5, bike.id)
     end
     return if unclaimed_count < 0
-    potential_bikes.unclaimed.limit(unclaimed_count).find_each do |bike|
+    potential_bikes.unclaimed.limit(unclaimed_count).each_with_index do |bike, index|
       next if no_survey?(bike)
-      ScheduledEmailSurveyWorker.perform_async(bike.id)
+      ScheduledEmailSurveyWorker.perform_in((unclaimed_count + index) * 5, bike.id)
     end
   end
 
