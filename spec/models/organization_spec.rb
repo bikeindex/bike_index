@@ -644,27 +644,6 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "law_enforcement_missing_verified_features?" do
-    let(:law_enforcement_organization) { Organization.new(kind: "law_enforcement") }
-    let(:law_enforcement_organization_with_unstolen) { Organization.new(kind: "law_enforcement", enabled_feature_slugs: ["unstolen_notifications"]) }
-    let(:bike_shop_organization) { Organization.new(kind: "bike_shop") }
-    it "is true for law_enforcement, false for shop, false for law_enforcement with unstolen_notifications" do
-      expect(law_enforcement_organization.law_enforcement_missing_verified_features?).to be_truthy
-      expect(bike_shop_organization.law_enforcement_missing_verified_features?).to be_falsey
-      expect(law_enforcement_organization_with_unstolen.law_enforcement_missing_verified_features?).to be_falsey
-    end
-  end
-
-  describe "display_avatar?" do
-    context "paid" do
-      it "displays" do
-        organization = Organization.new(is_paid: true)
-        allow(organization).to receive(:avatar) { "a pretty picture" }
-        expect(organization.display_avatar?).to be_truthy
-      end
-    end
-  end
-
   describe "mail_snippet_body" do
     let(:organization) { FactoryBot.create(:organization) }
     before do
@@ -687,44 +666,6 @@ RSpec.describe Organization, type: :model do
       let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, kind: "security") }
       it "returns nil for not-enabled snippet" do
         expect(organization.mail_snippet_body("security")).to eq mail_snippet.body
-      end
-    end
-  end
-
-  describe "bike_shop_display_integration_alert?" do
-    let(:organization) { Organization.new(kind: "law_enforcement", pos_kind: "no_pos") }
-    it "is falsey for non-shops" do
-      expect(organization.bike_shop_display_integration_alert?).to be_falsey
-    end
-    context "shop" do
-      let(:organization) { Organization.new(kind: "bike_shop", pos_kind: pos_kind) }
-      let(:pos_kind) { "no_pos" }
-      it "is true" do
-        expect(organization.bike_shop_display_integration_alert?).to be_truthy
-      end
-      context "lightspeed_pos" do
-        let(:pos_kind) { "lightspeed_pos" }
-        it "is false" do
-          expect(organization.bike_shop_display_integration_alert?).to be_falsey
-        end
-      end
-      context "ascend_pos" do
-        let(:pos_kind) { "ascend_pos" }
-        it "is false" do
-          expect(organization.bike_shop_display_integration_alert?).to be_falsey
-        end
-      end
-      context "broken_pos" do
-        let(:pos_kind) { "broken_lightspeed_pos" }
-        it "is true" do
-          expect(organization.bike_shop_display_integration_alert?).to be_truthy
-        end
-      end
-      context "does_not_need_pos" do
-        let(:pos_kind) { "does_not_need_pos" }
-        it "is falsey" do
-          expect(organization.bike_shop_display_integration_alert?).to be_falsey
-        end
       end
     end
   end

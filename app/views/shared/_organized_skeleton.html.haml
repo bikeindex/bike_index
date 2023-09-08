@@ -3,7 +3,7 @@
 %nav.organized-left-menu
   .organized-menu-wrapper
     %header{ class: show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" }
-      - if current_organization.display_avatar?
+      - if OrganizationDisplayer.avatar?(current_organization)
         = image_tag current_organization.avatar.url(:medium)
       %h3
         = t(".admin_panel")
@@ -19,13 +19,19 @@
 
 .organized-wrap
   %div{ class: organized_container }
-    - if current_organization.law_enforcement_missing_verified_features?
+    - if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization)
       .organization-wide-alert.alert.alert-info.in
         %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
           %span{'aria-hidden' => 'true' } &times;
         %p
           = t(".additional_features_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org"))
-    - if current_organization.bike_shop_display_integration_alert?
+    - if OrganizationDisplayer.subscription_expired_alert?(current_organization)
+      .organization-wide-alert.alert.alert-info.in
+        %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
+          %span{'aria-hidden' => 'true' } &times;
+        %p
+          = t(".subscription_expired_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org"))
+    - if OrganizationDisplayer.bike_shop_display_integration_alert?(current_organization)
       .organization-wide-alert.alert.alert-info.in
         %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
           %span{'aria-hidden' => 'true' } &times;

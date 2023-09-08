@@ -116,7 +116,7 @@ RSpec.describe Organized::BaseController, type: :request do
           expect(current_organization.reload.invoices.active.count).to eq 1
           expect(current_organization.official_manufacturer?).to be_truthy
           expect(current_organization.overview_dashboard?).to be_truthy
-          expect(current_organization.bike_shop_display_integration_alert?).to be_falsey
+          expect(OrganizationDisplayer.bike_shop_display_integration_alert?(current_organization)).to be_falsey
           get "/o/#{current_organization.to_param}/dashboard"
           expect(response).to render_template(:manufacturer)
           expect(assigns(:period)).to eq "year"

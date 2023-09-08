@@ -5303,6 +5303,9 @@ en:
       register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
       streamlined_bike_shop_registration_page: streamlined Bike Shop registration
         page
+      subscription_expired_html: >-
+        Your subscription to Bike Index has expired. Please contact %{email_link}
+        to get it re-enabled.
       use_ascend: Use Ascend?
       use_lightspeed_retail_pos: Use Lightspeed Retail POS?
       viewing_our_streamlined_page: >-
