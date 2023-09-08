@@ -279,10 +279,6 @@ class Organization < ApplicationRecord
     !paid_money? && invoices.expired.any? { |i| i.was_active? }
   end
 
-  def display_avatar?
-    avatar.present?
-  end
-
   def fetch_impound_configuration
     impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
   end
@@ -385,15 +381,6 @@ class Organization < ApplicationRecord
 
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
-  end
-
-  def law_enforcement_missing_verified_features?
-    law_enforcement? && !enabled?("unstolen_notifications")
-  end
-
-  def bike_shop_display_integration_alert?
-    bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind) &&
-      !official_manufacturer?
   end
 
   # bikes_member is slow - it's for graduated_notifications and shouldn't be called inline
