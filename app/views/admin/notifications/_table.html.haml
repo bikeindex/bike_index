@@ -4,6 +4,9 @@
 - skip_channel ||= false
 - skip_sender ||= false
 
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
     %thead.small-header.hidden-md-down
@@ -32,8 +35,7 @@
             %td
               %span.convertTime
                 = l(notification.created_at, format: :convert_time)
-              - if display_dev_info?
-                %code.small.only-dev-visible= notification.id
+              %code.small.only-dev-visible= notification.id
             %td
               %small.convertTime
                 = l(notification.updated_at, format: :convert_time)
