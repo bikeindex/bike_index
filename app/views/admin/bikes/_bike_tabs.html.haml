@@ -2,6 +2,10 @@
 - display_recovery ||= stolen_record.present? && stolen_record.recovered?
 - active_tab ||= "#{controller_name}-#{action_name}"
 
+-# require inline CSS setting because of caching
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
+
 .admin-bike-tabs
   - if bike.blank?
     %h1.text-danger
@@ -60,16 +64,15 @@
             = link_to "non-admin view", bike_path(bike.to_param, organization_id: bike.creation_organization.to_param), class: "text-muted float-right"
           %table.table-list.mb-0
             %tbody
-              - if display_dev_info?
-                %tr.small.only-dev-visible
-                  %td ID
-                  %td
-                    %code= bike.id
-                    %span.ml-2
-                      status:
-                      %code= bike.status&.gsub("status_", "")
-                    - if bike.user_hidden
-                      %small.text-warning.ml-2 user hidden
+              %tr.small.only-dev-visible
+                %td ID
+                %td
+                  %code= bike.id
+                  %span.ml-2
+                    status:
+                    %code= bike.status&.gsub("status_", "")
+                  - if bike.user_hidden
+                    %small.text-warning.ml-2 user hidden
 
               %tr
                 %td
@@ -134,9 +137,8 @@
                           %em missing
                   - if bike.not_updated_by_user?
                     %em.small.less-strong not updated after creation
-                  - if display_dev_info?
-                    %small.only-dev-visible.convertTime
-                      = l bike.updated_at, format: :convert_time
+                  %small.only-dev-visible.convertTime
+                    = l bike.updated_at, format: :convert_time
 
               - pdf ||= false
               - if pdf
@@ -194,11 +196,10 @@
                       \{
                       = reg_address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
                       \}
-                      - if display_dev_info?
-                        %small.only-dev-visible.ml-2
-                          %em
-                            source:
-                          = bike.registration_address_source
+                      %small.only-dev-visible.ml-2
+                        %em
+                          source:
+                        = bike.registration_address_source
 
             -# Only show phone if no stolen record
             - if stolen_record.blank? && bike.phone.present?
@@ -216,11 +217,10 @@
       .col-md-6.pr-md-0
         %table.table-list
           %tbody
-            - if display_dev_info?
-              %tr.small.only-dev-visible
-                %td ID
-                %td
-                  %code= stolen_record.id
+            %tr.small.only-dev-visible
+              %td ID
+              %td
+                %code= stolen_record.id
             %tr
               %td
                 Theft description
