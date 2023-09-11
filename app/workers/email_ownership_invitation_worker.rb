@@ -4,7 +4,7 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
   def perform(ownership_id)
     ownership = Ownership.find_by_id(ownership_id)
     return true unless ownership.present? && ownership.bike.present?
-    # recalculate spaminess, just in case
+    # recalculate spaminess, after bike is fully created and associated
     if SpamEstimator.estimate_bike(ownership.bike) > SpamEstimator::MARK_SPAM_PERCENT
       ownership.bike.update(likely_spam: true) unless ownership.bike.likely_spam?
     end

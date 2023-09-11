@@ -97,7 +97,8 @@ RSpec.describe BikeCreator do
               bike: default_params.merge(
                 frame_model: "2yynzfIfyiDCltHWjDDgWPr",
                 manufacturer_id: Manufacturer.other.id,
-                manufacturer_other: "qetasdgf8asdf00afdddvxcvxcvxc"),
+                manufacturer_other: "qetasdgf8asdf00afdddvxcvxcvxc"
+              ),
               stolen_record: {
                 phone: "7183839292",
                 theft_description: "asdfasdfg89xcv89sdf9asdfsdfffffffff"
