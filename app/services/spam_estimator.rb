@@ -3,7 +3,7 @@ class SpamEstimator
     def estimate_bike(bike, stolen_record = nil)
       estimate = 0
       return estimate if bike.blank?
-      estimate += 40 if bike.creation_organization&.spam_registrations
+      estimate += 35 if bike.creation_organization&.spam_registrations
       estimate += 0.3 * string_spaminess(bike.frame_model)
       estimate += 0.4 * string_spaminess(bike.manufacturer_other)
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
@@ -13,7 +13,7 @@ class SpamEstimator
 
     # eariot are the most frequent letters - this could be incorporated into calculations
     # Currently, doing a weird vowel count thing
-    def string_spaminess(str, str_length = nil, str_downlate = nil)
+    def string_spaminess(str)
       return 0 if str.blank?
       str_length ||= str.length.to_f
       return 10 if str_length == 1
@@ -21,8 +21,8 @@ class SpamEstimator
 
       total = vowel_frequency_suspiciousness(str, str_length, str_downlate) +
         space_count_suspiciousness(str, str_length, str_downlate) +
-        non_letter_count_suspiciousness(str, str_length, str_downlate) +
-        capital_count_suspiciousness(str, str_length, str_downlate)
+        capital_count_suspiciousness(str, str_length, str_downlate) +
+        non_letter_count_suspiciousness(str, str_length, str_downlate)
 
       within_bounds(total)
     end
@@ -33,7 +33,10 @@ class SpamEstimator
       estimate = 0
       return 0 if stolen_record.blank?
       estimate += string_spaminess(stolen_record.theft_description)
-      estimate += 0.6 * string_spaminess(stolen_record.street)
+      if stolen_record.street.present?
+        street_letters = stolen_record.street.gsub(/[^a-z|\s]/, "") # Ignore non letter things from street
+        estimate += 0.3 * string_spaminess(street_letters)
+      end
       within_bounds(estimate)
     end
 
@@ -94,7 +97,8 @@ class SpamEstimator
       else
         capital_ratio - 10
       end
-      within_bounds(susness)
+      # People love capitalizing things on the internet :/
+      0.3 * within_bounds(susness)
     end
 
     def non_letter_count_suspiciousness(str, str_length = nil, str_downlate = nil)

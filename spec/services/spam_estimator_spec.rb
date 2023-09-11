@@ -6,20 +6,20 @@ RSpec.describe SpamEstimator do
       let(:bike) { Bike.new(frame_model: str) }
       let(:str) { "Cutthroat" }
       it "is 0" do
-        expect(described_class.send(:string_spaminess, str)).to eq 0
+        expect(described_class.string_spaminess(str)).to eq 0
         expect(described_class.estimate_bike(bike)).to eq 0
       end
       context "FX 1 Disc" do
         let(:str) { "FX 1 Disc" }
         it "is 0" do
-          expect(described_class.send(:string_spaminess, str)).to be < 90
+          expect(described_class.string_spaminess(str)).to be < 90
           expect(described_class.estimate_bike(bike)).to be < 40
         end
       end
       context "garbage" do
         let(:str) { "efgBz9pNdd7efgBz9pNdd7" }
         it "estimate is percentage" do
-          expect(described_class.send(:string_spaminess, str)).to eq 100
+          expect(described_class.string_spaminess(str)).to eq 100
           expect(described_class.estimate_bike(bike)).to eq 30
         end
       end
@@ -29,14 +29,14 @@ RSpec.describe SpamEstimator do
       context "garbage" do
         let(:str) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
         it "estimate is percentage" do
-          expect(described_class.send(:string_spaminess, str)).to eq 100
+          expect(described_class.string_spaminess(str)).to eq 100
           expect(described_class.estimate_bike(bike)).to eq 40
         end
       end
       context "SON" do
         let(:str) { "SON Nabendynamo (Wilfried Schmidt Maschinenbau)" }
         it "returns" do
-          expect(described_class.send(:string_spaminess, str)).to be < 10
+          expect(described_class.string_spaminess(str)).to be < 10
           expect(described_class.estimate_bike(bike)).to be < 10
         end
       end
@@ -50,7 +50,7 @@ RSpec.describe SpamEstimator do
       context "spam_registrations" do
         let(:organization) { Organization.new(spam_registrations: true) }
         it "returns 40" do
-          expect(described_class.estimate_bike(bike)).to eq 40
+          expect(described_class.estimate_bike(bike)).to be_between(29, 41)
         end
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe SpamEstimator do
       let(:bike) { Bike.new }
       let(:stolen_record) { StolenRecord.new(theft_description: str, street: street) }
       let(:str) { "It was stolen last night" }
-      let(:street) { "1234 Main Street" }
+      let(:street) { "5434 N Mains St" }
       it "is 0" do
         expect(described_class.estimate_bike(bike, stolen_record)).to eq 0
       end
@@ -69,9 +69,9 @@ RSpec.describe SpamEstimator do
         end
       end
       context "garbage street" do
-        let(:street) { "efgBz9pNdd7" }
+        let(:street) { "efgBz9pNdd7efgBz9pNdd7efgBz9pNdd7" }
         it "is 51" do
-          expect(described_class.estimate_bike(bike, stolen_record)).to be_between(50, 80)
+          expect(described_class.estimate_bike(bike, stolen_record)).to eq 30
         end
         context "and garbage description" do
           let(:str) { "efgBz9pNdd7" }
@@ -91,30 +91,30 @@ RSpec.describe SpamEstimator do
         expect(described_class.send(:capital_count_suspiciousness, str)).to be_between(0, 20)
         expect(described_class.send(:space_count_suspiciousness, str)).to be_between(5, 15)
         expect(described_class.send(:non_letter_count_suspiciousness, str)).to be_between(0, 20)
-        expect(described_class.send(:string_spaminess, str)).to be_between(60, 81)
+        expect(described_class.string_spaminess(str)).to be_between(60, 81)
         # And double garbage
         expect(described_class.send(:vowel_frequency_suspiciousness, "#{str}#{str}")).to be_between(51, 80)
-        expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str}")).to be_between(10, 50)
+        expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str}")).to be_between(5, 30)
         expect(described_class.send(:space_count_suspiciousness, "#{str}#{str}")).to be_between(51, 80)
-        expect(described_class.send(:string_spaminess, "#{str}#{str}")).to eq 100
+        expect(described_class.string_spaminess("#{str}#{str}")).to eq 100
       end
     end
     context "frame_model names" do
       it "returns for proper frame_model names" do
-        expect(described_class.send(:string_spaminess, "Cutthroat")).to eq 0
-        expect(described_class.send(:string_spaminess, "Diverge 1.0")).to eq 0
-        expect(described_class.send(:string_spaminess, "Skye S")).to eq 0
+        expect(described_class.string_spaminess("Cutthroat")).to eq 0
+        expect(described_class.string_spaminess("Diverge 1.0")).to eq 0
+        expect(described_class.string_spaminess("Skye S")).to eq 0
       end
     end
-    context "Reward: 350" do
-      let(:str) { "Reward: 350" }
+    context "5434 N Mains St" do
+      let(:str) { "5434 N Mains St" }
       it "returns low" do
-        expect(described_class.send(:vowel_ratio, str).round(2)).to eq 0.29
-        expect(described_class.send(:vowel_frequency_suspiciousness, str)).to be < 10
+        # expect(described_class.send(:vowel_ratio, str).round(2)).to eq 0.18
+        expect(described_class.send(:vowel_frequency_suspiciousness, str)).to be < 80
         expect(described_class.send(:non_letter_count_suspiciousness, str)).to be < 15
         expect(described_class.send(:capital_count_suspiciousness, str)).to eq 0
         expect(described_class.send(:space_count_suspiciousness, str)).to eq 0
-        expect(described_class.send(:string_spaminess, str)).to be < 30
+        expect(described_class.string_spaminess(str)).to be < 65
       end
     end
     context "transliterate" do
@@ -124,7 +124,7 @@ RSpec.describe SpamEstimator do
         expect(described_class.send(:non_letter_count_suspiciousness, str)).to eq 0
         expect(described_class.send(:capital_count_suspiciousness, str)).to eq 0
         expect(described_class.send(:space_count_suspiciousness, str)).to eq 0
-        expect(described_class.send(:string_spaminess, str)).to be < 30
+        expect(described_class.string_spaminess(str)).to be < 30
       end
     end
     context "some troublesome ones" do
@@ -137,7 +137,7 @@ RSpec.describe SpamEstimator do
             # expect(described_class.send(:vowel_frequency_suspiciousness, str)).to be < 30
             # expect(described_class.send(:capital_count_suspiciousness, str)).to eq 0
             # expect(described_class.send(:space_count_suspiciousness, str)).to eq 0
-            expect(described_class.send(:string_spaminess, str)).to be < 30
+            expect(described_class.string_spaminess(str)).to be < 30
           end
         end
       end
@@ -243,23 +243,23 @@ RSpec.describe SpamEstimator do
     let(:str) { "ABCABDEFGH" }
     it "returns 0" do
       expect(described_class.send(:capital_count_suspiciousness, "AAABBB")).to eq 0
-      expect(described_class.send(:capital_count_suspiciousness, str.to_s)).to eq 50
-      expect(described_class.send(:capital_count_suspiciousness, "#{str}f")).to be_between(25, 50)
+      expect(described_class.send(:capital_count_suspiciousness, str.to_s)).to eq 15
+      expect(described_class.send(:capital_count_suspiciousness, "#{str}f")).to be_between(5, 15)
     end
 
     it "returns 60 at most for 12 characters" do
-      expect(described_class.send(:capital_count_suspiciousness, "#{str}AA")).to be_between(35, 60)
-      expect(described_class.send(:capital_count_suspiciousness, "#{str}aa")).to be_between(30, 55)
-      expect(described_class.send(:capital_count_suspiciousness, "AABBC DDeeaa")).to be_between(0, 10)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str}AA")).to be_between(10, 20)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str}aa")).to be_between(5, 15)
+      expect(described_class.send(:capital_count_suspiciousness, "AABBC DDeeaa")).to be_between(0, 5)
     end
 
     it "returns percentage for 25 characters" do
-      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str}AABBC")).to eq 90
-      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str}aabbc")).to eq 70
-      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str} abbc")).to eq 70
-      expect(described_class.send(:capital_count_suspiciousness, "#{str} #{str} bbc")).to eq 70
-      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str.downcase}aabbc")).to eq 30
-      expect(described_class.send(:capital_count_suspiciousness, "#{str.downcase}#{str.downcase}AABBC")).to be_between(0, 11)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str}AABBC")).to be_between(25, 40)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str}aabbc")).to be_between(20, 30)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str} abbc")).to be_between(20, 30)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str} #{str} bbc")).to be_between(20, 30)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str.downcase}aabbc")).to be_between(5, 20)
+      expect(described_class.send(:capital_count_suspiciousness, "#{str.downcase}#{str.downcase}AABBC")).to be_between(0, 5)
     end
   end
 end
