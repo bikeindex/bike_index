@@ -36,39 +36,36 @@ class SpamEstimator
 
     def vowel_frequency_suspiciousness(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
-      vowel_percent = vowel_percentage(str, str_downlate, str_length) * 100
+      return 0 if str_length < 4 # 3 letters or less get a pass
+      vowel_percent = vowel_ratio(str, str_downlate, str_length) * 100
 
       # In testing vowel percentage, 20-60% is reasonable for short strings
       # longer strings should be below 40%
-      centerpoint = 30
-      distance_from_center = if vowel_percent > centerpoint
-        vowel_percent - centerpoint
+      susness = if str_length < 6
+        [0, 100].include?(vowel_percent) ? 40 : 0
+      elsif vowel_percent < 20
+        offset = vowel_percent > 10 ? 90 : 110
+        if str_length < 10
+          offset -= 25
+        elsif str_length < 30
+          offset -+ 10
+        end
+        offset - vowel_percent
+      elsif vowel_percent > 69
+        if str_length < 15
+          vowel_percent
+        elsif str_length < 30
+          vowel_percent + 15
+        else
+          100
+        end
+      elsif vowel_percent > 40
+        vowel_percent - 40
       else
-        centerpoint - vowel_percent
+        0
       end
 
-      susness = if str_length < 5
-        # four letter words basically get a pass
-        if vowel_percent.between?(5, 80)
-          0
-        else
-          40
-        end
-      elsif str_length < 30
-        if vowel_percent.between?(20, 61)
-          0
-        else
-          # Vowel frequencies are more irregular for short strings
-          distance_from_center * (str_length < 10 ? 2 : 5)
-        end
-      else
-        if vowel_percent.between?(20, 4)
-          0
-        else
-          distance_from_center * 10
-        end
-      end
-      # pp "#{str} - susness: #{susness}     distance_from_center: #{distance_from_center.round(2)}   (#{vowel_percent.round(0)})"
+      pp "#{str} - susness: #{susness}    (#{vowel_percent.round(0)})"
 
       susness > 100 ? 100 : susness
     end
@@ -94,7 +91,7 @@ class SpamEstimator
 
     def suspicious_vowel_frequency?(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
-      vowel_percent = vowel_percentage(str, str_downlate, str_length)
+      vowel_percent = vowel_ratio(str, str_downlate, str_length)
 
       if vowel_percent == 1
         true
@@ -108,7 +105,7 @@ class SpamEstimator
       end
     end
 
-    def vowel_percentage(str, str_downlate = nil, str_length = nil)
+    def vowel_ratio(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
       str_downlate ||= downcase_transliterate(str)
 
