@@ -45,6 +45,7 @@ class OrganizationFeature < ApplicationRecord
     organization_stolen_message
     passwordless_users
     regional_bike_counts
+    require_student_id
     show_bulk_import
     show_bulk_import_impound
     show_bulk_import_stolen

@@ -27,14 +27,14 @@
           .form-group.row.unnested-field
             = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
             .form-well-input.fancy-select.unfancy
-              = select(:bike, :cycle_type, CycleType.select_options, { required: true, class: 'form-control'})
+              = select(:bike, :cycle_type, CycleType.select_options, {required: true, class: 'form-control'})
 
           .form-group.row.unnested-field
             = f.label :serial_number, class: 'form-well-label'
             .form-well-input
               #serial-input
                 = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.highly_recommended'), class: 'form-control'
-                %a.inline-input-help{ title: t(".serial_help"), data: { toggle: 'popover', content: serial_help_content } }
+                %a.inline-input-help{title: t(".serial_help"), data: {toggle: 'popover', content: serial_help_content}}
                   ?
               #made-without-serial-input
                 %label
@@ -42,7 +42,7 @@
                   = t(".without_serial", bike_type: @bike.type)
               .below-input-help#made-without-serial-help
                 .hidden-other
-                  %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
+                  %a{data: {toggle: 'modal', target: '#made-without-serial-modal'}}
                     = t(".without_serial_number", bike_type: @bike.type)
             .right-input-help
               %label.made-without-serial-checkbox
@@ -54,8 +54,8 @@
               = f.label :manufacturer_id, t(".manufacturer"), class: 'form-well-label'
 
               .form-well-input
-                - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
-                = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
+                - initial = @bike.manufacturer && {id: @bike.manufacturer.id, text: @bike.manufacturer.name}.to_json
+                = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: {initial: initial}
                 %span.below-input-help
                   = t(".select_other")
 
@@ -71,7 +71,7 @@
               = f.select :year, years, prompt: t(".unsure_or_unknown"), selected: @bike.year || Time.current.year
             .right-input-help
               %label
-                %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+                %input#bike_unknown_year{type: 'checkbox', tabindex: -1}
                 = t(".unknown_year")
 
           .form-group.row.unnested-field
@@ -80,7 +80,7 @@
               = f.text_field :frame_model, class: 'form-control'
 
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
-          = render partial: '/bikes_edit/bike_fields/revised_colors', locals: { f: f, classname: classname }
+          = render partial: '/bikes_edit/bike_fields/revised_colors', locals: {f: f, classname: classname}
 
           -# Show the phone if the bike is stolen, the organization requires phone
           -# only show the phone for impounded records if the current user doesn't have a confirmed phone
@@ -94,20 +94,20 @@
 
           - if @bike.status_stolen?
             = fields_for @bike.stolen_records.last do |srecord|
-              = render partial: '/bikes_edit/bike_fields/stolen_location', locals: { srecord: srecord }
+              = render partial: '/bikes_edit/bike_fields/stolen_location', locals: {srecord: srecord}
 
           - if @bike.status_impounded?
             = fields_for @bike.impound_records.last do |irecord|
-              = render partial: '/bikes_edit/bike_fields/stolen_location', locals: { srecord: irecord }
+              = render partial: '/bikes_edit/bike_fields/stolen_location', locals: {srecord: irecord}
 
           - if include_field_reg_address?(@organization, current_user) && BikeDisplayer.display_edit_address_fields?(@bike, current_user)
             .related-fields
               .form-group.row
                 -# Set all the bike address attrs
-                - @bike.attributes = { street: @b_param.address("address"),
+                - @bike.attributes = {street: @b_param.address("address"),
                   city: @b_param.address("city"),
                   zipcode: @b_param.address("zipcode"),
-                  state: @b_param.address("state") }
+                  state: @b_param.address("state")}
 
                 = f.label :street,
                   registration_field_label(@organization, "reg_address") || t(".mailing_address"),
@@ -141,8 +141,8 @@
                 %label.form-well-label
                 .form-well-input
                   = f.collection_select(:state, State.all, :abbreviation, :name,
-                    { include_blank: true, required: true, prompt: t(".state") },
-                    { class: "form-control" })
+                    {include_blank: true, required: true, prompt: t(".state")},
+                    {class: "form-control"})
 
           - if include_field_reg_extra_registration_number?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
@@ -176,6 +176,7 @@
                   autocomplete: "off",
                   autocorrect: "off",
                   autocapitalize: "off",
+                  required: @organization.enabled?("require_student_id"),
                   class: "form-control"
 
           - if include_field_reg_bike_sticker?(@organization, current_user, true)
@@ -237,4 +238,4 @@
           = t(".im_100_sure")
         = t(".without_serial", bike_type: @bike.type)
 
-= render partial: 'shared/modal', locals: { title: t('.are_you_certain'), id: 'made-without-serial-modal', modal_body: modal_body }
+= render partial: 'shared/modal', locals: {title: t('.are_you_certain'), id: 'made-without-serial-modal', modal_body: modal_body}

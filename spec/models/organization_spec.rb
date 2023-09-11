@@ -690,7 +690,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.additional_registration_fields.include?("reg_student_id")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_bike_sticker")).to be_truthy
 
-        expect(organization.organization_affiliation_options).to eq([["Student (Undergraduate)", "student"], ["Graduate Student", "graduate_student"], ["Employee", "employee"], ["Community Member", "community_member"]])
+        expect(organization.organization_affiliation_options).to eq([["Undergraduate Student", "student"], ["Graduate Student", "graduate_student"], ["Employee", "employee"], ["Community Member", "community_member"]])
       end
     end
   end
