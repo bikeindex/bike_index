@@ -1,7 +1,8 @@
 require "rails_helper"
 
 RSpec.describe SpamEstimator do
-  describe "suspicious_string?" do
+  describe "string_spaminess" do
+    # returns integers
     context "vowels" do
       it "returns true" do
         expect(described_class.suspicious_string?(" ")).to be_falsey
