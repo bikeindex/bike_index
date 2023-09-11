@@ -4,9 +4,9 @@ class SpamEstimator
       estimate = 0
       return estimate if bike.blank?
       estimate += 40 if bike.creation_organization&.spam_registrations
-      estimate += 0.5 * string_spaminess(bike.frame_model)
+      estimate += 0.3 * string_spaminess(bike.frame_model)
       if bike.manufacturer_other
-        estimate += 0.3 * string_spaminess?(bike.manufacturer_other)
+        estimate += 0.4 * string_spaminess(bike.manufacturer_other)
       end
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
@@ -15,10 +15,10 @@ class SpamEstimator
 
     def estimate_stolen_record(stolen_record)
       estimate = 0
-      return estimate if stolen_record.blank?
-      estimate += 51 if suspicious_string?(stolen_record.theft_description)
-      estimate += 21 if suspicious_string?(stolen_record.street)
-      estimate
+      return 0 if stolen_record.blank?
+      estimate += string_spaminess(stolen_record.theft_description)
+      estimate += 0.6 * string_spaminess(stolen_record.street)
+      within_bounds(estimate)
     end
 
     # eariot are the most frequent letters - this could be incorporated into calculations
@@ -33,7 +33,7 @@ class SpamEstimator
         space_count_suspiciousness(str, str_downlate, str_length) +
         capital_count_suspiciousness(str, str_downlate, str_length)
 
-      total / 3
+      within_bounds(total)
     end
 
     def vowel_frequency_suspiciousness(str, str_downlate = nil, str_length = nil)
@@ -122,6 +122,7 @@ class SpamEstimator
       return 0 if num < 0
       num < 100 ? num : 100
     end
+
     def downcase_transliterate(str)
       I18n.transliterate(str).downcase
     end

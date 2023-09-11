@@ -121,159 +121,132 @@ RSpec.describe SpamEstimator do
   end
 
   describe "string_spaminess" do
-    # context "vowels" do
-    #   it "returns low" do
-    #     expect(described_class.string_spaminess(" ")).to eq 0
-    #     expect(described_class.vowel_ratio("a")).to eq 1
-    #     expect(described_class.string_spaminess("a")).to eq 10
-    #   end
-    #   it "returns for aeiou" do
-    #     expect(described_class.vowel_ratio("aeiou")).to eq 1
-    #     expect(described_class.vowel_frequency_suspiciousness("aeiou")).to eq 80
-    #     expect(described_class.string_spaminess("aeiou")).to eq 60
-    #   end
-    #   it "returns for ay" do
-    #     expect(described_class.vowel_ratio("ay")).to eq 1
-    #     expect(described_class.vowel_frequency_suspiciousness("ay")).to eq 10
-    #     expect(described_class.string_spaminess("ay")).to eq 10
-    #   end
-    # end
-    # context "consonants" do
-    #   it "returns true" do
-    #     expect(described_class.vowel_ratio("z")).to eq 0
-    #     expect(described_class.string_spaminess("z")).to eq 10
-    #     expect(described_class.vowel_ratio("zf")).to eq 0
-    #     expect(described_class.string_spaminess("zf")).to eq 0
-    #   end
-    # end
-  #   context "garbage" do
-  #     let(:str) { "VhriBJhD1nuwH" }
-  #     it "returns for garbage" do
-  #       expect(described_class.vowel_frequency_suspiciousness(str)).to eq 80
-  #       expect(described_class.string_spaminess(str)).to eq 80
-  #       # And double garbage
-  #       expect(described_class.vowel_frequency_suspiciousness(str + str)).to eq 80
-  #       expect(described_class.string_spaminess(str + str)).to eq 100
-  #     end
-  #   end
-  #   context "frame_model names" do
-  #     it "returns for proper frame_model names" do
-  #       expect(described_class.string_spaminess("Cutthroat")).to eq 0
-  #       expect(described_class.string_spaminess("Diverge 1.0")).to eq 0
-  #       expect(described_class.string_spaminess("Skye S")).to eq 0
-  #       expect(described_class.string_spaminess("FX 1 Disc")).to eq 0
-  #     end
-  #   end
-  #   # context "garbage" do
-  #   #   let(:str) { "VhriBJhD1nuwHoI9" }
-  #   #   it "returns true" do
-  #   #     expect(described_class.vowel_ratio(str)).to eq 0.25
-  #   #     expect(described_class.suspicious_space_count?(str)).to be_truthy
-  #   #     expect(described_class.suspicious_string?(str)).to be_truthy
-  #   #   end
-  #   # end
-  #   # context "transliterate" do
-  #   #   let(:str) { "Stålhästen" }
-  #   #   it "returns true" do
-  #   #     expect(described_class.vowel_ratio(str).round(2)).to eq 0.3
-  #   #     expect(described_class.suspicious_vowel_frequency?(str)).to be_falsey
-  #   #     expect(described_class.suspicious_space_count?(str)).to be_falsey
-  #   #     expect(described_class.suspicious_string?(str)).to be_falsey
-  #   #   end
-  #   # end
-  #   # context "testing" do
-  #   #   let(:str) { "Mountainsmith" }
-  #   #   it "returns false" do
-  #   #     expect(described_class.suspicious_vowel_frequency?(str)).to be_falsey
-  #   #     expect(described_class.suspicious_space_count?(str)).to be_falsey
-  #   #     expect(described_class.suspicious_capital_count?(str)).to be_falsey
-  #   #     expect(described_class.suspicious_string?(str)).to be_falsey
-  #   #   end
-  #   # end
-  #   # context "some troublesome ones" do
-  #   #   ["SON Nabendynamo (Wilfried Schmidt Maschinenbau)", "ENVE (ENVE Composites)",
-  #   #     "Sturmey-Archer", "IRD (Interloc Racing Design)", "Louis Garneau", "DT Swiss",
-  #   #     "Currie Technology (Currietech)", "VSF Fahrradmanufaktur", "PUBLIC bikes"].each do |str|
-  #   #     context "'#{str}'" do
-  #   #       it "returns false" do
-  #   #         # pp described_class.vowel_ratio(str)
-  #   #         expect(described_class.suspicious_vowel_frequency?(str)).to be_falsey
-  #   #         expect(described_class.suspicious_space_count?(str)).to be_falsey
-  #   #         expect(described_class.suspicious_capital_count?(str)).to be_falsey
-  #   #         expect(described_class.suspicious_string?(str)).to be_falsey
-  #   #       end
-  #   #     end
-  #   #   end
-  #   # end
+    context "garbage" do
+      let(:str) { "VhriBJhD1nuwH" }
+      it "returns for garbage" do
+        expect(described_class.vowel_frequency_suspiciousness(str)).to be_between(51, 80)
+        expect(described_class.capital_count_suspiciousness(str)).to be_between(0, 20)
+        expect(described_class.space_count_suspiciousness(str)).to be_between(5, 15)
+        expect(described_class.string_spaminess(str)).to be_between(60, 81)
+        # And double garbage
+        expect(described_class.vowel_frequency_suspiciousness("#{str}#{str}")).to be_between(51, 80)
+        expect(described_class.capital_count_suspiciousness("#{str}#{str}")).to be_between(10, 50)
+        expect(described_class.space_count_suspiciousness("#{str}#{str}")).to be_between(51, 80)
+        expect(described_class.string_spaminess("#{str}#{str}")).to eq 100
+      end
+    end
+    context "frame_model names" do
+      it "returns for proper frame_model names" do
+        expect(described_class.string_spaminess("Cutthroat")).to eq 0
+        expect(described_class.string_spaminess("Diverge 1.0")).to eq 0
+        expect(described_class.string_spaminess("Skye S")).to eq 0
+      end
+    end
+    context "transliterate" do
+      let(:str) { "Stålhästen" }
+      it "returns true" do
+        expect(described_class.vowel_frequency_suspiciousness(str)).to be < 30
+        expect(described_class.capital_count_suspiciousness(str)).to eq 0
+        expect(described_class.space_count_suspiciousness(str)).to eq 0
+        expect(described_class.string_spaminess(str)).to be < 30
+      end
+    end
+    context "some troublesome ones" do
+      ["SON Nabendynamo (Wilfried Schmidt Maschinenbau)", "ENVE (ENVE Composites)",
+        "Sturmey-Archer", "IRD (Interloc Racing Design)", "Louis Garneau", "DT Swiss",
+        "Currie Technology (Currietech)", "VSF Fahrradmanufaktur", "PUBLIC bikes",
+        "Mountainsmith"].each do |str|
+        context "'#{str}'" do
+          it "returns false" do
+            # expect(described_class.vowel_frequency_suspiciousness(str)).to be < 30
+            # expect(described_class.capital_count_suspiciousness(str)).to eq 0
+            # expect(described_class.space_count_suspiciousness(str)).to eq 0
+            expect(described_class.string_spaminess(str)).to be < 30
+          end
+        end
+      end
+    end
   end
 
-  # # describe "estimate_bike" do
-  # #   context "frame_model" do
-  # #     let(:bike) { Bike.new(frame_model: str) }
-  # #     let(:str) { "Cutthroat" }
-  # #     it "is 0" do
-  # #       expect(described_class.string_spaminess(str)).to eq 0
-  # #       expect(described_class.estimate_bike(bike)).to eq 0
-  # #     end
-        # "CAAD 8"
-  # #     context "garbage" do
-  # #       let(:str) { "efgBz9pNdd7efgBz9pNdd7" }
-  # #       it "estimate is percentage" do
-  # #         expect(described_class.string_spaminess(str)).to eq 100
-  # #         expect(described_class.estimate_bike(bike)).to eq 50
-  # #       end
-  # #     end
-  # #   end
-  # #   context "manufacturer_other" do
-  # #     let(:bike) { FactoryBot.build(:bike, manufacturer: Manufacturer.other, manufacturer_other: str) }
-  # #     context "garbage" do
-  # #       let(:str) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
-  # #       it "estimate is percentage" do
-  # #         expect(described_class.string_spaminess(str)).to eq 100
-  # #         expect(described_class.estimate_bike(bike)).to eq 30
-  # #       end
-  # #     end
-  # #     context "SON" do
-  # #       let(:str) { "SON Nabendynamo (Wilfried Schmidt Maschinenbau)" }
-  # #       it "returns" do
-  # #         expect(described_class.string_spaminess(str)).to eq 30
-  # #         expect(described_class.estimate_bike(bike)).to eq 15
-  # #       end
-  # #     end
-  # #   end
-  # #   context "creation organization" do
-  # #     let(:bike) { Bike.new(creation_organization: organization) }
-  # #     let(:organization) { Organization.new }
-  # #     it "returns 0" do
-  # #       expect(described_class.estimate_bike(bike)).to eq 0
-  # #     end
-  # #     context "spam_registrations" do
-  # #       let(:organization) { Organization.new(spam_registrations: true) }
-  # #       it "returns 40" do
-  # #         expect(described_class.estimate_bike(bike)).to eq 40
-  # #       end
-  # #     end
-  # #   end
-  # #   # context "stolen_record" do
-  # #   #   let(:bike) { Bike.new }
-  # #   #   let(:stolen_record) { StolenRecord.new(theft_description: str, street: street) }
-  # #   #   let(:str) { "It was stolen last night" }
-  # #   #   let(:street) { "1234 Main Street" }
-  # #   #   it "is 0" do
-  # #   #     expect(described_class.estimate_bike(bike, stolen_record)).to eq 0
-  # #   #   end
-  # #   #   context "garbage" do
-  # #   #     let(:str) { "efgBz9pNdd7" }
-  # #   #     it "is 51" do
-  # #   #       expect(described_class.estimate_bike(bike, stolen_record)).to eq 51
-  # #   #     end
-  # #   #   end
-  # #   #   context "garbage" do
-  # #   #     let(:street) { "efgBz9pNdd7" }
-  # #   #     it "is 51" do
-  # #   #       expect(described_class.estimate_bike(bike, stolen_record)).to eq 21
-  # #   #     end
-  # #   #   end
-  # #   # end
-  # # end
+  describe "estimate_bike" do
+    context "frame_model" do
+      let(:bike) { Bike.new(frame_model: str) }
+      let(:str) { "Cutthroat" }
+      it "is 0" do
+        expect(described_class.string_spaminess(str)).to eq 0
+        expect(described_class.estimate_bike(bike)).to eq 0
+      end
+      context "FX 1 Disc" do
+        let(:str) { "FX 1 Disc" }
+        it "is 0" do
+          expect(described_class.string_spaminess(str)).to be < 90
+          expect(described_class.estimate_bike(bike)).to be < 40
+        end
+      end
+      context "garbage" do
+        let(:str) { "efgBz9pNdd7efgBz9pNdd7" }
+        it "estimate is percentage" do
+          expect(described_class.string_spaminess(str)).to eq 100
+          expect(described_class.estimate_bike(bike)).to eq 30
+        end
+      end
+    end
+    context "manufacturer_other" do
+      let(:bike) { FactoryBot.build(:bike, manufacturer: Manufacturer.other, manufacturer_other: str) }
+      context "garbage" do
+        let(:str) { "VhriBJhD1nuwHoI9VhriBJhD1nuwHoI9" }
+        it "estimate is percentage" do
+          expect(described_class.string_spaminess(str)).to eq 100
+          expect(described_class.estimate_bike(bike)).to eq 40
+        end
+      end
+      context "SON" do
+        let(:str) { "SON Nabendynamo (Wilfried Schmidt Maschinenbau)" }
+        it "returns" do
+          expect(described_class.string_spaminess(str)).to be < 10
+          expect(described_class.estimate_bike(bike)).to be < 10
+        end
+      end
+    end
+    context "creation organization" do
+      let(:bike) { Bike.new(creation_organization: organization) }
+      let(:organization) { Organization.new }
+      it "returns 0" do
+        expect(described_class.estimate_bike(bike)).to eq 0
+      end
+      context "spam_registrations" do
+        let(:organization) { Organization.new(spam_registrations: true) }
+        it "returns 40" do
+          expect(described_class.estimate_bike(bike)).to eq 40
+        end
+      end
+    end
+    context "stolen_record" do
+      let(:bike) { Bike.new }
+      let(:stolen_record) { StolenRecord.new(theft_description: str, street: street) }
+      let(:str) { "It was stolen last night" }
+      let(:street) { "1234 Main Street" }
+      it "is 0" do
+        expect(described_class.estimate_bike(bike, stolen_record)).to eq 0
+      end
+      context "garbage description" do
+        let(:str) { "efgBz9pNdd7" }
+        it "is 51" do
+          expect(described_class.estimate_bike(bike, stolen_record)).to be > 80
+        end
+      end
+      context "garbage street" do
+        let(:street) { "efgBz9pNdd7" }
+        it "is 51" do
+          expect(described_class.estimate_bike(bike, stolen_record)).to be_between(50, 80)
+        end
+        context "and garbage description" do
+          let(:str) { "efgBz9pNdd7" }
+          it "is 51" do
+            expect(described_class.estimate_bike(bike, stolen_record)).to eq 100
+          end
+        end
+      end
+    end
+  end
 end
