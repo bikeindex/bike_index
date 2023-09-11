@@ -92,19 +92,33 @@ RSpec.describe BikeCreator do
         end
         context "with spam_registrations" do
           let(:organization) { FactoryBot.create(:organization, spam_registrations: true) }
-          let(:bike_params) do
-            default_params.merge(
-              frame_model: "2yynzfIfyiDCltHWjDDgWPr",
-              manufacturer_id: Manufacturer.other.id,
-              manufacturer_other: "qetasdgf8asdf00af"
-            )
+          let(:b_param_params) do
+            {
+              bike: default_params.merge(
+                frame_model: "2yynzfIfyiDCltHWjDDgWPr",
+                manufacturer_id: Manufacturer.other.id,
+                manufacturer_other: "qetasdgf8asdf00afdddvxcvxcvxc"),
+              stolen_record: {
+                phone: "7183839292",
+                theft_description: "asdfasdfg89xcv89sdf9asdfsdfffffffff"
+              }
+            }
           end
+          let!(:b_param) { BParam.create(creator: user, params: b_param_params) }
+          let(:target_created_attrs) { b_param_params[:bike].merge(cycle_type: "bike", propulsion_type: "foot-pedal") }
           it "creates the bike_organization" do
+            Sidekiq::Worker.clear_all
+            ActionMailer::Base.deliveries = []
+
             expect {
               instance.create_bike(b_param)
             }.to change(BikeOrganization, :count).by 1
+            EmailOwnershipInvitationWorker.drain
+            # CRITICAL - this needs to not deliver email, or else we're spamming people
+            expect(ActionMailer::Base.deliveries.count).to eq 0
+
             bike = Bike.unscoped.last
-            expect(SpamEstimator.estimate_bike(bike)).to be > 50
+            expect(SpamEstimator.estimate_bike(bike)).to eq 100
             expect(bike.creator&.id).to eq user.id
             expect(bike.current_ownership&.id).to be_present
             expect(bike.likely_spam).to be_truthy

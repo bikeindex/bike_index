@@ -133,7 +133,8 @@ class BikeCreator
 
   def save_bike(b_param, bike)
     bike.set_location_info
-    bike.likely_spam = SpamEstimator.estimate_bike(bike) > 50
+    # NOTE: spaminess is recalculated in EmailOwnershipInvitationWorker
+    bike.likely_spam = SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?

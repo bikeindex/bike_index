@@ -1,10 +1,12 @@
 class SpamEstimator
+  MARK_SPAM_PERCENT = 90 # May modify in the future!
+
   class << self
     def estimate_bike(bike, stolen_record = nil)
       estimate = 0
       return estimate if bike.blank?
       estimate += 35 if bike.creation_organization&.spam_registrations
-      estimate += 0.3 * string_spaminess(bike.frame_model)
+      estimate += 0.2 * string_spaminess(bike.frame_model)
       estimate += 0.4 * string_spaminess(bike.manufacturer_other)
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
@@ -37,7 +39,7 @@ class SpamEstimator
         street_letters = stolen_record.street.gsub(/[^a-z|\s]/, "") # Ignore non letter things from street
         estimate += 0.3 * string_spaminess(street_letters)
       end
-      within_bounds(estimate)
+      within_bounds(estimate - 20)
     end
 
     def vowel_frequency_suspiciousness(str, str_length = nil, str_downlate = nil)

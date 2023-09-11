@@ -20,7 +20,7 @@ RSpec.describe SpamEstimator do
         let(:str) { "efgBz9pNdd7efgBz9pNdd7" }
         it "estimate is percentage" do
           expect(described_class.string_spaminess(str)).to eq 100
-          expect(described_class.estimate_bike(bike)).to eq 30
+          expect(described_class.estimate_bike(bike)).to be_between(9, 20)
         end
       end
     end
@@ -64,19 +64,19 @@ RSpec.describe SpamEstimator do
       end
       context "garbage description" do
         let(:str) { "efgBz9pNdd7" }
-        it "is 51" do
-          expect(described_class.estimate_bike(bike, stolen_record)).to be > 80
+        it "returns over 0" do
+          expect(described_class.estimate_bike(bike, stolen_record)).to be > 35
         end
       end
       context "garbage street" do
         let(:street) { "efgBz9pNdd7efgBz9pNdd7efgBz9pNdd7" }
-        it "is 51" do
-          expect(described_class.estimate_bike(bike, stolen_record)).to eq 30
+        it "returns over 0" do
+          expect(described_class.estimate_bike(bike, stolen_record)).to eq 10
         end
         context "and garbage description" do
           let(:str) { "efgBz9pNdd7" }
-          it "is 51" do
-            expect(described_class.estimate_bike(bike, stolen_record)).to eq 100
+          it "returns over 0" do
+            expect(described_class.estimate_bike(bike, stolen_record)).to be > 95
           end
         end
       end
