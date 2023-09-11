@@ -11,14 +11,6 @@ class SpamEstimator
       within_bounds(estimate)
     end
 
-    def estimate_stolen_record(stolen_record)
-      estimate = 0
-      return 0 if stolen_record.blank?
-      estimate += string_spaminess(stolen_record.theft_description)
-      estimate += 0.6 * string_spaminess(stolen_record.street)
-      within_bounds(estimate)
-    end
-
     # eariot are the most frequent letters - this could be incorporated into calculations
     # Currently, doing a weird vowel count thing
     def string_spaminess(str, str_length = nil, str_downlate = nil)
@@ -33,6 +25,16 @@ class SpamEstimator
         capital_count_suspiciousness(str, str_length, str_downlate)
 
       within_bounds(total)
+    end
+
+    private
+
+    def estimate_stolen_record(stolen_record)
+      estimate = 0
+      return 0 if stolen_record.blank?
+      estimate += string_spaminess(stolen_record.theft_description)
+      estimate += 0.6 * string_spaminess(stolen_record.street)
+      within_bounds(estimate)
     end
 
     def vowel_frequency_suspiciousness(str, str_length = nil, str_downlate = nil)
