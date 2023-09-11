@@ -81,18 +81,42 @@ RSpec.describe SpamEstimator do
       expect(described_class.space_count_suspiciousness("#{str} 1")).to eq 0
     end
 
-    it "returns ratio for 25 characters" do
+    it "returns percentage for 25 characters" do
       expect(described_class.space_count_suspiciousness("#{str}#{str}12345")).to eq 80
       expect(described_class.space_count_suspiciousness("#{str}#{str} 1234")).to eq 40
       expect(described_class.space_count_suspiciousness("#{str} #{str} 123")).to eq 0
     end
 
     context "35 characters" do
-      it "returns ratio for 35 characters" do
+      it "returns percentage for 35 characters" do
         expect(described_class.space_count_suspiciousness("#{str}#{str}#{str}12345")).to eq 100
         expect(described_class.space_count_suspiciousness("#{str} #{str}#{str}1234")).to eq 60
         expect(described_class.space_count_suspiciousness("#{str} #{str} #{str}234")).to eq 0
       end
+    end
+  end
+
+  describe "capital_count_suspiciousness" do
+    let(:str) { "ABCABDEFGH" }
+    it "returns 0" do
+      expect(described_class.capital_count_suspiciousness("AAABBB")).to eq 0
+      expect(described_class.capital_count_suspiciousness("#{str}")).to eq 50
+      expect(described_class.capital_count_suspiciousness("#{str}f")).to be_between(25, 50)
+    end
+
+    it "returns 60 at most for 12 characters" do
+      expect(described_class.capital_count_suspiciousness("#{str}AA")).to be_between(35, 60)
+      expect(described_class.capital_count_suspiciousness("#{str}aa")).to be_between(30, 55)
+      expect(described_class.capital_count_suspiciousness("AABBC DDeeaa")).to be_between(0, 10)
+    end
+
+    it "returns percentage for 25 characters" do
+      expect(described_class.capital_count_suspiciousness("#{str}#{str}AABBC")).to eq 90
+      expect(described_class.capital_count_suspiciousness("#{str}#{str}aabbc")).to eq 70
+      expect(described_class.capital_count_suspiciousness("#{str}#{str} abbc")).to eq 70
+      expect(described_class.capital_count_suspiciousness("#{str} #{str} bbc")).to eq 70
+      expect(described_class.capital_count_suspiciousness("#{str}#{str.downcase}aabbc")).to eq 30
+      expect(described_class.capital_count_suspiciousness("#{str.downcase}#{str.downcase}AABBC")).to be_between(0,11)
     end
   end
 

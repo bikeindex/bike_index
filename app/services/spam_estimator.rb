@@ -9,8 +9,8 @@ class SpamEstimator
         estimate += 0.3 * string_spaminess?(bike.manufacturer_other)
       end
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
-      return 0 if estimate < 0
-      estimate < 100 ? estimate : 100
+
+      within_bounds(estimate)
     end
 
     def estimate_stolen_record(stolen_record)
@@ -72,8 +72,7 @@ class SpamEstimator
       end
 
       # pp "#{str} - susness: #{susness}    (#{vowel_percent.round(0)})"
-
-      susness > 100 ? 100 : susness
+      within_bounds(susness)
     end
 
 
@@ -87,13 +86,18 @@ class SpamEstimator
     def capital_count_suspiciousness(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
 
-      return false if str_length < 6
-      capital_ration = str.count("ABCDEFGHIJKLMNOPQRSTUVWXYZ") / str_length
-      capital_ration > if str_length < 13
-        0.6
+      return 0 if str_length < 7
+      capital_ratio = (str.count("ABCDEFGHIJKLMNOPQRSTUVWXYZ") / str_length)*100
+
+      susness = if str_length < 16
+        capital_ratio - 50
+      elsif str_length < 25
+        capital_ratio - 40
       else
-        0.41
+        capital_ratio - 10
       end
+      # pp "#{str} suss: #{susness}   - #{capital_ratio}"
+      within_bounds(susness)
     end
 
     def space_count_suspiciousness(str, str_downlate = nil, str_length = nil)
@@ -110,9 +114,14 @@ class SpamEstimator
 
       multiplier = str_length < 31 ? 40 : 60
       susness = (target_space_count - spaces_count) * multiplier
-      susness > 100 ? 100 : susness
+
+      within_bounds(susness)
     end
 
+    def within_bounds(num)
+      return 0 if num < 0
+      num < 100 ? num : 100
+    end
     def downcase_transliterate(str)
       I18n.transliterate(str).downcase
     end
