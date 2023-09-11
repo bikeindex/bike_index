@@ -70,11 +70,8 @@ class SpamEstimator
       else
         0
       end
-
-      # pp "#{str} - susness: #{susness}    (#{vowel_percent.round(0)})"
       within_bounds(susness)
     end
-
 
     def vowel_ratio(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
@@ -87,7 +84,7 @@ class SpamEstimator
       str_length ||= str.length.to_f
 
       return 0 if str_length < 7
-      capital_ratio = (str.count("ABCDEFGHIJKLMNOPQRSTUVWXYZ") / str_length)*100
+      capital_ratio = (str.count("ABCDEFGHIJKLMNOPQRSTUVWXYZ") / str_length) * 100
 
       susness = if str_length < 16
         capital_ratio - 50
@@ -96,7 +93,6 @@ class SpamEstimator
       else
         capital_ratio - 10
       end
-      # pp "#{str} suss: #{susness}   - #{capital_ratio}"
       within_bounds(susness)
     end
 

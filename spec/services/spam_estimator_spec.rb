@@ -100,7 +100,7 @@ RSpec.describe SpamEstimator do
     let(:str) { "ABCABDEFGH" }
     it "returns 0" do
       expect(described_class.capital_count_suspiciousness("AAABBB")).to eq 0
-      expect(described_class.capital_count_suspiciousness("#{str}")).to eq 50
+      expect(described_class.capital_count_suspiciousness(str.to_s)).to eq 50
       expect(described_class.capital_count_suspiciousness("#{str}f")).to be_between(25, 50)
     end
 
@@ -116,7 +116,7 @@ RSpec.describe SpamEstimator do
       expect(described_class.capital_count_suspiciousness("#{str}#{str} abbc")).to eq 70
       expect(described_class.capital_count_suspiciousness("#{str} #{str} bbc")).to eq 70
       expect(described_class.capital_count_suspiciousness("#{str}#{str.downcase}aabbc")).to eq 30
-      expect(described_class.capital_count_suspiciousness("#{str.downcase}#{str.downcase}AABBC")).to be_between(0,11)
+      expect(described_class.capital_count_suspiciousness("#{str.downcase}#{str.downcase}AABBC")).to be_between(0, 11)
     end
   end
 
