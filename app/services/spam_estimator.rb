@@ -29,9 +29,11 @@ class SpamEstimator
       str_downlate ||= downcase_transliterate(str)
       return 10 if str_length == 1
 
-      vowel_frequency_suspiciousness(str, str_downlate, str_length) +
+      total = vowel_frequency_suspiciousness(str, str_downlate, str_length) +
         space_count_suspiciousness(str, str_downlate, str_length) +
         capital_count_suspiciousness(str, str_downlate, str_length)
+
+      total / 3
     end
 
     def vowel_frequency_suspiciousness(str, str_downlate = nil, str_length = nil)
@@ -75,40 +77,6 @@ class SpamEstimator
     end
 
 
-
-    # ----
-    #
-    #
-    # eariot are the most frequent letters - this could be incorporated into calculations
-    # Currently, doing a weird vowel count thing
-    def suspicious_string?(str, str_downlate = nil, str_length = nil)
-      return false if str.blank?
-      str_length ||= str.length.to_f
-      str_downlate ||= downcase_transliterate(str)
-      return true if str_length == 1
-      return false if str_length < 4
-      return true if suspicious_vowel_frequency?(str, str_downlate, str_length)
-
-      return true if suspicious_space_count?(str, str_downlate, str_length)
-      suspicious_capital_count?(str, str_downlate, str_length)
-    end
-
-    def suspicious_vowel_frequency?(str, str_downlate = nil, str_length = nil)
-      str_length ||= str.length.to_f
-      vowel_percent = vowel_ratio(str, str_downlate, str_length)
-
-      if vowel_percent == 1
-        true
-      elsif str_length < 9
-        # Vowel frequencies are more irregular for short strings
-        !vowel_percent.between?(0.1, 0.61)
-      elsif str_length < 30
-        !vowel_percent.between?(0.20, 0.61)
-      else
-        !vowel_percent.between?(0.20, 0.4)
-      end
-    end
-
     def vowel_ratio(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
       str_downlate ||= downcase_transliterate(str)
@@ -116,7 +84,7 @@ class SpamEstimator
       str_downlate.count("aeiouy") / str_length
     end
 
-    def suspicious_capital_count?(str, str_downlate = nil, str_length = nil)
+    def capital_count_suspiciousness(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
 
       return false if str_length < 6
@@ -128,13 +96,21 @@ class SpamEstimator
       end
     end
 
-    def suspicious_space_count?(str, str_downlate = nil, str_length = nil)
+    def space_count_suspiciousness(str, str_downlate = nil, str_length = nil)
       str_length ||= str.length.to_f
+      return 0 if str_length < 12
 
-      return false if str_length < 14
-      # Seems like 12 characters is the longest word
+      spaces_count = str.count(" -")
+      if str_length < 20
+        return spaces_count < 1 ? 10 : 0
+      end
+
       target_space_count = (str_length / 12).floor
-      str.count(" -") < target_space_count
+      return 0 if spaces_count >= target_space_count
+
+      multiplier = str_length < 31 ? 40 : 60
+      susness = (target_space_count - spaces_count) * multiplier
+      susness > 100 ? 100 : susness
     end
 
     def downcase_transliterate(str)

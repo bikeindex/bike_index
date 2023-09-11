@@ -67,49 +67,61 @@ RSpec.describe SpamEstimator do
         expect(described_class.vowel_frequency_suspiciousness("dddddddddddddddddddddddddddddd")).to eq 100
       end
     end
-    context "some troublesome ones" do
-      ["SON Nabendynamo (Wilfried Schmidt Maschinenbau)", "ENVE (ENVE Composites)",
-      "Sturmey-Archer", "IRD (Interloc Racing Design)", "Louis Garneau", "DT Swiss",
-      "Currie Technology (Currietech)", "VSF Fahrradmanufaktur", "PUBLIC bikes"].each do |str|
-        context "'#{str}'" do
-          it "returns false" do
-            # pp described_class.vowel_ratio(str)
-            expect(described_class.vowel_frequency_suspiciousness(str)).to be < 30
-            # expect(described_class.suspicious_space_count?(str)).to be_falsey
-            # expect(described_class.suspicious_capital_count?(str)).to be_falsey
-            # expect(described_class.suspicious_string?(str)).to be_falsey
-          end
-        end
+  end
+
+  describe "space_count_suspiciousness" do
+    let(:str) { "1234567890" }
+    it "returns 0" do
+      expect(described_class.space_count_suspiciousness("#{str}1")).to eq 0
+      expect(described_class.space_count_suspiciousness("123456 8901")).to eq 0
+    end
+
+    it "returns 10 at most for 12 characters" do
+      expect(described_class.space_count_suspiciousness("#{str}12")).to eq 10
+      expect(described_class.space_count_suspiciousness("#{str} 1")).to eq 0
+    end
+
+    it "returns ratio for 25 characters" do
+      expect(described_class.space_count_suspiciousness("#{str}#{str}12345")).to eq 80
+      expect(described_class.space_count_suspiciousness("#{str}#{str} 1234")).to eq 40
+      expect(described_class.space_count_suspiciousness("#{str} #{str} 123")).to eq 0
+    end
+
+    context "35 characters" do
+      it "returns ratio for 35 characters" do
+        expect(described_class.space_count_suspiciousness("#{str}#{str}#{str}12345")).to eq 100
+        expect(described_class.space_count_suspiciousness("#{str} #{str}#{str}1234")).to eq 60
+        expect(described_class.space_count_suspiciousness("#{str} #{str} #{str}234")).to eq 0
       end
     end
   end
 
-  # describe "string_spaminess" do
-  #   context "vowels" do
-  #     it "returns low" do
-  #       expect(described_class.string_spaminess(" ")).to eq 0
-  #       expect(described_class.vowel_ratio("a")).to eq 1
-  #       expect(described_class.string_spaminess("a")).to eq 10
-  #     end
-  #     it "returns for aeiou" do
-  #       expect(described_class.vowel_ratio("aeiou")).to eq 1
-  #       expect(described_class.vowel_frequency_suspiciousness("aeiou")).to eq 80
-  #       expect(described_class.string_spaminess("aeiou")).to eq 60
-  #     end
-  #     it "returns for ay" do
-  #       expect(described_class.vowel_ratio("ay")).to eq 1
-  #       expect(described_class.vowel_frequency_suspiciousness("ay")).to eq 10
-  #       expect(described_class.string_spaminess("ay")).to eq 10
-  #     end
-  #   end
-  #   # context "consonants" do
-  #   #   it "returns true" do
-  #   #     expect(described_class.vowel_ratio("z")).to eq 0
-  #   #     expect(described_class.string_spaminess("z")).to eq 10
-  #   #     expect(described_class.vowel_ratio("zf")).to eq 0
-  #   #     expect(described_class.string_spaminess("zf")).to eq 0
-  #   #   end
-  #   # end
+  describe "string_spaminess" do
+    # context "vowels" do
+    #   it "returns low" do
+    #     expect(described_class.string_spaminess(" ")).to eq 0
+    #     expect(described_class.vowel_ratio("a")).to eq 1
+    #     expect(described_class.string_spaminess("a")).to eq 10
+    #   end
+    #   it "returns for aeiou" do
+    #     expect(described_class.vowel_ratio("aeiou")).to eq 1
+    #     expect(described_class.vowel_frequency_suspiciousness("aeiou")).to eq 80
+    #     expect(described_class.string_spaminess("aeiou")).to eq 60
+    #   end
+    #   it "returns for ay" do
+    #     expect(described_class.vowel_ratio("ay")).to eq 1
+    #     expect(described_class.vowel_frequency_suspiciousness("ay")).to eq 10
+    #     expect(described_class.string_spaminess("ay")).to eq 10
+    #   end
+    # end
+    # context "consonants" do
+    #   it "returns true" do
+    #     expect(described_class.vowel_ratio("z")).to eq 0
+    #     expect(described_class.string_spaminess("z")).to eq 10
+    #     expect(described_class.vowel_ratio("zf")).to eq 0
+    #     expect(described_class.string_spaminess("zf")).to eq 0
+    #   end
+    # end
   #   context "garbage" do
   #     let(:str) { "VhriBJhD1nuwH" }
   #     it "returns for garbage" do
@@ -169,7 +181,7 @@ RSpec.describe SpamEstimator do
   #   #     end
   #   #   end
   #   # end
-  # end
+  end
 
   # # describe "estimate_bike" do
   # #   context "frame_model" do
