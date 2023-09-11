@@ -133,9 +133,7 @@ class BikeCreator
 
   def save_bike(b_param, bike)
     bike.set_location_info
-    if bike.creation_organization&.spam_registrations
-      bike.likely_spam = SpamEstimator.estimate_bike(bike) > 50
-    end
+    bike.likely_spam = SpamEstimator.estimate_bike(bike) > 50
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?

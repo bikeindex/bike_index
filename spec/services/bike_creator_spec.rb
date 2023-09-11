@@ -104,7 +104,7 @@ RSpec.describe BikeCreator do
               instance.create_bike(b_param)
             }.to change(BikeOrganization, :count).by 1
             bike = Bike.unscoped.last
-            expect(SpamEstimator.estimate_bike(bike)).to eq 82
+            expect(SpamEstimator.estimate_bike(bike)).to be > 50
             expect(bike.creator&.id).to eq user.id
             expect(bike.current_ownership&.id).to be_present
             expect(bike.likely_spam).to be_truthy

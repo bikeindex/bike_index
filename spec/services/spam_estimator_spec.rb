@@ -127,6 +127,7 @@ RSpec.describe SpamEstimator do
         expect(described_class.vowel_frequency_suspiciousness(str)).to be_between(51, 80)
         expect(described_class.capital_count_suspiciousness(str)).to be_between(0, 20)
         expect(described_class.space_count_suspiciousness(str)).to be_between(5, 15)
+        expect(described_class.non_letter_count_suspiciousness(str)).to be_between(0, 20)
         expect(described_class.string_spaminess(str)).to be_between(60, 81)
         # And double garbage
         expect(described_class.vowel_frequency_suspiciousness("#{str}#{str}")).to be_between(51, 80)
@@ -142,10 +143,22 @@ RSpec.describe SpamEstimator do
         expect(described_class.string_spaminess("Skye S")).to eq 0
       end
     end
+    context "Reward: 350" do
+      let(:str) { "Reward: 350" }
+      it "returns low" do
+        expect(described_class.vowel_ratio(str).round(2)).to eq 0.29
+        expect(described_class.vowel_frequency_suspiciousness(str)).to be < 10
+        expect(described_class.non_letter_count_suspiciousness(str)).to be < 15
+        expect(described_class.capital_count_suspiciousness(str)).to eq 0
+        expect(described_class.space_count_suspiciousness(str)).to eq 0
+        expect(described_class.string_spaminess(str)).to be < 30
+      end
+    end
     context "transliterate" do
       let(:str) { "Stålhästen" }
       it "returns true" do
         expect(described_class.vowel_frequency_suspiciousness(str)).to be < 30
+        expect(described_class.non_letter_count_suspiciousness(str)).to eq 0
         expect(described_class.capital_count_suspiciousness(str)).to eq 0
         expect(described_class.space_count_suspiciousness(str)).to eq 0
         expect(described_class.string_spaminess(str)).to be < 30

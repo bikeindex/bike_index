@@ -5,9 +5,7 @@ class SpamEstimator
       return estimate if bike.blank?
       estimate += 40 if bike.creation_organization&.spam_registrations
       estimate += 0.3 * string_spaminess(bike.frame_model)
-      if bike.manufacturer_other
-        estimate += 0.4 * string_spaminess(bike.manufacturer_other)
-      end
+      estimate += 0.4 * string_spaminess(bike.manufacturer_other)
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
       within_bounds(estimate)
@@ -23,24 +21,25 @@ class SpamEstimator
 
     # eariot are the most frequent letters - this could be incorporated into calculations
     # Currently, doing a weird vowel count thing
-    def string_spaminess(str, str_downlate = nil, str_length = nil)
+    def string_spaminess(str, str_length = nil, str_downlate = nil)
       return 0 if str.blank?
       str_length ||= str.length.to_f
-      str_downlate ||= downcase_transliterate(str)
       return 10 if str_length == 1
+      str_downlate ||= downcase_transliterate(str)
 
-      total = vowel_frequency_suspiciousness(str, str_downlate, str_length) +
-        space_count_suspiciousness(str, str_downlate, str_length) +
-        capital_count_suspiciousness(str, str_downlate, str_length)
+      total = vowel_frequency_suspiciousness(str, str_length, str_downlate) +
+        space_count_suspiciousness(str, str_length, str_downlate) +
+        non_letter_count_suspiciousness(str, str_length, str_downlate) +
+        capital_count_suspiciousness(str, str_length, str_downlate)
 
       within_bounds(total)
     end
 
-    def vowel_frequency_suspiciousness(str, str_downlate = nil, str_length = nil)
+    def vowel_frequency_suspiciousness(str, str_length = nil, str_downlate = nil)
       str_length ||= str.length.to_f
       return 0 if str_length < 4 # 3 letters or less get a pass
-      vowel_percent = vowel_ratio(str, str_downlate, str_length) * 100
 
+      vowel_percent = vowel_ratio(str, str_length) * 100
       # In testing vowel percentage, 20-60% is reasonable for short strings
       # longer strings should be below 40%
       susness = if str_length < 6
@@ -73,19 +72,19 @@ class SpamEstimator
       within_bounds(susness)
     end
 
-    def vowel_ratio(str, str_downlate = nil, str_length = nil)
-      str_length ||= str.length.to_f
+    def vowel_ratio(str, str_length = nil, str_downlate = nil)
       str_downlate ||= downcase_transliterate(str)
 
-      str_downlate.count("aeiouy") / str_length
+      only_letters_and_spaces = str_downlate.gsub(/[^a-z|\s]/, "")
+
+      only_letters_and_spaces.count("aeiouy") / only_letters_and_spaces.length.to_f
     end
 
-    def capital_count_suspiciousness(str, str_downlate = nil, str_length = nil)
+    def capital_count_suspiciousness(str, str_length = nil, str_downlate = nil)
       str_length ||= str.length.to_f
-
       return 0 if str_length < 7
-      capital_ratio = (str.count("ABCDEFGHIJKLMNOPQRSTUVWXYZ") / str_length) * 100
 
+      capital_ratio = (str.count("ABCDEFGHIJKLMNOPQRSTUVWXYZ") / str_length) * 100
       susness = if str_length < 16
         capital_ratio - 50
       elsif str_length < 25
@@ -96,7 +95,24 @@ class SpamEstimator
       within_bounds(susness)
     end
 
-    def space_count_suspiciousness(str, str_downlate = nil, str_length = nil)
+    def non_letter_count_suspiciousness(str, str_length = nil, str_downlate = nil)
+      str_length ||= str.length.to_f
+      return 0 if str_length < 7
+
+      str_downlate ||= downcase_transliterate(str)
+      non_letter_count = (1 - (str_downlate.count("abcdefghijklmnopqrstuvwxyz ") / str_length)) * 100
+
+      susness = if str_length < 16
+        non_letter_count - 50
+      elsif str_length < 25
+        non_letter_count - 40
+      else
+        non_letter_count - 10
+      end
+      within_bounds(susness)
+    end
+
+    def space_count_suspiciousness(str, str_length = nil, str_downlate = nil)
       str_length ||= str.length.to_f
       return 0 if str_length < 12
 
