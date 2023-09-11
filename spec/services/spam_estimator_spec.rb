@@ -34,10 +34,10 @@ RSpec.describe SpamEstimator do
         expect(described_class.vowel_frequency_suspiciousness("aeddddd")).to eq 0
 
         expect(described_class.vowel_ratio("adddddd").round(2)).to eq 0.14
-        expect(described_class.vowel_frequency_suspiciousness("adddddd")).to be_between(30, 53)
+        expect(described_class.vowel_frequency_suspiciousness("DT Swiss")).to be_between(5, 30)
 
         expect(described_class.vowel_ratio("ddddddd")).to eq 0
-        expect(described_class.vowel_frequency_suspiciousness("ddddddd")).to be_between(74, 100)
+        expect(described_class.vowel_frequency_suspiciousness("ddddddd")).to be_between(69, 100)
       end
     end
     context "15 letters" do
@@ -48,7 +48,7 @@ RSpec.describe SpamEstimator do
         expect(described_class.vowel_frequency_suspiciousness("aeiauyaeiaudddd")).to be_between(75, 100)
 
         expect(described_class.vowel_ratio("aaddddddddddddd").round(2)).to eq 0.13
-        expect(described_class.vowel_frequency_suspiciousness("aaddddddddddddd")).to be_between(75, 99)
+        expect(described_class.vowel_frequency_suspiciousness("aaddddddddddddd")).to be_between(41, 95)
       end
     end
     context "> 30 letters" do
@@ -65,6 +65,21 @@ RSpec.describe SpamEstimator do
         expect(described_class.vowel_frequency_suspiciousness("ddddddddddddddddddddddddddddaaa")).to eq 100
 
         expect(described_class.vowel_frequency_suspiciousness("dddddddddddddddddddddddddddddd")).to eq 100
+      end
+    end
+    context "some troublesome ones" do
+      ["SON Nabendynamo (Wilfried Schmidt Maschinenbau)", "ENVE (ENVE Composites)",
+      "Sturmey-Archer", "IRD (Interloc Racing Design)", "Louis Garneau", "DT Swiss",
+      "Currie Technology (Currietech)", "VSF Fahrradmanufaktur", "PUBLIC bikes"].each do |str|
+        context "'#{str}'" do
+          it "returns false" do
+            # pp described_class.vowel_ratio(str)
+            expect(described_class.vowel_frequency_suspiciousness(str)).to be < 30
+            # expect(described_class.suspicious_space_count?(str)).to be_falsey
+            # expect(described_class.suspicious_capital_count?(str)).to be_falsey
+            # expect(described_class.suspicious_string?(str)).to be_falsey
+          end
+        end
       end
     end
   end

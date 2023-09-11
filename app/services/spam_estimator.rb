@@ -43,12 +43,16 @@ class SpamEstimator
       # longer strings should be below 40%
       susness = if str_length < 6
         [0, 100].include?(vowel_percent) ? 40 : 0
+      elsif vowel_percent < 5
+        str_length < 11 ? 80 : 100
       elsif vowel_percent < 20
-        offset = vowel_percent > 10 ? 90 : 110
-        if str_length < 10
-          offset -= 25
+        offset = vowel_percent > 12 ? 90 : 120
+        if str_length < 9
+          offset -= 50
+        elsif str_length < 14
+          offset -= 20
         elsif str_length < 30
-          offset -+ 10
+          offset -= 10
         end
         offset - vowel_percent
       elsif vowel_percent > 69
@@ -65,7 +69,7 @@ class SpamEstimator
         0
       end
 
-      pp "#{str} - susness: #{susness}    (#{vowel_percent.round(0)})"
+      # pp "#{str} - susness: #{susness}    (#{vowel_percent.round(0)})"
 
       susness > 100 ? 100 : susness
     end
