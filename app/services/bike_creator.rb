@@ -133,14 +133,15 @@ class BikeCreator
 
   def save_bike(b_param, bike)
     bike.set_location_info
-    if bike.creation_organization&.spam_registrations
-      bike.likely_spam = SpamEstimator.estimate_bike(bike) > 50
-    end
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)
     return bike unless bike.present? && bike.id.present?
+    # NOTE: spaminess is recalculated in EmailOwnershipInvitationWorker as a failsafe
+    if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
+      bike.update(likely_spam: true)
+    end
     AfterBikeSaveWorker.perform_async(bike.id)
     if b_param.bike_sticker_code.present? && bike.creation_organization.present?
       bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
