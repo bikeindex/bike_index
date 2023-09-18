@@ -18,6 +18,7 @@ RSpec.describe EmailReceiptWorker, type: :job do
     expect(notification.message_channel).to eq "email"
     expect(notification.notifiable).to eq payment
     expect(notification.email_success?).to be_truthy
+    expect(notification.message_channel_target).to eq payment.email
   end
   context "donation, existing notification" do
     let(:payment) { FactoryBot.create(:payment, kind: "donation") }
