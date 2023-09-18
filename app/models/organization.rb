@@ -243,6 +243,7 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
+  # WARNING! This is not efficient
   def law_enforcement_features_enabled?
     law_enforcement? && invoices.any? { |i| i.law_enforcement_functionality_invoice? }
   end

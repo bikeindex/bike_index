@@ -1,6 +1,15 @@
 require "rails_helper"
 
 RSpec.describe OrganizationDisplayer do
+  describe "law_enforcement_missing_verified_features?" do
+    let(:law_enforcement_organization) { Organization.new(kind: "law_enforcement") }
+    let(:bike_shop_organization) { Organization.new(kind: "bike_shop") }
+    it "is true for law_enforcement, false for shop, false for law_enforcement with unstolen_notifications" do
+      expect(OrganizationDisplayer.law_enforcement_missing_verified_features?(law_enforcement_organization)).to be_truthy
+      expect(OrganizationDisplayer.law_enforcement_missing_verified_features?(bike_shop_organization)).to be_falsey
+    end
+  end
+
   describe "avatar?" do
     let(:organization) { Organization.new }
     before { allow(organization).to receive(:avatar) { "a pretty picture" } }

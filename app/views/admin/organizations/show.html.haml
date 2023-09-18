@@ -1,6 +1,6 @@
 = render partial: "/admin/organizations/display_header", locals: {current_action: "", show_custom_layouts: true, organization_view_path: organization_root_path(organization_id: @organization.to_param), show_edit: true}
 
-- if @organization.law_enforcement_features_enabled?
+- if OrganizationDisplayer.law_enforcement_missing_verified_features?(@organization)
   .alert.alert-info
     This is a law enforcement organization without unstolen notifications. To enable unstolen notifications, #{link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i)} and enable "Law Enforcement functionality" in it
 .row

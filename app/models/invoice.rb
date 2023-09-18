@@ -41,7 +41,7 @@ class Invoice < ApplicationRecord
   end
 
   def law_enforcement_functionality_invoice?
-    endless? && no_cost? && feature_slugs.include?("unstolen_notifications")
+    organization_features.pluck(:name).any? { |n| n.match?(/law enforcement/i) }
   end
 
   # Static, at least for now

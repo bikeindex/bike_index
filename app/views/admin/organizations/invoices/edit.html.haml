@@ -44,7 +44,8 @@
                 %span.convertTime.withPreposition
                   = l payment.created_at, format: :convert_time
           - if @invoice.law_enforcement_functionality_invoice?
-            %strong.less-strong Verified Law Enforcement functionality invoice
+            %strong.less-strong Verified Law Enforcement functionality
+            invoice
           - elsif @invoice.paid_in_full? && @invoice.no_cost?
             %strong.less-strong Amount due is $0
             this invoice doesn't make the organization "Paid"

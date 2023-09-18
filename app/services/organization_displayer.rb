@@ -4,6 +4,10 @@
 # TODO: Figure out a more consistent way of handling Displayers while preserving Functionalness
 class OrganizationDisplayer
   class << self
+    def law_enforcement_missing_verified_features?(organization)
+      organization.law_enforcement? && !organization.law_enforcement_features_enabled?
+    end
+
     def bike_shop_display_integration_alert?(organization)
       organization.bike_shop? &&
         %w[no_pos broken_other_pos broken_lightspeed_pos].include?(organization.pos_kind) &&

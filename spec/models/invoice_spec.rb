@@ -101,7 +101,7 @@ RSpec.describe Invoice, type: :model do
 
   describe "law_enforcement_functionality_invoice" do
     let(:amount_due) { 0 }
-    let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: %w[unstolen_notifications additional_registration_information]) }
+    let(:organization_feature) { FactoryBot.create(:organization_feature, name: "Law Enforcement", feature_slugs: %w[unstolen_notifications additional_registration_information]) }
     let(:organization) { FactoryBot.create(:organization, kind: :law_enforcement) }
     let!(:invoice) do
       FactoryBot.create(:invoice_with_payment,
@@ -119,14 +119,16 @@ RSpec.describe Invoice, type: :model do
       expect(invoice.law_enforcement_functionality_invoice?).to be_truthy
       expect(organization.reload.paid_money?).to be_falsey
       expect(organization.law_enforcement_features_enabled?).to be_truthy
+      expect(OrganizationDisplayer.law_enforcement_missing_verified_features?(organization)).to be_falsey
     end
     context "paid_money_in_full" do
       let(:amount_due) { 5000 }
-      it "is false" do
+      it "is true" do
         expect(invoice.paid_money_in_full?).to be_truthy
-        expect(invoice.law_enforcement_functionality_invoice?).to be_falsey
+        expect(invoice.law_enforcement_functionality_invoice?).to be_truthy
         expect(organization.reload.paid_money?).to be_truthy
-        expect(organization.law_enforcement_features_enabled?).to be_falsey
+        expect(organization.law_enforcement_features_enabled?).to be_truthy
+        expect(OrganizationDisplayer.law_enforcement_missing_verified_features?(organization)).to be_falsey
       end
     end
   end

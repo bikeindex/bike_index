@@ -19,7 +19,7 @@
 
 .organized-wrap
   %div{ class: organized_container }
-    - if current_organization.law_enforcement_features_enabled?
+    - if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization)
       .organization-wide-alert.alert.alert-info.in
         %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
           %span{'aria-hidden' => 'true' } &times;
