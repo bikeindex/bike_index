@@ -41,7 +41,7 @@ class Invoice < ApplicationRecord
   end
 
   def law_enforcement_functionality_invoice?
-    feature_slugs == ["unstolen_notifications"]
+    endless? && no_cost? && feature_slugs.include?("unstolen_notifications")
   end
 
   # Static, at least for now
@@ -95,8 +95,16 @@ class Invoice < ApplicationRecord
     amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents
   end
 
+  def costs_money?
+    amount_due_cents > 0
+  end
+
+  def no_cost?
+    !costs_money?
+  end
+
   def paid_money_in_full?
-    paid_in_full? && amount_due_cents > 0
+    paid_in_full? && costs_money?
   end
 
   def subscription_first_invoice_id

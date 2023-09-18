@@ -99,6 +99,38 @@ RSpec.describe Invoice, type: :model do
     end
   end
 
+  describe "law_enforcement_functionality_invoice" do
+    let(:amount_due) { 0 }
+    let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: %w[unstolen_notifications additional_registration_information]) }
+    let(:organization) { FactoryBot.create(:organization, kind: :law_enforcement) }
+    let!(:invoice) do
+      FactoryBot.create(:invoice_with_payment,
+        organization: organization,
+        amount_due_cents: amount_due,
+        is_endless: true)
+    end
+    before do
+      invoice.update(organization_feature_ids: organization_feature.id)
+      organization.update(updated_at: Time.current)
+    end
+    it "is true" do
+      expect(invoice.reload.paid_money_in_full?).to be_falsey
+      expect(invoice.feature_slugs).to eq(%w[unstolen_notifications additional_registration_information])
+      expect(invoice.law_enforcement_functionality_invoice?).to be_truthy
+      expect(organization.reload.paid_money?).to be_falsey
+      expect(organization.law_enforcement_features_enabled?).to be_truthy
+    end
+    context "paid_money_in_full" do
+      let(:amount_due) { 5000 }
+      it "is false" do
+        expect(invoice.paid_money_in_full?).to be_truthy
+        expect(invoice.law_enforcement_functionality_invoice?).to be_falsey
+        expect(organization.reload.paid_money?).to be_truthy
+        expect(organization.law_enforcement_features_enabled?).to be_falsey
+      end
+    end
+  end
+
   describe "child_enabled_feature_slugs" do
     let(:invoice) { FactoryBot.create(:invoice) }
     it "rejects unmatching feature slugs" do

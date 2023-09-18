@@ -243,6 +243,10 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
+  def law_enforcement_features_enabled?
+    law_enforcement? && invoices.any? { |i| i.law_enforcement_functionality_invoice? }
+  end
+
   # Stub for now, but it might be more sophisticated later
   def impound_claims?
     public_impound_bikes?
