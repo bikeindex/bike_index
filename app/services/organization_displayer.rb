@@ -5,7 +5,7 @@
 class OrganizationDisplayer
   class << self
     def law_enforcement_missing_verified_features?(organization)
-      organization.law_enforcement? && !organization.enabled?("unstolen_notifications")
+      organization.law_enforcement? && !organization.law_enforcement_features_enabled?
     end
 
     def bike_shop_display_integration_alert?(organization)
