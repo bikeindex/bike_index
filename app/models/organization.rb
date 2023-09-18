@@ -245,7 +245,7 @@ class Organization < ApplicationRecord
 
   # WARNING! This is not efficient
   def law_enforcement_features_enabled?
-    law_enforcement? && invoices.any? { |i| i.law_enforcement_functionality_invoice? }
+    law_enforcement? && current_invoices.any? { |i| i.law_enforcement_functionality_invoice? }
   end
 
   # Stub for now, but it might be more sophisticated later
