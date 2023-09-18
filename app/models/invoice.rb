@@ -40,6 +40,10 @@ class Invoice < ApplicationRecord
     includes(:organization_features).pluck(:feature_slugs).flatten.uniq
   end
 
+  def law_enforcement_functionality_invoice?
+    feature_slugs == ["unstolen_notifications"]
+  end
+
   # Static, at least for now
   def subscription_duration
     1.year
