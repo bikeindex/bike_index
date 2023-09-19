@@ -148,8 +148,8 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           expect(mail.reply_to).to eq([current_organization.auto_user.email])
           expect(mail.subject).to eq "Your impound claim was approved"
           expect(mail.body.encoded).to match snippet_body
-          # It escapes things
-          expect(mail.body.encoded).to match "RESponse=MESSAGE&lt;alert&gt;"
+          # It escapes things - added '3D' in PR#2408 unclear why it was necessary
+          expect(mail.body.encoded).to match "RESponse=3DMESSAGE&lt;alert&gt;"
 
           expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
           expect(assigns(:impound_claim)).to eq impound_claim
