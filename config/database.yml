@@ -27,10 +27,10 @@ test:
 production:
   primary:
     <<: *default
-      host: "<%= ENV['SPECIFIED_POSTGRESQL_ADDRESS'] %>"
-      database: "<%= ENV['SPECIFIED_POSTGRESQL_DATABASE'] %>"
-      username: "<%= ENV['SPECIFIED_POSTGRESQL_USERNAME'] %>"
-      password: "<%= ENV['SPECIFIED_POSTGRESQL_PASSWORD'] %>"
+    host: "<%= ENV['SPECIFIED_POSTGRESQL_ADDRESS'] %>"
+    database: "<%= ENV['SPECIFIED_POSTGRESQL_DATABASE'] %>"
+    username: "<%= ENV['SPECIFIED_POSTGRESQL_USERNAME'] %>"
+    password: "<%= ENV['SPECIFIED_POSTGRESQL_PASSWORD'] %>"
 
   primary_replica:
     <<: *default
