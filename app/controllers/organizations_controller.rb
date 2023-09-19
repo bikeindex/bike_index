@@ -3,7 +3,6 @@ class OrganizationsController < ApplicationController
   before_action :set_bparam, only: %i[embed embed_extended]
   skip_before_action :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
 
-
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
     @organization = Organization.new
