@@ -35,8 +35,8 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def calculated_owner_name
-    return nil unless stolen_record&.bike&.current_ownership&.present? && stolen_record.bike.owner.present?
-    stolen_record.bike.owner.name
+    return nil unless bike&.current_ownership&.present? && bike&.owner.present?
+    bike.owner.name
   end
 
   def image_processing?
@@ -53,8 +53,9 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def bike
-    return nil unless stolen_record_id.present?
-    StolenRecord.current_and_not.find(stolen_record_id).bike
+    bike_id = stolen_record&.bike_id
+    return nil unless bike_id.present?
+    Bike.unscoped.find_by_id(bike_id)
   end
 
   def stolen_record

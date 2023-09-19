@@ -697,6 +697,7 @@ en:
         e_scooter: E-Scooter
         e_skateboard: E-Skateboard
         non_e_scooter: Scooter (not electric)
+        non_e_skateboard: Skateboard (Not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
         personal_mobility: Personal mobility device (electric scooter, etc)
@@ -949,7 +950,8 @@ en:
         organization_affiliation_options:
           community_member: Community Member
           employee: Employee
-          student: Student
+          graduate_student: Graduate Student
+          student: Undergraduate Student
       stolen_record:
         bike_was_not_locked: Bike was not locked
         cable_lock: Cable lock
@@ -1105,7 +1107,6 @@ en:
         window)</small>.
       state: State
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
-      street_address: Street address
       student_id: Student ID
       this_is_a: This is a
       unknown_year: Unknown year
@@ -1115,7 +1116,6 @@ en:
       was_made_before_1970: Was made before 1970
       without_serial: This %{bike_type} was made without a serial
       without_serial_number: This %{bike_type} was made without a serial number
-      your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organization_stolen_message:
       report_link_text: at this link
@@ -1261,7 +1261,7 @@ en:
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
-      no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index
+      no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
         admins) can see it
       not_registered_by_user: Not registered to a user
       or_call: Or call
@@ -1270,6 +1270,7 @@ en:
       share_it: Share it!
       spread_the_word: Spread the word!
       switch_to_new_bike_id: Switch to a new bike ID
+      test_registration: test registration
       update: Update
       view_users_other_registrations: View user's other registrations
       where_did_you_see_this_bike: >-
@@ -2333,6 +2334,10 @@ en:
       hidden_for_unauthorized_users: hidden for unauthorized users
       made_without_serial: made without serial
       unknown: unknown
+    organization_helper:
+      address: Street address
+      address_school: Campus mailing address
+      your_full_address_is_required: Your full address is required by %{org_name}
     page_entries_info:
       more_pages:
         display_entries: >-
@@ -3992,7 +3997,6 @@ en:
     users_accept_terms: Terms of use - Bike Index
     users_accept_vendor_terms: Organization terms - Bike Index
     users_confirm: Confirm your email - Bike Index
-    users_edit: Edit your account
     users_new: Sign up - Bike Index
     users_password_reset: Password reset - Bike Index
     users_request_password_reset: Reset password - Bike Index
@@ -4035,6 +4039,7 @@ en:
         When not checked, manage through the "Groups and Organizations" page of each
         bike.
     root:
+      absolutely_no_notifications: Absolutely no email
       add_additional_email: Add additional email
       add_new_phone_number: Add a new phone number
       additional_email: Additional email
@@ -4053,6 +4058,9 @@ en:
       have_multiple_emails: Have multiple emails? Consolidate them into one account
         here
       make_primary_email: Make primary email
+      no_notifications_explanation: >-
+        blocks all email except password resets and theft notifications (for instance,
+        you will stop receiving new registration emails)
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
       preferred_language: Preferred language
@@ -4069,7 +4077,6 @@ en:
       why_you_should_text: Read why you should
       zipcode: Postal code
     sharing:
-      additional_link: Additional Link
       choose_file: Choose file...
       create_page: Create page
       create_public_page: Create public page
@@ -4096,6 +4103,8 @@ en:
       this_users_bikes: This user's bikes
       title_for_link: Title for link
       twitter_handle: Twitter handle
+      will_not_show_up: Your website won't show up because you haven't clicked "show
+        personal website"
       your_username_is_the_url_for_your_sharing: >-
         Your username is the URL for your sharing page and the bike embed form. Update
         it if you care about those things.
@@ -4210,7 +4219,6 @@ en:
     embed:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
-      address: Complete address
       choose_color: Choose color
       choose_country: Choose country
       city: City
@@ -4231,7 +4239,7 @@ en:
       model_year: Model year
       optional_upload_a_photo: Optional - upload a photo
       other_manufacturer: Other manufacturer
-      owners_street_address: Owner's Street address
+      owners_mailing_address: Owner's mailing address
       police_report_number: Police report number
       receive_notifications_from_bike_index: Receive notifications from the Index
         about this stolen %{bike_type}
@@ -4265,7 +4273,6 @@ en:
     embed_extended:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
-      address: Complete address
       any_extra_words: Any extra words?
       choose_color: Choose color
       choose_handlebar: Choose handlebar
@@ -4281,8 +4288,8 @@ en:
       other_defining_features: Other defining features
       other_manufacturer: Other manufacturer
       owners_email_address: Owner's email address
+      owners_mailing_address: Owner's mailing address
       owners_phone: Owner's phone
-      owners_street_address: Owner's Street address
       primary_frame_material: Primary frame material
       register_this: Register this
       remove_color: Remove color
@@ -4424,7 +4431,11 @@ en:
         email: email
         incomplete: incomplete
         matching: matching
+        only_resend_with_permission: >-
+          Only re-send partial registrations with the user's permission! Otherwise
+          the emails qualify as spam.
         org_incomplete_registrations_html: "<em>%{org_name}</em> Incomplete Registrations"
+        re_send: re-send
         registration: registration
         search: Search
         search_emails: Search emails
@@ -4500,16 +4511,17 @@ en:
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
     bulk_imports:
+      error_type:
+        file: File
+        line: Line
       index:
         added: Added
         bikes: Bikes
         creator: Creator
         errors: Errors
         exclude_empty_imports: Exclude Empty imports
-        file: File!
         include_empty_imports: Include Empty imports
         kind: Kind
-        line: Line
         new_import: New import
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
@@ -5291,6 +5303,9 @@ en:
       register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
       streamlined_bike_shop_registration_page: streamlined Bike Shop registration
         page
+      subscription_expired_html: >-
+        Your subscription to Bike Index has expired. Please contact %{email_link}
+        to get it re-enabled.
       use_ascend: Use Ascend?
       use_lightspeed_retail_pos: Use Lightspeed Retail POS?
       viewing_our_streamlined_page: >-

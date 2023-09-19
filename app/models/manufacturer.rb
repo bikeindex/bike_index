@@ -93,6 +93,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.name = name&.strip
     self.slug = Slugifyer.manufacturer(name)
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil

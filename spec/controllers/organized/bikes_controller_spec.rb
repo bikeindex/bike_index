@@ -8,6 +8,7 @@ RSpec.describe Organized::BikesController, type: :controller do
       expect(get(:recoveries, params: {organization_id: organization})).to redirect_to(organization_root_path)
       expect(get(:incompletes, params: {organization_id: organization})).to redirect_to(organization_root_path)
       expect(get(:new, params: {organization_id: organization})).to redirect_to(organization_root_path)
+      expect(post(:resend_incomplete_email, params: {organization_id: organization, id: 12})).to redirect_to(organization_root_path)
     end
     describe "multi_serial_search" do
       it "renders" do

@@ -851,6 +851,7 @@ nl:
         e_scooter: E-scooter
         e_skateboard: E-skateboard
         non_e_scooter: Scooter (niet elektrisch)
+        non_e_skateboard: Skateboard (niet elektrisch)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
@@ -1024,6 +1025,7 @@ nl:
           community_member: Gemeenschap lid
           employee: Werknemer
           student: Student
+          graduate_student: Afgestudeerde student
     status_humanized:
       bike:
         abandoned: Verlaten
@@ -1104,6 +1106,10 @@ nl:
       hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
       made_without_serial: gemaakt zonder serie
       unknown: Onbekend
+    organization_helper:
+      address: Adres
+      address_school: Postadres van de campus
+      your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
   i18n_tasks:
     add_missing:
       added:
@@ -1799,7 +1805,6 @@ nl:
         ze geïdentificeerd. Voor meer informatie of enkele voorbeelden, ga naar %{serial_page_link}
         <small>(opent in een apart venster)</small> .
       state: Staat
-      street_address: Adres
       this_is_a: Dit is een
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
@@ -1808,7 +1813,6 @@ nl:
       was_made_before_1970: Werd vóór 1970 gemaakt
       without_serial: Deze %{bike_type} is zonder framenummer gemaakt
       without_serial_number: Deze %{bike_type} is gemaakt zonder framenummer
-      your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
       zipcode: Postcode
       manufacturer: Fabrikant
       enter_stolen_bike_type_details: Voer de gegevens voor Gestolen %{bike_type}
@@ -1972,6 +1976,7 @@ nl:
       not_registered_by_user: Niet geregistreerd door een gebruiker
       in: in
       looking_for_correct_owner: Op zoek naar de juiste eigenaar van deze %{bike_type}!
+      test_registration: proefregistratie
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -4140,7 +4145,6 @@ nl:
     users_accept_terms: Gebruiksvoorwaarden - Bike Index
     users_accept_vendor_terms: Organisatievoorwaarden - Bike Index
     users_confirm: Bevestig uw e-mail - Fietsindex
-    users_edit: Bewerk je account
     users_new: Aanmelden - Fietsindex
     users_password_reset: Wachtwoord opnieuw instellen - Fietsindex
     users_request_password_reset: Wachtwoord opnieuw instellen - Fietsindex
@@ -4247,6 +4251,9 @@ nl:
         search_emails: Zoeken in e-mails
         sent: verzonden
         through_org: door %{org_name}
+        only_resend_with_permission: Deelregistraties alleen opnieuw verzenden met
+          toestemming van de gebruiker! Anders kwalificeren de e-mails als spam.
+        re_send: opnieuw versturen
       index:
         connected_to_bike_html: Het is hiermee verbonden %{bike_link}.
         enter_url_of_the_bike_html: 'U kunt de URL invoeren van de fiets waaraan u
@@ -4322,9 +4329,7 @@ nl:
         creator: Schepper
         errors: fouten
         exclude_empty_imports: Lege invoer uitsluiten
-        file: Het dossier!
         include_empty_imports: Inclusief lege invoer
-        line: Lijn
         new_import: Nieuwe import
         org_ascend_imports_html: "<em>%{org_name}</em> Importeren <em>ascenderen</em>"
         org_bulk_imports_html: "<em>%{org_name} Bulkimport</em>"
@@ -4394,6 +4399,9 @@ nl:
         bulk_import_impounded: In beslag genomen bulkimport
         impounded_at: In beslag genomen bij
         impounded_id: In beslag genomen identiteitsbewijs
+      error_type:
+        file: file
+        line: Lijn
     exports:
       index:
         bikes_in_export: Fietsen in export
@@ -4937,6 +4945,8 @@ nl:
       use_lightspeed_retail_pos: Lightspeed Retail POS gebruiken?
       viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
         voor Bike Shop, die wij aanbevelen te gebruiken
+      subscription_expired_html: Uw abonnement op Bike Index is verlopen. Neem contact
+        op met %{email_link} om het opnieuw in te schakelen.
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
@@ -5275,7 +5285,6 @@ nl:
     embed:
       add_a_color: Voeg een kleur toe
       additional_serial: Extra framenummer / stickernummer
-      address: Adres
       choose_color: Kies een kleur
       choose_country: Kies land
       city: City
@@ -5295,7 +5304,6 @@ nl:
       model_year: Modeljaar
       optional_upload_a_photo: Optioneel - upload een foto
       other_manufacturer: Andere fabrikant
-      owners_street_address: Straatnaam van de eigenaar
       police_report_number: Nummer politie rapport
       receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
         gestolen %{bike_type}
@@ -5319,6 +5327,7 @@ nl:
       zipcode: Postcode
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
+      owners_mailing_address: Het postadres van de eigenaar
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} is bij u geregistreerd via <strong>%{org_name}</strong>
         ."
@@ -5328,7 +5337,6 @@ nl:
     embed_extended:
       add_a_color: Voeg een kleur toe
       additional_serial: Extra framenummer / stickernummer
-      address: Adres
       any_extra_words: Nog extra woorden?
       choose_color: Kies een kleur
       choose_handlebar: Kies stuur
@@ -5345,7 +5353,6 @@ nl:
       other_manufacturer: Andere fabrikant
       owners_email_address: E-mailadres van de eigenaar
       owners_phone: Telefoon van de eigenaar
-      owners_street_address: Straatnaam van de eigenaar
       primary_frame_material: Primair framemateriaal
       register_this: Registreer dit
       remove_color: Verwijder kleur
@@ -5360,6 +5367,7 @@ nl:
       zipcode: Postcode
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
+      owners_mailing_address: Het postadres van de eigenaar
     new:
       bike_index_for_organizations: Bike Index voor organisaties
     new_form:
@@ -5647,8 +5655,11 @@ nl:
       verified: Geverifieerd
       why_you_should_text: Lees waarom u zou moeten
       zipcode: Postcode
+      absolutely_no_notifications: Absoluut geen e-mail
+      no_notifications_explanation: blokkeert alle e-mail behalve wachtwoordresets
+        en diefstalmeldingen (u ontvangt bijvoorbeeld geen nieuwe registratie-e-mails
+        meer)
     sharing:
-      additional_link: Aanvullende link
       choose_file: Kies bestand...
       create_page: Creëer pagina
       create_public_page: Maak een openbare pagina
@@ -5679,6 +5690,8 @@ nl:
       instagram_handle: Instagram-handvat
       no_instagram: Geen Instagram
       show_instagram: Toon Instagram
+      will_not_show_up: Uw website wordt niet weergegeven omdat u niet op 'persoonlijke
+        website weergeven' heeft geklikt
     registration_organizations:
       affiliation: "%{org_name} aansluiting"
       all_bikes_with_organization: Al uw fietsen zijn geregistreerd bij deze organisatie

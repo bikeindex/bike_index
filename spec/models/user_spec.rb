@@ -270,12 +270,12 @@ RSpec.describe User, type: :model do
   describe "set_calculated_attributes" do
     describe "title, urls" do
       it "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
-        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org")
+        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, my_bikes_link_target: "somewhere.org")
         user.set_calculated_attributes
-        expect(user.website).to eq("http://somewhere.org")
+        expect(user.mb_link_target).to eq("http://somewhere.org")
       end
       it "does not add http:// to twitter if it's already there" do
-        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere", my_bikes_link_target: "https://something.com")
+        user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, my_bikes_link_target: "https://something.com")
         user.set_calculated_attributes
         expect(user.my_bikes_hash["link_target"]).to eq("https://something.com")
         expect(user.mb_link_target).to eq("https://something.com")
@@ -355,6 +355,22 @@ RSpec.describe User, type: :model do
       expect(user_phone2.id).to_not eq user_phone.id
       expect(user_phone2.confirmation_code).to_not eq user_phone.confirmation_code
       expect(user_phone.notifications.count).to eq 1
+    end
+  end
+
+  describe "updating no_non_theft_notification" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
+    let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
+    let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
+    let!(:membership) { FactoryBot.create(:membership, user: user, organization: organization, hot_sheet_notification: :notification_daily) }
+    it "updates and marks all notifications false" do
+      expect(user.reload.notification_newsletters).to be_truthy
+      expect(user.no_non_theft_notification).to be_falsey
+      expect(user.memberships.first&.hot_sheet_notification).to eq "notification_daily"
+      user.update(no_non_theft_notification: true)
+      expect(user.reload.notification_newsletters).to be_falsey
+      expect(user.no_non_theft_notification).to be_truthy
+      expect(user.memberships.first&.hot_sheet_notification).to eq "notification_never"
     end
   end
 

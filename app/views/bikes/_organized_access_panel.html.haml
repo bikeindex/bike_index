@@ -154,7 +154,9 @@
                         = "#{(bike_attr || reg_field)&.humanize(keep_id_suffix: true)}"
                       %td
                         - if bike_attr == "organization_affiliation"
-                          = @bike.organization_affiliation&.humanize
+                          = @bike.organization_affiliation(passive_organization)&.humanize
+                        - elsif bike_attr == "student_id"
+                          = @bike.student_id(passive_organization)
                         - else
                           = @bike.send(bike_attr)
 

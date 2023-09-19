@@ -175,6 +175,10 @@ class User < ApplicationRecord
     developer
   end
 
+  def su_option?(opt)
+    superuser_abilities.with_su_option(opt).limit(1).any?
+  end
+
   def banned?
     banned
   end
@@ -354,6 +358,11 @@ class User < ApplicationRecord
     bike_sticker_updates.successful.unauthorized_organization.distinct.pluck(:bike_sticker_id)
   end
 
+  # Used to render organization address fields on user root, if present. Method here for testing
+  def uro_organization_reg_address
+    uro_organizations.with_enabled_feature_slugs("reg_address").first
+  end
+
   def render_donation_request
     return nil unless has_police_membership? && !organizations.law_enforcement.paid.limit(1).any?
     "law_enforcement"
@@ -381,7 +390,10 @@ class User < ApplicationRecord
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
     self.title = strip_tags(title) if title.present?
-    self.website = Urlifyer.urlify(website)
+    if no_non_theft_notification
+      self.notification_newsletters = false
+      memberships.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }
+    end
     if my_bikes_link_target.present? || my_bikes_link_title.present?
       mbh = my_bikes_hash || {}
       mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
@@ -396,7 +408,7 @@ class User < ApplicationRecord
   end
 
   def mb_link_title
-    (my_bikes_hash && my_bikes_hash["link_title"]) || mb_link_target
+    (my_bikes_hash && my_bikes_hash["link_title"])
   end
 
   def userlink

@@ -1,0 +1,55 @@
+%h1.mt-4
+  Edit Superuser Ability
+
+.row.mb-4
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Created
+          %td
+            %span.convertTime
+              = l(@superuser_ability.created_at, format: :convert_time)
+        %tr
+          %td Updated
+          %td.small.convertTime
+            = l(@superuser_ability.updated_at, format: :convert_time)
+        %tr
+          %td Deleted
+          %td
+            - if @superuser_ability.deleted_at.present?
+              %strong.convertTime.text-danger
+                = l(@superuser_ability.deleted_at, format: :convert_time)
+        %tr
+          %td User
+          %td
+            = render partial: "/shared/admin_user_cell", locals: {user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false, cache: true}
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Kind
+          %td
+            = @superuser_ability.kind.titleize
+        %tr
+          %td controller name
+          %td
+            = @superuser_ability.controller_name
+        %tr
+          %td Action name
+          %td
+            = @superuser_ability.action_name
+
+  .col-md-6
+    .card.bg-light
+      .card-body
+        = form_for [:admin, @superuser_ability] do |f|
+          - if @superuser_ability.errors.any?
+            = render partial: "/shared/errors", locals: {obj: @superuser_ability}
+
+          - SuperuserAbility::SU_OPTIONS.each do |ability|
+            .form-group
+              = label_tag ability, "#{ability.to_s.humanize}?"
+              = check_box_tag ability, true, @superuser_ability.su_option?(ability)
+
+          = f.submit "Update", class: 'btn btn-success float-right'

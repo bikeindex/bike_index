@@ -15,8 +15,8 @@ window.binxApp || (window.binxApp = {});
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
 $(document).ready(function () {
-  window.timeParser = new TimeParser();
-  window.timeParser.localize();
+  if (!window.timeParser) { window.timeParser = new TimeParser() }
+  window.timeParser.localize()
   // Period selector
   if ($("#timeSelectionBtnGroup").length) {
     window.periodSelector = PeriodSelector();

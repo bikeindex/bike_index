@@ -96,7 +96,7 @@ Rails.application.routes.draw do
   get "feedbacks/new", to: redirect("/help")
   %w[support contact contact_us].each { |p| get p, to: redirect("/help") }
 
-  resources :users, only: %i[new create show edit update] do
+  resources :users, only: %i[new create show update] do
     collection do
       get "please_confirm_email"
       post "resend_confirmation_email"
@@ -346,6 +346,7 @@ Rails.application.routes.draw do
         get :multi_serial_search
         get :new_iframe
       end
+      member { post :resend_incomplete_email }
     end
     resources :exports, except: [:edit]
     resources :bulk_imports, only: %i[index show new create]

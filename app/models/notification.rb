@@ -9,6 +9,7 @@ class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,
     finished_registration: 6,
+    partial_registration: 7,
     receipt: 1,
     stolen_notification_sent: 3,
     stolen_notification_blocked: 4,
@@ -28,7 +29,8 @@ class Notification < ApplicationRecord
     bike_possibly_found: 23,
     user_alert_theft_alert_without_photo: 24,
     user_alert_stolen_bike_without_location: 25,
-    theft_survey_4_2022: 26
+    theft_survey_4_2022: 26,
+    theft_survey_2023: 27
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -54,7 +56,7 @@ class Notification < ApplicationRecord
   scope :theft_alert, -> { where(kind: theft_alert_kinds) }
   scope :impound_claim, -> { where(kind: impound_claim_kinds) }
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
-  scope :theft_survey, -> { where(kind: "theft_survey_4_2022") }
+  scope :theft_survey, -> { where(kind: theft_survey_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -85,6 +87,14 @@ class Notification < ApplicationRecord
     kinds.select { |k| k.start_with?("user_alert_") }.freeze
   end
 
+  def self.theft_survey_kinds
+    %w[theft_survey_4_2022 theft_survey_2023].freeze
+  end
+
+  def self.b_param_kinds
+    %w[partial_registration].freeze
+  end
+
   def self.customer_contact_kinds
     %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
   end
@@ -92,6 +102,11 @@ class Notification < ApplicationRecord
   def self.sender_auto_kinds
     donation_kinds + theft_alert_kinds + user_alert_kinds +
       %w[stolen_twitter_alerter bike_possibly_found]
+  end
+
+  def self.search_message_channel_target(str)
+    return none unless str.present?
+    where("message_channel_target ILIKE ?", "%#{str.strip.downcase}%")
   end
 
   def self.notifications_sent_or_received_by(user_or_id)
@@ -118,6 +133,10 @@ class Notification < ApplicationRecord
     self.class.theft_alert_kinds.include?(kind)
   end
 
+  def b_param?
+    self.class.b_param_kinds.include?(kind)
+  end
+
   def stolen_notification?
     self.class.stolen_notification_kinds.include?(kind)
   end
@@ -134,14 +153,12 @@ class Notification < ApplicationRecord
     self.class.customer_contact_kinds.include?(kind)
   end
 
-  def kind_humanized
-    self.class.kind_humanized(kind)
+  def theft_survey?
+    self.class.theft_survey_kinds.include?(kind)
   end
 
-  def calculated_email
-    return notifiable&.receiver_email if stolen_notification?
-    return user&.email if user.present?
-    notifiable&.user_email if customer_contact?
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   def twilio_response
@@ -175,9 +192,39 @@ class Notification < ApplicationRecord
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
     self.delivery_status = nil if delivery_status.blank?
+    self.message_channel_target ||= calculated_message_channel_target if delivery_status.present?
+  end
+
+  def survey_id
+    raise "Not a theft survey!" unless theft_survey?
+    id_searched = id || self.class.where(kind: kind).maximum(:id)
+    self.class.where(kind: kind).where("id < ?", id_searched).count + 1
+  end
+
+  def bike_with_fallback
+    return nil if bike_id.blank?
+    bike || Bike.unscoped.find_by_id(bike_id)
+  end
+
+  def calculated_message_channel_target
+    return calculated_phone if message_channel == "text" || phone_verification?
+    calculated_email
   end
 
   private
+
+  def calculated_phone
+    notifiable&.phone
+  end
+
+  def calculated_email
+    c_email = notifiable&.email if b_param? || notifiable_type == "Payment"
+    c_email ||= notifiable&.receiver_email if stolen_notification?
+    c_email ||= user&.email if user_id.present?
+    c_email ||= notifiable&.user_email if customer_contact?
+    c_email ||= bike_with_fallback&.owner_email
+    c_email
+  end
 
   def calculated_user_id
     return notifiable&.receiver_id if notifiable_type == "StolenNotification"

@@ -21,6 +21,17 @@ module ApplicationHelper
     image_tag("link.svg", class: "link-emoji")
   end
 
+  def notification_delivery_display(status)
+    text = if status == "email_success"
+      check_mark
+    elsif status.nil?
+      "..."
+    else
+      status
+    end
+    content_tag(:span, text, title: status&.titleize, style: "cursor:default;")
+  end
+
   def attr_list_item(desc, title)
     return nil unless desc.present?
     content_tag(:li) do
@@ -211,8 +222,8 @@ module ApplicationHelper
   end
 
   def websiteable(user)
-    if user.show_website && user.website
-      link_to "Website", user.website
+    if user.show_website && user.mb_link_target.present?
+      link_to (user.mb_link_title || "Website"), user.mb_link_target
     end
   end
 

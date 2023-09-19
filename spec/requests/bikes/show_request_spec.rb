@@ -17,6 +17,16 @@ RSpec.describe "BikesController#show", type: :request do
       expect(assigns(:claim_message)).to be_blank
     end
   end
+  context "likely_spam bike" do
+    it "shows the bike" do
+      ownership.bike.update(likely_spam: true)
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(assigns(:bike).id).to eq bike.id
+      expect(assigns(:display_dev_info?)).to be_falsey
+      expect(assigns(:claim_message)).to be_blank
+    end
+  end
   context "organization_id & sign_in_if_not" do
     let(:current_user) { nil }
     let(:organization) { FactoryBot.create(:organization) }

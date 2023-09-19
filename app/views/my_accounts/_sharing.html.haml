@@ -43,19 +43,18 @@
         %label.radio-inline
           = f.radio_button :show_website, false
           = t(".no_personal_site")
-    #personal-field.form-group.row.collapse
-      = f.label :website, t(".personal_site_url"), class: 'form-well-label'
-      .form-well-input
-        = f.text_field :website, placeholder: t(".example_url"), class: 'form-control'
 
   .related-fields
     .form-group.row
-      = f.label :my_bikes_link_target, t(".additional_link"), class: 'form-well-label'
+      = f.label :my_bikes_link_target, t(".personal_site_url"), class: 'form-well-label'
       .form-well-input
         = f.text_field :my_bikes_link_target,
         value: @user.mb_link_target,
         placeholder: t(".example_url"),
         class: 'form-control'
+        - if @user.mb_link_target.present? && !@user.show_website
+          .below-input-help.text-warning
+            = t(".will_not_show_up")
 
     .form-group.row
       = f.label :my_bikes_link_target, t(".title_for_link"), class: 'form-well-label'

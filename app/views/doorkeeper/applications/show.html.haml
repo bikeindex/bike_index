@@ -24,7 +24,7 @@
               %code
                 = uri
             %td
-              = link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code'), class: 'btn btn-secondary', target: '_blank'
+              = link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code', scope: 'public'), class: 'btn btn-secondary', target: '_blank'
   .col-md-4
     %h3 Actions
     %p

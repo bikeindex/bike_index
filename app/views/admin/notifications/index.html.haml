@@ -76,6 +76,16 @@
 
 = render partial: "/shared/period_select"
 
+.row.mt-4
+  .col
+    = form_tag admin_notifications_path, method: :get, class: "form-inline" do
+      = render partial: "/shared/hidden_search_fields"
+      = hidden_field_tag :search_with_bike, params[:search_with_bike]
+      = hidden_field_tag :search_undelivered, params[:search_undelivered]
+      .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :query, params[:query], placeholder: "Search email/phone", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+
 = render partial: "/shared/pagination", locals: {collection: @notifications, count: matching_notifications.count, name: "Notifications", views_prefix: "admin"}
 
 = render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true}

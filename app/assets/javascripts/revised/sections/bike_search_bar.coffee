@@ -137,6 +137,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
 
   formatSearchText: (item) ->
     return item.text if item.loading
+    return "<span>Search only for <strong>#{ item.text }</strong></span>" if item.category == 'cycle_type'
     prefix = switch
       when item.category == 'colors'
         p = "<span class=\'sch_\'>Bikes that are </span>"
@@ -144,18 +145,26 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           p + "<span class=\'sclr\' style=\'background: #{item.display};\'></span>"
         else
           p + "<span class=\'sclr\'>stckrs</span>"
+      when item.category == 'cycle_type'
+        "<span class=\'sch_\'>only for</span>"
       when item.category == 'mnfg' || item.category == 'frame_mnfg'
         "<span class=\'sch_\'>Bikes made by</span>"
       else
         'Search for'
     "#{prefix} <span class=\'label\'>" + item.text + '</span>'
 
-  # Don't include manufacturers if there is a manufacturer selected
+  # Don't include manufacturers if a manufacturer is selected
   setCategories: ->
     query = $("#bikes_search_form #query_items").val()
-    query = [] if !query # Assign query to a string if it's blank
-    # if query is present and matches m_, it's a manufacturer
-    window.searchBarCategories = if / m_/.test(" #{query.join(" ")} ")
+    query = [] if !query # Assign query to an array if it's blank
+    # Soulheart doesn't support OR, only and for multiple categories.
+    # TODO: Fix Soulheart so it does support multiple categories, and don't include cycle_type if a cycle_type is selected
+    # queried_categories = query.filter (x) -> /^(v|m)_/.test(x)
+    # if queried_categories.length == 0
+    #   window.searchBarCategories = ""
+    # else
+    #   window.searchBarCategories = "colors"
+    window.searchBarCategories = if /m_/.test(" #{query.join(" ")} ")
       "colors"
     else
       ""

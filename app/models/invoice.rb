@@ -40,6 +40,10 @@ class Invoice < ApplicationRecord
     includes(:organization_features).pluck(:feature_slugs).flatten.uniq
   end
 
+  def law_enforcement_functionality_invoice?
+    organization_features.pluck(:name).any? { |n| n.match?(/law enforcement/i) }
+  end
+
   # Static, at least for now
   def subscription_duration
     1.year
@@ -91,8 +95,16 @@ class Invoice < ApplicationRecord
     amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents
   end
 
+  def costs_money?
+    amount_due_cents > 0
+  end
+
+  def no_cost?
+    !costs_money?
+  end
+
   def paid_money_in_full?
-    paid_in_full? && amount_due_cents > 0
+    paid_in_full? && costs_money?
   end
 
   def subscription_first_invoice_id

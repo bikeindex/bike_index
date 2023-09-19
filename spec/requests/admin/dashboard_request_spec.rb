@@ -23,21 +23,29 @@ RSpec.describe Admin::DashboardController, type: :request do
     include_context :request_spec_logged_in_as_superuser
 
     describe "index (also timezone setting tests)" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
       before do
         # Create the things we look at, so we ensure it doesn't break
-        FactoryBot.create(:ownership)
         FactoryBot.create(:user)
         FactoryBot.create(:organization)
       end
       let(:timezone) { "America/Los_Angeles" }
       let(:time_range_start) { Time.now.in_time_zone(timezone).beginning_of_day - 7.days }
-      it "renders, sets timezone from params" do
+      it "renders, sets timezone from params and skips likely_spam by default" do
+        bike2 = FactoryBot.create(:bike, :with_ownership, likely_spam: true)
         get "/admin", params: {timezone: timezone}
         expect(response.code).to eq "200"
         expect(response).to render_template(:index)
         expect(session[:timezone]).to eq timezone
         expect(assigns(:time_range).first).to be_within(2.seconds).of time_range_start
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
         expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
+        # If current user has no_hide_spam, it shows likely_spam though
+        SuperuserAbility.create(user: current_user, su_options: [:no_hide_spam])
+        get "/admin", params: {timezone: timezone}
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:index)
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike2.id])
       end
       context "passing nonsense timezone" do
         it "doesn't set the timezone" do

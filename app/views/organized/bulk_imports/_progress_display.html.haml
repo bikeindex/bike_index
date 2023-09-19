@@ -1,0 +1,15 @@
+- show_extended ||= false
+- if bulk_import.blocking_error?
+  %span.text-danger
+    Failed
+  - if show_extended
+    %em.small.less-strong
+      could not import, blocking error
+- else
+  - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
+  %span{class: bulk_import_progress_class}
+    = bulk_import.progress
+  - if show_extended && bulk_import.line_errors.present?
+    %em.small.less-strong
+      error did NOT block import
+

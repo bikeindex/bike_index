@@ -505,7 +505,8 @@ CREATE TABLE public.bikes (
     updated_by_user_at timestamp without time zone,
     occurred_at timestamp without time zone,
     serial_normalized_no_space character varying,
-    credibility_score integer
+    credibility_score integer,
+    likely_spam boolean DEFAULT false
 );
 
 
@@ -2017,7 +2018,8 @@ CREATE TABLE public.notifications (
     notifiable_id bigint,
     message_channel integer DEFAULT 0,
     twilio_sid text,
-    bike_id bigint
+    bike_id bigint,
+    message_channel_target character varying
 );
 
 
@@ -2303,7 +2305,8 @@ CREATE TABLE public.organizations (
     lightspeed_register_with_phone boolean DEFAULT false,
     manufacturer_id bigint,
     direct_unclaimed_notifications boolean DEFAULT false,
-    spam_registrations boolean DEFAULT false
+    spam_registrations boolean DEFAULT false,
+    opted_into_theft_survey_2023 boolean DEFAULT false
 );
 
 
@@ -2843,7 +2846,8 @@ CREATE TABLE public.superuser_abilities (
     action_name character varying,
     deleted_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    su_options jsonb DEFAULT '[]'::jsonb
 );
 
 
@@ -3244,7 +3248,6 @@ CREATE TABLE public.users (
     zipcode character varying(255),
     twitter character varying(255),
     show_twitter boolean DEFAULT false NOT NULL,
-    website character varying(255),
     show_website boolean DEFAULT false NOT NULL,
     show_phone boolean DEFAULT true,
     show_bikes boolean DEFAULT false NOT NULL,
@@ -3278,7 +3281,9 @@ CREATE TABLE public.users (
     address_set_manually boolean DEFAULT false,
     no_address boolean DEFAULT false,
     show_instagram boolean DEFAULT false,
-    instagram character varying
+    instagram character varying,
+    no_non_theft_notification boolean DEFAULT false,
+    admin_options jsonb
 );
 
 
@@ -6411,6 +6416,11 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220921170820'),
 ('20221007123638'),
 ('20230224234148'),
-('20230418192859');
+('20230418192859'),
+('20230831222013'),
+('20230906000736'),
+('20230906180600'),
+('20230906200524'),
+('20230906203110');
 
 

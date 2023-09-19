@@ -37,12 +37,23 @@
             = @invoice.paid_in_full? ? "Yes" : "No"
           %span.less-strong
             = MoneyFormater.money_format(@invoice.amount_paid_cents, @invoice.currency)
-          %ul
+          %ul.mb-2
             - @invoice.payments.each do |payment|
               %li
                 = link_to "#{payment.amount_formatted}", admin_payment_path(payment)
                 %span.convertTime.withPreposition
                   = l payment.created_at, format: :convert_time
+          - if @invoice.law_enforcement_functionality_invoice?
+            %strong.less-strong Verified Law Enforcement functionality
+            invoice
+          - elsif @invoice.paid_in_full? && @invoice.no_cost?
+            %strong.less-strong Amount due is $0
+            this invoice doesn't make the organization "Paid"
+            - if @invoice.payments.any?
+              %span.d-block.mt-1
+                %strong.text-danger This invoice has a payment,
+                but because amount due is $0, the organization isn't marked "paid"
+
   .col-sm-6
     %table.table-list
       %tr

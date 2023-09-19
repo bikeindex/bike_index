@@ -17,18 +17,41 @@ module Enumable
       slugs.map { |slug| {slug: slug, name: slug_translation(slug)} }
     end
 
-    def slugs
-      self::SLUGS.keys.map(&:to_s)
+    def slugs_sym
+      self::SLUGS.keys
     end
 
-    def friendly_find(str)
-      return unless str.present?
-      str = str.downcase.strip
+    def slugs
+      slugs_sym.map(&:to_s)
+    end
+
+    def all
+      slugs_sym.map { |s| new(s) }
+    end
+
+    def find(str)
+      new(self::SLUGS.key(str))
+    end
+
+    def find_sym(str)
+      return if str.blank?
+      return str if str.is_a?(Symbol) && self::SLUGS.key?(str)
+      str = str.downcase.strip if str.is_a?(String)
+      if str.is_a?(Integer) || str.match?(/\A\d+\z/)
+        str = str.to_i if str.is_a?(String)
+        matching_sym = self::SLUGS.key(str)
+        return matching_sym if matching_sym.present?
+      end
       slug = (slugs & [str]).first
       slug ||= self::NAMES.detect do |k, v|
         ([k.to_s, v.downcase] + v.downcase.strip.split(" or ")).include?(str)
       end&.first
-      new(slug.to_sym) if slug.present?
+      slug&.to_sym
+    end
+
+    def friendly_find(str)
+      matching_sym = find_sym(str)
+      str.present? ? new(matching_sym) : nil
     end
   end
 
