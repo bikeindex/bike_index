@@ -1,5 +1,6 @@
 module Organized
   class ManageImpoundingsController < Organized::AdminController
+    around_action :set_writing_role
     before_action :assign_organization
 
     # IDK, may want to render something here sometime

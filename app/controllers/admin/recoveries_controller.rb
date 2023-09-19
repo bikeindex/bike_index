@@ -2,6 +2,7 @@ class Admin::RecoveriesController < Admin::BaseController
   include SortableTable
 
   before_action :set_period, only: [:index]
+  around_action :set_writing_role, only: %i[edit] # find_or_create_recovery_link_token
 
   helper_method :available_recoveries
 

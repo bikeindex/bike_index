@@ -3,6 +3,7 @@ class Admin::StolenBikesController < Admin::BaseController
   before_action :find_bike, only: [:edit, :destroy, :update, :regenerate_alert_image]
   before_action :set_period, only: [:index]
   helper_method :available_stolen_records
+  around_action :set_writing_role, only: %i[show edit] # find_or_create_recovery_link_token
 
   def index
     page = params[:page] || 1

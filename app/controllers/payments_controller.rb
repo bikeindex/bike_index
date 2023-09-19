@@ -1,5 +1,6 @@
 class PaymentsController < ApplicationController
   layout "payments_layout"
+  around_action :set_writing_role, only: [:success]
 
   def new
   end

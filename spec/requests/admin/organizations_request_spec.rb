@@ -39,6 +39,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
 
   describe "edit" do
     it "renders" do
+      Country.united_states
       get "#{base_url}/#{organization.to_param}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/edit")

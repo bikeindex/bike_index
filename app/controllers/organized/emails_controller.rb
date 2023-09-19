@@ -3,6 +3,7 @@ module Organized
     skip_before_action :ensure_admin!, only: [:show]
     before_action :ensure_member!, only: [:show]
     before_action :find_mail_snippets, only: [:show, :edit, :update]
+    around_action :set_writing_role, only: %i[show edit] # building things
 
     def index
     end

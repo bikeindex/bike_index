@@ -3,6 +3,7 @@ module Organized
     include SortableTable
     skip_before_action :set_x_frame_options_header, only: [:new_iframe, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
+    around_action :set_writing_role, only: %i[index new_iframe] # Export - TODO, fix!!
 
     def index
       @page = params[:page] || 1

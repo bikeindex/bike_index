@@ -3,6 +3,7 @@ module Organized
     include SortableTable
     before_action :set_period, only: [:index]
     before_action :find_impound_record, except: [:index]
+    around_action :set_writing_role, only: [:index] # fetch_impound_configuration
 
     def index
       @page = params[:page] || 1

@@ -1,6 +1,7 @@
 module Organized
   class ManagesController < Organized::AdminController
     before_action :assign_organization, except: [:landing]
+    around_action :set_writing_role, only: [:show] # ensure_auto_user
 
     def show
       @organization.ensure_auto_user

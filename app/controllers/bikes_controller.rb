@@ -94,22 +94,20 @@ class BikesController < Bikes::BaseController
   end
 
   def new
-    ActiveRecord::Base.connected_to(role: :writing) do
-      unless current_user.present?
-        store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
-        flash[:info] = translation(:please_sign_in_to_register)
-        redirect_to(new_user_path) && return
-      end
-      find_or_new_b_param
-      redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
-      # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
-      flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
-      @bike ||= BikeCreator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
-      # Fallback to active (i.e. passed organization_id), then passive_organization
-      @bike.creation_organization ||= current_organization || passive_organization
-      @organization = @bike.creation_organization
-      @page_errors = @b_param.bike_errors
+    unless current_user.present?
+      store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
+      flash[:info] = translation(:please_sign_in_to_register)
+      redirect_to(new_user_path) && return
     end
+    find_or_new_b_param
+    redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
+    # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
+    flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
+    @bike ||= BikeCreator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
+    # Fallback to active (i.e. passed organization_id), then passive_organization
+    @bike.creation_organization ||= current_organization || passive_organization
+    @organization = @bike.creation_organization
+    @page_errors = @b_param.bike_errors
   end
 
   def create

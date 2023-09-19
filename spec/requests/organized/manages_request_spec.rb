@@ -70,6 +70,7 @@ RSpec.describe Organized::ManagesController, type: :request do
 
     describe "locations" do
       it "renders" do
+        Country.united_states # Read replica
         get "#{base_url}/locations"
         expect(response.status).to eq(200)
         expect(response).to render_template :locations

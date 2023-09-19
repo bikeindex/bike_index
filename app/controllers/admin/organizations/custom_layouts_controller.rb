@@ -1,5 +1,6 @@
 class Admin::Organizations::CustomLayoutsController < Admin::BaseController
   before_action :find_and_authorize_organization
+  around_action :set_writing_role, only: [:edit]
 
   def index
   end
