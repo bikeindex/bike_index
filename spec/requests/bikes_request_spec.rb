@@ -15,7 +15,7 @@ RSpec.describe BikesController, type: :request do
   let(:bike) { ownership.bike }
 
   describe "new" do
-    before { Country.united_states && Organization.example }
+    before { Country.united_states && Organization.example } # Read replica
     it "renders" do
       get "#{base_url}/new"
       expect(response.code).to eq("200")

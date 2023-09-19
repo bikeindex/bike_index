@@ -44,7 +44,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
   context "no current_user" do
     let!(:bike_version) { FactoryBot.create(:bike_version) }
     it "renders" do
-      Flipper.enable :bike_versions # Simpler to just enable it all
+      Flipper.enable :bike_versions
       expect(bike_version.authorized?(current_user)).to be_falsey
       get base_url
       expect(response).to redirect_to(bike_version_path(bike_version))
