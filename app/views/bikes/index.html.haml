@@ -58,6 +58,7 @@
 :javascript
   window.interpreted_params = #{@interpreted_params.to_json};
   window.bike_placeholder_image = "#{bike_placeholder_image_path}";
+  console.log("#{ApplicationRecord.current_role}");
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do
