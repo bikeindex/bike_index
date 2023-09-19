@@ -1,13 +1,15 @@
 class Admin::DashboardController < Admin::BaseController
   def index
-    @period = "week"
-    set_period # graphing set up
-    @organizations = Organization.unscoped.order("created_at DESC").limit(10)
-    bikes = Bike.unscoped.default_includes
-      .includes(:creation_organization, :paint, :recovered_records)
-    bikes = bikes.not_spam unless current_user.su_option?(:no_hide_spam)
-    @bikes = bikes.order(id: :desc).limit(10)
-    @users = User.includes(memberships: [:organization]).limit(5).order(id: :desc)
+    ActiveRecord::Base.connected_to(role: :reading) do
+      @period = "week"
+      set_period # graphing set up
+      @organizations = Organization.unscoped.order("created_at DESC").limit(10)
+      bikes = Bike.unscoped.default_includes
+        .includes(:creation_organization, :paint, :recovered_records)
+      bikes = bikes.not_spam unless current_user.su_option?(:no_hide_spam)
+      @bikes = bikes.order(id: :desc).limit(10)
+      @users = User.includes(memberships: [:organization]).limit(5).order(id: :desc)
+    end
   end
 
   def maintenance
