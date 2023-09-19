@@ -2,6 +2,7 @@ module Organized
   class HotSheetsController < Organized::BaseController
     before_action :ensure_admin!, except: [:show]
     before_action :ensure_access_to_hot_sheet!
+    around_action :set_writing_role
     before_action :set_current_hot_sheet_configuration
 
     def show

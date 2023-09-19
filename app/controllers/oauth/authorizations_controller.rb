@@ -2,6 +2,7 @@ module Oauth
   class AuthorizationsController < Doorkeeper::AuthorizationsController
     include ControllerHelpers
     before_action :authenticate_user_permit_unconfirmed_scope
+    around_action :set_writing_role
 
     private
 

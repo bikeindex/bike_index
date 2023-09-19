@@ -1,4 +1,6 @@
 class InfoController < ApplicationController
+  around_action :set_writing_role, only: [:lightspeed]
+
   def show
     @blog = Blog.friendly_find(params[:id])
     if @blog.blank?
