@@ -27,7 +27,15 @@ test:
 production:
   primary:
     <<: *default
+      host: "<%= ENV['POSTGRESQL_ADDRESS'] %>"
+      database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
+      username: "<%= ENV['POSTGRESQL_USERNAME'] %>"
+      password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
 
   primary_replica:
     <<: *default
     replica: true
+    host: "<%= ENV['POSTGRESQL_ADDRESS'] %>"
+    database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
+    username: "<%= ENV['POSTGRESQL_USERNAME'] %>"
+    password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
