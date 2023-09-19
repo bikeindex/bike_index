@@ -5,6 +5,7 @@ class BikesController < Bikes::BaseController
   skip_before_action :find_bike, except: %i[show update pdf resolve_token]
   skip_before_action :assign_current_organization, except: %i[index show]
   skip_before_action :ensure_user_allowed_to_edit, except: %i[update pdf]
+  around_action :set_reading_role, only: :index
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)

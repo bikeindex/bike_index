@@ -48,6 +48,12 @@ module ControllerHelpers
       Rack::MiniProfiler.current.present?
   end
 
+  def set_reading_role
+    ActiveRecord::Base.connected_to(role: :reading) do
+      yield
+    end
+  end
+
   def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
     translation_key ||= :you_have_to_log_in
 
