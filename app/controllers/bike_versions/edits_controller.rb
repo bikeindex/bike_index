@@ -15,6 +15,4 @@ class BikeVersions::EditsController < BikeVersionsController
 
     render "/bikes_edit/#{@edit_template}".to_sym
   end
-
-  protected
 end

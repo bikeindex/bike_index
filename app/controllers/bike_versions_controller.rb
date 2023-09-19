@@ -1,6 +1,8 @@
 class BikeVersionsController < ApplicationController
   before_action :render_ad, only: %i[index show]
   before_action :find_bike_version, except: %i[index new create]
+  # write mode required because authorize_and_claim_for_user in ensure_user_allowed_to_edit
+  # around_action :set_writing_role, except: %i[index show new create]
   before_action :ensure_user_allowed_to_edit, except: %i[index show new create]
 
   def index
@@ -72,7 +74,8 @@ class BikeVersionsController < ApplicationController
   end
 
   def ensure_user_allowed_to_edit
-    return true if @bike_version.authorized?(current_user)
+    pp "hererere"
+    return if @bike_version.authorized?(current_user)
     flash[:error] = "You don't appear to own that bike version"
     redirect_to(bike_version_path(@bike_version)) && return
   end

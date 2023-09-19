@@ -3,6 +3,7 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   before_action :set_period, only: [:index]
   before_action :find_theft_alert, only: [:edit, :update]
+  around_action :set_writing_role, only: %i[new edit] # find_or_create_recovery_link_token
 
   def index
     @theft_alerts =
