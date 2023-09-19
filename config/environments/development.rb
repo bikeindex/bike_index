@@ -1,4 +1,9 @@
 Rails.application.configure do
+  # Configure database selection
+  config.active_record.database_selector = { delay: 2.seconds }
+  config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
+  config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
+
   # Verifies that versions and hashed value of the package contents in the
   # project's package.json
   config.webpacker.check_yarn_integrity = true
@@ -100,7 +105,7 @@ Rails.application.configure do
 
   # Make sure we reload the API after every request!
   @last_api_change = Time.current
-  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/v2/**/*.rb"]) { |reloader|
+  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/v3/**/*.rb"]) { |reloader|
     times = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| File.mtime(f) }
     files = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| f }
 
