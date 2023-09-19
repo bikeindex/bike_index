@@ -1,6 +1,5 @@
 class BikeVersions::EditsController < BikeVersionsController
   include BikeEditable
-  before_action :ensure_user_allowed_to_edit
 
   def show
     @page_errors = @bike.errors

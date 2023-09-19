@@ -59,6 +59,7 @@ RSpec.describe BikesController, type: :request do
         expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       end
       it "renders a new stolen bike from status" do
+        Country.united_states
         country = FactoryBot.create(:country_canada)
         current_user.update(country_id: country.id)
         get "#{base_url}/new?status=stolen"

@@ -7,6 +7,8 @@ end
 class Bikes::BaseController < ApplicationController
   before_action :find_bike
   before_action :assign_current_organization
+  # write mode required because authorize_and_claim_for_user in ensure_user_allowed_to_edit
+  around_action :set_writing_role
   before_action :ensure_user_allowed_to_edit
 
   protected

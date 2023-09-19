@@ -1,6 +1,8 @@
 class OrganizationsController < ApplicationController
-  before_action :set_bparam, only: [:embed, :embed_extended]
+  around_action :set_writing_role, only: %i[embed embed_extended]
+  before_action :set_bparam, only: %i[embed embed_extended]
   skip_before_action :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
+
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
@@ -40,20 +42,24 @@ class OrganizationsController < ApplicationController
   # previously accepted stolen_first=true as a parameter.
   # Stopped accepting in PR#1875, because consistency, use stolen=true instead
   def embed
-    @bike = BikeCreator.new.build_bike(@b_param)
-    @bike.owner_email = params[:email] if params[:email].present?
-    @stolen_record = built_stolen_record
-    @stolen = @bike.status_stolen?
-    render layout: "embed_layout"
+    ActiveRecord::Base.connected_to(role: :writing) do
+      @bike = BikeCreator.new.build_bike(@b_param)
+      @bike.owner_email = params[:email] if params[:email].present?
+      @stolen_record = built_stolen_record
+      @stolen = @bike.status_stolen?
+      render layout: "embed_layout"
+    end
   end
 
   def embed_extended
-    @bike = BikeCreator.new.build_bike(@b_param)
-    if params[:email].present?
-      @bike.owner_email = params[:email]
-      @persist_email = true unless defined?(@persist_email)
+    ActiveRecord::Base.connected_to(role: :writing) do
+      @bike = BikeCreator.new.build_bike(@b_param)
+      if params[:email].present?
+        @bike.owner_email = params[:email]
+        @persist_email = true unless defined?(@persist_email)
+      end
+      render layout: "embed_layout"
     end
-    render layout: "embed_layout"
   end
 
   def embed_create_success

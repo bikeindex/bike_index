@@ -3,6 +3,7 @@ require "rails_helper"
 base_url = "/organizations"
 RSpec.describe OrganizationsController, type: :request do
   describe "new" do
+    before { Country.united_states } # Read mode!
     context "with out user" do
       it "renders" do
         get "#{base_url}/new"
