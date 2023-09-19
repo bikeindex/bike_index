@@ -110,6 +110,7 @@ gem "stackprof", require: false
 
 gem "responders"
 gem "thor"
+gem "net-http" # Required to remove error printouts, PR#2408
 
 source "https://rails-assets.org" do # JS land is crazy, so lock everything
   gem "rails-assets-jquery", "~> 3.4.1"

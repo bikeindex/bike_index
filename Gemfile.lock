@@ -437,6 +437,8 @@ GEM
       mustermann (>= 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
+    net-http (0.3.2)
+      uri
     net-imap (0.3.7)
       date
       net-protocol
@@ -719,6 +721,7 @@ GEM
     unicode-display_width (2.2.0)
     unicode_utils (1.4.0)
     uniform_notifier (1.14.2)
+    uri (0.12.2)
     user_agent_parser (2.7.0)
     vcr (5.0.0)
     vegas (0.1.11)
@@ -796,6 +799,7 @@ DEPENDENCIES
   mini_magick
   money-rails (~> 1.11)
   multi_json
+  net-http
   oj
   omniauth (~> 1.6)
   omniauth-facebook
