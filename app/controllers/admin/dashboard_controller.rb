@@ -1,5 +1,5 @@
 class Admin::DashboardController < Admin::BaseController
-  around_action :set_reading_role, only: :index
+  around_action :set_reading_role, only: [:index]
 
   def index
     @period = "week"
