@@ -18,7 +18,7 @@ class TimeParser
       Time.zone = DEFAULT_TIMEZONE
       time
     end
-  rescue ArgumentError => e
+  rescue ArgumentError
     # Try to parse some other, unexpected formats -
     paychex_formatted = %r{(?<month>\d+)/(?<day>\d+)/(?<year>\d+) (?<hour>\d\d):(?<minute>\d\d) (?<ampm>\w\w)}.match(time_str)
     ie11_formatted = %r{(?<month>\d+)/(?<day>\d+)/(?<year>\d+)}.match(time_str)
