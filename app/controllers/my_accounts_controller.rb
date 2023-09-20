@@ -2,7 +2,7 @@ class MyAccountsController < ApplicationController
   include Sessionable
   before_action :assign_edit_template, only: %i[edit update]
   before_action :authenticate_user_for_my_accounts_controller
-  around_action :set_writing_role, only: %i[show edit] # user_general_alert garbage
+  around_action :set_writing_role, only: %i[show edit] # ensure user_general_alert updates
 
   def show
     page = params[:page] || 1
