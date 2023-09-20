@@ -24,7 +24,7 @@
               = submit_tag modal_title, class: "btn btn-success btn-lg"
 
     = render partial: "shared/modal", locals: { title: modal_title, modal_body: modal_body, id: "confirmPhoneNumber" }
-  - else
+  - elsif ApplicationRecord.current_role != :reading # Only update if not in read mode
     -# Gross hack to force updating, the phone waiting for confirmation has expired
     - current_user.update(updated_at: Time.current, skip_update: false)
 
