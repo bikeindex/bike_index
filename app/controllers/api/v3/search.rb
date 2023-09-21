@@ -112,8 +112,10 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/close_serials" do
-          close_serials = Bike.search_close_serials(interpreted_params)
-          serialized_bikes_results(paginate(close_serials))
+          ActiveRecord::Base.connected_to(role: :reading) do
+            close_serials = Bike.search_close_serials(interpreted_params)
+            serialized_bikes_results(paginate(close_serials))
+          end
         end
 
         desc "Search by substring-match against serial number", {
@@ -130,8 +132,10 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/serials_containing" do
-          results = Bike.search_serials_containing(interpreted_params)
-          serialized_bikes_results(paginate(results))
+          ActiveRecord::Base.connected_to(role: :reading) do
+            results = Bike.search_serials_containing(interpreted_params)
+            serialized_bikes_results(paginate(results))
+          end
         end
 
         desc "Search external registries", {
