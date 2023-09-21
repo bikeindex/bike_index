@@ -263,9 +263,18 @@ class StolenRecord < ApplicationRecord
   end
 
   def find_or_create_recovery_link_token
-    return recovery_link_token if recovery_link_token.present?
-    update(recovery_link_token: SecurityTokenizer.new_token)
-    recovery_link_token
+    return @find_or_create_recovery_link_token if defined?(@find_or_create_recovery_link_token)
+
+    @find_or_create_recovery_link_token = if recovery_link_token
+      recovery_link_token
+    elsif ApplicationRecord.current_role != :reading
+      # set recovery_link_token, unless in read replica
+      update(recovery_link_token: SecurityTokenizer.new_token, skip_update: true)
+      recovery_link_token
+    else
+      enqueue_worker
+      nil
+    end
   end
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
@@ -279,7 +288,17 @@ class StolenRecord < ApplicationRecord
   end
 
   def current_alert_image
-    alert_image || generate_alert_image
+    return @current_alert_image if defined?(@current_alert_image)
+
+    @current_alert_image = if alert_image
+      alert_image
+    elsif ApplicationRecord.current_role != :reading
+      # Generate alert image, unless in read replica
+      generate_alert_image
+    else
+      enqueue_worker
+      nil
+    end
   end
 
   # Generate the "promoted alert image"
@@ -321,6 +340,11 @@ class StolenRecord < ApplicationRecord
   end
 
   private
+
+  # The read replica can't make database changes, but can enqueue the worker - which will make the changes
+  def enqueue_worker
+    AfterStolenRecordSaveWorker.perform_async(id)
+  end
 
   def notify_of_promoted_alert_recovery
     return unless recovered? && theft_alerts.any?

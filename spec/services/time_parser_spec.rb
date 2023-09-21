@@ -71,10 +71,8 @@ RSpec.describe TimeParser do
       end
     end
     context "not a date" do
-      it "errors" do
-        expect {
-          subject.parse("3fbd3770-1b71-4f21-8647-a1804e404aca")
-        }.to raise_error(ArgumentError)
+      it "returns nil" do
+        expect(subject.parse("3fbd3770-1b71-4f21-8647-a1804e404aca")).to be_nil
       end
     end
   end
