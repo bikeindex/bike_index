@@ -268,7 +268,7 @@ class StolenRecord < ApplicationRecord
     @find_or_create_recovery_link_token = if recovery_link_token
       recovery_link_token
     elsif ApplicationRecord.current_role != :reading
-      # Generate alert image, unless in read replica
+      # set recovery_link_token, unless in read replica
       update(recovery_link_token: SecurityTokenizer.new_token, skip_update: true)
       recovery_link_token
     else
@@ -341,7 +341,7 @@ class StolenRecord < ApplicationRecord
 
   private
 
-  # The read replica can't
+  # The read replica can't make database changes, but can enqueue the worker - which will make the changes
   def enqueue_worker
     AfterStolenRecordSaveWorker.perform_async(id)
   end

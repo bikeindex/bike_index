@@ -344,7 +344,8 @@ RSpec.describe "BikesController#update", type: :request do
           expect(flash[:success]).to be_present
         end
         bike.reload
-        stolen_record.reload
+        # Unmemoize @current_alert_image
+        stolen_record = StolenRecord.find(bike.current_stolen_record.id)
         stolen_record.current_alert_image
         stolen_record.reload
 

@@ -32,6 +32,7 @@ RSpec.describe Admin::DashboardController, type: :request do
       let(:timezone) { "America/Los_Angeles" }
       let(:time_range_start) { Time.now.in_time_zone(timezone).beginning_of_day - 7.days }
       it "renders, sets timezone from params and skips likely_spam by default" do
+        Organization.example && Cgroup.additional_parts # Read replica
         bike2 = FactoryBot.create(:bike, :with_ownership, likely_spam: true)
         get "/admin", params: {timezone: timezone}
         expect(response.code).to eq "200"
@@ -49,6 +50,7 @@ RSpec.describe Admin::DashboardController, type: :request do
       end
       context "passing nonsense timezone" do
         it "doesn't set the timezone" do
+          Organization.example && Cgroup.additional_parts # Read replica
           get "/admin", params: {timezone: "party-zone"}
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
@@ -76,8 +78,8 @@ RSpec.describe Admin::DashboardController, type: :request do
 
     describe "maintenance" do
       it "renders" do
+        Organization.example && Cgroup.additional_parts && Ctype.other # Read replica
         FactoryBot.create(:manufacturer, name: "other")
-        FactoryBot.create(:ctype, name: "other")
         BParam.create(creator_id: current_user.id)
         get "/admin/maintenance"
         expect(response.code).to eq "200"
