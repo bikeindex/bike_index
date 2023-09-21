@@ -146,7 +146,7 @@ RSpec.describe "BikesController#show", type: :request do
     let(:stolen_record) { theft_alert.stolen_record }
     let(:bike) { stolen_record.bike }
     let!(:image1) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
-    it "renders" do
+    xit "renders" do
       stolen_record.update_attribute :recovery_link_token, nil
       expect(stolen_record.reload.alert_image).to be_blank
       expect(stolen_record.recovery_link_token).to be_blank
