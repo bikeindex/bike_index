@@ -18,7 +18,7 @@ class TimeParser
       Time.zone = DEFAULT_TIMEZONE
       time
     end
-  rescue ArgumentError => e
+  rescue ArgumentError
     # Try to parse some other, unexpected formats -
     paychex_formatted = %r{(?<month>\d+)/(?<day>\d+)/(?<year>\d+) (?<hour>\d\d):(?<minute>\d\d) (?<ampm>\w\w)}.match(time_str)
     ie11_formatted = %r{(?<month>\d+)/(?<day>\d+)/(?<year>\d+)}.match(time_str)
@@ -27,7 +27,7 @@ class TimeParser
 
     # Get the successful matching regex group, and then reformat it in an expected way
     regex_match = [paychex_formatted, ie11_formatted, just_date, just_date_backward].compact.first
-    raise e unless regex_match.present?
+    return nil unless regex_match.present?
 
     new_str = %w[year month day]
       .map { |component| regex_match[component] if regex_match.names.include?(component) }
@@ -35,7 +35,7 @@ class TimeParser
       .join("-")
 
     # If we end up with an unreasonable year, throw an error
-    raise e unless new_str.split("-").first.to_i.between?(EARLIEST_YEAR, LATEST_YEAR)
+    return nil unless new_str.split("-").first.to_i.between?(EARLIEST_YEAR, LATEST_YEAR)
     # Add the day, if there isn't one
     new_str += "-01" unless regex_match.names.include?("day")
     # If it's paychex_formatted there is an hour and minute
