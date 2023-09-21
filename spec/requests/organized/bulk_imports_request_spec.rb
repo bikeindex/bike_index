@@ -58,6 +58,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
 
       describe "new" do
         it "renders" do
+          Country.united_states # Read replica
           get "#{base_url}/new"
           expect(response.status).to eq(200)
           expect(response).to render_template :new
@@ -150,6 +151,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
         context "all kinds" do
           let!(:current_organization) { everything_organization }
           it "renders" do
+            Country.united_states # Read replica
             get "#{base_url}/new"
             expect(response.status).to eq(200)
             expect(response).to render_template :new
