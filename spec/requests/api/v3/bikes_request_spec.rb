@@ -100,6 +100,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(user.unconfirmed?).to be_truthy
         expect(token.resource_owner_id).to eq user.id
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        pp json_result
         expect(response.code).to eq("403")
       end
     end
@@ -462,7 +463,7 @@ RSpec.describe "Bikes API V3", type: :request do
         front_gear_type_slug: front_gear_type.slug,
         handlebar_type_slug: handlebar_type_slug,
         is_for_sale: true,
-        propulsion_type: "throttle",
+        propulsion_type_name: "Pedal Assist",
         is_bulk: true,
         is_new: true,
         extra_registration_number: "serial:#{bike_attrs[:serial]}",
@@ -472,6 +473,7 @@ RSpec.describe "Bikes API V3", type: :request do
         description: "<svg/onload=alert(document.cookie)>")
       expect {
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        pp json_result
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(response.code).to eq("201")
       result = json_result["bike"]
@@ -490,7 +492,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       expect(bike.extra_registration_number).to be_nil
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
-      expect(bike.propulsion_type).to eq "throttle"
+      expect(bike.propulsion_type).to eq "pedal-assist"
       ownership = bike.current_ownership
       expect(ownership.pos?).to be_truthy
       expect(ownership.is_new).to be_truthy

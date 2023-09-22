@@ -44,7 +44,11 @@ module Enumable
       end
       slug = (slugs & [str]).first
       slug ||= self::NAMES.detect do |k, v|
-        ([k.to_s, v.downcase] + v.downcase.strip.split(" or ")).include?(str)
+        v_down = v.downcase
+        (
+          [k.to_s, v_down] + v_down.delete(")").split("(").map(&:strip) +
+          v_down.strip.split(" or ")
+        ).include?(str)
       end&.first
       slug&.to_sym
     end

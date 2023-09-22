@@ -6,7 +6,7 @@ class PropulsionType
     "pedal-assist": 1,
     throttle: 2,
     "hand-pedal": 3,
-    "other-propulsion": 4
+    "propulsion-other": 4
   }.freeze
 
   NAMES = {
@@ -14,7 +14,7 @@ class PropulsionType
     "pedal-assist": "Pedal Assist",
     throttle: "Electric throttle",
     "hand-pedal": "Hand cycle (hand pedal)",
-    "other-propulsion": "Other style"
+    "propulsion-other": "Other style"
   }.freeze
 
   def initialize(slug)

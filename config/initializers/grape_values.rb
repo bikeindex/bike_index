@@ -1,6 +1,5 @@
 CYCLE_TYPE_NAMES = CycleType::NAMES.values.map(&:downcase)
-PROPULSION_TYPES = PropulsionType::SLUGS
-
+PROPULSION_TYPE_NAMES = PropulsionType::NAMES.values.map(&:downcase)
 
 if Rails.env.test?
   CTYPE_NAMES = ["wheel", "headset"]

@@ -1,6 +1,11 @@
 require "rails_helper"
 
 RSpec.describe PropulsionType, type: :model do
+  describe "find_sym" do
+    it "finds" do
+      expect(PropulsionType.find_sym("hand cycle")).to eq :"hand-pedal"
+    end
+  end
   describe "normalized name" do
     let(:slug) { :"pedal-assist" }
 
