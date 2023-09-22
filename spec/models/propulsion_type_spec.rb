@@ -20,7 +20,7 @@ RSpec.describe PropulsionType, type: :model do
       let(:name) { "Other style" }
       it "tries to find the slug, given a name" do
         finder = PropulsionType.friendly_find(name)
-        expect(finder.slug).to eq :"other-propulsion"
+        expect(finder.slug).to eq :"propulsion-other"
       end
     end
   end

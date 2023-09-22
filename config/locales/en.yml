@@ -727,7 +727,7 @@ en:
       propulsion_type:
         foot_pedal: Foot pedal
         hand_pedal: Hand pedal
-        other_propulsion: Other style
+        propulsion_other: Other style
         pedal_assist: Pedal Assist
         throttle: throttle
     errors:
