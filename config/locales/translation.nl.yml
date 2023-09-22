@@ -869,9 +869,9 @@ nl:
       propulsion_type:
         foot_pedal: Voetpedaal
         hand_pedal: Handpedaal
-        other_propulsion: Andere stijl
         pedal_assist: Elektrische assist
         throttle: Elektrisch gaspedaal
+        propulsion_other: Andere stijl
     models:
       ad: Advertentie
       ambassador: Ambassadeur
