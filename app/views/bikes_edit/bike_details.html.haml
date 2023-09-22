@@ -113,7 +113,7 @@
                 = f.label :frame_material, class: "form-well-label"
                 %p.form-well-input-static
                   = @bike.frame_material_name
-            - if @bike.frame_material.present?
+            - if @bike.frame_size.present?
               .form-group.row
                 = f.label :frame_size, class: "form-well-label"
                 %p.form-well-input-static
