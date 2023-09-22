@@ -1479,7 +1479,7 @@ RSpec.describe Bike, type: :model do
     let(:wheel_size) { FactoryBot.create(:wheel_size) }
     let(:bike) { FactoryBot.create(:bike, rear_wheel_size: wheel_size) }
     let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
-    let(:target_cached_string) { "#{bike.mnfg_name} Electric throttle 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
+    let(:target_cached_string) { "#{bike.mnfg_name} Electric Throttle 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
     it "caches all the bike parts" do
       bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: FactoryBot.create(:color).id,

@@ -10,11 +10,11 @@ class PropulsionType
   }.freeze
 
   NAMES = {
-    "foot-pedal": "Foot pedal",
+    "foot-pedal": "Foot Pedal",
     "pedal-assist": "Pedal Assist",
-    throttle: "Electric throttle",
-    "hand-pedal": "Hand cycle (hand pedal)",
-    "propulsion-other": "Other style"
+    throttle: "Electric Throttle",
+    "hand-pedal": "Hand Cycle (hand pedal)",
+    "propulsion-other": "Other Style"
   }.freeze
 
   def initialize(slug)
