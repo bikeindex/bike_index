@@ -68,7 +68,7 @@ RSpec.shared_examples "bike_attributable" do
   end
 
   describe "propulsion_type_name" do
-    let(:obj) { FactoryBot.build(model_sym, propulsion_type: "electric-assist") }
+    let(:obj) { FactoryBot.build(model_sym, propulsion_type: "pedal-assist") }
     it "returns the normalized name" do
       normalized_name = PropulsionType.new(obj.propulsion_type).name
       expect(obj.propulsion_type_name).to eq(normalized_name)

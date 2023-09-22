@@ -728,8 +728,8 @@ en:
         foot_pedal: Foot pedal
         hand_pedal: Hand pedal
         other_propulsion: Other style
-        pedal_assist: Electric Assist
-        throttle: Electric throttle
+        pedal_assist: Pedal Assist
+        throttle: throttle
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.

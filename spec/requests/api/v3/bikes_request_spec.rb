@@ -462,6 +462,7 @@ RSpec.describe "Bikes API V3", type: :request do
         front_gear_type_slug: front_gear_type.slug,
         handlebar_type_slug: handlebar_type_slug,
         is_for_sale: true,
+        propulsion_type: "throttle",
         is_bulk: true,
         is_new: true,
         extra_registration_number: "serial:#{bike_attrs[:serial]}",
@@ -489,6 +490,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       expect(bike.extra_registration_number).to be_nil
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
+      expect(bike.propulsion_type).to eq "throttle"
       ownership = bike.current_ownership
       expect(ownership.pos?).to be_truthy
       expect(ownership.is_new).to be_truthy

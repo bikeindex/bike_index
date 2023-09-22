@@ -4,7 +4,7 @@ class PropulsionType
   SLUGS = {
     "foot-pedal": 0,
     "pedal-assist": 1,
-    "throttle": 2,
+    throttle: 2,
     "hand-pedal": 3,
     "other-propulsion": 4
   }.freeze
@@ -12,7 +12,7 @@ class PropulsionType
   NAMES = {
     "foot-pedal": "Foot pedal",
     "pedal-assist": "Pedal Assist",
-    "throttle": "Electric throttle",
+    throttle: "Electric throttle",
     "hand-pedal": "Hand cycle (hand pedal)",
     "other-propulsion": "Other style"
   }.freeze
