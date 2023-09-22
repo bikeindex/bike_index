@@ -1,5 +1,5 @@
 CYCLE_TYPE_NAMES = CycleType::NAMES.values.map(&:downcase)
-PROPULTION_TYPES = PropulsionType::SLUGS
+PROPULSION_TYPES = PropulsionType::SLUGS
 
 
 if Rails.env.test?
