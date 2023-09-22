@@ -2,11 +2,11 @@ require "rails_helper"
 
 RSpec.describe PropulsionType, type: :model do
   describe "normalized name" do
-    let(:slug) { :insufflation }
+    let(:slug) { :"pedal-assist" }
 
     it "returns the slug's normalized name" do
       pt = PropulsionType.new(slug)
-      expect(pt.name).to eq("Insufflation")
+      expect(pt.name).to eq("Pedal Assist")
     end
   end
 
@@ -15,7 +15,7 @@ RSpec.describe PropulsionType, type: :model do
       let(:name) { "Other style" }
       it "tries to find the slug, given a name" do
         finder = PropulsionType.friendly_find(name)
-        expect(finder.slug).to eq :"other-style"
+        expect(finder.slug).to eq :"other-propulsion"
       end
     end
   end

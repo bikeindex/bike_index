@@ -725,14 +725,11 @@ en:
         other: Not handlebars
         rearward: Rear facing
       propulsion_type:
-        electric_assist: Electric Assist
-        electric_throttle: Electric throttle
+        pedal_assist: Electric Assist
+        throttle: Electric throttle
         foot_pedal: Foot pedal
-        gas: Gas
         hand_pedal: Hand pedal
-        insufflation: Insufflation
-        other_style: Other style
-        sail: Sail
+        other_propulsion: Other style
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.
