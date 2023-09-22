@@ -24,7 +24,7 @@ module API
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
           optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
           optional :bike_sticker, type: String, desc: "Bike Sticker code"
-          optional :propulsion_type_name, type: String, values: PROPULSION_TYPE_NAMES, default: "foot pedal"
+          optional :propulsion_type_name, type: String, values: PROPULSION_TYPE_NAMES, default: "foot pedal", desc: "Propulsion Type name (lowercase)"
 
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
@@ -135,7 +135,7 @@ module API
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
           requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           requires :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
-          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
+          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Cycle type name (lowercase)"
           use :bike_attrs
         end
         post "check_if_registered" do
