@@ -100,7 +100,6 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(user.unconfirmed?).to be_truthy
         expect(token.resource_owner_id).to eq user.id
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-        pp json_result
         expect(response.code).to eq("403")
       end
     end
@@ -220,6 +219,7 @@ RSpec.describe "Bikes API V3", type: :request do
             rear_tire_narrow: true,
             front_wheel_bsd: new_front_wheel_size.iso_bsd,
             rear_wheel_bsd: new_rear_wheel_size.iso_bsd,
+            propulsion_type_slug: "hand-pedal",
             color: new_color.name,
             year: new_year,
             owner_email: user.email,
@@ -239,6 +239,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
           expect(bike2["rear_tire_narrow"]).to eq(true)
           expect(bike2["frame_material_slug"]).to eq("steel")
+          expect(bike2["propulsion_type_slug"]).to eq "hand-pedal"
 
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_truthy
@@ -463,7 +464,7 @@ RSpec.describe "Bikes API V3", type: :request do
         front_gear_type_slug: front_gear_type.slug,
         handlebar_type_slug: handlebar_type_slug,
         is_for_sale: true,
-        propulsion_type_name: "pedal assist",
+        propulsion_type_slug: "pedal-assist",
         is_bulk: true,
         is_new: true,
         extra_registration_number: "serial:#{bike_attrs[:serial]}",

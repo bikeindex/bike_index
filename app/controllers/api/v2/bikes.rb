@@ -24,7 +24,7 @@ module API
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
           optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
           optional :bike_sticker, type: String, desc: "Bike Sticker code"
-          optional :propulsion_type_name, type: String, values: PROPULSION_TYPE_NAMES, default: "foot pedal", desc: "Propulsion Type name (lowercase)"
+          optional :propulsion_type_slug, type: String, values: PROPULSION_TYPES, default: "foot-pedal", desc: "Propulsion Type slug"
 
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"

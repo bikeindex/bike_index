@@ -152,7 +152,7 @@ RSpec.describe BikeCreator do
         let(:bike_params) do
           default_params.merge(
             creation_organization_id: organization.id,
-            propulsion_type_name: "Hand Pedal",
+            propulsion_type_slug: "hand-pedal",
             cycle_type: "stroller",
             serial_number: "BIKE TOKENd",
             rear_tire_narrow: false,
@@ -172,7 +172,7 @@ RSpec.describe BikeCreator do
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.registration_address).to eq({"street" => "Somewhere Ville"})
-          expect_attrs_to_match_hash(bike, bike_params.except(:user_name, :propulsion_type_name))
+          expect_attrs_to_match_hash(bike, bike_params.except(:user_name, :propulsion_type_slug))
           # Test that front_wheel is assigned via rear wheel attr
           expect(bike.front_wheel_size_id).to eq wheel_size.id
           expect(bike.front_tire_narrow).to be_falsey

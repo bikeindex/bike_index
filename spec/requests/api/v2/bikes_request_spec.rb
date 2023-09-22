@@ -126,7 +126,7 @@ RSpec.describe "Bikes API V2", type: :request do
         front_gear_type_slug: front_gear_type.slug,
         handlebar_type_slug: handlebar_type_slug,
         is_for_sale: true,
-        propulsion_type_name: "other style",
+        propulsion_type_slug: "propulsion-other",
         is_bulk: true,
         is_new: true,
         is_pos: true)

@@ -124,7 +124,7 @@ module BikeAttributable
     PropulsionType.new(propulsion_type).name
   end
 
-  def propulsion_type_name=(val)
+  def propulsion_type_slug=(val)
     self.propulsion_type = PropulsionType.find_sym(val)
   end
 
