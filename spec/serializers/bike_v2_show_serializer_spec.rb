@@ -76,7 +76,8 @@ RSpec.describe BikeV2ShowSerializer do
         external_id: nil,
         registry_name: nil,
         registry_url: nil,
-        status: "with owner"
+        status: "with owner",
+        propulsion_type_slug: "foot-pedal"
       }
     end
 

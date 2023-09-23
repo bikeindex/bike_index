@@ -31,7 +31,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       FactoryBot.create(:bike, :with_ownership_claimed,
         cycle_type: "cargo",
         handlebar_type: "rearward",
-        propulsion_type: "electric-assist",
+        propulsion_type: "pedal-assist",
         frame_material: "organic",
         year: 1969,
         name: "My cool bike",
@@ -101,7 +101,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(bike_version.frame_colors).to eq([color1.name, "Black", color2.name])
       expect(bike_version.cycle_type_name).to eq "Cargo Bike (front storage)"
       expect(bike_version.handlebar_type_name).to eq "Rear facing"
-      expect(bike_version.propulsion_type_name).to eq "Electric Assist"
+      expect(bike_version.propulsion_type_name).to eq "Pedal Assist"
       expect(bike_version.frame_material_name).to eq "Wood or organic material"
       expect(bike_version.name).to eq "My cool bike, Version 1"
       expect(bike_version.year).to eq 1969
