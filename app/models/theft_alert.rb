@@ -140,6 +140,10 @@ class TheftAlert < ApplicationRecord
     latitude.blank? && longitude.blank?
   end
 
+  def paid_at
+    payment&.first_payment_date
+  end
+
   def address_string
     stolen_record&.address(force_show_address: true, country: [:iso])
   end

@@ -41,11 +41,7 @@
               %span.text-success activating!
             - else
               - unless theft_alert.recovered? && theft_alert.inactive?
-                - text_class = "text-info" if theft_alert.active?
-                - text_class ||= "text-warning" if theft_alert.pending?
-                - text_class ||= "less-strong small" if theft_alert.inactive?
-                - text_class += " small" if theft_alert.recovered?
-                %span{ class: text_class || "" }
+                %span{class: theft_alert_status_class(theft_alert)}
                   = theft_alert.status
               - if theft_alert.pending?
                 - if theft_alert.activateable?
