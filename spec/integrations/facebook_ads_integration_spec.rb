@@ -114,7 +114,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
 
         describe "objective OUTCOME_ENGAGEMENT" do
           let(:campaign_id) { "6449469501014" }
-          let(:adset_id) { "6449561360614" }
+          let(:adset_id) { "6449656709814" }
           it "creates an alert" do
             stub_const("Facebook::AdsIntegration::OBJECTIVE", "OUTCOME_ENGAGEMENT")
             VCR.use_cassette("facebook/ads_integration-create_ad-engagement", match_requests_on: [:method]) do
