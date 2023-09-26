@@ -872,6 +872,7 @@ nl:
         pedal_assist: Elektrische assist
         throttle: Elektrisch gaspedaal
         propulsion_other: Andere stijl
+        pedal_assist_and_throttle: Trapondersteuning en gaspedaal
     models:
       ad: Advertentie
       ambassador: Ambassadeur
