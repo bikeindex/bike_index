@@ -63,6 +63,12 @@ class TheftAlert < ApplicationRecord
     paid.sum("payments.amount_cents")
   end
 
+  def self.facebook_integration
+    "Facebook::AdsIntegration".constantize
+  rescue
+    nil
+  end
+
   # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?
@@ -201,6 +207,16 @@ class TheftAlert < ApplicationRecord
     facebook_data&.dig("engagement") || {}
   end
 
+  def objective_campaign
+    return nil if campaign_id.blank?
+    facebook_data&.dig("objective_campaign") || default_objective("campaign")
+  end
+
+  def objective_adset
+    return nil if campaign_id.blank?
+    facebook_data&.dig("objective_campaign") || default_objective("adset")
+  end
+
   def message
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
@@ -240,5 +256,14 @@ class TheftAlert < ApplicationRecord
 
   def calculated_cents_facebook_spent
     facebook_data&.dig("spend_cents")
+  end
+
+  def default_objective(target)
+    return nil if self.class.facebook_integration.blank?
+    if target == "campaign"
+      Facebook::AdsIntegration::OBJECTIVE_DEFAULT
+    else
+      Facebook::AdsIntegration::ADSET_OBJECTIVE_DEFAULT
+    end
   end
 end
