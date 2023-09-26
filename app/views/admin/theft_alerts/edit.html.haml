@@ -118,6 +118,14 @@
             - if @theft_alert.admin
               %small.text-info admin:
             = link_to @theft_alert.user.display_name, edit_admin_user_path(@theft_alert.user.to_param)
+        %tr
+          %td Campaign Objective
+          %td
+            %code= @theft_alert.objective_campaign
+        %tr
+          %td Adset Objective
+          %td
+            %code= @theft_alert.objective_adset
 
   .col-sm-6
     %table.table-list

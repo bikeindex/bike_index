@@ -201,6 +201,14 @@ class TheftAlert < ApplicationRecord
     facebook_data&.dig("engagement") || {}
   end
 
+  def objective_campaign
+    facebook_data&.dig("objective_campaign") || Facebook::AdsIntegration::OBJECTIVE_DEFAULT
+  end
+
+  def objective_adset
+    facebook_data&.dig("objective_campaign") || Facebook::AdsIntegration::ADSET_OBJECTIVE_DEFAULT
+  end
+
   def message
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
