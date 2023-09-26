@@ -20,6 +20,8 @@
           = sortable "start_at", "Start", render_sortable: render_sortable
         %th
           = sortable "end_at", render_sortable: render_sortable
+        - if display_dev_info?
+          %th.only-dev-visible.small FB updated
         %th
           = sortable "reach", render_sortable: render_sortable
         %th.small Clicks
@@ -75,7 +77,13 @@
           %td
             %small.convertTime= l(theft_alert.start_at, format: :convert_time) if theft_alert.start_at.present?
           %td
-            %small.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
+            - if theft_alert.end_at.present?
+              %small.convertTime= l(theft_alert.end_at, format: :convert_time)
+
+          - if display_dev_info?
+            %td
+              - if theft_alert.facebook_updated_at.present?
+                %small.convertTime= l theft_alert.facebook_updated_at, format: :convert_time
           %td
             = admin_number_display(theft_alert.reach)
           %td
