@@ -209,11 +209,13 @@ class TheftAlert < ApplicationRecord
   end
 
   def objective_campaign
-    facebook_data&.dig("objective_campaign") || facebook_integration && facebook_integration::OBJECTIVE_DEFAULT
+    return nil if campaign_id.blank?
+    facebook_data&.dig("objective_campaign") || default_objective("campaign")
   end
 
   def objective_adset
-    facebook_data&.dig("objective_campaign") || facebook_integration && facebook_integration::ADSET_OBJECTIVE_DEFAULT
+    return nil if campaign_id.blank?
+    facebook_data&.dig("objective_campaign") || default_objective("adset")
   end
 
   def message
@@ -255,5 +257,14 @@ class TheftAlert < ApplicationRecord
 
   def calculated_cents_facebook_spent
     facebook_data&.dig("spend_cents")
+  end
+
+  def default_objective(target)
+    return nil if self.class.facebook_integration.blank?
+    if target == "campaign"
+      Facebook::AdsIntegration::OBJECTIVE_DEFAULT
+    else
+      Facebook::AdsIntegration::ADSET_OBJECTIVE_DEFAULT
+    end
   end
 end
