@@ -178,6 +178,17 @@ module AdminHelper
     end
   end
 
+  def theft_alert_status_class(theft_alert)
+    text_class = if theft_alert.active?
+      "text-info"
+    elsif theft_alert.pending?
+      "text-warning"
+    elsif theft_alert.inactive?
+      "less-strong small"
+    end
+    theft_alert.recovered? ? text_class + " small" : text_class
+  end
+
   private
 
   def org_icon_text(kind:, paid:)

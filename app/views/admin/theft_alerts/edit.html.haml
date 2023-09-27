@@ -2,6 +2,10 @@
 
 %h2.mt-4
   Facebook data
+  %small.ml-1
+    alert status:
+    %span{class: theft_alert_status_class(@theft_alert)}
+      = @theft_alert.status
 %h4
   - if @theft_alert.facebook_updateable?
     = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
@@ -79,12 +83,19 @@
             - if @theft_alert.activating_at.present?
               %span.convertTime
                 = l @theft_alert.activating_at, format: :convert_time
+              %small.ml-2.less-strong
+                = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
+                after payment
         %tr
           %td last FB update
           %td
             - if @theft_alert.facebook_updated_at.present?
               %span.convertTime
                 = l @theft_alert.facebook_updated_at, format: :convert_time
+              %small.ml-2.less-strong
+                = @theft_alert.live? ? "alert ends" : "alert ended"
+                %span.convertTime
+                  = l @theft_alert.end_at, format: :convert_time
         %tr
           %td Notify?
           %td
@@ -107,6 +118,18 @@
             - if @theft_alert.admin
               %small.text-info admin:
             = link_to @theft_alert.user.display_name, edit_admin_user_path(@theft_alert.user.to_param)
+        %tr
+          %td
+            Campaign
+            %small Objective
+          %td
+            %code= @theft_alert.objective_campaign
+        %tr
+          %td
+            Adset
+            %small Objective
+          %td
+            %code= @theft_alert.objective_adset
 
   .col-sm-6
     %table.table-list

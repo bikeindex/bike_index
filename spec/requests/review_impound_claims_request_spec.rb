@@ -125,8 +125,9 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
           expect(mail.to).to eq([impound_claim.user.email])
           expect(mail.reply_to).to eq([current_user.email])
           expect(mail.subject).to eq "Your impound claim was approved"
-          # It escapes things
-          expect(mail.body.encoded).to match "RESponse=MESSAGE&lt;alert&gt;"
+          expect(impound_claim.reload.response_message).to eq response_message
+          # It escapes things - added '3D' in PR#2408 unclear why it was necessary
+          expect(mail.body.encoded).to match "RESponse=3DMESSAGE&lt;alert&gt;"
 
           expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
           expect(assigns(:impound_claim)).to eq impound_claim

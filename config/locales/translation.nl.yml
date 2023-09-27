@@ -867,14 +867,12 @@ nl:
         rearward: Achterzijde gericht
         drop_bar: Laten vallen
       propulsion_type:
-        electric_assist: Elektrische assist
-        electric_throttle: Elektrisch gaspedaal
         foot_pedal: Voetpedaal
-        gas: Gas
         hand_pedal: Handpedaal
-        insufflation: het inblazen
-        other_style: Andere stijl
-        sail: Zeil
+        pedal_assist: Elektrische assist
+        throttle: Elektrisch gaspedaal
+        propulsion_other: Andere stijl
+        pedal_assist_and_throttle: Trapondersteuning en gaspedaal
     models:
       ad: Advertentie
       ambassador: Ambassadeur

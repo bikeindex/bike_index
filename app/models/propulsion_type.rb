@@ -3,24 +3,20 @@ class PropulsionType
 
   SLUGS = {
     "foot-pedal": 0,
-    "hand-pedal": 1,
-    sail: 2,
-    insufflation: 3,
-    "electric-assist": 4,
-    "electric-throttle": 5,
-    gas: 6,
-    "other-style": 7
+    "pedal-assist": 1,
+    throttle: 2,
+    "pedal-assist-and-throttle": 5,
+    "hand-pedal": 3,
+    "propulsion-other": 4
   }.freeze
 
   NAMES = {
-    "foot-pedal": "Foot pedal",
-    "hand-pedal": "Hand cycle (hand pedal)",
-    sail: "Sail",
-    insufflation: "Insufflation",
-    "electric-assist": "Electric Assist",
-    "electric-throttle": "Electric throttle",
-    gas: "Gas",
-    "other-style": "Other style"
+    "foot-pedal": "Foot Pedal",
+    "pedal-assist": "Pedal Assist",
+    throttle: "Electric Throttle",
+    "pedal-assist-and-throttle": "Pedal Assist and Throttle",
+    "hand-pedal": "Hand Cycle (hand pedal)",
+    "propulsion-other": "Other Style"
   }.freeze
 
   def initialize(slug)

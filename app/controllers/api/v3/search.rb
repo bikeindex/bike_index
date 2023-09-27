@@ -50,7 +50,9 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/" do
-          serialized_bikes_results(paginate(Bike.search(interpreted_params)))
+          ActiveRecord::Base.connected_to(role: :reading) do
+            serialized_bikes_results(paginate(Bike.search(interpreted_params)))
+          end
         end
 
         desc "Count of bikes matching search", {
@@ -76,20 +78,22 @@ module API
           use :search
         end
         get "/count" do
-          # Doing extra stuff to make this query more efficient, since this is called all the time
-          interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
-          # Un-scope to remove the unnecessary eager loading
-          bikes = Bike.unscoped.current.search(interpreted_params.merge(stolenness: "all"))
-          # And then execute the specific BikeSearchable#search_matching_stolenness query for each
-          {
-            non: bikes.status_with_owner.count,
-            stolen: bikes.stolen_or_impounded.count,
-            proximity: if interpreted_params[:bounding_box].present?
-                         bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).count
-                       else # we're probably in testing, but regardless, just skip
-                         0
-                       end
-          }
+          ActiveRecord::Base.connected_to(role: :reading) do
+            # Doing extra stuff to make this query more efficient, since this is called all the time
+            interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
+            # Un-scope to remove the unnecessary eager loading
+            bikes = Bike.unscoped.current.search(interpreted_params.merge(stolenness: "all"))
+            # And then execute the specific BikeSearchable#search_matching_stolenness query for each
+            {
+              non: bikes.status_with_owner.count,
+              stolen: bikes.stolen_or_impounded.count,
+              proximity: if interpreted_params[:bounding_box].present?
+                           bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).count
+                         else # we're probably in testing, but regardless, just skip
+                           0
+                         end
+            }
+          end
         end
 
         # TODO: When next bumping the API version, rename this endpoint to
@@ -108,8 +112,10 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/close_serials" do
-          close_serials = Bike.search_close_serials(interpreted_params)
-          serialized_bikes_results(paginate(close_serials))
+          ActiveRecord::Base.connected_to(role: :reading) do
+            close_serials = Bike.search_close_serials(interpreted_params)
+            serialized_bikes_results(paginate(close_serials))
+          end
         end
 
         desc "Search by substring-match against serial number", {
@@ -126,8 +132,10 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/serials_containing" do
-          results = Bike.search_serials_containing(interpreted_params)
-          serialized_bikes_results(paginate(results))
+          ActiveRecord::Base.connected_to(role: :reading) do
+            results = Bike.search_serials_containing(interpreted_params)
+            serialized_bikes_results(paginate(results))
+          end
         end
 
         desc "Search external registries", {

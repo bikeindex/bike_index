@@ -25,8 +25,9 @@
 
     = render partial: "shared/modal", locals: { title: modal_title, modal_body: modal_body, id: "confirmPhoneNumber" }
   - else
-    -# Gross hack to force updating, the phone waiting for confirmation has expired
-    - current_user.update(updated_at: Time.current, skip_update: false)
+    -# enqueue job to update user (enqueuing doesn't write to DB, so can be performed by read replica)
+    - current_user.skip_update = false # required for testing
+    - current_user.perform_user_update_jobs
 
 - elsif current_user.alert_slugs.include?("stolen_bike_without_location")
   -# TODO: use existing user_alert to select correct stolen bike

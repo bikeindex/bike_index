@@ -2,6 +2,7 @@ class Admin::BikesController < Admin::BaseController
   include SortableTable
   before_action :find_bike, only: %i[edit update show]
   before_action :set_period, only: %i[index missing_manufacturer]
+  around_action :set_reading_role, only: %i[index show]
 
   def index
     @page = params[:page] || 1

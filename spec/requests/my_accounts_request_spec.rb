@@ -88,11 +88,15 @@ RSpec.describe MyAccountsController, type: :request do
         context "with user_phone" do
           before { current_user.update_column :alert_slugs, ["phone_waiting_confirmation"] }
           it "renders with show_general_alert" do
-            get base_url
-
-            expect(response).to be_ok
-            expect(assigns(:show_general_alert)).to be_truthy
-            expect(response).to render_template("show")
+            Sidekiq::Worker.clear_all
+            expect {
+              get base_url
+              expect(response).to be_ok
+              expect(assigns(:show_general_alert)).to be_truthy
+              expect(response).to render_template("show")
+            }.to change(AfterUserChangeWorker.jobs, :count).by 1
+            AfterUserChangeWorker.drain
+            expect(current_user.reload.alert_slugs).to eq([])
           end
         end
       end

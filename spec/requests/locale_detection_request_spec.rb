@@ -113,6 +113,7 @@ RSpec.describe "Locale detection", type: :request do
 
   describe "requesting an admin path" do
     include_context :request_spec_logged_in_as_superuser
+    before { Organization.example } # Read replica
 
     context "given a user preference" do
       it "renders the admin dashboard in English" do
