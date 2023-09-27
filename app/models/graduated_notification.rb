@@ -179,7 +179,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def most_recent_graduated_notification
-    most_recent? ? self : matching_notifications.most_recent.last
+    most_recent? ? self : matching_notifications_including_self.most_recent.last
   end
 
   def associated_interval
@@ -197,8 +197,8 @@ class GraduatedNotification < ApplicationRecord
   end
 
   # associated_notifications are notifications from the same notification period,
-  # matching_notifications are notifications for the same bike
-  def matching_notifications
+  # matching_notifications_including_self are notifications for the same bike, regardless of period
+  def matching_notifications_including_self
     GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
       .where(GraduatedNotification.user_or_email_query(self))
   end
@@ -249,10 +249,6 @@ class GraduatedNotification < ApplicationRecord
     self.primary_notification ||= calculated_primary_notification
     self.marked_remaining_link_token ||= SecurityTokenizer.new_token
     self.status = calculated_status
-    # Added when fighting a bug where some bikes aren't re-associated with the org, PR#2347
-    if status == "marked_remaining"
-      self.marked_remaining_at ||= Time.current
-    end
   end
 
   def update_associated_notifications
@@ -375,7 +371,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def previous_notifications
-    matching_notifications.where("id < ?", id)
+    matching_notifications_including_self.where("id < ?", id)
   end
 
   def mark_previous_notifications_not_most_recent

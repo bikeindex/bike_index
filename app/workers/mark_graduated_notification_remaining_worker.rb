@@ -21,7 +21,7 @@ class MarkGraduatedNotificationRemainingWorker < ApplicationWorker
     graduated_notification.marked_remaining_by_id = marked_remaining_by_id
     graduated_notification.update!(status: :marked_remaining, updated_at: Time.current)
     # Long shot - but update any graduated notifications that might have been missed, just in case
-    graduated_notification.matching_notifications.where.not(id: graduated_notification.id).bike_graduated.each do |match_notification|
+    matching_notifications(graduated_notification).each do |match_notification|
       if graduated_notification.bike_organization.created_at.present? && match_notification.bike_organization.created_at.present?
         # remove the newer bike_organization, keep the older one
         if graduated_notification.bike_organization.created_at > match_notification.bike_organization.created_at
@@ -34,5 +34,10 @@ class MarkGraduatedNotificationRemainingWorker < ApplicationWorker
     if graduated_notification.primary_notification? && graduated_notification.user_registration_organization&.deleted?
       graduated_notification.user_registration_organization.update(deleted_at: nil)
     end
+  end
+
+  def matching_notifications(graduated_notification)
+    graduated_notification.matching_notifications_including_self
+      .where.not(id: graduated_notification.id).bike_graduated
   end
 end
