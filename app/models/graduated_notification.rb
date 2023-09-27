@@ -229,13 +229,12 @@ class GraduatedNotification < ApplicationRecord
   def mark_remaining!(resolved_at: nil, marked_remaining_by_id: nil)
     return true if marked_remaining_at.present?
     bike_organization.update(deleted_at: nil)
+    # Update notification after bike organization restored
+    update!(marked_remaining_at: resolved_at || Time.current,
+            marked_remaining_by_id: marked_remaining_by_id)
     if primary_notification?
       associated_notifications.each { |n| n.mark_remaining!(resolved_at: marked_remaining_at) }
     end
-    # Update notification after all the other notifications
-    self.marked_remaining_at = resolved_at || Time.current
-    self.marked_remaining_by_id = marked_remaining_by_id
-    update!(updated_at: Time.current)
     # Long shot - but update any graduated notifications that might have been missed, just in case
     organization.graduated_notifications.where(bike_id: bike_id).bike_graduated.each do |pre_notification|
       if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
