@@ -7,10 +7,9 @@ development:
   primary:
     <<: *default
     database: bikeindex_development
-
   primary_replica:
     <<: *default
-    # Using main database because replica DB doesn't stream updates
+    # Using primary database, replica not actually replicating
     database: bikeindex_development
   #   database: bikeindex_development_replica
   #   replica: true
