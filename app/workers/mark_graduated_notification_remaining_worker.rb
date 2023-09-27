@@ -1,6 +1,5 @@
 # This job was added in PR#2347 because I wasn't sure why some graduated notifications failed to restore the organization.
-# I figure that potentially, it's timeouts - so I added this async processing version - but try to run in synchronously first
-
+# I figure that potentially it's timeouts - so I added this async processing version - but try to run in synchronously first
 class MarkGraduatedNotificationRemainingWorker < ApplicationWorker
   sidekiq_options queue: "high_priority", retry: 2
 

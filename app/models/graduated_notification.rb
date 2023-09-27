@@ -234,7 +234,6 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def mark_remaining!(marked_remaining_by_id: nil, skip_async: false)
-    # Enqueue a job to process, because we were getting periodic ones that failed to mark remaining
     unless skip_async
       MarkGraduatedNotificationRemainingWorker.perform_in(5, id, marked_remaining_by_id)
     end
@@ -305,7 +304,7 @@ class GraduatedNotification < ApplicationRecord
 
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
-    return "marked_remaining" if marked_remaining_at.present? || associated_notifications.marked_remaining.any?
+    return "marked_remaining" if marked_remaining_at.present?
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
     email_success? || primary_notification.present? && primary_notification.email_success? ? "bike_graduated" : "pending"
   end
@@ -344,6 +343,7 @@ class GraduatedNotification < ApplicationRecord
     existing_notification = if organization.graduated_notification_interval.present?
       GraduatedNotification.where(created_at: potential_matching_period)
         .where(GraduatedNotification.user_or_email_query(self))
+        .where(organization_id: organization_id)
         .email_success.primary_notification.first
     end
     existing_notification ||
