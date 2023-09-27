@@ -196,6 +196,13 @@ class GraduatedNotification < ApplicationRecord
     self.class.associated_notifications_including_self(self)
   end
 
+  # associated_notifications are notifications from the same notification period,
+  # matching_notifications are notifications for the same bike
+  def matching_notifications
+    GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
+      .where(GraduatedNotification.user_or_email_query(self))
+  end
+
   def mail_snippet
     MailSnippet.where(kind: "graduated_notification", organization_id: organization_id).first
   end
@@ -226,29 +233,12 @@ class GraduatedNotification < ApplicationRecord
     pending_period_ends_at > Time.current
   end
 
-  def mark_remaining!(marked_remaining_by_id: nil)
-    return true if marked_remaining_at.present?
-    bike_organization.update(deleted_at: nil)
-    if primary_notification?
-      associated_notifications.each { |n| n.mark_remaining!(marked_remaining_by_id: marked_remaining_by_id) }
+  def mark_remaining!(marked_remaining_by_id: nil, skip_async: false)
+    # Enqueue a job to process, because we were getting periodic ones that failed to mark remaining
+    unless skip_async
+      MarkGraduatedNotificationRemainingWorker.perform_in(5, id, marked_remaining_by_id)
     end
-    # Update notification after bike organization restored and other notifications updated (in case of an error)
-    self.marked_remaining_at ||= Time.current
-    self.marked_remaining_by_id = marked_remaining_by_id
-    update!(status: :marked_remaining, updated_at: Time.current)
-    # Long shot - but update any graduated notifications that might have been missed, just in case
-    organization.graduated_notifications.where(bike_id: bike_id).bike_graduated.each do |pre_notification|
-      if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
-        # remove the newer bike_organization, keep the older one
-        bike_organization.destroy if bike_organization.created_at > pre_notification.bike_organization.created_at
-      end
-      pre_notification.mark_remaining!(marked_remaining_by_id: marked_remaining_by_id)
-    end
-    # Update user_registration_organization only once, after everything has already been updated
-    if primary_notification? && user_registration_organization&.deleted?
-      user_registration_organization.update(deleted_at: nil)
-    end
-    true
+    MarkGraduatedNotificationRemainingWorker.new.perform(id, marked_remaining_by_id)
   end
 
   def set_calculated_attributes
@@ -382,11 +372,6 @@ class GraduatedNotification < ApplicationRecord
     associated_bike_ids = associated_bikes.pluck(:id)
     associated_notification_bike_ids = associated_notifications_including_self.pluck(:bike_id)
     associated_bike_ids - associated_notification_bike_ids
-  end
-
-  def matching_notifications
-    GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
-      .where(GraduatedNotification.user_or_email_query(self))
   end
 
   def previous_notifications
