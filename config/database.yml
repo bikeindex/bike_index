@@ -7,10 +7,13 @@ development:
   primary:
     <<: *default
     database: bikeindex_development
+
   primary_replica:
     <<: *default
-    database: bikeindex_development_replica
-    replica: true
+    # Using main database because replica DB doesn't stream updates
+    database: bikeindex_development
+  #   database: bikeindex_development_replica
+  #   replica: true
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
