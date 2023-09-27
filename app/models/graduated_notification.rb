@@ -228,12 +228,14 @@ class GraduatedNotification < ApplicationRecord
 
   def mark_remaining!(resolved_at: nil, marked_remaining_by_id: nil)
     return true if marked_remaining_at.present?
-    self.marked_remaining_at ||= resolved_at || Time.current
-    self.marked_remaining_by_id ||= marked_remaining_by_id
-    # We don't want to re-mark remaining
-    update(updated_at: Time.current)
     bike_organization.update(deleted_at: nil)
-    associated_notifications.each { |n| n.mark_remaining!(resolved_at: marked_remaining_at) } if primary_notification?
+    if primary_notification?
+      associated_notifications.each { |n| n.mark_remaining!(resolved_at: marked_remaining_at) }
+    end
+    # Update notification after all the other notifications
+    self.marked_remaining_at = resolved_at || Time.current
+    self.marked_remaining_by_id = marked_remaining_by_id
+    update!(updated_at: Time.current)
     # Long shot - but update any graduated notifications that might have been missed, just in case
     organization.graduated_notifications.where(bike_id: bike_id).bike_graduated.each do |pre_notification|
       if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
@@ -313,7 +315,7 @@ class GraduatedNotification < ApplicationRecord
 
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
-    return "marked_remaining" if marked_remaining_at.present? || associated_notifications_including_self.marked_remaining.any?
+    return "marked_remaining" if marked_remaining_at.present? || associated_notifications.marked_remaining.any?
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
     email_success? || primary_notification.present? && primary_notification.email_success? ? "bike_graduated" : "pending"
   end

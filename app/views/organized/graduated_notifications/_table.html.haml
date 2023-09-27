@@ -6,6 +6,8 @@
 - skip_email_search ||= !render_sortable
 - separate_secondary_notifications ||= false
 
+- current_org_to_param = current_organization&.to_param
+
 - # TODO: add translations
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -50,11 +52,14 @@
             = check_mark if graduated_notification.primary_notification?
         %td
           - if graduated_notification.bike.present?
-            = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id)
+            - org_param = current_organization&.id == graduated_notification.organization_id ? current_org_to_param : graduated_notification.organization_id
+            = link_to organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: org_param)
           - if !separate_secondary_notifications
             - graduated_notification.associated_notifications.each do |associated_notification|
+              -# Pretty sure this will always be the same as above, but - just to be sure...
+              - assoc_org_param = current_organization&.id == associated_notification.organization_id ? current_org_to_param : associated_notification.organization_id
               %small.d-block{ style: "padding-left: 0.5rem; line-height: 1.5" }
-                = link_to organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: associated_notification.organization_id)
+                = link_to organized_bike_text(associated_notification.bike), bike_path(associated_notification.bike, organization_id: assoc_org_param)
         - unless skip_status
           %td
             = status_display(graduated_notification.status_humanized&.titleize)
