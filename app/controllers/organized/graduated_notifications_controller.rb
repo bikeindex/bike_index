@@ -55,7 +55,9 @@ module Organized
       end
 
       # Doesn't make sense to include unprocessed if sorting by processed_at
-      a_graduated_notifications = a_graduated_notifications.processed if sort_column == "processed_at"
+      if sort_column == "processed_at"
+        a_graduated_notifications = a_graduated_notifications.where.not(processed_at: nil)
+      end
 
       if search_params_present?
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)

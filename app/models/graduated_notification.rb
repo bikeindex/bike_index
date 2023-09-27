@@ -226,22 +226,23 @@ class GraduatedNotification < ApplicationRecord
     pending_period_ends_at > Time.current
   end
 
-  def mark_remaining!(resolved_at: nil, marked_remaining_by_id: nil)
+  def mark_remaining!(marked_remaining_by_id: nil)
     return true if marked_remaining_at.present?
     bike_organization.update(deleted_at: nil)
-    # Update notification after bike organization restored
-    update!(marked_remaining_at: resolved_at || Time.current,
-            marked_remaining_by_id: marked_remaining_by_id)
     if primary_notification?
-      associated_notifications.each { |n| n.mark_remaining!(resolved_at: marked_remaining_at) }
+      associated_notifications.each { |n| n.mark_remaining!(marked_remaining_by_id: marked_remaining_by_id) }
     end
+    # Update notification after bike organization restored and other notifications updated (in case of an error)
+    self.marked_remaining_at ||= Time.current
+    self.marked_remaining_by_id = marked_remaining_by_id
+    update!(status: :marked_remaining, updated_at: Time.current)
     # Long shot - but update any graduated notifications that might have been missed, just in case
     organization.graduated_notifications.where(bike_id: bike_id).bike_graduated.each do |pre_notification|
       if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
         # remove the newer bike_organization, keep the older one
         bike_organization.destroy if bike_organization.created_at > pre_notification.bike_organization.created_at
       end
-      pre_notification.mark_remaining!
+      pre_notification.mark_remaining!(marked_remaining_by_id: marked_remaining_by_id)
     end
     # Update user_registration_organization only once, after everything has already been updated
     if primary_notification? && user_registration_organization&.deleted?
@@ -258,6 +259,10 @@ class GraduatedNotification < ApplicationRecord
     self.primary_notification ||= calculated_primary_notification
     self.marked_remaining_link_token ||= SecurityTokenizer.new_token
     self.status = calculated_status
+    # Added when fighting a bug where some bikes aren't re-associated with the org, PR#2347
+    if status == "marked_remaining"
+      self.marked_remaining_at ||= Time.current
+    end
   end
 
   def update_associated_notifications

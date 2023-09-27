@@ -160,7 +160,9 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         expect(graduated_notification_remaining_expired.status).to eq "marked_remaining"
 
         expect(graduated_notification2_remaining_expired.reload.most_recent?).to be_falsey
-        graduated_notification2.mark_remaining!(resolved_at: Time.current - 2.weeks)
+        graduated_notification2.mark_remaining!
+        graduated_notification2.update_column :marked_remaining_at, Time.current - 2.weeks
+        graduated_notification2.reload
         bike2.reload
         expect(bike2.organizations.pluck(:id)).to eq([organization.id])
         expect(bike2.graduated?(organization)).to be_falsey

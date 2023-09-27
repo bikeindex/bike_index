@@ -92,6 +92,7 @@ RSpec.describe GraduatedNotification, type: :model do
     context "marked_remaining" do
       let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization, bike_created_at: Time.current - 1.year) }
       it "is not bike_graduated" do
+        graduated_notification.reload
         expect(graduated_notification.bike_graduated?).to be_falsey
         expect(graduated_notification.processed?).to be_truthy
         expect(graduated_notification.email_success?).to be_truthy
