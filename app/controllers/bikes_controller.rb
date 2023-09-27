@@ -190,8 +190,10 @@ class BikesController < Bikes::BaseController
     if params[:token_type] == "graduated_notification"
       matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: params[:token]).first
       if matching_notification.present? && matching_notification.processed?
+        if matching_notification.marked_remaining_at.blank?
+          matching_notification.mark_remaining!(marked_remaining_by_id: current_user&.id)
+        end
         flash[:success] = translation(:marked_remaining, bike_type: @bike.type)
-        matching_notification.mark_remaining!(marked_remaining_by_id: current_user&.id) unless matching_notification.marked_remaining?
       else
         flash[:error] = translation(:unable_to_find_graduated_notification)
       end

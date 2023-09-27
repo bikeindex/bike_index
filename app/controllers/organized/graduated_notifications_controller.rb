@@ -41,7 +41,7 @@ module Organized
 
     def search_params_present?
       @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? ||
-        params[:search_bike_id].present? || user_search_params_present?
+        params[:search_bike_id].present?
     end
 
     def available_graduated_notifications
@@ -55,18 +55,22 @@ module Organized
       end
 
       # Doesn't make sense to include unprocessed if sorting by processed_at
-      a_graduated_notifications = a_graduated_notifications.processed if sort_column == "processed_at"
+      if sort_column == "processed_at"
+        a_graduated_notifications = a_graduated_notifications.where.not(processed_at: nil)
+      end
 
       if search_params_present?
         bikes = a_graduated_notifications.bikes.search(@interpreted_params)
         bikes = Bike.where(id: params[:search_bike_id]) if params[:search_bike_id].present?
-        if params[:search_email].present?
-          bikes = bikes.organized_email_and_name_search(params[:search_email])
-        elsif params[:user_id].present?
-          user = User.find_by_id(params[:user_id])
-          bikes = user.present? ? user.bikes : Bike.none
-        end
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
+      end
+      if params[:user_id].present?
+        @user = User.find_by_id(params[:user_id])
+        # Don't use @user to lookup, so even if user isn't found, we still search the id
+        a_graduated_notifications = a_graduated_notifications.where(user_id: params[:user_id])
+      elsif params[:search_email].present?
+        email = EmailNormalizer.normalize(params[:search_email])
+        a_graduated_notifications = a_graduated_notifications.where("email ILIKE ?", "%#{email}%")
       end
 
       a_graduated_notifications = a_graduated_notifications.primary_notification unless separate_secondary_notifications?

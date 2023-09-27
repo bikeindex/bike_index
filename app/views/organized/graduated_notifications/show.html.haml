@@ -24,7 +24,7 @@
             %span{class: status_display_class(@graduated_notification.status_humanized)}
               = @graduated_notification.status_humanized.titleize
               - if @graduated_notification.status == "marked_remaining"
-                \- remained registered with #{@graduated_notification.organization&.short_name || "organization"}
+                %small (remained registered with #{@graduated_notification.organization&.short_name || "organization"})
             - if @graduated_notification.status == "bike_graduated"
               %small.less-strong
                 no longer registered with #{@graduated_notification.organization&.short_name || "organization"}
@@ -81,7 +81,7 @@
               %span.convertTime
                 = l(bike.created_at, format: :convert_time)
             %td
-              = link_to organized_bike_text(bike), bike_path(bike, organization_id: current_organization.id)
+              = link_to organized_bike_text(bike), bike_path(bike, organization_id: current_organization.to_param)
               - if @graduated_notification.primary_bike_id == bike.id
                 %strong.less-strong Primary bike
               - if !@graduated_notification.primary_notification? && bike.id == @graduated_notification.bike_id
@@ -131,5 +131,5 @@
             - primary_bike = @graduated_notification.primary_bike
             .mt-4.text-muted
               %strong The primary notification is for
-              = link_to organized_bike_text(primary_bike), bike_path(primary_bike, organization_id: current_organization.id)
+              = link_to organized_bike_text(primary_bike), bike_path(primary_bike, organization_id: current_organization.to_param)
 
