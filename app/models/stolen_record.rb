@@ -6,7 +6,7 @@ class StolenRecord < ApplicationRecord
     not_eligible: 0,
     waiting_on_decision: 1,
     displayable_no_photo: 2,
-    displayed: 3,
+    recovery_displayed: 3,
     not_displayed: 4
   }.freeze
 
@@ -239,7 +239,7 @@ class StolenRecord < ApplicationRecord
   def calculated_recovery_display_status
     return "not_eligible" unless can_share_recovery
     return "not_displayed" if not_displayed?
-    return "displayed" if recovery_display.present?
+    return "recovery_displayed" if recovery_display.present?
     if bike&.thumb_path&.present?
       "waiting_on_decision"
     else
