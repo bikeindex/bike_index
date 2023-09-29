@@ -176,11 +176,19 @@ RSpec.describe OrganizationExportWorker, type: :job do
           owner_email: email)
       end
       # let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
+      let(:target_mnfg) do
+        # NOTE: this is different on the mac version of nokogiri, see PR#2366
+        if ENV["CI"]
+          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\"
+        else
+          "Sweet manufacturer &gt;"
+        end
+      end
       let(:bike_values) do
         [
           "http://test.host/bikes/#{bike.id}",
           bike.created_at.utc,
-          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\",
+          target_mnfg,
           "\",,,\"<script>XSSSSS</script>",
           "Black, #{secondary_color.name}",
           bike.serial_number,
@@ -194,7 +202,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           nil # assigned_sticker
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"#{target_mnfg}\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
       it "exports with all the header values" do
         expect(bike.reload.owner_name).to eq "George Smith"
         instance.perform(export.id)
