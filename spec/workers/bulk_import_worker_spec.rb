@@ -554,11 +554,10 @@ RSpec.describe BulkImportWorker, type: :job do
         def expect_registered_bike(passed_row)
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0
-          expect {
-            bike = instance.register_bike(instance.row_to_b_param_hash(passed_row))
-            # This test is being flaky! Add debug printout #2101
-            pp "Error line: 560", bike.errors unless bike.errors.none?
-          }.to change(Bike, :count).by 1
+          new_bike = instance.register_bike(instance.row_to_b_param_hash(passed_row))
+          # This test is being flaky! Add debug printout #2101
+          pp "Error line: 560", new_bike.errors if new_bike.errors.any?
+          expect(Bike.count).to eq 1
           bike = Bike.last
 
           expect(bike.owner_email).to eq row[:owner_email]
