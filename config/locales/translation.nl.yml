@@ -1292,6 +1292,9 @@ nl:
         except_values: heeft een waarde niet toegestaan
         same_as: is niet hetzelfde als %{parameter}
         invalid_response: Ongeldig antwoord
+        empty_message_body: lege berichttekst geleverd met %{body_format} inhoudstype
+        too_many_multipart_files: het aantal geüploade bestanden overschreed de geconfigureerde
+          limiet van het systeem (%{limit})
   flash:
     actions:
       create:
