@@ -3,6 +3,13 @@ module API
     class Bikes < API::Base
       include API::V2::Defaults
 
+      CYCLE_TYPE_NAMES = CycleType::NAMES.values.map(&:downcase)
+      PROPULSION_TYPES = PropulsionType::SLUGS
+      # Use default values if in test, because things aren't in the database
+      CTYPE_NAMES = (Rails.env.test? ? ["wheel", "headset"] : Ctype.pluck(:name).map(&:downcase)).freeze
+      COLOR_NAMES = (Rails.env.test? ? ["black", "orange"] : Color.pluck(:name).map(&:downcase)).freeze
+      COUNTRY_ISOS = (Rails.env.test? ? ["US"] : Country.pluck(:iso)).freeze
+
       helpers do
         params :bike_attrs do
           optional :rear_wheel_bsd, type: Integer, desc: "Rear wheel iso bsd (has to be one of the `selections`)"
