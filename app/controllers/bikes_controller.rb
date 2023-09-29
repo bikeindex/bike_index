@@ -21,7 +21,6 @@ class BikesController < Bikes::BaseController
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
-    @components = @bike.components
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
