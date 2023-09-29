@@ -201,7 +201,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
         "<title>#{title}</title>",
         "<meta name=\"description\" content=\"#{description}\" />",
         '<link rel="shortcut icon" href="/fav.ico" />',
-        '<link rel="apple-touch-icon-precomposed apple-touch-icon" href="/apple_touch_icon.png" />',
+        '<link rel="apple-touch-icon-precomposed apple-touch-icon" href="/apple-touch-icon.png" />',
         nil # csrf_meta_tags is nil in test
       ]
     end
