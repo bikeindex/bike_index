@@ -138,7 +138,7 @@
           %h3.cgroup-name
             = cgroup[:name]
           %ul.attr-list
-            - @components.each do |component|
+            - @bike.components.each do |component|
               - next unless component.cgroup_id == cgroup[:id]
               %li
                 %strong.attr-title
