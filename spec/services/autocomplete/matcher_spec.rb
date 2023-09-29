@@ -1,26 +1,26 @@
 require "rails_helper"
 
 RSpec.describe Autocomplete::Matcher do
-  describe "normalized_params" do
+  describe "search_params" do
     let(:default) { {offset: 0, limit: 4, categories: [], q_array: [], cache: true} }
     let(:default_cache_keys) { {cache_id: "autc:test:cache:all:", category_cache_id: "autc:test:cts:all:", interkeys: ["all:autc:test:cts:all:"]} }
     it "is the default plus cache keys" do
-      expect(described_class.search_params).to eq default.merge(default_cache_keys)
-      expect(described_class.search_params(page: "1")).to eq default.merge(default_cache_keys)
-      expect(described_class.search_params(page: "1", per_page: "5.0")).to eq default.merge(default_cache_keys)
+      expect(described_class.send(:search_params)).to eq default.merge(default_cache_keys)
+      expect(described_class.send(:search_params, {page: "1"})).to eq default.merge(default_cache_keys)
+      expect(described_class.send(:search_params, {page: "1", per_page: "5.0"})).to eq default.merge(default_cache_keys)
     end
     context "with different per_page and page params" do
       let(:default_target) { default.merge(default_cache_keys) }
       it "returns expected" do
-        expect(described_class.search_params(per_page: "10")).to eq default_target.merge(limit: 9)
-        expect(described_class.search_params(page: "2", per_page: "7.0")).to eq default_target.merge(limit: 13, offset: 7)
-        expect(described_class.search_params(page: 20)).to eq default_target.merge(limit: 99, offset: 95)
+        expect(described_class.send(:search_params, {per_page: "10"})).to eq default_target.merge(limit: 9)
+        expect(described_class.send(:search_params, {page: "2", per_page: "7.0"})).to eq default_target.merge(limit: 13, offset: 7)
+        expect(described_class.send(:search_params, {page: 20})).to eq default_target.merge(limit: 99, offset: 95)
       end
     end
     context "cache: false" do
       let(:target) { default.merge(cache: false, cache_id: "autc:test:cache:all:") }
       it "default false" do
-        expect(described_class.search_params(cache: false)).to eq target
+        expect(described_class.send(:search_params, {cache: "false"})).to eq target
       end
     end
     context "with a category and a query" do
@@ -32,14 +32,14 @@ RSpec.describe Autocomplete::Matcher do
           interkeys: ["autc:test:cts:manufacturer:black"])
       end
       it "has the cache keys" do
-        expect(described_class.search_params(q: "black", categories: ["manufacturer"])).to eq target
+        expect(described_class.send(:search_params, {q: "black", categories: ["manufacturer"]})).to eq target
       end
     end
 
     # TODO: Once loader is working
     xit "Makes category empty if it's all the categories" do
       Autocomplete::Loader.reset_categories(%w(cool test))
-      result = described_class.search_params({categories: "cool, test"})
+      result = described_class.send(:search_params, {categories: "cool, test"})
       expect(result).to eq default_params
     end
   end

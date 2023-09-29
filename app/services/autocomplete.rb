@@ -12,35 +12,43 @@ module Autocomplete
         .strip.gsub(/\s+/, " ")
     end
 
-    # def sorted_category_array
-    #   redis.smembers(categories_id).map { |c| normalize(c) }.uniq.sort
-    # end
+    # TODO: we have a static list of categories, we don't need to query redis for them
+    def sorted_category_array
+      redis { |r| r.smembers(categories_id) }
+        .map { |c| normalize(c) }.uniq.sort
+    end
 
-    # def hidden_category_array
-    #   redis.smembers(hidden_categories_id).map { |c| normalize(c) }.uniq.sort
-    # end
+    def hidden_category_array
+      redis { |r| r.smembers(hidden_categories_id) }
+        .map { |c| normalize(c) }.uniq.sort
+    end
 
-    # def combinatored_category_array
-    #   1.upto(sorted_category_array.size).
-    #     flat_map { |n| sorted_category_array.combination(n).
-    #     map { |el| el.join('') } }
-    # end
+    def combinatored_category_array
+      1.upto(sorted_category_array.size).
+        flat_map do |n|
+          sorted_category_array.combination(n)
+            .map { |el| el.join('') }
+        end
+    end
 
-    # def set_category_combos_array
-    #   redis.expire category_combos_id, 0
-    #   array = combinatored_category_array
-    #   array.any? ? array.last.replace('all') : array << 'all'
-    #   redis.sadd category_combos_id, array
-    #   array
-    # end
+    # I don't think this belongs in the module...
+    def set_category_combos_array
+      redis { |r| r.expire(category_combos_id, 0) }
+      array = combinatored_category_array
+      # IDK why, original code replaced the last element of the array with 'all'
+      # array.any? ? array.last.replace('all') : array << 'all'
+      array = ["all"] if array.none?
+      redis { |r| r.sadd(category_combos_id, array) }
+      array
+    end
 
-    # def category_combos_id
-    #   "#{Soulheart.base_id}category_combos:"
-    # end
+    def category_combos_id
+      "#{STOREAGE_KEY}category_combos:"
+    end
 
-    # def category_combos
-    #   redis.smembers(category_combos_id)
-    # end
+    def category_combos
+      redis { |r| r.smembers(category_combos_id) }
+    end
 
     def categories_id
       "#{STOREAGE_KEY}cts:"
@@ -66,7 +74,7 @@ module Autocomplete
       "#{STOREAGE_KEY}cache:#{type}:"
     end
 
-    # Should be the new canonical way of using redis
+    # Should be the canonical way of using redis
     def redis
       # Basically, crib what is done in sidekiq
       raise ArgumentError, "requires a block" unless block_given?

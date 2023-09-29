@@ -9,13 +9,17 @@ class Autocomplete::Matcher
 
   class << self
     def search_params(pparms = {})
-      sparams = DEFAULT_PARAMS.merge(pparms.slice(:page, :per_page, :categories, :q, :cache))
-      per_page = sparams.delete(:per_page).to_i
-      sparams[:offset] = (sparams.delete(:page).to_i - 1) * per_page
+      sparams = {
+        categories: categories_array(pparms[:categories]),
+        q_array: query_array(pparms[:q]),
+        cache: pparms[:cache].present? ? ParamsNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache]
+      }
+      per_page = pparms.dig(:per_page)&.to_i || DEFAULT_PARAMS[:per_page]
+      page = pparms.dig(:page)&.to_i || DEFAULT_PARAMS[:page]
+      sparams[:offset] = (page - 1) * per_page
       limit = per_page + sparams[:offset] - 1
       sparams[:limit] = limit < 0 ? 0 : limit
-      sparams[:categories] = categories_array(sparams[:categories])
-      sparams[:q_array] = query_array(sparams.delete(:q))
+
       sparams[:cache_id] = cache_id_from_opts(sparams[:categories], sparams[:q_array])
       return sparams unless sparams[:cache]
       sparams[:category_cache_id] = category_id_from_opts(sparams[:categories])
