@@ -179,7 +179,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
       let(:target_mnfg) do
         # NOTE: this is different on the mac version of nokogiri, see PR#2366
         if ENV["CI"]
-          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\"
+          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;"
         else
           "Sweet manufacturer &gt;"
         end
