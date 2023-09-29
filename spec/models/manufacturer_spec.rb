@@ -42,9 +42,9 @@ RSpec.describe Manufacturer, type: :model do
     it "returns what we expect" do
       manufacturer = FactoryBot.create(:manufacturer)
       result = manufacturer.autocomplete_hash
-      expect(result.keys).to eq(%w[id text category priority data])
-      expect(result["data"]["slug"]).to eq manufacturer.slug
-      expect(result["data"]["search_id"]).to eq("m_#{manufacturer.id}")
+      expect(result.keys).to eq(%i[id text category priority data])
+      expect(result[:data][:slug]).to eq manufacturer.slug
+      expect(result[:data][:search_id]).to eq("m_#{manufacturer.id}")
     end
   end
 

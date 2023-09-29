@@ -78,6 +78,6 @@ class CycleType
         slug: slug,
         search_id: search_id
       }
-    }.as_json
+    }
   end
 end

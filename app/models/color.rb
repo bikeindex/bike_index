@@ -48,7 +48,7 @@ class Color < ApplicationRecord
         display: display,
         search_id: search_id
       }
-    }.as_json
+    }
   end
 
   def search_id

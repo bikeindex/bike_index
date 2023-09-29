@@ -73,7 +73,7 @@ RSpec.describe CycleType, type: :model do
     context "all autocomplete_hashes" do
       it "has text" do
         autocomplete_hashes = CycleType.all.map { |c| c.autocomplete_hash }
-        expect(autocomplete_hashes.map { |h| h["text"] }).to_not include(nil)
+        expect(autocomplete_hashes.map { |h| h[:text] }).to_not include(nil)
       end
     end
   end

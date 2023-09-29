@@ -122,7 +122,7 @@ class Manufacturer < ApplicationRecord
         priority: autocomplete_hash_priority,
         search_id: search_id
       }
-    }.as_json
+    }
   end
 
   def search_id
