@@ -100,7 +100,7 @@ Rails.application.configure do
 
   # Make sure we reload the API after every request!
   @last_api_change = Time.current
-  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/v2/**/*.rb"]) { |reloader|
+  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/**/**/*.rb"]) { |reloader|
     times = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| File.mtime(f) }
     files = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| f }
 

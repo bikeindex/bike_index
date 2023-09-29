@@ -1,7 +1,7 @@
 class BikeVersionsController < ApplicationController
   before_action :render_ad, only: %i[index show]
   before_action :find_bike_version, except: %i[index new create]
-  before_action :ensure_user_allowed_to_edit, except: %i[index show new create]
+  before_action :ensure_user_allowed_to_edit_version, except: %i[index show new create]
 
   def index
     @interpreted_params = BikeVersion.searchable_interpreted_params(permitted_search_params)
@@ -71,8 +71,8 @@ class BikeVersionsController < ApplicationController
     fail ActiveRecord::RecordNotFound
   end
 
-  def ensure_user_allowed_to_edit
-    return true if @bike_version.authorized?(current_user)
+  def ensure_user_allowed_to_edit_version
+    return if @bike_version.authorized?(current_user)
     flash[:error] = "You don't appear to own that bike version"
     redirect_to(bike_version_path(@bike_version)) && return
   end
