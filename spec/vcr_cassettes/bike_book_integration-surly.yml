@@ -37,7 +37,7 @@ http_interactions:
       Server:
       - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
       Date:
-      - Tue, 29 Aug 2023 17:21:57 GMT
+      - Fri, 29 Sep 2023 17:05:50 GMT
       Via:
       - 1.1 vegur
     body:
@@ -73,5 +73,5 @@ http_interactions:
         Swiss Champion,","cgroup":"Wheels"},{"component_type":"tire","description":"Surly
         Nate, 27tpi","front_or_rear":"both","cgroup":"Wheels"}]}'
     http_version: 
-  recorded_at: Tue, 29 Aug 2023 17:21:57 GMT
+  recorded_at: Fri, 29 Sep 2023 17:05:50 GMT
 recorded_with: VCR 5.0.0
