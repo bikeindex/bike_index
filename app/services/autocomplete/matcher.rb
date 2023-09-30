@@ -8,25 +8,6 @@ class Autocomplete::Matcher
   }.freeze
 
   class << self
-    def search_params(pparms = {})
-      sparams = {
-        categories: categories_array(pparms[:categories]),
-        q_array: query_array(pparms[:q]),
-        cache: pparms[:cache].present? ? ParamsNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache]
-      }
-      per_page = pparms.dig(:per_page)&.to_i || DEFAULT_PARAMS[:per_page]
-      page = pparms.dig(:page)&.to_i || DEFAULT_PARAMS[:page]
-      sparams[:offset] = (page - 1) * per_page
-      limit = per_page + sparams[:offset] - 1
-      sparams[:limit] = limit < 0 ? 0 : limit
-
-      sparams[:cache_id] = cache_id_from_opts(sparams[:categories], sparams[:q_array])
-      return sparams unless sparams[:cache]
-      sparams[:category_cache_id] = category_id_from_opts(sparams[:categories])
-      sparams[:interkeys] = interkeys_from_opts(sparams[:category_cache_id], sparams[:q_array])
-      sparams
-    end
-
     def search(pparms = {})
       sparams = search_params(pparms)
       if sparams[:cache]
@@ -39,6 +20,24 @@ class Autocomplete::Matcher
     end
 
     private
+
+    def search_params(pparms = {})
+      sparams = {
+        categories: categories_array(pparms[:categories]),
+        q_array: query_array(pparms[:q]),
+        cache: pparms[:cache].present? ? ParamsNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache]
+      }
+      per_page = pparms.dig(:per_page)&.to_i || DEFAULT_PARAMS[:per_page]
+      page = pparms.dig(:page)&.to_i || DEFAULT_PARAMS[:page]
+      sparams[:offset] = (page - 1) * per_page
+      limit = per_page + sparams[:offset] - 1
+      sparams[:limit] = limit < 0 ? 0 : limit
+      sparams[:cache_id] = cache_id_from_opts(sparams[:categories], sparams[:q_array])
+      return sparams unless sparams[:cache]
+      sparams[:category_cache_id] = category_id_from_opts(sparams[:categories])
+      sparams[:interkeys] = interkeys_from_opts(sparams[:category_cache_id], sparams[:q_array])
+      sparams
+    end
 
     def query_array(query)
       if query.is_a?(Array)
@@ -59,7 +58,9 @@ class Autocomplete::Matcher
     end
 
     def total_categories_count
-      Autocomplete.redis { |r| r.scard(Autocomplete.categories_id) }
+      # Can be a static call, now that categories are static
+      Autocomplete.sorted_category_array.count
+      # Autocomplete.redis { |r| r.scard(Autocomplete.categories_id) }
     end
 
     def categories_string(categories)

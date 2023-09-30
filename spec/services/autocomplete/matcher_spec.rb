@@ -126,14 +126,6 @@ RSpec.describe Autocomplete::Matcher do
   #     expect(matches[0]['text']).to eq("中国佛山 李小龙")
   #   end
 
-  #   it "Finds by aliases" do
-  #     store_terms_fixture
-  #     opts = { 'q' => 'land shark stadium' }
-  #     matches = Soulheart::Matcher.new(opts).matches
-  #     expect(matches.length).to eq(1)
-  #     expect(matches[0]['text']).to eq('Sun Life Stadium')
-  #   end
-
   #   it "Doesn't duplicate when matching both alias and the normal term" do
   #     store_terms_fixture
   #     opts = { 'q' => 'stadium' }

@@ -1,6 +1,10 @@
 module Autocomplete
   STOREAGE_KEY = "autc#{Rails.env.test? ? ":test" : ""}:".freeze
+  SORTED_CATEGORY_ARRAY = %w[colors cycle_type frame_mnfg mnfg].freeze
+  STOP_WORDS = [].freeze # I think we might want to include 'the'
 
+  # Every method in this module should only be accessed by the subclasses.
+  # I'm not sure how to do that correctly :/
   class << self
     def cache_duration
       600 # 10 minutes
@@ -12,34 +16,27 @@ module Autocomplete
         .strip.gsub(/\s+/, " ")
     end
 
-    # TODO: we have a static list of categories, we don't need to query redis for them
-    def sorted_category_array
-      redis { |r| r.smembers(categories_id) }
-        .map { |c| normalize(c) }.uniq.sort
+    def prefixes_for_phrase(phrase)
+      normalize(phrase).split(" ").reject do |w|
+        STOP_WORDS.include?(w)
+      end.map do |w|
+        (0..(w.length - 1)).map { |l| w[0..l] }
+      end.flatten.uniq
     end
 
-    def hidden_category_array
-      redis { |r| r.smembers(hidden_categories_id) }
-        .map { |c| normalize(c) }.uniq.sort
+    def sorted_category_array
+      # TODO: We're still putting the categories into redis - but I don't think we actually need to
+      SORTED_CATEGORY_ARRAY
+      # redis { |r| r.smembers(categories_id) }.map { |c| normalize(c) }.uniq.sort
     end
 
     def combinatored_category_array
+      # Maybe use a static list?
       1.upto(sorted_category_array.size).
         flat_map do |n|
           sorted_category_array.combination(n)
             .map { |el| el.join('') }
         end
-    end
-
-    # I don't think this belongs in the module...
-    def set_category_combos_array
-      redis { |r| r.expire(category_combos_id, 0) }
-      array = combinatored_category_array
-      # IDK why, original code replaced the last element of the array with 'all'
-      # array.any? ? array.last.replace('all') : array << 'all'
-      array = ["all"] if array.none?
-      redis { |r| r.sadd(category_combos_id, array) }
-      array
     end
 
     def category_combos_id
@@ -54,16 +51,12 @@ module Autocomplete
       "#{STOREAGE_KEY}cts:"
     end
 
-    def hidden_categories_id
-      "#{categories_id}h:"
-    end
-
     def category_id(name = "all")
       "#{categories_id}#{name}:"
     end
 
-    def no_query_id(category = category_id)
-      "all:#{category}"
+    def no_query_id(category = nil)
+      "all:#{category || category_id}"
     end
 
     def results_hashes_id
@@ -84,7 +77,5 @@ module Autocomplete
     def redis_pool
       @redis_pool ||= ConnectionPool.new(timeout: 1, size: 2) { Redis.new }
     end
-
-    protected
   end
 end
