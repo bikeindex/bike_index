@@ -50,7 +50,7 @@ class Autocomplete::Loader
       i
     end
 
-    def store_item(item, category_base_id=nil, base_added=false)
+    def store_item(item, category_base_id = nil, base_added = false)
       category_base_id ||= Autocomplete.category_id(item[:category])
       priority = -1 * item[:priority]
       Autocomplete.redis do |r|
@@ -87,7 +87,7 @@ class Autocomplete::Loader
       return @combinatored_category_array if defined?(@combinatored_category_array)
       array = 1.upto(Autocomplete.sorted_category_array.size).flat_map do |n|
         Autocomplete.sorted_category_array.combination(n)
-          .map { |el| el.join('') }
+          .map { |el| el.join("") }
       end
       array.last.replace("all") # Last category is the combination of every one
       @combinatored_category_array = array
@@ -138,7 +138,7 @@ class Autocomplete::Loader
       end
     end
 
-    def delete_data(id=nil)
+    def delete_data(id = nil)
       id ||= "#{base_key}:"
       # delete the sorted sets for this type
       Autocomplete.redis do |r|

@@ -38,7 +38,7 @@ RSpec.describe Autocomplete::Matcher do
 
     # TODO: Once loader is working
     xit "Makes category empty if it's all the categories" do
-      Autocomplete::Loader.reset_categories(%w(cool test))
+      Autocomplete::Loader.reset_categories(%w[cool test])
       result = described_class.send(:search_params, {categories: "cool, test"})
       expect(result).to eq default_params
     end
@@ -58,16 +58,16 @@ RSpec.describe Autocomplete::Matcher do
   end
 
   describe "category_id_from_opts" do
-    it 'Gets the id for one' do
+    it "Gets the id for one" do
       expect(described_class.send(:category_id_from_opts, [])).to eq "autc:test:cts:all:"
     end
-    it 'Gets the id for one' do
+    it "Gets the id for one" do
       expect(described_class.send(:category_id_from_opts, ["some_category"])).to eq "autc:test:cts:some_category:"
     end
 
     # TODO: Once loader is working
-    xit 'Gets the id for all of them' do
-      Soulheart::Loader.new.reset_categories(%w(cool test boo))
+    xit "Gets the id for all of them" do
+      Soulheart::Loader.new.reset_categories(%w[cool test boo])
       expect(described_class.send(:category_id_from_opts, %w[boo cool test])).to eq("")
     end
   end

@@ -17,35 +17,35 @@ RSpec.describe Autocomplete::Loader do
   end
 
   describe "clean_data" do
-    it 'sets the color category, priority and normalizes term' do
-      item = { text: '  FooBar', category: "colors" }
+    it "sets the color category, priority and normalizes term" do
+      item = {text: "  FooBar", category: "colors"}
       target = {
         priority: 100,
         term: "foobar",
         category: "colors",
-        data: {text: "  FooBar", category: "colors" }
+        data: {text: "  FooBar", category: "colors"}
       }
       expect(subject.send(:clean_hash, item)).to eq target
     end
 
     it "doesn't overwrite the submitted params (including the data-text)" do
       item = {
-        text: 'Cool ',
-        priority: '50',
-        category: 'frame_mnfg',
+        text: "Cool ",
+        priority: "50",
+        category: "frame_mnfg",
         data: {
-          text: ' Cspan',
+          text: " Cspan",
           id: 199,
-          category: 'frame_mnfg'
+          category: "frame_mnfg"
         }
       }
       result = subject.send(:clean_hash, item)
-      expect(result[:term]).to eq('cool')
+      expect(result[:term]).to eq("cool")
       expect(result[:priority]).to eq(50)
       expect(result[:data][:id]).to eq(199)
-      expect(result[:data][:text]).to eq(' Cspan')
-      expect(result[:category]).to eq('frame_mnfg')
-      expect(result[:data][:category]).to eq('frame_mnfg')
+      expect(result[:data][:text]).to eq(" Cspan")
+      expect(result[:category]).to eq("frame_mnfg")
+      expect(result[:data][:category]).to eq("frame_mnfg")
     end
 
     it "raises argument error if no text is passed" do
@@ -124,7 +124,7 @@ RSpec.describe Autocomplete::Loader do
     end
     let(:item) { subject.send(:clean_hash, item_hash) }
     let(:target) { item_hash.except(:data).merge(item_hash[:data]) }
-    it 'adds an item, adds prefix scopes, adds category' do
+    it "adds an item, adds prefix scopes, adds category" do
       subject.clear_redis(true)
       subject.send(:store_item, item)
 
@@ -133,7 +133,7 @@ RSpec.describe Autocomplete::Loader do
 
       prefix = "#{Autocomplete.category_id("frame_mnfg")}brom"
       prefixed_result = Autocomplete.redis { |r| r.zrange(prefix, 0, -1) }
-      expect(prefixed_result[0]).to eq('brompton bicycle')
+      expect(prefixed_result[0]).to eq("brompton bicycle")
     end
   end
 
@@ -180,29 +180,29 @@ RSpec.describe Autocomplete::Loader do
         # loader.load(items)
 
         cat_prefixed = Autocomplete.redis do |r|
-          r.zrange("#{Autocomplete.category_id('frame manufacturermanufacturer')}brom", 0, -1)
+          r.zrange("#{Autocomplete.category_id("frame manufacturermanufacturer")}brom", 0, -1)
         end
         pp cat_prefixed
         expect(cat_prefixed.count).to eq(1)
         expect(redis.smembers(loader.categories_id).count).to be > 3
-        prefixed = redis.zrange "#{loader.category_id('all')}bro", 0, -1
+        prefixed = redis.zrange "#{loader.category_id("all")}bro", 0, -1
         expect(prefixed.count).to eq(2)
-        expect(prefixed[0]).to eq('brompton bicycle')
+        expect(prefixed[0]).to eq("brompton bicycle")
       end
     end
 
-  #   it "stores terms by priority and doesn't add run categories if none are present" do
-  #     items = [
-  #       { 'text' => 'cool thing', 'category' => 'AWESOME' },
-  #       { 'text' => 'Sweet', 'category' => ' awesome' }
-  #     ]
-  #     loader = Soulheart::Loader.new
-  #     loader.clear(true)
-  #     redis = loader.redis
-  #     loader.delete_categories
-  #     loader.load(items)
-  #     expect(redis.smembers(loader.category_combos_id).count).to eq(1)
-  #   end
+    #   it "stores terms by priority and doesn't add run categories if none are present" do
+    #     items = [
+    #       { 'text' => 'cool thing', 'category' => 'AWESOME' },
+    #       { 'text' => 'Sweet', 'category' => ' awesome' }
+    #     ]
+    #     loader = Soulheart::Loader.new
+    #     loader.clear(true)
+    #     redis = loader.redis
+    #     loader.delete_categories
+    #     loader.load(items)
+    #     expect(redis.smembers(loader.category_combos_id).count).to eq(1)
+    #   end
   end
 
   # describe :clear do
