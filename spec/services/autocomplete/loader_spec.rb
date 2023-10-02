@@ -2,6 +2,19 @@ require "rails_helper"
 
 RSpec.describe Autocomplete::Loader do
   let(:subject) { Autocomplete::Loader }
+  let(:category_count_for_1_item) { 7 } # Because of the combinatorial categories
+
+  describe "load_all" do
+    let!(:color) { Color.black }
+    let!(:manufacturer) { Manufacturer.other }
+    it "stores" do
+      expect(CycleType.all.count).to eq 20
+      expect(Manufacturer.count).to eq 1
+      expect(Color.count).to eq 1
+      total_count = subject.load_all
+      expect(total_count).to eq 22 * category_count_for_1_item
+    end
+  end
 
   describe "clean_data" do
     it 'sets the color category, priority and normalizes term' do
@@ -125,7 +138,6 @@ RSpec.describe Autocomplete::Loader do
   end
 
   describe "load_items" do
-    let(:category_count_for_1_item) { 7 }
     context "colors" do
       let!(:color) { FactoryBot.create(:color, display: "#333") }
       let(:target_color) { {category: "colors", display: "#333", id: color.id, priority: 1000, search_id: "c_#{color.id}", text: color.name} }

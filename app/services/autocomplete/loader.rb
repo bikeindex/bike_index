@@ -17,7 +17,7 @@ class Autocomplete::Loader
       clear_redis
       store_category_combos
       colors_count = store_items(Color.all.map { |c| c.autocomplete_hash })
-      puts "Total Colors added (including combinatorial categories):        #{colors_count}"
+      puts "Total Colors added (including combinatorial categories):         #{colors_count}"
 
       c_type_count = store_items(CycleType.all.map { |c| c.autocomplete_hash })
       puts "Total Cycle Types added (including combinatorial categories):    #{c_type_count}"
@@ -39,11 +39,9 @@ class Autocomplete::Loader
       combinatored_category_array.each do |category_combo|
         items.each do |item|
           if category_combo == item[:category]
-            pp "#{category_combo}     #{item[:term]}"
             store_item(item)
             i += 1
           elsif category_combo.match?(item[:category])
-            pp "#{category_combo}     #{item[:term]}"
             store_item(item, Autocomplete.category_id(category_combo), true)
             i += 1
           end
