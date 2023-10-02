@@ -1,6 +1,6 @@
 module Autocomplete
   STOREAGE_KEY = "autc#{Rails.env.test? ? ":test" : ""}:".freeze
-  SORTED_CATEGORY_ARRAY = %w[colors cycle_type frame_mnfg mnfg].freeze
+  SORTED_CATEGORY_ARRAY = %w[colors cycle_type frame_mnfg cmp_mnfg].freeze
   STOP_WORDS = [].freeze # I think we might want to include 'the'
 
   # Every method in this module should only be accessed by the subclasses.
@@ -16,27 +16,9 @@ module Autocomplete
         .strip.gsub(/\s+/, " ")
     end
 
-    def prefixes_for_phrase(phrase)
-      normalize(phrase).split(" ").reject do |w|
-        STOP_WORDS.include?(w)
-      end.map do |w|
-        (0..(w.length - 1)).map { |l| w[0..l] }
-      end.flatten.uniq
-    end
-
+    # TODO: is it better to have this be a method? Or just access the constant?
     def sorted_category_array
-      # TODO: We're still putting the categories into redis - but I don't think we actually need to
       SORTED_CATEGORY_ARRAY
-      # redis { |r| r.smembers(categories_id) }.map { |c| normalize(c) }.uniq.sort
-    end
-
-    def combinatored_category_array
-      # Maybe use a static list?
-      1.upto(sorted_category_array.size).
-        flat_map do |n|
-          sorted_category_array.combination(n)
-            .map { |el| el.join('') }
-        end
     end
 
     def category_combos_id
@@ -47,12 +29,8 @@ module Autocomplete
       redis { |r| r.smembers(category_combos_id) }
     end
 
-    def categories_id
-      "#{STOREAGE_KEY}cts:"
-    end
-
     def category_id(name = "all")
-      "#{categories_id}#{name}:"
+      "#{STOREAGE_KEY}cts:#{name}:"
     end
 
     def no_query_id(category = nil)

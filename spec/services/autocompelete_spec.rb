@@ -18,4 +18,11 @@ RSpec.describe Autocomplete do
     #   expect(Autocomplete.normalize("测试中文")).to eq "测试中文"
     # end
   end
+
+  describe "category_id" do
+    it "returns category_id" do
+      expect(Autocomplete.category_id("colors")).to eq "autc:test:cts:colors:"
+      expect(Autocomplete.category_id("cycle_type")).to eq "autc:test:cts:cycle_type:"
+    end
+  end
 end

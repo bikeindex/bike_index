@@ -60,7 +60,6 @@ class Autocomplete::Matcher
     def total_categories_count
       # Can be a static call, now that categories are static
       Autocomplete.sorted_category_array.count
-      # Autocomplete.redis { |r| r.scard(Autocomplete.categories_id) }
     end
 
     def categories_string(categories)

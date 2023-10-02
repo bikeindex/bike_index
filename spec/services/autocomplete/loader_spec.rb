@@ -2,14 +2,15 @@ require "rails_helper"
 
 RSpec.describe Autocomplete::Loader do
   let(:subject) { Autocomplete::Loader }
+
   describe "clean_data" do
-    it 'sets the default category, priority and normalizes term' do
-      item = { text: '  FooBar' }
+    it 'sets the color category, priority and normalizes term' do
+      item = { text: '  FooBar', category: "colors" }
       target = {
         priority: 100,
         term: "foobar",
-        category: "default",
-        data: {text: "  FooBar", category: "default" }
+        category: "colors",
+        data: {text: "  FooBar", category: "colors" }
       }
       expect(subject.send(:clean_hash, item)).to eq target
     end
@@ -18,11 +19,11 @@ RSpec.describe Autocomplete::Loader do
       item = {
         text: 'Cool ',
         priority: '50',
-        category: 'Gooble',
+        category: 'frame_mnfg',
         data: {
           text: ' Cspan',
           id: 199,
-          category: 'Stuff'
+          category: 'frame_mnfg'
         }
       }
       result = subject.send(:clean_hash, item)
@@ -30,14 +31,20 @@ RSpec.describe Autocomplete::Loader do
       expect(result[:priority]).to eq(50)
       expect(result[:data][:id]).to eq(199)
       expect(result[:data][:text]).to eq(' Cspan')
-      expect(result[:category]).to eq('gooble')
-      expect(result[:data][:category]).to eq('Stuff')
+      expect(result[:category]).to eq('frame_mnfg')
+      expect(result[:data][:category]).to eq('frame_mnfg')
     end
 
-    it 'raises argument error if no text is passed' do
+    it "raises argument error if no text is passed" do
       expect do
         subject.send(:clean_hash, {name: "stuff"})
       end.to raise_error(/must have/i)
+    end
+
+    it "raises argument error if the category doesn't match" do
+      expect do
+        subject.send(:clean_hash, {text: "stuff", category: "gooble"})
+      end.to raise_error(/category/i)
     end
 
     context "manufacturer" do
@@ -95,7 +102,7 @@ RSpec.describe Autocomplete::Loader do
     end
   end
 
-  describe :add_item do
+  describe "store_item" do
     let(:item_hash) do
       {
         id: 55, text: "Brompton Bicycle", category: "frame_mnfg", priority: 100,
@@ -106,7 +113,7 @@ RSpec.describe Autocomplete::Loader do
     let(:target) { item_hash.except(:data).merge(item_hash[:data]) }
     it 'adds an item, adds prefix scopes, adds category' do
       subject.clear_redis(true)
-      subject.send(:add_item, item)
+      subject.send(:store_item, item)
 
       result = Autocomplete.redis { |r| r.hget(Autocomplete.results_hashes_id, "brompton bicycle") }
       expect_hashes_to_match(JSON.parse(result), target)
@@ -117,41 +124,60 @@ RSpec.describe Autocomplete::Loader do
     end
   end
 
-  describe :load do
+  describe "load_items" do
+    let(:category_count_for_1_item) { 7 }
     context "colors" do
       let!(:color) { FactoryBot.create(:color, display: "#333") }
+      let(:target_color) { {category: "colors", display: "#333", id: color.id, priority: 1000, search_id: "c_#{color.id}", text: color.name} }
       let(:normalized_name) { Autocomplete.normalize(color.name) }
-      let(:target) { {category: "colors", display: "#333", id: color.id, priority: 1000, search_id: "c_#{color.id}", text: color.name} }
       it "loads colors" do
         subject.clear_redis(true)
         expect(Color.count).to eq 1
-        subject.load(Color.all.map { |c| c.autocomplete_hash })
+        count = subject.send(:store_items, [color.autocomplete_hash])
+        expect(count).to eq category_count_for_1_item
 
         result = Autocomplete.redis { |r| r.hget(Autocomplete.results_hashes_id, normalized_name) }
-        expect_hashes_to_match(JSON.parse(result), target)
+        expect_hashes_to_match(JSON.parse(result), target_color)
 
         prefix = "#{Autocomplete.category_id("colors")}col"
         prefixed_result = Autocomplete.redis { |r| r.zrange(prefix, 0, -1) }
         expect(prefixed_result[0]).to eq normalized_name
       end
     end
-  #   it 'stores terms by priority and adds categories for each possible category combination' do
-  #     items = []
-  #     file = File.read('spec/fixtures/multiple_categories.json')
-  #     file.each_line { |l| items << JSON.parse(l) }
-  #     loader = Soulheart::Loader.new
-  #     loader.clear(true)
-  #     redis = loader.redis
-  #     loader.delete_categories
-  #     loader.load(items)
+    context "manufacturers" do
+      let!(:manufacturer1) { FactoryBot.create(:manufacturer, frame_maker: true) }
+      let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "Brompton", frame_maker: true) }
+      let!(:manufacturer3) { FactoryBot.create(:manufacturer, frame_maker: false) }
+      let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer2) }
+      it "stores terms by priority and adds categories for each possible category combination" do
+        expect(manufacturer1.reload.autocomplete_hash_priority).to eq 0
+        expect(manufacturer2.reload.autocomplete_hash_priority).to eq 10
+        expect(manufacturer3.reload.autocomplete_hash_priority).to eq 0
 
-  #     cat_prefixed = redis.zrange "#{loader.category_id('frame manufacturermanufacturer')}brom", 0, -1
-  #     expect(cat_prefixed.count).to eq(1)
-  #     expect(redis.smembers(loader.categories_id).count).to be > 3
-  #     prefixed = redis.zrange "#{loader.category_id('all')}bro", 0, -1
-  #     expect(prefixed.count).to eq(2)
-  #     expect(prefixed[0]).to eq('brompton bicycle')
-  #   end
+        subject.clear_redis(true)
+        result = subject.send(:store_items, Manufacturer.all.map { |m| m.autocomplete_hash })
+        expect(result).to eq category_count_for_1_item * 3
+
+        # items = []
+        # file = File.read('spec/fixtures/multiple_categories.json')
+        # file.each_line { |l| items << JSON.parse(l) }
+        # loader = Soulheart::Loader.new
+        # loader.clear(true)
+        # redis = loader.redis
+        # loader.delete_categories
+        # loader.load(items)
+
+        cat_prefixed = Autocomplete.redis do |r|
+          r.zrange("#{Autocomplete.category_id('frame manufacturermanufacturer')}brom", 0, -1)
+        end
+        pp cat_prefixed
+        expect(cat_prefixed.count).to eq(1)
+        expect(redis.smembers(loader.categories_id).count).to be > 3
+        prefixed = redis.zrange "#{loader.category_id('all')}bro", 0, -1
+        expect(prefixed.count).to eq(2)
+        expect(prefixed[0]).to eq('brompton bicycle')
+      end
+    end
 
   #   it "stores terms by priority and doesn't add run categories if none are present" do
   #     items = [
