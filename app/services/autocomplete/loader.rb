@@ -37,19 +37,16 @@ class Autocomplete::Loader
       items = items.map { |i| clean_hash(i) }
       combinatored_category_array.each do |category_combo|
         items.each do |item|
-          if category_combo == item[:category]
-            store_item(item)
-            i += 1
-          elsif category_combo.match?(item[:category])
-            store_item(item, Autocomplete.category_key(category_combo), true)
-            i += 1
-          end
+          next unless category_combo.match?(item[:category])
+          # Only add item data once (when in the exact matching category)
+          store_item(item, Autocomplete.category_key(category_combo), category_combo != item[:category])
+          i += 1
         end
       end
       i
     end
 
-    def store_item(item, category_base_key = nil, base_added = false)
+    def store_item(item, category_base_key = nil, skip_item_data = false)
       category_base_key ||= Autocomplete.category_key(item[:category])
       priority = -1 * item[:priority]
       # pipeline doesn't reduce network requests, my understanding is wrapping all (as oppose to individual items)
@@ -59,10 +56,10 @@ class Autocomplete::Loader
           # Add to master set for queryless searches
           pipeline.zadd(Autocomplete.no_query_key(category_base_key), priority, item[:term])
           # store the raw data in a separate key (no need to have for each category)
-          pipeline.hset(Autocomplete.items_data_key, item[:term], item[:data].to_json) unless base_added
+          pipeline.hset(Autocomplete.items_data_key, item[:term], item[:data].to_json) unless skip_item_data
           # Store all the prefixes
           prefixes_for_phrase(item[:term]).each do |prefix|
-            pipeline.sadd(base_key, prefix) unless base_added # remember prefix in a master set
+            pipeline.sadd(base_key, prefix) unless skip_item_data # remember prefix in a master set
             # store the normalized term in the index for each of the categories
             pipeline.zadd("#{category_base_key}#{prefix}", priority, item[:term])
           end

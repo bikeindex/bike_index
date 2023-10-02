@@ -3,7 +3,7 @@ module Autocomplete
   SORTED_CATEGORY_ARRAY = %w[colors cycle_type frame_mnfg cmp_mnfg].freeze
   STOP_WORDS = [].freeze # I think we might want to include 'the'
 
-  # Every method in this module should only be accessed by the subclasses.
+  # The methods in this module should only be accessed by the subclasses.
   # I'm not sure how to do that correctly :/
   class << self
     def cache_duration
