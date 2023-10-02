@@ -7,14 +7,17 @@ class Autocomplete::Loader
   }.freeze
 
   class << self
-    def clear_redis(should_clear_cache = false)
-      clear_cache if should_clear_cache
+    # Generally, the cache should be cleared, but it doesn't need to be cleared if just adding new data
+    def clear_redis(skip_clearing_cache = false)
       delete_categories_and_item_data
       delete_data
+      # Clear cache at the end, to reduce disruption (hopefully the majority of the cache matches)
+      clear_cache unless skip_clearing_cache
     end
 
     def load_all
       store_category_combos
+
       colors_count = store_items(Color.all.map { |c| c.autocomplete_hash })
       puts "Total Colors added (including combinatorial categories):         #{colors_count}"
 

@@ -11,7 +11,7 @@ RSpec.describe Autocomplete::Loader do
       expect(CycleType.all.count).to eq 20
       expect(Manufacturer.count).to eq 1
       expect(Color.count).to eq 1
-      subject.clear_redis(true)
+      subject.clear_redis
       total_count = subject.load_all
       expect(total_count).to eq 22 * category_count_for_1_item
     end
@@ -126,7 +126,7 @@ RSpec.describe Autocomplete::Loader do
     let(:item) { subject.send(:clean_hash, item_hash) }
     let(:target) { item_hash.except(:data).merge(item_hash[:data]) }
     it "adds an item, adds prefix scopes, adds category" do
-      subject.clear_redis(true)
+      subject.clear_redis
       subject.send(:store_item, item)
 
       result = Autocomplete.redis { |r| r.hget(Autocomplete.items_data_key, "brompton bicycle") }
@@ -144,7 +144,7 @@ RSpec.describe Autocomplete::Loader do
       let(:target_color) { {category: "colors", display: "#333", id: color.id, priority: 1000, search_id: "c_#{color.id}", text: color.name} }
       let(:normalized_name) { Autocomplete.normalize(color.name) }
       it "loads colors" do
-        subject.clear_redis(true)
+        subject.clear_redis
         expect(Color.count).to eq 1
         count = subject.send(:store_items, [color.autocomplete_hash])
         expect(count).to eq category_count_for_1_item
@@ -168,7 +168,7 @@ RSpec.describe Autocomplete::Loader do
         expect(brompton.reload.autocomplete_hash_priority).to eq 10
         expect(manufacturer3.reload.autocomplete_hash_priority).to eq 0
 
-        subject.clear_redis(true)
+        subject.clear_redis
 
         result = subject.send(:store_items, Manufacturer.all.map { |m| m.autocomplete_hash })
         expect(result).to eq category_count_for_1_item * 3
@@ -187,97 +187,4 @@ RSpec.describe Autocomplete::Loader do
       end
     end
   end
-
-  # describe :clear do
-  #   context 'remove_results false (default)' do
-  #     it "deletes everything, but leaves the cache" do
-  #       items = [
-  #         {'text' => 'Brompton Bicycle', 'category' => 'Gooble'},
-  #         {'text' => 'Surly Bicycle', 'category' => 'Bluster'},
-  #         {"text" => "Defaulted"}
-  #       ]
-  #       search_opts = {'categories' => 'Bluster, Gooble', 'q' => 'brom'}
-
-  #       loader = Soulheart::Loader.new
-
-  #       redis = loader.redis
-  #       loader.load(items)
-  #       redis = loader.redis
-  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle').length).to be > 0
-  #       expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #       expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-
-  #       matches1 = Soulheart::Matcher.new(search_opts).matches
-  #       expect(matches1[0]['text']).to eq("Brompton Bicycle")
-
-  #       loader.clear
-  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle')).to_not be_nil
-  #       prefixed = redis.zrange "#{loader.category_key('gooble')}brom", 0, -1
-  #       expect(prefixed).to be_empty
-  #       expect(redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1).to be_empty
-  #       expect(redis.smembers(loader.categories_key).include?('gooble')).to be_false
-
-  #       matches2 = Soulheart::Matcher.new(search_opts).matches
-  #       expect(matches2[0]['text']).to eq("Brompton Bicycle")
-  #       expect(Soulheart::Matcher.new(search_opts.merge("cache" => false)).matches).to be_empty
-  #     end
-  #   end
-  #   context 'remove_results true' do
-  #     it 'removes everything including the results' do
-  #       items = [
-  #         {'text' => 'Brompton Bicycle', 'category' => 'Gooble'},
-  #         {'text' => 'Surly Bicycle', 'category' => 'Bluster'},
-  #         {"text" => "Defaulted"}
-  #       ]
-  #       search_opts = {'categories' => 'Bluster, Gooble', 'q' => 'brom'}
-
-  #       loader = Soulheart::Loader.new
-
-  #       redis = loader.redis
-  #       loader.load(items)
-  #       redis = loader.redis
-  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle').length).to be > 0
-  #       expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to_not be_nil
-  #       # expect((redis.zrange "#{loader.no_query_key('gooble')}", 0, -1)[0]).to eq("brompton bicycle")
-  #       expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #       expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-
-  #       matches1 = Soulheart::Matcher.new(search_opts).matches
-  #       expect(matches1[0]['text']).to eq("Brompton Bicycle")
-
-  #       loader.clear(true)
-  #       expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to eq([])
-  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle')).to be_nil
-  #     end
-  #   end
-  # end
-  # describe :clear_cache do
-  #   it 'removes the cache' do
-  #     items = [
-  #       {'text' => 'Brompton Bicycle', 'category' => 'Gooble'},
-  #       {'text' => 'Surly Bicycle', 'category' => 'Bluster'},
-  #       {"text" => "Defaulted"}
-  #     ]
-  #     search_opts = {'categories' => 'Bluster, Gooble', 'q' => 'brom'}
-
-  #     loader = Soulheart::Loader.new
-
-  #     redis = loader.redis
-  #     loader.load(items)
-  #     redis = loader.redis
-  #     expect(redis.hget(loader.items_data_key, 'brompton bicycle').length).to be > 0
-  #     expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to_not be_nil
-  #     # expect((redis.zrange "#{loader.no_query_key('gooble')}", 0, -1)[0]).to eq("brompton bicycle")
-  #     expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #     expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-
-  #     matches1 = Soulheart::Matcher.new(search_opts).matches
-  #     expect(matches1[0]['text']).to eq("Brompton Bicycle")
-
-  #     loader.clear_cache
-  #     expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to eq([])
-  #     expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #     expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #   end
-  # end
 end

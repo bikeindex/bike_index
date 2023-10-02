@@ -50,10 +50,9 @@ class Autocomplete::Matcher
     def categories_array(categories = [])
       return [] if categories.blank?
       categories = categories.split(/,|\+/) if !categories.is_a?(Array)
-      categories = categories.map { |s| Autocomplete.normalize(s) }.uniq.sort
-      if categories.length > 1 && categories.length == total_categories_count
-        categories = []
-      end
+      permitted_categories = Autocomplete.sorted_category_array
+      categories = permitted_categories & categories.map { |s| Autocomplete.normalize(s) }
+      return [] if categories.length == permitted_categories.length
       categories
     end
 
