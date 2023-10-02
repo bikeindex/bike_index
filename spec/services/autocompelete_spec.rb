@@ -19,10 +19,10 @@ RSpec.describe Autocomplete do
     # end
   end
 
-  describe "category_id" do
-    it "returns category_id" do
-      expect(Autocomplete.category_id("colors")).to eq "autc:test:cts:colors:"
-      expect(Autocomplete.category_id("cycle_type")).to eq "autc:test:cts:cycle_type:"
+  describe "category_key" do
+    it "returns category_key" do
+      expect(Autocomplete.category_key("colors")).to eq "autc:test:cts:colors:"
+      expect(Autocomplete.category_key("cycle_type")).to eq "autc:test:cts:cycle_type:"
     end
   end
 end

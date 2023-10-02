@@ -12,10 +12,10 @@ class Autocomplete::Matcher
       sparams = search_params(pparms)
       if sparams[:cache]
         # !redis.exists(@cachekey) || redis.exists(@cachekey) == 0
-        cache_it_because(sparams[:cache_id], sparams[:interkeys])
+        cache_it_because(sparams[:cache_key], sparams[:interkeys])
       end
 
-      terms = redis { |r| r.zrange(sparams[:cache_id], sparams[:offset], sparams[:limit]) }
+      terms = redis { |r| r.zrange(sparams[:cache_key], sparams[:offset], sparams[:limit]) }
       matching_hashes(terms)
     end
 
@@ -32,10 +32,10 @@ class Autocomplete::Matcher
       sparams[:offset] = (page - 1) * per_page
       limit = per_page + sparams[:offset] - 1
       sparams[:limit] = limit < 0 ? 0 : limit
-      sparams[:cache_id] = cache_id_from_opts(sparams[:categories], sparams[:q_array])
+      sparams[:cache_key] = cache_key_from_opts(sparams[:categories], sparams[:q_array])
       return sparams unless sparams[:cache]
-      sparams[:category_cache_id] = category_id_from_opts(sparams[:categories])
-      sparams[:interkeys] = interkeys_from_opts(sparams[:category_cache_id], sparams[:q_array])
+      sparams[:category_cache_key] = category_key_from_opts(sparams[:categories])
+      sparams[:interkeys] = interkeys_from_opts(sparams[:category_cache_key], sparams[:q_array])
       sparams
     end
 
@@ -66,36 +66,36 @@ class Autocomplete::Matcher
       categories.empty? ? "all" : categories.join("")
     end
 
-    def category_id_from_opts(categories)
-      Autocomplete.category_id(categories_string(categories))
+    def category_key_from_opts(categories)
+      Autocomplete.category_key(categories_string(categories))
     end
 
-    def cache_id_from_opts(categories, q_array)
+    def cache_key_from_opts(categories, q_array)
       [
-        Autocomplete.cache_id(categories_string(categories)),
+        Autocomplete.cache_key(categories_string(categories)),
         q_array.join(":")
       ].reject(&:blank?).join("")
     end
 
-    def interkeys_from_opts(category_cache_id, q_array)
+    def interkeys_from_opts(category_cache_key, q_array)
       # If there isn't a query, we use a special key in redis
       if q_array.empty?
-        [Autocomplete.no_query_id(category_cache_id)]
+        [Autocomplete.no_query_key(category_cache_key)]
       else
-        q_array.map { |w| "#{category_cache_id}#{w}" }
+        q_array.map { |w| "#{category_cache_key}#{w}" }
       end
     end
 
-    def cache_it_because(cache_id, interkeys)
+    def cache_it_because(cache_key, interkeys)
       Autocomplete.redis do |r|
-        r.zinterstore(cache_id, interkeys)
-        r.expire(cache_id, Autocomplete.cache_duration)
+        r.zinterstore(cache_key, interkeys)
+        r.expire(cache_key, Autocomplete.cache_duration)
       end
     end
 
     def matching_hashes(terms)
       return [] unless terms.size > 0
-      redis { |r| r.hmget(results_hashes_id, *terms) }
+      redis { |r| r.hmget(items_data_id, *terms) }
         .reject(&:blank?).map { |r| JSON.parse(r) }
     end
   end

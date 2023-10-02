@@ -11,6 +11,7 @@ RSpec.describe Autocomplete::Loader do
       expect(CycleType.all.count).to eq 20
       expect(Manufacturer.count).to eq 1
       expect(Color.count).to eq 1
+      subject.clear_redis(true)
       total_count = subject.load_all
       expect(total_count).to eq 22 * category_count_for_1_item
     end
@@ -128,10 +129,10 @@ RSpec.describe Autocomplete::Loader do
       subject.clear_redis(true)
       subject.send(:store_item, item)
 
-      result = Autocomplete.redis { |r| r.hget(Autocomplete.results_hashes_id, "brompton bicycle") }
+      result = Autocomplete.redis { |r| r.hget(Autocomplete.items_data_key, "brompton bicycle") }
       expect_hashes_to_match(JSON.parse(result), target)
 
-      prefix = "#{Autocomplete.category_id("frame_mnfg")}brom"
+      prefix = "#{Autocomplete.category_key("frame_mnfg")}brom"
       prefixed_result = Autocomplete.redis { |r| r.zrange(prefix, 0, -1) }
       expect(prefixed_result[0]).to eq("brompton bicycle")
     end
@@ -148,61 +149,43 @@ RSpec.describe Autocomplete::Loader do
         count = subject.send(:store_items, [color.autocomplete_hash])
         expect(count).to eq category_count_for_1_item
 
-        result = Autocomplete.redis { |r| r.hget(Autocomplete.results_hashes_id, normalized_name) }
+        result = Autocomplete.redis { |r| r.hget(Autocomplete.items_data_key, normalized_name) }
         expect_hashes_to_match(JSON.parse(result), target_color)
 
-        prefix = "#{Autocomplete.category_id("colors")}col"
+        prefix = "#{Autocomplete.category_key("colors")}col"
         prefixed_result = Autocomplete.redis { |r| r.zrange(prefix, 0, -1) }
         expect(prefixed_result[0]).to eq normalized_name
       end
     end
     context "manufacturers" do
       let!(:manufacturer1) { FactoryBot.create(:manufacturer, frame_maker: true) }
-      let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "Brompton", frame_maker: true) }
+      let!(:brompton) { FactoryBot.create(:manufacturer, name: "Brompton", frame_maker: true) }
       let!(:manufacturer3) { FactoryBot.create(:manufacturer, frame_maker: false) }
-      let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer2) }
+      let!(:bike) { FactoryBot.create(:bike, manufacturer: brompton) }
+      let(:target_manufacturer) { {text: "Brompton", category: "frame_mnfg", slug: "brompton", priority: 10, search_id: "m_#{brompton.id}", id: brompton.id} }
       it "stores terms by priority and adds categories for each possible category combination" do
         expect(manufacturer1.reload.autocomplete_hash_priority).to eq 0
-        expect(manufacturer2.reload.autocomplete_hash_priority).to eq 10
+        expect(brompton.reload.autocomplete_hash_priority).to eq 10
         expect(manufacturer3.reload.autocomplete_hash_priority).to eq 0
 
         subject.clear_redis(true)
+
         result = subject.send(:store_items, Manufacturer.all.map { |m| m.autocomplete_hash })
         expect(result).to eq category_count_for_1_item * 3
 
-        # items = []
-        # file = File.read('spec/fixtures/multiple_categories.json')
-        # file.each_line { |l| items << JSON.parse(l) }
-        # loader = Soulheart::Loader.new
-        # loader.clear(true)
-        # redis = loader.redis
-        # loader.delete_categories
-        # loader.load(items)
-
         cat_prefixed = Autocomplete.redis do |r|
-          r.zrange("#{Autocomplete.category_id("frame manufacturermanufacturer")}brom", 0, -1)
+          r.zrange("#{Autocomplete.category_key("frame_mnfg")}br", 0, -1)
         end
-        pp cat_prefixed
-        expect(cat_prefixed.count).to eq(1)
-        expect(redis.smembers(loader.categories_id).count).to be > 3
-        prefixed = redis.zrange "#{loader.category_id("all")}bro", 0, -1
-        expect(prefixed.count).to eq(2)
-        expect(prefixed[0]).to eq("brompton bicycle")
+        expect(cat_prefixed).to eq(["brompton"])
+
+        item_json = Autocomplete.redis do |r|
+          r.hmget(Autocomplete.items_data_key, Autocomplete.normalize(brompton.name))
+        end
+        expect(item_json.count).to eq 1
+        item = JSON.parse(item_json.first)
+        expect_hashes_to_match(item, target_manufacturer)
       end
     end
-
-    #   it "stores terms by priority and doesn't add run categories if none are present" do
-    #     items = [
-    #       { 'text' => 'cool thing', 'category' => 'AWESOME' },
-    #       { 'text' => 'Sweet', 'category' => ' awesome' }
-    #     ]
-    #     loader = Soulheart::Loader.new
-    #     loader.clear(true)
-    #     redis = loader.redis
-    #     loader.delete_categories
-    #     loader.load(items)
-    #     expect(redis.smembers(loader.category_combos_id).count).to eq(1)
-    #   end
   end
 
   # describe :clear do
@@ -220,19 +203,19 @@ RSpec.describe Autocomplete::Loader do
   #       redis = loader.redis
   #       loader.load(items)
   #       redis = loader.redis
-  #       expect(redis.hget(loader.results_hashes_id, 'brompton bicycle').length).to be > 0
-  #       expect((redis.zrange "#{loader.category_id('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #       expect((redis.zrange "#{loader.category_id('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle').length).to be > 0
+  #       expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #       expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
 
   #       matches1 = Soulheart::Matcher.new(search_opts).matches
   #       expect(matches1[0]['text']).to eq("Brompton Bicycle")
 
   #       loader.clear
-  #       expect(redis.hget(loader.results_hashes_id, 'brompton bicycle')).to_not be_nil
-  #       prefixed = redis.zrange "#{loader.category_id('gooble')}brom", 0, -1
+  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle')).to_not be_nil
+  #       prefixed = redis.zrange "#{loader.category_key('gooble')}brom", 0, -1
   #       expect(prefixed).to be_empty
-  #       expect(redis.zrange "#{loader.category_id('blustergooble')}brom", 0, -1).to be_empty
-  #       expect(redis.smembers(loader.categories_id).include?('gooble')).to be_false
+  #       expect(redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1).to be_empty
+  #       expect(redis.smembers(loader.categories_key).include?('gooble')).to be_false
 
   #       matches2 = Soulheart::Matcher.new(search_opts).matches
   #       expect(matches2[0]['text']).to eq("Brompton Bicycle")
@@ -253,18 +236,18 @@ RSpec.describe Autocomplete::Loader do
   #       redis = loader.redis
   #       loader.load(items)
   #       redis = loader.redis
-  #       expect(redis.hget(loader.results_hashes_id, 'brompton bicycle').length).to be > 0
-  #       expect(redis.zrange "#{loader.no_query_id(loader.category_id('gooble'))}", 0, -1).to_not be_nil
-  #       # expect((redis.zrange "#{loader.no_query_id('gooble')}", 0, -1)[0]).to eq("brompton bicycle")
-  #       expect((redis.zrange "#{loader.category_id('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #       expect((redis.zrange "#{loader.category_id('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle').length).to be > 0
+  #       expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to_not be_nil
+  #       # expect((redis.zrange "#{loader.no_query_key('gooble')}", 0, -1)[0]).to eq("brompton bicycle")
+  #       expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #       expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
 
   #       matches1 = Soulheart::Matcher.new(search_opts).matches
   #       expect(matches1[0]['text']).to eq("Brompton Bicycle")
 
   #       loader.clear(true)
-  #       expect(redis.zrange "#{loader.no_query_id(loader.category_id('gooble'))}", 0, -1).to eq([])
-  #       expect(redis.hget(loader.results_hashes_id, 'brompton bicycle')).to be_nil
+  #       expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to eq([])
+  #       expect(redis.hget(loader.items_data_key, 'brompton bicycle')).to be_nil
   #     end
   #   end
   # end
@@ -282,19 +265,19 @@ RSpec.describe Autocomplete::Loader do
   #     redis = loader.redis
   #     loader.load(items)
   #     redis = loader.redis
-  #     expect(redis.hget(loader.results_hashes_id, 'brompton bicycle').length).to be > 0
-  #     expect(redis.zrange "#{loader.no_query_id(loader.category_id('gooble'))}", 0, -1).to_not be_nil
-  #     # expect((redis.zrange "#{loader.no_query_id('gooble')}", 0, -1)[0]).to eq("brompton bicycle")
-  #     expect((redis.zrange "#{loader.category_id('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #     expect((redis.zrange "#{loader.category_id('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #     expect(redis.hget(loader.items_data_key, 'brompton bicycle').length).to be > 0
+  #     expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to_not be_nil
+  #     # expect((redis.zrange "#{loader.no_query_key('gooble')}", 0, -1)[0]).to eq("brompton bicycle")
+  #     expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #     expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
 
   #     matches1 = Soulheart::Matcher.new(search_opts).matches
   #     expect(matches1[0]['text']).to eq("Brompton Bicycle")
 
   #     loader.clear_cache
-  #     expect(redis.zrange "#{loader.no_query_id(loader.category_id('gooble'))}", 0, -1).to eq([])
-  #     expect((redis.zrange "#{loader.category_id('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
-  #     expect((redis.zrange "#{loader.category_id('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #     expect(redis.zrange "#{loader.no_query_key(loader.category_key('gooble'))}", 0, -1).to eq([])
+  #     expect((redis.zrange "#{loader.category_key('gooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
+  #     expect((redis.zrange "#{loader.category_key('blustergooble')}brom", 0, -1)[0]).to eq("brompton bicycle")
   #   end
   # end
 end

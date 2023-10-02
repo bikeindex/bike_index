@@ -1,5 +1,5 @@
 module Autocomplete
-  STOREAGE_KEY = "autc#{Rails.env.test? ? ":test" : ""}:".freeze
+  BASE_KEY = "autc#{Rails.env.test? ? ":test" : ""}:".freeze
   SORTED_CATEGORY_ARRAY = %w[colors cycle_type frame_mnfg cmp_mnfg].freeze
   STOP_WORDS = [].freeze # I think we might want to include 'the'
 
@@ -21,28 +21,28 @@ module Autocomplete
       SORTED_CATEGORY_ARRAY
     end
 
-    def category_combos_id
-      "#{STOREAGE_KEY}category_combos:"
+    def category_combos_key
+      "#{BASE_KEY}category_combos:"
     end
 
     def category_combos
-      redis { |r| r.smembers(category_combos_id) }
+      redis { |r| r.smembers(category_combos_key) }
     end
 
-    def category_id(name = "all")
-      "#{STOREAGE_KEY}cts:#{name}:"
+    def category_key(name = "all")
+      "#{BASE_KEY}cts:#{name}:"
     end
 
-    def no_query_id(category = nil)
-      "all:#{category || category_id}"
+    def no_query_key(category = nil)
+      "all:#{category || category_key}"
     end
 
-    def results_hashes_id
-      "#{STOREAGE_KEY}db:"
+    def items_data_key
+      "#{BASE_KEY}db:"
     end
 
-    def cache_id(type = "all")
-      "#{STOREAGE_KEY}cache:#{type}:"
+    def cache_key(type = "all")
+      "#{BASE_KEY}cache:#{type}:"
     end
 
     # Should be the canonical way of using redis

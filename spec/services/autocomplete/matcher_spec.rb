@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Autocomplete::Matcher do
   describe "search_params" do
     let(:default) { {offset: 0, limit: 4, categories: [], q_array: [], cache: true} }
-    let(:default_cache_keys) { {cache_id: "autc:test:cache:all:", category_cache_id: "autc:test:cts:all:", interkeys: ["all:autc:test:cts:all:"]} }
+    let(:default_cache_keys) { {cache_key: "autc:test:cache:all:", category_cache_key: "autc:test:cts:all:", interkeys: ["all:autc:test:cts:all:"]} }
     it "is the default plus cache keys" do
       expect(described_class.send(:search_params)).to eq default.merge(default_cache_keys)
       expect(described_class.send(:search_params, {page: "1"})).to eq default.merge(default_cache_keys)
@@ -18,7 +18,7 @@ RSpec.describe Autocomplete::Matcher do
       end
     end
     context "cache: false" do
-      let(:target) { default.merge(cache: false, cache_id: "autc:test:cache:all:") }
+      let(:target) { default.merge(cache: false, cache_key: "autc:test:cache:all:") }
       it "default false" do
         expect(described_class.send(:search_params, {cache: "false"})).to eq target
       end
@@ -27,8 +27,8 @@ RSpec.describe Autocomplete::Matcher do
       let(:target) do
         default.merge(categories: ["manufacturer"],
           q_array: ["black"],
-          cache_id: "autc:test:cache:manufacturer:black",
-          category_cache_id: "autc:test:cts:manufacturer:",
+          cache_key: "autc:test:cache:manufacturer:black",
+          category_cache_key: "autc:test:cts:manufacturer:",
           interkeys: ["autc:test:cts:manufacturer:black"])
       end
       it "has the cache keys" do
@@ -57,18 +57,18 @@ RSpec.describe Autocomplete::Matcher do
     end
   end
 
-  describe "category_id_from_opts" do
+  describe "category_key_from_opts" do
     it "Gets the id for one" do
-      expect(described_class.send(:category_id_from_opts, [])).to eq "autc:test:cts:all:"
+      expect(described_class.send(:category_key_from_opts, [])).to eq "autc:test:cts:all:"
     end
     it "Gets the id for one" do
-      expect(described_class.send(:category_id_from_opts, ["some_category"])).to eq "autc:test:cts:some_category:"
+      expect(described_class.send(:category_key_from_opts, ["some_category"])).to eq "autc:test:cts:some_category:"
     end
 
     # TODO: Once loader is working
     xit "Gets the id for all of them" do
       Soulheart::Loader.new.reset_categories(%w[cool test boo])
-      expect(described_class.send(:category_id_from_opts, %w[boo cool test])).to eq("")
+      expect(described_class.send(:category_key_from_opts, %w[boo cool test])).to eq("")
     end
   end
 

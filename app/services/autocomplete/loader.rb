@@ -9,12 +9,11 @@ class Autocomplete::Loader
   class << self
     def clear_redis(should_clear_cache = false)
       clear_cache if should_clear_cache
-      delete_categories
+      delete_categories_and_item_data
       delete_data
     end
 
     def load_all
-      clear_redis
       store_category_combos
       colors_count = store_items(Color.all.map { |c| c.autocomplete_hash })
       puts "Total Colors added (including combinatorial categories):         #{colors_count}"
@@ -42,7 +41,7 @@ class Autocomplete::Loader
             store_item(item)
             i += 1
           elsif category_combo.match?(item[:category])
-            store_item(item, Autocomplete.category_id(category_combo), true)
+            store_item(item, Autocomplete.category_key(category_combo), true)
             i += 1
           end
         end
@@ -50,20 +49,22 @@ class Autocomplete::Loader
       i
     end
 
-    def store_item(item, category_base_id = nil, base_added = false)
-      category_base_id ||= Autocomplete.category_id(item[:category])
+    def store_item(item, category_base_key = nil, base_added = false)
+      category_base_key ||= Autocomplete.category_key(item[:category])
       priority = -1 * item[:priority]
+      # pipeline doesn't reduce network requests, my understanding is wrapping all (as oppose to individual items)
+      # in pipeline wouldn't improve functionality and might actually cause longer blocking
       Autocomplete.redis do |r|
         r.pipelined do |pipeline|
           # Add to master set for queryless searches
-          pipeline.zadd(Autocomplete.no_query_id(category_base_id), priority, item[:term])
-          # store the raw data in a separate key to reduce memory usage
-          pipeline.hset(Autocomplete.results_hashes_id, item[:term], item[:data].to_json) unless base_added
+          pipeline.zadd(Autocomplete.no_query_key(category_base_key), priority, item[:term])
+          # store the raw data in a separate key (no need to have for each category)
+          pipeline.hset(Autocomplete.items_data_key, item[:term], item[:data].to_json) unless base_added
           # Store all the prefixes
           prefixes_for_phrase(item[:term]).each do |prefix|
             pipeline.sadd(base_key, prefix) unless base_added # remember prefix in a master set
             # store the normalized term in the index for each of the categories
-            pipeline.zadd("#{category_base_id}#{prefix}", priority, item[:term])
+            pipeline.zadd("#{category_base_key}#{prefix}", priority, item[:term])
           end
         end
       end
@@ -71,7 +72,7 @@ class Autocomplete::Loader
     end
 
     def base_key
-      Autocomplete::STOREAGE_KEY
+      Autocomplete::BASE_KEY
     end
 
     def prefixes_for_phrase(phrase)
@@ -95,7 +96,7 @@ class Autocomplete::Loader
 
     def store_category_combos
       Autocomplete.redis do |r|
-        r.sadd(Autocomplete.category_combos_id, combinatored_category_array)
+        r.sadd(Autocomplete.category_combos_key, combinatored_category_array)
       end
     end
 
@@ -118,23 +119,38 @@ class Autocomplete::Loader
       i_hash
     end
 
-    # Shouldn't be called independently from clearing and reloading - it breaks categories
     def clear_cache
+      # TODO: Add tests!
       Autocomplete.redis do |r|
-        # Remove the remove_results_hash
-        # has to be called before the cat_ids are cleared
-        Autocomplete.category_combos.each do |cat|
-          r.expire(Autocomplete.no_query_id(Autocomplete.category_id(cat)), 0)
-        end
+        keys = r.scan_each({match: Autocomplete.cache_key.gsub("all:", "*")}).to_a
 
-        r.expire(Autocomplete.results_hashes_id, 0)
-        r.del(Autocomplete.results_hashes_id)
+        r.pipelined do |pipeline|
+          keys.each { |k| pipeline.expire(k, 0) }
+          #  The scan should match all the categories, but leaving until tests exist
+          # combinatored_category_array.each { |cat| r.expire(Autocomplete.cache_key(cat), 0) }
+        end
       end
     end
 
-    def delete_categories
+    def delete_categories_and_item_data
       Autocomplete.redis do |r|
-        r.expire Autocomplete.category_combos_id, 0
+        # Get all the matching keys for category typeahead
+        keys = r.scan_each({match: Autocomplete.category_key.gsub("all:", "*")}).to_a
+
+        r.pipelined do |pipeline|
+          # Use static categories, so it doesn't rely on data in Redis
+          combinatored_category_array.each do |cat|
+            pipeline.expire(Autocomplete.no_query_key(Autocomplete.category_key(cat)), 0)
+          end
+          pipeline.expire(Autocomplete.category_combos_key, 0)
+
+          # Delete the items data values
+          # pipeline.expire(Autocomplete.items_data_key, 0)
+          pipeline.del(Autocomplete.items_data_key)
+
+          # Expire all the typeahead keys
+          keys.each { |k| pipeline.expire(k, 0) }
+        end
       end
     end
 
@@ -145,8 +161,8 @@ class Autocomplete::Loader
         phrases = r.smembers(base_key)
         r.pipelined do |pipeline|
           phrases.each { |phrase| pipeline.del("#{id}#{phrase}") }
+          pipeline.del(id)
         end
-        r.del(id)
       end
       # Redis can continue serving cached requests while the reload is
       # occurring. Some requests may be cached incorrectly as empty set (for requests
