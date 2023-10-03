@@ -98,6 +98,7 @@ class Manufacturer < ApplicationRecord
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
+    self.description = nil if description.blank?
     true
   end
 

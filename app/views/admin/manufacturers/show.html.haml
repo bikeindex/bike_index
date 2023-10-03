@@ -1,7 +1,12 @@
-%h1
-  = @manufacturer.name
+.admin-subnav
+  .col-md-12
+    %h1
+      = @manufacturer.name
+      %small
+        %span.less-strong simple:
 
-%hr
+        = @manufacturer.simple_name
+
 .row
   .col-6
     %table.table-list
@@ -13,21 +18,54 @@
             = @manufacturer.id
         %tr
           %td
-            Official Org
-          %td
-            - if @manufacturer.official_organization.present?
-              = link_to @manufacturer.official_organization.name, admin_organization_path(@manufacturer.official_organization.to_param)
-        %tr
-          %td
             Created
           %td
             %span.convertTime.preciseTime
               = l @manufacturer.created_at, format: :convert_time
+        - if display_dev_info?
+          %tr
+            %td.only-dev-visible
+              Updated
+            %td
+              %span.convertTime.preciseTime
+                = l @manufacturer.updated_at, format: :convert_time
         %tr
           %td
             Slug
           %td
             = @manufacturer.slug
+        %tr
+          %td
+            Frame Maker?
+          %td
+            = check_mark if @manufacturer.frame_maker
+        %tr
+          %td
+            Bikes
+          %td
+            = admin_number_display(@manufacturer.bikes.count)
+            %a{ href: admin_bikes_path(search_manufacturer: @manufacturer.slug) }
+              view
+        %tr
+          %td
+            Components
+          %td
+            = @manufacturer.components.count
+  .col-6
+    %table.table-list
+      %tbody
+        - if display_dev_info?
+          %tr
+            %td.only-dev-visible
+              Autocomplete priority
+            %td
+              = @manufacturer.autocomplete_hash_priority
+        %tr
+          %td
+            Official Org
+          %td
+            - if @manufacturer.official_organization.present?
+              = link_to @manufacturer.official_organization.name, admin_organization_path(@manufacturer.official_organization.to_param)
         %tr
           %td
             Open Year
@@ -40,7 +78,7 @@
             = @manufacturer.close_year
         %tr
           %td
-            Manufacturer website
+            Website
           %td
             - if @manufacturer.website.present?
               = link_to @manufacturer.website, @manufacturer.website
@@ -57,27 +95,9 @@
             = @manufacturer.description
         %tr
           %td
-            Bikes
-          %td
-            = admin_number_display(@manufacturer.bikes.count)
-            %a{ href: admin_bikes_path(search_manufacturer: @manufacturer.slug) }
-              view
-        %tr
-          %td
-            Components
-          %td
-            = @manufacturer.components.count
-        %tr
-          %td
             Logo
           %td
             = link_to image_tag(@manufacturer.logo.url(:thumb)), @manufacturer.logo_url
-        %tr
-          %td
-            Frame Maker?
-          %td.table-cell-check
-            - if @manufacturer.frame_maker
-              &#x2713
   .col-6
     = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
     = link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"
