@@ -186,10 +186,11 @@ RSpec.describe Manufacturer, type: :model do
       expect(manufacturer.logo_source).to eq("something cool")
     end
 
-    it "empties if no logo" do
-      manufacturer = Manufacturer.new(logo_source: "something cool")
+    it "empties" do
+      manufacturer = Manufacturer.new(logo_source: "something cool", description: " ")
       manufacturer.set_calculated_attributes
       expect(manufacturer.logo_source).to be_nil
+      expect(manufacturer.description).to be_nil
     end
   end
 end
