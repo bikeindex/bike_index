@@ -1,26 +1,43 @@
 require "rails_helper"
 
 RSpec.describe Autocomplete::Matcher do
-  describe "search_params" do
+  let(:subject) { Autocomplete::Matcher }
+  describe "search" do
+    let(:color) { FactoryBot.create(:color, name: "Blue") }
+    let!(:manufacturer1) { FactoryBot.create(:manufacturer, name: "S & M (S and M Bikes)", frame_maker: true) }
+    let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "SE Bikes", frame_maker: true) }
+    let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer2, primary_frame_color: color) }
+    it "orders by priority" do
+      Autocomplete::Loader.load_all
+      result = subject.search
+      expect(result.count).to eq 5
+      expect(result.first["search_id"]).to eq
+      expect(result.map { |i| i["search_id"] }).to eq("c_#{color.id}")
+
+      # Autocomplete::Loader.send(:store_items, [Color.black.autocomplete_hash])
+    end
+  end
+
+  describe "params_to_opts" do
     let(:default) { {offset: 0, limit: 4, categories: [], q_array: [], cache: true} }
     let(:default_cache_keys) { {cache_key: "autc:test:cache:all:", category_cache_key: "autc:test:cts:all:", interkeys: ["all:autc:test:cts:all:"]} }
     let(:default_target) { default.merge(default_cache_keys) }
     it "is the default plus cache keys" do
-      expect(described_class.send(:search_params)).to eq default.merge(default_cache_keys)
-      expect(described_class.send(:search_params, {page: "1"})).to eq default.merge(default_cache_keys)
-      expect(described_class.send(:search_params, {page: "1", per_page: "5.0"})).to eq default.merge(default_cache_keys)
+      expect(subject.send(:params_to_opts)).to eq default.merge(default_cache_keys)
+      expect(subject.send(:params_to_opts, {page: "1"})).to eq default.merge(default_cache_keys)
+      expect(subject.send(:params_to_opts, {page: "1", per_page: "5.0"})).to eq default.merge(default_cache_keys)
     end
     context "with different per_page and page params" do
       it "returns expected" do
-        expect(described_class.send(:search_params, {per_page: "10"})).to eq default_target.merge(limit: 9)
-        expect(described_class.send(:search_params, {page: "2", per_page: "7.0"})).to eq default_target.merge(limit: 13, offset: 7)
-        expect(described_class.send(:search_params, {page: 20})).to eq default_target.merge(limit: 99, offset: 95)
+        expect(subject.send(:params_to_opts, {per_page: "10"})).to eq default_target.merge(limit: 9)
+        expect(subject.send(:params_to_opts, {page: "2", per_page: "7.0"})).to eq default_target.merge(limit: 13, offset: 7)
+        expect(subject.send(:params_to_opts, {page: 20})).to eq default_target.merge(limit: 99, offset: 95)
       end
     end
     context "cache: false" do
-      let(:target) { default.merge(cache: false, cache_key: "autc:test:cache:all:") }
+      let(:target) { default_target.merge(cache: false) }
       it "default false" do
-        expect(described_class.send(:search_params, {cache: "false"})).to eq target
+        expect(subject.send(:params_to_opts, {cache: "false"})).to eq target
       end
     end
     context "with a category and a query" do
@@ -32,39 +49,39 @@ RSpec.describe Autocomplete::Matcher do
           interkeys: ["autc:test:cts:frame_mnfg:black"])
       end
       it "has the cache keys" do
-        expect(described_class.send(:search_params, {q: "black", categories: ["frame_mnfg"]})).to eq target
+        expect(subject.send(:params_to_opts, {q: "black", categories: ["frame_mnfg"]})).to eq target
       end
     end
 
     it "Makes category empty if it's all the categories" do
-      result = described_class.send(:search_params, {categories: "colors, cycle_type, frame_mnfg,CMP_MNFG"})
+      result = subject.send(:params_to_opts, {categories: "colors, cycle_type, frame_mnfg,CMP_MNFG"})
       expect(result).to eq default_target
     end
   end
 
   describe "categories_array" do
     it "Returns an empty array from a string" do
-      expect(described_class.send(:categories_array)).to eq([])
-      expect(described_class.send(:categories_array, [])).to eq([])
-      expect(described_class.send(:categories_array, nil)).to eq([])
-      expect(described_class.send(:categories_array, " ")).to eq([])
+      expect(subject.send(:categories_array)).to eq([])
+      expect(subject.send(:categories_array, [])).to eq([])
+      expect(subject.send(:categories_array, nil)).to eq([])
+      expect(subject.send(:categories_array, " ")).to eq([])
     end
     it "returns an array from strings" do
-      expect(described_class.send(:categories_array, "colors")).to eq(%w[colors])
-      expect(described_class.send(:categories_array, "cycle_type,colors")).to eq(%w[colors cycle_type])
+      expect(subject.send(:categories_array, "colors")).to eq(%w[colors])
+      expect(subject.send(:categories_array, "cycle_type,colors")).to eq(%w[colors cycle_type])
     end
   end
 
   describe "category_key_from_opts" do
     it "Gets the id for none" do
-      expect(described_class.send(:category_key_from_opts, [])).to eq "autc:test:cts:all:"
+      expect(subject.send(:category_key_from_opts, [])).to eq "autc:test:cts:all:"
     end
     it "Gets the id for one" do
-      expect(described_class.send(:category_key_from_opts, ["cycle_type"])).to eq "autc:test:cts:cycle_type:"
+      expect(subject.send(:category_key_from_opts, ["cycle_type"])).to eq "autc:test:cts:cycle_type:"
     end
 
     it "Gets the id for all of them" do
-      expect(described_class.send(:category_key_from_opts, %w[colors frame_mnfg cmp_mnfg])).to eq "autc:test:cts:colorsframe_mnfgcmp_mnfg:"
+      expect(subject.send(:category_key_from_opts, %w[colors frame_mnfg cmp_mnfg])).to eq "autc:test:cts:colorsframe_mnfgcmp_mnfg:"
     end
   end
 

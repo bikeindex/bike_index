@@ -15,21 +15,21 @@ class Autocomplete::Loader
       clear_cache unless skip_clearing_cache
     end
 
-    def load_all
+    def load_all(print_output = false)
       store_category_combos
 
       colors_count = store_items(Color.all.map { |c| c.autocomplete_hash })
-      puts "Total Colors added (including combinatorial categories):         #{colors_count}"
+      puts "Total Colors added (including combinatorial categories):         #{colors_count}" if print_output
 
       c_type_count = store_items(CycleType.all.map { |c| c.autocomplete_hash })
-      puts "Total Cycle Types added (including combinatorial categories):    #{c_type_count}"
+      puts "Total Cycle Types added (including combinatorial categories):    #{c_type_count}" if print_output
 
       # TODO: find in batches
       mnfg_count = store_items(Manufacturer.all.map { |m| m.autocomplete_hash })
-      puts "Total Manufacturers added (including combinatorial categories):  #{mnfg_count}"
-      total_count = colors_count + c_type_count + mnfg_count
+      puts "Total Manufacturers added (including combinatorial categories):  #{mnfg_count}" if print_output
 
-      puts "Total added:                                                     #{total_count}"
+      total_count = colors_count + c_type_count + mnfg_count
+      puts "Total added:                                                     #{total_count}" if print_output
       total_count
     end
 
@@ -40,7 +40,7 @@ class Autocomplete::Loader
       items = items.map { |i| clean_hash(i) }
       combinatored_category_array.each do |category_combo|
         items.each do |item|
-          next unless category_combo.match?(item[:category])
+          next unless category_combo.match?(item[:category]) || category_combo == "all"
           # Only add item data once (when in the exact matching category)
           store_item(item, Autocomplete.category_key(category_combo), category_combo != item[:category])
           i += 1
@@ -122,7 +122,7 @@ class Autocomplete::Loader
     def clear_cache
       # TODO: Add tests!
       Autocomplete.redis do |r|
-        keys = r.scan_each({match: Autocomplete.cache_key.gsub("all:", "*")}).to_a
+        keys = r.scan_each({match: Autocomplete.cache_key.gsub(/all:\z/, "*")}).to_a
 
         r.pipelined do |pipeline|
           keys.each { |k| pipeline.expire(k, 0) }
@@ -135,7 +135,7 @@ class Autocomplete::Loader
     def delete_categories_and_item_data
       Autocomplete.redis do |r|
         # Get all the matching keys for category typeahead
-        keys = r.scan_each({match: Autocomplete.category_key.gsub("all:", "*")}).to_a
+        keys = r.scan_each({match: Autocomplete.category_key.gsub(/all:\z/, "*")}).to_a
 
         r.pipelined do |pipeline|
           # Use static categories, so it doesn't rely on data in Redis

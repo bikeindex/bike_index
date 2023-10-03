@@ -9,34 +9,42 @@ class Autocomplete::Matcher
 
   class << self
     def search(pparms = {})
-      sparams = search_params(pparms)
-      if sparams[:cache]
-        # !redis.exists(@cachekey) || redis.exists(@cachekey) == 0
-        cache_it_because(sparams[:cache_key], sparams[:interkeys])
+      opts = params_to_opts(pparms)
+      # It always responds with the cache - if cache: false, store the cache - or, if there isn't a cached
+      if !opts[:cache] || not_in_cache?(opts[:cache_key])
+        store_search_in_cache(opts[:cache_key], opts[:interkeys])
       end
-
-      terms = redis { |r| r.zrange(sparams[:cache_key], sparams[:offset], sparams[:limit]) }
+      terms = Autocomplete.redis { |r| r.zrange(opts[:cache_key], opts[:offset], opts[:limit]) }
+      pp terms
       matching_hashes(terms)
     end
 
     private
 
-    def search_params(pparms = {})
-      sparams = {
-        categories: categories_array(pparms[:categories]),
-        q_array: query_array(pparms[:q]),
-        cache: pparms[:cache].present? ? ParamsNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache]
-      }
+    def not_in_cache?(cache_key)
+      cached_result = Autocomplete.redis { |r| r.exists(cache_key) }
+      pp "Cached response: #{cached_result}"
+      true
+    end
+
+    def params_to_opts(pparms = {})
       per_page = pparms.dig(:per_page)&.to_i || DEFAULT_PARAMS[:per_page]
       page = pparms.dig(:page)&.to_i || DEFAULT_PARAMS[:page]
-      sparams[:offset] = (page - 1) * per_page
-      limit = per_page + sparams[:offset] - 1
-      sparams[:limit] = limit < 0 ? 0 : limit
-      sparams[:cache_key] = cache_key_from_opts(sparams[:categories], sparams[:q_array])
-      return sparams unless sparams[:cache]
-      sparams[:category_cache_key] = category_key_from_opts(sparams[:categories])
-      sparams[:interkeys] = interkeys_from_opts(sparams[:category_cache_key], sparams[:q_array])
-      sparams
+      offset = (page - 1) * per_page
+      limit = per_page + offset - 1
+      categories = categories_array(pparms[:categories])
+
+      opts = {
+        categories: categories,
+        q_array: query_array(pparms[:q]),
+        category_cache_key: category_key_from_opts(categories)
+      }
+      opts.merge(
+        cache: pparms[:cache].present? ? ParamsNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache],
+        cache_key: cache_key_from_opts(categories, opts[:q_array]),
+        interkeys: interkeys_from_opts(opts[:category_cache_key], opts[:q_array]),
+        offset: offset,
+        limit: limit < 0 ? 0 : limit)
     end
 
     def query_array(query)
@@ -85,7 +93,7 @@ class Autocomplete::Matcher
       end
     end
 
-    def cache_it_because(cache_key, interkeys)
+    def store_search_in_cache(cache_key, interkeys)
       Autocomplete.redis do |r|
         r.zinterstore(cache_key, interkeys)
         r.expire(cache_key, Autocomplete.cache_duration)
@@ -94,7 +102,7 @@ class Autocomplete::Matcher
 
     def matching_hashes(terms)
       return [] unless terms.size > 0
-      redis { |r| r.hmget(items_data_id, *terms) }
+      Autocomplete.redis { |r| r.hmget(Autocomplete.items_data_key, *terms) }
         .reject(&:blank?).map { |r| JSON.parse(r) }
     end
   end

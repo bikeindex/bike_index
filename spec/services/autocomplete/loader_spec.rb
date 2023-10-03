@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Autocomplete::Loader do
   let(:subject) { Autocomplete::Loader }
-  let(:category_count_for_1_item) { 7 } # Because of the combinatorial categories
+  let(:category_count_for_1_item) { 8 } # Because of the combinatorial categories
 
   describe "load_all" do
     let!(:color) { Color.black }
