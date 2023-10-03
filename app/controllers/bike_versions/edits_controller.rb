@@ -1,6 +1,6 @@
 class BikeVersions::EditsController < BikeVersionsController
   include BikeEditable
-  before_action :ensure_user_allowed_to_edit
+  before_action :ensure_user_allowed_to_edit_version
 
   def show
     @page_errors = @bike.errors
@@ -16,6 +16,4 @@ class BikeVersions::EditsController < BikeVersionsController
 
     render "/bikes_edit/#{@edit_template}".to_sym
   end
-
-  protected
 end
