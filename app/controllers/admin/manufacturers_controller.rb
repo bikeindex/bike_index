@@ -3,7 +3,7 @@ class Admin::ManufacturersController < Admin::BaseController
   before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
   def index
-    @manufacturers = Manufacturer.reorder("manufacturers.#{sort_column} #{sort_direction}")
+    @manufacturers = searched_manufacturers.reorder("manufacturers.#{sort_column} #{sort_direction}")
   end
 
   def show
@@ -66,6 +66,15 @@ class Admin::ManufacturersController < Admin::BaseController
   def permitted_parameters
     params.require(:manufacturer).permit(:name, :slug, :website, :frame_maker, :total_years_active, :notes,
       :open_year, :close_year, :logo, :description, :logo_source, :twitter_name)
+  end
+
+  def searched_manufacturers
+    manufacturers = Manufacturer
+    @with_logos = ParamsNormalizer.boolean(params[:search_with_logos])
+    manufacturers = manufacturers.with_websites if @with_logos
+    @with_websites = ParamsNormalizer.boolean(params[:search_with_websites])
+    manufacturers = manufacturers.with_logos if @with_logos
+    manufacturers
   end
 
   def find_manufacturer
