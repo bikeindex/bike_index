@@ -54,7 +54,7 @@ RSpec.describe Manufacturer, type: :model do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { [] }
         allow(manufacturer).to receive(:components) { [] }
-        expect(manufacturer.autocomplete_hash_priority).to eq(0)
+        expect(manufacturer.send(:calculated_priority).to eq(0)
       end
     end
     context "1 component" do
@@ -62,7 +62,7 @@ RSpec.describe Manufacturer, type: :model do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { [] }
         allow(manufacturer).to receive(:components) { [2] }
-        expect(manufacturer.autocomplete_hash_priority).to eq(10)
+        expect(manufacturer.send(:calculated_priority).to eq(10)
       end
     end
     context "25 bikes and 50 components" do
@@ -70,7 +70,7 @@ RSpec.describe Manufacturer, type: :model do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { Array(0..24) }
         allow(manufacturer).to receive(:components) { Array(0..50) }
-        expect(manufacturer.autocomplete_hash_priority).to eq(15)
+        expect(manufacturer.send(:calculated_priority).to eq(15)
       end
     end
     context "1020 bikes" do
@@ -78,7 +78,7 @@ RSpec.describe Manufacturer, type: :model do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { Array(1..1020) }
         allow(manufacturer).to receive(:components) { [2, 2, 2] }
-        expect(manufacturer.autocomplete_hash_priority).to eq(100)
+        expect(manufacturer.send(:calculated_priority).to eq(100)
       end
     end
   end

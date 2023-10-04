@@ -99,6 +99,7 @@ class Manufacturer < ApplicationRecord
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
     self.description = nil if description.blank?
+    self.priority = calculated_priority
     true
   end
 
@@ -106,21 +107,15 @@ class Manufacturer < ApplicationRecord
     frame_maker ? "frame_mnfg" : "mnfg"
   end
 
-  def autocomplete_hash_priority
-    return 0 unless (bikes.count + components.count) > 0
-    pop = (2 * bikes.count + components.count) / 20 + 10
-    pop > 100 ? 100 : pop
-  end
-
   def autocomplete_hash
     {
       id: id,
       text: name,
       category: autocomplete_hash_category,
-      priority: autocomplete_hash_priority,
+      priority: priority,
       data: {
         slug: slug,
-        priority: autocomplete_hash_priority,
+        priority: priority,
         search_id: search_id
       }
     }.as_json
@@ -136,5 +131,16 @@ class Manufacturer < ApplicationRecord
 
   def simple_name
     name.gsub(/\s?\([^)]*\)/i, "")
+  end
+
+  private
+
+  def calculated_priority
+    b_count = bikes.limit(1000).count
+    return 100 if b_count > 999
+    c_count = components.limit(2000).count
+    return 0 unless (b_count + c_count) > 0
+    pop = (2 * b_count + c_count) / 20 + 10
+    pop > 100 ? 100 : pop
   end
 end
