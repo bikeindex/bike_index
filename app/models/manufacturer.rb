@@ -6,7 +6,7 @@ class Manufacturer < ApplicationRecord
   has_many :paints
   has_many :components
 
-  mount_uploader :logo, AvatarUploader
+  mount_uploader :logo, ManufacturerLogoUploader
 
   before_validation :set_calculated_attributes
 
@@ -99,10 +99,10 @@ class Manufacturer < ApplicationRecord
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
     self.description = nil if description.blank?
-    self.priority = calculated_priority
+    self.priority = calculated_priority # scheduled update by UpdateManufacturerLogoAndPriorityWorker
     true
   end
-
+#
   def autocomplete_hash_category
     frame_maker ? "frame_mnfg" : "mnfg"
   end
@@ -133,8 +133,7 @@ class Manufacturer < ApplicationRecord
     name.gsub(/\s?\([^)]*\)/i, "")
   end
 
-  private
-
+  # Can't be private because it's called by UpdateManufacturerLogoAndPriorityWorker
   def calculated_priority
     b_count = bikes.limit(1000).count
     return 100 if b_count > 999

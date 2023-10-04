@@ -43,7 +43,7 @@
       %th
         = sortable "created_at"
       - if display_dev_info?
-       %th.small.only-dev-visible
+        %th.small.only-dev-visible
           = sortable "priority"
     %tbody
       - @manufacturers.each do |manufacturer|
