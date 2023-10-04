@@ -15,6 +15,23 @@ RSpec.describe Autocomplete::Loader do
       total_count = subject.load_all
       expect(total_count).to eq 22 * category_count_for_1_item
     end
+
+    context "passing individual types" do
+      it "stores the passed kind" do
+        expect(CycleType.all.count).to eq 20
+        expect(Manufacturer.count).to eq 1
+        expect(Color.count).to eq 1
+        subject.clear_redis
+        color_count = subject.load_all(["Color"])
+        expect(color_count).to eq category_count_for_1_item
+
+        manufacturer_count = subject.load_all(["Manufacturer"])
+        expect(manufacturer_count).to eq category_count_for_1_item
+
+        cycle_type_count = subject.load_all(["CycleType"])
+        expect(cycle_type_count).to eq 20 * category_count_for_1_item
+      end
+    end
   end
 
   describe "clean_data" do

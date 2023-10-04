@@ -15,21 +15,37 @@ class Autocomplete::Loader
       clear_cache unless skip_clearing_cache
     end
 
-    def load_all(print_output = false)
+    def load_all(kinds = nil, print_counts: false)
       store_category_combos
+      kinds ||= %w[Color CycleType Manufacturer]
+      total_count = 0
 
-      colors_count = store_items(Color.all.map { |c| c.autocomplete_hash })
-      puts "Total Colors added (including combinatorial categories):         #{colors_count}" if print_output
+      if kinds.include?("Color")
+        colors_count = store_items(Color.all.map { |c| c.autocomplete_hash })
+        total_count += colors_count
+        if print_counts
+          puts "Total Colors added (including combinatorial categories):         #{colors_count}"
+        end
+      end
 
-      c_type_count = store_items(CycleType.all.map { |c| c.autocomplete_hash })
-      puts "Total Cycle Types added (including combinatorial categories):    #{c_type_count}" if print_output
+      if kinds.include?("CycleType")
+        c_type_count = store_items(CycleType.all.map { |c| c.autocomplete_hash })
+        total_count += c_type_count
+        if print_counts
+          puts "Total Cycle Types added (including combinatorial categories):    #{c_type_count}"
+        end
+      end
 
       # TODO: find in batches
-      mnfg_count = store_items(Manufacturer.all.map { |m| m.autocomplete_hash })
-      puts "Total Manufacturers added (including combinatorial categories):  #{mnfg_count}" if print_output
+      if kinds.include?("Manufacturer")
+        mnfg_count = store_items(Manufacturer.all.map { |m| m.autocomplete_hash })
+        total_count += mnfg_count
+        if print_counts
+          puts "Total Manufacturers added (including combinatorial categories):  #{mnfg_count}"
+        end
+      end
 
-      total_count = colors_count + c_type_count + mnfg_count
-      puts "Total added:                                                     #{total_count}" if print_output
+      puts "Total added:                                                     #{total_count}" if print_counts
       total_count
     end
 
