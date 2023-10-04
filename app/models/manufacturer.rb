@@ -99,10 +99,10 @@ class Manufacturer < ApplicationRecord
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
     self.description = nil if description.blank?
-    self.priority = calculated_priority # scheduled update by UpdateManufacturerLogoAndPriorityWorker
+    self.priority = calculated_priority # scheduled updates via UpdateManufacturerLogoAndPriorityWorker
     true
   end
-#
+
   def autocomplete_hash_category
     frame_maker ? "frame_mnfg" : "mnfg"
   end
@@ -135,11 +135,19 @@ class Manufacturer < ApplicationRecord
 
   # Can't be private because it's called by UpdateManufacturerLogoAndPriorityWorker
   def calculated_priority
-    b_count = bikes.limit(1000).count
     return 100 if b_count > 999
-    c_count = components.limit(2000).count
-    return 0 unless (b_count + c_count) > 0
+    return 0 if (b_count + c_count) == 0
     pop = (2 * b_count + c_count) / 20 + 10
     pop > 100 ? 100 : pop
+  end
+
+  private
+
+  def b_count
+    @b_count ||= bikes.limit(1000).count
+  end
+
+  def c_count
+    @c_count ||= components.limit(2000).count
   end
 end

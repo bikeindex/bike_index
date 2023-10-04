@@ -14,9 +14,7 @@ RSpec.describe UpdateManufacturerLogoAndPriorityWorker, type: :job do
       manufacturer = FactoryBot.create(:manufacturer, website: "https://trekbikes.com")
       described_class.new.perform(manufacturer.id)
       manufacturer.reload
-      # logo.present is failing inexplicably - http://logo.clearbit.com/trekbikes.com?size=400 still works
-      # Since it degrades nicely and isn't required, just ignoring
-      # expect(manufacturer.logo).to be_present
+      expect(manufacturer.logo).to be_present
       expect(manufacturer.logo_source).to eq("Clearbit")
     end
   end

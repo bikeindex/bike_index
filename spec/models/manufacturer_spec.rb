@@ -52,33 +52,33 @@ RSpec.describe Manufacturer, type: :model do
     context "0 bikes or components" do
       it "returns 0" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { [] }
-        allow(manufacturer).to receive(:components) { [] }
-        expect(manufacturer.send(:calculated_priority).to eq(0)
+        allow(manufacturer).to receive(:b_count) { 0 }
+        allow(manufacturer).to receive(:c_count) { 0 }
+        expect(manufacturer.send(:calculated_priority)).to eq(0)
       end
     end
     context "1 component" do
       it "returns 10" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { [] }
-        allow(manufacturer).to receive(:components) { [2] }
-        expect(manufacturer.send(:calculated_priority).to eq(10)
+        allow(manufacturer).to receive(:b_count) { 0 }
+        allow(manufacturer).to receive(:c_count) { 2 }
+        expect(manufacturer.send(:calculated_priority)).to eq(10)
       end
     end
     context "25 bikes and 50 components" do
       it "returns 15" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { Array(0..24) }
-        allow(manufacturer).to receive(:components) { Array(0..50) }
-        expect(manufacturer.send(:calculated_priority).to eq(15)
+        allow(manufacturer).to receive(:b_count) { 24 }
+        allow(manufacturer).to receive(:c_count) { 50 }
+        expect(manufacturer.send(:calculated_priority)).to eq(14)
       end
     end
     context "1020 bikes" do
       it "returns 100" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { Array(1..1020) }
-        allow(manufacturer).to receive(:components) { [2, 2, 2] }
-        expect(manufacturer.send(:calculated_priority).to eq(100)
+        allow(manufacturer).to receive(:b_count) { 1020 }
+        allow(manufacturer).to receive(:c_count) { 3 }
+        expect(manufacturer.send(:calculated_priority)).to eq(100)
       end
     end
   end
