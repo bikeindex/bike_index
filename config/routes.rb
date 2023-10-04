@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "soulheart/server"
 require "sidekiq/web"
 
 Rails.application.routes.draw do
