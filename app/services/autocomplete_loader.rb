@@ -17,16 +17,16 @@ class AutocompleteLoader
   end
 
   def load_colors
-    Soulheart::Loader.new.load(Color.all.map { |c| c.autocomplete_hash })
+    Soulheart::Loader.new.load(Color.all.map { |c| c.autocomplete_hash.as_json })
   end
 
   def load_cycle_types
-    Soulheart::Loader.new.load(CycleType.all.map { |c| c.autocomplete_hash })
+    Soulheart::Loader.new.load(CycleType.all.map { |c| c.autocomplete_hash.as_json })
   end
 
   def load_manufacturers
     mnfgs_list = []
-    Manufacturer.find_each { |m| mnfgs_list << m.autocomplete_hash }
+    Manufacturer.find_each { |m| mnfgs_list << m.autocomplete_hash.as_json }
     Soulheart::Loader.new.load(mnfgs_list)
   end
 end

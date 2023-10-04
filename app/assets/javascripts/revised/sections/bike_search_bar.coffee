@@ -147,7 +147,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           p + "<span class=\'sclr\'>stckrs</span>"
       when item.category == 'cycle_type'
         "<span class=\'sch_\'>only for</span>"
-      when item.category == 'cmp_mnfg' || item.category == 'frame_mnfg'
+      when item.category == 'mnfg' || item.category == 'frame_mnfg'
         "<span class=\'sch_\'>Bikes made by</span>"
       else
         'Search for'

@@ -286,7 +286,7 @@ Rails.application.routes.draw do
       get "not_found", to: "api_v1#not_found"
       get "*a", to: "api_v1#not_found"
     end
-    resources :autocomplete, only: [:index]
+    mount Soulheart::Server, at: "/autocomplete"
   end
   mount API::Base => "/api"
 
