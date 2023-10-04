@@ -56,7 +56,7 @@ class Admin::ManufacturersController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[name created_at frame_maker]
+    %w[name created_at frame_maker priority]
   end
 
   def default_direction
