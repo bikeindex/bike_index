@@ -54,14 +54,35 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
+  describe "priority" do
+    # These are calculated based on rough rankings from a count of matching bikes:
+    # CycleType.slugs.map { |s| "#{s}: #{Bike.where(cycle_type: s).count}" }
+    it "high priorities" do
+      expect(CycleType.find(0).priority).to eq 950
+      expect(CycleType.find(11).priority).to eq 940
+      expect(CycleType.new("e-scooter").priority).to eq 930
+    end
+    it "is 920 for a variety" do
+      expect(CycleType.new("tricycle").priority).to eq 920
+      expect(CycleType.new("tandem").priority).to eq 920
+      expect(CycleType.new("recumbent").priority).to eq 920
+      expect(CycleType.new("personal-mobility").priority).to eq 920
+    end
+    it "is 900 for some others" do
+      expect(CycleType.new("cargo").priority).to eq 900
+      expect(CycleType.new("non-e-scooter").priority).to eq 900
+      expect(CycleType.new("unicycle").priority).to eq 900
+    end
+  end
+
   describe "autocomplete_hash" do
     let(:target) do
       {
         id: 0,
         text: "Bike",
-        priority: 900,
+        priority: 950,
         category: "cycle_type",
-        data: {priority: 900, slug: :bike, search_id: "v_0"}
+        data: {priority: 950, slug: :bike, search_id: "v_0"}
       }
     end
     let(:cycle_type) { CycleType.find(0) }

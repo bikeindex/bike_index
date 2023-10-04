@@ -164,9 +164,9 @@ RSpec.describe Autocomplete::Loader do
       let!(:bike) { FactoryBot.create(:bike, manufacturer: brompton) }
       let(:target_manufacturer) { {text: "Brompton", category: "frame_mnfg", slug: "brompton", priority: 10, search_id: "m_#{brompton.id}", id: brompton.id} }
       it "stores terms by priority and adds categories for each possible category combination" do
-        expect(manufacturer1.reload.autocomplete_hash_priority).to eq 0
-        expect(brompton.reload.autocomplete_hash_priority).to eq 10
-        expect(manufacturer3.reload.autocomplete_hash_priority).to eq 0
+        expect(manufacturer1.reload.priority).to eq 0
+        expect(manufacturer3.reload.priority).to eq 0
+        brompton.update_column :priority, 10
 
         subject.clear_redis
 

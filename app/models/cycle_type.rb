@@ -48,6 +48,8 @@ class CycleType
     "non-e-skateboard": "Skateboard (Not electric)"
   }.freeze
 
+  MODEST_PRIORITY = %i[tricycle tandem recumbent personal-mobility].freeze
+
   def self.searchable_names
     slugs
   end
@@ -60,7 +62,17 @@ class CycleType
   attr_reader :slug, :id
 
   def priority
-    900
+    if slug == :bike
+      950
+    elsif slug == :"cargo-rear"
+      940
+    elsif slug == :"e-scooter"
+      930
+    elsif MODEST_PRIORITY.include?(slug)
+      920
+    else
+      900
+    end
   end
 
   def search_id

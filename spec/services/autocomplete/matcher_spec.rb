@@ -4,17 +4,45 @@ RSpec.describe Autocomplete::Matcher do
   let(:subject) { Autocomplete::Matcher }
   describe "search" do
     let(:color) { FactoryBot.create(:color, name: "Blue") }
-    let!(:manufacturer1) { FactoryBot.create(:manufacturer, name: "S & M (S and M Bikes)", frame_maker: true) }
-    let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "SE Bikes", frame_maker: true) }
+    let!(:manufacturer1) { FactoryBot.create(:manufacturer, name: "Bike Friday", frame_maker: true) }
+    let!(:manufacturer2) { FactoryBot.create(:manufacturer, name: "BH Bikes (Beistegui Hermanos)", frame_maker: true) }
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer2, primary_frame_color: color) }
+    # NOTE: This tests a bunch of different parts of the system, which is why it's a pretty long test
     it "orders by priority" do
+      expect(color.autocomplete_hash[:priority]).to eq 1000
+      expect(CycleType.new(:tandem).autocomplete_hash[:priority]).to eq 920
+      expect(manufacturer1.reload.autocomplete_hash[:priority]).to eq 0
+      manufacturer2 = Manufacturer.find(bike.manufacturer_id) # Unmemoize b_count
+      expect(manufacturer2.reload.calculated_priority).to eq 10
+      manufacturer2.reload.update(updated_at: Time.current)
+      expect(manufacturer2.reload.autocomplete_hash[:priority]).to eq 10
+      Autocomplete::Loader.clear_redis
       Autocomplete::Loader.load_all
-      result = subject.search
+      opts = subject.params_to_opts
+      # Check that it's not in cache (verifies that clear_redis works correctly, etc)
+      expect(subject.send(:not_in_cache?, opts[:cache_key])).to be_truthy
+      result = subject.search(nil, opts)
       expect(result.count).to eq 5
-      expect(result.first["search_id"]).to eq
-      expect(result.map { |i| i["search_id"] }).to eq("c_#{color.id}")
+      color_sid = "c_#{color.id}"
+      expect(result.first["search_id"]).to eq color_sid
+      cycle_type_search_ids = [0, 11, 16, 18].map { |i| "v_#{i}" }
+      expect(result.map { |i| i["search_id"] }).to eq([color_sid] + cycle_type_search_ids)
+      # And now, the response is the in the cache
+      expect(subject.send(:not_in_cache?, opts[:cache_key])).to be_falsey
 
-      # Autocomplete::Loader.send(:store_items, [Color.black.autocomplete_hash])
+      # Query result
+      opts_query = subject.params_to_opts(q: "b", per_page: 10)
+      # Isn't in cache
+      expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_truthy
+      result_query = subject.search({q: "b", per_page: 10}, opts_query)
+      expect(result_query.count).to eq 9
+      target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_9", "v_14", "m_#{manufacturer2.id}", "m_#{manufacturer1.id}"]
+      expect(result_query.map { |i| i["search_id"] }).to eq target_search_ids
+      # But it is in cache after the search
+      expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_falsey
+
+      # Testing caching - colors have higher priority, so they should come first
+      Autocomplete::Loader.send(:store_items, [Color.black.autocomplete_hash])
     end
   end
 

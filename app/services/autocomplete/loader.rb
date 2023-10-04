@@ -120,14 +120,12 @@ class Autocomplete::Loader
     end
 
     def clear_cache
-      # TODO: Add tests!
       Autocomplete.redis do |r|
+        # can't be pipelined, requires the response
         keys = r.scan_each({match: Autocomplete.cache_key.gsub(/all:\z/, "*")}).to_a
 
         r.pipelined do |pipeline|
           keys.each { |k| pipeline.expire(k, 0) }
-          #  The scan should match all the categories, but leaving until tests exist
-          # combinatored_category_array.each { |cat| r.expire(Autocomplete.cache_key(cat), 0) }
         end
       end
     end

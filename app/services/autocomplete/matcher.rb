@@ -8,23 +8,14 @@ class Autocomplete::Matcher
   }.freeze
 
   class << self
-    def search(pparms = {})
-      opts = params_to_opts(pparms)
+    def search(pparms = {}, opts = nil)
+      opts ||= params_to_opts(pparms)
       # It always responds with the cache - if cache: false, store the cache - or, if there isn't a cached
       if !opts[:cache] || not_in_cache?(opts[:cache_key])
         store_search_in_cache(opts[:cache_key], opts[:interkeys])
       end
       terms = Autocomplete.redis { |r| r.zrange(opts[:cache_key], opts[:offset], opts[:limit]) }
-      pp terms
       matching_hashes(terms)
-    end
-
-    private
-
-    def not_in_cache?(cache_key)
-      cached_result = Autocomplete.redis { |r| r.exists(cache_key) }
-      pp "Cached response: #{cached_result}"
-      true
     end
 
     def params_to_opts(pparms = {})
@@ -44,7 +35,15 @@ class Autocomplete::Matcher
         cache_key: cache_key_from_opts(categories, opts[:q_array]),
         interkeys: interkeys_from_opts(opts[:category_cache_key], opts[:q_array]),
         offset: offset,
-        limit: limit < 0 ? 0 : limit)
+        limit: limit < 0 ? 0 : limit
+      )
+    end
+
+    private
+
+    def not_in_cache?(cache_key)
+      cached_result = Autocomplete.redis { |r| r.exists(cache_key) }
+      cached_result.blank? || cached_result == 0
     end
 
     def query_array(query)
