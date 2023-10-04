@@ -1906,7 +1906,8 @@ CREATE TABLE public.manufacturers (
     logo character varying(255),
     description text,
     logo_source character varying(255),
-    twitter_name character varying
+    twitter_name character varying,
+    priority integer
 );
 
 
@@ -6421,6 +6422,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230906000736'),
 ('20230906180600'),
 ('20230906200524'),
-('20230906203110');
+('20230906203110'),
+('20231004171919');
 
 

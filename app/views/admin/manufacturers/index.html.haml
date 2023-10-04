@@ -42,8 +42,9 @@
         Website
       %th
         = sortable "created_at"
-      -# - if display_dev_info?
-      -#   %th.small.only-dev-visible autocomplete priority
+      - if display_dev_info?
+        %th.small.only-dev-visible
+          = sortable "priority"
     %tbody
       - @manufacturers.each do |manufacturer|
         %tr
@@ -57,7 +58,9 @@
           %td
             %span.convertTime
               = l manufacturer.created_at, format: :convert_time
-          -# %td= manufacturer.autocomplete_hash_priority
+          - if display_dev_info?
+            %td
+              = admin_number_display(manufacturer.priority)
 
 
 = form_tag import_admin_manufacturers_path, multipart: true do

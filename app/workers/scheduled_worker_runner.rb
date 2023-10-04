@@ -42,7 +42,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       DeactivateExpiredTheftAlertWorker,
       FetchProject529BikesWorker,
       FileCacheMaintenanceWorker,
-      GetManufacturerLogoWorker,
+      UpdateManufacturerLogoAndPriorityWorker,
       ImpoundExpirationWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
