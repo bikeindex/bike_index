@@ -3,6 +3,9 @@ require "rails_helper"
 RSpec.describe Autocomplete::Loader do
   let(:subject) { Autocomplete::Loader }
   let(:category_count_for_1_item) { 8 } # Because of the combinatorial categories
+  # WTF CircleCI - you're shitting the bed.
+  # manufacturer.count == 1 tests are failing, because manufacturers are sticking around
+  before { Manufacturer.delete_all }
 
   describe "load_all" do
     let!(:color) { Color.black }
