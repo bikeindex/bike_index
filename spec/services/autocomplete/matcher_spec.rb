@@ -54,7 +54,7 @@ RSpec.describe Autocomplete::Matcher do
 
   describe "params_to_opts" do
     let(:default) { {offset: 0, limit: 4, categories: [], q_array: [], cache: true} }
-    let(:default_cache_keys) { {cache_key: "autc:test:cache:all:", category_cache_key: "autc:test:cts:all:", interkeys: ["all:autc:test:cts:all:"]} }
+    let(:default_cache_keys) { {cache_key: "autc:test:cache:all:", category_cache_key: "autc:test:cts:all:", interkeys: ["autc:test:noq:autc:test:cts:all:"]} }
     let(:default_target) { default.merge(default_cache_keys) }
     it "is the default plus cache keys" do
       expect(subject.send(:params_to_opts)).to eq default.merge(default_cache_keys)

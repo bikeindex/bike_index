@@ -34,7 +34,7 @@ module Autocomplete
     end
 
     def no_query_key(category = nil)
-      "all:#{category || category_key}"
+      "#{BASE_KEY}noq:#{category || category_key}"
     end
 
     def items_data_key
@@ -45,7 +45,7 @@ module Autocomplete
       "#{BASE_KEY}cache:#{type}:"
     end
 
-    # Should be the canonical way of using redis
+    # Should be the canonical way of using edis
     def redis
       # Basically, crib what is done in sidekiq
       raise ArgumentError, "requires a block" unless block_given?
