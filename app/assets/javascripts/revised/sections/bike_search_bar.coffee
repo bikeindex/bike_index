@@ -157,14 +157,13 @@ class BikeIndex.BikeSearchBar extends BikeIndex
   setCategories: ->
     query = $("#bikes_search_form #query_items").val()
     query = [] if !query # Assign query to an array if it's blank
-    # Soulheart doesn't support OR, only and for multiple categories.
-    # TODO: Fix Soulheart so it does support multiple categories, and don't include cycle_type if a cycle_type is selected
-    # queried_categories = query.filter (x) -> /^(v|m)_/.test(x)
-    # if queried_categories.length == 0
-    #   window.searchBarCategories = ""
-    # else
-    #   window.searchBarCategories = "colors"
-    window.searchBarCategories = if /m_/.test(" #{query.join(" ")} ")
-      "colors"
+    queried_categories = query.filter (x) -> /^(v|m)_/.test(x)
+      .map (i) -> i.split("_")[0]
+    if queried_categories.length == 0
+      window.searchBarCategories = ""
     else
-      ""
+      window.searchBarCategories = "colors"
+      unless "v" in queried_categories
+        window.searchBarCategories += ",cycle_type"
+      unless "m" in queried_categories
+        window.searchBarCategories += ",frame_mnfg,cmp_mnfg"
