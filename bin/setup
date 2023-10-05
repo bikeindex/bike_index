@@ -25,7 +25,6 @@ chdir APP_ROOT do
   puts "\n== Preparing and seeding database =="
   system "bin/rake db:create db:structure:load db:seed"
   system "bin/rake seed_test_users_and_bikes"
-  system "bin/rake dev:seed_counts"
 
   puts "\n== Preparing test database (including parallelism) =="
   system "bin/rake parallel:prepare"
@@ -35,6 +34,7 @@ chdir APP_ROOT do
 
   puts "\n Running update to migrate and prepare typeahead"
   system "bin/rake dev:seed_counts"
+  system "bin/rake reset_autocomplete"
 
   puts "\n== Restarting application server =="
   system! "bin/rails restart"
