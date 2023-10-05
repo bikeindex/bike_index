@@ -45,7 +45,7 @@ module Autocomplete
       "#{BASE_KEY}cache:#{type}:"
     end
 
-    # Should be the canonical way of using edis
+    # Should be the canonical way of using Redis
     def redis
       # Basically, crib what is done in sidekiq
       raise ArgumentError, "requires a block" unless block_given?
