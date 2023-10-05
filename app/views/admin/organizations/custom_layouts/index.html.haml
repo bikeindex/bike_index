@@ -1,4 +1,4 @@
-= render partial: "/admin/organizations/display_header", locals: {current_action: "Edit custom layouts for", organization_view_path: organization_emails_path(organization_id: @organization.to_param)}
+= render partial: "/admin/organizations/display_header", locals: {current_action: "Custom layouts", organization_view_path: organization_emails_path(organization_id: @organization.to_param)}
 
 .row
   .col-lg-6
@@ -16,6 +16,8 @@
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
+      %th.small
+        Snipped Kind
       %th
         Link to edit
       %th
@@ -26,6 +28,7 @@
         Enabled
     %tbody
       %tr
+        %td
         %td
           = link_to "Landing page", edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: "landing_page")
         %td.small
@@ -38,6 +41,7 @@
         -# If there is a message, or organization_stolen_message is enabled, grab it. But don't create one otherwise
         - organization_stolen_message = @organization.enabled?("organization_stolen_message") ? OrganizationStolenMessage.for(@organization) : @organization.organization_stolen_message
         %td
+        %td
           = link_to "Organization Stolen Message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
         %td.small
           = link_to "preview message", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param)
@@ -48,6 +52,8 @@
       - MailSnippet.organization_snippets.each do |kind, snippet_attrs|
         - snippet = @organization.mail_snippets.where(kind: kind).first
         %tr
+          %td
+            %small= MailSnippet.kind_humanized(kind)
           %td
             = link_to snippet_attrs[:description], edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: kind)
           %td
@@ -65,3 +71,8 @@
             = check_mark if snippet&.body.present?
           %td.table-cell-check
             = check_mark if snippet&.is_enabled
+
+.mt-4
+  %strong
+    Note:
+  Custom Layouts (other than landing pages), are #{link_to "Mail Snippets", admin_mail_snippets_path}. You can view and edit all the active ones there.

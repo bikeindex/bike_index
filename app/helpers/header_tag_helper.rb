@@ -83,7 +83,7 @@ module HeaderTagHelper
       content_tag(:title, page_title),
       tag(:meta, name: "description", content: page_description),
       tag(:link, rel: "shortcut icon", href: (Rails.env.development? ? "/favicon_dev.ico" : "/fav.ico")),
-      tag(:link, rel: "apple-touch-icon-precomposed apple-touch-icon", href: "/apple_touch_icon.png"),
+      tag(:link, rel: "apple-touch-icon-precomposed apple-touch-icon", href: "/apple-touch-icon.png"),
       csrf_meta_tags
     ]
   end

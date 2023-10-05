@@ -42,9 +42,9 @@ RSpec.describe Manufacturer, type: :model do
     it "returns what we expect" do
       manufacturer = FactoryBot.create(:manufacturer)
       result = manufacturer.autocomplete_hash
-      expect(result.keys).to eq(%w[id text category priority data])
-      expect(result["data"]["slug"]).to eq manufacturer.slug
-      expect(result["data"]["search_id"]).to eq("m_#{manufacturer.id}")
+      expect(result.keys).to eq(%i[id text category priority data])
+      expect(result[:data][:slug]).to eq manufacturer.slug
+      expect(result[:data][:search_id]).to eq("m_#{manufacturer.id}")
     end
   end
 
@@ -52,33 +52,33 @@ RSpec.describe Manufacturer, type: :model do
     context "0 bikes or components" do
       it "returns 0" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { [] }
-        allow(manufacturer).to receive(:components) { [] }
-        expect(manufacturer.autocomplete_hash_priority).to eq(0)
+        allow(manufacturer).to receive(:b_count) { 0 }
+        allow(manufacturer).to receive(:c_count) { 0 }
+        expect(manufacturer.send(:calculated_priority)).to eq(0)
       end
     end
     context "1 component" do
       it "returns 10" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { [] }
-        allow(manufacturer).to receive(:components) { [2] }
-        expect(manufacturer.autocomplete_hash_priority).to eq(10)
+        allow(manufacturer).to receive(:b_count) { 0 }
+        allow(manufacturer).to receive(:c_count) { 2 }
+        expect(manufacturer.send(:calculated_priority)).to eq(10)
       end
     end
     context "25 bikes and 50 components" do
       it "returns 15" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { Array(0..24) }
-        allow(manufacturer).to receive(:components) { Array(0..50) }
-        expect(manufacturer.autocomplete_hash_priority).to eq(15)
+        allow(manufacturer).to receive(:b_count) { 24 }
+        allow(manufacturer).to receive(:c_count) { 50 }
+        expect(manufacturer.send(:calculated_priority)).to eq(14)
       end
     end
     context "1020 bikes" do
       it "returns 100" do
         manufacturer = Manufacturer.new
-        allow(manufacturer).to receive(:bikes) { Array(1..1020) }
-        allow(manufacturer).to receive(:components) { [2, 2, 2] }
-        expect(manufacturer.autocomplete_hash_priority).to eq(100)
+        allow(manufacturer).to receive(:b_count) { 1020 }
+        allow(manufacturer).to receive(:c_count) { 3 }
+        expect(manufacturer.send(:calculated_priority)).to eq(100)
       end
     end
   end
@@ -145,9 +145,15 @@ RSpec.describe Manufacturer, type: :model do
 
     context "weird stuff" do
       let(:malicious_str) { "Sweet manufacturer <><>><\\" }
-      let(:target) { "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\" }
+      let(:target) do
+        # NOTE: this is different on the mac version of nokogiri, see PR#2366
+        if ENV["CI"]
+          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\"
+        else
+          "Sweet manufacturer &gt;"
+        end
+      end
       it "encodes" do
-        # NOTE: this only seems to fail on the mac version of nokogiri, see PR#2366
         expect(Manufacturer.calculated_mnfg_name(manufacturer_other, malicious_str)).to eq target
       end
     end
@@ -180,10 +186,11 @@ RSpec.describe Manufacturer, type: :model do
       expect(manufacturer.logo_source).to eq("something cool")
     end
 
-    it "empties if no logo" do
-      manufacturer = Manufacturer.new(logo_source: "something cool")
+    it "empties" do
+      manufacturer = Manufacturer.new(logo_source: "something cool", description: " ")
       manufacturer.set_calculated_attributes
       expect(manufacturer.logo_source).to be_nil
+      expect(manufacturer.description).to be_nil
     end
   end
 end

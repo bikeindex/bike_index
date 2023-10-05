@@ -92,6 +92,7 @@ RSpec.describe GraduatedNotification, type: :model do
     context "marked_remaining" do
       let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization, bike_created_at: Time.current - 1.year) }
       it "is not bike_graduated" do
+        graduated_notification.reload
         expect(graduated_notification.bike_graduated?).to be_falsey
         expect(graduated_notification.processed?).to be_truthy
         expect(graduated_notification.email_success?).to be_truthy
@@ -104,7 +105,7 @@ RSpec.describe GraduatedNotification, type: :model do
         bike.reload
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         expect(bike.graduated?(organization)).to be_falsey
-        expect(bike.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification.id])
+        expect(bike.organization_graduated_notifications(organization).pluck(:id)).to eq([graduated_notification.id])
       end
     end
   end
@@ -141,7 +142,7 @@ RSpec.describe GraduatedNotification, type: :model do
     let!(:graduated_notification1) { FactoryBot.create(:graduated_notification, :marked_remaining, bike: bike1, organization: organization) }
     it "finds bikes to notify" do
       bike1.reload
-      expect(bike1.graduated_notifications(organization).pluck(:id)).to eq([graduated_notification1.id])
+      expect(bike1.organization_graduated_notifications(organization).pluck(:id)).to eq([graduated_notification1.id])
       expect(bike3.organizations.pluck(:organization_id).count).to eq 1
       expect(bike3.organizations.pluck(:organization_id).first).to_not eq organization.id
       bike_organization1.reload
@@ -641,11 +642,14 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.status).to eq "marked_remaining"
 
         expect(bike.bike_organizations.pluck(:organization_id)).to match_array([organization.id, organization2.id])
-        graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization2)
-        expect(graduated_notification2).to be_valid
-        graduated_notification2.process_notification
-        expect(graduated_notification2.reload.most_recent?).to be_truthy
-        expect(graduated_notification2.status).to eq "marked_remaining"
+        graduated_notification3 = GraduatedNotification.create(bike: bike, organization: organization2)
+        expect(graduated_notification3).to be_valid
+        expect(graduated_notification3.primary_notification_id).to eq graduated_notification3.id
+        allow(graduated_notification3).to receive(:processable?) { true }
+        expect(graduated_notification3.process_notification).to be_truthy
+        expect(graduated_notification3.reload.most_recent?).to be_truthy
+        expect(graduated_notification3.status).to eq "bike_graduated"
+        expect(graduated_notification3.associated_notifications.pluck(:id)).to eq([])
 
         expect(graduated_notification.reload.most_recent?).to be_truthy
       end

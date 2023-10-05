@@ -243,6 +243,11 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
+  # WARNING! This is not efficient
+  def law_enforcement_features_enabled?
+    law_enforcement? && current_invoices.any? { |i| i.law_enforcement_functionality_invoice? }
+  end
+
   # Stub for now, but it might be more sophisticated later
   def impound_claims?
     public_impound_bikes?
@@ -277,10 +282,6 @@ class Organization < ApplicationRecord
 
   def paid_previously?
     !paid_money? && invoices.expired.any? { |i| i.was_active? }
-  end
-
-  def display_avatar?
-    avatar.present?
   end
 
   def fetch_impound_configuration
@@ -375,7 +376,7 @@ class Organization < ApplicationRecord
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
-    %w[student employee community_member]
+    %w[student graduate_student employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
@@ -385,15 +386,6 @@ class Organization < ApplicationRecord
 
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
-  end
-
-  def law_enforcement_missing_verified_features?
-    law_enforcement? && !enabled?("unstolen_notifications")
-  end
-
-  def bike_shop_display_integration_alert?
-    bike_shop? && %w[no_pos broken_other_pos broken_lightspeed_pos].include?(pos_kind) &&
-      !official_manufacturer?
   end
 
   # bikes_member is slow - it's for graduated_notifications and shouldn't be called inline
@@ -452,7 +444,8 @@ class Organization < ApplicationRecord
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = short_name_fixer(short_name || name)
+    self.short_name = name_shortener(short_name || name)
+    self.ascend_name = nil if ascend_name.blank?
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
@@ -545,8 +538,12 @@ class Organization < ApplicationRecord
     strip_tags(name&.strip).gsub("&amp;", "&")
   end
 
-  def short_name_fixer(str)
-    str = str.strip.truncate(30)
+  def name_shortener(str)
+    # Remove parens if the name is too long
+    if str.length > 30 && str.match?(/\(.*\)/)
+      str = str.gsub(/\(.*\)/, "")
+    end
+    str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     return str unless deleted_at.present?
     str.match?("-deleted") ? str : "#{str}-deleted"
   end

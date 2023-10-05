@@ -34,8 +34,9 @@ class BikeCreator
 
   def build_bike(b_param, new_attrs = {})
     # Default attributes
-    bike = Bike.new(propulsion_type: "foot-pedal", cycle_type: "bike")
+    bike = Bike.new(cycle_type: "bike")
     bike.attributes = b_param.safe_bike_attrs(new_attrs)
+    bike.propulsion_type ||= "foot-pedal"
     # Use bike status because it takes into account new_attrs
     bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
     bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?
@@ -138,6 +139,10 @@ class BikeCreator
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)
     return bike unless bike.present? && bike.id.present?
+    # NOTE: spaminess is recalculated in EmailOwnershipInvitationWorker as a failsafe
+    if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
+      bike.update(likely_spam: true)
+    end
     AfterBikeSaveWorker.perform_async(bike.id)
     if b_param.bike_sticker_code.present? && bike.creation_organization.present?
       bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)

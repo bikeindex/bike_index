@@ -31,19 +31,19 @@ RSpec.describe ApplicationHelper, type: :helper do
     it "combines twitter, instagram, and website" do
       user = User.new(
         show_website: true,
-        website: "website",
+        my_bikes_hash: {"link_target" => "http://website.com"},
         show_twitter: true,
         twitter: "twitter",
         show_instagram: true,
         instagram: "instagram"
       )
       html = show_sharing_links(user)
-      expect(html).to eq("<a href=\"https://twitter.com/twitter\">Twitter</a>, <a href=\"https://instagram.com/instagram\">Instagram</a>, and <a href=\"website\">Website</a>")
+      expect(html).to eq("<a href=\"https://twitter.com/twitter\">Twitter</a>, <a href=\"https://instagram.com/instagram\">Instagram</a>, and <a href=\"http://website.com\">Website</a>")
     end
     it "justs return website if no twitter or instagram" do
-      user = User.new(show_website: true, website: "website")
+      user = User.new(show_website: true, my_bikes_hash: {"link_target" => "http://website.com"})
       html = show_sharing_links(user)
-      expect(html).to eq("<a href=\"website\">Website</a>")
+      expect(html).to eq("<a href=\"http://website.com\">Website</a>")
     end
     it "handles when no sharing links are present" do
       user = User.new(show_website: false, show_twitter: false, show_instagram: false)
@@ -53,12 +53,22 @@ RSpec.describe ApplicationHelper, type: :helper do
   end
 
   describe "#websiteable" do
+    let(:user) { User.new(show_website: true, my_bikes_hash: {"link_target" => "http://website.com"}) }
     it "creates a link if bike owner wants one shown" do
-      user = User.new
-      allow(user).to receive(:show_website).and_return(true)
-      allow(user).to receive(:website).and_return("website")
-      html = websiteable(user)
-      expect(html).to eq('<a href="website">Website</a>')
+      expect(user.mb_link_target).to eq "http://website.com"
+      expect(websiteable(user)).to eq('<a href="http://website.com">Website</a>')
+    end
+    context "with show_website false" do
+      let(:user) { User.new(show_website: false, my_bikes_hash: {"link_target" => "http://website.com"}) }
+      it "returns nil" do
+        expect(websiteable(user)).to be_nil
+      end
+    end
+    context "with link_title" do
+      let(:user) { User.new(show_website: true, my_bikes_hash: {"link_target" => "http://website.com", "link_title" => "stuff"}) }
+      it "returns nil" do
+        expect(websiteable(user)).to eq('<a href="http://website.com">stuff</a>')
+      end
     end
   end
 

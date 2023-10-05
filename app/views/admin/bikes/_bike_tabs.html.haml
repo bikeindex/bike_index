@@ -2,19 +2,49 @@
 - display_recovery ||= stolen_record.present? && stolen_record.recovered?
 - active_tab ||= "#{controller_name}-#{action_name}"
 
+-# require inline CSS setting because of caching
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
+
 .admin-bike-tabs
   - if bike.blank?
     %h1.text-danger
       No Bike present
   - else
-    - if bike.deleted?
+    - if bike.deleted? || bike.likely_spam? || bike.example? || bike.user_hidden
       .row.mb-4
-        .col-sm-6.offset-sm-3
-          .alert.alert-danger
-            %h4.text-danger #{bike.type_titleize} Deleted
-            Deleted:
-            %span.convertTime.preciseTime
-              = l bike.deleted_at, format: :convert_time
+        .col-sm-10.offset-sm-1.col-md-6.offset-md-3
+          - if bike.deleted?
+            .alert.alert-danger.mb-4
+              %h4.text-danger #{bike.type_titleize} Deleted
+              Deleted:
+              %span.convertTime.preciseTime
+                = l bike.deleted_at, format: :convert_time
+          - if bike.likely_spam?
+            .alert.alert-danger.mb-4
+              %h4.text-danger This #{bike.type_titleize} is likely spam
+              No need to remove, this doesn't show up in searches and will be deleted, automatically
+          - if bike.example?
+            .alert.alert-danger.mb-4
+              %h4.text-danger #{bike.type_titleize} is a test registration
+              No need to remove, this doesn't show up in searches and will be deleted, automatically
+              %small.d-block.mt-1 This is also known as an <em>example bike</em>
+          - if bike.user_hidden
+            .alert.alert-warning.mb-4
+              %h4.text-warning
+                Marked HIDDEN
+              - if @bike.unregistered_parking_notification?
+                %span.d-block.mb-2
+                  %strong Hidden because it was created by parking notification.
+                  Only members of the organization (and Bike Index superadmins) can see it.
+                Creation notification:
+                - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first
+                = link_to unregistered_parking_notification.kind_humanized.downcase, organization_parking_notification_path(unregistered_parking_notification, organization_id: unregistered_parking_notification.organization.to_param), class: "text-underline"
+                %small.d-block.mt-2 This is also known as an <span class="text-warning">unregistered</span> bike
+
+              - else
+                %strong.d-block.mb-1 Hidden by the user
+                No one but the user (and Bike Index superadmins) can see it
     .row
       - cache(["admin_bike_main", bike, stolen_record]) do
         .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
@@ -34,16 +64,15 @@
             = link_to "non-admin view", bike_path(bike.to_param, organization_id: bike.creation_organization.to_param), class: "text-muted float-right"
           %table.table-list.mb-0
             %tbody
-              - if display_dev_info?
-                %tr.small.only-dev-visible
-                  %td ID
-                  %td
-                    %code= bike.id
-                    %span.ml-2
-                      status:
-                      %code= bike.status&.gsub("status_", "")
-                    - if bike.user_hidden
-                      %small.text-warning.ml-2 user hidden
+              %tr.small.only-dev-visible
+                %td ID
+                %td
+                  %code= bike.id
+                  %span.ml-2
+                    status:
+                    %code= bike.status&.gsub("status_", "")
+                  - if bike.user_hidden
+                    %small.text-warning.ml-2 user hidden
 
               %tr
                 %td
@@ -108,9 +137,8 @@
                           %em missing
                   - if bike.not_updated_by_user?
                     %em.small.less-strong not updated after creation
-                  - if display_dev_info?
-                    %small.only-dev-visible.convertTime
-                      = l bike.updated_at, format: :convert_time
+                  %small.only-dev-visible.convertTime
+                    = l bike.updated_at, format: :convert_time
 
               - pdf ||= false
               - if pdf
@@ -168,11 +196,10 @@
                       \{
                       = reg_address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
                       \}
-                      - if display_dev_info?
-                        %small.only-dev-visible.ml-2
-                          %em
-                            source:
-                          = bike.registration_address_source
+                      %small.only-dev-visible.ml-2
+                        %em
+                          source:
+                        = bike.registration_address_source
 
             -# Only show phone if no stolen record
             - if stolen_record.blank? && bike.phone.present?
@@ -190,11 +217,10 @@
       .col-md-6.pr-md-0
         %table.table-list
           %tbody
-            - if display_dev_info?
-              %tr.small.only-dev-visible
-                %td ID
-                %td
-                  %code= stolen_record.id
+            %tr.small.only-dev-visible
+              %td ID
+              %td
+                %code= stolen_record.id
             %tr
               %td
                 Theft description

@@ -279,7 +279,7 @@ RSpec.describe StolenRecord, type: :model do
           can_share_recovery: true,
           recovery_display: recovery_display)
 
-        expect(stolen_record.recovery_display_status).to eq "displayed"
+        expect(stolen_record.recovery_display_status).to eq "recovery_displayed"
         expect(StolenRecord.recovered.with_recovery_display.pluck(:id)).to eq([stolen_record.id])
         expect(StolenRecord.recovered.without_recovery_display.pluck(:id)).to eq([])
       end
@@ -403,7 +403,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
           can_share_recovery: true,
           recovery_display: recovery_display)
-        expect(stolen_record.calculated_recovery_display_status).to eq "displayed"
+        expect(stolen_record.calculated_recovery_display_status).to eq "recovery_displayed"
       end
     end
     context "recovery has been marked as not eligible for display" do

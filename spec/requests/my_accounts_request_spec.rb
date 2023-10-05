@@ -88,11 +88,15 @@ RSpec.describe MyAccountsController, type: :request do
         context "with user_phone" do
           before { current_user.update_column :alert_slugs, ["phone_waiting_confirmation"] }
           it "renders with show_general_alert" do
-            get base_url
-
-            expect(response).to be_ok
-            expect(assigns(:show_general_alert)).to be_truthy
-            expect(response).to render_template("show")
+            Sidekiq::Worker.clear_all
+            expect {
+              get base_url
+              expect(response).to be_ok
+              expect(assigns(:show_general_alert)).to be_truthy
+              expect(response).to render_template("show")
+            }.to change(AfterUserChangeWorker.jobs, :count).by 1
+            AfterUserChangeWorker.drain
+            expect(current_user.reload.alert_slugs).to eq([])
           end
         end
       end
@@ -245,15 +249,14 @@ RSpec.describe MyAccountsController, type: :request do
           twitter: nil,
           show_instagram: false,
           instagram: nil,
-          show_website: false,
-          website: nil
+          show_website: false
         )
 
         patch base_url, params: {id: current_user.id,
                                  user: {
                                    instagram: "bikeinsta", show_instagram: true,
                                    twitter: "biketwitter", show_twitter: true,
-                                   website: "https://bikeindex.org", show_website: true
+                                   my_bikes_link_target: "https://bikeindex.org", show_website: true
                                  }}
 
         current_user.reload
@@ -261,7 +264,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.show_instagram).to be true
         expect(current_user.twitter).to eq "biketwitter"
         expect(current_user.show_twitter).to be true
-        expect(current_user.website).to eq "https://bikeindex.org"
+        expect(current_user.mb_link_target).to eq "https://bikeindex.org"
         expect(current_user.show_website).to be true
       end
     end

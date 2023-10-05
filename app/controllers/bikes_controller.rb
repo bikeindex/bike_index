@@ -5,6 +5,7 @@ class BikesController < Bikes::BaseController
   skip_before_action :find_bike, except: %i[show update pdf resolve_token]
   skip_before_action :assign_current_organization, except: %i[index show]
   skip_before_action :ensure_user_allowed_to_edit, except: %i[update pdf]
+  around_action :set_reading_role, only: %i[index show]
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
@@ -20,7 +21,6 @@ class BikesController < Bikes::BaseController
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
-    @components = @bike.components
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
@@ -189,8 +189,10 @@ class BikesController < Bikes::BaseController
     if params[:token_type] == "graduated_notification"
       matching_notification = GraduatedNotification.where(bike_id: @bike.id, marked_remaining_link_token: params[:token]).first
       if matching_notification.present? && matching_notification.processed?
+        if matching_notification.marked_remaining_at.blank?
+          matching_notification.mark_remaining!(marked_remaining_by_id: current_user&.id)
+        end
         flash[:success] = translation(:marked_remaining, bike_type: @bike.type)
-        matching_notification.mark_remaining!(marked_remaining_by_id: current_user&.id) unless matching_notification.marked_remaining?
       else
         flash[:error] = translation(:unable_to_find_graduated_notification)
       end

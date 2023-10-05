@@ -18,6 +18,7 @@ RSpec.describe EmailDonationWorker, type: :job do
     expect(payment.notifications.count).to eq 1
     expect(payment.notifications.first.kind).to eq "donation_standard"
     expect(payment.notifications.first.bike_id).to be_blank
+    expect(payment.notifications.first.message_channel_target).to eq user.email
     # But it doesn't send again
     instance.perform(payment.id)
     expect(ActionMailer::Base.deliveries.count).to eq 1

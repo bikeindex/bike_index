@@ -23,17 +23,17 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 28 Jul 2023 20:24:46 GMT
+      - Fri, 29 Sep 2023 17:06:05 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1759'
+      - '1848'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
       - 'true'
       Access-Control-Allow-Methods:
-      - GET, POST, HEAD, OPTIONS, DELETE
+      - GET,HEAD,PUT,PATCH,POST,DELETE
       Access-Control-Allow-Origin:
       - "*"
       Access-Control-Expose-Headers:
@@ -43,9 +43,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_assL3oL8aIBOpI
+      - req_EEt0Z2a3FFboAT
       Stripe-Version:
       - '2014-12-08'
+      Vary:
+      - Origin
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       Strict-Transport-Security:
@@ -75,7 +77,8 @@ http_interactions:
           "custom_fields": [],
           "custom_text": {
             "shipping_address": null,
-            "submit": null
+            "submit": null,
+            "terms_of_service_acceptance": null
           },
           "customer": "cus_JmPqQDidyY7LDB",
           "customer_creation": null,
@@ -98,6 +101,7 @@ http_interactions:
           "payment_intent": "pi_0J8qZLm0T0GBfX0v6J8Q3YjN",
           "payment_link": null,
           "payment_method_collection": null,
+          "payment_method_configuration_details": null,
           "payment_method_options": {},
           "payment_method_types": [
             "card"
@@ -124,7 +128,7 @@ http_interactions:
           "url": null
         }
     http_version: 
-  recorded_at: Fri, 28 Jul 2023 20:24:45 GMT
+  recorded_at: Fri, 29 Sep 2023 17:06:05 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -137,7 +141,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_assL3oL8aIBOpI","request_duration_ms":230}}'
+      - '{"last_request_metrics":{"request_id":"req_EEt0Z2a3FFboAT","request_duration_ms":289}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -150,7 +154,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 28 Jul 2023 20:24:46 GMT
+      - Fri, 29 Sep 2023 17:06:05 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -160,7 +164,7 @@ http_interactions:
       Access-Control-Allow-Credentials:
       - 'true'
       Access-Control-Allow-Methods:
-      - GET, POST, HEAD, OPTIONS, DELETE
+      - GET,HEAD,PUT,PATCH,POST,DELETE
       Access-Control-Allow-Origin:
       - "*"
       Access-Control-Expose-Headers:
@@ -170,9 +174,11 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_6HZmrd0Bf4s3zY
+      - req_hiPFnSyKdK7RNc
       Stripe-Version:
       - '2014-12-08'
+      Vary:
+      - Origin
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       Strict-Transport-Security:
@@ -250,5 +256,5 @@ http_interactions:
           "test_clock": null
         }
     http_version: 
-  recorded_at: Fri, 28 Jul 2023 20:24:46 GMT
+  recorded_at: Fri, 29 Sep 2023 17:06:05 GMT
 recorded_with: VCR 5.0.0

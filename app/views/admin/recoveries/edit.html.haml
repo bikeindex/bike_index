@@ -13,7 +13,7 @@
     .col-6.col-md-4
       = button_to "Mark Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: { is_not_displayable: true }), method: :put, class: "btn btn-lg btn-warning d-block", style: "width: 100%;"
 
-  - elsif @recovery.displayed?
+  - elsif @recovery.recovery_displayed?
     .col-6
       %p
         This recovery is displayed.

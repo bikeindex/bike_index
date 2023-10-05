@@ -57,7 +57,6 @@ task seed_test_users_and_bikes: :environment do
     end
   end
   Bike.pluck(:id).each { |b| AfterBikeSaveWorker.perform_async(b) }
-  AutocompleteLoader.new.reset
 end
 
 task seed_dup_bikes: :environment do

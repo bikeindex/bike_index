@@ -45,7 +45,9 @@ FactoryBot.define do
       after(:create) do |graduated_notification, evaluator|
         graduated_notification.marked_remaining_at = nil # need to blank this so mark_remaining functions
         graduated_notification.process_notification
-        graduated_notification.mark_remaining!(resolved_at: evaluator.marked_remaining_at)
+        graduated_notification.mark_remaining!
+        # Manually update
+        graduated_notification.update_column :marked_remaining_at, evaluator.marked_remaining_at
         graduated_notification.reload
       end
     end

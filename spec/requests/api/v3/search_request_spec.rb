@@ -18,6 +18,28 @@ RSpec.describe "Search API V3", type: :request do
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       end
     end
+    context "cycle_type" do
+      let(:query_params) { {query_items: ["v_8"], stolenness: "all", format: :json} }
+      let!(:bike2) { FactoryBot.create(:bike, manufacturer: manufacturer, cycle_type: :cargo) }
+      it "returns matching bikes" do
+        expect(Bike.count).to eq 2
+        expect(Bike.where(cycle_type: "cargo").count).to eq 1
+        get "/api/v3/search", params: query_params
+        expect(response.header["Total"]).to eq("1")
+        result = JSON.parse(response.body)
+        expect(result["bikes"][0]["id"]).to eq bike2.id
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+        # It works with manufacturer
+        get "/api/v3/search", params: query_params.merge(manufacturer: manufacturer.name)
+        expect(response.header["Total"]).to eq("1")
+        expect(json_result["bikes"][0]["id"]).to eq bike2.id
+        # Also works passing the cycle_type
+        get "/api/v3/search", params: {cycle_type: "Cargo Bike (front storage)", stolenness: "all"}
+        expect(response.header["Total"]).to eq("1")
+        expect(json_result["bikes"][0]["id"]).to eq bike2.id
+      end
+    end
   end
 
   describe "/close_serials" do

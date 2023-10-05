@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "soulheart/server"
 require "sidekiq/web"
 
 Rails.application.routes.draw do
@@ -96,7 +95,7 @@ Rails.application.routes.draw do
   get "feedbacks/new", to: redirect("/help")
   %w[support contact contact_us].each { |p| get p, to: redirect("/help") }
 
-  resources :users, only: %i[new create show edit update] do
+  resources :users, only: %i[new create show update] do
     collection do
       get "please_confirm_email"
       post "resend_confirmation_email"
@@ -286,7 +285,7 @@ Rails.application.routes.draw do
       get "not_found", to: "api_v1#not_found"
       get "*a", to: "api_v1#not_found"
     end
-    mount Soulheart::Server, at: "/autocomplete"
+    resources :autocomplete, only: [:index]
   end
   mount API::Base => "/api"
 

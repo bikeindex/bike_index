@@ -49,8 +49,9 @@ class Bike < ApplicationRecord
   has_many :impound_records
   has_many :impound_claims_claimed, through: :impound_records, source: :impound_claims
   has_many :parking_notifications
-  has_many :graduated_notifications, foreign_key: :bike_id
+  has_many :graduated_notifications
   has_many :notifications
+  has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
   has_many :theft_alerts
 
   accepts_nested_attributes_for :stolen_records
@@ -82,8 +83,9 @@ class Bike < ApplicationRecord
     to: :current_ownership, allow_nil: true
 
   scope :without_location, -> { where(latitude: nil) }
-  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil) }
+  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
+  scope :unclaimed, -> { includes(:ownerships).where(ownerships: {claimed: false}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
   scope :not_abandoned, -> { where.not(status: "status_abandoned") }
   scope :stolen_or_impounded, -> { where(status: %w[status_impounded status_stolen]) }
@@ -99,6 +101,8 @@ class Bike < ApplicationRecord
   scope :does_not_need_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "does_not_need_pos"}) }
   scope :pos_not_lightspeed_ascend, -> { includes(:ownerships).where.not(ownerships: {pos_kind: %w[lightspeed_pos ascend_pos no_pos]}) }
   scope :no_pos, -> { includes(:ownerships).where(ownerships: {pos_kind: "no_pos"}) }
+  scope :spam, -> { unscoped.where(likely_spam: true) }
+  scope :not_spam, -> { where(likely_spam: false) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
   scope :with_user_hidden, -> { unscoped.non_example.without_deleted }
@@ -393,14 +397,13 @@ class Bike < ApplicationRecord
     end
   end
 
-  def graduated_notifications(org = nil)
-    return GraduatedNotification.none unless org.present?
-    org.graduated_notifications.where(bike_id: id)
+  def organization_graduated_notifications(org = nil)
+    g_notifications = GraduatedNotification.where(bike_id: id)
+    org.present? ? g_notifications.where(organization_id: org.id) : g_notifications
   end
 
   def graduated?(org = nil)
-    g_notifications = org.present? ? graduated_notifications(org) : GraduatedNotification.where(bike_id: id)
-    g_notifications.bike_graduated.any?
+    organization_graduated_notifications(org).bike_graduated.any?
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably

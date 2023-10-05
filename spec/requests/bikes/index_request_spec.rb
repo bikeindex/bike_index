@@ -7,7 +7,7 @@ RSpec.describe "BikesController#index", type: :request do
   let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc) }
   let!(:impounded_bike) { FactoryBot.create(:impounded_bike, :in_nyc) }
   let(:serial) { "1234567890" }
-  let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles) }
+  let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles, cycle_type: "e-scooter") }
 
   it "renders" do
     get base_url
@@ -35,6 +35,13 @@ RSpec.describe "BikesController#index", type: :request do
           expect(assigns(:selected_query_items_options)).to eq([])
           expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
           expect(assigns(:page_id)).to eq "bikes_index"
+          # Test cycle_type
+          get "#{base_url}?query_items%5B%5D=v_16"
+          expect(response.status).to eq 200
+          expect(response).to render_template(:index)
+          expect(flash).to_not be_present
+          expect(assigns(:interpreted_params)).to eq(stolenness: "stolen", cycle_type: :"e-scooter")
+          expect(assigns(:bikes).map(&:id)).to eq([stolen_bike_2.id])
           # Test impounded
           get "#{base_url}?stolenness=found"
           expect(assigns(:interpreted_params)).to eq(stolenness: "found")

@@ -63,7 +63,6 @@ RSpec.describe "Bikes API V2", type: :request do
       FactoryBot.create(:bike, serial_number: "awesome")
       FactoryBot.create(:bike)
       get "/api/v2/bikes_search/count?query=awesome", params: {format: :json}
-      pp json_result
       result = JSON.parse(response.body)
       expect(result["non_stolen"]).to eq(1)
       expect(result["stolen"]).to eq(0)

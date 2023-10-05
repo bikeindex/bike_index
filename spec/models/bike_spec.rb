@@ -8,7 +8,7 @@ RSpec.describe Bike, type: :model do
   describe "scopes and searching" do
     describe "scopes" do
       it "default scopes to created_at desc" do
-        expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, user_hidden: false, deleted_at: nil).order(listing_order: :desc).to_sql)
+        expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false).order(listing_order: :desc).to_sql)
       end
       it "recovered_records default scopes to created_at desc" do
         bike = FactoryBot.create(:bike)
@@ -367,6 +367,22 @@ RSpec.describe Bike, type: :model do
             bike.reload
             expect(bike.organization_affiliation).to eq "student"
             expect(bike.registration_info).to eq target_registration_info.merge(organization_affiliation: "student").as_json
+          end
+          context "multiple organizations" do
+            # Look in user_registration_organization_spec
+            let(:organization1) { FactoryBot.create(:organization) }
+            let(:organization2) { FactoryBot.create(:organization) }
+            let(:registration_info) do
+              {"organization_affiliation_#{organization1.id}" => "graduate_student",
+               "organization_affiliation_#{organization2.id}" => "community_member"}
+            end
+            it "uses correct values" do
+              bike.reload
+              # expect(bike.registration_info).to eq target_registration_info
+              expect(bike.organization_affiliation(organization1)).to eq "graduate_student"
+              expect(bike.organization_affiliation(organization2.id)).to eq "community_member"
+              expect(bike.registration_info).to eq registration_info
+            end
           end
         end
       end
@@ -1463,13 +1479,13 @@ RSpec.describe Bike, type: :model do
     let(:wheel_size) { FactoryBot.create(:wheel_size) }
     let(:bike) { FactoryBot.create(:bike, rear_wheel_size: wheel_size) }
     let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
-    let(:target_cached_string) { "#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
+    let(:target_cached_string) { "#{bike.mnfg_name} Electric Throttle 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
     it "caches all the bike parts" do
       bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: FactoryBot.create(:color).id,
         tertiary_frame_color_id: FactoryBot.create(:color).id,
         handlebar_type: "bmx",
-        propulsion_type: "sail",
+        propulsion_type: "throttle",
         cycle_type: "unicycle",
         frame_size: "56", frame_size_unit: "foo",
         frame_model: "Some model")

@@ -179,7 +179,7 @@ class GraduatedNotification < ApplicationRecord
   end
 
   def most_recent_graduated_notification
-    most_recent? ? self : matching_notifications.most_recent.last
+    most_recent? ? self : matching_notifications_including_self.most_recent.last
   end
 
   def associated_interval
@@ -194,6 +194,13 @@ class GraduatedNotification < ApplicationRecord
 
   def associated_notifications_including_self
     self.class.associated_notifications_including_self(self)
+  end
+
+  # associated_notifications are notifications from the same notification period,
+  # matching_notifications_including_self are notifications for the same bike, regardless of period
+  def matching_notifications_including_self
+    GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
+      .where(GraduatedNotification.user_or_email_query(self))
   end
 
   def mail_snippet
@@ -226,27 +233,11 @@ class GraduatedNotification < ApplicationRecord
     pending_period_ends_at > Time.current
   end
 
-  def mark_remaining!(resolved_at: nil, marked_remaining_by_id: nil)
-    return true if marked_remaining_at.present?
-    self.marked_remaining_at ||= resolved_at || Time.current
-    self.marked_remaining_by_id ||= marked_remaining_by_id
-    # We don't want to re-mark remaining
-    update(updated_at: Time.current)
-    bike_organization.update(deleted_at: nil)
-    associated_notifications.each { |n| n.mark_remaining!(resolved_at: marked_remaining_at) } if primary_notification?
-    # Long shot - but update any graduated notifications that might have been missed, just in case
-    organization.graduated_notifications.where(bike_id: bike_id).bike_graduated.each do |pre_notification|
-      if bike_organization.created_at.present? && pre_notification.bike_organization.created_at.present?
-        # remove the newer bike_organization, keep the older one
-        bike_organization.destroy if bike_organization.created_at > pre_notification.bike_organization.created_at
-      end
-      pre_notification.mark_remaining!
+  def mark_remaining!(marked_remaining_by_id: nil, skip_async: false)
+    unless skip_async
+      MarkGraduatedNotificationRemainingWorker.perform_in(5, id, marked_remaining_by_id)
     end
-    # Update user_registration_organization only once, after everything has already been updated
-    if primary_notification? && user_registration_organization&.deleted?
-      user_registration_organization.update(deleted_at: nil)
-    end
-    true
+    MarkGraduatedNotificationRemainingWorker.new.perform(id, marked_remaining_by_id)
   end
 
   def set_calculated_attributes
@@ -313,7 +304,7 @@ class GraduatedNotification < ApplicationRecord
 
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
-    return "marked_remaining" if marked_remaining_at.present? || associated_notifications_including_self.marked_remaining.any?
+    return "marked_remaining" if marked_remaining_at.present?
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
     email_success? || primary_notification.present? && primary_notification.email_success? ? "bike_graduated" : "pending"
   end
@@ -352,6 +343,7 @@ class GraduatedNotification < ApplicationRecord
     existing_notification = if organization.graduated_notification_interval.present?
       GraduatedNotification.where(created_at: potential_matching_period)
         .where(GraduatedNotification.user_or_email_query(self))
+        .where(organization_id: organization_id)
         .email_success.primary_notification.first
     end
     existing_notification ||
@@ -378,13 +370,8 @@ class GraduatedNotification < ApplicationRecord
     associated_bike_ids - associated_notification_bike_ids
   end
 
-  def matching_notifications
-    GraduatedNotification.where(bike_id: bike_id, organization_id: organization_id)
-      .where(GraduatedNotification.user_or_email_query(self))
-  end
-
   def previous_notifications
-    matching_notifications.where("id < ?", id)
+    matching_notifications_including_self.where("id < ?", id)
   end
 
   def mark_previous_notifications_not_most_recent

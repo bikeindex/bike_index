@@ -39,8 +39,6 @@ gem "translation"
 gem "redis"
 gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
-# soulheart on branch because github.com/sethherr/soulheart/pull/32
-gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis" # Autocomplete loader
 
 gem "eventmachine"
 gem "faraday_middleware" # Manage faraday request flow
@@ -111,6 +109,7 @@ gem "stackprof", require: false
 
 gem "responders"
 gem "thor"
+gem "net-http" # Required to remove error printouts, PR#2408
 
 source "https://rails-assets.org" do # JS land is crazy, so lock everything
   gem "rails-assets-jquery", "~> 3.4.1"

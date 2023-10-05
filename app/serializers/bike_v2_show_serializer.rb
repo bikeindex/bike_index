@@ -19,7 +19,8 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :front_gear_type_slug,
     :rear_gear_type_slug,
     :extra_registration_number,
-    :additional_registration
+    :additional_registration,
+    :propulsion_type_slug
 
   has_one :stolen_record
 
@@ -69,6 +70,10 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   def rear_gear_type_slug
     object.rear_gear_type&.slug
+  end
+
+  def propulsion_type_slug
+    object.propulsion_type
   end
 
   def frame_material_slug

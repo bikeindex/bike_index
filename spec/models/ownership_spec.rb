@@ -341,6 +341,13 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.calculated_send_email).to be_falsey
       end
     end
+    context "likely_spam bike" do
+      let(:bike) { Bike.new(likely_spam: true) }
+      let(:ownership) { Ownership.new(bike: bike) }
+      it "is false" do
+        expect(ownership.calculated_send_email).to be_falsey
+      end
+    end
     context "organization with organization feature of skip_ownership_email" do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["skip_ownership_email"]) }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }

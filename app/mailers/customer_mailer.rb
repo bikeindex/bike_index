@@ -58,10 +58,18 @@ class CustomerMailer < ApplicationMailer
   end
 
   def theft_survey(notification)
-    mail_snippet = MailSnippet.theft_survey_4_2022.first
-    mail_body = mail_snippet.body.gsub(/Bike Index Registrant/i, notification.user.name)
+    mail_snippet = MailSnippet.theft_survey_2023.first
+    raise "Missing theft survey mail snippet" if mail_snippet.blank?
+    mail_body = mail_snippet.body.gsub(/SURVEY_LINK_ID/, notification.survey_id.to_s)
+    if notification.user.present?
+      mail_body = mail_body.gsub(/Bike Index Registrant/i, notification.user.name)
+    end
 
-    mail(to: notification.user.email, from: "gavin@bikeindex.org",
+    # Also replace organization if it's present
+    organization = notification.bike.creation_organization
+    mail_body = mail_body.gsub(/a Bike Shop/, organization.name) if organization.present?
+
+    mail(to: notification.calculated_message_channel_target, from: "gavin@bikeindex.org",
       subject: mail_snippet.subject, body: mail_body + "\n\n\n\n", tag: notification.kind)
   end
 

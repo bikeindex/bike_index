@@ -39,6 +39,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
 
   describe "edit" do
     it "renders" do
+      Country.united_states # Read replica
       get "#{base_url}/#{organization.to_param}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/edit")
@@ -204,6 +205,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         put "#{base_url}/#{organization.to_param}", params: {organization: {spam_registrations: "1"}}
         organization.reload
         expect(organization.spam_registrations).to be_truthy
+      end
+    end
+    context "updating ascend_name" do
+      it "updates" do
+        expect(organization.reload.ascend_name).to be_nil
+        put "#{base_url}/#{organization.to_param}", params: {organization: {ascend_name: "Party name"}}
+        expect(organization.reload.ascend_name).to eq "Party name"
+        put "#{base_url}/#{organization.to_param}", params: {organization: {ascend_name: ""}}
+        expect(organization.reload.ascend_name).to be_nil
       end
     end
     context "updating registration labels" do

@@ -2,7 +2,6 @@ module AutocompleteHashable
   extend ActiveSupport::Concern
 
   def autocomplete_result_hash
-    hash = autocomplete_hash.dup
-    hash.merge(hash.delete("data"))
+    autocomplete_hash.except(:data).merge(autocomplete_hash[:data]).as_json
   end
 end

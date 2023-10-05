@@ -19,6 +19,8 @@ RSpec.describe TheftAlert, type: :model do
         expect(theft_alert.save).to be_truthy
         expect(theft_alert.payment).to be_present
         expect(TheftAlert.paid.pluck(:id)).to eq([theft_alert.id])
+        expect(theft_alert.objective_campaign).to be_nil
+        expect(theft_alert.objective_adset).to be_nil
       end
     end
   end

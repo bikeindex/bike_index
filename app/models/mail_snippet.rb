@@ -5,6 +5,7 @@ class MailSnippet < ApplicationRecord
     custom: 0,
     header: 1,
     welcome: 2,
+    after_welcome: 14,
     footer: 3,
     security: 4,
     partial_registration: 6,
@@ -14,7 +15,8 @@ class MailSnippet < ApplicationRecord
     impound_claim_approved: 11,
     impound_claim_denied: 12,
     graduated_notification: 10,
-    theft_survey_4_2022: 13
+    theft_survey_4_2022: 13,
+    theft_survey_2023: 15
   }.freeze
 
   belongs_to :organization
@@ -37,6 +39,7 @@ class MailSnippet < ApplicationRecord
     {
       header: {emails: "all", description: "Top of email block"},
       welcome: {emails: "finished_registration", description: "Below header"},
+      after_welcome: {emails: "finished_registration", description: "After \"Congrats\", in \"Finished registration\""},
       footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
       partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
       security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""}
