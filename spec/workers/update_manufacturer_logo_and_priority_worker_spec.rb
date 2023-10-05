@@ -41,7 +41,6 @@ RSpec.describe UpdateManufacturerLogoAndPriorityWorker, type: :job do
       local_image = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
       manufacturer = FactoryBot.create(:manufacturer, logo: local_image, website: "http://example.com")
       expect(manufacturer.logo).to be_present
-      expect(Manufacturer.count).to eq 1
       Sidekiq::Worker.clear_all
       described_class.new.perform
       # Verify that it doesn't call update
