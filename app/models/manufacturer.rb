@@ -104,7 +104,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def autocomplete_hash_category
-    frame_maker ? "frame_mnfg" : "mnfg"
+    frame_maker ? "frame_mnfg" : "cmp_mnfg"
   end
 
   def autocomplete_hash
@@ -118,7 +118,7 @@ class Manufacturer < ApplicationRecord
         priority: priority,
         search_id: search_id
       }
-    }.as_json
+    }
   end
 
   def search_id
