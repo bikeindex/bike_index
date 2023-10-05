@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "soulheart/server"
 require "sidekiq/web"
 
 Rails.application.routes.draw do
@@ -286,7 +285,7 @@ Rails.application.routes.draw do
       get "not_found", to: "api_v1#not_found"
       get "*a", to: "api_v1#not_found"
     end
-    mount Soulheart::Server, at: "/autocomplete"
+    resources :autocomplete, only: [:index]
   end
   mount API::Base => "/api"
 

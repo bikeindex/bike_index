@@ -25,16 +25,6 @@ GIT
       excon (~> 0.76.0)
       json (~> 2.1, >= 2.1.0)
 
-GIT
-  remote: https://github.com/sethherr/soulheart.git
-  revision: 301ff545ad8449994bee5018272e22fac11b3e05
-  branch: non-hiredis
-  specs:
-    soulheart (0.4.0)
-      redis (>= 3.0.5)
-      sinatra (>= 1.4.4)
-      vegas (>= 0.1.0)
-
 GEM
   remote: https://rails-assets.org/
   specs:
@@ -659,11 +649,6 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    sinatra (2.0.8.1)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.8.1)
-      tilt (~> 2.0)
     sitemap_generator (6.1.2)
       builder (~> 3.0)
     sixarm_ruby_unaccent (1.2.0)
@@ -720,8 +705,6 @@ GEM
     uri (0.12.2)
     user_agent_parser (2.7.0)
     vcr (5.0.0)
-    vegas (0.1.11)
-      rack (>= 1.0.0)
     webmock (3.7.6)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -845,7 +828,6 @@ DEPENDENCIES
   simplecov
   sitemap_generator (~> 6)
   skylight
-  soulheart!
   sprockets (= 4.0.0)
   sprockets-rails
   stackprof

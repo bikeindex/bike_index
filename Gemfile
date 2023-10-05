@@ -38,8 +38,6 @@ gem "translation"
 gem "redis"
 gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
-# soulheart on branch because github.com/sethherr/soulheart/pull/32
-gem "soulheart", github: "sethherr/soulheart", branch: "non-hiredis" # Autocomplete loader
 
 gem "eventmachine"
 gem "faraday_middleware" # Manage faraday request flow

@@ -2,9 +2,9 @@ task run_scheduler: :environment do
   ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
 end
 
-desc "Reset Soulheart - colors and frame_makers"
+desc "Reset Autocomplete"
 task reset_autocomplete: :environment do
-  AutocompleteLoaderWorker.perform_async("reset")
+  AutocompleteLoaderWorker.new.perform(nil, true)
 end
 
 desc "Load counts" # This is a rake task so it can be loaded from bin/update
