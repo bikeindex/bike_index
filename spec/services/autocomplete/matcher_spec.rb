@@ -41,16 +41,20 @@ RSpec.describe Autocomplete::Matcher do
       # But it is in cache after the search
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_falsey
 
-      # TODO: test caching
-      #       test pagination
       # Testing caching - colors have higher priority, so they should come first
       Autocomplete::Loader.send(:store_items, [Color.black.autocomplete_hash])
+      # Because caching, it is still the same as it was before
+      expect(subject.search(nil, opts)).to eq result
+      # Getting the second page, skips the first two colors
+      paginated_opts = subject.params_to_opts(page: 2, per_page: 4)
+      result_paginated = subject.search(page: 2, per_page: 4)
+      expect(result_paginated.map { |i| i["search_id"] }).to eq(%w[v_18 v_5 v_1 v_3])
     end
   end
 
   describe "params_to_opts" do
     let(:default) { {offset: 0, limit: 4, categories: [], q_array: [], cache: true} }
-    let(:default_cache_keys) { {cache_key: "autc:test:cache:all:", category_cache_key: "autc:test:cts:all:", interkeys: ["all:autc:test:cts:all:"]} }
+    let(:default_cache_keys) { {cache_key: "autc:test:cache:all:", category_cache_key: "autc:test:cts:all:", interkeys: ["autc:test:noq:autc:test:cts:all:"]} }
     let(:default_target) { default.merge(default_cache_keys) }
     it "is the default plus cache keys" do
       expect(subject.send(:params_to_opts)).to eq default.merge(default_cache_keys)
