@@ -1,14 +1,6 @@
 class ListicleImageUploader < ApplicationUploader
   include CarrierWave::MiniMagick
 
-  def store_dir
-    "#{base_store_dir}/#{model.id}"
-  end
-
-  def base_store_dir
-    "uploads/#{model.class.to_s[0, 2]}"
-  end
-
   process :fix_exif_rotation
   process :strip # Remove EXIF data, because we don't need it
 
