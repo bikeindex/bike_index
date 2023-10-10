@@ -303,6 +303,10 @@ RSpec.shared_examples "bike_searchable" do
           let(:query_params) { {serial: "STood ffer", stolenness: "all"} }
           it "finds matching bikes" do
             expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
+            # It finds without spaces
+            expect(Bike.search(interpreted_params.merge(serial: "SToodffer")).pluck(:id)).to eq([bike.id])
+            # And with extra spaces
+            expect(Bike.search(interpreted_params.merge(serial: "ST ood ffer")).pluck(:id)).to eq([bike.id])
           end
         end
         context "partial homoglyph match" do

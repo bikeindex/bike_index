@@ -35,7 +35,7 @@ module BikeSearchable
     end
 
     def search(interpreted_params)
-      search_matching_serial(interpreted_params[:serial])
+      search_matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
         .non_serial_matches(interpreted_params)
     end
 
@@ -209,10 +209,10 @@ module BikeSearchable
       query.presence && pg_search(query) || all
     end
 
-    def search_matching_serial(serial)
+    def search_matching_serial(serial, serial_no_space)
       return all unless serial.present?
       # Note: @@ is postgres fulltext search
-      where("serial_normalized @@ ?", serial)
+      where("serial_normalized @@ ? OR serial_normalized_no_space @@ ?", serial, serial_no_space)
     end
 
     def serials_containing(interpreted_params)
