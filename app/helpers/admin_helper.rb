@@ -3,15 +3,16 @@ module AdminHelper
     return [] unless current_user&.developer?
     [
       # Impound claims index is currently busted, so ignoring for now
-      {title: "Impound Claims", path: admin_impound_claims_path, match_controller: true},
-      {title: "Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
-      {title: "Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
-      {title: "Mailchimp Data", path: admin_mailchimp_data_path, match_controller: true},
-      {title: "User Alerts", path: admin_user_alerts_path, match_controller: true},
-      {title: "Ownerships", path: admin_ownerships_path, match_controller: true},
-      {title: "User Registration Organizations", path: admin_user_registration_organizations_path, match_controller: true},
-      {title: "Notifications", path: admin_notifications_path, match_controller: true},
-      {title: "Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true}
+      {title: "Dev: Impound Claims", path: admin_impound_claims_path, match_controller: true},
+      {title: "Dev: Feature Flags", path: admin_feature_flags_path, match_controller: false},
+      {title: "Dev: Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
+      {title: "Dev: Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
+      {title: "Dev: Mailchimp Data", path: admin_mailchimp_data_path, match_controller: true},
+      {title: "Dev: User Alerts", path: admin_user_alerts_path, match_controller: true},
+      {title: "Dev: Ownerships", path: admin_ownerships_path, match_controller: true},
+      {title: "Dev: User Reg Organizations", path: admin_user_registration_organizations_path, match_controller: true},
+      {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
+      {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true}
     ]
   end
 
@@ -40,7 +41,7 @@ module AdminHelper
       {title: "Recovery Displays", path: admin_recovery_displays_path, match_controller: true},
       {title: "Memberships", path: admin_memberships_path, match_controller: true},
       {title: "Manufacturers", path: admin_manufacturers_path, match_controller: true},
-      {title: "TSV Exports", path: admin_tsvs_path, match_controller: false},
+      {title: "Config: TSV Exports", path: admin_tsvs_path, match_controller: false},
       {title: "Credibility badges", path: admin_credibility_badges_path, match_controller: false},
       {title: "Maintenance", path: admin_maintenance_path, match_controller: false},
       {title: "Partial Bikes", path: admin_b_params_path, match_controller: true},
@@ -55,9 +56,8 @@ module AdminHelper
       {title: "Exports", path: admin_exports_path, match_controller: true},
       {title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true},
       {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false},
-      {title: "Feature Flags", path: admin_feature_flags_path, match_controller: false},
-      {title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
-      {title: "Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
+      {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
+      {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
     ] + dev_nav_select_links).sort_by { |a| a[:title] }
   end

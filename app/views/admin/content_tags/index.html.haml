@@ -1,11 +1,10 @@
-.row
+.admin-subnav
   .col-lg-10.col-sm-12
     %h1 Content Tag
   .col-lg-2.col-sm-12
     = link_to "New tag", new_admin_content_tag_url, class: "btn btn-success float-right"
 
-%h4
-  #{matching_content_tags.count} total
+= render partial: "/shared/pagination", locals: {collection: @content_tags}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
@@ -18,6 +17,8 @@
         = sortable "name"
       %th
         = sortable "priority"
+      %th
+        Blogs
     %tbody
       - @content_tags.each do |content_tag|
         %tr
@@ -34,3 +35,5 @@
           %td
             %small
               = content_tag.priority
+          %td
+            = admin_number_display(content_tag.blogs.count)
