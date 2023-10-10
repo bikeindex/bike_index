@@ -34,7 +34,7 @@ RSpec.describe Autocomplete::Matcher do
       opts_query = subject.params_to_opts(q: "b", per_page: 10)
       # Isn't in cache
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_truthy
-      result_query = subject.search({q: "b", per_page: 10}, opts_query)
+      result_query = subject.search(nil, opts_query)
       expect(result_query.count).to eq 9
       target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_9", "v_14", "m_#{manufacturer2.id}", "m_#{manufacturer1.id}"]
       expect(result_query.map { |i| i["search_id"] }).to eq target_search_ids
@@ -47,7 +47,7 @@ RSpec.describe Autocomplete::Matcher do
       expect(subject.search(nil, opts)).to eq result
       # Getting the second page, skips the first two colors
       paginated_opts = subject.params_to_opts(page: 2, per_page: 4)
-      result_paginated = subject.search(page: 2, per_page: 4)
+      result_paginated = subject.search(nil, paginated_opts)
       expect(result_paginated.map { |i| i["search_id"] }).to eq(%w[v_18 v_5 v_1 v_3])
     end
   end

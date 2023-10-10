@@ -54,7 +54,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
   private
 
   def render_finished_registration(bikes, bike = nil)
-    bike ||= bikes.reorder(:created_at).limit(50).shuffle.last
+    bike ||= bikes.reorder(:created_at).limit(50).sample
     OrganizedMailer.finished_registration(bike.current_ownership)
   end
 end
