@@ -22,7 +22,6 @@ class BikeSearch extends Component {
 
   componentDidMount () {
     this.resultsBeingFetched()
-    console.log(this.props.interpretedParams)
     this.props
       .fetchBikes(this.props.interpretedParams)
       .then(this.resultsFetched)
