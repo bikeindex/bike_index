@@ -22,7 +22,7 @@ gem "fast_blank", "~> 1.0"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
-gem "net-smtp" # Required for
+gem "net-smtp" # Required in Ruby 3
 
 # Feature flagging
 gem "flipper"
@@ -78,7 +78,7 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 gem "api-pagination"
 gem "doorkeeper", "~> 5.2.5" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
-gem "grape" # API DSL
+gem "grape", "~> 1.8.0" # API DSL
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "hashie" # required for some Grape endpoints
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
