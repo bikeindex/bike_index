@@ -17,6 +17,10 @@ RSpec.describe Autocomplete::Loader do
       subject.clear_redis
       total_count = subject.load_all
       expect(total_count).to eq 22 * category_count_for_1_item
+      info = subject.info
+      expect(info.keys).to match_array(%i[category_keys cache_keys db0 used_memory used_memory_peak])
+      expect(info[:category_keys]).to eq 1508
+      expect(info[:cache_keys]).to eq 0
     end
 
     context "passing individual types" do

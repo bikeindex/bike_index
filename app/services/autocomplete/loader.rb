@@ -49,6 +49,18 @@ class Autocomplete::Loader
       total_count
     end
 
+    def info
+      Autocomplete.redis do |r|
+        # NOTE: if you add in more DBs, include the keys here
+        included_info = r.info.slice("used_memory_human", "used_memory_peak_human", "db0")
+          .map { |k, v| [k.gsub("_human", "").to_sym, v] }.to_h
+        {
+          category_keys: fetch_category_keys(r).count,
+          cache_keys: fetch_cache_keys(r).count
+        }.merge(included_info)
+      end
+    end
+
     private
 
     def store_items(items)
@@ -138,7 +150,7 @@ class Autocomplete::Loader
     def clear_cache
       Autocomplete.redis do |r|
         # can't be pipelined, requires the response
-        keys = r.scan_each({match: Autocomplete.cache_key.gsub(/all:\z/, "*")}).to_a
+        keys = fetch_cache_keys(r).to_a
 
         r.pipelined do |pipeline|
           keys.each { |k| pipeline.expire(k, 0) }
@@ -149,7 +161,7 @@ class Autocomplete::Loader
     def delete_categories_and_item_data
       Autocomplete.redis do |r|
         # Get all the matching keys for category typeahead
-        keys = r.scan_each({match: Autocomplete.category_key.gsub(/all:\z/, "*")}).to_a
+        keys = fetch_category_keys(r).to_a
 
         r.pipelined do |pipeline|
           # Use static categories, so it doesn't rely on data in Redis
@@ -166,6 +178,14 @@ class Autocomplete::Loader
           keys.each { |k| pipeline.expire(k, 0) }
         end
       end
+    end
+
+    def fetch_category_keys(redis_block)
+      redis_block.scan_each({match: Autocomplete.category_key.gsub(/all:\z/, "*")})
+    end
+
+    def fetch_cache_keys(redis_block)
+      redis_block.scan_each({match: Autocomplete.cache_key.gsub(/all:\z/, "*")})
     end
 
     def delete_data(id = nil)

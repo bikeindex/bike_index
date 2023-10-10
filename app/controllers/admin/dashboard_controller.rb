@@ -23,6 +23,10 @@ class Admin::DashboardController < Admin::BaseController
     @paint = Paint.where("color_id IS NULL")
   end
 
+  def autocomplete_status
+    @autocomplete_info = Autocomplete::Loader.info
+  end
+
   def scheduled_jobs
   end
 

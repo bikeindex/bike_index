@@ -1,5 +1,7 @@
--# Requires  collection
-- count ||= collection.total_count
+-# Requires collection
+-# total_count is pagination method. Handle non-paginated collections, in case this is used to display count and time range
+- count ||= defined?(collection.total_count) ? collection.total_count : collection.count
+
 - skip_total ||= false
 - skip_today ||= false
 - skip_pagination ||= false
@@ -7,14 +9,14 @@
 - humanized_time_range_column_override ||= nil
 -# Currently only used in admin, but worth preparing for the future
 - views_prefix ||= controller_namespace == "admin" ? "admin" : nil
-- name ||= collection.table_name.humanize
+- viewing ||= collection.table_name.humanize
 
 .row.mt-4.mb-4
   - unless skip_total
     .col-md-5
       %p.pagination-number
         %strong= number_with_delimiter(count)
-        Matching #{name.pluralize(count)}
+        Matching #{viewing.pluralize(count)}
 
         - if defined?(@time_range) && @period != "all"
           %em

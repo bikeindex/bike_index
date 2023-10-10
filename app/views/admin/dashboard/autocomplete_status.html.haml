@@ -1,0 +1,32 @@
+.admin-subnav
+  .col-12
+    %h1
+      Autocomplete status
+
+.row
+  .col-md-6
+    %h4.mb-3
+      Autocomplete info
+    %table.table-list
+      %tbody
+        %tr
+          %td Category Keys
+          %td
+            = admin_number_display(@autocomplete_info[:category_keys])
+            %small.less-strong.ml-1
+              should be > 52k
+        %tr
+          %td Cache Keys
+          %td
+            = admin_number_display(@autocomplete_info[:category_keys])
+            %small.less-strong.ml-1
+              they should expire every 10 minutes...
+
+        - @autocomplete_info.except(:category_keys, :cache_keys).each do |key, value|
+          %tr
+            %td= key.to_s.humanize
+            %td
+              - if value.is_a?(Integer)
+                = admin_number_display(value)
+              - else
+                = value
