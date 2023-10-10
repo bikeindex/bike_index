@@ -11,6 +11,7 @@ module AdminHelper
       {title: "Dev: User Alerts", path: admin_user_alerts_path, match_controller: true},
       {title: "Dev: Ownerships", path: admin_ownerships_path, match_controller: true},
       {title: "Dev: User Reg Organizations", path: admin_user_registration_organizations_path, match_controller: true},
+      {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true}
     ]
@@ -23,7 +24,7 @@ module AdminHelper
       {title: "Stolen Bikes", path: admin_stolen_bikes_path, match_controller: true},
       {title: "Stolen Notifications", path: admin_stolen_notifications_url, match_controller: true},
       {title: "External Registry Bikes", path: admin_external_registry_bikes_path, match_controller: true},
-      {title: "External Registry Credentials", path: admin_external_registry_credentials_path, match_controller: true},
+      {title: "Config: External Registry Credentials", path: admin_external_registry_credentials_path, match_controller: true},
       {title: "Organizations", path: admin_organizations_path, match_controller: true},
       {title: "News", path: admin_news_index_path, match_controller: true},
       {title: "Content Tags", path: admin_content_tags_path, match_controller: true},

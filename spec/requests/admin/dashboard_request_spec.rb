@@ -76,6 +76,14 @@ RSpec.describe Admin::DashboardController, type: :request do
       end
     end
 
+    describe "autocomplete_status" do
+      it "renders" do
+        get "/admin/autocomplete_status"
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:autocomplete_status)
+      end
+    end
+
     describe "maintenance" do
       it "renders" do
         Organization.example && Cgroup.additional_parts && Ctype.other # Read replica

@@ -191,6 +191,7 @@ Rails.application.routes.draw do
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
+    get "autocomplete_status", to: "dashboard#autocomplete_status"
     put "update_tsv_blocklist", to: "dashboard#update_tsv_blocklist"
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
