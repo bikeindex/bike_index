@@ -28,7 +28,7 @@ const MultipleSerialSearchHeader = ({ serial, queriesCount }) =>
   queriesCount === 1 ? (
     <Fragment />
   ) : (
-    <h2 className='secondary-matches'>{t('serial_search', { serial })}</h2>
+    <h2 className='secondary-matches uncap'>{t('serial_search', { serial })}</h2>
   )
 
 const SecondarySearches = ({ interpretedParams }) =>

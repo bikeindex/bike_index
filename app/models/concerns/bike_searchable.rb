@@ -1,9 +1,6 @@
 module BikeSearchable
   extend ActiveSupport::Concern
 
-  # TODO: add a flipper to test searching with and without pluck, for performance
-  WHERE_NOT_PLUCK = ENV["BIKESEARCH_WHERE_NOT_PLUCK"].blank?
-
   module ClassMethods
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
@@ -42,9 +39,7 @@ module BikeSearchable
     def search_close_serials(interpreted_params)
       return none if interpreted_params[:serial].blank? # normalized_serial blank
 
-      # TODO: if WHERE_NOT_PLUCK
-      where
-        .not(id: serials_containing(interpreted_params).pluck(:id))
+      search_not_matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
         .non_serial_matches(interpreted_params)
         .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
     end
@@ -52,9 +47,8 @@ module BikeSearchable
     def search_serials_containing(interpreted_params)
       return none if interpreted_params[:serial].blank? # normalized_serial blank
 
-      # TODO: if WHERE_NOT_PLUCK
-      where
-        .not(id: search(interpreted_params).pluck(:id))
+      search_not_matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
+        .non_serial_matches(interpreted_params)
         .serials_containing(interpreted_params)
     end
 
@@ -209,10 +203,17 @@ module BikeSearchable
       query.presence && pg_search(query) || all
     end
 
+    # NOTE: This where query should exactly match
     def search_matching_serial(serial, serial_no_space)
       return all unless serial.present?
       # Note: @@ is postgres fulltext search
-      where("serial_normalized @@ ? OR serial_normalized_no_space LIKE ?", serial, serial_no_space)
+      where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
+    end
+
+    def search_not_matching_serial(serial, serial_no_space)
+      return all unless serial.present?
+      # Note: @@ is postgres fulltext search
+      where.not("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
     end
 
     def serials_containing(interpreted_params)

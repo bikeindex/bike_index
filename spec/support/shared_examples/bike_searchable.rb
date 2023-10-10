@@ -404,9 +404,10 @@ RSpec.shared_examples "bike_searchable" do
     end
   end
 
-  describe "search_close_serials" do
+  describe "search_close_serials and serials_containing" do
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "O|ILSZB-111JJJG8", manufacturer: manufacturer) }
-    let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJJ") }
+    let(:blue) { FactoryBot.create(:color, name: "Blue") }
+    let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJJJ", primary_frame_color: blue) }
     context "no serial param" do
       let(:query_params) { {query_items: [manufacturer.search_id], stolenness: "non"} }
       it "returns nil" do
@@ -416,7 +417,27 @@ RSpec.shared_examples "bike_searchable" do
     context "exact normalized serial" do
       let(:query_params) { {serial: "11I528-111JJJJJ", stolenness: "all"} } # Because drops leading zeros
       it "matches only non-exact" do
+        expect(Bike.search(interpreted_params).pluck(:id)).to eq([non_stolen_bike.id])
         expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
+      end
+    end
+    context "passing color" do
+      let(:q_blue) { {colors: [blue.id]} }
+      let(:q_black) { {colors: [color.id]} }
+      let(:s_contain) { "011 I528-111J J" }
+      let(:s_nearby) { "011 I528-111J v" }
+      it "matches by color as well" do
+        # Sanity check
+        expect(Bike.serials_containing(i_params(s_contain)).pluck(:id)).to match_array([stolen_bike.id, non_stolen_bike.id])
+        # expect(Bike.search_close_serials(i_params(s_nearby)).pluck(:id)).to match_array([stolen_bike.id, non_stolen_bike.id])
+        expect(Bike.search(i_params(nil, query_items: q_blue)).pluck(:id)).to eq([stolen_bike.id])
+        expect(Bike.search(i_params(nil, query_items: q_black)).pluck(:id)).to eq([non_stolen_bike.id])
+        # serials_containing matches by color
+        expect(Bike.serials_containing(i_params(s_contain, query_items: q_blue)).pluck(:id)).to eq([non_stolen_bike.id])
+        expect(Bike.serials_containing(i_params(s_contain, query_items: q_black)).pluck(:id)).to eq([stolen_bike.id])
+        # search_close_serials matches by color too
+        expect(Bike.search_close_serials(i_params(s_contain, query_items: q_blue)).pluck(:id)).to eq([non_stolen_bike.id])
+        expect(Bike.search_close_serials(i_params(s_contain, query_items: q_black)).pluck(:id)).to eq([stolen_bike.id])
       end
     end
     context "serial with spaces rather than dashes" do
@@ -429,7 +450,7 @@ RSpec.shared_examples "bike_searchable" do
       let!(:non_stolen_bike_n) { FactoryBot.create(:bike, serial_number: "O|ILSZB-111JJJN") }
       let(:query_params) { {serial: "011-I528-111J-J", stolenness: "all"} }
       let(:interpreted_params_g) { i_params("011 I528-111J JJg") }
-      let(:interpreted_params_n) { i_params("111528 11 1JJ Jn") } # just segment 2
+      let(:interpreted_params_n) { i_params("11528 11 1JJ Jn") } # just segment 2
       let(:interpreted_params_no_space) { i_params("011I528111JJ") }
       let(:interpreted_params_first_segment) { i_params("111529") }
       let(:all_ids) { [stolen_bike.id, non_stolen_bike.id, non_stolen_bike_n.id] }
@@ -452,6 +473,13 @@ RSpec.shared_examples "bike_searchable" do
         expect(non_stolen_bike.serial_normalized_no_space).to match interpreted_params_no_space[:serial_no_space]
         expect(Bike.serials_containing(interpreted_params_no_space).pluck(:id)).to match_array(all_ids)
         expect(Bike.search_close_serials(interpreted_params_no_space).pluck(:id)).to eq([])
+        # Exact match, no whitespace
+        pp non_stolen_bike_n.serial_normalized_no_space
+        expect(Bike.serials_containing(i_params("0111528111JJJN")).pluck(:id)).to eq([])
+        # expect(Bike.search_close_serials(i_params("O11LSZB111JJJN")).pluck(:id)).to eq([])
+        # Exact match, extra whitespace - doesn't match
+        expect(Bike.serials_containing(i_params("O11 LSZB 111 JJJN")).pluck(:id)).to eq([])
+        # expect(Bike.search_close_serials(i_params("O11 LSZB 111 JJJN")).pluck(:id)).to eq([])
         # first segment mismatch. NOTE: This doesn't work!
         expect(Bike.serials_containing(interpreted_params_first_segment).pluck(:id)).to match_array([])
         # TODO: Make this actually work - Levenshtein match against different serial segments, separated by space
