@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
-ruby "2.7.6"
+ruby "3.2.2"
 gem "rack", "2.2.3"
 gem "rails", "~> 6.0"
 
@@ -22,6 +22,7 @@ gem "fast_blank", "~> 1.0"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
+gem "net-smtp" # Required in Ruby 3
 
 # Feature flagging
 gem "flipper"
@@ -156,9 +157,9 @@ group :development, :test do
   # the gem version hasn't been updated in a long time github.com/pry/pry-coolline/issues/22
   # https://github.com/pry/pry-coolline/commit/f3a130c9829969732977015a04e90b9fb5d281b2
   # gem "jazz_fingers"
+  # gem "pry-byebug" # Commented out for Ruby 3 upgrade, PR#2374
+  # gem "pry-rails" # Commented out for Ruby 3 upgrade, PR#2374
   gem "parallel_tests"
-  gem "pry-byebug"
-  gem "pry-rails"
   gem "rb-fsevent", "~> 0.10.3"
   gem "rspec", "~> 3.4"
   gem "rspec-rails", "~> 4.0"
