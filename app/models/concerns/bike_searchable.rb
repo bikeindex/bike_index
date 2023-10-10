@@ -212,12 +212,11 @@ module BikeSearchable
     def search_matching_serial(serial, serial_no_space)
       return all unless serial.present?
       # Note: @@ is postgres fulltext search
-      where("serial_normalized @@ ? OR serial_normalized_no_space @@ ?", serial, serial_no_space)
+      where("serial_normalized @@ ? OR serial_normalized_no_space LIKE ?", serial, serial_no_space)
     end
 
     def serials_containing(interpreted_params)
       non_serial_matches(interpreted_params)
-        # .where("serial_normalized LIKE ?", "%#{interpreted_params[:serial]}%")
         .where("serial_normalized_no_space LIKE ?", "%#{interpreted_params[:serial_no_space]}%")
     end
 

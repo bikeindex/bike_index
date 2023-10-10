@@ -319,7 +319,7 @@ RSpec.shared_examples "bike_searchable" do
       context "reversed serial" do
         let(:bike) { FactoryBot.create(:bike, serial_number: "K10DY00047-bkd") }
         let(:query_params) { {serial: "bkd-K1oDYooo47", stolenness: "all"} }
-        it "fulls text search" do
+        it "full text search" do
           expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
         end
       end
