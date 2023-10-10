@@ -4,14 +4,6 @@ class AlertImageUploader < ApplicationUploader
 
   delegate :stolen_record, to: :model
 
-  def store_dir
-    "#{base_store_dir}/#{model.id}"
-  end
-
-  def base_store_dir
-    "uploads/#{model.class.to_s[0, 2]}"
-  end
-
   def extension_white_list
     IMAGE_EXT_WHITE_LIST
   end

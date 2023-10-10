@@ -53,7 +53,7 @@ RSpec.describe "Bikes API V3", type: :request do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_phone_attrs[:serial]) }
     let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, bike: bike) }
-    let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes read_organization_membership") }
+    let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     it "returns 401" do
       post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.to_json, headers: json_headers
       expect(response.code).to eq("401")

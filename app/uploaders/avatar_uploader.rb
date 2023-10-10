@@ -6,14 +6,6 @@ class AvatarUploader < ApplicationUploader
     "https://files.bikeindex.org/blank.png"
   end
 
-  def store_dir
-    "#{base_store_dir}/#{model.id}"
-  end
-
-  def base_store_dir
-    "uploads/#{model.class.to_s[0, 2]}"
-  end
-
   process :validate_dimensions
 
   def extension_white_list

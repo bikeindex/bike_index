@@ -132,7 +132,7 @@ module API
 
         desc "Check if a bike is already registered <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
-          notes: "**Requires** `read_organizations` **in the access token** you use to make the request."
+          notes: "**Access token user** _must_ be a member of the organization from the `organization_slug`."
         }
         params do
           requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial, 'unknown' if the serial is not known)"
