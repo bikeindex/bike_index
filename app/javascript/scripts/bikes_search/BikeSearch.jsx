@@ -91,7 +91,7 @@ class BikeSearch extends Component {
       return (
         <div className={wrapperClassName}>
           <div className='col-md-12'>
-            <h3 className='secondary-matches'>
+            <h3 className='secondary-matches uncap'>
               {this.props.t('searching_html', { serial })}
             </h3>
             <Loading />

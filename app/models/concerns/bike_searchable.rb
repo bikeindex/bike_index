@@ -1,9 +1,6 @@
 module BikeSearchable
   extend ActiveSupport::Concern
 
-  # TODO: add a flipper to test searching with and without pluck, for performance
-  WHERE_NOT_PLUCK = ENV["BIKESEARCH_WHERE_NOT_PLUCK"].blank?
-
   module ClassMethods
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
@@ -35,16 +32,15 @@ module BikeSearchable
     end
 
     def search(interpreted_params)
-      search_matching_serial(interpreted_params[:serial])
+      matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
         .non_serial_matches(interpreted_params)
     end
 
     def search_close_serials(interpreted_params)
       return none if interpreted_params[:serial].blank? # normalized_serial blank
 
-      # TODO: if WHERE_NOT_PLUCK
-      where
-        .not(id: serials_containing(interpreted_params).pluck(:id))
+      # serials_not_containing excludes exact matches too
+      serials_not_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
         .non_serial_matches(interpreted_params)
         .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
     end
@@ -52,10 +48,9 @@ module BikeSearchable
     def search_serials_containing(interpreted_params)
       return none if interpreted_params[:serial].blank? # normalized_serial blank
 
-      # TODO: if WHERE_NOT_PLUCK
-      where
-        .not(id: search(interpreted_params).pluck(:id))
-        .serials_containing(interpreted_params)
+      not_matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
+        .non_serial_matches(interpreted_params)
+        .serials_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
     end
 
     # Initial autocomplete options hashes for the main select search input
@@ -209,16 +204,29 @@ module BikeSearchable
       query.presence && pg_search(query) || all
     end
 
-    def search_matching_serial(serial)
+    # NOTE: This where query should exactly match not_matching_serial
+    def matching_serial(serial, serial_no_space)
       return all unless serial.present?
       # Note: @@ is postgres fulltext search
-      where("serial_normalized @@ ?", serial)
+      where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
     end
 
-    def serials_containing(interpreted_params)
-      non_serial_matches(interpreted_params)
-        # .where("serial_normalized LIKE ?", "%#{interpreted_params[:serial]}%")
-        .where("serial_normalized_no_space LIKE ?", "%#{interpreted_params[:serial_no_space]}%")
+    # TODO: Better way of matching this with matching_serial
+    def not_matching_serial(serial, serial_no_space)
+      return all unless serial.present?
+      where.not("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
+    end
+
+    # NOTE: THis query should exactly match serials_not_containing
+    def serials_containing(serial, serial_no_space)
+      return all unless serial.present?
+      where("serial_normalized_no_space LIKE ?", "%#{serial_no_space}%")
+    end
+
+    # TODO: Better way of matching this with serials_containing
+    def serials_not_containing(serial, serial_no_space)
+      return all unless serial.present?
+      where.not("serial_normalized_no_space LIKE ?", "%#{serial_no_space}%")
     end
 
     def search_matching_stolenness(interpreted_params)
