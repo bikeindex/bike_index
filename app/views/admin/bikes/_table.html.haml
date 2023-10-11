@@ -72,7 +72,8 @@
                   = render partial: "/shared/admin_user_cell", locals: {email: bike.owner_email, user: bike.user, render_search: true, cache: true}
                   -# Previously, was passing in search_url with search_email: owner_email - which is more inclusive and MUCH SLOWER
                   - if bike.claimed?
-                    %span.less-strong-right.text-info= check_mark
+                    %span.less-strong-right.text-info{title: "#{bike.type} is claimed", style: "cursor: default"}
+                      = check_mark
               %td
                 - if bike.manufacturer_other.present?
                   %span.text-warning
