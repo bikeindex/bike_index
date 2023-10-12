@@ -356,6 +356,11 @@
           .nav-item
             = link_to "Edit", edit_admin_bike_path(bike), class: "nav-link bikes-edit"
           .nav-item
+            = link_to admin_bike_path(bike, active_tab: "duplicates"), class: "nav-link bikes-duplicates" do
+              D<span class="d-none d-md-inline">uplicates</span>
+              %small
+                (#{admin_number_display(bike.duplicate_bike_groups.count)})
+          .nav-item
             = link_to admin_bike_path(bike, active_tab: "messages"), class: "nav-link bikes-messages" do
               M<span class="d-none d-md-inline">essages</span>
               %small

@@ -6,7 +6,7 @@ class MigrateNormalizedSerialSegmentsWorker < ScheduledWorker
   sidekiq_options retry: false
 
   def self.frequency
-    4.minutes
+    1.1.minutes
   end
 
   def self.potential_bikes
