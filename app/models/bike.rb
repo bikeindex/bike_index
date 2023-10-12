@@ -300,6 +300,11 @@ class Bike < ApplicationRecord
       current_ownership.status == "status_impounded"
   end
 
+  # Matches the current scope
+  def current?
+    deleted_at.blank? && !example && !user_hidden && !likely_spam
+  end
+
   # Abbreviation, checks if this is a bike_version
   def version?
     false

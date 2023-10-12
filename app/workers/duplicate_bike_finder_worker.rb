@@ -2,7 +2,7 @@ class DuplicateBikeFinderWorker < ApplicationWorker
   sidekiq_options retry: false
 
   def perform(bike_id)
-    bike = Bike.find_by_id(bike_id)
+    bike = Bike.unscoped.find_by_id(bike_id)
     return true unless bike.present?
     serial_segments = bike.normalized_serial_segments
 
