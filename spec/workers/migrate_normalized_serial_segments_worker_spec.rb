@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe MigrateNormalizedSerialSegmentsWorker, type: :job do
   let(:instance) { described_class.new }
+  include_context :scheduled_worker
+  include_examples :scheduled_worker_tests
 
   it "adds the missing serial segments" do
     bike = FactoryBot.create(:bike, serial_number: "applejacks cereal cross")

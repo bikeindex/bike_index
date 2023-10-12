@@ -1,4 +1,4 @@
-class MigrateNormalizedSerialSegmentsWorker < ApplicationWorker
+class MigrateNormalizedSerialSegmentsWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   NUMBER_TO_ENQUEUE = ENV.fetch("SEGMENTS_WORKER_LIMIT", 1000).to_i.freeze
