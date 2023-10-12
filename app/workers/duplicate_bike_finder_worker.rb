@@ -1,7 +1,7 @@
 class DuplicateBikeFinderWorker < ApplicationWorker
   sidekiq_options retry: false
 
-  def perform(bike_id, bike)
+  def perform(bike_id, bike = nil)
     bike ||= Bike.unscoped.find_by_id(bike_id)
     return true if bike.blank?
 
