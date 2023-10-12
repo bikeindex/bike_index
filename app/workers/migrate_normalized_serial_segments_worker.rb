@@ -3,10 +3,10 @@ class MigrateNormalizedSerialSegmentsWorker < ScheduledWorker
 
   NUMBER_TO_ENQUEUE = ENV.fetch("SEGMENTS_WORKER_LIMIT", 1000).to_i.freeze
 
-  sidekiq_options retry: false, queue: :low_priority
+  sidekiq_options retry: false
 
   def self.frequency
-    2.minutes
+    1.1.minutes
   end
 
   def self.potential_bikes

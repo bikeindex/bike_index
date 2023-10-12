@@ -9,8 +9,21 @@
 - elsif @active_tab == "stickers"
   = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @bike.bike_stickers}
 
+- elsif @active_tab == "duplicates"
+  - duplicate_groups = @bike.duplicate_bike_groups
+  - duplicate_groups.each do |duplicate_group|
+    .row
+      .col-lg-6
+        %p
+          %strong
+            #{duplicate_group.segment}
+      .col-lg-6
+        = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: 'PUT', class: 'float-right less-strong'
 
-
+    = render partial: "/admin/bikes/table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
+  - if duplicate_groups.none
+    %h3.mt-4
+      No duplicates
 - elsif @active_tab == "messages"
   %h3.mt-4
     Notifications

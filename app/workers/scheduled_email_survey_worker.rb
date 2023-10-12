@@ -1,6 +1,6 @@
 class ScheduledEmailSurveyWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
-  sidekiq_options retry: 2, queue: :low_priority
+  sidekiq_options retry: 2
   SURVEY_COUNT = (ENV["THEFT_SURVEY_COUNT"] || 200).to_i
 
   def self.frequency
