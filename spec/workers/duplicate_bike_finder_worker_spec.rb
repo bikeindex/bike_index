@@ -1,13 +1,15 @@
 require "rails_helper"
 
 RSpec.describe DuplicateBikeFinderWorker, type: :job do
+  let(:instance) { described_class.new }
+
   it "takes a bike id and search for groups, ignoring any less than 5 chars" do
     bike1 = FactoryBot.create(:bike, serial_number: "applejacks cereal cross")
     bike1.create_normalized_serial_segments
     bike2 = FactoryBot.create(:bike, serial_number: "applejacks Funtimes cross")
     bike2.create_normalized_serial_segments
     expect {
-      described_class.new.perform(bike1.id)
+      instance.perform(bike1.id)
     }.to change(DuplicateBikeGroup, :count).by 1
 
     expect {
@@ -26,7 +28,7 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
       let!(:bike2) { FactoryBot.create(:bike, serial_number: "Y0AASFFFFF", user_hidden: true) }
       it "creates for user_hidden" do
         expect(DuplicateBikeGroup.count).to eq 0
-        described_class.new.perform(bike2.id)
+        instance.perform(bike2.id)
         expect(bike2.reload.normalized_serial_segments.first.duplicate_bike_group).to be_present
         expect(bike2.duplicate_bikes.pluck(:id)).to eq([bike1.id])
         expect(DuplicateBikeGroup.count).to eq 1
@@ -36,7 +38,7 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
       let!(:bike2) { FactoryBot.create(:bike, serial_number: "Y0AASFFFFF", example: true) }
       it "doesn't create" do
         expect(DuplicateBikeGroup.count).to eq 0
-        described_class.new.perform(bike2.id)
+        instance.perform(bike2.id)
         expect(bike2.reload.normalized_serial_segments.count).to eq 0
         expect(DuplicateBikeGroup.count).to eq 0
       end
@@ -45,7 +47,7 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
       let!(:bike2) { FactoryBot.create(:bike, serial_number: "Y0AASFFFFF", likely_spam: true) }
       it "doesn't create" do
         expect(DuplicateBikeGroup.count).to eq 0
-        described_class.new.perform(bike2.id)
+        instance.perform(bike2.id)
         expect(bike2.reload.normalized_serial_segments.count).to eq 0
         expect(DuplicateBikeGroup.count).to eq 0
       end
@@ -55,7 +57,7 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
       it "deletes segments on deletion" do
         expect(DuplicateBikeFinderWorker.jobs.count).to eq 0 # TODO: remove after tests pass
         expect(DuplicateBikeGroup.count).to eq 0
-        described_class.new.perform(bike2.id)
+        instance.perform(bike2.id)
         expect(bike2.reload.normalized_serial_segments.count).to eq 4
         expect(bike2.duplicate_bikes.pluck(:id)).to eq([bike1.id])
         expect(DuplicateBikeGroup.count).to eq 1
@@ -74,7 +76,7 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
       bike = FactoryBot.create(:bike, serial_number: "applejacks")
       bike.create_normalized_serial_segments
       expect(DuplicateBikeGroup.count).to eq 0
-      described_class.new.perform(bike.id)
+      instance.perform(bike.id)
       expect(bike.normalized_serial_segments.first.duplicate_bike_group).to_not be_present
       expect(DuplicateBikeGroup.count).to eq 0
     end
@@ -93,7 +95,7 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
       bike2.normalized_serial_segments.first.update_attribute :duplicate_bike_group_id, duplicate_group.id
       bike3 = FactoryBot.create(:bike, serial_number: "applejacks")
       bike3.create_normalized_serial_segments
-      described_class.new.perform(bike3.id)
+      instance.perform(bike3.id)
       expect(bike3.normalized_serial_segments.first.duplicate_bike_group).to eq(duplicate_group)
       duplicate_group.reload
       expect(duplicate_group.added_bike_at).to_not eq(t)
@@ -103,7 +105,7 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
   context "bike gone" do
     it "doesn't explode" do
       expect {
-        described_class.new.perform(12121212)
+        instance.perform(12121212)
       }.to_not raise_error
     end
   end

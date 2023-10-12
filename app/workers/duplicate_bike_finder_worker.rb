@@ -1,8 +1,8 @@
 class DuplicateBikeFinderWorker < ApplicationWorker
   sidekiq_options retry: false
 
-  def perform(bike_id)
-    bike = Bike.unscoped.find_by_id(bike_id)
+  def perform(bike_id, bike)
+    bike ||= Bike.unscoped.find_by_id(bike_id)
     return true if bike.blank?
 
     should_delete = bike.blank? || bike.deleted_at.present? || bike.example ||
@@ -31,6 +31,9 @@ class DuplicateBikeFinderWorker < ApplicationWorker
     end
 
     serial_segments.destroy_all if should_delete
+
+    # TODO: Remove after migration
+    bike.update_column :serial_segments_migrated_at, Time.current
   end
 
   def remove_orphaned_duplicate(duplicate_bike_group, normalized_serial_segment)
