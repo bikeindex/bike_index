@@ -42,7 +42,6 @@ class ScheduledWorkerRunner < ScheduledWorker
       DeactivateExpiredTheftAlertWorker,
       FetchProject529BikesWorker,
       FileCacheMaintenanceWorker,
-      UpdateManufacturerLogoAndPriorityWorker,
       ImpoundExpirationWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
@@ -54,6 +53,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       UpdateCountsWorker,
       UpdateExchangeRatesWorker,
       UpdateInvoiceWorker,
+      UpdateManufacturerLogoAndPriorityWorker,
       UpdateOrganizationPosKindWorker,
       UpdateTheftAlertFacebookWorker,
       self
