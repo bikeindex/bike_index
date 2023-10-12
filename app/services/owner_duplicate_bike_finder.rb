@@ -21,8 +21,8 @@ module OwnerDuplicateBikeFinder
 
     candidate_user_ids = find_matching_user_ids(email, phone)
     Bike.with_user_hidden
+      .matching_serial(serial_normalized)
       .joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
-      .where("bikes.serial_normalized @@ ?", serial_normalized) # @@ is used in BikeSearchable, replicated here
       .where(
         "bikes.owner_email = ? OR bikes.owner_email = ? OR ownerships.owner_email = ? OR ownerships.owner_email = ? OR ownerships.user_id IN (?)",
         email,

@@ -38,7 +38,7 @@ class Bike < ApplicationRecord
   has_many :stolen_records, -> { current_and_not }
   has_many :impound_claims_submitting, through: :stolen_records, source: :impound_claims
   has_many :stolen_bike_listings
-  has_many :normalized_serial_segments, dependent: :destroy
+  has_many :normalized_serial_segments
   has_many :ownerships
   has_many :bike_versions
   has_many :bike_stickers
@@ -111,6 +111,7 @@ class Bike < ApplicationRecord
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
   before_validation :set_calculated_attributes
+  after_commit :enqueue_duplicate_bike_finder_worker, on: :destroy
 
   pg_search_scope :pg_search, against: {
     serial_number: "A",
@@ -787,6 +788,10 @@ class Bike < ApplicationRecord
     return "status_stolen" if current_stolen_record.present?
 
     "status_with_owner"
+  end
+
+  def enqueue_duplicate_bike_finder_worker
+    DuplicateBikeFinderWorker.perform_async(id)
   end
 
   private

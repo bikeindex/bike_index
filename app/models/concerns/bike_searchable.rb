@@ -76,9 +76,17 @@ module BikeSearchable
         :serial, :stolenness, colors: [], query_items: []].freeze
     end
 
+    # NOTE: This where query should exactly match not_matching_serial
+    # This method is also called from OwnerDuplicateBikeFinder
+    def matching_serial(serial, serial_no_space = nil)
+      return all unless serial.present?
+      serial_no_space ||= SerialNormalizer.no_space(serial)
+      # Note: @@ is postgres fulltext search
+      where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
+    end
+
     # TODO: actually make private?
     # Private (internal only) methods below here, as defined at the start
-    # private
 
     def non_serial_matches(interpreted_params)
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
@@ -202,13 +210,6 @@ module BikeSearchable
 
     def search_matching_query(query)
       query.presence && pg_search(query) || all
-    end
-
-    # NOTE: This where query should exactly match not_matching_serial
-    def matching_serial(serial, serial_no_space)
-      return all unless serial.present?
-      # Note: @@ is postgres fulltext search
-      where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
     end
 
     # TODO: Better way of matching this with matching_serial

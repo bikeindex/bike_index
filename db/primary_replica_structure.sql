@@ -506,7 +506,8 @@ CREATE TABLE public.bikes (
     occurred_at timestamp without time zone,
     serial_normalized_no_space character varying,
     credibility_score integer,
-    likely_spam boolean DEFAULT false
+    likely_spam boolean DEFAULT false,
+    serial_segments_migrated_at timestamp without time zone
 );
 
 
@@ -6423,6 +6424,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230906180600'),
 ('20230906200524'),
 ('20230906203110'),
-('20231004171919');
+('20231004171919'),
+('20231012212343');
 
 

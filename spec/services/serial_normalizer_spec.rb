@@ -90,7 +90,7 @@ RSpec.describe SerialNormalizer do
   describe "normalized_segments" do
     it "makes normalized segments" do
       segments = SerialNormalizer.new(serial: "some + : serial").normalized_segments
-      expect(segments.count).to eq(2)
+      expect(segments.count).to eq(3)
       expect(segments[0]).to eq("50ME")
     end
     it "returns nil if serial is absent" do
@@ -103,7 +103,7 @@ RSpec.describe SerialNormalizer do
     it "saves normalized segments with the bike_id and not break if we resave" do
       bike = FactoryBot.create(:bike)
       SerialNormalizer.new(serial: "some + : serial").save_segments(bike.id)
-      expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(2)
+      expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(3)
     end
 
     it "does not save made_without_serial segments" do
@@ -121,10 +121,10 @@ RSpec.describe SerialNormalizer do
     it "rewrites the segments if we save them a second time" do
       bike = FactoryBot.create(:bike)
       SerialNormalizer.new(serial: "some + : serial").save_segments(bike.id)
-      expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(2)
+      expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(3)
       SerialNormalizer.new(serial: "another + : THING").save_segments(bike.id)
       segments = NormalizedSerialSegment.where(bike_id: bike.id)
-      expect(segments.count).to eq(2)
+      expect(segments.count).to eq(3)
       seg_strings = segments.map(&:segment)
       expect(seg_strings.include?("AN0THER")).to be_truthy
       expect(seg_strings.include?("TH1NG")).to be_truthy
