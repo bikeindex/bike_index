@@ -15,16 +15,72 @@ RSpec.describe DuplicateBikeFinderWorker, type: :job do
       expect(bike2.normalized_serial_segments.first.duplicate_bike_group).to eq(duplicate_group)
     }.to_not change(DuplicateBikeGroup, :count)
   end
+
+  context "not current bikes" do
+    let!(:bike1) { FactoryBot.create(:bike, serial_number: "Y0AAS-FFFFF") }
+    before do
+      bike1.create_normalized_serial_segments
+      bike2.create_normalized_serial_segments
+    end
+    context "user_hidden" do
+      let!(:bike2) { FactoryBot.create(:bike, serial_number: "Y0AASFFFFF", user_hidden: true) }
+      it "creates for user_hidden" do
+        expect(DuplicateBikeGroup.count).to eq 0
+        described_class.new.perform(bike2.id)
+        expect(bike2.reload.normalized_serial_segments.first.duplicate_bike_group).to be_present
+        expect(bike2.duplicate_bikes.pluck(:id)).to eq([bike1.id])
+        expect(DuplicateBikeGroup.count).to eq 1
+      end
+    end
+    context "example" do
+      let!(:bike2) { FactoryBot.create(:bike, serial_number: "Y0AASFFFFF", example: true) }
+      it "doesn't create" do
+        expect(DuplicateBikeGroup.count).to eq 0
+        described_class.new.perform(bike2.id)
+        expect(bike2.reload.normalized_serial_segments.count).to eq 0
+        expect(DuplicateBikeGroup.count).to eq 0
+      end
+    end
+    context "likely_spam" do
+      let!(:bike2) { FactoryBot.create(:bike, serial_number: "Y0AASFFFFF", likely_spam: true) }
+      it "doesn't create" do
+        expect(DuplicateBikeGroup.count).to eq 0
+        described_class.new.perform(bike2.id)
+        expect(bike2.reload.normalized_serial_segments.count).to eq 0
+        expect(DuplicateBikeGroup.count).to eq 0
+      end
+    end
+    context "deletion" do
+      let!(:bike2) { FactoryBot.create(:bike, serial_number: "Y0A ASF FFFF") }
+      it "deletes segments on deletion" do
+        expect(DuplicateBikeFinderWorker.jobs.count).to eq 0 # TODO: remove after tests pass
+        expect(DuplicateBikeGroup.count).to eq 0
+        described_class.new.perform(bike2.id)
+        expect(bike2.reload.normalized_serial_segments.count).to eq 4
+        expect(bike2.duplicate_bikes.pluck(:id)).to eq([bike1.id])
+        expect(DuplicateBikeGroup.count).to eq 1
+        bike2.destroy
+        # Bike destroy enqueues the duplicate bike finder
+        expect(DuplicateBikeFinderWorker.jobs.count).to eq 1
+        DuplicateBikeFinderWorker.drain
+        expect(bike2.reload.normalized_serial_segments.count).to eq 0
+        expect(DuplicateBikeGroup.count).to eq 0
+      end
+    end
+  end
+
   context "only one match" do
     it "doesn't create a duplicate" do
       bike = FactoryBot.create(:bike, serial_number: "applejacks")
       bike.create_normalized_serial_segments
+      expect(DuplicateBikeGroup.count).to eq 0
       described_class.new.perform(bike.id)
       expect(bike.normalized_serial_segments.first.duplicate_bike_group).to_not be_present
+      expect(DuplicateBikeGroup.count).to eq 0
     end
   end
 
-  context "existing duplciate bike group" do
+  context "existing duplicate bike group" do
     it "adds a bike to an existing duplicate bike group" do
       bike1 = FactoryBot.create(:bike, serial_number: "applejacks")
       bike1.create_normalized_serial_segments

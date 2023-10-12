@@ -60,13 +60,13 @@ class SerialNormalizer
 
   def normalized_segments
     return [] if normalized.blank?
-    normalized.split(" ").reject(&:empty?).uniq
+    (normalized.split(" ").reject(&:empty?) + [SerialNormalizer.no_space(normalized)]).uniq
   end
 
   def save_segments(bike_id)
     existing = NormalizedSerialSegment.where(bike_id: bike_id)
     existing.map(&:destroy) if existing.present?
-    return false unless Bike.where(id: bike_id).present?
+    return false if Bike.unscoped.where(deleted_at: nil).where(id: bike_id).limit(1).none?
     normalized_segments.each do |seg|
       NormalizedSerialSegment.create(bike_id: bike_id, segment: seg)
     end

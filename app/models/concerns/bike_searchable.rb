@@ -77,7 +77,7 @@ module BikeSearchable
     end
 
     # NOTE: This where query should exactly match not_matching_serial
-    # Also Called from OwnerDuplicateBikeFinder
+    # This method is also called from OwnerDuplicateBikeFinder
     def matching_serial(serial, serial_no_space = nil)
       return all unless serial.present?
       serial_no_space ||= SerialNormalizer.no_space(serial)
@@ -87,7 +87,6 @@ module BikeSearchable
 
     # TODO: actually make private?
     # Private (internal only) methods below here, as defined at the start
-    # private
 
     def non_serial_matches(interpreted_params)
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
