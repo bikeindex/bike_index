@@ -4956,7 +4956,7 @@ en:
   registrations:
     create:
       in_it_youll_find_instructions: Follow the instructions in the email to complete your registration.
-      finish_registering: Finish registering
+      youre_not_done: You're not done!
       we_sent_an_email_to: 'We sent an email to:'
       well_do_our_best_to_help_you_recover_it: We'll do our best to help you get it
         back
