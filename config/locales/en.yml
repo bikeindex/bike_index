@@ -4960,13 +4960,11 @@ en:
       translated_from_english: translated from English
   registrations:
     create:
-      in_it_youll_find_instructions: In it, you'll find instructions on how to complete
-        the registration of your bike
-      radicool: Radicool!
-      we_got_this: We got this.
+      follow_link_in_email: Follow the link in the email to complete your registration.
       we_sent_an_email_to: 'We sent an email to:'
       well_do_our_best_to_help_you_recover_it: We'll do our best to help you get it
         back
+      youre_not_done: You're not done!
     embed:
       bike_manufacturer: bike manufacturer
       choose_specific_organization_optional: Choose Specific Organization (optional)
