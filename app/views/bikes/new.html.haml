@@ -25,11 +25,6 @@
       .col-lg-8.offset-lg-2.form-well
         .form-wrap
           .form-group.row.unnested-field
-            = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
-            .form-well-input.fancy-select.unfancy
-              = select(:bike, :cycle_type, CycleType.select_options, {required: true, class: 'form-control'})
-
-          .form-group.row.unnested-field
             = f.label :serial_number, class: 'form-well-label'
             .form-well-input
               #serial-input
@@ -48,6 +43,16 @@
               %label.made-without-serial-checkbox
                 = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
                 = t(".missing_serial")
+
+          .form-group.row.unnested-field
+            = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
+            - if @bike.type == "bike"
+              .form-well-input#cycleTypeCheckWell.collapse.in
+                %label.pt-1
+                  = check_box_tag :standard_bike_checkbox, true, true
+                  = t(".standard_bike")
+            #cycleTypeSelectWell.form-well-input.fancy-select.unfancy{class: @bike.type == "bike" ? "collapse" : ""}
+              = select(:bike, :cycle_type, CycleType.select_options, {required: true, class: 'form-control'})
 
           .related-fields
             .form-group.row

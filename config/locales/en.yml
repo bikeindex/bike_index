@@ -689,7 +689,7 @@ en:
         priority: Priority
     enums:
       cycle_type:
-        bike: Bike
+        bike: Standard Bike
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike (rear storage)
         cargo_trike: Cargo Tricycle (front storage)
@@ -1107,6 +1107,7 @@ en:
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       student_id: Student ID
       this_is_a: This is a
+      standard_bike: Standard bicycle
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
       very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.

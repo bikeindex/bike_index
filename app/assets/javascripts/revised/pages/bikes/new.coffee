@@ -25,6 +25,8 @@ class BikeIndex.BikesNew extends BikeIndex
       @madeWithoutSerial(true)
     $('#bike_made_without_serial').change (e) => # Only ever called when visible, so it's time to close
       @updateSerial(true)
+    $("#standard_bike_checkbox").change (e) => # Only ever called when visible, so it's time to close
+      @updateCycleTypeCheck()
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -106,3 +108,8 @@ class BikeIndex.BikesNew extends BikeIndex
     else
       year_select.setValue(new Date().getFullYear())
       year_select.enable()
+
+  updateCycleTypeCheck: ->
+    console.log("whoop!")
+    $("#cycleTypeCheckWell").collapse("hide")
+    $("#cycleTypeSelectWell").collapse("show")
