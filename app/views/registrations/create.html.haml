@@ -1,11 +1,9 @@
-%h2
-  - if @b_param.status_stolen?
-    = t(".we_got_this")
-  - else
-    = t(".radicool")
 %p
   = t(".we_sent_an_email_to")
   %strong #{@b_param.owner_email}
+
+%h2.uncap
+  = t(".finish_registering")
 
 %p
   = t(".in_it_youll_find_instructions")
