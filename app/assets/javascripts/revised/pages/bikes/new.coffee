@@ -25,8 +25,10 @@ class BikeIndex.BikesNew extends BikeIndex
       @madeWithoutSerial(true)
     $('#bike_made_without_serial').change (e) => # Only ever called when visible, so it's time to close
       @updateSerial(true)
-    $("#standard_bike_checkbox").change (e) => # Only ever called when visible, so it's time to close
+    $('#standard_bike_checkbox').change (e) =>
       @updateCycleTypeCheck()
+    $('#e_motor_checkbox').change (e) =>
+      @updatePropulsionTypeCheck($("#e_motor_checkbox").prop('checked'))
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -112,3 +114,11 @@ class BikeIndex.BikesNew extends BikeIndex
   updateCycleTypeCheck: ->
     $("#standard_bike_checkbox").parents("label").collapse("hide")
     $(".cycle-type-select").collapse("show")
+
+
+  updatePropulsionTypeCheck: (checked) ->
+    # if checked
+    #   $("")
+    # else
+    #   "show"
+    # $(".propulsion")

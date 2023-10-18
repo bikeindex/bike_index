@@ -51,18 +51,16 @@
                 %label.collapse.in.pt-1.cursor-pointer
                   = check_box_tag :standard_bike_checkbox, true, true
                   = t(".standard_bike")
-                  %span.below-input-help
-                    = t(".standard_bike_definition")
-                    make full size
+                  %span.below-input-help{style: "font-size: 100%; padding: 0 0 0 1.1em"}
+                    %em= t(".standard_bike_definition")
               .cycle-type-select.fancy-select.unfancy{class: @bike.type == "bike" ? "collapse" : ""}
-                = select(:bike, :cycle_type, CycleType.select_options, {required: true, class: 'form-control'})
-                prompt (no default)
-                %span.below-input-help
+                = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
             .cycle-type-select.right-input-help{class: @bike.type == "bike" ? "collapse" : ""}
               %label.cursor-pointer
                 = check_box_tag :e_motor_checkbox, true
+                %strong ⚡️
                 Electric
-                lightning bolt
+
 
           .related-fields
             .form-group.row
