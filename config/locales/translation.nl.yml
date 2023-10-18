@@ -5265,13 +5265,11 @@ nl:
         gered.
   registrations:
     create:
-      in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien
-        van de registratie van uw fiets
-      radicool: Radicool!
-      we_got_this: We hebben dit.
       we_sent_an_email_to: 'We hebben een e-mail gestuurd naar:'
       well_do_our_best_to_help_you_recover_it: We zullen ons best doen om u te helpen
         het terug te krijgen
+      youre_not_done: Je bent nog niet klaar!
+      follow_link_in_email: Volg de link in de e-mail om uw registratie te voltooien.
     embed:
       bike_manufacturer: fietsfabrikant
       choose_specific_organization_optional: Kies specifieke organisatie (optioneel)
