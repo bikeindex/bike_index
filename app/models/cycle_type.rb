@@ -49,6 +49,11 @@ class CycleType
   }.freeze
 
   MODEST_PRIORITY = %i[tricycle tandem recumbent personal-mobility].freeze
+  # Used to determine whether to show pedal-assist as a propulsion type
+  PEDALS = %i[bike tandem unicycle tricycle recumbent cargo tall-bike
+    penny-farthing cargo-rear cargo-trike cargo-trike pedi-cab].freeze
+  DEFAULT_ELECTRIC = %i[e-scooter personal-mobility].freeze
+  NOT_ELECTRIFIABLE = %i[non-e-scooter non-e-skateboard].freeze
 
   def self.searchable_names
     slugs

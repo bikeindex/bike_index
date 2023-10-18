@@ -128,6 +128,14 @@ module BikeAttributable
     self.propulsion_type = PropulsionType.find_sym(val)
   end
 
+  def propulsion_type_pedal_assist?
+    %w[pedal-assist pedal-assist-and-throttle].include?(propulsion_type)
+  end
+
+  def propulsion_type_throttle?
+    %w[throttle pedal-assist-and-throttle].include?(propulsion_type)
+  end
+
   def cached_data_array
     [
       mnfg_name,

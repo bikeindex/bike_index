@@ -144,6 +144,8 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.example).to be_falsey
       expect(bike.is_for_sale).to be_truthy
       expect(bike.propulsion_type).to eq "pedal-assist-and-throttle"
+      expect(bike.propulsion_type_throttle?).to be_truthy
+      expect(bike.propulsion_type_pedal_assist?).to be_truthy
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)

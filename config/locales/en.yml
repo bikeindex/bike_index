@@ -700,7 +700,7 @@ en:
         non_e_skateboard: Skateboard (Not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: Personal mobility device (electric scooter, etc)
+        personal_mobility: E-Skateboard (E-Unicycle, Personal mobility device, etc)
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike
@@ -1107,8 +1107,9 @@ en:
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       student_id: Student ID
       this_is_a: This is a
-      standard_bike: Traditional bicycle
-      standard_bike_definition: Two wheels, one seat, no motor
+      traditional_bike: Traditional bicycle
+      traditional_bike_definition: Two wheels, one seat, no motor
+      electric: Electric
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
       very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.

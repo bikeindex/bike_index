@@ -25,10 +25,12 @@ class BikeIndex.BikesNew extends BikeIndex
       @madeWithoutSerial(true)
     $('#bike_made_without_serial').change (e) => # Only ever called when visible, so it's time to close
       @updateSerial(true)
-    $('#standard_bike_checkbox').change (e) =>
+    $('#traditional_bike_checkbox').change (e) =>
       @updateCycleTypeCheck()
+    $('#bike_cycle_type').change (e) =>
+      @updatePropulsionType('cycle_type')
     $('#e_motor_checkbox').change (e) =>
-      @updatePropulsionTypeCheck($("#e_motor_checkbox").prop('checked'))
+      @updatePropulsionType('e_motor')
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -112,13 +114,50 @@ class BikeIndex.BikesNew extends BikeIndex
       year_select.enable()
 
   updateCycleTypeCheck: ->
-    $("#standard_bike_checkbox").parents("label").collapse("hide")
-    $(".cycle-type-select").collapse("show")
+    $('#traditional_bike_checkbox').parents('label').collapse('hide')
+    $('.cycle-type-select').collapse('show')
 
 
-  updatePropulsionTypeCheck: (checked) ->
-    # if checked
-    #   $("")
-    # else
-    #   "show"
-    # $(".propulsion")
+  # changed is one of: [cycle_type, e_motor]
+  updatePropulsionType: (changed) ->
+    cycleTypeValue = $('#bike_cycle_type').val()
+    if window.cycleTypesDefaultE.includes(cycleTypeValue)
+      # Propulsion type ignored in this situation, so commenting out
+      # $('#propulsion_type_throttle').prop('checked', true)
+      # $('#propulsion_type_pedal_assist').prop('checked', false)
+      $('#propulsionTypeFields').collapse('hide')
+      $('#e_motor_checkbox').prop('checked', true)
+      $('#e_motor_checkbox').attr('disabled', true)
+      $('#eletricMotorWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+    else if window.cycleTypesUnelectrifiable.includes(cycleTypeValue)
+      # Propulsion type is ignored in this situation, so commenting out
+      # $('#propulsion_type_throttle').prop('checked', false)
+      # $('#propulsion_type_pedal_assist').prop('checked', false)
+      $('#e_motor_checkbox').prop('checked', false)
+      $('#e_motor_checkbox').attr('disabled', true)
+      $('#propulsionTypeFields').collapse('hide')
+      $('#eletricMotorWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+    else
+      $('#eletricMotorWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
+      $('#e_motor_checkbox').attr('disabled', false)
+      if $('#e_motor_checkbox').prop('checked')
+        if window.cycleTypesPedals.includes(cycleTypeValue)
+          $('#propulsionTypeFields').collapse('show')
+        else
+          $('#propulsionTypeFields').collapse('hide')
+          # Propulsion type is set in this situation, so commenting out
+      else
+        $('#propulsionTypeFields').collapse('hide')
+
+        $('#propulsion_type_throttle').prop('checked', false)
+        $('#propulsion_type_pedal_assist').prop('checked', false)
+      #   if $('#e_motor_checkbox').prop('checked')
+      #     $('#propulsionTypeFields').collapse('show')
+      #     if window.cycleTypesPedals.includes(cycleTypeValue)
+      #       $('#propulsion_type_pedal_assist').collapse('show')
+      #     if changed == "e_motor"
+      #       $('')
+      # else
+      #   $('#propulsionTypeFields').collapse('hide')
+      #   $('#propulsion_type_throttle').prop('checked', false)
+      #   $('#propulsion_type_pedal_assist').prop('checked', false)
