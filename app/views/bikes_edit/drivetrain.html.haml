@@ -48,12 +48,13 @@
               %label.form-well-label
                 = t(".side", side: side.titleize)
               .form-well-input
-                %label.radio-inline
+                %label.radio-inline.mr-2{title: t(".narrow_title")}
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
                   = t(".narrow")
-                %label.radio-inline
+                %label.radio-inline{title: t(".wide_title")}
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'false'
                   = t(".wide")
+                  %small= t(".wide_help")
 
         .form-wrap.secondary-form-wrap#edit_drivetrain
           .form-well-form-header-always-visible
@@ -66,10 +67,10 @@
             %label.form-well-label
               = t(".drivetrain_type")
             .form-well-input
-              %label.checkbox-inline
+              %label.checkbox-inline.mr-2
                 %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
                 = t(".fixed")
-              %label.checkbox-inline.not-fixed
+              %label.checkbox-inline.mr-2.not-fixed
                 = f.check_box :coaster_brake
                 = t(".coaster_brake")
               %label.checkbox-inline.not-fixed
@@ -90,7 +91,7 @@
                       = gt.name
               .right-input-help
                 - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
-                %label
+                %label.cursor-pointer
                   %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
                   = t(".internal_front_gears")
               .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
@@ -112,7 +113,7 @@
                       = gt.name
               .right-input-help
                 - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
-                %label
+                %label.cursor-pointer
                   %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
                   = t(".internal_rear_gears")
 

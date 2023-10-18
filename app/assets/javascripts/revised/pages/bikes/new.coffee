@@ -110,6 +110,5 @@ class BikeIndex.BikesNew extends BikeIndex
       year_select.enable()
 
   updateCycleTypeCheck: ->
-    console.log("whoop!")
-    $("#cycleTypeCheckWell").collapse("hide")
-    $("#cycleTypeSelectWell").collapse("show")
+    $("#standard_bike_checkbox").parents("label").collapse("hide")
+    $(".cycle-type-select").collapse("show")

@@ -689,7 +689,7 @@ en:
         priority: Priority
     enums:
       cycle_type:
-        bike: Standard Bike
+        bike: Bike
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike (rear storage)
         cargo_trike: Cargo Tricycle (front storage)
@@ -1108,6 +1108,7 @@ en:
       student_id: Student ID
       this_is_a: This is a
       standard_bike: Standard bicycle
+      standard_bike_definition: Two wheels, one seat, no motor
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
       very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
@@ -1406,8 +1407,8 @@ en:
           easier
         primary_frame_color: Primary frame color
         remove_color: Remove color
-        secondary_frame_color: Secondary frame color
-        tertiary_frame_color: Tertiary frame color
+        secondary_frame_color: Secondary color
+        tertiary_frame_color: Tertiary color
       revised_component_fields:
         component_type: Component type
         model: Model
@@ -1438,6 +1439,7 @@ en:
       internal_front_gears: Internal front gears
       internal_rear_gears: Internal rear gears
       narrow: Narrow
+      narrow_title: Tires under 39mm (1.5 inches) wide
       rear_gears: Rear gears
       select_chainring_count: Select chainring count
       select_cog_count: Select cog count
@@ -1446,6 +1448,8 @@ en:
       sidetitleize_wheel: "%{sidetitleize} wheel"
       wheels: Wheels
       wide: Wide
+      wide_help: "> 38mm (1.5in)"
+      wide_title: "Tires that are at least 39mm (1.5 inches) wide"
     edit_bike_organization:
       can_edit_this_bike: Can edit this %{bike_type}
       manage_organization_information: Manage organization information
