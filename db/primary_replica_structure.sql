@@ -2344,7 +2344,7 @@ CREATE TABLE public.ownerships (
     updated_at timestamp without time zone NOT NULL,
     creator_id integer,
     current boolean DEFAULT false,
-    claimed boolean,
+    claimed boolean DEFAULT false,
     example boolean DEFAULT false NOT NULL,
     user_hidden boolean DEFAULT false NOT NULL,
     impound_record_id bigint,
@@ -6425,6 +6425,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230906200524'),
 ('20230906203110'),
 ('20231004171919'),
-('20231012212343');
+('20231012212343'),
+('20231019173522');
 
 
