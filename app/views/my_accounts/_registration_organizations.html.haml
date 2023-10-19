@@ -23,7 +23,7 @@
               = t(".register_all_with")
             .below-input-help
               %em= t(".when_not_selected")
-              .collapse.mt-1.collapse-NotAllBikes{class: (user_registration_organization.all_bikes? ? "" : "in")}
+              .collapse.mt-2.collapse-NotAllBikes{class: (user_registration_organization.all_bikes? ? "" : "in")}
                 %span.less-strong
                   - if user_registration_organization.bikes.pluck(:id).sort == user_bike_ids
                     = t(".all_bikes_with_organization")

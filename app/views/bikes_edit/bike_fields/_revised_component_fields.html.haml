@@ -49,6 +49,8 @@
       = f.label :manufacturer_id, class: 'form-well-label'
       .form-well-input
         = f.text_field :manufacturer_id, class: 'form-control component-manufacturer-input unfancy', data: { initial: initial_manufacturer }
+        %span.below-input-help
+          = t(".select_other")
     .hidden-other.form-group.row{ class: other_mnfg_show }
       = f.label :manufacturer_other, t(".other_manufacturer"), class: 'form-well-label'
       .form-well-input

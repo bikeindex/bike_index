@@ -6,8 +6,8 @@
     .form-group.row.sharing-collapser{ data: { target: '#twitter-field' } }
       %label.form-well-label
         = t(".show_twitter")
-      .form-well-input
-        %label.radio-inline
+      .form-well-input.form-well-input-checks
+        %label.radio-inline.mr-2
           = f.radio_button :show_twitter, true
           = t(".show_twitter")
         %label.radio-inline
@@ -21,8 +21,8 @@
     .form-group.row.sharing-collapser{ data: { target: '#instagram-field' } }
       %label.form-well-label
         = t(".show_instagram")
-      .form-well-input
-        %label.radio-inline
+      .form-well-input.form-well-input-checks
+        %label.radio-inline.mr-2
           = f.radio_button :show_instagram, true
           = t(".show_instagram")
         %label.radio-inline
@@ -36,8 +36,8 @@
     .form-group.row.sharing-collapser{ data: { target: '#personal-field' } }
       %label.form-well-label
         = t(".show_personal_site")
-      .form-well-input
-        %label.radio-inline
+      .form-well-input.form-well-input-checks
+        %label.radio-inline.mr-2
           = f.radio_button :show_website, true
           = t(".show_personal_website")
         %label.radio-inline
@@ -79,7 +79,7 @@
     .form-group.unnested-field.row.sharing-collapser{ data: { target: '#personal-page' } }
       %label.form-well-label
         = t(".create_public_page")
-      .form-well-input
+      .form-well-input.form-well-input-checks
         %label.radio-inline
           = f.radio_button :show_bikes, true
           = t(".create_page")

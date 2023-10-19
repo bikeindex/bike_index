@@ -49,19 +49,19 @@
               = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
               .form-well-input
                 - if @bike.type == "bike"
-                  %label.collapse.in.pt-1.cursor-pointer
+                  %label.collapse.in.pt-1.ml-1.cursor-pointer
                     = check_box_tag :traditional_bike_checkbox, true, true
                     = t(".traditional_bike")
                     %span.below-input-help{style: "font-size: 100%; padding: 0 0 0 1.1em"}
                       %em= t(".traditional_bike_definition")
                 .cycle-type-select.fancy-select.unfancy{class: @bike.type == "bike" ? "collapse" : ""}
                   = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
-                  %label.cursor-pointer.mt-1.mb-0#eletricMotorWrapper
+                  %label#eletricMotorWrapper.cursor-pointer.mt-1.mb-0.ml-1
                     = check_box_tag :e_motor_checkbox, true
                     %strong ⚡️
                     = t(".electric")
                     (motorized)
-                  #propulsionTypeFields.collapse
+                  #propulsionTypeFields.collapse.ml-1
                     :javascript
                       window.cycleTypesPedals = #{CycleType::PEDALS.to_json};
                       window.cycleTypesDefaultE = #{CycleType::DEFAULT_ELECTRIC.to_json};

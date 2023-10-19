@@ -47,7 +47,7 @@
             .form-group.row.unnested-field
               %label.form-well-label
                 = t(".side", side: side.titleize)
-              .form-well-input
+              .form-well-input.form-well-input-checks
                 %label.radio-inline.mr-2{title: t(".narrow_title")}
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
                   = t(".narrow")
@@ -66,7 +66,7 @@
           .form-group.row.unnested-field
             %label.form-well-label
               = t(".drivetrain_type")
-            .form-well-input
+            .form-well-input-large.form-well-input-checks
               %label.checkbox-inline.mr-2
                 %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
                 = t(".fixed")

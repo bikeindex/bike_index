@@ -1412,6 +1412,7 @@ en:
         tertiary_frame_color: Tertiary color
       revised_component_fields:
         component_type: Component type
+        select_other: Select 'Other' if manufacturer doesn't show up when entered
         model: Model
         model_year: Model Year
         other_manufacturer: Other manufacturer

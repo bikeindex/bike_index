@@ -105,6 +105,12 @@
     @include make-col-ready;
   }
 
+  // line checkboxes and radio inputs up with text fields
+  // standard padding is 15px;
+  .form-well-input-checks {
+    padding-left: 19px;
+  }
+
   .related-fields {
     .form-group {
       padding-top: 0.5 * $vertical-height;
