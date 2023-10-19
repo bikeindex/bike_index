@@ -28,9 +28,9 @@ class BikeIndex.BikesNew extends BikeIndex
     $('#traditional_bike_checkbox').change (e) =>
       @updateCycleTypeCheck()
     $('#bike_cycle_type').change (e) =>
-      @updatePropulsionType('cycle_type')
-    $('#e_motor_checkbox').change (e) =>
-      @updatePropulsionType('e_motor')
+      @updatePropulsionType()
+    $('#propulsion_type_motorized').change (e) =>
+      @updatePropulsionType()
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -118,23 +118,22 @@ class BikeIndex.BikesNew extends BikeIndex
     $('.cycle-type-select').collapse('show')
 
 
-  # changed is one of: [cycle_type, e_motor]
-  updatePropulsionType: (changed) ->
+  updatePropulsionType: ->
     cycleTypeValue = $('#bike_cycle_type').val()
     if window.cycleTypesDefaultE.includes(cycleTypeValue)
       $('#propulsionTypeFields').collapse('hide')
-      $('#e_motor_checkbox').prop('checked', true)
-      $('#e_motor_checkbox').attr('disabled', true)
+      $('#propulsion_type_motorized').prop('checked', true)
+      $('#propulsion_type_motorized').attr('disabled', true)
       $('#eletricMotorWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
     else if window.cycleTypesUnelectrifiable.includes(cycleTypeValue)
-      $('#e_motor_checkbox').prop('checked', false)
-      $('#e_motor_checkbox').attr('disabled', true)
+      $('#propulsion_type_motorized').prop('checked', false)
+      $('#propulsion_type_motorized').attr('disabled', true)
       $('#propulsionTypeFields').collapse('hide')
       $('#eletricMotorWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
     else
       $('#eletricMotorWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
-      $('#e_motor_checkbox').attr('disabled', false)
-      if $('#e_motor_checkbox').prop('checked')
+      $('#propulsion_type_motorized').attr('disabled', false)
+      if $('#propulsion_type_motorized').prop('checked')
         if window.cycleTypesPedals.includes(cycleTypeValue)
           $('#propulsionTypeFields').collapse('show')
         else

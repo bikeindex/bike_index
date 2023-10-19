@@ -81,11 +81,14 @@ RSpec.describe BikeCreator do
           instance.create_bike(b_param)
         }.to change(Bike, :count).by 1
         expect(BikeOrganization.count).to eq 0
+        # pp BParam.last
         bike = Bike.last
         expect(bike.creator&.id).to eq user.id
         expect(bike.current_ownership&.id).to be_present
-        expect(bike.claimed?).to be_truthy
+        expect(bike.claimed?).to be_falsey
         expect_attrs_to_match_hash(bike, target_created_attrs)
+        expect(bike.motorized?).to be_truthy
+        expect(Bike.motorized.count).to eq 1
       end
     end
 
@@ -718,6 +721,48 @@ RSpec.describe BikeCreator do
       it "impounded if status_impounded" do
         bike = instance.build_bike(BParam.new, status: "status_impounded")
         expect(bike.status).to eq "status_impounded"
+      end
+    end
+  end
+
+  describe "propulsion_type_from_params" do
+    it "is foot-pedal" do
+      expect(instance.send(:propulsion_type_from_params, {})).to be_nil
+    end
+    context "with propulsion_type" do
+      let(:pparams) { {"bike" => {"propulsion_type" => "hand-pedal"}} }
+      it "is passed propulsion_type" do
+        expect(instance.send(:propulsion_type_from_params, pparams)).to eq "hand-pedal"
+      end
+      context "with propulsion_type_pedal_assist" do
+        let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
+        it "is pedal-assist" do
+          expect(instance.send(:propulsion_type_from_params, pparams_with_assist)).to eq "pedal-assist"
+        end
+      end
+    end
+    context "propulsion_type_throttle" do
+      let(:pparams) { {"propulsion_type_throttle" => "1"} }
+      it "is throttle" do
+        expect(instance.send(:propulsion_type_from_params, pparams)).to eq "throttle"
+      end
+      context "with propulsion_type_pedal_assist" do
+        let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
+        it "is pedal-assist-and-throttle" do
+          expect(instance.send(:propulsion_type_from_params, pparams_with_assist)).to eq "pedal-assist-and-throttle"
+        end
+      end
+      context "with propulsion_type_motorized" do
+        let(:pparams_motorized) { pparams.merge("propulsion_type_motorized" => "1") }
+        it "is throttle" do
+          expect(instance.send(:propulsion_type_from_params, pparams)).to eq "throttle"
+        end
+      end
+    end
+    context "propulsion_type_motorized" do
+      let(:pparams) { {"propulsion_type_motorized" => "1"} }
+      it "is throttle" do
+        expect(instance.send(:propulsion_type_from_params, pparams)).to eq "motorized"
       end
     end
   end

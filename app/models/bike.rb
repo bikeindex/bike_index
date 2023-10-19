@@ -72,7 +72,8 @@ class Bike < ApplicationRecord
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr,
     :bike_sticker
 
-  attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
+  # reading is managed by a method
+  attr_writer :phone, :user_name, :external_image_urls
 
   enum status: STATUS_ENUM
 
