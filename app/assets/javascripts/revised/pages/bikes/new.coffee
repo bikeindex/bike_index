@@ -122,17 +122,11 @@ class BikeIndex.BikesNew extends BikeIndex
   updatePropulsionType: (changed) ->
     cycleTypeValue = $('#bike_cycle_type').val()
     if window.cycleTypesDefaultE.includes(cycleTypeValue)
-      # Propulsion type ignored in this situation, so commenting out
-      # $('#propulsion_type_throttle').prop('checked', true)
-      # $('#propulsion_type_pedal_assist').prop('checked', false)
       $('#propulsionTypeFields').collapse('hide')
       $('#e_motor_checkbox').prop('checked', true)
       $('#e_motor_checkbox').attr('disabled', true)
       $('#eletricMotorWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
     else if window.cycleTypesUnelectrifiable.includes(cycleTypeValue)
-      # Propulsion type is ignored in this situation, so commenting out
-      # $('#propulsion_type_throttle').prop('checked', false)
-      # $('#propulsion_type_pedal_assist').prop('checked', false)
       $('#e_motor_checkbox').prop('checked', false)
       $('#e_motor_checkbox').attr('disabled', true)
       $('#propulsionTypeFields').collapse('hide')
@@ -145,19 +139,8 @@ class BikeIndex.BikesNew extends BikeIndex
           $('#propulsionTypeFields').collapse('show')
         else
           $('#propulsionTypeFields').collapse('hide')
-          # Propulsion type is set in this situation, so commenting out
       else
         $('#propulsionTypeFields').collapse('hide')
 
         $('#propulsion_type_throttle').prop('checked', false)
         $('#propulsion_type_pedal_assist').prop('checked', false)
-      #   if $('#e_motor_checkbox').prop('checked')
-      #     $('#propulsionTypeFields').collapse('show')
-      #     if window.cycleTypesPedals.includes(cycleTypeValue)
-      #       $('#propulsion_type_pedal_assist').collapse('show')
-      #     if changed == "e_motor"
-      #       $('')
-      # else
-      #   $('#propulsionTypeFields').collapse('hide')
-      #   $('#propulsion_type_throttle').prop('checked', false)
-      #   $('#propulsion_type_pedal_assist').prop('checked', false)
