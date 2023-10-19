@@ -20,12 +20,16 @@ RSpec.describe PropulsionType, type: :model do
     it "tries to find the slug, given a name" do
       finder = PropulsionType.friendly_find(name)
       expect(finder.slug).to eq name
+      expect(finder.motorized?).to be_truthy
+      expect(finder.human_powered?).to be_falsey
     end
     context "slug" do
       let(:name) { "Human powered" }
       it "tries to find the slug, given a name" do
         finder = PropulsionType.friendly_find(name)
         expect(finder.slug).to eq :"human-not-pedal"
+        expect(finder.motorized?).to be_falsey
+        expect(finder.human_powered?).to be_truthy
       end
     end
   end
@@ -37,10 +41,37 @@ RSpec.describe PropulsionType, type: :model do
       expect(PropulsionType.for_vehicle("unicycle")).to eq :"foot-pedal"
     end
 
+    context "pedal_type cycle_type" do
+      it "is what it is passed" do
+        expect(PropulsionType.for_vehicle(:cargo, :"hand-pedal")).to eq :"hand-pedal"
+        expect(PropulsionType.for_vehicle(:"trail-behind", :"hand-pedal")).to eq :"hand-pedal"
+        expect(PropulsionType.for_vehicle(:unicycle, :throttle)).to eq :throttle
+        expect(PropulsionType.for_vehicle(:bike, :throttle)).to eq :throttle
+      end
+      it "is default pedal_type if passed non pedal type" do
+        expect(PropulsionType.for_vehicle(:bike, :"human-not-pedal")).to eq :"foot-pedal"
+        expect(PropulsionType.for_vehicle(:unicycle, :"human-not-pedal")).to eq :"foot-pedal"
+      end
+    end
+
+    context "not pedal_type cycle_type" do
+      it "is human-not-pedal if pedal_type" do
+        expect(PropulsionType.for_vehicle(:wheelchair, :"hand-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:wheelchair, :"foot-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"non-e-scooter", :"foot-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"non-e-scooter", :"hand-pedal")).to eq :"human-not-pedal"
+
+        expect(PropulsionType.for_vehicle(:wheelchair, :motorized)).to eq :"throttle"
+        # Not sure - this might make more sense to make motorized? whatever
+        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist")).to eq :"throttle"
+        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist-and-throttle")).to eq :"throttle"
+      end
+    end
+
     context "non-pedal" do
-      (CycleType.slugs_sym - CycleType::PEDALS - CycleType::ALWAYS_MOTORIZED).each do |cycle_type|
+      (CycleType.slugs_sym - CycleType::PEDAL - CycleType::ALWAYS_MOTORIZED).each do |cycle_type|
         it "is human-not-pedal for '#{cycle_type}'" do
-          expect(CycleType::PEDALS).to_not include(cycle_type)
+          expect(CycleType::PEDAL).to_not include(cycle_type)
           expect(PropulsionType.for_vehicle(cycle_type)).to eq :"human-not-pedal"
         end
       end

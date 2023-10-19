@@ -117,7 +117,8 @@ class BikeIndex.BikesNew extends BikeIndex
     $('#traditional_bike_checkbox').parents('label').collapse('hide')
     $('.cycle-type-select').collapse('show')
 
-
+  # Set motorized if it should be motorized.
+  # Only show propulsion type options if there can be options
   updatePropulsionType: ->
     cycleTypeValue = $('#bike_cycle_type').val()
     if window.cycleTypesDefaultE.includes(cycleTypeValue)

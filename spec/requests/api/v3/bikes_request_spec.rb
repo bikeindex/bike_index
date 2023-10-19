@@ -492,6 +492,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       expect(bike.extra_registration_number).to be_nil
       expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
+      pp bike.cycle_type
       expect(bike.propulsion_type).to eq "pedal-assist"
       ownership = bike.current_ownership
       expect(ownership.pos?).to be_truthy

@@ -72,8 +72,7 @@ class Bike < ApplicationRecord
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr,
     :bike_sticker
 
-  # reading is managed by a method
-  attr_writer :phone, :user_name, :external_image_urls
+  attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
   enum status: STATUS_ENUM
 
@@ -84,6 +83,7 @@ class Bike < ApplicationRecord
     to: :current_ownership, allow_nil: true
 
   scope :without_location, -> { where(latitude: nil) }
+  scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :unclaimed, -> { includes(:ownerships).where(ownerships: {claimed: false}) }
@@ -305,6 +305,10 @@ class Bike < ApplicationRecord
   # Abbreviation, checks if this is a bike_version
   def version?
     false
+  end
+
+  def motorized?
+    PropulsionType.motorized?(propulsion_type)
   end
 
   def display_name

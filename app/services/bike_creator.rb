@@ -36,7 +36,6 @@ class BikeCreator
     # Default attributes
     bike = Bike.new(cycle_type: "bike")
     bike.attributes = b_param.safe_bike_attrs(new_attrs)
-    bike.propulsion_type = PropulsionType.for_vehicle(bike.cycle_type, propulsion_type_from_params(b_param.params))
     # Use bike status because it takes into account new_attrs
     bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
     bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?
@@ -292,6 +291,7 @@ class BikeCreator
   end
 
   def propulsion_type_from_params(passed_params)
+    pp passed_params
     throttle = ParamsNormalizer.boolean(passed_params["propulsion_type_throttle"])
     pedal_assist = ParamsNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
     if pedal_assist
@@ -302,6 +302,6 @@ class BikeCreator
       "motorized"
     else
       passed_params.dig("bike", "propulsion_type")
-    end
+    end&.to_sym
   end
 end

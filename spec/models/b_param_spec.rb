@@ -580,4 +580,34 @@ RSpec.describe BParam, type: :model do
       end
     end
   end
+
+  describe "top_level_propulsion_type" do
+    it "is foot-pedal" do
+      expect(BParam.send(:top_level_propulsion_type, {})).to be_nil
+    end
+    context "propulsion_type_throttle" do
+      let(:pparams) { {"propulsion_type_throttle" => "1"} }
+      it "is throttle" do
+        expect(BParam.send(:top_level_propulsion_type, pparams)).to eq :throttle
+      end
+      context "with propulsion_type_pedal_assist" do
+        let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
+        it "is pedal-assist-and-throttle" do
+          expect(BParam.send(:top_level_propulsion_type, pparams_with_assist)).to eq :"pedal-assist-and-throttle"
+        end
+      end
+      context "with propulsion_type_motorized" do
+        let(:pparams_motorized) { pparams.merge("propulsion_type_motorized" => "1") }
+        it "is throttle" do
+          expect(BParam.send(:top_level_propulsion_type, pparams)).to eq :throttle
+        end
+      end
+    end
+    context "propulsion_type_motorized" do
+      let(:pparams) { {"propulsion_type_motorized" => "1"} }
+      it "is throttle" do
+        expect(BParam.send(:top_level_propulsion_type, pparams)).to eq :motorized
+      end
+    end
+  end
 end

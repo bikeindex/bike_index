@@ -124,8 +124,9 @@ module BikeAttributable
     PropulsionType.new(propulsion_type).name
   end
 
+  # WARNING! val can be :motorized, or a propulsion_type slug
   def propulsion_type_slug=(val)
-    self.propulsion_type = PropulsionType.find_sym(val)
+    self.propulsion_type = PropulsionType.for_vehicle(cycle_type, val)
   end
 
   def propulsion_type_pedal_assist?

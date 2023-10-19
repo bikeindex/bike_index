@@ -727,9 +727,9 @@ en:
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Pedal
+        human_not_pedal: Human powered (but not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
-        propulsion_other: Other Style
         throttle: throttle
     errors:
       messages:
@@ -1074,6 +1074,7 @@ en:
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
       city: City
+      electric: Electric
       enter_bike_type_details: Enter %{bike_type} details
       enter_found_bike_type_details: Enter Found %{bike_type} details
       enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
@@ -1109,7 +1110,6 @@ en:
       this_is_a: This is a
       traditional_bike: Traditional bicycle
       traditional_bike_definition: Two wheels, one seat, no motor
-      electric: Electric
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
       very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
@@ -1412,7 +1412,6 @@ en:
         tertiary_frame_color: Tertiary color
       revised_component_fields:
         component_type: Component type
-        select_other: Select 'Other' if manufacturer doesn't show up when entered
         model: Model
         model_year: Model Year
         other_manufacturer: Other manufacturer
@@ -1420,6 +1419,7 @@ en:
         part_serial: Part Serial
         part_type: Part type
         remove_part: Remove part
+        select_other: Select 'Other' if manufacturer doesn't show up when entered
         unknown_part_type: Unknown part type
       stolen_location:
         address_or_intersection: Address or intersection
@@ -1451,7 +1451,7 @@ en:
       wheels: Wheels
       wide: Wide
       wide_help: "> 38mm (1.5in)"
-      wide_title: "Tires that are at least 39mm (1.5 inches) wide"
+      wide_title: Tires that are at least 39mm (1.5 inches) wide
     edit_bike_organization:
       can_edit_this_bike: Can edit this %{bike_type}
       manage_organization_information: Manage organization information

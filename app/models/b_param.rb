@@ -103,6 +103,18 @@ class BParam < ApplicationRecord
     {}
   end
 
+  def self.top_level_propulsion_type(passed_params)
+    throttle = ParamsNormalizer.boolean(passed_params["propulsion_type_throttle"])
+    pedal_assist = ParamsNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
+    if pedal_assist
+      throttle ? "pedal-assist-and-throttle" : "pedal-assist"
+    elsif throttle
+      "throttle"
+    elsif ParamsNormalizer.boolean(passed_params["propulsion_type_motorized"])
+      "motorized"
+    end&.to_sym
+  end
+
   # Crazy new shit
   def manufacturer_id=(val)
     params["bike"]["manufacturer_id"] = val
@@ -494,8 +506,12 @@ class BParam < ApplicationRecord
   # Below here is revised setup
 
   def safe_bike_attrs(new_attrs)
+    override_attrs = {"status" => status}
+    propulsion_type = self.class.top_level_propulsion_type(params)
+    # propulsion_type_slug safe assigns the type
+    override_attrs["propulsion_type_slug"] = propulsion_type if propulsion_type.present?
     # existing bike attrs, overridden with passed attributes
-    bike.merge(status: status).merge(new_attrs.as_json)
+    bike.merge(override_attrs).merge(new_attrs.as_json)
       .select { |_k, v| ParamsNormalizer.present_or_false?(v) }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
