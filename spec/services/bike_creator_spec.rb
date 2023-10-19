@@ -55,6 +55,40 @@ RSpec.describe BikeCreator do
       end
     end
 
+    context "e_motor_checkbox true" do
+      let(:bike_params) do
+        {
+          primary_frame_color_id: color.id,
+          manufacturer_id: manufacturer.id,
+          owner_email: "something@stuff.com",
+          cycle_type: "cargo"
+        }
+      end
+      let(:default_params) do
+        {
+          bike: bike_params,
+          e_motor_checkbox: true,
+          propulsion_type_throttle: true,
+          propulsion_type_pedal_assist: false
+        }
+      end
+      let(:passed_params) { default_params }
+      let(:b_param) { BParam.create(creator: user, params: passed_params) }
+      let(:target_created_attrs) { bike_params.merge(propulsion_type: "throttle") }
+      it "creates an e-bike vehicle" do
+        expect(BikeOrganization.count).to eq 0
+        expect {
+          instance.create_bike(b_param)
+        }.to change(Bike, :count).by 1
+        expect(BikeOrganization.count).to eq 0
+        bike = Bike.last
+        expect(bike.creator&.id).to eq user.id
+        expect(bike.current_ownership&.id).to be_present
+        expect(bike.claimed?).to be_truthy
+        expect_attrs_to_match_hash(bike, target_created_attrs)
+      end
+    end
+
     describe "with organization" do
       let(:default_params) do
         {
@@ -385,6 +419,7 @@ RSpec.describe BikeCreator do
         end
       end
     end
+
     describe "no_duplicate" do
       let!(:existing_bike) { FactoryBot.create(:bike, :with_ownership, serial_number: "some serial number", owner_email: email) }
       let(:new_bike) { Bike.new(bike_params.except(:no_duplicate)) }

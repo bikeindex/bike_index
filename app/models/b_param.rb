@@ -73,15 +73,16 @@ class BParam < ApplicationRecord
   # Attrs that need to be skipped on bike assignment
   def self.skipped_bike_attrs
     # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
-    %w[cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker handlebar_type_slug
-      stolen abandoned revised_new
-      is_bulk is_new is_pos no_duplicate accuracy address address_city address_state address_zipcode address_state address_country
-      bike_code]
+    %w[abandoned accuracy address address_city address_country address_state address_state
+       address_zipcode bike_code bike_sticker cycle_type_name cycle_type_slug
+       front_gear_type_slug handlebar_type_slug is_bulk is_new is_pos no_duplicate
+       rear_gear_type_slug revised_new stolen]
   end
 
   def self.registration_info_attrs
-    %w[bike_sticker bike_code phone organization_affiliation student_id user_name
-      accuracy street city state zipcode state country] # Also uses address_hash to get legacy address attributes
+    # Also uses address_hash to get legacy address attributes
+    %w[accuracy bike_code bike_sticker city country organization_affiliation phone state
+       street student_id user_name zipcode]
   end
 
   def self.email_search(str)
