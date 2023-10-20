@@ -61,10 +61,10 @@ RSpec.describe PropulsionType, type: :model do
         expect(PropulsionType.for_vehicle(:"non-e-scooter", :"foot-pedal")).to eq :"human-not-pedal"
         expect(PropulsionType.for_vehicle(:"non-e-scooter", :"hand-pedal")).to eq :"human-not-pedal"
 
-        expect(PropulsionType.for_vehicle(:wheelchair, :motorized)).to eq :"throttle"
+        expect(PropulsionType.for_vehicle(:wheelchair, :motorized)).to eq :throttle
         # Not sure - this might make more sense to make motorized? whatever
-        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist")).to eq :"throttle"
-        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist-and-throttle")).to eq :"throttle"
+        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist")).to eq :throttle
+        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist-and-throttle")).to eq :throttle
       end
     end
 
@@ -105,8 +105,8 @@ RSpec.describe PropulsionType, type: :model do
     context "passed motorized" do
       it "is default_motorized_type" do
         expect(PropulsionType.for_vehicle(:bike, :motorized)).to eq :"pedal-assist"
-        expect(PropulsionType.for_vehicle(:wheelchair, :motorized)).to eq :"throttle"
-        expect(PropulsionType.for_vehicle(:stroller, :motorized)).to eq :"throttle"
+        expect(PropulsionType.for_vehicle(:wheelchair, :motorized)).to eq :throttle
+        expect(PropulsionType.for_vehicle(:stroller, :motorized)).to eq :throttle
       end
     end
   end
