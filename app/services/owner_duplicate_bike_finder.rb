@@ -13,16 +13,17 @@ module OwnerDuplicateBikeFinder
   # - the phone associated with any owner (via user.user_phones)
   #
   # Return a Bike object, or nil
-  def self.matching(serial: nil, owner_email: nil, phone: nil, b_param: nil)
+  def self.matching(serial: nil, owner_email: nil, phone: nil, b_param: nil, manufacturer_id: nil)
     email = EmailNormalizer.normalize(owner_email)
     phone = Phonifyer.phonify(phone)
     serial_normalized = SerialNormalizer.normalized_and_corrected(serial)
     return Bike.none if serial_normalized.blank?
 
     candidate_user_ids = find_matching_user_ids(email, phone)
-    Bike.with_user_hidden
-      .matching_serial(serial_normalized)
-      .joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
+
+    matching_bikes = Bike.with_user_hidden.matching_serial(serial_normalized)
+    matching_bikes = matching_bikes.where(manufacturer_id: manufacturer_id) if manufacturer_id.present?
+    matching_bikes.joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
       .where(
         "bikes.owner_email = ? OR bikes.owner_email = ? OR ownerships.owner_email = ? OR ownerships.owner_email = ? OR ownerships.user_id IN (?)",
         email,

@@ -167,7 +167,7 @@ class BikeCreator
     if b_param.no_duplicate?
       # If a dupe is found, return that rather than the just built bike
       dupe = OwnerDuplicateBikeFinder.matching(serial: bike.serial_normalized,
-        owner_email: bike.owner_email)
+        owner_email: bike.owner_email, manufacturer_id: bike.manufacturer_id).first
       if dupe.present?
         b_param.update(created_bike_id: dupe.id)
         return dupe

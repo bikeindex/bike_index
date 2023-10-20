@@ -53,17 +53,32 @@ RSpec.describe OwnerDuplicateBikeFinder do
       end
     end
 
-    it "returns match when the target email is present on a bike record and the serial matches" do
-      bike = FactoryBot.create(:bike)
-      expect(User.find_by(email: bike.owner_email)).to be_nil
-      expect(UserEmail.find_by(email: bike.owner_email)).to be_nil
+    context "target email is present on a bike record and the serial matches" do
+      let!(:bike) { FactoryBot.create(:bike) }
+      it "returns match unless manufacturer_id incorrect" do
+        expect(User.find_by(email: bike.owner_email)).to be_nil
+        expect(UserEmail.find_by(email: bike.owner_email)).to be_nil
 
-      result = described_class.matching(
-        serial: bike.serial_number,
-        owner_email: "  #{bike.owner_email} "
-      ).first
+        result = described_class.matching(
+          serial: bike.serial_number,
+          owner_email: "  #{bike.owner_email} "
+        ).pluck(:id)
+        expect(result).to eq([bike.id])
 
-      expect(result).to eq(bike)
+        result2 = described_class.matching(
+          serial: bike.serial_number,
+          owner_email: "  #{bike.owner_email} ",
+          manufacturer_id: bike.manufacturer_id
+        ).pluck(:id)
+        expect(result2).to eq([bike.id])
+
+        result2 = described_class.matching(
+          serial: bike.serial_number,
+          owner_email: "  #{bike.owner_email} ",
+          manufacturer_id: FactoryBot.create(:manufacturer).id
+        ).pluck(:id)
+        expect(result2).to eq([])
+      end
     end
 
     it "returns nil if neither the serial nor the normalized serial match a bike record" do

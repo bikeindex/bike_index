@@ -233,20 +233,16 @@ RSpec.describe "Bikes API V2", type: :request do
       {
         serial: "69 non-example",
         manufacturer: manufacturer.name,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: color.name,
-        year: "1969",
-        frame_material: "steel",
-        cycle_type: "bike",
         organization_slug: organization.name,
         owner_email: phone,
-        owner_email_is_phone_number: true
+        owner_email_is_phone_number: true,
+        color: color.name,
+        cycle_type_name: "bike"
       }
     end
     let(:phone) { "2221114444" }
     let(:organization) { FactoryBot.create(:organization) }
-    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_phone_attrs[:serial]) }
+    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_phone_attrs[:serial], manufacturer: manufacturer) }
     let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, bike: bike) }
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     it "returns 401" do

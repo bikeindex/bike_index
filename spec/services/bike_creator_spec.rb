@@ -385,24 +385,25 @@ RSpec.describe BikeCreator do
         end
       end
     end
+
     describe "no_duplicate" do
-      let!(:existing_bike) { FactoryBot.create(:bike, :with_ownership, serial_number: "some serial number", owner_email: email) }
-      let(:new_bike) { Bike.new(bike_params.except(:no_duplicate)) }
+      let(:serial) { "some serial number" }
+      let!(:existing_bike) { FactoryBot.create(:bike, :with_ownership, serial_number: serial, owner_email: email, manufacturer: manufacturer) }
       let(:user) { existing_bike.creator }
-      let(:bike_params) do
+      let(:default_params) do
         {
           primary_frame_color_id: color.id,
           manufacturer_id: manufacturer.id,
-          serial_number: "some serial NUMBER",
+          serial_number: "#{serial.upcase} ",
           owner_email: new_email,
           no_duplicate: true
         }
       end
+      let(:bike_params) { default_params }
       let(:email) { "something@gmail.com" }
       let(:new_email) { "Something@GMAIL.com" }
-      before { new_bike.set_calculated_attributes }
-      let(:found_duplicate) { OwnerDuplicateBikeFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email]).first }
-      it "finds a duplicate" do
+      let(:found_duplicate) { OwnerDuplicateBikeFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email], manufacturer_id: bike_params[:manufacturer_id]).first }
+      def expect_duplicate_found
         expect(b_param.no_duplicate?).to be_truthy
         expect(found_duplicate&.id).to eq existing_bike.id
         expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
@@ -410,38 +411,49 @@ RSpec.describe BikeCreator do
         expect(b_param.created_bike_id).to eq existing_bike.id
         expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
       end
+      def expect_no_duplicate
+        expect(b_param.no_duplicate?).to be_truthy
+        expect(found_duplicate&.id).to be_blank
+        bike = instance.create_bike(b_param)
+        expect(bike.id).to_not eq existing_bike.id
+        b_param.reload
+        expect(b_param.created_bike_id).to eq bike.id
+      end
+      it "finds a duplicate" do
+        expect_duplicate_found
+      end
+      context "add_duplicate parameter" do
+        let(:bike_params) { default_params.except(:no_duplicate).merge(add_duplicate: false) }
+        it "finds a duplicate" do
+          expect(bike_params.key?(:no_duplicate)).to be_falsey
+          expect_duplicate_found
+        end
+      end
+      context "different manufacturer" do
+        let(:bike_params) { default_params.merge(manufacturer_id: FactoryBot.create(:manufacturer).id) }
+        it "doesn't find the duplicate" do
+          expect_no_duplicate
+        end
+      end
       context "different email" do
         let(:email) { "something@gmail.com" }
         let(:new_email) { "newsomething@gmail.com" }
         it "does not find a non-duplicate" do
-          expect(b_param.no_duplicate?).to be_truthy
-          expect(found_duplicate&.id).to be_blank
-          bike = instance.create_bike(b_param)
-          expect(bike.id).to_not eq existing_bike.id
-          b_param.reload
-          expect(b_param.created_bike_id).to eq bike.id
+          expect_no_duplicate
         end
       end
-      context "absent serial" do
-        let!(:existing_bike) { FactoryBot.create(:bike, :with_ownership, serial_number: "unknown", owner_email: email) }
-        let(:bike_params) do
-          {
-            primary_frame_color_id: color.id,
-            manufacturer_id: manufacturer.id,
-            serial_number: "ABSENT",
-            owner_email: new_email,
-            no_duplicate: true
-          }
-        end
-        it "does not find a non-duplicate" do
+      context "existing bike with made_without_serial serial" do
+        let(:serial) { "made_without_serial" }
+        it "finds no duplicate" do
           expect(existing_bike.serial_normalized).to be_blank
-          expect(new_bike.serial_normalized).to be_blank
-          expect(b_param.no_duplicate?).to be_truthy
-          expect(found_duplicate&.id).to be_blank
-          bike = instance.create_bike(b_param)
-          expect(bike.id).to_not eq existing_bike.id
-          b_param.reload
-          expect(b_param.created_bike_id).to eq bike.id
+          expect_no_duplicate
+        end
+        context "unknown serial" do
+          let(:bike_params) { default_params.merge(serial_number: "unknown") }
+          it "finds no duplicate" do
+            expect(existing_bike.serial_normalized).to be_blank
+            expect_no_duplicate
+          end
         end
       end
       context "user_hidden" do

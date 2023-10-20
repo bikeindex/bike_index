@@ -76,7 +76,7 @@ class BParam < ApplicationRecord
     %w[abandoned accuracy address address_city address_country address_state address_state
       address_zipcode bike_code bike_sticker cycle_type_name cycle_type_slug
       front_gear_type_slug handlebar_type_slug is_bulk is_new is_pos no_duplicate
-      rear_gear_type_slug register_duplicate revised_new stolen]
+      rear_gear_type_slug add_duplicate revised_new stolen]
   end
 
   def self.registration_info_attrs
@@ -236,7 +236,8 @@ class BParam < ApplicationRecord
   end
 
   def no_duplicate?
-    return !bike["register_duplicate"] if bike.key?("register_duplicate")
+    # add_duplicate is an API key, if it's included, it has precedence
+    return !bike["add_duplicate"] if bike.key?("add_duplicate")
     bike["no_duplicate"] || false
   end
 

@@ -48,13 +48,16 @@ RSpec.describe "Bikes API V3", type: :request do
     let(:search_params) do
       {
         serial: "SNFBT22609255533",
-        manufacturer: manufacturer.name,
-        color: color.name,
-        year: "1969",
-        owner_email: email,
-        frame_material: "steel",
         organization_slug: organization&.slug,
-        cycle_type: "bike"
+        owner_email: email,
+        manufacturer: manufacturer.name,
+        cycle_type_name: "bike", # Only matters if match_all_parameters: true
+        color: color.name, # Only matters if match_all_parameters: true
+        # Attributes below here are currently ignored
+        rear_tire_narrow: "true",
+        rear_wheel_bsd: "559",
+        year: "1969",
+        frame_material: "steel"
       }
     end
     def create_attrs(search_hash)
@@ -91,7 +94,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result)
 
-        required_params = search_params.slice(:serial, :manufacturer, :owner_email, :organization_slug)
+        required_params = search_params.slice(:serial, :owner_email, :organization_slug)
         post check_if_registered_url, params: required_params.to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result)
@@ -105,6 +108,8 @@ RSpec.describe "Bikes API V3", type: :request do
         post check_if_registered_url, params: required_params.merge(frame_material: "aluminum").to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result.merge(registered: false))
+
+        # It responds with error if passed a manufacturer it doesn't know
 
         # User secondary email address
         fail
