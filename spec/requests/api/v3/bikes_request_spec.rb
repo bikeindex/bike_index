@@ -44,30 +44,70 @@ RSpec.describe "Bikes API V3", type: :request do
   end
 
   describe "check_if_registered" do
-    let(:bike_phone_attrs) do
-      bike_attrs.merge(organization_slug: organization.id,
-        owner_email: phone,
-        owner_email_is_phone_number: true)
-    end
-    let(:phone) { "2221114444" }
     let(:organization) { FactoryBot.create(:organization) }
-    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_phone_attrs[:serial]) }
-    let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, bike: bike) }
+    let(:search_params) do
+      {
+        serial: "SNFBT22609255533",
+        manufacturer: manufacturer.name,
+        color: color.name,
+        year: "1969",
+        owner_email: email,
+        frame_material: "steel",
+        organization_slug: organization&.slug,
+        cycle_type: "bike"
+      }
+    end
+    def create_attrs(search_hash)
+      search_hash.except(:serial, :manufacturer, :color, :organization_slug)
+        .merge(serial_number: search_hash[:serial], manufacturer: manufacturer, primary_frame_color: color)
+    end
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, create_attrs(search_params)) }
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
+    let(:check_if_registered_url) { "/api/v3/bikes/check_if_registered?access_token=#{token.token}" }
     it "returns 401" do
-      post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.to_json, headers: json_headers
+      expect(bike.reload.claimed?).to be_falsey
+      expect(bike.authorized?(user)).to be_falsey
+      post check_if_registered_url, params: search_params.to_json, headers: json_headers
       expect(response.code).to eq("401")
+      expect(json_result["error"]).to match(/authorized.*organization/i)
+      # Without org slug
+      post check_if_registered_url, params: search_params.except(:organization_slug).to_json, headers: json_headers
+      expect(response.code).to match(/40\d/)
+      expect(json_result["error"]).to match(/organization.*missing/i)
+      # With unknown org slug
+      post check_if_registered_url, params: search_params.merge(organization_slug: "bbbb").to_json, headers: json_headers
+      expect(response.code).to match(/40\d/)
+      expect(json_result["error"]).to match(/organization/i)
     end
     context "user is organization member" do
       let(:user) { FactoryBot.create(:organization_member) }
       let!(:organization) { user.organizations.first }
-      it "returns success" do
-        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.to_json, headers: json_headers
+      let(:target_result) { {registered: true, claimed: false, with_organization: false} }
+      let(:organized_bike) { {} }
+      it "returns true" do
+        expect(bike.reload.claimed?).to be_falsey
+        expect(bike.authorized?(user)).to be_falsey
+        post check_if_registered_url, params: search_params.to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result[:registered].to_s).to eq "true"
-        post "/api/v3/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.merge(serial: "ffff").to_json, headers: json_headers
+        expect_hashes_to_match(json_result, target_result)
+
+        required_params = search_params.slice(:serial, :manufacturer, :owner_email, :organization_slug)
+        post check_if_registered_url, params: required_params.to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect_hashes_to_match(json_result, target_result)
+
+        # normalized serial match
+        post check_if_registered_url, params: required_params.merge(serial: "SNFBT226092sss33").to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect_hashes_to_match(json_result, target_result)
+
+        # It doesn't match when passed optional attribute that doesn't match
+        post check_if_registered_url, params: required_params.merge(frame_material: "aluminum").to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect(json_result[:registered].to_s).to eq "false"
+
+        # User secondary email address
+        fail
       end
     end
   end

@@ -132,22 +132,38 @@ module API
 
         desc "Check if a bike is already registered <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
-          notes: "**Access token user** _must_ be a member of the organization from the `organization_slug`."
+          notes: <<-NOTE
+            **Access token user** _must_ be a member of the organization from the `organization_slug`.
+
+            Returns JSON with keys:
+
+            - `registered`: If a match was found
+            - `claimed`: If match was found and the user has claimed the bike
+            - `with_organization`: If a match was found and the bike is registered with the organization
+
+            <br>
+
+            All values are either `true` or `false`
+          NOTE
         }
         params do
           requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial, 'unknown' if the serial is not known)"
           requires :manufacturer, type: String, desc: "Manufacturer name or ID"
-          # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
+          requires :organization_slug, type: String, desc: "Organization (ID or slug) bike is registered with. **Only works** if user is a member of the organization"
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
-          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
-          requires :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
+          optional :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Cycle type name (lowercase)"
           use :bike_attrs
         end
         post "check_if_registered" do
           if current_organization.present?
-            {registered: find_owner_duplicate_bike.present?}
+            matching_bike = find_owner_duplicate_bike
+            {
+              registered: matching_bike.present?,
+              claimed: matching_bike.present? && matching_bike.claimed?,
+              with_organization: matching_bike.present? && matching_bike.organized?(current_organization),
+            }
           else
             error!("You are not authorized for that organization", 401)
           end
