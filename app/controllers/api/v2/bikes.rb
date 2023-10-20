@@ -99,7 +99,7 @@ module API
         end
 
         # Search for a duplicate bike - a bike matching the provided serial number / owner email
-        def find_owner_duplicate_bike(manufacturer_id = nil)
+        def owner_duplicate_bike(manufacturer_id = nil)
           if manufacturer_id.blank? && params[:manufacturer].present?
             manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
           end
@@ -139,11 +139,14 @@ module API
           notes: <<-NOTE
             **Access token user** _must_ be a member of the organization from the `organization_slug`.
 
-            By default, it matches on `serial`, `owner_email` and `manufacturer`. No matches are returned if the serial is 'made_without_serial' or 'unknown'.
+            It matches on `serial`, `owner_email` and `manufacturer`.
 
             This is the matching that happens when adding bikes, to prevent duplicate registrations (unless `add_duplicate` is explicitly set to true).
 
-            If you would like to match on all attributes (i.e. `color` and `cycle_type_name`), include `match_all_parameters: true`
+            Two notes:
+
+            - No matches are returned if the serial is 'made_without_serial' or 'unknown'.
+            - `manufacturer` behaves slightly differently from the add bike endpoint. It's optional - but if you include it, it
 
             Returns JSON with keys:
 
@@ -162,20 +165,18 @@ module API
           requires :organization_slug, type: String, desc: "Organization (ID or slug) to perform the check from. **Only works** if user is a member of the organization"
           optional :manufacturer, type: String, desc: "Manufacturer name or ID"
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
-          optional :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
-          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Cycle type name (lowercase)"
-          optional :match_all_parameters, type: Boolean, default: false
         end
         post "check_if_registered" do
           if current_organization.present?
+            # Lookup manufacturer to raise an error if manufacturer isn't found
             if params[:manufacturer].present?
               manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
               if manufacturer_id.blank?
-                error!("Manufacturer: '#{params[:manufacturer]}' is not a known manufacturer on Bike Index!")
+                error!("Manufacturer: '#{params[:manufacturer]}' is not a known manufacturer on Bike Index!", 400)
               end
             end
-            matching_bike = find_owner_duplicate_bike(manufacturer_id)
 
+            matching_bike = owner_duplicate_bike(manufacturer_id)
             {
               registered: matching_bike.present?,
               claimed: matching_bike.present? && matching_bike.claimed?,
@@ -230,7 +231,7 @@ module API
           declared_p["declared_params"]["no_duplicate"] ||= !add_duplicate
           # TODO: BikeCreator also includes bike finding, and this duplicates it - it would be nice to DRY this up
           # It's required so that the bike can be updated if there is a match
-          found_bike = find_owner_duplicate_bike unless declared_p["declared_params"]["no_duplicate"]
+          found_bike = owner_duplicate_bike if declared_p["declared_params"]["no_duplicate"]
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
             # prepare params
@@ -251,7 +252,7 @@ module API
             end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
-              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :add_duplicate))
+              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
               BikeUpdator
                 .new(user: current_user, bike: @bike, b_params: bike_update_params)
                 .update_available_attributes
