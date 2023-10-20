@@ -236,8 +236,6 @@ class BParam < ApplicationRecord
   end
 
   def no_duplicate?
-    # add_duplicate is an API key, if it's included, it has precedence
-    return !bike["add_duplicate"] if bike.key?("add_duplicate")
     bike["no_duplicate"] || false
   end
 

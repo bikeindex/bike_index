@@ -22,6 +22,7 @@ module OwnerDuplicateBikeFinder
     candidate_user_ids = find_matching_user_ids(email, phone)
 
     matching_bikes = Bike.with_user_hidden.matching_serial(serial_normalized)
+    # Only search by manufacturer_id if it's passed
     matching_bikes = matching_bikes.where(manufacturer_id: manufacturer_id) if manufacturer_id.present?
     matching_bikes.joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
       .where(

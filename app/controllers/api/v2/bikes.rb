@@ -222,12 +222,16 @@ module API
           end
         end
         post "/" do
-          found_bike = find_owner_duplicate_bike
-          # if a matching bike is and can be updated by the submitter, update
-          # existing record instead of creating a new one
+          # TODO: Unwrap from "declared_params"
+          declared_p = {"declared_params" => declared(params, include_missing: false)}
+          add_duplicate = declared_p["declared_params"].delete("add_duplicate")
+          declared_p["declared_params"]["no_duplicate"] ||= !add_duplicate
+          # TODO: BikeCreator also includes bike finding, and this duplicates it - it would be nice to DRY this up
+          # It's required so that the bike can be updated if there is a match
+          found_bike = find_owner_duplicate_bike unless
+          # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
             # prepare params
-            declared_p = {"declared_params" => declared(params, include_missing: false)}
             b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
             b_param.clean_params
             @bike = found_bike
@@ -245,7 +249,7 @@ module API
             end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
-              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone))
+              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :add_duplicate))
               BikeUpdator
                 .new(user: current_user, bike: @bike, b_params: bike_update_params)
                 .update_available_attributes
@@ -257,7 +261,7 @@ module API
             return created_bike_serialized(@bike.reload, false)
           end
 
-          declared_p = {"declared_params" => declared(params, include_missing: false).merge(creation_state_params)}
+          declared_p = {"declared_params" => declared_p["declared_params"].merge(creation_state_params)}
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
           b_param.save
           bike = BikeCreator.new.create_bike(b_param)
