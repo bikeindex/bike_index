@@ -100,12 +100,14 @@ module API
 
         # Search for a duplicate bike - a bike matching the provided serial number / owner email
         def find_owner_duplicate_bike(manufacturer_id = nil)
+          if manufacturer_id.blank? && params[:manufacturer].present?
+            manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
+          end
           OwnerDuplicateBikeFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
             manufacturer_id: manufacturer_id).first
         end
-
 
         def created_bike_serialized(bike, include_claim_token)
           serialized = BikeV2ShowSerializer.new(bike, root: false)
@@ -167,7 +169,7 @@ module API
         post "check_if_registered" do
           if current_organization.present?
             if params[:manufacturer].present?
-              manufacturer_id = Manufacturer.friendly_find(params[:manufacturer])&.id
+              manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
               if manufacturer_id.blank?
                 error!("Manufacturer: '#{params[:manufacturer]}' is not a known manufacturer on Bike Index!")
               end
@@ -177,7 +179,7 @@ module API
             {
               registered: matching_bike.present?,
               claimed: matching_bike.present? && matching_bike.claimed?,
-              with_organization: matching_bike.present? && matching_bike.organized?(current_organization),
+              with_organization: matching_bike.present? && matching_bike.organized?(current_organization)
             }
           else
             error!("You are not authorized for that organization", 401)
@@ -228,7 +230,7 @@ module API
           declared_p["declared_params"]["no_duplicate"] ||= !add_duplicate
           # TODO: BikeCreator also includes bike finding, and this duplicates it - it would be nice to DRY this up
           # It's required so that the bike can be updated if there is a match
-          found_bike = find_owner_duplicate_bike unless
+          found_bike = find_owner_duplicate_bike unless declared_p["declared_params"]["no_duplicate"]
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
             # prepare params

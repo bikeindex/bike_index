@@ -411,6 +411,7 @@ RSpec.describe BikeCreator do
         expect(b_param.created_bike_id).to eq existing_bike.id
         expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
       end
+
       def expect_no_duplicate
         expect(b_param.no_duplicate?).to be_truthy
         expect(found_duplicate&.id).to be_blank
