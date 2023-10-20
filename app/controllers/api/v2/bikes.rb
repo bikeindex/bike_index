@@ -100,10 +100,12 @@ module API
 
         # Search for a duplicate bike - a bike matching the provided serial number / owner email
         def find_owner_duplicate_bike
-          OwnerDuplicateBikeFinder.find_matching(serial: params[:serial],
+          OwnerDuplicateBikeFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil)
+            .first
         end
+
 
         def created_bike_serialized(bike, include_claim_token)
           serialized = BikeV2ShowSerializer.new(bike, root: false)
@@ -135,6 +137,10 @@ module API
           notes: <<-NOTE
             **Access token user** _must_ be a member of the organization from the `organization_slug`.
 
+            By default, it matches on `serial`, `owner_email` and `manufacturer` - which is also the behavior for adding bikes (when `register_duplicate` isn't explicitly set to true)
+
+            If you would like to match on all attributes (i.e. `color` and `cycle_type_name`), include `match_all_parameters: true`
+
             Returns JSON with keys:
 
             - `registered`: If a match was found
@@ -148,13 +154,13 @@ module API
         }
         params do
           requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial, 'unknown' if the serial is not known)"
-          requires :manufacturer, type: String, desc: "Manufacturer name or ID"
           requires :owner_email, type: String, desc: "Owner email"
           requires :organization_slug, type: String, desc: "Organization (ID or slug) bike is registered with. **Only works** if user is a member of the organization"
+          optional :manufacturer, type: String, desc: "Manufacturer name or ID"
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
           optional :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Cycle type name (lowercase)"
-          use :bike_attrs
+          optional :match_all_parameters, type: Boolean, default: false
         end
         post "check_if_registered" do
           if current_organization.present?
@@ -200,6 +206,7 @@ module API
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
+          optional :register_duplicate, type: Boolean, default: false, desc: "If false (the default), no bike is registered if the user has a bike with the same serial and manufacturer"
           use :bike_attrs
           optional :components, type: Array do
             use :components_attrs

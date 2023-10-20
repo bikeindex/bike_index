@@ -104,7 +104,7 @@ RSpec.describe "Bikes API V3", type: :request do
         # It doesn't match when passed optional attribute that doesn't match
         post check_if_registered_url, params: required_params.merge(frame_material: "aluminum").to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result[:registered].to_s).to eq "false"
+        expect_hashes_to_match(json_result, target_result.merge(registered: false))
 
         # User secondary email address
         fail

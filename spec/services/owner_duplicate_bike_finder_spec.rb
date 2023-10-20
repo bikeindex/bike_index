@@ -10,10 +10,10 @@ RSpec.describe OwnerDuplicateBikeFinder do
       expect(User.exists?(email: missing_email)).to eq(false)
       expect(UserEmail.exists?(email: missing_email)).to eq(false)
 
-      result = described_class.find_matching(
+      result = described_class.matching(
         serial: bike.serial_number,
         owner_email: missing_email
-      )
+      ).first
 
       expect(result).to be_nil
     end
@@ -24,10 +24,10 @@ RSpec.describe OwnerDuplicateBikeFinder do
       expect(User.exists?(email: bike.owner_email)).to eq(true)
       expect(UserEmail.exists?(email: bike.owner_email)).to eq(false)
 
-      result = described_class.find_matching(
+      result = described_class.matching(
         serial: bike.serial_number,
         owner_email: bike.owner_email
-      )
+      ).first
 
       expect(result).to eq(bike)
     end
@@ -44,10 +44,10 @@ RSpec.describe OwnerDuplicateBikeFinder do
         expect(User.exists?(email: additional_email)).to eq(false)
         expect(UserEmail.exists?(email: additional_email)).to eq(true)
 
-        result = described_class.find_matching(
+        result = described_class.matching(
           serial: bike.serial_number,
           owner_email: additional_email
-        )
+        ).first
 
         expect(result).to eq(bike)
       end
@@ -58,10 +58,10 @@ RSpec.describe OwnerDuplicateBikeFinder do
       expect(User.find_by(email: bike.owner_email)).to be_nil
       expect(UserEmail.find_by(email: bike.owner_email)).to be_nil
 
-      result = described_class.find_matching(
+      result = described_class.matching(
         serial: bike.serial_number,
         owner_email: "  #{bike.owner_email} "
-      )
+      ).first
 
       expect(result).to eq(bike)
     end
@@ -69,10 +69,10 @@ RSpec.describe OwnerDuplicateBikeFinder do
     it "returns nil if neither the serial nor the normalized serial match a bike record" do
       expect(bike).to be_present
 
-      result = described_class.find_matching(
+      result = described_class.matching(
         serial: "bad-serial-number",
         owner_email: bike.creator.email
-      )
+      ).first
 
       expect(result).to be_nil
     end
@@ -84,16 +84,16 @@ RSpec.describe OwnerDuplicateBikeFinder do
       bike.update(serial_number: serial)
       expect(bike.reload.serial_normalized).to eq normalized_serial
 
-      result = described_class.find_matching(
+      result = described_class.matching(
         serial: serial,
         owner_email: bike.owner_email
-      )
+      ).first
       expect(result).to eq(bike)
 
-      result2 = described_class.find_matching(
+      result2 = described_class.matching(
         serial: "#{normalized_serial.downcase}\n",
         owner_email: bike.owner_email
-      )
+      ).first
       expect(result2).to eq(bike)
     end
 
@@ -119,14 +119,14 @@ RSpec.describe OwnerDuplicateBikeFinder do
         expect(described_class.send(:find_matching_user_ids, bike1.creator.email, "92929292")).to eq([bike1.creator.id])
         expect(described_class.send(:find_matching_user_ids, "s@stuff.com", phone1)).to eq([user1.id])
 
-        expect(described_class.find_matching(serial: "50C001", phone: " #{phone1}  ")&.id).to eq bike1.id
-        expect(described_class.find_matching(serial: serial1, owner_email: "a@b.com", phone: phone1)&.id).to eq bike1.id
-        expect(described_class.find_matching(serial: serial1, phone: phone2)&.id).to be_blank
+        expect(described_class.matching(serial: "50C001", phone: " #{phone1}  ").first&.id).to eq bike1.id
+        expect(described_class.matching(serial: serial1, owner_email: "a@b.com", phone: phone1).first&.id).to eq bike1.id
+        expect(described_class.matching(serial: serial1, phone: phone2).first&.id).to be_blank
 
-        expect(described_class.find_matching(serial: serial2, phone: phone1)&.id).to be_blank
-        expect(described_class.find_matching(serial: serial2, phone: phone2)&.id).to eq bike2.id
-        expect(described_class.find_matching(serial: serial2, phone: phone1)&.id).to be_blank
-        expect(described_class.find_matching(serial: serial2, owner_email: "a@b.com", phone: phone2)&.id).to eq bike2.id
+        expect(described_class.matching(serial: serial2, phone: phone1).first&.id).to be_blank
+        expect(described_class.matching(serial: serial2, phone: phone2).first&.id).to eq bike2.id
+        expect(described_class.matching(serial: serial2, phone: phone1).first&.id).to be_blank
+        expect(described_class.matching(serial: serial2, owner_email: "a@b.com", phone: phone2).first&.id).to eq bike2.id
       end
     end
 
@@ -135,16 +135,16 @@ RSpec.describe OwnerDuplicateBikeFinder do
       let(:serial) { "made_without_serial" }
       it "returns nil" do
         expect(Bike.where(serial_number: serial).count).to eq 1
-        result = described_class.find_matching(
+        result = described_class.matching(
           serial: "made_without_serial",
           owner_email: bike.owner_email
-        )
+        ).first
         expect(result).to be_blank
 
-        result2 = described_class.find_matching(
+        result2 = described_class.matching(
           serial: "Made Without Serial",
           owner_email: bike.owner_email
-        )
+        ).first
         expect(result2).to be_blank
       end
       context "unknown" do
@@ -152,17 +152,17 @@ RSpec.describe OwnerDuplicateBikeFinder do
         it "returns nil" do
           expect(Bike.where(serial_number: serial).count).to eq 1
           expect(bike.reload.serial_number).to eq "unknown"
-          result = described_class.find_matching(
+          result = described_class.matching(
             serial: "UNknown",
             owner_email: bike.owner_email
-          )
+          ).first
           expect(result).to be_blank
 
           expect(SerialNormalizer.normalized_and_corrected("idk")).to be_nil
-          result2 = described_class.find_matching(
+          result2 = described_class.matching(
             serial: "idk",
             owner_email: bike.owner_email
-          )
+          ).first
           expect(result2).to be_blank
         end
       end

@@ -401,7 +401,7 @@ RSpec.describe BikeCreator do
       let(:email) { "something@gmail.com" }
       let(:new_email) { "Something@GMAIL.com" }
       before { new_bike.set_calculated_attributes }
-      let(:found_duplicate) { OwnerDuplicateBikeFinder.find_matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email]) }
+      let(:found_duplicate) { OwnerDuplicateBikeFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email]).first }
       it "finds a duplicate" do
         expect(b_param.no_duplicate?).to be_truthy
         expect(found_duplicate&.id).to eq existing_bike.id
