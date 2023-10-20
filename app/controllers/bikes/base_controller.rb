@@ -134,7 +134,8 @@ class Bikes::BaseController < ApplicationController
     params[:id] || params[:scanned_id] || params[:card_id]
   end
 
-  # TODO: Remove this, updator should handle. Probably using BParam.safe_bike_attrs
+  # TODO: Remove this, should be in updator. Probably using BParam.safe_bike_attrs
+  # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
   def permitted_bike_params
     {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
   end

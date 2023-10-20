@@ -307,10 +307,6 @@ class Bike < ApplicationRecord
     false
   end
 
-  def motorized?
-    PropulsionType.motorized?(propulsion_type)
-  end
-
   def display_name
     name.presence || cycle_type.titleize
   end

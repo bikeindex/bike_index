@@ -41,6 +41,15 @@ RSpec.describe PropulsionType, type: :model do
       expect(PropulsionType.for_vehicle("unicycle")).to eq :"foot-pedal"
     end
 
+    it "is hand-pedal" do
+      expect(PropulsionType.for_vehicle("bike", "hand-pedal")).to eq :"hand-pedal"
+      expect(PropulsionType.find_sym("Hand Cycle")).to eq :"hand-pedal"
+      expect(PropulsionType.for_vehicle("bike", "Hand Cycle")).to eq :"hand-pedal"
+      expect(PropulsionType.for_vehicle("bike", "Hand Cycle (hand pedal)")).to eq :"hand-pedal"
+      expect(PropulsionType.find_sym("Hand CYCLE (hand pedal) ")).to eq :"hand-pedal"
+      expect(PropulsionType.for_vehicle("bike", "Hand CYCLE (hand pedal) ")).to eq :"hand-pedal"
+    end
+
     context "pedal_type cycle_type" do
       it "is what it is passed" do
         expect(PropulsionType.for_vehicle(:cargo, :"hand-pedal")).to eq :"hand-pedal"
@@ -48,9 +57,9 @@ RSpec.describe PropulsionType, type: :model do
         expect(PropulsionType.for_vehicle(:unicycle, :throttle)).to eq :throttle
         expect(PropulsionType.for_vehicle(:bike, :throttle)).to eq :throttle
       end
-      it "is default pedal_type if passed non pedal type" do
-        expect(PropulsionType.for_vehicle(:bike, :"human-not-pedal")).to eq :"foot-pedal"
-        expect(PropulsionType.for_vehicle(:unicycle, :"human-not-pedal")).to eq :"foot-pedal"
+      it "is passed value if pedal type" do
+        expect(PropulsionType.for_vehicle(:bike, :"human-not-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:unicycle, :"human-not-pedal")).to eq :"human-not-pedal"
       end
     end
 
@@ -111,9 +120,14 @@ RSpec.describe PropulsionType, type: :model do
     end
   end
 
-  describe "default_motorized_type" do
-    it "is pedal-assist for bike" do
-      expect(PropulsionType.default_motorized_type(:bike)).to eq(:"pedal-assist")
+  describe "valid_propulsion_types_for" do
+    it "is all the types for bike" do
+      expect(PropulsionType.send(:valid_propulsion_types_for, :bike)).to eq(PropulsionType.slugs_sym)
+    end
+    context "wheelchair" do
+      it "is valid types" do
+        expect(PropulsionType.send(:valid_propulsion_types_for, :wheelchair)).to eq(%i[human-not-pedal throttle])
+      end
     end
   end
 end

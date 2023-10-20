@@ -22,66 +22,71 @@ class PropulsionType
   MOTORIZED = %i[pedal-assist throttle pedal-assist-and-throttle].freeze
   PEDAL = %i[foot-pedal hand-pedal pedal-assist pedal-assist-and-throttle].freeze
 
-  def self.not_pedal
-    (slugs_sym - PEDAL).freeze
-  end
-
-  def self.not_motorized
-    (slugs_sym - MOTORIZED).freeze
-  end
-
-  def self.pedal_type?(slug_sym)
-    PEDAL.include?(slug_sym)
-  end
-
-  def self.valid_propulsion_types_for(cycle_type)
-    valid_types = if CycleType.pedal_type?(cycle_type)
-      slugs_sym - %i[human-not-pedal]
-    else
-      not_pedal.reverse
+  class << self
+    def not_pedal
+      (slugs_sym - PEDAL).freeze
     end
 
-    strictly = CycleType.strict_motorized(cycle_type)
-    if strictly == :never
-      valid_types -= MOTORIZED
-    elsif strictly == :always
-      valid_types -= not_motorized
+    def not_motorized
+      (slugs_sym - MOTORIZED).freeze
     end
-    valid_types
-  end
 
-  # propulsion type can by one of the slugs or :motorized
-  def self.for_vehicle(cycle_type, propulsion_type = nil)
-    cycle_type = cycle_type&.to_sym
-    propulsion_type = propulsion_type&.to_sym
-    propulsion_type = default_motorized_type(cycle_type) if propulsion_type == :motorized
-    v_types = valid_propulsion_types_for(cycle_type)
+    def motorized?(slug)
+      MOTORIZED.include?(slug&.to_sym)
+    end
 
-    return propulsion_type if v_types.include?(propulsion_type)
+    def not_motorized?(slug)
+      (slugs_sym - MOTORIZED).include?(slug&.to_sym)
+    end
 
-    # If a motorized type was passed, try to return a motorized type
-    propulsion_type = default_motorized_type(cycle_type) if motorized?(propulsion_type)
-    return propulsion_type if v_types.include?(propulsion_type)
+    def pedal_type?(slug_sym)
+      PEDAL.include?(slug_sym)
+    end
 
-    valid_propulsion_types_for(cycle_type).first
-  end
+    # propulsion type can by one of the slugs or :motorized
+    def for_vehicle(cycle_type, propulsion_type = nil)
+      cycle_type = cycle_type&.to_sym
+      propulsion_type = propulsion_type&.to_sym
+      propulsion_type = default_motorized_type(cycle_type) if propulsion_type == :motorized
+      propulsion_type = find_sym(propulsion_type) unless slugs_sym.include?(propulsion_type)
+      v_types = valid_propulsion_types_for(cycle_type)
 
-  def self.default_non_motorized_type(cycle_type)
-    return nil if CycleType.strict_motorized(cycle_type) == :always
-    CycleType.pedal_type?(cycle_type) ? :"foot-pedal" : :"human-not-pedal"
-  end
+      return propulsion_type if v_types.include?(propulsion_type)
 
-  def self.default_motorized_type(cycle_type)
-    return nil if CycleType.strict_motorized(cycle_type) == :never
-    CycleType.pedal_type?(cycle_type) ? :"pedal-assist" : :throttle
-  end
+      # If a motorized type was passed, try to return a motorized type
+      propulsion_type = default_motorized_type(cycle_type) if motorized?(propulsion_type)
+      return propulsion_type if v_types.include?(propulsion_type)
 
-  def self.motorized?(slug)
-    MOTORIZED.include?(slug.to_sym)
-  end
+      valid_propulsion_types_for(cycle_type).first
+    end
 
-  def self.not_motorized?(slug)
-    (slugs_sym - MOTORIZED).include?(slug)
+    private
+
+    def default_non_motorized_type(cycle_type)
+      return nil if CycleType.strict_motorized(cycle_type) == :always
+      CycleType.pedal_type?(cycle_type) ? :"foot-pedal" : :"human-not-pedal"
+    end
+
+    def default_motorized_type(cycle_type)
+      return nil if CycleType.strict_motorized(cycle_type) == :never
+      CycleType.pedal_type?(cycle_type) ? :"pedal-assist" : :throttle
+    end
+
+    def valid_propulsion_types_for(cycle_type)
+      valid_types = if CycleType.pedal_type?(cycle_type)
+        slugs_sym
+      else
+        not_pedal.reverse
+      end
+
+      strictly = CycleType.strict_motorized(cycle_type)
+      if strictly == :never
+        valid_types -= MOTORIZED
+      elsif strictly == :always
+        valid_types -= not_motorized
+      end
+      valid_types
+    end
   end
 
   def initialize(slug)

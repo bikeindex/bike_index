@@ -507,9 +507,7 @@ class BParam < ApplicationRecord
 
   def safe_bike_attrs(new_attrs)
     override_attrs = {"status" => status}
-    propulsion_type = self.class.top_level_propulsion_type(params)
-    # propulsion_type_slug safe assigns the type
-    override_attrs["propulsion_type_slug"] = propulsion_type if propulsion_type.present?
+    top_propulsion_type = self.class.top_level_propulsion_type(params)
     # existing bike attrs, overridden with passed attributes
     bike.merge(override_attrs).merge(new_attrs.as_json)
       .select { |_k, v| ParamsNormalizer.present_or_false?(v) }
@@ -518,7 +516,12 @@ class BParam < ApplicationRecord
         "b_param_id_token" => id_token,
         "creator_id" => creator_id,
         "updator_id" => creator_id)
-      .merge(address_hash)
+      .merge(address_hash).tap do |attrs|
+        propulsion_type = attrs.delete("propulsion_type")
+        # propulsion_type_slug safe assigns, verifying cycle_type. It needs to always be used
+        attrs["propulsion_type_slug"] = top_propulsion_type ||
+          attrs["propulsion_type_slug"] || propulsion_type
+      end
   end
 
   private

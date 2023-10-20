@@ -28,7 +28,7 @@
             = f.label :serial_number, class: 'form-well-label'
             .form-well-input
               #serial-input
-                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.highly_recommended'), class: 'form-control'
+                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.required'), class: 'form-control'
                 %a.inline-input-help{title: t(".serial_help"), data: {toggle: 'popover', content: serial_help_content}}
                   ?
               #made-without-serial-input
