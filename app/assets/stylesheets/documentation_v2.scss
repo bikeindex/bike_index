@@ -7721,11 +7721,12 @@ p {
   max-width: 100%; // override bs
 }
 
-.swagger-ui-wrap .operations .content > ul {
+.swagger-ui-wrap .operations .content ul {
   list-style-type: square;
+  padding-left: 1.5em;
 }
 
-.swagger-ui-wrap .operations .content > ul br {
+.swagger-ui-wrap .operations .content ul br {
   display: none;
 }
 

@@ -1,6 +1,6 @@
 # Used when registering new bikes, to prevent registering duplicate bikes
 module OwnerDuplicateBikeFinder
-  # Find a bike with the given serial number `serial` associated with email
+  # Finds bikes with the given serial number `serial` associated with email
   # address `owner_email`.
   #
   # Matches based on the normalized serial number, and `owner_email` should be
@@ -13,16 +13,18 @@ module OwnerDuplicateBikeFinder
   # - the phone associated with any owner (via user.user_phones)
   #
   # Return a Bike object, or nil
-  def self.find_matching(serial: nil, owner_email: nil, phone: nil, b_param: nil)
+  def self.matching(serial: nil, owner_email: nil, phone: nil, b_param: nil, manufacturer_id: nil)
     email = EmailNormalizer.normalize(owner_email)
     phone = Phonifyer.phonify(phone)
     serial_normalized = SerialNormalizer.normalized_and_corrected(serial)
-    return nil if serial_normalized.blank?
+    return Bike.none if serial_normalized.blank?
 
     candidate_user_ids = find_matching_user_ids(email, phone)
-    Bike.with_user_hidden
-      .matching_serial(serial_normalized)
-      .joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
+
+    matching_bikes = Bike.with_user_hidden.matching_serial(serial_normalized)
+    # Only search by manufacturer_id if it's passed
+    matching_bikes = matching_bikes.where(manufacturer_id: manufacturer_id) if manufacturer_id.present?
+    matching_bikes.joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
       .where(
         "bikes.owner_email = ? OR bikes.owner_email = ? OR ownerships.owner_email = ? OR ownerships.owner_email = ? OR ownerships.user_id IN (?)",
         email,
@@ -31,7 +33,6 @@ module OwnerDuplicateBikeFinder
         phone,
         candidate_user_ids
       )
-      .first
   end
 
   def self.find_matching_user_ids(email = nil, phone = nil)
