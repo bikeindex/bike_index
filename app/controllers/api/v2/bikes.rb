@@ -214,10 +214,9 @@ module API
           # TODO: Unwrap from "declared_params"
           declared_p = {"declared_params" => declared(params, include_missing: false)}
           add_duplicate = declared_p["declared_params"].delete("add_duplicate")
-          declared_p["declared_params"]["no_duplicate"] ||= !add_duplicate
           # TODO: BikeCreator also includes bike finding, and this duplicates it - it would be nice to DRY this up
           # It's required so that the bike can be updated if there is a match
-          found_bike = owner_duplicate_bike if declared_p["declared_params"]["no_duplicate"]
+          found_bike = owner_duplicate_bike unless add_duplicate
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
             # prepare params
