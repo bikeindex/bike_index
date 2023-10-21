@@ -138,15 +138,15 @@ module API
 
             It matches on `serial`, `owner_email` and `manufacturer`. No matches are returned if the serial is 'made_without_serial' or 'unknown'.
 
-            This is the matching that happens when adding bikes, to prevent duplicate registrations (unless `add_duplicate` is explicitly set to true).
+            This is the matching that happens when adding bikes, to prevent duplicate registrations. By default, adding a bike will update the existing bike if there is a match, which can be edited - and will create a new bike if the existing match can't be edited. (If you include `no_duplicate` when adding a bike, it won't add a duplicate bike when it can't be edited)
 
-            The only difference between this and the behavior of adding a bike, is that `manufacturer` is optional here.
+            The only difference between this and the behavior of add a bike, is that `manufacturer` is optional here.
 
             Returns JSON with keys:
 
             - `registered`: If a match was found
             - `claimed`: If a match was found and the user has claimed the bike
-            - `with_organization`: If a match was found and the bike is registered with the organization
+            - `can_edit`: If a match was found and it can be edited by the current token (e.g. was registered by the organization)
 
             <br>
 
@@ -166,7 +166,7 @@ module API
             {
               registered: matching_bike.present?,
               claimed: matching_bike.present? && matching_bike.claimed?,
-              with_organization: matching_bike.present? && matching_bike.organized?(current_organization)
+              can_edit: matching_bike.present? && matching_bike.authorized?(current_user)
             }
           else
             error!("You are not authorized for that organization", 401)
@@ -204,7 +204,7 @@ module API
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
-          optional :add_duplicate, type: Boolean, default: false, desc: "If false (the default), no bike is registered if the user has a bike with the same serial and manufacturer"
+          optional :no_duplicate, type: Boolean, default: false, desc: "If true, it won't register a duplicate bike - when it can't edit an existing matching bike (see `/check_if_registered`)"
           use :bike_attrs
           optional :components, type: Array do
             use :components_attrs

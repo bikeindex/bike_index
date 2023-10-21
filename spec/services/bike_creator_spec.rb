@@ -423,11 +423,14 @@ RSpec.describe BikeCreator do
       it "finds a duplicate" do
         expect_duplicate_found
       end
-      context "add_duplicate parameter" do
-        let(:bike_params) { default_params.except(:no_duplicate).merge(add_duplicate: false) }
+      context "no_duplicate false" do
+        let(:bike_params) { default_params.merge(no_duplicate: false) }
         it "finds a duplicate" do
-          expect(bike_params.key?(:no_duplicate)).to be_falsey
-          expect_duplicate_found
+          expect(found_duplicate&.id).to eq existing_bike.id
+          bike = instance.create_bike(b_param)
+          expect(bike.id).to_not eq existing_bike.id
+          b_param.reload
+          expect(b_param.created_bike_id).to eq bike.id
         end
       end
       context "different manufacturer" do

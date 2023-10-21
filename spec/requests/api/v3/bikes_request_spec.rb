@@ -51,8 +51,8 @@ RSpec.describe "Bikes API V3", type: :request do
         organization_slug: organization&.slug,
         owner_email: email,
         manufacturer: manufacturer.name,
-        cycle_type_name: "bike", # Only matters if match_all_parameters: true
-        color: color.name # Only matters if match_all_parameters: true
+        cycle_type_name: "bike", # Ignored
+        color: color.name # Ignored
       }
     end
     def create_attrs(search_hash)
@@ -80,17 +80,17 @@ RSpec.describe "Bikes API V3", type: :request do
     context "user is organization member" do
       let(:user) { FactoryBot.create(:organization_member) }
       let!(:organization) { user.organizations.first }
-      let(:target_result) { {registered: true, claimed: false, with_organization: false} }
-      let(:unmatched_result) { {registered: false, claimed: false, with_organization: false} }
+      let(:target_result) { {registered: true, claimed: false, can_edit: false} }
+      let(:unmatched_result) { {registered: false, claimed: false, can_edit: false} }
       let(:organized_bike) { {} }
-      it "returns true" do
+      let(:required_params) { search_params.slice(:serial, :owner_email, :organization_slug) }
+      it "returns target" do
         expect(bike.reload.claimed?).to be_falsey
         expect(bike.authorized?(user)).to be_falsey
         post check_if_registered_url, params: search_params.to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result)
 
-        required_params = search_params.slice(:serial, :owner_email, :organization_slug)
         post check_if_registered_url, params: required_params.to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result)
@@ -115,6 +115,30 @@ RSpec.describe "Bikes API V3", type: :request do
         post check_if_registered_url, params: required_params.merge(email: "2@DDDD.com").to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result)
+      end
+      context "bike is authorized" do
+        let(:target_result) { {registered: true, claimed: false, can_edit: true} }
+        it "returns target" do
+          # If the user is authorized via a secondary email
+          user_email = FactoryBot.create(:user_email, user: user, email: bike.owner_email)
+          expect(bike.reload.claimed?).to be_falsey
+          expect(bike.authorized?(user)).to be_truthy
+          post check_if_registered_url, params: search_params.to_json, headers: json_headers
+          expect(response.code).to eq("201")
+          expect_hashes_to_match(json_result, target_result)
+          # Sanity check
+          user_email.destroy
+          post check_if_registered_url, params: search_params.to_json, headers: json_headers
+          expect(response.code).to eq("201")
+          expect_hashes_to_match(json_result, target_result.merge(can_edit: false))
+          # Test via bike organization
+          bike_organization = BikeOrganization.create(bike: bike, organization: organization)
+          expect(bike_organization).to be_valid
+          expect(bike.reload.authorized?(user)).to be_truthy
+          post check_if_registered_url, params: required_params.to_json, headers: json_headers
+          expect(response.code).to eq("201")
+          expect_hashes_to_match(json_result, target_result)
+        end
       end
     end
   end
@@ -464,22 +488,33 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     context "given a bike with a pre-existing match by serial" do
-      it "creates a new bike if the match has a different owner" do
-        bike = FactoryBot.create(:ownership, creator: user).bike
-
-        bike_attrs = {
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }
+      let(:bike_attrs) do
+        {
           serial: bike.serial_display,
           manufacturer: bike.manufacturer.name,
           color: color.name,
           year: bike.year,
-          owner_email: "some-other-owner@example.com"
+          owner_email: bike.owner_email
         }
-        post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+      end
+      it "creates a new bike if the match has a different owner" do
+        post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(owner_email: "some-other-owner@example.com").to_json, headers: json_headers
 
         returned_bike = json_result["bike"]
         expect(response.status).to eq(201)
         expect(response.status_message).to eq("Created")
         expect(returned_bike["id"]).to_not eq(bike.id)
+      end
+      context "no_duplicate" do
+        it "doesn't create a duplicate" do
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
+
+          returned_bike = json_result["bike"]
+          expect(response.status).to eq(302)
+          expect(response.status_message).to eq("Found")
+          expect(returned_bike["id"]).to eq(bike.id)
+        end
       end
     end
 
@@ -696,7 +731,7 @@ RSpec.describe "Bikes API V3", type: :request do
             Sidekiq::Worker.clear_all
             expect(bike.reload.authorized?(user)).to be_truthy
             expect {
-              post tokenized_url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
+              post tokenized_url, params: bike_attrs.to_json, headers: json_headers
             }.to change(Bike, :count).by 0
 
             result = json_result["bike"]
