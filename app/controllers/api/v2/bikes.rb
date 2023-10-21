@@ -138,7 +138,7 @@ module API
 
             It matches on `serial`, `owner_email` and `manufacturer`. No matches are returned if the serial is 'made_without_serial' or 'unknown'.
 
-            This is the matching that happens when adding bikes, to prevent duplicate registrations. By default, adding a bike will update the existing bike if there is a match, which can be edited - and will create a new bike if the existing match can't be edited. (If you include `no_duplicate` when adding a bike, it won't add a duplicate bike when it can't be edited)
+            This is the matching that happens when adding bikes, to prevent duplicate registrations. By default, adding a bike will update the existing bike if there is a match _which can be edited_ - and will create a new bike if the existing match can't be edited (If you include `no_duplicate` when adding a bike, it won't add a duplicate bike in that situation).
 
             The only difference between this and the behavior of add a bike, is that `manufacturer` is optional here.
 
