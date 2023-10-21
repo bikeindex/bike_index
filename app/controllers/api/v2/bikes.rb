@@ -98,11 +98,8 @@ module API
           @bike = Bike.unscoped.find(params[:id])
         end
 
-        # Search for a duplicate bike - a bike matching the provided serial number / owner email
-        def owner_duplicate_bike(manufacturer_id = nil)
-          if manufacturer_id.blank? && params[:manufacturer].present?
-            manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
-          end
+        def owner_duplicate_bike
+          manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
           OwnerDuplicateBikeFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
@@ -139,14 +136,11 @@ module API
           notes: <<-NOTE
             **Access token user** _must_ be a member of the organization from the `organization_slug`.
 
-            It matches on `serial`, `owner_email` and `manufacturer`.
+            It matches on `serial`, `owner_email` and `manufacturer`. No matches are returned if the serial is 'made_without_serial' or 'unknown'.
 
             This is the matching that happens when adding bikes, to prevent duplicate registrations (unless `add_duplicate` is explicitly set to true).
 
-            Two notes:
-
-            - No matches are returned if the serial is 'made_without_serial' or 'unknown'.
-            - `manufacturer` behaves slightly differently from the add bike endpoint. It's optional - but if you include it, it
+            The only difference between this and the behavior of adding a bike, is that `manufacturer` is optional here.
 
             Returns JSON with keys:
 
@@ -168,15 +162,7 @@ module API
         end
         post "check_if_registered" do
           if current_organization.present?
-            # Lookup manufacturer to raise an error if manufacturer isn't found
-            if params[:manufacturer].present?
-              manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
-              if manufacturer_id.blank?
-                error!("Manufacturer: '#{params[:manufacturer]}' is not a known manufacturer on Bike Index!", 400)
-              end
-            end
-
-            matching_bike = owner_duplicate_bike(manufacturer_id)
+            matching_bike = owner_duplicate_bike
             {
               registered: matching_bike.present?,
               claimed: matching_bike.present? && matching_bike.claimed?,
