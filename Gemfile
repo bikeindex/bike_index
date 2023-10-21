@@ -80,7 +80,7 @@ gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape", "~> 1.8.0" # API DSL
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "hashie" # required for some Grape endpoints
-gem "swagger-ui_rails"
+gem "swagger-ui_rails", "~> 0.1.7"
 
 # Secure things
 gem "rack-throttle" # Rate limiting

@@ -829,7 +829,7 @@ DEPENDENCIES
   stackprof
   standard
   stripe
-  swagger-ui_rails
+  swagger-ui_rails (~> 0.1.7)
   terminal-notifier
   thor
   translation
