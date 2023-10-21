@@ -87,7 +87,6 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.reload.claimed?).to be_falsey
         expect(bike.authorized?(user)).to be_falsey
         post check_if_registered_url, params: search_params.to_json, headers: json_headers
-        pp json_result
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result)
 
@@ -109,8 +108,13 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(response.code).to eq("201")
         expect_hashes_to_match(json_result, target_result)
 
-        # User secondary email address
-        fail
+        # It matches via user secondary email address
+        owner = FactoryBot.create(:user, :confirmed, email: "2@dddd.com")
+        FactoryBot.create(:user_email, user: owner, email: bike.owner_email)
+        expect(owner.reload.confirmed_emails).to match_array(["2@dddd.com", bike.owner_email])
+        post check_if_registered_url, params: required_params.merge(email: "2@DDDD.com").to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect_hashes_to_match(json_result, target_result)
       end
     end
   end
@@ -218,7 +222,6 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(response.status).to eq(201)
           expect(response.status_message).to eq("Created")
           bike1_result = json_result["bike"]
-          pp "--------"
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(owner_email: "something@stuff.com").to_json, headers: json_headers
           bike2_result = json_result["bike"]
           expect(response.status).to eq(302)
@@ -232,7 +235,6 @@ RSpec.describe "Bikes API V3", type: :request do
           old_color = FactoryBot.create(:color, name: "old_color")
           new_color = FactoryBot.create(:color, name: "new_color")
           old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
-          new_manufacturer = FactoryBot.create(:manufacturer, name: "new_manufacturer")
           old_wheel_size = FactoryBot.create(:wheel_size, name: "old_wheel_size", iso_bsd: 10)
           new_rear_wheel_size = FactoryBot.create(:wheel_size, name: "new_rear_wheel_size", iso_bsd: 11)
           new_front_wheel_size = FactoryBot.create(:wheel_size, name: "new_front_wheel_size", iso_bsd: 12)
@@ -257,7 +259,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
           bike_attrs = {
             serial: bike1.serial_number,
-            manufacturer: new_manufacturer.name,
+            manufacturer: old_manufacturer.name,
             rear_tire_narrow: true,
             front_wheel_bsd: new_front_wheel_size.iso_bsd,
             rear_wheel_bsd: new_rear_wheel_size.iso_bsd,
@@ -684,7 +686,7 @@ RSpec.describe "Bikes API V3", type: :request do
       context "duplicated serial" do
         context "matching email" do
           it "returns existing bike if authorized by organization" do
-            bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
+            bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email, manufacturer: manufacturer)
             bike.organizations << organization
             bike.save
             ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
@@ -692,6 +694,7 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(ownership.claimed).to be_falsey
             ActionMailer::Base.deliveries = []
             Sidekiq::Worker.clear_all
+            expect(bike.reload.authorized?(user)).to be_truthy
             expect {
               post tokenized_url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
             }.to change(Bike, :count).by 0

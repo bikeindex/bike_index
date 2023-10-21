@@ -248,7 +248,6 @@ module API
             status :found
             return created_bike_serialized(@bike.reload, false)
           end
-
           declared_p = {"declared_params" => declared_p["declared_params"].merge(creation_state_params)}
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
           b_param.save
