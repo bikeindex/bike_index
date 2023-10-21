@@ -211,16 +211,14 @@ module API
           end
         end
         post "/" do
-          # TODO: Unwrap from "declared_params"
-          declared_p = {"declared_params" => declared(params, include_missing: false)}
-          add_duplicate = declared_p["declared_params"].delete("add_duplicate")
+          declared_p = declared(params, include_missing: false)
+          add_duplicate = declared_p.delete("add_duplicate")
           # TODO: BikeCreator also includes bike finding, and this duplicates it - it would be nice to DRY this up
           # It's required so that the bike can be updated if there is a match
           found_bike = owner_duplicate_bike unless add_duplicate
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
-            # prepare params
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p.as_json, origin: origin_api_version)
             b_param.clean_params
             @bike = found_bike
             authorize_bike_for_user
@@ -248,8 +246,8 @@ module API
             status :found
             return created_bike_serialized(@bike.reload, false)
           end
-          declared_p = {"declared_params" => declared_p["declared_params"].merge(creation_state_params)}
-          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
+          b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
+            params: declared_p.merge(creation_state_params).as_json)
           b_param.save
           bike = BikeCreator.new.create_bike(b_param)
 
@@ -281,10 +279,10 @@ module API
           end
         end
         put ":id" do
-          declared_p = {"declared_params" => declared(params, include_missing: false)}
+          declared_p = declared(params, include_missing: false)
           find_bike
           authorize_bike_for_user
-          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: origin_api_version)
+          b_param = BParam.new(params: declared_p.as_json, origin: origin_api_version)
           b_param.clean_params
           hash = b_param.params
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
