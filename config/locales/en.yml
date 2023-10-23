@@ -700,7 +700,7 @@ en:
         non_e_skateboard: Skateboard (Not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: Personal mobility device (electric scooter, etc)
+        personal_mobility: E-Skateboard (E-Unicycle, Personal mobility device, etc)
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike
@@ -727,9 +727,9 @@ en:
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Pedal
+        human_not_pedal: Human powered (not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
-        propulsion_other: Other Style
         throttle: throttle
     errors:
       messages:
@@ -1061,6 +1061,7 @@ en:
       paint_description: Color description
       police_report: 'Police report #'
       primary_colors: Primary colors
+      propulsion_type: Propulsion
       rear: Rear
       rear_wheel_diameter: Rear wheel diameter
       serial: Serial
@@ -1074,10 +1075,10 @@ en:
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
       city: City
+      electric: Electric
       enter_bike_type_details: Enter %{bike_type} details
       enter_found_bike_type_details: Enter Found %{bike_type} details
       enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
-      highly_recommended: highly recommended
       how_to_find_serial: how to find your serial number
       i_just_dont_know_the_serial: I just don't know the serial
       im_100_sure: I'm 100% sure
@@ -1097,6 +1098,7 @@ en:
         window)</small>
       register: Register
       register_with: Register with %{organization_name}
+      required: required - or mark missing
       select_other: Select 'Other' if manufacturer doesn't show up when entered
       serial_help: Serial help
       serial_help_content_html: >-
@@ -1107,6 +1109,8 @@ en:
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       student_id: Student ID
       this_is_a: This is a
+      traditional_bike: Traditional bicycle
+      traditional_bike_definition: Two wheels, one seat, no motor
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
       very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
@@ -1405,8 +1409,8 @@ en:
           easier
         primary_frame_color: Primary frame color
         remove_color: Remove color
-        secondary_frame_color: Secondary frame color
-        tertiary_frame_color: Tertiary frame color
+        secondary_frame_color: Secondary color
+        tertiary_frame_color: Tertiary color
       revised_component_fields:
         component_type: Component type
         model: Model
@@ -1416,6 +1420,7 @@ en:
         part_serial: Part Serial
         part_type: Part type
         remove_part: Remove part
+        select_other: Select 'Other' if manufacturer doesn't show up when entered
         unknown_part_type: Unknown part type
       stolen_location:
         address_or_intersection: Address or intersection
@@ -1437,6 +1442,7 @@ en:
       internal_front_gears: Internal front gears
       internal_rear_gears: Internal rear gears
       narrow: Narrow
+      narrow_title: Tires under 39mm (1.5 inches) wide
       rear_gears: Rear gears
       select_chainring_count: Select chainring count
       select_cog_count: Select cog count
@@ -1445,6 +1451,8 @@ en:
       sidetitleize_wheel: "%{sidetitleize} wheel"
       wheels: Wheels
       wide: Wide
+      wide_help: "> 38mm (1.5in)"
+      wide_title: Tires that are at least 39mm (1.5 inches) wide
     edit_bike_organization:
       can_edit_this_bike: Can edit this %{bike_type}
       manage_organization_information: Manage organization information

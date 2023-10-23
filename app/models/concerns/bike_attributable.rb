@@ -59,6 +59,10 @@ module BikeAttributable
     made_without_serial? || serial_unknown?
   end
 
+  def motorized?
+    PropulsionType.motorized?(propulsion_type)
+  end
+
   def frame_colors
     [
       primary_frame_color&.name,
@@ -124,8 +128,17 @@ module BikeAttributable
     PropulsionType.new(propulsion_type).name
   end
 
+  # NB: val can be a propulsion_type OR [nil, :motorized] (see spec)
   def propulsion_type_slug=(val)
-    self.propulsion_type = PropulsionType.find_sym(val)
+    self.propulsion_type = PropulsionType.for_vehicle(cycle_type, val)
+  end
+
+  def propulsion_type_pedal_assist?
+    %w[pedal-assist pedal-assist-and-throttle].include?(propulsion_type)
+  end
+
+  def propulsion_type_throttle?
+    %w[throttle pedal-assist-and-throttle].include?(propulsion_type)
   end
 
   def cached_data_array

@@ -74,4 +74,42 @@ RSpec.shared_examples "bike_attributable" do
       expect(obj.propulsion_type_name).to eq(normalized_name)
     end
   end
+
+  describe "propulsion_type_slug" do
+    let(:obj) { FactoryBot.build(model_sym, propulsion_type_slug: propulsion_type) }
+    let(:propulsion_type) { "hand-pedal" }
+    it "assigns" do
+      expect(obj.propulsion_type).to eq "hand-pedal"
+    end
+    context "name" do
+      let(:propulsion_type) { "Hand CYCLE (hand pedal)" }
+      it "assigns" do
+        expect(obj.propulsion_type).to eq "hand-pedal"
+      end
+    end
+    context "short name" do
+      let(:propulsion_type) { "Hand Cycle (hand pedal)" }
+      it "assigns" do
+        expect(obj.propulsion_type).to eq "hand-pedal"
+      end
+    end
+    context "motorized" do
+      let(:propulsion_type) { "motorized" }
+      it "assigns default motorized type" do
+        expect(obj.propulsion_type).to eq "pedal-assist"
+      end
+    end
+    context "nil" do
+      let(:propulsion_type) { nil }
+      it "assigns default type" do
+        expect(obj.propulsion_type).to eq "foot-pedal"
+      end
+    end
+    context "random thing" do
+      let(:propulsion_type) { "random-thing" }
+      it "assigns default type" do
+        expect(obj.propulsion_type).to eq "foot-pedal"
+      end
+    end
+  end
 end

@@ -25,9 +25,12 @@
     @extend .form-well-input-full-width;
   }
 
+  .right-input-help {
+    line-height: 1.25;
+    margin-top: 0.6em;
+  }
   .right-input-help.right-text-help {
     font-style: italic;
-    line-height: 1.2;
 
     a {
       color: $body-font-color;
@@ -102,6 +105,12 @@
     @include make-col-ready;
   }
 
+  // line checkboxes and radio inputs up with text fields
+  // *Matched by the padding on the new bike electric checks*
+  .form-well-input-checks {
+    padding-left: 19px;
+  }
+
   .related-fields {
     .form-group {
       padding-top: 0.5 * $vertical-height;
@@ -124,7 +133,7 @@
   .form-group {
     clear: both;
 
-    label.checkbox-inline {
+    label.checkbox-inline, label.radio-inline {
       cursor: pointer;
     }
     .checkbox-inline {
@@ -198,7 +207,7 @@
 
       @include make-col(8);
 
-      margin-top: -0.5em;
+      margin-top: 0.25em;
 
       label {
         padding-top: 0.5em;

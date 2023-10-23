@@ -80,8 +80,9 @@ class BParam < ApplicationRecord
   end
 
   def self.registration_info_attrs
-    %w[bike_sticker bike_code phone organization_affiliation student_id user_name
-      accuracy street city state zipcode state country] # Also uses address_hash to get legacy address attributes
+    # Also uses address_hash to get legacy address attributes
+    %w[accuracy bike_code bike_sticker city country organization_affiliation phone state
+      street student_id user_name zipcode]
   end
 
   def self.email_search(str)
@@ -100,6 +101,18 @@ class BParam < ApplicationRecord
     end
     return {status: "status_stolen"} if ParamsNormalizer.boolean(url_params[:stolen])
     {}
+  end
+
+  def self.top_level_propulsion_type(passed_params)
+    throttle = ParamsNormalizer.boolean(passed_params["propulsion_type_throttle"])
+    pedal_assist = ParamsNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
+    if pedal_assist
+      throttle ? "pedal-assist-and-throttle" : "pedal-assist"
+    elsif throttle
+      "throttle"
+    elsif ParamsNormalizer.boolean(passed_params["propulsion_type_motorized"])
+      "motorized"
+    end&.to_sym
   end
 
   # Crazy new shit
@@ -494,7 +507,7 @@ class BParam < ApplicationRecord
 
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
-    bike.merge(status: status).merge(new_attrs.as_json)
+    safe_attrs = bike.merge("status" => status).merge(new_attrs.as_json)
       .select { |_k, v| ParamsNormalizer.present_or_false?(v) }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
@@ -502,6 +515,12 @@ class BParam < ApplicationRecord
         "creator_id" => creator_id,
         "updator_id" => creator_id)
       .merge(address_hash)
+    # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
+    propulsion_type = self.class.top_level_propulsion_type(params) ||
+      safe_attrs["propulsion_type_slug"] || safe_attrs["propulsion_type"]
+    # propulsion_type_slug needs to be the last key in the hash
+    safe_attrs.except("propulsion_type", "propulsion_type_slug")
+      .merge("propulsion_type_slug" => propulsion_type)
   end
 
   private

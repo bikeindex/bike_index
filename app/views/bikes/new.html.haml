@@ -25,15 +25,10 @@
       .col-lg-8.offset-lg-2.form-well
         .form-wrap
           .form-group.row.unnested-field
-            = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
-            .form-well-input.fancy-select.unfancy
-              = select(:bike, :cycle_type, CycleType.select_options, {required: true, class: 'form-control'})
-
-          .form-group.row.unnested-field
             = f.label :serial_number, class: 'form-well-label'
             .form-well-input
               #serial-input
-                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.highly_recommended'), class: 'form-control'
+                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.required'), class: 'form-control'
                 %a.inline-input-help{title: t(".serial_help"), data: {toggle: 'popover', content: serial_help_content}}
                   ?
               #made-without-serial-input
@@ -45,14 +40,51 @@
                   %a{data: {toggle: 'modal', target: '#made-without-serial-modal'}}
                     = t(".without_serial_number", bike_type: @bike.type)
             .right-input-help
-              %label.made-without-serial-checkbox
+              %label.cursor-pointer.made-without-serial-checkbox
                 = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
                 = t(".missing_serial")
 
           .related-fields
+            .form-group.row.unnested-field
+              = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
+              .form-well-input
+                - if @bike.type == "bike"
+                  %label.collapse.in.pt-1.pl-1.cursor-pointer
+                    = check_box_tag :traditional_bike_checkbox, true, true
+                    = t(".traditional_bike")
+                    %span.below-input-help{style: "font-size: 100%; padding: 0 0 0 1.1em"}
+                      %em= t(".traditional_bike_definition")
+                .cycle-type-select.fancy-select.unfancy{class: @bike.type == "bike" ? "collapse" : ""}
+                  = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
+                  %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
+                    = check_box_tag :propulsion_type_motorized, true
+                    %strong ⚡️
+                    = t(".electric")
+                    (motorized)
+                  #propulsionTypeFields.collapse.pl-1
+                    :javascript
+                      window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
+                      window.cycleTypesAlwaysMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
+                      window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
+                    %label.checkbox-inline.mr-2
+                      = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
+                      Throttle
+                    %label.checkbox-inline
+                      = check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist?
+                      Pedal assist
+            .form-group.row.hidden-other#propulsionTypeFields
+              = f.label :propulsion_type, "Motor type", class: "form-well-label"
+              .form-well-input
+                %label.checkbox-inline.mr-2
+                  = check_box_tag :propulsion_type, "pedal-assist"
+                  Pedal assist
+                %label.checkbox-inline.mr-2
+                  = check_box_tag :propulsion_type, "throttle"
+                  Throttle
+
+          .related-fields
             .form-group.row
               = f.label :manufacturer_id, t(".manufacturer"), class: 'form-well-label'
-
               .form-well-input
                 - initial = @bike.manufacturer && {id: @bike.manufacturer.id, text: @bike.manufacturer.name}.to_json
                 = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: {initial: initial}
@@ -70,7 +102,7 @@
               - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
               = f.select :year, years, prompt: t(".unsure_or_unknown"), selected: @bike.year || Time.current.year
             .right-input-help
-              %label
+              %label.cursor-pointer
                 %input#bike_unknown_year{type: 'checkbox', tabindex: -1}
                 = t(".unknown_year")
 

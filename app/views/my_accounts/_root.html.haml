@@ -12,20 +12,20 @@
   .related-fields.user-notification-checks
     .form-group.row
       %label.form-well-label
-      %label.form-well-input
+      %label.form-well-input.form-well-input-checks
         = f.check_box :notification_newsletters
         = t(".receive_the_bike_index_newsletter")
 
     .form-group.row
       %label.form-well-label
-      %label.form-well-input
+      %label.form-well-input.form-well-input-checks
         = f.check_box :no_non_theft_notification
         %strong= t(".absolutely_no_notifications")
         %em.less-strong= t(".no_notifications_explanation")
 
     .form-group.row
       %label.form-well-label
-      %label.form-well-input
+      %label.form-well-input.form-well-input-checks
         = f.check_box :notification_unstolen
         - why_you_should_link = link_to(t(".why_you_should_text"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
         = t(".give_us_permission_html", why_you_should_link: why_you_should_link)
@@ -36,7 +36,7 @@
     - hot_sheet_organizations.each do |organization|
       .form-group.row
         %label.form-well-label
-        %label.form-well-input{style: "line-height: 1.5em;"}
+        %label.form-well-input.form-well-input-checks{style: "line-height: 1.5em;"}
           = check_box_tag "hot_sheet_notifications[#{organization.id}]", true, @user.memberships.where(organization_id: organization.id).first&.notification_daily?
           - hot_sheets_link = link_to(t(".stolen_hot_sheets"),  organization_hot_sheet_path(organization_id: organization.to_param))
           = t(".daily_hot_sheet_notifications_html", org_name: organization.short_name, hot_sheets_link: hot_sheets_link)

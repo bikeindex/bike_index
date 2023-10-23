@@ -55,6 +55,66 @@ RSpec.describe BikeCreator do
       end
     end
 
+    context "e_motor_checkbox true" do
+      let(:default_params) do
+        {
+          bike: {
+            primary_frame_color_id: color.id,
+            manufacturer_id: manufacturer.id,
+            owner_email: "something@stuff.com",
+            cycle_type: cycle_type
+          },
+          propulsion_type_motorized: true,
+          propulsion_type_throttle: true,
+          propulsion_type_pedal_assist: true
+        }
+      end
+      let(:passed_params) { default_params }
+      let(:cycle_type) { "cargo" }
+      let(:b_param) { BParam.create(creator: user, params: passed_params) }
+      it "creates an e-bike vehicle" do
+        expect(BikeOrganization.count).to eq 0
+        expect {
+          instance.create_bike(b_param)
+        }.to change(Bike, :count).by 1
+        expect(BikeOrganization.count).to eq 0
+        bike = Bike.last
+        expect(bike.creator&.id).to eq user.id
+        expect(bike.current_ownership&.id).to be_present
+        expect(bike.claimed?).to be_falsey
+        expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "pedal-assist-and-throttle"))
+        expect(bike.motorized?).to be_truthy
+        expect(Bike.motorized.count).to eq 1
+      end
+      context "not pedal cycle_type" do
+        let(:cycle_type) { "wheelchair" }
+        it "creates an e-bike" do
+          expect(BikeOrganization.count).to eq 0
+          expect {
+            instance.create_bike(b_param)
+          }.to change(Bike, :count).by 1
+          expect(BikeOrganization.count).to eq 0
+          bike = Bike.last
+          expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "throttle"))
+          expect(bike.motorized?).to be_truthy
+        end
+      end
+      context "not motorizable cycle_type" do
+        let(:cycle_type) { "trail-behind" }
+        it "creates a non motorized vehicle" do
+          expect(BikeOrganization.count).to eq 0
+          expect {
+            instance.create_bike(b_param)
+          }.to change(Bike, :count).by 1
+          expect(BikeOrganization.count).to eq 0
+          bike = Bike.last
+          expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "foot-pedal"))
+          expect(bike.motorized?).to be_falsey
+          expect(Bike.motorized.count).to eq 0
+        end
+      end
+    end
+
     describe "with organization" do
       let(:default_params) do
         {
@@ -167,12 +227,12 @@ RSpec.describe BikeCreator do
           expect { instance.create_bike(b_param) }.to change(Bike, :count).by(1)
           expect(b_param.skip_email?).to be_falsey
           bike = Bike.last
-          expect(bike.propulsion_type).to eq "hand-pedal"
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.registration_address).to eq({"street" => "Somewhere Ville"})
           expect_attrs_to_match_hash(bike, bike_params.except(:user_name, :propulsion_type_slug))
+          expect(bike.propulsion_type).to eq "human-not-pedal"
           # Test that front_wheel is assigned via rear wheel attr
           expect(bike.front_wheel_size_id).to eq wheel_size.id
           expect(bike.front_tire_narrow).to be_falsey
