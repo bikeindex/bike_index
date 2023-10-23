@@ -45,7 +45,6 @@ class ScheduledWorkerRunner < ScheduledWorker
       ImpoundExpirationWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
-      MigrateNormalizedSerialSegmentsWorker,
       ScheduleBikePossiblyFoundNotificationWorker,
       ScheduleSearchForExternalRegistryBikesWorker,
       ScheduledEmailSurveyWorker,
