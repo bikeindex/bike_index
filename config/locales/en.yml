@@ -1058,6 +1058,7 @@ en:
       name: Name
       other: Other
       other_serial: Other serial/registration/sticker
+      propulsion_type: Propulsion
       paint_description: Color description
       police_report: 'Police report #'
       primary_colors: Primary colors

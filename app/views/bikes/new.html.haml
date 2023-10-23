@@ -56,7 +56,7 @@
                       %em= t(".traditional_bike_definition")
                 .cycle-type-select.fancy-select.unfancy{class: @bike.type == "bike" ? "collapse" : ""}
                   = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
-                  %label#eletricMotorWrapper.cursor-pointer.mt-1.mb-0.pl-1
+                  %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
                     = check_box_tag :propulsion_type_motorized, true
                     %strong ⚡️
                     = t(".electric")
@@ -64,8 +64,8 @@
                   #propulsionTypeFields.collapse.pl-1
                     :javascript
                       window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
-                      window.cycleTypesDefaultE = #{CycleType::ALWAYS_MOTORIZED.to_json};
-                      window.cycleTypesUnelectrifiable = #{CycleType::NEVER_MOTORIZED.to_json};
+                      window.cycleTypesDefaultMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
+                      window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
                     %label.checkbox-inline.mr-2
                       = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
                       Throttle

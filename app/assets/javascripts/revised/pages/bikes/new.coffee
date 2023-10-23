@@ -121,18 +121,18 @@ class BikeIndex.BikesNew extends BikeIndex
   # Only show propulsion type options if there can be options
   updatePropulsionType: ->
     cycleTypeValue = $('#bike_cycle_type').val()
-    if window.cycleTypesDefaultE.includes(cycleTypeValue)
+    if window.cycleTypesDefaultMotorized.includes(cycleTypeValue)
       $('#propulsionTypeFields').collapse('hide')
       $('#propulsion_type_motorized').prop('checked', true)
       $('#propulsion_type_motorized').attr('disabled', true)
-      $('#eletricMotorWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
-    else if window.cycleTypesUnelectrifiable.includes(cycleTypeValue)
+      $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+    else if window.cycleTypesNeverMotorized.includes(cycleTypeValue)
       $('#propulsion_type_motorized').prop('checked', false)
       $('#propulsion_type_motorized').attr('disabled', true)
       $('#propulsionTypeFields').collapse('hide')
-      $('#eletricMotorWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+      $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
     else
-      $('#eletricMotorWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
+      $('#motorizedWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
       $('#propulsion_type_motorized').attr('disabled', false)
       if $('#propulsion_type_motorized').prop('checked')
         if window.cycleTypesPedals.includes(cycleTypeValue)
