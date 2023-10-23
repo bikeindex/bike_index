@@ -181,6 +181,11 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.admin_text_search(@search_email)
     end
 
+    if params[:search_serial].present?
+      @serial_normalized = SerialNormalizer.normalized_and_corrected(params[:search_serial])
+      bikes = bikes.matching_serial(@serial_normalized)
+    end
+
     bikes = search_bike_statuses(bikes)
 
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil

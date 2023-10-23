@@ -1492,6 +1492,8 @@ RSpec.describe Bike, type: :model do
       bike.reload
       expect(bike.cached_data).to eq target_cached_string
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
+      expect(bike.propulsion_type_throttle?).to be_truthy
+      expect(bike.propulsion_type_pedal_assist?).to be_falsey
     end
   end
 

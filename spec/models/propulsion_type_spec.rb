@@ -16,11 +16,129 @@ RSpec.describe PropulsionType, type: :model do
   end
 
   describe "friendly_find" do
+    let(:name) { :"pedal-assist-and-throttle" }
+    it "tries to find the slug, given a name" do
+      finder = PropulsionType.friendly_find(name)
+      expect(finder.slug).to eq name
+      expect(finder.motorized?).to be_truthy
+      expect(finder.human_powered?).to be_falsey
+    end
     context "slug" do
-      let(:name) { "other style" }
+      let(:name) { "Human powered" }
       it "tries to find the slug, given a name" do
         finder = PropulsionType.friendly_find(name)
-        expect(finder.slug).to eq :"propulsion-other"
+        expect(finder.slug).to eq :"human-not-pedal"
+        expect(finder.motorized?).to be_falsey
+        expect(finder.human_powered?).to be_truthy
+      end
+    end
+  end
+
+  describe "for_vehicle" do
+    it "is foot-pedal" do
+      expect(PropulsionType.for_vehicle("bike")).to eq :"foot-pedal"
+      expect(PropulsionType.for_vehicle("unicycle")).to eq :"foot-pedal"
+      expect(PropulsionType.for_vehicle("unicycle")).to eq :"foot-pedal"
+    end
+
+    it "is hand-pedal" do
+      expect(PropulsionType.for_vehicle("bike", "hand-pedal")).to eq :"hand-pedal"
+      expect(PropulsionType.find_sym("Hand Cycle")).to eq :"hand-pedal"
+      expect(PropulsionType.for_vehicle("bike", "Hand Cycle")).to eq :"hand-pedal"
+      expect(PropulsionType.for_vehicle("bike", "Hand Cycle (hand pedal)")).to eq :"hand-pedal"
+      expect(PropulsionType.find_sym("Hand CYCLE (hand pedal) ")).to eq :"hand-pedal"
+      expect(PropulsionType.for_vehicle("bike", "Hand CYCLE (hand pedal) ")).to eq :"hand-pedal"
+    end
+
+    context "pedal_type cycle_type" do
+      it "is what it is passed" do
+        expect(PropulsionType.for_vehicle(:cargo, :"hand-pedal")).to eq :"hand-pedal"
+        expect(PropulsionType.for_vehicle(:"trail-behind", :"hand-pedal")).to eq :"hand-pedal"
+        expect(PropulsionType.for_vehicle(:unicycle, :throttle)).to eq :throttle
+        expect(PropulsionType.for_vehicle(:bike, :throttle)).to eq :throttle
+      end
+      it "is passed value if pedal type" do
+        expect(PropulsionType.for_vehicle(:bike, :"human-not-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:unicycle, :"human-not-pedal")).to eq :"human-not-pedal"
+      end
+    end
+
+    context "not pedal_type cycle_type" do
+      it "is passed value if valid" do
+        expect(PropulsionType.for_vehicle(:wheelchair, :"human-not-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"e-scooter", :throttle)).to eq :throttle
+      end
+
+      it "is human-not-pedal" do
+        expect(PropulsionType.for_vehicle(:wheelchair, :"hand-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"non-e-skateboard", :"foot-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"non-e-scooter", :"foot-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"non-e-scooter", :"hand-pedal")).to eq :"human-not-pedal"
+        (CycleType.slugs_sym - CycleType::PEDAL - CycleType::ALWAYS_MOTORIZED).each do |cycle_type|
+          expect(PropulsionType.for_vehicle(cycle_type)).to eq :"human-not-pedal"
+        end
+      end
+
+      it "is throttle if motorized" do
+        expect(PropulsionType.for_vehicle(:stroller, :"pedal-assist")).to eq :throttle
+        expect(PropulsionType.for_vehicle(:"personal-mobility", :"pedal-assist")).to eq :throttle
+        expect(PropulsionType.for_vehicle(:"e-scooter", :"pedal-assist-and-throttle")).to eq :throttle
+        (CycleType.slugs_sym - CycleType::PEDAL - CycleType::NEVER_MOTORIZED).each do |cycle_type|
+          expect(PropulsionType.for_vehicle(cycle_type, :motorized)).to eq :throttle
+        end
+      end
+    end
+
+    context "non-pedal" do
+      (CycleType.slugs_sym - CycleType::PEDAL - CycleType::ALWAYS_MOTORIZED).each do |cycle_type|
+        it "is human-not-pedal for '#{cycle_type}'" do
+          expect(CycleType::PEDAL).to_not include(cycle_type)
+          expect(PropulsionType.for_vehicle(cycle_type)).to eq :"human-not-pedal"
+        end
+      end
+    end
+
+    context "ALWAYS_MOTORIZED CycleType" do
+      CycleType::ALWAYS_MOTORIZED.each do |cycle_type|
+        it "is throttle for '#{cycle_type}'" do
+          expect(PropulsionType.for_vehicle(cycle_type, :"hand-pedal")).to eq :throttle
+        end
+      end
+    end
+
+    context "NEVER_MOTORIZED CycleType" do
+      (CycleType::NEVER_MOTORIZED - %i[trail-behind]).each do |cycle_type|
+        it "is human-not-pedal for '#{cycle_type}'" do
+          expect(PropulsionType.for_vehicle(cycle_type)).to eq :"human-not-pedal"
+          expect(PropulsionType.for_vehicle(cycle_type, :motorized)).to eq :"human-not-pedal"
+          expect(PropulsionType.for_vehicle(cycle_type, :throttle)).to eq :"human-not-pedal"
+        end
+      end
+      it "is foot-pedal for 'trail-behind'" do
+        cycle_type = :"trail-behind"
+        expect(CycleType::NEVER_MOTORIZED).to include(cycle_type)
+        expect(PropulsionType.for_vehicle(cycle_type)).to eq :"foot-pedal"
+        expect(PropulsionType.for_vehicle(cycle_type, :motorized)).to eq :"foot-pedal"
+        expect(PropulsionType.for_vehicle(cycle_type, :throttle)).to eq :"foot-pedal"
+      end
+    end
+
+    context "passed motorized" do
+      it "is default_motorized_type" do
+        expect(PropulsionType.for_vehicle(:bike, :motorized)).to eq :"pedal-assist"
+        expect(PropulsionType.for_vehicle(:wheelchair, :motorized)).to eq :throttle
+        expect(PropulsionType.for_vehicle(:stroller, :motorized)).to eq :throttle
+      end
+    end
+  end
+
+  describe "valid_propulsion_types_for" do
+    it "is all the types for bike" do
+      expect(PropulsionType.send(:valid_propulsion_types_for, :bike)).to eq(PropulsionType.slugs_sym)
+    end
+    context "wheelchair" do
+      it "is valid types" do
+        expect(PropulsionType.send(:valid_propulsion_types_for, :wheelchair)).to eq(%i[human-not-pedal throttle])
       end
     end
   end

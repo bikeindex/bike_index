@@ -25,6 +25,12 @@ class BikeIndex.BikesNew extends BikeIndex
       @madeWithoutSerial(true)
     $('#bike_made_without_serial').change (e) => # Only ever called when visible, so it's time to close
       @updateSerial(true)
+    $('#traditional_bike_checkbox').change (e) =>
+      @updateCycleTypeCheck()
+    $('#bike_cycle_type').change (e) =>
+      @updatePropulsionType()
+    $('#propulsion_type_motorized').change (e) =>
+      @updatePropulsionType()
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -106,3 +112,35 @@ class BikeIndex.BikesNew extends BikeIndex
     else
       year_select.setValue(new Date().getFullYear())
       year_select.enable()
+
+  updateCycleTypeCheck: ->
+    $('#traditional_bike_checkbox').parents('label').collapse('hide')
+    $('.cycle-type-select').collapse('show')
+
+  # Set motorized if it should be motorized.
+  # Only show propulsion type options if there can be options
+  updatePropulsionType: ->
+    cycleTypeValue = $('#bike_cycle_type').val()
+    if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)
+      $('#propulsionTypeFields').collapse('hide')
+      $('#propulsion_type_motorized').prop('checked', true)
+      $('#propulsion_type_motorized').attr('disabled', true)
+      $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+    else if window.cycleTypesNeverMotorized.includes(cycleTypeValue)
+      $('#propulsion_type_motorized').prop('checked', false)
+      $('#propulsion_type_motorized').attr('disabled', true)
+      $('#propulsionTypeFields').collapse('hide')
+      $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+    else
+      $('#motorizedWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
+      $('#propulsion_type_motorized').attr('disabled', false)
+      if $('#propulsion_type_motorized').prop('checked')
+        if window.cycleTypesPedals.includes(cycleTypeValue)
+          $('#propulsionTypeFields').collapse('show')
+        else
+          $('#propulsionTypeFields').collapse('hide')
+      else
+        $('#propulsionTypeFields').collapse('hide')
+
+        $('#propulsion_type_throttle').prop('checked', false)
+        $('#propulsion_type_pedal_assist').prop('checked', false)

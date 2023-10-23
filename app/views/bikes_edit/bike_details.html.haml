@@ -96,7 +96,7 @@
                 - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
                 = f.select :year, years, prompt: t(".unsure_or_unknown"), allow_blank: true
               .right-input-help
-                %label
+                %label.cursor-pointer
                   %input#bike_unknown_year{type: "checkbox", tabindex: -1}
                   = t(".unknown_year")
 

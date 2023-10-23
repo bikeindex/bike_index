@@ -55,6 +55,66 @@ RSpec.describe BikeCreator do
       end
     end
 
+    context "e_motor_checkbox true" do
+      let(:default_params) do
+        {
+          bike: {
+            primary_frame_color_id: color.id,
+            manufacturer_id: manufacturer.id,
+            owner_email: "something@stuff.com",
+            cycle_type: cycle_type
+          },
+          propulsion_type_motorized: true,
+          propulsion_type_throttle: true,
+          propulsion_type_pedal_assist: true
+        }
+      end
+      let(:passed_params) { default_params }
+      let(:cycle_type) { "cargo" }
+      let(:b_param) { BParam.create(creator: user, params: passed_params) }
+      it "creates an e-bike vehicle" do
+        expect(BikeOrganization.count).to eq 0
+        expect {
+          instance.create_bike(b_param)
+        }.to change(Bike, :count).by 1
+        expect(BikeOrganization.count).to eq 0
+        bike = Bike.last
+        expect(bike.creator&.id).to eq user.id
+        expect(bike.current_ownership&.id).to be_present
+        expect(bike.claimed?).to be_falsey
+        expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "pedal-assist-and-throttle"))
+        expect(bike.motorized?).to be_truthy
+        expect(Bike.motorized.count).to eq 1
+      end
+      context "not pedal cycle_type" do
+        let(:cycle_type) { "wheelchair" }
+        it "creates an e-bike" do
+          expect(BikeOrganization.count).to eq 0
+          expect {
+            instance.create_bike(b_param)
+          }.to change(Bike, :count).by 1
+          expect(BikeOrganization.count).to eq 0
+          bike = Bike.last
+          expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "throttle"))
+          expect(bike.motorized?).to be_truthy
+        end
+      end
+      context "not motorizable cycle_type" do
+        let(:cycle_type) { "trail-behind" }
+        it "creates a non motorized vehicle" do
+          expect(BikeOrganization.count).to eq 0
+          expect {
+            instance.create_bike(b_param)
+          }.to change(Bike, :count).by 1
+          expect(BikeOrganization.count).to eq 0
+          bike = Bike.last
+          expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "foot-pedal"))
+          expect(bike.motorized?).to be_falsey
+          expect(Bike.motorized.count).to eq 0
+        end
+      end
+    end
+
     describe "with organization" do
       let(:default_params) do
         {
@@ -167,12 +227,12 @@ RSpec.describe BikeCreator do
           expect { instance.create_bike(b_param) }.to change(Bike, :count).by(1)
           expect(b_param.skip_email?).to be_falsey
           bike = Bike.last
-          expect(bike.propulsion_type).to eq "hand-pedal"
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.registration_address).to eq({"street" => "Somewhere Ville"})
           expect_attrs_to_match_hash(bike, bike_params.except(:user_name, :propulsion_type_slug))
+          expect(bike.propulsion_type).to eq "human-not-pedal"
           # Test that front_wheel is assigned via rear wheel attr
           expect(bike.front_wheel_size_id).to eq wheel_size.id
           expect(bike.front_tire_narrow).to be_falsey
@@ -385,24 +445,25 @@ RSpec.describe BikeCreator do
         end
       end
     end
+
     describe "no_duplicate" do
-      let!(:existing_bike) { FactoryBot.create(:bike, :with_ownership, serial_number: "some serial number", owner_email: email) }
-      let(:new_bike) { Bike.new(bike_params.except(:no_duplicate)) }
+      let(:serial) { "some serial number" }
+      let!(:existing_bike) { FactoryBot.create(:bike, :with_ownership, serial_number: serial, owner_email: email, manufacturer: manufacturer) }
       let(:user) { existing_bike.creator }
-      let(:bike_params) do
+      let(:default_params) do
         {
           primary_frame_color_id: color.id,
           manufacturer_id: manufacturer.id,
-          serial_number: "some serial NUMBER",
+          serial_number: "#{serial.upcase} ",
           owner_email: new_email,
           no_duplicate: true
         }
       end
+      let(:bike_params) { default_params }
       let(:email) { "something@gmail.com" }
       let(:new_email) { "Something@GMAIL.com" }
-      before { new_bike.set_calculated_attributes }
-      let(:found_duplicate) { OwnerDuplicateBikeFinder.find_matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email]) }
-      it "finds a duplicate" do
+      let(:found_duplicate) { OwnerDuplicateBikeFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email], manufacturer_id: bike_params[:manufacturer_id]).first }
+      def expect_duplicate_found
         expect(b_param.no_duplicate?).to be_truthy
         expect(found_duplicate&.id).to eq existing_bike.id
         expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
@@ -410,38 +471,53 @@ RSpec.describe BikeCreator do
         expect(b_param.created_bike_id).to eq existing_bike.id
         expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
       end
-      context "different email" do
-        let(:email) { "something@gmail.com" }
-        let(:new_email) { "newsomething@gmail.com" }
-        it "does not find a non-duplicate" do
-          expect(b_param.no_duplicate?).to be_truthy
-          expect(found_duplicate&.id).to be_blank
+
+      def expect_no_duplicate
+        expect(b_param.no_duplicate?).to be_truthy
+        expect(found_duplicate&.id).to be_blank
+        bike = instance.create_bike(b_param)
+        expect(bike.id).to_not eq existing_bike.id
+        b_param.reload
+        expect(b_param.created_bike_id).to eq bike.id
+      end
+      it "finds a duplicate" do
+        expect_duplicate_found
+      end
+      context "no_duplicate false" do
+        let(:bike_params) { default_params.merge(no_duplicate: false) }
+        it "finds a duplicate" do
+          expect(found_duplicate&.id).to eq existing_bike.id
           bike = instance.create_bike(b_param)
           expect(bike.id).to_not eq existing_bike.id
           b_param.reload
           expect(b_param.created_bike_id).to eq bike.id
         end
       end
-      context "absent serial" do
-        let!(:existing_bike) { FactoryBot.create(:bike, :with_ownership, serial_number: "unknown", owner_email: email) }
-        let(:bike_params) do
-          {
-            primary_frame_color_id: color.id,
-            manufacturer_id: manufacturer.id,
-            serial_number: "ABSENT",
-            owner_email: new_email,
-            no_duplicate: true
-          }
+      context "different manufacturer" do
+        let(:bike_params) { default_params.merge(manufacturer_id: FactoryBot.create(:manufacturer).id) }
+        it "doesn't find the duplicate" do
+          expect_no_duplicate
         end
+      end
+      context "different email" do
+        let(:email) { "something@gmail.com" }
+        let(:new_email) { "newsomething@gmail.com" }
         it "does not find a non-duplicate" do
+          expect_no_duplicate
+        end
+      end
+      context "existing bike with made_without_serial serial" do
+        let(:serial) { "made_without_serial" }
+        it "finds no duplicate" do
           expect(existing_bike.serial_normalized).to be_blank
-          expect(new_bike.serial_normalized).to be_blank
-          expect(b_param.no_duplicate?).to be_truthy
-          expect(found_duplicate&.id).to be_blank
-          bike = instance.create_bike(b_param)
-          expect(bike.id).to_not eq existing_bike.id
-          b_param.reload
-          expect(b_param.created_bike_id).to eq bike.id
+          expect_no_duplicate
+        end
+        context "unknown serial" do
+          let(:bike_params) { default_params.merge(serial_number: "unknown") }
+          it "finds no duplicate" do
+            expect(existing_bike.serial_normalized).to be_blank
+            expect_no_duplicate
+          end
         end
       end
       context "user_hidden" do

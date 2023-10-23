@@ -144,6 +144,8 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.example).to be_falsey
       expect(bike.is_for_sale).to be_truthy
       expect(bike.propulsion_type).to eq "pedal-assist-and-throttle"
+      expect(bike.propulsion_type_throttle?).to be_truthy
+      expect(bike.propulsion_type_pedal_assist?).to be_truthy
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
@@ -225,6 +227,45 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
+    end
+  end
+
+  describe "check_if_registered" do
+    let(:bike_phone_attrs) do
+      {
+        serial: "69 non-example",
+        manufacturer: manufacturer.name,
+        organization_slug: organization.name,
+        owner_email: phone,
+        owner_email_is_phone_number: true,
+        color: color.name,
+        cycle_type_name: "bike"
+      }
+    end
+    let(:phone) { "2221114444" }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: bike_phone_attrs[:serial], manufacturer: manufacturer) }
+    let!(:ownership) { FactoryBot.create(:ownership, owner_email: phone, is_phone: true, bike: bike) }
+    let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
+    it "returns 401" do
+      expect(bike.reload.authorized?(user)).to be_falsey
+      post "/api/v2/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.to_json, headers: json_headers
+      expect(response.code).to eq("401")
+    end
+    context "user is organization member" do
+      let(:user) { FactoryBot.create(:organization_member) }
+      let!(:organization) { user.organizations.first }
+      it "returns success" do
+        expect(token.resource_owner_id).to eq user.id
+        expect(bike.reload.authorized?(user)).to be_falsey
+        expect(bike.organized?).to be_falsey
+        post "/api/v2/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect(json_result[:registered].to_s).to eq "true"
+        post "/api/v2/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.merge(serial: "ffff").to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect(json_result[:registered].to_s).to eq "false"
+      end
     end
   end
 

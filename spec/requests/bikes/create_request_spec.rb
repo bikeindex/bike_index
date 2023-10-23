@@ -266,13 +266,13 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
   end
-  context "no existing b_param, reg_address" do
+  context "no existing b_param, reg_address, top_level_propulsion_type" do
     let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_los_angeles, :with_auto_user, enabled_feature_slugs: %w[reg_address reg_organization_affiliation]) }
     let(:bike_params_with_address) do
       {
         b_param_id_token: "",
         creation_organization_id: organization.id.to_s,
-        cycle_type: "bike",
+        cycle_type: "recumbent",
         serial_number: "141212",
         made_without_serial: false,
         manufacturer_id: manufacturer.slug.to_s,
@@ -305,7 +305,12 @@ RSpec.describe "BikesController#create", type: :request do
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           expect {
-            post base_url, params: {bike: bike_params_with_address}
+            post base_url, params: {
+              bike: bike_params_with_address,
+              propulsion_type_motorized: true,
+              propulsion_type_throttle: false,
+              propulsion_type_pedal_assist: false
+            }
           }.to change(Bike, :count).by(1)
         end
         expect(flash[:success]).to be_present
@@ -324,6 +329,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.user_id).to eq current_user.id
         expect(new_bike.ownerships.count).to eq 1
         expect(new_bike.current_ownership.self_made?).to be_truthy
+        expect(new_bike.propulsion_type).to eq "pedal-assist"
 
         ownership = new_bike.current_ownership
         expect(ownership.origin).to eq "web"
@@ -418,6 +424,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.phone).to eq "3123799513"
       expect(new_bike.student_id).to eq nil
       expect(new_bike.cycle_type).to eq "personal-mobility"
+      expect(new_bike.motorized?).to be_truthy
 
       expect(new_bike.current_ownership.organization&.id).to eq organization.id
       expect(new_bike.current_ownership.origin).to eq "embed_extended"

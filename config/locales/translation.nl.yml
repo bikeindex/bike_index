@@ -871,8 +871,8 @@ nl:
         hand_pedal: Handpedaal
         pedal_assist: Elektrische assist
         throttle: Elektrisch gaspedaal
-        propulsion_other: Andere stijl
         pedal_assist_and_throttle: Trapondersteuning en gaspedaal
+        human_not_pedal: Menselijk aangedreven (niet door pedalen)
     models:
       ad: Advertentie
       ambassador: Ambassadeur
@@ -1782,7 +1782,6 @@ nl:
       are_you_certain: Weet je het zeker?
       city: City
       enter_bike_type_details: Voer %{bike_type} details in
-      highly_recommended: sterk aanbevolen
       how_to_find_serial: hoe je het framenummer kan vinden
       i_just_dont_know_the_serial: Ik ken de serie gewoon niet
       im_100_sure: Ik ben 100% zeker
@@ -1823,6 +1822,10 @@ nl:
       student_id: Student-ID
       owner_email: E-mailadres eigenaar
       register_with: Registreer bij %{organization_name}
+      electric: Elektrisch
+      required: vereist - of markering ontbreekt
+      traditional_bike: Traditionele fiets
+      traditional_bike_definition: Twee wielen, één stoel, geen motor
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'
@@ -2079,6 +2082,7 @@ nl:
       stolen_details: Diefstal details
       wheel_diameter: Wiel diameter
       year: jaar
+      propulsion_type: Voortstuwing
     organization_stolen_message:
       report_link_text: op deze link
       report_the_theft_to_the_organization_html: <span class="text-warning">Meld de
@@ -5265,13 +5269,11 @@ nl:
         gered.
   registrations:
     create:
-      in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien
-        van de registratie van uw fiets
-      radicool: Radicool!
-      we_got_this: We hebben dit.
       we_sent_an_email_to: 'We hebben een e-mail gestuurd naar:'
       well_do_our_best_to_help_you_recover_it: We zullen ons best doen om u te helpen
         het terug te krijgen
+      youre_not_done: Je bent nog niet klaar!
+      follow_link_in_email: Volg de link in de e-mail om uw registratie te voltooien.
     embed:
       bike_manufacturer: fietsfabrikant
       choose_specific_organization_optional: Kies specifieke organisatie (optioneel)
@@ -5778,6 +5780,8 @@ nl:
         part_type: Onderdeel type
         remove_part: Verwijder deel
         unknown_part_type: Onbekend onderdeeltype
+        select_other: Selecteer 'Overig' als de fabrikant niet verschijnt wanneer
+          deze wordt ingevoerd
       stolen_location:
         address_or_intersection: Adres of kruispunt
         choose_country: Kies land
@@ -5806,6 +5810,9 @@ nl:
       sidetitleize_wheel: "%{sidetitleize} wiel"
       wheels: Wheels
       wide: Breed
+      narrow_title: Banden minder dan 39 mm (1,5 inch) breed
+      wide_help: "> 38 mm (1,5 inch)"
+      wide_title: Banden die minimaal 39 mm (1,5 inch) breed zijn
     groups:
       add_an_organization: Voeg een andere organisatie toe
       are_you_part_of_a_school_want_to_bolster_: Ben je een student van een van onze

@@ -98,11 +98,12 @@ module API
           @bike = Bike.unscoped.find(params[:id])
         end
 
-        # Search for a duplicate bike - a bike matching the provided serial number / owner email
-        def find_owner_duplicate_bike
-          OwnerDuplicateBikeFinder.find_matching(serial: params[:serial],
+        def owner_duplicate_bike
+          manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
+          OwnerDuplicateBikeFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
-            phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil)
+            phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
+            manufacturer_id: manufacturer_id).first
         end
 
         def created_bike_serialized(bike, include_claim_token)
@@ -132,22 +133,41 @@ module API
 
         desc "Check if a bike is already registered <span class='accstr'>*</span>", {
           authorizations: {oauth2: {scope: :write_bikes, allow_client_credentials: true}},
-          notes: "**Access token user** _must_ be a member of the organization from the `organization_slug`."
+          notes: <<-NOTE
+            **Access token user** _must_ be a member of the organization from the `organization_slug`.
+
+            It matches on `serial`, `owner_email` and `manufacturer`. No matches are returned if the serial is 'made_without_serial' or 'unknown'.
+
+            This is the matching that happens when adding bikes, to prevent duplicate registrations. By default, adding a bike will update the existing bike if there is a match _which can be edited_ - and will create a new bike if the existing match can't be edited (If you include `no_duplicate` when adding a bike, it won't add a duplicate bike in that situation).
+
+            The only difference between this and the behavior of add a bike, is that `manufacturer` is optional here.
+
+            Returns JSON with keys:
+
+            - `registered`: If a match was found
+            - `claimed`: If a match was found and the user has claimed the bike
+            - `can_edit`: If a match was found and it can be edited by the current token (e.g. was registered by the organization)
+
+            <br>
+
+            All values are either `true` or `false`
+          NOTE
         }
         params do
           requires :serial, type: String, desc: "The serial number for the bike (use 'made_without_serial' if the bike doesn't have a serial, 'unknown' if the serial is not known)"
-          requires :manufacturer, type: String, desc: "Manufacturer name or ID"
-          # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
+          requires :organization_slug, type: String, desc: "Organization (ID or slug) to perform the check from. **Only works** if user is a member of the organization"
+          optional :manufacturer, type: String, desc: "Manufacturer name or ID"
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
-          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
-          requires :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
-          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Cycle type name (lowercase)"
-          use :bike_attrs
         end
         post "check_if_registered" do
           if current_organization.present?
-            {registered: find_owner_duplicate_bike.present?}
+            matching_bike = owner_duplicate_bike
+            {
+              registered: matching_bike.present?,
+              claimed: matching_bike.present? && matching_bike.claimed?,
+              can_edit: matching_bike.present? && matching_bike.authorized?(current_user)
+            }
           else
             error!("You are not authorized for that organization", 401)
           end
@@ -184,19 +204,21 @@ module API
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
+          optional :no_duplicate, type: Boolean, default: false, desc: "If true, it won't register a duplicate bike - when it can't edit an existing matching bike (see `/check_if_registered`)"
           use :bike_attrs
           optional :components, type: Array do
             use :components_attrs
           end
         end
         post "/" do
-          found_bike = find_owner_duplicate_bike
-          # if a matching bike is and can be updated by the submitter, update
-          # existing record instead of creating a new one
+          declared_p = declared(params, include_missing: false)
+          add_duplicate = declared_p.delete("add_duplicate")
+          # TODO: BikeCreator also includes bike finding, and this duplicates it - it would be nice to DRY this up
+          # It's required so that the bike can be updated if there is a match
+          found_bike = owner_duplicate_bike unless add_duplicate
+          # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
-            # prepare params
-            declared_p = {"declared_params" => declared(params, include_missing: false)}
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p.as_json, origin: origin_api_version)
             b_param.clean_params
             @bike = found_bike
             authorize_bike_for_user
@@ -213,7 +235,7 @@ module API
             end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
-              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone))
+              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
               BikeUpdator
                 .new(user: current_user, bike: @bike, b_params: bike_update_params)
                 .update_available_attributes
@@ -224,9 +246,8 @@ module API
             status :found
             return created_bike_serialized(@bike.reload, false)
           end
-
-          declared_p = {"declared_params" => declared(params, include_missing: false).merge(creation_state_params)}
-          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: origin_api_version)
+          b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
+            params: declared_p.merge(creation_state_params).as_json)
           b_param.save
           bike = BikeCreator.new.create_bike(b_param)
 
@@ -258,10 +279,10 @@ module API
           end
         end
         put ":id" do
-          declared_p = {"declared_params" => declared(params, include_missing: false)}
+          declared_p = declared(params, include_missing: false)
           find_bike
           authorize_bike_for_user
-          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: origin_api_version)
+          b_param = BParam.new(params: declared_p.as_json, origin: origin_api_version)
           b_param.clean_params
           hash = b_param.params
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?

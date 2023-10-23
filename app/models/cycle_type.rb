@@ -50,8 +50,25 @@ class CycleType
 
   MODEST_PRIORITY = %i[tricycle tandem recumbent personal-mobility].freeze
 
+  PEDAL = %i[bike cargo cargo-rear cargo-trike cargo-trike-rear pedi-cab penny-farthing
+    recumbent tall-bike tandem trail-behind trailer tricycle unicycle].freeze
+  ALWAYS_MOTORIZED = %i[e-scooter personal-mobility].freeze
+  NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind].freeze
+
   def self.searchable_names
     slugs
+  end
+
+  def self.pedal_type?(slug_sym)
+    PEDAL.include?(slug_sym)
+  end
+
+  def self.strict_motorized(slug_sym)
+    if ALWAYS_MOTORIZED.include?(slug_sym)
+      :always
+    elsif NEVER_MOTORIZED.include?(slug_sym)
+      :never
+    end
   end
 
   def initialize(slug)

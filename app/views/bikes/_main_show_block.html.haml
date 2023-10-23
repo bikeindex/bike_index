@@ -40,6 +40,8 @@
           = attr_list_item(@bike.extra_registration_number, t(".other_serial"))
       - unless @bike.type == "bike"
         = attr_list_item(@bike.type_titleize, t(".cycle_type"))
+      - unless @bike.propulsion_type == "foot-pedal"
+        = attr_list_item(@bike.propulsion_type, t(".propulsion_type"))
 
       %li
         %strong.attr-title #{t(".manufacturer")}:

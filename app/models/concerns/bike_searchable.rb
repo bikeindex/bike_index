@@ -77,7 +77,7 @@ module BikeSearchable
     end
 
     # NOTE: This where query should exactly match not_matching_serial
-    # This method is also called from OwnerDuplicateBikeFinder
+    # This method is called from outside this class
     def matching_serial(serial, serial_no_space = nil)
       return all unless serial.present?
       serial_no_space ||= SerialNormalizer.no_space(serial)

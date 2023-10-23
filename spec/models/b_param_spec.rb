@@ -580,4 +580,82 @@ RSpec.describe BParam, type: :model do
       end
     end
   end
+
+  describe "top_level_propulsion_type" do
+    it "is foot-pedal" do
+      expect(BParam.top_level_propulsion_type({})).to be_nil
+    end
+    context "propulsion_type_throttle" do
+      let(:pparams) { {"propulsion_type_throttle" => "1"} }
+      it "is throttle" do
+        expect(BParam.top_level_propulsion_type(pparams)).to eq :throttle
+      end
+      context "with propulsion_type_pedal_assist" do
+        let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
+        it "is pedal-assist-and-throttle" do
+          expect(BParam.top_level_propulsion_type(pparams_with_assist)).to eq :"pedal-assist-and-throttle"
+        end
+      end
+      context "with propulsion_type_motorized" do
+        let(:pparams_motorized) { pparams.merge("propulsion_type_motorized" => "1") }
+        it "is throttle" do
+          expect(BParam.top_level_propulsion_type(pparams)).to eq :throttle
+        end
+      end
+    end
+    context "propulsion_type_motorized" do
+      let(:pparams) { {"propulsion_type_motorized" => "1"} }
+      it "is throttle" do
+        expect(BParam.top_level_propulsion_type(pparams)).to eq :motorized
+      end
+    end
+  end
+
+  describe "safe_bike_attrs" do
+    let(:b_param) { BParam.new(params: params) }
+    let(:bike_params) { {owner_email: "stuff@something.com", propulsion_type: "foot-pedal"} }
+    let(:params) { {bike: bike_params} }
+    let(:target) do
+      {
+        owner_email: "stuff@something.com",
+        b_param_id: nil,
+        b_param_id_token: nil,
+        city: nil,
+        country: nil,
+        creator_id: nil,
+        state: nil,
+        street: nil,
+        updator_id: nil,
+        zipcode: nil,
+        status: "status_with_owner",
+        propulsion_type_slug: "foot-pedal"
+      }
+    end
+    it "responds with bike_attrs" do
+      expect_hashes_to_match(b_param.safe_bike_attrs({}), target)
+    end
+    context "with new_attrs" do
+      it "uses the new_attrs" do
+        expect_hashes_to_match(b_param.safe_bike_attrs({"owner_email" => "e@f.g"}), target.merge(owner_email: "e@f.g"))
+      end
+    end
+    context "top_level_propulsion_type" do
+      let(:params) { {propulsion_type_motorized: 1, propulsion_type_throttle: 0, propulsion_type_pedal_assist: 1, bike: bike_params} }
+      it "returns with propulsion_type overridden" do
+        result = b_param.safe_bike_attrs({})
+        expect_hashes_to_match(result, target.merge(propulsion_type_slug: "pedal-assist"))
+        expect(result.keys.last.to_s).to eq "propulsion_type_slug"
+      end
+    end
+    context "with cycle_type" do
+      let(:bike_params) { {owner_email: "stuff@something.com", propulsion_type_slug: "foot-pedal", cycle_type: "tandem"} }
+      # propulsion_type_slug verifies the propulsion type is valid for the cycle type in bike_attributable,
+      # if cycle_type hasn't been set yet, it doesn't work. So test that it is in the back
+      it "makes propulsion_type_slug the last element" do
+        result = b_param.safe_bike_attrs({})
+        expect_hashes_to_match(result, target.merge(cycle_type: "tandem", propulsion_type_slug: "foot-pedal"))
+        expect(result.keys.last.to_s).to eq "propulsion_type_slug"
+      end
+    end
+  end
 end
