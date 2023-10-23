@@ -1058,10 +1058,10 @@ en:
       name: Name
       other: Other
       other_serial: Other serial/registration/sticker
-      propulsion_type: Propulsion
       paint_description: Color description
       police_report: 'Police report #'
       primary_colors: Primary colors
+      propulsion_type: Propulsion
       rear: Rear
       rear_wheel_diameter: Rear wheel diameter
       serial: Serial
