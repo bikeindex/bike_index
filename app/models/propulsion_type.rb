@@ -16,27 +16,19 @@ class PropulsionType
     throttle: "Electric Throttle",
     "pedal-assist-and-throttle": "Pedal Assist and Throttle",
     "hand-pedal": "Hand Cycle (hand pedal)",
-    "human-not-pedal": "Human powered (but not by pedals)"
+    "human-not-pedal": "Human powered (not by pedals)"
   }.freeze
 
   MOTORIZED = %i[pedal-assist throttle pedal-assist-and-throttle].freeze
   PEDAL = %i[foot-pedal hand-pedal pedal-assist pedal-assist-and-throttle].freeze
 
   class << self
-    def not_pedal
-      (slugs_sym - PEDAL).freeze
-    end
-
-    def not_motorized
-      (slugs_sym - MOTORIZED).freeze
-    end
-
     def motorized?(slug)
       MOTORIZED.include?(slug&.to_sym)
     end
 
     def not_motorized?(slug)
-      (slugs_sym - MOTORIZED).include?(slug&.to_sym)
+      not_motorized.include?(slug&.to_sym)
     end
 
     def pedal_type?(slug_sym)
@@ -61,6 +53,14 @@ class PropulsionType
     end
 
     private
+
+    def not_motorized
+      (slugs_sym - MOTORIZED).freeze
+    end
+
+    def not_pedal
+      (slugs_sym - PEDAL).freeze
+    end
 
     def default_non_motorized_type(cycle_type)
       return nil if CycleType.strict_motorized(cycle_type) == :always

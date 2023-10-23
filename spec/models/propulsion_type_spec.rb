@@ -64,16 +64,28 @@ RSpec.describe PropulsionType, type: :model do
     end
 
     context "not pedal_type cycle_type" do
-      it "is human-not-pedal if pedal_type" do
+      it "is passed value if valid" do
+        expect(PropulsionType.for_vehicle(:wheelchair, :"human-not-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"e-scooter", :throttle)).to eq :throttle
+      end
+
+      it "is human-not-pedal" do
         expect(PropulsionType.for_vehicle(:wheelchair, :"hand-pedal")).to eq :"human-not-pedal"
-        expect(PropulsionType.for_vehicle(:wheelchair, :"foot-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"non-e-skateboard", :"foot-pedal")).to eq :"human-not-pedal"
         expect(PropulsionType.for_vehicle(:"non-e-scooter", :"foot-pedal")).to eq :"human-not-pedal"
         expect(PropulsionType.for_vehicle(:"non-e-scooter", :"hand-pedal")).to eq :"human-not-pedal"
+        (CycleType.slugs_sym - CycleType::PEDAL - CycleType::ALWAYS_MOTORIZED).each do |cycle_type|
+          expect(PropulsionType.for_vehicle(cycle_type)).to eq :"human-not-pedal"
+        end
+      end
 
-        expect(PropulsionType.for_vehicle(:wheelchair, :motorized)).to eq :throttle
-        # Not sure - this might make more sense to make motorized? whatever
-        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist")).to eq :throttle
-        expect(PropulsionType.for_vehicle(:wheelchair, :"pedal-assist-and-throttle")).to eq :throttle
+      it "is throttle if motorized" do
+        expect(PropulsionType.for_vehicle(:stroller, :"pedal-assist")).to eq :throttle
+        expect(PropulsionType.for_vehicle(:"personal-mobility", :"pedal-assist")).to eq :throttle
+        expect(PropulsionType.for_vehicle(:"e-scooter", :"pedal-assist-and-throttle")).to eq :throttle
+        (CycleType.slugs_sym - CycleType::PEDAL - CycleType::NEVER_MOTORIZED).each do |cycle_type|
+          expect(PropulsionType.for_vehicle(cycle_type, :motorized)).to eq :throttle
+        end
       end
     end
 

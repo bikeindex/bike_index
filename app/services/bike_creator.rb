@@ -290,19 +290,4 @@ class BikeCreator
     photos = b_param.params["photos"].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end
-
-  def propulsion_type_from_params(passed_params)
-    pp passed_params
-    throttle = ParamsNormalizer.boolean(passed_params["propulsion_type_throttle"])
-    pedal_assist = ParamsNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
-    if pedal_assist
-      throttle ? "pedal-assist-and-throttle" : "pedal-assist"
-    elsif throttle
-      "throttle"
-    elsif ParamsNormalizer.boolean(passed_params["propulsion_type_motorized"])
-      "motorized"
-    else
-      passed_params.dig("bike", "propulsion_type")
-    end&.to_sym
-  end
 end

@@ -64,7 +64,7 @@
                   #propulsionTypeFields.collapse.pl-1
                     :javascript
                       window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
-                      window.cycleTypesDefaultMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
+                      window.cycleTypesAlwaysMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
                       window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
                     %label.checkbox-inline.mr-2
                       = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?

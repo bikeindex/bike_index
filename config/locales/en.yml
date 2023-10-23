@@ -727,7 +727,7 @@ en:
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Pedal
-        human_not_pedal: Human powered (but not by pedals)
+        human_not_pedal: Human powered (not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
         throttle: throttle

@@ -506,22 +506,21 @@ class BParam < ApplicationRecord
   # Below here is revised setup
 
   def safe_bike_attrs(new_attrs)
-    override_attrs = {"status" => status}
-    top_propulsion_type = self.class.top_level_propulsion_type(params)
     # existing bike attrs, overridden with passed attributes
-    bike.merge(override_attrs).merge(new_attrs.as_json)
+    safe_attrs = bike.merge("status" => status).merge(new_attrs.as_json)
       .select { |_k, v| ParamsNormalizer.present_or_false?(v) }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,
         "creator_id" => creator_id,
         "updator_id" => creator_id)
-      .merge(address_hash).tap do |attrs|
-        propulsion_type = attrs.delete("propulsion_type")
-        # propulsion_type_slug safe assigns, verifying cycle_type. It needs to always be used
-        attrs["propulsion_type_slug"] = top_propulsion_type ||
-          attrs["propulsion_type_slug"] || propulsion_type
-      end
+      .merge(address_hash)
+    # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
+    propulsion_type = self.class.top_level_propulsion_type(params) ||
+      safe_attrs["propulsion_type_slug"] || safe_attrs["propulsion_type"]
+    # propulsion_type_slug needs to be the last key in the hash
+    safe_attrs.except("propulsion_type", "propulsion_type_slug")
+      .merge("propulsion_type_slug" => propulsion_type)
   end
 
   private

@@ -121,7 +121,7 @@ class BikeIndex.BikesNew extends BikeIndex
   # Only show propulsion type options if there can be options
   updatePropulsionType: ->
     cycleTypeValue = $('#bike_cycle_type').val()
-    if window.cycleTypesDefaultMotorized.includes(cycleTypeValue)
+    if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)
       $('#propulsionTypeFields').collapse('hide')
       $('#propulsion_type_motorized').prop('checked', true)
       $('#propulsion_type_motorized').attr('disabled', true)
