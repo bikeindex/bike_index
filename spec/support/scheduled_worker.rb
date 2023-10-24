@@ -1,8 +1,8 @@
 RSpec.shared_context :scheduled_worker do
-  let(:redis) { ScheduledWorker.redis }
+  let(:redis) { Redis.new }
 
   def clear_scheduled_history
-    ScheduledWorker.redis { |r| r.expire(ScheduledWorkerRunner::HISTORY_KEY, 0) }
+    redis.expire(ScheduledWorkerRunner::HISTORY_KEY, 0)
   end
 
   before { Sidekiq::Worker.clear_all }

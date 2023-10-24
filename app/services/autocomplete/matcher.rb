@@ -14,7 +14,7 @@ class Autocomplete::Matcher
       if !opts[:cache] || not_in_cache?(opts[:cache_key])
         store_search_in_cache(opts[:cache_key], opts[:interkeys])
       end
-      terms = Autocomplete.redis { |r| r.zrange(opts[:cache_key], opts[:offset], opts[:limit]) }
+      terms = RedisPool.conn { |r| r.zrange(opts[:cache_key], opts[:offset], opts[:limit]) }
       matching_hashes(terms)
     end
 
@@ -42,7 +42,7 @@ class Autocomplete::Matcher
     private
 
     def not_in_cache?(cache_key)
-      cached_result = Autocomplete.redis { |r| r.exists(cache_key) }
+      cached_result = RedisPool.conn { |r| r.exists(cache_key) }
       cached_result.blank? || cached_result == 0
     end
 
@@ -93,7 +93,7 @@ class Autocomplete::Matcher
     end
 
     def store_search_in_cache(cache_key, interkeys)
-      Autocomplete.redis do |r|
+      RedisPool.conn do |r|
         r.zinterstore(cache_key, interkeys)
         r.expire(cache_key, Autocomplete.cache_duration)
       end
@@ -101,7 +101,7 @@ class Autocomplete::Matcher
 
     def matching_hashes(terms)
       return [] unless terms.size > 0
-      Autocomplete.redis { |r| r.hmget(Autocomplete.items_data_key, *terms) }
+      RedisPool.conn { |r| r.hmget(Autocomplete.items_data_key, *terms) }
         .reject(&:blank?).map { |r| JSON.parse(r) }
     end
   end
