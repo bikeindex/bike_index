@@ -1,23 +1,24 @@
 class FileCacheMaintainer
   class << self
     def assign_blocklist_ids(ids)
-      if ids.present?
-        redis.sadd blocklist_id, ids.map { |i| normalized(i) }.reject { |i| i.blank? }
+      normalized_ids = ids&.map { |i| normalized(i) }&.reject(&:blank?)
+      if normalized_ids.present?
+        RedisPool.conn { |r| r.sadd(blocklist_id, normalized_ids) }
       end
     end
 
     def blocklist
       return [] unless redis.type(info_id) == "set"
-      redis.smembers blocklist_id
+      RedisPool.conn { |r| r.smembers blocklist_id }
     end
 
     def reset_blocklist_ids(ids)
-      redis.expire(blocklist_id, 0)
+      RedisPool.conn { |r| r.expire(blocklist_id, 0) }
       assign_blocklist_ids(ids)
     end
 
     def blocklist_include?(id)
-      redis.sismember blocklist_id, normalized(id)
+      RedisPool.conn { |r| r.sismember blocklist_id, normalized(id) }
     end
 
     def descriptions
@@ -35,7 +36,7 @@ class FileCacheMaintainer
     def update_file_info(filename, updated_at = nil)
       updated_at ||= Time.current
       begin
-        redis.hset info_id, filename, updated_at.to_i
+        RedisPool.conn { |r| r.hset info_id, filename, updated_at.to_i }
       rescue
         # Sometimes key errors from wrong type, so reset it!
         reset_file_info(filename, updated_at.to_i)
@@ -44,7 +45,7 @@ class FileCacheMaintainer
     end
 
     def reset_file_info(filename, updated_at = nil)
-      redis.expire(info_id, 0)
+      RedisPool.conn { |r| r.expire(info_id, 0) }
       update_file_info(filename, updated_at)
     end
 
@@ -62,8 +63,8 @@ class FileCacheMaintainer
     end
 
     def files
-      return [] unless redis.type(info_id) == "hash"
-      @result = redis.hgetall(info_id)
+      return [] unless RedisPool.conn { |r| r.type(info_id) } == "hash"
+      @result = RedisPool.conn { |r| r.hgetall(info_id) }
       @result.keys.map { |k| file_info_hash(k).with_indifferent_access }
         .sort_by { |t| t[:filename] }.sort_by { |t| t[:daily] ? 1 : 0 }
     end
@@ -101,7 +102,7 @@ class FileCacheMaintainer
       uploader = uploader_from_filename(file_info_hash["filename"])
       uploader.retrieve_from_store!(file_info_hash["filename"])
       uploader.remove!
-      redis.hdel(info_id, file_info_hash["path"])
+      RedisPool.conn { |r| r.hdel(info_id, file_info_hash["path"]) }
     end
   end
 end
