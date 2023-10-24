@@ -22,7 +22,6 @@ RSpec.describe LogSearcher do
       it "returns rgrep piped to a time regex" do
         expect(described_class.send(:time_rgrep, time)).to match time_target
         result = described_class.rgrep_command(time, log_path: log_path).split(" | rg")
-        pp result
         expect(result.first).to eq target
         expect(result.last).to match time_target
       end

@@ -1,6 +1,6 @@
 module LogSearcher
   KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
-  DEFAULT_LOG_PATH = ENV["LOG_SEARCH_PATH"].freeze
+  DEFAULT_LOG_PATH = (ENV["LOG_SEARCH_PATH"] || "#{Rails.root}/log/#{Rails.env}.log").freeze
   SEARCHES_MATCHES = %w[BikesController#index
     Organized::BikesController#index
     Admin::BikesController#index
@@ -28,7 +28,7 @@ module LogSearcher
       `#{rgrep_arguments(time, log_path: log_path)}`
     end
 
-    # This is for diagnostics, to check how many are returned
+    # This is for diagnostics, to count how many are returned
     # Probably won't include forever
     def rgrep_command_log_lines(command)
       `#{command}" | wc -l`.strip.to_i
@@ -53,7 +53,7 @@ module LogSearcher
       " | rg '\AI,\s\[#{time.utc.strftime('%Y-%m-%dT%H')}'"
     end
 
-    # Should be the canonical way of u# This is for diagnostics, to check how many are returnedng Redis
+    # Should be the canonical way of using redis
     def redis
       # Basically, crib what is done in sidekiq
       raise ArgumentError, "requires a block" unless block_given?
