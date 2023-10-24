@@ -11,21 +11,20 @@ module LogSearcher
   ].freeze
 
   class << self
+    # Remove search matches that contain bikesController index (which are already matched)
+    # Including them for clarity/documentation
     def searches_regex
       SEARCHES_MATCHES.reject { |s| s.match?(/.BikesController#index/) }.join("|")
     end
 
-    def time_regex(time)
-    end
-
-    # If a time is passed, it only returns lines that occurred within that hour
+    # If a time is included, it only returns lines that occurred in the hour of the time
     def rgrep_command(time = nil, log_path: nil)
       log_path ||= DEFAULT_LOG_PATH
       "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time)
     end
 
     def matching_search_lines(time = nil, log_path: nil)
-      `#{rgrep_arguments(time, log_path: log_path)}`
+      `#{rgrep_command(time, log_path: log_path)}`
     end
 
     # This is for diagnostics, to count how many are returned
@@ -50,7 +49,7 @@ module LogSearcher
 
     def time_rgrep(time)
       return "" if time.blank?
-      " | rg '\AI,\s\[#{time.utc.strftime('%Y-%m-%dT%H')}'"
+      " | rg '\\AI,\\s\\[#{time.utc.strftime('%Y-%m-%dT%H')}'"
     end
 
     # Should be the canonical way of using redis

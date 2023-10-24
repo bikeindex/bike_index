@@ -22,9 +22,16 @@ RSpec.describe LogSearcher do
       it "returns rgrep piped to a time regex" do
         expect(described_class.send(:time_rgrep, time)).to match time_target
         result = described_class.rgrep_command(time, log_path: log_path).split(" | rg")
+
         expect(result.first).to eq target
         expect(result.last).to match time_target
       end
+    end
+  end
+
+  describe "matching_search_lines" do
+    it "returns lines" do
+      # pp described_class.matching_search_lines
     end
   end
 
@@ -32,9 +39,7 @@ RSpec.describe LogSearcher do
     xit "adds the lines" do
       pp described_class.log_lines_in_redis
       log_lines = described_class.rgrep_command("Admin::BikesController#index")
-      pp log_lines
       described_class.write_log_lines(log_lines)
-      pp described_class.log_lines_in_redis
     end
   end
 end
