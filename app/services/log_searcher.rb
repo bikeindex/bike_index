@@ -1,6 +1,7 @@
 module LogSearcher
   KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
-  SEARCH_STRINGS = %w[BikesController#index
+  LOG_PATH = ENV["LOG_SEARCH_PATH"].freeze
+  SEARCHES_MATCHES = %w[BikesController#index
     Organized::BikesController#index
     Admin::BikesController#index
     API::V1::BikesController#index
@@ -8,8 +9,13 @@ module LogSearcher
     api/v2/bikes_search
     api/v3/search
   ].freeze
+  DUPLICATED_MATCHES = %w[
+    Organized::BikesController#index
+    Admin::BikesController#index
+    API::V1::BikesController#index
+  ].freeze
 
-  LOG_PATH = ENV["LOG_SEARCH_PATH"].freeze
+  UNOVERLAP = (SEARCHES_MATCHES - DUPLICATED_MATCHES).freeze
 
   class << self
     def rgrep_commands(time = nil)
