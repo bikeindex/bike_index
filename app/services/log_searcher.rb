@@ -15,21 +15,23 @@ module LogSearcher
       SEARCHES_MATCHES.reject { |s| s.match?(/.BikesController#index/) }.join("|")
     end
 
-    # If a time is passed, it only matches events that occurred
-    # Searches for events that occurred within the hour
-    def rgrep_arguments(time = nil, log_path: nil)
-      log_path ||= DEFAULT_LOG_PATH
-      "\"#{searches_regex}\" #{LOG_PATH}"
+    def time_regex(time)
     end
 
+    # If a time is passed, it only returns lines that occurred within that hour
     def rgrep_command(time = nil, log_path: nil)
-      `rg "#{rgrep_arguments(time, log_path: log_path)}"`
+      log_path ||= DEFAULT_LOG_PATH
+      "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time)
+    end
+
+    def matching_search_lines(time = nil, log_path: nil)
+      `#{rgrep_arguments(time, log_path: log_path)}`
     end
 
     # This is for diagnostics, to check how many are returned
     # Probably won't include forever
-    def rgrep_command_log_lines(grep_command)
-      `rg "#{grep_command}" #{LOG_PATH} | wc -l`.strip.to_i
+    def rgrep_command_log_lines(command)
+      `#{command}" | wc -l`.strip.to_i
     end
 
     def write_log_lines(log_lines)
@@ -42,6 +44,13 @@ module LogSearcher
 
     def log_lines_in_redis
       redis { |r| r.llen(KEY) }
+    end
+
+    private
+
+    def time_rgrep(time)
+      return "" if time.blank?
+      " | rg '\AI,\s\[#{time.utc.strftime('%Y-%m-%dT%H')}'"
     end
 
     # Should be the canonical way of u# This is for diagnostics, to check how many are returnedng Redis
