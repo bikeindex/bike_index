@@ -19,6 +19,11 @@ production:
       sudo: true
 
   after_rails:
+    # Add ripgrep
+    - command: sudo apt-get install ripgrep
+      target: rails
+      run_on: all_servers
+      sudo: true
     # Make papertrail connected
     - source: /.cloud66/log_files.yml
       destination: /etc/log_files.yml

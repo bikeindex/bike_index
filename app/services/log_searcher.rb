@@ -12,18 +12,18 @@ module LogSearcher
   LOG_PATH = ENV["LOG_SEARCH_PATH"].freeze
 
   class << self
-    def grep_commands(time = nil)
+    def rgrep_commands(time = nil)
       SEARCH_STRINGS.map { |s| s }
     end
 
-    def grep_command(grep_command)
-      `grep "#{grep_command}" #{LOG_PATH}`.split("\n")
+    def rgrep_command(grep_command)
+      `rg "#{grep_command}" #{LOG_PATH}`.split("\n")
     end
 
     # This is for diagnostics, to check how many are returned
     # Probably won't include forever
-    def grep_command_log_lines(grep_command)
-      `grep "#{grep_command}" #{LOG_PATH} | wc -l`.strip.to_i
+    def rgrep_command_log_lines(grep_command)
+      `rg "#{grep_command}" #{LOG_PATH} | wc -l`.strip.to_i
     end
 
     def write_log_lines(log_lines)
@@ -38,7 +38,7 @@ module LogSearcher
       redis { |r| r.llen(KEY) }
     end
 
-    # Should be the canonical way of using Redis
+    # Should be the canonical way of u# This is for diagnostics, to check how many are returnedng Redis
     def redis
       # Basically, crib what is done in sidekiq
       raise ArgumentError, "requires a block" unless block_given?
