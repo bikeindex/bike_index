@@ -3,6 +3,8 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
+  mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
+
   use_doorkeeper do
     controllers applications: "oauth/applications"
     controllers authorizations: "oauth/authorizations"
@@ -329,8 +331,6 @@ Rails.application.routes.draw do
   get "/404", to: "errors#not_found", via: :all
   get "/422", to: "errors#unprocessable_entity", via: :all
   get "/500", to: "errors#server_error", via: :all
-
-  mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
 
   # No actions are defined here, this `resources` declaration
   # prepends a :organization_id/ to every nested URL.
