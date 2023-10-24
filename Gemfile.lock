@@ -154,7 +154,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.2.2)
-    connection_pool (2.2.5)
+    connection_pool (2.4.1)
     countries (3.1.0)
       i18n_data (~> 0.11.0)
       sixarm_ruby_unaccent (~> 1.1)
@@ -562,7 +562,10 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (4.6.0)
+    redis (5.0.8)
+      redis-client (>= 0.17.0)
+    redis-client (0.17.1)
+      connection_pool
     regexp_parser (2.5.0)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -638,10 +641,10 @@ GEM
       user_agent_parser
     semantic_range (3.0.0)
     shellany (0.0.1)
-    sidekiq (6.4.1)
+    sidekiq (6.5.5)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      redis (>= 4.2.0)
+      redis (>= 4.5.0)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
     simple_oauth (0.3.1)
