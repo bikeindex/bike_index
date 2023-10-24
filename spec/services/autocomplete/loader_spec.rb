@@ -153,11 +153,11 @@ RSpec.describe Autocomplete::Loader do
       subject.clear_redis
       subject.send(:store_item, item)
 
-      result = Autocomplete.redis { |r| r.hget(Autocomplete.items_data_key, "brompton bicycle") }
+      result = RedisPool.conn { |r| r.hget(Autocomplete.items_data_key, "brompton bicycle") }
       expect_hashes_to_match(JSON.parse(result), target)
 
       prefix = "#{Autocomplete.category_key("frame_mnfg")}brom"
-      prefixed_result = Autocomplete.redis { |r| r.zrange(prefix, 0, -1) }
+      prefixed_result = RedisPool.conn { |r| r.zrange(prefix, 0, -1) }
       expect(prefixed_result[0]).to eq("brompton bicycle")
     end
   end
@@ -173,11 +173,11 @@ RSpec.describe Autocomplete::Loader do
         count = subject.send(:store_items, [color.autocomplete_hash])
         expect(count).to eq category_count_for_1_item
 
-        result = Autocomplete.redis { |r| r.hget(Autocomplete.items_data_key, normalized_name) }
+        result = RedisPool.conn { |r| r.hget(Autocomplete.items_data_key, normalized_name) }
         expect_hashes_to_match(JSON.parse(result), target_color)
 
         prefix = "#{Autocomplete.category_key("colors")}col"
-        prefixed_result = Autocomplete.redis { |r| r.zrange(prefix, 0, -1) }
+        prefixed_result = RedisPool.conn { |r| r.zrange(prefix, 0, -1) }
         expect(prefixed_result[0]).to eq normalized_name
       end
     end
@@ -197,12 +197,12 @@ RSpec.describe Autocomplete::Loader do
         result = subject.send(:store_items, Manufacturer.all.map { |m| m.autocomplete_hash })
         expect(result).to eq category_count_for_1_item * 3
 
-        cat_prefixed = Autocomplete.redis do |r|
+        cat_prefixed = RedisPool.conn do |r|
           r.zrange("#{Autocomplete.category_key("frame_mnfg")}br", 0, -1)
         end
         expect(cat_prefixed).to eq(["brompton"])
 
-        item_json = Autocomplete.redis do |r|
+        item_json = RedisPool.conn do |r|
           r.hmget(Autocomplete.items_data_key, Autocomplete.normalize(brompton.name))
         end
         expect(item_json.count).to eq 1

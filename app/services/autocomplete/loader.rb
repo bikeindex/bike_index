@@ -50,7 +50,7 @@ class Autocomplete::Loader
     end
 
     def info
-      Autocomplete.redis do |r|
+      RedisPool.conn do |r|
         # NOTE: if you add in more DBs, include the keys here
         included_info = r.info.slice("used_memory_human", "used_memory_peak_human", "db0")
           .map { |k, v| [k.gsub("_human", "").to_sym, v] }.to_h
@@ -82,7 +82,7 @@ class Autocomplete::Loader
       priority = -1 * item[:priority]
       # pipeline doesn't reduce network requests, my understanding is wrapping all (as oppose to individual items)
       # in pipeline wouldn't improve functionality and might actually cause longer blocking
-      Autocomplete.redis do |r|
+      RedisPool.conn do |r|
         r.pipelined do |pipeline|
           # Add to master set for queryless searches
           pipeline.zadd(Autocomplete.no_query_key(category_base_key), priority, item[:term])
@@ -123,7 +123,7 @@ class Autocomplete::Loader
     end
 
     def store_category_combos
-      Autocomplete.redis do |r|
+      RedisPool.conn do |r|
         r.sadd(Autocomplete.category_combos_key, combinatored_category_array)
       end
     end
@@ -148,7 +148,7 @@ class Autocomplete::Loader
     end
 
     def clear_cache
-      Autocomplete.redis do |r|
+      RedisPool.conn do |r|
         # can't be pipelined, requires the response
         keys = fetch_cache_keys(r).to_a
 
@@ -159,7 +159,7 @@ class Autocomplete::Loader
     end
 
     def delete_categories_and_item_data
-      Autocomplete.redis do |r|
+      RedisPool.conn do |r|
         # Get all the matching keys for category typeahead
         keys = fetch_category_keys(r).to_a
 
@@ -191,7 +191,7 @@ class Autocomplete::Loader
     def delete_data(id = nil)
       id ||= "#{base_key}:"
       # delete the sorted sets for this type
-      Autocomplete.redis do |r|
+      RedisPool.conn do |r|
         phrases = r.smembers(base_key)
         r.pipelined do |pipeline|
           phrases.each { |phrase| pipeline.del("#{id}#{phrase}") }
