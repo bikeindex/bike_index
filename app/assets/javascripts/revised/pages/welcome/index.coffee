@@ -1,6 +1,8 @@
 # Note: this is also loaded on info pages - because the recovery slider is included in get_your_stolen_bike_back
 class BikeIndex.WelcomeIndex extends BikeIndex
   constructor: ->
+    # Because of caching, manually update the active link
+    @updateActiveLink()
     # Early exit if no recovery stories, ie on a news page without them
     return unless $('#recovery-stories-container').length
     @translator = new BikeIndex.GoogleTranslate()
@@ -18,6 +20,11 @@ class BikeIndex.WelcomeIndex extends BikeIndex
 
     $(window).scroll ->
       $('.root-landing-who').addClass('scrolled')
+
+  updateActiveLink: ->
+    if window.location.pathname.match("info/how-to-get-your-stolen-bike-back")
+      $(".primary-nav-item .active").removeClass("active")
+      $("#getStolenBackLink").addClass("active")
 
   # Return the DOM node for the slide with index `index` in the slides
   # container element.
