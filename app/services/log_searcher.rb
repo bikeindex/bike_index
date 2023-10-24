@@ -16,24 +16,27 @@ module LogSearcher
       SEARCH_STRINGS.map { |s| s }
     end
 
+    def grep_command(grep_command)
+      `grep "#{grep_command}" #{LOG_PATH}`.split("\n")
+    end
+
     # This is for diagnostics, to check how many are returned
+    # Probably won't include forever
     def grep_command_log_lines(grep_command)
       `grep "#{grep_command}" #{LOG_PATH} | wc -l`.strip.to_i
     end
 
     def write_log_lines(log_lines)
-      redis.lpush(KEY, log_lines)
+      redis { |r| r.lpush(KEY, log_lines) }
     end
 
     def get_log_line
-      redis.rpop(KEY)
+      redis { |r| r.rpop(KEY) }
     end
 
-    def redis_log_length
-      redis.llen(KEY)
+    def log_lines_in_redis
+      redis { |r| r.llen(KEY) }
     end
-
-    # length is redis.llen(KEY)
 
     # Should be the canonical way of using Redis
     def redis
