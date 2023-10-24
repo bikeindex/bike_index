@@ -1,6 +1,6 @@
 module LogSearcher
   KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
-  LOG_PATH = ENV["LOG_SEARCH_PATH"].freeze
+  DEFAULT_LOG_PATH = ENV["LOG_SEARCH_PATH"].freeze
   SEARCHES_MATCHES = %w[BikesController#index
     Organized::BikesController#index
     Admin::BikesController#index
@@ -9,21 +9,21 @@ module LogSearcher
     api/v2/bikes_search
     api/v3/search
   ].freeze
-  DUPLICATED_MATCHES = %w[
-    Organized::BikesController#index
-    Admin::BikesController#index
-    API::V1::BikesController#index
-  ].freeze
-
-  UNOVERLAP = (SEARCHES_MATCHES - DUPLICATED_MATCHES).freeze
 
   class << self
-    def rgrep_commands(time = nil)
-      SEARCH_STRINGS.map { |s| s }
+    def searches_regex
+      SEARCHES_MATCHES.reject { |s| s.match?(/.BikesController#index/) }.join("|")
     end
 
-    def rgrep_command(grep_command)
-      `rg "#{grep_command}" #{LOG_PATH}`.split("\n")
+    # If a time is passed, it only matches events that occurred
+    # Searches for events that occurred within the hour
+    def rgrep_arguments(time = nil, log_path: nil)
+      log_path ||= DEFAULT_LOG_PATH
+      "\"#{searches_regex}\" #{LOG_PATH}"
+    end
+
+    def rgrep_command(time = nil, log_path: nil)
+      `rg "#{rgrep_arguments(time, log_path: log_path)}"`
     end
 
     # This is for diagnostics, to check how many are returned
