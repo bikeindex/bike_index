@@ -48,11 +48,11 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - Go to [localhost:3001](http://localhost:3001)
 
-| Toggle in development | command                      | default  |
-| ---------             | -------                      | -------  |
-| Caching               | `bundle exec rails dev:cache`         | disabled |
-| [letter_opener][]     | `bin/rake dev:letter_opener` | enabled  |
-| logging with lograge  | `bin/rake dev:lograge`       | enabled  |
+| Toggle in development | command                       | default  |
+| ---------             | -------                       | -------  |
+| Caching               | `bundle exec rails dev:cache` | disabled |
+| [letter_opener][]     | `bin/rake dev:letter_opener`  | enabled  |
+| logging with lograge  | `bin/rake dev:lograge`        | enabled  |
 
 [letter_opener]: https://github.com/ryanb/letter_opener
 
