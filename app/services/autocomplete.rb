@@ -26,7 +26,7 @@ module Autocomplete
     end
 
     def category_combos
-      redis { |r| r.smembers(category_combos_key) }
+      RedisPool.conn { |r| r.smembers(category_combos_key) }
     end
 
     def category_key(name = "all")
@@ -43,17 +43,6 @@ module Autocomplete
 
     def cache_key(type = "all")
       "#{BASE_KEY}cache:#{type}:"
-    end
-
-    # Should be the canonical way of using Redis
-    def redis
-      # Basically, crib what is done in sidekiq
-      raise ArgumentError, "requires a block" unless block_given?
-      redis_pool.with { |conn| yield conn }
-    end
-
-    def redis_pool
-      @redis_pool ||= ConnectionPool.new(timeout: 1, size: 2) { Redis.new }
     end
   end
 end

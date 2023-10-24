@@ -3,12 +3,12 @@ class Counts
 
   class << self
     def assign_for(count_key, value)
-      redis { |r| r.hset STOREAGE_KEY, count_key, value }
+      RedisPool.conn { |r| r.hset STOREAGE_KEY, count_key, value }
       retrieve_for(count_key) # To be nice
     end
 
     def retrieve_for(count_key)
-      redis { |r| r.hget STOREAGE_KEY, count_key }.to_i
+      RedisPool.conn { |r| r.hget STOREAGE_KEY, count_key }.to_i
     end
 
     def count_keys
@@ -41,7 +41,7 @@ class Counts
     end
 
     def week_creation_chart
-      chart_data = redis { |r| r.hget STOREAGE_KEY, "week_creation_chart" }
+      chart_data = RedisPool.conn { |r| r.hget STOREAGE_KEY, "week_creation_chart" }
       chart_data.present? ? JSON.parse(chart_data) : chart_data
     end
 
