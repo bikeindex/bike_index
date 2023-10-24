@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe LogSearcher do
   let(:log_path) { Rails.root.join("spec", "fixtures", "example_log.log") }
+  let(:redis) { Redis.new }
 
   describe "SEARCHES_MATCHES" do
     it "returns search strings" do
@@ -21,25 +22,22 @@ RSpec.describe LogSearcher do
       let(:time_target) { "2023-10-23T20" }
       it "returns rgrep piped to a time regex" do
         expect(described_class.send(:time_rgrep, time)).to match time_target
-        result = described_class.rgrep_command(time, log_path: log_path).split(" | rg")
+        result = described_class.rgrep_command(time, log_path: log_path)
 
-        expect(result.first).to eq target
-        expect(result.last).to match time_target
+        splitted = result.split(" | rg")
+        expect(splitted.first).to eq target
+        expect(splitted.last).to match time_target
       end
     end
   end
 
-  describe "matching_search_lines" do
-    it "returns lines" do
-      # pp described_class.matching_search_lines
-    end
-  end
-
   describe "test adding log_lines" do
-    xit "adds the lines" do
-      pp described_class.log_lines_in_redis
-      log_lines = described_class.rgrep_command("Admin::BikesController#index")
-      described_class.write_log_lines(log_lines)
+    let(:time) { Time.at(1698020443) }
+    it "adds the lines" do
+      redis.expire(LogSearcher::KEY, 0)
+      expect(LogSearcher.log_lines_in_redis).to eq 0
+      LogSearcher.write_log_lines(LogSearcher.rgrep_command(time, log_path: log_path))
+      expect(LogSearcher.log_lines_in_redis).to eq 3
     end
   end
 end

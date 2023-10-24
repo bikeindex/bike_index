@@ -23,8 +23,12 @@ module LogSearcher
       "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time)
     end
 
-    def matching_search_lines(time = nil, log_path: nil)
-      `#{rgrep_command(time, log_path: log_path)}`
+    def write_log_lines(rgrep_command)
+      RedisPool.conn do |r|
+        r.pipelined do |pipeline|
+          IO.popen(rgrep_command) { |io| io.each { |l| pipeline.lpush(KEY, l) } }
+        end
+      end
     end
 
     # This is for diagnostics, to count how many are returned
@@ -33,16 +37,12 @@ module LogSearcher
       `#{command}" | wc -l`.strip.to_i
     end
 
-    def write_log_lines(log_lines)
-      redis { |r| r.lpush(KEY, log_lines) }
-    end
-
     def get_log_line
-      redis { |r| r.rpop(KEY) }
+      RedisPool.conn { |r| r.rpop(KEY) }
     end
 
     def log_lines_in_redis
-      redis { |r| r.llen(KEY) }
+      RedisPool.conn { |r| r.llen(KEY) }
     end
 
     private
@@ -50,17 +50,6 @@ module LogSearcher
     def time_rgrep(time)
       return "" if time.blank?
       " | rg '\\AI,\\s\\[#{time.utc.strftime('%Y-%m-%dT%H')}'"
-    end
-
-    # Should be the canonical way of using redis
-    def redis
-      # Basically, crib what is done in sidekiq
-      raise ArgumentError, "requires a block" unless block_given?
-      redis_pool.with { |conn| yield conn }
-    end
-
-    def redis_pool
-      @redis_pool ||= ConnectionPool.new(timeout: 1, size: 2) { Redis.new }
     end
   end
 end
