@@ -25,11 +25,11 @@ class ScheduledWorkerRunner < ScheduledWorker
   end
 
   def self.worker_history(worker_string, record)
-    RedisPool.conn { |r| r.hget HISTORY_KEY, record_key(worker_string, record) }
+    RedisPool.conn { |r| r.hget(HISTORY_KEY, record_key(worker_string, record)) }
   end
 
   def self.write_worker_history(worker_string, record, value = Time.current)
-    RedisPool.conn { |r| r.hset HISTORY_KEY, record_key(worker_string, record), value }
+    RedisPool.conn { |r| r.hset(HISTORY_KEY, record_key(worker_string, record), value.to_s) }
   end
 
   def self.scheduled_workers
