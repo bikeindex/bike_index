@@ -5,7 +5,7 @@ RSpec.describe TsvCreator do
 
   describe "create_manufacturer" do
     it "makes mnfgs" do
-      # Added lamest test possible in PR#2450
+      # Added lamest test possible in PR#2453
       # NOTE: the code wasn't actually improved in this PR though
       expect(instance.create_manufacturer).to be_present
     end
