@@ -7,12 +7,17 @@ development:
   primary:
     <<: *default
     database: bikeindex_development
+  analytics:
+    <<: *default
+    database: bikeindex_analytics_development
   primary_replica:
     <<: *default
     # Using primary database, replica not actually replicating
     database: bikeindex_development
   #   database: bikeindex_development_replica
   #   replica: true
+
+
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -25,6 +30,9 @@ test:
     <<: *default
     database: bikeindex_test_replica<%= ENV["TEST_ENV_NUMBER"] %>
     replica: true
+  analytics:
+    <<: *default
+    database: bikeindex_analytics_test<%= ENV["TEST_ENV_NUMBER"] %>
 
 production:
   primary:
@@ -41,3 +49,11 @@ production:
     database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
     username: "<%= ENV['POSTGRESQL_USERNAME'] %>"
     password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
+
+  analytics:
+    <<: *default
+    database: bikeindex_analytics
+    host: "<%= ENV['ANALYTICS_DB_ADDRESSES'] %>"
+    database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
+    username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
+    password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"
