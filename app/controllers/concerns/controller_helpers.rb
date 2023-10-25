@@ -30,6 +30,7 @@ module ControllerHelpers
   def append_info_to_payload(payload)
     super
     payload[:ip] = forwarded_ip_address
+    payload[:u_id] = current_user&.id
   end
 
   def forwarded_ip_address

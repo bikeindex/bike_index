@@ -10,6 +10,7 @@ Rails.application.configure do
   config.lograge.custom_options = lambda do |event|
     {
       remote_ip: event.payload[:ip],
+      uid: event.payload[:uid],
       params: event.payload[:params].except("controller", "action", "format", "id")
     }
   end
