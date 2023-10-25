@@ -25,9 +25,9 @@ module LogSearcher
 
     def write_log_lines(rgrep_command)
       RedisPool.conn do |r|
-        r.pipelined do |pipeline|
-          IO.popen(rgrep_command) { |io| io.each { |l| pipeline.lpush(KEY, l) } }
-        end
+        # r.pipelined do |pipeline|
+          IO.popen(rgrep_command) { |io| io.each { |l| r.lpush(KEY, l) } }
+        # end
       end
     end
 
