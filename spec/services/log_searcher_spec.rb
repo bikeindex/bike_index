@@ -39,6 +39,7 @@ RSpec.describe LogSearcher do
       LogSearcher.write_log_lines(LogSearcher.rgrep_command(time, log_path: log_path))
       sleep 1 if ENV["CI"] # Maybe fix CI?
       expect(LogSearcher.log_lines_in_redis).to eq 3
+      redis.expire(LogSearcher::KEY, 0)
     end
   end
 end

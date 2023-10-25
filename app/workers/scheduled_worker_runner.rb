@@ -43,6 +43,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       FetchProject529BikesWorker,
       FileCacheMaintenanceWorker,
       ImpoundExpirationWorker,
+      ParseLogSearchesWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
       ScheduleBikePossiblyFoundNotificationWorker,
