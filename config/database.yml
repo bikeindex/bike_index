@@ -59,3 +59,4 @@ production:
     database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
     username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
     password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"
+    port: "<%= ENV['ANALYTICS_DB_PORT'] %>"
