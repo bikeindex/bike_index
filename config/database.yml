@@ -7,16 +7,16 @@ development:
   primary:
     <<: *default
     database: bikeindex_development
-  analytics:
-    <<: *default
-    database: bikeindex_analytics_development
   primary_replica:
     <<: *default
     # Using primary database, replica not actually replicating
     database: bikeindex_development
-  #   database: bikeindex_development_replica
-  #   replica: true
-
+    # database: bikeindex_development_replica
+    # replica: true
+  analytics:
+    <<: *default
+    database: bikeindex_analytics_development
+    migrations_paths: db/analytics_migrate
 
 
 # Warning: The database defined as "test" will be erased and
@@ -33,6 +33,7 @@ test:
   analytics:
     <<: *default
     database: bikeindex_analytics_test<%= ENV["TEST_ENV_NUMBER"] %>
+    migrations_paths: db/analytics_migrate
 
 production:
   primary:
@@ -53,6 +54,7 @@ production:
   analytics:
     <<: *default
     database: bikeindex_analytics
+    migrations_paths: db/analytics_migrate
     host: "<%= ENV['ANALYTICS_DB_ADDRESSES'] %>"
     database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
     username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
