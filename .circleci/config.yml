@@ -250,6 +250,7 @@ jobs:
       - run:
           name: Setup Database
           command: |
+            bundle exec rails db:create --trace
             bundle exec rails db:structure:load --trace
 
       - run:
