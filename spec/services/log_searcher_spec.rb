@@ -42,4 +42,8 @@ RSpec.describe LogSearcher do
       redis.expire(LogSearcher::KEY, 0)
     end
   end
+
+  describe "log_lines_array" do
+    it "has every endpoint type"
+  end
 end

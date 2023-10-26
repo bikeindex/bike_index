@@ -28,10 +28,17 @@ module LogSearcher
 
     def write_log_lines(rgrep_command)
       RedisPool.conn do |r|
-        # r.pipelined do |pipeline|
-          IO.popen(rgrep_command) { |io| io.each { |l| r.lpush(KEY, l) } }
-        # end
+        r.pipelined do |pipeline|
+          IO.popen(rgrep_command) { |io| io.each { |l| pipeline.lpush(KEY, l) } }
+        end
       end
+    end
+
+    # NOTE: THIS IS ONLY FOR TESTING (or diagnostics)
+    def log_lines_array(rgrep_command)
+      log_lines = []
+      IO.popen(rgrep_command) { |io| io.each { |l| log_lines += l } }
+      log_lines
     end
 
     # This is for diagnostics, to count how many are returned

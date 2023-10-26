@@ -1,6 +1,21 @@
 class LoggedSearch < AnalyticsRecord
   ENDPOINT_ENUM = {
-    web: 0,
+    bikes: 0,
+    api_v1_bikes: 1,
+    api_v1_stolen_ids: 2,
+    api_v2_bikes: 3, # Includes /search, /stolen, /not_stolen
+    api_v2_count: 4,
+    api_v2_close_serials: 5,
+    api_v3_bikes: 6,
+    api_v3_count: 7,
+    api_v3_close_serials: 8,
+    api_v3_serials_containing: 9,
+    api_v3_external_registries: 10,
+    admin_bikes: 11,
+    org_bikes: 12,
+    org_parking_notifications: 13,
+    org_impounded: 14,
+    org_public_impounded: 15
   }
 
   enum kind: ENDPOINT_ENUM
