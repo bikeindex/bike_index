@@ -33,7 +33,7 @@ class LogSearcher::Parser
       {
         request_at: parse_request_time(line_data),
         request_id: line_data.split("[").last,
-        duration_ms: opts["duration"]&.to_f.round,
+        duration_ms: opts["duration"]&.to_f&.round,
         user_id: opts["u_id"],
         organization_id: Organization.friendly_find_id(opts.dig("params", "organization_id")),
         endpoint: endpoint,
@@ -49,15 +49,13 @@ class LogSearcher::Parser
 
     def parse_endpoint(opts)
       if opts["message"].present?
-        controller_action = opts["message"].split("(").last.gsub(")", "")
+        controller_action = opts["message"].split("(").last.delete(")")
         CONTROLLER_ENDPOINTS[controller_action]
+      elsif %w[/api/v2/bikes_search /api/v2/bikes_search/stolen
+        /api/v2/bikes_search/non_stolen].include?(opts["path"])
+        :api_v2_bikes
       else
-        if %w[/api/v2/bikes_search /api/v2/bikes_search/stolen
-              /api/v2/bikes_search/non_stolen].include?(opts["path"])
-          endpoint = :api_v2_bikes
-        else
-          ROUTE_ENDPOINTS[opts["path"]]
-        end
+        ROUTE_ENDPOINTS[opts["path"]]
       end
     end
 

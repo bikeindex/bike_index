@@ -29,7 +29,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
   def matching_logged_searches
     logged_searches = LoggedSearch.all
 
-    if LoggedSearch.endpoints.keys.include?(params[:search_endpoint])
+    if LoggedSearch.endpoints.key?(params[:search_endpoint])
       @endpoint = params[:search_endpoint]
       logged_searches.where(endpoint: @endpoint)
     else

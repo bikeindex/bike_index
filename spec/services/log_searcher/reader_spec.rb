@@ -42,4 +42,3 @@ RSpec.describe LogSearcher::Reader do
     end
   end
 end
-

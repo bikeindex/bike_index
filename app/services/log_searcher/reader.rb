@@ -11,8 +11,7 @@ class LogSearcher::Reader
     Admin::BikesController#index
     OrgPublic::ImpoundedBikesController#index
     Organized::ImpoundRecordsController#index
-    ParkingNotificationsController#index
-  ].freeze
+    ParkingNotificationsController#index].freeze
 
   class << self
     # Remove search matches that contain bikesController index (which are already matched)
@@ -53,7 +52,7 @@ class LogSearcher::Reader
 
     def time_rgrep(time)
       return "" if time.blank?
-      " | rg '\\AI,\\s\\[#{time.utc.strftime('%Y-%m-%dT%H')}'"
+      " | rg '\\AI,\\s\\[#{time.utc.strftime("%Y-%m-%dT%H")}'"
     end
   end
 end
