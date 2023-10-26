@@ -37,7 +37,11 @@ RSpec.describe LogSearcher::Reader do
       redis.expire(LogSearcher::Reader::KEY, 0)
       expect(LogSearcher::Reader.log_lines_in_redis).to eq 0
       LogSearcher::Reader.write_log_lines(LogSearcher::Reader.rgrep_command(time, log_path: log_path))
-      sleep 1 if ENV["CI"] # Maybe fix CI?
+      if ENV["CI"] # Maybe fix CI?
+        log_line = described_class.get_log_line
+        pp log_line
+        expect(log_line).to be_present
+      end
       expect(LogSearcher::Reader.log_lines_in_redis).to eq 3
       redis.expire(LogSearcher::Reader::KEY, 0)
     end
