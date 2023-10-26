@@ -1,6 +1,6 @@
 class LoggedSearch < AnalyticsRecord
   ENDPOINT_ENUM = {
-    bikes: 0,
+    public_bikes: 0,
     api_v1_bikes: 1,
     api_v1_stolen_ids: 2,
     api_v2_bikes: 3, # Includes /search, /stolen, /not_stolen
@@ -18,7 +18,10 @@ class LoggedSearch < AnalyticsRecord
     org_public_impounded: 15
   }.freeze
 
+  STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3}.freeze
+
   enum endpoint: ENDPOINT_ENUM
+  enum stolenness: STOLENNESS_ENUM, _prefix: :stolenness
 
   validates_presence_of :log_line
   validates_uniqueness_of :request_id, allow_nil: false
