@@ -7,15 +7,15 @@ RSpec.describe LogSearcher::Parser do
       "{\"method\":\"GET\",\"path\":\"/bikes\",\"format\":\"html\"," \
       "\"controller\":\"BikesController\",\"action\":\"index\",\"status\":200," \
       "\"duration\":1001.79,\"view\":52.68,\"db\":946.26,\"remote_ip\":\"11.222.33.4\"," \
-      "\"u_id\":null,\"params\":{},\"@timestamp\":\"2023-10-23T00:20:01.681Z\"," \
+      "\"u_id\":null,\"params\":{\"page\": 2},\"@timestamp\":\"2023-10-23T00:20:01.681Z\"," \
       "\"@version\":\"1\",\"message\":\"[200] GET /bikes (BikesController#index)\"}"
     end
     let(:time) { Time.parse("2023-10-23T00:20:01.681937 UTC") }
     let(:target) do
       {request_at: time, request_id: "6473c6f5-51f6-422b-bb3c-7e94b670f520",
        duration_ms: 1002, user_id: nil, organization_id: nil, endpoint: :public_bikes,
-       ip_address: "11.222.33.4", query_items: {}, page: nil, serial: false,
-       stolenness: :all}
+       ip_address: "11.222.33.4", query_items: {}, page: 2, serial: false,
+       stolenness: :all, includes_query: false}
     end
     it "parses into attrs" do
       # request_time actually takes line_data (not log_line) - but, it works either way
@@ -36,7 +36,8 @@ RSpec.describe LogSearcher::Parser do
           query_items: {"serial" => "WC02001xxxxx", "serial_no_space" => "WC02001xxxxx", "raw_serial" => "WC02001xxxxx", "stolenness" => "proximity", "location" => "you"},
           stolenness: :stolen,
           serial: true,
-          page: nil
+          page: nil,
+          includes_query: true
         }
       end
       it "parses" do
@@ -54,17 +55,14 @@ RSpec.describe LogSearcher::Parser do
           user_id: 85,
           organization_id: organization.id,
           endpoint: :org_bikes,
-          query_items: {search_email: "", serial: "", sort: "id", sort_direction: "desc",
-                        render_chart: "false", period: "", end_time: "", start_time: "", user_id: "",
-                        search_bike_id: "", search_status: "", search_kind: "", stolenness: "stolen",
-                        search_stickers: "", search_address: "", search_secondary: [""]},
+          query_items: {sort: "id", sort_direction: "desc", render_chart: "false", stolenness: "stolen"},
           ip_address: "127.0.0.1",
           stolenness: :stolen,
           serial: false,
-          page: nil
+          page: nil,
+          includes_query: false
         }
       end
-      let(:target_query_items) {}
       it "parses" do
         # pp described_class.send(:parse_request_time, log_line).to_i
         # pp described_class.parse_log_line(log_line)

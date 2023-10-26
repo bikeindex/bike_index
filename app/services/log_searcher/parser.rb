@@ -29,35 +29,47 @@ class LogSearcher::Parser
       opts = JSON.parse("{#{opts}")
       endpoint = parse_endpoint(opts)
       return nil unless LoggedSearch.endpoints_sym.include?(endpoint)
-      page = opts.dig("params", "page")
+
+      query_items = (opts["params"] || {}).select { |_, value| value.present? }
+      if query_items["search_secondary"].present? && query_items["search_secondary"].is_a?(Array) &&
+          query_items["search_secondary"].reject(&:blank?).none?
+
+        query_items = query_items.except("search_secondary")
+      end
+
       {
         request_at: parse_request_time(line_data),
         request_id: line_data.split("[").last,
-        duration_ms: opts["duration"]&.to_f.round,
+        duration_ms: opts["duration"]&.to_f&.round,
         user_id: opts["u_id"],
         organization_id: Organization.friendly_find_id(opts.dig("params", "organization_id")),
         endpoint: endpoint,
         ip_address: opts["remote_ip"],
-        query_items: opts["params"].except("organization_id", "page"),
+        query_items: query_items.except("organization_id", "page"),
         stolenness: stolenness_for(endpoint, opts),
-        serial: opts.dig("params", "serial").present?,
-        page: [nil, "1"].include?(page) ? nil : page.to_i
+        serial: query_items["serial"].present?,
+        includes_query: includes_query?(query_items),
+        page: [nil, "1"].include?(query_items["page"]) ? nil : query_items["page"].to_i
       }
     end
 
     private
 
+    def includes_query?(query_items)
+      query_items.except("organization_id", "page", "stolenness", "location", "distance",
+        "locale", "sort", "sort_direction", "render_chart")
+        .present?
+    end
+
     def parse_endpoint(opts)
       if opts["message"].present?
-        controller_action = opts["message"].split("(").last.gsub(")", "")
+        controller_action = opts["message"].split("(").last.delete(")")
         CONTROLLER_ENDPOINTS[controller_action]
+      elsif %w[/api/v2/bikes_search /api/v2/bikes_search/stolen
+        /api/v2/bikes_search/non_stolen].include?(opts["path"])
+        :api_v2_bikes
       else
-        if %w[/api/v2/bikes_search /api/v2/bikes_search/stolen
-              /api/v2/bikes_search/non_stolen].include?(opts["path"])
-          :api_v2_bikes
-        else
-          ROUTE_ENDPOINTS[opts["path"]]
-        end
+        ROUTE_ENDPOINTS[opts["path"]]
       end
     end
 

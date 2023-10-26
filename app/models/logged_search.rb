@@ -31,6 +31,14 @@ class LoggedSearch < AnalyticsRecord
   validates_presence_of :log_line, :request_at
   validates_uniqueness_of :request_id, allow_nil: false
 
+  scope :organized, -> { where(endpoint: organized_endpoints) }
+  scope :serial, -> { where(serial: true) }
+  scope :query, -> { where(has_query: true) }
+
+  def self.organized_endpoints
+    %i[org_bikes org_parking_notifications org_impounded].freeze
+  end
+
   def self.endpoints_sym
     ENDPOINT_ENUM.keys.freeze
   end

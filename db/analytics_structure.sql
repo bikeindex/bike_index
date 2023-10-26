@@ -37,6 +37,7 @@ CREATE TABLE public.logged_searches (
     endpoint integer,
     stolenness integer,
     serial boolean DEFAULT false,
+    includes_query boolean DEFAULT false,
     page integer,
     duration_ms integer,
     query_items jsonb,

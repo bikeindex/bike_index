@@ -8,6 +8,7 @@ class CreateLoggedSearches < ActiveRecord::Migration[6.1]
       t.integer :endpoint
       t.integer :stolenness
       t.boolean :serial, default: false
+      t.boolean :includes_query, default: false
       t.integer :page
 
       t.integer :duration_ms

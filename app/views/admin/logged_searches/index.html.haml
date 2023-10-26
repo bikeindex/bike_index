@@ -8,22 +8,60 @@
         %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@endpoint != "all" ? "active" : "")}
           - if @endpoint == "all"
             All endpoints
-          - else
+          - elsif special_endpoints.include?(@endpoint)
             = @endpoint.humanize
+          - else
+            = @endpoint
         .dropdown-menu
           = link_to "All endpoints", url_for(sortable_search_params.merge(search_endpoint: nil)), class: "dropdown-item #{@endpoint == "all" ? 'active' : ''}"
-          - LoggedSearch.endpoints.keys.each do |endpoint|
+          - special_endpoints.each do |endpoint|
             - endpoint_active = @endpoint == endpoint
             = link_to endpoint.humanize, url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), class: "dropdown-item #{endpoint_active ? 'active' : ''}"
+          .dropdown-divider
+          - LoggedSearch.endpoints.keys.each do |endpoint|
+            - endpoint_active = @endpoint == endpoint
+            = link_to endpoint, url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), class: "dropdown-item #{endpoint_active ? 'active' : ''}"
+      %li.nav-item
+        = link_to "include blank Query Items", url_for(sortable_search_params.merge(search_serial: @serial)), class: "nav-link #{@serial ? 'active' : ''}"
+      %li.nav-item
+        - include_blank_q = ParamsNormalizer.boolean(params[:search_include_blank])
+        = link_to "include blank Query Items", url_for(sortable_search_params.merge(search_include_blank: !include_blank_q)), class: "nav-link #{include_blank_q ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
   = render partial: "/shared/admin_current_header", locals: {viewing: "Logged Searches"}
 
 -# Check BikeStickerUpdates charts if @render_chart
+- if @render_chart
+  - if @endpoint.present?
+    - endpoints = matching_logged_searches.distinct.pluck(:endpoint).sort
+    - counts_by_endpoint = endpoints.map { |endpoint| {name: endpoint, data: time_range_counts(collection: matching_logged_searches.where(endpoint: endpoint))} }
+    -# colors, if ever necessary to include the other response types: {green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0"}
+    = column_chart counts_by_endpoint, stacked: true, thousands: ","
+  - else
+    = column_chart time_range_counts(collection: matching_logged_searches, column: @time_range_column), stacked: true, thousands: ","
 
 .mt-2
   = render partial: "/shared/period_select"
+
+.mt-4
+
+- if params[:search_endpoint].present?
+  %p
+    Viewing only Searches
+    %strong to
+    - if special_endpoints.include?(params[:search_endpoint])
+      %em= params[:search_endpoint].humanize
+    - else
+      %code= params[:search_endpoint]
+    = link_to "view for all endpoints", url_for(sortable_search_params.merge(search_endpoint: nil)), class: "gray-link small"
+
+- if params[:search_ip_address].present?
+  %p
+    Viewing only Searches
+    %strong from
+    %code= params[:search_ip_address]
+    = link_to "view from any ip address", url_for(sortable_search_params.merge(search_ip_address: nil)), class: "gray-link small"
 
 = render partial: "/shared/pagination", locals: {collection: @logged_searches}
 
@@ -48,6 +86,8 @@
       %th
         = sortable "stolenness"
       %th
+        = sortable "page"
+      %th
         = sortable "serial", "Serial?"
     %tbody
       - @logged_searches.each do |logged_search|
@@ -62,22 +102,28 @@
               = logged_search.endpoint
           %td
             %code.small= logged_search.ip_address
-          %td
-            %code.small= logged_search.query_items
+            = link_to search_emoji, url_for(sortable_search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link small"
+          %td.data-cell.only-data.small
+            - if logged_search.query_items.present?
+              = pretty_print_json(logged_search.query_items)
           %td
             - if logged_search.organization_id.present?
               %code= logged_search.organization_id
-              -# = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id), class: "display-sortable-link small"
+              = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id)), class: "display-sortable-link small"
             -#- if logged_search.organization.present?
             -#  = link_to logged_search.organization.short_name, admin_organization_path(sortable_search_params.merge(organization_id: logged_search.organization_id))
-            -#  = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id), class: "display-sortable-link small"
           %td
             - if logged_search.user_id.present?
               %code= logged_search.user_id
+              = link_to search_emoji, url_for(sortable_search_params.merge(user_id: logged_search.user_id)), class: "display-sortable-link small"
               -# = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.user_id), class: "display-sortable-link small"
               -# = render partial: "/shared/admin_user_cell", locals: {user: logged_search.user, render_search: true, cache: true}
           %td
             - unless logged_search.stolenness_all?
               %small= logged_search.stolenness
-          %td
+          %td.small
+            = admin_number_display(logged_search.page)
+          %td.table-cell-check
             = check_mark if logged_search.serial
+
+= render partial: "/shared/pagination", locals: {collection: @logged_searches, skip_total: true}
