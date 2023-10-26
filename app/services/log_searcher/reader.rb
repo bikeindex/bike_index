@@ -1,13 +1,17 @@
-module LogSearcher
+class LogSearcher::Reader
   KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
   DEFAULT_LOG_PATH = (ENV["LOG_SEARCH_PATH"] || "#{Rails.root}/log/#{Rails.env}.log").freeze
-  SEARCHES_MATCHES = %w[BikesController#index
-    Organized::BikesController#index
-    Admin::BikesController#index
+  SEARCHES_MATCHES = %w[api/v2/bikes_search
+    api/v3/search
     API::V1::BikesController#index
     API::V1::BikesController#stolen_ids
-    api/v2/bikes_search
-    api/v3/search
+    API::V1::BikesController#close_serial
+    BikesController#index
+    Organized::BikesController#index
+    Admin::BikesController#index
+    OrgPublic::ImpoundedBikesController#index
+    Organized::ImpoundRecordsController#index
+    ParkingNotificationsController#index
   ].freeze
 
   class << self
@@ -25,9 +29,9 @@ module LogSearcher
 
     def write_log_lines(rgrep_command)
       RedisPool.conn do |r|
-        # r.pipelined do |pipeline|
-          IO.popen(rgrep_command) { |io| io.each { |l| r.lpush(KEY, l) } }
-        # end
+        r.pipelined do |pipeline|
+          IO.popen(rgrep_command) { |io| io.each { |l| pipeline.lpush(KEY, l) } }
+        end
       end
     end
 
