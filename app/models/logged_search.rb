@@ -21,10 +21,13 @@ class LoggedSearch < AnalyticsRecord
 
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3}.freeze
 
+  # belongs_to :user
+  # belongs_to :organization
+
   enum endpoint: ENDPOINT_ENUM
   enum stolenness: STOLENNESS_ENUM, _prefix: :stolenness
 
-  validates_presence_of :log_line
+  validates_presence_of :log_line, :request_at
   validates_uniqueness_of :request_id, allow_nil: false
 
   def self.endpoints_sym

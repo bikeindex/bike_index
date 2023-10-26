@@ -8,8 +8,8 @@ class Admin::LoggedSearchesController < Admin::BaseController
     @per_page = params[:per_page] || 25
     @logged_searches =
       matching_logged_searches
-        .reorder("bike_sticker_updates.#{sort_column} #{sort_direction}")
-        .includes(:organization, :user)
+        .reorder("logged_searches.#{sort_column} #{sort_direction}")
+        # .includes(:organization, :user)
         .page(page)
         .per(@per_page)
   end
@@ -19,7 +19,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[request_at created_at endpoint]
+    %w[request_at created_at endpoint stolenness ip_address organization_id user_id serial]
   end
 
   def earliest_period_date
@@ -32,6 +32,8 @@ class Admin::LoggedSearchesController < Admin::BaseController
     if LoggedSearch.endpoints.keys.include?(params[:search_endpoint])
       @endpoint = params[:search_endpoint]
       logged_searches.where(endpoint: @endpoint)
+    else
+      @endpoint = "all"
     end
 
     logged_searches.where(created_at: @time_range)

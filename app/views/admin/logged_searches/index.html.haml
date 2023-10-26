@@ -1,0 +1,83 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Logged Bike Searches
+  .col-md-7
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@endpoint != "all" ? "active" : "")}
+          - if @endpoint == "all"
+            All endpoints
+          - else
+            = @endpoint.humanize
+        .dropdown-menu
+          = link_to "All endpoints", url_for(sortable_search_params.merge(search_endpoint: nil)), class: "dropdown-item #{@endpoint == "all" ? 'active' : ''}"
+          - LoggedSearch.endpoints.keys.each do |endpoint|
+            - endpoint_active = @endpoint == endpoint
+            = link_to endpoint.humanize, url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), class: "dropdown-item #{endpoint_active ? 'active' : ''}"
+      %li.nav-item
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Logged Searches"}
+
+-# Check BikeStickerUpdates charts if @render_chart
+
+.mt-2
+  = render partial: "/shared/period_select"
+
+= render partial: "/shared/pagination", locals: {collection: @logged_searches}
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th
+        = sortable "request_at"
+      - if false # display_dev_info?
+        %th.only-dev-visible.small
+          = sortable "created_at"
+      %th
+        = sortable "endpoint"
+      %th
+        = sortable "ip_address"
+      %th
+        Query
+      %th
+        = sortable "organization_id"
+      %th
+        = sortable "user_id"
+      %th
+        = sortable "stolenness"
+      %th
+        = sortable "serial", "Serial?"
+    %tbody
+      - @logged_searches.each do |logged_search|
+        %tr
+          %td
+            %span.convertTime.preciseTimeSeconds= l logged_search.request_at, format: :convert_time
+          -# if display_dev_info?
+            -#%td
+            -#  %small.convertTime.preciseTimeSecond= l logged_search.created_at, format: :convert_time
+          %td
+            %code.small{style: "word-break: keep-all;"}
+              = logged_search.endpoint
+          %td
+            %code.small= logged_search.ip_address
+          %td
+            %code.small= logged_search.query_items
+          %td
+            - if logged_search.organization_id.present?
+              %code= logged_search.organization_id
+              -# = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id), class: "display-sortable-link small"
+            -#- if logged_search.organization.present?
+            -#  = link_to logged_search.organization.short_name, admin_organization_path(sortable_search_params.merge(organization_id: logged_search.organization_id))
+            -#  = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id), class: "display-sortable-link small"
+          %td
+            - if logged_search.user_id.present?
+              %code= logged_search.user_id
+              -# = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.user_id), class: "display-sortable-link small"
+              -# = render partial: "/shared/admin_user_cell", locals: {user: logged_search.user, render_search: true, cache: true}
+          %td
+            - unless logged_search.stolenness_all?
+              %small= logged_search.stolenness
+          %td
+            = check_mark if logged_search.serial
