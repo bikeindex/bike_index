@@ -264,7 +264,6 @@ Rails.application.routes.draw do
         collection do
           get :search_tags
           get :close_serials
-          get :serials_containing
           get :stolen_ids
         end
       end
