@@ -37,7 +37,7 @@ class LogSearcher::Reader
     # NOTE: THIS IS ONLY FOR TESTING (or diagnostics)
     def log_lines_array(rgrep_command)
       log_lines = []
-      IO.popen(rgrep_command) { |io| io.each { |l| log_lines += l } }
+      IO.popen(rgrep_command) { |io| io.each { |l| log_lines << l } }
       log_lines
     end
 

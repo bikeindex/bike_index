@@ -1,3 +1,4 @@
+# This class parses bike search log lines
 class LogSearcher::Parser
   class << self
     def parse_log_line(log_line)
@@ -26,8 +27,8 @@ class LogSearcher::Parser
       # "/all_stolen" - reject
     end
 
-    def stolenness_for()
-
+    def stolenness_for(opts)
+      "all"
     end
 
     def parse_request_time(line_data)

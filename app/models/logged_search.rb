@@ -16,10 +16,14 @@ class LoggedSearch < AnalyticsRecord
     org_parking_notifications: 13,
     org_impounded: 14,
     org_public_impounded: 15
-  }
+  }.freeze
 
-  enum kind: ENDPOINT_ENUM
+  enum endpoint: ENDPOINT_ENUM
 
   validates_presence_of :log_line
   validates_uniqueness_of :request_id, allow_nil: false
+
+  def self.endpoints_sym
+    ENDPOINT_ENUM.keys.freeze
+  end
 end

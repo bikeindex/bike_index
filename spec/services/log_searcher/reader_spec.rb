@@ -6,9 +6,9 @@ RSpec.describe LogSearcher::Reader do
 
   describe "SEARCHES_MATCHES" do
     it "returns search strings" do
-      expect(LogSearcher::SEARCHES_MATCHES.count).to be > 5
-      expect(LogSearcher.searches_regex).to match("BikesController#index|")
-      expect(LogSearcher.searches_regex.split("|").count).to be > 3
+      expect(LogSearcher::Reader::SEARCHES_MATCHES.count).to be > 5
+      expect(LogSearcher::Reader.searches_regex).to match("BikesController#index|")
+      expect(LogSearcher::Reader.searches_regex.split("|").count).to be > 3
     end
   end
 
@@ -34,16 +34,12 @@ RSpec.describe LogSearcher::Reader do
   describe "test adding log_lines" do
     let(:time) { Time.at(1698020443) }
     it "adds the lines" do
-      redis.expire(LogSearcher::KEY, 0)
-      expect(LogSearcher.log_lines_in_redis).to eq 0
-      LogSearcher.write_log_lines(LogSearcher.rgrep_command(time, log_path: log_path))
+      redis.expire(LogSearcher::Reader::KEY, 0)
+      expect(LogSearcher::Reader.log_lines_in_redis).to eq 0
+      LogSearcher::Reader.write_log_lines(LogSearcher::Reader.rgrep_command(time, log_path: log_path))
       sleep 1 if ENV["CI"] # Maybe fix CI?
-      expect(LogSearcher.log_lines_in_redis).to eq 3
-      redis.expire(LogSearcher::KEY, 0)
+      expect(LogSearcher::Reader.log_lines_in_redis).to eq 3
+      redis.expire(LogSearcher::Reader::KEY, 0)
     end
-  end
-
-  describe "log_lines_array" do
-    it "has every endpoint type"
   end
 end
