@@ -90,10 +90,9 @@ RSpec.describe LogSearcher::Parser do
       expect(log_lines.count).to be > 15
       parsed_log_lines = log_lines.map { |l| described_class.parse_log_line(l) }.compact
       expect(parsed_log_lines.count).to be < log_lines.count
-      # pp parsed_log_lines
       # It should have every endpoint
       logged_endpoints = parsed_log_lines.map { |l| l[:endpoint] }.uniq.sort
-      pp logged_endpoints, LoggedSearch.endpoints_sym.sort - logged_endpoints
+      expect(LoggedSearch.endpoints_sym - logged_endpoints).to eq([])
       expect(logged_endpoints).to eq LoggedSearch.endpoints_sym.sort
     end
   end

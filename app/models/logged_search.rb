@@ -3,6 +3,7 @@ class LoggedSearch < AnalyticsRecord
     public_bikes: 0,
     api_v1_bikes: 1,
     api_v1_stolen_ids: 2,
+    api_v1_close_serials: 16,
     api_v2_bikes: 3, # Includes /search, /stolen, /not_stolen
     api_v2_count: 4,
     api_v2_close_serials: 5,

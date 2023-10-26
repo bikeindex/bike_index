@@ -5,11 +5,12 @@ class LogSearcher::Reader
     api/v3/search
     API::V1::BikesController#index
     API::V1::BikesController#stolen_ids
+    API::V1::BikesController#close_serial
     BikesController#index
     Organized::BikesController#index
     Admin::BikesController#index
     OrgPublic::ImpoundedBikesController#index
-    ImpoundRecordsController#index
+    Organized::ImpoundRecordsController#index
     ParkingNotificationsController#index
   ].freeze
 
@@ -32,13 +33,6 @@ class LogSearcher::Reader
           IO.popen(rgrep_command) { |io| io.each { |l| pipeline.lpush(KEY, l) } }
         end
       end
-    end
-
-    # NOTE: THIS IS ONLY FOR TESTING (or diagnostics)
-    def log_lines_array(rgrep_command)
-      log_lines = []
-      IO.popen(rgrep_command) { |io| io.each { |l| log_lines << l } }
-      log_lines
     end
 
     # This is for diagnostics, to count how many are returned

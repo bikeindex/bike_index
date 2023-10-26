@@ -3,12 +3,13 @@ class LogSearcher::Parser
   CONTROLLER_ENDPOINTS = {
     "API::V1::BikesController#index" => :api_v1_bikes,
     "API::V1::BikesController#stolen_ids" => :api_v1_stolen_ids,
+    "API::V1::BikesController#close_serials" => :api_v1_close_serials,
     "BikesController#index" => :public_bikes,
     "Organized::BikesController#index" => :org_bikes,
     "Admin::BikesController#index" => :admin_bikes,
     "OrgPublic::ImpoundedBikesController#index" => :org_public_impounded,
-    "Organized::ImpoundRecordsController" => :org_impounded,
-    "Organized::ParkingNotificationsController" => :org_parking_notifications
+    "Organized::ImpoundRecordsController#index" => :org_impounded,
+    "Organized::ParkingNotificationsController#index" => :org_parking_notifications
   }.freeze
 
   ROUTE_ENDPOINTS = {
@@ -74,6 +75,8 @@ class LogSearcher::Parser
         end
       elsif %i[org_impounded org_public_impounded].include?(endpoint)
         :impounded
+      elsif endpoint == :api_v1_stolen_ids
+        :stolen
       else
         case opts.dig("params", "stolenness")
         when "stolen", "proximity" then :stolen
