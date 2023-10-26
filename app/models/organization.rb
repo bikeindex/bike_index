@@ -85,7 +85,7 @@ class Organization < ApplicationRecord
   scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
-  scope :with_stolen_message, -> { left_joins(:organization_stolen_message).where.not(organization_stolen_message: { body: nil }) }
+  scope :with_stolen_message, -> { left_joins(:organization_stolen_message).where.not(organization_stolen_message: {body: nil}) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[unstolen_notifications parking_notifications impound_bikes]) }
   # Regional orgs have to have the organization feature slug AND the search location set

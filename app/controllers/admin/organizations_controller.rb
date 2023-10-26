@@ -153,11 +153,11 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[created_at name approved pos_kind bikes]
+    %w[created_at name approved pos_kind bikes].freeze
   end
 
   def organization_settings
-    %w[theft_survey with_stolen_message]
+    %w[theft_survey with_stolen_message].freeze
   end
 
   def pos_kind_for_organizations
