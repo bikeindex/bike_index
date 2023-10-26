@@ -1,4 +1,4 @@
-class LogSearcher::Reader
+class  LogSearcher::Reader
   KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
   DEFAULT_LOG_PATH = (ENV["LOG_SEARCH_PATH"] || "#{Rails.root}/log/#{Rails.env}.log").freeze
   SEARCHES_MATCHES = %w[api/v2/bikes_search
