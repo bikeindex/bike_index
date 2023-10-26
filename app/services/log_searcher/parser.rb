@@ -1,11 +1,5 @@
-class ParseLogSearchesWorker < ScheduledWorker
-  prepend ScheduledWorkerRecorder
-
+class LogSearcher::Parser
   class << self
-    def frequency
-      1.minute
-    end
-
     def parse_log_line(log_line)
       raise "Multiple line_data matches for log line #{log_line}" if log_line.match?(/\] \{.*\] \{/)
       line_data, opts = log_line.split("] {")
@@ -20,11 +14,21 @@ class ParseLogSearchesWorker < ScheduledWorker
         endpoint: parse_endpoint(opts),
         ip_address: opts["remote_ip"],
         query_items: opts["params"].except("organization_id", "page"),
+        stolenness: stolenness_for(opts),
+        serial: opts.dig("params", "serial").present?,
         page: [nil, "1"].include?(page) ? nil : page.to_i
       }
     end
 
     private
+
+    def endpoint_for(opts)
+      # "/all_stolen" - reject
+    end
+
+    def stolenness_for()
+
+    end
 
     def parse_request_time(line_data)
       time_str = line_data.gsub("I, [", "").split(" #").first
@@ -34,8 +38,5 @@ class ParseLogSearchesWorker < ScheduledWorker
     def parse_endpoint(opts)
       :web
     end
-  end
-
-  def perform
   end
 end

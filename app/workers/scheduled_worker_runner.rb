@@ -43,12 +43,12 @@ class ScheduledWorkerRunner < ScheduledWorker
       FetchProject529BikesWorker,
       FileCacheMaintenanceWorker,
       ImpoundExpirationWorker,
-      ParseLogSearchesWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
       ScheduleBikePossiblyFoundNotificationWorker,
       ScheduleSearchForExternalRegistryBikesWorker,
       ScheduledEmailSurveyWorker,
+      ScheduledStoreLogSearchesWorker,
       TsvCreatorWorker,
       UnusedOwnershipRemovalWorker,
       UpdateCountsWorker,
@@ -58,7 +58,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       UpdateOrganizationPosKindWorker,
       UpdateTheftAlertFacebookWorker,
       self
-    ]
+    ].freeze
   end
 
   def self.scheduled_non_scheduler_workers
