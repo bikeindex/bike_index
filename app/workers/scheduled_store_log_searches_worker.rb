@@ -1,5 +1,6 @@
 class ScheduledStoreLogSearchesWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
+  MAX_W = 5_000
 
   def self.frequency
     1.minute
@@ -9,8 +10,11 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
     return enqueue_workers unless read_log_line
 
     log_line = get_log_line
+    return if log_line.nil
     log_line_attrs = LogSearcher::Parser.parse_log_line(log_line)
     LoggedSearch.create(log_line_attrs.merge(log_line: log_line))
+  rescue e =>
+    raise "Error: #{e}, log_line: #{log_line}"
   end
 
   def get_log_line
@@ -18,7 +22,9 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
   end
 
   def enqueue_workers
-    LogSearcher::Reader.log_lines_in_redis.times do
+    workers_to_enqueue = LogSearcher::Reader.log_lines_in_redis
+    workers_to_enqueue = MAX_W if workers_to_enqueue > MAX_W
+    workers_to_enqueue.times do
       ScheduledStoreLogSearchesWorker.perform_async(true)
     end
   end
