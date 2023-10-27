@@ -4,10 +4,7 @@ end
 
 task read_logged_searches: :environment do
   LogSearcher::Reader.write_log_lines(Time.current)
-  # TODO: Improve/catch additional searches. running this task every 15 minutes, loading the previous hour searches
-  if Time.current.min < 30
-    LogSearcher::Reader.write_log_lines(Time.current - 1.hour)
-  end
+  LogSearcher::Reader.write_log_lines(Time.current - 1.hour)
 end
 
 desc "Reset Autocomplete"
