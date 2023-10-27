@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 
 import ErrorBoundary from "@honeybadger-io/react";
 
-import SecondarySearches from "../scripts/bikes_search/SecondarySearches";
+import BikeSearches from "../scripts/bikes_search/bike_searches";
 import honeybadger from "../scripts/utils/honeybadger";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   ReactDOM.render(
     <ErrorBoundary honeybadger={honeybadger}>
-      <SecondarySearches interpretedParams={window.interpreted_params} />
+      <BikeSearches interpretedParams={window.interpreted_params} />
     </ErrorBoundary>,
     el
   );
