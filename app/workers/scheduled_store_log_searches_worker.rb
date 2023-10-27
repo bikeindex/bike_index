@@ -1,6 +1,6 @@
 class ScheduledStoreLogSearchesWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
-  MAX_W = 1_000
+  MAX_W = 2_000
 
   def self.frequency
     3.minutes

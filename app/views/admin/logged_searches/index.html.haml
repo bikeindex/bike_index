@@ -67,6 +67,9 @@
     %thead.small-header
       %th
         = sortable "request_at"
+      - if sort_column == "created_at"
+        %th.small
+          = sortable "created_at"
       %th
         = sortable "endpoint"
       %th
@@ -81,14 +84,20 @@
         = sortable "stolenness"
       %th
         = sortable "page"
-      %th
-        = sortable "serial", "Serial?"
+      - if sort_column == "serial_normalized"
+        %th
+          = sortable "serial_normalized", "Serial"
+      %th{title: "Duration in seconds"}
+        = sortable "duration_ms", "Duration s"
     %tbody
       - @logged_searches.each do |logged_search|
         %tr
           %td
             %span.convertTime.preciseTimeSeconds
               = l logged_search.request_at, format: :convert_time
+          - if sort_column == "created_at"
+            %td.small
+              %span.convertTime= l logged_search.created_at, format: :convert_time
 
           %td
             %code.small{style: "word-break: keep-all;"}
@@ -124,8 +133,14 @@
               %small= logged_search.stolenness
           %td.small
             = admin_number_display(logged_search.page)
+          - if sort_column == "serial_normalized"
+            %td.small
+              - if logged_search.serial_normalized.present?
+                %code= logged_search.serial_normalized
           %td
-            - if logged_search.serial_normalized.present?
-              %code= logged_search.serial_normalized
+            - if logged_search.duration_ms.present?
+              %span{title: "#{logged_search.duration_ms} ms"}
+                = admin_number_display((logged_search.duration_ms * 0.001).round(2))
+
 
 = render partial: "/shared/pagination", locals: {collection: @logged_searches, skip_total: true}

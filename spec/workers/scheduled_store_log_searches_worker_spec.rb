@@ -35,8 +35,8 @@ RSpec.describe ScheduledStoreLogSearchesWorker, type: :job do
         allow(LogSearcher::Reader).to receive(:log_lines_in_redis) { 5000 }
         expect(described_class.jobs.count).to eq 0
         instance.perform
-        # Not testing precisely that 1000 enqueue with true, 1 enqueued to reschedule - but good enough
-        expect(described_class.jobs.count).to eq 1001
+        # Not testing precisely that MAX_W enqueued with true, 1 enqueued to reschedule - but good enough
+        expect(described_class.jobs.count).to eq ScheduledStoreLogSearchesWorker::MAX_W + 1
       end
     end
   end

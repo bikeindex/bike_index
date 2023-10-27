@@ -19,8 +19,8 @@ class Admin::LoggedSearchesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[request_at created_at endpoint stolenness ip_address organization_id user_id serial
-      page].freeze
+    %w[request_at created_at duration_ms endpoint stolenness ip_address organization_id user_id
+      serial_normalized page].freeze
   end
 
   def earliest_period_date
