@@ -6,7 +6,7 @@ class AdminRestriction
     auth = Rack::Session::Cookie::Base64::JSON.new.decode(cookie)
 
     # With signed cookies (in production), there is another layer of encoding
-    if auth["_rails"].present?
+    if auth.is_a?(Hash) && auth["_rails"].present?
       auth = JSON.parse(Base64.decode64(auth.dig("_rails", "message")))
     end
 
