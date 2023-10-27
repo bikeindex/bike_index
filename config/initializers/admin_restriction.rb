@@ -1,11 +1,15 @@
 class AdminRestriction
   def self.matches?(req)
-    return false unless (cookie = req.cookie_jar["auth"])
+    cookie = req.cookies["auth"]
+    return false unless cookie.present?
 
-    raise cookie
+    auth = Rack::Session::Cookie::Base64::JSON.new.decode(cookie)
 
-    pp "cookie: #{cookie}"
-    auth = JSON.parse(Base64.decode64(cookie))
+    # With signed cookies (in production), there is another layer of encoding
+    if auth["_rails"].present?
+      auth = JSON.parse(Base64.decode64(auth.dig("_rails", "message")))
+    end
+
     user = User.from_auth(auth)
 
     user&.superuser?
