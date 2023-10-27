@@ -36,7 +36,7 @@ CREATE TABLE public.logged_searches (
     log_line text,
     endpoint integer,
     stolenness integer,
-    serial_boolean boolean DEFAULT false,
+    serial boolean DEFAULT false,
     includes_query boolean DEFAULT false,
     page integer,
     duration_ms integer,
@@ -48,7 +48,7 @@ CREATE TABLE public.logged_searches (
     user_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    serial character varying
+    serial_normalized character varying
 );
 
 

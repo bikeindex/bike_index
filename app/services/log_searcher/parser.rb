@@ -47,7 +47,7 @@ class LogSearcher::Parser
         ip_address: opts["remote_ip"],
         query_items: query_items.except("organization_id", "page"),
         stolenness: stolenness_for(endpoint, opts),
-        serial: query_items["serial"],
+        serial_normalized: SerialNormalizer.normalized_and_corrected(query_items["serial"]),
         includes_query: includes_query?(query_items),
         page: [nil, "1", "undefined"].include?(query_items["page"]) ? nil : query_items["page"].to_i
       }
