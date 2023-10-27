@@ -15,14 +15,14 @@ RSpec.describe LogSearcher::Reader do
   describe "rgrep_command" do
     let(:target) { "rg '#{described_class.searches_regex}' '#{log_path}'" }
     it "returns a single rgrep" do
-      expect(described_class.rgrep_command(log_path: log_path)).to eq target
+      expect(described_class.rgrep_command_str(log_path: log_path)).to eq target
     end
     context "passed a time" do
       let(:time) { Time.at(1698092443) } # 2023-10-23 15:20
       let(:time_target) { "2023-10-23T20" }
       it "returns rgrep piped to a time regex" do
         expect(described_class.send(:time_rgrep, time)).to match time_target
-        result = described_class.rgrep_command(time, log_path: log_path)
+        result = described_class.rgrep_command_str(time, log_path: log_path)
 
         splitted = result.split(" | rg")
         expect(splitted.first).to eq target
@@ -36,8 +36,13 @@ RSpec.describe LogSearcher::Reader do
     it "adds the lines" do
       redis.expire(LogSearcher::Reader::KEY, 0)
       expect(LogSearcher::Reader.log_lines_in_redis).to eq 0
-      LogSearcher::Reader.write_log_lines(LogSearcher::Reader.rgrep_command(time, log_path: log_path))
+      expect(LogSearcher::Reader.rgrep_log_lines_count(time, log_path: log_path)).to eq 3
+      # Also, test that passing the command works
+      command_str = LogSearcher::Reader.rgrep_command_str(time, log_path: log_path)
+      expect(LogSearcher::Reader.rgrep_log_lines_count(rgrep_command: command_str)).to eq 3
+      LogSearcher::Reader.write_log_lines(time, log_path: log_path)
       expect(LogSearcher::Reader.log_lines_in_redis).to eq 3
+      # Clean up!
       redis.expire(LogSearcher::Reader::KEY, 0)
     end
   end

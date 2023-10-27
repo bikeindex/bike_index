@@ -45,7 +45,8 @@ class SerialNormalizer
   end
 
   # This is simple - but let's make sure it's consistent
-  def self.no_space(serial)
+  def self.no_space(serial = nil)
+    return nil if serial.blank?
     serial&.gsub(/\s/, "")
   end
 

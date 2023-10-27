@@ -32,7 +32,7 @@ class LoggedSearch < AnalyticsRecord
   validates_uniqueness_of :request_id, allow_nil: false
 
   scope :organized, -> { where(endpoint: organized_endpoints) }
-  scope :serial, -> { where(serial: true) }
+  scope :serial, -> { where.not(serial_normalized: nil) }
   scope :includes_query, -> { where(includes_query: true) }
 
   def self.organized_endpoints
