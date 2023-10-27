@@ -114,6 +114,9 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       available_stolen_records = StolenRecord
     end
+    unless ParamsNormalizer.boolean(params[:search_include_spam])
+      available_stolen_records = available_stolen_records.not_spam
+    end
 
     # We always render distance
     distance = params[:search_distance].to_i
