@@ -14,7 +14,7 @@ RSpec.describe LogSearcher::Parser do
     let(:target) do
       {request_at: time, request_id: "6473c6f5-51f6-422b-bb3c-7e94b670f520",
        duration_ms: 1002, user_id: nil, organization_id: nil, endpoint: :public_bikes,
-       ip_address: "11.222.33.4", query_items: {}, page: 2, serial: false,
+       ip_address: "11.222.33.4", query_items: {}, page: 2, serial: nil,
        stolenness: :all, includes_query: false}
     end
     it "parses into attrs" do
@@ -35,7 +35,7 @@ RSpec.describe LogSearcher::Parser do
           ip_address: "11.222.33.4",
           query_items: {"serial" => "WC02001xxxxx", "serial_no_space" => "WC02001xxxxx", "raw_serial" => "WC02001xxxxx", "stolenness" => "proximity", "location" => "you"},
           stolenness: :stolen,
-          serial: true,
+          serial: "WC02001xxxxx",
           page: nil,
           includes_query: true
         }
@@ -45,7 +45,7 @@ RSpec.describe LogSearcher::Parser do
       end
     end
     context "organized" do
-      let(:log_line) { 'I, [2023-10-23T17:57:36.142389 #666692]  INFO -- : [2ac7efc6-6660-4b11-a1ca-a276698bdbdf] {"method":"GET","path":"/o/hogwarts/bikes","format":"html","controller":"Organized::BikesController","action":"index","status":200,"allocations":510947,"duration":699.31,"view":307.43,"db":383.28,"remote_ip":"127.0.0.1","u_id":85,"params":{"search_email":"","serial":"","sort":"id","sort_direction":"desc","render_chart":"false","period":"","end_time":"","start_time":"","user_id":"","search_bike_id":"","search_status":"","search_kind":"","organization_id":"hogwarts","stolenness":"stolen","search_stickers":"","search_address":"","search_secondary":[""]},"@timestamp":"2023-10-23T17:57:36.142Z","@version":"1","message":"[200] GET /o/hogwarts/bikes (Organized::BikesController#index)"}' }
+      let(:log_line) { 'I, [2023-10-23T17:57:36.142389 #666692]  INFO -- : [2ac7efc6-6660-4b11-a1ca-a276698bdbdf] {"method":"GET","path":"/o/hogwarts/bikes","format":"html","controller":"Organized::BikesController","action":"index","status":200,"allocations":510947,"duration":699.31,"view":307.43,"db":383.28,"remote_ip":"127.0.0.1","u_id":85,"params":{"page":"undefined","search_email":"","serial":"","sort":"id","sort_direction":"desc","render_chart":"false","period":"","end_time":"","start_time":"","user_id":"","search_bike_id":"","search_status":"","search_kind":"","organization_id":"hogwarts","stolenness":"stolen","search_stickers":"","search_address":"","search_secondary":[""]},"@timestamp":"2023-10-23T17:57:36.142Z","@version":"1","message":"[200] GET /o/hogwarts/bikes (Organized::BikesController#index)"}' }
       let!(:organization) { FactoryBot.create(:organization, name: "Hogwarts") }
       let(:target) do
         {
@@ -58,7 +58,7 @@ RSpec.describe LogSearcher::Parser do
           query_items: {sort: "id", sort_direction: "desc", render_chart: "false", stolenness: "stolen"},
           ip_address: "127.0.0.1",
           stolenness: :stolen,
-          serial: false,
+          serial: nil,
           page: nil,
           includes_query: false
         }

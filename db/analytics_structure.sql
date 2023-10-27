@@ -36,7 +36,7 @@ CREATE TABLE public.logged_searches (
     log_line text,
     endpoint integer,
     stolenness integer,
-    serial boolean DEFAULT false,
+    serial_boolean boolean DEFAULT false,
     includes_query boolean DEFAULT false,
     page integer,
     duration_ms integer,
@@ -47,7 +47,8 @@ CREATE TABLE public.logged_searches (
     organization_id bigint,
     user_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    serial character varying
 );
 
 
@@ -138,6 +139,7 @@ CREATE INDEX index_logged_searches_on_user_id ON public.logged_searches USING bt
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20231025160704');
+('20231025160704'),
+('20231027162602');
 
 
