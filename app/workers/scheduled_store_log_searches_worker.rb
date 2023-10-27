@@ -25,7 +25,6 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
   def enqueue_workers
     workers_to_enqueue = LogSearcher::Reader.log_lines_in_redis
     if workers_to_enqueue > MAX_W
-      # TODO: Add notification when above 100k
       workers_to_enqueue = MAX_W
       # Reschedule enqueuing workers
       ScheduledStoreLogSearchesWorker.perform_in(15.seconds)
