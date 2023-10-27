@@ -46,8 +46,14 @@ class Admin::LoggedSearchesController < Admin::BaseController
       @endpoint = "all"
     end
 
-    logged_searches = logged_searches.serial if ParamsNormalizer.boolean(params[:search_serial])
-    logged_searches = logged_searches.includes_query if ParamsNormalizer.boolean(params[:search_includes_query])
+    if ParamsNormalizer.boolean(params[:search_serial])
+      @serial = true
+      logged_searches = logged_searches.serial
+    end
+    if ParamsNormalizer.boolean(params[:search_includes_query])
+      @includes_query = true
+      logged_searches = logged_searches.includes_query
+    end
 
     if params[:search_ip_address].present?
       logged_searches = logged_searches.where(ip_address: params[:search_ip_address])

@@ -33,7 +33,7 @@ class LoggedSearch < AnalyticsRecord
 
   scope :organized, -> { where(endpoint: organized_endpoints) }
   scope :serial, -> { where(serial: true) }
-  scope :query, -> { where(has_query: true) }
+  scope :includes_query, -> { where(includes_query: true) }
 
   def self.organized_endpoints
     %i[org_bikes org_parking_notifications org_impounded].freeze

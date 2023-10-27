@@ -22,10 +22,9 @@
             - endpoint_active = @endpoint == endpoint
             = link_to endpoint, url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), class: "dropdown-item #{endpoint_active ? 'active' : ''}"
       %li.nav-item
-        = link_to "include blank Query Items", url_for(sortable_search_params.merge(search_serial: @serial)), class: "nav-link #{@serial ? 'active' : ''}"
+        = link_to "serial", url_for(sortable_search_params.merge(search_serial: !@serial)), class: "nav-link #{@serial ? 'active' : ''}"
       %li.nav-item
-        - include_blank_q = ParamsNormalizer.boolean(params[:search_include_blank])
-        = link_to "include blank Query Items", url_for(sortable_search_params.merge(search_include_blank: !include_blank_q)), class: "nav-link #{include_blank_q ? 'active' : ''}"
+        = link_to "include query", url_for(sortable_search_params.merge(search_includes_query: !@includes_query)), class: "nav-link #{@includes_query ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
