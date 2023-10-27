@@ -84,8 +84,11 @@
         = sortable "stolenness"
       %th
         = sortable "page"
+      - if sort_column == "serial_normalized"
+        %th
+          = sortable "serial_normalized", "Serial"
       %th
-        = sortable "serial", "Serial?"
+        = sortable "duration_ms", "Duration"
     %tbody
       - @logged_searches.each do |logged_search|
         %tr
@@ -130,8 +133,11 @@
               %small= logged_search.stolenness
           %td.small
             = admin_number_display(logged_search.page)
+          - if sort_column == "serial_normalized"
+            %td.small
+              - if logged_search.serial_normalized.present?
+                %code= logged_search.serial_normalized
           %td
-            - if logged_search.serial_normalized.present?
-              %code= logged_search.serial_normalized
+            = admin_number_display(logged_search.duration_ms * 0.001)
 
 = render partial: "/shared/pagination", locals: {collection: @logged_searches, skip_total: true}
