@@ -34,8 +34,7 @@
 - if @render_chart
   - if @endpoint.present?
     - endpoints = matching_logged_searches.distinct.pluck(:endpoint).sort
-    - counts_by_endpoint = endpoints.map { |endpoint| {name: endpoint, data: time_range_counts(collection: matching_logged_searches.where(endpoint: endpoint))} }
-    -# colors, if ever necessary to include the other response types: {green: "#178813", red: "#d12310" , orange: "#ffc281", blue: "#88a2e0"}
+    - counts_by_endpoint = endpoints.map { |endpoint| {name: endpoint, data: time_range_counts(collection: matching_logged_searches.where(endpoint: endpoint), column: @time_range_column)} }
     = column_chart counts_by_endpoint, stacked: true, thousands: ","
   - else
     = column_chart time_range_counts(collection: matching_logged_searches, column: @time_range_column), stacked: true, thousands: ","
