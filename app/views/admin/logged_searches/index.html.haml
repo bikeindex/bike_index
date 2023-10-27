@@ -138,8 +138,9 @@
               - if logged_search.serial_normalized.present?
                 %code= logged_search.serial_normalized
           %td
-            %span{title: "#{logged_search.duration_ms} ms"}
-              = admin_number_display((logged_search.duration_ms * 0.001).round(2))
+            - if logged_search.duration_ms.present?
+              %span{title: "#{logged_search.duration_ms} ms"}
+                = admin_number_display((logged_search.duration_ms * 0.001).round(2))
 
 
 = render partial: "/shared/pagination", locals: {collection: @logged_searches, skip_total: true}
