@@ -57,8 +57,7 @@ class LogSearcher::Parser
 
     def includes_query?(query_items)
       query_items.except("organization_id", "page", "stolenness", "location", "distance",
-        "locale", "sort", "sort_direction", "render_chart")
-        .present?
+        "locale", "sort", "sort_direction", "render_chart", "utf8").present?
     end
 
     def parse_endpoint(opts)
