@@ -14,7 +14,7 @@ RSpec.describe LogSearcher::Parser do
     let(:target) do
       {request_at: time, request_id: "6473c6f5-51f6-422b-bb3c-7e94b670f520",
        duration_ms: 1002, user_id: nil, organization_id: nil, endpoint: :public_bikes,
-       ip_address: "11.222.33.4", query_items: {}, page: 2, serial: false,
+       ip_address: "11.222.33.4", query_items: {}, page: 2, serial_normalized: nil,
        stolenness: :all, includes_query: false}
     end
     it "parses into attrs" do
@@ -23,7 +23,7 @@ RSpec.describe LogSearcher::Parser do
       expect_hashes_to_match(described_class.parse_log_line(log_line), target)
     end
     context "API" do
-      let(:log_line) { 'I, [2023-10-23T00:20:29.448035 #666684]  INFO -- : [8f46986c-7d36-46f5-aeb6-9d4851de15b7] {"status":200,"method":"GET","path":"/api/v3/search/serials_containing","params":{"serial":"WC02001xxxxx","serial_no_space":"WC02001xxxxx","raw_serial":"WC02001xxxxx","stolenness":"proximity","location":"you"},"host":"bikeindex.org","remote_ip":"11.222.33.4","u_id":1321,"format":"json","db":1879.08,"view":12.02999999999997,"duration":1891.11}' }
+      let(:log_line) { 'I, [2023-10-23T00:20:29.448035 #666684]  INFO -- : [8f46986c-7d36-46f5-aeb6-9d4851de15b7] {"status":200,"method":"GET","path":"/api/v3/search/serials_containing","params":{"serial":"WCo2001xxxxx","serial_no_space":"WC02001XXXXX","raw_serial":"WC02001XXXXX","stolenness":"proximity","location":"you"},"host":"bikeindex.org","remote_ip":"11.222.33.4","u_id":1321,"format":"json","db":1879.08,"view":12.02999999999997,"duration":1891.11}' }
       let(:target) do
         {
           request_at: Time.at(1698020429).utc,
@@ -33,9 +33,9 @@ RSpec.describe LogSearcher::Parser do
           organization_id: nil,
           endpoint: :api_v3_serials_containing,
           ip_address: "11.222.33.4",
-          query_items: {"serial" => "WC02001xxxxx", "serial_no_space" => "WC02001xxxxx", "raw_serial" => "WC02001xxxxx", "stolenness" => "proximity", "location" => "you"},
+          query_items: {"serial" => "WCo2001xxxxx", "serial_no_space" => "WC02001XXXXX", "raw_serial" => "WC02001XXXXX", "stolenness" => "proximity", "location" => "you"},
           stolenness: :stolen,
-          serial: true,
+          serial_normalized: "WC02001XXXXX",
           page: nil,
           includes_query: true
         }
@@ -45,7 +45,7 @@ RSpec.describe LogSearcher::Parser do
       end
     end
     context "organized" do
-      let(:log_line) { 'I, [2023-10-23T17:57:36.142389 #666692]  INFO -- : [2ac7efc6-6660-4b11-a1ca-a276698bdbdf] {"method":"GET","path":"/o/hogwarts/bikes","format":"html","controller":"Organized::BikesController","action":"index","status":200,"allocations":510947,"duration":699.31,"view":307.43,"db":383.28,"remote_ip":"127.0.0.1","u_id":85,"params":{"search_email":"","serial":"","sort":"id","sort_direction":"desc","render_chart":"false","period":"","end_time":"","start_time":"","user_id":"","search_bike_id":"","search_status":"","search_kind":"","organization_id":"hogwarts","stolenness":"stolen","search_stickers":"","search_address":"","search_secondary":[""]},"@timestamp":"2023-10-23T17:57:36.142Z","@version":"1","message":"[200] GET /o/hogwarts/bikes (Organized::BikesController#index)"}' }
+      let(:log_line) { 'I, [2023-10-23T17:57:36.142389 #666692]  INFO -- : [2ac7efc6-6660-4b11-a1ca-a276698bdbdf] {"method":"GET","path":"/o/hogwarts/bikes","format":"html","controller":"Organized::BikesController","action":"index","status":200,"allocations":510947,"duration":699.31,"view":307.43,"db":383.28,"remote_ip":"127.0.0.1","u_id":85,"params":{"page":"undefined","search_email":"","serial":"","sort":"id","sort_direction":"desc","render_chart":"false","period":"","end_time":"","start_time":"","user_id":"","search_bike_id":"","search_status":"","search_kind":"","organization_id":"hogwarts","stolenness":"stolen","search_stickers":"","search_address":"","search_secondary":[""]},"@timestamp":"2023-10-23T17:57:36.142Z","@version":"1","message":"[200] GET /o/hogwarts/bikes (Organized::BikesController#index)"}' }
       let!(:organization) { FactoryBot.create(:organization, name: "Hogwarts") }
       let(:target) do
         {
@@ -58,7 +58,7 @@ RSpec.describe LogSearcher::Parser do
           query_items: {sort: "id", sort_direction: "desc", render_chart: "false", stolenness: "stolen"},
           ip_address: "127.0.0.1",
           stolenness: :stolen,
-          serial: false,
+          serial_normalized: nil,
           page: nil,
           includes_query: false
         }

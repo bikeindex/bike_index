@@ -1,9 +1,10 @@
 require "rails_helper"
 
 RSpec.describe ScheduledStoreLogSearchesWorker, type: :job do
-  let(:instance) { described_class.new }
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
+
+  let(:instance) { described_class.new }
 
   describe "perform" do
     let!(:organization) { FactoryBot.create(:organization, name: "Hogwarts") }
@@ -18,6 +19,25 @@ RSpec.describe ScheduledStoreLogSearchesWorker, type: :job do
       expect(logged_search.stolenness).to eq "impounded"
       expect(logged_search.organization_id).to eq organization.id
       expect(logged_search.user_id).to eq 111
+    end
+  end
+
+  describe "enqueue_workers" do
+    before { Sidekiq::Worker.clear_all }
+    it "enqueues workers for all the log lines" do
+      allow(LogSearcher::Reader).to receive(:log_lines_in_redis) { 50 }
+      expect(described_class.jobs.count).to eq 0
+      instance.perform
+      expect(described_class.jobs.count).to eq 50
+    end
+    context "over 1000 log lines" do
+      it "enqueues 1k and re-enqueues scheduler" do
+        allow(LogSearcher::Reader).to receive(:log_lines_in_redis) { 5000 }
+        expect(described_class.jobs.count).to eq 0
+        instance.perform
+        # Not testing precisely that 1000 enqueue with true, 1 enqueued to reschedule - but good enough
+        expect(described_class.jobs.count).to eq 1001
+      end
     end
   end
 end

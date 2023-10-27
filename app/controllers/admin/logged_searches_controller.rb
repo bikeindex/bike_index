@@ -19,7 +19,8 @@ class Admin::LoggedSearchesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[request_at created_at endpoint stolenness ip_address organization_id user_id serial]
+    %w[request_at created_at endpoint stolenness ip_address organization_id user_id serial
+      page].freeze
   end
 
   def earliest_period_date
@@ -64,6 +65,10 @@ class Admin::LoggedSearchesController < Admin::BaseController
     if params[:organization_id].present?
       logged_searches = logged_searches.where(organization_id: params[:organization_id])
     end
+
+    logged_searches = logged_searches.where.not(user_id: nil) if sort_column == "user_id"
+    logged_searches = logged_searches.where.not(organization_id: nil) if sort_column == "organization_id"
+    logged_searches = logged_searches.where.not(page: nil) if sort_column == "page"
 
     @time_range_column = sort_column if %w[created_at updated_at].include?(sort_column)
     @time_range_column ||= "request_at"
