@@ -366,7 +366,7 @@ class Bike < ApplicationRecord
         current_impound_record.present? && current_impound_record.authorized?(u)
     end
     return serial_number.humanize if no_serial?
-    serial_number
+    serial_number.upcase
   end
 
   # Prevent returning ip address, rather than the TLD URL
