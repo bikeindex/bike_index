@@ -67,9 +67,6 @@
     %thead.small-header
       %th
         = sortable "request_at"
-      - if sort_column == "created_at"
-        %th.small
-          = sortable "created_at"
       %th
         = sortable "endpoint"
       %th
@@ -92,9 +89,6 @@
           %td
             %span.convertTime.preciseTimeSeconds
               = l logged_search.request_at, format: :convert_time
-          - if sort_column == "created_at"
-            %td.small
-              %span.convertTime= l logged_search.created_at, format: :convert_time
 
           %td
             %code.small{style: "word-break: keep-all;"}
