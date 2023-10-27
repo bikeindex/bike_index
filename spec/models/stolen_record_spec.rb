@@ -568,6 +568,15 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "not_spam" do
+    let!(:bike) { FactoryBot.create(:bike, :with_stolen_record, likely_spam: true) }
+    let(:stolen_record) { bike.current_stolen_record }
+    it "skips likely_spam" do
+      expect(StolenRecord.current.pluck(:id)).to eq([stolen_record.id])
+      expect(StolenRecord.not_spam.pluck(:id)).to eq([])
+    end
+  end
+
   describe "latitude_public" do
     let(:latitude) { -122.2824933 }
     let(:longitude) { 37.837112 }
