@@ -32,19 +32,9 @@ Rails.application.routes.draw do
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
-  %w[
-    ambassadors_current
-    ambassadors_how_to
-    ascend
-    bike_shop_packages
-    campus_packages
-    cities_packages
-    for_bike_shops
-    for_community_groups
-    for_cities
-    for_law_enforcement
-    for_schools
-  ].freeze.each do |page|
+  %w[ambassadors_current ambassadors_how_to ascend bike_shop_packages campus_packages
+    cities_packages for_bike_shops for_community_groups for_cities for_law_enforcement
+    for_schools].freeze.each do |page|
     get page, controller: "landing_pages", action: page
   end
 
