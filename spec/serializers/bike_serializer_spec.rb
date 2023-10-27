@@ -20,7 +20,7 @@ RSpec.describe BikeSerializer, type: :lib do
       expect(serializer.rear_tire_narrow).to eq(bike.rear_tire_narrow)
       expect(serializer.front_tire_narrow).to eq(bike.front_tire_narrow)
       expect(serializer.rear_wheel_size).to eq(bike.rear_wheel_size)
-      expect(serializer.serial).to eq(bike.serial_number)
+      expect(serializer.serial).to eq(bike.serial_number.upcase)
       expect(serializer.front_wheel_size).to eq(bike.front_wheel_size)
       expect(serializer.handlebar_type).to eq(bike.handlebar_type)
       expect(serializer.frame_material).to eq(bike.frame_material)

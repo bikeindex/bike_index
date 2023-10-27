@@ -11,7 +11,7 @@ RSpec.describe BikeV2Serializer do
       {
         id: bike.id,
         title: bike.title_string,
-        serial: bike.serial_number,
+        serial: bike.serial_number.upcase,
         manufacturer_name: bike.mnfg_name,
         frame_model: nil,
         year: 2011,
@@ -29,7 +29,9 @@ RSpec.describe BikeV2Serializer do
         location_found: nil,
         description: nil,
         external_id: nil,
-        status: "with owner"
+        status: "with owner",
+        propulsion_type_slug: "foot-pedal",
+        cycle_type_slug: "bike"
       }
     end
 
