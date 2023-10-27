@@ -4,10 +4,17 @@
 
 const url = urn => [process.env.BASE_URL, urn].join('/')
 
-const serialSearchUrl = serial => url(`api/v2/bikes_search?serial=${serial}`)
+const serialSearchUrl = serial => {
+  url(`api/v3/search?serial=${serial}`)
+}
 
 const fuzzySearchUrl = serial =>
-  url(`api/v2/bikes_search/close_serials?serial=${serial}`)
+  url(`api/v3/search/close_serials?serial=${serial}`)
+
+const searchUrl = params => {
+  const query = queryString(params)
+  return url(`api/v3/search?${query}`)
+}
 
 const partialMatchSerialSearchUrl = params => {
   const query = queryString(params)
@@ -68,6 +75,11 @@ const fetchFuzzyResults = serial => {
   return request(url)
 }
 
+const fetchMatches = interpretedParams => {
+  const url = searchUrl(interpretedParams)
+  return request(url)
+}
+
 const fetchPartialMatchSearch = interpretedParams => {
   const url = partialMatchSerialSearchUrl(interpretedParams)
   return request(url)
@@ -84,6 +96,7 @@ const fetchSerialExternalSearch = ({ raw_serial }) => {
 }
 
 export default {
+  fetchMatches,
   fetchSerialResults,
   fetchFuzzyResults,
   fetchSerialExternalSearch,

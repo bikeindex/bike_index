@@ -3360,6 +3360,10 @@ en:
       location: Location
       registry: Registry
       registry_id: Registry ID
+      search:
+        matches_found_html: '%{stolenness} bikes'
+        no_matches_found_html: No matching bikes found
+        searching_html: Searching for bikes...
       search_external_registries:
         matches_found_html: '%{stolenness} bikes matching "%{serial}" found in external
           registries'

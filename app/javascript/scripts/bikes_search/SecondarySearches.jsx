@@ -42,7 +42,7 @@ const SecondarySearches = ({ interpretedParams }) =>
             serial={params.serial}
             queriesCount={allQueries.length}
           />
-          <BikeSearch
+          {<BikeSearch
             fetchBikes={api.fetchPartialMatchSearch}
             searchName='search_serials_containing'
             resultComponent={BikeSearchResult}
@@ -50,7 +50,7 @@ const SecondarySearches = ({ interpretedParams }) =>
             t={window.BikeIndex.translator(
               'bikes_search.search_serials_containing'
             )}
-          />
+          />}
           <BikeSearch
             fetchBikes={api.fetchSerialCloseSearch}
             searchName='search_similar_serials'
@@ -60,7 +60,7 @@ const SecondarySearches = ({ interpretedParams }) =>
               'bikes_search.search_similar_serials'
             )}
           />
-          <BikeSearch
+          {<BikeSearch
             fetchBikes={api.fetchSerialExternalSearch}
             searchName='search_external_registries'
             resultComponent={ExternalRegistrySearchResult}
@@ -68,7 +68,7 @@ const SecondarySearches = ({ interpretedParams }) =>
             t={window.BikeIndex.translator(
               'bikes_search.search_external_registries'
             )}
-          />
+          />}
         </Fragment>
       ))}
     </Fragment>

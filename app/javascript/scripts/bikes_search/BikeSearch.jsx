@@ -79,7 +79,7 @@ class BikeSearch extends Component {
       return (
         <div className={wrapperClassName}>
           <div className='col-md-12'>
-            <h3 className='no-exact-results'>
+            <h3 className='no-exact-results uncap'>
               {this.props.t('no_matches_found_html', { serial })}
             </h3>
           </div>
