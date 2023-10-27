@@ -26,12 +26,64 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: logged_searches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.logged_searches (
+    id bigint NOT NULL,
+    request_at timestamp without time zone,
+    request_id uuid,
+    log_line text,
+    endpoint integer,
+    stolenness integer,
+    serial boolean DEFAULT false,
+    includes_query boolean DEFAULT false,
+    page integer,
+    duration_ms integer,
+    query_items jsonb,
+    ip_address character varying,
+    latitude double precision,
+    longitude double precision,
+    organization_id bigint,
+    user_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: logged_searches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.logged_searches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: logged_searches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.logged_searches_id_seq OWNED BY public.logged_searches.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
 );
+
+
+--
+-- Name: logged_searches id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.logged_searches ALTER COLUMN id SET DEFAULT nextval('public.logged_searches_id_seq'::regclass);
 
 
 --
@@ -43,6 +95,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
+-- Name: logged_searches logged_searches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.logged_searches
+    ADD CONSTRAINT logged_searches_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -51,10 +111,33 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: index_logged_searches_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_logged_searches_on_organization_id ON public.logged_searches USING btree (organization_id);
+
+
+--
+-- Name: index_logged_searches_on_request_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_logged_searches_on_request_id ON public.logged_searches USING btree (request_id);
+
+
+--
+-- Name: index_logged_searches_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_logged_searches_on_user_id ON public.logged_searches USING btree (user_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
+INSERT INTO "schema_migrations" (version) VALUES
+('20231025160704');
 
 
