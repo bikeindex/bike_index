@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe BikeV2ShowSerializer do
   describe "standard validations" do
-    let(:bike) { FactoryBot.create(:bike, frame_size: "42", extra_registration_number: "XXYY") }
+    let(:bike) { FactoryBot.create(:bike, propulsion_type: "pedal-assist", cycle_type: "cargo" frame_size: "42", extra_registration_number: "XXYY") }
     let!(:component) { FactoryBot.create(:component, bike: bike) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
     subject { BikeV2ShowSerializer.new(bike) }
@@ -59,7 +59,7 @@ RSpec.describe BikeV2ShowSerializer do
         description: nil,
         rear_tire_narrow: true,
         front_tire_narrow: nil,
-        type_of_cycle: "Bike",
+        type_of_cycle: "Cargo Bike (front storage)",
         test_bike: false,
         frame_material_slug: nil,
         rear_wheel_size_iso_bsd: nil,
@@ -77,7 +77,8 @@ RSpec.describe BikeV2ShowSerializer do
         registry_name: nil,
         registry_url: nil,
         status: "with owner",
-        propulsion_type_slug: "foot-pedal"
+        propulsion_type_slug: "pedal-assist",
+        cycle_type_slug: "cargo"
       }
     end
 

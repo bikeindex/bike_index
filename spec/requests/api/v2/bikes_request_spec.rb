@@ -138,7 +138,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(ActionMailer::Base.deliveries.count).to eq 1
       expect(response.code).to eq("201")
       result = json_result["bike"]
-      expect(result["serial"]).to eq(bike_attrs[:serial])
+      expect(result["serial"]).to eq(bike_attrs[:serial].upcase)
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.find(result["id"])
       expect(bike.example).to be_falsey
@@ -177,7 +177,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(ActionMailer::Base.deliveries.count).to eq 0
       expect(response.code).to eq("201")
       result = json_result["bike"]
-      expect(result["serial"]).to eq(bike_attrs[:serial])
+      expect(result["serial"]).to eq(bike_attrs[:serial].upcase)
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result["id"])
       expect(bike.current_ownership.origin).to eq "api_v2"
@@ -216,7 +216,7 @@ RSpec.describe "Bikes API V2", type: :request do
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       result = json_result
       expect(result).to include("bike")
-      expect(result["bike"]["serial"]).to eq(bike_attrs[:serial])
+      expect(result["bike"]["serial"]).to eq(bike_attrs[:serial].upcase)
       expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       expect(result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
       bike = Bike.find(result["bike"]["id"])
