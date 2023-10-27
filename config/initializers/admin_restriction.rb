@@ -1,7 +1,6 @@
 class AdminRestriction
   def self.matches?(req)
-    cookie = req.cookies["auth"]
-    return false unless cookie.present?
+    return false unless (cookie = req.cookie_jar["auth"])
 
     auth =
       Rack::Session::Cookie::Base64::JSON.new.decode(cookie) ||

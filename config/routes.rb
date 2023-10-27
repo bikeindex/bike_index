@@ -3,7 +3,7 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  mount Sidekiq::Web => "/sidekiq-zxv8b98lkk"
+  mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -32,8 +32,7 @@ Rails.application.routes.draw do
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
-  %w[
-    ambassadors_current
+  %w[ambassadors_current
     ambassadors_how_to
     ascend
     bike_shop_packages
@@ -43,8 +42,7 @@ Rails.application.routes.draw do
     for_community_groups
     for_cities
     for_law_enforcement
-    for_schools
-  ].freeze.each do |page|
+    for_schools].freeze.each do |page|
     get page, controller: "landing_pages", action: page
   end
 
