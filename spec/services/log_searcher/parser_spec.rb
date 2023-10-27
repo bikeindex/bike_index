@@ -64,8 +64,6 @@ RSpec.describe LogSearcher::Parser do
         }
       end
       it "parses" do
-        # pp described_class.send(:parse_request_time, log_line).to_i
-        # pp described_class.parse_log_line(log_line)
         expect_hashes_to_match(described_class.parse_log_line(log_line), target)
       end
     end
@@ -84,7 +82,6 @@ RSpec.describe LogSearcher::Parser do
     let(:log_path) { Rails.root.join("spec", "fixtures", "example_log.log") }
     it "parses all the lines from the example" do
       log_lines = File.read(log_path).split("\n")
-      # pp log_lines
       expect(log_lines.count).to be > 15
       parsed_log_lines = log_lines.map { |l| described_class.parse_log_line(l) }.compact
       expect(parsed_log_lines.count).to be < log_lines.count
