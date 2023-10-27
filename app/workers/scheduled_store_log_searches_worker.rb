@@ -1,9 +1,9 @@
 class ScheduledStoreLogSearchesWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
-  MAX_W = 5_000
+  MAX_W = 1_000
 
   def self.frequency
-    1.minute
+    3.minutes
   end
 
   def perform(read_log_line = false)
@@ -24,7 +24,12 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
 
   def enqueue_workers
     workers_to_enqueue = LogSearcher::Reader.log_lines_in_redis
-    workers_to_enqueue = MAX_W if workers_to_enqueue > MAX_W
+    if workers_to_enqueue > MAX_W
+      # TODO: Add notification when above 100k
+      workers_to_enqueue = MAX_W
+      # Reschedule enqueuing workers
+      ScheduledStoreLogSearchesWorker.perform_in(15.seconds)
+    end
     workers_to_enqueue.times do
       ScheduledStoreLogSearchesWorker.perform_async(true)
     end
