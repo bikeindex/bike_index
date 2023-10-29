@@ -26,7 +26,7 @@ RSpec.describe FileCacheMaintenanceWorker, type: :job do
       cache_all_stolen_worker.write_stolen
       result = JSON.parse(File.read(cache_all_stolen_worker.tmp_path))
       expect(result["bikes"].count).to eq(1)
-      expect(result["bikes"][0]["serial"]).to eq("party seri8al")
+      expect(result["bikes"][0]["serial"]).to eq("PARTY SERI8AL")
       expect(result["bikes"][0].keys).to match_array(
         %w[
           date_stolen
@@ -50,6 +50,8 @@ RSpec.describe FileCacheMaintenanceWorker, type: :job do
           title
           url
           year
+          propulsion_type_slug
+          cycle_type_slug
         ]
       )
     end

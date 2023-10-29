@@ -2,6 +2,11 @@ task run_scheduler: :environment do
   ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
 end
 
+task read_logged_searches: :environment do
+  LogSearcher::Reader.write_log_lines(Time.current)
+  LogSearcher::Reader.write_log_lines(Time.current - 1.hour)
+end
+
 desc "Reset Autocomplete"
 task reset_autocomplete: :environment do
   AutocompleteLoaderWorker.new.perform(nil, true)

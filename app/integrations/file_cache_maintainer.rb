@@ -33,11 +33,13 @@ class FileCacheMaintainer
       }
     end
 
-    def update_file_info(filename, updated_at = nil)
+    def update_file_info(filename, updated_at = nil, retrying = false)
       updated_at ||= Time.current
       begin
         RedisPool.conn { |r| r.hset info_id, filename, updated_at.to_i }
-      rescue
+      rescue => e
+        # Make sure it doesn't loop infinitely
+        raise e if retrying
         # Sometimes key errors from wrong type, so reset it!
         reset_file_info(filename, updated_at.to_i)
       end
@@ -46,7 +48,7 @@ class FileCacheMaintainer
 
     def reset_file_info(filename, updated_at = nil)
       RedisPool.conn { |r| r.expire(info_id, 0) }
-      update_file_info(filename, updated_at)
+      update_file_info(filename, updated_at, true)
     end
 
     def file_info_hash(k)

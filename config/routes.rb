@@ -32,19 +32,9 @@ Rails.application.routes.draw do
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
-  %w[
-    ambassadors_current
-    ambassadors_how_to
-    ascend
-    bike_shop_packages
-    campus_packages
-    cities_packages
-    for_bike_shops
-    for_community_groups
-    for_cities
-    for_law_enforcement
-    for_schools
-  ].freeze.each do |page|
+  %w[ambassadors_current ambassadors_how_to ascend bike_shop_packages campus_packages
+    cities_packages for_bike_shops for_community_groups for_cities for_law_enforcement
+    for_schools].freeze.each do |page|
     get page, controller: "landing_pages", action: page
   end
 
@@ -198,11 +188,11 @@ Rails.application.routes.draw do
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
-    resources :memberships, :bulk_imports, :exports, :bike_sticker_updates,
-      :paints, :ads, :recovery_displays, :mail_snippets, :organization_features, :payments,
-      :ctypes, :parking_notifications, :impound_records, :graduated_notifications,
-      :content_tags, :impound_claims, :mailchimp_values, :mailchimp_data, :user_alerts,
-      :notifications, :user_registration_organizations, :theft_alerts, :superuser_abilities
+    resources :ads, :bike_sticker_updates, :bulk_imports, :content_tags, :ctypes, :exports,
+      :graduated_notifications, :impound_claims, :impound_records, :logged_searches,
+      :mail_snippets, :mailchimp_data, :mailchimp_values, :memberships, :notifications,
+      :organization_features, :paints, :parking_notifications, :payments, :recovery_displays,
+      :superuser_abilities, :theft_alerts, :user_alerts, :user_registration_organizations
 
     resources :bike_stickers do
       collection { get :reassign }
@@ -264,7 +254,6 @@ Rails.application.routes.draw do
         collection do
           get :search_tags
           get :close_serials
-          get :serials_containing
           get :stolen_ids
         end
       end

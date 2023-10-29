@@ -18,6 +18,7 @@ class OrganizationStolenMessage < ApplicationRecord
 
   enum kind: KIND_ENUM
 
+  scope :present, -> { where.not(body: nil) }
   scope :enabled, -> { where(is_enabled: true) }
   scope :disabled, -> { where(is_enabled: false) }
 
