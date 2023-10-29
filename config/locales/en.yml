@@ -4512,6 +4512,7 @@ en:
         stolen: Stolen
         stolen_bikes_html: "<em>stolen</em> bikes"
         updated: Updated
+        propulsion_type: Propulsion
         vehicle_type: Vehicle type
         view_all_bikes: view all bikes
         view_just_stolen_bikes: view just stolen bikes
