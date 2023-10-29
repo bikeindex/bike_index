@@ -25,8 +25,8 @@ RSpec.describe Autocomplete::Matcher do
       expect(result.count).to eq 5
       color_sid = "c_#{color.id}"
       expect(result.first["search_id"]).to eq color_sid
-      cycle_type_search_ids = [0, 11, 16, 18].map { |i| "v_#{i}" }
-      expect(result.map { |i| i["search_id"] }).to eq([color_sid] + cycle_type_search_ids)
+      cycle_type_search_ids = [0, 11, 16].map { |i| "v_#{i}" }
+      expect(result.map { |i| i["search_id"] }).to eq([color_sid] + ["p_10"] + cycle_type_search_ids)
       # And now, the response is the in the cache
       expect(subject.send(:not_in_cache?, opts[:cache_key])).to be_falsey
 
@@ -48,7 +48,7 @@ RSpec.describe Autocomplete::Matcher do
       # Getting the second page, skips the first two colors
       paginated_opts = subject.params_to_opts(page: 2, per_page: 4)
       result_paginated = subject.search(nil, paginated_opts)
-      expect(result_paginated.map { |i| i["search_id"] }).to eq(%w[v_18 v_5 v_1 v_3])
+      expect(result_paginated.map { |i| i["search_id"] }).to eq(%w[v_16 v_18 v_5 v_1])
     end
   end
 
@@ -88,7 +88,7 @@ RSpec.describe Autocomplete::Matcher do
     end
 
     it "Makes category empty if it's all the categories" do
-      result = subject.send(:params_to_opts, {categories: "colors, cycle_type, frame_mnfg,CMP_MNFG"})
+      result = subject.send(:params_to_opts, {categories: "colors, cycle_type, Propulsion,frame_mnfg,CMP_MNFG"})
       expect(result).to eq default_target
     end
   end

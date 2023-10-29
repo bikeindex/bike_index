@@ -1,5 +1,6 @@
 class PropulsionType
   include Enumable
+  include AutocompleteHashable
 
   SLUGS = {
     "foot-pedal": 0,
@@ -8,7 +9,7 @@ class PropulsionType
     "pedal-assist-and-throttle": 5,
     "hand-pedal": 3,
     "human-not-pedal": 4
-  }.freeze
+  }.freeze # NOTE: 10 is reserved for "motorized"
 
   NAMES = {
     "foot-pedal": "Foot Pedal",
@@ -52,6 +53,25 @@ class PropulsionType
       valid_propulsion_types_for(cycle_type).first
     end
 
+    def autocomplete_ids
+      [10]
+    end
+
+    def autocomplete_hashes
+      autocomplete_ids.map do |id|
+        id == 10 ? motorized_autocomplete_hash : new(id).autocomplete_hash
+      end
+    end
+
+    def autocomplete_result_hash_for(sym)
+      if sym == :motorized
+        motorized_autocomplete_hash.except(:data)
+          .merge(motorized_autocomplete_hash[:data]).as_json
+      else
+        new(sym).autocomplete_result_hash
+      end
+    end
+
     private
 
     def not_motorized
@@ -87,6 +107,16 @@ class PropulsionType
       end
       valid_types
     end
+
+    def motorized_autocomplete_hash
+      {
+        id: 10,
+        text: "E-Vehicles",
+        priority: 980,
+        category: "propulsion",
+        data: {priority: 980, slug: :motorized, search_id: "p_10"}
+      }
+    end
   end
 
   def initialize(slug)
@@ -102,5 +132,19 @@ class PropulsionType
 
   def human_powered?
     !motorized?
+  end
+
+  def autocomplete_hash
+    {
+      id: id,
+      text: name,
+      category: "propulsion",
+      priority: priority,
+      data: {
+        priority: priority,
+        slug: slug,
+        search_id: search_id
+      }
+    }
   end
 end

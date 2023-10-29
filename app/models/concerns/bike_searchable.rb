@@ -27,6 +27,7 @@ module BikeSearchable
         .merge(searchable_query_items_manufacturer(query_params)) # manufacturer if present
         .merge(searchable_query_items_colors(query_params)) # color if present
         .merge(searchable_query_items_cycle_type(query_params)) # cycle_type if present
+        .merge(searchable_query_items_propulsion_type(query_params)) # propulsion_type if present
         .merge(searchable_query_stolenness(query_params, ip))
         .to_h
     end
@@ -68,11 +69,14 @@ module BikeSearchable
       if interpreted_params[:cycle_type].present?
         items += [CycleType.friendly_find(interpreted_params[:cycle_type]).autocomplete_result_hash]
       end
+      if interpreted_params[:propulsion_type].present?
+        items += [PropulsionType.autocomplete_result_hash_for(interpreted_params[:propulsion_type])]
+      end
       items.flatten.compact
     end
 
     def permitted_search_params
-      [:cycle_type, :distance, :location, :manufacturer, :query,
+      [:cycle_type, :distance, :location, :manufacturer, :query, :propulsion_type,
         :serial, :stolenness, colors: [], query_items: []].freeze
     end
 
@@ -95,12 +99,13 @@ module BikeSearchable
         .search_matching_stolenness(interpreted_params)
         .search_matching_query(interpreted_params[:query])
         .search_matching_cycle_type(interpreted_params[:cycle_type])
+        .search_matching_propulsion_type(interpreted_params[:propulsion_type])
         .where(interpreted_params[:manufacturer] ? {manufacturer_id: interpreted_params[:manufacturer]} : {})
     end
 
     def searchable_query_items_query(query_params)
       return {query: query_params[:query]} if query_params[:query].present?
-      query = query_params[:query_items]&.select { |i| !(/\A[cmv]_/ =~ i) }&.join(" ")
+      query = query_params[:query_items]&.select { |i| !(/\A[cmvp]_/ =~ i) }&.join(" ")
       query.present? ? {query: query} : {}
     end
 
@@ -143,6 +148,17 @@ module BikeSearchable
       cycle_type ? {cycle_type: cycle_type} : {}
     end
 
+    def searchable_query_items_propulsion_type(query_params)
+      # we expect a singular propulsion_type but deal with arrays because the multi-select search
+      propulsion_type_id = extracted_query_items_propulsion_type_id(query_params)
+      if propulsion_type_id.present?
+        propulsion_type_id = propulsion_type_id.first if propulsion_type_id.is_a?(Array)
+        propulsion_type = :motorized if %w[motorized 10].include?(propulsion_type_id.to_s)
+        propulsion_type ||= PropulsionType.find_sym(propulsion_type_id)
+      end
+      propulsion_type ? {propulsion_type: propulsion_type} : {}
+    end
+
     def searchable_query_stolenness(query_params, ip)
       if query_params[:stolenness] && %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
@@ -156,6 +172,13 @@ module BikeSearchable
       manufacturer_id = query_params[:query_items]&.select { |i| i.start_with?(/m_/) }
       return nil unless manufacturer_id&.any?
       manufacturer_id.map { |i| i.gsub(/m_/, "").to_i }
+    end
+
+    def extracted_query_items_propulsion_type_id(query_params)
+      return query_params[:propulsion_type] if query_params[:propulsion_type].present?
+      propulsion_type_id = query_params[:query_items]&.select { |i| i.start_with?(/p_/) }
+      return nil unless propulsion_type_id&.any?
+      propulsion_type_id.map { |i| i.gsub(/p_/, "").to_i }
     end
 
     def extracted_query_items_cycle_type_id(query_params)
@@ -204,8 +227,13 @@ module BikeSearchable
     end
 
     def search_matching_cycle_type(cycle_type)
-      return all unless cycle_type
+      return all unless cycle_type.present?
       where(cycle_type: cycle_type)
+    end
+
+    def search_matching_propulsion_type(propulsion_type)
+      return all unless propulsion_type.present?
+      where(propulsion_type: propulsion_type == :motorized ? PropulsionType::MOTORIZED : propulsion_type)
     end
 
     def search_matching_query(query)

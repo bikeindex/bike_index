@@ -1,6 +1,6 @@
 module Autocomplete
   BASE_KEY = "autc#{Rails.env.test? ? ":test" : ""}:".freeze
-  SORTED_CATEGORY_ARRAY = %w[colors cycle_type frame_mnfg cmp_mnfg].freeze
+  SORTED_CATEGORY_ARRAY = %w[cmp_mnfg colors cycle_type frame_mnfg propulsion].freeze
   STOP_WORDS = [].freeze # I think we might want to include 'the'
 
   # The methods in this module should only be accessed by the subclasses.

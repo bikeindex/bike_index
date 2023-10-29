@@ -8,6 +8,7 @@ module API
           optional :query, type: String, desc: "Full text search"
           optional :manufacturer
           optional :cycle_type, type: String, desc: "Cycle Type slug or name (see **Selections: cycle_types**)"
+          optional :propulsion_type, type: String, desc: "Propulsion Type slug or name (see **Selections: propulsion_types**). Also accepts 'motorized' to match any e-vehicle."
           optional :colors, desc: "Color slugs or ids, comma delineated (see **Selections: colors**)"
           optional :location, type: String, desc: "Location for proximity search (must set stolenness to `proximity`)", default: "IP"
           optional :distance, type: String, desc: "Distance in miles from `location` for proximity search (must set stolenness to `proximity`)", default: 10

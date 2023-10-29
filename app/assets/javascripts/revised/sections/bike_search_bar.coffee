@@ -137,6 +137,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
 
   formatSearchText: (item) ->
     return item.text if item.loading
+    return "<span>Search for <strong>#{ item.text }</strong> only</span>" if item.category == 'propulsion'
     return "<span>Search only for <strong>#{ item.text }</strong></span>" if item.category == 'cycle_type'
     prefix = switch
       when item.category == 'colors'
@@ -167,3 +168,5 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         window.searchBarCategories += ",cycle_type"
       unless "m" in queried_categories
         window.searchBarCategories += ",frame_mnfg,cmp_mnfg"
+      unless "p" in queried_categories
+        window.searchBarCategories += ",propulsion"
