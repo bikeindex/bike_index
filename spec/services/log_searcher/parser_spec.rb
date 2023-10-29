@@ -13,7 +13,7 @@ RSpec.describe LogSearcher::Parser do
     let(:time) { Time.parse("2023-10-23T00:20:01.681937 UTC") }
     let(:target) do
       {request_at: time, request_id: "6473c6f5-51f6-422b-bb3c-7e94b670f520",
-       duration_ms: 1002, user_id: nil, organization_id: nil, endpoint: :public_bikes,
+       duration_ms: 1002, user_id: nil, organization_id: nil, endpoint: :web_bikes,
        ip_address: "11.222.33.4", query_items: {}, page: 2, serial_normalized: nil,
        stolenness: :all, includes_query: false}
     end

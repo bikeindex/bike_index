@@ -4,7 +4,7 @@ class LogSearcher::Parser
     "API::V1::BikesController#index" => :api_v1_bikes,
     "API::V1::BikesController#stolen_ids" => :api_v1_stolen_ids,
     "API::V1::BikesController#close_serials" => :api_v1_close_serials,
-    "BikesController#index" => :public_bikes,
+    "BikesController#index" => :web_bikes,
     "Organized::BikesController#index" => :org_bikes,
     "Admin::BikesController#index" => :admin_bikes,
     "OrgPublic::ImpoundedBikesController#index" => :org_public_impounded,
