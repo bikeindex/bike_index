@@ -147,9 +147,9 @@ RSpec.describe PropulsionType, type: :model do
     let(:motorized_hash) do
       {
         id: 10,
-        text: "E-Vehicle",
+        text: "E-Vehicles",
         priority: 980,
-        category: "propulsion_type",
+        category: "propulsion",
         data: {priority: 980, slug: :motorized, search_id: "p_10"}
       }
     end

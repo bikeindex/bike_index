@@ -20,13 +20,13 @@ RSpec.describe Autocomplete::Loader do
       expect(total_count).to eq 23 * category_count_for_1_item
       info = subject.info
       expect(info.keys).to match_array(%i[category_keys cache_keys db0 used_memory used_memory_peak])
-      expect(info[:category_keys]).to eq 3136
+      expect(info[:category_keys]).to eq 3152
       expect(info[:cache_keys]).to eq 0
     end
 
     context "passing individual types" do
       it "stores the passed kind" do
-        expect(CycleType.all_plus_motorized.count).to eq 21
+        expect(CycleType.all.count).to eq 20
         expect(Manufacturer.count).to eq 1
         expect(Color.count).to eq 1
         subject.clear_redis
@@ -37,7 +37,7 @@ RSpec.describe Autocomplete::Loader do
         expect(manufacturer_count).to eq category_count_for_1_item
 
         cycle_type_count = subject.load_all(["CycleType"])
-        expect(cycle_type_count).to eq 21 * category_count_for_1_item
+        expect(cycle_type_count).to eq 20 * category_count_for_1_item
       end
     end
   end
