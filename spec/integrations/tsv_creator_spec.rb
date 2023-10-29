@@ -17,6 +17,7 @@ RSpec.describe TsvCreator do
       organization = bike.creation_organization
       target = "#{instance.org_counts_header}#{instance.org_count_row(bike)}"
       expect_any_instance_of(TsvUploader).to receive(:store!)
+      expect_any_instance_of(TsvUploader).to receive(:current_path) { "some-file.tsv" }
       output = instance.create_org_count(organization)
       expect(File.read(output)).to eq(target)
       expect(FileCacheMaintainer.files.is_a?(Array)).to be_truthy
