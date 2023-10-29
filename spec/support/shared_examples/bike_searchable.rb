@@ -36,8 +36,25 @@ RSpec.shared_examples "bike_searchable" do
           expect(Bike.searchable_query_items_cycle_type({query_items: ["v_1", "v_0"]})).to eq({cycle_type: :tandem})
           expect(Bike.searchable_query_items_cycle_type({cycle_type: :tandem})).to eq({cycle_type: :tandem})
           expect(Bike.searchable_query_items_cycle_type({cycle_type: "Cargo Bike (front storage)"})).to eq({cycle_type: :cargo})
+          expect(Bike.searchable_query_items_cycle_type({cycle_type: "Jibberish"})).to eq({})
           expect(Bike.searchable_query_items_cycle_type(query_params)).to eq({cycle_type: :tandem})
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_cycle_type
+          expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_cycle_type
+        end
+      end
+      context "with propulsion_type" do
+        let(:query_params) { {query_items: multi_query_items + ["p_10"]} }
+        let(:target_with_propulsion_type) { target.merge(propulsion_type: :motorized) }
+        it "returns" do
+          expect(Bike.searchable_query_items_propulsion_type({query_items: ["p_10"]})).to eq({propulsion_type: :motorized})
+          expect(Bike.searchable_query_items_propulsion_type({query_items: ["p_10", "p_10"]})).to eq({propulsion_type: :motorized})
+          expect(Bike.searchable_query_items_propulsion_type({propulsion_type: :motorized})).to eq({propulsion_type: :motorized})
+          expect(Bike.searchable_query_items_propulsion_type({query_items: ["p_1"]})).to eq({propulsion_type: :"pedal-assist"})
+          expect(Bike.searchable_query_items_propulsion_type({propulsion_type: :throttle})).to eq({propulsion_type: :throttle})
+          expect(Bike.searchable_query_items_propulsion_type({propulsion_type: "jibberish"})).to eq({})
+          expect(Bike.searchable_query_items_propulsion_type(query_params)).to eq({propulsion_type: :motorized})
+          expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_propulsion_type
+          expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_propulsion_type
         end
       end
       context "with passed ids" do
@@ -245,9 +262,9 @@ RSpec.shared_examples "bike_searchable" do
   describe "search" do
     context "color_ids of primary, secondary and tertiary" do
       let(:color2) { FactoryBot.create(:color) }
-      let(:bike1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 3.months, cycle_type: :cargo) }
+      let(:bike1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 3.months, cycle_type: :cargo, propulsion_type: "pedal-assist-and-throttle") }
       let(:bike2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color2, updated_at: Time.current - 2.weeks, cycle_type: :cargo) }
-      let(:bike3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer, cycle_type: :stroller) }
+      let(:bike3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer, cycle_type: :stroller, propulsion_type: "throttle") }
       let(:all_color_ids) do
         [
           bike1.primary_frame_color_id,
@@ -290,6 +307,14 @@ RSpec.shared_examples "bike_searchable" do
           expect(Bike.search(interpreted_params).pluck(:id)).to match_array([bike1.id, bike2.id])
           expect(Bike.search(interpreted_params.merge(colors: [color.id, color2.id])).pluck(:id)).to eq([bike2.id])
           expect(Bike.search({stolenness: "all", cycle_type: "stroller"}).pluck(:id)).to eq([bike3.id])
+        end
+      end
+      context "and propulsion_type" do
+        let(:query_params) { {colors: [color.id], stolenness: "all", propulsion_type: "motorized"} }
+        it "matches just the bikes with the cycle_type" do
+          expect(Bike.search(interpreted_params).pluck(:id)).to match_array([bike1.id, bike3.id])
+          expect(Bike.search(interpreted_params.merge(colors: [color.id, color2.id])).pluck(:id)).to eq([])
+          expect(Bike.search({stolenness: "all", propulsion_type: "throttle"}).pluck(:id)).to eq([bike3.id])
         end
       end
     end

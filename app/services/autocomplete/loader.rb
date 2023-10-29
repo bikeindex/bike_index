@@ -17,7 +17,7 @@ class Autocomplete::Loader
 
     def load_all(kinds = nil, print_counts: false)
       store_category_combos
-      kinds ||= %w[Color CycleType Manufacturer]
+      kinds ||= %w[Color CycleType Manufacturer PropulsionType]
       total_count = 0
 
       if kinds.include?("Color")
@@ -25,6 +25,14 @@ class Autocomplete::Loader
         total_count += colors_count
         if print_counts
           puts "Total Colors added (including combinatorial categories):         #{colors_count}"
+        end
+      end
+
+      if kinds.include?("PropulsionType")
+        pro_count = store_items(PropulsionType.autocomplete_hashes)
+        total_count += pro_count
+        if print_counts
+          puts "Total Propulsion Types added (including combinatorial categories):         #{pro_count}"
         end
       end
 

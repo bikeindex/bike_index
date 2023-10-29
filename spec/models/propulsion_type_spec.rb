@@ -142,4 +142,24 @@ RSpec.describe PropulsionType, type: :model do
       end
     end
   end
+
+  describe "autocompleteable" do
+    let(:motorized_hash) do
+      {
+        id: 10,
+        text: "E-Vehicle",
+        priority: 980,
+        category: "propulsion_type",
+        data: {priority: 980, slug: :motorized, search_id: "p_10"}
+      }
+    end
+    describe "autocomplete_hash" do
+      it "is the target" do
+        expect_hashes_to_match(PropulsionType.send(:motorized_autocomplete_hash), motorized_hash)
+        expect(PropulsionType.autocomplete_hashes.count).to eq 1
+        # target_result_hash = target.except(:data).merge(target[:data])
+        # expect(cycle_type.autocomplete_result_hash).to eq target_result_hash.as_json
+      end
+    end
+  end
 end

@@ -167,3 +167,5 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         window.searchBarCategories += ",cycle_type"
       unless "m" in queried_categories
         window.searchBarCategories += ",frame_mnfg,cmp_mnfg"
+      unless "p" in queried_categories
+        window.searchBarCategories += ",propulsion"
