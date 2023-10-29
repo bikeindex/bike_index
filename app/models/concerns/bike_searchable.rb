@@ -149,7 +149,7 @@ module BikeSearchable
     end
 
     def searchable_query_items_propulsion_type(query_params)
-      # we expect a singular cycle_type but deal with arrays because the multi-select search
+      # we expect a singular propulsion_type but deal with arrays because the multi-select search
       propulsion_type_id = extracted_query_items_propulsion_type_id(query_params)
       if propulsion_type_id.present?
         propulsion_type_id = propulsion_type_id.first if propulsion_type_id.is_a?(Array)

@@ -21,7 +21,6 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :extra_registration_number,
     :additional_registration
 
-
   has_one :stolen_record
 
   has_many :public_images
