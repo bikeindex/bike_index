@@ -89,7 +89,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(attr_list_item(" ", "title")).to be_blank
     end
     context "with matching element" do
-      let(:target) { "<li><strong class=\"attr-title\">Serial: </strong><span>adasdfasdf</span></li>" }
+      let(:target) { "<li><strong class=\"attr-title\">Serial: </strong><span>ADASDFASDF</span></li>" }
       it "returns with the values" do
         expect(attr_list_item(bike.serial_display, "Serial")).to eq target
       end

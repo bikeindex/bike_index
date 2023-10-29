@@ -48,6 +48,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       ScheduleBikePossiblyFoundNotificationWorker,
       ScheduleSearchForExternalRegistryBikesWorker,
       ScheduledEmailSurveyWorker,
+      ScheduledStoreLogSearchesWorker,
       TsvCreatorWorker,
       UnusedOwnershipRemovalWorker,
       UpdateCountsWorker,
@@ -57,7 +58,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       UpdateOrganizationPosKindWorker,
       UpdateTheftAlertFacebookWorker,
       self
-    ]
+    ].freeze
   end
 
   def self.scheduled_non_scheduler_workers

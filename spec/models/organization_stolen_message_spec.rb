@@ -8,6 +8,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
     let(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
     it "uses attributes" do
       expect(organization.search_radius_miles).to eq 50
+      expect(Organization.with_stolen_message.pluck(:id)).to eq([])
       expect(organization_stolen_message.reload.organization_id).to eq organization.id
       expect(organization_stolen_message.kind).to eq "area"
       expect(organization_stolen_message.search_radius_miles).to eq OrganizationStolenMessage::DEFAULT_RADIUS_MILES
@@ -16,6 +17,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       expect(organization_stolen_message.body).to eq nil
       expect(organization_stolen_message.latitude).to be_blank
       expect(organization_stolen_message.content_added_at).to be_blank
+      expect(OrganizationStolenMessage.present.pluck(:id)).to eq([])
+      expect(Organization.with_stolen_message.pluck(:id)).to eq([])
     end
     context "organization with location" do
       let(:organization) { FactoryBot.create(:organization, :in_nyc, kind: "bike_manufacturer", search_radius_miles: 94) }
@@ -32,6 +35,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(organization_stolen_message.search_radius_miles).to eq 12
         expect(organization_stolen_message.is_enabled).to be_truthy
         expect(organization_stolen_message.content_added_at).to be_present
+        expect(OrganizationStolenMessage.present.pluck(:id)).to eq([organization_stolen_message.id])
+        expect(Organization.with_stolen_message.pluck(:id)).to eq([organization.id])
       end
     end
     context "overly long body" do

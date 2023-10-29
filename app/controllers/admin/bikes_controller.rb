@@ -181,8 +181,8 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.admin_text_search(@search_email)
     end
 
-    if params[:search_serial].present?
-      @serial_normalized = SerialNormalizer.normalized_and_corrected(params[:search_serial])
+    if params[:serial].present?
+      @serial_normalized = SerialNormalizer.normalized_and_corrected(params[:serial])
       bikes = bikes.matching_serial(@serial_normalized)
     end
 

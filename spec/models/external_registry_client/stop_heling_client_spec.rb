@@ -6,7 +6,7 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
   before do
     null_cache = ActiveSupport::Cache.lookup_store(:null_store)
     allow(Rails).to receive(:cache).and_return(null_cache)
-    ExternalRegistryCredential.find_or_create_by(**FactoryBot.attributes_for(:stop_heling_credentials))
+    ExternalRegistryCredential.find_or_create_by(**FactoryBot.attributes_for(:stop_heling_credential))
   end
 
   after do
