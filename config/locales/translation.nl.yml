@@ -4336,6 +4336,7 @@ nl:
         status: 'Toestand:'
         status_cell: Toestand
         create_export: Maak export van gezochte fietsen
+        propulsion_type: Voortstuwing
     bulk_imports:
       index:
         added: Toegevoegd

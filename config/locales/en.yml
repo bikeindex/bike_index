@@ -4501,6 +4501,7 @@ en:
         only_with_owner_html: Not stolen or impounded
         only_with_stickers_html: Only <strong>with</strong> stickers
         owner_name: Owner name
+        propulsion_type: Propulsion
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
         sent_to: Sent to
@@ -4512,7 +4513,6 @@ en:
         stolen: Stolen
         stolen_bikes_html: "<em>stolen</em> bikes"
         updated: Updated
-        propulsion_type: Propulsion
         vehicle_type: Vehicle type
         view_all_bikes: view all bikes
         view_just_stolen_bikes: view just stolen bikes

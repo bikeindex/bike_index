@@ -176,7 +176,7 @@
     %tbody
       - @bikes.each do |bike|
         %tr
-          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}") do
+          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}-#{@bike_sticker}-2") do
             %td.hiddenColumn.url_cell
               %code.small.p0{style: "word-break: normal"}
                 = bike.html_url
