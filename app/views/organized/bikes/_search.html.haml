@@ -28,7 +28,7 @@
     "impounded_cell" => "Impounded",
     "avery_cell" => "Avery Exportable",
     "cycle_type_cell" => "Vehicle type",
-    "motorized_cell" => "E-vehicle?",
+    "propulsion_type_cell" => "E-vehicle",
     "status_cell" => "Status",
     "url_cell" => "URL"
   }
@@ -46,7 +46,7 @@
   initially_checked_columns += current_organization.enabled?("bike_stickers") ? ["sticker_cell"] : []
   enabled_columns = initially_checked_columns
   # Some optional columns
-  enabled_columns += %w[url_cell updated_at_cell cycle_type_cell status_cell]
+  enabled_columns += %w[url_cell updated_at_cell cycle_type_cell propulsion_type_cell status_cell]
   enabled_columns += additional_registration_fields.map { |f| "#{f}_cell" }
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
   enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
@@ -134,6 +134,8 @@
         %th.hiddenColumn.hidden-xs-down.stolen_cell
           %small
             = t(".stolen")
+        %th.hiddenColumn.hidden-xs-down.propulsion_type_cell
+          = sortable "propulsion_type", t(".propulsion_type")
         %th.hiddenColumn.hidden-xs-down.cycle_type_cell
           = sortable "cycle_type", t(".vehicle_type")
         %th.hiddenColumn.hidden-xs-down.manufacturer_cell
@@ -186,8 +188,12 @@
                 = l bike.updated_by_user_fallback, format: :convert_time
             %td.hiddenColumn.hidden-xs-down.table-cell-check.stolen_cell
               = check_mark if bike.status_stolen?
+            %td.hiddenColumn.hidden-xs-down.propulsion_type_cell
+              %span{class: (bike.propulsion_type == "foot-pedal" ? "less-strong" : "")}
+                = bike.propulsion_titleize
             %td.hiddenColumn.hidden-xs-down.cycle_type_cell
-              = bike.type_titleize
+              %span{class: (bike.cycle_type == "bike" ? "less-strong" : "")}
+                = bike.type_titleize
             %td.hiddenColumn.hidden-xs-down.manufacturer_cell
               = bike.mnfg_name
             %td.hiddenColumn.hidden-xs-down.model_cell
