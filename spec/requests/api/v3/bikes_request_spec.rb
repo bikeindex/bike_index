@@ -8,7 +8,7 @@ RSpec.describe "Bikes API V3", type: :request do
   let(:email) { "fun_times@examples.com" }
   let(:bike_attrs) do
     {
-      serial: "69 non-example",
+      serial: "69 NON-EXAMPLE",
       manufacturer: manufacturer.name,
       rear_tire_narrow: "true",
       rear_wheel_bsd: "559",

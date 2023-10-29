@@ -1175,7 +1175,7 @@ RSpec.describe Bike, type: :model do
 
   describe "serial_display" do
     it "returns the serial" do
-      expect(Bike.new(serial_number: "AAbbCC").serial_display).to eq "AAbbCC"
+      expect(Bike.new(serial_number: "AAbbCC").serial_display).to eq "AABBCC"
     end
     context "abandoned" do
       it "only returns the serial if we should show people the serial" do
@@ -1185,7 +1185,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.serial_hidden?).to be_truthy
         expect(bike.serial_display).to eq "Hidden"
         allow(bike).to receive(:authorized?) { true }
-        expect(bike.serial_display(User.new)).to eq "something"
+        expect(bike.serial_display(User.new)).to eq "SOMETHING"
       end
     end
     context "impounded" do
@@ -1223,8 +1223,8 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized?(bike.user)).to be_truthy
         expect(bike.authorized?(impound_user)).to be_falsey
         expect(bike.serial_display).to eq "Hidden"
-        expect(bike.serial_display(bike.user)).to eq "Hello Party"
-        expect(bike.serial_display(impound_user)).to eq "Hello Party"
+        expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
+        expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
       end
       context "organized" do
         let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
@@ -1235,8 +1235,8 @@ RSpec.describe Bike, type: :model do
           expect(bike.authorized?(bike.user)).to be_falsey
           expect(bike.authorized?(impound_user)).to be_truthy
           expect(bike.serial_display).to eq "Hidden"
-          expect(bike.serial_display(bike.user)).to eq "Hello Party"
-          expect(bike.serial_display(impound_user)).to eq "Hello Party"
+          expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
+          expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
         end
       end
     end

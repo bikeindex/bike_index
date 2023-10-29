@@ -5,7 +5,7 @@ RSpec.describe BikeHelper, type: :helper do
     let(:bike) { Bike.new(serial_number: serial_number, cycle_type: "tandem") }
     let(:serial_number) { "fff333" }
     it "is in a code element" do
-      expect(render_serial_display(bike)).to eq("<code class=\"bike-serial\">fff333</code>")
+      expect(render_serial_display(bike)).to eq("<code class=\"bike-serial\">FFF333</code>")
     end
     context "unknown" do
       let(:serial_number) { "unknown" }
@@ -15,14 +15,14 @@ RSpec.describe BikeHelper, type: :helper do
     end
     context "hidden" do
       let(:target) { "<span class=\"less-strong\">hidden</span> <em class=\"small less-less-strong\">because tandem is impounded</em>" }
-      let(:target_authorized) { "<code class=\"bike-serial\">fff333</code> <em class=\"small less-less-strong\">hidden for unauthorized users</em>" }
+      let(:target_authorized) { "<code class=\"bike-serial\">FFF333</code> <em class=\"small less-less-strong\">hidden for unauthorized users</em>" }
       it "returns target" do
         bike.status = "status_impounded"
         expect(render_serial_display(bike)).to eq target
         expect(render_serial_display(bike, skip_explanation: true)).to eq "<span class=\"less-strong\">hidden</span>"
         expect(render_serial_display(bike, User.new)).to eq target
         expect(render_serial_display(bike, User.new(superuser: true))).to eq target_authorized
-        expect(render_serial_display(bike, User.new(superuser: true), skip_explanation: true)).to eq "<code class=\"bike-serial\">fff333</code>"
+        expect(render_serial_display(bike, User.new(superuser: true), skip_explanation: true)).to eq "<code class=\"bike-serial\">FFF333</code>"
       end
     end
   end

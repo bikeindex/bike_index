@@ -112,6 +112,8 @@ RSpec.describe "Search API V3", type: :request do
             title
             url
             year
+            propulsion_type_slug
+            cycle_type_slug
           ]))
         expect(response.header["Total"]).to eq("1")
       end

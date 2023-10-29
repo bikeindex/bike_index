@@ -6,20 +6,17 @@
     %ul
       %li.nav-item
         - active_kind = params[:search_kind]
-        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: ((active_kind.present? || @search_theft_survey) ? "active" : "")}
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (active_kind.present? ? "active" : "")}
           - if active_kind.present?
             = active_kind.humanize
-          - elsif @search_theft_survey
-            Opted into theft survey
           - else
             Kind
         .dropdown-menu
+          = link_to "All Kinds", admin_organizations_path(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{active_kind.blank? ? 'active' : ''}"
+          .dropdown-divider
           - Organization.kinds.each do |kind|
             - kind_active = active_kind == kind
             = link_to kind.humanize, admin_organizations_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
-          .dropdown-divider
-          = link_to "Theft survey", admin_organizations_path(sortable_search_params.merge(search_theft_survey: @search_theft_survey ? nil : true)), class: "dropdown-item #{@search_theft_survey ? 'active' : ''}"
-
       %li.nav-item
         - active_pos_kind = params[:search_pos]
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (active_pos_kind.present? ? "active" : "") }
@@ -57,9 +54,11 @@
   = hidden_field_tag :search_paid, @search_paid
   = hidden_field_tag :search_pos, params[:search_pos]
   .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
-    .fancy-select.no-restore-on-backspace.unfancy.mt-2.mr-2{style: "margin-bottom: -0.4rem; "}
-      - opt_vals = OrganizationFeature.order(name: :desc).pluck(:name, :id)
-      = select_tag :search_organization_features, options_for_select(opt_vals, selected: @organization_features.map(&:id)), placeholder: "with features", class: "form-control", include_blank: true, multiple: true
+    .fancy-select.no-restore-on-backspace.unfancy.col-md-4.mt-2{style: "margin-bottom: -0.4rem; padding-left: 0;"}
+      - features_group = OrganizationFeature.order(name: :desc).pluck(:name, :id)
+      - settings_group = [["With Stolen Message", "with_stolen_message"], ["Opted into Theft Survey", "theft_survey"]]
+      - opt_groups = [["Settings", settings_group], ["Features", features_group]]
+      = select_tag :search_features_and_settings, grouped_options_for_select(opt_groups, selected: @features_and_settings_ids), placeholder: "With features", class: "form-control", include_blank: true, multiple: true
     .align-self-end.mt-2.mr-2
       = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location", class: "form-control", style: ""
     .mt-2.mr-2

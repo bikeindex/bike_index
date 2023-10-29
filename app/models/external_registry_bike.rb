@@ -86,6 +86,14 @@ class ExternalRegistryBike < ApplicationRecord
     Bike.status_humanized_translated(status_humanized)
   end
 
+  def propulsion_type
+    "foot-pedal"
+  end
+
+  def cycle_type
+    "bike"
+  end
+
   def frame_colors
     self[:frame_colors]&.split(/\s*,\s*/) || []
   end

@@ -311,7 +311,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
           allow(bike).to receive(:stock_photo_url) { "http://something.com" }
           header_tags = helper.bikes_header_tags # Required to be called in here (can't be in a let)
           expect(helper.page_title).to eq title_string
-          expect(helper.page_description).to eq "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number}. Cool description."
+          expect(helper.page_description).to eq "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number.upcase}. Cool description."
           og_image = header_tags.find { |t| t && t[/og.image/] }
           twitter_image = header_tags.find { |t| t&.include?("twitter:image") }
           expect(og_image.include?("http://something.com")).to be_truthy
@@ -322,7 +322,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
           let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
           let(:title_string) { bike.manufacturer.simple_name.to_s }
           let(:target_page_description) do
-            "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number}. " \
+            "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number.upcase}. " \
             "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
           end
           it "returns expected things" do

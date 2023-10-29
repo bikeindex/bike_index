@@ -57,7 +57,8 @@ jobs:
               libexpat1-dev \
               libssl-dev \
               libz-dev \
-              postgresql-client
+              postgresql-client \
+              ripgrep
 
       - run:
           name: "Update Node.js and npm"
@@ -250,6 +251,7 @@ jobs:
       - run:
           name: Setup Database
           command: |
+            bundle exec rails db:create --trace
             bundle exec rails db:structure:load --trace
 
       - run:

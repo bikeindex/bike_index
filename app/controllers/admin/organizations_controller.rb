@@ -127,22 +127,37 @@ class Admin::OrganizationsController < Admin::BaseController
     matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
-    @organization_features = OrganizationFeature.where(id: params[:search_organization_features])
-    if @organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
-      matching_organizations = matching_organizations.with_enabled_feature_slugs(@organization_features.feature_slugs)
+
+    @features_and_settings_ids = []
+    features_and_settings = Array(params[:search_features_and_settings]).reject(&:blank?)
+    organization_features = OrganizationFeature.where(id: features_and_settings)
+    if organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
+      matching_organizations = matching_organizations.with_enabled_feature_slugs(organization_features.feature_slugs)
+      @features_and_settings_ids += organization_features.pluck(:id)
     end
+    selected_settings = organization_settings & features_and_settings
+    if selected_settings.include?("theft_survey")
+      matching_organizations = matching_organizations.where(opted_into_theft_survey_2023: true)
+    end
+    if selected_settings.include?("with_stolen_message")
+      matching_organizations = matching_organizations.with_stolen_message
+    end
+    @features_and_settings_ids += selected_settings
+
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos].present?
     matching_organizations = matching_organizations.where(approved: (sort_direction == "desc")) if sort_column == "approved"
-    @search_theft_survey = ParamsNormalizer.boolean(params[:search_theft_survey])
-    matching_organizations = matching_organizations.where(opted_into_theft_survey_2023: true) if @search_theft_survey
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
     @matching_organizations = matching_organizations.where(@time_range_column => @time_range)
   end
 
   def sortable_columns
-    %w[created_at name approved pos_kind bikes]
+    %w[created_at name approved pos_kind bikes].freeze
+  end
+
+  def organization_settings
+    %w[theft_survey with_stolen_message].freeze
   end
 
   def pos_kind_for_organizations

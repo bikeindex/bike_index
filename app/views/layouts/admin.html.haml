@@ -40,7 +40,8 @@
           = link_to admin_nav_select_link_active[:path], class: "nav-link text-muted em" do
             All
             .d-none.d-sm-inline-block.d-lg-none.d-xl-inline-block
-              = admin_nav_select_link_active[:title]
+              -# Remove "Config:" and "Dev:" from the all link title
+              = admin_nav_select_link_active[:title]&.split(":").last
         .fancy-select.unfancy.no-restore-on-backspace
           = select(:admin, :other_navigation, options_for_select(admin_nav_select_links.map { |l| [l[:title], l[:path]] }), { prompt: admin_nav_select_prompt }, { class: "form-control" })
 

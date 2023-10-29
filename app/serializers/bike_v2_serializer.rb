@@ -20,7 +20,9 @@ class BikeV2Serializer < ApplicationSerializer
     :thumb,
     :title,
     :url,
-    :year
+    :year,
+    :propulsion_type_slug,
+    :cycle_type_slug
 
   attr_accessor \
     :external_id,
@@ -80,6 +82,14 @@ class BikeV2Serializer < ApplicationSerializer
   def stolen_coordinates
     return nil unless current_stolen_record&.latitude_public&.present?
     [current_stolen_record.latitude_public, current_stolen_record.longitude_public]
+  end
+
+  def propulsion_type_slug
+    object.propulsion_type
+  end
+
+  def cycle_type_slug
+    object.cycle_type
   end
 
   private
