@@ -83,8 +83,13 @@ module BikeAttributable
 
   def type_titleize
     return "" unless type.present?
-    # make this work for e-scooter
     type.split(/(\s|-)/).map(&:capitalize).join("")
+  end
+
+  def propulsion_titleize
+    return "" unless propulsion_type.present?
+    return "Pedal" if propulsion_type == "foot-pedal"
+    propulsion_type.split(/(\s|-)/).map(&:capitalize).join("")
   end
 
   def frame_model_truncated

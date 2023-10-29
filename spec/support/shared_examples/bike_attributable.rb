@@ -36,17 +36,21 @@ RSpec.shared_examples "bike_attributable" do
   end
 
   describe "type" do
-    let(:obj) { FactoryBot.build(model_sym, cycle_type: type) }
+    let(:obj) { FactoryBot.build(model_sym, cycle_type: type, propulsion_type: propulsion_type) }
     let(:type) { "trailer" }
+    let(:propulsion_type) { "foot-pedal" }
     it "returns the cycle type name" do
       expect(obj.type).to eq("bike trailer")
       expect(obj.type_titleize).to eq("Bike Trailer")
+      expect(obj.propulsion_titleize).to eq("Pedal")
     end
     context "e_scooter" do
       let(:type) { "e-scooter" }
+      let(:propulsion_type) { "throttle" }
       it "returns expected" do
         expect(obj.type).to eq "e-scooter"
         expect(obj.type_titleize).to eq "E-Scooter"
+        expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
   end
