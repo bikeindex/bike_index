@@ -1,6 +1,6 @@
 class LoggedSearch < AnalyticsRecord
   ENDPOINT_ENUM = {
-    public_bikes: 0,
+    web_bikes: 0,
     api_v1_bikes: 1,
     api_v1_stolen_ids: 2,
     api_v1_close_serials: 16,

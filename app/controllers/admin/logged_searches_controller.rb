@@ -28,7 +28,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
   end
 
   def special_endpoints
-    %w[not_public_bikes organized]
+    %w[not_web_bikes organized]
   end
 
   def matching_logged_searches
@@ -37,7 +37,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
     if special_endpoints.include?(params[:search_endpoint])
       @endpoint = params[:search_endpoint]
       logged_searches = case @endpoint
-      when "not_public_bikes" then logged_searches.where.not(endpoint: :public_bikes)
+      when "not_web_bikes" then logged_searches.where.not(endpoint: :web_bikes)
       when "organized" then logged_searches.organized
       end
     elsif LoggedSearch.endpoints.key?(params[:search_endpoint])
