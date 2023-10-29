@@ -1,6 +1,6 @@
 FactoryBot.define do
-  factory :external_registry_credentials do
-    factory :project529_credentials,
+  factory :external_registry_credential do
+    factory :project529_credential,
       class: "ExternalRegistryCredential::Project529Credential" do
       access_token { "test" }
       access_token_expires_at { Time.current + 2.days }
@@ -9,7 +9,7 @@ FactoryBot.define do
       type { "ExternalRegistryCredential::Project529Credential" }
     end
 
-    factory :stop_heling_credentials,
+    factory :stop_heling_credential,
       class: "ExternalRegistryCredential::StopHelingCredential" do
       access_token { "test" }
       access_token_expires_at { nil }
