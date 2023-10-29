@@ -130,6 +130,7 @@ nl:
         24' of '123 %{thousands} 456 %{decimal} 78'). Kreeg %{currency}
       model_invalid: 'Validatie mislukt: %{errors}'
       required: moet bestaan
+      in: moet in %{count} zijn
     template:
       body: 'Er zijn problemen met de volgende velden:'
       header:
@@ -1206,6 +1207,8 @@ nl:
           of translation.deepl_api_key in config / i18n-jobs.yml. Haal de sleutel
           op https://www.deepl.com/pro.
         no_results: DeepL heeft geen resultaten opgeleverd.
+        specific_target_missing: U moet een specifieke variant voor de opgegeven doeltaal
+          opgeven, bijvoorbeeld en-us in plaats van en.
     google_translate:
       errors:
         no_api_key: Stel de Google API-sleutel in via GOOGLE_TRANSLATE_API_KEY omgevingsvariabele
@@ -1239,6 +1242,12 @@ nl:
           of translation.yandex_api_key in config / i18n-Tasks.yml. Haal de sleutel
           op https://tech.yandex.com/translate.
         no_results: Yandex leverde geen resultaten op.
+    openai_translate:
+      errors:
+        no_api_key: Stel de OpenAI API-sleutel in via OPENAI_API_KEY omgevingsvariabele
+          of translation.openai_api_key in config/i18n-tasks.yml. Haal de sleutel
+          op https://openai.com/.
+        no_results: OpenAI heeft geen resultaten opgeleverd.
   grape:
     errors:
       format: "%{attributes} %{message}"
