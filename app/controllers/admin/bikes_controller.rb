@@ -175,6 +175,9 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.includes(:ownerships).where(deleted_at: nil, ownerships: {organization_id: nil})
     end
 
+    @motorized = ParamsNormalizer.boolean(params[:search_motorized])
+    bikes = bikes.motorized if @motorized
+
     # Get a query error if both are passed
     if params[:search_email].present? && @user.blank?
       @search_email = params[:search_email]
@@ -245,7 +248,9 @@ class Admin::BikesController < Admin::BaseController
     if params[:search_time_ordered].present?
       session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:search_time_ordered])
     end
-    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
+    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id).not_spam
+    @motorized = ParamsNormalizer.boolean(params[:search_motorized])
+    bikes = bikes.motorized if @motorized
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = bikes.where(created_at: @time_range) unless @period == "all"
     @include_blank = ParamsNormalizer.boolean(params[:search_include_blank])
