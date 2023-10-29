@@ -157,8 +157,6 @@ RSpec.describe PropulsionType, type: :model do
       it "is the target" do
         expect_hashes_to_match(PropulsionType.send(:motorized_autocomplete_hash), motorized_hash)
         expect(PropulsionType.autocomplete_hashes.count).to eq 1
-        # target_result_hash = target.except(:data).merge(target[:data])
-        # expect(cycle_type.autocomplete_result_hash).to eq target_result_hash.as_json
       end
     end
   end
