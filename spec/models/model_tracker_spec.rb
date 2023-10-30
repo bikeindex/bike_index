@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe ModelTracker, type: :model do
   describe "factory" do
