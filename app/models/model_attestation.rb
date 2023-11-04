@@ -9,11 +9,11 @@ class ModelAttestation < ApplicationRecord
 
   enum kind: CERTIFICATION_KIND_ENUM
 
-  belongs_to :model_tracker
+  belongs_to :model_audit
   belongs_to :user
   belongs_to :organization
 
-  validates_presence_of :model_tracker_id
+  validates_presence_of :model_audit_id
   validates_presence_of :kind
   validates_presence_of :user_id
 end

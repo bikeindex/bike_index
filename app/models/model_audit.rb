@@ -1,4 +1,4 @@
-class ModelTracker < ApplicationRecord
+class ModelAudit < ApplicationRecord
   enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
   enum propulsion_type: PropulsionType::SLUGS
 

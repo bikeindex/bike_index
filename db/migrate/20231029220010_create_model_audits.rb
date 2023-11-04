@@ -1,6 +1,6 @@
-class CreateModelTrackers < ActiveRecord::Migration[6.1]
+class CreateModelAudits < ActiveRecord::Migration[6.1]
   def change
-    create_table :model_trackers do |t|
+    create_table :model_audits do |t|
       t.integer :propulsion_type
       t.references :manufacturer, index: true
       t.string :manufacturer_other
@@ -10,6 +10,6 @@ class CreateModelTrackers < ActiveRecord::Migration[6.1]
 
       t.timestamps
     end
-    add_reference :bikes, :model_tracker, index: true
+    add_reference :bikes, :model_audit, index: true
   end
 end

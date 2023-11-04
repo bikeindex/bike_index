@@ -508,7 +508,7 @@ CREATE TABLE public.bikes (
     credibility_score integer,
     likely_spam boolean DEFAULT false,
     serial_segments_migrated_at timestamp without time zone,
-    model_tracker_id bigint
+    model_audit_id bigint
 );
 
 
@@ -1979,7 +1979,7 @@ ALTER SEQUENCE public.memberships_id_seq OWNED BY public.memberships.id;
 
 CREATE TABLE public.model_attestations (
     id bigint NOT NULL,
-    model_tracker_id bigint,
+    model_audit_id bigint,
     kind integer,
     user_id bigint,
     organization_id bigint,
@@ -2010,10 +2010,10 @@ ALTER SEQUENCE public.model_attestations_id_seq OWNED BY public.model_attestatio
 
 
 --
--- Name: model_trackers; Type: TABLE; Schema: public; Owner: -
+-- Name: model_audits; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.model_trackers (
+CREATE TABLE public.model_audits (
     id bigint NOT NULL,
     propulsion_type integer,
     manufacturer_id bigint,
@@ -2026,10 +2026,10 @@ CREATE TABLE public.model_trackers (
 
 
 --
--- Name: model_trackers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: model_audits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.model_trackers_id_seq
+CREATE SEQUENCE public.model_audits_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2038,10 +2038,10 @@ CREATE SEQUENCE public.model_trackers_id_seq
 
 
 --
--- Name: model_trackers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: model_audits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.model_trackers_id_seq OWNED BY public.model_trackers.id;
+ALTER SEQUENCE public.model_audits_id_seq OWNED BY public.model_audits.id;
 
 
 --
@@ -3765,10 +3765,10 @@ ALTER TABLE ONLY public.model_attestations ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: model_trackers id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: model_audits id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.model_trackers ALTER COLUMN id SET DEFAULT nextval('public.model_trackers_id_seq'::regclass);
+ALTER TABLE ONLY public.model_audits ALTER COLUMN id SET DEFAULT nextval('public.model_audits_id_seq'::regclass);
 
 
 --
@@ -4404,11 +4404,11 @@ ALTER TABLE ONLY public.model_attestations
 
 
 --
--- Name: model_trackers model_trackers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: model_audits model_audits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.model_trackers
-    ADD CONSTRAINT model_trackers_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.model_audits
+    ADD CONSTRAINT model_audits_pkey PRIMARY KEY (id);
 
 
 --
@@ -4934,10 +4934,10 @@ CREATE INDEX index_bikes_on_manufacturer_id ON public.bikes USING btree (manufac
 
 
 --
--- Name: index_bikes_on_model_tracker_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bikes_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_model_tracker_id ON public.bikes USING btree (model_tracker_id);
+CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_audit_id);
 
 
 --
@@ -5389,10 +5389,10 @@ CREATE INDEX index_memberships_on_user_id ON public.memberships USING btree (use
 
 
 --
--- Name: index_model_attestations_on_model_tracker_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_model_attestations_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_model_attestations_on_model_tracker_id ON public.model_attestations USING btree (model_tracker_id);
+CREATE INDEX index_model_attestations_on_model_audit_id ON public.model_attestations USING btree (model_audit_id);
 
 
 --
@@ -5410,10 +5410,10 @@ CREATE INDEX index_model_attestations_on_user_id ON public.model_attestations US
 
 
 --
--- Name: index_model_trackers_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_model_audits_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_model_trackers_on_manufacturer_id ON public.model_trackers USING btree (manufacturer_id);
+CREATE INDEX index_model_audits_on_manufacturer_id ON public.model_audits USING btree (manufacturer_id);
 
 
 --
