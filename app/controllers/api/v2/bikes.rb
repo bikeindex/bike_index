@@ -166,7 +166,8 @@ module API
             {
               registered: matching_bike.present?,
               claimed: matching_bike.present? && matching_bike.claimed?,
-              can_edit: matching_bike.present? && matching_bike.authorized?(current_user)
+              can_edit: matching_bike.present? && matching_bike.authorized?(current_user),
+              status: matching_bike.status_humanized_translated
             }
           else
             error!("You are not authorized for that organization", 401)
