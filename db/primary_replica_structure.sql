@@ -1983,6 +1983,7 @@ CREATE TABLE public.model_attestations (
     kind integer,
     user_id bigint,
     organization_id bigint,
+    replaced boolean DEFAULT false,
     url text,
     info text,
     created_at timestamp(6) without time zone NOT NULL,
@@ -2307,7 +2308,7 @@ CREATE TABLE public.organization_model_audits (
     model_audit_id bigint,
     organization_id bigint,
     certification_status integer,
-    bikes_count integer,
+    bikes_count integer DEFAULT 0,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

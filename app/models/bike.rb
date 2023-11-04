@@ -27,6 +27,7 @@ class Bike < ApplicationRecord
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
   belongs_to :paint, counter_cache: true # Not in BikeAttributable because of counter cache
+  belongs_to :model_audit
 
   has_many :bike_organizations
   has_many :organizations, through: :bike_organizations

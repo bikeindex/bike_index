@@ -16,4 +16,6 @@ class ModelAttestation < ApplicationRecord
   validates_presence_of :model_audit_id
   validates_presence_of :kind
   validates_presence_of :user_id
+
+  scope :current, -> { where(replaced: false) }
 end
