@@ -2299,6 +2299,40 @@ ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organiza
 
 
 --
+-- Name: organization_model_audits; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_model_audits (
+    id bigint NOT NULL,
+    model_audit_id bigint,
+    organization_id bigint,
+    certification_status integer,
+    bikes_count integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_model_audits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_model_audits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_model_audits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_model_audits_id_seq OWNED BY public.organization_model_audits.id;
+
+
+--
 -- Name: organization_stolen_messages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3821,6 +3855,13 @@ ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT n
 
 
 --
+-- Name: organization_model_audits id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_model_audits ALTER COLUMN id SET DEFAULT nextval('public.organization_model_audits_id_seq'::regclass);
+
+
+--
 -- Name: organization_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4465,6 +4506,14 @@ ALTER TABLE ONLY public.organization_features
 
 ALTER TABLE ONLY public.organization_manufacturers
     ADD CONSTRAINT organization_manufacturers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_model_audits organization_model_audits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_model_audits
+    ADD CONSTRAINT organization_model_audits_pkey PRIMARY KEY (id);
 
 
 --
@@ -5505,6 +5554,20 @@ CREATE INDEX index_organization_manufacturers_on_manufacturer_id ON public.organ
 --
 
 CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organization_manufacturers USING btree (organization_id);
+
+
+--
+-- Name: index_organization_model_audits_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_model_audits_on_model_audit_id ON public.organization_model_audits USING btree (model_audit_id);
+
+
+--
+-- Name: index_organization_model_audits_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_model_audits_on_organization_id ON public.organization_model_audits USING btree (organization_id);
 
 
 --
@@ -6565,6 +6628,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231012212343'),
 ('20231019173522'),
 ('20231029220010'),
-('20231030150841');
+('20231030150841'),
+('20231104191652');
 
 
