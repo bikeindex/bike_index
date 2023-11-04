@@ -1984,6 +1984,7 @@ CREATE TABLE public.model_attestations (
     user_id bigint,
     organization_id bigint,
     url text,
+    info text,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
