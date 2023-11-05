@@ -26,6 +26,7 @@ class Admin::BikesController < Admin::BaseController
       bike_ids.each do |bid|
         Bike.unscoped.find_by_id(bid)&.update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
+      # Needs to happen after the manufacturer has been assigned
       Bike.unscoped.where(id: bike_ids).distinct.pluck(:model_audit_id)
         .each { |i| UpdateModelAuditWorker.perform_async(i) }
       flash[:success] = "Success. #{bike_ids.count} Bikes updated"

@@ -752,7 +752,7 @@ class Bike < ApplicationRecord
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
-    self.frame_model = if frame_model.present? ? frame_model.strip : nil
+    self.frame_model = frame_model.present? ? frame_model.strip : nil
     self.name = name.present? ? name.strip : nil
     self.extra_registration_number = ParamsNormalizer.strip_or_nil_if_blank(extra_registration_number)
     if extra_registration_number.present?
