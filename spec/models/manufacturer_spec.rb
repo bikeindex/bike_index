@@ -36,6 +36,10 @@ RSpec.describe Manufacturer, type: :model do
       mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
       expect(Manufacturer.friendly_find("poopy panters Accell")).to eq(mnfg)
     end
+    it "finds with dashes" do
+      mnfg = FactoryBot.create(:manufacturer, name: "All City")
+      expect(Manufacturer.friendly_find("All-city ")).to eq(mnfg)
+    end
   end
 
   describe "autocomplete_hash" do
