@@ -32,7 +32,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     # Bump model_audit, unless it was just created
     model_audit.update(updated_at: Time.current) unless new_model_audit
 
-    Organization.with_enabled_feature_slugs("model_audits").pluck(:id)
+    organization_ids_to_enqueue_for_model_audits.pluck(:id)
       .each { |id| update_org_model_audit(model_audit, id) }
   end
 
@@ -42,7 +42,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     bikes = Bike.where(model_audit_id: model_audit.id).left_joins(:bike_organizations)
       .where(bike_organizations: {organization_id: organization_id}).reorder(:id)
     bikes_count = bikes.count
-    bike_at = bikes.last.created_at
+    bike_at = bikes.last&.created_at || nil
 
     organization_model_audit = model_audit.organization_model_audits
       .where(organization_id: organization_id).first
@@ -66,6 +66,14 @@ class UpdateModelAuditWorker < ApplicationWorker
       frame_model: bike.frame_model,
       propulsion_type: propulsion_type,
       cycle_type: cycle_type)
+  end
+
+  def organization_ids_to_enqueue_for_model_audits
+    # One we start creating model_audits, keep updating them
+    # we enqueue every single model_audit when it's turned on for the first time,
+    # so rather than tracking which to update, just update all of them
+    (Organization.with_enabled_feature_slugs("model_audits") +
+      OrganizationModelAudit.distinct.pluck(:organization_id)).uniq
   end
 
   def update_attrs(model_audit)

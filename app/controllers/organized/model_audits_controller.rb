@@ -12,14 +12,9 @@ module Organized
         .page(@page).per(@per_page)
     end
 
-    def update
-      if params[:remove_bike_stickers] && @export.assign_bike_codes?
-        @export.remove_bike_stickers_and_record!(current_user)
-        flash[:success] = translation(:bike_stickers_removed)
-      else
-        flash[:error] = translation(:unknown_update_action)
-      end
-      redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id)
+    # NOTE: This is really "create model_attestation" -
+    def create
+      redirect_back(fallback_location: organized_model_audits_path(organization_id: current_organization.to_param))
     end
 
     private
@@ -29,7 +24,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:model_attestation).permit(:kind)
+      params.require(:model_attestation).permit(:kind, :url, :info)
         .merge(user_id: current_user.id, organization_id: current_organization.id)
     end
 
@@ -44,6 +39,9 @@ module Organized
     def organization_model_audits
       organization_model_audits = OrganizationModelAudit.where(organization_id: current_organization.id)
       @time_range_column = "last_bike_created_at"
+      unless InputNormalizer.boolean(params[:search_0])
+        organization_model_audits = organization_model_audits.where.not(bikes_count: 0)
+      end
       organization_model_audits.where(@time_range_column => @time_range)
         .joins(:model_audit)
     end

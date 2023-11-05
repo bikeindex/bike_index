@@ -11,7 +11,7 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
       describe "index" do
         it "redirects" do
           get base_url
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
           expect(flash[:error]).to be_present
         end
       end
@@ -35,18 +35,18 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
     let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
     let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
 
-    # describe "index" do
-    #   it "renders" do
-    #     expect(current_user.memberships.first.role).to eq "member"
-    #     expect(export).to be_present # So that we're actually rendering an export
-    #     current_organization.reload
-    #     expect(current_organization.enabled?("csv_exports")).to be_truthy
-    #     get base_url
-    #     expect(response.code).to eq("200")
-    #     expect(response).to render_template(:index)
-    #     expect(assigns(:current_organization)).to eq current_organization
-    #     expect(assigns(:exports).pluck(:id)).to eq([export.id])
-    #   end
-    # end
+    describe "index" do
+      it "renders" do
+        expect(current_user.memberships.first.role).to eq "member"
+        expect(export).to be_present # So that we're actually rendering an export
+        current_organization.reload
+        expect(current_organization.enabled?("csv_exports")).to be_truthy
+        get base_url
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:index)
+        expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:exports).pluck(:id)).to eq([export.id])
+      end
+    end
   end
 end

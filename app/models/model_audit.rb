@@ -24,10 +24,10 @@ class ModelAudit < ApplicationRecord
 
   def self.matching_bikes_for_bike(bike)
     bikes = Bike.unscoped.where(manufacturer_id: bike.manufacturer_id)
-    bikes = bikes.where("frame_model ILIKE ?", bike.frame_model)
     if bike.manufacturer_id == Manufacturer.other.id
       bikes = bikes.where("mnfg_name ILIKE ?", bike.mnfg_name)
     end
+    bikes = bikes.where("frame_model ILIKE ?", bike.frame_model)
     bikes.reorder(id: :desc)
   end
 
