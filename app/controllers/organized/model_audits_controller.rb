@@ -14,7 +14,21 @@ module Organized
 
     # NOTE: This is really "create model_attestation" -
     def create
-      redirect_back(fallback_location: organized_model_audits_path(organization_id: current_organization.to_param))
+      if !permitted_attestation_kinds.include?(permitted_parameters[:kind])
+        flash[:error] = "Sorry, you can't make an attestation of that kind"
+      else
+        model_attestation = ModelAttestation.new(permitted_parameters)
+        if model_attestation.save
+          # Inline update to reflect the new certification_status
+          current_organization.organization_model_audits
+            .where(model_audit_id: model_attestation.model_audit_id)
+            .first&.update(updated_at: Time.current)
+          flash[:success] = "Certification status updated successfully"
+        else
+          flash[:error] = "Unable to save that attestation, #{model_attestation.errors.full_messages.to_sentence}"
+        end
+      end
+      redirect_back(fallback_location: organization_model_audits_path(organization_id: current_organization.to_param))
     end
 
     private
@@ -23,8 +37,12 @@ module Organized
       %w[last_bike_created_at bikes_count certification_status mnfg_name frame_model]
     end
 
+    def permitted_attestation_kinds
+      %w[uncertified_by_trusted_org certified_by_trusted_org]
+    end
+
     def permitted_parameters
-      params.require(:model_attestation).permit(:kind, :url, :info)
+      params.permit(:kind, :url, :info, :model_audit_id)
         .merge(user_id: current_user.id, organization_id: current_organization.id)
     end
 
@@ -38,8 +56,10 @@ module Organized
 
     def organization_model_audits
       organization_model_audits = OrganizationModelAudit.where(organization_id: current_organization.id)
-      @time_range_column = "last_bike_created_at"
-      unless InputNormalizer.boolean(params[:search_0])
+      if InputNormalizer.boolean(params[:search_zero])
+        @time_range_column = "updated_at" # Can't be last_bike_created_at, since it's nil
+      else
+        @time_range_column = "last_bike_created_at"
         organization_model_audits = organization_model_audits.where.not(bikes_count: 0)
       end
       organization_model_audits.where(@time_range_column => @time_range)

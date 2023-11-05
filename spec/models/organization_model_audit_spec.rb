@@ -29,7 +29,7 @@ RSpec.describe OrganizationModelAudit, type: :model do
       it "is the organization_model_attestation status" do
         expect(organization_model_attestation).to be_valid
         expect(organization_model_audit.organization_model_attestations.pluck(:id)).to eq([organization_model_attestation.id])
-        expect(organization_model_audit.certification_status).to eq "certified_by_trusted_org"
+        expect(organization_model_audit.certification_status).to eq "certified_by_your_org"
         expect(model_audit.reload.send(:calculated_certification_status)).to eq certification_status
       end
     end

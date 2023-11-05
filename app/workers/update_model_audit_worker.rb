@@ -32,7 +32,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     # Bump model_audit, unless it was just created
     model_audit.update(updated_at: Time.current) unless new_model_audit
 
-    organization_ids_to_enqueue_for_model_audits.pluck(:id)
+    organization_ids_to_enqueue_for_model_audits
       .each { |id| update_org_model_audit(model_audit, id) }
   end
 
@@ -51,7 +51,7 @@ class UpdateModelAuditWorker < ApplicationWorker
       model_audit.organization_model_audits.create(bikes_count: bikes_count,
         organization_id: organization_id, last_bike_created_at: bike_at)
     elsif organization_model_audit.present?
-      organization_model_audit.update_attribute(bikes_count: bikes_count,
+      organization_model_audit.update(bikes_count: bikes_count,
         last_bike_created_at: bike_at)
     end
   end
@@ -71,7 +71,7 @@ class UpdateModelAuditWorker < ApplicationWorker
   def organization_ids_to_enqueue_for_model_audits
     # We enqueue every single model_audit when it's turned on for an org for the first time
     # ... So one we start creating model_audits, keep updating them
-    (Organization.with_enabled_feature_slugs("model_audits") +
+    (Organization.with_enabled_feature_slugs("model_audits").pluck(:id) +
       OrganizationModelAudit.distinct.pluck(:organization_id)).uniq
   end
 

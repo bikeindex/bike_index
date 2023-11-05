@@ -396,7 +396,7 @@ class User < ApplicationRecord
     end
     if my_bikes_link_target.present? || my_bikes_link_title.present?
       mbh = my_bikes_hash || {}
-      mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
+      mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target)
       mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
     end

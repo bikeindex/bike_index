@@ -36,6 +36,10 @@ class OrganizationModelAudit < ApplicationRecord
   private
 
   def calculated_certification_status
-    current_organization_model_attestation&.kind || model_audit&.certification_status
+    if current_organization_model_attestation.present?
+      current_organization_model_attestation.kind.gsub("trusted", "your")
+    else
+      model_audit&.certification_status
+    end
   end
 end

@@ -34,10 +34,13 @@
   %tbody
     - organization_model_audits.each do |organization_model_audit|
       - model_audit = organization_model_audit.model_audit
-      %tr{data: {id: organization_model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
+      %tr{data: {modelauditid: model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
         %td
           %span.convertTime.preciseTime
-            = l(organization_model_audit.last_bike_created_at, format: :convert_time)
+            - if organization_model_audit.last_bike_created_at
+              = l(organization_model_audit.last_bike_created_at, format: :convert_time)
+            - else
+              %span.less-strong= l(organization_model_audit.updated_at, format: :convert_time)
           - if display_dev_info?
             %small.only-dev-visible= organization_model_audit.id
         %td
@@ -53,7 +56,8 @@
         %td
           = model_audit.frame_model
         %td
-          = organization_model_audit.certification_status_humanized
+          %span{class: status_display_class(organization_model_audit.certification_status)}
+            = organization_model_audit.certification_status_humanized
         %td
           %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal"}}
             update
@@ -64,7 +68,7 @@
 - modal_body = capture_haml do
   .modal-body
     = form_tag organization_model_audits_path(organization_id: current_organization.to_param), method: :post, action: "create", class: "form" do
-      = hidden_field_tag :organization_model_audit_id
+      = hidden_field_tag :model_audit_id
       .form-group
         = label_tag :kind do
           Update the certification status of the
@@ -95,6 +99,6 @@
     $targetRow = $(e.target).parents("tr")
     $("#updateModalMnfg").text($targetRow.attr("data-mnfgname"))
     $("#updateModalFrameModel").text($targetRow.attr("data-framemodel"))
-    $("#update-model-cert-modal #organization_model_audit_id").val($targetRow.attr("data-id"))
+    $("#update-model-cert-modal #model_audit_id").val($targetRow.attr("data-modelauditid"))
     return true
   })
