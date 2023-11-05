@@ -1,4 +1,5 @@
 - skip_view_just_stolen ||= @bike_sticker.present?
+- cycle_type = BikeDisplayer.vehicle_search?(@interpreted_params) ? t(".vehicle") : t(".bike")
 
 .mb-4
   = render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_bikes_path(organization_id: current_organization.to_param)}
@@ -91,33 +92,33 @@
       = link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")), class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do
         = t(".only_not_impounded_html")
       = link_to organization_bikes_path(search_params.merge(search_status: "impounded")), class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do
-        = t(".only_impounded_html")
+        = t(".only_impounded_vehicles_html")
     = link_to organization_bikes_path(search_params.merge(search_status: "with_owner")), class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do
       = t(".only_with_owner_html")
     = link_to organization_bikes_path(search_params.merge(search_status: "stolen")), class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do
       = t(".only_stolen_html")
   - if current_organization.enabled?("csv_exports")
     %p.search-sort-btns.text-right
-      = link_to t(".create_export"), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
+      = link_to t(".create_export_of_vehicles", cycle_type: cycle_type), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
 
 
 %p.mt-4
   - if @search_query_present || params[:search_stickers].present? || params[:search_address].present?
-    = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), t(".bike")))
+    = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type))
   - else
     = t(".registered_bikes_html",
-    bikes: pluralize(number_with_delimiter(@bikes.total_count), t(".bike")),
+    bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type),
     org_name: current_organization.short_name)
   %em
     = humanized_time_range(@time_range)
   - unless skip_view_just_stolen
     - if @stolenness == 'all'
       %a.float-right.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "stolen")), data: {stolenness: "stolen"}}
-        = t(".view_just_stolen_bikes")
+        = t(".view_just_stolen_vehicles", cycle_type: cycle_type.pluralize(10))
     - else
-      = t(".stolen_bikes_html")
+      = t(".stolen_vehicles_html", cycle_type: cycle_type)
       %a.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "all")), data: {stolenness: "all"}}
-        = t(".view_all_bikes")
+        = t(".view_all_vehicles", cycle_type: cycle_type)
   %a.float-right.less-strong{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb"}
     = t(".settings")
 
@@ -268,4 +269,4 @@
     .col-sm-6.mb-2
       = paginate @bikes
     .col-sm-6.text-right
-      = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} bikes per page", i] }, selected: @per_page), {class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;"}
+      = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] }, selected: @per_page), {class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;"}

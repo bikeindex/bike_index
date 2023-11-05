@@ -69,9 +69,8 @@ class UpdateModelAuditWorker < ApplicationWorker
   end
 
   def organization_ids_to_enqueue_for_model_audits
-    # One we start creating model_audits, keep updating them
-    # we enqueue every single model_audit when it's turned on for the first time,
-    # so rather than tracking which to update, just update all of them
+    # We enqueue every single model_audit when it's turned on for an org for the first time
+    # ... So one we start creating model_audits, keep updating them
     (Organization.with_enabled_feature_slugs("model_audits") +
       OrganizationModelAudit.distinct.pluck(:organization_id)).uniq
   end

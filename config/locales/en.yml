@@ -4449,7 +4449,7 @@ en:
         avery: Avery?
         bike: bike
         color: Color
-        create_export: Create export of searched bikes
+        create_export_of_vehicles: Create export of searched %{cycle_type}
         email_hidden: email hidden
         impounded: Impounded
         link: Link
@@ -4457,7 +4457,7 @@ en:
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
-        only_impounded_html: Only <strong>impounded</strong> bikes
+        only_impounded_vehicles_html: Only <strong>impounded</strong>
         only_no_address_html: Only <strong>no</strong> address
         only_no_sticker_html: Only <strong>no</strong> sticker
         only_not_impounded_html: Only <strong>not</strong> impounded
@@ -4476,11 +4476,12 @@ en:
         sticker: Sticker
         stickers: 'Stickers:'
         stolen: Stolen
-        stolen_bikes_html: "<em>stolen</em> bikes"
+        stolen_vehicles_html: "<em>stolen</em> %{cycle_type}"
         updated: Updated
+        vehicle: vehicle
         vehicle_type: Vehicle type
-        view_all_bikes: view all bikes
-        view_just_stolen_bikes: view just stolen bikes
+        view_all_vehicles: view all %{cycle_type}
+        view_just_stolen_vehicles: view just stolen %{cycle_type}
         visible_columns: Visible columns
     bulk_imports:
       error_type:
@@ -5237,13 +5238,13 @@ en:
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
-      model_audits: E-Vehicle audits
       impounded_bikes: Impounded Bikes
       impounded_claims: Impounded claims
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
       manage_impounding: Manage impounding
       manage_users: Manage users
+      model_audits: E-Vehicle audits
       multi_serial_search: Multi serial search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
