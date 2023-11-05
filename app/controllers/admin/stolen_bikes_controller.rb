@@ -71,7 +71,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def find_bike
-    if ParamsNormalizer.boolean(params[:stolen_record_id])
+    if InputNormalizer.boolean(params[:stolen_record_id])
       @stolen_record = StolenRecord.unscoped.find(params[:id])
       @bike = Bike.unscoped.find_by_id(@stolen_record.bike_id)
     else
@@ -103,8 +103,8 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def available_stolen_records
     return @available_stolen_records if defined?(@available_stolen_records)
-    @unapproved_only = !ParamsNormalizer.boolean(params[:search_unapproved])
-    @only_without_location = ParamsNormalizer.boolean(params[:search_without_location])
+    @unapproved_only = !InputNormalizer.boolean(params[:search_unapproved])
+    @only_without_location = InputNormalizer.boolean(params[:search_without_location])
     if @unapproved_only
       available_stolen_records = StolenRecord.current.unapproved
       unless @only_without_location
@@ -114,7 +114,7 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       available_stolen_records = StolenRecord
     end
-    unless ParamsNormalizer.boolean(params[:search_include_spam])
+    unless InputNormalizer.boolean(params[:search_include_spam])
       available_stolen_records = available_stolen_records.not_spam
     end
 

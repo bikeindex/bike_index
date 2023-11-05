@@ -41,7 +41,7 @@ class RegistrationsController < ApplicationController
   end
 
   def find_selectable_child_organizations
-    return [] unless @organization.present? && ParamsNormalizer.boolean(params[:select_child_organization])
+    return [] unless @organization.present? && InputNormalizer.boolean(params[:select_child_organization])
     @organization.child_organizations
   end
 

@@ -259,7 +259,7 @@ class User < ApplicationRecord
   end
 
   def accepted_vendor_terms_of_service=(val)
-    return unless ParamsNormalizer.boolean(val)
+    return unless InputNormalizer.boolean(val)
     self.vendor_terms_of_service = true
     self.when_vendor_terms_of_service = Time.current
   end
