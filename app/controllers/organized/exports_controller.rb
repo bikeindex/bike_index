@@ -107,8 +107,7 @@ module Organized
 
     def ensure_access_to_exports!
       return true if current_organization.enabled?("csv_exports") || current_user.superuser?
-      flash[:error] = translation(:your_org_does_not_have_access)
-      redirect_to(organization_bikes_path(organization_id: current_organization.to_param)) && return
+      raise_do_not_have_access!
     end
   end
 end

@@ -34,5 +34,10 @@ module Organized
         scope: [:controllers, :organized, :base, __method__])
       redirect_to(organization_root_path) && return
     end
+
+    def raise_do_not_have_access!
+      flash[:error] = translation(:raise_do_not_have_access, scope: [:controllers, :organized, :base])
+      redirect_to(organization_root_path) && return
+    end
   end
 end

@@ -95,11 +95,8 @@ module Organized
       # Need to return so we don't double render
       return false unless ensure_admin!
 
-      # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
       return true if current_user.superuser? || current_organization.show_bulk_import?
-
-      flash[:error] = translation(:org_does_not_have_access)
-      redirect_to(organization_root_path) && return
+      raise_do_not_have_access!
     end
 
     def permitted_kinds
