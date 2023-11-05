@@ -30,7 +30,11 @@ RSpec.describe OrganizationModelAudit, type: :model do
         expect(organization_model_attestation).to be_valid
         expect(organization_model_audit.organization_model_attestations.pluck(:id)).to eq([organization_model_attestation.id])
         expect(organization_model_audit.certification_status).to eq "certified_by_your_org"
+        expect(organization_model_attestation.replaced).to be_falsey
         expect(model_audit.reload.send(:calculated_certification_status)).to eq certification_status
+        # And replace it
+        FactoryBot.create(:model_attestation, model_audit: model_audit, kind: :uncertified_by_trusted_org, organization: organization)
+        expect(organization_model_attestation.reload.replaced).to be_truthy
       end
     end
   end

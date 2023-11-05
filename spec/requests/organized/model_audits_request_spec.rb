@@ -44,7 +44,6 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
         expect(response).to render_template(:index)
         expect(assigns(:current_organization)&.id).to eq current_organization.id
         expect(assigns(:organization_model_audits).pluck(:id)).to eq([])
-        pp current_organization.organization_model_audits.pluck(:id)
         # But if passed search_zero, it includes the model_audit
         get base_url, params: {search_zero: true}
         expect(assigns(:organization_model_audits).pluck(:id)).to eq([organization_model_audit.id])

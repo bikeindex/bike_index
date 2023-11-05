@@ -12,7 +12,7 @@ module Organized
         .page(@page).per(@per_page)
     end
 
-    # NOTE: This is really "create model_attestation" -
+    # NOTE: This is really "create model_attestation"
     def create
       if !permitted_attestation_kinds.include?(permitted_parameters[:kind])
         flash[:error] = "Sorry, you can't make an attestation of that kind"
