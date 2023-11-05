@@ -69,7 +69,7 @@ class Admin::PaintsController < Admin::BaseController
     else
       Paint
     end
-    @search_unlinked = ParamsNormalizer.boolean(params[:search_unlinked])
+    @search_unlinked = InputNormalizer.boolean(params[:search_unlinked])
     paints = paints.unlinked if @search_unlinked
     paints.where(created_at: @time_range)
   end

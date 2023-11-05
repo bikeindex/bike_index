@@ -10,7 +10,7 @@ module API
           optional :only_frame, type: Boolean, desc: "Only include Frame Manufacturers"
         end
         get "/" do
-          manufacturers = if ParamsNormalizer.boolean(params[:only_frame])
+          manufacturers = if InputNormalizer.boolean(params[:only_frame])
             Manufacturer.frame_makers
           else
             Manufacturer

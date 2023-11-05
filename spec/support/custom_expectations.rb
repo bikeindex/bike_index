@@ -17,7 +17,7 @@ def expect_attrs_to_match_hash(obj, hash, match_time_within: 1)
       next
     elsif [true, false].include?(obj_value)
       # If we're comparing a boolean, use params normalizer
-      next if obj_value == ParamsNormalizer.boolean(value)
+      next if obj_value == InputNormalizer.boolean(value)
     end
     unmatched_obj_attrs[key] = obj_value
   end

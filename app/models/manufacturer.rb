@@ -71,7 +71,7 @@ class Manufacturer < ApplicationRecord
   def self.calculated_mnfg_name(manufacturer, manufacturer_other)
     return nil if manufacturer.blank?
     if manufacturer.other? && manufacturer_other.present?
-      ParamsNormalizer.sanitize(manufacturer_other)
+      InputNormalizer.sanitize(manufacturer_other)
     else
       manufacturer.simple_name
     end.strip.truncate(60)
@@ -93,7 +93,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.name = ParamsNormalizer.string(name)
+    self.name = InputNormalizer.string(name)
     self.slug = Slugifyer.manufacturer(name)
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
