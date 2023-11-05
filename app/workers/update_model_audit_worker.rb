@@ -17,6 +17,8 @@ class UpdateModelAuditWorker < ApplicationWorker
       model_audit = create_model_audit_for_bike(bike, matching_bikes)
       matching_bikes.find_each { |b| b.update(model_audit_id: model_audit.id) }
     end
+    matching_bikes ||= Bike.where(model_audit_id: model_audit.id)
+    Organization.with_enabled_feature_slugs("")
   end
 
   def create_model_audit_for_bike(bike, matching_bikes)
