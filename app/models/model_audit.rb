@@ -9,9 +9,14 @@ class ModelAudit < ApplicationRecord
   has_many :model_attestations
   has_many :organization_model_audits
 
-  validates_uniqueness_of :frame_model, scope: %i[manufacturer_id manufacturer_other]
+  validates_uniqueness_of :frame_model, scope: %i[manufacturer_id manufacturer_other], allow_nil: false
 
   before_validation :set_calculated_attributes
+
+  def self.certification_status_humanized(str)
+    return nil if str.blank?
+    str.to_s.gsub("_", " ")
+  end
 
   def self.valid_kinds
     (certification_statuses.keys - ["certification_proof_url"])

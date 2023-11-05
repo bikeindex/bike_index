@@ -11,11 +11,6 @@ class OrganizationModelAudit < ApplicationRecord
   validates_presence_of :organization_id
   validates_uniqueness_of :model_audit_id, scope: %i[organization_id], allow_nil: false
 
-  def certification_status_humanized(str)
-    return nil if str.blank?
-    str.to_s.gsub("_", " ")
-  end
-
   # TODO: Maybe make this has_many
   def bikes
     organization.bikes.where(model_audit_id: model_audit_id)
@@ -31,7 +26,7 @@ class OrganizationModelAudit < ApplicationRecord
   end
 
   def certification_status_humanized
-    self.class.certification_status_humanized(certification_status)
+    ModelAudit.certification_status_humanized(certification_status)
   end
 
   def set_calculated_attributes

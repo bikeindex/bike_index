@@ -12,8 +12,11 @@
     %em
       = humanized_time_range(@time_range)
 
+- render_sortable = true
+
 - organization_model_audits ||= @organization_model_audits
 - render_sortable ||= false
+- manufacturer_other_id = Manufacturer.other.id
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
     %th
@@ -36,7 +39,10 @@
             = l(organization_model_audit.last_bike_created_at, format: :convert_time)
         %td
           = admin_number_display(organization_model_audit.bikes_count)
-          %small= link_to "🔎", organization_bikes_path(organization_id: current_organization.id, frame_model: model_audit.frame_model, manufacturer_id: model_audit.manufacturer_id)
+          -# TODO: when we implement non-frame model, need to update
+          - query_items = [model_audit.frame_model]
+          - query_items += [(model_audit.manufacturer_other.present? ? model_audit.mnfg_name : "m_#{model_audit.manufacturer_id}")]
+          %small= link_to "🔎", organization_bikes_path(organization_id: current_organization.id, query_items: query_items)
         %td
           = model_audit.mnfg_name
         %td
