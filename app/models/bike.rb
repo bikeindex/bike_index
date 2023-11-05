@@ -746,14 +746,14 @@ class Bike < ApplicationRecord
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
-    self.manufacturer_other = ParamsNormalizer.strip_or_nil_if_blank(manufacturer_other)
+    self.manufacturer_other = ParamsNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
-    self.frame_model = frame_model.present? ? frame_model.strip.gsub(/\s+/, " ") : nil
+    self.frame_model = ParamsNormalizer.string(frame_model)
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
-    self.name = name.present? ? name.strip : nil
-    self.extra_registration_number = ParamsNormalizer.strip_or_nil_if_blank(extra_registration_number)
+    self.name = ParamsNormalizer.string(name)
+    self.extra_registration_number = ParamsNormalizer.string(extra_registration_number)
     if extra_registration_number.present?
       self.extra_registration_number = nil if extra_registration_number.match?(/(serial.)?#{serial_number}/i)
     end
