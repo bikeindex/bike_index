@@ -18,4 +18,10 @@ class ModelAttestation < ApplicationRecord
   validates_presence_of :user_id
 
   scope :current, -> { where(replaced: false) }
+
+  after_commit :update_model_audit
+
+  def update_model_audit
+    UpdateModelAuditWorker.perform_async(model_audit_id)
+  end
 end

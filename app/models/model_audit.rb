@@ -7,6 +7,7 @@ class ModelAudit < ApplicationRecord
 
   has_many :bikes
   has_many :model_attestations
+  has_many :organization_model_audits
 
   validates_uniqueness_of :frame_model, scope: %i[manufacturer_id manufacturer_other]
 
@@ -14,6 +15,15 @@ class ModelAudit < ApplicationRecord
 
   def self.valid_kinds
     (certification_statuses.keys - ["certification_proof_url"])
+  end
+
+  def self.matching_bikes_for_bike(bike)
+    bikes = Bike.unscoped.where(manufacturer_id: bike.manufacturer_id)
+    bikes = bikes.where("frame_model ILIKE ?", bike.frame_model)
+    if bike.manufacturer_id == Manufacturer.other.id
+      bikes = bikes.where("mnfg_name ILIKE ?", bike.mnfg_name)
+    end
+    bikes.order(id: :desc)
   end
 
   def set_calculated_attributes
