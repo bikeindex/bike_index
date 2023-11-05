@@ -43,7 +43,7 @@ class Admin::ImpoundRecordsController < Admin::BaseController
         impound_records.send(@search_status)
       end
     end
-    @with_claims = ParamsNormalizer.boolean(params[:search_with_claims])
+    @with_claims = InputNormalizer.boolean(params[:search_with_claims])
     impound_records = impound_records.with_claims if @with_claims
     if params[:search_bike_id].present?
       impound_records = impound_records.where(bike_id: params[:search_bike_id])

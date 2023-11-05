@@ -136,7 +136,7 @@ class MailchimpDatum < ApplicationRecord
     end.compact
 
     new_interests = val.map do |key, value|
-      next unless ParamsNormalizer.boolean(value)
+      next unless InputNormalizer.boolean(value)
       MailchimpValue.interest.friendly_find(key, list: list)&.slug || key
     end.compact
     self.data ||= {}

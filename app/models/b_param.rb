@@ -26,7 +26,7 @@ class BParam < ApplicationRecord
     h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
     h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
     if h["bike"].key?("owner_email_is_phone_number")
-      h["bike"]["is_phone"] = ParamsNormalizer.boolean(h["bike"].delete("owner_email_is_phone_number"))
+      h["bike"]["is_phone"] = InputNormalizer.boolean(h["bike"].delete("owner_email_is_phone_number"))
     end
     org = Organization.friendly_find(h["bike"].delete("organization_slug"))
     h["bike"]["creation_organization_id"] = org.id if org.present?
@@ -99,18 +99,18 @@ class BParam < ApplicationRecord
       status = "status_impounded" if status == "status_found" # Rename, so we can give pretty URLs to users
       return {status: status} if Bike.statuses.include?(status)
     end
-    return {status: "status_stolen"} if ParamsNormalizer.boolean(url_params[:stolen])
+    return {status: "status_stolen"} if InputNormalizer.boolean(url_params[:stolen])
     {}
   end
 
   def self.top_level_propulsion_type(passed_params)
-    throttle = ParamsNormalizer.boolean(passed_params["propulsion_type_throttle"])
-    pedal_assist = ParamsNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
+    throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
+    pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
     if pedal_assist
       throttle ? "pedal-assist-and-throttle" : "pedal-assist"
     elsif throttle
       "throttle"
-    elsif ParamsNormalizer.boolean(passed_params["propulsion_type_motorized"])
+    elsif InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
       "motorized"
     end&.to_sym
   end
@@ -191,7 +191,7 @@ class BParam < ApplicationRecord
     end
     return "unregistered_parking_notification" if parking_notification_params.present?
     return "status_impounded" if impound_attrs.present?
-    return "status_stolen" if stolen_attrs.present? || ParamsNormalizer.boolean(bike["stolen"])
+    return "status_stolen" if stolen_attrs.present? || InputNormalizer.boolean(bike["stolen"])
     "status_with_owner"
   end
 
@@ -295,7 +295,7 @@ class BParam < ApplicationRecord
   def skip_email?
     return true if status_impounded? || unregistered_parking_notification?
     send_email = params.dig("bike", "send_email").to_s
-    send_email.present? && !ParamsNormalizer.boolean(send_email)
+    send_email.present? && !InputNormalizer.boolean(send_email)
   end
 
   def organization_affiliation
@@ -487,7 +487,7 @@ class BParam < ApplicationRecord
     attrs.merge(organization_id: creation_organization_id,
       user_id: creator_id,
       bike_id: created_bike_id,
-      use_entered_address: ParamsNormalizer.boolean(attrs[:use_entered_address]))
+      use_entered_address: InputNormalizer.boolean(attrs[:use_entered_address]))
   end
 
   def partial_notification_pre_tracking?
@@ -508,7 +508,7 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     safe_attrs = bike.merge("status" => status).merge(new_attrs.as_json)
-      .select { |_k, v| ParamsNormalizer.present_or_false?(v) }
+      .select { |_k, v| InputNormalizer.present_or_false?(v) }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,

@@ -256,8 +256,8 @@ class StolenRecord < ApplicationRecord
       current: false,
       recovered_description: info[:recovered_description],
       recovering_user_id: info[:recovering_user_id],
-      index_helped_recovery: ParamsNormalizer.boolean(info[:index_helped_recovery]),
-      can_share_recovery: ParamsNormalizer.boolean(info[:can_share_recovery])
+      index_helped_recovery: InputNormalizer.boolean(info[:index_helped_recovery]),
+      can_share_recovery: InputNormalizer.boolean(info[:can_share_recovery])
     )
     notify_of_promoted_alert_recovery
     true

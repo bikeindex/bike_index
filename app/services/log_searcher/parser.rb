@@ -94,7 +94,7 @@ class LogSearcher::Parser
         when "non" then :non
         when "found", "impounded" then :impounded
         else
-          if opts.dig("params", "stolen").present? && ParamsNormalizer.boolean(opts.dig("params", "stolen"))
+          if opts.dig("params", "stolen").present? && InputNormalizer.boolean(opts.dig("params", "stolen"))
             :stolen
           else
             :all

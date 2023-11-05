@@ -12,7 +12,7 @@ module Organized
 
         @per_page = params[:per_page] || 10
         search_organization_bikes
-        if current_organization.enabled?("csv_exports") && ParamsNormalizer.boolean(params[:create_export])
+        if current_organization.enabled?("csv_exports") && InputNormalizer.boolean(params[:create_export])
           if @bikes.count > 10_000 # Don't want everything to explode...
             flash[:error] = "Too many bikes selected to export"
           else
@@ -39,7 +39,7 @@ module Organized
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       # Default to showing regional recoveries
-      @search_only_organization = ParamsNormalizer.boolean(params[:search_only_organization])
+      @search_only_organization = InputNormalizer.boolean(params[:search_only_organization])
       # ... but if organization isn't regional, we can't show regional
       @search_only_organization = true unless current_organization.regional?
       recovered_records = @search_only_organization ? current_organization.recovered_records : current_organization.nearby_recovered_records
@@ -47,7 +47,7 @@ module Organized
       @matching_recoveries = recovered_records.where(recovered_at: @time_range)
       @recoveries = @matching_recoveries.reorder(recovered_at: :desc).page(@page).per(@per_page)
       # When selecting through the organization bikes, it fails. Lazy solution: Don't permit doing that ;)
-      @render_chart = !@search_only_organization && ParamsNormalizer.boolean(params[:render_chart])
+      @render_chart = !@search_only_organization && InputNormalizer.boolean(params[:render_chart])
     end
 
     def incompletes

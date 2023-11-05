@@ -169,7 +169,7 @@ class Admin::BikesController < Admin::BaseController
     end
     bikes = bikes.non_example if params[:search_example] == "non_example_only"
     if current_organization.present?
-      bikes = if ParamsNormalizer.boolean(params[:search_only_creation_organization])
+      bikes = if InputNormalizer.boolean(params[:search_only_creation_organization])
         bikes.includes(:ownerships).where(ownerships: {organization_id: current_organization.id})
       else
         bikes.organization(current_organization)
@@ -179,7 +179,7 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.includes(:ownerships).where(deleted_at: nil, ownerships: {organization_id: nil})
     end
 
-    @motorized = ParamsNormalizer.boolean(params[:search_motorized])
+    @motorized = InputNormalizer.boolean(params[:search_motorized])
     bikes = bikes.motorized if @motorized
 
     # Get a query error if both are passed
@@ -199,14 +199,14 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
     bikes = bikes.includes(:ownerships).where(ownerships: {origin: @origin_search_type}) if @origin_search_type.present?
-    @multi_delete = ParamsNormalizer.boolean(params[:search_multi_delete])
+    @multi_delete = InputNormalizer.boolean(params[:search_multi_delete])
     bikes
   end
 
   # Separated out purely to make logic easier to follow
   def search_bike_statuses(bikes)
     @searched_statuses = params.keys.select do |k|
-      k.start_with?("search_status_") && ParamsNormalizer.boolean(params[k])
+      k.start_with?("search_status_") && InputNormalizer.boolean(params[k])
     end.map { |k| k.gsub(/\Asearch_status_/, "") }
 
     @searched_statuses = default_statuses if @searched_statuses.blank?
@@ -250,14 +250,14 @@ class Admin::BikesController < Admin::BaseController
   def missing_manufacturer_bikes
     session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
     if params[:search_time_ordered].present?
-      session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:search_time_ordered])
+      session[:missing_manufacturer_time_order] = InputNormalizer.boolean(params[:search_time_ordered])
     end
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id).not_spam
-    @motorized = ParamsNormalizer.boolean(params[:search_motorized])
+    @motorized = InputNormalizer.boolean(params[:search_motorized])
     bikes = bikes.motorized if @motorized
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = bikes.where(created_at: @time_range) unless @period == "all"
-    @include_blank = ParamsNormalizer.boolean(params[:search_include_blank])
+    @include_blank = InputNormalizer.boolean(params[:search_include_blank])
     bikes = bikes.where.not(manufacturer_other: nil) unless @include_blank
     bikes = if session[:missing_manufacturer_time_order]
       bikes.order("created_at desc")
