@@ -15,7 +15,7 @@ class ModelAudit < ApplicationRecord
 
   def self.certification_status_humanized(str)
     return nil if str.blank?
-    str.to_s.gsub("_", " ")
+    str.to_s.tr("_", " ")
   end
 
   def self.valid_kinds

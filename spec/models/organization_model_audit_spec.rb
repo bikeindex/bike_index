@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe OrganizationModelAudit, type: :model do
   let(:model_audit) { FactoryBot.create(:model_audit) }
@@ -39,8 +39,8 @@ RSpec.describe OrganizationModelAudit, type: :model do
     let!(:bike) { FactoryBot.create(:bike_organized, model_audit_id: model_audit.id) }
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization_model_audit) { FactoryBot.create(:organization_model_audit, model_audit: model_audit, organization: organization) }
-    let!(:bike_organized)  { FactoryBot.create(:bike_organized, creation_organization: organization) }
-    let!(:bike_match)  { FactoryBot.create(:bike_organized, creation_organization: organization, model_audit_id: model_audit.id) }
+    let!(:bike_organized) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let!(:bike_match) { FactoryBot.create(:bike_organized, creation_organization: organization, model_audit_id: model_audit.id) }
     it "is the organization bikes" do
       expect(model_audit.reload.bikes.pluck(:id)).to match_array([bike.id, bike_match.id])
       expect(organization.reload.bikes.pluck(:id)).to match_array([bike_organized.id, bike_match.id])
