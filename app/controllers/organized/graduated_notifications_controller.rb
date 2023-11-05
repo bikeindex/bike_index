@@ -85,9 +85,7 @@ module Organized
 
     def ensure_access_to_graduated_notifications!
       return true if current_organization.enabled?("graduated_notifications")
-      flash[:error] = translation(:your_org_does_not_have_access)
-      redirect_to organization_bikes_path(organization_id: current_organization.to_param)
-      nil
+      raise_do_not_have_access!
     end
   end
 end
