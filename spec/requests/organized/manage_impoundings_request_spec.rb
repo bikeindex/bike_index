@@ -51,7 +51,7 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
           expect(current_organization.reload.enabled?("impound_bikes")).to be_falsey
           get "#{base_url}/edit"
           expect(flash[:error]).to be_present
-          expect(response).to redirect_to(organization_manage_path(organization_id: current_organization.to_param))
+          expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
         end
       end
     end

@@ -84,7 +84,7 @@ module Organized
     end
 
     def ensure_access_to_graduated_notifications!
-      return true if current_organization.enabled?("graduated_notifications")
+      return true if current_organization.enabled?("graduated_notifications") || current_user.superuser?
       raise_do_not_have_access!
     end
   end
