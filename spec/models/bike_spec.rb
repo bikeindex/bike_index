@@ -1498,16 +1498,20 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "set_calculated_unassociated_attributes extra_registration_number" do
-    let(:bike) { FactoryBot.create(:bike, serial_number: serial, extra_registration_number: extra_registration_number) }
+    let(:bike) { FactoryBot.create(:bike, serial_number: serial, extra_registration_number: extra_registration_number, frame_model: frame_model) }
+    let(:frame_model) { "Something  1" }
     let(:serial) { "xxxx-zzzzz-VVVVVV" }
     let(:extra_registration_number) { " extra " }
     it "strips extra_registration_number" do
       expect(bike.extra_registration_number).to eq "extra"
+      expect(bike.frame_model).to eq "Something 1"
     end
     context "same as serial" do
       let(:extra_registration_number) { " #{serial.downcase}" }
+      let(:frame_model) { "\n" }
       it "removes extra_registration_number" do
         expect(bike.extra_registration_number).to be_nil
+        expect(bike.frame_model).to be_nil
       end
     end
     context "is serial:serial as serial" do

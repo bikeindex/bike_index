@@ -748,7 +748,7 @@ class Bike < ApplicationRecord
     clean_frame_size
     self.manufacturer_other = ParamsNormalizer.strip_or_nil_if_blank(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
-    self.frame_model = frame_model.present? ? frame_model.strip : nil
+    self.frame_model = frame_model.present? ? frame_model.strip.gsub(/\s+/, " ") : nil
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
