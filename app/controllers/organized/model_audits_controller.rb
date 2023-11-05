@@ -2,11 +2,13 @@ module Organized
   class ModelAuditsController < Organized::BaseController
     include SortableTable
     before_action :ensure_access_to_model_audits!
+    before_action :set_period, only: [:index]
 
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @exports = available_model_audits.order(created_at: :desc).page(@page).per(@per_page)
+      @organization_model_audits = ordered_organization_model_audits
+        .page(@page).per(@per_page)
     end
 
     def update
@@ -21,24 +23,29 @@ module Organized
 
     private
 
+    def sortable_columns
+      %w[last_bike_created_at bikes_count certification_status manufacturer_id frame_model]
+    end
+
     def permitted_parameters
-      params.require(:model_attestation).permit(:timezone, :start_at, :end_at, :bike_code_start,
-        :custom_bike_ids, :only_custom_bike_ids)
-        .merge(avery_export: true)
+      params.require(:model_attestation).permit(:kind)
+        .merge(user_id: current_user.id, organization_id: current_organization.id)
     end
 
-    def find_export
-      @export = exports.find(params[:id])
+    def ordered_organization_model_audits
+      organization_model_audits
     end
 
-    def available_model_audits
-      OrganizationModelAudit.all
+    def organization_model_audits
+      organization_model_audits = OrganizationModelAudit.where(organization_id: current_organization.id)
+      @time_range_column = "last_bike_created_at"
+      organization_model_audits.where(@time_range_column => @time_range)
+        .includes(:model_audit, :model_attestations)
     end
 
     def ensure_access_to_model_audits!
       return true if current_organization.enabled?("model_audits") || current_user.superuser?
-      flash[:error] = translation(:your_org_does_not_have_access)
-      redirect_to(organization_bikes_path(organization_id: current_organization.to_param)) && return
+      raise_do_not_have_access!
     end
   end
 end

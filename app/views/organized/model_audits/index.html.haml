@@ -4,3 +4,45 @@
   %h1
     E-Vehicle Model audits
 
+= render partial: "/shared/period_select"
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = pluralize(number_with_delimiter(@organization_model_audits.total_count), "matching models")
+    %em
+      = humanized_time_range(@time_range)
+
+- organization_model_audits ||= @organization_model_audits
+- render_sortable ||= false
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border
+  %thead.small-header.hidden-md-down
+    %th
+      = sortable "last_bike_created_at", "Most Recent registration", render_sortable: render_sortable
+    %th
+      = sortable "bikes_count", render_sortable: render_sortable
+    %th
+      = sortable "mnfg_name", "Manufacturer", render_sortable: render_sortable
+    %th
+      = sortable "frame_model", "frame_model", render_sortable: render_sortable
+    %th
+      = sortable "certification_status", render_sortable: render_sortable
+
+  %tbody
+    - organization_model_audits.each do |organization_model_audit|
+      - model_audit = organization_model_audit.model_audit
+      %tr
+        %td
+          %span.convertTime.preciseTime
+            = l(organization_model_audit.last_bike_created_at, format: :convert_time)
+        %td
+          = admin_number_display(organization_model_audit.bikes_count)
+          %small= link_to "🔎", organization_bikes_path(organization_id: current_organization.id, frame_model: model_audit.frame_model, manufacturer_id: model_audit.manufacturer_id)
+        %td
+          = model_audit.mnfg_name
+        %td
+          = model_audit.frame_model
+        %td
+          = organization_model_audit.certification_status_humanized
+
+.paginate-container.paginate-container-bottom
+  = paginate @organization_model_audits

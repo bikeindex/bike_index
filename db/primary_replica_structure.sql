@@ -2020,6 +2020,7 @@ CREATE TABLE public.model_audits (
     cycle_type integer,
     manufacturer_id bigint,
     manufacturer_other character varying,
+    mnfg_name character varying,
     frame_model character varying,
     certification_status integer,
     created_at timestamp(6) without time zone NOT NULL,
