@@ -2310,6 +2310,7 @@ CREATE TABLE public.organization_model_audits (
     organization_id bigint,
     certification_status integer,
     bikes_count integer DEFAULT 0,
+    last_bike_created_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

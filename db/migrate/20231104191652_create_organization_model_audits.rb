@@ -7,6 +7,7 @@ class CreateOrganizationModelAudits < ActiveRecord::Migration[6.1]
       t.integer :certification_status
 
       t.integer :bikes_count, default: 0
+      t.datetime :last_bike_created_at
 
       t.timestamps
     end

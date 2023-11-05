@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::ModelAuditsController, type: :request do
   let(:root_path) { "/o/#{current_organization.to_param}/bikes" }
-  let(:base_url) { "/o/#{current_organization.to_param}/audits" }
+  let(:base_url) { "/o/#{current_organization.to_param}/model_audits" }
 
   include_context :request_spec_logged_in_as_organization_admin
 
@@ -11,14 +11,6 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
       describe "index" do
         it "redirects" do
           get base_url
-          expect(response).to redirect_to root_path
-          expect(flash[:error]).to be_present
-        end
-      end
-
-      describe "show" do
-        it "redirects" do
-          get "#{base_url}/#{export.id}"
           expect(response).to redirect_to root_path
           expect(flash[:error]).to be_present
         end

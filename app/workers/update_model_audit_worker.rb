@@ -37,19 +37,20 @@ class UpdateModelAuditWorker < ApplicationWorker
   private
 
   def update_org_model_audit(model_audit, organization_id)
-    bikes_count = Bike.where(model_audit_id: model_audit.id).left_joins(:bike_organizations)
-      .where(bike_organizations: {organization_id: organization_id}).count
+    bikes = Bike.where(model_audit_id: model_audit.id).left_joins(:bike_organizations)
+      .where(bike_organizations: {organization_id: organization_id}).reorder(:id)
+    bikes_count = bikes.count
+    bike_at = bikes.last.created_at
 
     organization_model_audit = model_audit.organization_model_audits
       .where(organization_id: organization_id).first
 
     if bikes_count > 0 && organization_model_audit.blank?
       model_audit.organization_model_audits.create(bikes_count: bikes_count,
-        organization_id: organization_id)
+        organization_id: organization_id, last_bike_created_at: bike_at)
     elsif organization_model_audit.present?
-      # Pass updated_at to ensure it updates (and )
       organization_model_audit.update_attribute(bikes_count: bikes_count,
-        updated_at: Time.current)
+        last_bike_created_at: bike_at)
     end
   end
 

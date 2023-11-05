@@ -44,7 +44,8 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
     end
     context "bike_organized organization" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
-      let!(:bike3) { FactoryBot.create(:bike_organized, creation_organization: organization, frame_model: "PARTY  model", manufacturer: manufacturer) }
+      let(:time) { Time.current - 1.day }
+      let!(:bike3) { FactoryBot.create(:bike_organized, created_at: time, creation_organization: organization, frame_model: "PARTY  model", manufacturer: manufacturer) }
       it "creates an organization_model_audit" do
         expect(organization.reload.bikes.pluck(:id)).to eq([bike3.id])
         bike2.update(likely_spam: true)
@@ -62,6 +63,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
         expect(organization_model_audit.organization_id).to eq organization.id
         expect(organization_model_audit.bikes_count).to eq 1
         expect(organization_model_audit.certification_status).to be_nil
+        expect(organization_model_audit.last_bike_created_at).to be_within(1).of time
       end
     end
     context "existing model_audit" do
