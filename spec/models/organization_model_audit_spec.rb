@@ -25,15 +25,22 @@ RSpec.describe OrganizationModelAudit, type: :model do
       expect(organization_model_audit.certification_status).to eq certification_status
     end
     context "with organization attestation" do
-      let(:organization_model_attestation) { FactoryBot.create(:model_attestation, model_audit: model_audit, kind: :certified_by_trusted_org, organization: organization) }
+      let(:certification_status) { "certification_proof_url" }
+      let(:organization_model_attestation) { FactoryBot.create(:model_attestation, model_audit: model_audit, kind: :uncertified_by_trusted_org, organization: organization) }
       it "is the organization_model_attestation status" do
         expect(organization_model_attestation).to be_valid
         expect(organization_model_audit.organization_model_attestations.pluck(:id)).to eq([organization_model_attestation.id])
-        expect(organization_model_audit.certification_status).to eq "certified_by_your_org"
+        expect(organization_model_audit.certification_status).to eq "uncertified_by_your_org"
         expect(organization_model_attestation.replaced).to be_falsey
-        expect(model_audit.reload.send(:calculated_certification_status)).to eq certification_status
+        expect(model_audit.reload.send(:calculated_certification_status)).to eq "uncertified_by_trusted_org"
         # And replace it
-        FactoryBot.create(:model_attestation, model_audit: model_audit, kind: :uncertified_by_trusted_org, organization: organization)
+        Sidekiq::Worker.clear_all
+        expect {
+          FactoryBot.create(:model_attestation, model_audit: model_audit, kind: :certified_by_trusted_org, organization: organization)
+        }.to change(UpdateModelAuditWorker.jobs, :count).by 1
+        UpdateModelAuditWorker.drain
+        expect(organization_model_audit.reload.certification_status).to eq "certified_by_your_org"
+        expect(model_audit.reload.certification_status).to eq "certified_by_trusted_org"
         expect(organization_model_attestation.reload.replaced).to be_truthy
       end
     end

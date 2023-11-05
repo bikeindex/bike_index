@@ -28,7 +28,6 @@ class UpdateModelAuditWorker < ApplicationWorker
     end
 
     return unless model_audit.present?
-
     # Bump model_audit, unless it was just created
     model_audit.update(updated_at: Time.current) unless new_model_audit
 

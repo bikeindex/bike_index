@@ -27,16 +27,19 @@ class ModelAttestation < ApplicationRecord
   def update_model_audit
     UpdateModelAuditWorker.perform_async(model_audit_id)
     # Also lazy set the replaced attribute
-    if id.present?
-      ModelAttestation.where("id < ?", id)
-        .where(organization_id: organization_id,
-          model_audit_id: model_audit_id,
-          replaced: false)
-        .update_all(replaced: true)
-    end
+    previous_attesations.update_all(replaced: true)
   end
 
   def set_calculated_attributes
     self.url = Urlifyer.urlify(url)
+  end
+
+  private
+
+  def previous_attesations
+    return ModelAttestation.none if id.blank?
+
+    ModelAttestation.where("id < ?", id)
+      .where(organization_id: organization_id, model_audit_id: model_audit_id)
   end
 end

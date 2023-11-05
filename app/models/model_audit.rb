@@ -40,6 +40,6 @@ class ModelAudit < ApplicationRecord
   private
 
   def calculated_certification_status
-    (self.class.valid_kinds & model_attestations.distinct.pluck(:kind)).first
+    (self.class.valid_kinds & model_attestations.current.distinct.pluck(:kind)).first
   end
 end
