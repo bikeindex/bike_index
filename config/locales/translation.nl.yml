@@ -2348,6 +2348,8 @@ nl:
             dat te zien!
         ensure_not_ambassador_organization!:
           must_be_an_admin: Je moet een admin zijn om dat te doen!
+        raise_do_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
+          contact op met Bike Index support.
       bikes:
         update:
           unknown_update_action: Onbekende updateactie. Neem contact op met support@bikeindex.org
@@ -2356,9 +2358,6 @@ nl:
           bulk_import_created: Bulkimport gemaakt!
           file_imported: Bestand geïmporteerd
           unable_to_create_bulk_import: Kan bulkimport niet maken.
-        ensure_access_to_bulk_import!:
-          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
-            contact op met Bike Index support.
         show:
           unable_to_find_import: Kan die import niet vinden.
       exports:
@@ -2374,26 +2373,13 @@ nl:
             initiële Stickery_assigned.
         destroy:
           export_deleted: Export is succesvol verwijderd!
-        ensure_access_to_exports!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
         update:
           unknown_update_action: Onbekende updateactie!
           bike_stickers_removed: Fietscodes verwijderd!
-      messages:
-        create:
-          message_sent: "%{message_kind} bericht verzonden"
-          unable_to_send: Kan bericht niet verzenden - %{errors}
-        ensure_permitted_message_kind!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
       stickers:
         update:
           cannot_update: Je kunt dat %{bike_sticker_kind} niet bijwerken. Neem contact
             op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
-        ensure_access_to_bike_stickers!:
-          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
-            contact op met Bike Index support.
         find_bike_sticker:
           unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_sticker}.'
       users:
@@ -2417,9 +2403,6 @@ nl:
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
           unable_to_create: Kan niet maken - %{errors}
-        ensure_access_to_parking_notifications!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
       manages:
         destroy:
           contact_support_to_delete: Neem contact op met support@bikeindex.org om
@@ -2429,18 +2412,7 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
-      graduated_notifications:
-        ensure_access_to_graduated_notifications!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
-      hot_sheets:
-        ensure_access_to_hot_sheet!:
-          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
-            contact op met Bike Index support.
       manage_impoundings:
-        assign_organization:
-          can_not_access: Uw organisatie heeft hier geen toegang toe, neem contact
-            op met Bike Index support.
         update:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.

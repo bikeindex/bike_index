@@ -177,7 +177,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             post base_url, params: {
               organization_id: current_organization.to_param, parking_notification: parking_notification_params
             }
-            expect(response).to redirect_to organization_bikes_path(organization_id: current_organization.to_param)
+            expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
           }.to_not change(ParkingNotification, :count)
         end

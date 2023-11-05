@@ -1750,6 +1750,9 @@ en:
             to see that!
         ensure_not_ambassador_organization!:
           must_be_an_admin: You have to be an admin to do that!
+        raise_do_not_have_access: >-
+          Your organization doesn't have access to that, please contact Bike Index
+          support.
       bikes:
         update:
           unknown_update_action: Unknown update action. Please contact support@bikeindex.org
@@ -1758,10 +1761,6 @@ en:
           bulk_import_created: Bulk Import created!
           file_imported: File imported
           unable_to_create_bulk_import: Unable to create bulk import.
-        ensure_access_to_bulk_import!:
-          org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         show:
           unable_to_find_import: Unable to find that import.
       exports:
@@ -1780,28 +1779,10 @@ en:
             That sticker has already been assigned! Please choose a new initial Stickery_assigned.
         destroy:
           export_deleted: Export was successfully deleted!
-        ensure_access_to_exports!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         update:
           bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
-      graduated_notifications:
-        ensure_access_to_graduated_notifications!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
-      hot_sheets:
-        ensure_access_to_hot_sheet!:
-          org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       manage_impoundings:
-        assign_organization:
-          can_not_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
@@ -1813,27 +1794,11 @@ en:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
-      messages:
-        create:
-          message_sent: "%{message_kind} message sent"
-          unable_to_send: Unable to send message - %{errors}
-        ensure_permitted_message_kind!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
           unable_to_create: Unable to create - %{errors}
-        ensure_access_to_parking_notifications!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       stickers:
-        ensure_access_to_bike_stickers!:
-          org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         find_bike_sticker:
           unable_to_find_sticker: 'Unable to find sticker with code: %{bike_sticker}.'
         update:

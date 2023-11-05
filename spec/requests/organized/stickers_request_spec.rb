@@ -12,14 +12,14 @@ RSpec.describe Organized::StickersController, type: :request do
       describe "index" do
         it "redirects" do
           get base_url
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
         end
       end
       describe "edit" do
         it "redirects" do
           get "#{base_url}/#{bike_sticker.code}/edit"
           expect(flash[:error]).to be_present
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
         end
       end
     end
