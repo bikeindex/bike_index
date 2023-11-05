@@ -2,6 +2,7 @@ class CreateModelAudits < ActiveRecord::Migration[6.1]
   def change
     create_table :model_audits do |t|
       t.integer :propulsion_type
+      t.integer :cycle_type
       t.references :manufacturer, index: true
       t.string :manufacturer_other
       t.string :frame_model

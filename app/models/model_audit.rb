@@ -1,6 +1,7 @@
 class ModelAudit < ApplicationRecord
   enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
   enum propulsion_type: PropulsionType::SLUGS
+  enum cycle_type: CycleType::SLUGS
 
   belongs_to :manufacturer
 

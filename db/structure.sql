@@ -2017,6 +2017,7 @@ ALTER SEQUENCE public.model_attestations_id_seq OWNED BY public.model_attestatio
 CREATE TABLE public.model_audits (
     id bigint NOT NULL,
     propulsion_type integer,
+    cycle_type integer,
     manufacturer_id bigint,
     manufacturer_other character varying,
     frame_model character varying,
