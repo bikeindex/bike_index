@@ -22,12 +22,15 @@ class ModelAudit < ApplicationRecord
     (certification_statuses.keys - ["certification_proof_url"])
   end
 
-  def self.matching_bikes_for_bike(bike)
-    bikes = Bike.unscoped.where(manufacturer_id: bike.manufacturer_id)
-    if bike.manufacturer_id == Manufacturer.other.id
-      bikes = bikes.where("mnfg_name ILIKE ?", bike.mnfg_name)
+  def self.matching_bikes_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
+    manufacturer_id ||= bike&.manufacturer_id
+    bikes = Bike.unscoped.where(manufacturer_id: manufacturer_id)
+    if manufacturer_id == Manufacturer.other.id
+      mnfg_name ||= bike&.mnfg_name
+      bikes = bikes.where("mnfg_name ILIKE ?", mnfg_name)
     end
-    bikes = bikes.where("frame_model ILIKE ?", bike.frame_model)
+    frame_model ||= bike&.frame_model
+    bikes = bikes.where("frame_model ILIKE ?", frame_model)
     bikes.reorder(id: :desc)
   end
 

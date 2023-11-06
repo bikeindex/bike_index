@@ -34,7 +34,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
     it "creates a model_audit" do
       expect(bike1.model_audit_id).to be_blank
       expect {
-        expect(ModelAudit.matching_bikes_for_bike(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
+        expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
         instance.perform(nil, bike1.id)
       }.to change(ModelAudit, :count).by 1
       new_model_audit = bike1.reload.model_audit
@@ -113,9 +113,23 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
         }.to change(ModelAudit, :count).by 1
         new_model_audit = bike1.reload.model_audit
         expect(bike2.reload.model_audit_id).to be_blank
+        expect(bike2.manufacturer_id).to eq Manufacturer.other.id
+        expect(bike2.frame_model.downcase).to eq bike1.reload.frame_model.downcase
         expect(bike3.reload.model_audit_id).to eq new_model_audit.id
         expect(new_model_audit.manufacturer_other).to eq "Salsa bikes"
         expect(new_model_audit.organization_model_audits.count).to eq 0
+        # After updating to a known manufacturer, all the bikes update
+        bike1.update(manufacturer_id: FactoryBot.create(:manufacturer, name: "Salsa").id)
+        instance.perform(new_model_audit.id)
+        expect(new_model_audit.reload.manufacturer_id).to eq bike1.manufacturer_id
+        expect(new_model_audit.manufacturer_other).to be_nil
+        expect(bike1.reload.model_audit_id).to eq new_model_audit.id
+
+        expect(bike2.reload.model_audit_id).to eq new_model_audit.id
+        expect(bike2.manufacturer_id).to eq new_model_audit.manufacturer_id
+
+        expect(bike3.reload.model_audit_id).to eq new_model_audit.id
+        expect(bike3.manufacturer_id).to eq new_model_audit.manufacturer_id
       end
     end
   end

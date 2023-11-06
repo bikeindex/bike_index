@@ -5,7 +5,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     return true if bike.model_audit_id.present?
     return true if bike.motorized? && bike.frame_model.present?
     # Also enqueue if any matching bikes have a model_audit
-    ModelAudit.matching_bikes_for_bike(bike).where.not(model_audit_id: nil).limit(1).any?
+    ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
   end
 
   def perform(model_audit_id = nil, bike_id = nil)
@@ -15,7 +15,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     if model_audit_id.present?
       model_audit = ModelAudit.find_by_id(model_audit_id)
     else
-      matching_bikes = ModelAudit.matching_bikes_for_bike(bike)
+      matching_bikes = ModelAudit.matching_bikes_for(bike)
       model_audit = matching_bikes.where.not(model_audit_id: nil).limit(1).first&.model_audit
       if model_audit.present?
         bike.update(update_attrs(model_audit))
@@ -28,8 +28,8 @@ class UpdateModelAuditWorker < ApplicationWorker
     end
 
     return unless model_audit.present?
-    # Bump model_audit, unless it was just created
-    model_audit.update(updated_at: Time.current) unless new_model_audit
+
+    update_existing_model_audit(model_audit) unless new_model_audit
 
     organization_ids_to_enqueue_for_model_audits
       .each { |id| update_org_model_audit(model_audit, id) }
@@ -72,6 +72,23 @@ class UpdateModelAuditWorker < ApplicationWorker
     # ... So one we start creating model_audits, keep updating them
     (Organization.with_enabled_feature_slugs("model_audits").pluck(:id) +
       OrganizationModelAudit.distinct.pluck(:organization_id)).uniq
+  end
+
+  def update_existing_model_audit(model_audit)
+    if model_audit.manufacturer_other.present?
+      non_other_bike = model_audit.bikes.where.not(manufacturer_id: Manufacturer.other.id).first
+      if non_other_bike.present?
+        mnfg_id = non_other_bike.manufacturer_id
+        mnfg_name = non_other_bike.mnfg_name
+        model_audit.bikes.where(manufacturer_id: Manufacturer.other.id).each { |b| b.update(manufacturer_id: mnfg_id) }
+
+        ModelAudit.matching_bikes_for(manufacturer_id: Manufacturer.other.id, mnfg_name: mnfg_name, frame_model: model_audit.frame_model)
+          .each { |b| b.update(manufacturer_id: mnfg_id, model_audit_id: model_audit.id) }
+        # Update model_audit afterward, so if this fails it will try to update the bikes again
+        model_audit.manufacturer_id = mnfg_id
+      end
+    end
+    model_audit.update(updated_at: Time.current)
   end
 
   def update_attrs(model_audit)
