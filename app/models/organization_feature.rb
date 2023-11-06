@@ -40,6 +40,7 @@ class OrganizationFeature < ApplicationRecord
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
+    model_audits
     no_address
     official_manufacturer
     organization_stolen_message

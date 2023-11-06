@@ -507,7 +507,8 @@ CREATE TABLE public.bikes (
     serial_normalized_no_space character varying,
     credibility_score integer,
     likely_spam boolean DEFAULT false,
-    serial_segments_migrated_at timestamp without time zone
+    serial_segments_migrated_at timestamp without time zone,
+    model_audit_id bigint
 );
 
 
@@ -1973,6 +1974,80 @@ ALTER SEQUENCE public.memberships_id_seq OWNED BY public.memberships.id;
 
 
 --
+-- Name: model_attestations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.model_attestations (
+    id bigint NOT NULL,
+    model_audit_id bigint,
+    kind integer,
+    user_id bigint,
+    organization_id bigint,
+    replaced boolean DEFAULT false,
+    url text,
+    info text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: model_attestations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.model_attestations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: model_attestations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.model_attestations_id_seq OWNED BY public.model_attestations.id;
+
+
+--
+-- Name: model_audits; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.model_audits (
+    id bigint NOT NULL,
+    propulsion_type integer,
+    cycle_type integer,
+    manufacturer_id bigint,
+    manufacturer_other character varying,
+    mnfg_name character varying,
+    frame_model character varying,
+    certification_status integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: model_audits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.model_audits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: model_audits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.model_audits_id_seq OWNED BY public.model_audits.id;
+
+
+--
 -- Name: normalized_serial_segments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2224,6 +2299,41 @@ CREATE SEQUENCE public.organization_manufacturers_id_seq
 --
 
 ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organization_manufacturers.id;
+
+
+--
+-- Name: organization_model_audits; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_model_audits (
+    id bigint NOT NULL,
+    model_audit_id bigint,
+    organization_id bigint,
+    certification_status integer,
+    bikes_count integer DEFAULT 0,
+    last_bike_created_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_model_audits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_model_audits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_model_audits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_model_audits_id_seq OWNED BY public.organization_model_audits.id;
 
 
 --
@@ -3686,6 +3796,20 @@ ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: model_attestations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.model_attestations ALTER COLUMN id SET DEFAULT nextval('public.model_attestations_id_seq'::regclass);
+
+
+--
+-- Name: model_audits id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.model_audits ALTER COLUMN id SET DEFAULT nextval('public.model_audits_id_seq'::regclass);
+
+
+--
 -- Name: normalized_serial_segments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3732,6 +3856,13 @@ ALTER TABLE ONLY public.organization_features ALTER COLUMN id SET DEFAULT nextva
 --
 
 ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT nextval('public.organization_manufacturers_id_seq'::regclass);
+
+
+--
+-- Name: organization_model_audits id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_model_audits ALTER COLUMN id SET DEFAULT nextval('public.organization_model_audits_id_seq'::regclass);
 
 
 --
@@ -4310,6 +4441,22 @@ ALTER TABLE ONLY public.memberships
 
 
 --
+-- Name: model_attestations model_attestations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.model_attestations
+    ADD CONSTRAINT model_attestations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: model_audits model_audits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.model_audits
+    ADD CONSTRAINT model_audits_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: normalized_serial_segments normalized_serial_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4363,6 +4510,14 @@ ALTER TABLE ONLY public.organization_features
 
 ALTER TABLE ONLY public.organization_manufacturers
     ADD CONSTRAINT organization_manufacturers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_model_audits organization_model_audits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_model_audits
+    ADD CONSTRAINT organization_model_audits_pkey PRIMARY KEY (id);
 
 
 --
@@ -4832,6 +4987,13 @@ CREATE INDEX index_bikes_on_manufacturer_id ON public.bikes USING btree (manufac
 
 
 --
+-- Name: index_bikes_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_audit_id);
+
+
+--
 -- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5280,6 +5442,34 @@ CREATE INDEX index_memberships_on_user_id ON public.memberships USING btree (use
 
 
 --
+-- Name: index_model_attestations_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_model_attestations_on_model_audit_id ON public.model_attestations USING btree (model_audit_id);
+
+
+--
+-- Name: index_model_attestations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_model_attestations_on_organization_id ON public.model_attestations USING btree (organization_id);
+
+
+--
+-- Name: index_model_attestations_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_model_attestations_on_user_id ON public.model_attestations USING btree (user_id);
+
+
+--
+-- Name: index_model_audits_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_model_audits_on_manufacturer_id ON public.model_audits USING btree (manufacturer_id);
+
+
+--
 -- Name: index_normalized_serial_segments_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5368,6 +5558,20 @@ CREATE INDEX index_organization_manufacturers_on_manufacturer_id ON public.organ
 --
 
 CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organization_manufacturers USING btree (organization_id);
+
+
+--
+-- Name: index_organization_model_audits_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_model_audits_on_model_audit_id ON public.organization_model_audits USING btree (model_audit_id);
+
+
+--
+-- Name: index_organization_model_audits_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_model_audits_on_organization_id ON public.organization_model_audits USING btree (organization_id);
 
 
 --
@@ -6426,6 +6630,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230906203110'),
 ('20231004171919'),
 ('20231012212343'),
-('20231019173522');
+('20231019173522'),
+('20231029220010'),
+('20231030150841'),
+('20231104191652');
 
 

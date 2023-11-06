@@ -15,6 +15,7 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(described_class.jobs.count).to eq 0
       expect(organization1.reload.updated_at).to be_within(1).of Time.current
       expect(organization2.reload.updated_at).to be_within(1).of Time.current
+      expect(UpdateModelAuditWorker.jobs.count).to eq 0
     end
   end
 
@@ -98,6 +99,22 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       expect(organization_manufacturer.manufacturer_id).to eq manufacturer.id
       expect(organization_manufacturer.can_view_counts).to be_falsey
       expect { instance.perform(bike_shop.id) }.to_not change(OrganizationManufacturer, :count)
+    end
+  end
+
+  describe "UpdateModelAuditWorker" do
+    let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
+    let(:model_audit) { FactoryBot.create(:model_audit) }
+    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, model_audit: model_audit) }
+    it "enqueues all the model model_audits" do
+      # there might be a more performant way of dealing with this but I think this is good enough
+      Sidekiq::Worker.clear_all
+      expect(OrganizationModelAudit.count).to eq 0
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        instance.perform(organization.id)
+      end
+      expect(OrganizationModelAudit.count).to eq 1
     end
   end
 

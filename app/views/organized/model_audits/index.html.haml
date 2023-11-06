@@ -1,0 +1,104 @@
+-# TODO: add translations
+
+.organized-page-header
+  %h1
+    E-Vehicle Model audits
+
+= render partial: "/shared/period_select"
+
+.row.mt-4.mb-4
+  .col-sm-6
+    = pluralize(number_with_delimiter(@organization_model_audits.total_count), "matching models")
+    %em
+      = humanized_time_range(@time_range)
+
+- render_sortable = true
+
+- organization_model_audits ||= @organization_model_audits
+- render_sortable ||= false
+- manufacturer_other_id = Manufacturer.other.id
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border
+  %thead.small-header.hidden-md-down
+    %th
+      = sortable "last_bike_created_at", "Most Recent registration", render_sortable: render_sortable
+    %th
+      = sortable "bikes_count", render_sortable: render_sortable
+    %th
+      = sortable "mnfg_name", "Manufacturer", render_sortable: render_sortable
+    %th
+      = sortable "frame_model", "frame_model", render_sortable: render_sortable
+    %th
+      = sortable "certification_status", render_sortable: render_sortable
+    %th
+
+  %tbody
+    - organization_model_audits.each do |organization_model_audit|
+      - model_audit = organization_model_audit.model_audit
+      %tr{data: {modelauditid: model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
+        %td
+          %span.convertTime.preciseTime
+            - if organization_model_audit.last_bike_created_at
+              = l(organization_model_audit.last_bike_created_at, format: :convert_time)
+            - else
+              %span.less-strong= l(organization_model_audit.updated_at, format: :convert_time)
+          - if display_dev_info?
+            %small.only-dev-visible= organization_model_audit.id
+        %td
+          = admin_number_display(organization_model_audit.bikes_count)
+          -# TODO: when we implement non-frame model, need to update
+          - query_items = [model_audit.frame_model]
+          - query_items += [(model_audit.manufacturer_other.present? ? model_audit.mnfg_name : "m_#{model_audit.manufacturer_id}")]
+          %small= link_to "🔎", organization_bikes_path(organization_id: current_organization.id, query_items: query_items)
+        %td
+          = model_audit.mnfg_name
+          - if model_audit.manufacturer_other.present? && display_dev_info?
+            %small.only-dev-visible other
+        %td
+          = model_audit.frame_model
+        %td
+          %span{class: status_display_class(organization_model_audit.certification_status)}
+            = organization_model_audit.certification_status_humanized
+        %td
+          %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal"}}
+            update
+
+.paginate-container.paginate-container-bottom
+  = paginate @organization_model_audits
+
+- modal_body = capture_haml do
+  .modal-body
+    = form_tag organization_model_audits_path(organization_id: current_organization.to_param), method: :post, action: "create", class: "form" do
+      = hidden_field_tag :model_audit_id
+      .form-group
+        = label_tag :kind do
+          Update the certification status of the
+          %strong#updateModalMnfg Manufacturer
+          %em#updateModalFrameModel Model
+        - opts = [["Certified", "certified_by_trusted_org"],["NOT certified", "uncertified_by_trusted_org"]]
+        = select_tag(:kind, options_for_select(opts), include_blank: false, required: true, class: 'form-control')
+      .form-group
+        = label_tag :url do
+          Url
+          %small where to find information on the certification
+        = text_field_tag :url, "", placeholder: "optional", required: false, class: "form-control"
+      .form-group
+        = label_tag :info do
+          additional info
+          %small certification type, etc
+        = text_area_tag :info, "", placeholder: "optional", required: false, class: "form-control"
+      .modal-btn-footer
+        .form-submit-button
+          = submit_tag "submit", class: "btn btn-success btn-lg"
+
+
+
+= render partial: 'shared/modal', locals: {title: "Update certification status", id: 'update-model-cert-modal', modal_body: modal_body}
+
+:javascript
+  $(".updateModelCert").on("click", e => {
+    $targetRow = $(e.target).parents("tr")
+    $("#updateModalMnfg").text($targetRow.attr("data-mnfgname"))
+    $("#updateModalFrameModel").text($targetRow.attr("data-framemodel"))
+    $("#update-model-cert-modal #model_audit_id").val($targetRow.attr("data-modelauditid"))
+    return true
+  })

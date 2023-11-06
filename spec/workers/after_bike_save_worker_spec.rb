@@ -106,8 +106,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
         expect(user.user_registration_organizations.count).to eq 0
         Sidekiq::Worker.clear_all
         instance.perform(bike.id)
-        expect(Sidekiq::Worker.jobs.count).to eq 1
-        expect(Sidekiq::Worker.jobs.count { |j| j["class"] != "DuplicateBikeFinderWorker" }).to eq 0
+        expect(Sidekiq::Worker.jobs.map { |j| j["class"] }.sort).to eq(%w[DuplicateBikeFinderWorker])
         expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
         expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
         expect(UserRegistrationOrganization.unscoped.count).to eq 1
@@ -131,8 +130,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
           expect(UserRegistrationOrganization.unscoped.count).to eq 0
           Sidekiq::Worker.clear_all
           instance.perform(bike.id)
-          expect(Sidekiq::Worker.jobs.count).to eq 1
-          expect(Sidekiq::Worker.jobs.count { |j| j["class"] != "DuplicateBikeFinderWorker" }).to eq 0
+          expect(Sidekiq::Worker.jobs.map { |j| j["class"] }.sort).to eq(%w[DuplicateBikeFinderWorker])
           expect(UserRegistrationOrganization.unscoped.count).to eq 0
           expect(bike.reload.bike_organizations.count).to eq 1
           expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
@@ -302,6 +300,19 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       expect_attrs_to_match_hash(bike_version.reload, update_attributes)
       expect(bike_version.mnfg_name).to eq "Some cool thing"
       expect(bike_version.frame_size_unit).to eq "ordinal"
+    end
+  end
+
+  describe "motorized" do
+    let(:bike) { FactoryBot.create(:bike, propulsion_type: "throttle", frame_model: "something") }
+    it "enqueues UpdateModelAuditWorker" do
+      expect(bike.reload.motorized?).to be_truthy
+      Sidekiq::Worker.clear_all
+      instance.perform(bike.id)
+      expect(Sidekiq::Worker.jobs.map { |j| j["class"] }.sort).to eq(%w[DuplicateBikeFinderWorker UpdateModelAuditWorker])
+      expect(ModelAudit.count).to eq 0
+      UpdateModelAuditWorker.drain
+      expect(bike.reload.model_audit_id).to be_present
     end
   end
 end

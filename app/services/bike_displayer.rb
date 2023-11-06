@@ -5,6 +5,11 @@
 class BikeDisplayer
   # Not sure if I like everything being class methods, but doing that for now anyway because functional-ish
   class << self
+    # This is just a quick hack, will improve
+    def vehicle_search?(interpreted_params)
+      (%i[propulsion_type cycle_type] & interpreted_params.keys).any?
+    end
+
     # user arg because all methods have it
     def paint_description?(bike, _user = nil)
       bike.pos? && bike.paint.present?
