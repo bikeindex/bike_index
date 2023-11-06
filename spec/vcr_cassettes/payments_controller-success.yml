@@ -23,11 +23,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 29 Sep 2023 17:06:05 GMT
+      - Mon, 06 Nov 2023 03:46:32 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1848'
+      - '1896'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -37,13 +37,19 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       Access-Control-Expose-Headers:
-      - Request-Id, Stripe-Manage-Version, X-Stripe-External-Auth-Required, X-Stripe-Privileged-Session-Required
+      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
+        X-Stripe-Privileged-Session-Required
       Access-Control-Max-Age:
       - '300'
       Cache-Control:
       - no-cache, no-store
+      Content-Security-Policy-Report-Only:
+      - report-uri https://q.stripe.com/csp-report?p=v1%2Fcheckout%2Fsessions%2F%3Asession;
+        block-all-mixed-content; default-src 'none'; base-uri 'none'; form-action
+        'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample';
+        style-src 'self'
       Request-Id:
-      - req_EEt0Z2a3FFboAT
+      - req_NZY2BQlkzBofxN
       Stripe-Version:
       - '2014-12-08'
       Vary:
@@ -69,6 +75,7 @@ http_interactions:
           "billing_address_collection": null,
           "cancel_url": "http://localhost:3001/payments/new",
           "client_reference_id": null,
+          "client_secret": null,
           "consent": null,
           "consent_collection": null,
           "created": 1625248467,
@@ -125,10 +132,11 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
+          "ui_mode": "hosted",
           "url": null
         }
-    http_version: 
-  recorded_at: Fri, 29 Sep 2023 17:06:05 GMT
+    http_version:
+  recorded_at: Mon, 06 Nov 2023 03:46:32 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -141,7 +149,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_EEt0Z2a3FFboAT","request_duration_ms":289}}'
+      - '{"last_request_metrics":{"request_id":"req_NZY2BQlkzBofxN","request_duration_ms":210}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -154,7 +162,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 29 Sep 2023 17:06:05 GMT
+      - Mon, 06 Nov 2023 03:46:33 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -168,13 +176,19 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       Access-Control-Expose-Headers:
-      - Request-Id, Stripe-Manage-Version, X-Stripe-External-Auth-Required, X-Stripe-Privileged-Session-Required
+      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
+        X-Stripe-Privileged-Session-Required
       Access-Control-Max-Age:
       - '300'
       Cache-Control:
       - no-cache, no-store
+      Content-Security-Policy-Report-Only:
+      - report-uri https://q.stripe.com/csp-report?p=v1%2Fcustomers%2F%3Acustomer;
+        block-all-mixed-content; default-src 'none'; base-uri 'none'; form-action
+        'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample';
+        style-src 'self'
       Request-Id:
-      - req_hiPFnSyKdK7RNc
+      - req_NMEOd4cM1TAUIQ
       Stripe-Version:
       - '2014-12-08'
       Vary:
@@ -255,6 +269,6 @@ http_interactions:
           "tax_info_verification": null,
           "test_clock": null
         }
-    http_version: 
-  recorded_at: Fri, 29 Sep 2023 17:06:05 GMT
+    http_version:
+  recorded_at: Mon, 06 Nov 2023 03:46:33 GMT
 recorded_with: VCR 5.0.0
