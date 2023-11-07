@@ -4,6 +4,12 @@ RSpec.describe ScheduledWorkerRunner, type: :lib do
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
+  it "has scheduled_workers in order" do
+    scheduled_workers = described_class.scheduled_workers.map(&:to_s) - [described_class.name.to_s]
+
+    expect(scheduled_workers).to eq scheduled_workers.sort
+  end
+
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "high_priority" # overrides default
     expect(described_class.frequency).to be > 1.minute
