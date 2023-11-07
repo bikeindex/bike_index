@@ -7,9 +7,13 @@ class ScheduledAutocompleteCheckWorker < ScheduledWorker
   end
 
   def perform
-    if Autocomplete::Loader.frame_mnfg_count < Manufacturer.frame_makers.count
+    if too_few_autocomplete_manufacturers?
       AutocompleteLoaderWorker.perform_async
       raise "Missing Manufacturers!"
     end
+  end
+
+  def too_few_autocomplete_manufacturers?
+    Autocomplete::Loader.frame_mnfg_count < Manufacturer.frame_makers.count
   end
 end
