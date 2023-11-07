@@ -1,8 +1,4 @@
-# Since re-writing soulheart internally (PR#2423), the autocomplete list has been empty
-# TWICE
-# This means that bike registration is silently broken, because you can't register without a manufacturer
-# I _think_ it was just because admin manufacturers had a bug, but...
-# run a scheduled job, fix it if it's broken and throw an error so we know
+# See PR#2483 - frequency can definitely be dropped a month or 2 after 2023-11
 class ScheduledAutocompleteCheckWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
