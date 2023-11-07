@@ -70,9 +70,9 @@ class Autocomplete::Loader
     end
 
     def frame_mnfg_count
-      RedisPool.conn { |r|
+      RedisPool.conn do |r|
         r.scan_each({match: "#{Autocomplete.category_key("frame_mnfg")}*"})
-      }.count
+      end.count
     end
 
     private
