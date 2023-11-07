@@ -47,10 +47,10 @@ class UpdateModelAuditWorker < ApplicationWorker
       .where(organization_id: organization_id).first
 
     if bikes_count > 0 && organization_model_audit.blank?
-      model_audit.organization_model_audits.create(bikes_count: bikes_count,
+      model_audit.organization_model_audits.create!(bikes_count: bikes_count,
         organization_id: organization_id, last_bike_created_at: bike_at)
     elsif organization_model_audit.present?
-      organization_model_audit.update(bikes_count: bikes_count,
+      organization_model_audit.update!(bikes_count: bikes_count,
         last_bike_created_at: bike_at)
     end
   end
@@ -60,7 +60,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     propulsion_type ||= matching_bikes.first&.propulsion_type
     cycle_type = matching_bikes.detect { |b| b.cycle_type != "bike" }&.cycle_type
     cycle_type ||= matching_bikes.first&.cycle_type
-    ModelAudit.create(manufacturer_id: bike.manufacturer_id,
+    ModelAudit.create!(manufacturer_id: bike.manufacturer_id,
       manufacturer_other: bike.manufacturer_other,
       frame_model: bike.frame_model,
       propulsion_type: propulsion_type,
