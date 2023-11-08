@@ -41,6 +41,11 @@ class ModelAudit < ApplicationRecord
     self.certification_status = calculated_certification_status
   end
 
+  # TODO: include display for model missing
+  def frame_model_display
+    frame_model
+  end
+
   private
 
   def calculated_certification_status

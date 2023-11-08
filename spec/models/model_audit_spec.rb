@@ -6,6 +6,14 @@ RSpec.describe ModelAudit, type: :model do
     it "is valid" do
       expect(model_audit).to be_valid
     end
+    context "case_sensitive" do
+      let(:model_audit_dupe) { FactoryBot.build(:model_audit, manufacturer: model_audit.manufacturer, frame_model: model_audit.frame_model.upcase) }
+      it "doesn't duplicate" do
+        expect(model_audit).to be_valid
+        expect(model_audit_dupe).to_not be_valid
+        expect(model_audit_dupe.errors.full_messages).to eq(["Frame model has already been taken"])
+      end
+    end
   end
 
   describe "calculated_certification_status" do

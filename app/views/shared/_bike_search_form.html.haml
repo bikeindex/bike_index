@@ -43,7 +43,8 @@
     = render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search"}
     = hidden_field_tag :search_stickers, params[:search_stickers]
     = hidden_field_tag :search_address, params[:search_address]
-    = hidden_field :search_secondary, params[:search_secondary]
+    = hidden_field_tag :search_secondary, params[:search_secondary]
+    = hidden_field_tag :search_model_audit_id, params[:search_model_audit_id]
 
 - if @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
   .alert.alert-warning.mt-4
