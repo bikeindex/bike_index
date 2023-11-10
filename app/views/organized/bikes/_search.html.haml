@@ -103,7 +103,7 @@
 
 
 %p.mt-4
-  - if @search_query_present || params[:search_stickers].present? || params[:search_address].present? || @organization_model_audit.present?
+  - if @search_query_present || params[:search_stickers].present? || params[:search_address].present? || @model_audit.present?
     = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type))
   - else
     = t(".registered_bikes_html",
@@ -121,13 +121,11 @@
         = t(".view_all_vehicles", cycle_type: cycle_type)
   %a.float-right.less-strong{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb"}
     = t(".settings")
-- if @organization_model_audit.present?
-  - model_audit = @organization_model_audit.model_audit
+- if @model_audit.present?
   %p.mt-0
-    E-Vehicles matching audit:
-    %em
-      %strong= model_audit.mnfg_name
-      = model_audit.frame_model_display
+    E-Vehicles for audit:
+    %strong= @model_audit.mnfg_name
+    %em= @model_audit.frame_model_display
 
     = link_to "view matching any audit", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "gray-link small"
 

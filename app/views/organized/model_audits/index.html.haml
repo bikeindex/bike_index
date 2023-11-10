@@ -50,7 +50,7 @@
             %small.only-dev-visible= organization_model_audit.id
         %td.text-center
           %strong
-            = link_to(admin_number_display(organization_model_audit.bikes_count), organization_bikes_path(organization_id: current_organization.id, search_organization_model_audit_id: organization_model_audit.id))
+            = link_to(admin_number_display(organization_model_audit.bikes_count), organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: model_audit.id))
         %td
           = model_audit.mnfg_name
           %small= link_to "🔎", url_for(sortable_search_params.merge(search_mnfg_name: model_audit.mnfg_name))

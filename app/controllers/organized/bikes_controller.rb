@@ -205,10 +205,8 @@ module Organized
         end
       end
       if params[:search_model_audit_id].present?
-        @organization_model_audit = current_organization.organization_model_audits.where(model_audit_id: params[:search_model_audit_id]).first
-        if @organization_model_audit.present?
-          bikes = bikes.where(model_audit_id: @organization_model_audit.model_audit_id)
-        end
+        @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
+        bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
       @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
