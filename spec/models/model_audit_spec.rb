@@ -38,7 +38,6 @@ RSpec.describe ModelAudit, type: :model do
   end
 
   describe "matching_bikes_for" do
-    it "finds matching bikes"
     context "frame model nil" do
       let(:bike1) { FactoryBot.create(:bike, frame_model: nil) }
       let(:manufacturer) { bike1.manufacturer }
@@ -57,6 +56,19 @@ RSpec.describe ModelAudit, type: :model do
         end
         expect(ModelAudit.unknown_model?(bike_known.frame_model)).to be_falsey
         expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array match_ids
+      end
+    end
+  end
+
+  describe "delete_if_no_bikes?" do
+    let(:model_audit) { FactoryBot.create(:model_audit) }
+    it "returns true" do
+      expect(model_audit.reload.delete_if_no_bikes?).to be_truthy
+    end
+    context "with_model_attestations" do
+      let!(:model_attestation) { FactoryBot.create(:model_attestation, model_audit: model_audit) }
+      it "returns false" do
+        expect(model_audit.reload.delete_if_no_bikes?).to be_falsey
       end
     end
   end
