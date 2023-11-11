@@ -17,11 +17,13 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
   end
 
   describe "perform" do
-    let(:bike1) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: "Party model") }
+    let!(:bike1) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1) }
+    let(:frame_model1) { "Party model" }
     let(:manufacturer) { bike1.manufacturer }
-    let!(:bike2) { FactoryBot.create(:bike, manufacturer: manufacturer, frame_model: "Party MODEL ", cycle_type: :cargo, model_audit_id: model_audit&.id) }
+    let(:bike2) { FactoryBot.create(:bike, manufacturer: manufacturer, frame_model: frame_model2, cycle_type: :cargo, model_audit_id: model_audit&.id) }
+    let(:frame_model2) { "Party MODEL " }
     let(:model_audit) { nil }
-    let(:target_attributes) do
+    let(:basid_target_attributes) do
       {
         propulsion_type: "pedal-assist-and-throttle",
         cycle_type: :cargo,
@@ -33,13 +35,14 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
     end
     it "creates a model_audit" do
       expect(bike1.model_audit_id).to be_blank
+      expect(bike2.model_audit_id).to be_blank
       expect {
         expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
         instance.perform(nil, bike1.id)
       }.to change(ModelAudit, :count).by 1
       new_model_audit = bike1.reload.model_audit
       expect(bike2.reload.model_audit_id).to eq new_model_audit.id
-      expect_attrs_to_match_hash(new_model_audit, target_attributes)
+      expect_attrs_to_match_hash(new_model_audit, basid_target_attributes)
       expect(new_model_audit.organization_model_audits.count).to eq 0
     end
     context "bike_organized organization" do
@@ -51,13 +54,14 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
         bike2.update(likely_spam: true)
         expect(Bike.count).to eq 2
         expect(Bike.unscoped.count).to eq 3
+        expect(bike3.frame_model.downcase).to eq bike3.frame_model.downcase
         expect {
           instance.perform(nil, bike1.id)
         }.to change(ModelAudit, :count).by 1
         expect(Bike.unscoped.where.not(model_audit_id: nil).count).to eq 3
         new_model_audit = bike1.reload.model_audit
         expect(bike2.reload.model_audit_id).to eq new_model_audit.id
-        expect_attrs_to_match_hash(new_model_audit, target_attributes)
+        expect_attrs_to_match_hash(new_model_audit, basid_target_attributes)
         expect(new_model_audit.organization_model_audits.count).to eq 1
         organization_model_audit = new_model_audit.organization_model_audits.first
         expect(organization_model_audit.organization_id).to eq organization.id
@@ -65,6 +69,9 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
         expect(organization_model_audit.certification_status).to be_nil
         expect(organization_model_audit.last_bike_created_at).to be_within(1).of time
       end
+      # context "bike frame_model changes" do
+      #   it "updates and deletes"
+      # end
     end
     context "existing model_audit" do
       let(:model_audit) do
@@ -75,6 +82,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           propulsion_type: "throttle")
       end
       it "updates" do
+        expect(bike2.model_audit_id).to be_present
         # It matches, because a matching bike has a model_audit
         bike1.update(propulsion_type: "foot-pedal")
         expect(described_class.enqueue_for?(bike1)).to be_truthy
@@ -99,7 +107,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
       end
     end
     context "manufacturer_other" do
-      let!(:bike3) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: "Party model", manufacturer: Manufacturer.other, manufacturer_other: "SALSA BIKES") }
+      let!(:bike3) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1, manufacturer: Manufacturer.other, manufacturer_other: "SALSA BIKES") }
       before do
         bike1.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa bikes")
         bike2.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa")
@@ -130,6 +138,23 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
 
         expect(bike3.reload.model_audit_id).to eq new_model_audit.id
         expect(bike3.manufacturer_id).to eq new_model_audit.manufacturer_id
+      end
+    end
+
+    context "model_unknown?" do
+      let(:frame_model1) { "unkown" }
+      let(:frame_model2) { nil }
+      let(:target_attributes) { basic_target_attributes.merge(frame_model: nil) }
+      it "creates with nil" do
+        expect(bike1.model_audit_id).to be_blank
+        expect {
+          expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
+          instance.perform(nil, bike1.id)
+        }.to change(ModelAudit, :count).by 1
+        new_model_audit = bike1.reload.model_audit
+        expect(bike2.reload.model_audit_id).to eq new_model_audit.id
+        expect_attrs_to_match_hash(new_model_audit, target_attributes)
+        expect(new_model_audit.organization_model_audits.count).to eq 0
       end
     end
   end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: add translations
 module OrganizedHelper
   def organized_bike_text(bike = nil, skip_creation: false)
     return nil unless bike.present?

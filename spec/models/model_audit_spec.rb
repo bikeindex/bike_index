@@ -36,4 +36,28 @@ RSpec.describe ModelAudit, type: :model do
       expect(model_audit.certification_status).to eq "uncertified_by_trusted_org"
     end
   end
+
+  describe "matching_bikes_for" do
+    it "finds matching bikes"
+    context "frame model nil" do
+      let(:bike1) { FactoryBot.create(:bike, frame_model: nil) }
+      let(:manufacturer) { bike1.manufacturer }
+      let!(:bike2) { FactoryBot.create(:bike, frame_model: "na", manufacturer: manufacturer) }
+      let!(:bike3) { FactoryBot.create(:bike, frame_model: "UNknown", manufacturer: manufacturer) }
+      let!(:bike4) { FactoryBot.create(:bike, frame_model: "TBD ", manufacturer: manufacturer) }
+      let!(:bike5) { FactoryBot.create(:bike, frame_model: "idk ", manufacturer: manufacturer) }
+      let!(:bike6) { FactoryBot.create(:bike, frame_model: "No model") }
+      let!(:bike_known) { FactoryBot.create(:bike, frame_model: "none coolest", manufacturer: manufacturer) }
+      let(:match_ids) { [bike1.id, bike2.id, bike3.id, bike4.id, bike5.id] }
+      it "finds the matches" do
+        expect(ModelAudit.unknown_model?(bike1.frame_model)).to be_truthy
+        expect(bike6.manufacturer_id).to_not eq manufacturer.id
+        (Bike.pluck(:frame_model) - ["No bikes"]).each do |frame_model|
+          ModelAudit.unknown_model?(frame_model)
+        end
+        expect(ModelAudit.unknown_model?(bike_known.frame_model)).to be_falsey
+        expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array match_ids
+      end
+    end
+  end
 end
