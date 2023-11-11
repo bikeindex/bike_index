@@ -48,7 +48,9 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
     context "likely_spam and example" do
       it "does not create a model_audit" do
         bike1.update(example: true)
+        expect(described_class.enqueue_for?(bike1)).to be_falsey
         bike2.update(likely_spam: true)
+        expect(described_class.enqueue_for?(bike2)).to be_falsey
         expect {
           expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
           instance.perform(nil, bike1.id)
@@ -58,7 +60,9 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
     context "user_hidden and deleted" do
       it "creates a model_audit" do
         bike1.update(user_hidden: true)
+        expect(described_class.enqueue_for?(bike1)).to be_truthy
         bike2.destroy
+        expect(described_class.enqueue_for?(bike2)).to be_falsey
         expect {
           expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
           instance.perform(nil, bike1.id)
@@ -113,15 +117,15 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           expect(organization_model_audit.last_bike_created_at).to be_nil
           # frame_model update, with a frame_model still in model_audit
           expect(new_model_audit.delete_if_no_bikes?).to be_truthy
-          bike1.update(frame_model: "Unknown") # passing bike_id that still matches
+          bike1.update(frame_model: "Unknown")
+          expect(new_model_audit.matching_bike?(bike1)).to be_falsey
           expect(new_model_audit.reload.matching_bikes.pluck(:id)).to match_array([bike2.id, bike3.id])
-          instance.perform(nil, bike2.id)
-          pp described_class.jobs
+          instance.perform(nil, bike2.id) # passing bike_id that still matches
           expect(described_class.jobs.count).to eq 1
-          described_class.drain
-
+          described_class.drain # Has to run a second time
           expect(ModelAudit.count).to eq 2
           model_audit_unknown = ModelAudit.order(:id).last
+          expect(model_audit_unknown.matching_bike?(bike1)).to be_truthy
           expect(model_audit_unknown.frame_model).to be_nil
           expect(bike1.reload.model_audit_id).to eq model_audit_unknown.id
           expect(bike2.reload.model_audit_id).to eq new_model_audit.id
@@ -130,8 +134,14 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           organization_model_audit_unknown = OrganizationModelAudit.order(:id).last
           expect(organization_model_audit_unknown.bikes_count).to eq 0
           # frame_model update, with only likely_spam frame_model in model_audit - deletes the model audit
+          expect(new_model_audit.matching_bike?(bike2)).to be_truthy
           bike2.update(frame_model: "IDK")
+          expect(new_model_audit.matching_bike?(bike2)).to be_falsey
+
+          pp "--------"
           instance.perform(nil, bike1.id) # passing already updated bike_id
+          expect(described_class.jobs.count).to eq 1
+          described_class.drain
           expect(ModelAudit.where(id: new_model_audit.id).count).to eq 0
           expect(bike1.reload.model_audit_id).to eq model_audit_unknown.id
           expect(bike2.reload.model_audit_id).to eq model_audit_unknown.id
@@ -192,7 +202,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
         expect(bike2.propulsion_type).to eq "foot-pedal"
         expect(bike2.model_audit_id).to eq model_audit.id
         expect(model_audit.reload.certification_status).to be_nil
-        # Creating a model attestation enqueues the update
+        # Creating a model attestation enqueues job
         expect(described_class.jobs.count).to eq 0
         FactoryBot.create(:model_attestation, model_audit: model_audit, kind: "certified_by_manufacturer")
         expect(described_class.jobs.count).to eq 1
@@ -209,6 +219,8 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           expect {
             instance.perform(nil, bike1.id)
           }.to change(ModelAudit, :count).by -1
+          expect(described_class.jobs.count).to eq 1
+          described_class.drain
           expect(bike1.reload.model_audit_id).to eq model_audit.id
           expect(bike2.reload.model_audit_id).to eq model_audit.id
           expect(ModelAudit.pluck(:id)).to eq([model_audit.id])

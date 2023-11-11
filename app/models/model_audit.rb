@@ -59,6 +59,16 @@ class ModelAudit < ApplicationRecord
     self.class.matching_bikes_for(nil, manufacturer_id: manufacturer_id, mnfg_name: mnfg_name, frame_model: frame_model)
   end
 
+  def matching_bike?(bike)
+    same_frame_model = if self.class.unknown_model?(bike.frame_model)
+      unknown_model?
+    else
+      frame_model&.downcase == bike.frame_model&.downcase
+    end
+    return false unless same_frame_model
+    mnfg_name.downcase == bike.mnfg_name.downcase
+  end
+
   def delete_if_no_bikes?
     model_attestations.limit(1).blank?
   end
