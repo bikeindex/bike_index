@@ -78,10 +78,7 @@ class ModelAudit < ApplicationRecord
     frame_model.blank?
   end
 
-  def update_certification_status?
-  end
-
-  def set_calculated_attributes
+   def set_calculated_attributes
     self.manufacturer_other = nil if manufacturer_id != Manufacturer.other.id
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.certification_status = calculated_certification_status
