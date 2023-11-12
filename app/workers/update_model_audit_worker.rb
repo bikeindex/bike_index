@@ -16,6 +16,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     # update any non-counted bikes (e.g. likely_spam) and delete it
     if ModelAudit.counted_matching_bikes(matching_bikes).limit(1).blank? && model_audit.delete_if_no_bikes?
       matching_bikes.find_each { |b| b.update(model_audit_id: nil) }
+      model_audit.bikes.find_each { |b| b.update(model_audit_id: nil) }
       model_audit.destroy
       # bike_id might have been passed - and if so, re-enqueue it if it should be
       if bike_id.present? && self.class.enqueue_for?(Bike.find_by_id(bike_id))
@@ -59,7 +60,6 @@ class UpdateModelAuditWorker < ApplicationWorker
         # Delete any extraneous model_audits
         # ModelAudit.where(id: model_audit_ids[1..]).destroy_all if model_audit_ids.count > 1
         if model_audit_ids.count > 1
-          pp model_audit_ids
           model_audit_ids[1..].each { |id| self.class.perform_async(id) }
         end
         ModelAudit.find(model_audit_ids.first)

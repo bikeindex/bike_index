@@ -138,7 +138,6 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           bike2.update(frame_model: "IDK")
           expect(new_model_audit.matching_bike?(bike2)).to be_falsey
 
-          pp "--------"
           instance.perform(nil, bike1.id) # passing already updated bike_id
           expect(described_class.jobs.count).to eq 1
           described_class.drain
@@ -216,6 +215,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           # It matches, because a matching bike has a model_audit
           bike1.update(model_audit_id: model_audit2.id)
           expect(described_class.enqueue_for?(bike1)).to be_truthy
+          Sidekiq::Worker.clear_all
           expect {
             instance.perform(nil, bike1.id)
           }.to change(ModelAudit, :count).by -1
