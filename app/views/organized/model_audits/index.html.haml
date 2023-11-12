@@ -22,7 +22,7 @@
 - organization_model_audits ||= @organization_model_audits
 - render_sortable ||= false
 - manufacturer_other_id = Manufacturer.other.id
-- skip_manufacturer_search ||= false
+- skip_manufacturer_search ||= params[:search_mnfg_name].present?
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
     %th
@@ -35,7 +35,6 @@
       = sortable "bikes_count", "Vehicles #", render_sortable: render_sortable
     %th
       = sortable "certification_status", render_sortable: render_sortable
-    %th
 
   %tbody
     - organization_model_audits.each do |organization_model_audit|
@@ -56,15 +55,15 @@
           - if model_audit.manufacturer_other.present? && display_dev_info?
             %small.only-dev-visible other
         %td
-          = audit_frame_model_display(model_audit)
-        %td.text-center
+          = link_to audit_frame_model_display(model_audit), organization_model_audit_path(model_audit, organization_id: current_organization.to_param)
+        %td
           %strong
-            = link_to(admin_number_display(organization_model_audit.bikes_count), organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: model_audit.id))
+            = admin_number_display(organization_model_audit.bikes_count)
         %td
           %span{class: status_display_class(organization_model_audit.certification_status)}
             = organization_model_audit.certification_status_humanized
-        %td
-          %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal"}}
+
+          %a.btn.btn-sm.btn-secondary.float-right.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal"}}
             update
 
 .paginate-container.paginate-container-bottom

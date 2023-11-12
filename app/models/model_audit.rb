@@ -15,11 +15,6 @@ class ModelAudit < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  def self.certification_status_humanized(str)
-    return nil if str.blank?
-    str.to_s.gsub("_org", " organization").tr("_", " ")
-  end
-
   def self.valid_kinds
     (certification_statuses.keys - ["certification_proof_url"])
   end
@@ -76,6 +71,10 @@ class ModelAudit < ApplicationRecord
 
   def unknown_model?
     frame_model.blank?
+  end
+
+  def certification_status_humanized
+    ModelAttestation.kind_humanized(certification_status)
   end
 
    def set_calculated_attributes

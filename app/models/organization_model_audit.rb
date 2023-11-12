@@ -26,7 +26,7 @@ class OrganizationModelAudit < ApplicationRecord
   end
 
   def certification_status_humanized
-    ModelAudit.certification_status_humanized(certification_status)
+    ModelAttestation.kind_humanized(certification_status)
   end
 
   def set_calculated_attributes
