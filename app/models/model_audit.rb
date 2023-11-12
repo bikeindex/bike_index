@@ -79,7 +79,6 @@ class ModelAudit < ApplicationRecord
   end
 
   def update_certification_status?
-
   end
 
   def set_calculated_attributes

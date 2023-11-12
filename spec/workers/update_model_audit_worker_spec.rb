@@ -219,7 +219,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           Sidekiq::Worker.clear_all
           expect {
             instance.perform(nil, bike1.id)
-          }.to change(ModelAudit, :count).by -1
+          }.to change(ModelAudit, :count).by(-1)
           expect(described_class.jobs.count).to eq 1
           described_class.drain
           expect(bike1.reload.model_audit_id).to eq model_audit.id
