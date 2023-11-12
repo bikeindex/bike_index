@@ -39,8 +39,8 @@ class UpdateModelAuditWorker < ApplicationWorker
     Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
     # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
     non_matching_bike_ids.each_with_index { |id, inx| self.class.perform_in(inx * 15, nil, id) }
-    # Update the model_audit to set the certification_status. Only needs to be done if changed, but... easier this way
-    model_audit.update(updated_at: Time.current)
+    # Update the model_audit to set the certification_status. Bust admin cache
+    model_audit.reload.update(updated_at: Time.current)
     organization_ids_to_enqueue_for_model_audits
       .each { |id| update_org_model_audit(model_audit, id) }
   end

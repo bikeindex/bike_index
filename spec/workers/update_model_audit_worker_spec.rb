@@ -125,6 +125,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           described_class.drain # Has to run a second time
           expect(ModelAudit.count).to eq 2
           model_audit_unknown = ModelAudit.order(:id).last
+          expect(model_audit_unknown.bikes_count).to eq 1
           expect(model_audit_unknown.matching_bike?(bike1)).to be_truthy
           expect(model_audit_unknown.frame_model).to be_nil
           expect(bike1.reload.model_audit_id).to eq model_audit_unknown.id

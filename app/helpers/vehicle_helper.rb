@@ -4,9 +4,9 @@
 module VehicleHelper
   def audit_frame_model_display(model_audit)
     if model_audit.unknown_model?
-      content_tag(:em, "Missing model", class: "less-strong")
+      content_tag(:span, "Missing model", class: "less-strong")
     else
-      content_tag(:em, model_audit.frame_model)
+      content_tag(:span, model_audit.frame_model)
     end
   end
 end

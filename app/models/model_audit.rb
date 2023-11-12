@@ -45,6 +45,7 @@ class ModelAudit < ApplicationRecord
     if manufacturer_id != Manufacturer.other.id
       bikes = bikes.or(Bike.unscoped.where(manufacturer_id: manufacturer_id))
     end
+
     matching_bikes_for_frame_model(bikes, frame_model: frame_model || bike&.frame_model)
       .reorder(id: :desc)
   end
@@ -77,10 +78,15 @@ class ModelAudit < ApplicationRecord
     frame_model.blank?
   end
 
+  def update_certification_status?
+
+  end
+
   def set_calculated_attributes
     self.manufacturer_other = nil if manufacturer_id != Manufacturer.other.id
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.certification_status = calculated_certification_status
+    self.bikes_count = bikes.count
   end
 
   private

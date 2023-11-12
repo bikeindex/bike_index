@@ -2024,7 +2024,8 @@ CREATE TABLE public.model_audits (
     frame_model character varying,
     certification_status integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    bikes_count integer
 );
 
 
@@ -6633,6 +6634,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231019173522'),
 ('20231029220010'),
 ('20231030150841'),
-('20231104191652');
+('20231104191652'),
+('20231112013451');
 
 
