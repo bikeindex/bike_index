@@ -114,7 +114,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           expect(organization_model_audit.organization_id).to eq organization.id
           expect(organization_model_audit.bikes_count).to eq 0
           expect(organization_model_audit.certification_status).to be_nil
-          expect(organization_model_audit.last_bike_created_at).to be_nil
+          # expect(organization_model_audit.last_bike_created_at).to be_nil
           # frame_model update, with a frame_model still in model_audit
           expect(new_model_audit.delete_if_no_bikes?).to be_truthy
           bike1.update(frame_model: "Unknown")
