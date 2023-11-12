@@ -1,7 +1,7 @@
 require "rails_helper"
 
 base_url = "/admin/model_audits"
-RSpec.describe Admin::ModelAuditController, type: :request do
+RSpec.describe Admin::ModelAuditsController, type: :request do
   context "given a logged-in superuser" do
     include_context :request_spec_logged_in_as_superuser
 
