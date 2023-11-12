@@ -190,9 +190,10 @@ Rails.application.routes.draw do
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :ads, :bike_sticker_updates, :bulk_imports, :content_tags, :ctypes, :exports,
       :graduated_notifications, :impound_claims, :impound_records, :logged_searches,
-      :mail_snippets, :mailchimp_data, :mailchimp_values, :memberships, :notifications,
-      :organization_features, :paints, :parking_notifications, :payments, :recovery_displays,
-      :superuser_abilities, :theft_alerts, :user_alerts, :user_registration_organizations
+      :mail_snippets, :mailchimp_data, :mailchimp_values, :memberships, :model_audits,
+      :notifications, :organization_features, :paints, :parking_notifications, :payments,
+      :recovery_displays, :superuser_abilities, :theft_alerts, :user_alerts,
+      :user_registration_organizations
 
     resources :bike_stickers do
       collection { get :reassign }
@@ -337,7 +338,7 @@ Rails.application.routes.draw do
       end
       member { post :resend_incomplete_email }
     end
-    resources :model_audits, only: %i[index create]
+    resources :model_audits, only: %i[index create show]
     resources :exports, except: [:edit]
     resources :bulk_imports, only: %i[index show new create]
     resources :emails, only: %i[index show edit update]

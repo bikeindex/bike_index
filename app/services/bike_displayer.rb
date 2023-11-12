@@ -6,8 +6,9 @@ class BikeDisplayer
   # Not sure if I like everything being class methods, but doing that for now anyway because functional-ish
   class << self
     # This is just a quick hack, will improve
-    def vehicle_search?(interpreted_params)
-      (%i[propulsion_type cycle_type] & interpreted_params.keys).any?
+    def vehicle_search?(params_and_interpreted_params)
+      (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||
+        params_and_interpreted_params[:search_model_audit_id].present?
     end
 
     # user arg because all methods have it

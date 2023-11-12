@@ -24,6 +24,15 @@ class ModelAttestation < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_model_audit
 
+  def self.kind_humanized(str)
+    return nil if str.blank?
+    str.to_s.gsub("_org", " organization").tr("_", " ")
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
+  end
+
   def update_model_audit
     UpdateModelAuditWorker.perform_async(model_audit_id)
     # Also lazy set the replaced attribute

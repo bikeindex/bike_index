@@ -1,0 +1,89 @@
+-# TODO: add translations
+
+.organized-page-header
+  %h1
+    %strong= @model_audit.mnfg_name
+    %em= audit_frame_model_display(@model_audit)
+    &nbsp;
+    %small E-Vehicle audit
+
+.row.mt-4
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Manufacturer
+          %td
+            = @model_audit.mnfg_name
+            %small= link_to "view all manufacturer's audits", organization_model_audits_path(search_mnfg_name: @model_audit.mnfg_name, organization_id: current_organization.to_param)
+        %tr
+          %td Frame model
+          %td
+            = audit_frame_model_display(@model_audit)
+        %tr
+          %td Vehicle type
+          %td
+            = @model_audit.cycle_type
+        %tr
+          %td Propulsion
+          %td
+            = @model_audit.propulsion_type
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Total vehicles
+          %td
+            = admin_number_display @bikes_count
+            %small= link_to "search matching vehicles", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)
+        %tr
+          %td Most recent
+          %td
+            - if @organization_model_audit&.last_bike_created_at.present?
+              %span.convertTime.preciseTime
+                = l(@organization_model_audit&.last_bike_created_at, format: :convert_time)
+
+        %tr
+          %td Certification status
+          %td
+            %span{class: status_display_class(@model_audit.certification_status)}
+            = @model_audit.certification_status_humanized
+
+%h2.uncap.mt-4 Attestations
+- if @model_attestations.none?
+  %h4.mt-2.uncap No Attestations
+- else
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header.hidden-md-down
+      %th
+        Created
+      %th
+        Kind
+      %th
+        Submitted by
+      %th
+        Information
+      %th
+        Url
+
+    %tbody
+      - @model_attestations.each do |model_attestation|
+        %tr
+          %td
+            %span.convertTime.preciseTime
+              = l(model_attestation.created_at, format: :convert_time)
+          %td
+            %span{class: status_display_class(model_attestation.kind)}
+              = model_attestation.kind_humanized
+          %td
+            = model_attestation.organization&.short_name
+            - if model_attestation.organization_id == current_organization.id
+              %small= model_attestation.user&.display_name
+          %td
+            = model_attestation.info
+          %td
+            = link_to truncate(model_attestation.url), model_attestation.url
+
+-# TODO: Actually render!
+-# %h2 Vehicles
+-# = render partial: "/organized/bikes/search", locals: {only_show_bikes: true}

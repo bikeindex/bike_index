@@ -1,13 +1,9 @@
-- skip_view_just_stolen ||= @bike_sticker.present?
-- cycle_type = BikeDisplayer.vehicle_search?(@interpreted_params) ? t(".vehicle") : t(".bike")
-
-.mb-4
-  = render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_bikes_path(organization_id: current_organization.to_param)}
-
-%hr{style: "opacity: .3;"}
-
 :ruby
-  search_params = sortable_search_params.merge(@interpreted_params.merge(organization_id: current_organization.to_param))
+  skip_view_just_stolen ||= @bike_sticker.present?
+  cycle_type = BikeDisplayer.vehicle_search?(params.merge(@interpreted_params)) ? t(".vehicle") : t(".bike")
+  only_show_bikes ||= false
+
+  search_params = (sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: current_organization.to_param))
 
   # TODO: Now that we have translations, we need to localize this. I believe the easiest way to do so would be to pull the text from the header cell and use that.
   column_renames = {
@@ -59,68 +55,83 @@
   initially_checked_columns += ["impounded_cell"] if @search_impoundedness == "impounded"
   enabled_columns = enabled_columns.sort { |a, b| column_renames[a] <=> column_renames[b] }
 
-.collapse#organizedSearchSettings.settings-list{"data-defaultcols" => initially_checked_columns.to_json, class: (settings_default_open ? "in" : "")}
-  %h3.header-font-alt
-    = t(".visible_columns")
-  .row.pb-3
-    - enabled_columns.each do |cell_name|
-      .col-xs-6.col-md-4
-        .form-group
-          %label
-            = check_box_tag cell_name, cell_name
-            = column_renames[cell_name]
-  - if current_organization.enabled?("bike_stickers")
+
+- unless only_show_bikes
+  .mb-4
+    = render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_bikes_path(organization_id: current_organization.to_param)}
+
+  %hr{style: "opacity: .3;"}
+
+  .collapse#organizedSearchSettings.settings-list{"data-defaultcols" => initially_checked_columns.to_json, class: (settings_default_open ? "in" : "")}
+    %h3.header-font-alt
+      = t(".visible_columns")
+    .row.pb-3
+      - enabled_columns.each do |cell_name|
+        .col-xs-6.col-md-4
+          .form-group
+            %label
+              = check_box_tag cell_name, cell_name
+              = column_renames[cell_name]
+    - if current_organization.enabled?("bike_stickers")
+      %p.search-sort-btns
+        %span.sort-group-label= t(".stickers")
+        = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
+        = link_to organization_bikes_path(search_params.merge(search_stickers: "with")), class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do
+          = t(".only_with_stickers_html")
+        = link_to organization_bikes_path(search_params.merge(search_stickers: "none")), class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do
+          = t(".only_no_sticker_html")
+    - if current_organization.enabled?("reg_address")
+      %p.search-sort-btns
+        %span.sort-group-label= t(".address")
+        = link_to t(".all"), organization_bikes_path(search_params.merge(search_address: nil)), class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}"
+        = link_to organization_bikes_path(search_params.merge(search_address: "with_street")), class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do
+          = t(".only_with_address_html")
+        = link_to organization_bikes_path(search_params.merge(search_address: "without_street")), class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do
+          = t(".only_no_address_html")
     %p.search-sort-btns
-      %span.sort-group-label= t(".stickers")
-      = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
-      = link_to organization_bikes_path(search_params.merge(search_stickers: "with")), class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do
-        = t(".only_with_stickers_html")
-      = link_to organization_bikes_path(search_params.merge(search_stickers: "none")), class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do
-        = t(".only_no_sticker_html")
-  - if current_organization.enabled?("reg_address")
-    %p.search-sort-btns
-      %span.sort-group-label= t(".address")
-      = link_to t(".all"), organization_bikes_path(search_params.merge(search_address: nil)), class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}"
-      = link_to organization_bikes_path(search_params.merge(search_address: "with_street")), class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do
-        = t(".only_with_address_html")
-      = link_to organization_bikes_path(search_params.merge(search_address: "without_street")), class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do
-        = t(".only_no_address_html")
-  %p.search-sort-btns
-    %span.sort-group-label= t(".status")
-    = link_to t(".all"), organization_bikes_path(search_params.merge(search_status: "all")), class: "btn btn-secondary #{@search_status == 'all' ? 'active' : ''}"
-    - if current_organization.enabled?("impound_bikes")
-      = link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")), class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do
-        = t(".only_not_impounded_html")
-      = link_to organization_bikes_path(search_params.merge(search_status: "impounded")), class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do
-        = t(".only_impounded_vehicles_html")
-    = link_to organization_bikes_path(search_params.merge(search_status: "with_owner")), class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do
-      = t(".only_with_owner_html")
-    = link_to organization_bikes_path(search_params.merge(search_status: "stolen")), class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do
-      = t(".only_stolen_html")
-  - if current_organization.enabled?("csv_exports")
-    %p.search-sort-btns.text-right
-      = link_to t(".create_export_of_vehicles", cycle_type: cycle_type), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
+      %span.sort-group-label= t(".status")
+      = link_to t(".all"), organization_bikes_path(search_params.merge(search_status: "all")), class: "btn btn-secondary #{@search_status == 'all' ? 'active' : ''}"
+      - if current_organization.enabled?("impound_bikes")
+        = link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")), class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do
+          = t(".only_not_impounded_html")
+        = link_to organization_bikes_path(search_params.merge(search_status: "impounded")), class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do
+          = t(".only_impounded_vehicles_html")
+      = link_to organization_bikes_path(search_params.merge(search_status: "with_owner")), class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do
+        = t(".only_with_owner_html")
+      = link_to organization_bikes_path(search_params.merge(search_status: "stolen")), class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do
+        = t(".only_stolen_html")
+    - if current_organization.enabled?("csv_exports")
+      %p.search-sort-btns.text-right
+        = link_to t(".create_export_of_vehicles", cycle_type: cycle_type), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
 
 
-%p.mt-4
-  - if @search_query_present || params[:search_stickers].present? || params[:search_address].present?
-    = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type))
-  - else
-    = t(".registered_bikes_html",
-    bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type),
-    org_name: current_organization.short_name)
-  %em
-    = humanized_time_range(@time_range)
-  - unless skip_view_just_stolen
-    - if @stolenness == 'all'
-      %a.float-right.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "stolen")), data: {stolenness: "stolen"}}
-        = t(".view_just_stolen_vehicles", cycle_type: cycle_type.pluralize(10))
+  %p.mt-4
+    - if @search_query_present || params[:search_stickers].present? || params[:search_address].present? || @model_audit.present?
+      = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type))
     - else
-      = t(".stolen_vehicles_html", cycle_type: cycle_type)
-      %a.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "all")), data: {stolenness: "all"}}
-        = t(".view_all_vehicles", cycle_type: cycle_type)
-  %a.float-right.less-strong{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb"}
-    = t(".settings")
+      = t(".registered_bikes_html",
+      bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type),
+      org_name: current_organization.short_name)
+    %em
+      = humanized_time_range(@time_range)
+    - unless skip_view_just_stolen
+      - if @stolenness == 'all'
+        %a.float-right.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "stolen")), data: {stolenness: "stolen"}}
+          = t(".view_just_stolen_vehicles", cycle_type: cycle_type.pluralize(10))
+      - else
+        = t(".stolen_vehicles_html", cycle_type: cycle_type)
+        %a.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "all")), data: {stolenness: "all"}}
+          = t(".view_all_vehicles", cycle_type: cycle_type)
+    %a.float-right.less-strong{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb"}
+      = t(".settings")
+  - if @model_audit.present?
+    %p.mt-0
+      E-Vehicles for audit:
+      %a.gray-link{href: organization_model_audit_path(@model_audit.to_param, organization_id: current_organization.to_param)}
+        %strong= @model_audit.mnfg_name
+        %em= audit_frame_model_display(@model_audit)
+      &nbsp;
+      = link_to "view matching any audit", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "gray-link small"
 
 .full-screen-table.pl-lg-1.pr-lg-1
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
@@ -264,7 +275,8 @@
           - if show_avery_export # NOTE: this is outside of the cache for the bike
             %td.hiddenColumn.hidden-xs-down{class: "avery_cell"}
               = check_mark if bike.avery_exportable?
-- if @bikes.total_count > @bikes.count
+
+- if !only_show_bikes && @bikes.total_count > @bikes.count
   .paginate-container.paginate-container-bottom.row
     .col-sm-6.mb-2
       = paginate @bikes

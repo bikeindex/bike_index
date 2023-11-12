@@ -7,6 +7,8 @@ class SerialNormalizer
     "B" => "8"
   }.freeze
 
+  UNKNOWN_STRINGS = ["na", "idk", "no", "unkown", "no serial", "none", "tbd"].freeze
+
   def self.unknown_and_absent_corrected(str = nil)
     str = str.to_s.strip
     # Return unknown if blank, '?' or 'absent' (legacy concern - 'unknown' used to be stored as 'absent')
@@ -22,7 +24,7 @@ class SerialNormalizer
   end
 
   def self.looks_like_unknown?(str_downcase)
-    return true if ["na", "idk", "no", "unkown", "no serial", "none", "tbd"].include?(str_downcase) # specific things
+    return true if UNKNOWN_STRINGS.include?(str_downcase) # specific things
     if str_downcase[/(no)|(remember)/].present?
       return true if str_downcase[/unkno/].present?
       return true if str_downcase[/(do.?n.?t)|(not?).?k?no/].present? # Don't know

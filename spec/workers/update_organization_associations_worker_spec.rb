@@ -105,7 +105,7 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
   describe "UpdateModelAuditWorker" do
     let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
     let(:model_audit) { FactoryBot.create(:model_audit) }
-    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, model_audit: model_audit) }
+    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, model_audit: model_audit, manufacturer: model_audit.manufacturer, frame_model: model_audit.frame_model) }
     it "enqueues all the model model_audits" do
       # there might be a more performant way of dealing with this but I think this is good enough
       Sidekiq::Worker.clear_all
@@ -114,6 +114,8 @@ RSpec.describe UpdateOrganizationAssociationsWorker, type: :job do
       Sidekiq::Testing.inline! do
         instance.perform(organization.id)
       end
+      expect(bike.reload.model_audit_id).to eq model_audit.id
+      expect(model_audit.reload.matching_bike?(bike)).to be_truthy
       expect(OrganizationModelAudit.count).to eq 1
     end
   end

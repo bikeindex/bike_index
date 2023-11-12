@@ -1,0 +1,81 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Model Audits
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "Mnfg Other", url_for(sortable_search_params.merge(search_mnfg_other: !@mnfg_other)), class: "nav-link #{@mnfg_other ? 'active' : ''}"
+      %li.nav-item
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Logged Searches"}
+
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_model_audits, column: @time_range_column), stacked: true, thousands: ","
+
+.mt-2
+  = render partial: "/shared/period_select"
+
+.mt-4
+
+- if params[:search_mnfg_name].present?
+  %p
+    Viewing only audits from
+    %strong from
+    %code= params[:search_mnfg_name]
+    = link_to "view from any manufacturer", url_for(sortable_search_params.merge(search_mnfg_name: nil)), class: "gray-link small"
+
+= render partial: "/shared/pagination", locals: {collection: @model_audits}
+
+- skip_manufacturer_search ||= false
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th.small
+        = sortable "created_at"
+      %th.small
+        = sortable "updated_at"
+      %th
+        = sortable "mnfg_name", "Manufacturer"
+      %th
+        %small Mnfg other
+      %th
+        = sortable "frame_model", "Model"
+      %th
+        = sortable "bikes_count", "Vehicles #"
+      %td
+        Org vehicles
+      %td
+        Attestations
+    %tbody
+      - @model_audits.each do |model_audit|
+        - cache(model_audit) do
+          %tr
+            %td
+              %span.convertTime= l model_audit.created_at, format: :convert_time
+
+            %td.small
+              %span.convertTime= l model_audit.updated_at, format: :convert_time
+            %td
+              = model_audit.mnfg_name
+              - unless skip_manufacturer_search
+                %small= link_to "🔎", url_for(sortable_search_params.merge(search_mnfg_name: model_audit.mnfg_name))
+            %td.table-cell-check
+              = check_mark if model_audit.manufacturer_other.present?
+            %td
+              = audit_frame_model_display(model_audit)
+            %td
+              = admin_number_display(model_audit.bikes_count)
+            %td
+              - model_audit.organization_model_audits.where.not(bikes_count: 0).pluck(:bikes_count, :organization_id).each do |bikes_count, org_id|
+                %a.small{href: organization_model_audits_path(organization_id: org_id, model_audit_id: model_audit.id)}
+                  = admin_number_display(bikes_count)
+                  for
+                  = "id##{org_id}"
+            %td
+              = admin_number_display(model_audit.model_attestations.count)
+
+
+
+= render partial: "/shared/pagination", locals: {collection: @model_audits, skip_total: true}

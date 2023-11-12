@@ -5,11 +5,21 @@ module Organized
     before_action :set_period, only: [:index]
 
     def index
+      @page_title = "E-Vehicle Audits"
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @organization_model_audits = organization_model_audits
         .reorder("#{scoped_sort_column} #{sort_direction}")
         .page(@page).per(@per_page)
+    end
+
+    def show
+      @model_audit = ModelAudit.find(params[:id])
+      @model_attestations = @model_audit.model_attestations
+      @organization_model_audit = @model_audit.organization_model_audits.where(organization_id: current_organization.id).first
+      bikes = @organization_model_audits&.bikes
+      @bikes_count = @organization_model_audit&.bikes_count || 0
+      @bikes = bikes&.page(1)&.per_page(10) || Bike.none
     end
 
     # NOTE: This is really "create model_attestation"
@@ -56,14 +66,17 @@ module Organized
 
     def organization_model_audits
       organization_model_audits = OrganizationModelAudit.where(organization_id: current_organization.id)
+        .joins(:model_audit)
       if InputNormalizer.boolean(params[:search_zero])
         @time_range_column = "updated_at" # Can't be last_bike_created_at, since it's nil
       else
         @time_range_column = "last_bike_created_at"
         organization_model_audits = organization_model_audits.where.not(bikes_count: 0)
       end
+      if params[:search_mnfg_name].present?
+        organization_model_audits = organization_model_audits.where(model_audits: {mnfg_name: params[:search_mnfg_name]})
+      end
       organization_model_audits.where(@time_range_column => @time_range)
-        .joins(:model_audit)
     end
 
     def ensure_access_to_model_audits!

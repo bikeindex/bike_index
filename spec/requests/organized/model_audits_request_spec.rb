@@ -50,6 +50,18 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
       end
     end
 
+    describe "show" do
+      let(:model_audit) { FactoryBot.create(:model_audit) }
+      let!(:model_attestation) { FactoryBot.create(:model_attestation, organization: current_organization, model_audit: model_audit) }
+      it "renders" do
+        get "#{base_url}/#{model_audit.id}"
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:show)
+        expect(assigns(:model_attestations).pluck(:id)).to eq([model_attestation.id])
+        # It renders with a model attestation too
+      end
+    end
+
     describe "update create" do
       it "creates a model_attestation" do
         expect(organization_model_audit.model_attestations.count).to eq 0
