@@ -2,8 +2,9 @@
 production:
   :concurrency: 10
 :queues:
-  - low_priority # Lowest priority, general things, non-user-facing
-  - [carrierwave, 2] # Also includes file_caching/tsv creation
-  - [notify, 20] # sending email & notifications
-  - [high_priority, 20] # User facing updates, execute immediately
+  - update_model_audit
+  - [low_priority, 10] # Lowest priority, general things, non-user-facing
+  - [carrierwave, 20] # Also includes file_caching/tsv creation
+  - [notify, 200] # sending email & notifications
+  - [high_priority, 200] # User facing updates, execute immediately
   

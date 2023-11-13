@@ -1,5 +1,5 @@
 class UpdateModelAuditWorker < ApplicationWorker
-  sidekiq_options queue: "low_priority", retry: 2
+  sidekiq_options queue: "update_model_audit", retry: 2
 
   def self.enqueue_for?(bike)
     return false if bike.example? || bike.deleted? || bike.likely_spam?
