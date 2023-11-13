@@ -1,5 +1,6 @@
 class UpdateModelAuditWorker < ApplicationWorker
-  sidekiq_options queue: "update_model_audit", retry: 2
+  sidekiq_options queue: "low_priority", retry: 2
+  REDLOCK_PREFIX = "UMAW-#{Rails.env.slice(0, 3)}"
 
   def self.enqueue_for?(bike)
     return false if bike.example? || bike.deleted? || bike.likely_spam?
@@ -9,7 +10,24 @@ class UpdateModelAuditWorker < ApplicationWorker
     ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
   end
 
+  def lock_duration_ms
+    (10.minutes * 1000).to_i
+  end
+
+  def redlock_key(model_audit_id, bike_id)
+    "#{REDLOCK_PREFIX}-#{model_audit_id}-#{bike_id}"
+  end
+
+  def new_lock
+    Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
+  end
+
   def perform(model_audit_id = nil, bike_id = nil)
+    return
+    lock_manager = new_lock
+    redlock = lock_manager.lock(redlock_key(model_audit_id, bike_id), lock_duration_ms)
+    return unless redlock
+
     model_audit, matching_bikes = model_audit_and_matching_bikes(model_audit_id, bike_id)
     return if model_audit.blank?
     # If there are 0 counted bikes, and should be deleted when there are no bikes:
@@ -43,6 +61,9 @@ class UpdateModelAuditWorker < ApplicationWorker
     model_audit.reload.update(updated_at: Time.current)
     organization_ids_to_enqueue_for_model_audits
       .each { |id| update_org_model_audit(model_audit, id) }
+
+    # Unlock!
+    lock_manager.unlock(redlock)
   end
 
   private

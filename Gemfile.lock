@@ -575,6 +575,8 @@ GEM
       redis-client (>= 0.17.0)
     redis-client (0.17.1)
       connection_pool
+    redlock (2.0.6)
+      redis-client (>= 0.14.1, < 1.0.0)
     regexp_parser (2.5.0)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -829,6 +831,7 @@ DEPENDENCIES
   rails-i18n
   rb-fsevent (~> 0.10.3)
   redis
+  redlock
   rerun
   responders
   rqrcode (= 0.10.1)
