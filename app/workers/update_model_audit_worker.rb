@@ -1,6 +1,7 @@
 class UpdateModelAuditWorker < ApplicationWorker
-  sidekiq_options queue: "low_priority", retry: 2
   REDLOCK_PREFIX = "ModelAuditLock-#{Rails.env.slice(0, 3)}"
+
+  sidekiq_options queue: "low_priority", retry: 2
 
   def self.enqueue_for?(bike)
     return false if bike.example? || bike.deleted? || bike.likely_spam?

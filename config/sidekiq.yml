@@ -2,6 +2,7 @@
 production:
   :concurrency: 10
 :queues:
+  - update_model_audit # Shouldn't exist! Already removed.
   - low_priority # Lowest priority, general things, non-user-facing
   - [carrierwave, 2] # Also includes file_caching/tsv creation
   - [notify, 20] # sending email & notifications
