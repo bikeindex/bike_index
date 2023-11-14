@@ -1,6 +1,6 @@
 class UpdateModelAuditWorker < ApplicationWorker
   sidekiq_options queue: "low_priority", retry: 2
-  REDLOCK_PREFIX = "UMAW-#{Rails.env.slice(0, 3)}"
+  REDLOCK_PREFIX = "ModelAuditLock-#{Rails.env.slice(0, 3)}"
 
   def self.enqueue_for?(bike)
     return false if bike.example? || bike.deleted? || bike.likely_spam?
@@ -11,10 +11,12 @@ class UpdateModelAuditWorker < ApplicationWorker
   end
 
   def lock_duration_ms
-    (10.minutes * 1000).to_i
+    (5.minutes * 1000).to_i
   end
 
   def redlock_key(model_audit_id, bike_id)
+    # Don't include both model_audit_id and bike_id in key
+    bike_id = nil if model_audit_id.present?
     "#{REDLOCK_PREFIX}-#{model_audit_id}-#{bike_id}"
   end
 
@@ -23,47 +25,48 @@ class UpdateModelAuditWorker < ApplicationWorker
   end
 
   def perform(model_audit_id = nil, bike_id = nil)
-    return
     lock_manager = new_lock
     redlock = lock_manager.lock(redlock_key(model_audit_id, bike_id), lock_duration_ms)
     return unless redlock
 
-    model_audit, matching_bikes = model_audit_and_matching_bikes(model_audit_id, bike_id)
-    return if model_audit.blank?
-    # If there are 0 counted bikes, and should be deleted when there are no bikes:
-    # update any non-counted bikes (e.g. likely_spam) and delete it
-    if ModelAudit.counted_matching_bikes(matching_bikes).limit(1).blank? && model_audit.delete_if_no_bikes?
-      matching_bikes.find_each { |b| b.update(model_audit_id: nil) }
-      model_audit.bikes.find_each { |b| b.update(model_audit_id: nil) }
-      model_audit.destroy
-      # bike_id might have been passed - and if so, re-enqueue it if it should be
-      if bike_id.present? && self.class.enqueue_for?(Bike.find_by_id(bike_id))
-        self.class.perform_async(nil, bike_id)
+    begin
+      model_audit, matching_bikes = model_audit_and_matching_bikes(model_audit_id, bike_id)
+      return if model_audit.blank?
+      # If there are 0 counted bikes, and should be deleted when there are no bikes:
+      # update any non-counted bikes (e.g. likely_spam) and delete it
+      if ModelAudit.counted_matching_bikes(matching_bikes).limit(1).blank? && model_audit.delete_if_no_bikes?
+        matching_bikes.find_each { |b| b.update(model_audit_id: nil) }
+        model_audit.bikes.find_each { |b| b.update(model_audit_id: nil) }
+        model_audit.destroy
+        # bike_id might have been passed - and if so, re-enqueue it if it should be
+        if bike_id.present? && self.class.enqueue_for?(Bike.find_by_id(bike_id))
+          self.class.perform_async(nil, bike_id)
+        end
+        return
       end
-      return
+      other_model_audit_ids = matching_bikes.reorder(:model_audit_id).distinct.pluck(:model_audit_id).compact - [model_audit.id]
+      # Assign all the matching bikes to the model_audit
+      matching_bikes.where.not(model_audit_id: model_audit_id).or(matching_bikes.where(model_audit_id: nil)).find_each do |b|
+        b.update(model_audit_id: model_audit.id)
+      end
+      other_model_audit_ids.each_with_index { |id, inx| self.class.perform_in(inx * 15, id) }
+      # Update bikes with manufacturer_other. If any bikes are updated, re-enqueue to prevent non_matching mixups
+      if manufacturer_other_update(model_audit)
+        return self.class.perform_async(model_audit.id)
+      end
+      # Update all non_matching bikes (so they aren't accidentally processed in update_org_model_audit)
+      non_matching_bike_ids = model_audit.bikes.pluck(:id) - matching_bikes.pluck(:id)
+      Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
+      # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
+      non_matching_bike_ids.each_with_index { |id, inx| self.class.perform_in(inx * 15, nil, id) }
+      # Update the model_audit to set the certification_status. Bust admin cache
+      model_audit.reload.update(updated_at: Time.current)
+      organization_ids_to_enqueue_for_model_audits
+        .each { |id| update_org_model_audit(model_audit, id) }
+    ensure
+      # Unlock!
+      lock_manager.unlock(redlock)
     end
-    other_model_audit_ids = matching_bikes.reorder(:model_audit_id).distinct.pluck(:model_audit_id).compact - [model_audit.id]
-    # Assign all the matching bikes to the model_audit
-    matching_bikes.where.not(model_audit_id: model_audit_id).or(matching_bikes.where(model_audit_id: nil)).find_each do |b|
-      b.update(model_audit_id: model_audit.id)
-    end
-    other_model_audit_ids.each_with_index { |id, inx| self.class.perform_in(inx * 15, id) }
-    # Update bikes with manufacturer_other. If any bikes are updated, re-enqueue to prevent non_matching mixups
-    if manufacturer_other_update(model_audit)
-      return self.class.perform_async(model_audit.id)
-    end
-    # Update all non_matching bikes (so they aren't accidentally processed in update_org_model_audit)
-    non_matching_bike_ids = model_audit.bikes.pluck(:id) - matching_bikes.pluck(:id)
-    Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
-    # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
-    non_matching_bike_ids.each_with_index { |id, inx| self.class.perform_in(inx * 15, nil, id) }
-    # Update the model_audit to set the certification_status. Bust admin cache
-    model_audit.reload.update(updated_at: Time.current)
-    organization_ids_to_enqueue_for_model_audits
-      .each { |id| update_org_model_audit(model_audit, id) }
-
-    # Unlock!
-    lock_manager.unlock(redlock)
   end
 
   private

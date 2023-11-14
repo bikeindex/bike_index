@@ -77,7 +77,15 @@ class ModelAudit < ApplicationRecord
     ModelAttestation.kind_humanized(certification_status)
   end
 
-   def set_calculated_attributes
+  def cycle_type_name
+    CycleType.new(cycle_type)&.name
+  end
+
+  def propulsion_type_name
+    PropulsionType.new(propulsion_type).name
+  end
+
+  def set_calculated_attributes
     self.manufacturer_other = nil if manufacturer_id != Manufacturer.other.id
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.certification_status = calculated_certification_status
