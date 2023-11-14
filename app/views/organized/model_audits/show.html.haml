@@ -23,7 +23,7 @@
         %tr
           %td Vehicle type
           %td
-            = @model_audit.cycle_type
+            = @model_audit.cycle_type_name
         %tr
           %td Propulsion
           %td
@@ -85,5 +85,6 @@
             = link_to truncate(model_attestation.url), model_attestation.url
 
 -# TODO: Actually render!
--# %h2 Vehicles
--# = render partial: "/organized/bikes/search", locals: {only_show_bikes: true}
+%h2
+  Vehicles '#{@bikes.count}'
+= render partial: "/organized/bikes/search", locals: {only_show_bikes: true}
