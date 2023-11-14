@@ -17,9 +17,9 @@ module Organized
       @model_audit = ModelAudit.find(params[:id])
       @model_attestations = @model_audit.model_attestations
       @organization_model_audit = @model_audit.organization_model_audits.where(organization_id: current_organization.id).first
-      bikes = @organization_model_audits&.bikes
-      @bikes_count = @organization_model_audit&.bikes_count || 0
-      @bikes = bikes&.page(1)&.per_page(10) || Bike.none
+      bikes = @organization_model_audit&.bikes
+      # @bikes_count = @organization_model_audit&.bikes_count || 0
+      @bikes = bikes&.page(1)&.per(10) || Bike.none
     end
 
     # NOTE: This is really "create model_attestation"
