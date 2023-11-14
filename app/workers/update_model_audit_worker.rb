@@ -1,7 +1,7 @@
 class UpdateModelAuditWorker < ApplicationWorker
   REDLOCK_PREFIX = "ModelAuditLock-#{Rails.env.slice(0, 3)}"
 
-  sidekiq_options queue: "low_priority", retry: 2
+  sidekiq_options queue: "update_model_audit", retry: 2
 
   def self.enqueue_for?(bike)
     return false if bike.example? || bike.deleted? || bike.likely_spam?
@@ -50,7 +50,7 @@ class UpdateModelAuditWorker < ApplicationWorker
       matching_bikes.where.not(model_audit_id: model_audit_id).or(matching_bikes.where(model_audit_id: nil)).find_each do |b|
         b.update(model_audit_id: model_audit.id)
       end
-      other_model_audit_ids.each_with_index { |id, inx| self.class.perform_in(inx * 15, id) }
+      other_model_audit_ids.each { |id| self.class.perform_async(id) }
       # Update bikes with manufacturer_other. If any bikes are updated, re-enqueue to prevent non_matching mixups
       if manufacturer_other_update(model_audit)
         return self.class.perform_async(model_audit.id)
@@ -59,7 +59,7 @@ class UpdateModelAuditWorker < ApplicationWorker
       non_matching_bike_ids = model_audit.bikes.pluck(:id) - matching_bikes.pluck(:id)
       Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
       # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
-      non_matching_bike_ids.each_with_index { |id, inx| self.class.perform_in(inx * 15, nil, id) }
+      non_matching_bike_ids.each { |id| self.class.perform_async(nil, id) }
       # Update the model_audit to set the certification_status. Bust admin cache
       model_audit.reload.update(updated_at: Time.current)
       organization_ids_to_enqueue_for_model_audits
