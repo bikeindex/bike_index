@@ -1,5 +1,6 @@
 class UpdateModelAuditWorker < ApplicationWorker
   REDLOCK_PREFIX = "ModelAuditLock-#{Rails.env.slice(0, 3)}"
+  SKIP_PROCESSING = ENV["SKIP_UPDATE_MODEL_AUDIT"]
 
   sidekiq_options queue: "update_model_audit", retry: 2
 
@@ -26,6 +27,7 @@ class UpdateModelAuditWorker < ApplicationWorker
   end
 
   def perform(model_audit_id = nil, bike_id = nil)
+    return if SKIP_PROCESSING
     lock_manager = new_lock
     redlock = lock_manager.lock(redlock_key(model_audit_id, bike_id), lock_duration_ms)
     return unless redlock
