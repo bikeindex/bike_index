@@ -23,6 +23,7 @@ chdir APP_ROOT do
   system('bin/yarn')
 
   puts "\n== Preparing and seeding database =="
+  # NOTE: only loading db:structure on primary, because primary_replica is the same db in dev
   system "bin/rake db:create db:structure:load:primary db:migrate db:seed"
   system "bin/rake seed_test_users_and_bikes"
 
