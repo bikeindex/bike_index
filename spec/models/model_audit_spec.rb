@@ -37,6 +37,36 @@ RSpec.describe ModelAudit, type: :model do
     end
   end
 
+  describe "audit?" do
+    let(:bike) { Bike.new(propulsion_type: "foot-pedal", model_audit_id: 11) }
+    it "returns false" do
+      expect(ModelAudit.audit?(bike)).to be_falsey
+    end
+    context "not motorized" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:bike) { FactoryBot.build(:bike, frame_model: frame_model, propulsion_type: "hand-pedal", manufacturer: manufacturer) }
+      let(:frame_model) { "unkown" }
+      it "returns false" do
+        expect(ModelAudit.unknown_model?(bike)).to be_truthy
+        expect(ModelAudit.audit?(bike)).to be_falsey
+      end
+      context "with not unknown frame_model" do
+        let(:frame_model) { "something" }
+        it "returns true" do
+          expect(ModelAudit.audit?(bike)).to be_truthy
+        end
+      end
+      context "with manufacturer motorized_only" do
+        let(:manufacturer) { FactoryBot.create(:manufacturer, motorized_only: true) }
+        let(:frame_model) { nil }
+        it "returns true" do
+          expect(ModelAudit.unknown_model?(bike)).to be_truthy
+          expect(ModelAudit.audit?(bike)).to be_truthy
+        end
+      end
+    end
+  end
+
   describe "matching_bikes_for" do
     context "frame model nil" do
       let(:bike1) { FactoryBot.create(:bike, frame_model: nil) }

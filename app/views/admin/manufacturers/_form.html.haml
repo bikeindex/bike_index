@@ -28,6 +28,10 @@
     = f.check_box :frame_maker
 
   .form-group
+    = f.label :motorized_only
+    = f.check_box :motorized_only
+
+  .form-group
     = f.label :logo
     - if @manufacturer.logo?
       = image_tag(@manufacturer.logo_url(:thumb))

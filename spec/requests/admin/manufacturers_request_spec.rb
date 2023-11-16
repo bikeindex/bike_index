@@ -14,7 +14,8 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       open_year: 1992,
       close_year: 89898,
       description: "new description",
-      twitter_name: "cool-name"
+      twitter_name: "cool-name",
+      motorized_only: true
     }
   end
 

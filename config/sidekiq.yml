@@ -2,9 +2,9 @@
 production:
   :concurrency: 10
 :queues:
-  - update_model_audit # UpdateModelAudit can take a really long time and block things
+  - blockable # Things that can take a really long time and might get dropped if the queue backs up
   - [low_priority, 10] # Lowest priority, general things, non-user-facing
   - [carrierwave, 20] # Also includes file_caching/tsv creation
-  - [notify, 200] # sending email & notifications
-  - [high_priority, 200] # User facing updates, execute immediately
+  - [notify, 200] # sending email & notifications - NOTE: has a dedicated queue
+  - [high_priority, 200] # User facing updates, execute immediately - NOTE: has a dedicated queue
   
