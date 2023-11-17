@@ -28,7 +28,7 @@ class Admin::BikesController < Admin::BaseController
       end
       # Needs to happen after the manufacturer has been assigned
       Bike.unscoped.where(id: bike_ids).distinct.pluck(:model_audit_id)
-        .each_with_index { |i| UpdateModelAuditWorker.perform_async(i) }
+        .each_with_index { |i| FindOrCreateModelAuditWorker.perform_async(i) }
       flash[:success] = "Success. #{bike_ids.count} Bikes updated"
     else
       flash[:notice] = "Sorry, you need to add bikes and a manufacturer"

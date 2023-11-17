@@ -24,6 +24,13 @@ class ModelAudit < ApplicationRecord
     UNKNOWN_STRINGS.include?(frame_model.downcase)
   end
 
+  def self.audit?(bike)
+    return true if bike.motorized? || bike.manufacturer&.motorized_only?
+    return false if unknown_model?(bike.frame_model)
+    # Also enqueue if any matching bikes have a model_audit
+    ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
+  end
+
   def self.matching_bikes_for_frame_model(bikes, frame_model: nil)
     if unknown_model?(frame_model)
       bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))

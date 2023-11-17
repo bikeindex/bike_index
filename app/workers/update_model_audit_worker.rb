@@ -1,15 +1,16 @@
+# This updates all matching bikes that ought to be updated
+# saving bikes takes a LONG time - so this uses redlock to ensure
 class UpdateModelAuditWorker < ApplicationWorker
   REDLOCK_PREFIX = "ModelAuditLock-#{Rails.env.slice(0, 3)}"
   SKIP_PROCESSING = ENV["SKIP_UPDATE_MODEL_AUDIT"]
 
-  sidekiq_options queue: "update_model_audit", retry: 2
+  sidekiq_options queue: "droppable", retry: 2
 
-  def self.enqueue_for?(bike)
-    return false if bike.example? || bike.deleted? || bike.likely_spam?
-    return true if bike.model_audit_id.present?
-    return true if bike.motorized? && bike.frame_model.present?
-    # Also enqueue if any matching bikes have a model_audit
-    ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
+  # Not sure we actually want this method...
+  def self.enqueue_for?(model_audit)
+    return false if model_audit.updated_at > Time.current - 1.minute # Or if currently locked?
+    return true if OrganizationModelAudit.missing_for(model_audit)
+    model_audit.bikes_count != ModelAudit.counted_matching_bikes(model_audit.matching_bikes).count
   end
 
   def lock_duration_ms
@@ -26,7 +27,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
   end
 
-  def perform(model_audit_id = nil, bike_id = nil)
+  def perform(model_audit_id = nil)
     return if SKIP_PROCESSING
     lock_manager = new_lock
     redlock = lock_manager.lock(redlock_key(model_audit_id, bike_id), lock_duration_ms)
@@ -130,12 +131,12 @@ class UpdateModelAuditWorker < ApplicationWorker
       cycle_type: cycle_type)
   end
 
-  def organization_ids_to_enqueue_for_model_audits
-    # We enqueue every single model_audit when it's turned on for an org for the first time
-    # ... So one we start creating model_audits, keep updating them
-    (Organization.with_enabled_feature_slugs("model_audits").pluck(:id) +
-      OrganizationModelAudit.distinct.pluck(:organization_id)).uniq
-  end
+  # def organization_ids_to_enqueue_for_model_audits
+  #   # We enqueue every single model_audit when it's turned on for an org for the first time
+  #   # ... So one we start creating model_audits, keep updating them
+  #   (Organization.with_enabled_feature_slugs("model_audits").pluck(:id) +
+  #     OrganizationModelAudit.distinct.pluck(:organization_id)).uniq
+  # end
 
   def manufacturer_other_update(model_audit)
     mnfg_other_id = Manufacturer.other.id

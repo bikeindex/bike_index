@@ -42,26 +42,41 @@ RSpec.describe ModelAudit, type: :model do
     it "returns false" do
       expect(ModelAudit.audit?(bike)).to be_falsey
     end
+    context "motorized" do
+      let(:bike) { Bike.new(propulsion_type: "throttle") }
+      it "returns true" do
+        expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
+        expect(ModelAudit.audit?(bike)).to be_truthy
+      end
+    end
     context "not motorized" do
       let(:manufacturer) { FactoryBot.create(:manufacturer) }
       let(:bike) { FactoryBot.build(:bike, frame_model: frame_model, propulsion_type: "hand-pedal", manufacturer: manufacturer) }
       let(:frame_model) { "unkown" }
       it "returns false" do
-        expect(ModelAudit.unknown_model?(bike)).to be_truthy
+        expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
         expect(ModelAudit.audit?(bike)).to be_falsey
-      end
-      context "with not unknown frame_model" do
-        let(:frame_model) { "something" }
-        it "returns true" do
-          expect(ModelAudit.audit?(bike)).to be_truthy
-        end
       end
       context "with manufacturer motorized_only" do
         let(:manufacturer) { FactoryBot.create(:manufacturer, motorized_only: true) }
         let(:frame_model) { nil }
         it "returns true" do
-          expect(ModelAudit.unknown_model?(bike)).to be_truthy
+          expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
           expect(ModelAudit.audit?(bike)).to be_truthy
+        end
+      end
+      context "existing model_audit" do
+        let!(:existing_bike) { FactoryBot.create(:bike, manufacturer: manufacturer, frame_model: frame_model, model_audit_id: 12) }
+        it "returns false" do
+          expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
+          expect(ModelAudit.audit?(bike)).to be_falsey
+        end
+        context "with not unknown frame_model" do
+          let(:frame_model) { "something" }
+          it "returns true" do
+            expect(ModelAudit.unknown_model?(bike.frame_model)).to be_falsey
+            expect(ModelAudit.audit?(bike)).to be_truthy
+          end
         end
       end
     end
