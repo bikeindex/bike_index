@@ -105,6 +105,30 @@ RSpec.describe ModelAudit, type: :model do
     end
   end
 
+  describe "find_for" do
+    let!(:model_audit) { FactoryBot.create(:model_audit, manufacturer: manufacturer) }
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    let(:bike) { Bike.new(manufacturer: manufacturer, frame_model: model_audit.frame_model.upcase, mnfg_name: manufacturer.simple_name) }
+    it "finds the matching model_audit" do
+      expect(ModelAudit.find_for(bike)&.id).to eq model_audit.id
+    end
+    context "manufacturer_other and unknown_model" do
+      let!(:model_audit) { FactoryBot.create(:model_audit, manufacturer: Manufacturer.other, manufacturer_other: "Some Cool Name", frame_model: nil) }
+      let(:bike) { Bike.new(frame_model: "NA", manufacturer: Manufacturer.other, mnfg_name: "Some cool name") }
+      it "finds the matching model_audit" do
+        expect(ModelAudit.matching_manufacturer(Manufacturer.other.id, "Some Cool NAME").pluck(:id)).to eq([model_audit.id])
+        expect(ModelAudit.find_for(bike)&.id).to eq model_audit.id
+      end
+    end
+    context "manufacturer_other matching manufacturer" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "BH Bikes (Beistegui Hermanos)") }
+      let(:bike) { Bike.new(frame_model: model_audit.frame_model.upcase, manufacturer: Manufacturer.other, mnfg_name: "BH") }
+      it "finds the matching model_audit" do
+        expect(ModelAudit.find_for(bike)&.id).to eq model_audit.id
+      end
+    end
+  end
+
   describe "delete_if_no_bikes?" do
     let(:model_audit) { FactoryBot.create(:model_audit) }
     it "returns true" do

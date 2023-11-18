@@ -19,6 +19,29 @@ class ModelAudit < ApplicationRecord
     (certification_statuses.keys - ["certification_proof_url"])
   end
 
+  def self.manufacturer_id_corrected(manufacturer_id, mnfg_name)
+    if manufacturer_id == Manufacturer.other.id
+      manufacturer_id = Manufacturer.friendly_find_id(mnfg_name)
+    end
+    manufacturer_id
+  end
+
+  def self.matching_manufacturer(manufacturer_id, mnfg_name)
+    model_audits = where("mnfg_name ILIKE ?",  mnfg_name)
+    manufacturer_id = manufacturer_id_corrected(manufacturer_id, mnfg_name)
+    return model_audits if manufacturer_id == Manufacturer.other.id
+    model_audits.or(where(manufacturer_id: manufacturer_id))
+  end
+
+  def self.find_for(bike)
+    model_audits = matching_manufacturer(bike.manufacturer_id, bike.mnfg_name)
+    if unknown_model?(bike.frame_model)
+      model_audits.where(frame_model: nil)
+    else
+      model_audits.where("frame_model ILIKE ?", bike.frame_model)
+    end.first
+  end
+
   def self.unknown_model?(frame_model)
     return true if frame_model.blank?
     UNKNOWN_STRINGS.include?(frame_model.downcase)
@@ -26,6 +49,12 @@ class ModelAudit < ApplicationRecord
 
   def self.audit?(bike)
     return true if bike.motorized? || bike.manufacturer&.motorized_only?
+    if bike.manufacturer.other?
+      manufacturer_id = manufacturer_id_corrected(bike.manufacturer_id, bike.mnfg_name)
+      if manufacturer_id != Manufacturer.other.id
+        return true if Manufacturer.find(manufacturer_id)&.motorized_only?
+      end
+    end
     return false if unknown_model?(bike.frame_model)
     # Also enqueue if any matching bikes have a model_audit
     ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
@@ -60,6 +89,11 @@ class ModelAudit < ApplicationRecord
   # WARNING! This is a calculated query. You should probably use the association
   def matching_bikes
     self.class.matching_bikes_for(nil, manufacturer_id: manufacturer_id, mnfg_name: mnfg_name, frame_model: frame_model)
+  end
+
+  # WARNING! This is a calculated query.
+  def counted_matching_bikes
+    self.class.counted_matching_bikes(matching_bikes)
   end
 
   def matching_bike?(bike)

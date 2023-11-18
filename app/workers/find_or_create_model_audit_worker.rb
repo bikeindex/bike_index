@@ -4,31 +4,45 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
   def self.enqueue_for?(bike)
     return false if bike.example? || bike.deleted? || bike.likely_spam?
     return true if bike.model_audit_id.present?
-    return true if ModelAudit.audit?(bike)
+    ModelAudit.audit?(bike)
   end
 
   def perform(bike_id)
     bike = Bike.unscoped.find(bike_id)
-    if bike.model_audit.present?
-      if UpdateModelAuditWorker.enqueue_for?(bike.model_audit)
-        UpdateModelAuditWorker.perform_async(bike.model_audit_id)
+    if bike.model_audit_id.present?
+      if bike.model_audit&.matching_bike?(bike)
+        if UpdateModelAuditWorker.enqueue_for?(bike.model_audit)
+          UpdateModelAuditWorker.perform_async(bike.model_audit_id)
+        end
+        return
+      else
+        UpdateModelAuditWorker.perform_in(5, bike.model_audit_id)
+        # Do a fast update, to make sure it updates later
+        bike.update_attribute(:model_audit_id, nil)
       end
-      return
     end
 
-    matching_bikes = ModelAudit.matching_bikes_for(bike)
-    model_audit_ids = matching_bikes.reorder(:model_audit_id).distinct.pluck(:model_audit_id).compact.sort
-    if model_audit_ids.any?
-      # Assign model_audit_id to reduce the need to assign in UpdateModelAuditWorker
-      bike.update(model_audit_id: model_audit_ids.first)
-      model_audit_ids.each { |i| UpdateModelAuditWorker.perform_async(i) }
-    elsif ModelAudit.counted_matching_bikes(matching_bikes).limit(1).none?
-      # noop, there are no counted bikes
-      return
+    fix_bike_manufacturer(bike) if bike.manufacturer_id == Manufacturer.other.id
+
+    model_audit = ModelAudit.find_for(bike)
+    if model_audit.present?
+      bike.update(model_audit_id: model_audit.id)
     else
+      matching_bikes = ModelAudit.matching_bikes_for(bike)
+      # If there are no counted bike (i.e. this bike is a non-counted bike), don't create a model_audit
+      return if ModelAudit.counted_matching_bikes(matching_bikes).limit(1).none?
       model_audit = create_model_audit_for_bike(bike, matching_bikes)
       bike.update(model_audit_id: model_audit.id)
-      UpdateModelAuditWorker.perform_async(model_audit.id)
+    end
+
+    return unless UpdateModelAuditWorker.enqueue_for?(model_audit.reload)
+    UpdateModelAuditWorker.perform_async(model_audit.id)
+  end
+
+  def fix_bike_manufacturer(bike)
+    existing_manufacturer = Manufacturer.friendly_find(bike.mnfg_name)
+    if existing_manufacturer.present? && !existing_manufacturer.other?
+      bike.update_attribute(:manufacturer_id, existing_manufacturer.id)
     end
   end
 

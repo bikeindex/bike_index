@@ -1910,7 +1910,8 @@ CREATE TABLE public.manufacturers (
     logo_source character varying(255),
     twitter_name character varying,
     priority integer,
-    motorized_only boolean DEFAULT false
+    motorized_only boolean DEFAULT false,
+    secondary_slug character varying
 );
 
 

@@ -72,6 +72,7 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
     it "creates a model_audit" do
       expect(bike1.model_audit_id).to be_blank
       expect(bike2.model_audit_id).to be_blank
+      Sidekiq::Worker.clear_all
       expect {
         expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
         instance.perform(bike1.id)
@@ -79,7 +80,92 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
       new_model_audit = bike1.reload.model_audit
       expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
       expect_attrs_to_match_hash(new_model_audit, basic_target_attributes)
+      # Organization model audits are created by UpdateModelAuditWorker
       expect(new_model_audit.organization_model_audits.count).to eq 0
+      expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
+    end
+    context "matching model_audit exists" do
+      let(:model_audit) { FactoryBot.create(:model_audit, manufacturer: manufacturer, frame_model: frame_model1) }
+      def expect_assigned_to_model_audit
+        expect(bike2.model_audit_id).to eq model_audit.id
+        expect(model_audit.reload.matching_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+        Sidekiq::Worker.clear_all
+        expect {
+          instance.perform(bike1.id)
+        }.to change(ModelAudit, :count).by 0
+        expect(bike1.reload.model_audit_id).to eq model_audit.id
+        expect(bike2.reload.model_audit_id).to eq model_audit.id
+      end
+      it "assigns bike to model_audit" do
+        expect_assigned_to_model_audit
+
+        expect(model_audit.reload.bikes_count).to eq 0
+        expect(model_audit.matching_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+        expect(UpdateModelAuditWorker.enqueue_for?(model_audit)).to be_truthy
+        expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([model_audit.id])
+      end
+      context "UpdateModelAuditWorker.enqueue_for? false" do
+        before { allow(UpdateModelAuditWorker).to receive(:enqueue_for?) { false } }
+        it "assigns bike, doesn't enqueue" do
+          expect_assigned_to_model_audit
+
+          expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([])
+        end
+      end
+      context "manufacturer other" do
+        let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Segway Ninebot (Ninebot)", motorized_only: true) }
+        let!(:bike1) { FactoryBot.create(:bike, frame_model: "iDK", manufacturer: Manufacturer.other, manufacturer_other: "Ninebot") }
+        let(:frame_model1) { nil }
+        let(:frame_model2) { "Unknown" }
+        it "assigns the model_audit" do
+          expect(bike2.model_audit_id).to eq model_audit.id
+          Sidekiq::Worker.clear_all
+          # This adds some extra calculations, but I think it's worth it
+          expect(described_class.enqueue_for?(bike1)).to be_truthy
+          expect {
+            expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id])
+            instance.perform(bike1.id)
+          }.to change(ModelAudit, :count).by 0
+          expect(bike1.reload.model_audit_id).to eq model_audit.id
+          expect(bike1.manufacturer_id).to eq manufacturer.id
+          expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([model_audit.id])
+          # expect that the matching is corrected!
+          expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
+        end
+      end
+    end
+    context "not matching model_audit" do
+      let(:model_audit) { FactoryBot.create(:model_audit) }
+      # This test replicates what would happen if a user updated a bike and it no longer matched the vehicle
+      it "enqueues update for model, creates new_model_audit" do
+        Sidekiq::Worker.clear_all
+        expect(bike2.model_audit_id).to eq model_audit.id
+        expect(model_audit.reload.matching_bikes.pluck(:id)).to eq([])
+        expect {
+          # NOTE: Enqueues bike2
+          instance.perform(bike2.id)
+        }.to change(ModelAudit, :count).by 1
+        expect(bike1.reload.model_audit_id).to be_blank
+        expect(bike2.reload.model_audit_id).to_not be_blank
+
+        new_model_audit = bike2.reload.model_audit
+        expect(new_model_audit.id).to_not eq model_audit.id
+        expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(frame_model: "Party MODEL"))
+        expect(new_model_audit.organization_model_audits.count).to eq 0
+        expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to match_array([model_audit.id, new_model_audit.id])
+      end
+    end
+    context "deleted model_audit" do
+      it "updates" do
+        bike1.update(model_audit_id: 12)
+        Sidekiq::Worker.clear_all
+        expect {
+          instance.perform(bike1.id)
+        }.to change(ModelAudit, :count).by 1
+        new_model_audit = bike1.reload.model_audit
+        expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(cycle_type: "bike"))
+        expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to match_array([12, new_model_audit.id])
+      end
     end
     context "likely_spam and example" do
       it "does not create a model_audit" do
@@ -91,6 +177,7 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
           expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
           instance.perform(bike1.id)
         }.to change(ModelAudit, :count).by 0
+        expect(UpdateModelAuditWorker.jobs.count).to eq 0
       end
     end
     context "user_hidden and deleted" do
@@ -106,6 +193,7 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
         new_model_audit = bike1.reload.model_audit
         expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
         expect_attrs_to_match_hash(new_model_audit, basic_target_attributes)
+        expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
       end
     end
   end

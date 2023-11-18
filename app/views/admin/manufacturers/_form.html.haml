@@ -6,6 +6,10 @@
   .form-group
     = f.label :name
     = f.text_field :name, class: "form-control"
+    - if @manufacturer.id.present?
+      %small.below-input-help
+        %span.less-strong Secondary name (name in parentheses):
+        = @manufacturer.secondary_name.present? ? @manufacturer.secondary_name : nil
 
   .form-group
     = f.label :website

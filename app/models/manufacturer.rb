@@ -13,6 +13,7 @@ class Manufacturer < ApplicationRecord
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :slug
+  validates_uniqueness_of :secondary_slug, allow_nil: true
   validate :ensure_non_blocking_name
 
   default_scope { order(:name) }
@@ -26,13 +27,20 @@ class Manufacturer < ApplicationRecord
       logo_cache logo_source description].map(&:to_sym).freeze
   end
 
+  # Search in the paretheses
+  def self.find_by_secondary_slug(str)
+    return nil if str.blank?
+    super
+  end
+
   def self.friendly_find(n)
     return nil if n.blank?
     if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
       where(id: n).first
     else
       ns = Slugifyer.manufacturer(n)
-      find_by_slug(ns) || find_by_slug(fill_stripped(ns))
+      find_by_slug(ns) || find_by_slug(fill_stripped(ns)) ||
+        find_by_secondary_slug(ns)
     end
   end
 
@@ -41,7 +49,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def self.other
-    where(name: "Other", frame_maker: true).first_or_create
+    @other ||= where(name: "Other", frame_maker: true).first_or_create
   end
 
   def self.fill_stripped(n)
@@ -92,8 +100,14 @@ class Manufacturer < ApplicationRecord
     errors.add(:name, :cannot_match_a_color_name) if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
   end
 
+  def secondary_name
+    s_name = name&.gsub(/\A[^\(]*/, "")&.gsub(/\(|\)/, "")
+    s_name.present? ? s_name : nil
+  end
+
   def set_calculated_attributes
     self.name = InputNormalizer.string(name)
+    self.secondary_slug = Slugifyer.manufacturer(secondary_name)
     self.slug = Slugifyer.manufacturer(name)
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
