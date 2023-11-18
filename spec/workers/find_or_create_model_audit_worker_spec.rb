@@ -127,8 +127,11 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
             instance.perform(bike1.id)
           }.to change(ModelAudit, :count).by 0
           expect(bike1.reload.model_audit_id).to eq model_audit.id
-          expect(bike1.manufacturer_id).to eq manufacturer.id
+          expect(bike1.manufacturer_id).to eq Manufacturer.other.id
           expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([model_audit.id])
+          # UpdateModelAuditWorker updates the manufacturer other
+          UpdateModelAuditWorker.drain
+          expect(bike1.reload.manufacturer_id).to eq manufacturer.id
           # expect that the matching is corrected!
           expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
         end

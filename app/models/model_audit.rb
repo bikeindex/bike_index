@@ -49,7 +49,7 @@ class ModelAudit < ApplicationRecord
 
   def self.audit?(bike)
     return true if bike.motorized? || bike.manufacturer&.motorized_only?
-    if bike.manufacturer.other?
+    if bike.manufacturer&.other?
       manufacturer_id = manufacturer_id_corrected(bike.manufacturer_id, bike.mnfg_name)
       if manufacturer_id != Manufacturer.other.id
         return true if Manufacturer.find(manufacturer_id)&.motorized_only?
@@ -81,9 +81,9 @@ class ModelAudit < ApplicationRecord
       .reorder(id: :desc)
   end
 
-  def self.counted_matching_bikes(bikes)
+  def self.counted_matching_bikes_count(bikes)
     # As of now, user_hidden isn't normally visible in orgs. Not sure what to do about that?
-    bikes.where(example: false, deleted_at: nil, likely_spam: false)
+    bikes.where(example: false, deleted_at: nil, likely_spam: false).count
   end
 
   # WARNING! This is a calculated query. You should probably use the association
@@ -92,8 +92,8 @@ class ModelAudit < ApplicationRecord
   end
 
   # WARNING! This is a calculated query.
-  def counted_matching_bikes
-    self.class.counted_matching_bikes(matching_bikes)
+  def counted_matching_bikes_count
+    self.class.counted_matching_bikes_count(matching_bikes)
   end
 
   def matching_bike?(bike)

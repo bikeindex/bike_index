@@ -30,7 +30,7 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
     else
       matching_bikes = ModelAudit.matching_bikes_for(bike)
       # If there are no counted bike (i.e. this bike is a non-counted bike), don't create a model_audit
-      return if ModelAudit.counted_matching_bikes(matching_bikes).limit(1).none?
+      return if ModelAudit.counted_matching_bikes_count(matching_bikes) == 0
       model_audit = create_model_audit_for_bike(bike, matching_bikes)
       bike.update(model_audit_id: model_audit.id)
     end

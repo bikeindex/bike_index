@@ -8,29 +8,34 @@ class UpdateModelAuditWorker < ApplicationWorker
 
   # Not sure we actually want this method...
   def self.enqueue_for?(model_audit)
-    return false if false # TODO: check if currently locked
+    return false if locked_for?(model_audit.id)
     return true if OrganizationModelAudit.missing_for?(model_audit)
-    model_audit.bikes_count != model_audit.counted_matching_bikes.count
+    model_audit.bikes_count != model_audit.counted_matching_bikes_count
   end
 
-  def lock_duration_ms
-    (5.minutes * 1000).to_i
-  end
-
-  def redlock_key(model_audit_id, bike_id)
+  def self.redlock_key(model_audit_id)
     # Don't include both model_audit_id and bike_id in key
     bike_id = nil if model_audit_id.present?
     "#{REDLOCK_PREFIX}-#{model_audit_id}-#{bike_id}"
   end
 
-  def new_lock
+  def self.new_lock_manager
     Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
+  end
+
+  def self.locked_for?(model_audit_id)
+    lock_manager = new_lock_manager
+    lock_manager.locked?(redlock_key(model_audit_id))
+  end
+
+  def lock_duration_ms
+    (10.minutes * 1000).to_i
   end
 
   def perform(model_audit_id = nil)
     return if SKIP_PROCESSING
-    lock_manager = new_lock
-    redlock = lock_manager.lock(redlock_key(model_audit_id, bike_id), lock_duration_ms)
+    lock_manager = self.class.new_lock_manager
+    redlock = lock_manager.lock(self.class.redlock_key(model_audit_id), lock_duration_ms)
     return unless redlock
 
     begin
@@ -38,7 +43,7 @@ class UpdateModelAuditWorker < ApplicationWorker
       return if model_audit.blank?
       # If there are 0 counted bikes, and should be deleted when there are no bikes:
       # update any non-counted bikes (e.g. likely_spam) and delete it
-      if ModelAudit.counted_matching_bikes(matching_bikes).limit(1).blank? && model_audit.delete_if_no_bikes?
+      if ModelAudit.counted_matching_bikes_count(matching_bikes) == 0 && model_audit.delete_if_no_bikes?
         matching_bikes.find_each { |b| b.update(model_audit_id: nil) }
         model_audit.bikes.find_each { |b| b.update(model_audit_id: nil) }
         model_audit.destroy
@@ -91,7 +96,7 @@ class UpdateModelAuditWorker < ApplicationWorker
   #         model_audit_ids[1..].each { |id| self.class.perform_async(id) }
   #       end
   #       ModelAudit.find(model_audit_ids.first)
-  #     elsif ModelAudit.counted_matching_bikes(matching_bikes).limit(1).none?
+  #     elsif ModelAudit.counted_matching_bikes_count(matching_bikes).limit(1).none?
   #       return # Because there are no counted bikes
   #     else
   #       create_model_audit_for_bike(bike, matching_bikes)
