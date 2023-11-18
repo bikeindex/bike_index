@@ -36,7 +36,7 @@ _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby an
 
 ## Running Bike Index locally
 
-This explanation assumes you're familiar with developing Ruby on Rails applications.
+Follow [the Getting Started guide](docs/getting-started.markdown) for a complete set up. Or if you're familiar with developing Ruby on Rails applications start with these steps and a local Postgresql installation:
 
 - `bin/setup` sets up the application and seeds:
   - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
