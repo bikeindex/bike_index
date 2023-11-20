@@ -130,7 +130,7 @@ class ModelAudit < ApplicationRecord
     self.manufacturer_other = nil if manufacturer_id != Manufacturer.other.id
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.certification_status = calculated_certification_status
-    self.bikes_count = bikes.count
+    # self.bikes_count = bikes&.count || 0
   end
 
   private

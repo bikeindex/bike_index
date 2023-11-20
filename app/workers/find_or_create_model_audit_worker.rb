@@ -22,8 +22,6 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
       end
     end
 
-    fix_bike_manufacturer(bike) if bike.manufacturer_id == Manufacturer.other.id
-
     model_audit = ModelAudit.find_for(bike)
     if model_audit.present?
       bike.update(model_audit_id: model_audit.id)
@@ -37,13 +35,6 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
 
     return unless UpdateModelAuditWorker.enqueue_for?(model_audit.reload)
     UpdateModelAuditWorker.perform_async(model_audit.id)
-  end
-
-  def fix_bike_manufacturer(bike)
-    existing_manufacturer = Manufacturer.friendly_find(bike.mnfg_name)
-    if existing_manufacturer.present? && !existing_manufacturer.other?
-      bike.update_attribute(:manufacturer_id, existing_manufacturer.id)
-    end
   end
 
   def create_model_audit_for_bike(bike, matching_bikes)

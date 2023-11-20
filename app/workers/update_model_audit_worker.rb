@@ -29,7 +29,7 @@ class UpdateModelAuditWorker < ApplicationWorker
   end
 
   def lock_duration_ms
-    (10.minutes * 1000).to_i
+    (20.minutes * 1000).to_i
   end
 
   def perform(model_audit_id = nil)
@@ -39,38 +39,45 @@ class UpdateModelAuditWorker < ApplicationWorker
     return unless redlock
 
     begin
-      model_audit, matching_bikes = model_audit_and_matching_bikes(model_audit_id, bike_id)
+      model_audit = ModelAudit.find_by(id: model_audit_id)
       return if model_audit.blank?
+      matching_bikes = model_audit.matching_bikes
       # If there are 0 counted bikes, and should be deleted when there are no bikes:
       # update any non-counted bikes (e.g. likely_spam) and delete it
-      if ModelAudit.counted_matching_bikes_count(matching_bikes) == 0 && model_audit.delete_if_no_bikes?
-        matching_bikes.find_each { |b| b.update(model_audit_id: nil) }
-        model_audit.bikes.find_each { |b| b.update(model_audit_id: nil) }
+      counted_bikes = ModelAudit.counted_matching_bikes_count(matching_bikes)
+      if counted_bikes == 0 && model_audit.delete_if_no_bikes?
+        matching_bikes.update_all(model_audit_id: nil)
+        model_audit.bikes.update_all(model_audit_id: nil)
         model_audit.destroy
-        # bike_id might have been passed - and if so, re-enqueue it if it should be
-        if bike_id.present? && self.class.enqueue_for?(Bike.find_by_id(bike_id))
-          self.class.perform_async(nil, bike_id)
-        end
         return
       end
+
+          # Update bikes with manufacturer_other. If any bikes are updated, re-enqueue to prevent non_matching mixups
+          # if model_audit.manufacturer_id == Manufacturer.other.id
+          #   model_audit = fix_manufacturer(model_audit)
+          # end
+
       other_model_audit_ids = matching_bikes.reorder(:model_audit_id).distinct.pluck(:model_audit_id).compact - [model_audit.id]
       # Assign all the matching bikes to the model_audit
-      matching_bikes.where.not(model_audit_id: model_audit_id).or(matching_bikes.where(model_audit_id: nil)).find_each do |b|
-        b.update(model_audit_id: model_audit.id)
+      matching_bikes.where.not(model_audit_id: model_audit_id)
+        .or(matching_bikes.where(model_audit_id: nil)).find_each do |b|
+          # b.manufacturer_id = model_audit.manufacturer_id
+          b.update(model_audit_id: model_audit.id)
       end
       other_model_audit_ids.each { |id| self.class.perform_async(id) }
-      # Update bikes with manufacturer_other. If any bikes are updated, re-enqueue to prevent non_matching mixups
-      if manufacturer_other_update(model_audit)
-        return self.class.perform_async(model_audit.id)
-      end
+
       # Update all non_matching bikes (so they aren't accidentally processed in update_org_model_audit)
       non_matching_bike_ids = model_audit.bikes.pluck(:id) - matching_bikes.pluck(:id)
       Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
       # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
-      non_matching_bike_ids.each { |id| self.class.perform_async(nil, id) }
-      # Update the model_audit to set the certification_status. Bust admin cache
-      model_audit.reload.update(updated_at: Time.current)
-      organization_ids_to_enqueue_for_model_audits
+      non_matching_bike_ids.each_with_index do |id, inx|
+        FindOrCreateModelAuditWorker.perform_in(inx * 15, id)
+      end
+
+      # Update the model_audit to set the certification_status, bikes_count and bust admin cache
+      model_audit.reload.update(bikes_count: counted_bikes)
+
+      OrganizationModelAudit.organizations_to_audit.pluck(:id)
         .each { |id| update_org_model_audit(model_audit, id) }
     ensure
       # Unlock!
@@ -136,12 +143,13 @@ class UpdateModelAuditWorker < ApplicationWorker
   #     cycle_type: cycle_type)
   # end
 
-  # def organization_ids_to_enqueue_for_model_audits
-  #   # We enqueue every single model_audit when it's turned on for an org for the first time
-  #   # ... So one we start creating model_audits, keep updating them
-  #   (Organization.with_enabled_feature_slugs("model_audits").pluck(:id) +
-  #     OrganizationModelAudit.distinct.pluck(:organization_id)).uniq
-  # end
+  def fix_manufacturer(model_audit)
+    existing_manufacturer = Manufacturer.friendly_find(model_audit.mnfg_name)
+    existing_manufacturer ||= model_audit.matching_bikes.where.not(manufacturer_id: Manufacturer.other.id)
+    if existing_manufacturer.present? && !existing_manufacturer.other?
+      model_audit.update_attribute(:manufacturer_id, existing_manufacturer.id)
+    end
+  end
 
   def manufacturer_other_update(model_audit)
     mnfg_other_id = Manufacturer.other.id
