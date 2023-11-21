@@ -52,17 +52,18 @@ class UpdateModelAuditWorker < ApplicationWorker
         return
       end
 
-          # Update bikes with manufacturer_other. If any bikes are updated, re-enqueue to prevent non_matching mixups
-          # if model_audit.manufacturer_id == Manufacturer.other.id
-          #   model_audit = fix_manufacturer(model_audit)
-          # end
+      # Update bikes with manufacturer_other
+      if model_audit.manufacturer_id == Manufacturer.other.id
+        fix_manufacturer(model_audit, matching_bikes)
+      end
+      update_manufacturer = model_audit.manufacturer_id != Manufacturer.other.id
 
       other_model_audit_ids = matching_bikes.reorder(:model_audit_id).distinct.pluck(:model_audit_id).compact - [model_audit.id]
       # Assign all the matching bikes to the model_audit
-      matching_bikes.where.not(model_audit_id: model_audit_id)
-        .or(matching_bikes.where(model_audit_id: nil)).find_each do |b|
-          # b.manufacturer_id = model_audit.manufacturer_id
-          b.update(model_audit_id: model_audit.id)
+
+      bikes_to_update(matching_bikes, model_audit).find_each do |bike|
+        bike.manufacturer_id = model_audit.manufacturer_id if update_manufacturer
+        bike.update(model_audit_id: model_audit.id)
       end
       other_model_audit_ids.each { |id| self.class.perform_async(id) }
 
@@ -87,31 +88,6 @@ class UpdateModelAuditWorker < ApplicationWorker
 
   private
 
-  # def model_audit_and_matching_bikes(model_audit_id, bike_id)
-  #   bike = Bike.unscoped.find_by_id(bike_id) if bike_id.present?
-  #   model_audit_id ||= bike.model_audit_id
-  #   if model_audit_id.present?
-  #     model_audit = ModelAudit.find_by_id(model_audit_id)
-  #     matching_bikes = model_audit.matching_bikes
-  #   else
-  #     matching_bikes = ModelAudit.matching_bikes_for(bike)
-  #     model_audit_ids = matching_bikes.reorder(:model_audit_id).distinct.pluck(:model_audit_id).compact.sort
-  #     model_audit = if model_audit_ids.any?
-  #       # Delete any extraneous model_audits
-  #       # ModelAudit.where(id: model_audit_ids[1..]).destroy_all if model_audit_ids.count > 1
-  #       if model_audit_ids.count > 1
-  #         model_audit_ids[1..].each { |id| self.class.perform_async(id) }
-  #       end
-  #       ModelAudit.find(model_audit_ids.first)
-  #     elsif ModelAudit.counted_matching_bikes_count(matching_bikes).limit(1).none?
-  #       return # Because there are no counted bikes
-  #     else
-  #       create_model_audit_for_bike(bike, matching_bikes)
-  #     end
-  #   end
-  #   [model_audit, matching_bikes]
-  # end
-
   def update_org_model_audit(model_audit, organization_id)
     bikes = Bike.where(model_audit_id: model_audit.id).left_joins(:bike_organizations)
       .where(bike_organizations: {organization_id: organization_id}).reorder(:id)
@@ -130,38 +106,18 @@ class UpdateModelAuditWorker < ApplicationWorker
     end
   end
 
-  # def create_model_audit_for_bike(bike, matching_bikes)
-  #   propulsion_type = matching_bikes.detect { |b| b.propulsion_type != "foot-pedal" }&.propulsion_type
-  #   propulsion_type ||= matching_bikes.first&.propulsion_type
-  #   cycle_type = matching_bikes.detect { |b| b.cycle_type != "bike" }&.cycle_type
-  #   cycle_type ||= matching_bikes.first&.cycle_type
-  #   frame_model = ModelAudit.unknown_model?(bike.frame_model) ? nil : bike.frame_model
-  #   ModelAudit.create!(manufacturer_id: bike.manufacturer_id,
-  #     manufacturer_other: bike.manufacturer_other,
-  #     frame_model: frame_model,
-  #     propulsion_type: propulsion_type,
-  #     cycle_type: cycle_type)
-  # end
-
-  def fix_manufacturer(model_audit)
+  def fix_manufacturer(model_audit, matching_bikes)
     existing_manufacturer = Manufacturer.friendly_find(model_audit.mnfg_name)
-    existing_manufacturer ||= model_audit.matching_bikes.where.not(manufacturer_id: Manufacturer.other.id)
+    existing_manufacturer ||= matching_bikes.where.not(manufacturer_id: Manufacturer.other.id).first&.manufacturer
     if existing_manufacturer.present? && !existing_manufacturer.other?
-      model_audit.update_attribute(:manufacturer_id, existing_manufacturer.id)
+      model_audit.update(manufacturer_id: existing_manufacturer.id)
     end
   end
 
-  def manufacturer_other_update(model_audit)
-    mnfg_other_id = Manufacturer.other.id
-    manufacturer = model_audit.manufacturer if model_audit.manufacturer_id != mnfg_other_id
-    manufacturer ||= model_audit.bikes.where.not(manufacturer_id: mnfg_other_id).first&.manufacturer
-    manufacturer ||= Manufacturer.friendly_find(model_audit.mnfg_name)
-    return false if manufacturer.blank? || manufacturer.id == mnfg_other_id # Just in case friendly find...
-    if model_audit.manufacturer_id == mnfg_other_id
-      model_audit.update(manufacturer_id: manufacturer.id, manufacturer_other: nil)
-    end
-    bikes_updated = model_audit.bikes.where(manufacturer_id: mnfg_other_id).limit(1).present?
-    model_audit.bikes.where(manufacturer_id: mnfg_other_id).each { |b| b.update(manufacturer_id: manufacturer.id) }
-    bikes_updated
+  def bikes_to_update(matching_bikes, model_audit)
+    bikes = matching_bikes.where.not(model_audit_id: model_audit.id)
+      .or(matching_bikes.where(model_audit_id: nil))
+    return bikes if model_audit.manufacturer_id == Manufacturer.other.id
+    bikes.or(matching_bikes.where(manufacturer_id: Manufacturer.other.id))
   end
 end
