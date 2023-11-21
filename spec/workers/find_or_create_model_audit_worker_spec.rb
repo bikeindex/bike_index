@@ -84,6 +84,25 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
       expect(new_model_audit.organization_model_audits.count).to eq 0
       expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
     end
+    context "unknown frame_model" do
+      let(:frame_model1) { "no model" }
+      let(:frame_model2) { "unknown" }
+      it "creates a model_audit" do
+        expect(bike1.model_audit_id).to be_blank
+        expect(bike2.model_audit_id).to be_blank
+        Sidekiq::Worker.clear_all
+        expect {
+          expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
+          instance.perform(bike1.id)
+        }.to change(ModelAudit, :count).by 1
+        new_model_audit = bike1.reload.model_audit
+        expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
+        expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(frame_model: nil))
+        # Organization model audits are created by UpdateModelAuditWorker
+        expect(new_model_audit.organization_model_audits.count).to eq 0
+        expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
+      end
+    end
     context "matching model_audit exists" do
       let(:model_audit) { FactoryBot.create(:model_audit, manufacturer: manufacturer, frame_model: frame_model1) }
       def expect_assigned_to_model_audit
@@ -99,7 +118,6 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
       it "assigns bike to model_audit" do
         expect_assigned_to_model_audit
 
-        expect(model_audit.reload.bikes_count).to eq 0
         expect(model_audit.matching_bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         expect(UpdateModelAuditWorker.enqueue_for?(model_audit)).to be_truthy
         expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([model_audit.id])

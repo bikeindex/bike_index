@@ -105,6 +105,22 @@ RSpec.describe ModelAudit, type: :model do
     end
   end
 
+  describe "manufacturer_id_corrected" do
+    context "with matching manufacturer" do
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Specialized bikes") }
+      it "returns manufacturer_id" do
+        expect(ModelAudit.manufacturer_id_corrected(manufacturer.id, "Specialized")).to eq manufacturer.id
+        expect(ModelAudit.manufacturer_id_corrected(Manufacturer.other.id, "Specialized")).to eq manufacturer.id
+      end
+    end
+    context "other" do
+      let!(:manufacturer) { Manufacturer.other }
+      it "returns manufacturer other id" do
+        expect(ModelAudit.manufacturer_id_corrected(manufacturer.id, "Specialized")).to eq manufacturer.id
+      end
+    end
+  end
+
   describe "find_for" do
     let!(:model_audit) { FactoryBot.create(:model_audit, manufacturer: manufacturer) }
     let(:manufacturer) { FactoryBot.create(:manufacturer) }

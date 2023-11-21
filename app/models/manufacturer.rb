@@ -1,5 +1,6 @@
 class Manufacturer < ApplicationRecord
   include AutocompleteHashable
+  MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"].blank? # enable skipping for testing
 
   has_many :bikes
   has_many :locks
@@ -27,7 +28,7 @@ class Manufacturer < ApplicationRecord
       logo_cache logo_source description].map(&:to_sym).freeze
   end
 
-  # Search in the paretheses
+  # Secondary_slug is the slug of the stuff in the paretheses
   def self.find_by_secondary_slug(str)
     return nil if str.blank?
     super
@@ -49,7 +50,8 @@ class Manufacturer < ApplicationRecord
   end
 
   def self.other
-    @other ||= where(name: "Other", frame_maker: true).first_or_create
+    return @other if MEMOIZE_OTHER && defined?(@other)
+    @other = where(name: "Other", frame_maker: true).first_or_create
   end
 
   def self.fill_stripped(n)

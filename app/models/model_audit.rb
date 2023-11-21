@@ -20,10 +20,8 @@ class ModelAudit < ApplicationRecord
   end
 
   def self.manufacturer_id_corrected(manufacturer_id, mnfg_name)
-    if manufacturer_id == Manufacturer.other.id
-      manufacturer_id = Manufacturer.friendly_find_id(mnfg_name)
-    end
-    manufacturer_id
+    return manufacturer_id if manufacturer_id != Manufacturer.other.id
+    Manufacturer.friendly_find_id(mnfg_name) || manufacturer_id
   end
 
   def self.matching_manufacturer(manufacturer_id, mnfg_name)
@@ -52,7 +50,7 @@ class ModelAudit < ApplicationRecord
     if bike.manufacturer&.other?
       manufacturer_id = manufacturer_id_corrected(bike.manufacturer_id, bike.mnfg_name)
       if manufacturer_id != Manufacturer.other.id
-        return true if Manufacturer.find(manufacturer_id)&.motorized_only?
+        return true if Manufacturer.find_by_id(manufacturer_id)&.motorized_only?
       end
     end
     return false if unknown_model?(bike.frame_model)
@@ -130,7 +128,6 @@ class ModelAudit < ApplicationRecord
     self.manufacturer_other = nil if manufacturer_id != Manufacturer.other.id
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.certification_status = calculated_certification_status
-    # self.bikes_count = bikes&.count || 0
   end
 
   private
