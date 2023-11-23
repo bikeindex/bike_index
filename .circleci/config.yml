@@ -18,7 +18,7 @@ jobs:
       NODE_ENV: test
       RACK_ENV: test
       COVERAGE: true
-      DISABLE_SPRING: true
+      SKIP_MEMOIZE_MANUFACTURER_OTHER: true
       TRANSLATION_BRANCH: main
       TZ: /usr/share/zoneinfo/America/Chicago
 

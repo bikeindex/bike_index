@@ -65,7 +65,7 @@ class Admin::ManufacturersController < Admin::BaseController
 
   def permitted_parameters
     params.require(:manufacturer).permit(:name, :slug, :website, :frame_maker,
-      :motorized_manufacturer, :total_years_active, :notes, :open_year,
+      :motorized_only, :total_years_active, :notes, :open_year,
       :close_year, :logo, :description, :logo_source, :twitter_name)
   end
 
