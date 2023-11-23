@@ -1909,7 +1909,9 @@ CREATE TABLE public.manufacturers (
     description text,
     logo_source character varying(255),
     twitter_name character varying,
-    priority integer
+    priority integer,
+    motorized_only boolean DEFAULT false,
+    secondary_slug character varying
 );
 
 
@@ -6635,6 +6637,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231029220010'),
 ('20231030150841'),
 ('20231104191652'),
-('20231112013451');
+('20231112013451'),
+('20231115201426');
 
 

@@ -18,7 +18,7 @@ jobs:
       NODE_ENV: test
       RACK_ENV: test
       COVERAGE: true
-      DISABLE_SPRING: true
+      SKIP_MEMOIZE_MANUFACTURER_OTHER: true
       TRANSLATION_BRANCH: main
       TZ: /usr/share/zoneinfo/America/Chicago
 
@@ -33,7 +33,7 @@ jobs:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test
           POSTGRES_PASSWORD: ""
-      - image: redis:4.0.9
+      - image: redis:7.2.3
 
     # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
     resource_class: large

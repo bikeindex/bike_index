@@ -12,7 +12,7 @@ function BinxAppOrgBikes() {
     initSearchColumns() {
       // I'm concerned about javascript breaking, and the bikes being hidden and unable to be shown.
       // To prevent that, only hide columns after adding this class
-      $("#organized_bikes_index").addClass("javascriptFunctioning");
+      $("body").addClass("javascriptFunctioning");
       let self = this;
       this.selectStoredVisibleColumns();
       this.updateVisibleColumns();

@@ -227,7 +227,7 @@ RSpec.describe Admin::BikesController, type: :request do
       end
       bike3.reload
       expect(bike3.manufacturer_other).to eq "69" # Sanity check
-      expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to match_array([11, 12])
+      expect(FindOrCreateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to match_array([11, 12])
     end
   end
 

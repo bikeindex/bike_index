@@ -26,11 +26,11 @@
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
     %th
-      = sortable "last_bike_created_at", "Most Recent registration", render_sortable: render_sortable
-    %th
       = sortable "mnfg_name", "Manufacturer", render_sortable: render_sortable
     %th
       = sortable "frame_model", "Model", render_sortable: render_sortable
+    %th
+      = sortable "last_bike_created_at", "Most Recent registration", render_sortable: render_sortable
     %th
       = sortable "bikes_count", "Vehicles #", render_sortable: render_sortable
     %th
@@ -41,14 +41,6 @@
       - model_audit = organization_model_audit.model_audit
       %tr{data: {modelauditid: model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
         %td
-          %span.convertTime.preciseTime
-            - if organization_model_audit.last_bike_created_at
-              = l(organization_model_audit.last_bike_created_at, format: :convert_time)
-            - else
-              %span.less-strong= l(organization_model_audit.updated_at, format: :convert_time)
-          - if display_dev_info?
-            %small.only-dev-visible= organization_model_audit.id
-        %td
           = model_audit.mnfg_name
           - unless skip_manufacturer_search
             %small= link_to "🔎", url_for(sortable_search_params.merge(search_mnfg_name: model_audit.mnfg_name))
@@ -56,6 +48,14 @@
             %small.only-dev-visible other
         %td
           = link_to audit_frame_model_display(model_audit), organization_model_audit_path(model_audit, organization_id: current_organization.to_param)
+          - if display_dev_info?
+            %small.only-dev-visible= organization_model_audit.id
+        %td
+          %span.convertTime.preciseTime
+            - if organization_model_audit.last_bike_created_at
+              = l(organization_model_audit.last_bike_created_at, format: :convert_time)
+            - else
+              %span.less-strong= l(organization_model_audit.updated_at, format: :convert_time)
         %td
           %strong
             = admin_number_display(organization_model_audit.bikes_count)

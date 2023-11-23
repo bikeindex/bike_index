@@ -23,11 +23,11 @@
         %tr
           %td Vehicle type
           %td
-            = @model_audit.cycle_type
+            = @model_audit.cycle_type_name
         %tr
           %td Propulsion
           %td
-            = @model_audit.propulsion_type
+            = @model_audit.propulsion_type_name
   .col-md-6
     %table.table-list
       %tbody
@@ -44,10 +44,18 @@
                 = l(@organization_model_audit&.last_bike_created_at, format: :convert_time)
 
         %tr
-          %td Certification status
+          %td Certification
           %td
             %span{class: status_display_class(@model_audit.certification_status)}
             = @model_audit.certification_status_humanized
+        - if display_dev_info?
+          %tr
+            %td.only-dev-visible IDs
+            %td
+              Org Model Audit ID
+              %code.mr-2= @organization_model_audit.id
+              Model Audit ID
+              %code= @model_audit.id
 
 %h2.uncap.mt-4 Attestations
 - if @model_attestations.none?
@@ -85,5 +93,5 @@
             = link_to truncate(model_attestation.url), model_attestation.url
 
 -# TODO: Actually render!
--# %h2 Vehicles
--# = render partial: "/organized/bikes/search", locals: {only_show_bikes: true}
+%h2 Vehicles
+= render partial: "/organized/bikes/search", locals: {only_show_bikes: true}

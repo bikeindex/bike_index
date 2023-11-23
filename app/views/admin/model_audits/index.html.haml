@@ -28,6 +28,8 @@
 
 = render partial: "/shared/pagination", locals: {collection: @model_audits}
 
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
 - skip_manufacturer_search ||= false
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -54,7 +56,7 @@
           %tr
             %td
               %span.convertTime= l model_audit.created_at, format: :convert_time
-
+              %code.small.only-dev-visible= model_audit.id
             %td.small
               %span.convertTime= l model_audit.updated_at, format: :convert_time
             %td

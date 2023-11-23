@@ -38,6 +38,7 @@ gem "translation"
 gem "redis"
 gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+gem "redlock" # Locking
 
 gem "eventmachine"
 gem "faraday_middleware" # Manage faraday request flow

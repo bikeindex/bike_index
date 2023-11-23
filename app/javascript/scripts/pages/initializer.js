@@ -38,7 +38,7 @@ $(document).ready(function () {
   } else if ("organized_exports" === pageControllerId) {
     window.binxAppOrgExport = new BinxAppOrgExport();
     binxAppOrgExport.init();
-  } else if (bodyId === "organized_bikes_index") {
+  } else if (bodyId === "organized_bikes_index" || bodyId == "organized_model_audits_show") {
     const binxAppOrgBikes = BinxAppOrgBikes();
     binxAppOrgBikes.init();
   } else if ("organized_impound_records" === pageControllerId) {

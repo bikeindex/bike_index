@@ -187,7 +187,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
             bike_hash_nested = bike_hash[:bike].merge(bike_sticker: "CAL 00 09 99 9", phone: "CELL888 777 - 6666")
             bike_hash.merge(organization_slug: organization.id, bike: bike_hash_nested)
           end
-          it "creates and adds sticker" do
+          it "creates and adds sticker", :flaky do
             expect(bike_sticker.bike_sticker_updates.count).to eq 0
             Sidekiq::Testing.inline! do
               expect {

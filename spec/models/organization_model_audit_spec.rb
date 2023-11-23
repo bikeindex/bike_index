@@ -58,4 +58,24 @@ RSpec.describe OrganizationModelAudit, type: :model do
       expect(organization_model_audit.reload.bikes.pluck(:id)).to eq([bike_match.id])
     end
   end
+
+  describe "missing_for?" do
+    let(:model_audit) { FactoryBot.create(:model_audit) }
+    it "is false" do
+      expect(OrganizationModelAudit.missing_for?(model_audit)).to be_falsey
+    end
+    context "with an enabled organization that doesn't have a matching model_audit" do
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
+      it "is truthy" do
+        expect(OrganizationModelAudit.missing_for?(model_audit)).to be_truthy
+      end
+    end
+    context "with an organization_model_audit" do
+      let!(:organization_model_audit) { FactoryBot.create(:organization_model_audit) }
+      it "is truthy" do
+        expect(Organization.with_enabled_feature_slugs("model_audits").pluck(:id)).to eq([])
+        expect(OrganizationModelAudit.missing_for?(model_audit)).to be_truthy
+      end
+    end
+  end
 end

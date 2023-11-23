@@ -305,13 +305,13 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
 
   describe "motorized" do
     let(:bike) { FactoryBot.create(:bike, propulsion_type: "throttle", frame_model: "something") }
-    it "enqueues UpdateModelAuditWorker" do
+    it "enqueues FindOrCreateModelAuditWorker" do
       expect(bike.reload.motorized?).to be_truthy
       Sidekiq::Worker.clear_all
       instance.perform(bike.id)
-      expect(Sidekiq::Worker.jobs.map { |j| j["class"] }.sort).to eq(%w[DuplicateBikeFinderWorker UpdateModelAuditWorker])
+      expect(Sidekiq::Worker.jobs.map { |j| j["class"] }.sort).to eq(%w[DuplicateBikeFinderWorker FindOrCreateModelAuditWorker])
       expect(ModelAudit.count).to eq 0
-      UpdateModelAuditWorker.drain
+      FindOrCreateModelAuditWorker.drain
       expect(bike.reload.model_audit_id).to be_present
     end
   end

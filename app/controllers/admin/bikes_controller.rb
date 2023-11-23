@@ -28,7 +28,7 @@ class Admin::BikesController < Admin::BaseController
       end
       # Needs to happen after the manufacturer has been assigned
       Bike.unscoped.where(id: bike_ids).distinct.pluck(:model_audit_id)
-        .each_with_index { |i, inx| UpdateModelAuditWorker.perform_in(inx * 15, i) }
+        .each { |i| FindOrCreateModelAuditWorker.perform_async(i) }
       flash[:success] = "Success. #{bike_ids.count} Bikes updated"
     else
       flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
@@ -254,6 +254,8 @@ class Admin::BikesController < Admin::BaseController
     end
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id).not_spam
     @motorized = InputNormalizer.boolean(params[:search_motorized])
+    bikes = bikes.where(likely_spam: false) unless InputNormalizer.boolean(params[:search_spam])
+    bikes = bikes.where(deleted_at: nil) unless InputNormalizer.boolean(params[:search_deleted])
     bikes = bikes.motorized if @motorized
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = bikes.where(created_at: @time_range) unless @period == "all"
