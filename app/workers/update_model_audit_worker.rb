@@ -42,14 +42,10 @@ class UpdateModelAuditWorker < ApplicationWorker
       model_audit = ModelAudit.find_by(id: model_audit_id)
       return if model_audit.blank?
       matching_bikes = model_audit.matching_bikes
-      # If there are 0 counted bikes, and should be deleted when there are no bikes:
-      # update any non-counted bikes (e.g. likely_spam) and delete it
-      counted_bikes = ModelAudit.counted_matching_bikes_count(matching_bikes)
-      if counted_bikes == 0 && model_audit.delete_if_no_bikes?
-        matching_bikes.update_all(model_audit_id: nil)
-        model_audit.bikes.update_all(model_audit_id: nil)
-        model_audit.destroy
-        return
+      counted_bikes_count = ModelAudit.counted_matching_bikes_count(matching_bikes)
+
+      if should_delete_model_audit?(model_audit, counted_bikes_count)
+        return delete_model_audit!(model_audit, matching_bikes)
       end
 
       # Update bikes with manufacturer_other
@@ -76,7 +72,7 @@ class UpdateModelAuditWorker < ApplicationWorker
       end
 
       # Update the model_audit to set the certification_status, bikes_count and bust admin cache
-      model_audit.reload.update(bikes_count: counted_bikes)
+      model_audit.reload.update(bikes_count: counted_bikes_count)
 
       OrganizationModelAudit.organizations_to_audit.pluck(:id)
         .each { |id| update_org_model_audit(model_audit, id) }
@@ -87,6 +83,18 @@ class UpdateModelAuditWorker < ApplicationWorker
   end
 
   private
+
+  def should_delete_model_audit?(model_audit, counted_bikes_count)
+    counted_bikes_count == 0 && model_audit.delete_if_no_bikes?
+  end
+
+  def delete_model_audit!(model_audit, matching_bikes)
+    # update any non-counted bikes (e.g. likely_spam) and delete it
+    matching_bikes.update_all(model_audit_id: nil)
+    model_audit.bikes.update_all(model_audit_id: nil)
+    model_audit.organization_model_audits.destroy_all
+    model_audit.destroy
+  end
 
   def update_org_model_audit(model_audit, organization_id)
     bikes = Bike.where(model_audit_id: model_audit.id).left_joins(:bike_organizations)

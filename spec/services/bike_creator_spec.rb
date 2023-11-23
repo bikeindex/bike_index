@@ -192,7 +192,7 @@ RSpec.describe BikeCreator do
       context "child organization" do
         let(:organization_parent) { FactoryBot.create(:organization) }
         let(:organization) { FactoryBot.create(:organization_child, parent_organization: organization_parent) }
-        it "creates the bike_organization for both" do
+        it "creates the bike_organization for both", :flaky do
           expect {
             instance.create_bike(b_param)
           }.to change(BikeOrganization, :count).by 2

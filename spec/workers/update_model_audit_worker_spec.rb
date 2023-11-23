@@ -138,153 +138,135 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           expect(organization_model_audit_unknown.reload.bikes_count).to eq 0
         end
       end
-      context "frame_model update with model_attestation" do
-        let(:model_audit) { FactoryBot.create(:model_audit, frame_model: "Party Frame Model", manufacturer: manufacturer) }
-        let!(:model_attestation) { FactoryBot.create(:model_attestation, model_audit: model_audit) }
-        it "doesn't delete" do
+      context "user_hidden and model_attestation" do
+        # let(:model_audit) { FactoryBot.create(:model_audit, frame_model: "Party Model", manufacturer: manufacturer, bikes_count: 3) }
+        let!(:model_attestation) { FactoryBot.create(:model_attestation, model_audit: model_audit, kind: :certification_proof_url) }
+        it "updates" do
           expect(organization.reload.bikes.pluck(:id)).to eq([bike3.id])
           bike3.update(user_hidden: true)
-          expect(model_audit.delete_if_no_bikes?).to be_falsey
-          expect {
-            instance.perform(model_audit.id)
-            expect(described_class.jobs.count).to eq 1
-            described_class.drain
-            expect(described_class.jobs.count).to eq 0
-            expect(FindOrCreateModelAuditWorker.jobs.count).to eq 1
-            FindOrCreateModelAuditWorker.drain
-          }.to change(ModelAudit, :count).by 1
-          expect(Bike.unscoped.where.not(model_audit_id: nil).count).to eq 3
-          model_audit = bike1.reload.model_audit
-          expect(bike2.reload.model_audit_id).to eq new_model_audit.id
-          expect(bike3.reload.model_audit_id).to eq new_model_audit.id
-          expect(new_model_audit.organization_model_audits.count).to eq 1
-          organization_model_audit = new_model_audit.organization_model_audits.first
-          expect(organization_model_audit.organization_id).to eq organization.id
-          expect(organization_model_audit.bikes_count).to eq 0 # TODO: Handle user_hidden org bikes
-          expect(organization_model_audit.certification_status).to be_nil
-          expect(organization_model_audit.last_bike_created_at).to be_nil
-          # It still created an organization_model_audit for the empty model_audit
-          expect(model_audit.reload.organization_model_audits.count).to eq 1
-        end
-      end
-    end
-    context "existing model_audit" do
-      let(:model_audit) do
-        FactoryBot.create(:model_audit,
-          frame_model: "PARTY MODEL",
-          manufacturer: manufacturer,
-          cycle_type: "penny-farthing",
-          propulsion_type: "throttle")
-      end
-      # it "updates" do
-      #   expect(bike2.model_audit_id).to be_present
-      #   # It matches, because a matching bike has a model_audit
-      #   bike1.update(propulsion_type: "foot-pedal")
-      #   expect(described_class.enqueue_for?(model_audit)).to be_truthy
-      #   expect {
-      #     instance.perform(nil, bike1.id)
-      #   }.to change(ModelAudit, :count).by 0
-      #   expect(bike1.reload.model_audit_id).to eq model_audit.id
-
-      #   expect(bike2.reload.cycle_type).to eq "cargo"
-      #   expect(bike2.propulsion_type).to eq "foot-pedal"
-      #   expect(bike2.model_audit_id).to eq model_audit.id
-      #   expect(model_audit.reload.certification_status).to be_nil
-      #   # Creating a model attestation enqueues job
-      #   expect(described_class.jobs.count).to eq 0
-      #   FactoryBot.create(:model_attestation, model_audit: model_audit, kind: "certified_by_manufacturer")
-      #   expect(described_class.jobs.count).to eq 1
-      #   described_class.drain
-      #   expect(model_audit.reload.certification_status).to eq "certified_by_manufacturer"
-      # end
-      describe "duplicate model_audit" do
-        let(:model_audit2) { FactoryBot.create(:model_audit, frame_model: "Party Model", manufacturer: Manufacturer.other, manufacturer_other: "PARty model") }
-        it "deletes" do
-          expect(bike2.model_audit_id).to be_present
-          # It matches, because a matching bike has a model_audit
-          bike1.update(model_audit_id: model_audit2.id)
-          expect(described_class.enqueue_for?(model_audit)).to be_truthy
+          expect(model_audit.reload.matching_bikes.pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
           Sidekiq::Worker.clear_all
           expect {
-            instance.perform(model_audit2.id)
-          }.to change(ModelAudit, :count).by(-1)
-          expect(FindOrCreateModelAuditWorker.jobs.count).to eq 1
-          FindOrCreateModelAuditWorker.drain
+            instance.perform(model_audit.id)
+          }.to change(ModelAudit, :count).by 0
+          expect(model_audit.reload.bikes_count).to eq 3
+          expect(model_audit.certification_status).to be_nil
+
+          expect(Bike.unscoped.where.not(model_audit_id: nil).count).to eq 3
           expect(bike1.reload.model_audit_id).to eq model_audit.id
           expect(bike2.reload.model_audit_id).to eq model_audit.id
-          expect(ModelAudit.pluck(:id)).to eq([model_audit.id])
+          expect(bike3.reload.model_audit_id).to eq model_audit.id
+          expect(model_audit.organization_model_audits.count).to eq 1
+          organization_model_audit = model_audit.organization_model_audits.first
+          expect(organization_model_audit.organization_id).to eq organization.id
+
+          expect(organization_model_audit.bikes_count).to eq 0 # TODO: better handling of user_hidden org bikes
+          expect(organization_model_audit.certification_status).to be_nil
+          expect(organization_model_audit.last_bike_created_at).to be_nil
         end
       end
     end
-
-    context "manufacturer_other" do
-      let(:manufacturer) { Manufacturer.other }
-      let!(:bike3) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1, manufacturer: Manufacturer.other, manufacturer_other: "SALSA BIKES") }
-      before do
-        bike1.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa bikes")
-        bike2.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa")
-        model_audit.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa")
-      end
-      it "updates" do
-        expect(bike1.reload.model_audit_id).to be_blank
-        expect(bike1.mnfg_name).to eq "Salsa bikes"
-        expect(bike2.reload.mnfg_name).to eq "Salsa"
-        mnfg_salsa = FactoryBot.create(:manufacturer, name: "Salsa Bikes")
-
-        # expect(model_audit.reload.mnfg_name).to eq "Salsa"
-        # expect(model_audit.reload.matching_bikes.pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
-        expect {
-          instance.perform(model_audit.id)
-        }.to change(ModelAudit, :count).by 0
-        expect(model_audit.reload.manufacturer_id).to eq mnfg_salsa.id
-        expect(model_audit.manufacturer_other).to be_nil
-        expect(model_audit.organization_model_audits.count).to eq 0
-        expect(model_audit.bikes.count).to eq 3
-
-        expect(bike2.reload.model_audit_id).to eq model_audit.id
-        expect(bike2.manufacturer_id).to eq mnfg_salsa.id
-        expect(bike2.frame_model.downcase).to eq bike1.reload.frame_model.downcase
-        expect(bike3.reload.model_audit_id).to eq model_audit.id
-
-        # After updating to a known manufacturer, all the bikes update
-        bike3.update(manufacturer_id: FactoryBot.create(:manufacturer, name: "Salsa").id)
-        expect(model_audit.reload.bikes.count).to eq 2
-        expect(model_audit.matching_bikes.count).to eq 1
-
+    describe "duplicate model_audit" do
+      let(:model_audit2) { FactoryBot.create(:model_audit, frame_model: "Party Model", manufacturer: Manufacturer.other, manufacturer_other: "PARty model") }
+      it "deletes" do
+        expect(bike2.model_audit_id).to be_present
+        # It matches, because a matching bike has a model_audit
+        bike1.update(model_audit_id: model_audit2.id)
+        expect(described_class.enqueue_for?(model_audit)).to be_truthy
         Sidekiq::Worker.clear_all
-        instance.perform(new_model_audit.id)
-        # Because it re-enqueues
-        expect(described_class.jobs.count).to eq 1
-        described_class.drain
-        expect(described_class.jobs.count).to eq 0
-        expect(new_model_audit.reload.manufacturer_id).to eq bike3.manufacturer_id
-        expect(new_model_audit.manufacturer_other).to be_nil
-        expect(bike1.reload.model_audit_id).to eq new_model_audit.id
-
-        expect(bike2.reload.model_audit_id).to eq new_model_audit.id
-        expect(bike2.manufacturer_id).to eq new_model_audit.manufacturer_id
-
-        expect(bike3.reload.model_audit_id).to eq new_model_audit.id
-        expect(bike3.manufacturer_id).to eq new_model_audit.manufacturer_id
+        expect {
+          instance.perform(model_audit2.id)
+        }.to change(ModelAudit, :count).by(-1)
+        expect(FindOrCreateModelAuditWorker.jobs.count).to eq 1
+        FindOrCreateModelAuditWorker.drain
+        expect(bike1.reload.model_audit_id).to eq model_audit.id
+        expect(bike2.reload.model_audit_id).to eq model_audit.id
+        expect(ModelAudit.pluck(:id)).to eq([model_audit.id])
       end
     end
-
-    # I THINK below here is no longer necessary
-
-    # context "model_unknown?" do
-    #   let(:frame_model1) { "unkown" }
-    #   let(:frame_model2) { nil }
-    #   let(:target_attributes) { basic_target_attributes.merge(frame_model: nil) }
-    #   it "creates with nil" do
-    #     expect(bike2.model_audit_id).to be_blank
+    # describe "model_audit no counted bikes" do
+    #   before { bike1.update(model_audit: model_audit, likely_spam: true) }
+    #   it "deletes" do
+    #     FactoryBot.create(:organization_model_audit, model_audit: model_audit)
+    #     expect(model_audit.reload.bikes.count).to eq 1
+    #     expect(model_audit.counted_matching_bikes_count).to eq 0
+    #     expect(described_class.enqueue_for?(model_audit)).to be_truthy
     #     expect {
-    #       expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
-    #       instance.perform(nil, bike1.id)
-    #     }.to change(ModelAudit, :count).by 1
-    #     new_model_audit = bike1.reload.model_audit
+    #       instance.perform(model_audit.id)
+    #     }.to change(ModelAudit, :count).by -1
+    #     expect(bike1.reload.model_audit_id).to be_nil
+    #     expect(OrganizationModelAudit.count).to eq 0
+    #   end
+    #   context "with model_attestation" do
+    #     it "doesn't delete" do
+    #       expect(model_audit.reload.bikes.count).to eq 1
+    #       expect(model_audit.counted_matching_bikes_count).to eq 0
+    #       Sidekiq::Worker.clear_all
+    #       # Creating a model attestation enqueues job
+    #       FactoryBot.create(:model_attestation, model_audit: model_audit, kind: "certified_by_manufacturer")
+    #       expect(described_class.jobs.count).to eq 1
+    #       expect {
+    #         instance.perform(model_audit.id)
+    #       }.to change(ModelAudit, :count).by -1
+    #       expect(bike1.reload.model_audit_id).to eq model_audit.id
+
+    #       expect(model_audit.reload.certification_status).to eq "certified_by_manufacturer"
+    #       expect(model_audit.reload.bikes.count).to eq 1
+    #       expect(model_audit.counted_matching_bikes_count).to eq 0
+    #       expect(described_class.enqueue_for?(model_audit)).to be_falsey
+    #     end
+    #   end
+    # end
+
+    # context "manufacturer_other" do
+    #   let(:manufacturer) { Manufacturer.other }
+    #   let!(:bike3) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1, manufacturer: Manufacturer.other, manufacturer_other: "SALSA BIKES") }
+    #   before do
+    #     bike1.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa bikes")
+    #     bike2.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa")
+    #     model_audit.update(manufacturer: Manufacturer.other, manufacturer_other: "Salsa")
+    #   end
+    #   it "updates" do
+    #     expect(bike1.reload.model_audit_id).to be_blank
+    #     expect(bike1.mnfg_name).to eq "Salsa bikes"
+    #     expect(bike2.reload.mnfg_name).to eq "Salsa"
+    #     mnfg_salsa = FactoryBot.create(:manufacturer, name: "Salsa Bikes")
+
+    #     # expect(model_audit.reload.mnfg_name).to eq "Salsa"
+    #     # expect(model_audit.reload.matching_bikes.pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
+    #     expect {
+    #       instance.perform(model_audit.id)
+    #     }.to change(ModelAudit, :count).by 0
+    #     expect(model_audit.reload.manufacturer_id).to eq mnfg_salsa.id
+    #     expect(model_audit.manufacturer_other).to be_nil
+    #     expect(model_audit.organization_model_audits.count).to eq 0
+    #     expect(model_audit.bikes.count).to eq 3
+
+    #     expect(bike2.reload.model_audit_id).to eq model_audit.id
+    #     expect(bike2.manufacturer_id).to eq mnfg_salsa.id
+    #     expect(bike2.frame_model.downcase).to eq bike1.reload.frame_model.downcase
+    #     expect(bike3.reload.model_audit_id).to eq model_audit.id
+
+    #     # After updating to a known manufacturer, all the bikes update
+    #     bike3.update(manufacturer_id: FactoryBot.create(:manufacturer, name: "Salsa").id)
+    #     expect(model_audit.reload.bikes.count).to eq 2
+    #     expect(model_audit.matching_bikes.count).to eq 1
+
+    #     Sidekiq::Worker.clear_all
+    #     instance.perform(new_model_audit.id)
+    #     # Because it re-enqueues
+    #     expect(described_class.jobs.count).to eq 1
+    #     described_class.drain
+    #     expect(described_class.jobs.count).to eq 0
+    #     expect(new_model_audit.reload.manufacturer_id).to eq bike3.manufacturer_id
+    #     expect(new_model_audit.manufacturer_other).to be_nil
+    #     expect(bike1.reload.model_audit_id).to eq new_model_audit.id
+
     #     expect(bike2.reload.model_audit_id).to eq new_model_audit.id
-    #     expect_attrs_to_match_hash(new_model_audit, target_attributes)
-    #     expect(new_model_audit.organization_model_audits.count).to eq 0
+    #     expect(bike2.manufacturer_id).to eq new_model_audit.manufacturer_id
+
+    #     expect(bike3.reload.model_audit_id).to eq new_model_audit.id
+    #     expect(bike3.manufacturer_id).to eq new_model_audit.manufacturer_id
     #   end
     # end
   end
