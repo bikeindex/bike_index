@@ -103,7 +103,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def secondary_name
-    s_name = name&.gsub(/\A[^\(]*/, "")&.gsub(/\(|\)/, "")
+    s_name = name&.gsub(/\A[^(]*/, "")&.gsub(/\(|\)/, "")
     s_name.present? ? s_name : nil
   end
 

@@ -142,6 +142,19 @@ RSpec.describe ModelAudit, type: :model do
       it "finds the matching model_audit" do
         expect(ModelAudit.find_for(bike)&.id).to eq model_audit.id
       end
+      context "existing manufacturer_other" do
+        let!(:model_audit) { FactoryBot.create(:model_audit, manufacturer: Manufacturer.other, frame_model: "Cool name") }
+        let(:model_audit_later) { FactoryBot.create(:model_audit, manufacturer: manufacturer, frame_model: "Cool name") }
+        before do
+          model_audit
+          model_audit_later
+        end
+        it "finds the model_audit with manufacturer_id not other" do
+          expect(model_audit_later.id).to be > model_audit.id
+          expect(ModelAudit.find_for(bike)&.id).to eq model_audit_later.id
+          expect(ModelAudit.find_for(nil, manufacturer_id: manufacturer, frame_model: "COOL NAme")&.id).to eq model_audit_later.id
+        end
+      end
     end
   end
 

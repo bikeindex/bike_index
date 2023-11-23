@@ -25,19 +25,29 @@ class ModelAudit < ApplicationRecord
   end
 
   def self.matching_manufacturer(manufacturer_id, mnfg_name)
-    model_audits = where("mnfg_name ILIKE ?",  mnfg_name)
+    model_audits = where("mnfg_name ILIKE ?", mnfg_name)
     manufacturer_id = manufacturer_id_corrected(manufacturer_id, mnfg_name)
     return model_audits if manufacturer_id == Manufacturer.other.id
     model_audits.or(where(manufacturer_id: manufacturer_id))
   end
 
-  def self.find_for(bike)
-    model_audits = matching_manufacturer(bike.manufacturer_id, bike.mnfg_name)
-    if unknown_model?(bike.frame_model)
-      model_audits.where(frame_model: nil)
+  def self.matching_frame_model(frame_model)
+    if unknown_model?(frame_model)
+      where(frame_model: nil)
     else
-      model_audits.where("frame_model ILIKE ?", bike.frame_model)
-    end.first
+      where("frame_model ILIKE ?", frame_model)
+    end
+  end
+
+  def self.find_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
+    manufacturer_id ||= bike&.manufacturer_id
+    mnfg_name ||= bike&.mnfg_name
+    frame_model ||= bike&.frame_model
+    matching_audits = matching_manufacturer(manufacturer_id, mnfg_name)
+      .matching_frame_model(frame_model).reorder(:id)
+    return matching_audits.first if matching_audits.count < 2
+    not_other = matching_audits.where.not(manufacturer_id: Manufacturer.other.id)
+    not_other.present? ? not_other.first : matching_audits.first
   end
 
   def self.unknown_model?(frame_model)
