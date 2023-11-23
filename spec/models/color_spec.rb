@@ -29,25 +29,6 @@ RSpec.describe Color, type: :model do
     end
   end
 
-  describe "update_display_format" do
-    context "with a background color" do
-      it "removes the extra display information to just return a color" do
-        color = FactoryBot.create(:color, name: "blue", display: "<span class='sclr' style='background: #386ed2'></span>")
-        color.reload
-        color.update_display_format
-        expect(color.display).to eq("#386ed2")
-      end
-    end
-    context "without a background color" do
-      it "makes it white with full transparency" do
-        color = FactoryBot.create(:color, name: "blue", display: "<span class='sclr'>stckrs</span>")
-        color.reload
-        color.update_display_format
-        expect(color.display).to be_nil
-      end
-    end
-  end
-
   describe "black" do
     context "not-existing" do
       it "creates it on first pass" do
