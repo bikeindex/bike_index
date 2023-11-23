@@ -58,9 +58,4 @@ class Color < ApplicationRecord
   def slug
     name.downcase.split(/\W+/).first
   end
-
-  def update_display_format
-    u = display.match(/\#[^('|")]*/)
-    update_attribute :display, (u.present? ? u[0] : nil)
-  end
 end

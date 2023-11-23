@@ -2,12 +2,12 @@ require "rails_helper"
 
 RSpec.describe "Selections API V3", type: :request do
   describe "colors" do
+    let!(:color) { FactoryBot.create(:color, display: "#386ed2") }
+    let(:target) { {name: color.name, hex_code: "#386ed2", slug: color.slug, id: color.id} }
     it "responds on index" do
-      selection = FactoryBot.create(:color)
       get "/api/v3/selections/colors"
       expect(response.code).to eq("200")
-      result = JSON.parse(response.body)["colors"][0]
-      expect(result["name"]).to eq(selection.name)
+      expect_hashes_to_match(json_result["colors"][0], target)
     end
   end
 
