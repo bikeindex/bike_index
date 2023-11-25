@@ -123,7 +123,7 @@ nb:
       invalid_currency: har ugyldig format (må være '100', '5%{decimal}24' eller '123%{thousands}456%{decimal}78').
         Fikk %{currency}
       record_invalid: 'Validering mislyktes: %{errors}'
-      in:
+      in: må være i %{count}
     bad_request:
       explanation: Vi beklager, men vi forsto ikke hva du spurte om. Kan du ikke prøve
         igjen?
@@ -5542,262 +5542,262 @@ nb:
       success: Suksess
       warning: Advarsel
   countries:
-    AC:
-    AD:
-    AE:
-    AF:
-    AG:
-    AI:
-    AL:
-    AM:
-    AN:
-    AO:
-    AQ:
-    AR:
-    AS:
-    AT:
-    AU:
-    AW:
-    AX:
-    AZ:
-    BA:
-    BB:
-    BD:
-    BE:
-    BF:
-    BG:
-    BH:
-    BI:
-    BJ:
-    BL:
-    BM:
-    BN:
-    BO:
-    BQ:
-    BR:
-    BS:
-    BT:
-    BV:
-    BW:
-    BY:
-    BZ:
-    CA:
-    CC:
-    CD:
-    CF:
-    CG:
-    CH:
-    CI:
-    CK:
-    CL:
-    CM:
-    CN:
-    CO:
-    CP:
-    CR:
-    CU:
-    CV:
-    CW:
-    CX:
-    CY:
-    CZ:
-    DE:
-    DG:
-    DJ:
-    DK:
-    DM:
-    DO:
-    DZ:
-    EA:
-    EC:
-    EE:
-    EG:
-    EH:
-    ER:
-    ES:
-    ET:
-    EU:
-    FI:
-    FJ:
-    FK:
-    FM:
-    FO:
-    FR:
-    GA:
-    GB:
-    GD:
-    GE:
-    GF:
-    GG:
-    GH:
-    GI:
-    GL:
-    GM:
-    GN:
-    GP:
-    GQ:
-    GR:
-    GS:
-    GT:
-    GU:
-    GW:
-    GY:
-    HK:
-    HM:
-    HN:
-    HR:
-    HT:
-    HU:
-    IC:
-    ID:
-    IE:
-    IL:
-    IM:
-    IN:
-    IO:
-    IQ:
-    IR:
-    IS:
-    IT:
-    JE:
-    JM:
-    JO:
-    JP:
-    KE:
-    KG:
-    KH:
-    KI:
-    KM:
-    KN:
-    KP:
-    KR:
-    KW:
-    KY:
-    KZ:
-    LA:
-    LB:
-    LC:
-    LI:
-    LK:
-    LR:
-    LS:
-    LT:
-    LU:
-    LV:
-    LY:
-    MA:
-    MC:
-    MD:
-    ME:
-    MF:
-    MG:
-    MH:
-    MK:
-    ML:
-    MM:
-    MN:
-    MO:
-    MP:
-    MQ:
-    MR:
-    MS:
-    MT:
-    MU:
-    MV:
-    MW:
-    MX:
-    MY:
-    MZ:
-    NA:
-    NC:
-    NE:
-    NF:
-    NG:
-    NI:
-    NL:
-    'NO':
-    NP:
-    NR:
-    NU:
-    NZ:
-    OM:
-    PA:
-    PE:
-    PF:
-    PG:
-    PH:
-    PK:
-    PL:
-    PM:
-    PN:
-    PR:
-    PS:
-    PT:
-    PW:
-    PY:
-    QA:
-    QO:
-    RE:
-    RO:
-    RS:
-    RU:
-    RW:
-    SA:
-    SB:
-    SC:
-    SD:
-    SE:
-    SG:
-    SH:
-    SI:
-    SJ:
-    SK:
-    SL:
-    SM:
-    SN:
-    SO:
-    SR:
-    SS:
-    ST:
-    SV:
-    SX:
-    SY:
-    SZ:
-    TA:
-    TC:
-    TD:
-    TF:
-    TG:
-    TH:
-    TJ:
-    TK:
-    TL:
-    TM:
-    TN:
-    TO:
-    TR:
-    TT:
-    TV:
-    TW:
-    TZ:
-    UA:
-    UG:
-    UM:
-    US:
-    UY:
-    UZ:
-    VA:
-    VC:
-    VE:
-    VG:
-    VI:
-    VN:
-    VU:
-    WF:
-    WS:
-    XK:
-    YE:
-    YT:
-    ZA:
-    ZM:
-    ZW:
+    AC: Ascension Island
+    AD: Andorra
+    AE: De forente arabiske emirater
+    AF: Afghanistan
+    AG: Antigua og Barbuda
+    AI: Anguilla
+    AL: Albania
+    AM: Armenia
+    AN: Nederlandske Antiller
+    AO: Angola
+    AQ: Antarktis
+    AR: Argentina
+    AS: Amerikansk Samoa
+    AT: Østerrike
+    AU: Australia
+    AW: Aruba
+    AX: Ålandsøyene
+    AZ: Aserbajdsjan
+    BA: Bosnia-Hercegovina
+    BB: Barbados
+    BD: Bangladesh
+    BE: Belgia
+    BF: Burkina Faso
+    BG: Bulgaria
+    BH: Bahrain
+    BI: Burundi
+    BJ: Benin
+    BL: Barthélemy
+    BM: Bermuda
+    BN: Brunei
+    BO: Bolivia
+    BQ: Karibia Nederland
+    BR: Brasil
+    BS: Bahamas
+    BT: Bhutan
+    BV: Bouvetøya
+    BW: Botswana
+    BY: Hviterussland
+    BZ: Belize
+    CA: Canada
+    CC: Kokosøyene (Keeling)
+    CD: Kongo - Kinshasa
+    CF: Den sentralafrikanske republikk
+    CG: Kongo - Brazzaville
+    CH: Sveits
+    CI: Elfenbenskysten
+    CK: Cookøyene
+    CL: Chile
+    CM: Kamerun
+    CN: Kina
+    CO: Colombia
+    CP: Clipperton Island
+    CR: Costa Rica
+    CU: Cuba
+    CV: Kapp Verde
+    CW: Curaçao
+    CX: Juleøya
+    CY: Kypros
+    CZ: Tsjekkia
+    DE: Tyskland
+    DG: Diego Garcia
+    DJ: Djibouti
+    DK: Danmark
+    DM: Dominica
+    DO: Den dominikanske republikk
+    DZ: Algerie
+    EA: Ceuta og Melilla
+    EC: Ecuador
+    EE: Estland
+    EG: Egypt
+    EH: Vest-Sahara
+    ER: Eritrea
+    ES: Spania
+    ET: Etiopia
+    EU: Den europeiske union
+    FI: Finland
+    FJ: Fiji
+    FK: Falklandsøyene
+    FM: Mikronesia
+    FO: Færøyene
+    FR: Frankrike
+    GA: Gabon
+    GB: Storbritannia
+    GD: Grenada
+    GE: Georgia
+    GF: Fransk Guyana
+    GG: Guernsey
+    GH: Ghana
+    GI: Gibraltar
+    GL: Grønland
+    GM: Gambia
+    GN: Guinea
+    GP: Guadeloupe
+    GQ: Ekvatorial-Guinea
+    GR: Hellas
+    GS: Sør-Georgia og Sør-Sandwichøyene
+    GT: Guatemala
+    GU: Guam
+    GW: Guinea-Bissau
+    GY: Guyana
+    HK: Hongkong SAR Kina
+    HM: Heard- og McDonald-øyene
+    HN: Honduras
+    HR: Kroatia
+    HT: Haiti
+    HU: Ungarn
+    IC: Kanariøyene
+    ID: Indonesia
+    IE: Irland
+    IL: Israel
+    IM: Isle of Man
+    IN: India
+    IO: Britisk territorium i Det indiske hav
+    IQ: Irak
+    IR: Iran
+    IS: Island
+    IT: Italia
+    JE: Jersey
+    JM: Jamaica
+    JO: Jordan
+    JP: Japan
+    KE: Kenya
+    KG: Kirgisistan
+    KH: Kambodsja
+    KI: Kiribati
+    KM: Komorene
+    KN: Kitts og Nevis
+    KP: Nord-Korea
+    KR: Sør-Korea
+    KW: Kuwait
+    KY: Caymanøyene
+    KZ: Kasakhstan
+    LA: Laos
+    LB: Libanon
+    LC: Lucia
+    LI: Liechtenstein
+    LK: Sri Lanka
+    LR: Liberia
+    LS: Lesotho
+    LT: Litauen
+    LU: Luxembourg
+    LV: Latvia
+    LY: Libya
+    MA: Marokko
+    MC: Monaco
+    MD: Moldova
+    ME: Montenegro
+    MF: Martin
+    MG: Madagaskar
+    MH: Marshalløyene
+    MK: Makedonia
+    ML: Mali
+    MM: Myanmar (Burma)
+    MN: Mongolia
+    MO: Macao SAR Kina
+    MP: Nord-Marianene
+    MQ: Martinique
+    MR: Mauritania
+    MS: Montserrat
+    MT: Malta
+    MU: Mauritius
+    MV: Maldivene
+    MW: Malawi
+    MX: Mexico
+    MY: Malaysia
+    MZ: Mosambik
+    NA: Namibia
+    NC: Ny-Caledonia
+    NE: Niger
+    NF: Norfolkøya
+    NG: Nigeria
+    NI: Nicaragua
+    NL: Nederland
+    'NO': Norge
+    NP: Nepal
+    NR: Nauru
+    NU: Niue
+    NZ: New Zealand
+    OM: Oman
+    PA: Panama
+    PE: Peru
+    PF: Fransk Polynesia
+    PG: Papua Ny-Guinea
+    PH: Filippinene
+    PK: Pakistan
+    PL: Polen
+    PM: Pierre & Miquelon
+    PN: Pitcairnøyene
+    PR: Puerto Rico
+    PS: Palestinske områder
+    PT: Portugal
+    PW: Palau
+    PY: Paraguay
+    QA: Qatar
+    QO: Det ytre Oseania
+    RE: Réunion
+    RO: Romania
+    RS: Serbia
+    RU: Russland
+    RW: Rwanda
+    SA: Saudi-Arabia
+    SB: Salomonøyene
+    SC: Seychellene
+    SD: Sudan
+    SE: Sverige
+    SG: Singapore
+    SH: Helena
+    SI: Slovenia
+    SJ: Svalbard og Jan Mayen
+    SK: Slovakia
+    SL: Sierra Leone
+    SM: San Marino
+    SN: Senegal
+    SO: Somalia
+    SR: Surinam
+    SS: Sør-Sudan
+    ST: São Tomé og Príncipe
+    SV: El Salvador
+    SX: Saint Martin
+    SY: Syria
+    SZ: Swaziland
+    TA: Tristan da Cunha
+    TC: Turks- og Caicosøyene
+    TD: Tsjad
+    TF: Franske sørlige territorier
+    TG: Togo
+    TH: Thailand
+    TJ: Tadsjikistan
+    TK: Tokelau
+    TL: Øst-Timor
+    TM: Turkmenistan
+    TN: Tunisia
+    TO: Tonga
+    TR: Tyrkia
+    TT: Trinidad og Tobago
+    TV: Tuvalu
+    TW: Taiwan
+    TZ: Tanzania
+    UA: Ukraina
+    UG: Uganda
+    UM: USAs avsidesliggende øyer
+    US: USA
+    UY: Uruguay
+    UZ: Usbekistan
+    VA: Vatikanstaten
+    VC: Vincent og Grenadinene
+    VE: Venezuela
+    VG: De britiske jomfruøyene
+    VI: De amerikanske jomfruøyene
+    VN: Vietnam
+    VU: Vanuatu
+    WF: Wallis og Futuna
+    WS: Samoa
+    XK: Kosovo
+    YE: Jemen
+    YT: Mayotte
+    ZA: Sør-Afrika
+    ZM: Zambia
+    ZW: Zimbabwe
