@@ -3970,6 +3970,7 @@ nb:
   locales:
     en: Engelsk
     nl: Nederlands (nederlandsk)
+    nb: Norsk
   locks:
     edit:
       are_you_sure: Er du sikker?
@@ -4113,6 +4114,7 @@ nb:
       en-GB: GBP
       es: EUR
       nl: EUR
+      nb: NOK
   my_accounts:
     edit:
       save_changes: Lagre endringer

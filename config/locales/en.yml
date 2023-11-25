@@ -3829,6 +3829,7 @@ en:
   locales:
     en: English
     nl: Nederlands (Dutch)
+    nb: Norwegian (Bokmål)
   locks:
     edit:
       are_you_sure: Are you sure?
@@ -3979,6 +3980,7 @@ en:
       en-GB: GBP
       es: EUR
       nl: EUR
+      nb: NOK
   my_accounts:
     edit:
       save_changes: Save changes
