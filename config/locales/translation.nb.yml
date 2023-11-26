@@ -52,8 +52,8 @@ nb:
     - Nov
     - Des
   time:
-    am: am
-    pm: pm
+    am: 
+    pm: 
   number:
     human:
       storage_units:
