@@ -756,7 +756,10 @@ class Bike < ApplicationRecord
     self.name = InputNormalizer.string(name)
     self.extra_registration_number = InputNormalizer.string(extra_registration_number)
     if extra_registration_number.present?
-      self.extra_registration_number = nil if extra_registration_number.match?(/(serial.)?#{serial_number}/i)
+      serial_sanitized = InputNormalizer.regex_escape(serial_number)
+      if serial_sanitized.present? && extra_registration_number.match?(/(serial.)?#{serial_sanitized}/i)
+        self.extra_registration_number = nil
+      end
     end
   end
 
