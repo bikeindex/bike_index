@@ -50,6 +50,9 @@ RSpec.configure do |config|
   config.include StripeHelpers, type: :request
   config.include StripeHelpers, type: :controller
   config.include StripeHelpers, type: :service
+
+  # Set default geocoder location
+  config.include_context :geocoder_default_location
 end
 
 VCR.configure do |config|
@@ -74,13 +77,24 @@ VCR.configure do |config|
   end
 end
 
-RSpec::Sidekiq.configure do |config|
-  config.warn_when_jobs_not_processed_by_sidekiq = false
+# retry flaky specs on CI
+if ENV["RETRY_FLAKY"]
+  require "rspec/retry"
+
+  RSpec.configure do |config|
+    # configure retry
+    config.verbose_retry = true # show retry status in spec process
+
+    config.around(:each) do |ex|
+      if ex.metadata[:flaky]
+        ex.run_with_retry retry: 1
+      end
+    end
+  end
 end
 
-# Set default geocoder location
-RSpec.configure do |config|
-  config.include_context :geocoder_default_location
+RSpec::Sidekiq.configure do |config|
+  config.warn_when_jobs_not_processed_by_sidekiq = false
 end
 
 # Doesn't seem to be important

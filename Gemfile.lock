@@ -608,6 +608,8 @@ GEM
       rspec-expectations (~> 3.9)
       rspec-mocks (~> 3.9)
       rspec-support (~> 3.9)
+    rspec-retry (0.6.2)
+      rspec-core (> 3.3)
     rspec-sidekiq (3.0.3)
       rspec-core (~> 3.0, >= 3.0.0)
       sidekiq (>= 2.4.0)
@@ -837,6 +839,7 @@ DEPENDENCIES
   rqrcode (= 0.10.1)
   rspec (~> 3.4)
   rspec-rails (~> 4.0)
+  rspec-retry
   rspec-sidekiq
   rspec_junit_formatter
   sass-rails

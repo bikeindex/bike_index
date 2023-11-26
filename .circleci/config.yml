@@ -21,6 +21,7 @@ jobs:
       SKIP_MEMOIZE_MANUFACTURER_OTHER: true
       TRANSLATION_BRANCH: main
       TZ: /usr/share/zoneinfo/America/Chicago
+      RETRY_FLAKY: true
 
     docker:
       - image: cimg/ruby:2.7.8-node
