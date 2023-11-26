@@ -77,8 +77,9 @@ VCR.configure do |config|
   end
 end
 
-if ENV["RETRY_FLAKY"] # retry flaky specs on CI and when running parallel
-  require 'rspec/retry'
+# retry flaky specs on CI
+if ENV["RETRY_FLAKY"]
+  require "rspec/retry"
 
   RSpec.configure do |config|
     # configure retry
