@@ -92,15 +92,30 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
         expect(bike2.model_audit_id).to be_blank
         Sidekiq::Worker.clear_all
         expect {
-          expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
+          expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id])
           instance.perform(bike1.id)
         }.to change(ModelAudit, :count).by 1
         new_model_audit = bike1.reload.model_audit
         expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
-        expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(frame_model: nil))
+        expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(frame_model: nil, cycle_type: :bike))
         # Organization model audits are created by UpdateModelAuditWorker
         expect(new_model_audit.organization_model_audits.count).to eq 0
         expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
+      end
+      context "bike2 is motorized" do
+        it "matches" do
+          bike2.update(propulsion_type: "pedal-assist")
+          Sidekiq::Worker.clear_all
+          expect {
+            expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
+            instance.perform(bike1.id)
+          }.to change(ModelAudit, :count).by 1
+          new_model_audit = bike1.reload.model_audit
+          expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
+          # NOTE: this uses the cycle_type of bike2
+          expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(frame_model: nil, propulsion_type: "pedal-assist"))
+          expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
+        end
       end
     end
     context "matching model_audit exists" do
@@ -141,7 +156,6 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
           # This adds some extra calculations, but I think it's worth it
           expect(described_class.enqueue_for?(bike1)).to be_truthy
           expect {
-            expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id])
             instance.perform(bike1.id)
           }.to change(ModelAudit, :count).by 0
           expect(bike1.reload.model_audit_id).to eq model_audit.id

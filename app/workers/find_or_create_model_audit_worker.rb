@@ -45,6 +45,7 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
     existing_manufacturer = Manufacturer.friendly_find(bike.mnfg_name)
     if existing_manufacturer.present? && !existing_manufacturer.other?
       bike.update_attribute(:manufacturer_id, existing_manufacturer.id)
+      bike.reload
     end
   end
 
