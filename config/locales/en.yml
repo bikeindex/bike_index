@@ -3828,8 +3828,8 @@ en:
       please_fix_the_following: Please fix the following %{errors}
   locales:
     en: English
-    nl: Nederlands (Dutch)
     nb: Norwegian (Bokmål)
+    nl: Nederlands (Dutch)
   locks:
     edit:
       are_you_sure: Are you sure?
@@ -3979,8 +3979,8 @@ en:
       en: USD
       en-GB: GBP
       es: EUR
-      nl: EUR
       nb: NOK
+      nl: EUR
   my_accounts:
     edit:
       save_changes: Save changes
