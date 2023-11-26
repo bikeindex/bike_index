@@ -45,9 +45,9 @@ module Bikeindex
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
-    config.i18n.available_locales = %i[en nl]
+    config.i18n.available_locales = %i[en nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
-
+    
     config.middleware.use Rack::Throttle::Minute,
       max: ENV["MIN_MAX_RATE"].to_i,
       cache: Redis.new(url: config.redis_cache_url),
