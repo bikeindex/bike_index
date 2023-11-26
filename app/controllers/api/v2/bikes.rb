@@ -127,12 +127,10 @@ module API
                 "with_user"
               end
             end
+          elsif owner_duplicate_bike(bikes: Bike.deleted).present?
+            "removed"
           else
-            if owner_duplicate_bike(bikes: Bike.deleted).present?
-              "removed"
-            else
-              "no_matching_bike"
-            end
+            "no_matching_bike"
           end
         end
 
@@ -168,19 +166,28 @@ module API
 
             It matches on `serial`, `owner_email` and `manufacturer`. No matches are returned if the serial is 'made_without_serial' or 'unknown'.
 
-            This is the matching that happens when adding bikes, to prevent duplicate registrations. By default, adding a bike will update the existing bike if there is a match _which can be edited_ - and will create a new bike if the existing match can't be edited (If you include `no_duplicate` when adding a bike, it won't add a duplicate bike in that situation).
+            This is the matching that happens when adding bikes, to prevent duplicate registrations. By default, adding a bike will update the existing bike if there is a match _which can be edited_ - and will create a new bike if the existing match can't be edited (however, if you include `no_duplicate` when adding a bike, it won't add a duplicate bike in that situation).
 
             The only difference between this and the behavior of add a bike, is that `manufacturer` is optional here.
 
             Returns JSON with keys:
 
-            - `registered`: If a match was found
-            - `claimed`: If a match was found and the user has claimed the bike
-            - `can_edit`: If a match was found and it can be edited by the current token (e.g. was registered by the organization)
+            - `registered`: If a match was found. (`true` or `false`)
+            - `claimed`: If a match was found and the user has claimed the bike. (`true` or `false`)
+            - `can_edit`: If a match was found and it can be edited by the current token, e.g. was registered by the organization. (`true` or `false`)
+            - `state`: The state of the bike that was found (_see below for possible values_)
 
             <br>
 
-            All values are either `true` or `false`
+            `state` is one of the following string values:
+
+            - `with_user`: Registered and the `owner_email` is the current owner of the bike
+            - `stolen`: Stolen 🙁
+            - `recovered`: It was stolen, but has been recovered within the past year (after a year, the state returns to `with_user`)
+            - `impounded`: Impounded
+            - `transferred`: Registered, but user transfered to someone else on Bike Index
+            - `removed`: It was registered, but has been deleted from Bike Index
+            - `no_matching_bike`: bike not found
           NOTE
         }
         params do
