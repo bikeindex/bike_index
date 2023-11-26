@@ -68,14 +68,6 @@ class ModelAudit < ApplicationRecord
     ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
   end
 
-  def self.matching_bikes_for_frame_model(bikes, frame_model: nil)
-    if unknown_model?(frame_model)
-      bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))
-    else
-      bikes.where("frame_model ILIKE ?", frame_model)
-    end
-  end
-
   def self.matching_bikes_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
     manufacturer_id ||= bike&.manufacturer_id
     mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.simple_name
@@ -85,7 +77,7 @@ class ModelAudit < ApplicationRecord
       bikes = bikes.or(Bike.unscoped.where(manufacturer_id: manufacturer_id))
     end
 
-    matching_bikes_for_frame_model(bikes, frame_model: frame_model || bike&.frame_model)
+    matching_bikes_for_frame_model(bikes, manufacturer_id: manufacturer_id, frame_model: frame_model || bike&.frame_model)
       .reorder(id: :desc)
   end
 
@@ -93,6 +85,17 @@ class ModelAudit < ApplicationRecord
     # As of now, user_hidden isn't normally visible in orgs. Not sure what to do about that?
     bikes.where(example: false, deleted_at: nil, likely_spam: false).count
   end
+
+  def self.matching_bikes_for_frame_model(bikes, manufacturer_id: nil, frame_model: nil)
+    if unknown_model?(frame_model)
+      bikes = bikes.motorized unless Manufacturer.find_by_id(manufacturer_id)&.motorized_only
+      bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))
+    else
+      bikes.where("frame_model ILIKE ?", frame_model)
+    end
+  end
+
+  private_class_method :matching_bikes_for_frame_model
 
   # WARNING! This is a calculated query. You should probably use the association
   def matching_bikes
