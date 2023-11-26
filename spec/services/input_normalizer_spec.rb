@@ -65,4 +65,13 @@ RSpec.describe InputNormalizer do
       expect(InputNormalizer.string(" D HI \Z \nf ")).to eq "D HI \Z f"
     end
   end
+
+  describe "regex_escape" do
+    it "is nil for blank" do
+      expect(InputNormalizer.string(" ")).to be_nil
+    end
+    it "replaces" do
+      expect(InputNormalizer.regex_escape("(((\..{?}")).to eq "........"
+    end
+  end
 end

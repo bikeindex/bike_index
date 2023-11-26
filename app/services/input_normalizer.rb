@@ -16,4 +16,9 @@ class InputNormalizer
   def self.sanitize(str)
     Rails::Html::FullSanitizer.new.sanitize(str)&.strip
   end
+
+  def self.regex_escape(val)
+    # Lazy hack, good enough for current purposes. Improve if required!
+    string(val)&.gsub(/\W/, ".")
+  end
 end

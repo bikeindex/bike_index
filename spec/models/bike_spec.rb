@@ -1520,6 +1520,13 @@ RSpec.describe Bike, type: :model do
         expect(bike.extra_registration_number).to be_nil
       end
     end
+    context "regex characters serial:serial as serial" do
+      let(:serial) { "painted over, by me :(" }
+      it "strips extra_registration_number" do
+        # Make sure we escape for regex
+        expect(bike.extra_registration_number).to eq "extra"
+      end
+    end
   end
 
   describe "calculated_listing_order" do
