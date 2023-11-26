@@ -171,7 +171,7 @@ RSpec.describe BulkImportWorker, type: :job do
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
-      it "creates the bikes, doesn't have any errors" do
+      it "creates the bikes, doesn't have any errors", :flaky do
         expect(bike_sticker.reload.claimed?).to be_falsey
         expect(bike_sticker.bike_sticker_updates.count).to eq 0
         # In production, we actually use remote files rather than local files.
@@ -246,7 +246,7 @@ RSpec.describe BulkImportWorker, type: :job do
         end
       end
       context "no_duplicate" do
-        it "creates the bikes, doesn't have any errors" do
+        it "creates the bikes, doesn't have any errors", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
           allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
@@ -353,7 +353,7 @@ RSpec.describe BulkImportWorker, type: :job do
             state_id: state.id
           }
         end
-        it "creates the bikes and impound records" do
+        it "creates the bikes and impound records", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
           VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do

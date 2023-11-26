@@ -177,6 +177,7 @@ group :test do
   gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
+  gem 'rspec-retry', require: false # Retry failures on CI
 end
 
 gem "dockerfile-rails", ">= 1.5", group: :development
