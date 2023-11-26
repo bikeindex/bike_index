@@ -99,12 +99,41 @@ module API
           @bike = Bike.unscoped.find(params[:id])
         end
 
-        def owner_duplicate_bike
-          manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer])
+        def owner_duplicate_bike(bikes: nil)
+          @manufacturer_id ||= Manufacturer.friendly_find_id(params[:manufacturer])
           OwnerDuplicateBikeFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
-            manufacturer_id: manufacturer_id).first
+            manufacturer_id: @manufacturer_id,
+            bikes: bikes).limit(1).first
+        end
+
+        def registered_state(bike = nil)
+          state = bike&.status&.gsub("status_", "")
+          if state.present?
+            return state if state == "stolen"
+            if %w[abandoned impounded unregistered_parking_notification].include?(state)
+              "impounded"
+            elsif StolenRecord.recovered.where(bike_id: bike.id)
+                .where("recovered_at > ?", Time.current - 1.year).limit(1).present?
+              "recovered"
+            else
+              # NOTE: I believe this doesn't fully cover phone number registrations,
+              # but as of 2023-11, phone registrations aren't being heavily used
+              email = EmailNormalizer.normalize(params[:owner_email])
+              if bike.ownerships.where(current: false).where(owner_email: email) && bike.owner_email != email
+                "transferred"
+              else
+                "with_user"
+              end
+            end
+          else
+            if owner_duplicate_bike(bikes: Bike.deleted).present?
+              "removed"
+            else
+              "no_matching_bike"
+            end
+          end
         end
 
         def created_bike_serialized(bike, include_claim_token)
@@ -168,7 +197,7 @@ module API
               registered: matching_bike.present?,
               claimed: matching_bike.present? && matching_bike.claimed?,
               can_edit: matching_bike.present? && matching_bike.authorized?(current_user),
-              status: matching_bike.status_humanized_translated
+              state: registered_state(matching_bike)
             }
           else
             error!("You are not authorized for that organization", 401)
@@ -215,7 +244,6 @@ module API
         post "/" do
           declared_p = declared(params, include_missing: false)
           add_duplicate = declared_p.delete("add_duplicate")
-          # TODO: BikeCreator also includes bike finding, and this duplicates it - it would be nice to DRY this up
           # It's required so that the bike can be updated if there is a match
           found_bike = owner_duplicate_bike unless add_duplicate
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
