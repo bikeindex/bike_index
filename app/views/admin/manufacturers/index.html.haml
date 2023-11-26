@@ -39,6 +39,8 @@
       %th
         = sortable "frame_maker", "frame"
       %th
+        = sortable "motorized_only", "motorized"
+      %th
         Website
       %th
         = sortable "created_at"
@@ -52,6 +54,8 @@
             = link_to manufacturer.name, admin_manufacturer_url(manufacturer)
           %td.table-cell-check
             = check_mark if manufacturer.frame_maker
+          %td.table-cell-check
+            = check_mark if manufacturer.motorized_only
           %td
             - if manufacturer.website
               = link_to "Company website", manufacturer.website

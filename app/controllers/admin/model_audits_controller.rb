@@ -29,6 +29,7 @@ class Admin::ModelAuditsController < Admin::BaseController
     model_audits = ModelAudit
     if params[:search_mnfg_name].present?
       model_audits = model_audits.where("mnfg_name ILIKE ?", params[:search_mnfg_name])
+      @manufacturer = Manufacturer.friendly_find(params[:search_mnfg_name])
     end
     @mnfg_other = InputNormalizer.boolean(params[:search_mnfg_other])
     model_audits = model_audits.where.not(manufacturer_other: nil) if @mnfg_other
