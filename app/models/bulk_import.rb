@@ -109,11 +109,11 @@ class BulkImport < ApplicationRecord
 
   def no_duplicate=(val)
     self.data ||= {}
-    self.data["no_duplicate"] = ParamsNormalizer.boolean(val)
+    self.data["no_duplicate"] = InputNormalizer.boolean(val)
   end
 
   def no_duplicate
-    ascend? || ParamsNormalizer.boolean(data&.dig("no_duplicate"))
+    ascend? || InputNormalizer.boolean(data&.dig("no_duplicate"))
   end
 
   def creator

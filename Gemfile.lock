@@ -358,18 +358,18 @@ GEM
       thor (>= 0.14, < 2.0)
     json (2.6.3)
     jwt (2.2.2)
-    kaminari (1.2.1)
+    kaminari (1.2.2)
       activesupport (>= 4.1.0)
-      kaminari-actionview (= 1.2.1)
-      kaminari-activerecord (= 1.2.1)
-      kaminari-core (= 1.2.1)
-    kaminari-actionview (1.2.1)
+      kaminari-actionview (= 1.2.2)
+      kaminari-activerecord (= 1.2.2)
+      kaminari-core (= 1.2.2)
+    kaminari-actionview (1.2.2)
       actionview
-      kaminari-core (= 1.2.1)
-    kaminari-activerecord (1.2.1)
+      kaminari-core (= 1.2.2)
+    kaminari-activerecord (1.2.2)
       activerecord
-      kaminari-core (= 1.2.1)
-    kaminari-core (1.2.1)
+      kaminari-core (= 1.2.2)
+    kaminari-core (1.2.2)
     kramdown (2.3.1)
       rexml
     kramdown-parser-gfm (1.1.0)
@@ -516,7 +516,7 @@ GEM
     public_suffix (5.0.3)
     puma (6.3.1)
       nio4r (~> 2.0)
-    racc (1.7.1)
+    racc (1.7.3)
     rack (2.2.3)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -575,6 +575,8 @@ GEM
       redis-client (>= 0.17.0)
     redis-client (0.17.1)
       connection_pool
+    redlock (2.0.6)
+      redis-client (>= 0.14.1, < 1.0.0)
     regexp_parser (2.5.0)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -606,6 +608,8 @@ GEM
       rspec-expectations (~> 3.9)
       rspec-mocks (~> 3.9)
       rspec-support (~> 3.9)
+    rspec-retry (0.6.2)
+      rspec-core (> 3.3)
     rspec-sidekiq (3.0.3)
       rspec-core (~> 3.0, >= 3.0.0)
       sidekiq (>= 2.4.0)
@@ -829,11 +833,13 @@ DEPENDENCIES
   rails-i18n
   rb-fsevent (~> 0.10.3)
   redis
+  redlock
   rerun
   responders
   rqrcode (= 0.10.1)
   rspec (~> 3.4)
   rspec-rails (~> 4.0)
+  rspec-retry
   rspec-sidekiq
   rspec_junit_formatter
   sass-rails
@@ -860,7 +866,7 @@ DEPENDENCIES
   webpacker
 
 RUBY VERSION
-   ruby 2.7.6p219
+   ruby 2.7.8p225
 
 BUNDLED WITH
    2.3.16

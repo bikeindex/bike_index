@@ -36,17 +36,15 @@ _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby an
 
 ## Running Bike Index locally
 
-This explanation assumes you're familiar with developing Ruby on Rails applications.
+Follow [the Getting Started guide](docs/getting-started.markdown) for a complete set up. Or if you're familiar with developing Ruby on Rails applications start with these steps and a local Postgresql installation:
 
 - `bin/setup` sets up the application and seeds:
   - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
   - Gives user@example.com 50 bikes
 
-- `./start` start the server.
+- `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile_development](Procfile_development) and [.env](.env)
 
-  - [start](start) is a bash script. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3001, change the appropriate values in [Procfile_development](Procfile_development) and [.env](.env)
-
-- Go to [localhost:3001](http://localhost:3001)
+- Go to [localhost:3042](http://localhost:3042)
 
 | Toggle in development | command                       | default  |
 | ---------             | -------                       | -------  |

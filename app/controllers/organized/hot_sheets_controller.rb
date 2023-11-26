@@ -32,10 +32,8 @@ module Organized
       return unless ensure_current_organization!
 
       # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
-      return true if current_user.superuser? || current_organization.enabled?("hot_sheet")
-
-      flash[:error] = translation(:org_does_not_have_access)
-      redirect_to(organization_root_path) && return
+      return true if current_organization.enabled?("hot_sheet") || current_user.superuser?
+      raise_do_not_have_access!
     end
 
     def set_current_hot_sheet_configuration

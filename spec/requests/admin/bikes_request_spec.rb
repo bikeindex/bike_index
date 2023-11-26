@@ -211,10 +211,11 @@ RSpec.describe Admin::BikesController, type: :request do
 
   describe "update_manufacturers" do
     it "updates the products" do
-      bike1 = FactoryBot.create(:bike, manufacturer_other: "hahaha")
-      bike2 = FactoryBot.create(:bike, manufacturer_other: "69")
-      bike3 = FactoryBot.create(:bike, manufacturer_other: "69")
+      bike1 = FactoryBot.create(:bike, manufacturer_other: "hahaha", model_audit_id: 12)
+      bike2 = FactoryBot.create(:bike, manufacturer_other: "69", model_audit_id: 11, likely_spam: true)
+      bike3 = FactoryBot.create(:bike, manufacturer_other: "69", model_audit_id: 12)
       manufacturer = FactoryBot.create(:manufacturer)
+      Sidekiq::Worker.clear_all
       post "#{base_url}/update_manufacturers", params: {
         manufacturer_id: manufacturer.id,
         bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
@@ -226,6 +227,7 @@ RSpec.describe Admin::BikesController, type: :request do
       end
       bike3.reload
       expect(bike3.manufacturer_other).to eq "69" # Sanity check
+      expect(FindOrCreateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to match_array([11, 12])
     end
   end
 

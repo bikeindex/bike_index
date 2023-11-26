@@ -18,7 +18,7 @@ Rails.application.configure do
   # Run rails dev:cache to toggle caching.
   if Rails.root.join("tmp", "caching-dev.txt").exist?
     config.action_controller.perform_caching = true
-    config.cache_store = :redis_cache_store, {url: ENV["REDIS_CACHE_URL"]}
+    config.cache_store = :redis_cache_store, {url: config.redis_cache_url}
 
     config.public_file_server.headers = {
       "Cache-Control" => "public, max-age=#{2.days.to_i}"
@@ -34,7 +34,7 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = {host: "localhost", port: 3001}
+  config.action_mailer.default_url_options = {host: "localhost", port: 3042}
   if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
     config.action_mailer.perform_deliveries = false
     config.action_mailer.delivery_method = :smtp

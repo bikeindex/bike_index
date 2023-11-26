@@ -2,8 +2,13 @@
 production:
   :concurrency: 10
 :queues:
-  - low_priority # Lowest priority, general things, non-user-facing
-  - [carrierwave, 2] # Also includes file_caching/tsv creation
-  - [notify, 20] # sending email & notifications
-  - [high_priority, 20] # User facing updates, execute immediately
-  
+  # There are two workers on production, specified in the procfile.
+  # - 1 runs all the queues
+  # - 1 runs everything but the droppable queue
+  # This is to ensure that if the droppable queue backs up, it doesn't block other things
+  # (e.g. signup email links)
+  - droppable # Things that can take a really long time and can be dropped if the queue backs up
+  - [low_priority, 10] # Lowest priority, general things, non-user-facing
+  - [carrierwave, 20] # Also includes file_caching/tsv creation
+  - [notify, 200] # sending email & notifications - NOTE: has a dedicated queue
+  - [high_priority, 200] # User facing updates, execute immediately - NOTE: has a dedicated queue

@@ -100,7 +100,7 @@ class Export < ApplicationRecord
   end
 
   def only_custom_bike_ids=(val)
-    options["only_custom_bike_ids"] = ParamsNormalizer.boolean(val)
+    options["only_custom_bike_ids"] = InputNormalizer.boolean(val)
   end
 
   def partial_registrations

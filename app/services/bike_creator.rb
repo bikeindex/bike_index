@@ -36,6 +36,13 @@ class BikeCreator
     # Default attributes
     bike = Bike.new(cycle_type: "bike")
     bike.attributes = b_param.safe_bike_attrs(new_attrs)
+    # If manufacturer_other is an existing manufacturer, reassign it
+    if bike.manufacturer_id == Manufacturer.other.id
+      manufacturer = Manufacturer.friendly_find(bike.manufacturer_other)
+      if manufacturer.present?
+        bike.attributes = {manufacturer_id: manufacturer.id, manufacturer_other: nil}
+      end
+    end
     # Use bike status because it takes into account new_attrs
     bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
     bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?

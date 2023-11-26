@@ -20,7 +20,7 @@ class Admin::ManufacturersController < Admin::BaseController
   def update
     if @manufacturer.update(permitted_parameters)
       flash[:success] = "Manufacturer Saved!"
-      AutocompleteLoaderWorker.perform_async("reset")
+      AutocompleteLoaderWorker.perform_async
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :edit
@@ -31,7 +31,7 @@ class Admin::ManufacturersController < Admin::BaseController
     @manufacturer = Manufacturer.create(permitted_parameters)
     if @manufacturer.save
       flash[:success] = "Manufacturer Created!"
-      AutocompleteLoaderWorker.perform_async("reset")
+      AutocompleteLoaderWorker.perform_async
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :new
@@ -64,15 +64,16 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:manufacturer).permit(:name, :slug, :website, :frame_maker, :total_years_active, :notes,
-      :open_year, :close_year, :logo, :description, :logo_source, :twitter_name)
+    params.require(:manufacturer).permit(:name, :slug, :website, :frame_maker,
+      :motorized_only, :total_years_active, :notes, :open_year,
+      :close_year, :logo, :description, :logo_source, :twitter_name)
   end
 
   def searched_manufacturers
     manufacturers = Manufacturer
-    @with_logos = ParamsNormalizer.boolean(params[:search_with_logos])
+    @with_logos = InputNormalizer.boolean(params[:search_with_logos])
     manufacturers = manufacturers.with_websites if @with_logos
-    @with_websites = ParamsNormalizer.boolean(params[:search_with_websites])
+    @with_websites = InputNormalizer.boolean(params[:search_with_websites])
     manufacturers = manufacturers.with_logos if @with_logos
     manufacturers
   end

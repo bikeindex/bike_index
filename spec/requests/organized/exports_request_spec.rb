@@ -13,7 +13,7 @@ RSpec.describe Organized::ExportsController, type: :request do
       describe "index" do
         it "redirects" do
           get base_url
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
           expect(flash[:error]).to be_present
         end
       end
@@ -21,7 +21,7 @@ RSpec.describe Organized::ExportsController, type: :request do
       describe "show" do
         it "redirects" do
           get "#{base_url}/#{export.id}"
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
           expect(flash[:error]).to be_present
         end
       end

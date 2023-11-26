@@ -27,6 +27,7 @@ class Bike < ApplicationRecord
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
   belongs_to :paint, counter_cache: true # Not in BikeAttributable because of counter cache
+  belongs_to :model_audit
 
   has_many :bike_organizations
   has_many :organizations, through: :bike_organizations
@@ -580,10 +581,10 @@ class Bike < ApplicationRecord
 
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
-    if marked_user_hidden.present? && ParamsNormalizer.boolean(marked_user_hidden)
+    if marked_user_hidden.present? && InputNormalizer.boolean(marked_user_hidden)
       self.user_hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden.present? && ParamsNormalizer.boolean(marked_user_unhidden)
+    elsif marked_user_unhidden.present? && InputNormalizer.boolean(marked_user_unhidden)
       self.user_hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
@@ -746,15 +747,19 @@ class Bike < ApplicationRecord
   # Called in BikeCreator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
-    self.manufacturer_other = ParamsNormalizer.strip_or_nil_if_blank(manufacturer_other)
+    self.manufacturer_other = InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
+    self.frame_model = InputNormalizer.string(frame_model)
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
-    self.name = name.present? ? name.strip : nil
-    self.extra_registration_number = ParamsNormalizer.strip_or_nil_if_blank(extra_registration_number)
+    self.name = InputNormalizer.string(name)
+    self.extra_registration_number = InputNormalizer.string(extra_registration_number)
     if extra_registration_number.present?
-      self.extra_registration_number = nil if extra_registration_number.match?(/(serial.)?#{serial_number}/i)
+      serial_sanitized = InputNormalizer.regex_escape(serial_number)
+      if serial_sanitized.present? && extra_registration_number.match?(/(serial.)?#{serial_sanitized}/i)
+        self.extra_registration_number = nil
+      end
     end
   end
 

@@ -9,7 +9,7 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
       .reorder("user_registration_organizations.#{sort_column} #{sort_direction}")
       .includes(:user, :organization)
       .page(page).per(@per_page)
-    @render_org_counts = ParamsNormalizer.boolean(params[:search_org_counts])
+    @render_org_counts = InputNormalizer.boolean(params[:search_org_counts])
   end
 
   helper_method :matching_user_registration_organizations
@@ -33,7 +33,7 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
     if current_organization.present?
       user_registration_organizations = user_registration_organizations.where(organization_id: current_organization.id)
     end
-    @with_registration_info = ParamsNormalizer.boolean(params[:search_with_registration_info])
+    @with_registration_info = InputNormalizer.boolean(params[:search_with_registration_info])
     if @with_registration_info
       user_registration_organizations = user_registration_organizations.where.not(registration_info: {})
     end

@@ -2,6 +2,14 @@ require "rails_helper"
 
 RSpec.describe OrganizationFeature, type: :model do
   it_behaves_like "amountable"
+  describe "constant ordering" do
+    it "is ordered" do
+      expect(OrganizationFeature::REG_FIELDS.sort).to eq OrganizationFeature::REG_FIELDS
+      expect(OrganizationFeature::BIKE_ACTIONS.sort).to eq OrganizationFeature::BIKE_ACTIONS
+      expected_slugs = OrganizationFeature::EXPECTED_SLUGS - OrganizationFeature::REG_FIELDS - OrganizationFeature::BIKE_ACTIONS
+      expect(expected_slugs.sort).to eq expected_slugs
+    end
+  end
 
   describe "feature_slugs_string" do
     let(:organization_feature) { OrganizationFeature.new }

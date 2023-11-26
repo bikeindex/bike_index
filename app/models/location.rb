@@ -50,7 +50,7 @@ class Location < ApplicationRecord
   end
 
   def publicly_visible=(val)
-    self.not_publicly_visible = !ParamsNormalizer.boolean(val)
+    self.not_publicly_visible = !InputNormalizer.boolean(val)
   end
 
   def set_calculated_attributes

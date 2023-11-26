@@ -28,6 +28,9 @@ class AfterBikeSaveWorker < ApplicationWorker
       bike_version.save if bike_version.changed?
     end
     bike.update_column :credibility_score, bike.credibility_scorer.score
+    if FindOrCreateModelAuditWorker.enqueue_for?(bike)
+      FindOrCreateModelAuditWorker.perform_async(bike.id)
+    end
     return true unless bike.status_stolen? # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
   end

@@ -1750,6 +1750,9 @@ en:
             to see that!
         ensure_not_ambassador_organization!:
           must_be_an_admin: You have to be an admin to do that!
+        raise_do_not_have_access: >-
+          Your organization doesn't have access to that, please contact Bike Index
+          support.
       bikes:
         update:
           unknown_update_action: Unknown update action. Please contact support@bikeindex.org
@@ -1758,10 +1761,6 @@ en:
           bulk_import_created: Bulk Import created!
           file_imported: File imported
           unable_to_create_bulk_import: Unable to create bulk import.
-        ensure_access_to_bulk_import!:
-          org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         show:
           unable_to_find_import: Unable to find that import.
       exports:
@@ -1780,28 +1779,10 @@ en:
             That sticker has already been assigned! Please choose a new initial Stickery_assigned.
         destroy:
           export_deleted: Export was successfully deleted!
-        ensure_access_to_exports!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         update:
           bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
-      graduated_notifications:
-        ensure_access_to_graduated_notifications!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
-      hot_sheets:
-        ensure_access_to_hot_sheet!:
-          org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       manage_impoundings:
-        assign_organization:
-          can_not_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
@@ -1813,27 +1794,11 @@ en:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
-      messages:
-        create:
-          message_sent: "%{message_kind} message sent"
-          unable_to_send: Unable to send message - %{errors}
-        ensure_permitted_message_kind!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
           unable_to_create: Unable to create - %{errors}
-        ensure_access_to_parking_notifications!:
-          your_org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
       stickers:
-        ensure_access_to_bike_stickers!:
-          org_does_not_have_access: >-
-            Your organization doesn't have access to that, please contact Bike Index
-            support.
         find_bike_sticker:
           unable_to_find_sticker: 'Unable to find sticker with code: %{bike_sticker}.'
         update:
@@ -4484,7 +4449,7 @@ en:
         avery: Avery?
         bike: bike
         color: Color
-        create_export: Create export of searched bikes
+        create_export_of_vehicles: Create export of searched %{cycle_type}
         email_hidden: email hidden
         impounded: Impounded
         link: Link
@@ -4492,7 +4457,7 @@ en:
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         model: Model
-        only_impounded_html: Only <strong>impounded</strong> bikes
+        only_impounded_vehicles_html: Only <strong>impounded</strong>
         only_no_address_html: Only <strong>no</strong> address
         only_no_sticker_html: Only <strong>no</strong> sticker
         only_not_impounded_html: Only <strong>not</strong> impounded
@@ -4511,11 +4476,12 @@ en:
         sticker: Sticker
         stickers: 'Stickers:'
         stolen: Stolen
-        stolen_bikes_html: "<em>stolen</em> bikes"
+        stolen_vehicles_html: "<em>stolen</em> %{cycle_type}"
         updated: Updated
+        vehicle: vehicle
         vehicle_type: Vehicle type
-        view_all_bikes: view all bikes
-        view_just_stolen_bikes: view just stolen bikes
+        view_all_vehicles: view all %{cycle_type}
+        view_just_stolen_vehicles: view just stolen %{cycle_type}
         visible_columns: Visible columns
     bulk_imports:
       error_type:
@@ -5278,6 +5244,7 @@ en:
       lightspeed_integration_panel: Lightspeed Integration Panel
       manage_impounding: Manage impounding
       manage_users: Manage users
+      model_audits: E-Vehicle audits
       multi_serial_search: Multi serial search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"

@@ -12,7 +12,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_qC9ssKAdZFJULd","request_duration_ms":175}}'
+      - '{"last_request_metrics":{"request_id":"req_p6z0Iv2SiWGBrq","request_duration_ms":217}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -25,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 29 Sep 2023 17:06:07 GMT
+      - Tue, 07 Nov 2023 16:14:41 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2158'
+      - '2206'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -39,17 +39,22 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       Access-Control-Expose-Headers:
-      - Request-Id, Stripe-Manage-Version, X-Stripe-External-Auth-Required, X-Stripe-Privileged-Session-Required
+      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
+        X-Stripe-Privileged-Session-Required
       Access-Control-Max-Age:
       - '300'
       Cache-Control:
       - no-cache, no-store
+      Content-Security-Policy:
+      - report-uri https://q.stripe.com/csp-report?p=v1%2Fcheckout%2Fsessions; block-all-mixed-content;
+        default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none';
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'
       Idempotency-Key:
-      - 94456d65-9c11-4677-b6dd-54cb0cfac635
+      - a86ee111-4c3d-4022-b719-3e2cc3a46f67
       Original-Request:
-      - req_jTc6mAp7eJny6S
+      - req_u3COavfEdwz3VK
       Request-Id:
-      - req_jTc6mAp7eJny6S
+      - req_u3COavfEdwz3VK
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -64,7 +69,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1TjHW2fVOK5DgjZ6wnuocymMz82Vwz5PLh5SrImSR1JY5iaIUZs1dwjnF",
+          "id": "cs_test_a1YUNk5SzdSDlJzbPqAaoZ8CJmxARFGTyeuS0quj91eGjWose6YFshfbk5",
           "object": "checkout.session",
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -77,9 +82,10 @@ http_interactions:
           "billing_address_collection": null,
           "cancel_url": "http://test.host/payments/new",
           "client_reference_id": null,
+          "client_secret": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1696007167,
+          "created": 1699373681,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -92,7 +98,7 @@ http_interactions:
           "customer_creation": "always",
           "customer_details": null,
           "customer_email": null,
-          "expires_at": 1696093566,
+          "expires_at": 1699460081,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -109,7 +115,7 @@ http_interactions:
           "locale": null,
           "metadata": {},
           "mode": "payment",
-          "payment_intent": "pi_2Nvk8hm0T0GBfX0v1P20FMVn",
+          "payment_intent": "pi_2O9rvJm0T0GBfX0v0Bk9OIhw",
           "payment_link": null,
           "payment_method_collection": "always",
           "payment_method_configuration_details": null,
@@ -136,8 +142,9 @@ http_interactions:
             "amount_shipping": 0,
             "amount_tax": 0
           },
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1TjHW2fVOK5DgjZ6wnuocymMz82Vwz5PLh5SrImSR1JY5iaIUZs1dwjnF#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "ui_mode": "hosted",
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1YUNk5SzdSDlJzbPqAaoZ8CJmxARFGTyeuS0quj91eGjWose6YFshfbk5#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-    http_version: 
-  recorded_at: Fri, 29 Sep 2023 17:06:07 GMT
+    http_version:
+  recorded_at: Tue, 07 Nov 2023 16:14:41 GMT
 recorded_with: VCR 5.0.0

@@ -30,10 +30,10 @@ class BikeVersionsController < ApplicationController
   def update
     # Set the start and end at with timezone
     if permitted_params.key?(:start_at)
-      @bike_version.start_at = if ParamsNormalizer.boolean(permitted_params[:start_at_shown])
+      @bike_version.start_at = if InputNormalizer.boolean(permitted_params[:start_at_shown])
         TimeParser.parse(permitted_params[:start_at], permitted_params[:timezone])
       end
-      @bike_version.end_at = if ParamsNormalizer.boolean(permitted_params[:end_at_shown])
+      @bike_version.end_at = if InputNormalizer.boolean(permitted_params[:end_at_shown])
         TimeParser.parse(permitted_params[:end_at], permitted_params[:timezone])
       end
     end

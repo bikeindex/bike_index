@@ -247,7 +247,7 @@ module ApplicationHelper
     cleaned_data = if no_blank
       # Show false values, just not empty or nil things
       data.select do |k, v|
-        next unless ParamsNormalizer.present_or_false?(v)
+        next unless InputNormalizer.present_or_false?(v)
         [k, v]
       end.compact.to_h
     else

@@ -16,7 +16,7 @@
 - else
   - if @kind == "bikes"
     .mt-4.text-right
-      - if ParamsNormalizer.boolean(params[:search_deleted])
+      - if InputNormalizer.boolean(params[:search_deleted])
         = link_to "Don't include deleted bikes", admin_graphs_path(sortable_search_params.merge(search_deleted: false)), class: "less-strong"
       - else
         = link_to "Include deleted bikes", admin_graphs_path(sortable_search_params.merge(search_deleted: true)), class: "less-strong"

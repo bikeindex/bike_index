@@ -97,6 +97,11 @@
     %li
       = active_link t(".graduated_notifications"), organization_graduated_notifications_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
 
+  - if passed_organization.enabled?("model_audits")
+    - additional_divider = true
+    %li
+      = active_link t(".model_audits"), organization_model_audits_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"
+
   - if passed_organization.impound_claims?
     %li
       = active_link t(".impounded_claims"), organization_impound_claims_path(organization_id: passed_organization.to_param), match_controller: true, class: "nav-link"

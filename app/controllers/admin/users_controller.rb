@@ -102,10 +102,10 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def matching_users
-    @search_ambassadors = ParamsNormalizer.boolean(params[:search_ambassadors])
-    @search_banned = ParamsNormalizer.boolean(params[:search_banned])
-    @search_superusers = ParamsNormalizer.boolean(params[:search_superusers])
-    @updated_at = ParamsNormalizer.boolean(params[:search_updated_at])
+    @search_ambassadors = InputNormalizer.boolean(params[:search_ambassadors])
+    @search_banned = InputNormalizer.boolean(params[:search_banned])
+    @search_superusers = InputNormalizer.boolean(params[:search_superusers])
+    @updated_at = InputNormalizer.boolean(params[:search_updated_at])
     users = if current_organization.present?
       current_organization.users
     else

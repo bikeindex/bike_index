@@ -62,6 +62,7 @@ class Organization < ApplicationRecord
   has_one :organization_stolen_message
   has_one :impound_configuration
   has_many :hot_sheets
+  has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true

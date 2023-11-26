@@ -14,7 +14,8 @@ module AdminHelper
       {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
-      {title: "Dev: Logged searches", path: admin_logged_searches_path, match_controller: true}
+      {title: "Dev: Logged searches", path: admin_logged_searches_path, match_controller: true},
+      {title: "Dev: Model Audits", path: admin_model_audits_path, match_controller: true}
     ]
   end
 

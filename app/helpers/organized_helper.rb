@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: add translations
 module OrganizedHelper
   def organized_bike_text(bike = nil, skip_creation: false)
     return nil unless bike.present?
@@ -51,7 +52,7 @@ module OrganizedHelper
   end
 
   def organized_container
-    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines]
+    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits]
     return "container-fluid" if fluid.include?(controller_name)
     controller_name == "bikes" && action_name == "index" ? "container-fluid" : "container"
   end
@@ -70,12 +71,13 @@ module OrganizedHelper
   end
 
   def status_display_class(status)
+    return "" if status.blank?
     case status.downcase
-    when "current", "paging", "being_helped"
+    when "current", "paging", "being_helped", /\Acertified/
       "text-success"
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated"
       "text-info"
-    when /removed/, "impounded", "trashed", "failed_to_find", /denied/
+    when /removed/, "impounded", "trashed", "failed_to_find", /denied/, /uncertified/
       "text-danger"
     when "stolen"
       "text-warning"

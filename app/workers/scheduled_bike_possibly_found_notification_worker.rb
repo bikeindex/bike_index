@@ -1,4 +1,4 @@
-class ScheduleBikePossiblyFoundNotificationWorker < ScheduledWorker
+class ScheduledBikePossiblyFoundNotificationWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   def self.frequency

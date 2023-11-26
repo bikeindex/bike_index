@@ -259,7 +259,7 @@ class User < ApplicationRecord
   end
 
   def accepted_vendor_terms_of_service=(val)
-    return unless ParamsNormalizer.boolean(val)
+    return unless InputNormalizer.boolean(val)
     self.vendor_terms_of_service = true
     self.when_vendor_terms_of_service = Time.current
   end
@@ -396,7 +396,7 @@ class User < ApplicationRecord
     end
     if my_bikes_link_target.present? || my_bikes_link_title.present?
       mbh = my_bikes_hash || {}
-      mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
+      mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target)
       mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
     end

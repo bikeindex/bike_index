@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
-ruby "2.7.6"
+ruby "2.7.8"
 gem "rack", "2.2.3"
 gem "rails", "~> 6.0"
 
@@ -38,6 +38,7 @@ gem "translation"
 gem "redis"
 gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+gem "redlock" # Locking
 
 gem "eventmachine"
 gem "faraday_middleware" # Manage faraday request flow
@@ -176,6 +177,7 @@ group :test do
   gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
+  gem "rspec-retry", require: false # Retry failures on CI
 end
 
 gem "dockerfile-rails", ">= 1.5", group: :development

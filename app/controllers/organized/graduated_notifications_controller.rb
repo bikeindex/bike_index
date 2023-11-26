@@ -36,7 +36,7 @@ module Organized
     end
 
     def separate_secondary_notifications?
-      @separate_secondary_notifications ||= ParamsNormalizer.boolean(params[:search_secondary])
+      @separate_secondary_notifications ||= InputNormalizer.boolean(params[:search_secondary])
     end
 
     def search_params_present?
@@ -84,10 +84,8 @@ module Organized
     end
 
     def ensure_access_to_graduated_notifications!
-      return true if current_organization.enabled?("graduated_notifications")
-      flash[:error] = translation(:your_org_does_not_have_access)
-      redirect_to organization_bikes_path(organization_id: current_organization.to_param)
-      nil
+      return true if current_organization.enabled?("graduated_notifications") || current_user.superuser?
+      raise_do_not_have_access!
     end
   end
 end

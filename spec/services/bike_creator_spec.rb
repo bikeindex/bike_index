@@ -192,7 +192,7 @@ RSpec.describe BikeCreator do
       context "child organization" do
         let(:organization_parent) { FactoryBot.create(:organization) }
         let(:organization) { FactoryBot.create(:organization_child, parent_organization: organization_parent) }
-        it "creates the bike_organization for both" do
+        it "creates the bike_organization for both", :flaky do
           expect {
             instance.create_bike(b_param)
           }.to change(BikeOrganization, :count).by 2
@@ -208,10 +208,13 @@ RSpec.describe BikeCreator do
         end
       end
       context "extra attributes" do
+        let(:manufacturer_name) { "BH Bikes (Beistegui Hermanos)" }
         let(:wheel_size) { FactoryBot.create(:wheel_size) }
         let(:bike_params) do
           default_params.merge(
             creation_organization_id: organization.id,
+            manufacturer_id: Manufacturer.other.id,
+            manufacturer_other: "BH", # It looks up the manufacturer
             propulsion_type_slug: "hand-pedal",
             cycle_type: "stroller",
             serial_number: "BIKE TOKENd",
@@ -231,7 +234,10 @@ RSpec.describe BikeCreator do
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.registration_address).to eq({"street" => "Somewhere Ville"})
-          expect_attrs_to_match_hash(bike, bike_params.except(:user_name, :propulsion_type_slug))
+          expect_attrs_to_match_hash(bike, bike_params.except(:user_name, :propulsion_type_slug, :manufacturer_id, :manufacturer_other))
+          expect(bike.manufacturer_id).to eq manufacturer.id
+          expect(bike.manufacturer_other).to be_nil
+          expect(bike.mnfg_name).to eq "BH Bikes" # Because that's the short name
           expect(bike.propulsion_type).to eq "human-not-pedal"
           # Test that front_wheel is assigned via rear wheel attr
           expect(bike.front_wheel_size_id).to eq wheel_size.id

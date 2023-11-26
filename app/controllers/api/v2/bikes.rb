@@ -5,10 +5,11 @@ module API
 
       CYCLE_TYPE_NAMES = CycleType::NAMES.values.map(&:downcase)
       PROPULSION_TYPES = PropulsionType::SLUGS
-      # Use default values if in test, because things aren't in the database
-      CTYPE_NAMES = (Rails.env.test? ? ["wheel", "headset"] : Ctype.pluck(:name).map(&:downcase)).freeze
-      COLOR_NAMES = (Rails.env.test? ? ["black", "orange"] : Color.pluck(:name).map(&:downcase)).freeze
-      COUNTRY_ISOS = (Rails.env.test? ? ["US"] : Country.pluck(:iso)).freeze
+      # When running bin/setup, things break if the database isn't setup. Also use default in test
+      STATIC_VALS = Rails.env.test? || !!Ctype
+      CTYPE_NAMES = (STATIC_VALS ? ["wheel", "headset"] : Ctype.pluck(:name).map(&:downcase)).freeze
+      COLOR_NAMES = (STATIC_VALS ? ["black", "orange"] : Color.pluck(:name).map(&:downcase)).freeze
+      COUNTRY_ISOS = (STATIC_VALS ? ["US"] : Country.pluck(:iso)).freeze
 
       helpers do
         params :bike_attrs do

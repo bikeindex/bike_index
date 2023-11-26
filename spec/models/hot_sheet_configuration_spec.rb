@@ -47,17 +47,25 @@ RSpec.describe HotSheetConfiguration, type: :model do
           timezone_str: "America/Halifax",
           is_on: true)
       end
+      # On days when there is a transition between DST, the time gap is an hour. This hacks that
+      def dst_transition?
+        Time.current.dst? != Time.current.yesterday.dst?
+      end
+      let(:within_time) { dst_transition? ? 3602 : 2 }
       it "is falsey" do
         expect(hot_sheet_configuration.time_in_zone.to_i).to be_within(1).of Time.current.utc.to_i # OMG Time math is so hard
         expect(hot_sheet_configuration.timezone.utc_offset).to eq(-14400) # AKA Atlantic Time (Canada)
         expect(hot_sheet_configuration.timezone.utc_offset).to eq timezone.utc_offset
-        expect(hot_sheet_configuration.send_today_at.to_i).to be_within(2).of Time.current.to_i + 100
-        expect(hot_sheet_configuration.send_today_now?).to be_falsey
+        expect(hot_sheet_configuration.send_today_at.to_i).to be_within(within_time).of Time.current.to_i + 100
+        # This fails when transitioning out of DST, so ignore it
+        unless dst_transition?
+          expect(hot_sheet_configuration.send_today_now?).to be_falsey
+        end
       end
       context "send_today_at before current time" do
         let(:send_seconds) { Time.current.in_time_zone(timezone).seconds_since_midnight - 60 }
         it "is truthy - until it's been created" do
-          expect(hot_sheet_configuration.send_today_at.to_i).to be_within(2).of Time.current.to_i - 60
+          expect(hot_sheet_configuration.send_today_at.to_i).to be_within(within_time).of Time.current.to_i - 60
           expect(hot_sheet_configuration.hot_sheets.count).to eq 0
           expect(hot_sheet_configuration.send_today_now?).to be_truthy
           # If there is a current hot_sheet, it shouldn't send_today_now

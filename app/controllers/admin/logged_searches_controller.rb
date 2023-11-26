@@ -47,11 +47,11 @@ class Admin::LoggedSearchesController < Admin::BaseController
       @endpoint = "all"
     end
 
-    if ParamsNormalizer.boolean(params[:search_serial])
+    if InputNormalizer.boolean(params[:search_serial])
       @serial = true
       logged_searches = logged_searches.serial
     end
-    if ParamsNormalizer.boolean(params[:search_includes_query])
+    if InputNormalizer.boolean(params[:search_includes_query])
       @includes_query = true
       logged_searches = logged_searches.includes_query
     end

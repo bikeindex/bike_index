@@ -25,6 +25,11 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
         end
       end
 
+      # Only enqueue this if there aren't any org model audits, because this will be a lot
+      if organization.enabled?("model_audits") && organization.organization_model_audits.limit(1).none?
+        ModelAudit.pluck(:id).each { |id| UpdateModelAuditWorker.perform_async(id) }
+      end
+
       organization.calculated_children.where.not(id: organization_ids_for_update)
         .each { |o| o.update(skip_update: true, updated_at: Time.current) }
 

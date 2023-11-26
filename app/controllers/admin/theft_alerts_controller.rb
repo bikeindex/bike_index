@@ -11,7 +11,7 @@ class Admin::TheftAlertsController < Admin::BaseController
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
     @page_title = "Admin | Promoted alerts"
-    @location_counts = ParamsNormalizer.boolean(params[:search_location_counts])
+    @location_counts = InputNormalizer.boolean(params[:search_location_counts])
   end
 
   def show
@@ -22,13 +22,13 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def update
-    if ParamsNormalizer.boolean(params[:activate_theft_alert])
+    if InputNormalizer.boolean(params[:activate_theft_alert])
       new_data = @theft_alert.facebook_data || {}
       @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
       ActivateTheftAlertWorker.perform_async(@theft_alert.id, true)
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
-    elsif ParamsNormalizer.boolean(params[:update_theft_alert])
+    elsif InputNormalizer.boolean(params[:update_theft_alert])
       UpdateTheftAlertFacebookWorker.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
@@ -118,7 +118,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def searched_theft_alerts
-    @search_recovered = ParamsNormalizer.boolean(params[:search_recovered])
+    @search_recovered = InputNormalizer.boolean(params[:search_recovered])
     theft_alerts = if @search_recovered
       stolen_record_ids = StolenRecord.recovered.with_theft_alerts
         .where(theft_alerts: {created_at: @time_range}).pluck(:id)
@@ -129,7 +129,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     @search_paid_admin = available_paid_admin.include?(params[:search_paid_admin]) ? params[:search_paid_admin] : nil
     theft_alerts = theft_alerts.send(@search_paid_admin) if @search_paid_admin.present?
 
-    @search_facebook_data = ParamsNormalizer.boolean(params[:search_facebook_data])
+    @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
     if available_statuses.include?(params[:search_status])
       @status = params[:search_status]

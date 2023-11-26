@@ -2348,6 +2348,8 @@ nl:
             dat te zien!
         ensure_not_ambassador_organization!:
           must_be_an_admin: Je moet een admin zijn om dat te doen!
+        raise_do_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
+          contact op met Bike Index support.
       bikes:
         update:
           unknown_update_action: Onbekende updateactie. Neem contact op met support@bikeindex.org
@@ -2356,9 +2358,6 @@ nl:
           bulk_import_created: Bulkimport gemaakt!
           file_imported: Bestand geïmporteerd
           unable_to_create_bulk_import: Kan bulkimport niet maken.
-        ensure_access_to_bulk_import!:
-          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
-            contact op met Bike Index support.
         show:
           unable_to_find_import: Kan die import niet vinden.
       exports:
@@ -2374,26 +2373,13 @@ nl:
             initiële Stickery_assigned.
         destroy:
           export_deleted: Export is succesvol verwijderd!
-        ensure_access_to_exports!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
         update:
           unknown_update_action: Onbekende updateactie!
           bike_stickers_removed: Fietscodes verwijderd!
-      messages:
-        create:
-          message_sent: "%{message_kind} bericht verzonden"
-          unable_to_send: Kan bericht niet verzenden - %{errors}
-        ensure_permitted_message_kind!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
       stickers:
         update:
           cannot_update: Je kunt dat %{bike_sticker_kind} niet bijwerken. Neem contact
             op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
-        ensure_access_to_bike_stickers!:
-          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
-            contact op met Bike Index support.
         find_bike_sticker:
           unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_sticker}.'
       users:
@@ -2417,9 +2403,6 @@ nl:
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
           unable_to_create: Kan niet maken - %{errors}
-        ensure_access_to_parking_notifications!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
       manages:
         destroy:
           contact_support_to_delete: Neem contact op met support@bikeindex.org om
@@ -2429,18 +2412,7 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
-      graduated_notifications:
-        ensure_access_to_graduated_notifications!:
-          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
-            neem contact op met Bike Index support.
-      hot_sheets:
-        ensure_access_to_hot_sheet!:
-          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
-            contact op met Bike Index support.
       manage_impoundings:
-        assign_organization:
-          can_not_access: Uw organisatie heeft hier geen toegang toe, neem contact
-            op met Bike Index support.
         update:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
@@ -4316,10 +4288,7 @@ nl:
         sticker: Sticker
         stickers: 'stickers:'
         stolen: Gestolen
-        stolen_bikes_html: "<em>gestolen</em> fietsen"
         updated: Bijgewerkt
-        view_all_bikes: bekijk alle fietsen
-        view_just_stolen_bikes: bekijk alleen gestolen fietsen
         visible_columns: Zichtbare kolommen
         email_hidden: email verborgen
         impounded: In beslag genomen bij
@@ -4327,7 +4296,6 @@ nl:
         avery: Avery?
         only_no_address_html: Alleen <strong>geen</strong> adres
         only_with_address_html: Alleen <strong>met</strong> adres
-        only_impounded_html: Alleen in <strong>beslag genomen</strong> fietsen
         only_not_impounded_html: Fietsen die <strong>niet in</strong> beslag <strong>worden</strong>
           genomen
         vehicle_type: 'Voertuigtype:'
@@ -4335,8 +4303,13 @@ nl:
         only_with_owner_html: Niet gestolen of in beslag genomen
         status: 'Toestand:'
         status_cell: Toestand
-        create_export: Maak export van gezochte fietsen
         propulsion_type: Voortstuwing
+        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
+        only_impounded_vehicles_html: Alleen <strong>in beslag genomen</strong>
+        stolen_vehicles_html: "<em>gestolen</em> %{cycle_type}"
+        vehicle: voertuig
+        view_all_vehicles: alles bekijken %{cycle_type}
+        view_just_stolen_vehicles: weergave zojuist gestolen %{cycle_type}
     bulk_imports:
       index:
         added: Toegevoegd
@@ -5073,6 +5046,7 @@ nl:
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
       super_admin_view: Superbeheerder voor %{org_name}
       stolen_message: Gestolen bericht
+      model_audits: Audits van e-voertuigen
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
