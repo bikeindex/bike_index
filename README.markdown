@@ -1,4 +1,4 @@
-# [![BIKE INDEX][bike-index-logo]][bike-index] ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![Test Coverage][codeclimate-badge]][codeclimate] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![View performance data on Skylight][skylight-badge]][skylight]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/bike_index.png?raw=true
 [circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/main
@@ -56,7 +56,7 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 
 ## Internationalization
 
-See the [internationalization docs](docs/internationalization.markdown) for details.
+See the [internationalization docs](docs/internationalization.markdown) for details (we use [translation.io](https://translation.io/) for localization).
 
 ## Testing
 
