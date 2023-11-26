@@ -1,14 +1,11 @@
-# [![BIKE INDEX][bike-index-logo]][bike-index] ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![Test Coverage][codeclimate-badge]][codeclimate] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] [![CircleCI][circleci-badge]][circleci] [![View performance data on Skylight][skylight-badge]][skylight]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/bike_index.png?raw=true
 [circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/main
 [circleci-badge]: https://circleci.com/gh/bikeindex/bike_index/tree/main.svg?style=svg
-[codeclimate]: https://codeclimate.com/github/bikeindex/bike_index
-[codeclimate-badge]: https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg
 [skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
 [skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
 [bike-index]: https://www.bikeindex.org
-[cloud66-badge]: https://app.cloud66.com/stacks/badge/ff54cf1d55d7eb91ef09c90f125ae4f1.svg
 
 Bike registration that works: online, powerful, free.
 
@@ -56,7 +53,7 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 
 ## Internationalization
 
-See the [internationalization docs](docs/internationalization.markdown) for details.
+See the [internationalization docs](docs/internationalization.markdown) for details (we use [translation.io](https://translation.io/) for localization).
 
 ## Testing
 
