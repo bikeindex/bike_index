@@ -80,8 +80,8 @@ RSpec.describe "Bikes API V3", type: :request do
     context "user is organization member" do
       let(:user) { FactoryBot.create(:organization_member) }
       let!(:organization) { user.organizations.first }
-      let(:target_result) { {registered: true, claimed: false, can_edit: false} }
-      let(:unmatched_result) { {registered: false, claimed: false, can_edit: false} }
+      let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "with_user"} }
+      let(:unmatched_result) { {registered: false, claimed: false, can_edit: false, state: "no_matching_bike"} }
       let(:organized_bike) { {} }
       let(:required_params) { search_params.slice(:serial, :owner_email, :organization_slug) }
       it "returns target" do
@@ -117,7 +117,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect_hashes_to_match(json_result, target_result)
       end
       context "bike is authorized" do
-        let(:target_result) { {registered: true, claimed: false, can_edit: true} }
+        let(:target_result) { {registered: true, claimed: false, can_edit: true, state: "with_user"} }
         it "returns target" do
           # If the user is authorized via a secondary email
           user_email = FactoryBot.create(:user_email, user: user, email: bike.owner_email)
@@ -136,6 +136,66 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike_organization).to be_valid
           expect(bike.reload.authorized?(user)).to be_truthy
           post check_if_registered_url, params: required_params.to_json, headers: json_headers
+          expect(response.code).to eq("201")
+          expect_hashes_to_match(json_result, target_result)
+        end
+      end
+      context "state: stolen" do
+        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "stolen"} }
+        let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, date_stolen: Time.current - 1.year) }
+        before { bike.update(updated_at: Time.current) }
+        it "returns target" do
+          expect(bike.reload.status).to eq "status_stolen"
+          post check_if_registered_url, params: search_params.to_json, headers: json_headers
+          expect(response.code).to eq("201")
+          expect_hashes_to_match(json_result, target_result)
+        end
+        context "recovered" do
+          let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "recovered"} }
+          it "returns target" do
+            stolen_record.add_recovery_information(recovered_at: Time.current - 1.week)
+            post check_if_registered_url, params: search_params.to_json, headers: json_headers
+            expect(response.code).to eq("201")
+            expect_hashes_to_match(json_result, target_result)
+            # if recovery is more than a year ago, it goes back to being `with_user`
+            stolen_record.update(recovered_at: Time.current - 2.years)
+            post check_if_registered_url, params: search_params.to_json, headers: json_headers
+            expect(response.code).to eq("201")
+            expect_hashes_to_match(json_result, target_result.merge(state: "with_user"))
+          end
+        end
+      end
+      context "state: impounded" do
+        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "impounded"} }
+        it "returns impounded for impounded statuses" do
+          %w[unregistered_parking_notification status_abandoned status_impounded].each do |status|
+            bike.update_column :status, status
+            expect(bike.reload.status).to eq status
+            post check_if_registered_url, params: search_params.to_json, headers: json_headers
+            expect(response.code).to eq("201")
+            expect_hashes_to_match(json_result, target_result)
+          end
+        end
+      end
+      context "state: transferred" do
+        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "transferred"} }
+        it "returns target" do
+          ownership = bike.current_ownership
+          BikeUpdator.new(bike: bike, b_params: {bike: {owner_email: "newemail@example.com"}}.as_json).update_ownership
+          expect(ownership.reload.current).to be_falsey
+          expect(bike.reload.current_ownership.id).to_not eq ownership.id
+          expect(bike.reload.owner_email).to eq "newemail@example.com"
+          expect(bike.reload.authorized?(user)).to be_falsey
+          post check_if_registered_url, params: search_params.to_json, headers: json_headers
+          expect(response.code).to eq("201")
+          expect_hashes_to_match(json_result, target_result)
+        end
+      end
+      context "state: removed" do
+        let(:target_result) { {registered: false, claimed: false, can_edit: false, state: "removed"} }
+        it "returns target" do
+          bike.delete
+          post check_if_registered_url, params: search_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
           expect_hashes_to_match(json_result, target_result)
         end

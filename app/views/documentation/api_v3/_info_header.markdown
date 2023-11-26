@@ -42,7 +42,7 @@ Errors respond with a JSON object with a description of the error under the key 
 
 We use the work "bike" throughout this documentation to mean anything that is registered (be it a tandem, ice-cream cart or standard bicycle). If we are referring specifically to standard bicycles, we make note of that.
 
-You can view <a href="#selections_GET_version_selections_cycle_types_format_get_2" class="scroll-link">all the types of cycles we accept.</a>
+You can view <a href="#selections_GET_version_selections_cycle_types_format_get_2" class="scroll-link">all the types of cycles (or vehicles) we accept.</a>
 
 
 <a class="ref" id="ref_bike_urls">
