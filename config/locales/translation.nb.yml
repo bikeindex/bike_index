@@ -3350,11 +3350,11 @@ nb:
     welcome_index:
   money:
     currencies:
-      en:
-      en-GB:
-      es:
-      nb:
-      nl:
+      en: USD
+      nl: EUR
+      en-GB: GBP
+      es: EUR
+      nb: EUR
   my_accounts:
     edit:
       save_changes:

@@ -47,10 +47,6 @@ Rails.application.routes.draw do
     get page, controller: "welcome", action: page
   end
 
-  get "update_browser", to: "welcome#update_browser"
-  get "choose_registration", to: "welcome#choose_registration"
-  get "goodbye", to: "welcome#goodbye"
-  get "bike_creation_graph", to: "welcome#bike_creation_graph"
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
 
   resource :session, only: %i[new create destroy] do
