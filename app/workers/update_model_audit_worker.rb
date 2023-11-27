@@ -130,6 +130,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     non_matching_bike_ids.each_with_index do |id, inx|
       FindOrCreateModelAuditWorker.perform_in(inx * 15, id)
     end
+    "finished"
   end
 
   def update_org_model_audit(model_audit, organization_id)

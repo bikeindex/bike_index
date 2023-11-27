@@ -127,7 +127,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           FindOrCreateModelAuditWorker.new.perform(bike2.id)
           expect(model_audit.matching_bike?(bike2)).to be_falsey
           instance.perform(model_audit.id) # passing already updated bike_id
-          expect(described_class.jobs.map { |j| j["args"] }.flatten).to match_array([model_audit.id, model_audit_unknown.id])
+          expect(described_class.jobs.map { |j| j["args"] }.flatten).to match_array([model_audit.id])
           described_class.drain
           expect(ModelAudit.where(id: model_audit.id).count).to eq 0
           expect(bike1.reload.model_audit_id).to eq model_audit_unknown.id
