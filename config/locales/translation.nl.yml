@@ -5190,7 +5190,9 @@ nl:
       nl: EUR
       en-GB: GBP
       es: EUR
-      nb: NOK
+      nb: 'EUR
+
+        '
   locks:
     edit:
       are_you_sure: Weet je het zeker?
