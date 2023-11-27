@@ -34,7 +34,7 @@ RSpec.describe "Locale detection", type: :request do
 
         current_user.update(preferred_language: :nb)
         get "/"
-        expect(response.body).to match(/NORWEGIAN - replace me/i)
+        expect(response.body).to match(/sykkelregistrering/i)
       end
     end
 
@@ -45,7 +45,7 @@ RSpec.describe "Locale detection", type: :request do
         get "/", params: {locale: :nl}
         expect(response.body).to match(/fietsregistratie/i)
         get "/", params: {locale: :nb}
-        expect(response.body).to match(/NORWEGIAN - replace me/i)
+        expect(response.body).to match(/sykkelregistrering/i)
       end
     end
 
@@ -66,6 +66,9 @@ RSpec.describe "Locale detection", type: :request do
 
         get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9"}
         expect(response.body).to match(/fietsregistratie/i)
+
+        get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "nb,en;q=0.9"}
+        expect(response.body).to match(/sykkelregistrering/i)
       end
     end
 
