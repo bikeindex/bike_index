@@ -88,6 +88,8 @@ if ENV["RETRY_FLAKY"]
     config.around(:each) do |ex|
       if ex.metadata[:flaky]
         ex.run_with_retry retry: 1
+      else
+        ex.run
       end
     end
   end
