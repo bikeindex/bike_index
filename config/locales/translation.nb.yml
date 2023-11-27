@@ -2591,13 +2591,17 @@ nb:
     about:
       about_bike_index:
       alumni:
-      bike_registration_that_works:
+      bike_registration_that_works: Sykkelregistrering som fungerer.
       bryan_hance_bio_new_html:
       cofounded_by_html:
       craig_dalton_bio_html:
       gavin_hoover_bio_html:
       jan_pecnik_bio_html:
-      merging_the_services:
+      merging_the_services: Ved å slå sammen de to tjenestene skapte Seth og Bryan
+        den universelle sykkelregistreringstjenesten de begge drømte om - en database
+        som brukes og søkes i av privatpersoner, sykkelbutikker, politiet og andre
+        apper. Et sykkelregister som gir alle muligheten til å registrere og gjenfinne
+        sykler.
       mike_oleon_bio_html:
       nonprofit_status:
       seth_built:
@@ -2771,7 +2775,14 @@ nb:
       bike_index_reserves:
       bike_index_shall_not_be_liable:
       by_creating_account:
-      by_giving_bike_shops_html:
+      by_giving_bike_shops_html: Ved å gi sykkelbutikker, sykkelorganisasjoner og
+        politiavdelinger muligheten til å registrere sykler direkte for sine innbyggere,
+        ønsker vi å stimulere til sykkelregistrering, støtte den lokale sykkelkulturen
+        og sikre nøyaktige registreringer. Vi har forsøkt å utforme disse tjenestevilkårene
+        så enkelt og forståelig som mulig. Dessverre gjør realitetene i den juridiske
+        verden dette til en svært vanskelig oppgave. Så hvis du har spørsmål eller
+        bekymringer, eller bare ønsker å forstå bedre hvordan vi gjør ting på Bike
+        Index, ikke nøl med å %{contact_link}.
       content_on_the_service:
       if_bike_index_html:
       last_updated_html:
@@ -2791,7 +2802,9 @@ nb:
       we_claim_no_ip:
       we_dont_prescreen_content:
       we_may_remove_content:
-      welcome_to_bike_index_html:
+      welcome_to_bike_index_html: <strong>Velkommen til Bike Index</strong>, en 501(c)(3)
+        ideell organisasjon. Vi har utviklet en offentlig tilgjengelig sykkelregistreringstjeneste
+        ("tjenesten") som gir deg muligheten til å lagre og dele syklene dine på internett.
       you_agree_not_to_resell:
       you_are_responsible_for_content:
       you_are_responsible_for_security:
@@ -2810,7 +2823,15 @@ nb:
       bike_index_vendor_tos:
       binding_arbitration:
       binding_arbitration_p1:
-      by_giving_bike_shop_employees_html:
+      by_giving_bike_shop_employees_html: |
+        Ved å gi ansatte i sykkelbutikker og sykkelorganisasjoner - leverandører - muligheten til å
+        muligheten til å legge til sykler i tjenesten gratis, tar vi sikte på å oppmuntre til registrering
+        og bekjempe utsettelse av sykkelregistreringer. Vi har i tillegg
+        utviklet en Lightspeed-integrasjon som gjør det mulig for butikker som bruker Lightspeed som din
+        salgssted for å registrere sykler umiddelbart etter salg. Vi diskuterer dette i detalj
+        senere i dette dokumentet. Hvis du har spørsmål eller bekymringer, eller rett og slett bare ønsker å forstå
+        bedre forstå hvordan vi gjør ting hos Bike Index, ikke nøl med å ta kontakt med oss på
+        %{contact_link}.
       customer_service:
       customer_service_body:
       disclosures_and_notices:
@@ -2885,7 +2906,13 @@ nb:
       verification_p4:
       we_can_deactivate_html:
       we_provide_you_with_html:
-      welcome_to_bike_index_html:
+      welcome_to_bike_index_html: |
+        <strong>Velkommen til Bike Index</strong>, en 501(c)(3) ideell organisasjon. Vi har utviklet en
+        offentlig tilgjengelig sykkelregistreringstjeneste ("tjenesten") som gir organisasjoner som er
+        organisasjoner som er registrert på Bike Index ("leverandører", "du") muligheten til raskt og enkelt å
+        og enkelt registrere sykler for sine "kunder" - de som benytter seg av deres tjenester - ved hjelp av
+        ved hjelp av leverandørens "kontoer" Vi mener at en slik tjeneste avskrekker
+        sykkeltyverier og hjelper kundene med å finne igjen stjålne sykler.
       with_the_following_brief_descriptions:
       your_liability:
       your_liability_p1:
@@ -3069,7 +3096,8 @@ nb:
       do_right_by_your_customers:
       dont_use_ascend_or_lightspeed_html:
       driving_service_revenues_with_bicycle_reg:
-      embed_a_bike_index_registration_form:
+      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
+        på nettstedet ditt
       for_free_we_provide_you_with_t:
       here:
       join_our_network_link_html:
@@ -3090,14 +3118,18 @@ nb:
     for_cities:
       actually_get_people_registered_and_do_it_:
       bike_index_for_cities:
-      bike_index_is_the_community_registration_:
+      bike_index_is_the_community_registration_: Bike Index er det foretrukne registreringssystemet
+        for lokalsamfunn. Vi er sykkelregistreringssystemet for %{organization_counts}
+        organisasjoner - lokalsamfunn i alle verdenshjørner. Bli med i det mest brukte
+        sykkelregistreringsnettverket i verden.
       bike_index_new_dashboard:
       bike_index_organization_impounding:
       bike_index_unveils_partnership_with_the_c:
       bring_together_bike_shops_schools_municip:
       check_out:
       cities_deck:
-      embed_a_bike_index_registration_form:
+      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
+        på nettstedet ditt
       engage_your_residents_and_recover_their_b:
       features_amp_pricing:
       mitigate_the_registration_mess:
@@ -3111,7 +3143,8 @@ nb:
       bike_index_for_community_groups:
       bike_index_launches_new_ambassadors_progr:
       bike_index_welcomes_stolen_bikes_nola:
-      embed_a_bike_index_registration_form:
+      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
+        på nettstedet ditt
       gone_are_the_days_where_you_had_to_regist:
       help_us_help_you:
       here:
@@ -3133,7 +3166,8 @@ nb:
       bike_index_organization_impounding:
       calgary_doubles:
       check_out:
-      embed_a_bike_index_registration_form:
+      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
+        på nettstedet ditt
       here:
       if_you_want_to_collaborate_html:
       is_your_department_equipped_to_fight_bike:
@@ -3160,11 +3194,12 @@ nb:
       bike_index_for_universities:
       bike_index_users_provide:
       check_out:
-      embed_a_bike_index_registration_form:
+      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
+        på nettstedet ditt
       features_amp_pricing:
       how_it_works:
       keep_campus_bikes_in_order:
-      make_bike_registration_better:
+      make_bike_registration_better: Gjør sykkelregistreringen bedre
       must_read:
       protecting_bikes_on_campus_can_be:
       read_about_our_html:
@@ -3300,7 +3335,8 @@ nb:
     sessions_create:
     sessions_new:
     stolen_index:
-    stolen_merging:
+    stolen_merging: StolenBicycleRegistry.com fusjonerte med Bike Index i 2014 og
+      ble verdens største åpne sykkelregistreringstjeneste
     users_new:
     welcome_index:
   meta_titles:
@@ -3312,7 +3348,7 @@ nb:
     feedbacks_index:
     feedbacks_new:
     feedbacks_vendor_signup:
-    info_about:
+    info_about: Bike Index - Sykkelregistrering som fungerer
     info_serials:
     info_spokecard:
     info_stolen_bikes:
@@ -3328,7 +3364,7 @@ nb:
     landing_pages_for_community_groups:
     landing_pages_for_law_enforcement:
     landing_pages_for_schools:
-    landing_pages_show:
+    landing_pages_show: "%{organization} Sykkelregistrering"
     links:
     manufacturers_index:
     news_index:
@@ -3347,14 +3383,14 @@ nb:
     users_password_reset:
     users_request_password_reset:
     welcome_goodbye:
-    welcome_index:
+    welcome_index: Bike Index - Sykkelregistrering som fungerer
   money:
     currencies:
-      en:
-      en-GB:
-      es:
-      nb:
-      nl:
+      en: USD
+      en-GB: GBP
+      es: EUR
+      nb: kr
+      nl: EUR
   my_accounts:
     edit:
       save_changes:
@@ -3835,7 +3871,8 @@ nb:
         delete_organization:
         i_would_like_to_terminate_my_account:
         name: Navn
-        org_email_address_html:
+        org_email_address_html: E-postadresse <em>%{org_name}</em> sykkelregistreringer
+          vil bli sendt fra
         org_settings:
         organization_logo:
         organization_type:
@@ -4197,7 +4234,8 @@ nb:
       everyone_can_register_bikes_for_free:
       faqs:
       follow_us_html:
-      free_to_transfer:
+      free_to_transfer: Sykkelregistreringen er permanent, og det er gratis å bytte
+        sykkel.
       go_to_edit_page:
       how_bikes_are_verified:
       how_can_i_advertise:
@@ -4486,7 +4524,7 @@ nb:
       bike_index_statistics:
       bikes_registered_this_week:
       but_how_does_it_work:
-      hero:
+      hero: Sykkelregistrering som fungerer
       how_it_works:
       identifying_your_bike:
       if_your_bike_goes_missing:
