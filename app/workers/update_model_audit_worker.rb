@@ -96,11 +96,13 @@ class UpdateModelAuditWorker < ApplicationWorker
         .find_each { |att| att.update(model_audit_id: found_model_audit_id) }
     end
     model_audit.reload
+  rescue ActiveRecord::RecordInvalid
+    model_audit.destroy # Because the model audit already exists
   end
 
   # model_audit can be blank if it was deleted in fix_manufacturer_if_other!
   def should_delete_model_audit?(model_audit)
-    return true if find_model_audit_id(model_audit) != model_audit.id
+    return true if model_audit.blank? || find_model_audit_id(model_audit) != model_audit.id
     model_audit.counted_matching_bikes_count == 0 && model_audit.delete_if_no_bikes?
   end
 
@@ -130,7 +132,6 @@ class UpdateModelAuditWorker < ApplicationWorker
     non_matching_bike_ids.each_with_index do |id, inx|
       FindOrCreateModelAuditWorker.perform_in(inx * 15, id)
     end
-    "finished"
   end
 
   def update_org_model_audit(model_audit, organization_id)
