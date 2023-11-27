@@ -93,5 +93,10 @@
             = link_to truncate(model_attestation.url), model_attestation.url
 
 -# TODO: Actually render!
-%h2 Vehicles
+%h2.uncap
+  Vehicles
+  - if @bikes_count > @per_page
+    %small
+      first #{@per_page} shown, #{link_to "see all", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
+
 = render partial: "/organized/bikes/search", locals: {only_show_bikes: true}

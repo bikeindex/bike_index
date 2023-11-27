@@ -184,7 +184,7 @@ function BinxAdmin () {
     },
 
     initPerPageSelect () {
-      $('#per_page_select').on('change', function (e) {
+      $('#per_page_select, #per_page_select-skiptotal').on('change', function (e) {
         let urlParams = new URLSearchParams(window.location.search)
         urlParams.delete('per_page')
         urlParams.append('per_page', $('#per_page_select').val())

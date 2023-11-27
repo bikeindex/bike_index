@@ -36,4 +36,5 @@
 
       - if views_prefix == "admin" && count > @per_page.to_i
         - per_pages = [10, 25, 50, 100, @per_page.to_i].uniq.sort
-        = select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {class: "form-control per-page-select"}
+        -# Add -skiptotal onto id so that the JS can select it correctly for updating on change (otherwise there are two elements with the same ID)
+        = select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {id: "per_page_select#{skip_total ? '-skiptotal' : ''}", class: "form-control per-page-select"}

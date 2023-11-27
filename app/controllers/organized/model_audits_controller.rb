@@ -19,7 +19,8 @@ module Organized
       @organization_model_audit = @model_audit.organization_model_audits.where(organization_id: current_organization.id).first
       bikes = @organization_model_audit&.bikes
       @bikes_count = @organization_model_audit&.bikes_count || 0
-      @bikes = bikes&.page(1)&.per(10) || Bike.none
+      @per_page = 10
+      @bikes = bikes&.page(1)&.per(@per_page) || Bike.none
     end
 
     # NOTE: This is really "create model_attestation"

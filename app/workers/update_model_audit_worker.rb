@@ -2,7 +2,7 @@
 # saving bikes takes a LONG time - so this uses redlock to ensure we don't run duplicate jobs
 class UpdateModelAuditWorker < ApplicationWorker
   REDLOCK_PREFIX = "ModelAuditLock-#{Rails.env.slice(0, 3)}"
-  SKIP_PROCESSING = ENV["SKIP_UPDATE_MODEL_AUDIT"]
+  SKIP_PROCESSING = ENV["SKIP_UPDATE_MODEL_AUDIT"].present?
 
   sidekiq_options queue: "droppable", retry: 2
 
