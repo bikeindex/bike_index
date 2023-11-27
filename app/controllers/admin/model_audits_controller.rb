@@ -32,6 +32,13 @@ class Admin::ModelAuditsController < Admin::BaseController
       @manufacturer = Manufacturer.friendly_find(params[:search_mnfg_name])
     end
     @mnfg_other = InputNormalizer.boolean(params[:search_mnfg_other])
+    if params[:search_frame_model].present?
+      model_audits = if ["unknown", "missing model"].include?(params[:search_frame_model].downcase)
+        model_audits.where(frame_model: nil)
+      else
+        model_audits.where("frame_model ILIKE ?", params[:search_frame_model])
+      end
+    end
     model_audits = model_audits.where.not(manufacturer_other: nil) if @mnfg_other
 
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)

@@ -18,6 +18,14 @@
   = render partial: "/shared/period_select"
 
 .mt-4
+= form_tag admin_model_audits_path, method: :get do
+  = render partial: "/shared/hidden_search_fields"
+  = hidden_field_tag :search_mnfg_name, params[:search_mnfg_name]
+  .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
+    .align-self-end.mt-2.mr-2
+      = text_field_tag :search_frame_model, params[:search_frame_model], placeholder: "Frame model", class: "form-control", style: ""
+    .mt-2.mr-2
+      = submit_tag "Search", name: "search", class: "btn btn-primary"
 
 - if params[:search_mnfg_name].present?
   %p
