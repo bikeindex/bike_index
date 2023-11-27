@@ -57,7 +57,11 @@
               Model Audit ID
               %code= @model_audit.id
 
-%h2.uncap.mt-4 Attestations
+%h2.uncap.mt-4
+  Attestations
+  %small
+    %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: @model_audit.id, mnfgname: @model_audit.mnfg_name, framemodel: @model_audit.frame_model}}
+      submit new
 - if @model_attestations.none?
   %h4.mt-2.uncap No Attestations
 - else
@@ -93,10 +97,12 @@
             = link_to truncate(model_attestation.url), model_attestation.url
 
 -# TODO: Actually render!
-%h2.uncap
+%h2.uncap.mt-4
   Vehicles
   - if @bikes_count > @per_page
     %small
       first #{@per_page} shown, #{link_to "see all", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
 
 = render partial: "/organized/bikes/search", locals: {only_show_bikes: true}
+
+= render partial: "/organized/model_audits/update_model_cert"

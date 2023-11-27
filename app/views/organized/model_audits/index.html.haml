@@ -39,7 +39,7 @@
   %tbody
     - organization_model_audits.each do |organization_model_audit|
       - model_audit = organization_model_audit.model_audit
-      %tr{data: {modelauditid: model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
+      %tr
         %td
           = model_audit.mnfg_name
           - unless skip_manufacturer_search
@@ -63,46 +63,10 @@
           %span{class: status_display_class(organization_model_audit.certification_status)}
             = organization_model_audit.certification_status_humanized
 
-          %a.btn.btn-sm.btn-secondary.float-right.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal"}}
+          %a.btn.btn-sm.btn-secondary.float-right.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
             update
 
 .paginate-container.paginate-container-bottom
   = paginate @organization_model_audits
 
-- modal_body = capture_haml do
-  .modal-body
-    = form_tag organization_model_audits_path(organization_id: current_organization.to_param), method: :post, action: "create", class: "form" do
-      = hidden_field_tag :model_audit_id
-      .form-group
-        = label_tag :kind do
-          Update the certification status of the
-          %strong#updateModalMnfg Manufacturer
-          %em#updateModalFrameModel Model
-        - opts = [["Certified", "certified_by_trusted_org"],["NOT certified", "uncertified_by_trusted_org"]]
-        = select_tag(:kind, options_for_select(opts), include_blank: false, required: true, class: 'form-control')
-      .form-group
-        = label_tag :url do
-          Url
-          %small where to find information on the certification
-        = text_field_tag :url, "", placeholder: "optional", required: false, class: "form-control"
-      .form-group
-        = label_tag :info do
-          additional info
-          %small certification type, etc
-        = text_area_tag :info, "", placeholder: "optional", required: false, class: "form-control"
-      .modal-btn-footer
-        .form-submit-button
-          = submit_tag "submit", class: "btn btn-success btn-lg"
-
-
-
-= render partial: 'shared/modal', locals: {title: "Update certification status", id: 'update-model-cert-modal', modal_body: modal_body}
-
-:javascript
-  $(".updateModelCert").on("click", e => {
-    $targetRow = $(e.target).parents("tr")
-    $("#updateModalMnfg").text($targetRow.attr("data-mnfgname"))
-    $("#updateModalFrameModel").text($targetRow.attr("data-framemodel"))
-    $("#update-model-cert-modal #model_audit_id").val($targetRow.attr("data-modelauditid"))
-    return true
-  })
+= render partial: "/organized/model_audits/update_model_cert"
