@@ -21,10 +21,13 @@ data:
     ## Default:
     - config/locales/doorkeeper.en.yml
     - config/locales/doorkeeper.nl.yml
+    - config/locales/doorkeeper.nb.yml
     - config/locales/gflash.en.yml
     - config/locales/gflash.nl.yml
+    - config/locales/gflash.nb.yml
     - config/locales/en.yml
     - config/locales/nl.yml
+    - config/locales/nb.yml
 
   # Locale files to write new keys to, based on a list of key pattern => file
   # rules. Matched from top to bottom:

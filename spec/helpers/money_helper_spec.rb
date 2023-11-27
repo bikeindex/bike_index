@@ -14,6 +14,11 @@ RSpec.describe MoneyHelper, type: :helper do
           expect(default_currency).to eq("EUR")
         end
       end
+      it "returns the alphabetic_code for the locale's currency" do
+        I18n.with_locale(:nb) do
+          expect(default_currency).to eq("EUR")
+        end
+      end
     end
 
     context "given the current locale is set to a locale with a fallback" do

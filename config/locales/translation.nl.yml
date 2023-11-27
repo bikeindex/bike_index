@@ -5183,12 +5183,16 @@ nl:
   locales:
     en: English (Engels)
     nl: Nederlands
+    nb: Noors (Bokmål)
   money:
     currencies:
       en: USD
       nl: EUR
       en-GB: GBP
       es: EUR
+      nb: 'EUR
+
+        '
   locks:
     edit:
       are_you_sure: Weet je het zeker?
