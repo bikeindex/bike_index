@@ -47,7 +47,7 @@
           %td Certification
           %td
             %span{class: status_display_class(@model_audit.certification_status)}
-            = @model_audit.certification_status_humanized
+              = @organization_model_audit.certification_status_humanized
         - if display_dev_info?
           %tr
             %td.only-dev-visible IDs
@@ -96,7 +96,7 @@
           %td
             = link_to truncate(model_attestation.url), model_attestation.url
 
-%h2.uncap.mt-4
+%h2.uncap.pt-3.mt-4.mb-0
   Vehicles
   - if @bikes_count > @per_page
     %small

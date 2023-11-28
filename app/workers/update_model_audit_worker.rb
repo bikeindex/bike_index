@@ -130,7 +130,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
     # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
     non_matching_bike_ids.each_with_index do |id, inx|
-      FindOrCreateModelAuditWorker.perform_in(inx * 15, id)
+      FindOrCreateModelAuditWorker.perform_in(inx * 3, id)
     end
   end
 

@@ -1905,6 +1905,8 @@ nl:
       contact_the_owner_it_is_stolen: aan de eigenaar van deze %{bike_type} waarvan
         u denkt dat deze is gestolen.
       write_a_message: Schrijf een bericht
+      model_audit: Audit van e-voertuigen
+      not_audited: Niet gecontroleerd
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial

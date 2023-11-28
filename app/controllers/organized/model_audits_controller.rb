@@ -9,7 +9,7 @@ module Organized
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @organization_model_audits = organization_model_audits
-        .reorder("#{scoped_sort_column} #{sort_direction}")
+        .reorder(sort_ordered)
         .page(@page).per(@per_page)
     end
 
@@ -55,6 +55,14 @@ module Organized
     def permitted_parameters
       params.permit(:kind, :url, :info, :model_audit_id)
         .merge(user_id: current_user.id, organization_id: current_organization.id)
+    end
+
+    def sort_ordered
+      if %w[mnfg_name frame_model].include?(sort_column)
+        ModelAudit.arel_table[sort_column].lower.send(sort_direction)
+      else
+        "organization_model_audits.#{sort_column} #{sort_direction}"
+      end
     end
 
     def scoped_sort_column

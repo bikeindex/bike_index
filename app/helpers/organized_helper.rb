@@ -73,13 +73,13 @@ module OrganizedHelper
   def status_display_class(status)
     return "" if status.blank?
     case status.downcase
-    when "current", "paging", "being_helped", /\Acertified/
+    when "current", "paging", "being_helped"
       "text-success"
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated"
       "text-info"
-    when /removed/, "impounded", "trashed", "failed_to_find", /denied/, /uncertified/
+    when /removed/, "impounded", "trashed", "failed_to_find", /denied/
       "text-danger"
-    when "stolen"
+    when "stolen", /uncertified/
       "text-warning"
     else
       "less-strong"

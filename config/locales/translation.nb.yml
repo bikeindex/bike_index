@@ -1934,6 +1934,8 @@ nb:
         om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
       write_a_message: Skrive en melding
       zipcode: Postnummer
+      model_audit: E-kjøretøy revisjon
+      not_audited: Ikke revidert
     pdf:
       bike_description: 'Sykkelbeskrivelse:'
       bike_serial: Sykkelserie
@@ -5015,7 +5017,7 @@ nb:
         last_login_ip: Siste innlogging ip
         member_of_organization: Medlem av organisasjonen
         membership_type: Medlemskapstype
-        remove_from_organization: fjerne fra organisasjonen
+        remove_from_organization: fjern fra organisasjonen
         signed_up: Meldt seg
         update: Oppdater
       index:

@@ -193,6 +193,11 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.matching_serial(@serial_normalized)
     end
 
+    if params[:search_model_audit_id].present?
+      @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
+      bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
+    end
+
     bikes = search_bike_statuses(bikes)
 
     @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil

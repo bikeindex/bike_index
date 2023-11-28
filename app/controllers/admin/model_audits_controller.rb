@@ -8,7 +8,7 @@ class Admin::ModelAuditsController < Admin::BaseController
     @model_audits =
       matching_model_audits
         .includes(:organization_model_audits, :model_attestations)
-        .reorder("model_audits.#{sort_column}" + " " + sort_direction)
+        .reorder(sort_ordered)
         .page(page)
         .per(@per_page)
   end
@@ -25,10 +25,18 @@ class Admin::ModelAuditsController < Admin::BaseController
     Time.at(1528767966) # First Model Audit
   end
 
+  def sort_ordered
+    if %w[mnfg_name frame_model].include?(sort_column)
+      ModelAudit.arel_table[sort_column].lower.send(sort_direction)
+    else
+      "organization_model_audits.#{sort_column} #{sort_direction}"
+    end
+  end
+
   def matching_model_audits
     model_audits = ModelAudit
     if params[:search_mnfg_name].present?
-      model_audits = model_audits.where("mnfg_name ILIKE ?", params[:search_mnfg_name])
+      model_audits = model_audits.where("mnfg_name ILIKE ?", "%#{params[:search_mnfg_name]}%")
       @manufacturer = Manufacturer.friendly_find(params[:search_mnfg_name])
     end
     @mnfg_other = InputNormalizer.boolean(params[:search_mnfg_other])
