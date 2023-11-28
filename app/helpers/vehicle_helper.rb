@@ -2,12 +2,12 @@
 
 # TODO: add translations
 module VehicleHelper
-  def audit_display(model_audit, truncate: false)
+  def model_audit_display(model_audit, truncate: false)
     content_tag(:strong, model_audit.mnfg_name) + "&nbsp;".html_safe +
-      audit_frame_model_display(model_audit, truncate: truncate)
+      content_tag(:em, model_audit_frame_model_display(model_audit, truncate: truncate))
   end
 
-  def audit_frame_model_display(model_audit, truncate: false)
+  def model_audit_frame_model_display(model_audit, truncate: false)
     if model_audit.unknown_model?
       content_tag(:span, "Missing model", class: "less-strong")
     elsif truncate

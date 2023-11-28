@@ -72,7 +72,7 @@
             %td.table-cell-check
               = check_mark if model_audit.manufacturer_other.present?
             %td
-              = audit_frame_model_display(model_audit, truncate: true)
+              = model_audit_frame_model_display(model_audit, truncate: true)
             %td
               = link_to admin_number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id)
             %td

@@ -47,7 +47,7 @@
           - if model_audit.manufacturer_other.present? && display_dev_info?
             %small.only-dev-visible other
         %td
-          = link_to audit_frame_model_display(model_audit), organization_model_audit_path(model_audit, organization_id: current_organization.to_param)
+          = link_to model_audit_frame_model_display(model_audit), organization_model_audit_path(model_audit, organization_id: current_organization.to_param)
           - if display_dev_info?
             %small.only-dev-visible= organization_model_audit.id
         %td

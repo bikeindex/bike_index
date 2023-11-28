@@ -183,7 +183,7 @@
                       - model_audit = @bike.model_audit if @bike.model_audit_id.present?
                       - organization_model_audit = OrganizationModelAudit.where(organization_id: passive_organization.id, model_audit_id: @bike.model_audit_id).first if model_audit.present?
                       - if organization_model_audit.present?
-                        = link_to audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: passive_organization.to_param)
+                        = link_to model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: passive_organization.to_param)
                         %span.ml-2{class: status_display_class(organization_model_audit.certification_status)}
                           = organization_model_audit.certification_status_humanized
                       - else

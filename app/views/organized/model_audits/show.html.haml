@@ -3,7 +3,7 @@
 .organized-page-header
   %h1
     %strong= @model_audit.mnfg_name
-    %em= audit_frame_model_display(@model_audit)
+    %em= model_audit_frame_model_display(@model_audit)
     &nbsp;
     %small E-Vehicle audit
 
@@ -19,7 +19,7 @@
         %tr
           %td Frame model
           %td
-            = audit_frame_model_display(@model_audit)
+            = model_audit_frame_model_display(@model_audit)
         %tr
           %td Vehicle type
           %td
