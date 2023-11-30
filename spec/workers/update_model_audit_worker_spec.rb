@@ -19,6 +19,38 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
     end
   end
 
+  describe "should_delete_model_audit?" do
+    let(:model_audit) { FactoryBot.create(:model_audit, bikes_count: 0) }
+    let!(:bike) { FactoryBot.create(:bike, manufacturer: model_audit.manufacturer, frame_model: model_audit.frame_model, propulsion_type: propulsion_type) }
+    let(:propulsion_type) { "throttle" }
+    it "is false" do
+      expect(model_audit.reload.counted_matching_bikes_count).to eq 1
+      expect(model_audit.delete_if_no_bikes?).to be_truthy
+      expect(described_class.delete_model_audit?(model_audit)).to be_falsey
+    end
+    context "0 bikes" do
+      it "is truthy" do
+        bike.destroy
+        expect(model_audit.reload.counted_matching_bikes_count).to eq 0
+        expect(described_class.delete_model_audit?(model_audit)).to be_truthy
+      end
+    end
+    context "no motorized bikes" do
+      let(:propulsion_type) { "hand-pedal" }
+      it "is truthy" do
+        expect(model_audit.reload.counted_matching_bikes_count).to eq 1
+        expect(described_class.delete_model_audit?(model_audit)).to be_truthy
+      end
+      context "manufacturer motorized_only" do
+        it "is falsey" do
+          model_audit.manufacturer.update(motorized_only: true)
+          expect(model_audit.reload.counted_matching_bikes_count).to eq 1
+          expect(described_class.delete_model_audit?(model_audit)).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "perform" do
     let!(:bike1) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1) }
     let(:frame_model1) { "Party model" }
@@ -58,7 +90,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
     context "bike_organized organization" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:time) { Time.current - 1.day }
-      let!(:bike3) { FactoryBot.create(:bike_organized, created_at: time, creation_organization: organization, frame_model: "PARTY  model", manufacturer: manufacturer) }
+      let!(:bike3) { FactoryBot.create(:bike_organized, created_at: time, creation_organization: organization, frame_model: "PARTY  model", manufacturer: manufacturer, propulsion_type: "throttle") }
       before { expect(bike2).to be_present }
       # factory organization_with_organization_features enqueues inline sidekiq processing, which runs this job. So handle it manually
       before { organization.update_attribute(:enabled_feature_slugs, ["model_audits"]) }
@@ -86,6 +118,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
       context "likely_spam bike" do
         it "creates an organization_model_audit, updates likely_spam" do
           expect(organization.reload.bikes.pluck(:id)).to eq([bike3.id])
+          bike2.update(propulsion_type: "throttle")
           bike3.update(likely_spam: true)
           expect(Bike.count).to eq 2
           expect(Bike.unscoped.count).to eq 3
@@ -127,7 +160,7 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
           FindOrCreateModelAuditWorker.new.perform(bike2.id)
           expect(model_audit.matching_bike?(bike2)).to be_falsey
           instance.perform(model_audit.id) # passing already updated bike_id
-          expect(described_class.jobs.map { |j| j["args"] }.flatten).to match_array([model_audit.id])
+          expect(described_class.jobs.map { |j| j["args"] }.flatten).to match_array([model_audit.id, model_audit_unknown.id])
           described_class.drain
           expect(ModelAudit.where(id: model_audit.id).count).to eq 0
           expect(bike1.reload.model_audit_id).to eq model_audit_unknown.id

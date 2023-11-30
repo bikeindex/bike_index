@@ -29,7 +29,7 @@ class Admin::ModelAuditsController < Admin::BaseController
     if %w[mnfg_name frame_model].include?(sort_column)
       ModelAudit.arel_table[sort_column].lower.send(sort_direction)
     else
-      "organization_model_audits.#{sort_column} #{sort_direction}"
+      "model_audits.#{sort_column} #{sort_direction}"
     end
   end
 

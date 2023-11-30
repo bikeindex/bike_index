@@ -81,9 +81,13 @@ class ModelAudit < ApplicationRecord
       .reorder(id: :desc)
   end
 
+  def self.counted_matching_bikes(bikes)
+    bikes.where(example: false, deleted_at: nil, likely_spam: false)
+  end
+
   def self.counted_matching_bikes_count(bikes)
     # As of now, user_hidden isn't normally visible in orgs. Not sure what to do about that?
-    bikes.where(example: false, deleted_at: nil, likely_spam: false).count
+    counted_matching_bikes(bikes).count
   end
 
   def self.matching_bikes_for_frame_model(bikes, manufacturer_id: nil, frame_model: nil)
