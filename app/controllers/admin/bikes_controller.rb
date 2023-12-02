@@ -203,41 +203,6 @@ class Admin::BikesController < Admin::BaseController
     bikes
   end
 
-  # Separated out purely to make logic easier to follow
-  def search_bike_statuses(bikes)
-    @searched_statuses = params.keys.select do |k|
-      k.start_with?("search_status_") && InputNormalizer.boolean(params[k])
-    end.map { |k| k.gsub(/\Asearch_status_/, "") }
-
-    @searched_statuses = default_statuses if @searched_statuses.blank?
-    @not_default_statuses = @searched_statuses != default_statuses
-
-    if @searched_statuses.include?("example_only")
-      bikes = bikes.where(example: true)
-    elsif !@searched_statuses.include?("example")
-      bikes = bikes.where(example: false)
-    end
-
-    if @searched_statuses.include?("spam_only")
-      bikes = bikes.where(likely_spam: true)
-    elsif !@searched_statuses.include?("spam")
-      bikes = bikes.where(likely_spam: false)
-    end
-
-    if @searched_statuses.include?("deleted_only")
-      bikes = bikes.where.not(deleted_at: nil)
-    elsif !@searched_statuses.include?("deleted")
-      bikes = bikes.where(deleted_at: nil)
-    end
-
-    bike_statuses = (%w[stolen with_owner abandoned impounded] & @searched_statuses)
-      .map { |k| "status_#{k}" }
-    if @searched_statuses.include?("unregistered_parking_notification")
-      bike_statuses << "unregistered_parking_notification"
-    end
-    bikes.where(status: bike_statuses)
-  end
-
   def default_statuses
     %w[stolen with_owner abandoned impounded unregistered_parking_notification] +
       (current_user.su_option?(:no_hide_spam) ? ["spam"] : [])
