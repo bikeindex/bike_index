@@ -50,6 +50,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def matching_bikes
+    return @matching_bikes if defined?(@matching_bikes)
     bikes = Bike.unscoped.where(created_at: @time_range)
     if params[:search_manufacturer].present?
       @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer])
@@ -59,7 +60,7 @@ class Admin::GraphsController < Admin::BaseController
         bikes.where(mnfg_name: params[:search_manufacturer])
       end
     end
-    admin_search_bike_statuses(bikes)
+    @matching_bikes = admin_search_bike_statuses(bikes)
   end
 
   def default_period
@@ -84,11 +85,11 @@ class Admin::GraphsController < Admin::BaseController
     if bike_graph_kind == "stolen"
       [
         {
-          name: "Registered",
+          name: "Registered bikes",
           data: helpers.time_range_counts(collection: bikes)
         },
         {
-          name: "Stolen bikes",
+          name: "Stolen records",
           data: helpers.time_range_counts(collection: StolenRecord.unscoped.joins(:bike).merge(bikes), column: "stolen_records.created_at")
         }
       ]
