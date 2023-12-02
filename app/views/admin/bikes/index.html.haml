@@ -1,12 +1,14 @@
+- show_search_statuses = !@ignored_only
 .admin-subnav
   .col-md-5
     %h1
       Manage Bikes
   .col-md-7
     %ul
-      %li.nav-item
-        %a.nav-link#showStatusesSearch{href: "#", class: (@not_default_statuses ? "active" : "")}
-          Search statuses
+      - if show_search_statuses
+        %li.nav-item
+          %a.nav-link#showStatusesSearch{href: "#", class: (@not_default_statuses ? "active" : "")}
+            Search statuses
       %li.nav-item
         = link_to "motorized", url_for(sortable_search_params.merge(search_motorized: !@motorized)), class: "nav-link #{@motorized ? 'active' : ''}"
       %li.nav-item
@@ -90,6 +92,13 @@
           bikes -
           = link_to "view only bikes created by", url_for(sortable_search_params.merge(search_only_creation_organization: true))
         \| #{link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param)}
+    - if @ignored_only
+      %p
+        Viewing only
+        %strong ignored
+        bikes
+        %em (deleted, test, spam)
+        = link_to "view not ignored bikes", url_for(sortable_search_params.merge(search_ignored: false)), class: "gray-link small"
     - if @search_email.present?
       %p
         Viewing only bikes
@@ -118,75 +127,76 @@
   .col-md-6.order-1.order-md-2
     = form_tag admin_bikes_path, method: :get, class: "" do
       = render partial: "/shared/hidden_search_fields"
-      = hidden_field_tag :search_example, params[:search_example]
 
       = hidden_field_tag :search_pos, params[:search_pos]
       = hidden_field_tag :search_origin, params[:search_origin]
       = hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization]
-      .search-statuses.mb-1{class: (@not_default_statuses ? "" : "collapse")}
-        :javascript
-          window.statusesSearchDefault = #{!@not_default_statuses};
-        %p.mb-1
-          %em Include bikes that are:
-        .row
-          .col-6
-            .form-check
-              = check_box_tag :search_status_stolen, true, @searched_statuses.include?("stolen"), class: "form-check-input"
-              = label_tag :search_status_stolen, "Stolen"
-            .form-check
-              = check_box_tag :search_status_with_owner, true, @searched_statuses.include?("with_owner"), class: "form-check-input"
-              = label_tag :search_status_with_owner do
-                With owner
-                %small.less-strong (not stolen)
-            .form-check
-              = check_box_tag :search_status_abandoned, true, @searched_statuses.include?("abandoned"), class: "form-check-input"
-              = label_tag :search_status_abandoned, "Abandoned"
-            .form-check
-              = check_box_tag :search_status_impounded, true, @searched_statuses.include?("impounded"), class: "form-check-input"
-              = label_tag :search_status_impounded, "Impounded"
-            .form-check
-              = check_box_tag :search_status_unregistered_parking_notification, true, @searched_statuses.include?("unregistered_parking_notification"), class: "form-check-input"
-              = label_tag :search_status_unregistered_parking_notification, "Parking Notifications"
 
-          .col-6
-            .form-check
-              - if @searched_statuses.include?("deleted_only")
-                = check_box_tag :search_status_deleted_only, true, @searched_statuses.include?("deleted_only"), class: "form-check-input"
-                = label_tag :search_status_deleted_only do
-                  Deleted
-                  %strong Only
-              - else
-                = check_box_tag :search_status_deleted, true, @searched_statuses.include?("deleted"), class: "form-check-input"
-                = label_tag :search_status_deleted, "Deleted"
-                = link_to "only", url_for(sortable_search_params.merge(search_status_deleted: nil, search_status_deleted_only: true)), class: "gray-link"
-            .form-check
-              - if @searched_statuses.include?("spam_only")
-                = check_box_tag :search_status_spam_only, true, @searched_statuses.include?("spam_only"), class: "form-check-input"
-                = label_tag :search_status_spam_only do
-                  likely Spam
-                  %strong Only
-              - else
-                = check_box_tag :search_status_spam, true, @searched_statuses.include?("spam"), class: "form-check-input"
-                = label_tag :search_status_spam, "Likely Spam"
-                = link_to "only", url_for(sortable_search_params.merge(search_status_spam: nil, search_status_spam_only: true)), class: "gray-link"
-                - if current_user.su_option?(:no_hide_spam) && display_dev_info?
-                  %small.less-strong.only-dev-visible
-                    on by default because <code>su_option</code>
-            .form-check
-              - if @searched_statuses.include?("example_only")
-                = check_box_tag :search_status_example_only, true, @searched_statuses.include?("example_only"), class: "form-check-input"
-                = label_tag :search_status_example_only do
-                  Test / Example
-                  %strong Only
-              - else
-                = check_box_tag :search_status_example, true, @searched_statuses.include?("example"), class: "form-check-input"
-                = label_tag :search_status_example, "Test / Example"
-                = link_to "only", url_for(sortable_search_params.merge(search_status_example: nil, search_status_example_only: true)), class: "gray-link"
+      - if show_search_statuses
+        .search-statuses.mb-1{class: (@not_default_statuses ? "" : "collapse")}
+          :javascript
+            window.statusesSearchDefault = #{!@not_default_statuses};
+          %p.mb-1
+            %em Include bikes that are:
+          .row
+            .col-6
+              .form-check
+                = check_box_tag :search_status_stolen, true, @searched_statuses.include?("stolen"), class: "form-check-input"
+                = label_tag :search_status_stolen, "Stolen"
+              .form-check
+                = check_box_tag :search_status_with_owner, true, @searched_statuses.include?("with_owner"), class: "form-check-input"
+                = label_tag :search_status_with_owner do
+                  With owner
+                  %small.less-strong (not stolen)
+              .form-check
+                = check_box_tag :search_status_abandoned, true, @searched_statuses.include?("abandoned"), class: "form-check-input"
+                = label_tag :search_status_abandoned, "Abandoned"
+              .form-check
+                = check_box_tag :search_status_impounded, true, @searched_statuses.include?("impounded"), class: "form-check-input"
+                = label_tag :search_status_impounded, "Impounded"
+              .form-check
+                = check_box_tag :search_status_unregistered_parking_notification, true, @searched_statuses.include?("unregistered_parking_notification"), class: "form-check-input"
+                = label_tag :search_status_unregistered_parking_notification, "Parking Notifications"
 
-            - if @not_default_statuses
-              - status_keys = sortable_search_params.keys.select { |k| k.match?(/\Asearch_status/) }
-              .text-right.small
-                = link_to "reset to default statuses", url_for(sortable_search_params.merge(status_keys.map { |k| [k, nil] }.to_h))
+            .col-6
+              .form-check
+                - if @searched_statuses.include?("deleted_only")
+                  = check_box_tag :search_status_deleted_only, true, @searched_statuses.include?("deleted_only"), class: "form-check-input"
+                  = label_tag :search_status_deleted_only do
+                    Deleted
+                    %strong Only
+                - else
+                  = check_box_tag :search_status_deleted, true, @searched_statuses.include?("deleted"), class: "form-check-input"
+                  = label_tag :search_status_deleted, "Deleted"
+                  = link_to "only", url_for(sortable_search_params.merge(search_status_deleted: nil, search_status_deleted_only: true)), class: "gray-link"
+              .form-check
+                - if @searched_statuses.include?("spam_only")
+                  = check_box_tag :search_status_spam_only, true, @searched_statuses.include?("spam_only"), class: "form-check-input"
+                  = label_tag :search_status_spam_only do
+                    likely Spam
+                    %strong Only
+                - else
+                  = check_box_tag :search_status_spam, true, @searched_statuses.include?("spam"), class: "form-check-input"
+                  = label_tag :search_status_spam, "Likely Spam"
+                  = link_to "only", url_for(sortable_search_params.merge(search_status_spam: nil, search_status_spam_only: true)), class: "gray-link"
+                  - if current_user.su_option?(:no_hide_spam) && display_dev_info?
+                    %small.less-strong.only-dev-visible
+                      on by default because <code>su_option</code>
+              .form-check
+                - if @searched_statuses.include?("example_only")
+                  = check_box_tag :search_status_example_only, true, @searched_statuses.include?("example_only"), class: "form-check-input"
+                  = label_tag :search_status_example_only do
+                    Test / Example
+                    %strong Only
+                - else
+                  = check_box_tag :search_status_example, true, @searched_statuses.include?("example"), class: "form-check-input"
+                  = label_tag :search_status_example, "Test / Example"
+                  = link_to "only", url_for(sortable_search_params.merge(search_status_example: nil, search_status_example_only: true)), class: "gray-link"
+
+              - if @not_default_statuses
+                - status_keys = sortable_search_params.keys.select { |k| k.match?(/\Asearch_status/) }
+                .text-right.small
+                  = link_to "reset to default statuses", url_for(sortable_search_params.merge(status_keys.map { |k| [k, nil] }.to_h))
 
       .form-inline
         .form-group.ml-auto.mr-1.mb-2
@@ -196,9 +206,6 @@
         .form-group.mr-1.mb-2
           = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
         = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
-
--# %code= @searched_statuses
--# %pre.small= pretty_print_json(sortable_search_params.as_json)
 
 = render partial: "/shared/pagination", locals: {collection: @bikes, count: @bikes.total_count}
 

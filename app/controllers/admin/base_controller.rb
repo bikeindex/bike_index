@@ -1,6 +1,9 @@
 class Admin::BaseController < ApplicationController
   before_action :require_index_admin!
   layout "admin"
+  DEFAULT_SEARCH_STATUSES = %w[
+    stolen with_owner abandoned impounded unregistered_parking_notification
+  ].freeze
 
   # Permit viewing deleted organizations
   def current_organization
@@ -10,11 +13,17 @@ class Admin::BaseController < ApplicationController
     set_passive_organization(@current_organization)
   end
 
-  def admin_search_bike_statuses(bikes)
+  private
+
+  def admin_search_bike_statuses(bikes, default_statuses: nil)
+    # Search ignored overrides status searches
+    @ignored_only = InputNormalizer.boolean(params[:search_ignored])
+    return bikes.ignored if @ignored_only
+
     @searched_statuses = params.keys.select do |k|
       k.start_with?("search_status_") && InputNormalizer.boolean(params[k])
     end.map { |k| k.gsub(/\Asearch_status_/, "") }
-
+    default_statuses ||= DEFAULT_SEARCH_STATUSES
     @searched_statuses = default_statuses if @searched_statuses.blank?
     @not_default_statuses = @searched_statuses != default_statuses
 

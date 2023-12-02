@@ -13,6 +13,14 @@
 - yday = Time.current.yday
 - days_left = Time.current.end_of_year.yday - yday
 
+- if @ignored_only
+  %p
+    Viewing only
+    %strong ignored
+    bikes
+    %em (deleted, test, spam)
+    = link_to "view not ignored bikes", url_for(sortable_search_params.merge(search_ignored: false)), class: "gray-link small"
+
 %h2
   Records everywhere
 %p
