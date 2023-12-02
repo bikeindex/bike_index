@@ -23,9 +23,9 @@ class Admin::BaseController < ApplicationController
     @searched_statuses = params.keys.select do |k|
       k.start_with?("search_status_") && InputNormalizer.boolean(params[k])
     end.map { |k| k.gsub(/\Asearch_status_/, "") }
-    default_statuses ||= DEFAULT_SEARCH_STATUSES
-    @searched_statuses = default_statuses if @searched_statuses.blank?
-    @not_default_statuses = @searched_statuses != default_statuses
+    @default_statuses = default_statuses || DEFAULT_SEARCH_STATUSES
+    @searched_statuses = @default_statuses if @searched_statuses.blank?
+    @not_default_statuses = @searched_statuses != @default_statuses
 
     if @searched_statuses.include?("example_only")
       bikes = bikes.where(example: true)

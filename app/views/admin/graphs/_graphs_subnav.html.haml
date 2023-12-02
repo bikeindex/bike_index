@@ -11,13 +11,13 @@
     %ul
       - if @kind == "bikes"
         %li.nav-item
-          = link_to "Search these bikes", admin_bikes_path(sortable_search_params), class: "nav-link text-info"
+          = link_to "Search these bikes", admin_bikes_path(sortable_params), class: "nav-link text-info"
 
       %li.nav-item
         = link_to "Location count tables", tables_admin_graphs_path(location_count: true), class: location_count ? "nav-link active" : "nav-link"
       - @graph_kinds.each do |kind|
         %li.nav-item
-          = link_to "#{kind} graphs", admin_graphs_path(sortable_search_params.merge(search_kind: kind)), class: @kind == kind ? " nav-link active" : "nav-link"
+          = link_to "#{kind} graphs", admin_graphs_path(sortable_params.merge(search_kind: kind)), class: @kind == kind ? " nav-link active" : "nav-link"
 
   - if !["general", ""].include?(@kind) # General and location tables don't have period select :/
     .col-12.mt-4

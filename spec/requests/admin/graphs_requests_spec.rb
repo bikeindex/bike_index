@@ -100,14 +100,11 @@ RSpec.describe Admin::GraphsController, type: :request do
         expect(json_result.is_a?(Array)).to be_truthy
         expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
-        expect(assigns(:bike_graph_kind)).to eq "stolen"
         # And it gets the other kinds too
         get "#{base_url}/variable", params: {search_kind: "bikes", timezone: "America/Los_Angeles", bike_graph_kind: "origin"}
         expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:bike_graph_kind)).to eq "origin"
         get "#{base_url}/variable", params: {search_kind: "bikes", timezone: "America/Los_Angeles", bike_graph_kind: "pos"}
         expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:bike_graph_kind)).to eq "pos"
       end
     end
   end

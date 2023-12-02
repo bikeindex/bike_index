@@ -1,6 +1,7 @@
 class Admin::GraphsController < Admin::BaseController
   before_action :set_period
   before_action :set_variable_graph_kind
+  around_action :set_reading_role
 
   def index
     @total_count = if @kind == "users"
@@ -31,7 +32,7 @@ class Admin::GraphsController < Admin::BaseController
     @kind = ""
   end
 
-  helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds
+  helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period
 
   protected
 
@@ -45,7 +46,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def matching_recoveries
-    StolenRecord.unscoped.where(recovered_at: @time_range)
+    StolenRecord.recovered.where(recovered_at: @time_range)
   end
 
   def matching_bikes
@@ -81,14 +82,16 @@ class Admin::GraphsController < Admin::BaseController
     bikes = matching_bikes
     bike_graph_kind = bike_graph_kinds.include?(params[:bike_graph_kind]) ? params[:bike_graph_kind] : bike_graph_kinds.first
     if bike_graph_kind == "stolen"
-      [{
-        name: "Registered",
-        data: helpers.time_range_counts(collection: bikes)
-      },
+      [
+        {
+          name: "Registered",
+          data: helpers.time_range_counts(collection: bikes)
+        },
         {
           name: "Stolen bikes",
-          data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
-        }]
+          data: helpers.time_range_counts(collection: StolenRecord.unscoped.joins(:bike).merge(bikes), column: "stolen_records.created_at")
+        }
+      ]
     elsif bike_graph_kind == "origin"
       Ownership.origins.map do |origin|
         {
@@ -105,13 +108,19 @@ class Admin::GraphsController < Admin::BaseController
       end
     elsif bike_graph_kind == "ignored"
       [
-        {name: "Spam",
-         data: helpers.time_range_counts(collection: bikes.spam)},
-        {name: "Deleted",
-         data: helpers.time_range_counts(collection: bikes.deleted)},
-        {name: "Test",
-         data: helpers.time_range_counts(collection: bikes.example)}
-       ]
+        {
+          name: "Spam",
+          data: helpers.time_range_counts(collection: bikes.spam)
+        },
+        {
+          name: "Deleted",
+          data: helpers.time_range_counts(collection: bikes.deleted)
+        },
+        {
+          name: "Test",
+          data: helpers.time_range_counts(collection: bikes.example)
+        }
+      ]
     end
   end
 end
