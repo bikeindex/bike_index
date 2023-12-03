@@ -103,8 +103,8 @@
             - if model_attestation.url.present?
               = link_to truncate(model_attestation.url), model_attestation.url
           %td
-            - if model_attestation.document.present?
-              = link_to truncate(model_attestation.document.url), model_attestation.document.url, target: "_blank"
+            - if model_attestation.file.present?
+              = link_to truncate(model_attestation.file.url), model_attestation.file.url, target: "_blank"
           %td
             = model_attestation.info
 

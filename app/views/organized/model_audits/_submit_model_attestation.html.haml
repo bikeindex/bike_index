@@ -20,7 +20,7 @@
         = text_field_tag :url, "", placeholder: "optional", required: false, class: "form-control"
       .form-group.file-upload-wrapper{style: "position: relative;"}
         %label.file
-          = file_field_tag :document, class: "avatar-upload-field", accept: PdfUploader.permitted_extensions.join(",")
+          = file_field_tag :file, class: "avatar-upload-field", accept: PdfUploader.permitted_extensions.join(",")
           %span.file-custom
             %span.file-upload-text Upload documentation (optional)
       .form-group

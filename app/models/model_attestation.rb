@@ -19,7 +19,7 @@ class ModelAttestation < ApplicationRecord
   validates_presence_of :kind
   validates_presence_of :user_id
 
-  mount_uploader :document, PdfUploader
+  mount_uploader :file, PdfUploader
 
   scope :current, -> { where(replaced: false) }
 
@@ -43,6 +43,8 @@ class ModelAttestation < ApplicationRecord
 
   def set_calculated_attributes
     self.url = Urlifyer.urlify(url)
+    self.info = InputNormalizer.string(info)
+    self.certification_type = InputNormalizer.string(certification_type)
   end
 
   private

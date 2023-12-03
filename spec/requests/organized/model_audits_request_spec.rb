@@ -70,7 +70,8 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
           model_audit_id: organization_model_audit.model_audit_id,
           url: " ffff.com/sss ",
           info: "Some cool info",
-          kind: "certified_by_trusted_org"
+          kind: "certified_by_trusted_org",
+          certification_type: "UL"
         }
         expect(flash[:success]).to be_present
         expect(organization_model_audit.model_attestations.count).to eq 1
@@ -80,9 +81,37 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
         expect(model_attestation.url).to eq "http://ffff.com/sss"
         expect(model_attestation.info).to eq "Some cool info"
         expect(model_attestation.kind).to eq "certified_by_trusted_org"
+        expect(model_attestation.certification_type).to eq "UL"
         # Needs to update inline or else the page doesn't show what you just did
         expect(organization_model_audit.reload.certification_status).to eq "certified_by_your_org"
       end
+      context "uploading a document" do
+        let(:test_file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))) }
+        it "creates a model_attestation" do
+          expect(organization_model_audit.model_attestations.count).to eq 0
+          expect(organization_model_audit.certification_status).to be_nil
+          post base_url, params: {
+            model_audit_id: organization_model_audit.model_audit_id,
+            url: " ",
+            info: "\n",
+            kind: "certified_by_trusted_org",
+            certification_type: " ",
+            file: test_file
+          }
+          expect(flash[:success]).to be_present
+          expect(organization_model_audit.model_attestations.count).to eq 1
+          model_attestation = organization_model_audit.model_attestations.first
+          expect(model_attestation.user_id).to eq current_user.id
+          expect(model_attestation.organization_id).to eq current_organization.id
+          expect(model_attestation.url).to be_nil
+          expect(model_attestation.info).to be_nil
+          expect(model_attestation.kind).to eq "certified_by_trusted_org"
+          expect(model_attestation.certification_type).to be_nil
+          expect(model_attestation.file).to be_present
+          # Needs to update inline or else the page doesn't show what you just did
+          expect(organization_model_audit.reload.certification_status).to eq "certified_by_your_org"
+      end
     end
   end
+end
 end

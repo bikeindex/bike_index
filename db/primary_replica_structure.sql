@@ -1990,7 +1990,7 @@ CREATE TABLE public.model_attestations (
     info text,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    document character varying,
+    file character varying,
     certification_type character varying
 );
 
