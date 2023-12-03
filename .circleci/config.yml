@@ -215,7 +215,7 @@ jobs:
           - ~/.cache/yarn
 
       - restore_cache:
-          name: "Assets: cache restore"
+          name: " : cache restore"
           keys:
             - CACHE_V4-assets-{{ .Environment.CIRCLE_SHA1 }}
             - CACHE_V4-assets-
@@ -261,14 +261,7 @@ jobs:
             mkdir -p test-results/rspec test-artifacts
             ./cc-test-reporter before-build
             TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-            bundle exec rspec --profile 10 \
-                              --color \
-                              --order random \
-                              --require rails_helper \
-                              --format RspecJunitFormatter \
-                              --out test-results/rspec/rspec.xml \
-                              --format progress \
-                              -- ${TESTFILES}
+            echo $TESTFILES | circleci tests run --command="xargs bin/rspec --profile 10 --order random --format RspecJunitFormatter --out test-results/rspec/rspec.xml --format progress"
       - run:
           name: "Jest: Tests"
           command: |
