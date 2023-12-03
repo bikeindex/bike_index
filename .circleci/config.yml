@@ -271,11 +271,6 @@ jobs:
             JEST_JUNIT_OUTPUT: "test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
             JEST_JUNIT_OUTPUT_DIR: "test-results/junit/"
 
-      - run:
-          name: Code Climate Test Coverage
-          command: |
-            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
-
       - persist_to_workspace:
           root: coverage
           paths:
