@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Admin::AmbassadorTasksController, type: :controller do
   context "given an authenticated super admin" do
-    include_context :logged_in_as_super_admin
+    include_context :logged_in_as_superuser
 
     describe "#index" do
       it "renders the index template" do

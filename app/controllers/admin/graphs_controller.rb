@@ -1,6 +1,7 @@
 class Admin::GraphsController < Admin::BaseController
   before_action :set_period
   before_action :set_variable_graph_kind
+  around_action :set_reading_role
 
   def index
     @total_count = if @kind == "users"
@@ -10,6 +11,7 @@ class Admin::GraphsController < Admin::BaseController
     elsif @kind == "bikes"
       matching_bikes.count
     end
+    @page_title = "#{@kind.humanize} graphs"
   end
 
   def variable
@@ -31,7 +33,7 @@ class Admin::GraphsController < Admin::BaseController
     @kind = ""
   end
 
-  helper_method :bike_graph_kinds, :matching_bikes, :pos_search_kinds
+  helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period
 
   protected
 
@@ -45,12 +47,12 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def matching_recoveries
-    StolenRecord.unscoped.where(recovered_at: @time_range)
+    StolenRecord.recovered.where(recovered_at: @time_range)
   end
 
   def matching_bikes
+    return @matching_bikes if defined?(@matching_bikes)
     bikes = Bike.unscoped.where(created_at: @time_range)
-    bikes = bikes.where(deleted_at: nil) unless InputNormalizer.boolean(params[:search_deleted])
     if params[:search_manufacturer].present?
       @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer])
       bikes = if @manufacturer.present?
@@ -59,7 +61,7 @@ class Admin::GraphsController < Admin::BaseController
         bikes.where(mnfg_name: params[:search_manufacturer])
       end
     end
-    bikes
+    @matching_bikes = admin_search_bike_statuses(bikes)
   end
 
   def default_period
@@ -67,7 +69,11 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def bike_graph_kinds
-    %w[stolen origin pos]
+    %w[stolen origin pos ignored]
+  end
+
+  def shown_bike_graph_kinds
+    bike_graph_kinds - ["ignored"]
   end
 
   def pos_search_kinds
@@ -76,30 +82,47 @@ class Admin::GraphsController < Admin::BaseController
 
   def bike_chart_data
     bikes = matching_bikes
-    @bike_graph_kind = bike_graph_kinds.include?(params[:bike_graph_kind]) ? params[:bike_graph_kind] : bike_graph_kinds.first
-    if @bike_graph_kind == "stolen"
-      [{
-        name: "Registered",
-        data: helpers.time_range_counts(collection: bikes)
-      },
+    bike_graph_kind = bike_graph_kinds.include?(params[:bike_graph_kind]) ? params[:bike_graph_kind] : bike_graph_kinds.first
+    if bike_graph_kind == "stolen"
+      [
         {
-          name: "Stolen bikes",
-          data: helpers.time_range_counts(collection: StolenRecord.where(created_at: @time_range))
-        }]
-    elsif @bike_graph_kind == "origin"
+          name: "Registered bikes",
+          data: helpers.time_range_counts(collection: bikes)
+        },
+        {
+          name: "Stolen records",
+          data: helpers.time_range_counts(collection: StolenRecord.unscoped.joins(:bike).merge(bikes), column: "stolen_records.created_at")
+        }
+      ]
+    elsif bike_graph_kind == "origin"
       Ownership.origins.map do |origin|
         {
           name: origin.humanize,
           data: helpers.time_range_counts(collection: bikes.includes(:ownerships).where(ownerships: {origin: origin}))
         }
       end
-    elsif @bike_graph_kind == "pos"
+    elsif bike_graph_kind == "pos"
       pos_search_kinds.map do |pos_kind|
         {
           name: pos_kind.humanize,
           data: helpers.time_range_counts(collection: bikes.send(pos_kind))
         }
       end
+    elsif bike_graph_kind == "ignored"
+      [
+        {
+          name: "Spam",
+          data: helpers.time_range_counts(collection: bikes.spam)
+        },
+        {
+          name: "Deleted",
+          data: helpers.time_range_counts(collection: bikes.deleted)
+        },
+        {
+          name: "Test",
+          data: helpers.time_range_counts(collection: bikes.example)
+        }
+      ]
     end
   end
 end

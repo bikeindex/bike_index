@@ -264,7 +264,7 @@ RSpec.describe Organized::EmailsController, type: :request do
     end
   end
 
-  context "logged_in_as_super_admin" do
+  context "logged_in_as_superuser" do
     include_context :request_spec_logged_in_as_superuser
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs, kind: "bike_shop") }
     # Also defined in controller

@@ -12,7 +12,7 @@ module ControllerSpecHelpers
     before { set_current_user(user) }
   end
 
-  RSpec.shared_context :logged_in_as_super_admin do
+  RSpec.shared_context :logged_in_as_superuser do
     let(:user) { FactoryBot.create(:admin) }
     before { set_current_user(user) }
   end

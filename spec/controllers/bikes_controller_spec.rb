@@ -60,7 +60,7 @@ RSpec.describe BikesController, type: :controller do
       end
     end
     context "Admin with manually set current_organization" do
-      include_context :logged_in_as_super_admin
+      include_context :logged_in_as_superuser
       let(:user) { FactoryBot.create(:organization_member, superuser: true) }
       it "renders, sets passive_organization_id to be passed organization" do
         expect(user.default_organization).to be_present
@@ -178,7 +178,7 @@ RSpec.describe BikesController, type: :controller do
         }.to raise_error(ActiveRecord::RecordNotFound)
       end
       context "user is super_admin" do
-        include_context :logged_in_as_super_admin
+        include_context :logged_in_as_superuser
         it "shows the bike" do
           bike.destroy
           bike.reload

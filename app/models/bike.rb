@@ -107,7 +107,8 @@ class Bike < ApplicationRecord
   scope :not_spam, -> { where(likely_spam: false) }
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
-  scope :with_user_hidden, -> { unscoped.non_example.without_deleted }
+  scope :ignored, -> { where(example: true).or(where.not(deleted_at: nil)).or(where(likely_spam: true)) }
+  scope :with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }

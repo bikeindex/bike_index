@@ -3,7 +3,7 @@ require "rails_helper"
 # NOTE: put new specs in the request spec, not here.
 
 RSpec.describe Admin::BikesController, type: :controller do
-  include_context :logged_in_as_super_admin
+  include_context :logged_in_as_superuser
 
   describe "update" do
     context "valid return_to url" do

@@ -2,8 +2,9 @@
 - skip_organization ||= false
 
 -# Sortable
-= hidden_field_tag :sort, sort_column
-= hidden_field_tag :sort_direction, sort_direction
+- if defined?(sort_column)
+  = hidden_field_tag :sort, sort_column
+  = hidden_field_tag :sort_direction, sort_direction
 -# Period
 = hidden_field_tag :render_chart, @render_chart
 = hidden_field_tag :period, params[:period]
@@ -14,7 +15,8 @@
 -# common things that might be around
 = hidden_field_tag :search_status, params[:search_status]
 = hidden_field_tag :search_kind, params[:search_kind]
-
+-# ignored bikes scope
+= hidden_field_tag :search_ignored, params[:search_ignored]
 
 - unless skip_organization
   = hidden_field_tag :organization_id, current_organization&.to_param
