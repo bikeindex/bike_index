@@ -38,70 +38,70 @@
       %th Users in year
     %tbody
       - years.each_with_index do |year, index|
-        / - cache("admin_table_count_#{year}", expires_in: 1.hour) do
-        - date = dates[index]
-        %tr
-          %td
-            = year
-          %td
-            / Because of data import from SBR - after, we want created_at, it's more reliable
-            / and we're actually showing bikes registered/recorded - not stolen times
-            - if [2013, 2014].include?(year)
-              - stolen_in_year = stolen_records.where(date_stolen: date.all_year).count
-            - else
-              - stolen_in_year = stolen_records.where(created_at: date.all_year).count
-            = number_with_delimiter(stolen_in_year)
-            - if year == Time.current.year
-              - stolen_past_year = stolen_records.where(created_at: (Time.current - 1.year)..Time.current).count
-              - stolen_per_day = BigDecimal(stolen_past_year) / 365
-              %span.less-strong.ml-1
-                - stolen_in_year_projection = stolen_in_year + (stolen_per_day * days_left).to_i
-                = number_with_delimiter(stolen_in_year_projection)
-          %td
-            - stolen_beginning_of_year = stolen_records.where("date_stolen < ?", date.beginning_of_year).count
-            = number_with_delimiter(stolen_beginning_of_year + stolen_in_year)
-            - if year == Time.current.year
-              %span.less-strong.ml-1
-                = number_with_delimiter(stolen_in_year_projection + stolen_beginning_of_year)
-          %td
-            - recovered_in_year = stolen_records.recovered.where(recovered_at: date.all_year).count
-            = number_with_delimiter(recovered_in_year)
-            - if year == Time.current.year
-              - recovered_past_year = stolen_records.recovered.where(recovered_at: (Time.current - 1.year)..Time.current).count
-              - recovered_per_day = BigDecimal(recovered_past_year) / 365
-              %span.less-strong.ml-1
-                - recovered_in_year_projection = recovered_in_year + (recovered_per_day * days_left).to_i
-                = number_with_delimiter(recovered_in_year_projection)
-          %td
-            - recovered_beginning_of_year = stolen_records.recovered.where("recovered_at < ?", date.beginning_of_year).count
-            = number_with_delimiter(recovered_beginning_of_year + recovered_in_year)
-            - if year == Time.current.year
-              %span.less-strong.ml-1
-                = number_with_delimiter(recovered_beginning_of_year + recovered_in_year_projection)
-          %td
-            - all_in_year = bikes.where(created_at: date.all_year).count
-            = number_with_delimiter(all_in_year)
-            - if year == Time.current.year
-              - all_past_year = bikes.where(created_at: (Time.current - 1.year)..Time.current).count
-              - all_per_day = BigDecimal(all_past_year) / 365
-              %span.less-strong.ml-1
-                - all_in_year_projection = all_in_year + (all_per_day * days_left).to_i
-                = number_with_delimiter(all_in_year_projection)
-          %td
-            - all_beginning_of_year = bikes.where("created_at < ?", date.all_year.last).count
-            = number_with_delimiter(all_beginning_of_year + all_in_year)
-            - if year == Time.current.year
-              %span.less-strong.ml-1
-                = number_with_delimiter(all_beginning_of_year + all_in_year_projection)
-          %td
-            - users_in_year = User.unscoped.where(created_at: date.all_year).count
-            = number_with_delimiter(users_in_year)
-            - if year == Time.current.year
-              - users_past_year = User.unscoped.where(created_at: (Time.current - 1.year)..Time.current).count
-              - users_per_day = BigDecimal(users_past_year) / 365
-              %span.less-strong.ml-1
-                - users_in_year_projection = users_in_year + (users_per_day * days_left).to_i
-                = number_with_delimiter(users_in_year_projection)
+        - cache("admin_table_count_#{year}", expires_in: 1.hour) do
+          - date = dates[index]
+          %tr
+            %td
+              = year
+            %td
+              / Because of data import from SBR - after, we want created_at, it's more reliable
+              / and we're actually showing bikes registered/recorded - not stolen times
+              - if [2013, 2014].include?(year)
+                - stolen_in_year = stolen_records.where(date_stolen: date.all_year).count
+              - else
+                - stolen_in_year = stolen_records.where(created_at: date.all_year).count
+              = number_with_delimiter(stolen_in_year)
+              - if year == Time.current.year
+                - stolen_past_year = stolen_records.where(created_at: (Time.current - 1.year)..Time.current).count
+                - stolen_per_day = BigDecimal(stolen_past_year) / 365
+                %span.less-strong.ml-1
+                  - stolen_in_year_projection = stolen_in_year + (stolen_per_day * days_left).to_i
+                  = number_with_delimiter(stolen_in_year_projection)
+            %td
+              - stolen_beginning_of_year = stolen_records.where("date_stolen < ?", date.beginning_of_year).count
+              = number_with_delimiter(stolen_beginning_of_year + stolen_in_year)
+              - if year == Time.current.year
+                %span.less-strong.ml-1
+                  = number_with_delimiter(stolen_in_year_projection + stolen_beginning_of_year)
+            %td
+              - recovered_in_year = stolen_records.recovered.where(recovered_at: date.all_year).count
+              = number_with_delimiter(recovered_in_year)
+              - if year == Time.current.year
+                - recovered_past_year = stolen_records.recovered.where(recovered_at: (Time.current - 1.year)..Time.current).count
+                - recovered_per_day = BigDecimal(recovered_past_year) / 365
+                %span.less-strong.ml-1
+                  - recovered_in_year_projection = recovered_in_year + (recovered_per_day * days_left).to_i
+                  = number_with_delimiter(recovered_in_year_projection)
+            %td
+              - recovered_beginning_of_year = stolen_records.recovered.where("recovered_at < ?", date.beginning_of_year).count
+              = number_with_delimiter(recovered_beginning_of_year + recovered_in_year)
+              - if year == Time.current.year
+                %span.less-strong.ml-1
+                  = number_with_delimiter(recovered_beginning_of_year + recovered_in_year_projection)
+            %td
+              - all_in_year = bikes.where(created_at: date.all_year).count
+              = number_with_delimiter(all_in_year)
+              - if year == Time.current.year
+                - all_past_year = bikes.where(created_at: (Time.current - 1.year)..Time.current).count
+                - all_per_day = BigDecimal(all_past_year) / 365
+                %span.less-strong.ml-1
+                  - all_in_year_projection = all_in_year + (all_per_day * days_left).to_i
+                  = number_with_delimiter(all_in_year_projection)
+            %td
+              - all_beginning_of_year = bikes.where("created_at < ?", date.all_year.last).count
+              = number_with_delimiter(all_beginning_of_year + all_in_year)
+              - if year == Time.current.year
+                %span.less-strong.ml-1
+                  = number_with_delimiter(all_beginning_of_year + all_in_year_projection)
+            %td
+              - users_in_year = User.unscoped.where(created_at: date.all_year).count
+              = number_with_delimiter(users_in_year)
+              - if year == Time.current.year
+                - users_past_year = User.unscoped.where(created_at: (Time.current - 1.year)..Time.current).count
+                - users_per_day = BigDecimal(users_past_year) / 365
+                %span.less-strong.ml-1
+                  - users_in_year_projection = users_in_year + (users_per_day * days_left).to_i
+                  = number_with_delimiter(users_in_year_projection)
 .mt-4
 .mt-4
 - location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100
