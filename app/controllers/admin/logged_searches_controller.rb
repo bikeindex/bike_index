@@ -24,7 +24,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
   end
 
   def earliest_period_date
-    LoggedSearch.minimum(:request_at)
+    LoggedSearch.minimum(:request_at) || Time.current - 1.day
   end
 
   def special_endpoints
