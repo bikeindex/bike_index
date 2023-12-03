@@ -39,6 +39,9 @@ RSpec.describe Admin::GraphsController, type: :request do
       get "#{base_url}/tables"
       expect(response.status).to eq(200)
       expect(response).to render_template(:tables)
+      get "#{base_url}/tables", params: {location: "San Francisco, CA"}
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:tables)
     end
   end
 
