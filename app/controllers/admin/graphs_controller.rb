@@ -11,6 +11,7 @@ class Admin::GraphsController < Admin::BaseController
     elsif @kind == "bikes"
       matching_bikes.count
     end
+    @page_title = "#{@kind.humanize} graphs"
   end
 
   def variable

@@ -23,7 +23,8 @@
     data in this color
   is (simplified, not accounting for seasonalness) projections for the end of the current year
 
-- stolen_records = stolen_records = StolenRecord.unscoped.joins(:bike).merge(Bike.with_user_hidden)
+- bikes = Bike.with_user_hidden
+- stolen_records = stolen_records = StolenRecord.unscoped.joins(:bike).merge(bikes)
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
@@ -78,16 +79,16 @@
               %span.less-strong.ml-1
                 = number_with_delimiter(recovered_beginning_of_year + recovered_in_year_projection)
           %td
-            - all_in_year = Bike.unscoped.where(created_at: date.all_year).count
+            - all_in_year = bikes.where(created_at: date.all_year).count
             = number_with_delimiter(all_in_year)
             - if year == Time.current.year
-              - all_past_year = Bike.unscoped.where(created_at: (Time.current - 1.year)..Time.current).count
+              - all_past_year = bikes.where(created_at: (Time.current - 1.year)..Time.current).count
               - all_per_day = BigDecimal(all_past_year) / 365
               %span.less-strong.ml-1
                 - all_in_year_projection = all_in_year + (all_per_day * days_left).to_i
                 = number_with_delimiter(all_in_year_projection)
           %td
-            - all_beginning_of_year = Bike.unscoped.where("created_at < ?", date.all_year.last).count
+            - all_beginning_of_year = bikes.where("created_at < ?", date.all_year.last).count
             = number_with_delimiter(all_beginning_of_year + all_in_year)
             - if year == Time.current.year
               %span.less-strong.ml-1
