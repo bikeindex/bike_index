@@ -28,7 +28,7 @@ class Admin::BikesController < Admin::BaseController
       end
       # Needs to happen after the manufacturer has been assigned
       Bike.unscoped.where(id: bike_ids).distinct.pluck(:model_audit_id)
-        .each { |i| FindOrCreateModelAuditWorker.perform_async(i) }
+        .each { |i| UpdateModelAuditWorker.perform_async(i) }
       flash[:success] = "Success. #{bike_ids.count} Bikes updated"
     else
       flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
@@ -192,6 +192,11 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.matching_serial(@serial_normalized)
     end
 
+    if params[:search_model_audit_id].present?
+      @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
+      bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
+    end
+
     search_statuses = DEFAULT_SEARCH_STATUSES + (current_user.su_option?(:no_hide_spam) ? ["spam"] : [])
     bikes = admin_search_bike_statuses(bikes, default_statuses: search_statuses)
 
@@ -200,7 +205,6 @@ class Admin::BikesController < Admin::BaseController
     @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
     bikes = bikes.includes(:ownerships).where(ownerships: {origin: @origin_search_type}) if @origin_search_type.present?
     @multi_delete = InputNormalizer.boolean(params[:search_multi_delete])
-
     bikes
   end
 

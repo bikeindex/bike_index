@@ -44,6 +44,11 @@
             = check_mark if @manufacturer.frame_maker
         %tr
           %td
+            Motorized only?
+          %td
+            = check_mark if @manufacturer.motorized_only
+        %tr
+          %td
             Bikes
           %td
             = admin_number_display(@manufacturer.bikes.count)

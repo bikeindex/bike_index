@@ -3,7 +3,7 @@
 .organized-page-header
   %h1
     %strong= @model_audit.mnfg_name
-    %em= audit_frame_model_display(@model_audit)
+    %em= model_audit_frame_model_display(@model_audit)
     &nbsp;
     %small E-Vehicle audit
 
@@ -19,7 +19,7 @@
         %tr
           %td Frame model
           %td
-            = audit_frame_model_display(@model_audit)
+            = model_audit_frame_model_display(@model_audit)
         %tr
           %td Vehicle type
           %td
@@ -47,17 +47,21 @@
           %td Certification
           %td
             %span{class: status_display_class(@model_audit.certification_status)}
-            = @model_audit.certification_status_humanized
+              = @organization_model_audit&.certification_status_humanized
         - if display_dev_info?
           %tr
             %td.only-dev-visible IDs
             %td
               Org Model Audit ID
-              %code.mr-2= @organization_model_audit.id
+              %code.mr-2= @organization_model_audit&.id
               Model Audit ID
               %code= @model_audit.id
 
-%h2.uncap.mt-4 Attestations
+%h2.uncap.mt-4
+  Attestations
+  %small
+    %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: @model_audit.id, mnfgname: @model_audit.mnfg_name, framemodel: @model_audit.frame_model}}
+      submit new
 - if @model_attestations.none?
   %h4.mt-2.uncap No Attestations
 - else
@@ -92,6 +96,12 @@
           %td
             = link_to truncate(model_attestation.url), model_attestation.url
 
--# TODO: Actually render!
-%h2 Vehicles
+%h2.uncap.pt-3.mt-4.mb-0
+  Vehicles
+  - if @bikes_count > @per_page
+    %small
+      first #{@per_page} shown, #{link_to "see all", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)}
+
 = render partial: "/organized/bikes/search", locals: {only_show_bikes: true}
+
+= render partial: "/organized/model_audits/update_model_cert"

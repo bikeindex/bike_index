@@ -184,12 +184,14 @@ function BinxAdmin () {
     },
 
     initPerPageSelect () {
-      $('#per_page_select').on('change', function (e) {
-        let urlParams = new URLSearchParams(window.location.search)
-        urlParams.delete('per_page')
-        urlParams.append('per_page', $('#per_page_select').val())
-        window.location = `${location.pathname}?${urlParams.toString()}`
-      })
+      ['#per_page_select', '#per_page_select-skiptotal'].forEach((selector) =>
+        $(selector).on('change', function (e) {
+          let urlParams = new URLSearchParams(window.location.search)
+          urlParams.delete('per_page')
+          urlParams.append('per_page', $(selector).val())
+          window.location = `${location.pathname}?${urlParams.toString()}`
+        })
+      )
     }
   }
 }

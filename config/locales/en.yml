@@ -1166,6 +1166,8 @@ en:
       mark_bike_recovered: Mark bike recovered
       missing_address: missing address
       missing_owner_name: missing user name
+      model_audit: E-Vehicle audit
+      not_audited: Not audited
       or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
       org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
       org_cannot_edit: "%{org_name} can not edit"

@@ -2,7 +2,7 @@
 # saving bikes takes a LONG time - so this uses redlock to ensure we don't run duplicate jobs
 class UpdateModelAuditWorker < ApplicationWorker
   REDLOCK_PREFIX = "ModelAuditLock-#{Rails.env.slice(0, 3)}"
-  SKIP_PROCESSING = ENV["SKIP_UPDATE_MODEL_AUDIT"]
+  SKIP_PROCESSING = ENV["SKIP_UPDATE_MODEL_AUDIT"].present?
 
   sidekiq_options queue: "droppable", retry: 2
 
@@ -11,6 +11,20 @@ class UpdateModelAuditWorker < ApplicationWorker
     return false if locked_for?(model_audit.id)
     return true if OrganizationModelAudit.missing_for?(model_audit)
     model_audit.bikes_count != model_audit.counted_matching_bikes_count
+  end
+
+  def self.find_model_audit_id(model_audit)
+    ModelAudit.find_for(nil, manufacturer_id: model_audit.manufacturer_id,
+      mnfg_name: model_audit.mnfg_name, frame_model: model_audit.frame_model)&.id
+  end
+
+  # model_audit can be blank if it was deleted in fix_manufacturer_if_other!
+  def self.delete_model_audit?(model_audit)
+    return true if model_audit.blank? || find_model_audit_id(model_audit) != model_audit.id
+    return false unless model_audit.delete_if_no_bikes?
+    return true if model_audit.counted_matching_bikes_count == 0
+    return false if model_audit.manufacturer&.motorized_only?
+    ModelAudit.counted_matching_bikes(model_audit.matching_bikes).motorized.limit(1).none?
   end
 
   def self.redlock_key(model_audit_id)
@@ -43,7 +57,7 @@ class UpdateModelAuditWorker < ApplicationWorker
       return if model_audit.blank?
 
       fix_manufacturer!(model_audit) if model_audit.manufacturer_id == mnfg_other_id
-      return delete_model_audit!(model_audit) if should_delete_model_audit?(model_audit)
+      return delete_model_audit!(model_audit) if self.class.delete_model_audit?(model_audit)
 
       update_matching_bikes!(model_audit)
 
@@ -66,11 +80,6 @@ class UpdateModelAuditWorker < ApplicationWorker
     Manufacturer.other.id
   end
 
-  def find_model_audit_id(model_audit)
-    ModelAudit.find_for(nil, manufacturer_id: model_audit.manufacturer_id,
-      mnfg_name: model_audit.mnfg_name, frame_model: model_audit.frame_model)&.id
-  end
-
   def bikes(model_audit)
     Bike.unscoped.where(model_audit_id: model_audit.id)
   end
@@ -81,7 +90,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     # Only can be fixed if there is a new matching manufacturer
     return if existing_manufacturer.blank? || existing_manufacturer.other?
     # If there is already a model_audit matching this, delete this model audit
-    found_model_audit_id = find_model_audit_id(model_audit)
+    found_model_audit_id = self.class.find_model_audit_id(model_audit)
     if found_model_audit_id == model_audit.id
       # Update bikes first, so if this fails, it tries to fix_manufacturer again
       bikes(model_audit).where(manufacturer_id: mnfg_other_id).find_each do |bike|
@@ -96,12 +105,8 @@ class UpdateModelAuditWorker < ApplicationWorker
         .find_each { |att| att.update(model_audit_id: found_model_audit_id) }
     end
     model_audit.reload
-  end
-
-  # model_audit can be blank if it was deleted in fix_manufacturer_if_other!
-  def should_delete_model_audit?(model_audit)
-    return true if find_model_audit_id(model_audit) != model_audit.id
-    model_audit.counted_matching_bikes_count == 0 && model_audit.delete_if_no_bikes?
+  rescue ActiveRecord::RecordInvalid
+    model_audit.destroy # Because the model audit already exists
   end
 
   def delete_model_audit!(model_audit)
@@ -128,7 +133,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
     # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
     non_matching_bike_ids.each_with_index do |id, inx|
-      FindOrCreateModelAuditWorker.perform_in(inx * 15, id)
+      FindOrCreateModelAuditWorker.perform_in(inx * 3, id)
     end
   end
 

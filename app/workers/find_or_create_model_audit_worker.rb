@@ -14,8 +14,7 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
     fix_bike_manufacturer(bike) if bike.manufacturer_id == Manufacturer.other.id
 
     model_audit = ModelAudit.find_for(bike)
-    if model_audit.present?
-    else
+    if model_audit.blank?
       matching_bikes = ModelAudit.matching_bikes_for(bike)
       # If there are no counted bike (i.e. this bike is a non-counted bike), don't create a model_audit
       return if ModelAudit.counted_matching_bikes_count(matching_bikes) == 0
@@ -46,6 +45,7 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
     existing_manufacturer = Manufacturer.friendly_find(bike.mnfg_name)
     if existing_manufacturer.present? && !existing_manufacturer.other?
       bike.update_attribute(:manufacturer_id, existing_manufacturer.id)
+      bike.reload
     end
   end
 
