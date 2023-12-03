@@ -47,13 +47,13 @@
           %td Certification
           %td
             %span{class: status_display_class(@model_audit.certification_status)}
-              = @organization_model_audit.certification_status_humanized
+              = @organization_model_audit&.certification_status_humanized
         - if display_dev_info?
           %tr
             %td.only-dev-visible IDs
             %td
               Org Model Audit ID
-              %code.mr-2= @organization_model_audit.id
+              %code.mr-2= @organization_model_audit&.id
               Model Audit ID
               %code= @model_audit.id
 
