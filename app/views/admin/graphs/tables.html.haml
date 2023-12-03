@@ -49,10 +49,10 @@
               - if [2013, 2014].include?(year)
                 - stolen_in_year = stolen_records.where(date_stolen: date.all_year).count
               - else
-                - stolen_in_year = stolen_records.where(created_at: date.all_year).count
+                - stolen_in_year = stolen_records.where("stolen_records.created_at" => date.all_year).count
               = number_with_delimiter(stolen_in_year)
               - if year == Time.current.year
-                - stolen_past_year = stolen_records.where(created_at: (Time.current - 1.year)..Time.current).count
+                - stolen_past_year = stolen_records.where("stolen_records.created_at" => (Time.current - 1.year)..Time.current).count
                 - stolen_per_day = BigDecimal(stolen_past_year) / 365
                 %span.less-strong.ml-1
                   - stolen_in_year_projection = stolen_in_year + (stolen_per_day * days_left).to_i
