@@ -1,16 +1,8 @@
 class ImageUploader < ApplicationUploader
   include CarrierWave::MiniMagick
 
-  def self.permitted_extensions
-    IMAGE_EXT_WHITE_LIST.map { |i| ".#{i}" }
-  end
-
-  def self.permitted_extensions_display
-    permitted_extensions - [".jpg", ".tif"]
-  end
-
   def extension_white_list
-    IMAGE_EXT_WHITE_LIST
+    self.class.extensions
   end
 
   process :validate_dimensions

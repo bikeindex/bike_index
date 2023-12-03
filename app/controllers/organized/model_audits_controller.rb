@@ -53,7 +53,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.permit(:kind, :url, :info, :model_audit_id)
+      params.permit(:kind, :url, :info, :model_audit_id, :certification_type, :document)
         .merge(user_id: current_user.id, organization_id: current_organization.id)
     end
 

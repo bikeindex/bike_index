@@ -11,14 +11,20 @@
         - opts = [["Certified", "certified_by_trusted_org"],["NOT certified", "uncertified_by_trusted_org"]]
         = select_tag(:kind, options_for_select(opts), include_blank: false, required: true, class: 'form-control')
       .form-group
+        = label_tag :certification_type
+        = text_field_tag :certification_type, "", placeholder: "optional", required: false, class: "form-control"
+      .form-group
         = label_tag :url do
           Url
-          %small where to find information on the certification
+          %small where to find the certification
         = text_field_tag :url, "", placeholder: "optional", required: false, class: "form-control"
+      .form-group.file-upload-wrapper{style: "position: relative;"}
+        %label.file
+          = file_field_tag :document, class: "avatar-upload-field", accept: PdfUploader.permitted_extensions.join(",")
+          %span.file-custom
+            %span.file-upload-text Upload documentation (optional)
       .form-group
-        = label_tag :info do
-          additional info
-          %small certification type, etc
+        = label_tag :info, "Additional info"
         = text_area_tag :info, "", placeholder: "optional", required: false, class: "form-control"
       .modal-btn-footer
         .form-submit-button

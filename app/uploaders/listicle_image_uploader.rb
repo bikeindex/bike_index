@@ -21,7 +21,7 @@ class ListicleImageUploader < ApplicationUploader
   end
 
   def extension_white_list
-    IMAGE_EXT_WHITE_LIST
+    self.class.extensions
   end
 
   def crop

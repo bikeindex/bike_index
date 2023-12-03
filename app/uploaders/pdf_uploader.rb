@@ -1,7 +1,5 @@
 class PdfUploader < ApplicationUploader
-  include ::CarrierWave::Backgrounder::Delay
-
-  def extension_white_list
+  def self.extensions
     IMAGE_EXT_WHITE_LIST + ["pdf"]
   end
 end
