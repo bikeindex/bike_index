@@ -1,5 +1,5 @@
 class ListicleImageSizeWorker < ApplicationWorker
-  sidekiq_options queue: "carrierwave"
+  sidekiq_options queue: "med_carrierwave"
 
   def perform(id)
     listicle = Listicle.find(id)

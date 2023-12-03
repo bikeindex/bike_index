@@ -9,6 +9,6 @@ production:
   # (e.g. signup email links)
   - droppable # Things that can take a really long time and can be dropped if the queue backs up
   - [low_priority, 10] # Lowest priority, general things, non-user-facing
-  - [carrierwave, 20] # Also includes file_caching/tsv creation
+  - [med_priority, 20] # Includes file_caching/tsv creation
   - [notify, 200] # sending email & notifications - NOTE: has a dedicated queue
   - [high_priority, 200] # User facing updates, execute immediately - NOTE: has a dedicated queue

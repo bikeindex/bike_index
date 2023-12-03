@@ -1,6 +1,18 @@
 class ApplicationUploader < CarrierWave::Uploader::Base
   IMAGE_EXT_WHITE_LIST = %w[jpg jpeg gif png tiff tif].freeze
 
+  def self.extensions
+    IMAGE_EXT_WHITE_LIST
+  end
+
+  def self.permitted_extensions
+    extensions.map { |i| ".#{i}" }
+  end
+
+  def self.permitted_extensions_display
+    permitted_extensions - [".jpg", ".tif"]
+  end
+
   after :remove, :delete_empty_upstream_dirs
 
   def store_dir

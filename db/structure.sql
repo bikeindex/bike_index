@@ -1989,7 +1989,9 @@ CREATE TABLE public.model_attestations (
     url text,
     info text,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    file character varying,
+    certification_type character varying
 );
 
 
@@ -6638,6 +6640,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231030150841'),
 ('20231104191652'),
 ('20231112013451'),
-('20231115201426');
+('20231115201426'),
+('20231203021402');
 
 

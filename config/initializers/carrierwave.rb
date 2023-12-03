@@ -52,3 +52,7 @@ CarrierWave.configure do |config|
     config.fog_attributes = {"Cache-Control" => "max-age=315576000"}
   end
 end
+
+CarrierWave::Backgrounder.configure do |c|
+  c.backend :sidekiq, queue: :med_priority, retry: 2
+end

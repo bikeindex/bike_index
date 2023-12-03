@@ -74,9 +74,11 @@
       %th
         Submitted by
       %th
-        Information
+        Certification
       %th
-        Url
+        Documentation
+      %th
+        Information
 
     %tbody
       - @model_attestations.each do |model_attestation|
@@ -84,6 +86,8 @@
           %td
             %span.convertTime.preciseTime
               = l(model_attestation.created_at, format: :convert_time)
+            - if display_dev_info?
+              %code.only-dev-visible= model_attestation.id
           %td
             %span{class: status_display_class(model_attestation.kind)}
               = model_attestation.kind_humanized
@@ -92,9 +96,14 @@
             - if model_attestation.organization_id == current_organization.id
               %small= model_attestation.user&.display_name
           %td
-            = model_attestation.info
+            = model_attestation.certification_type
           %td
-            = link_to truncate(model_attestation.url), model_attestation.url
+            - if model_attestation.file.present?
+              %strong= link_to "File", model_attestation.file.url, target: "_blank"
+            - if model_attestation.url.present?
+              %small= link_to truncate(model_attestation.url), model_attestation.url
+          %td
+            = model_attestation.info
 
 %h2.uncap.pt-3.mt-4.mb-0
   Vehicles
@@ -104,4 +113,4 @@
 
 = render partial: "/organized/bikes/search", locals: {only_show_bikes: true}
 
-= render partial: "/organized/model_audits/update_model_cert"
+= render partial: "/organized/model_audits/submit_model_attestation"

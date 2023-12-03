@@ -9,7 +9,7 @@ class AvatarUploader < ApplicationUploader
   process :validate_dimensions
 
   def extension_white_list
-    IMAGE_EXT_WHITE_LIST
+    self.class.extensions
   end
 
   def auto_orient

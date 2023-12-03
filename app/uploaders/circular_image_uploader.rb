@@ -23,7 +23,7 @@ class CircularImageUploader < ApplicationUploader
   end
 
   def extension_white_list
-    IMAGE_EXT_WHITE_LIST
+    self.class.extensions
   end
 
   def round_image

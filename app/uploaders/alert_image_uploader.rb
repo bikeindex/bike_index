@@ -5,7 +5,7 @@ class AlertImageUploader < ApplicationUploader
   delegate :stolen_record, to: :model
 
   def extension_white_list
-    IMAGE_EXT_WHITE_LIST
+    self.class.extensions
   end
 
   process :fix_exif_rotation

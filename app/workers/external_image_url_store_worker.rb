@@ -1,5 +1,5 @@
 class ExternalImageUrlStoreWorker < ApplicationWorker
-  sidekiq_options queue: "carrierwave"
+  sidekiq_options queue: "med_priority"
 
   def perform(public_image_id)
     public_image = PublicImage.find(public_image_id)
