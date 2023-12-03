@@ -19,6 +19,9 @@ class ModelAttestation < ApplicationRecord
   validates_presence_of :kind
   validates_presence_of :user_id
 
+  mount_uploader :document, PdfUploader
+  process_in_background :document, CarrierWaveProcessWorker
+
   scope :current, -> { where(replaced: false) }
 
   before_validation :set_calculated_attributes
