@@ -104,6 +104,9 @@ RSpec.describe GraphingHelper, type: :helper do
     it "humanizes needs_renewal_at" do
       expect(humanized_time_range_column("needs_renewal_at")).to eq "need renewal"
     end
+    it "humanizes request_at" do
+      expect(humanized_time_range_column("request_at")).to eq "requested"
+    end
   end
 
   describe "humanized_time_range" do

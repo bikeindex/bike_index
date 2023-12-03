@@ -21,6 +21,7 @@ class LogSearcher::Reader
     end
 
     # If a time is included, it returns lines that occurred in the hour of the time
+    # If no time is included, it returns all the lines from the file
     def rgrep_command_str(time = nil, log_path: nil)
       log_path ||= DEFAULT_LOG_PATH
       "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time)
