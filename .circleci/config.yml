@@ -257,10 +257,10 @@ jobs:
       - run:
           name: RSpec
           command: |
-            mkdir -p test-results/rspec test-artifacts
+            mkdir -p test-results/rspec
             ./cc-test-reporter before-build
             TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-            echo $TESTFILES | circleci tests run --command="xargs bin/rspec --profile 10 --order random --format RspecJunitFormatter --out test-results/rspec/rspec.xml"
+            echo $TESTFILES | circleci tests run --command="xargs bin/rspec --profile 10 --order random --format RspecJunitFormatter --out test-results/rspec/rspec.xml --format progress --color --require spec_helper"
       - run:
           name: "Jest: Tests"
           command: |
@@ -272,9 +272,6 @@ jobs:
 
       - store_test_results:
           path: test-results
-
-      - store_artifacts:
-          path: test-artifacts
 
   deploy_production:
     machine:
