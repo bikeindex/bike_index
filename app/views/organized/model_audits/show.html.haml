@@ -76,9 +76,7 @@
       %th
         Certification
       %th
-        Url
-      %th
-        Document
+        Documentation
       %th
         Information
 
@@ -100,11 +98,10 @@
           %td
             = model_attestation.certification_type
           %td
-            - if model_attestation.url.present?
-              = link_to truncate(model_attestation.url), model_attestation.url
-          %td
             - if model_attestation.file.present?
-              = link_to truncate(model_attestation.file.url), model_attestation.file.url, target: "_blank"
+              %strong= link_to "File", model_attestation.file.url, target: "_blank"
+            - if model_attestation.url.present?
+              %small= link_to truncate(model_attestation.url), model_attestation.url
           %td
             = model_attestation.info
 

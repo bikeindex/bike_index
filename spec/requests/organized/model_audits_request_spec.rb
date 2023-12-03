@@ -67,11 +67,13 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
         expect(organization_model_audit.model_attestations.count).to eq 0
         expect(organization_model_audit.certification_status).to be_nil
         post base_url, params: {
-          model_audit_id: organization_model_audit.model_audit_id,
-          url: " ffff.com/sss ",
-          info: "Some cool info",
-          kind: "certified_by_trusted_org",
-          certification_type: "UL"
+          model_attestation: {
+            model_audit_id: organization_model_audit.model_audit_id,
+            url: " ffff.com/sss ",
+            info: "Some cool info",
+            kind: "certified_by_trusted_org",
+            certification_type: "UL"
+          }
         }
         expect(flash[:success]).to be_present
         expect(organization_model_audit.model_attestations.count).to eq 1
@@ -91,12 +93,14 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
           expect(organization_model_audit.model_attestations.count).to eq 0
           expect(organization_model_audit.certification_status).to be_nil
           post base_url, params: {
-            model_audit_id: organization_model_audit.model_audit_id,
-            url: " ",
-            info: "\n",
-            kind: "certified_by_trusted_org",
-            certification_type: " ",
-            file: test_file
+            model_attestation: {
+              model_audit_id: organization_model_audit.model_audit_id,
+              url: " ",
+              info: "\n",
+              kind: "certified_by_trusted_org",
+              certification_type: " ",
+              file: test_file
+            }
           }
           expect(flash[:success]).to be_present
           expect(organization_model_audit.model_attestations.count).to eq 1

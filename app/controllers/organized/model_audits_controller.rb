@@ -8,6 +8,7 @@ module Organized
       @page_title = "E-Vehicle Audits"
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
+      @model_attestation ||= ModelAttestation.new
       @organization_model_audits = organization_model_audits
         .reorder(sort_ordered)
         .page(@page).per(@per_page)
@@ -16,6 +17,7 @@ module Organized
     def show
       @model_audit = ModelAudit.find(params[:id])
       @model_attestations = @model_audit.model_attestations
+      @model_attestation ||= ModelAttestation.new
       @organization_model_audit = @model_audit.organization_model_audits.where(organization_id: current_organization.id).first
       bikes = @organization_model_audit&.bikes
       @bikes_count = @organization_model_audit&.bikes_count || 0
@@ -28,15 +30,15 @@ module Organized
       if !permitted_attestation_kinds.include?(permitted_parameters[:kind])
         flash[:error] = "Sorry, you can't make an attestation of that kind"
       else
-        model_attestation = ModelAttestation.new(permitted_parameters)
-        if model_attestation.save
+        @model_attestation = ModelAttestation.new(permitted_parameters)
+        if @model_attestation.save
           # Inline update to reflect the new certification_status
           current_organization.organization_model_audits
-            .where(model_audit_id: model_attestation.model_audit_id)
+            .where(model_audit_id: @model_attestation.model_audit_id)
             .first&.update(updated_at: Time.current)
           flash[:success] = "Certification status updated successfully"
         else
-          flash[:error] = "Unable to save that attestation, #{model_attestation.errors.full_messages.to_sentence}"
+          flash[:error] = "Unable to save that attestation, #{@model_attestation.errors.full_messages.to_sentence}"
         end
       end
       redirect_back(fallback_location: organization_model_audits_path(organization_id: current_organization.to_param))
@@ -53,7 +55,8 @@ module Organized
     end
 
     def permitted_parameters
-      params.permit(:kind, :url, :info, :model_audit_id, :certification_type, :file)
+      params.require(:model_attestation)
+        .permit(:certification_type, :file, :info, :kind, :model_audit_id, :url)
         .merge(user_id: current_user.id, organization_id: current_organization.id)
     end
 

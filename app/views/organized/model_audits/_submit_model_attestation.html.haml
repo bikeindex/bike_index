@@ -1,34 +1,33 @@
-
 - modal_body = capture_haml do
   .modal-body
-    = form_tag organization_model_audits_path(organization_id: current_organization.to_param), method: :post, action: "create", class: "form" do
-      = hidden_field_tag :model_audit_id
+    = form_for @model_attestation, {url: organization_model_audits_path(organization_id: current_organization.to_param), method: :post, action: "create", html: {class: "form"}} do |f|
+      = f.hidden_field :model_audit_id
       .form-group
-        = label_tag :kind do
+        = f.label :kind do
           Update the certification status of the
           %strong#updateModalMnfg Manufacturer
           %em#updateModalFrameModel Model
         - opts = [["Certified", "certified_by_trusted_org"],["NOT certified", "uncertified_by_trusted_org"]]
-        = select_tag(:kind, options_for_select(opts), include_blank: false, required: true, class: 'form-control')
+        = f.select(:kind, opts, {include_blank: false, required: true}, {class: 'form-control'})
       .form-group
-        = label_tag :certification_type
-        = text_field_tag :certification_type, "", placeholder: "optional", required: false, class: "form-control"
+        = f.label :certification_type
+        = f.text_field :certification_type, placeholder: "optional", required: false, class: "form-control"
       .form-group
-        = label_tag :url do
+        = f.label :url do
           Url
-          %small where to find the certification
-        = text_field_tag :url, "", placeholder: "optional", required: false, class: "form-control"
+          %small where to find the certification/documentation
+        = f.text_field :url, placeholder: "optional", required: false, class: "form-control"
       .form-group.file-upload-wrapper{style: "position: relative;"}
         %label.file
-          = file_field_tag :file, class: "avatar-upload-field", accept: PdfUploader.permitted_extensions.join(",")
+          = f.file_field :file, class: "avatar-upload-field", accept: PdfUploader.permitted_extensions.join(",")
           %span.file-custom
             %span.file-upload-text Upload documentation (optional)
       .form-group
-        = label_tag :info, "Additional info"
-        = text_area_tag :info, "", placeholder: "optional", required: false, class: "form-control"
+        = f.label :info, "Additional info"
+        = f.text_area :info, placeholder: "optional", required: false, class: "form-control"
       .modal-btn-footer
         .form-submit-button
-          = submit_tag "submit", class: "btn btn-success btn-lg"
+          = f.submit "submit", class: "btn btn-success btn-lg"
 
 
 
@@ -39,6 +38,6 @@
     $target = $(e.target)
     $("#updateModalMnfg").text($target.attr("data-mnfgname"))
     $("#updateModalFrameModel").text($target.attr("data-framemodel"))
-    $("#update-model-cert-modal #model_audit_id").val($target.attr("data-modelauditid"))
+    $("#update-model-cert-modal #model_attestation_model_audit_id").val($target.attr("data-modelauditid"))
     return true
   })
