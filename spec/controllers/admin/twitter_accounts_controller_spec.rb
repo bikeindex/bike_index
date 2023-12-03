@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
-  include_context :logged_in_as_super_admin
+  include_context :logged_in_as_superuser
 
   describe "index" do
     it "renders" do

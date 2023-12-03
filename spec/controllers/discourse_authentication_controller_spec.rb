@@ -65,7 +65,7 @@ RSpec.describe DiscourseAuthenticationController, type: :controller do
     end
 
     context "signed in as a superuser" do
-      include_context :logged_in_as_super_admin
+      include_context :logged_in_as_superuser
 
       let(:sso) do
         SingleSignOn.parse(discourse_query_string, ENV["DISCOURSE_SECRET"]).tap do |sso|

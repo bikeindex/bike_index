@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Admin::FeedbacksController, type: :controller do
   let(:subject) { FactoryBot.create(:feedback) }
-  include_context :logged_in_as_super_admin
+  include_context :logged_in_as_superuser
 
   describe "index" do
     it "renders" do
