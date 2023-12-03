@@ -5015,7 +5015,7 @@ nb:
         last_login_ip: Siste innlogging ip
         member_of_organization: Medlem av organisasjonen
         membership_type: Medlemskapstype
-        remove_from_organization: fjerne fra organisasjonen
+        remove_from_organization: fjern fra organisasjonen
         signed_up: Meldt seg
         update: Oppdater
       index:
