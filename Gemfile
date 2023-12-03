@@ -174,7 +174,6 @@ group :test do
   gem "factory_bot_rails"
   gem "rails-controller-testing"
   gem "rspec-sidekiq"
-  gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry failures on CI
