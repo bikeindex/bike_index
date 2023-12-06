@@ -239,12 +239,6 @@ jobs:
           - tmp/cache/webpacker
 
       - run:
-          name: Install Code Climate Test Reporter
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-
-      - run:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
@@ -258,7 +252,6 @@ jobs:
           name: RSpec
           command: |
             mkdir -p test-results/rspec
-            ./cc-test-reporter before-build
             TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
             echo $TESTFILES | circleci tests run --command="xargs bin/rspec --profile 10 --order random --format RspecJunitFormatter --out test-results/rspec/rspec.xml --format progress --color --require spec_helper"
       - run:
