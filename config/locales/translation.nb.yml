@@ -4422,6 +4422,8 @@ nb:
       verified: verifisert
       why_you_should_text: Les hvorfor du bør
       zipcode: Postnummer
+      time_single_format: Vis kun datoer
+      time_single_format_small: "(ikke i dag, i går osv.)"
     sharing:
       choose_file: Velg Fil...
       create_page: Lag side
