@@ -4046,6 +4046,8 @@ en:
       resend_confirmation: Resend confirmation
       state: State
       stolen_hot_sheets: Stolen Bike Hot Sheets
+      time_single_format: Only show dates
+      time_single_format_small: "(not today, yesterday, etc)"
       unconfirmed: unconfirmed!
       unconfirmed_emails: Unconfirmed emails
       verified: verified

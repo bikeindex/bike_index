@@ -539,13 +539,14 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
 
-    describe "preferred_language" do
+    describe "preferred_language and time_single_format" do
       it "updates if valid" do
         expect(current_user.reload.preferred_language).to eq(nil)
-        patch base_url, params: {id: current_user.username, locale: "nl", user: {preferred_language: "en"}}
+        patch base_url, params: {id: current_user.username, locale: "nl", user: {preferred_language: "en", time_single_format: true}}
         expect(flash[:success]).to match(/succesvol/i)
         expect(response).to redirect_to "/my_account/edit/root?locale=nl"
         expect(current_user.reload.preferred_language).to eq("en")
+        expect(current_user.time_single_format).to be_truthy
       end
 
       it "changes from previous if valid" do

@@ -11,6 +11,9 @@
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
       }
+    - if current_user&.time_single_format
+      <script>window.timeParserSingleFormat = true</script>
+
     = render partial: "/shared/analytics"
     -# Use with content_for(:header) -- see news/show for an example of content yielded to a named `yield`.
     -# https://guides.rubyonrails.org/layouts_and_rendering.html#using-the-content-for-method
