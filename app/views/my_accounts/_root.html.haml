@@ -9,7 +9,7 @@
     .form-well-input
       = f.text_field :name, class: "form-control"
 
-  .related-fields.user-notification-checks
+  .related-fields.my-account-checks
     .form-group.row
       %label.form-well-label
       %label.form-well-input.form-well-input-checks
@@ -99,14 +99,21 @@
       .form-well-input
         = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
 
-  .form-group.row.fancy-select.unfancy
-    = f.label :preferred_language, class: "form-well-label" do
-      = t(".preferred_language")
-    .form-well-input
-      = f.select(:preferred_language,
-        options_for_select(language_choices, selected: current_user.preferred_language),
-        {prompt: t(".choose_language"), include_blank: true},
-        {class: "language-select-input form-control"} )
+  .related-fields.my-account-checks
+    .form-group.row.fancy-select.unfancy
+      = f.label :preferred_language, class: "form-well-label" do
+        = t(".preferred_language")
+      .form-well-input
+        = f.select(:preferred_language,
+          options_for_select(language_choices, selected: current_user.preferred_language),
+          {prompt: t(".choose_language"), include_blank: true},
+          {class: "language-select-input form-control"} )
+    .form-group.row.mt-3
+      %label.form-well-label
+      %label.form-well-input.form-well-input-checks
+        = f.check_box :time_single_format
+        = t(".time_single_format")
+        %small.less-strong= t(".time_single_format_small")
 
   .col-xs-12.mt-4
     %p

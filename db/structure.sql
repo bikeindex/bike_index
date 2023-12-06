@@ -3400,7 +3400,8 @@ CREATE TABLE public.users (
     show_instagram boolean DEFAULT false,
     instagram character varying,
     no_non_theft_notification boolean DEFAULT false,
-    admin_options jsonb
+    admin_options jsonb,
+    time_single_format boolean DEFAULT false
 );
 
 
@@ -6641,6 +6642,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231104191652'),
 ('20231112013451'),
 ('20231115201426'),
-('20231203021402');
+('20231203021402'),
+('20231206022455');
 
 
