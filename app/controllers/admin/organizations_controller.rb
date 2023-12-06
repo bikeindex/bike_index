@@ -143,6 +143,12 @@ class Admin::OrganizationsController < Admin::BaseController
     if selected_settings.include?("with_stolen_message")
       matching_organizations = matching_organizations.with_stolen_message
     end
+    if selected_settings.include?("not_approved")
+      matching_organizations = matching_organizations.where(approved: false)
+    end
+    if selected_settings.include?("unlisted")
+      matching_organizations = matching_organizations.where(unlisted: true)
+    end
     @features_and_settings_ids += selected_settings
 
     matching_organizations = matching_organizations.where(kind: params[:search_kind]) if params[:search_kind].present?
@@ -158,7 +164,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def organization_settings
-    %w[theft_survey with_stolen_message].freeze
+    %w[theft_survey with_stolen_message not_approved unlisted].freeze
   end
 
   def pos_kind_for_organizations

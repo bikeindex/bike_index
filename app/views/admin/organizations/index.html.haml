@@ -56,7 +56,7 @@
   .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
     .fancy-select.no-restore-on-backspace.unfancy.col-md-4.mt-2{style: "margin-bottom: -0.4rem; padding-left: 0;"}
       - features_group = OrganizationFeature.order(name: :desc).pluck(:name, :id)
-      - settings_group = [["With Stolen Message", "with_stolen_message"], ["Opted into Theft Survey", "theft_survey"]]
+      - settings_group = [["With Stolen Message", "with_stolen_message"], ["Opted into Theft Survey", "theft_survey"], ["Not approved", "not_approved"], ["Unlisted", "unlisted"]]
       - opt_groups = [["Settings", settings_group], ["Features", features_group]]
       = select_tag :search_features_and_settings, grouped_options_for_select(opt_groups, selected: @features_and_settings_ids), placeholder: "With features", class: "form-control", include_blank: true, multiple: true
     .align-self-end.mt-2.mr-2
