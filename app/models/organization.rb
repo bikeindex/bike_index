@@ -84,6 +84,7 @@ class Organization < ApplicationRecord
   scope :paid_money, -> { where(is_paid: true) } # TODO: make this actually show paid money, rather than just paid
   scope :unpaid, -> { where(is_paid: false) }
   scope :approved, -> { where(approved: true) }
+  scope :listed, -> { where(unlisted: false) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
   scope :with_stolen_message, -> { left_joins(:organization_stolen_message).where.not(organization_stolen_message: {body: nil}) }

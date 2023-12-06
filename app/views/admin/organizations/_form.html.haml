@@ -66,10 +66,17 @@
             Lightspeed POS registrations include phone
             %small.less-strong originally for Edmonton
 
-
-    .form-group.mt-4
-      = f.check_box :show_on_map
-      = f.label :show_on_map
+    .row.mt-4
+      .col-lg-6
+        .form-group
+          = f.check_box :show_on_map
+          = f.label :show_on_map
+      .col-lg-6
+        .form-group
+          = f.check_box :unlisted
+          = f.label :unlisted do
+            Unlisted
+            %small.less-strong hide from users
     .form-group
       = f.check_box :lock_show_on_map
       = f.label :lock_show_on_map do
@@ -90,6 +97,7 @@
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
+
     .form-group
       = f.check_box :direct_unclaimed_notifications
       = f.label :direct_unclaimed_notifications do

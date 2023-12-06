@@ -115,6 +115,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :show_on_map,
         :slug,
         :spam_registrations,
+        :unlisted,
         :website,
         [locations_attributes: permitted_locations_params]
       ).merge(kind: approved_kind)

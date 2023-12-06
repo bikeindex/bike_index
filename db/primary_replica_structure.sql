@@ -2423,7 +2423,8 @@ CREATE TABLE public.organizations (
     manufacturer_id bigint,
     direct_unclaimed_notifications boolean DEFAULT false,
     spam_registrations boolean DEFAULT false,
-    opted_into_theft_survey_2023 boolean DEFAULT false
+    opted_into_theft_survey_2023 boolean DEFAULT false,
+    unlisted boolean DEFAULT false
 );
 
 
@@ -6641,6 +6642,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231104191652'),
 ('20231112013451'),
 ('20231115201426'),
-('20231203021402');
+('20231203021402'),
+('20231206015540');
 
 

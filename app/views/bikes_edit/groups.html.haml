@@ -28,7 +28,7 @@
 
 
           :javascript
-            window.organizations = #{Organization.approved.map { |organization| { name: organization.name, id: organization.id } }.to_json };
+            window.organizations = #{Organization.approved.listed.map { |organization| { name: organization.name, id: organization.id } }.to_json };
 
           .related-fields#additional_organization_fields
             .form-group.row.unnested-field.no-divider-row
