@@ -18,7 +18,7 @@ class Admin::ModelAttestationsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at updated_at model_audit_id user_id organization_id]
+    %w[created_at updated_at model_audit_id user_id organization_id kind]
   end
 
   def earliest_period_date
@@ -26,13 +26,17 @@ class Admin::ModelAttestationsController < Admin::BaseController
   end
 
   def matching_model_attestations
-    model_audits = ModelAudit
+    model_attestations = ModelAttestation
     if current_organization.present?
-      model_audits = model_audits.where(organization_id: current_organization.id)
+      model_attestations = model_attestations.where(organization_id: current_organization.id)
+    end
+    if params[:search_model_audit_id].present?
+      @model_audit = ModelAudit.find(params[:search_model_audit_id])
+      model_attestations = model_attestations.where(model_audit_id: @model_audit.id)
     end
 
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)
     @time_range_column ||= "created_at"
-    model_audits.where(@time_range_column => @time_range)
+    model_attestations.where(@time_range_column => @time_range)
   end
 end
