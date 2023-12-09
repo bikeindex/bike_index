@@ -4,12 +4,12 @@
       = f.hidden_field :model_audit_id
       .form-group
         = f.label :kind do
-          Update the certification status of the
+          Update the
           %strong#updateModalMnfg Manufacturer
           %em#updateModalFrameModel Model
-        - opts = [["Certified", "certified_by_trusted_org"],["NOT certified", "uncertified_by_trusted_org"]]
+        - opts = [["Mark Certified", "certified_by_trusted_org"], ["Mark NOT certified", "uncertified_by_trusted_org"], ["Record other update", "certification_update"]]
         = f.select(:kind, opts, {include_blank: false, required: true}, {class: 'form-control'})
-      .form-group
+      .form-group.collapse.in.hidden-not-certification-updating
         = f.label :certification_type
         = f.text_field :certification_type, placeholder: "optional", required: false, class: "form-control"
       .form-group
@@ -35,9 +35,13 @@
 
 :javascript
   $(".updateModelCert").on("click", e => {
-    $target = $(e.target)
+    const $target = $(e.target)
     $("#updateModalMnfg").text($target.attr("data-mnfgname"))
     $("#updateModalFrameModel").text($target.attr("data-framemodel"))
     $("#update-model-cert-modal #model_attestation_model_audit_id").val($target.attr("data-modelauditid"))
     return true
+  })
+  $("#model_attestation_kind").on("change", e => {
+    const collapseState = $("#model_attestation_kind").val() == ["certification_update"] ? "hide" : "show"
+    $(".hidden-not-certification-updating").collapse(collapseState)
   })
