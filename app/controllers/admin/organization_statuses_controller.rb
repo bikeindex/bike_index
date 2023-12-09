@@ -26,7 +26,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
   end
 
   def grouped_pos_kinds
-    %w[broken_pos_kinds no_pos_kinds with_pos].freeze
+    %w[broken_pos without_pos with_pos].freeze
   end
 
   def permitted_pos_kinds
@@ -63,7 +63,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
 
     if permitted_kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
-      organization_statuses = organization_statuses.send(@pos_kind)
+      organization_statuses = organization_statuses.send(@kind)
     else
       @kind = "all"
     end

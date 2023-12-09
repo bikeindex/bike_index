@@ -6,6 +6,9 @@ class OrganizationStatus < AnalyticsRecord
 
   scope :current, -> { where(end_at: nil) }
   scope :ended, -> { where.not(end_at: nil) }
+  scope :broken_pos, -> { where(pos_kind: Organization.broken_pos_kinds) }
+  scope :with_pos, -> { where(pos_kind: Organization.with_pos_kinds) }
+  scope :without_pos, -> { where(pos_kind: Organization.without_pos_kinds) }
 
   def current?
     end_at.blank?
