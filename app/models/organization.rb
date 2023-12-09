@@ -126,16 +126,16 @@ class Organization < ApplicationRecord
     %w[broken_other_pos broken_lightspeed_pos]
   end
 
-  def self.no_pos_kinds
+  def self.without_pos_kinds
     %w[no_pos does_not_need_pos]
   end
 
   def self.with_pos_kinds
-    pos_kinds - broken_pos_kinds - no_pos_kinds
+    pos_kinds - broken_pos_kinds - without_pos_kinds
   end
 
   def self.pos?(kind = nil)
-    kind.present? && !no_pos_kinds.include?(kind)
+    kind.present? && !without_pos_kinds.include?(kind)
   end
 
   def self.admin_required_kinds

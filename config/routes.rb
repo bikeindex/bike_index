@@ -184,11 +184,31 @@ Rails.application.routes.draw do
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
-    resources :ads, :bike_sticker_updates, :bulk_imports, :content_tags, :ctypes, :exports,
-      :graduated_notifications, :impound_claims, :impound_records, :logged_searches,
-      :mail_snippets, :mailchimp_data, :mailchimp_values, :memberships, :model_audits,
-      :notifications, :organization_features, :paints, :parking_notifications, :payments,
-      :recovery_displays, :superuser_abilities, :theft_alerts, :user_alerts,
+    resources :ads,
+      :bike_sticker_updates,
+      :bulk_imports,
+      :content_tags,
+      :ctypes,
+      :exports,
+      :graduated_notifications,
+      :impound_claims,
+      :impound_records,
+      :logged_searches,
+      :mail_snippets,
+      :mailchimp_data,
+      :mailchimp_values,
+      :memberships,
+      :model_audits,
+      :notifications,
+      :organization_features,
+      :organization_statuses,
+      :paints,
+      :parking_notifications,
+      :payments,
+      :recovery_displays,
+      :superuser_abilities,
+      :theft_alerts,
+      :user_alerts,
       :user_registration_organizations
 
     resources :bike_stickers do

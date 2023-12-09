@@ -12,7 +12,7 @@ class Counts
     end
 
     def count_keys
-      %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations organization_types]
+      %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations]
     end
 
     def recovery_average_value
@@ -78,26 +78,6 @@ class Counts
 
     def recoveries_value
       retrieve_for("recoveries_value")
-    end
-
-    # TODO: put this in a more reasonable place. Hack to store organization counts per day
-    def assign_organization_types
-      Organization.kinds.each do |kind|
-        assign_for(organization_type_key(kind), Organization.where(kind: kind).count)
-      end
-      Organization.pos_kinds.each do |kind|
-        assign_for(organization_type_key(kind), Organization.where(pos_kind: kind).count)
-      end
-    end
-
-    def organization_type_key(kind, time = Time.current)
-      "org_type-#{kind}-#{time.to_date}"
-    end
-
-    def retrieve_organization_type_counts_for(time)
-      (Organization.kinds + Organization.pos_kinds).map do |kind|
-        [kind, retrieve_for(organization_type_key(kind, time))]
-      end.to_h
     end
 
     protected

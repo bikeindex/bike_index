@@ -103,14 +103,18 @@ module GraphingHelper
   def period_in_words(seconds)
     return "" if seconds.blank?
     seconds = seconds.to_i.abs
-    if seconds < 1.minute
+    if seconds >= 365.days
+      pluralize((seconds / 31556952.0).round(1), "year")
+    elsif seconds < 1.minute
       pluralize(seconds, "second")
     elsif seconds >= 1.minute && seconds < 1.hour
       pluralize((seconds / 60.0).round(1), "minute")
     elsif seconds >= 1.hour && seconds < 24.hours
       pluralize((seconds / 3600.0).round(1), "hour")
-    elsif seconds >= 24.hours
+    elsif seconds >= 24.hours && seconds < 14.days
       pluralize((seconds / 86400.0).round(1), "day")
+    else
+      pluralize((seconds / 604800.0).round(1), "weeks")
     end.gsub(".0 ", " ") # strip out the empty zero
   end
 
