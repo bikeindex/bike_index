@@ -53,6 +53,38 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         expect(organization_status2.end_at).to be_blank
       end
     end
+    context "deleted" do
+      let(:pos_bike) { nil }
+      it "creates status" do
+        organization.destroy
+        expect {
+          described_class.new.perform(organization.id)
+        }.to change(OrganizationStatus, :count).by 1
+
+        organization_status1 = OrganizationStatus.order(:id).first
+        expect(organization_status1.organization_id).to eq organization.id
+        expect(organization_status1.pos_kind).to eq "no_pos"
+        expect(organization_status1.start_at).to be_within(5).of Time.current
+        expect(organization_status1.end_at).to be_blank
+        expect(organization_status1.deleted?).to be_truthy
+
+        organization.restore
+        expect {
+          described_class.new.perform(organization.id)
+        }.to change(OrganizationStatus, :count).by 1
+
+        expect(organization_status1.reload.current?).to be_falsey
+        expect(organization_status1.end_at).to be_blank
+        expect(organization_status1.deleted?).to be_truthy
+
+        organization_status2 = OrganizationStatus.order(:id).last
+        expect(organization_status2.organization_id).to eq organization.id
+        expect(organization_status2.pos_kind).to eq "no_pos"
+        expect(organization_status2.start_at).to be_within(5).of Time.current
+        expect(organization_status2.end_at).to be_blank
+        expect(organization_status2.deleted?).to be_falsey
+      end
+    end
     context "broken lightspeed" do
       let!(:pos_bike) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: organization, created_at: Time.current - 1.month) }
       it "updates to broken" do

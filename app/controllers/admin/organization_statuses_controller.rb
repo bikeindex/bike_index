@@ -18,7 +18,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[start_at end_at organization_id pos_kind kind created_at].freeze
+    %w[start_at end_at organization_id pos_kind kind created_at organization_deleted_at].freeze
   end
 
   def earliest_period_date
@@ -54,6 +54,11 @@ class Admin::OrganizationStatusesController < Admin::BaseController
       organization_statuses = organization_statuses.ended
     end
 
+    if InputNormalizer.boolean(params[:search_deleted])
+      @deleted = true
+      organization_statuses = organization_statuses.deleted
+    end
+
     if permitted_pos_kinds.include?(params[:search_pos_kind])
       @pos_kind = params[:search_pos_kind]
       organization_statuses = organization_statuses.send(@pos_kind)
@@ -68,7 +73,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
       @kind = "all"
     end
 
-    @time_range_column = sort_column if %w[end_at created_at].include?(sort_column)
+    @time_range_column = sort_column if %w[end_at created_at deleted_at].include?(sort_column)
     @time_range_column ||= "start_at"
     organization_statuses.where(@time_range_column => @time_range)
   end

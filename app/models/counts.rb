@@ -12,7 +12,7 @@ class Counts
     end
 
     def count_keys
-      %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations organization_types]
+      %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart]
     end
 
     def recovery_average_value
@@ -36,10 +36,6 @@ class Counts
       retrieve_for("stolen_bikes")
     end
 
-    def organizations
-      retrieve_for("organizations")
-    end
-
     def week_creation_chart
       chart_data = RedisPool.conn { |r| r.hget STOREAGE_KEY, "week_creation_chart" }
       chart_data.present? ? JSON.parse(chart_data) : chart_data
@@ -52,10 +48,6 @@ class Counts
 
     def assign_total_bikes
       assign_for("total_bikes", Bike.count)
-    end
-
-    def assign_organizations
-      assign_for("organizations", Organization.count)
     end
 
     def assign_recoveries

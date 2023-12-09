@@ -79,6 +79,7 @@ CREATE TABLE public.organization_statuses (
     organization_id bigint,
     pos_kind integer,
     kind integer,
+    organization_deleted_at timestamp without time zone,
     start_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,

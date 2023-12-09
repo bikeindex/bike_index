@@ -36,6 +36,8 @@
       %li.nav-item
         = link_to "current", url_for(sortable_search_params.merge(search_current: !@current)), class: "nav-link #{@current ? 'active' : ''}"
       %li.nav-item
+        = link_to "deleted", url_for(sortable_search_params.merge(search_deleted: !@deleted)), class: "nav-link #{@deleted ? 'active' : ''}"
+      %li.nav-item
         = link_to "ended", url_for(sortable_search_params.merge(search_ended: !@ended)), class: "nav-link #{@ended ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
@@ -77,7 +79,7 @@
 = render partial: "/shared/pagination", locals: {collection: @organization_statuses}
 
 - org_ids = @organization_statuses.distinct.map(&:organization_id)
-- org_names_hash = Organization.where(id: org_ids).pluck(:id, :short_name).to_h
+- org_names_hash = Organization.unscoped.where(id: org_ids).pluck(:id, :short_name).to_h
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header
@@ -96,6 +98,8 @@
         = sortable "pos_kind", "POS kind"
       %th
         = sortable "kind"
+      %th.small
+        = sortable "organization_deleted_at", "Deleted"
     %tbody
       - @organization_statuses.each do |organization_status|
         %tr
@@ -125,7 +129,10 @@
               = organization_status.pos_kind&.humanize
           %td
             = Organization.kind_humanized(organization_status.kind)
-
+          %td
+            - if organization_status.organization_deleted_at.present?
+              %span.convertTime.preciseTime.text-danger
+                = l organization_status.organization_deleted_at, format: :convert_time
 
 
 
