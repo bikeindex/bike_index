@@ -35,22 +35,22 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         expect(organization.pos_kind).to eq "ascend_pos"
         expect {
           described_class.new.perform(organization.id)
-        }.to change(PosIntegrationStatus, :count).by 2
+        }.to change(OrganizationStatus, :count).by 2
 
         organization.reload
         expect(organization.pos_kind).to eq "broken_other_pos"
 
-        pos_integration_status1 = PosIntegrationStatus.order(:id).first
-        expect(pos_integration_status1.organization_id).to eq organization.id
-        expect(pos_integration_status1.pos_kind).to eq "ascend_pos"
-        expect(pos_integration_status1.start_at).to be_within(5).of og_updated_at
-        expect(pos_integration_status1.end_at).to be_within(5).of Time.current
+        organization_status1 = OrganizationStatus.order(:id).first
+        expect(organization_status1.organization_id).to eq organization.id
+        expect(organization_status1.pos_kind).to eq "ascend_pos"
+        expect(organization_status1.start_at).to be_within(5).of og_updated_at
+        expect(organization_status1.end_at).to be_within(5).of Time.current
 
-        pos_integration_status2 = PosIntegrationStatus.order(:id).last
-        expect(pos_integration_status2.organization_id).to eq organization.id
-        expect(pos_integration_status2.pos_kind).to eq "broken_other_pos"
-        expect(pos_integration_status2.start_at).to be_within(5).of Time.current
-        expect(pos_integration_status2.end_at).to be_blank
+        organization_status2 = OrganizationStatus.order(:id).last
+        expect(organization_status2.organization_id).to eq organization.id
+        expect(organization_status2.pos_kind).to eq "broken_other_pos"
+        expect(organization_status2.start_at).to be_within(5).of Time.current
+        expect(organization_status2.end_at).to be_blank
       end
     end
     context "broken lightspeed" do
@@ -92,23 +92,23 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         expect(organization.calculated_pos_kind).to eq "ascend_pos"
         expect {
           UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        }.to change(PosIntegrationStatus, :count).by 2
+        }.to change(OrganizationStatus, :count).by 2
         organization.reload
         expect(organization.manual_pos_kind?).to be_blank
         expect(organization.pos_kind).to eq "ascend_pos"
         expect(organization.show_bulk_import?).to be_truthy
 
-        pos_integration_status1 = PosIntegrationStatus.order(:id).first
-        expect(pos_integration_status1.organization_id).to eq organization.id
-        expect(pos_integration_status1.pos_kind).to eq "no_pos"
-        expect(pos_integration_status1.start_at).to be_within(5).of Time.current
-        expect(pos_integration_status1.end_at).to be_within(1).of Time.current
+        organization_status1 = OrganizationStatus.order(:id).first
+        expect(organization_status1.organization_id).to eq organization.id
+        expect(organization_status1.pos_kind).to eq "no_pos"
+        expect(organization_status1.start_at).to be_within(5).of Time.current
+        expect(organization_status1.end_at).to be_within(1).of Time.current
 
-        pos_integration_status2 = PosIntegrationStatus.order(:id).last
-        expect(pos_integration_status2.organization_id).to eq organization.id
-        expect(pos_integration_status2.pos_kind).to eq "ascend_pos"
-        expect(pos_integration_status2.start_at).to be_within(5).of Time.current
-        expect(pos_integration_status2.end_at).to be_blank
+        organization_status2 = OrganizationStatus.order(:id).last
+        expect(organization_status2.organization_id).to eq organization.id
+        expect(organization_status2.pos_kind).to eq "ascend_pos"
+        expect(organization_status2.start_at).to be_within(5).of Time.current
+        expect(organization_status2.end_at).to be_blank
       end
     end
     context "manual_pos_kind" do
@@ -138,9 +138,9 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         expect(organization.calculated_pos_kind).to eq "no_pos"
         expect {
           UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        }.to change(PosIntegrationStatus, :count).by 1
-        pos_integration_status1 = PosIntegrationStatus.order(:id).first
-        expect(pos_integration_status1.current?).to be_truthy
+        }.to change(OrganizationStatus, :count).by 1
+        organization_status1 = OrganizationStatus.order(:id).first
+        expect(organization_status1.current?).to be_truthy
 
         organization.update_attribute :created_at, Time.current - 2.weeks
         organization.reload
@@ -148,14 +148,14 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
 
         expect {
           UpdateOrganizationPosKindWorker.new.perform(organization.id)
-        }.to change(PosIntegrationStatus, :count).by 1
-        expect(pos_integration_status1.reload.current?).to be_falsey
+        }.to change(OrganizationStatus, :count).by 1
+        expect(organization_status1.reload.current?).to be_falsey
 
-        pos_integration_status2 = PosIntegrationStatus.order(:id).last
-        expect(pos_integration_status2.organization_id).to eq organization.id
-        expect(pos_integration_status2.pos_kind).to eq "does_not_need_pos"
-        expect(pos_integration_status2.start_at).to be_within(5).of Time.current
-        expect(pos_integration_status2.end_at).to be_blank
+        organization_status2 = OrganizationStatus.order(:id).last
+        expect(organization_status2.organization_id).to eq organization.id
+        expect(organization_status2.pos_kind).to eq "does_not_need_pos"
+        expect(organization_status2.start_at).to be_within(5).of Time.current
+        expect(organization_status2.end_at).to be_blank
       end
     end
   end

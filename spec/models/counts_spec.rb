@@ -51,27 +51,4 @@ RSpec.describe Counts, type: :model do
       expect(Counts.recoveries_value).to eq Counts.recovery_average_value * 2042
     end
   end
-
-  describe "assign_organization_types" do
-    before do
-      FactoryBot.create(:organization, kind: "law_enforcement")
-      FactoryBot.create(:organization, kind: "bike_shop")
-      FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "lightspeed_pos")
-      FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "ascend_pos")
-      FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "broken_lightspeed_pos")
-    end
-    # NOTE: This is just to record. At some point in the future, we'll make this more useable
-    # but! For now, just get some data stored
-    it "sets counts for the things!" do
-      Counts.assign_organization_types
-      expect(Organization.lightspeed_pos.count).to eq 1
-      expect(Counts.organization_type_key("law_enforcement", Time.at(1657314786))).to eq "org_type-law_enforcement-2022-07-08"
-      expect(Counts.organization_type_key("ascend_pos")).to eq "org_type-ascend_pos-#{Time.current.to_date}"
-      expect(Counts.retrieve_for(Counts.organization_type_key("law_enforcement"))).to eq 1
-      expect(Counts.retrieve_for(Counts.organization_type_key("no_pos"))).to eq 2
-      expect(Counts.retrieve_for(Counts.organization_type_key("lightspeed_pos"))).to eq 1
-      expect(Counts.retrieve_for(Counts.organization_type_key("broken_lightspeed_pos"))).to eq 1
-      expect(Counts.retrieve_organization_type_counts_for(Time.current).keys.count).to be > 15
-    end
-  end
 end

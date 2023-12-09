@@ -71,13 +71,14 @@ ALTER SEQUENCE public.logged_searches_id_seq OWNED BY public.logged_searches.id;
 
 
 --
--- Name: pos_integration_statuses; Type: TABLE; Schema: public; Owner: -
+-- Name: organization_statuses; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.pos_integration_statuses (
+CREATE TABLE public.organization_statuses (
     id bigint NOT NULL,
     organization_id bigint,
     pos_kind integer,
+    kind integer,
     start_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,
@@ -86,10 +87,10 @@ CREATE TABLE public.pos_integration_statuses (
 
 
 --
--- Name: pos_integration_statuses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: organization_statuses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.pos_integration_statuses_id_seq
+CREATE SEQUENCE public.organization_statuses_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -98,10 +99,10 @@ CREATE SEQUENCE public.pos_integration_statuses_id_seq
 
 
 --
--- Name: pos_integration_statuses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: organization_statuses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.pos_integration_statuses_id_seq OWNED BY public.pos_integration_statuses.id;
+ALTER SEQUENCE public.organization_statuses_id_seq OWNED BY public.organization_statuses.id;
 
 
 --
@@ -121,10 +122,10 @@ ALTER TABLE ONLY public.logged_searches ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- Name: pos_integration_statuses id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_statuses id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.pos_integration_statuses ALTER COLUMN id SET DEFAULT nextval('public.pos_integration_statuses_id_seq'::regclass);
+ALTER TABLE ONLY public.organization_statuses ALTER COLUMN id SET DEFAULT nextval('public.organization_statuses_id_seq'::regclass);
 
 
 --
@@ -144,11 +145,11 @@ ALTER TABLE ONLY public.logged_searches
 
 
 --
--- Name: pos_integration_statuses pos_integration_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_statuses organization_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.pos_integration_statuses
-    ADD CONSTRAINT pos_integration_statuses_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.organization_statuses
+    ADD CONSTRAINT organization_statuses_pkey PRIMARY KEY (id);
 
 
 --
@@ -181,10 +182,10 @@ CREATE INDEX index_logged_searches_on_user_id ON public.logged_searches USING bt
 
 
 --
--- Name: index_pos_integration_statuses_on_organization_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_organization_statuses_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pos_integration_statuses_on_organization_id ON public.pos_integration_statuses USING btree (organization_id);
+CREATE INDEX index_organization_statuses_on_organization_id ON public.organization_statuses USING btree (organization_id);
 
 
 --
