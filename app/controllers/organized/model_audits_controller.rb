@@ -51,7 +51,7 @@ module Organized
     end
 
     def permitted_attestation_kinds
-      %w[uncertified_by_trusted_org certified_by_trusted_org]
+      %w[uncertified_by_trusted_org certified_by_trusted_org certification_update]
     end
 
     def permitted_parameters

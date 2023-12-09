@@ -5,6 +5,7 @@ class ModelAttestation < ApplicationRecord
     certified_by_trusted_org: 1,
     certified_by_manufacturer: 0,
     certification_proof_url: 2,
+    certification_update: 4,
     certified_by_your_org: 10, # Only available on OrganizationModelAudits
     uncertified_by_your_org: 11
   }.freeze
@@ -22,6 +23,7 @@ class ModelAttestation < ApplicationRecord
   mount_uploader :file, PdfUploader
 
   scope :current, -> { where(replaced: false) }
+  scope :certification_updating, -> { where(kind: certification_update_kinds) }
 
   before_validation :set_calculated_attributes
   after_commit :update_model_audit
@@ -29,6 +31,11 @@ class ModelAttestation < ApplicationRecord
   def self.kind_humanized(str)
     return nil if str.blank?
     str.to_s.gsub("_org", " organization").tr("_", " ")
+  end
+
+  def self.certification_update_kinds
+    %i[uncertified_by_trusted_org certified_by_trusted_org certified_by_manufacturer
+      certified_by_your_org uncertified_by_your_org]
   end
 
   def kind_humanized

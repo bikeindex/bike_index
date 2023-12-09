@@ -75,12 +75,12 @@ module OrganizedHelper
     case status.downcase
     when "current", "paging", "being_helped"
       "text-success"
-    when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated"
+    when "stolen", /uncertified/
+      "text-warning"
+    when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated", /certified_by/
       "text-info"
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/
       "text-danger"
-    when "stolen", /uncertified/
-      "text-warning"
     else
       "less-strong"
     end

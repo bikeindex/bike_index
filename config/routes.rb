@@ -198,6 +198,7 @@ Rails.application.routes.draw do
       :mailchimp_data,
       :mailchimp_values,
       :memberships,
+      :model_attestations,
       :model_audits,
       :notifications,
       :organization_features,

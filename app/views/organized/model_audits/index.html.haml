@@ -60,8 +60,11 @@
           %strong
             = admin_number_display(organization_model_audit.bikes_count)
         %td
-          %span{class: status_display_class(organization_model_audit.certification_status)}
-            = organization_model_audit.certification_status_humanized
+          - if organization_model_audit.certification_status.present?
+            %span{class: status_display_class(organization_model_audit.certification_status)}
+              = organization_model_audit.certification_status_humanized
+          - elsif model_audit.model_attestations.limit(1).present?
+            %small.less-strong has attestation
 
           %a.btn.btn-sm.btn-secondary.float-right.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
             update
