@@ -6,72 +6,70 @@ class Admin::OrganizationStatusesController < Admin::BaseController
   def index
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
-    @logged_searches =
-      matching_logged_searches
-        .reorder("logged_searches.#{sort_column} #{sort_direction}")
-        # .includes(:organization, :user)
+    @organization_statuses =
+      matching_organization_statuses
+        .reorder("organization_statuses.#{sort_column} #{sort_direction}")
         .page(page)
         .per(@per_page)
   end
 
-  helper_method :matching_logged_searches, :special_endpoints
+  helper_method :matching_organization_statuses, :grouped_pos_kinds
 
   private
 
   def sortable_columns
-    %w[request_at created_at duration_ms endpoint stolenness ip_address organization_id user_id
-      serial_normalized page].freeze
+    %w[start_at end_at organization_id pos_kind kind created_at].freeze
   end
 
   def earliest_period_date
-    LoggedSearch.minimum(:request_at) || Time.current - 1.day
+    OrganizationStatus.minimum(:start_at) || Time.current - 1.day
   end
 
-  def special_endpoints
-    %w[not_web_bikes organized]
+  def grouped_pos_kinds
+    %w[broken_pos_kinds no_pos_kinds with_pos].freeze
   end
 
-  def matching_logged_searches
-    logged_searches = LoggedSearch.all
+  def permitted_pos_kinds
+    Organization.pos_kinds + grouped_pos_kinds
+  end
 
-    if special_endpoints.include?(params[:search_endpoint])
-      @endpoint = params[:search_endpoint]
-      logged_searches = case @endpoint
-      when "not_web_bikes" then logged_searches.where.not(endpoint: :web_bikes)
-      when "organized" then logged_searches.organized
-      end
-    elsif LoggedSearch.endpoints.key?(params[:search_endpoint])
-      @endpoint = params[:search_endpoint]
-      logged_searches = logged_searches.where(endpoint: @endpoint)
+  def permitted_kinds
+    Organization.kinds + ["not_bike_shop"]
+  end
+
+  def matching_organization_statuses
+    organization_statuses = OrganizationStatus.all
+
+    if current_organization.present?
+      organization_statuses = organization_statuses.where(organization_id: current_organization.id)
+    end
+
+    if InputNormalizer.boolean(params[:search_current])
+      @current = true
+      organization_statuses = organization_statuses.current
+    end
+
+    if InputNormalizer.boolean(params[:search_ended])
+      @ended = true
+      organization_statuses = organization_statuses.ended
+    end
+
+    if permitted_pos_kinds.include?(params[:search_pos_kind])
+      @pos_kind = params[:search_pos_kind]
+      organization_statuses = organization_statuses.send(@pos_kind)
     else
-      @endpoint = "all"
+      @pos_kind = "all"
     end
 
-    if InputNormalizer.boolean(params[:search_serial])
-      @serial = true
-      logged_searches = logged_searches.serial
-    end
-    if InputNormalizer.boolean(params[:search_includes_query])
-      @includes_query = true
-      logged_searches = logged_searches.includes_query
+    if permitted_kinds.include?(params[:search_kind])
+      @kind = params[:search_kind]
+      organization_statuses = organization_statuses.send(@pos_kind)
+    else
+      @kind = "all"
     end
 
-    if params[:search_ip_address].present?
-      logged_searches = logged_searches.where(ip_address: params[:search_ip_address])
-    end
-    if params[:user_id].present?
-      logged_searches = logged_searches.where(user_id: params[:user_id])
-    end
-    if params[:organization_id].present?
-      logged_searches = logged_searches.where(organization_id: params[:organization_id])
-    end
-
-    logged_searches = logged_searches.where.not(user_id: nil) if sort_column == "user_id"
-    logged_searches = logged_searches.where.not(organization_id: nil) if sort_column == "organization_id"
-    logged_searches = logged_searches.where.not(page: nil) if sort_column == "page"
-
-    @time_range_column = sort_column if %w[created_at updated_at].include?(sort_column)
-    @time_range_column ||= "request_at"
-    logged_searches.where(@time_range_column => @time_range)
+    @time_range_column = sort_column if %w[end_at created_at].include?(sort_column)
+    @time_range_column ||= "start_at"
+    organization_statuses.where(@time_range_column => @time_range)
   end
 end

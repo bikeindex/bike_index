@@ -210,5 +210,15 @@ RSpec.describe GraphingHelper, type: :helper do
         expect(period_in_words(100800)).to eq "1.2 days"
       end
     end
+    context "weeks" do
+      it "returns weeks" do
+        expect(period_in_words(24.days)).to eq "3.4 weeks"
+      end
+    end
+    context "years" do
+      it "returns years" do
+        expect(period_in_words(839.days)).to eq "2.3 years"
+      end
+    end
   end
 end

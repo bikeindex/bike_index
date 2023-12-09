@@ -5,8 +5,13 @@ class OrganizationStatus < AnalyticsRecord
   enum kind: Organization::KIND_ENUM
 
   scope :current, -> { where(end_at: nil) }
+  scope :ended, -> { where.not(end_at: nil) }
 
   def current?
     end_at.blank?
+  end
+
+  def ended?
+    !current?
   end
 end
