@@ -16,8 +16,7 @@ module LocalizationHelper
   # [<localized language name>, <language key (from Blog::LANGUAGE_ENUM)>]
   def language_choices
     @language_choices ||=
-      I18n
-        .available_locales
+      (I18n.available_locales - [:es])
         .map { |locale| [t(locale, scope: [:locales]), locale.to_s] }
         .sort_by { |language_name, _| language_name.downcase }
   end
