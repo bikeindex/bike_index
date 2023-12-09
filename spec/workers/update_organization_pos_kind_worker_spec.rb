@@ -10,7 +10,8 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
   end
 
   describe "perform" do
-    let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
+    let(:og_updated_at) { Time.current - 3.weeks }
+    let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", created_at: Time.current - 1.month, updated_at: og_updated_at) }
     let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization) }
     it "schedules all the workers" do
       organization.reload
@@ -27,14 +28,29 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
     context "broken ascend" do
       let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: Time.current - 1.month) }
       it "updates to broken" do
-        organization.reload
+        organization.update_column :pos_kind, :ascend_pos
+        expect(organization.reload.updated_at).to be_within(5).of og_updated_at
         pos_bike.reload
         expect(organization.bikes).to eq([pos_bike])
-        expect(organization.pos_kind).to eq "no_pos"
-        described_class.new.perform(organization.id)
+        expect(organization.pos_kind).to eq "ascend_pos"
+        expect {
+          described_class.new.perform(organization.id)
+        }.to change(PosIntegrationStatus, :count).by 2
 
         organization.reload
         expect(organization.pos_kind).to eq "broken_other_pos"
+
+        pos_integration_status1 = PosIntegrationStatus.order(:id).first
+        expect(pos_integration_status1.organization_id).to eq organization.id
+        expect(pos_integration_status1.pos_kind).to eq "ascend_pos"
+        expect(pos_integration_status1.start_at).to be_within(5).of og_updated_at
+        expect(pos_integration_status1.end_at).to be_within(5).of Time.current
+
+        pos_integration_status2 = PosIntegrationStatus.order(:id).last
+        expect(pos_integration_status2.organization_id).to eq organization.id
+        expect(pos_integration_status2.pos_kind).to eq "broken_other_pos"
+        expect(pos_integration_status2.start_at).to be_within(5).of Time.current
+        expect(pos_integration_status2.end_at).to be_blank
       end
     end
     context "broken lightspeed" do
@@ -72,12 +88,27 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
     context "ascend_name" do
       let(:organization) { FactoryBot.create(:organization, ascend_name: "SOMESHOP") }
       it "returns ascend_pos" do
+        expect(organization.reload.pos_kind).to eq "no_pos"
         expect(organization.calculated_pos_kind).to eq "ascend_pos"
-        UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        expect {
+          UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        }.to change(PosIntegrationStatus, :count).by 2
         organization.reload
         expect(organization.manual_pos_kind?).to be_blank
         expect(organization.pos_kind).to eq "ascend_pos"
         expect(organization.show_bulk_import?).to be_truthy
+
+        pos_integration_status1 = PosIntegrationStatus.order(:id).first
+        expect(pos_integration_status1.organization_id).to eq organization.id
+        expect(pos_integration_status1.pos_kind).to eq "no_pos"
+        expect(pos_integration_status1.start_at).to be_within(5).of Time.current
+        expect(pos_integration_status1.end_at).to be_within(1).of Time.current
+
+        pos_integration_status2 = PosIntegrationStatus.order(:id).last
+        expect(pos_integration_status2.organization_id).to eq organization.id
+        expect(pos_integration_status2.pos_kind).to eq "ascend_pos"
+        expect(pos_integration_status2.start_at).to be_within(5).of Time.current
+        expect(pos_integration_status2.end_at).to be_blank
       end
     end
     context "manual_pos_kind" do
@@ -105,9 +136,26 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         3.times { FactoryBot.create(:bike_organized, creation_organization: organization) }
         organization.reload
         expect(organization.calculated_pos_kind).to eq "no_pos"
+        expect {
+          UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        }.to change(PosIntegrationStatus, :count).by 1
+        pos_integration_status1 = PosIntegrationStatus.order(:id).first
+        expect(pos_integration_status1.current?).to be_truthy
+
         organization.update_attribute :created_at, Time.current - 2.weeks
         organization.reload
         expect(organization.calculated_pos_kind).to eq "does_not_need_pos"
+
+        expect {
+          UpdateOrganizationPosKindWorker.new.perform(organization.id)
+        }.to change(PosIntegrationStatus, :count).by 1
+        expect(pos_integration_status1.reload.current?).to be_falsey
+
+        pos_integration_status2 = PosIntegrationStatus.order(:id).last
+        expect(pos_integration_status2.organization_id).to eq organization.id
+        expect(pos_integration_status2.pos_kind).to eq "does_not_need_pos"
+        expect(pos_integration_status2.start_at).to be_within(5).of Time.current
+        expect(pos_integration_status2.end_at).to be_blank
       end
     end
   end

@@ -1,4 +1,4 @@
-class Admin::LoggedSearchesController < Admin::BaseController
+class Admin::PosIntegrationStatusesController < Admin::BaseController
   include SortableTable
 
   before_action :set_period, only: [:index]

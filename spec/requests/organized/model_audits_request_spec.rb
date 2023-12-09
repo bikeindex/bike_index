@@ -114,8 +114,8 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
           expect(model_attestation.file).to be_present
           # Needs to update inline or else the page doesn't show what you just did
           expect(organization_model_audit.reload.certification_status).to eq "certified_by_your_org"
+        end
       end
     end
   end
-end
 end

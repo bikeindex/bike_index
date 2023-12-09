@@ -15,6 +15,7 @@ module AdminHelper
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
       {title: "Dev: Logged searches", path: admin_logged_searches_path, match_controller: true},
+      {title: "Dev: POS Integration statuses", path: admin_pos_integration_statuses_path, match_controller: true},
       {title: "Dev: Model Audits", path: admin_model_audits_path, match_controller: true}
     ]
   end
