@@ -133,7 +133,7 @@ class UpdateModelAuditWorker < ApplicationWorker
     Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
     # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
     # Process 500 - that should cover the matching audits, but avoid overwhelming the queue
-    non_matching_bike_ids.sample(501).each_with_index do |id, inx|
+    non_matching_bike_ids.shuffle[0..500].each_with_index do |id, inx|
       FindOrCreateModelAuditWorker.perform_in(inx * 15, id)
     end
   end
