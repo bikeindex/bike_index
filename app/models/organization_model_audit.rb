@@ -36,7 +36,7 @@ class OrganizationModelAudit < ApplicationRecord
   end
 
   def current_organization_model_attestation
-    organization_model_attestations.current.last
+    organization_model_attestations.current.certification_updating.last
   end
 
   def certification_status_humanized
