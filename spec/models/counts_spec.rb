@@ -6,8 +6,9 @@ RSpec.describe Counts, type: :model do
 
   describe "counts_keys" do
     it "has things" do
-      expect(Counts.count_keys.count).to eq 5
+      expect(Counts.count_keys.count).to eq 6
       expect(Counts.count_keys).to include("total_bikes")
+      expect(Counts.count_keys).to include("organizations")
     end
   end
 
@@ -36,7 +37,7 @@ RSpec.describe Counts, type: :model do
     it "saves the thing" do
       expect(Counts.week_creation_chart).to be_nil # Ensure we aren't throwing errors with nil
       Counts.assign_week_creation_chart
-      expect(Counts.week_creation_chart.keys.count).to eq 5
+      expect(Counts.week_creation_chart.keys.count).to eq 7
       expect(Counts.week_creation_chart).to eq target
     end
   end
