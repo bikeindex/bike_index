@@ -730,7 +730,7 @@ en:
         human_not_pedal: Human powered (not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
-        throttle: throttle
+        throttle: Throttle
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.
@@ -1038,7 +1038,7 @@ en:
       bike_photo: "%{bike_type} photo"
       color_may_not_match: Color may not match!
       componentyear: "%{componentyear}"
-      cycle_type: Cycle type
+      vehicle_type: Vehicle type
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
@@ -1432,8 +1432,9 @@ en:
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
     drivetrain:
+      propulsion_type: Propulsion
+      update_propulsion: Update propulsion
       belt_drive: Belt Drive
-      
       coaster_brake: Coaster Brake
       drivetrain: Drivetrain
       drivetrain_type: Drivetrain type
@@ -1449,15 +1450,24 @@ en:
       vehicle_type: Vehicle type
       cycle_type: Cycle type
       wheels: Wheels
+      update_vehicle_type: Update vehicle type
+      update_propulsion_type: Update propulsion
+      nevermind: Nevermind
+      submit_update: Submit update
     wheels:
+      front_wheel: Front wheel
+      rear_wheel: Rear wheel
+      general_wheel: Wheel(s)
+      front_tire: Front tire
+      rear_tire: Rear tire
+      general_tire: Tire(s)
       all_diameters: All diameters
       choose_diameter: Choose diameter
+      diameter_700c: 700c (includes 29ers)
       show_more_sizes: Show more sizes
       hide_extra_sizes: Hide extra sizes
       narrow: Narrow
       narrow_title: Tires under 39mm (1.5 inches) wide
-      side: "%{side} tire"
-      sidetitleize_wheel: "%{sidetitleize} wheel"
       wide: Wide
       wide_help: "> 38mm (1.5in)"
       wide_title: Tires that are at least 39mm (1.5 inches) wide

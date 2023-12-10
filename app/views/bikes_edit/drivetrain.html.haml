@@ -1,7 +1,9 @@
+- type_text = @bike.not_cycle? ? t(".vehicle_type") : t(".cycle_type")
+- valid_propulsion_types = PropulsionType.valid_propulsion_types_for(@bike.cycle_type)
+
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
-  - type_text = @bike.not_cycle? ? t(".vehicle_type") : t(".cycle_type")
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes_edit/primary_menu'
@@ -12,27 +14,35 @@
               = type_text
           .related-fields
             .form-group.row
-              = f.label :cycle_type, type_text, class: "form-well-label"
+              %label.form-well-label= type_text
               %p.form-well-input-static
                 = CycleType.slug_translation(@bike.cycle_type)
                 - if @bike.cycle_type == "bike"
-                  %span.below-input-help{style: "font-size: 100%; padding: 0 0 0 1.1em"}
+                  %span.below-input-help
                     %em= t(".traditional_bike_definition")
               .right-input-help.right-text-help
                 %a{data: {toggle: "modal", target: "#cycle_type-correction"}}
                   = t(".submit_correction")
+          .related-fields
+            .form-group.row
+              %label.form-well-label= t(".propulsion_type")
+              %p.form-well-input-static
+                = PropulsionType.slug_translation(@bike.propulsion_type)
+              - if valid_propulsion_types.count > 1
+                .right-input-help.right-text-help
+                  %a{data: {toggle: "modal", target: "#propulsion_type-correction"}}
+                    = t(".update_propulsion")
 
         .form-wrap.secondary-form-wrap
           .form-well-form-header-always-visible
             %h3
               = t(".wheels")
-
-          = render partial: "/bikes_edit/wheels", locals: {f: f, side: "front"}
-
+          - side_title = CycleType.front_and_rear_wheels?(@bike.cycle_type) ? "front" : "general"
+          = render partial: "/bikes_edit/wheels", locals: {f: f, side: "front", side_title: side_title}
           - if CycleType.front_and_rear_wheels?(@bike.cycle_type)
             = render partial: "/bikes_edit/wheels", locals: {f: f, side: "rear"}
-
         - unless CycleType.not_cycle_drivetrain?(@bike.cycle_type)
+
           .form-wrap.secondary-form-wrap#edit_drivetrain
             .form-well-form-header-always-visible
               %h3
@@ -45,7 +55,7 @@
                 = t(".drivetrain_type")
               .form-well-input-large.form-well-input-checks
                 %label.checkbox-inline.mr-2
-                  %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
+                  %input#fixed_gear_check.checkbox.drive-check{type: "checkbox", checked: fixed}
                   = t(".fixed")
                 %label.checkbox-inline.mr-2.not-fixed
                   = f.check_box :coaster_brake
@@ -104,3 +114,44 @@
 
 
         = render "/shared/form_well_footer_save"
+
+- vehicle_type_body = capture_haml do
+  = form_for @bike, multipart: true do |f|
+    - if params[:return_to].present?
+      = hidden_field_tag :return_to, params[:return_to]
+    - else
+      = hidden_field_tag :edit_template, @edit_template
+    .modal-body
+      .form-group.fancy-select.unfancy
+        = f.label :cycle_type, type_text, class: "form-well-label"
+        = select(:bike, :cycle_type, CycleType.select_options, {}, {required: true, class: 'form-control'})
+    .modal-btn-footer
+      .row
+        .col-xs-6.col-xs-push-6
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
+        .col-xs-6.col-xs-pull-6
+          %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
+            = t(".nevermind")
+
+= render partial: 'shared/modal', locals: {title: t(".update_vehicle_type"), id: 'cycle_type-correction', modal_body: vehicle_type_body}
+
+- propulsion_type_body = capture_haml do
+  = form_for @bike, multipart: true do |f|
+    - if params[:return_to].present?
+      = hidden_field_tag :return_to, params[:return_to]
+    - else
+      = hidden_field_tag :edit_template, @edit_template
+    .modal-body
+      .form-group.fancy-select.unfancy
+        = f.label :propulsion_type, class: "form-well-label"
+        - propulsion_select_options = valid_propulsion_types.map { |slug| [PropulsionType.slug_translation(slug), slug] }
+        = select(:bike, :propulsion_type, propulsion_select_options, {}, {required: true, class: 'form-control'})
+    .modal-btn-footer
+      .row
+        .col-xs-6.col-xs-push-6
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
+        .col-xs-6.col-xs-pull-6
+          %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
+            = t(".nevermind")
+
+= render partial: 'shared/modal', locals: {title: t(".update_propulsion"), id: 'propulsion_type-correction', modal_body: propulsion_type_body}

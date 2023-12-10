@@ -60,14 +60,14 @@ class CycleType
     slugs
   end
 
-  def self.pedal_type?(slug_sym)
-    PEDAL.include?(slug_sym)
+  def self.pedal_type?(slug)
+    PEDAL.include?(slug&.to_sym)
   end
 
-  def self.strict_motorized(slug_sym)
-    if ALWAYS_MOTORIZED.include?(slug_sym)
+  def self.strict_motorized(slug)
+    if ALWAYS_MOTORIZED.include?(slug&.to_sym)
       :always
-    elsif NEVER_MOTORIZED.include?(slug_sym)
+    elsif NEVER_MOTORIZED.include?(slug&.to_sym)
       :never
     end
   end
