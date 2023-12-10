@@ -1732,7 +1732,6 @@ es:
       bike_photo:
       color_may_not_match:
       componentyear:
-      cycle_type:
       department_city:
       description_of_incident:
       distinguishing_features:
@@ -1764,15 +1763,13 @@ es:
       stolen_details:
       wheel_diameter:
       year: Año
+      vehicle_type:
     new:
       additional_serial_sticker_number:
       affiliation:
       are_you_certain:
       city:
       electric:
-      enter_bike_type_details:
-      enter_found_bike_type_details:
-      enter_stolen_bike_type_details:
       how_to_find_serial:
       i_just_dont_know_the_serial:
       im_100_sure:
@@ -1805,9 +1802,13 @@ es:
       unsure_or_unknown:
       very_few_bikes_html:
       was_made_before_1970:
-      without_serial:
-      without_serial_number:
       zipcode:
+      enter_bike_type_details_html:
+      enter_found_bike_type_details_html:
+      enter_stolen_bike_type_details_html:
+      very_few_vehicles_html:
+      without_serial_html:
+      without_serial_number_html:
     organization_stolen_message:
       report_link_text:
       report_the_theft_to_the_organization_html:
@@ -2070,29 +2071,27 @@ es:
         where_was_it_stolen_type:
         zipcode:
     drivetrain:
-      all_diameters:
       belt_drive:
-      choose_diameter:
       coaster_brake:
       drivetrain:
       drivetrain_type:
       fixed:
       front_gears:
-      hide_extra_sizes:
       internal_front_gears:
       internal_rear_gears:
-      narrow:
-      narrow_title:
       rear_gears:
       select_chainring_count:
       select_cog_count:
-      show_more_sizes:
-      side:
-      sidetitleize_wheel:
       wheels:
-      wide:
-      wide_help:
-      wide_title:
+      cycle_type:
+      nevermind:
+      propulsion_type:
+      submit_correction:
+      submit_update:
+      traditional_bike_definition:
+      update_propulsion:
+      update_vehicle_type:
+      vehicle_type:
     edit_bike_organization:
       can_edit_this_bike:
       manage_organization_information:
@@ -2180,6 +2179,23 @@ es:
       show_phone_users:
       when_was_it_stolen_at:
       without_a_valid_report_number_html:
+    wheels:
+      all_diameters:
+      choose_diameter:
+      diameter_700c:
+      front_tire:
+      front_wheel:
+      general_tire:
+      general_wheel:
+      hide_extra_sizes:
+      narrow:
+      narrow_title:
+      rear_tire:
+      rear_wheel:
+      show_more_sizes:
+      wide:
+      wide_help:
+      wide_title:
   controllers:
     application:
       handle_unverified_request:

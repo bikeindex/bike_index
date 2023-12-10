@@ -53,6 +53,23 @@ class PropulsionType
       valid_propulsion_types_for(cycle_type).first
     end
 
+    def valid_propulsion_types_for(cycle_type)
+      valid_types = if CycleType.pedal_type?(cycle_type)
+        slugs_sym
+      else
+        not_pedal.reverse
+      end
+      valid_types << :"hand-pedal" if cycle_type&.to_sym == :wheelchair
+
+      strictly = CycleType.strict_motorized(cycle_type)
+      if strictly == :never
+        valid_types -= MOTORIZED
+      elsif strictly == :always
+        valid_types -= not_motorized
+      end
+      valid_types
+    end
+
     def autocomplete_ids
       [10]
     end
@@ -90,22 +107,6 @@ class PropulsionType
     def default_motorized_type(cycle_type)
       return nil if CycleType.strict_motorized(cycle_type) == :never
       CycleType.pedal_type?(cycle_type) ? :"pedal-assist" : :throttle
-    end
-
-    def valid_propulsion_types_for(cycle_type)
-      valid_types = if CycleType.pedal_type?(cycle_type)
-        slugs_sym
-      else
-        not_pedal.reverse
-      end
-
-      strictly = CycleType.strict_motorized(cycle_type)
-      if strictly == :never
-        valid_types -= MOTORIZED
-      elsif strictly == :always
-        valid_types -= not_motorized
-      end
-      valid_types
     end
 
     def motorized_autocomplete_hash

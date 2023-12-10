@@ -8,9 +8,10 @@
     %h5.title-link
       %a{ href: bike.html_url }
         %strong
-          = bike.type unless bike.type == 'bike'
           = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
         = bike.frame_model.to_s
+        - unless bike.type == 'bike'
+          %em.less-strong= bike.type
     %ul.attr-list
       %li
         %strong.attr-title #{t(".serial")}:

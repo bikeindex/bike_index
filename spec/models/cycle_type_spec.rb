@@ -48,9 +48,84 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
+  describe "slug_hash_lowecase" do
+    it "makes a hash" do
+      expect(CycleType.slug_translation_hash_lowercase_short["cargo"]).to eq "cargo bike"
+    end
+  end
+
   describe "find" do
     it "finds" do
       expect(CycleType.find(3).as_json).to eq CycleType.new(:tricycle).as_json
+    end
+  end
+
+  describe "not_cycle_drivetrain?" do
+    it "is falsey" do
+      expect(CycleType.not_cycle_drivetrain?(:bike)).to be_falsey
+      %w[tandem tricycle recumbent cargo tall-bike penny-farthing
+        cargo-rear cargo-trike cargo-trike-rear pedi-cab].each do |vtype|
+          expect(CycleType.not_cycle_drivetrain?(vtype)).to be_falsey
+          # Coincidentally, also this:
+          expect(CycleType.not_cycle?(vtype)).to be_falsey
+          expect(CycleType.front_and_rear_wheels?(vtype)).to be_truthy
+        end
+    end
+    context "trail-behind" do
+      let(:vtype) { "trail-behind" }
+      it "is truthy" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_falsey
+        expect(CycleType.front_and_rear_wheels?(vtype)).to be_falsey
+      end
+    end
+    context "e-scooter" do
+      let(:vtype) { "e-scooter" }
+      it "is truthy" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_truthy
+        expect(CycleType.front_and_rear_wheels?(vtype)).to be_truthy
+      end
+    end
+    context "non-e-skateboard" do
+      let(:vtype) { "non-e-skateboard" }
+      it "is truthy" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_truthy
+        expect(CycleType.front_and_rear_wheels?(vtype)).to be_falsey
+      end
+    end
+    context "unicycle" do
+      let(:vtype) { "unicycle" }
+      it "is truthy" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_falsey
+        expect(CycleType.front_and_rear_wheels?(vtype)).to be_falsey
+      end
+    end
+    context "wheelchair" do
+      let(:vtype) { "wheelchair" }
+      it "is truthy" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_truthy
+        expect(CycleType.front_and_rear_wheels?(vtype)).to be_falsey
+      end
+    end
+    context "stroller" do
+      let(:vtype) { "stroller" }
+      it "is truthy" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_truthy
+        expect(CycleType.front_and_rear_wheels?(vtype)).to be_falsey
+      end
+    end
+    context "trailer" do
+      let(:vtype) { "trailer" }
+      it "is truthy" do
+        expect(CycleType.not_cycle_drivetrain?(vtype)).to be_truthy
+        expect(CycleType.not_cycle?(vtype)).to be_falsey
+        expect(CycleType.front_and_rear_wheels?(vtype)).to be_falsey
+      end
     end
   end
 

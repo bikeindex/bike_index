@@ -73,6 +73,15 @@ class BikeUpdator
     if update_attrs.slice("street", "city", "zipcode").values.reject(&:blank?).any?
       @bike.address_set_manually = true
     end
+
+    propulsion_updates = update_attrs.keys & %w[cycle_type cycle_type_name propulsion_type propulsion_type_slug]
+    if propulsion_updates.any?
+      # Ensure valid propulsion type
+      cycle_type = update_attrs["cycle_type"] || update_attrs["cycle_type_name"] || @bike.cycle_type
+      @bike.cycle_type = CycleType.friendly_find(cycle_type)&.slug || "bike"
+      @bike.propulsion_type_slug = update_attrs["propulsion_type"] || update_attrs["propulsion_type_slug"] || @bike.propulsion_type
+      update_attrs = update_attrs.except(*propulsion_updates)
+    end
     if @bike.update(update_attrs.merge(updator_attrs))
       update_stolen_record
       update_impound_record

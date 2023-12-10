@@ -16,6 +16,23 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.bike_stickers.count).to eq 0
     end
   end
+  context "updating vehicle_type and propulsion_type" do
+    it "ensures valid propulsion_type for cycle_type" do
+      expect(bike.reload.cycle_type).to eq "bike"
+      patch base_url, params: {bike: {propulsion_type: "pedal-assist"}}
+      expect(flash[:success]).to be_present
+      expect(bike.reload.propulsion_type).to eq "pedal-assist"
+
+      patch base_url, params: {bike: {cycle_type: "stroller"}}
+      expect(flash[:success]).to be_present
+      expect(bike.reload.cycle_type).to eq "stroller"
+      expect(bike.propulsion_type).to eq "throttle"
+
+      patch base_url, params: {bike: {propulsion_type: "foot-pedal"}}
+      expect(flash[:success]).to be_present
+      expect(bike.reload.propulsion_type).to eq "human-not-pedal"
+    end
+  end
   context "setting address for bike" do
     let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address.merge(address_set_manually: true)) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }

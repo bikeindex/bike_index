@@ -13,6 +13,10 @@ module Enumable
       slugs.map { |slug| [slug_translation(slug), slug] }
     end
 
+    def slug_translation_hash_lowercase_short
+      select_options.to_h { |x| [x[1], x[0].downcase.split("(").first.strip] }
+    end
+
     def legacy_selections
       slugs.map { |slug| {slug: slug, name: slug_translation(slug)} }
     end
