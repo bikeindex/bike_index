@@ -1451,6 +1451,8 @@ en:
       show_more_sizes: Show more sizes
       side: "%{side} tire"
       sidetitleize_wheel: "%{sidetitleize} wheel"
+      vehicle_type: Vehicle type
+      cycle_type: Cycle type
       wheels: Wheels
       wide: Wide
       wide_help: "> 38mm (1.5in)"

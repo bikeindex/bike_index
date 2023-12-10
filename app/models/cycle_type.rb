@@ -54,6 +54,7 @@ class CycleType
     recumbent tall-bike tandem trail-behind trailer tricycle unicycle].freeze
   ALWAYS_MOTORIZED = %i[e-scooter personal-mobility].freeze
   NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind].freeze
+  NON_CYCLE_TYPE = %i[wheelchair stroller e-scooter personal-mobility non-e-skateboard].freeze
 
   def self.searchable_names
     slugs
@@ -69,6 +70,14 @@ class CycleType
     elsif NEVER_MOTORIZED.include?(slug_sym)
       :never
     end
+  end
+
+  def self.not_a_cycle?(slug)
+    NON_CYCLE_TYPE.include?(slug&.to_sym)
+  end
+
+  def self.not_cycle_drivetrain?(slug)
+    (NON_CYCLE_TYPE + %i[trail-behind trailer unicycle]).include?(slug&.to_sym)
   end
 
   def initialize(slug)

@@ -54,6 +54,27 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
+  describe "not_cycle_drivetrain?" do
+    it "is falsey" do
+      expect(CycleType.not_cycle_drivetrain?(:bike)).to be_falsey
+      %w[tandem tricycle recumbent cargo tall-bike penny-farthing
+        cargo-rear cargo-trike cargo-trike-rear pedi-cab].each do |vtype|
+          expect(CycleType.not_cycle_drivetrain?(vtype)).to be_falsey
+          # Coincidentally, also this:
+          expect(CycleType.not_a_cycle?(vtype)).to be_falsey
+        end
+    end
+    it "is truthy" do
+      expect(CycleType.not_cycle_drivetrain?("trail-behind")).to be_truthy
+      expect(CycleType.not_cycle_drivetrain?("e-scooter")).to be_truthy
+      expect(CycleType.not_cycle_drivetrain?("non-e-skateboard")).to be_truthy
+      expect(CycleType.not_cycle_drivetrain?("unicycle")).to be_truthy
+      expect(CycleType.not_cycle_drivetrain?("wheelchair")).to be_truthy
+      expect(CycleType.not_cycle_drivetrain?("stroller")).to be_truthy
+      expect(CycleType.not_cycle_drivetrain?("trailer")).to be_truthy
+    end
+  end
+
   describe "priority" do
     # These are calculated based on rough rankings from a count of matching bikes:
     # CycleType.slugs.map { |s| "#{s}: #{Bike.where(cycle_type: s).count}" }

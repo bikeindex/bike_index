@@ -8,6 +8,11 @@
         .form-wrap
           .form-well-form-header-always-visible
             %h3
+              = @bike.not_a_cycle? ? t(".vehicle_type") : t(".cycle_type")
+
+        .form-wrap.secondary-form-wrap
+          .form-well-form-header-always-visible
+            %h3
               = t(".wheels")
 
           - %w(front rear).each do |side|
@@ -56,74 +61,75 @@
                   = t(".wide")
                   %small= t(".wide_help")
 
-        .form-wrap.secondary-form-wrap#edit_drivetrain
-          .form-well-form-header-always-visible
-            %h3
-              = t(".drivetrain")
-          - rear_fixed = RearGearType.fixed.id
-          - front_fixed = FrontGearType.fixed.id
-          - fixed = @bike.rear_gear_type_id == rear_fixed
-          .form-group.row.unnested-field
-            %label.form-well-label
-              = t(".drivetrain_type")
-            .form-well-input-large.form-well-input-checks
-              %label.checkbox-inline.mr-2
-                %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
-                = t(".fixed")
-              %label.checkbox-inline.mr-2.not-fixed
-                = f.check_box :coaster_brake
-                = t(".coaster_brake")
-              %label.checkbox-inline.not-fixed
-                = f.check_box :belt_drive
-                = t(".belt_drive")
+        - unless CycleType.not_cycle_drivetrain?(@bike.type)
+          .form-wrap.secondary-form-wrap#edit_drivetrain
+            .form-well-form-header-always-visible
+              %h3
+                = t(".drivetrain")
+            - rear_fixed = RearGearType.fixed.id
+            - front_fixed = FrontGearType.fixed.id
+            - fixed = @bike.rear_gear_type_id == rear_fixed
+            .form-group.row.unnested-field
+              %label.form-well-label
+                = t(".drivetrain_type")
+              .form-well-input-large.form-well-input-checks
+                %label.checkbox-inline.mr-2
+                  %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
+                  = t(".fixed")
+                %label.checkbox-inline.mr-2.not-fixed
+                  = f.check_box :coaster_brake
+                  = t(".coaster_brake")
+                %label.checkbox-inline.not-fixed
+                  = f.check_box :belt_drive
+                  = t(".belt_drive")
 
-          .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
-            .form-group.row
-              %label.form-well-label{ for: 'front_gear_select'}
-                = t(".front_gears")
-              .form-well-input
-                // ignore this select in dirty forms
-                %select#front_gear_select.form-control.dirtyignore
-                  %option.placeholder{ value: ''}
-                    = t(".select_chainring_count")
-                  - FrontGearType.standard.each do |gt|
-                    %option{ value: gt.count }
-                      = gt.name
-              .right-input-help
-                - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
-                %label.cursor-pointer
-                  %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
-                  = t(".internal_front_gears")
-              .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
-                = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
-                - FrontGearType.all.each do |gt|
-                  = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: { count: gt.count }
+            .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
+              .form-group.row
+                %label.form-well-label{ for: 'front_gear_select'}
+                  = t(".front_gears")
+                .form-well-input
+                  // ignore this select in dirty forms
+                  %select#front_gear_select.form-control.dirtyignore
+                    %option.placeholder{ value: ''}
+                      = t(".select_chainring_count")
+                    - FrontGearType.standard.each do |gt|
+                      %option{ value: gt.count }
+                        = gt.name
+                .right-input-help
+                  - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
+                  %label.cursor-pointer
+                    %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
+                    = t(".internal_front_gears")
+                .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
+                  = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
+                  - FrontGearType.all.each do |gt|
+                    = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: { count: gt.count }
 
-          .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
-            .form-group.row
-              %label.form-well-label{ for: 'rear_gear_select' }
-                = t(".rear_gears")
-              .form-well-input
-                // ignore this select in dirty forms
-                %select#rear_gear_select.form-control.dirtyignore
-                  %option.placeholder{ value: '' }
-                    = t(".select_cog_count")
-                  - RearGearType.standard.each do |gt|
-                    %option{ value: gt.count }
-                      = gt.name
-              .right-input-help
-                - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
-                %label.cursor-pointer
-                  %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
-                  = t(".internal_rear_gears")
+            .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
+              .form-group.row
+                %label.form-well-label{ for: 'rear_gear_select' }
+                  = t(".rear_gears")
+                .form-well-input
+                  // ignore this select in dirty forms
+                  %select#rear_gear_select.form-control.dirtyignore
+                    %option.placeholder{ value: '' }
+                      = t(".select_cog_count")
+                    - RearGearType.standard.each do |gt|
+                      %option{ value: gt.count }
+                        = gt.name
+                .right-input-help
+                  - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
+                  %label.cursor-pointer
+                    %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
+                    = t(".internal_rear_gears")
 
-              .row.currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
-                = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'
-                - RearGearType.all.each do |gt|
-                  - if gt.id == rear_fixed
-                    = f.radio_button 'rear_gear_type_id', gt.id
-                  - else
-                    = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: {count: gt.count }
+                .row.currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
+                  = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'
+                  - RearGearType.all.each do |gt|
+                    - if gt.id == rear_fixed
+                      = f.radio_button 'rear_gear_type_id', gt.id
+                    - else
+                      = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: {count: gt.count }
 
 
         = render "/shared/form_well_footer_save"
