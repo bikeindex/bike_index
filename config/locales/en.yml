@@ -1076,9 +1076,9 @@ en:
       are_you_certain: Are you certain?
       city: City
       electric: Electric
-      enter_bike_type_details: Enter %{bike_type} details
-      enter_found_bike_type_details: Enter Found %{bike_type} details
-      enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
+      enter_bike_type_details_html: Enter %{type_html} details
+      enter_found_bike_type_details_html: Enter Found %{type_html} details
+      enter_stolen_bike_type_details_html: Enter Stolen %{type_html} details
       how_to_find_serial: how to find your serial number
       i_just_dont_know_the_serial: I just don't know the serial
       im_100_sure: I'm 100% sure
@@ -1113,11 +1113,11 @@ en:
       traditional_bike_definition: Two wheels, one seat, no motor
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
-      very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
-        Unless this %{bike_type}:'
+      very_few_vehicles_html: 'Very few %{type_html} are made without serials.'
+      very_few_bikes_html: 'Very <em>very</em> few %{type_html} are made without serials. Unless this %{type_html}:'
       was_made_before_1970: Was made before 1970
-      without_serial: This %{bike_type} was made without a serial
-      without_serial_number: This %{bike_type} was made without a serial number
+      without_serial_html: This %{type_html} was made without a serial
+      without_serial_number_html: This <span %{type_html} was made without a serial number
       zipcode: Postal code
     organization_stolen_message:
       report_link_text: at this link
@@ -1432,28 +1432,32 @@ en:
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
     drivetrain:
-      all_diameters: All diameters
       belt_drive: Belt Drive
-      choose_diameter: Choose diameter
+      
       coaster_brake: Coaster Brake
       drivetrain: Drivetrain
       drivetrain_type: Drivetrain type
+      traditional_bike_definition: Two wheels, one seat, no motor
+      submit_correction: Submit correction
       fixed: Fixed
       front_gears: Front gears
-      hide_extra_sizes: Hide extra sizes
       internal_front_gears: Internal front gears
       internal_rear_gears: Internal rear gears
-      narrow: Narrow
-      narrow_title: Tires under 39mm (1.5 inches) wide
       rear_gears: Rear gears
       select_chainring_count: Select chainring count
       select_cog_count: Select cog count
-      show_more_sizes: Show more sizes
-      side: "%{side} tire"
-      sidetitleize_wheel: "%{sidetitleize} wheel"
       vehicle_type: Vehicle type
       cycle_type: Cycle type
       wheels: Wheels
+    wheels:
+      all_diameters: All diameters
+      choose_diameter: Choose diameter
+      show_more_sizes: Show more sizes
+      hide_extra_sizes: Hide extra sizes
+      narrow: Narrow
+      narrow_title: Tires under 39mm (1.5 inches) wide
+      side: "%{side} tire"
+      sidetitleize_wheel: "%{sidetitleize} wheel"
       wide: Wide
       wide_help: "> 38mm (1.5in)"
       wide_title: Tires that are at least 39mm (1.5 inches) wide

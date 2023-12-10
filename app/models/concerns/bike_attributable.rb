@@ -129,8 +129,8 @@ module BikeAttributable
     CycleType.new(cycle_type)&.name
   end
 
-  def not_a_cycle?
-    CycleType.not_a_cycle?(cycle_type)
+  def not_cycle?
+    CycleType.not_cycle?(cycle_type)
   end
 
   def propulsion_type_name
