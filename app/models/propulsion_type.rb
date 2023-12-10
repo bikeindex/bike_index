@@ -59,6 +59,7 @@ class PropulsionType
       else
         not_pedal.reverse
       end
+      valid_types << :"hand-pedal" if cycle_type&.to_sym == :wheelchair
 
       strictly = CycleType.strict_motorized(cycle_type)
       if strictly == :never
