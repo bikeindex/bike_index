@@ -2179,7 +2179,6 @@ nb:
       submit_update: Send inn oppdatering
       traditional_bike_definition: To hjul, ett sete, ingen motor
       update_propulsion: Oppdater fremdrift
-      update_propulsion_type: Oppdater fremdrift
       update_vehicle_type: Oppdater kjøretøytype
       vehicle_type: Bil type
     edit_bike_organization:

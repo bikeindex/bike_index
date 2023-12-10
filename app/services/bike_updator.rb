@@ -79,7 +79,7 @@ class BikeUpdator
       # Ensure valid propulsion type
       cycle_type = update_attrs["cycle_type"] || update_attrs["cycle_type_name"] || @bike.cycle_type
       @bike.cycle_type = CycleType.friendly_find(cycle_type)&.slug || "bike"
-      @bike.propulsion_type_slug = update_attrs["propultion_type"] || update_attrs["propulsion_type_slug"] || @bike.propulsion_type
+      @bike.propulsion_type_slug = update_attrs["propulsion_type"] || update_attrs["propulsion_type_slug"] || @bike.propulsion_type
       update_attrs = update_attrs.except(*propulsion_updates)
     end
     if @bike.update(update_attrs.merge(updator_attrs))

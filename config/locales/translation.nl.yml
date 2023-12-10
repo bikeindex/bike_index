@@ -5804,7 +5804,6 @@ nl:
       submit_update: Update verzenden
       traditional_bike_definition: Twee wielen, één stoel, geen motor
       update_propulsion: Aandrijving bijwerken
-      update_propulsion_type: Aandrijving bijwerken
       update_vehicle_type: Voertuigtype bijwerken
       vehicle_type: 'Voertuigtype:'
     groups:
