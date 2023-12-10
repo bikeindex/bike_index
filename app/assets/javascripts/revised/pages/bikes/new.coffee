@@ -10,17 +10,6 @@ class BikeIndex.BikesNew extends BikeIndex
       united_stated_id = $('#stolen_record_us_id').data('usid')
       new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
 
-    # window.updateCycleTypeText = (cycleTypeVal) ->
-    #   newTypeText = window.cycleTypeTranslations[cycleTypeVal]
-    #   if newTypeText.length
-    #     $(".cycleTypeText").text(newTypeText)
-    #   if window.cycleTypesNot.includes(cycleTypeVal)
-    #     $(".cycleTypeOnly").collapse("hide")
-    #     $(".notCycleTypeOnly").collapse("show")
-    #   else
-    #     $(".cycleTypeOnly").collapse("show")
-    #     $(".notCycleTypeOnly").collapse("hide")
-
   initializeEventListeners: ->
     $('#bike_manufacturer_id').change (e) =>
       current_val = e.target.value
@@ -158,8 +147,7 @@ class BikeIndex.BikesNew extends BikeIndex
 
         $('#propulsion_type_throttle').prop('checked', false)
         $('#propulsion_type_pedal_assist').prop('checked', false)
-
-    # window.updateCycleTypeText(cycleTypeValue)
+    # Update cycle_type text on the page
     newTypeText = window.cycleTypeTranslations[cycleTypeValue]
     if newTypeText.length
       $(".cycleTypeText").text(newTypeText)

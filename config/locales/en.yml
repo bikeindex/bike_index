@@ -1038,7 +1038,6 @@ en:
       bike_photo: "%{bike_type} photo"
       color_may_not_match: Color may not match!
       componentyear: "%{componentyear}"
-      vehicle_type: Vehicle type
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
@@ -1068,6 +1067,7 @@ en:
       stock_photo: Stock photo of a %{year} %{model}
       stolen_at: Stolen at
       stolen_details: Theft Details
+      vehicle_type: Vehicle type
       wheel_diameter: Wheel diameter
       year: Year
     new:
@@ -1113,11 +1113,14 @@ en:
       traditional_bike_definition: Two wheels, one seat, no motor
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
-      very_few_vehicles_html: 'Very few %{type_html} are made without serials.'
-      very_few_bikes_html: 'Very <em>very</em> few %{type_html} are made without serials. Unless this %{type_html}:'
+      very_few_bikes_html: >-
+        Very <em>very</em> few %{type_html} are made without serials. Unless this
+        %{type_html}:
+      very_few_vehicles_html: Very few %{type_html} are made without serials.
       was_made_before_1970: Was made before 1970
       without_serial_html: This %{type_html} was made without a serial
-      without_serial_number_html: This <span %{type_html} was made without a serial number
+      without_serial_number_html: This <span %{type_html} was made without a serial
+        number
       zipcode: Postal code
     organization_stolen_message:
       report_link_text: at this link
@@ -1432,45 +1435,28 @@ en:
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
     drivetrain:
-      propulsion_type: Propulsion
-      update_propulsion: Update propulsion
       belt_drive: Belt Drive
       coaster_brake: Coaster Brake
+      cycle_type: Cycle type
       drivetrain: Drivetrain
       drivetrain_type: Drivetrain type
-      traditional_bike_definition: Two wheels, one seat, no motor
-      submit_correction: Submit correction
       fixed: Fixed
       front_gears: Front gears
       internal_front_gears: Internal front gears
       internal_rear_gears: Internal rear gears
+      nevermind: Nevermind
+      propulsion_type: Propulsion
       rear_gears: Rear gears
       select_chainring_count: Select chainring count
       select_cog_count: Select cog count
-      vehicle_type: Vehicle type
-      cycle_type: Cycle type
-      wheels: Wheels
-      update_vehicle_type: Update vehicle type
-      update_propulsion_type: Update propulsion
-      nevermind: Nevermind
+      submit_correction: Submit correction
       submit_update: Submit update
-    wheels:
-      front_wheel: Front wheel
-      rear_wheel: Rear wheel
-      general_wheel: Wheel(s)
-      front_tire: Front tire
-      rear_tire: Rear tire
-      general_tire: Tire(s)
-      all_diameters: All diameters
-      choose_diameter: Choose diameter
-      diameter_700c: 700c (includes 29ers)
-      show_more_sizes: Show more sizes
-      hide_extra_sizes: Hide extra sizes
-      narrow: Narrow
-      narrow_title: Tires under 39mm (1.5 inches) wide
-      wide: Wide
-      wide_help: "> 38mm (1.5in)"
-      wide_title: Tires that are at least 39mm (1.5 inches) wide
+      traditional_bike_definition: Two wheels, one seat, no motor
+      update_propulsion: Update propulsion
+      update_propulsion_type: Update propulsion
+      update_vehicle_type: Update vehicle type
+      vehicle_type: Vehicle type
+      wheels: Wheels
     edit_bike_organization:
       can_edit_this_bike: Can edit this %{bike_type}
       manage_organization_information: Manage organization information
@@ -1596,6 +1582,23 @@ en:
       without_a_valid_report_number_html: >-
         Without a valid report number, your bike won't be included in partner searches
         by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+    wheels:
+      all_diameters: All diameters
+      choose_diameter: Choose diameter
+      diameter_700c: 700c (includes 29ers)
+      front_tire: Front tire
+      front_wheel: Front wheel
+      general_tire: Tire(s)
+      general_wheel: Wheel(s)
+      hide_extra_sizes: Hide extra sizes
+      narrow: Narrow
+      narrow_title: Tires under 39mm (1.5 inches) wide
+      rear_tire: Rear tire
+      rear_wheel: Rear wheel
+      show_more_sizes: Show more sizes
+      wide: Wide
+      wide_help: "> 38mm (1.5in)"
+      wide_title: Tires that are at least 39mm (1.5 inches) wide
   controllers:
     application:
       handle_unverified_request:
