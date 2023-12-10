@@ -63,12 +63,14 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
     it "renders text-warning" do
       expect(status_display("stolen")).to eq "<span class=\"text-warning\">stolen</span>"
+      expect(status_display("uncertified_by_trusted_org")).to eq "<span class=\"text-warning\">uncertified by trusted org</span>"
     end
-    context "retrieved" do
-      it "is blue" do
+    context "text-info" do
+      it "is expected" do
         expect(status_display("retrieved_by_owner")).to eq "<span class=\"text-info\">retrieved by owner</span>"
         expect(status_display("Retrieved")).to eq "<span class=\"text-info\">Retrieved</span>"
         expect(status_display("resolved_otherwise")).to eq "<span class=\"text-info\">resolved</span>"
+        expect(status_display("certified_by_trusted_org")).to eq "<span class=\"text-info\">certified by trusted org</span>"
       end
     end
     context "removed_from_bike_index, trashed or Removed from Bike Index" do
