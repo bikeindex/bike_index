@@ -14,13 +14,13 @@ class BulkImport < ApplicationRecord
   enum progress: PROGRESS_ENUM
   enum kind: KIND_ENUM
 
-  scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
-  scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
-  scope :ascend_errors, -> { where("(import_errors -> 'ascend') is not null") }
+  scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
+  scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }
+  scope :ascend_errors, -> { where("(import_errors -> 'ascend') IS NOT NULL") }
   scope :import_errors, -> { file_errors.or(line_errors) }
-  scope :no_import_errors, -> { where("(import_errors -> 'line') is null").where("(import_errors -> 'file') is null") }
-  scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
-  scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
+  scope :no_import_errors, -> { where("(import_errors -> 'line') IS NULL").where("(import_errors -> 'file') IS NULL") }
+  scope :no_bikes, -> { where("(import_errors -> 'bikes') IS NOT NULL") }
+  scope :with_bikes, -> { where.not("(import_errors -> 'bikes') IS NOT NULL") }
   scope :not_ascend, -> { where.not(kind: "ascend") }
 
   before_save :set_calculated_attributes
