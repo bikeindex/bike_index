@@ -10,7 +10,7 @@ class OrganizationDisplayer
 
     def bike_shop_display_integration_alert?(organization)
       organization.bike_shop? &&
-        %w[no_pos broken_other_pos broken_lightspeed_pos].include?(organization.pos_kind) &&
+        %w[no_pos broken_ascend_pos broken_lightspeed_pos].include?(organization.pos_kind) &&
         !organization.official_manufacturer?
     end
 

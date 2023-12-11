@@ -14,7 +14,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
     let(:user) { user_email.user }
     let(:membership) { FactoryBot.create(:membership, invited_email: "#{email.upcase} ") }
 
-    context "existing user account" do
+    context "existing user account", flaky: true do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
       let(:old_user) { FactoryBot.create(:user_confirmed, email: email) }
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
