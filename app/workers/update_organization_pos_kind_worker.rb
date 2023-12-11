@@ -49,9 +49,6 @@ class UpdateOrganizationPosKindWorker < ScheduledWorker
       start_at: organization.updated_at)
   end
 
-  # def create_organization_status(organization, pos_kind:)
-  # end
-
   def enqueue_workers
     Organization.unscoped.pluck(:id).each do |id|
       UpdateOrganizationPosKindWorker.perform_async(id)
