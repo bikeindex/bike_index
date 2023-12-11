@@ -22,7 +22,7 @@ class Organization < ApplicationRecord
     ascend_pos: 3,
     broken_lightspeed_pos: 4,
     does_not_need_pos: 5,
-    broken_other_pos: 6
+    broken_ascend_pos: 6
   }.freeze
 
   acts_as_paranoid
@@ -123,7 +123,7 @@ class Organization < ApplicationRecord
   end
 
   def self.broken_pos_kinds
-    %w[broken_other_pos broken_lightspeed_pos]
+    %w[broken_ascend_pos broken_lightspeed_pos]
   end
 
   def self.without_pos_kinds
@@ -507,20 +507,6 @@ class Organization < ApplicationRecord
       return nil unless users.any?
       self.auto_user_id = users.first.id
     end
-  end
-
-  def calculated_pos_kind
-    return manual_pos_kind if manual_pos_kind.present?
-    recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
-    return "ascend_pos" if ascend_name.present? || recent_bikes.ascend_pos.count > 0
-    return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
-    return "other_pos" if recent_bikes.any_pos.count > 0
-    if bike_shop? && recent_bikes.count > 2
-      return "does_not_need_pos" if created_at < Time.current - 1.week ||
-        bikes.where("bikes.created_at > ?", Time.current - 1.year).count > 100
-    end
-    return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
-    bikes.any_pos.count > 0 ? "broken_other_pos" : "no_pos"
   end
 
   def update_associations

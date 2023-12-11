@@ -6,16 +6,33 @@ class UpdateOrganizationPosKindWorker < ScheduledWorker
     6.3.hours
   end
 
+  def self.calculated_pos_kind(organization)
+    return organization.manual_pos_kind if organization.manual_pos_kind.present?
+    bikes = organization.created_bikes
+    recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
+    return "ascend_pos" if organization.ascend_name.present? || recent_bikes.ascend_pos.count > 0
+    return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
+    return "other_pos" if recent_bikes.any_pos.count > 0
+    if organization.bike_shop? && recent_bikes.count > 2
+      return "does_not_need_pos" if organization.created_at < Time.current - 1.week ||
+        bikes.where("bikes.created_at > ?", Time.current - 1.year).count > 100
+    end
+    return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
+    bikes.any_pos.count > 0 ? "broken_ascend_pos" : "no_pos"
+  end
+
   def perform(org_id = nil)
     return enqueue_workers unless org_id.present?
     organization = Organization.unscoped.find(org_id)
-    pos_kind = organization.calculated_pos_kind
+    pos_kind = self.class.calculated_pos_kind(organization)
     organization_status = current_organization_status(organization)
     return true if organization.pos_kind == pos_kind
     organization_status.update(end_at: Time.current)
     organization.update(pos_kind: pos_kind)
     current_organization_status(organization)
   end
+
+  private
 
   def current_organization_status(organization)
     organization_status = OrganizationStatus.current.where(organization_id: organization.id).first

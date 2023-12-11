@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
+  let(:described_class) { UpdateOrganizationPosKindWorker }
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
@@ -38,7 +39,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         }.to change(OrganizationStatus, :count).by 2
 
         organization.reload
-        expect(organization.pos_kind).to eq "broken_other_pos"
+        expect(organization.pos_kind).to eq "broken_ascend_pos"
 
         organization_status1 = OrganizationStatus.order(:id).first
         expect(organization_status1.organization_id).to eq organization.id
@@ -48,7 +49,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
 
         organization_status2 = OrganizationStatus.order(:id).last
         expect(organization_status2.organization_id).to eq organization.id
-        expect(organization_status2.pos_kind).to eq "broken_other_pos"
+        expect(organization_status2.pos_kind).to eq "broken_ascend_pos"
         expect(organization_status2.start_at).to be_within(5).of Time.current
         expect(organization_status2.end_at).to be_blank
       end
@@ -100,7 +101,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
     end
   end
 
-  describe "organization calculated_pos_kind" do
+  describe "calculated_pos_kind" do
     context "organization with pos bike and non pos bike" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
       let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: organization) }
@@ -108,20 +109,20 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
       it "returns pos type" do
         organization.reload
         expect(organization.pos_kind).to eq "no_pos"
-        expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
+        expect(described_class.calculated_pos_kind(organization)).to eq "lightspeed_pos"
         UpdateOrganizationPosKindWorker.new.perform(organization.id)
         organization.reload
         expect(organization.pos_kind).to eq "lightspeed_pos"
         # And if bike is created before cut-of for pos kind, it returns broken
         bike_pos.update_attribute :created_at, Time.current - 2.weeks
-        expect(organization.calculated_pos_kind).to eq "broken_lightspeed_pos"
+        expect(described_class.calculated_pos_kind(organization)).to eq "broken_lightspeed_pos"
       end
     end
     context "ascend_name" do
       let(:organization) { FactoryBot.create(:organization, ascend_name: "SOMESHOP") }
       it "returns ascend_pos" do
         expect(organization.reload.pos_kind).to eq "no_pos"
-        expect(organization.calculated_pos_kind).to eq "ascend_pos"
+        expect(described_class.calculated_pos_kind(organization)).to eq "ascend_pos"
         expect {
           UpdateOrganizationPosKindWorker.new.perform(organization.id)
         }.to change(OrganizationStatus, :count).by 2
@@ -152,22 +153,22 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         organization.reload
         expect(organization.manual_pos_kind).to eq "lightspeed_pos"
         expect(organization.pos_kind).to eq "lightspeed_pos"
-        organization.update_attribute :manual_pos_kind, "broken_other_pos"
+        organization.update_attribute :manual_pos_kind, "broken_ascend_pos"
 
         UpdateOrganizationPosKindWorker.new.perform(organization.id)
         organization.reload
-        expect(organization.manual_pos_kind).to eq "broken_other_pos"
-        expect(organization.pos_kind).to eq "broken_other_pos"
+        expect(organization.manual_pos_kind).to eq "broken_ascend_pos"
+        expect(organization.pos_kind).to eq "broken_ascend_pos"
       end
     end
     context "recent bikes" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
       it "no_pos, does_not_need_pos if older organization" do
         organization.reload
-        expect(organization.calculated_pos_kind).to eq "no_pos"
+        expect(described_class.calculated_pos_kind(organization)).to eq "no_pos"
         3.times { FactoryBot.create(:bike_organized, creation_organization: organization) }
         organization.reload
-        expect(organization.calculated_pos_kind).to eq "no_pos"
+        expect(described_class.calculated_pos_kind(organization)).to eq "no_pos"
         expect {
           UpdateOrganizationPosKindWorker.new.perform(organization.id)
         }.to change(OrganizationStatus, :count).by 1
@@ -176,7 +177,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
 
         organization.update_attribute :created_at, Time.current - 2.weeks
         organization.reload
-        expect(organization.calculated_pos_kind).to eq "does_not_need_pos"
+        expect(described_class.calculated_pos_kind(organization)).to eq "does_not_need_pos"
 
         expect {
           UpdateOrganizationPosKindWorker.new.perform(organization.id)
