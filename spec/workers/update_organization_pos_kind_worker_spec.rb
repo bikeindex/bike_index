@@ -27,19 +27,10 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
       expect(organization.pos_kind).to eq "ascend_pos"
     end
     context "broken ascend" do
-      let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: Time.current - 1.month) }
-      it "updates to broken" do
-        organization.update_column :pos_kind, :ascend_pos
-        expect(organization.reload.updated_at).to be_within(5).of og_updated_at
-        pos_bike.reload
-        expect(organization.bikes).to eq([pos_bike])
-        expect(organization.pos_kind).to eq "ascend_pos"
-        expect {
-          described_class.new.perform(organization.id)
-        }.to change(OrganizationStatus, :count).by 2
-
-        organization.reload
-        expect(organization.pos_kind).to eq "broken_ascend_pos"
+      before { organization.update_column :pos_kind, :ascend_pos }
+      def expect_broken_ascend(org)
+        org.reload
+        expect(org.pos_kind).to eq "broken_ascend_pos"
 
         organization_status1 = OrganizationStatus.order(:id).first
         expect(organization_status1.organization_id).to eq organization.id
@@ -48,10 +39,40 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         expect(organization_status1.end_at).to be_within(5).of Time.current
 
         organization_status2 = OrganizationStatus.order(:id).last
-        expect(organization_status2.organization_id).to eq organization.id
+        expect(organization_status2.organization_id).to eq org.id
         expect(organization_status2.pos_kind).to eq "broken_ascend_pos"
         expect(organization_status2.start_at).to be_within(5).of Time.current
         expect(organization_status2.end_at).to be_blank
+      end
+      context "bulk_import_ascend broken" do
+        let!(:bulk_import) do
+          FactoryBot.create(:bulk_import_ascend,
+            organization: organization,
+            import_errors: {file: ["Invalid file extension, must be .csv or .tsv"]})
+        end
+        it "updates to broken" do
+          expect(organization.reload.updated_at).to be_within(5).of og_updated_at
+          expect(bulk_import.reload.blocking_error?).to be_truthy
+          expect {
+            described_class.new.perform(organization.id)
+          }.to change(OrganizationStatus, :count).by 2
+
+          expect_broken_ascend(organization)
+        end
+      end
+      context "bike" do
+        let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: Time.current - 1.month) }
+        it "updates to broken" do
+          expect(organization.reload.updated_at).to be_within(5).of og_updated_at
+          pos_bike.reload
+          expect(organization.bikes).to eq([pos_bike])
+          expect(organization.pos_kind).to eq "ascend_pos"
+          expect {
+            described_class.new.perform(organization.id)
+          }.to change(OrganizationStatus, :count).by 2
+
+          expect_broken_ascend(organization)
+        end
       end
     end
     context "deleted" do

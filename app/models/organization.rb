@@ -56,6 +56,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :graduated_notifications
+  has_many :organization_statuses
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
@@ -368,6 +369,10 @@ class Organization < ApplicationRecord
     return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
     snippet = mail_snippets.enabled.where(kind: snippet_kind).first
     snippet&.body
+  end
+
+  def current_organization_status
+    organization_statuses.current.order(:start_at).limit(1).first
   end
 
   def additional_registration_fields

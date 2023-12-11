@@ -8,9 +8,12 @@ class UpdateOrganizationPosKindWorker < ScheduledWorker
 
   def self.calculated_pos_kind(organization)
     return organization.manual_pos_kind if organization.manual_pos_kind.present?
-    bikes = organization.created_bikes
+    bikes = organization.created_bikes # NOTE: Only created, so regional orgs don't get them
     recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
-    return "ascend_pos" if organization.ascend_name.present? || recent_bikes.ascend_pos.count > 0
+    if organization.ascend_name.present? || recent_bikes.ascend_pos.count > 0
+      last_import = BulkImport.ascend.where(organization_id: organization.id).order(id: :desc).limit(1).last
+      return last_import&.blocking_error? ? "broken_ascend_pos" : "ascend_pos"
+    end
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
     if organization.bike_shop? && recent_bikes.count > 2
@@ -46,8 +49,8 @@ class UpdateOrganizationPosKindWorker < ScheduledWorker
       start_at: organization.updated_at)
   end
 
-  def create_organization_status(organization, pos_kind:)
-  end
+  # def create_organization_status(organization, pos_kind:)
+  # end
 
   def enqueue_workers
     Organization.unscoped.pluck(:id).each do |id|
