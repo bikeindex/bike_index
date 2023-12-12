@@ -1816,8 +1816,6 @@ nl:
       this_is_a: Dit is een
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
-      very_few_bikes_html: 'Heel <em>erg</em> weinig fietsen zijn gemaakt zonder series.
-        Tenzij dit %{bike_type}:'
       was_made_before_1970: Werd vóór 1970 gemaakt
       zipcode: Postcode
       manufacturer: Fabrikant
@@ -1838,6 +1836,8 @@ nl:
       without_serial_html: Deze %{type_html} is gemaakt zonder serienummer
       without_serial_number_html: Dit <span %{type_html} was made without a serial
         number
+      very_very_few_bikes_html: 'Er zijn heel <em>weinig</em> %{type_html} gemaakt
+        zonder serienummers. Tenzij dit %{type_html}:'
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'

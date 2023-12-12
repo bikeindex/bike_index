@@ -1851,8 +1851,6 @@ nb:
       traditional_bike_definition: To hjul, ett sete, ingen motor
       unknown_year: Ukjent årstall
       unsure_or_unknown: Usikker eller ukjent
-      very_few_bikes_html: 'Veldig <em>svært</em> få sykler er laget uten serier.
-        Med mindre dette %{bike_type}:'
       was_made_before_1970: Ble laget før 1970
       zipcode: Postnummer
       enter_bike_type_details_html: Skriv inn %{type_html} detaljer
@@ -1862,6 +1860,8 @@ nb:
       without_serial_html: Denne %{type_html} ble laget uten en serie
       without_serial_number_html: Dette <span %{type_html} was made without a serial
         number
+      very_very_few_bikes_html: 'Veldig <em>svært</em> få %{type_html} er laget uten
+        serier. Med mindre dette %{type_html}:'
     organization_stolen_message:
       report_link_text: på denne linken
       report_the_theft_to_the_organization_html: <span class="text-warning">Rapporter

@@ -1800,7 +1800,6 @@ es:
       traditional_bike_definition:
       unknown_year:
       unsure_or_unknown:
-      very_few_bikes_html:
       was_made_before_1970:
       zipcode:
       enter_bike_type_details_html:
@@ -1809,6 +1808,7 @@ es:
       very_few_vehicles_html:
       without_serial_html:
       without_serial_number_html:
+      very_very_few_bikes_html:
     organization_stolen_message:
       report_link_text:
       report_the_theft_to_the_organization_html:
