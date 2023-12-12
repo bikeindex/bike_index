@@ -4461,15 +4461,12 @@ nl:
         unclaimed: niet opgeëist
     users:
       edit:
-        admin_of_organization: Beheerder van organisatie
         confirmation: Weet je zeker dat je %{user_name} wilt verwijderen uit %{org_name}?
           (Ze zullen nog steeds hun persoonlijke account gebruiken)
         edit_membership_html: Lidmaatschap bewerken voor <em class="small">%{email}</em>
         email: E-mailadres
         has_not_signed_up_html: "%{name} <strong>heeft zich nog steeds niet aangemeld</strong>"
         invited: Uitgenodigd
-        member_of_organization: Lid van organisatie
-        membership_type: Soort lidmaatschap
         remove_from_organization: verwijderen uit organisatie
         signed_up: Ingeschreven
         update: Bijwerken
@@ -4481,7 +4478,6 @@ nl:
         emails_are_currently_sent_from_html: E-mails worden momenteel verzonden vanuit
           <em>%{email}</em> .
         invite_more_users: Nodig meer gebruikers uit
-        is_admin: Beheerder?
         manage_users: Gebruikers beheren
         remaining_invites_html: U kunt <strong>%{invitations_count}</strong> meer
           toevoegen
@@ -4499,18 +4495,19 @@ nl:
         permitted_domain_info_html: Je hebt een toegestaan domein. Iedereen die zich
           aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
           , wordt lid van %{org_name}.
+        role: Rol
+        admin: beheerder
+        member: lid
+        no_bike_edit: geen fietsbewerking
       new:
         1_email_per_line: 1 e-mail per regel
-        admin_of_organization: Beheerder van organisatie
         automatic_passwordless: Uw organisatie is ingesteld met automatisch inloggen
           zonder wachtwoord. De e-mails die u toevoegt, ontvangen een bericht met
           een link om in te loggen.
         email_youre_inviting: E-mail die u uitnodigt
         invite_multiple_emails: Nodig meerdere e-mails uit
         invite_user: Nodig gebruiker uit
-        member_of_organization: Lid van organisatie
         membership: Lidmaatschap
-        membership_type: Soort lidmaatschap
         multiple_emails: Meerdere e-mails
         remaining_invites_html: U kunt <strong>%{invitations_count}</strong> meer
           toevoegen
@@ -4521,6 +4518,16 @@ nl:
           per e-mail" met een adres dat eindigt op <code>%{email_suffix}</code> wordt
           u automatisch lid van %{org_name}.
         you_have_a_permitted_domain: Je hebt een toegestaan domein
+      membership_role_fields:
+        member_of_organization: Lid van organisatie
+        member_no_bikes: Lid zonder fietsbewerking
+        membership_type: Soort lidmaatschap
+        admin_of_organization: Beheerder van organisatie
+        admin_access: Volledige toegang tot de organisatie
+        member_access: Organisatietoegang, maar kan geen organisatie-instellingen
+          bewerken of nieuwe gebruikers uitnodigen
+        member_no_bikes_access: Dezelfde toegang als Member, maar kan organisatiefietsen
+          niet bewerken
     parking_notifications:
       index:
         parking_notifications: Verlaten records

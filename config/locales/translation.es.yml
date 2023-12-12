@@ -3921,7 +3921,6 @@ es:
         unclaimed:
     users:
       edit:
-        admin_of_organization:
         confirmation:
         edit_membership_html:
         email: Email
@@ -3929,8 +3928,6 @@ es:
         invited:
         last_login:
         last_login_ip:
-        member_of_organization:
-        membership_type:
         remove_from_organization:
         signed_up:
         update:
@@ -3941,7 +3938,6 @@ es:
         emails_are_currently_sent_from_html:
         find_by_name_or_email:
         invite_more_users:
-        is_admin:
         manage_users:
         manually_invite_email:
         matching_user:
@@ -3954,16 +3950,17 @@ es:
         user:
         you_can_also:
         you_have_invited_html:
+        role:
+        admin:
+        member:
+        no_bike_edit:
       new:
         1_email_per_line:
-        admin_of_organization:
         automatic_passwordless:
         email_youre_inviting:
         invite_multiple_emails:
         invite_user:
-        member_of_organization:
         membership:
-        membership_type:
         multiple_emails:
         remaining_invites_html:
         send_invitation:
@@ -3971,6 +3968,14 @@ es:
         user:
         you_have_a_permitted_domain:
         you_have_invited_html:
+      membership_role_fields:
+        member_of_organization:
+        member_no_bikes:
+        membership_type:
+        admin_of_organization:
+        admin_access:
+        member_access:
+        member_no_bikes_access:
   organized_mailer:
     custom_message:
       subject:

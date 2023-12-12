@@ -5025,7 +5025,6 @@ nb:
         unclaimed: Ikke gjort krav på
     users:
       edit:
-        admin_of_organization: Administrator for organisasjonen
         confirmation: Er du sikker på at du vil fjerne %{user_name} fra %{org_name}?
           (De vil fortsatt bruke sin personlige konto)
         edit_membership_html: Rediger medlemskap for <em class="small">%{email}</em>
@@ -5034,8 +5033,6 @@ nb:
         invited: Invitert
         last_login: Siste innlogging
         last_login_ip: Siste innlogging ip
-        member_of_organization: Medlem av organisasjonen
-        membership_type: Medlemskapstype
         remove_from_organization: fjern fra organisasjonen
         signed_up: Meldt seg
         update: Oppdater
@@ -5047,7 +5044,6 @@ nb:
           .
         find_by_name_or_email: Finn etter navn eller e-post
         invite_more_users: Inviter flere brukere
-        is_admin: Administrator?
         manage_users: Administrer brukere
         manually_invite_email: invitere e-poster manuelt
         matching_user: Matchende bruker
@@ -5063,18 +5059,19 @@ nb:
         user: bruker
         you_can_also: Du kan også
         you_have_invited_html: 'Du har invitert: <strong>%{users_count}</strong>'
+        role: Rolle
+        admin: admin
+        member: medlem
+        no_bike_edit: ingen sykkelredigering
       new:
         1_email_per_line: 1 e-post per linje
-        admin_of_organization: Administrator for organisasjonen
         automatic_passwordless: Organisasjonen din er konfigurert med automatisk passordløs
           pålogging. E-poster du inviterer vil kunne logge på ved å bruke "E-post
           påloggingslenke"-knappen på påloggingssiden.
         email_youre_inviting: E-post du inviterer
         invite_multiple_emails: Inviter flere e-poster
         invite_user: Inviter bruker
-        member_of_organization: Medlem av organisasjonen
         membership: Medlemskap
-        membership_type: Medlemskapstype
         multiple_emails: Flere e-poster
         remaining_invites_html: Du kan legge til <strong>%{invitations_count}</strong>
           mer
@@ -5085,6 +5082,15 @@ nb:
         user: bruker
         you_have_a_permitted_domain: Du har et tillatt domene
         you_have_invited_html: 'Du har invitert: <strong>%{users_count}</strong>'
+      membership_role_fields:
+        member_of_organization: Medlem av organisasjonen
+        member_no_bikes: Medlem uten sykkelredigering
+        membership_type: Medlemskapstype
+        admin_of_organization: Administrator for organisasjonen
+        admin_access: Full organisasjonstilgang
+        member_access: Organisasjonstilgang, men kan ikke redigere organisasjonsinnstillinger
+          eller invitere nye brukere
+        member_no_bikes_access: Samme tilgang som medlem, men kan ikke redigere organisasjonssykler
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"
