@@ -4726,7 +4726,6 @@ en:
         unclaimed: Unclaimed
     users:
       edit:
-        admin_of_organization: Admin of organization
         confirmation: >-
           Are you sure you want to remove %{user_name} from %{org_name}? (They will
           still be to use their personal account)
@@ -4736,8 +4735,6 @@ en:
         invited: Invited
         last_login: Last login
         last_login_ip: Last login ip
-        member_of_organization: Member of organization
-        membership_type: Membership type
         remove_from_organization: remove from organization
         signed_up: Signed up
         update: Update
@@ -4748,7 +4745,10 @@ en:
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
         find_by_name_or_email: Find by name or email
         invite_more_users: Invite more users
-        is_admin: Admin?
+        role: Role
+        admin: admin
+        member: member
+        no_bike_edit: no bike edit
         manage_users: Manage Users
         manually_invite_email: manually invite emails
         matching_user: Matching user
@@ -4764,9 +4764,16 @@ en:
         user: user
         you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+      membership_role_fields:
+        member_of_organization: Member of organization
+        member_no_bikes: Member without bike edit
+        membership_type: Membership type
+        admin_of_organization: Admin of organization
+        admin_access: Full organization access
+        member_access: Organization access, but can not edit organization settings or invite new users
+        member_no_bikes_access: Same access as Member, but can not edit organization bikes
       new:
         1_email_per_line: 1 email per line
-        admin_of_organization: Admin of organization
         automatic_passwordless: >-
           Your organization is set up with automatic passwordless log in. Emails you
           invite will be able to sign in by using the "Emailed sign in link" button
@@ -4774,9 +4781,7 @@ en:
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user
-        member_of_organization: Member of organization
         membership: Membership
-        membership_type: Membership type
         multiple_emails: Multiple emails
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more

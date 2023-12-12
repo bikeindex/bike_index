@@ -44,18 +44,7 @@
     .col-sm-4
       %p.static-form-control= @membership.user&.email
 
-  .form-group.row
-    %label.org-form-label
-      = t(".membership_type")
-    .col-sm-4
-      .radio
-        %label
-          = f.radio_button :role, Membership.membership_types.first
-          = t(".admin_of_organization")
-      .radio
-        %label
-          = f.radio_button :role, Membership.membership_types.second
-          = t(".member_of_organization")
+  = render partial: "membership_role_fields", locals: {f: f}
 
   .row.mt-4.form-group
     .form-submit-button
