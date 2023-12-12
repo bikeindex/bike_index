@@ -775,6 +775,7 @@ RSpec.describe Bike, type: :model do
       end
       let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
+      let(:member_no_bikes) { FactoryBot.create(:organization_member, organization: organization, role: :member_no_bike_edit) }
       it "returns correctly for all sorts of convoluted things" do
         bike.reload
         expect(bike.creation_organization).to eq organization
@@ -790,6 +791,12 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(u: member, org: organization)).to be_truthy
         expect(bike.authorized_by_organization?(org: organization)).to be_truthy
         expect(bike.authorized_by_organization?(u: member, org: Organization.new)).to be_falsey
+        # member_no_bikes doesn't have access
+        expect(member_no_bikes.member_of?(organization)).to be_truthy
+        expect(member_no_bikes.member_bike_edit_of?(organization)).to be_falsey
+        expect(bike.authorized_by_organization?(u: member_no_bikes)).to be_falsey
+        expect(bike.authorized_by_organization?(u: member_no_bikes, org: organization)).to be_falsey
+        expect(bike.authorized?(member_no_bikes)).to be_falsey
         # If the member has multiple memberships, it should only work for the correct organization
         new_membership = FactoryBot.create(:membership_claimed, user: member)
         expect(bike.authorized_by_organization?).to be_truthy

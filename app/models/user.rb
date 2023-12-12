@@ -303,13 +303,19 @@ class User < ApplicationRecord
 
   def member_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.where(user_id: id, organization_id: organization.id).limit(1).any?
+    return true if claimed_memberships_for(organization.id).limit(1).any?
+    superuser? && !no_superuser_override
+  end
+
+  def member_bike_edit_of?(organization, no_superuser_override: false)
+    return false unless organization.present?
+    return true if claimed_memberships_for(organization.id).not_member_no_bike_edit.limit(1).any?
     superuser? && !no_superuser_override
   end
 
   def admin_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if Membership.claimed.admin.where(user_id: id, organization_id: organization.id).limit(1).any?
+    return true if claimed_memberships_for(organization.id).admin.limit(1).any?
     superuser? && !no_superuser_override
   end
 
@@ -446,6 +452,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def claimed_memberships_for(organization_id)
+    Membership.claimed.where(user_id: id, organization_id: organization_id)
+  end
 
   def preferred_language_is_an_available_locale
     return if preferred_language.blank?
