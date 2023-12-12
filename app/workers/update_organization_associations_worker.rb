@@ -27,7 +27,8 @@ class UpdateOrganizationAssociationsWorker < ApplicationWorker
 
       # Only enqueue this if there aren't any org model audits, because this will be a lot
       if organization.enabled?("model_audits") && organization.organization_model_audits.limit(1).none?
-        ModelAudit.pluck(:id).each { |id| UpdateModelAuditWorker.perform_async(id) }
+        organization.bikes.where.not(bikes: {model_audit_id: nil}).pluck(:model_audit_id)
+          .each { |id| UpdateModelAuditWorker.perform_async(id) }
       end
 
       organization.calculated_children.where.not(id: organization_ids_for_update)
