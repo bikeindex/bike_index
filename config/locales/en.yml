@@ -1113,10 +1113,10 @@ en:
       traditional_bike_definition: Two wheels, one seat, no motor
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
+      very_few_vehicles_html: Very few %{type_html} are made without serials.
       very_very_few_bikes_html: >-
         Very <em>very</em> few %{type_html} are made without serials. Unless this
         %{type_html}:
-      very_few_vehicles_html: Very few %{type_html} are made without serials.
       was_made_before_1970: Was made before 1970
       without_serial_html: This %{type_html} was made without a serial
       without_serial_number_html: This <span %{type_html} was made without a serial
