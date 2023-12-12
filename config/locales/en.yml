@@ -1113,7 +1113,7 @@ en:
       traditional_bike_definition: Two wheels, one seat, no motor
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
-      very_few_bikes_html: >-
+      very_very_few_bikes_html: >-
         Very <em>very</em> few %{type_html} are made without serials. Unless this
         %{type_html}:
       very_few_vehicles_html: Very few %{type_html} are made without serials.
