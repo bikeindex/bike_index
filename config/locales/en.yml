@@ -4739,24 +4739,24 @@ en:
         signed_up: Signed up
         update: Update
       index:
+        admin: admin
         claimed: Claimed
         created: Created
         current_users: Current users
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
         find_by_name_or_email: Find by name or email
         invite_more_users: Invite more users
-        role: Role
-        admin: admin
-        member: member
-        no_bike_edit: no bike edit
         manage_users: Manage Users
         manually_invite_email: manually invite emails
         matching_user: Matching user
+        member: member
+        no_bike_edit: no bike edit
         permitted_domain_info_html: >-
           You have a permitted domain, anyone signing up with an email address ending
           in <code>%{email_suffix}</code> will be a member of %{org_name}.
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
+        role: Role
         search: Search
         sender: Sender
         to: To
@@ -4765,13 +4765,15 @@ en:
         you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
       membership_role_fields:
-        member_of_organization: Member of organization
-        member_no_bikes: Member without bike edit
-        membership_type: Membership type
-        admin_of_organization: Admin of organization
         admin_access: Full organization access
-        member_access: Organization access, but can not edit organization settings or invite new users
-        member_no_bikes_access: Same access as Member, but can not edit organization bikes
+        admin_of_organization: Admin of organization
+        member_access: Organization access, but can not edit organization settings
+          or invite new users
+        member_no_bikes: Member without bike edit
+        member_no_bikes_access: Same access as Member, but can not edit organization
+          bikes
+        member_of_organization: Member of organization
+        membership_type: Membership type
       new:
         1_email_per_line: 1 email per line
         automatic_passwordless: >-
