@@ -1,5 +1,5 @@
 class Membership < ApplicationRecord
-  MEMBERSHIP_TYPES = %w[admin member].freeze
+  MEMBERSHIP_TYPES = %w[admin member member_no_bike_edit].freeze
   HOT_SHEET_NOTIFICATION_ENUM = {notification_never: 0, notification_daily: 1}.freeze
 
   acts_as_paranoid
@@ -8,6 +8,7 @@ class Membership < ApplicationRecord
   belongs_to :organization
   belongs_to :sender, class_name: "User"
 
+  enum role: MEMBERSHIP_TYPES
   enum hot_sheet_notification: HOT_SHEET_NOTIFICATION_ENUM
 
   validates_presence_of :role, :organization_id, :invited_email
@@ -19,7 +20,6 @@ class Membership < ApplicationRecord
 
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
-  scope :admin, -> { where(role: "admin") }
   scope :created_by_magic_link, -> { where(created_by_magic_link: true) }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 
@@ -57,10 +57,6 @@ class Membership < ApplicationRecord
     return false if created_by_magic_link # Don't send an email if they're already being emailed
     return false if email_invitation_sent_at.present?
     invited_email.present?
-  end
-
-  def admin?
-    role == "admin"
   end
 
   def claimed?

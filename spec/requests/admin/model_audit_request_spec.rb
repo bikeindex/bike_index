@@ -11,6 +11,7 @@ RSpec.describe Admin::ModelAuditsController, type: :request do
         get base_url
         expect(response).to be_ok
         expect(response).to render_template(:index)
+        expect(assigns(:model_audits).pluck(:id)).to eq([model_audit.id])
       end
     end
   end

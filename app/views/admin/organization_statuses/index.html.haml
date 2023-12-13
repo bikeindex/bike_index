@@ -1,0 +1,139 @@
+.admin-subnav
+  .col-md-5
+    %h1 Organization Statuses
+
+  .col-md-7
+    %ul
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "")}
+          - if @kind == "all"
+            All org kinds
+          - else
+            = Organization.kind_humanized(@kind)
+        .dropdown-menu
+          = link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == "all" ? 'active' : ''}"
+          - not_bike_shop_active = @kind == "not_bike_shop"
+          = link_to "NOT bike shops", url_for(sortable_search_params.merge(search_kind: not_bike_shop_active ? "" : "not_bike_shop")), class: "dropdown-item #{not_bike_shop_active ? 'active' : ''}"
+          .dropdown-divider
+          - Organization.kinds.each do |kind|
+            - kind_active = @kind == kind
+            = link_to Organization.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+      %li.nav-item
+        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@pos_kind != "all" ? "active" : "")}
+          - if @pos_kind == "all"
+            Any POS kind
+          - else
+            = @pos_kind.humanize
+        .dropdown-menu
+          = link_to "Any POS kind", url_for(sortable_search_params.merge(search_pos_kind: nil)), class: "dropdown-item #{@pos_kind == "all" ? 'active' : ''}"
+          - grouped_pos_kinds.each do |pos_kind|
+            - pos_kind_active = @pos_kind == pos_kind
+            = link_to pos_kind.humanize, url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? 'active' : ''}"
+          .dropdown-divider
+          - Organization.pos_kinds.each do |pos_kind|
+            - pos_kind_active = @pos_kind == pos_kind
+            = link_to pos_kind.humanize, url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? 'active' : ''}"
+      %li.nav-item
+        = link_to "current", url_for(sortable_search_params.merge(search_current: !@current)), class: "nav-link #{@current ? 'active' : ''}"
+      %li.nav-item
+        = link_to "deleted", url_for(sortable_search_params.merge(search_deleted: !@deleted)), class: "nav-link #{@deleted ? 'active' : ''}"
+      %li.nav-item
+        = link_to "ended", url_for(sortable_search_params.merge(search_ended: !@ended)), class: "nav-link #{@ended ? 'active' : ''}"
+      %li.nav-item
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Organization Statuses"}
+
+- if @render_chart
+  :ruby
+    # Only render stacked kinds if rendering type counts
+    colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
+
+    # GROSS, sorry
+    pos_kinds_start_counts = []
+    start_colors = []
+    pos_kinds_end_counts = []
+    end_colors = []
+    Organization.pos_kinds.each_with_index do |k, i|
+      if matching_organization_statuses.where(pos_kind: k).where(start_at: @time_range).limit(1).present?
+        pos_kinds_start_counts << {name: k.humanize, data: time_range_counts(collection: matching_organization_statuses.where(pos_kind: k), column: :start_at)}
+        start_colors << colors[i]
+      end
+      if matching_organization_statuses.where(pos_kind: k).where(end_at: @time_range).limit(1).present?
+        pos_kinds_end_counts << {name: k.humanize, data: time_range_counts(collection: matching_organization_statuses.where(pos_kind: k), column: :end_at)}
+        end_colors << colors[i]
+      end
+    end
+  - unless @ended
+    %h4.mt-4 POS kinds <code>start_at</code>
+    = column_chart pos_kinds_start_counts, stacked: true, thousands: ",", colors: start_colors
+  - unless @current
+    %h4.mt-4 POS kinds <code>end_at</code>
+    = column_chart pos_kinds_end_counts, stacked: true, thousands: ",", colors: end_colors
+
+.mt-2
+  = render partial: "/shared/period_select"
+
+.mt-4
+
+= render partial: "/shared/pagination", locals: {collection: @organization_statuses}
+
+- org_ids = @organization_statuses.distinct.map(&:organization_id)
+- org_names_hash = Organization.unscoped.where(id: org_ids).pluck(:id, :short_name).to_h
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th
+        = sortable "start_at"
+      - if sort_column == "created_at"
+        %th.small
+          = sortable "created_at"
+      %th
+        = sortable "end_at"
+      %th
+        Duration
+      %th
+        = sortable "organization_id"
+      %th
+        = sortable "pos_kind", "POS kind"
+      %th
+        = sortable "kind"
+      %th.small
+        = sortable "organization_deleted_at", "Deleted"
+    %tbody
+      - @organization_statuses.each do |organization_status|
+        %tr
+          %td
+            %span.convertTime.preciseTime
+              = l organization_status.start_at, format: :convert_time
+          - if sort_column == "created_at"
+            %td.small
+              %span.convertTime= l organization_status.created_at, format: :convert_time
+
+          %td
+            - if organization_status.end_at.present?
+              %span.convertTime.preciseTime
+                = l organization_status.end_at, format: :convert_time
+          %td
+            - if organization_status.end_at.present?
+              = period_in_words(organization_status.end_at - organization_status.start_at)
+          %td
+            - if organization_status.organization_id.present?
+              = link_to org_names_hash[organization_status.organization_id], admin_organization_path(organization_status.organization_id), class: "text-link"
+              = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: organization_status.organization_id)), class: "display-sortable-link small"
+
+          %td
+            - status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : ""
+            - status_class = "less-strong" if organization_status.pos_kind == "no_pos"
+            %span{class: status_class}
+              = organization_status.pos_kind&.humanize
+          %td
+            = Organization.kind_humanized(organization_status.kind)
+          %td
+            - if organization_status.organization_deleted_at.present?
+              %span.convertTime.preciseTime.text-danger
+                = l organization_status.organization_deleted_at, format: :convert_time
+
+
+
+= render partial: "/shared/pagination", locals: {collection: @organization_statuses, skip_total: true}

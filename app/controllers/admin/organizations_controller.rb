@@ -172,7 +172,7 @@ class Admin::OrganizationsController < Admin::BaseController
     if params[:search_pos] == "with_pos"
       Organization.with_pos_kinds
     elsif params[:search_pos] == "without_pos"
-      Organization.no_pos_kinds
+      Organization.without_pos_kinds
     elsif params[:search_pos] == "broken_pos"
       Organization.broken_pos_kinds
     else

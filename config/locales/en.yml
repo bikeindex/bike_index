@@ -730,7 +730,7 @@ en:
         human_not_pedal: Human powered (not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
-        throttle: throttle
+        throttle: Throttle
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.
@@ -1038,7 +1038,6 @@ en:
       bike_photo: "%{bike_type} photo"
       color_may_not_match: Color may not match!
       componentyear: "%{componentyear}"
-      cycle_type: Cycle type
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
@@ -1068,6 +1067,7 @@ en:
       stock_photo: Stock photo of a %{year} %{model}
       stolen_at: Stolen at
       stolen_details: Theft Details
+      vehicle_type: Vehicle type
       wheel_diameter: Wheel diameter
       year: Year
     new:
@@ -1076,9 +1076,9 @@ en:
       are_you_certain: Are you certain?
       city: City
       electric: Electric
-      enter_bike_type_details: Enter %{bike_type} details
-      enter_found_bike_type_details: Enter Found %{bike_type} details
-      enter_stolen_bike_type_details: Enter Stolen %{bike_type} details
+      enter_bike_type_details_html: Enter %{type_html} details
+      enter_found_bike_type_details_html: Enter Found %{type_html} details
+      enter_stolen_bike_type_details_html: Enter Stolen %{type_html} details
       how_to_find_serial: how to find your serial number
       i_just_dont_know_the_serial: I just don't know the serial
       im_100_sure: I'm 100% sure
@@ -1113,11 +1113,14 @@ en:
       traditional_bike_definition: Two wheels, one seat, no motor
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
-      very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials.
-        Unless this %{bike_type}:'
+      very_few_vehicles_html: Very few %{type_html} are made without serials.
+      very_very_few_bikes_html: >-
+        Very <em>very</em> few %{type_html} are made without serials. Unless this
+        %{type_html}:
       was_made_before_1970: Was made before 1970
-      without_serial: This %{bike_type} was made without a serial
-      without_serial_number: This %{bike_type} was made without a serial number
+      without_serial_html: This %{type_html} was made without a serial
+      without_serial_number_html: This <span %{type_html} was made without a serial
+        number
       zipcode: Postal code
     organization_stolen_message:
       report_link_text: at this link
@@ -1432,29 +1435,27 @@ en:
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
     drivetrain:
-      all_diameters: All diameters
       belt_drive: Belt Drive
-      choose_diameter: Choose diameter
       coaster_brake: Coaster Brake
+      cycle_type: Cycle type
       drivetrain: Drivetrain
       drivetrain_type: Drivetrain type
       fixed: Fixed
       front_gears: Front gears
-      hide_extra_sizes: Hide extra sizes
       internal_front_gears: Internal front gears
       internal_rear_gears: Internal rear gears
-      narrow: Narrow
-      narrow_title: Tires under 39mm (1.5 inches) wide
+      nevermind: Nevermind
+      propulsion_type: Propulsion
       rear_gears: Rear gears
       select_chainring_count: Select chainring count
       select_cog_count: Select cog count
-      show_more_sizes: Show more sizes
-      side: "%{side} tire"
-      sidetitleize_wheel: "%{sidetitleize} wheel"
+      submit_correction: Submit correction
+      submit_update: Submit update
+      traditional_bike_definition: Two wheels, one seat, no motor
+      update_propulsion: Update propulsion
+      update_vehicle_type: Update vehicle type
+      vehicle_type: Vehicle type
       wheels: Wheels
-      wide: Wide
-      wide_help: "> 38mm (1.5in)"
-      wide_title: Tires that are at least 39mm (1.5 inches) wide
     edit_bike_organization:
       can_edit_this_bike: Can edit this %{bike_type}
       manage_organization_information: Manage organization information
@@ -1580,6 +1581,23 @@ en:
       without_a_valid_report_number_html: >-
         Without a valid report number, your bike won't be included in partner searches
         by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+    wheels:
+      all_diameters: All diameters
+      choose_diameter: Choose diameter
+      diameter_700c: 700c (includes 29ers)
+      front_tire: Front tire
+      front_wheel: Front wheel
+      general_tire: Tire(s)
+      general_wheel: Wheel(s)
+      hide_extra_sizes: Hide extra sizes
+      narrow: Narrow
+      narrow_title: Tires under 39mm (1.5 inches) wide
+      rear_tire: Rear tire
+      rear_wheel: Rear wheel
+      show_more_sizes: Show more sizes
+      wide: Wide
+      wide_help: "> 38mm (1.5in)"
+      wide_title: Tires that are at least 39mm (1.5 inches) wide
   controllers:
     application:
       handle_unverified_request:
@@ -4708,7 +4726,6 @@ en:
         unclaimed: Unclaimed
     users:
       edit:
-        admin_of_organization: Admin of organization
         confirmation: >-
           Are you sure you want to remove %{user_name} from %{org_name}? (They will
           still be to use their personal account)
@@ -4718,27 +4735,28 @@ en:
         invited: Invited
         last_login: Last login
         last_login_ip: Last login ip
-        member_of_organization: Member of organization
-        membership_type: Membership type
         remove_from_organization: remove from organization
         signed_up: Signed up
         update: Update
       index:
+        admin: admin
         claimed: Claimed
         created: Created
         current_users: Current users
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
         find_by_name_or_email: Find by name or email
         invite_more_users: Invite more users
-        is_admin: Admin?
         manage_users: Manage Users
         manually_invite_email: manually invite emails
         matching_user: Matching user
+        member: member
+        no_bike_edit: no bike edit
         permitted_domain_info_html: >-
           You have a permitted domain, anyone signing up with an email address ending
           in <code>%{email_suffix}</code> will be a member of %{org_name}.
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
+        role: Role
         search: Search
         sender: Sender
         to: To
@@ -4746,9 +4764,18 @@ en:
         user: user
         you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+      membership_role_fields:
+        admin_access: Full organization access
+        admin_of_organization: Admin of organization
+        member_access: Organization access, but can not edit organization settings
+          or invite new users
+        member_no_bikes: Member without bike edit
+        member_no_bikes_access: Same access as Member, but can not edit organization
+          bikes
+        member_of_organization: Member of organization
+        membership_type: Membership type
       new:
         1_email_per_line: 1 email per line
-        admin_of_organization: Admin of organization
         automatic_passwordless: >-
           Your organization is set up with automatic passwordless log in. Emails you
           invite will be able to sign in by using the "Emailed sign in link" button
@@ -4756,9 +4783,7 @@ en:
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user
-        member_of_organization: Member of organization
         membership: Membership
-        membership_type: Membership type
         multiple_emails: Multiple emails
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more

@@ -52,7 +52,7 @@
       %th= sortable "created_at", t(".created")
       %th= sortable "invited_email", t(".to")
       %th= sortable "claimed_at", t(".claimed")
-      %th= sortable "role", t(".is_admin")
+      %th= sortable "role", t(".role")
       %th
         %small
           = sortable "sender_id", t(".sender")
@@ -70,7 +70,14 @@
             - if membership.claimed_at.present?
               %span.convertTime
                 = l(membership.created_at, format: :convert_time)
-          %td= check_mark if membership.admin?
+          %td
+            - if membership.admin?
+              %span.text-info= t(".admin")
+            - else
+              %span.less-strong= t(".member")
+              - if membership.member_no_bike_edit?
+                %small= t(".no_bike_edit")
+
           %td
             - if membership.sender.present?
               %small

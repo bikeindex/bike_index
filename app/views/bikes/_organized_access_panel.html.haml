@@ -53,7 +53,8 @@
                     - if @bike.can_edit_claimed_organizations.pluck(:id).include?(passive_organization.id)
                       %em.small
                         = t(".organization_can_edit_after_claimed", bike_type: @bike.type)
-                    = link_to t(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "btn btn-success btn-sm float-right"
+                    - if @bike.authorized?(current_user)
+                      = link_to t(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "btn btn-success btn-sm float-right"
                   - else
                     %em.small.less-strong
                       = t(".org_cannot_edit", org_name: passive_organization.short_name)

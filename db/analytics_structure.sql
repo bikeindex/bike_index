@@ -71,6 +71,42 @@ ALTER SEQUENCE public.logged_searches_id_seq OWNED BY public.logged_searches.id;
 
 
 --
+-- Name: organization_statuses; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_statuses (
+    id bigint NOT NULL,
+    organization_id bigint,
+    pos_kind integer,
+    kind integer,
+    organization_deleted_at timestamp without time zone,
+    start_at timestamp without time zone,
+    end_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_statuses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_statuses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_statuses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_statuses_id_seq OWNED BY public.organization_statuses.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -87,6 +123,13 @@ ALTER TABLE ONLY public.logged_searches ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
+-- Name: organization_statuses id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_statuses ALTER COLUMN id SET DEFAULT nextval('public.organization_statuses_id_seq'::regclass);
+
+
+--
 -- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -100,6 +143,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.logged_searches
     ADD CONSTRAINT logged_searches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_statuses organization_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_statuses
+    ADD CONSTRAINT organization_statuses_pkey PRIMARY KEY (id);
 
 
 --
@@ -132,6 +183,13 @@ CREATE INDEX index_logged_searches_on_user_id ON public.logged_searches USING bt
 
 
 --
+-- Name: index_organization_statuses_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_statuses_on_organization_id ON public.organization_statuses USING btree (organization_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -140,6 +198,7 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20231025160704'),
 ('20231027162602'),
-('20231027173606');
+('20231027173606'),
+('20231209193453');
 
 

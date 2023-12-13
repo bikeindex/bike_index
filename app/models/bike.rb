@@ -432,8 +432,8 @@ class Bike < ApplicationRecord
       return false if claimable_by?(u) || u == owner # authorized by owner, not organization
     end
     # Ensure the user is part of the organization and the organization can edit if passed both
-    return u.member_of?(org) && editable_organization_ids.include?(org.id) if org.present?
-    editable_organizations.any? { |o| u.member_of?(o) }
+    return u.member_bike_edit_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+    editable_organizations.any? { |o| u.member_bike_edit_of?(o) }
   end
 
   def first_owner_email

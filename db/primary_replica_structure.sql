@@ -1942,7 +1942,6 @@ CREATE TABLE public.memberships (
     id integer NOT NULL,
     organization_id integer NOT NULL,
     user_id integer,
-    role character varying(255) DEFAULT 'member'::character varying NOT NULL,
     invited_email character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -1952,7 +1951,8 @@ CREATE TABLE public.memberships (
     email_invitation_sent_at timestamp without time zone,
     created_by_magic_link boolean DEFAULT false,
     receive_hot_sheet boolean DEFAULT false,
-    hot_sheet_notification integer DEFAULT 0
+    hot_sheet_notification integer DEFAULT 0,
+    role integer
 );
 
 
@@ -6643,6 +6643,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231112013451'),
 ('20231115201426'),
 ('20231203021402'),
-('20231206022455');
+('20231206022455'),
+('20231212023722'),
+('20231212025929');
 
 

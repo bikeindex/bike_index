@@ -48,27 +48,41 @@ class CycleType
     "non-e-skateboard": "Skateboard (Not electric)"
   }.freeze
 
-  MODEST_PRIORITY = %i[tricycle tandem recumbent personal-mobility].freeze
+  MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze
 
   PEDAL = %i[bike cargo cargo-rear cargo-trike cargo-trike-rear pedi-cab penny-farthing
-    recumbent tall-bike tandem trail-behind trailer tricycle unicycle].freeze
+    recumbent tall-bike tandem trail-behind tricycle unicycle].freeze
   ALWAYS_MOTORIZED = %i[e-scooter personal-mobility].freeze
   NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind].freeze
+  NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair].freeze
 
   def self.searchable_names
     slugs
   end
 
-  def self.pedal_type?(slug_sym)
-    PEDAL.include?(slug_sym)
+  def self.pedal_type?(slug)
+    PEDAL.include?(slug&.to_sym)
   end
 
-  def self.strict_motorized(slug_sym)
-    if ALWAYS_MOTORIZED.include?(slug_sym)
+  def self.strict_motorized(slug)
+    if ALWAYS_MOTORIZED.include?(slug&.to_sym)
       :always
-    elsif NEVER_MOTORIZED.include?(slug_sym)
+    elsif NEVER_MOTORIZED.include?(slug&.to_sym)
       :never
     end
+  end
+
+  def self.not_cycle?(slug)
+    NOT_CYCLE_TYPE.include?(slug&.to_sym)
+  end
+
+  def self.front_and_rear_wheels?(slug)
+    (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter])
+      .include?(slug&.to_sym)
+  end
+
+  def self.not_cycle_drivetrain?(slug)
+    (NOT_CYCLE_TYPE + %i[trail-behind trailer unicycle]).include?(slug&.to_sym)
   end
 
   def initialize(slug)

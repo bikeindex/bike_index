@@ -70,8 +70,8 @@ RSpec.describe PropulsionType, type: :model do
       end
 
       it "is human-not-pedal" do
-        expect(PropulsionType.for_vehicle(:wheelchair, :"hand-pedal")).to eq :"human-not-pedal"
-        expect(PropulsionType.for_vehicle(:"non-e-skateboard", :"foot-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:wheelchair, :"foot-pedal")).to eq :"human-not-pedal"
+        expect(PropulsionType.for_vehicle(:"non-e-skateboard", :"hand-pedal")).to eq :"human-not-pedal"
         expect(PropulsionType.for_vehicle(:"non-e-scooter", :"foot-pedal")).to eq :"human-not-pedal"
         expect(PropulsionType.for_vehicle(:"non-e-scooter", :"hand-pedal")).to eq :"human-not-pedal"
         (CycleType.slugs_sym - CycleType::PEDAL - CycleType::ALWAYS_MOTORIZED).each do |cycle_type|
@@ -134,11 +134,24 @@ RSpec.describe PropulsionType, type: :model do
 
   describe "valid_propulsion_types_for" do
     it "is all the types for bike" do
-      expect(PropulsionType.send(:valid_propulsion_types_for, :bike)).to eq(PropulsionType.slugs_sym)
+      expect(PropulsionType.valid_propulsion_types_for(:bike)).to eq(PropulsionType.slugs_sym)
+      expect(PropulsionType.valid_propulsion_types_for(:tricycle)).to eq(PropulsionType.slugs_sym)
     end
     context "wheelchair" do
       it "is valid types" do
-        expect(PropulsionType.send(:valid_propulsion_types_for, :wheelchair)).to eq(%i[human-not-pedal throttle])
+        expect(PropulsionType.valid_propulsion_types_for(:wheelchair)).to eq(%i[human-not-pedal throttle hand-pedal])
+      end
+    end
+    context "e-" do
+      it "is valid types" do
+        expect(PropulsionType.valid_propulsion_types_for(:"e-scooter")).to eq(%i[throttle])
+        expect(PropulsionType.valid_propulsion_types_for("personal-mobility")).to eq(%i[throttle])
+      end
+    end
+    context "non-e" do
+      it "is valid types" do
+        expect(PropulsionType.valid_propulsion_types_for(:"non-e-scooter")).to eq(%i[human-not-pedal])
+        expect(PropulsionType.valid_propulsion_types_for("non-e-skateboard")).to eq(%i[human-not-pedal])
       end
     end
   end

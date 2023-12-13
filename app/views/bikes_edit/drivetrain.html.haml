@@ -1,3 +1,6 @@
+- type_text = @bike.not_cycle? ? t(".vehicle_type") : t(".cycle_type")
+- valid_propulsion_types = PropulsionType.valid_propulsion_types_for(@bike.cycle_type)
+
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
@@ -8,122 +11,147 @@
         .form-wrap
           .form-well-form-header-always-visible
             %h3
-              = t(".wheels")
+              = type_text
+          .related-fields
+            .form-group.row
+              %label.form-well-label= type_text
+              %p.form-well-input-static
+                = CycleType.slug_translation(@bike.cycle_type)
+                - if @bike.cycle_type == "bike"
+                  %span.below-input-help
+                    %em= t(".traditional_bike_definition")
+              .right-input-help.right-text-help
+                %a{data: {toggle: "modal", target: "#cycle_type-correction"}}
+                  = t(".submit_correction")
+          .related-fields
+            .form-group.row
+              %label.form-well-label= t(".propulsion_type")
+              %p.form-well-input-static
+                = PropulsionType.slug_translation(@bike.propulsion_type)
+              - if valid_propulsion_types.count > 1
+                .right-input-help.right-text-help
+                  %a{data: {toggle: "modal", target: "#propulsion_type-correction"}}
+                    = t(".update_propulsion")
 
-          - %w(front rear).each do |side|
-            .related-fields
-              .form-group.row
-                %label.form-well-label{ for: "#{side}_standard" }
-                  = t(".sidetitleize_wheel", sidetitleize: side.titleize)
-                .form-well-input.fancy-select-placeholder.unfancy
-                  .standard-diams{ id: "#{side}_standard"}
-                    -# ignore this select in dirty forms
-                    %select.form-control.dirtyignore
-                      %option{ value: '' }
-                        = t(".choose_diameter")
-                      %option{ value: WheelSize.id_for_bsd(622) }
-                        700c (includes 29ers)
-                      %option{ value: WheelSize.id_for_bsd(584) }
-                        650b / 27.5
-                      %option{ value: WheelSize.id_for_bsd(630) }
-                        27in
-                      %option{ value: WheelSize.id_for_bsd(559) }
-                        26in
-                      %option{ value: WheelSize.id_for_bsd(406) }
-                        20in
-                      %option{ value: WheelSize.id_for_bsd(355) }
-                        18in
-                      %option{ value: WheelSize.id_for_bsd(305) }
-                        16in
-                      %option{ value: WheelSize.id_for_bsd(203) }
-                        12in
-                  .all-diams.currently-hidden{ id: "#{side}_all" }
-                    = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: t(".all_diameters", ))
-                .right-input-help
-                  %a.wh_sw.show-all-diams.optional-form-block{ id: "show_#{side}_wheel_diams", data: { target: "##{side}_all", toggle: "#hide_#{side}_wheel_diams", action: 'swap', swap: "##{side}_standard" } }
-                    = t(".show_more_sizes")
-                  %a.wh_sw.optional-form-block.currently-hidden{ id: "hide_#{side}_wheel_diams", data: { target: "##{side}_standard", toggle: "#show_#{side}_wheel_diams", action: 'swap', swap: "##{side}_all" } }
-                    = t(".hide_extra_sizes")
-            .form-group.row.unnested-field
-              %label.form-well-label
-                = t(".side", side: side.titleize)
-              .form-well-input.form-well-input-checks
-                %label.radio-inline.mr-2{title: t(".narrow_title")}
-                  = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
-                  = t(".narrow")
-                %label.radio-inline{title: t(".wide_title")}
-                  = f.radio_button "#{side}_tire_narrow".to_sym, 'false'
-                  = t(".wide")
-                  %small= t(".wide_help")
-
-        .form-wrap.secondary-form-wrap#edit_drivetrain
+        .form-wrap.secondary-form-wrap
           .form-well-form-header-always-visible
             %h3
-              = t(".drivetrain")
-          - rear_fixed = RearGearType.fixed.id
-          - front_fixed = FrontGearType.fixed.id
-          - fixed = @bike.rear_gear_type_id == rear_fixed
-          .form-group.row.unnested-field
-            %label.form-well-label
-              = t(".drivetrain_type")
-            .form-well-input-large.form-well-input-checks
-              %label.checkbox-inline.mr-2
-                %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
-                = t(".fixed")
-              %label.checkbox-inline.mr-2.not-fixed
-                = f.check_box :coaster_brake
-                = t(".coaster_brake")
-              %label.checkbox-inline.not-fixed
-                = f.check_box :belt_drive
-                = t(".belt_drive")
+              = t(".wheels")
+          - side_title = CycleType.front_and_rear_wheels?(@bike.cycle_type) ? "front" : "general"
+          = render partial: "/bikes_edit/wheels", locals: {f: f, side: "front", side_title: side_title}
+          - if CycleType.front_and_rear_wheels?(@bike.cycle_type)
+            = render partial: "/bikes_edit/wheels", locals: {f: f, side: "rear"}
+        - unless CycleType.not_cycle_drivetrain?(@bike.cycle_type)
 
-          .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
-            .form-group.row
-              %label.form-well-label{ for: 'front_gear_select'}
-                = t(".front_gears")
-              .form-well-input
-                // ignore this select in dirty forms
-                %select#front_gear_select.form-control.dirtyignore
-                  %option.placeholder{ value: ''}
-                    = t(".select_chainring_count")
-                  - FrontGearType.standard.each do |gt|
-                    %option{ value: gt.count }
-                      = gt.name
-              .right-input-help
-                - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
-                %label.cursor-pointer
-                  %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
-                  = t(".internal_front_gears")
-              .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
-                = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
-                - FrontGearType.all.each do |gt|
-                  = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: { count: gt.count }
+          .form-wrap.secondary-form-wrap#edit_drivetrain
+            .form-well-form-header-always-visible
+              %h3
+                = t(".drivetrain")
+            - rear_fixed = RearGearType.fixed.id
+            - front_fixed = FrontGearType.fixed.id
+            - fixed = @bike.rear_gear_type_id == rear_fixed
+            .form-group.row.unnested-field
+              %label.form-well-label
+                = t(".drivetrain_type")
+              .form-well-input-large.form-well-input-checks
+                %label.checkbox-inline.mr-2
+                  %input#fixed_gear_check.checkbox.drive-check{type: "checkbox", checked: fixed}
+                  = t(".fixed")
+                %label.checkbox-inline.mr-2.not-fixed
+                  = f.check_box :coaster_brake
+                  = t(".coaster_brake")
+                %label.checkbox-inline.not-fixed
+                  = f.check_box :belt_drive
+                  = t(".belt_drive")
 
-          .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
-            .form-group.row
-              %label.form-well-label{ for: 'rear_gear_select' }
-                = t(".rear_gears")
-              .form-well-input
-                // ignore this select in dirty forms
-                %select#rear_gear_select.form-control.dirtyignore
-                  %option.placeholder{ value: '' }
-                    = t(".select_cog_count")
-                  - RearGearType.standard.each do |gt|
-                    %option{ value: gt.count }
-                      = gt.name
-              .right-input-help
-                - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
-                %label.cursor-pointer
-                  %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
-                  = t(".internal_rear_gears")
+            .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
+              .form-group.row
+                %label.form-well-label{ for: 'front_gear_select'}
+                  = t(".front_gears")
+                .form-well-input
+                  // ignore this select in dirty forms
+                  %select#front_gear_select.form-control.dirtyignore
+                    %option.placeholder{ value: ''}
+                      = t(".select_chainring_count")
+                    - FrontGearType.standard.each do |gt|
+                      %option{ value: gt.count }
+                        = gt.name
+                .right-input-help
+                  - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
+                  %label.cursor-pointer
+                    %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
+                    = t(".internal_front_gears")
+                .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
+                  = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
+                  - FrontGearType.all.each do |gt|
+                    = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: { count: gt.count }
 
-              .row.currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
-                = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'
-                - RearGearType.all.each do |gt|
-                  - if gt.id == rear_fixed
-                    = f.radio_button 'rear_gear_type_id', gt.id
-                  - else
-                    = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: {count: gt.count }
+            .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
+              .form-group.row
+                %label.form-well-label{ for: 'rear_gear_select' }
+                  = t(".rear_gears")
+                .form-well-input
+                  // ignore this select in dirty forms
+                  %select#rear_gear_select.form-control.dirtyignore
+                    %option.placeholder{ value: '' }
+                      = t(".select_cog_count")
+                    - RearGearType.standard.each do |gt|
+                      %option{ value: gt.count }
+                        = gt.name
+                .right-input-help
+                  - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
+                  %label.cursor-pointer
+                    %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
+                    = t(".internal_rear_gears")
+
+                .row.currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
+                  = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'
+                  - RearGearType.all.each do |gt|
+                    - if gt.id == rear_fixed
+                      = f.radio_button 'rear_gear_type_id', gt.id
+                    - else
+                      = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: {count: gt.count }
 
 
         = render "/shared/form_well_footer_save"
+
+- vehicle_type_body = capture_haml do
+  = form_for @bike, multipart: true do |f|
+    - if params[:return_to].present?
+      = hidden_field_tag :return_to, params[:return_to]
+    - else
+      = hidden_field_tag :edit_template, @edit_template
+    .modal-body
+      .form-group.fancy-select.unfancy
+        = f.label :cycle_type, type_text, class: "form-well-label"
+        = select(:bike, :cycle_type, CycleType.select_options, {}, {required: true, class: 'form-control'})
+    .modal-btn-footer
+      .row
+        .col-xs-6.col-xs-push-6
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
+        .col-xs-6.col-xs-pull-6
+          %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
+            = t(".nevermind")
+
+= render partial: 'shared/modal', locals: {title: t(".update_vehicle_type"), id: 'cycle_type-correction', modal_body: vehicle_type_body}
+
+- propulsion_type_body = capture_haml do
+  = form_for @bike, multipart: true do |f|
+    - if params[:return_to].present?
+      = hidden_field_tag :return_to, params[:return_to]
+    - else
+      = hidden_field_tag :edit_template, @edit_template
+    .modal-body
+      .form-group.fancy-select.unfancy
+        = f.label :propulsion_type, class: "form-well-label"
+        - propulsion_select_options = valid_propulsion_types.map { |slug| [PropulsionType.slug_translation(slug), slug] }
+        = select(:bike, :propulsion_type, propulsion_select_options, {}, {required: true, class: 'form-control'})
+    .modal-btn-footer
+      .row
+        .col-xs-6.col-xs-push-6
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
+        .col-xs-6.col-xs-pull-6
+          %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
+            = t(".nevermind")
+
+= render partial: 'shared/modal', locals: {title: t(".update_propulsion"), id: 'propulsion_type-correction', modal_body: propulsion_type_body}

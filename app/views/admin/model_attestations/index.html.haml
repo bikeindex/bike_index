@@ -1,0 +1,88 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Model Attestations
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+  = render partial: "/shared/admin_current_header"
+
+- if @render_chart
+  = column_chart time_range_counts(collection: matching_model_attestations, column: @time_range_column), stacked: true, thousands: ","
+
+.mt-2
+  = render partial: "/shared/period_select"
+
+- if params[:search_model_audit_id].present?
+  %p
+    Viewing only Searches
+    %strong for
+    %em= model_audit_frame_model_display(@model_audit, truncate: false)
+    = link_to "view for all model audits", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "gray-link small"
+
+= render partial: "/shared/pagination", locals: {collection: @model_attestations}
+
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th.small
+        = sortable "created_at"
+      - if sort_column == "updated_at"
+        %th.small
+          = sortable "updated_at"
+      %th
+        = sortable "model_audit_id"
+      %th.small
+        Vehicles&nbsp;#
+      %th
+        = sortable "kind"
+      %th
+        = sortable "organization_id"
+      %th
+        = sortable "user_id"
+      %th
+        File/URL
+      %th
+        Info
+    %tbody
+      - @model_attestations.each do |model_attestation|
+        -# cache(model_attestation) do
+        - model_audit = model_attestation.model_audit
+        %tr
+          %td
+            %span.convertTime= l model_attestation.created_at, format: :convert_time
+            %code.small.d-inline-block.only-dev-visible= model_attestation.id
+          - if sort_column == "updated_at"
+            %td.small
+              %span.convertTime= l model_attestation.updated_at, format: :convert_time
+          %td{style: "min-width: 200px"}
+            %strong= model_audit.mnfg_name
+            = model_audit_frame_model_display(model_audit, truncate: true)
+            %small= link_to search_emoji, url_for(sortable_search_params.merge(search_model_audit_id: model_audit.id))
+            - if model_attestation.organization_id.present?
+              = link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "small d-inline-block less-strong"
+          %td
+            = link_to admin_number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id)
+          %td
+            = model_attestation.kind_humanized
+          %td
+            - if model_attestation.organization
+              = link_to model_attestation.organization&.short_name || model_attestation.organization_id, organization_model_audits_path(organization_id: model_attestation.organization&.to_param), class: "text-link"
+              %small= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: model_attestation.organization&.to_param))
+          %td
+            = render partial: "/shared/admin_user_cell", locals: {user: model_attestation.user, render_search: true, cache: false}
+          %td
+            - if model_attestation.file.present?
+              %strong= link_to "File", model_attestation.file.url, target: "_blank"
+            - if model_attestation.url.present?
+              %small= link_to truncate(model_attestation.url), model_attestation.url
+          %td
+            = model_attestation.info
+
+
+= render partial: "/shared/pagination", locals: {collection: @model_attestations, skip_total: true}

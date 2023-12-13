@@ -28,9 +28,12 @@ class BikeIndex.BikesNew extends BikeIndex
     $('#traditional_bike_checkbox').change (e) =>
       @updateCycleTypeCheck()
     $('#bike_cycle_type').change (e) =>
-      @updatePropulsionType()
+      @updatePropulsionAndCycleType()
     $('#propulsion_type_motorized').change (e) =>
-      @updatePropulsionType()
+      @updatePropulsionAndCycleType()
+    $('.modal').on 'show.bs.modal', =>
+      # Need to trigger correct text on modal
+      @updatePropulsionAndCycleType()
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -119,7 +122,7 @@ class BikeIndex.BikesNew extends BikeIndex
 
   # Set motorized if it should be motorized.
   # Only show propulsion type options if there can be options
-  updatePropulsionType: ->
+  updatePropulsionAndCycleType: ->
     cycleTypeValue = $('#bike_cycle_type').val()
     if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)
       $('#propulsionTypeFields').collapse('hide')
@@ -144,3 +147,13 @@ class BikeIndex.BikesNew extends BikeIndex
 
         $('#propulsion_type_throttle').prop('checked', false)
         $('#propulsion_type_pedal_assist').prop('checked', false)
+    # Update cycle_type text on the page
+    newTypeText = window.cycleTypeTranslations[cycleTypeValue]
+    if newTypeText.length
+      $(".cycleTypeText").text(newTypeText)
+    if window.cycleTypesNot.includes(cycleTypeValue)
+      $(".cycleTypeOnly").collapse("hide")
+      $(".notCycleTypeOnly").collapse("show")
+    else
+      $(".cycleTypeOnly").collapse("show")
+      $(".notCycleTypeOnly").collapse("hide")

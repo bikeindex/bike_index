@@ -1790,7 +1790,6 @@ nl:
       affiliation: "%{org_name} aansluiting"
       are_you_certain: Weet je het zeker?
       city: City
-      enter_bike_type_details: Voer %{bike_type} details in
       how_to_find_serial: hoe je het framenummer kan vinden
       i_just_dont_know_the_serial: Ik ken de serie gewoon niet
       im_100_sure: Ik ben 100% zeker
@@ -1817,16 +1816,9 @@ nl:
       this_is_a: Dit is een
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
-      very_few_bikes_html: 'Heel <em>erg</em> weinig fietsen zijn gemaakt zonder series.
-        Tenzij dit %{bike_type}:'
       was_made_before_1970: Werd vóór 1970 gemaakt
-      without_serial: Deze %{bike_type} is zonder framenummer gemaakt
-      without_serial_number: Deze %{bike_type} is gemaakt zonder framenummer
       zipcode: Postcode
       manufacturer: Fabrikant
-      enter_stolen_bike_type_details: Voer de gegevens voor Gestolen %{bike_type}
-        in
-      enter_found_bike_type_details: Voer de gevonden %{bike_type} -gegevens in
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
       owner_email: E-mailadres eigenaar
@@ -1835,6 +1827,17 @@ nl:
       required: vereist - of markering ontbreekt
       traditional_bike: Traditionele fiets
       traditional_bike_definition: Twee wielen, één stoel, geen motor
+      enter_bike_type_details_html: Voer %{type_html}-gegevens in
+      enter_found_bike_type_details_html: Voer de gevonden %{type_html}-gegevens in
+      enter_stolen_bike_type_details_html: Voer gegevens over gestolen %{type_html}
+        in
+      very_few_vehicles_html: Er zijn maar heel weinig %{type_html} gemaakt zonder
+        serienummers.
+      without_serial_html: Deze %{type_html} is gemaakt zonder serienummer
+      without_serial_number_html: Dit <span %{type_html} was made without a serial
+        number
+      very_very_few_bikes_html: 'Er zijn heel <em>weinig</em> %{type_html} gemaakt
+        zonder serienummers. Tenzij dit %{type_html}:'
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'
@@ -2062,7 +2065,6 @@ nl:
       bike_photo: "%{bike_type} foto"
       color_may_not_match: Kleur komt mogelijk niet overeen!
       componentyear: "%{componentyear}"
-      cycle_type: Type cyclus
       department_city: Afdeling & stad
       description_of_incident: Beschrijving van het incident
       distinguishing_features: Onderscheidende kenmerken
@@ -2094,6 +2096,7 @@ nl:
       wheel_diameter: Wiel diameter
       year: jaar
       propulsion_type: Voortstuwing
+      vehicle_type: 'Voertuigtype:'
     organization_stolen_message:
       report_link_text: op deze link
       report_the_theft_to_the_organization_html: <span class="text-warning">Meld de
@@ -4458,15 +4461,12 @@ nl:
         unclaimed: niet opgeëist
     users:
       edit:
-        admin_of_organization: Beheerder van organisatie
         confirmation: Weet je zeker dat je %{user_name} wilt verwijderen uit %{org_name}?
           (Ze zullen nog steeds hun persoonlijke account gebruiken)
         edit_membership_html: Lidmaatschap bewerken voor <em class="small">%{email}</em>
         email: E-mailadres
         has_not_signed_up_html: "%{name} <strong>heeft zich nog steeds niet aangemeld</strong>"
         invited: Uitgenodigd
-        member_of_organization: Lid van organisatie
-        membership_type: Soort lidmaatschap
         remove_from_organization: verwijderen uit organisatie
         signed_up: Ingeschreven
         update: Bijwerken
@@ -4478,7 +4478,6 @@ nl:
         emails_are_currently_sent_from_html: E-mails worden momenteel verzonden vanuit
           <em>%{email}</em> .
         invite_more_users: Nodig meer gebruikers uit
-        is_admin: Beheerder?
         manage_users: Gebruikers beheren
         remaining_invites_html: U kunt <strong>%{invitations_count}</strong> meer
           toevoegen
@@ -4496,18 +4495,19 @@ nl:
         permitted_domain_info_html: Je hebt een toegestaan domein. Iedereen die zich
           aanmeldt met een e-mailadres dat eindigt op <code>%{email_suffix}</code>
           , wordt lid van %{org_name}.
+        role: Rol
+        admin: beheerder
+        member: lid
+        no_bike_edit: geen fietsbewerking
       new:
         1_email_per_line: 1 e-mail per regel
-        admin_of_organization: Beheerder van organisatie
         automatic_passwordless: Uw organisatie is ingesteld met automatisch inloggen
           zonder wachtwoord. De e-mails die u toevoegt, ontvangen een bericht met
           een link om in te loggen.
         email_youre_inviting: E-mail die u uitnodigt
         invite_multiple_emails: Nodig meerdere e-mails uit
         invite_user: Nodig gebruiker uit
-        member_of_organization: Lid van organisatie
         membership: Lidmaatschap
-        membership_type: Soort lidmaatschap
         multiple_emails: Meerdere e-mails
         remaining_invites_html: U kunt <strong>%{invitations_count}</strong> meer
           toevoegen
@@ -4518,6 +4518,16 @@ nl:
           per e-mail" met een adres dat eindigt op <code>%{email_suffix}</code> wordt
           u automatisch lid van %{org_name}.
         you_have_a_permitted_domain: Je hebt een toegestaan domein
+      membership_role_fields:
+        member_of_organization: Lid van organisatie
+        member_no_bikes: Lid zonder fietsbewerking
+        membership_type: Soort lidmaatschap
+        admin_of_organization: Beheerder van organisatie
+        admin_access: Volledige toegang tot de organisatie
+        member_access: Organisatietoegang, maar kan geen organisatie-instellingen
+          bewerken of nieuwe gebruikers uitnodigen
+        member_no_bikes_access: Dezelfde toegang als Member, maar kan organisatiefietsen
+          niet bewerken
     parking_notifications:
       index:
         parking_notifications: Verlaten records
@@ -5782,29 +5792,27 @@ nl:
         where_was_it_stolen_type: Waar was het %{stolen_type}?
         zipcode: Postcode
     drivetrain:
-      all_diameters: Alle diameters
       belt_drive: Riemaandrijving
-      choose_diameter: Kies diameter
       coaster_brake: Terugtraprem
       drivetrain: drivetrain
       drivetrain_type: Type aandrijflijn
       fixed: vast
       front_gears: Voorste versnellingen
-      hide_extra_sizes: Verberg extra maten
       internal_front_gears: Interne versnellingen vooraan
       internal_rear_gears: Interne versnellingen achter
-      narrow: smal
       rear_gears: Achter versnellingen
       select_chainring_count: Selecteer kettingtelling
       select_cog_count: Selecteer aantal tandwielen
-      show_more_sizes: Meer maten weergeven
-      side: "%{side} band"
-      sidetitleize_wheel: "%{sidetitleize} wiel"
       wheels: Wheels
-      wide: Breed
-      narrow_title: Banden minder dan 39 mm (1,5 inch) breed
-      wide_help: "> 38 mm (1,5 inch)"
-      wide_title: Banden die minimaal 39 mm (1,5 inch) breed zijn
+      cycle_type: Type cyclus
+      nevermind: Laat maar
+      propulsion_type: Voortstuwing
+      submit_correction: Correctie indienen
+      submit_update: Update verzenden
+      traditional_bike_definition: Twee wielen, één stoel, geen motor
+      update_propulsion: Aandrijving bijwerken
+      update_vehicle_type: Voertuigtype bijwerken
+      vehicle_type: 'Voertuigtype:'
     groups:
       add_an_organization: Voeg een andere organisatie toe
       are_you_part_of_a_school_want_to_bolster_: Ben je een student van een van onze
@@ -5924,6 +5932,23 @@ nl:
       without_a_valid_report_number_html: Zonder een geldig rapportnummer wordt uw
         fiets niet opgenomen in <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">partnerzoekopdrachten</a>
         door <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+    wheels:
+      all_diameters: Alle diameters
+      choose_diameter: Kies diameter
+      diameter_700c: 700c (inclusief 29ers)
+      front_tire: Voorwiel
+      front_wheel: Voorwiel
+      general_tire: Banden)
+      general_wheel: Wiel(en)
+      hide_extra_sizes: Verberg extra maten
+      narrow: smal
+      narrow_title: Banden minder dan 39 mm (1,5 inch) breed
+      rear_tire: Achterband
+      rear_wheel: Achterwiel
+      show_more_sizes: Meer maten weergeven
+      wide: Breed
+      wide_help: "> 38 mm (1,5 inch)"
+      wide_title: Banden die minimaal 39 mm (1,5 inch) breed zijn
   bike_versions:
     index:
       primary_colors: Primaire kleuren

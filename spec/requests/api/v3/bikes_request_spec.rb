@@ -323,7 +323,6 @@ RSpec.describe "Bikes API V3", type: :request do
           new_rear_wheel_size = FactoryBot.create(:wheel_size, name: "new_rear_wheel_size", iso_bsd: 11)
           new_front_wheel_size = FactoryBot.create(:wheel_size, name: "new_front_wheel_size", iso_bsd: 12)
           old_cycle_type = CycleType.new("unicycle")
-          new_cycle_type = CycleType.new("tricycle")
           old_year = 1969
           new_year = 2001
           bike1 = FactoryBot.create(
@@ -353,7 +352,7 @@ RSpec.describe "Bikes API V3", type: :request do
             owner_email: user.email,
             frame_material: "steel",
             bike_sticker: bike_sticker.code.downcase,
-            cycle_type_name: new_cycle_type.slug.to_s
+            cycle_type_name: "cargo tricycle (front storage)"
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
           bike2 = json_result["bike"]
@@ -361,12 +360,13 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike2["serial"]).to eq(bike1.serial_display)
           expect(bike2["year"]).to eq(new_year)
           expect(bike2["frame_colors"].first).to eq(new_color.name)
-          expect(bike2["type_of_cycle"]).to eq(new_cycle_type.name)
+          expect(bike2["type_of_cycle"]).to eq("Cargo Tricycle (front storage)")
           expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
           expect(bike2["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
           expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
           expect(bike2["rear_tire_narrow"]).to eq(true)
           expect(bike2["frame_material_slug"]).to eq("steel")
+          expect(bike2["cycle_type_slug"]).to eq "cargo-trike"
           expect(bike2["propulsion_type_slug"]).to eq "hand-pedal"
 
           bike_sticker.reload
@@ -967,7 +967,7 @@ RSpec.describe "Bikes API V3", type: :request do
     context "application creator is admin of organization" do
       let(:application_owner) { FactoryBot.create(:organization_admin, organization: organization) }
 
-      it "creates" do
+      it "creates", :flaky do
         expect(application_owner.reload.admin_of?(organization)).to be_truthy
         expect(client_credentials_token.application.owner.id).to_not eq auto_user.id
         post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers

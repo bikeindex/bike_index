@@ -22,7 +22,7 @@ class Organization < ApplicationRecord
     ascend_pos: 3,
     broken_lightspeed_pos: 4,
     does_not_need_pos: 5,
-    broken_other_pos: 6
+    broken_ascend_pos: 6
   }.freeze
 
   acts_as_paranoid
@@ -56,6 +56,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :graduated_notifications
+  has_many :organization_statuses
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
@@ -123,19 +124,19 @@ class Organization < ApplicationRecord
   end
 
   def self.broken_pos_kinds
-    %w[broken_other_pos broken_lightspeed_pos]
+    %w[broken_ascend_pos broken_lightspeed_pos]
   end
 
-  def self.no_pos_kinds
+  def self.without_pos_kinds
     %w[no_pos does_not_need_pos]
   end
 
   def self.with_pos_kinds
-    pos_kinds - broken_pos_kinds - no_pos_kinds
+    pos_kinds - broken_pos_kinds - without_pos_kinds
   end
 
   def self.pos?(kind = nil)
-    kind.present? && !no_pos_kinds.include?(kind)
+    kind.present? && !without_pos_kinds.include?(kind)
   end
 
   def self.admin_required_kinds
@@ -370,6 +371,10 @@ class Organization < ApplicationRecord
     snippet&.body
   end
 
+  def current_organization_status
+    organization_statuses.current.order(:start_at).limit(1).first
+  end
+
   def additional_registration_fields
     OrganizationFeature::REG_FIELDS.select { |f| enabled?(f) }
   end
@@ -507,20 +512,6 @@ class Organization < ApplicationRecord
       return nil unless users.any?
       self.auto_user_id = users.first.id
     end
-  end
-
-  def calculated_pos_kind
-    return manual_pos_kind if manual_pos_kind.present?
-    recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
-    return "ascend_pos" if ascend_name.present? || recent_bikes.ascend_pos.count > 0
-    return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
-    return "other_pos" if recent_bikes.any_pos.count > 0
-    if bike_shop? && recent_bikes.count > 2
-      return "does_not_need_pos" if created_at < Time.current - 1.week ||
-        bikes.where("bikes.created_at > ?", Time.current - 1.year).count > 100
-    end
-    return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
-    bikes.any_pos.count > 0 ? "broken_other_pos" : "no_pos"
   end
 
   def update_associations

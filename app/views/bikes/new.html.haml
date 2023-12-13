@@ -1,14 +1,22 @@
 - serial_page_link = link_to(t(".our_serial_page"), serials_url, target: '_blank')
 - serial_help_content = t(".serial_help_content_html", serial_page_link: serial_page_link)
+- type_html = content_tag(:span, CycleType.slug_translation(@bike.cycle_type).downcase, class: "cycleTypeText")
+
+:javascript
+  window.cycleTypeTranslations = #{CycleType.slug_translation_hash_lowercase_short.to_json};
+  window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
+  window.cycleTypesAlwaysMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
+  window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
+  window.cycleTypesNot = #{CycleType::NOT_CYCLE_TYPE.to_json};
 
 .form-well-header.container
   %h1.uncap
     - if @bike.status_stolen?
-      = t(".enter_stolen_bike_type_details", bike_type: @bike.type)
+      = t(".enter_stolen_bike_type_details_html", type_html: type_html)
     - elsif @bike.status_impounded?
-      = t(".enter_found_bike_type_details", bike_type: @bike.type)
+      = t(".enter_found_bike_type_details_html", type_html: type_html)
     - else
-      = t(".enter_bike_type_details", bike_type: @bike.type)
+      = t(".enter_bike_type_details_html", type_html: type_html)
 
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
@@ -34,11 +42,11 @@
               #made-without-serial-input
                 %label
                   = f.check_box :made_without_serial
-                  = t(".without_serial", bike_type: @bike.type)
+                  = t(".without_serial_html", type_html: type_html)
               .below-input-help#made-without-serial-help
                 .hidden-other
                   %a{data: {toggle: 'modal', target: '#made-without-serial-modal'}}
-                    = t(".without_serial_number", bike_type: @bike.type)
+                    = t(".without_serial_number_html", type_html: type_html)
             .right-input-help
               %label.cursor-pointer.made-without-serial-checkbox
                 = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
@@ -48,13 +56,13 @@
             .form-group.row.unnested-field
               = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
               .form-well-input
-                - if @bike.type == "bike"
+                - if @bike.cycle_type == "bike"
                   %label.collapse.in.pt-1.pl-1.cursor-pointer
                     = check_box_tag :traditional_bike_checkbox, true, true
                     = t(".traditional_bike")
                     %span.below-input-help{style: "font-size: 100%; padding: 0 0 0 1.1em"}
                       %em= t(".traditional_bike_definition")
-                .cycle-type-select.fancy-select.unfancy{class: @bike.type == "bike" ? "collapse" : ""}
+                .cycle-type-select.fancy-select.unfancy{class: @bike.cycle_type == "bike" ? "collapse" : ""}
                   = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
                   %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
                     = check_box_tag :propulsion_type_motorized, true
@@ -62,10 +70,6 @@
                     = t(".electric")
                     (motorized)
                   #propulsionTypeFields.collapse.pl-1
-                    :javascript
-                      window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
-                      window.cycleTypesAlwaysMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
-                      window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
                     %label.checkbox-inline.mr-2
                       = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
                       Throttle
@@ -242,23 +246,25 @@
 
 - modal_body = capture_haml do
   .modal-body
-    %p
-      = t(".very_few_bikes_html", bike_type: @bike.type)
-    %ul
-      %li
-        = t(".was_made_before_1970")
-      %li.li-or
-        \-
-        = t(".or")
-        \-
-      %li
-        = t(".is_a_handmade_frame")
-    %p
-      = t(".it_probably_has_a_serial_number")
-    %p
-      - how_to_find_link = link_to t('.how_to_find_serial'), serials_url, target: "_blank"
-      = t(".read_how_to_find_html", how_to_find_link: how_to_find_link)
-
+    .cycleTypeOnly.collapse.in
+      %p
+        = t(".very_very_few_bikes_html", type_html: type_html)
+      %ul
+        %li
+          = t(".was_made_before_1970")
+        %li.li-or
+          \-
+          = t(".or")
+          \-
+        %li
+          = t(".is_a_handmade_frame")
+      %p.mb-1
+        = t(".it_probably_has_a_serial_number")
+      %p.mb-1
+        - how_to_find_link = link_to t('.how_to_find_serial'), serials_url, target: "_blank"
+        = t(".read_how_to_find_html", how_to_find_link: how_to_find_link)
+    .collapse.notCycleTypeOnly
+      = t(".very_few_vehicles_html", type_html: type_html)
   .modal-btn-footer
     .row
       .col-xs-6
@@ -268,6 +274,6 @@
       .col-xs-6
         %button.btn.btn-danger#made-without-serial-button{type: 'button'}
           = t(".im_100_sure")
-        = t(".without_serial", bike_type: @bike.type)
+        = t(".without_serial_html", type_html: type_html)
 
 = render partial: 'shared/modal', locals: {title: t('.are_you_certain'), id: 'made-without-serial-modal', modal_body: modal_body}

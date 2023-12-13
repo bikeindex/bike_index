@@ -33,6 +33,17 @@ RSpec.describe Organized::BikesController, type: :request do
         get base_url, params: query_params.merge(create_export: true)
       }.to_not change(Export, :count)
     end
+    context "member_no_bike_edit" do
+      let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization, role: "member_no_bike_edit") }
+      it "allows viewing" do
+        expect(current_user.reload.memberships.first.role).to eq "member_no_bike_edit"
+        get base_url, params: query_params
+        expect(response.status).to eq(200)
+        expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:search_query_present)).to be_truthy
+        expect(assigns(:bikes).pluck(:id)).to eq([])
+      end
+    end
     describe "create_export" do
       let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
       it "creates export" do
