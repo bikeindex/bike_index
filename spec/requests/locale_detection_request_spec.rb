@@ -50,7 +50,7 @@ RSpec.describe "Locale detection", type: :request do
         expect(response.body).to match(/fietsregistratie/i)
         get "/", params: {locale: :nb}
         expect(response.body).to match(/sykkelregistrering/i)
-        # get "/", params: {locale: :nb}
+        # get "/", params: {locale: :es}
         # expect(response.body).to match(/registro de bicicletas/i)
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe "Locale detection", type: :request do
         get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "nb,en;q=0.9"}
         expect(response.body).to match(/sykkelregistrering/i)
 
-        # get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "nb,en;q=0.9"}
+        # get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "es,en;q=0.9"}
         # expect(response.body).to match(/registro de bicicletas/i)
       end
     end
