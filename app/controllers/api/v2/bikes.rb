@@ -70,7 +70,7 @@ module API
         end
 
         def creation_user_id
-          if current_user&.id == ENV["V2_ACCESSOR_ID"].to_i || doorkeeper_authorized_no_user
+          if permanent_token? || doorkeeper_authorized_no_user?
             # current_organization requires token user to be authorized - V2_ACCESSOR is not
             organization = Organization.friendly_find(params[:organization_slug])
             if organization.present? && current_token&.application&.owner&.admin_of?(organization)
@@ -78,7 +78,7 @@ module API
               return current_organization.auto_user_id
             end
 
-            if doorkeeper_authorized_no_user
+            if doorkeeper_authorized_no_user?
               error!("Access tokens with no user can only be used to create bikes for organizations you're an admin of", 403)
             else
               error!("Permanent tokens can only be used to create bikes for organizations you're an admin of", 403)
@@ -198,7 +198,10 @@ module API
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
         end
         post "check_if_registered" do
-          if current_organization.present?
+          if permanent_token?
+            error!("Permanent tokens can not be used to check_if_registered)", 403)
+          elsif current_organization.present?
+
             matching_bike = owner_duplicate_bike
             {
               registered: matching_bike.present?,
