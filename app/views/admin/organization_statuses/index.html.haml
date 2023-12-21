@@ -106,6 +106,8 @@
           %td
             %span.convertTime.preciseTime
               = l organization_status.start_at, format: :convert_time
+            - if display_dev_info?
+              %code.small.only-dev-visible= organization_status.id
           - if sort_column == "created_at"
             %td.small
               %span.convertTime= l organization_status.created_at, format: :convert_time

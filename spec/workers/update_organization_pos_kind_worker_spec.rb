@@ -89,6 +89,7 @@ RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
         organization.destroy
         expect {
           instance.perform(organization.id)
+          instance.perform(organization.id)
         }.to change(OrganizationStatus, :count).by 1
 
         organization_status1 = OrganizationStatus.order(:id).first

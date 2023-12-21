@@ -6,7 +6,7 @@ class OrganizationStatus < AnalyticsRecord
 
   scope :not_deleted, -> { where(organization_deleted_at: nil) }
   scope :deleted, -> { where.not(organization_deleted_at: nil) }
-  scope :current, -> { not_deleted.where(end_at: nil) }
+  scope :current, -> { where(end_at: nil) }
   scope :ended, -> { where.not(end_at: nil) }
   scope :broken_pos, -> { where(pos_kind: Organization.broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: Organization.with_pos_kinds) }

@@ -4,6 +4,7 @@ class InvalidExtensionForAscendImportWorker < ApplicationWorker
 
   def perform(id)
     return if SKIP_ASCEND_EMAIL
+    Notification.create!
     AdminMailer.invalid_extension_for_ascend_import(BulkImport.find(id)).deliver_now
   end
 end

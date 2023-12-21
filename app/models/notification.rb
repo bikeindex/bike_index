@@ -30,7 +30,8 @@ class Notification < ApplicationRecord
     user_alert_theft_alert_without_photo: 24,
     user_alert_stolen_bike_without_location: 25,
     theft_survey_4_2022: 26,
-    theft_survey_2023: 27
+    theft_survey_2023: 27,
+    organization_pos_integration_broken: 28
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
