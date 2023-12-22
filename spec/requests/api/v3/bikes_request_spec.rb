@@ -142,7 +142,7 @@ RSpec.describe "Bikes API V3", type: :request do
       end
       context "v2_accessor" do
         let(:check_if_registered_url) { "/api/v3/bikes/check_if_registered?access_token=#{v2_access_token.token}" }
-        it "returns 401" do
+        it "returns unauthorized" do
           expect(bike.reload.claimed?).to be_falsey
           expect(bike.authorized?(user)).to be_falsey
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
