@@ -15,12 +15,18 @@ class LogSearcher::Parser
   ROUTE_ENDPOINTS = {
     "/api/v2/bikes_search/count" => :api_v2_count,
     "/api/v2/bikes_search/close_serials" => :api_v2_close_serials,
+    "/api/v2/bikes/check_if_registered" => :api_v2_check_if_registered,
     "/api/v3/search" => :api_v3_bikes,
     "/api/v3/search/count" => :api_v3_count,
     "/api/v3/search/close_serials" => :api_v3_close_serials,
     "/api/v3/search/serials_containing" => :api_v3_serials_containing,
-    "/api/v3/search/external_registries" => :api_v3_external_registries
+    "/api/v3/search/external_registries" => :api_v3_external_registries,
+    "/api/v3/bikes/check_if_registered" => :api_v3_check_if_registered
   }.freeze
+
+  FILTERED_PARAMS = %w[access_token organization_id organization_slug page].freeze
+  NON_QUERY_ITEMS = (FILTERED_PARAMS +
+    %w[stolenness location distance locale sort sort_direction render_chart utf8]).freeze
 
   class << self
     def parse_log_line(log_line)
@@ -42,10 +48,10 @@ class LogSearcher::Parser
         request_id: line_data.split("[").last,
         duration_ms: opts["duration"]&.to_f&.round,
         user_id: opts["u_id"],
-        organization_id: Organization.friendly_find_id(opts.dig("params", "organization_id")),
+        organization_id: organization_from_params(opts.dig("params")),
         endpoint: endpoint,
         ip_address: opts["remote_ip"],
-        query_items: query_items.except("organization_id", "page"),
+        query_items: query_items.except(*FILTERED_PARAMS),
         stolenness: stolenness_for(endpoint, opts),
         serial_normalized: SerialNormalizer.normalized_and_corrected(query_items["serial"]),
         includes_query: includes_query?(query_items),
@@ -56,8 +62,7 @@ class LogSearcher::Parser
     private
 
     def includes_query?(query_items)
-      query_items.except("organization_id", "page", "stolenness", "location", "distance",
-        "locale", "sort", "sort_direction", "render_chart", "utf8").present?
+      query_items.except(*NON_QUERY_ITEMS).present?
     end
 
     def parse_endpoint(opts)
@@ -70,6 +75,11 @@ class LogSearcher::Parser
       else
         ROUTE_ENDPOINTS[opts["path"]]
       end
+    end
+
+    def organization_from_params(params)
+      return nil if params.blank?
+      Organization.friendly_find_id(params["organization_id"] || params["organization_slug"])
     end
 
     def parse_request_time(line_data)

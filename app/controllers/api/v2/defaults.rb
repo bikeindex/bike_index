@@ -32,8 +32,12 @@ module API
             current_token&.scopes || []
           end
 
+          def permanent_token?
+            current_user&.id == ENV["V2_ACCESSOR_ID"].to_i
+          end
+
           # client_credentials flow. See #2282
-          def doorkeeper_authorized_no_user
+          def doorkeeper_authorized_no_user?
             env["doorkeeper_authorized_no_user"]
           end
 
