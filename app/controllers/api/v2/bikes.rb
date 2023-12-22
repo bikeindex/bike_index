@@ -203,11 +203,14 @@ module API
           elsif current_organization.present?
 
             matching_bike = owner_duplicate_bike
+            is_authorized = matching_bike.present? && matching_bike.authorized?(current_user)
             {
-              registered: matching_bike.present?,
+              authorized_bike_id: is_authorized ? matching_bike.id : nil,
+              can_edit: is_authorized,
               claimed: matching_bike.present? && matching_bike.claimed?,
-              can_edit: matching_bike.present? && matching_bike.authorized?(current_user),
+              registered: matching_bike.present?,
               state: registered_state(matching_bike)
+
             }
           else
             error!("You are not authorized for that organization", 401)
