@@ -36,12 +36,12 @@ RSpec.describe LogSearcher::Reader do
     it "adds the lines" do
       redis.expire(LogSearcher::Reader::KEY, 0)
       expect(LogSearcher::Reader.log_lines_in_redis).to eq 0
-      expect(LogSearcher::Reader.rgrep_log_lines_count(time, log_path: log_path)).to eq 3
+      expect(LogSearcher::Reader.rgrep_log_lines_count(time, log_path: log_path)).to eq 4
       # Also, test that passing the command works
       command_str = LogSearcher::Reader.rgrep_command_str(time, log_path: log_path)
-      expect(LogSearcher::Reader.rgrep_log_lines_count(rgrep_command: command_str)).to eq 3
+      expect(LogSearcher::Reader.rgrep_log_lines_count(rgrep_command: command_str)).to eq 4
       LogSearcher::Reader.write_log_lines(time, log_path: log_path)
-      expect(LogSearcher::Reader.log_lines_in_redis).to eq 3
+      expect(LogSearcher::Reader.log_lines_in_redis).to eq 4
       # Clean up!
       redis.expire(LogSearcher::Reader::KEY, 0)
     end

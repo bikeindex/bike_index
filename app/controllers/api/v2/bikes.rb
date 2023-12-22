@@ -199,7 +199,7 @@ module API
         end
         post "check_if_registered" do
           if permanent_token?
-            error!("Permanent tokens can not be used to check_if_registered)", 403)
+            error!("Permanent tokens can NOT be used to check_if_registered)", 403)
           elsif current_organization.present?
 
             matching_bike = owner_duplicate_bike

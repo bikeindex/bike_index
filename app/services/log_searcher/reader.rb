@@ -2,7 +2,9 @@ class LogSearcher::Reader
   KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
   DEFAULT_LOG_PATH = (ENV["LOG_SEARCH_PATH"] || "#{Rails.root}/log/#{Rails.env}.log").freeze
   SEARCHES_MATCHES = %w[api/v2/bikes_search
+    api/v2/bikes/check_if_registered
     api/v3/search
+    api/v3/bikes/check_if_registered
     API::V1::BikesController#index
     API::V1::BikesController#stolen_ids
     API::V1::BikesController#close_serial
