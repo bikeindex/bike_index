@@ -140,6 +140,17 @@ RSpec.describe "Bikes API V3", type: :request do
           expect_hashes_to_match(json_result, target_result)
         end
       end
+      context "v2_accessor" do
+        let(:check_if_registered_url) { "/api/v3/bikes/check_if_registered?access_token=#{v2_access_token.token}" }
+        it "returns unauthorized" do
+          expect(bike.reload.claimed?).to be_falsey
+          expect(bike.authorized?(user)).to be_falsey
+          post check_if_registered_url, params: search_params.to_json, headers: json_headers
+          expect(response.code).to eq("403")
+          expect(json_result["error"].is_a?(String)).to be_truthy
+          expect(json_result["error"]).to match(/permanent token/i)
+        end
+      end
       context "state: stolen" do
         let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "stolen"} }
         let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, date_stolen: Time.current - 1.year) }
