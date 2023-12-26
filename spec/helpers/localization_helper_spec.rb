@@ -33,7 +33,6 @@ RSpec.describe LocalizationHelper, type: :helper do
     context "in Norwegian" do
       it "returns with norwegian included" do
         I18n.with_locale(:nb) do
-          I18n.with_locale(:nb) do
             choices = [
               ["English (Engelsk)", "en"],
               ["Nederlands (Nederlandsk)", "nl"],
