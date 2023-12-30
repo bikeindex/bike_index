@@ -131,6 +131,7 @@ GEM
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
+    bigdecimal (3.1.5)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
     bootstrap (4.0.0.alpha4)
@@ -457,7 +458,8 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
-    oj (3.13.11)
+    oj (3.16.3)
+      bigdecimal (>= 3.0)
     omniauth (1.9.1)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
@@ -862,4 +864,4 @@ RUBY VERSION
    ruby 2.7.8p225
 
 BUNDLED WITH
-   2.3.16
+   2.4.22
