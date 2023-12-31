@@ -102,7 +102,7 @@ class Notification < ApplicationRecord
 
   def self.sender_auto_kinds
     donation_kinds + theft_alert_kinds + user_alert_kinds +
-      %w[stolen_twitter_alerter bike_possibly_found]
+      %w[bike_possibly_found organization_pos_integration_broken stolen_twitter_alerter]
   end
 
   def self.search_message_channel_target(str)
