@@ -23,11 +23,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 06 Nov 2023 03:46:32 GMT
+      - Sun, 31 Dec 2023 17:43:19 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1896'
+      - '1922'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -43,13 +43,13 @@ http_interactions:
       - '300'
       Cache-Control:
       - no-cache, no-store
-      Content-Security-Policy-Report-Only:
+      Content-Security-Policy:
       - report-uri https://q.stripe.com/csp-report?p=v1%2Fcheckout%2Fsessions%2F%3Asession;
         block-all-mixed-content; default-src 'none'; base-uri 'none'; form-action
         'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample';
         style-src 'self'
       Request-Id:
-      - req_NZY2BQlkzBofxN
+      - req_PN9ee5Du4EbtAo
       Stripe-Version:
       - '2014-12-08'
       Vary:
@@ -83,6 +83,7 @@ http_interactions:
           "currency_conversion": null,
           "custom_fields": [],
           "custom_text": {
+            "after_submit": null,
             "shipping_address": null,
             "submit": null,
             "terms_of_service_acceptance": null
@@ -136,7 +137,7 @@ http_interactions:
           "url": null
         }
     http_version:
-  recorded_at: Mon, 06 Nov 2023 03:46:32 GMT
+  recorded_at: Sun, 31 Dec 2023 17:43:19 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -149,7 +150,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_NZY2BQlkzBofxN","request_duration_ms":210}}'
+      - '{"last_request_metrics":{"request_id":"req_PN9ee5Du4EbtAo","request_duration_ms":275}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -162,7 +163,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 06 Nov 2023 03:46:33 GMT
+      - Sun, 31 Dec 2023 17:43:19 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -182,13 +183,13 @@ http_interactions:
       - '300'
       Cache-Control:
       - no-cache, no-store
-      Content-Security-Policy-Report-Only:
+      Content-Security-Policy:
       - report-uri https://q.stripe.com/csp-report?p=v1%2Fcustomers%2F%3Acustomer;
         block-all-mixed-content; default-src 'none'; base-uri 'none'; form-action
         'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample';
         style-src 'self'
       Request-Id:
-      - req_NMEOd4cM1TAUIQ
+      - req_49mzIBT9qJj8Lf
       Stripe-Version:
       - '2014-12-08'
       Vary:
@@ -270,5 +271,5 @@ http_interactions:
           "test_clock": null
         }
     http_version:
-  recorded_at: Mon, 06 Nov 2023 03:46:33 GMT
+  recorded_at: Sun, 31 Dec 2023 17:43:19 GMT
 recorded_with: VCR 5.0.0
