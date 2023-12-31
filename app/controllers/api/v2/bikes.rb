@@ -173,8 +173,9 @@ module API
             Returns JSON with keys:
 
             - `registered`: If a match was found. (`true` or `false`)
-            - `claimed`: If a match was found and the user has claimed the bike. (`true` or `false`)
             - `can_edit`: If a match was found and it can be edited by the current token, e.g. was registered by the organization. (`true` or `false`)
+            - `authorized_bike_id`: If `can_edit` is true, this returns the bike's ID (`Integer` or `null`)
+            - `claimed`: If a match was found and the user has claimed the bike. (`true` or `false`)
             - `state`: The state of the bike that was found (_see below for possible values_)
 
             <br>
