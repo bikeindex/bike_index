@@ -253,6 +253,7 @@ jobs:
           command: |
             mkdir -p test-results/rspec
             RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out test-results/rspec/rspec.xml --format progress --color --require spec_helper"
+            echo $RSPEC_CMD
             circleci tests glob "spec/**/*_spec.rb" | circleci tests run --command="xargs $RSPEC_CMD" --verbose --split-by=timings
       - run:
           name: "Jest: Tests"
