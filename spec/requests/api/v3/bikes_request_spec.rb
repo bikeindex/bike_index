@@ -117,7 +117,15 @@ RSpec.describe "Bikes API V3", type: :request do
         expect_hashes_to_match(json_result, target_result)
       end
       context "bike is authorized" do
-        let(:target_result) { {registered: true, claimed: false, can_edit: true, state: "with_user"} }
+        let(:target_result) do
+          {
+            authorized_bike_id: bike.id,
+            can_edit: true,
+            claimed: false,
+            registered: true,
+            state: "with_user"
+          }
+        end
         it "returns target" do
           # If the user is authorized via a secondary email
           user_email = FactoryBot.create(:user_email, user: user, email: bike.owner_email)
@@ -130,7 +138,7 @@ RSpec.describe "Bikes API V3", type: :request do
           user_email.destroy
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
-          expect_hashes_to_match(json_result, target_result.merge(can_edit: false))
+          expect_hashes_to_match(json_result, target_result.merge(can_edit: false, authorized_bike_id: nil))
           # Test via bike organization
           bike_organization = BikeOrganization.create(bike: bike, organization: organization)
           expect(bike_organization).to be_valid
@@ -152,7 +160,15 @@ RSpec.describe "Bikes API V3", type: :request do
         end
       end
       context "state: stolen" do
-        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "stolen"} }
+        let(:target_result) do
+          {
+            authorized_bike_id: nil,
+            can_edit: false,
+            claimed: false,
+            registered: true,
+            state: "stolen"
+          }
+        end
         let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, date_stolen: Time.current - 1.year) }
         before { bike.update(updated_at: Time.current) }
         it "returns target" do
