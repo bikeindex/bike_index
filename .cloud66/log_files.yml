@@ -1,7 +1,8 @@
 files:
-  - <%= ENV['STACK_BASE'] %>/shared/log/production.log
-  - <%= ENV['STACK_BASE'] %>/shared/log/nginx_error.log
-  - <%= ENV['STACK_BASE'] %>/shared/log/custom_web.log
+  - /var/deploy/bike_index/web_head/shared/log/production.log
+  - /var/deploy/bike_index/web_head/shared/log/nginx_error.log
+  - /var/deploy/bike_index/web_head/shared/log/custom_web.log
+  # NOTE: Make sure that '/var/deploy/bike_index/web_head' matches ENV['STACK_BASE']
 destination:
   host: logs2.papertrailapp.com
   port: 13062
