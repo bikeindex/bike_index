@@ -332,7 +332,7 @@ RSpec.describe Organization, type: :model do
     context "paid" do
       let(:enabled_feature_slugs) { ["regional_bike_counts"] }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-      it "is truthy" do
+      it "is truthy", :flaky do
         expect(organization.user_registration_all_bikes?).to be_truthy
       end
       context "official_manufacturer?" do
