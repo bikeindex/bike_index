@@ -8,4 +8,10 @@ RSpec.describe OrganizationStatus, type: :model do
       expect(organization_status.current?).to be_truthy
     end
   end
+
+  describe "at_time" do
+    it "returns matching statuses" do
+      fail
+    end
+  end
 end

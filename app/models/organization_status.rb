@@ -12,6 +12,11 @@ class OrganizationStatus < AnalyticsRecord
   scope :with_pos, -> { where(pos_kind: Organization.with_pos_kinds) }
   scope :without_pos, -> { where(pos_kind: Organization.without_pos_kinds) }
 
+  def self.at_time(time)
+    where("start_at < ?", time).where("end_at > ?", time)
+      .or(current.where("start_at < ?", time))
+  end
+
   def ended?
     end_at.present?
   end

@@ -4,7 +4,17 @@ class InvalidExtensionForAscendImportWorker < ApplicationWorker
 
   def perform(id)
     return if SKIP_ASCEND_EMAIL
+    bulk_import = BulkImport.find(id)
+    organization_status =
     Notification.create!
-    AdminMailer.invalid_extension_for_ascend_import(BulkImport.find(id)).deliver_now
+
+    AdminMailer.invalid_extension_for_ascend_import(bulk_import).deliver_now
+
+    # notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
+    # # If we just sent it, don't send again
+    # return false if notifications.email_success.any?
+    # notification = notifications.last || Notification.create(user_id: user.id, kind: "confirmation_email")
+    # CustomerMailer.confirmation_email(user).deliver_now
+    # notification.update(delivery_status: "email_success") # I'm not sure how to make this more representative
   end
 end
