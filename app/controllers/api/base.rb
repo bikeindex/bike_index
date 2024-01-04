@@ -6,7 +6,7 @@ module GrapeLogging
       def parameters(request, _)
         rtok = request.params["refresh_token"]
 
-        {remote_ip: ForwardedIpAddress.parse(request), format: "json"}
+        {remote_ip: ForwardedIpAddress.parse(request), format: "json", u_id: current_user&.id}
           .merge(rtok.present? ? {refreshtok: rtok} : {})
       end
     end

@@ -11,6 +11,7 @@ Rails.application.configure do
     {
       remote_ip: event.payload[:ip],
       u_id: event.payload[:u_id],
+      refresh_tok: event.payload[:params]["refresh_token"],
       params: event.payload[:params].except("controller", "action", "format", "id")
     }
   end
