@@ -4,10 +4,10 @@ module GrapeLogging
   module Loggers
     class BinxLogger < GrapeLogging::Loggers::Base
       def parameters(request, _)
-        {
-          remote_ip: ForwardedIpAddress.parse(request), format: "json",
-          refreshtok: request.params["refresh_token"]
-        }
+        rtok = request.params["refresh_token"]
+
+        {remote_ip: ForwardedIpAddress.parse(request), format: "json"}
+          .merge(rtok.present? ? {refreshtok: rtok} : {})
       end
     end
   end
