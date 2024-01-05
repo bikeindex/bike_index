@@ -111,7 +111,7 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:auto_user) { current_user }
     let(:b_param) { BParam.create(creator_id: current_organization.auto_user.id, params: {creation_organization_id: current_organization.id, embeded: true}) }
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
-    let(:color) { FactoryBot.create(:color, name: "black") }
+    let(:color) { Color.black }
     let!(:state) { FactoryBot.create(:state_new_york) }
     let(:testable_bike_params) { bike_params.except(:serial_unknown, :b_param_id_token, :cycle_type_slug, :accuracy, :origin) }
     context "with parking_notification" do
