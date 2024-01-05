@@ -10,6 +10,14 @@ module GrapeLogging
   end
 end
 
+class CaseInsensitiveColor < Grape::Validations::Validators::Base
+  def validate_param!(attr_name, params)
+    val = params[attr_name]
+    return if val.present? && Color.friendly_find(val)
+    raise Grape::Exceptions::Validation.new params: [@scope.full_name(attr_name)], message: "must be one of: #{Color::ALL_NAMES}"
+  end
+end
+
 module API
   class Base < Grape::API
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: "grape_key",

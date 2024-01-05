@@ -722,6 +722,33 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.extra_registration_number).to eq "Another Serial"
       end
     end
+
+    context "without color" do
+      it "fails" do
+        expect {
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.except(:color).to_json, headers: json_headers
+          expect(json_result["error"]).to eq "color is missing"
+        }.to_not change(Bike, :count)
+      end
+    end
+
+    context "with non case matching primary_frame_color and non-matching color" do
+      let!(:silver) { FactoryBot.create(:color, name: "Silver, gray or bare metal")}
+      let!(:purple) { FactoryBot.create(:color, name: "Purple") }
+      let(:purple_attrs) { bike_attrs.merge(color: "Eggplant", primary_frame_color: "Purple", secondary_frame_color: "pURPLE ", tertiary_frame_color: "silver") }
+      it "registers" do
+        post "/api/v3/bikes?access_token=#{token.token}", params: purple_attrs.to_json, headers: json_headers
+        bike = Bike.last
+        bike_response = json_result["bike"]
+        expect(bike_response["id"]).to eq(bike.id)
+        expect(bike_response["serial"]).to eq bike_attrs[:serial]
+        expect(bike_response["frame_colors"]).to eq(["Purple", "Purple", silver.name])
+        expect(bike_response["manufacturer_id"]).to eq(manufacturer.id)
+        expect(bike.paint).to eq "Eggplant"
+        fail
+      end
+    end
+
     context "organization" do
       let(:organization) { FactoryBot.create(:organization) }
       it "creates a stolen bike through an organization and uses the passed phone" do

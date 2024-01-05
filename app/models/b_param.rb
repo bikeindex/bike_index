@@ -428,25 +428,6 @@ class BParam < ApplicationRecord
     ].each { |key| set_color_key(key) }
   end
 
-  def set_color_key(key = nil)
-    if bike["#{key}_id"].present?
-      params["bike"].delete(key)
-      return
-    end
-
-    paint = params.dig("bike", "color") || params.dig("bike", key)
-    color = Color.friendly_find(paint.strip) if paint.present?
-
-    if color.present?
-      params["bike"]["#{key}_id"] = color.id
-    else
-      set_paint_key(paint)
-    end
-
-    params["bike"].delete(key)
-    params["bike"].delete("color")
-  end
-
   def set_paint_key(paint_entry)
     return nil unless paint_entry.present?
 
@@ -466,7 +447,7 @@ class BParam < ApplicationRecord
       params["bike"]["primary_frame_color_id"] = if paint.color_id.present?
         paint.color.id
       else
-        Color.find_by_name("Black").id
+        Color.black.id
       end
     end
   end
@@ -529,5 +510,29 @@ class BParam < ApplicationRecord
     return true if image_processed || image.blank?
     ImageAssociatorWorker.perform_in(5.seconds)
     ImageAssociatorWorker.perform_in(1.minutes)
+  end
+
+  def set_color_key(key = nil)
+    # If the ID is present, remove the non-id param
+    if params.dig("bike", "#{key}_id").present?
+      params["bike"].delete(key)
+      return
+    end
+
+    # Set the paint from color param, if in primary_frame_color
+    if key == "primary_frame_color"
+      paint = params.dig("bike", "color") || params.dig("bike", key)
+      color = Color.friendly_find(paint.strip) if paint.present?
+      if color.present?
+        params["bike"]["#{key}_id"] = color.id
+      else
+        set_paint_key(paint)
+      end
+      params["bike"].delete("color")
+    end
+    # Set the frame_color
+    color = params.dig("bike", key).presence && Color.friendly_find(params.dig("bike", key))
+    params["bike"]["#{key}_id"] = color.id if color.present?
+    params["bike"].delete(key)
   end
 end

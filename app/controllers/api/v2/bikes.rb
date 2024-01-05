@@ -8,7 +8,7 @@ module API
       # When running bin/setup, things break if the database isn't setup. Also use default in test
       STATIC_VALS = Rails.env.test? || !!Ctype
       CTYPE_NAMES = (STATIC_VALS ? ["wheel", "headset"] : Ctype.pluck(:name).map(&:downcase)).freeze
-      COLOR_NAMES = (STATIC_VALS ? ["black", "orange"] : Color.pluck(:name).map(&:downcase)).freeze
+      # COLOR_NAMES = (STATIC_VALS ? ["black", "orange"] : Color.pluck(:name).map(&:downcase)).freeze
       COUNTRY_ISOS = (STATIC_VALS ? ["US"] : Country.pluck(:iso)).freeze
 
       helpers do
@@ -20,9 +20,9 @@ module API
           optional :frame_model, type: String, desc: "What frame model?"
           optional :year, type: Integer, desc: "What year was the frame made?"
           optional :description, type: String, desc: "General description"
-          optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame (case sensitive match)"
-          optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color (case sensitive match)"
-          optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color (case sensitive match)"
+          optional :primary_frame_color, type: String, case_insensitive_color: true, desc: "Main color of frame"
+          optional :secondary_frame_color, type: String, case_insensitive_color: true, desc: "Secondary color"
+          optional :tertiary_frame_color, type: String, case_insensitive_color: true, desc: "Third color"
           optional :rear_gear_type_slug, type: String, desc: "rear gears (has to be one of the `selections`)"
           optional :front_gear_type_slug, type: String, desc: "front gears (has to be one of the `selections`)"
           optional :extra_registration_number, type: String, desc: "Additional serial or registration number (not the original serial)"
@@ -245,7 +245,7 @@ module API
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
-          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
+          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors."
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
