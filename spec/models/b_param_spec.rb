@@ -291,25 +291,45 @@ RSpec.describe BParam, type: :model do
   end
 
   describe "set_color_key" do
+    let(:b_param) { BParam.new(params: {bike: bike}) }
+    let!(:color) { FactoryBot.create(:color, name: "Teal") }
+    let(:bike) { {color: color.name} }
+    before { b_param.set_color_keys }
+
     it "sets the color if it's a color and remove the color attr" do
-      color = FactoryBot.create(:color)
-      bike = {color: color.name}
-      b_param = BParam.new(params: {bike: bike})
-      b_param.set_color_key("primary_frame_color")
-      expect(b_param.params["bike"]["color"]).not_to be_present
-      expect(b_param.params["bike"]["primary_frame_color_id"]).to eq(color.id)
+      expect_hashes_to_match(b_param.bike, {primary_frame_color_id: color.id})
     end
-    it "set_paint_keys if it isn't a color" do
-      bike = {color: "Goop"}
-      b_param = BParam.new(params: {bike: bike})
-      expect(b_param).to receive(:set_paint_key).and_return(true)
-      b_param.set_color_key
+    context "not a color" do
+      let(:bike) { {color: "Goop"} }
+      let(:target) { {paint_name: "goop", primary_frame_color_id: Color.black.id} }
+      it "sets paint and makes primary_frame_color black" do
+        expect_hashes_to_match(b_param.bike.except("paint_id"), target)
+        expect(b_param.bike["paint_id"]).to eq Paint.friendly_find_id("goop")
+      end
+    end
+    context "color and primary_frame_color set" do
+      let(:bike) { {color: "Sea Green", primary_frame_color: "teal"} }
+      let(:target) { {paint_name: "sea green", primary_frame_color_id: color.id} }
+      it "sets the color keys" do
+        expect_hashes_to_match(b_param.bike.except("paint_id"), target)
+      end
+      context "unknown secondary_frame_color" do
+        let(:bike) { {color: "Sea green", primary_frame_color: "teal", secondary_frame_color: "something else"} }
+        it "ignores secondary_frame_color" do
+          expect_hashes_to_match(b_param.bike.except("paint_id"), target)
+        end
+      end
+      context "secondary_frame_color" do
+        let(:bike) { {color: "Sea green", primary_frame_color: "teal", secondary_frame_color: " TEAL\n"} }
+        it "ignores secondary_frame_color" do
+          expect_hashes_to_match(b_param.bike.except("paint_id"), target.merge(secondary_frame_color_id: color.id))
+        end
+      end
     end
   end
 
   describe "set_paint_key" do
     it "associates the paint and set the color if it can" do
-      FactoryBot.create(:color, name: "Black")
       color = FactoryBot.create(:color, name: "Yellow")
       paint = FactoryBot.create(:paint, name: "pinkly butter", color_id: color.id)
       b_param = BParam.new(params: {bike: {color: paint.name}})
@@ -319,7 +339,7 @@ RSpec.describe BParam, type: :model do
     end
 
     it "creates a paint and set the color to black if we don't know the color" do
-      black = FactoryBot.create(:color, name: "Black")
+      black = Color.black
       b_param = BParam.new(params: {bike: {}})
       expect {
         b_param.set_paint_key("Paint 69")
@@ -329,7 +349,6 @@ RSpec.describe BParam, type: :model do
     end
 
     it "associates the manufacturer with the paint if it's a new bike" do
-      FactoryBot.create(:color, name: "Black")
       m = FactoryBot.create(:manufacturer)
       bike = {is_pos: true, manufacturer_id: m.id}
       b_param = BParam.new(params: {bike: bike})

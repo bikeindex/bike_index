@@ -5,7 +5,7 @@ RSpec.describe BulkImportWorker, type: :job do
   let(:instance) { subject.new }
   let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", kind: kind) }
   let(:kind) { nil }
-  let!(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
+  let!(:black) { Color.black }
 
   let(:sample_csv_lines) do
     [

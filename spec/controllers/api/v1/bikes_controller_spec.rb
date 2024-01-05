@@ -66,7 +66,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
       let(:auto_user) { FactoryBot.create(:organization_auto_user) }
       let(:organization) { auto_user.organizations.first }
       let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Specialized") }
-      let(:black) { FactoryBot.create(:color, name: "Black") }
+      let(:black) { Color.black }
       let(:red) { FactoryBot.create(:color, name: "Red") }
       let(:bike_hash) do
         {
@@ -417,7 +417,6 @@ RSpec.describe API::V1::BikesController, type: :controller do
       end
 
       it "creates an example bike if the bike is from example, and include all the options" do
-        FactoryBot.create(:color, name: "Black")
         org = Organization.example
         user = FactoryBot.create(:user)
         FactoryBot.create(:membership_claimed, user: user, organization: org)

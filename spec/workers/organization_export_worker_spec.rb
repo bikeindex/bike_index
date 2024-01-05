@@ -5,7 +5,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
   let(:instance) { subject.new }
   let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil) }
   let(:organization) { export.organization }
-  let(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
+  let(:black) { Color.black }
   let(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
   let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, creation_organization: organization) }
   let(:bike_values) do
