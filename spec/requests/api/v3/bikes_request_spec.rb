@@ -733,9 +733,9 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     context "with non case matching primary_frame_color and non-matching color" do
-      let!(:silver) { FactoryBot.create(:color, name: "Silver, gray or bare metal")}
+      let!(:silver) { FactoryBot.create(:color, name: "Silver, gray or bare metal") }
       let!(:purple) { FactoryBot.create(:color, name: "Purple") }
-      let(:purple_attrs) { bike_attrs.merge(color: "Eggplant", primary_frame_color: "Purple", secondary_frame_color: "pURPLE ", tertiary_frame_color: "silver") }
+      let(:purple_attrs) { bike_attrs.merge(color: "Chaotic Eggplant", primary_frame_color: "Purple", secondary_frame_color: "pURPLE ", tertiary_frame_color: "silver") }
       it "registers" do
         post "/api/v3/bikes?access_token=#{token.token}", params: purple_attrs.to_json, headers: json_headers
         bike = Bike.last
@@ -743,9 +743,9 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike_response["id"]).to eq(bike.id)
         expect(bike_response["serial"]).to eq bike_attrs[:serial]
         expect(bike_response["frame_colors"]).to eq(["Purple", "Purple", silver.name])
+        expect(bike_response["paint_description"]).to eq("Chaotic Eggplant")
         expect(bike_response["manufacturer_id"]).to eq(manufacturer.id)
-        expect(bike.paint).to eq "Eggplant"
-        fail
+        expect(bike.paint.name).to eq "chaotic eggplant"
       end
     end
 

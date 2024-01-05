@@ -293,7 +293,7 @@ RSpec.describe BParam, type: :model do
   describe "set_color_key" do
     let(:b_param) { BParam.new(params: {bike: bike}) }
     let!(:color) { FactoryBot.create(:color, name: "Teal") }
-    let(:bike) {{ color: color.name}}
+    let(:bike) { {color: color.name} }
     before { b_param.set_color_keys }
 
     it "sets the color if it's a color and remove the color attr" do
@@ -301,7 +301,7 @@ RSpec.describe BParam, type: :model do
     end
     context "not a color" do
       let(:bike) { {color: "Goop"} }
-      let(:target) { {paint_name: "goop", primary_frame_color_id: Color.black.id}}
+      let(:target) { {paint_name: "goop", primary_frame_color_id: Color.black.id} }
       it "sets paint and makes primary_frame_color black" do
         expect_hashes_to_match(b_param.bike.except("paint_id"), target)
         expect(b_param.bike["paint_id"]).to eq Paint.friendly_find_id("goop")
