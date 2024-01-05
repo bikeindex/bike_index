@@ -1163,7 +1163,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "updates a bike, adds and removes components" do
-      wheels = FactoryBot.create(:ctype, name: "wheel")
+      wheels = FactoryBot.create(:ctype, name: "Wheel")
       headsets = FactoryBot.create(:ctype, name: "Headset")
       mfg1 = FactoryBot.create(:manufacturer, name: "old manufacturer")
       mfg2 = FactoryBot.create(:manufacturer, name: "new manufacturer")
@@ -1177,7 +1177,7 @@ RSpec.describe "Bikes API V3", type: :request do
         {
           manufacturer: mfg2.name,
           year: "1999",
-          component_type: "headset",
+          component_type: "HEADSET ", # Friendly find!
           description: "C-2",
           model: "Sram GXP Eagle"
         },
