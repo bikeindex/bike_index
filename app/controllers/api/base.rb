@@ -1,5 +1,8 @@
 require "grape_logging"
 
+# TODO: creating all these classes here is ugly
+# Ideally the validators would be less duplicative. But - this fixes the problem
+
 module GrapeLogging
   module Loggers
     class BinxLogger < GrapeLogging::Loggers::Base
