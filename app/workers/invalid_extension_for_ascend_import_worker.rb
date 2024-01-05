@@ -5,9 +5,15 @@ class InvalidExtensionForAscendImportWorker < ApplicationWorker
   def perform(id)
     return if SKIP_ASCEND_EMAIL
     bulk_import = BulkImport.find(id)
-    organization_status =
-    Notification.create!
+    organization_id = bulk_import.organization_id
+    if bulk_import.organization_id.blank?
+      raise "Missing organization_id for invalid bulk_import: #{bulk_import.id}"
+    end
+    UpdateOrganizationPosKindWorker.new.perform(organization_id)
+    organization_status = OrganizationStatus.where(organization_id: organization_id)
+      .at_time(bulk_import.created_at).first
 
+    Notification.create!
     AdminMailer.invalid_extension_for_ascend_import(bulk_import).deliver_now
 
     # notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
