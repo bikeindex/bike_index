@@ -722,6 +722,33 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.extra_registration_number).to eq "Another Serial"
       end
     end
+
+    context "without color" do
+      it "fails" do
+        expect {
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.except(:color).to_json, headers: json_headers
+          expect(json_result["error"]).to eq "color is missing"
+        }.to_not change(Bike, :count)
+      end
+    end
+
+    context "with non case matching primary_frame_color and non-matching color" do
+      let!(:silver) { FactoryBot.create(:color, name: "Silver, gray or bare metal") }
+      let!(:purple) { FactoryBot.create(:color, name: "Purple") }
+      let(:purple_attrs) { bike_attrs.merge(color: "Chaotic Eggplant", primary_frame_color: "Purple", secondary_frame_color: "pURPLE ", tertiary_frame_color: "silver") }
+      it "registers" do
+        post "/api/v3/bikes?access_token=#{token.token}", params: purple_attrs.to_json, headers: json_headers
+        bike = Bike.last
+        bike_response = json_result["bike"]
+        expect(bike_response["id"]).to eq(bike.id)
+        expect(bike_response["serial"]).to eq bike_attrs[:serial]
+        expect(bike_response["frame_colors"]).to eq(["Purple", "Purple", silver.name])
+        expect(bike_response["paint_description"]).to eq("Chaotic Eggplant")
+        expect(bike_response["manufacturer_id"]).to eq(manufacturer.id)
+        expect(bike.paint.name).to eq "chaotic eggplant"
+      end
+    end
+
     context "organization" do
       let(:organization) { FactoryBot.create(:organization) }
       it "creates a stolen bike through an organization and uses the passed phone" do
@@ -1136,7 +1163,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "updates a bike, adds and removes components" do
-      wheels = FactoryBot.create(:ctype, name: "wheel")
+      wheels = FactoryBot.create(:ctype, name: "Wheel")
       headsets = FactoryBot.create(:ctype, name: "Headset")
       mfg1 = FactoryBot.create(:manufacturer, name: "old manufacturer")
       mfg2 = FactoryBot.create(:manufacturer, name: "new manufacturer")
@@ -1150,7 +1177,7 @@ RSpec.describe "Bikes API V3", type: :request do
         {
           manufacturer: mfg2.name,
           year: "1999",
-          component_type: "headset",
+          component_type: "HEADSET ", # Friendly find!
           description: "C-2",
           model: "Sram GXP Eagle"
         },

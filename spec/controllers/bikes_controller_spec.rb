@@ -5,7 +5,7 @@ RSpec.describe BikesController, type: :controller do
   let!(:country) { state.country }
 
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
-  let(:color) { FactoryBot.create(:color, name: "black") }
+  let(:color) { Color.black }
 
   describe "show" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }

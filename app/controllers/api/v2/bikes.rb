@@ -4,12 +4,6 @@ module API
       include API::V2::Defaults
 
       CYCLE_TYPE_NAMES = CycleType::NAMES.values.map(&:downcase)
-      PROPULSION_TYPES = PropulsionType::SLUGS
-      # When running bin/setup, things break if the database isn't setup. Also use default in test
-      STATIC_VALS = Rails.env.test? || !!Ctype
-      CTYPE_NAMES = (STATIC_VALS ? ["wheel", "headset"] : Ctype.pluck(:name).map(&:downcase)).freeze
-      COLOR_NAMES = (STATIC_VALS ? ["black", "orange"] : Color.pluck(:name).map(&:downcase)).freeze
-      COUNTRY_ISOS = (STATIC_VALS ? ["US"] : Country.pluck(:iso)).freeze
 
       helpers do
         params :bike_attrs do
@@ -20,9 +14,9 @@ module API
           optional :frame_model, type: String, desc: "What frame model?"
           optional :year, type: Integer, desc: "What year was the frame made?"
           optional :description, type: String, desc: "General description"
-          optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame (case sensitive match)"
-          optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color (case sensitive match)"
-          optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color (case sensitive match)"
+          optional :primary_frame_color, type: String, case_insensitive_color: true, desc: "Main color of frame"
+          optional :secondary_frame_color, type: String, case_insensitive_color: true, desc: "Secondary color"
+          optional :tertiary_frame_color, type: String, case_insensitive_color: true, desc: "Third color"
           optional :rear_gear_type_slug, type: String, desc: "rear gears (has to be one of the `selections`)"
           optional :front_gear_type_slug, type: String, desc: "front gears (has to be one of the `selections`)"
           optional :extra_registration_number, type: String, desc: "Additional serial or registration number (not the original serial)"
@@ -32,12 +26,12 @@ module API
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
           optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
           optional :bike_sticker, type: String, desc: "Bike Sticker code"
-          optional :propulsion_type_slug, type: String, values: PROPULSION_TYPES, default: "foot-pedal", desc: "Propulsion Type slug"
+          optional :propulsion_type_slug, type: String, case_insensitive_propulsion_type: true, default: "foot-pedal", desc: "Propulsion Type slug"
 
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
             optional :city, type: String, desc: "City where stolen <br> **required to create stolen**"
-            optional :country, type: String, values: COUNTRY_ISOS, desc: "Country the bike was stolen"
+            optional :country, type: String, case_insensitive_country: true, desc: "Country the bike was stolen"
             optional :zipcode, type: String, desc: "Where the bike was stolen from"
             optional :state, type: String, desc: "State postal abbreviation if in US - e.g. OR, IL, NY"
             optional :address, type: String, desc: "Public. Use an intersection if you'd prefer the specific address not be revealed"
@@ -61,7 +55,7 @@ module API
         params :components_attrs do
           optional :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
-          optional :component_type, type: String, desc: "Type of component", values: CTYPE_NAMES
+          optional :component_type, type: String, desc: "Type of component", case_insensitive_ctype: true
           optional :model, type: String, desc: "Component model"
           optional :year, type: Integer, desc: "Component year"
           optional :description, type: String, desc: "Component description"
@@ -245,10 +239,10 @@ module API
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
           requires :owner_email, type: String, desc: "Owner email"
           optional :owner_email_is_phone_number, type: Boolean, desc: "If using a phone number for registration, rather than email"
-          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
+          requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors."
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization (ID or slug) bike should be created by. **Only works** if user is a member of the organization"
-          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
+          optional :cycle_type_name, type: String, case_insensitive_cycle_type: true, default: "bike", desc: "Type of cycle"
           optional :no_duplicate, type: Boolean, default: false, desc: "If true, it won't register a duplicate bike - when it can't edit an existing matching bike (see `/check_if_registered`)"
           use :bike_attrs
           optional :components, type: Array do

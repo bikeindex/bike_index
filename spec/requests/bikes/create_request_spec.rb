@@ -5,7 +5,7 @@ RSpec.describe "BikesController#create", type: :request do
   let(:base_url) { "/bikes" }
   let(:current_user) { FactoryBot.create(:user_confirmed) }
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
-  let(:color) { FactoryBot.create(:color, name: "black") }
+  let(:color) { Color.black }
   let(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
   let(:country) { state.country }
   let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug, :manufacturer_id) }

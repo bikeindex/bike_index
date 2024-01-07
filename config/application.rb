@@ -31,7 +31,7 @@ module Bikeindex
     config.exceptions_app = routes
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password]
+    Rails.application.config.filter_parameters += [:password, :file]
 
     config.time_zone = "Central Time (US & Canada)"
 

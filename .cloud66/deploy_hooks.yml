@@ -31,12 +31,6 @@ production:
       target: rails
       apply_during: build_only
 
-    - source: /.cloud66/remote_syslog.init.d
-      destination: /etc/init.d/remote_syslog
-      sudo: true
-      target: rails
-      apply_during: build_only
-
     - source: /.cloud66/papertrail.sh
       destination: /tmp/papertrail.sh
       target: rails
