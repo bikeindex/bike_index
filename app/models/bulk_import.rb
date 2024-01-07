@@ -179,11 +179,6 @@ class BulkImport < ApplicationRecord
     true
   end
 
-  def invalid_extension?
-    extension = (local_file? ? file.path : file.url)&.split(".")&.last
-    extension.blank? || !VALID_FILE_EXTENSIONS.include?(extension)
-  end
-
   # Because the way we load the file is different if it's remote or local
   # This is hacky, but whatever
   def local_file?
@@ -204,6 +199,11 @@ class BulkImport < ApplicationRecord
   def calculated_kind
     return "unorganized" if organization_id.blank?
     "organization_import" # Default
+  end
+
+  def invalid_extension?
+    extension = (local_file? ? file.path : file.url)&.split(".")&.last
+    extension.blank? || !VALID_FILE_EXTENSIONS.include?(extension)
   end
 
   def ensure_valid_file_type

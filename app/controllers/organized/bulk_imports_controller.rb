@@ -102,7 +102,7 @@ module Organized
     def permitted_kinds
       return @permitted_kinds if defined?(@permitted_kinds)
       permitted_kinds = []
-      permitted_kinds += ["ascend"] if current_organization.ascend_pos?
+      permitted_kinds += ["ascend"] if current_organization.ascend_or_broken_ascend?
       permitted_kinds += ["organization_import"] if current_organization.enabled?("show_bulk_import")
       permitted_kinds += ["impounded"] if current_organization.enabled?("show_bulk_import_impound")
       permitted_kinds += ["stolen"] if current_organization.enabled?("show_bulk_import_stolen")

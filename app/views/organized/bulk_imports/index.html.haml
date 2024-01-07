@@ -1,6 +1,6 @@
 .organized-page-header.mb-4
   %h1.uncap
-    - if current_organization.ascend_pos?
+    - if current_organization.ascend_or_broken_ascend?
       = t(".org_ascend_imports_html", org_name: current_organization.name)
     - else
       = t(".org_bulk_imports_html", org_name: current_organization.name)
