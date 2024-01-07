@@ -131,7 +131,7 @@
         %td
           - if @organization.no_pos?
             %em.small.less-strong no integration
-          - elsif @organization.ascend_pos?
+          - elsif @organization.ascend_or_broken_ascend?
             = link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param)
             %small
               Ascend name:

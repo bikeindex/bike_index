@@ -31,7 +31,7 @@ class Notification < ApplicationRecord
     user_alert_stolen_bike_without_location: 25,
     theft_survey_4_2022: 26,
     theft_survey_2023: 27,
-    organization_pos_integration_broken: 28
+    invalid_extension_for_ascend_import: 28
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -58,6 +58,7 @@ class Notification < ApplicationRecord
   scope :impound_claim, -> { where(kind: impound_claim_kinds) }
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
+  scope :admin, -> { where(kind: admin_kinds) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -100,9 +101,18 @@ class Notification < ApplicationRecord
     %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
   end
 
+  def self.pos_integration_broken_kinds
+    # TODO: Send Lightspeed notifications from here
+    %w[invalid_extension_for_ascend_import].freeze
+  end
+
+  def self.admin_kinds
+    pos_integration_broken_kinds + %w[stolen_notification_blocked].freeze
+  end
+
   def self.sender_auto_kinds
-    donation_kinds + theft_alert_kinds + user_alert_kinds +
-      %w[bike_possibly_found organization_pos_integration_broken stolen_twitter_alerter]
+    donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
+      %w[bike_possibly_found stolen_twitter_alerter]
   end
 
   def self.search_message_channel_target(str)

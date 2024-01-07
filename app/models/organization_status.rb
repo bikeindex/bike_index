@@ -4,6 +4,8 @@ class OrganizationStatus < AnalyticsRecord
   enum pos_kind: Organization::POS_KIND_ENUM
   enum kind: Organization::KIND_ENUM
 
+  has_one :notification, as: :notifiable
+
   scope :not_deleted, -> { where(organization_deleted_at: nil) }
   scope :deleted, -> { where.not(organization_deleted_at: nil) }
   scope :current, -> { where(end_at: nil) }
@@ -15,6 +17,15 @@ class OrganizationStatus < AnalyticsRecord
   def self.at_time(time)
     where("start_at < ?", time).where("end_at > ?", time)
       .or(current.where("start_at < ?", time))
+  end
+
+  def bulk_imports
+    if Organization.ascend_or_broken_ascend_kinds.include?(pos_kind)
+      b_imports = BulkImport.where("created_at > ?", start_at)
+      ended? ? b_imports.where("created_at < ?", end_at) : b_imports
+    else
+      BulkImport.none
+    end
   end
 
   def ended?

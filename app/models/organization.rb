@@ -124,11 +124,19 @@ class Organization < ApplicationRecord
   end
 
   def self.broken_pos_kinds
-    %w[broken_ascend_pos broken_lightspeed_pos]
+    %w[broken_ascend_pos broken_lightspeed_pos].freeze
   end
 
   def self.without_pos_kinds
-    %w[no_pos does_not_need_pos]
+    %w[no_pos does_not_need_pos].freeze
+  end
+
+  def self.ascend_or_broken_ascend_kinds
+    %w[ascend_pos broken_ascend_pos].freeze
+  end
+
+  def self.lightspeed_or_broken_lightspeed_kinds
+    %w[lightspeed_pos broken_lightspeed_pos].freeze
   end
 
   def self.with_pos_kinds
@@ -233,9 +241,17 @@ class Organization < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
+  def lightspeed_or_broken_lightspeed?
+    self.class.lightspeed_or_broken_lightspeed_kinds.include?(pos_kind)
+  end
+
+  def ascend_or_broken_ascend?
+    self.class.ascend_or_broken_ascend_kinds.include?(pos_kind)
+  end
+
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
-    ascend_pos? || any_enabled?(%w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen])
+    ascend_or_broken_ascend? || any_enabled?(%w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen])
   end
 
   def show_multi_serial?

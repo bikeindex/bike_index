@@ -42,8 +42,10 @@ class AdminMailer < ApplicationMailer
       subject: "Unknown organization for ascend import")
   end
 
-  def invalid_extension_for_ascend_import(bulk_import)
-    @bulk_import = bulk_import
+  def invalid_extension_for_ascend_import(notification)
+    @notification = notification
+    @bulk_import = notification.notifiable.bulk_imports.first
+    # Notification is addressed to Gavin, but emails are hardcoded
     mail(to: ["gavin@bikeindex.org", "craig@bikeindex.org"],
       subject: "Invalid extension for ascend import")
   end

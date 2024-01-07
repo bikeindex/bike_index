@@ -1,6 +1,7 @@
 class InvalidExtensionForAscendImportWorker < ApplicationWorker
   sidekiq_options queue: "notify"
   SKIP_ASCEND_EMAIL = ENV["SKIP_UNKNOWN_ASCEND_EMAIL"].present?
+  NOTIFICATION_USER_ID = 377351 # Gavin email
 
   def perform(id)
     return if SKIP_ASCEND_EMAIL
@@ -13,14 +14,14 @@ class InvalidExtensionForAscendImportWorker < ApplicationWorker
     organization_status = OrganizationStatus.where(organization_id: organization_id)
       .at_time(bulk_import.created_at).first
 
-    Notification.create!
-    AdminMailer.invalid_extension_for_ascend_import(bulk_import).deliver_now
+    notification = Notification.invalid_extension_for_ascend_import
+      .find_by(notifiable: organization_status)
+    notification ||= Notification.create(notifiable: organization_status,
+      kind: :invalid_extension_for_ascend_import, user_id: NOTIFICATION_USER_ID)
 
-    # notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
-    # # If we just sent it, don't send again
-    # return false if notifications.email_success.any?
-    # notification = notifications.last || Notification.create(user_id: user.id, kind: "confirmation_email")
-    # CustomerMailer.confirmation_email(user).deliver_now
-    # notification.update(delivery_status: "email_success") # I'm not sure how to make this more representative
+    return true if notification.email_success?
+
+    AdminMailer.invalid_extension_for_ascend_import(notification).deliver_now
+    notification.update!(delivery_status: "email_success")
   end
 end
