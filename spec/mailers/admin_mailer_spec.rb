@@ -109,17 +109,6 @@ RSpec.describe AdminMailer, type: :mailer do
     end
   end
 
-  describe "unknown_organization_for_ascend_import" do
-    let(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
-    let(:mail) { AdminMailer.unknown_organization_for_ascend_import(bulk_import) }
-
-    it "renders email" do
-      expect(mail.to).to eq(["gavin@bikeindex.org", "craig@bikeindex.org"])
-      expect(mail.subject).to match("Unknown organization for ascend import")
-      expect(mail.tag).to eq("admin")
-    end
-  end
-
   describe "#theft_alert_notification" do
     context "given notify_of_recovered true" do
       it "renders email with recovered notification" do

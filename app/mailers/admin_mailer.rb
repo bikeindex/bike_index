@@ -36,8 +36,8 @@ class AdminMailer < ApplicationMailer
       subject: "Stolen notification blocked!")
   end
 
-  def unknown_organization_for_ascend_import(bulk_import)
-    @bulk_import = bulk_import
+  def unknown_organization_for_ascend_import(notification)
+    @bulk_import = notification.notifiable
     mail(to: ["gavin@bikeindex.org", "craig@bikeindex.org"],
       subject: "Unknown organization for ascend import")
   end

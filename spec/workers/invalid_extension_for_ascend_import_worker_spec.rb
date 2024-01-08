@@ -33,7 +33,23 @@ RSpec.describe InvalidExtensionForAscendImportWorker, type: :job do
 
     expect(notification.kind).to eq "invalid_extension_for_ascend_import"
     expect(notification.user_id).to eq user.id
+    expect(notification.email_success?).to be_truthy
 
     expect(ActionMailer::Base.deliveries.count).to eq 1
+  end
+
+  context "unknown organization" do
+    let(:bulk_import) { FactoryBot.create(:bulk_import_ascend, organization: nil) }
+    it "doesn't notify" do
+      expect(bulk_import.blocking_error?).to be_truthy
+      expect(bulk_import.file_errors.to_s).to match(/Invalid file extension/i)
+      ActionMailer::Base.deliveries = []
+      expect(OrganizationStatus.count).to eq 0
+      expect(Notification.count).to eq 0
+      instance.perform(bulk_import.id)
+      instance.perform(bulk_import.id) # Do it again to verify it never notifies
+      expect(OrganizationStatus.count).to eq 0
+      expect(Notification.count).to eq 0
+    end
   end
 end

@@ -31,7 +31,8 @@ class Notification < ApplicationRecord
     user_alert_stolen_bike_without_location: 25,
     theft_survey_4_2022: 26,
     theft_survey_2023: 27,
-    invalid_extension_for_ascend_import: 28
+    invalid_extension_for_ascend_import: 28,
+    unknown_organization_for_ascend: 29
   }.freeze
 
   MESSAGE_CHANNEL_ENUM = {
@@ -107,12 +108,13 @@ class Notification < ApplicationRecord
   end
 
   def self.admin_kinds
-    pos_integration_broken_kinds + %w[stolen_notification_blocked].freeze
+    %w[stolen_notification_blocked unknown_organization_for_ascend].freeze +
+      pos_integration_broken_kinds
   end
 
   def self.sender_auto_kinds
     donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
-      %w[bike_possibly_found stolen_twitter_alerter]
+      %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend]
   end
 
   def self.search_message_channel_target(str)

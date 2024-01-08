@@ -7,9 +7,7 @@ class InvalidExtensionForAscendImportWorker < ApplicationWorker
     return if SKIP_ASCEND_EMAIL
     bulk_import = BulkImport.find(id)
     organization_id = bulk_import.organization_id
-    if bulk_import.organization_id.blank?
-      raise "Missing organization_id for invalid bulk_import: #{bulk_import.id}"
-    end
+    return if bulk_import.organization_id.blank?
     UpdateOrganizationPosKindWorker.new.perform(organization_id)
     organization_status = OrganizationStatus.where(organization_id: organization_id)
       .at_time(bulk_import.created_at).first
