@@ -6,6 +6,16 @@ class UnknownOrganizationForAscendImportWorker < ApplicationWorker
 
   def perform(id)
     return if SKIP_ASCEND_EMAIL
-    AdminMailer.unknown_organization_for_ascend_import(BulkImport.find(id)).deliver_now
+    bulk_import = BulkImport.find(id)
+    notification = Notification.unknown_organization_for_ascend
+      .where(notifiable: bulk_import).first
+    notification ||= Notification.create!(notifiable: bulk_import,
+      kind: :unknown_organization_for_ascend,
+      user_id: InvalidExtensionForAscendImportWorker::NOTIFICATION_USER_ID)
+
+    return true if notification.email_success?
+
+    AdminMailer.unknown_organization_for_ascend_import(notification).deliver_now
+    notification.update!(delivery_status: "email_success")
   end
 end
