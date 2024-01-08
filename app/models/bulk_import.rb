@@ -142,7 +142,7 @@ class BulkImport < ApplicationRecord
       self.organization_id = organization_for_ascend_name&.id
       save if organization_id.present?
     end
-    if invalid_extension?
+    if organization_id.present? && invalid_extension?
       InvalidExtensionForAscendImportWorker.perform_async(id)
     end
     return true if organization_id.present?
