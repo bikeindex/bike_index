@@ -198,4 +198,5 @@ $(document).ready ->
   warnIfUnsupportedBrowser()
   if $("#donationModal").length
     renderDonationModal()
-  window.adDisplayer = new window.AdDisplayer
+  # Remove ads, for now
+  # window.adDisplayer = new window.AdDisplayer
