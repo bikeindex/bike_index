@@ -27,6 +27,6 @@
 
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @ownerships}
+= render partial: "/shared/pagination", locals: {collection: @ownerships, count: matching_ownerships.size}
 
 = render partial: "/admin/ownerships/table", locals: {ownerships: @ownerships, render_sortable: true}

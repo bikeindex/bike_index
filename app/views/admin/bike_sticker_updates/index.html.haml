@@ -103,7 +103,7 @@
 .row.mt-4.mb-2
   .col-md-6
     %p
-      = admin_number_display(@bike_sticker_updates.total_count)
+      = admin_number_display(matching_bike_sticker_updates.size)
       matching sticker updates
       %em
         = humanized_time_range(@time_range)
@@ -131,7 +131,7 @@
       = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)}
 
 
-= render partial: "/shared/pagination", locals: {collection: @bike_sticker_updates, viewing: "Sticker Update"}
+= render partial: "/shared/pagination", locals: {collection: @bike_sticker_updates, viewing: "Sticker Update", count: matching_bike_sticker_updates.size}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border

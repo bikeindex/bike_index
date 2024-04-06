@@ -77,9 +77,9 @@
 .row.mt-4
   .col-md-6
     %p
-      = admin_number_display(@bike_stickers.total_count)
+      = admin_number_display(selected_bike_stickers.size)
       matching
-      = "sticker".pluralize(@bike_stickers.total_count)
+      = "sticker".pluralize(selected_bike_stickers.size)
       %span.less-strong
         = number_with_delimiter(matching_bike_stickers.claimed.count)
         claimed

@@ -361,8 +361,8 @@
 .row.mt-4
   .col-sm-6
     %h2
-      = number_with_delimiter(@bikes.total_count)
-      = "Bike".pluralize(@bikes.total_count)
+      = number_with_delimiter(@bikes_count)
+      = "Bike".pluralize(@bikes_count)
       %em.small
         = link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param)
 

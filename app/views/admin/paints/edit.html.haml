@@ -62,7 +62,7 @@
 
 - if @bikes.present?
   %p
-    = number_with_delimiter(@bikes.total_count)
+    = number_with_delimiter(@bikes_count)
     Bikes with this paint
   = paginate @bikes, views_prefix: "admin"
 
