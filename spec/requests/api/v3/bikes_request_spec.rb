@@ -783,6 +783,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.bike_organizations.count).to eq 1
         expect(bike.serial_unknown?).to be_truthy
         expect(bike.serial_normalized).to be_blank
+        expect(bike.status).to eq "status_stolen"
         bike_organization = bike.bike_organizations.first
         expect(bike_organization.organization_id).to eq organization.id
         expect(bike_organization.can_edit_claimed).to be_truthy

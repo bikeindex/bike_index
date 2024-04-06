@@ -7,6 +7,7 @@ class Admin::BikesController < Admin::BaseController
   def index
     @page = params[:page] || 1
     @per_page = params[:per_page] || 100
+
     @bikes = available_bikes.includes(:creation_organization, :current_ownership, :paint)
       .reorder("bikes.#{sort_column} #{sort_direction}")
       .page(@page).per(@per_page)
@@ -44,6 +45,7 @@ class Admin::BikesController < Admin::BaseController
     end
     @page = params[:page] || 1
     @per_page = params[:per_page] || 25
+    @duplicate_groups_count = duplicate_groups.size
     @duplicate_groups = duplicate_groups.page(@page).per(@per_page)
   end
 
