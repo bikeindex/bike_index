@@ -31,7 +31,7 @@
 
 .row.mt-4.mb-4
   .col-sm-6
-    = number_with_delimiter(@impound_claims.total_count)
+    = number_with_delimiter(matching_impound_claims.size)
     matching Impound Claims
     %em
       = humanized_time_range(@time_range)
@@ -62,6 +62,6 @@
 .mt-4.mb-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @impound_claims}
+= render partial: "/shared/pagination", locals: {collection: @impound_claims, count: matching_impound_claims.size}
 
 = render partial: "table", locals: {impound_claims: @impound_claims, render_sortable: true, skip_organization: current_organization.present?}

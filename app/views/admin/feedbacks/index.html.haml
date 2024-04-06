@@ -73,7 +73,7 @@
     .mt-2
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
-= render partial: "/shared/pagination", locals: {collection: @feedbacks, viewing: "Message"}
+= render partial: "/shared/pagination", locals: {collection: @feedbacks, viewing: "Message", count: available_feedbacks.size}
 
 = render partial: "/admin/feedbacks/table", locals: {feedbacks: @feedbacks, render_sortable: true}
 

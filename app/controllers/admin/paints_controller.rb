@@ -18,9 +18,10 @@ class Admin::PaintsController < Admin::BaseController
   def edit
     page = params[:page] || 1
     @per_page = params[:per_page] || 20
-    @bikes = Bike.unscoped.default_includes.includes(:paint)
+    bikes = Bike.unscoped.default_includes.includes(:paint)
       .where(paint_id: @paint.id).order("created_at desc")
-      .page(page).per(@per_page)
+    @bikes_count = bikes.size
+    @bikes = bikes.page(page).per(@per_page)
   end
 
   def update
