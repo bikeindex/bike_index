@@ -266,16 +266,16 @@ jobs:
       - store_test_results:
           path: test-results
 
-  deploy_production:
-    machine:
-      enabled: true
-    working_directory: ~/bikeindex/bike_index
-    steps:
-      - checkout
-      - run:
-          name: Deploying to Cloud66 production
-          command: |
-            curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
+  # deploy_production:
+  #   machine:
+  #     enabled: true
+  #   working_directory: ~/bikeindex/bike_index
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Deploying to Cloud66 production
+  #         command: |
+  #           curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
   version: 2
