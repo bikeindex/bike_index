@@ -53,7 +53,6 @@ production:
 
   analytics:
     <<: *default
-    database: bikeindex_analytics
     migrations_paths: db/analytics_migrate
     host: "<%= ENV['ANALYTICS_DB_ADDRESSES'] %>"
     database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
