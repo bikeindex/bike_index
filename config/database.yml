@@ -55,6 +55,8 @@ production:
     <<: *default
     database: bikeindex_analytics
     migrations_paths: db/analytics_migrate
-    host: "<%= ENV['POSTGRESQL_ANALYTICS_ADDRESS'] %>"
-    username: "<%= ENV['POSTGRESQL_ANALYTICS_USERNAME'] %>"
-    password: "<%= ENV['POSTGRESQL_ANALYTICS_PASSWORD'] %>"
+    host: "<%= ENV['ANALYTICS_DB_ADDRESSES'] %>"
+    database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
+    username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
+    password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"
+    port: "<%= ENV['ANALYTICS_DB_PORT'] %>"
