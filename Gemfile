@@ -180,3 +180,7 @@ group :test do
 end
 
 gem "dockerfile-rails", ">= 1.5", group: :development
+
+# Stats gems
+gem "bundler-stats"
+gem "rails_stats"

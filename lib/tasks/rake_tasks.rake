@@ -73,3 +73,6 @@ task database_vacuum: :environment do
 rescue
   Rails.logger.error("Database VACUUM error: #{exc.message}")
 end
+
+# Rakefile
+require "rails_stats"
