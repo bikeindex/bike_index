@@ -54,7 +54,7 @@ production:
   analytics:
     <<: *default
     migrations_paths: db/analytics_migrate
-    host: "<%= ENV['ANALYTICS_DB_ADDRESSES'] %>"
+    host: "<%= ENV['POSTGRESQL_ANALYTICS_ADDRESS'] %>"
     database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
     username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
     password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"
