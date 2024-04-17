@@ -3,6 +3,6 @@ class ApplicationRecord < ActiveRecord::Base
 
   connects_to database: {
     writing: :primary,
-    reading: :primary_replica
+    reading: :primary # :primary_replica
   }
 end
