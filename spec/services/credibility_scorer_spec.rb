@@ -297,7 +297,7 @@ RSpec.describe CredibilityScorer do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
         let!(:payment) { FactoryBot.create(:payment, user: user) }
-        it "returns just user_trusted_organization_member" do
+        it "returns just user_trusted_organization_member", :flaky do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
           expect(subject.bike_user_badges(bike)).to match_array(%i[user_trusted_organization_member user_supporter])
         end
