@@ -444,18 +444,27 @@ RSpec.describe Organization, type: :model do
         can_share_recovery: true
       }
     end
+    let(:bike2) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
+    let(:stolen_record2) { bike2.fetch_current_stolen_record }
+    let!(:bike_organization2) { FactoryBot.create(:bike_organization, bike: bike2, organization: organization) }
     it "returns recovered bikes" do
+      stolen_record2.add_recovery_information(recovery_information)
+      bike_organization2.destroy
+      expect(BikeOrganization.unscoped.pluck(:id)).to match_array([bike_organization.id, bike_organization2.id])
       organization.reload
-      expect(organization.bikes).to eq([bike])
-      expect(organization.bikes.status_stolen).to eq([bike])
+      expect(organization.bikes.pluck(:id)).to eq([bike.id])
+      expect(organization.bikes.status_stolen.pluck(:id)).to eq([bike.id])
+      # Now for the deleted stuff!
+      expect(organization.bike_organizations_ever_registered.pluck(:id)).to match_array([bike_organization.id, bike_organization2.id])
+      expect(organization.bikes_ever_registered.pluck(:id)).to eq([bike.id, bike2.id])
       # Check the inverse lookup
-      expect(Bike.organization(organization)).to eq([bike])
-      expect(Bike.organization(organization.id)).to eq([bike])
+      expect(Bike.organization(organization).pluck(:id)).to eq([bike.id])
+      expect(Bike.organization(organization.id).pluck(:id)).to eq([bike.id])
       # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
       expect(bike.stolen_recovery?).to be_truthy
-      expect(organization.recovered_records).to eq([stolen_record])
+      expect(organization.recovered_records.pluck(:id)).to match_array([stolen_record.id, stolen_record2.id])
     end
   end
 
