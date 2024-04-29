@@ -35,7 +35,7 @@ class Organization < ApplicationRecord
 
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
-  has_many :bike_organizations_ever_registered, -> { with_deleted }, class_name: 'BikeOrganization'
+  has_many :bike_organizations_ever_registered, -> { with_deleted }, class_name: "BikeOrganization"
   has_many :bikes_ever_registered, through: :bike_organizations_ever_registered, source: :bike
   has_many :recovered_records, through: :bikes_ever_registered
 
