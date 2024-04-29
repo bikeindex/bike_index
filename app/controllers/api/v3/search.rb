@@ -51,9 +51,9 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/" do
-          ActiveRecord::Base.connected_to(role: :reading) do
+          # ActiveRecord::Base.connected_to(role: :reading) do
             serialized_bikes_results(paginate(Bike.search(interpreted_params)))
-          end
+          # end
         end
 
         desc "Count of bikes matching search", {
@@ -80,7 +80,7 @@ module API
         end
         get "/count" do
           max_limit = 11_000
-          ActiveRecord::Base.connected_to(role: :reading) do
+          # ActiveRecord::Base.connected_to(role: :reading) do
             # Doing extra stuff to make this query more efficient, since this is called all the time
             interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
             # Un-scope to remove the unnecessary eager loading
@@ -95,7 +95,7 @@ module API
                            0
                          end
             }
-          end
+          # end
         end
 
         # TODO: When next bumping the API version, rename this endpoint to
@@ -114,10 +114,10 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/close_serials" do
-          ActiveRecord::Base.connected_to(role: :reading) do
+          # ActiveRecord::Base.connected_to(role: :reading) do
             close_serials = Bike.search_close_serials(interpreted_params)
             serialized_bikes_results(paginate(close_serials))
-          end
+          # end
         end
 
         desc "Search by substring-match against serial number", {
@@ -134,10 +134,10 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/serials_containing" do
-          ActiveRecord::Base.connected_to(role: :reading) do
+          # ActiveRecord::Base.connected_to(role: :reading) do
             results = Bike.search_serials_containing(interpreted_params)
             serialized_bikes_results(paginate(results))
-          end
+          # end
         end
 
         desc "Search external registries", {
