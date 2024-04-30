@@ -224,6 +224,15 @@
                   autocorrect: "off",
                   autocapitalize: "off",
                   class: "form-control"
+          - if include_field_reg_true_false_question?(@organization, current_user, true)
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :true_false_question, t(".sticker_id_html"), class: "form-well-label"
+              .form-well-input
+                = f.text_field :true_false_question,
+                  autocomplete: "off",
+                  autocorrect: "off",
+                  autocapitalize: "off",
+                  class: "form-control"
 
           -# With impounded and found bikes, including owner_email is confusing
           - if @bike.status_impounded?

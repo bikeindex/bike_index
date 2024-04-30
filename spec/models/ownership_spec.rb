@@ -592,6 +592,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.student_id_key(organization2.slug)).to eq "student_id"
           expect(ownership.organization_affiliation).to eq "employee"
           organization_uniq_keys = OrganizationFeature.reg_fields_organization_uniq.map { |f| f.gsub("reg_", "") }
+          pp organization_uniq_keys
           expect(ownership.registration_info_uniq_keys).to match_array organization_uniq_keys
 
           expect(bike.student_id).to eq "1222"
@@ -615,9 +616,12 @@ RSpec.describe Ownership, type: :model do
 
           expect(ownership.organization_affiliation).to eq "employee"
           expect(ownership.organization_affiliation(organization)).to eq "employee"
+          expect(ownership.organization_affiliation_key(organization)).to eq "organization_affiliation_#{organization.id}"
           expect(ownership.organization_affiliation(organization.id)).to eq "employee"
           expect(ownership.organization_affiliation(organization.slug)).to eq "employee"
           expect(ownership.organization_affiliation(organization2)).to eq "employee"
+          # coming back to this months later, IDK if this is the best approach - but fuck it
+          expect(ownership.organization_affiliation_key(organization2)).to eq "organization_affiliation"
 
           # sanity check
           expect(ownership.registration_info_uniq_keys).to match_array organization_uniq_keys

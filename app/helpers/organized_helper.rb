@@ -147,6 +147,15 @@ module OrganizedHelper
     user.user_registration_organizations.with_student_id(organization.id).none?
   end
 
+  def include_field_reg_true_false_question?(organization = nil, user = nil)
+    return false unless organization.present? &&
+      organization.additional_registration_fields.include?("reg_true_false_question")
+    return true if user.blank?
+    user.user_registration_organizations.with_reg_true_false_question(organization.id).none?
+  end
+
+
+
   def registration_field_label(organization = nil, field_slug = nil, strip_tags: false)
     txt = organization&.registration_field_labels&.dig(field_slug.to_s)
     return nil unless txt.present?
