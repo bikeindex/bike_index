@@ -224,16 +224,13 @@
                   autocorrect: "off",
                   autocapitalize: "off",
                   class: "form-control"
-          - if include_field_reg_true_false_question?(@organization, current_user, true)
+          - if include_field_reg_true_false_question?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row
-              = f.label :true_false_question, t(".sticker_id_html"), class: "form-well-label"
-              .form-well-input
-                = f.text_field :true_false_question,
-                  autocomplete: "off",
-                  autocorrect: "off",
-                  autocapitalize: "off",
-                  class: "form-control"
-
+              %label.form-well-label.form-well-label-large-input
+              .form-well-input-large
+                %label.pt-1.pl-1.cursor-pointer
+                  = check_box_tag :true_false_question, true, false
+                  = registration_field_label(@organization, "reg_true_false_question")
           -# With impounded and found bikes, including owner_email is confusing
           - if @bike.status_impounded?
             = f.hidden_field :owner_email, value: @bike.owner_email || current_user&.email
