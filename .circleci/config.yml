@@ -282,9 +282,9 @@ workflows:
   commit:
     jobs:
       - build
-      # - deploy_production:
-      #     requires:
-      #       - build
-      #     filters:
-      #       branches:
-      #         only: main
+      - deploy_production:
+          requires:
+            - build
+          filters:
+            branches:
+              only: main

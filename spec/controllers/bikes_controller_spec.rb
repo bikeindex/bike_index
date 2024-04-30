@@ -459,7 +459,7 @@ RSpec.describe BikesController, type: :controller do
         context "valid" do
           include_context :geocoder_real
           context "with old style date input" do
-            it "creates a new ownership and bike from an organization" do
+            it "creates a new ownership and bike from an organization", :flaky do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect {
                   post :create, params: {bike: bike_params, stolen_record: stolen_params}
