@@ -229,7 +229,7 @@
               %label.form-well-label.form-well-label-large-input
               .form-well-input-large
                 %label.pt-1.pl-1.cursor-pointer
-                  = check_box_tag :true_false_question, true, false
+                  = check_box_tag :true_false_question, "true", false
                   = registration_field_label(@organization, "reg_true_false_question")
           -# With impounded and found bikes, including owner_email is confusing
           - if @bike.status_impounded?
