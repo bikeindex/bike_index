@@ -51,7 +51,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       ScheduledSearchForExternalRegistryBikesWorker,
       ScheduledStoreLogSearchesWorker,
       TsvCreatorWorker,
-      UnusedOwnershipRemovalWorker,
+      # UnusedOwnershipRemovalWorker,
       UpdateCountsWorker,
       UpdateExchangeRatesWorker,
       UpdateInvoiceWorker,
