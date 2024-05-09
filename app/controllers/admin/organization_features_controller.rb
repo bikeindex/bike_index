@@ -15,7 +15,7 @@ class Admin::OrganizationFeaturesController < Admin::BaseController
   end
 
   def edit
-    @invoices = @organization_feature.invoices.includes(:organization, :payments)
+    @invoices = @organization_feature.invoices.includes(:organization, :payments).reorder(:id)
   end
 
   def update

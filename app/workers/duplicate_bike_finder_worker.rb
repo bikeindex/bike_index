@@ -1,5 +1,5 @@
 class DuplicateBikeFinderWorker < ApplicationWorker
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: "droppable"
 
   def perform(bike_id)
     bike = Bike.unscoped.find_by_id(bike_id)

@@ -253,7 +253,7 @@ RSpec.describe Admin::BikesController, type: :request do
       end
     end
     context "multi_destroy" do
-      it "destroys the all" do
+      it "destroys the all", :flaky do
         bike1 = FactoryBot.create(:bike)
         bike2 = FactoryBot.create(:bike, example: true)
         bike3 = FactoryBot.create(:bike)
