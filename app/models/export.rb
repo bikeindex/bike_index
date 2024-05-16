@@ -4,7 +4,8 @@ class Export < ApplicationRecord
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
   AVERY_HEADERS = %w[owner_name address].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[vehicle_type thumbnail extra_registration_number registered_by owner_email owner_name]).freeze
+  EXTRA_HEADERS = %w[vehicle_type thumbnail extra_registration_number registered_by owner_email owner_name status].freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).freeze
 
   mount_uploader :file, ExportUploader
 
@@ -53,6 +54,7 @@ class Export < ApplicationRecord
     elsif organization_or_overide.is_a?(Organization)
       additional_headers = organization_or_overide.additional_registration_fields
       additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
+      additional_headers += ["is_impounded"] if organization_or_overide.enabled?("impound_bikes")
     end
     additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
     # We always give the option to export extra_registration_number, don't double up if org can add too
@@ -158,8 +160,12 @@ class Export < ApplicationRecord
   end
 
   def custom_bike_ids=(val)
-    custom_ids = (val.is_a?(Array) ? val : val.split(/\s+|,/))
-      .map { |cid| bike_id_from_url(cid) }.compact.uniq
+    custom_ids = if val.is_a?(Array)
+      val
+    else
+      # Organized Bikes controller uses _ as delimiter to shorten encoded URL length
+      val.match?(/\A\w*\z/) ? val.split("_") : val.split(/\s+|,/)
+    end.map { |cid| bike_id_from_url(cid) }.compact.uniq
     custom_ids = nil if custom_ids.none?
     self.options = options.merge(custom_bike_ids: custom_ids)
   end

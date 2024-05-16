@@ -143,6 +143,7 @@ class OrganizationExportWorker < ApplicationWorker
     when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
     when "is_stolen" then bike.status_stolen? ? "true" : nil
+    when "is_impounded" then bike.status_impounded? ? "true" : nil
     when "address" then bike.registration_address["street"] # These are the expanded values for bike registration address
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
@@ -150,6 +151,7 @@ class OrganizationExportWorker < ApplicationWorker
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     when "vehicle_type" then bike.type_titleize
+    when "status" then bike.status_humanized_no_with_owner
     end
   end
 

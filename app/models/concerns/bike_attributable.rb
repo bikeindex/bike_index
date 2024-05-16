@@ -39,11 +39,16 @@ module BikeAttributable
 
   def status_humanized
     return "found" if status_found?
-    self.class.status_humanized(status)
+    Bike.status_humanized(status)
   end
 
   def status_humanized_translated
-    self.class.status_humanized_translated(status_humanized)
+    Bike.status_humanized_translated(status_humanized)
+  end
+
+  def status_humanized_no_with_owner
+    return "" if status == "status_with_owner"
+    status_humanized
   end
 
   # We may eventually remove the boolean. For now, we're just going with it.

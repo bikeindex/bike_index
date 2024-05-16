@@ -199,10 +199,11 @@ RSpec.describe OrganizationExportWorker, type: :job do
           nil, # Since user isn't part of organization. TODO: Currently not implemented
           email,
           "George Smith",
+          "", # no status
           nil # assigned_sticker
         ]
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"#{target_mnfg}\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\"" }
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"#{target_mnfg}\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\",\"\"" }
       it "exports with all the header values" do
         expect(bike.reload.owner_name).to eq "George Smith"
         instance.perform(export.id)
@@ -330,6 +331,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             registered_by: nil,
             owner_email: bike.owner_email,
             owner_name: nil,
+            status: "",
             bike_sticker: "FF 333 333",
             organization_affiliation: "community_member",
             phone: "7177423423",
@@ -399,6 +401,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             student_id: nil,
             phone: nil,
             bike_sticker: nil,
+            status: nil,
             address: nil,
             city: nil,
             state: nil,
@@ -441,6 +444,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
               owner_email: bike.owner_email,
               owner_name: nil,
               bike_sticker: nil,
+              status: "",
               organization_affiliation: "community_member",
               phone: "7177423423",
               student_id: "XX9999",
