@@ -15,7 +15,7 @@ module Organized
     end
 
     def new
-      @export ||= Export.new
+      @export ||= Export.new(permitted_new_parameters)
     end
 
     def create
@@ -70,6 +70,11 @@ module Organized
       else
         flash[:error] = translation(:do_not_have_permission)
       end
+    end
+
+    def permitted_new_parameters
+      # For new, params aren't in export (to save encoding space)
+      params.permit(*params_with_assigned_codes)
     end
 
     def permitted_parameters

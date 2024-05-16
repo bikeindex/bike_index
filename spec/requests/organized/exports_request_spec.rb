@@ -103,6 +103,28 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(flash).to_not be_present
         end
       end
+      context "passed properties" do
+        let(:export_properties) do
+          {
+            kind: "organization",
+            organization_id: current_organization.id,
+            custom_bike_ids: '123_12_44444',
+            only_custom_bike_ids: true,
+            headers: %w[link registered_at manufacturer model color serial is_stolen],
+            user_id: current_user.id
+          }
+        end
+        it "renders with those options" do
+          get "#{base_url}/new?#{export_properties.to_query}"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:new)
+          expect(flash).to_not be_present
+          export = assigns(:export)
+          expect(export.headers).to eq(%w[link registered_at manufacturer model color serial is_stolen])
+          expect(export.only_custom_bike_ids).to be_truthy
+          expect(export.custom_bike_ids).to eq([123, 12, 44444])
+        end
+      end
     end
 
     describe "destroy" do

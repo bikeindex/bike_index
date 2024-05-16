@@ -158,8 +158,12 @@ class Export < ApplicationRecord
   end
 
   def custom_bike_ids=(val)
-    custom_ids = (val.is_a?(Array) ? val : val.split(/\s+|,/))
-      .map { |cid| bike_id_from_url(cid) }.compact.uniq
+    custom_ids = if val.is_a?(Array)
+      val
+    else
+      # Organized Bikes controller uses _ as delimiter to shorten encoded URL length
+      val.match?(/\A\w*\z/) ? val.split('_') : val.split(/\s+|,/)
+    end.map { |cid| bike_id_from_url(cid) }.compact.uniq
     custom_ids = nil if custom_ids.none?
     self.options = options.merge(custom_bike_ids: custom_ids)
   end

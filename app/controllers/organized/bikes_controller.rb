@@ -13,13 +13,13 @@ module Organized
         @per_page = params[:per_page] || 10
         search_organization_bikes
         if current_organization.enabled?("csv_exports") && InputNormalizer.boolean(params[:create_export])
-          if @bikes.count > 10_000 # Don't want everything to explode...
+          if @available_bikes.count > 1_000 # Don't want everything to explode...
             flash[:error] = "Too many bikes selected to export"
           else
-            export = Export.create(create_export_params)
-            OrganizationExportWorker.perform_async(export.id)
-            flash[:success] = "Export created"
-            redirect_to organization_export_path(export, organization_id: current_organization.id)
+            if @available_bikes.count > 300
+              flash[:info] = "Warning: Exporting from search with this many matching bikes may not work correctly"
+            end
+            redirect_to new_organization_export_path(create_export_params)
           end
         end
       else
@@ -225,13 +225,19 @@ module Organized
 
     def create_export_params
       {
-        kind: "organization",
         organization_id: current_organization.id,
-        custom_bike_ids: @available_bikes.pluck(:id),
+        custom_bike_ids: @available_bikes.pluck(:id).join('_'), # Use _ because it doesn't get encoded
         only_custom_bike_ids: true,
-        headers: Export.permitted_headers(current_organization),
-        user_id: current_user.id
+        # headers: Export.permitted_headers(current_organization),
       }
     end
+    # {
+    #     kind: "organization",
+    #     organization_id: current_organization.id,
+    #     custom_bike_ids: @available_bikes.pluck(:id),
+    #     only_custom_bike_ids: true,
+    #     headers: Export.permitted_headers(current_organization),
+    #     user_id: current_user.id
+    #   }
   end
 end

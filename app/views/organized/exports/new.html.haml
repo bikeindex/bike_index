@@ -4,6 +4,7 @@
       %em
         = current_organization.name
       new export
+      %code= params[:cc]
 
   = form_for @export, {url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}} do |f|
     = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
@@ -33,10 +34,11 @@
           Included columns:
       .col-lg-8
         .row
+          - checked_headers = @export.headers.present? ? @export.headers : Export.default_headers
           - Export.permitted_headers(current_organization).each do |header|
             .form-group.col-xs-6.col-md-4
               %label.checkbox
-                = f.check_box :headers, {multiple: true, checked: Export.default_headers.include?(header)}, header, 1
+                = f.check_box :headers, {multiple: true, checked: checked_headers.include?(header)}, header, 1
                 = header.titleize(keep_id_suffix: true)
     .form-group.row.mt-4.hiddenOnOnlyCustom
       = f.label :start_at, "Registered after", class: "org-form-label"
@@ -78,6 +80,8 @@
           = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"
           %span.below-input-help
             For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+            %br
+            (can just be the IDs - e.g. <code>123, 4567</code>)
           %label.checkbox.mt-0
             = f.check_box :only_custom_bike_ids
             <em>Only</em> include specific bikes
