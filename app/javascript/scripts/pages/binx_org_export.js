@@ -25,9 +25,9 @@ export default class BinxAppOrgExport {
         )
       })
 
-      // If this is 'Add Specific Bikes to export'
-      // Mark 'only include specific bikes' by default
-      if ($(e.target).is('#addSpecificBikes')) {
+      // If this is 'Add Specific Bikes to export' mark 'only include specific bikes' by default
+      // (unless include partial registrations is checked)
+      if ($(e.target).is('#addSpecificBikes') && !$('#include_partial_registrations').is(':checked')) {
         $('#export_only_custom_bike_ids').prop('checked', true).change()
       }
     })
@@ -83,6 +83,7 @@ export default class BinxAppOrgExport {
   showOrHideOnlyCustom () {
     let isOnlyCustom = $('#export_only_custom_bike_ids').is(':checked')
     if (isOnlyCustom) {
+      $('#expandCustomBikeIds').slideDown('fast') // required if custom bike ids start assigned
       $('.hiddenOnOnlyCustom').slideUp('fast')
     } else {
       $('.hiddenOnOnlyCustom')

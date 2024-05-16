@@ -46,19 +46,36 @@ RSpec.describe Organized::BikesController, type: :request do
     end
     describe "create_export" do
       let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
+      let(:target_params) do
+        {
+          organization_id: current_organization.id,
+          custom_bike_ids: "#{bike.id}_#{bike2.id}",
+          only_custom_bike_ids: true
+        }
+      end
+      let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: current_organization, manufacturer: bike.manufacturer) }
       it "creates export" do
-        Sidekiq::Worker.clear_all
         expect {
           get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
-        }.to change(Export, :count).by 1
-        expect(flash[:success]).to be_present
-        export = Export.last
-        expect(export.organization_id).to eq current_organization.id
-        expect(export.kind).to eq "organization"
-        expect(export.custom_bike_ids).to eq([bike.id])
-        expect(export.user_id).to eq current_user.id
-        expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
-        expect(OrganizationExportWorker.jobs.count).to eq 1
+        }.to change(Export, :count).by 0
+        expect(flash).to be_blank
+        expect(response).to redirect_to(new_organization_export_path(target_params))
+      end
+      context "directly create export" do
+        it "directly creates" do
+          Sidekiq::Worker.clear_all
+          expect {
+            get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
+          }.to change(Export, :count).by 1
+          expect(flash[:info]).to be_present
+          export = Export.last
+          expect(export.organization_id).to eq current_organization.id
+          expect(export.kind).to eq "organization"
+          expect(export.custom_bike_ids).to eq([bike.id, bike2.id])
+          expect(export.user_id).to eq current_user.id
+          expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
+          expect(OrganizationExportWorker.jobs.count).to eq 1
+        end
       end
     end
   end

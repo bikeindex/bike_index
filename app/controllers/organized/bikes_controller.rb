@@ -13,13 +13,18 @@ module Organized
         @per_page = params[:per_page] || 10
         search_organization_bikes
         if current_organization.enabled?("csv_exports") && InputNormalizer.boolean(params[:create_export])
-          if @available_bikes.count > 1_000 # Don't want everything to explode...
+          if @available_bikes.count > 10_000 # Don't want everything to explode...
             flash[:error] = "Too many bikes selected to export"
+          elsif directly_create_export?
+            flash[:info] = "Directly creating export - can't configure with over 1,000 bikes"
+            export = Export.create(create_export_params)
+            OrganizationExportWorker.perform_async(export.id)
+            redirect_to organization_export_path(export, organization_id: current_organization.id)
           else
             if @available_bikes.count > 300
               flash[:info] = "Warning: Exporting from search with this many matching bikes may not work correctly"
             end
-            redirect_to new_organization_export_path(create_export_params)
+            redirect_to new_organization_export_path(build_export_params)
           end
         end
       else
@@ -223,21 +228,22 @@ module Organized
       @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last
     end
 
-    def create_export_params
+    def directly_create_export?
+      InputNormalizer.boolean(params[:directly_create_export]) || @available_bikes.count > 999
+    end
+
+    def build_export_params
       {
         organization_id: current_organization.id,
-        custom_bike_ids: @available_bikes.pluck(:id).join('_'), # Use _ because it doesn't get encoded
         only_custom_bike_ids: true,
-        # headers: Export.permitted_headers(current_organization),
+        custom_bike_ids: @available_bikes.pluck(:id).join('_') # Use _ because it doesn't get encoded
       }
     end
-    # {
-    #     kind: "organization",
-    #     organization_id: current_organization.id,
-    #     custom_bike_ids: @available_bikes.pluck(:id),
-    #     only_custom_bike_ids: true,
-    #     headers: Export.permitted_headers(current_organization),
-    #     user_id: current_user.id
-    #   }
+
+    def create_export_params
+      build_export_params.merge(kind: "organization",
+        headers: Export.permitted_headers(current_organization),
+        user_id: current_user.id)
+    end
   end
 end

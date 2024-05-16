@@ -76,12 +76,12 @@
           .col-xs-4.mb-0
             %a#addSpecificBikes.field-expander{href: "#expandCustomBikeIds"}
               Add specific bikes to export
-        .collapsed-fields
+        .collapsed-fields#expandCustomBikeIds
           = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"
           %span.below-input-help
             For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
             %br
-            (can just be the IDs - e.g. <code>123, 4567</code>)
+            (can also be just the IDs - e.g. for the above: <code>123, 4567</code>)
           %label.checkbox.mt-0
             = f.check_box :only_custom_bike_ids
             <em>Only</em> include specific bikes
