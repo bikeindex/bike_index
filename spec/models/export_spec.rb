@@ -221,7 +221,7 @@ RSpec.describe Export, type: :model do
     let(:additional_headers) { %w[address bike_sticker organization_affiliation phone student_id] }
     let(:all_headers) { permitted_headers + additional_headers }
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 13
+      expect(permitted_headers.count).to eq 14
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers("include_paid")).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
@@ -230,9 +230,21 @@ RSpec.describe Export, type: :model do
       expect(organization_full.additional_registration_fields.map { |s| s.gsub("reg_", "") }).to eq additional_headers
       expect(Export.permitted_headers(organization_full)).to eq all_headers
     end
+    context "with impounded and partial" do
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
+      let(:org_headers) do
+        Export::DEFAULT_HEADERS + ["is_impounded"] + Export::EXTRA_HEADERS + ["partial_registration"]
+      end
+      it "returns the array we expect" do
+        expect(permitted_headers.count).to eq 14
+        expect(Export.permitted_headers).to eq permitted_headers
+        expect(Export.permitted_headers("include_paid")).to match_array all_headers
+        expect(Export.permitted_headers(organization)).to eq org_headers
+      end
+    end
     context "with bike_stickers from regional organization" do
       let!(:organization_in_region) { FactoryBot.create(:organization, :in_nyc) }
-      let!(:organization_regional) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: %w[bike_stickers regional_bike_counts]) }
+      let!(:organization_regional) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: %w[bike_stickers regional_bike_counts ]) }
       it "returns with reg_bike_sticker" do
         organization_regional.reload
         expect(organization_regional.regional?).to be_truthy

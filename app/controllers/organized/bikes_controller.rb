@@ -16,6 +16,8 @@ module Organized
           if @available_bikes.count > 10_000 # Don't want everything to explode...
             flash[:error] = "Too many bikes selected to export"
           elsif directly_create_export?
+            # There is probably a better way to handle this, via storing in session or building the export but not starting
+            # ... but, this works
             flash[:info] = "Directly creating export - can't configure with over 1,000 bikes"
             export = Export.create(create_export_params)
             OrganizationExportWorker.perform_async(export.id)
