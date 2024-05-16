@@ -24,7 +24,14 @@ export default class BinxAppOrgExport {
             .format('YYYY-MM-DDTHH:mm')
         )
       })
+
+      // If this is 'Add Specific Bikes to export'
+      // Mark 'only include specific bikes' by default
+      if ($(e.target).is('#addSpecificBikes')) {
+        $('#export_only_custom_bike_ids').prop('checked', true).change()
+      }
     })
+
     // make the datetimefield collapse, remove the time
     $('.field-collapser').on('click', e => {
       e.preventDefault()
