@@ -238,7 +238,7 @@ module Organized
       {
         organization_id: current_organization.id,
         only_custom_bike_ids: true,
-        custom_bike_ids: @available_bikes.pluck(:id).join('_') # Use _ because it doesn't get encoded
+        custom_bike_ids: @available_bikes.pluck(:id).join("_") # Use _ because it doesn't get encoded
       }
     end
 

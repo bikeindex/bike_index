@@ -164,7 +164,7 @@ class Export < ApplicationRecord
       val
     else
       # Organized Bikes controller uses _ as delimiter to shorten encoded URL length
-      val.match?(/\A\w*\z/) ? val.split('_') : val.split(/\s+|,/)
+      val.match?(/\A\w*\z/) ? val.split("_") : val.split(/\s+|,/)
     end.map { |cid| bike_id_from_url(cid) }.compact.uniq
     custom_ids = nil if custom_ids.none?
     self.options = options.merge(custom_bike_ids: custom_ids)

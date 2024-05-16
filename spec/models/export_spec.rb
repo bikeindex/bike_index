@@ -112,7 +112,7 @@ RSpec.describe Export, type: :model do
     it "assigns the bike ids" do
       # Verify that there is a dash in the org slug, since we use that as a delimiter in special circumstances
       # and need to test that it doesn't break things
-      expect(organization.slug).to match('-')
+      expect(organization.slug).to match("-")
       bike1.reload
       expect(bike1.created_at).to be < export.end_at
       export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}?organization_id=#{organization.slug}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}?organization_id=#{organization.slug}  "
@@ -241,7 +241,7 @@ RSpec.describe Export, type: :model do
     end
     context "with bike_stickers from regional organization" do
       let!(:organization_in_region) { FactoryBot.create(:organization, :in_nyc) }
-      let!(:organization_regional) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: %w[bike_stickers regional_bike_counts ]) }
+      let!(:organization_regional) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: %w[bike_stickers regional_bike_counts]) }
       it "returns with reg_bike_sticker" do
         organization_regional.reload
         expect(organization_regional.regional?).to be_truthy

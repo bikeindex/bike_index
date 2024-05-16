@@ -108,7 +108,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           {
             kind: "organization",
             organization_id: current_organization.id,
-            custom_bike_ids: '123_12_44444',
+            custom_bike_ids: "123_12_44444",
             only_custom_bike_ids: true,
             headers: %w[link registered_at manufacturer model color serial is_stolen],
             user_id: current_user.id
