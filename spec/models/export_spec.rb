@@ -232,14 +232,11 @@ RSpec.describe Export, type: :model do
     end
     context "with impounded and partial" do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
-      let(:org_headers) do
-        Export::DEFAULT_HEADERS + ["is_impounded"] + Export::EXTRA_HEADERS + ["partial_registration"]
-      end
       it "returns the array we expect" do
         expect(permitted_headers.count).to eq 14
         expect(Export.permitted_headers).to eq permitted_headers
         expect(Export.permitted_headers("include_paid")).to match_array all_headers
-        expect(Export.permitted_headers(organization)).to eq org_headers
+        expect(Export.permitted_headers(organization)).to match_array(permitted_headers + %w[is_impounded partial_registration])
       end
     end
     context "with bike_stickers from regional organization" do

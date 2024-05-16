@@ -235,8 +235,7 @@
                 %em
                   = bike.owner_name
             %td.hiddenColumn.status_cell.small
-              - unless bike.status_with_owner?
-                = status_display(bike.status_humanized)
+              = status_display(bike.status_humanized_no_with_owner)
             - additional_registration_fields.each do |reg_field|
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{class: "#{reg_field}_cell"}
