@@ -76,7 +76,7 @@
             %a#addSpecificBikes.field-expander{href: "#expandCustomBikeIds"}
               Add specific bikes to export
         .collapsed-fields#expandCustomBikeIds
-          = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"
+          = f.text_area :custom_bike_ids, value: @export.custom_bike_ids&.join(", "), placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"
           %span.below-input-help
             For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
             %br
