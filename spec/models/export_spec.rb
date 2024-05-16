@@ -110,9 +110,6 @@ RSpec.describe Export, type: :model do
     let!(:bike3) { FactoryBot.create(:bike) }
     let(:export) { FactoryBot.build(:export_organization, organization: organization, end_at: Time.current - 1.hour) }
     it "assigns the bike ids" do
-      # Verify that there is a dash in the org slug, since we use that as a delimiter in special circumstances
-      # and need to test that it doesn't break things
-      expect(organization.slug).to match("-")
       bike1.reload
       expect(bike1.created_at).to be < export.end_at
       export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}?organization_id=#{organization.slug}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}?organization_id=#{organization.slug}  "
@@ -120,7 +117,7 @@ RSpec.describe Export, type: :model do
       expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
-      # Using - (dash) separator - custom separator from
+      # Using _ separator: bikes search > export separator
       export.custom_bike_ids = "#{bike1.id}_#{bike3.id}_#{bike2.id}"
       expect(export.custom_bike_ids).to eq([bike1.id, bike3.id, bike2.id])
       export.assign_exported_bike_ids
