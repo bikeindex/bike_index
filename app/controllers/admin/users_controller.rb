@@ -124,7 +124,6 @@ class Admin::UsersController < Admin::BaseController
     @time_range_column = sort_column if %w[updated_at deleted_at].include?(sort_column)
     @time_range_column = nil if @time_range_column == "deleted_at" && !@search_deleted
     @time_range_column ||= "created_at"
-
     users.where(@time_range_column => @time_range)
   end
 
