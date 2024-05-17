@@ -3401,7 +3401,8 @@ CREATE TABLE public.users (
     instagram character varying,
     no_non_theft_notification boolean DEFAULT false,
     admin_options jsonb,
-    time_single_format boolean DEFAULT false
+    time_single_format boolean DEFAULT false,
+    deleted_at timestamp without time zone
 );
 
 
@@ -6645,6 +6646,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231203021402'),
 ('20231206022455'),
 ('20231212023722'),
-('20231212025929');
+('20231212025929'),
+('20240517161713');
 
 

@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   cattr_accessor :current_user
 
+  acts_as_paranoid
   has_secure_password
 
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
@@ -17,7 +18,7 @@ class User < ApplicationRecord
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :notifications
-  has_many :memberships, dependent: :destroy
+  has_many :memberships
   has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
@@ -36,8 +37,8 @@ class User < ApplicationRecord
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy
-  has_many :user_emails, dependent: :destroy
-  has_many :user_phones, dependent: :destroy
+  has_many :user_emails
+  has_many :user_phones
   has_many :user_alerts
   has_many :superuser_abilities
 
