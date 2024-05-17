@@ -37,7 +37,7 @@ class User < ApplicationRecord
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy
-  has_many :user_emails
+  has_many :user_emails, dependent: :destroy
   has_many :user_phones
   has_many :user_alerts
   has_many :superuser_abilities
@@ -330,6 +330,10 @@ class User < ApplicationRecord
 
   def has_shop_membership?
     organizations.bike_shop.limit(1).any?
+  end
+
+  def deletable?
+    !superuser? && memberships.admin.limit(1).none?
   end
 
   def default_organization

@@ -99,7 +99,7 @@ Rails.application.routes.draw do
       post "unsubscribe_update"
     end
   end
-  resource :my_account, only: %i[show update]
+  resource :my_account, only: %i[show update destroy]
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")

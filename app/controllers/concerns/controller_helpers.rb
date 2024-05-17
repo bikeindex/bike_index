@@ -45,6 +45,7 @@ module ControllerHelpers
   def display_dev_info?
     return @display_dev_info if defined?(@display_dev_info)
     # Tie display_dev_info to the rack mini profiler display
+    # add ?pp=disable to the URL to disable miniprofiler temporarily
     @display_dev_info = !Rails.env.test? && current_user&.developer? &&
       Rack::MiniProfiler.current.present?
   end

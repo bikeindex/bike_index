@@ -1,6 +1,6 @@
 class MyAccountsController < ApplicationController
   include Sessionable
-  before_action :assign_edit_template, only: %i[edit update]
+  before_action :assign_edit_template, only: %i[edit update destroy]
   before_action :authenticate_user_for_my_accounts_controller
   around_action :set_reading_role, only: %i[show]
 
@@ -43,6 +43,22 @@ class MyAccountsController < ApplicationController
     end
     @page_errors = @user.errors.full_messages
     render action: :edit
+  end
+
+  def destroy
+    if current_user.deletable?
+      UserDeleteWorker.new.perform(current_user.id, user: current_user)
+      flash[:success] = "Account deleted"
+      redirect_to logout_url
+    else
+      error_reason = if current_user.superuser?
+        "Super User's can't delete their account."
+      else
+        "Organization admins cannot delete their accounts."
+      end
+      flash[:error] = [error_reason, "Email support@bikeindex.org for help"].join(" ")
+      redirect_back(fallback_location: edit_my_account_url(edit_template: @edit_template))
+    end
   end
 
   private

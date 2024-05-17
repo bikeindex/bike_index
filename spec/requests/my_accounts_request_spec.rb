@@ -566,4 +566,33 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
   end
+
+  describe "delete" do
+    let!(:current_user) { let!(:user) { FactoryBot.create(:user_confirmed, :with_organization, role: "member") } }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: current_user) }
+    include_context :request_spec_logged_in_as_user
+
+    it "deletes" do
+      expect(current_user.reload.deletable?).to be_truthy
+      expect do
+        delete base_url
+      end.to change(User, :count).by(-1)
+      expect(Bike.count).to eq 0
+      expect(response).to redirect_to(logout_path)
+      expect(flash[:success]).to be_present
+    end
+
+    context "organization admin" do
+      let!(:current_user) { FactoryBot.create(:user, :with_organization, role: "admin") }
+
+      it "does not delete" do
+        expect(current_user.reload.deletable?).to be_falsey
+        expect do
+          delete base_url
+        end.to change(User, :count).by(0)
+        expect(Bike.count).to eq 1
+        expect(flash[:error]).to eq "Organization admins cannot delete their accounts. Email support@bikeindex.org for help"
+      end
+    end
+  end
 end
