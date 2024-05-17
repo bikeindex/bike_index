@@ -1,4 +1,10 @@
 - render_sortable ||= false
+- render_deleted ||= false
+
+- unless render_deleted
+  <style>.deleted-cell {display: none !important;} </style>
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
 
 .full-screen-table
   %table.table.table-bordered.table-striped.table-sm
@@ -7,6 +13,8 @@
         = sortable "created_at", render_sortable: render_sortable
       %th.only-dev-visible
         %small= sortable "updated_at", render_sortable: render_sortable
+      %th.deleted-cell
+        %small= sortable "deleted_at", render_sortable: render_sortable
       %th
         = sortable "email", render_sortable: render_sortable
       %th
@@ -36,6 +44,10 @@
             %td.only-dev-visible
               %small.convertTime
                 = l user.updated_at, format: :convert_time
+            %td.deleted-cell
+              - if user.deleted_at.present?
+                %span.convertTime.text-danger
+                  = l user.deleted_at, format: :convert_time
             %td
               .less-strong-hold
                 = render partial: "/shared/admin_user_cell", locals: {email: user.email, user: user, render_search: false, cache: true}

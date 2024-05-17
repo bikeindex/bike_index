@@ -1,6 +1,6 @@
 class MyAccountsController < ApplicationController
   include Sessionable
-  before_action :assign_edit_template, only: %i[edit update]
+  before_action :assign_edit_template, only: %i[edit update destroy]
   before_action :authenticate_user_for_my_accounts_controller
   around_action :set_reading_role, only: %i[show]
 
@@ -45,6 +45,22 @@ class MyAccountsController < ApplicationController
     render action: :edit
   end
 
+  def destroy
+    if current_user.deletable?
+      UserDeleteWorker.new.perform(current_user.id, user: current_user)
+      remove_session
+      redirect_to goodbye_url, notice: "Account deleted!"
+    else
+      error_reason = if current_user.superuser?
+        "Super User's can't delete their account."
+      else
+        "Organization admins cannot delete their accounts."
+      end
+      flash[:error] = [error_reason, "Email support@bikeindex.org for help"].join(" ")
+      redirect_back(fallback_location: edit_my_account_url(edit_template: @edit_template))
+    end
+  end
+
   private
 
   def authenticate_user_for_my_accounts_controller
@@ -55,7 +71,8 @@ class MyAccountsController < ApplicationController
     @edit_templates ||= {
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
       password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
-      sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit])
+      sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
     }.merge(registration_organization_template).as_json
   end
 

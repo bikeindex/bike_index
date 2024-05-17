@@ -2435,6 +2435,7 @@ nl:
         sharing: Delen + persoonlijke pagina
         user_settings: Gebruikersinstellingen
         registration_organizations: Registratie Organisaties
+        delete_account: Account verwijderen
       update:
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
@@ -5716,6 +5717,13 @@ nl:
       update_your_phone_on_html: Update je telefoon in %{user_settings_link}
       when_not_selected: Indien niet aangevinkt, beheer via de pagina "Groepen en
         organisaties" van elke fiets.
+    delete_account:
+      delete_account: Account verwijderen
+      delete_my_account: Verwijder mijn account en al mijn geregistreerde fietsen
+      delete_warning_html: "<strong>Waarschuwing!</strong> Deze actie kan niet ongedaan
+        gemaakt worden!"
+      modal_title: Weet u zeker dat u uw account wilt verwijderen?
+      nevermind: Laat maar
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe

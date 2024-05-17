@@ -2439,6 +2439,7 @@ nb:
         registration_organizations: Registreringsorganisasjoner
         sharing: Deling + personlig side
         user_settings: Brukerinstillinger
+        delete_account: Slett konto
       update:
         current_password_doesnt_match: Gjeldende passord stemmer ikke, det er nødvendig
           for å oppdatere passordet ditt.
@@ -4514,6 +4515,12 @@ nb:
       welcome: Velkommen
       you_have_no_registered_bikes: Du har ingen registrerte sykler
       you_have_no_registered_locks: Du har ingen registrerte låser
+    delete_account:
+      delete_account: Slett konto
+      delete_my_account: Slett kontoen min og alle mine registrerte sykler
+      delete_warning_html: "<strong>Advarsel!</strong> Denne handlingen kan ikke angres!"
+      modal_title: Er du sikker på at du vil slette kontoen din?
+      nevermind: Glem det
   news:
     index:
       bike_index_blog: Sykkelindeksblogg

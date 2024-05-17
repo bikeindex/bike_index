@@ -2305,6 +2305,7 @@ es:
         registration_organizations:
         sharing:
         user_settings:
+        delete_account:
       update:
         current_password_doesnt_match:
         successfully_updated:
@@ -3500,6 +3501,12 @@ es:
       welcome:
       you_have_no_registered_bikes:
       you_have_no_registered_locks:
+    delete_account:
+      delete_account:
+      delete_my_account:
+      delete_warning_html:
+      modal_title:
+      nevermind:
   news:
     index:
       bike_index_blog:

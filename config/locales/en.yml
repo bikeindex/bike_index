@@ -1726,6 +1726,7 @@ en:
         not_your_lock: Whoops, that's not your lock!
     my_accounts:
       edit:
+        delete_account: Delete account
         password: Password
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
@@ -4002,6 +4003,12 @@ en:
       nb: EUR
       nl: EUR
   my_accounts:
+    delete_account:
+      delete_account: Delete account
+      delete_my_account: Delete my account and all my registered bikes
+      delete_warning_html: "<strong>Warning!</strong> This action can not be undone!"
+      modal_title: Are you sure you want to delete your account?
+      nevermind: Nevermind
     edit:
       save_changes: Save changes
     password:

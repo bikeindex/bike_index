@@ -58,7 +58,7 @@ class Admin::UsersController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at email updated_at]
+    %w[created_at email updated_at deleted_at]
   end
 
   def earliest_period_date
@@ -66,7 +66,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def find_user
-    @user = User.username_friendly_find(params[:id])
+    @user = User.unscoped.username_friendly_find(params[:id])
     raise ActiveRecord::RecordNotFound unless @user.present?
   end
 
@@ -105,12 +105,14 @@ class Admin::UsersController < Admin::BaseController
     @search_ambassadors = InputNormalizer.boolean(params[:search_ambassadors])
     @search_banned = InputNormalizer.boolean(params[:search_banned])
     @search_superusers = InputNormalizer.boolean(params[:search_superusers])
+    @search_deleted = InputNormalizer.boolean(params[:search_deleted])
     @updated_at = InputNormalizer.boolean(params[:search_updated_at])
     users = if current_organization.present?
       current_organization.users
     else
       User
     end
+    users = users.only_deleted if @search_deleted
     users = users.ambassadors if @search_ambassadors
     users = users.superuser_abilities if @search_superusers
     users = users.banned if @search_banned
@@ -119,7 +121,9 @@ class Admin::UsersController < Admin::BaseController
       users = users.search_phone(params[:search_phone])
     end
 
-    @time_range_column = sort_column == "updated_at" ? "updated_at" : "created_at"
+    @time_range_column = sort_column if %w[updated_at deleted_at].include?(sort_column)
+    @time_range_column = nil if @time_range_column == "deleted_at" && !@search_deleted
+    @time_range_column ||= "created_at"
     users.where(@time_range_column => @time_range)
   end
 
