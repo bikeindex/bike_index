@@ -48,8 +48,8 @@ class MyAccountsController < ApplicationController
   def destroy
     if current_user.deletable?
       UserDeleteWorker.new.perform(current_user.id, user: current_user)
-      flash[:success] = "Account deleted"
-      redirect_to logout_url
+      remove_session
+      redirect_to goodbye_url, notice: "Account deleted!"
     else
       error_reason = if current_user.superuser?
         "Super User's can't delete their account."
@@ -71,7 +71,8 @@ class MyAccountsController < ApplicationController
     @edit_templates ||= {
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
       password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
-      sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit])
+      sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
     }.merge(registration_organization_template).as_json
   end
 

@@ -105,7 +105,14 @@ RSpec.describe MyAccountsController, type: :request do
 
   describe "/edit" do
     include_context :request_spec_logged_in_as_user
-    let(:default_edit_templates) { {root: "User Settings", password: "Password", sharing: "Sharing + Personal Page"} }
+    let(:default_edit_templates) do
+      {
+        delete_account: "Delete account",
+        root: "User Settings",
+        password: "Password",
+        sharing: "Sharing + Personal Page"
+      }
+    end
     context "no page given" do
       it "renders root" do
         get "#{base_url}/edit"
@@ -578,8 +585,8 @@ RSpec.describe MyAccountsController, type: :request do
         delete base_url
       end.to change(User, :count).by(-1)
       expect(Bike.count).to eq 0
-      expect(response).to redirect_to(logout_path)
-      expect(flash[:success]).to be_present
+      expect(response).to redirect_to(goodbye_url)
+      expect(flash[:notice]).to be_present
     end
 
     context "organization admin" do

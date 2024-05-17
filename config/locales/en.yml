@@ -1730,6 +1730,7 @@ en:
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
         user_settings: User Settings
+        delete_account: Delete account
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -4012,6 +4013,12 @@ en:
       password_helper_text_html: Password must be at least 12 characters. Longer is
         %{better_password_link}.
       reset_password: Reset password
+    delete_account:
+      delete_account: Delete account
+      modal_title: Are you sure you want to delete your account?
+      nevermind: Nevermind
+      delete_my_account: Delete my account and all my registered bikes
+      delete_warning_html: <strong>Warning!</strong> This action can not be undone!
     registration_organizations:
       affiliation: "%{org_name} affiliation"
       all_bikes_with_organization: All your bikes are registered with this organization
