@@ -1,6 +1,7 @@
 = form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
   .form-well-container.container
     .row
+      -# NOTE: delete_account uses JS to add .no-save-button to this menu
       %nav.primary-edit-form-well-menu
         %ul
           - @edit_templates.each do |template, description|
