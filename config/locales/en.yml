@@ -4011,6 +4011,7 @@ en:
       nevermind: Nevermind
     edit:
       save_changes: Save changes
+      edit_pages: 'Edit account pages:'
     password:
       better_password: better
       for_password_update: For password update
@@ -5077,6 +5078,7 @@ en:
         has permission to edit
       view_bike: View %{bike_type}
       view_bike_version: View %{bike_type} version
+      edit_pages: 'Edit %{bike_type} pages:'
     email_bike_box:
       color: Color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
