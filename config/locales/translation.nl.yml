@@ -4927,6 +4927,7 @@ nl:
         %{org_name} heeft toestemming om te bewerken
       view_bike: Bekijk %{bike_type}
       view_bike_version: Bekijk %{bike_type} versie
+      edit_pages: 'Bewerk %{bike_type} pagina''s:'
     organized_skeleton:
       additional_features_html: Bike Index biedt extra functies voor geverifieerde
         wetshandhavingsorganisaties. Neem contact op met %{email_link} om ze ingeschakeld
@@ -5618,6 +5619,7 @@ nl:
       updated: Bijgewerkt
     edit:
       save_changes: Wijzigingen opslaan
+      edit_pages: 'Accountpagina''s bewerken:'
     password:
       better_password: beter
       for_password_update: Voor wachtwoordupdate

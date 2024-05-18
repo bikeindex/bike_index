@@ -3382,6 +3382,7 @@ es:
   my_accounts:
     edit:
       save_changes:
+      edit_pages:
     password:
       better_password:
       for_password_update:
@@ -4205,6 +4206,7 @@ es:
       owned_with_permission_to_edit_html:
       view_bike:
       view_bike_version:
+      edit_pages:
     email_bike_box:
       color:
       color_may_be_incorrect:
