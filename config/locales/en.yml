@@ -4010,6 +4010,7 @@ en:
       modal_title: Are you sure you want to delete your account?
       nevermind: Nevermind
     edit:
+      edit_pages: 'Edit account pages:'
       save_changes: Save changes
     password:
       better_password: better
@@ -5071,6 +5072,7 @@ en:
       donation_header: Help support our efforts!
     edit_bike_skeleton:
       edit: Edit
+      edit_pages: 'Edit %{bike_type} pages:'
       owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
         been claimed yet
       owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}

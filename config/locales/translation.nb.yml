@@ -4379,6 +4379,7 @@ nb:
   my_accounts:
     edit:
       save_changes: Lagre endringer
+      edit_pages: 'Rediger kontosider:'
     password:
       better_password: bedre
       for_password_update: For passordoppdatering
@@ -5369,6 +5370,7 @@ nb:
         har tillatelse til å redigere
       view_bike: Se %{bike_type}
       view_bike_version: Se %{bike_type} versjon
+      edit_pages: 'Rediger %{bike_type} sider:'
     email_bike_box:
       color: Farge
       color_may_be_incorrect: Fargen kan være feil. Oppdater den om nødvendig!
