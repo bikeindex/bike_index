@@ -12,14 +12,14 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
 
   describe "enqueue workers" do
     let(:user2) { FactoryBot.create(:user, no_non_theft_notification: true) }
-    let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user2, creation_organization: organization) }
+    let(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user2, creation_organization: organization) }
     let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, creation_organization: organization, user: user) }
 
     let(:bike5) { FactoryBot.create(:bike, :with_ownership, creation_organization: organization, owner_email: "phoebe@example.com") }
 
     it "enqueues expected emails" do
-      expect(bike.reload.claimed?).to be_truthy
       expect(bike2.reload.claimed?).to be_truthy
+      expect(bike.reload.claimed?).to be_truthy
       expect(bike3.reload.claimed?).to be_truthy
       # Test that no_notify is the same for everyone
       expect(instance.send_survey?(bike)).to be_truthy
