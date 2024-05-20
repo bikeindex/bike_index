@@ -17,7 +17,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   end
 
   def notifications
-    Notification.theft_survey_2023
+    Notification.theft_survey
   end
 
   def send_survey?(bike = nil)
@@ -27,7 +27,9 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
       return false if bike.user&.no_non_theft_notification
     end
     # Verify there are no theft survey notifications with the email
-    notifications.where(message_channel_target: bike.owner_email).limit(1).none?
+    return false if notifications.where(message_channel_target: bike.owner_email).limit(1).any?
+    matching_stolen_records = bike.stolen_records.where(date_stolen: stolen_survey_period)
+    matching_stolen_records.any?
   end
 
   def no_survey?(bike)
@@ -50,9 +52,20 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   end
 
   # Split out to make it easier to individually send messages
+  def potential_stolen_records
+    StolenRecord.unscoped.where(no_notify: false, date_stolen: survey_period)
+      .left_joins(:theft_surveys).where(notifications: {notifiable_id: nil})
+      .where(country_id: [nil, Country.united_states.id, Country.canada.id])
+  end
+
+  def stolen_survey_period
+    (Time.current - 5.years)..(Time.current - 2.weeks)
+  end
+
+  # Split out to make it easier to individually send messages
   def potential_bikes
-    Bike.unscoped.where(creation_organization_id: organizations_emailing.pluck(:id))
-      .left_joins(:theft_surveys).where(notifications: {bike_id: nil})
+    Bike.unscoped.left_joins(:theft_surveys).where(notifications: {bike_id: nil})
+      .merge(potential_stolen_records)
       .reorder(Arel.sql("random()"))
   end
 
