@@ -11,7 +11,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
   let(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
   let!(:stolen_record1) { FactoryBot.create(:stolen_record, bike: bike1, date_stolen: stolen_at) }
   let(:bike_unclaimed) { FactoryBot.create(:bike, :with_ownership, owner_email: user.email) }
-  let!(:stolen_record_unclaimed) { FactoryBot.create(:stolen_record_recovered, bike: bike_unclaimed, date_stolen: stolen_at) }
+  let!(:stolen_record_unclaimed) { FactoryBot.create(:stolen_record, :in_nyc, bike: bike_unclaimed, date_stolen: stolen_at) }
 
   describe "enqueue workers" do
     let(:user2) { FactoryBot.create(:user, no_non_theft_notification: true) }
@@ -21,12 +21,10 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
     end
     let(:bike3) do
       FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed,
-        date_stolen: stolen_at, user: user)
+        date_stolen: stolen_at, user: user, stolen_no_notify: true)
     end
-    let(:bike5) do
-      FactoryBot.create(:bike, :with_stolen_record, :with_ownership,
-        owner_email: "phoebe@example.com", date_stolen: stolen_at)
-    end
+    let(:bike_recovered) { FactoryBot.create(:bike, :with_ownership, owner_email: "phoebe@example.com") }
+    let!(:stolen_record_recovered) { FactoryBot.create(:stolen_record_recovered, :in_nyc, bike: bike_recovered, date_stolen: stolen_at) }
     let!(:bike_outside_survey_period) do
       FactoryBot.create(:bike, :with_stolen_record, :with_ownership, date_stolen: Time.current)
     end
@@ -39,30 +37,45 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
     let!(:bike_outside_us) do
       FactoryBot.create(:stolen_bike_in_amsterdam, :with_ownership, date_stolen: stolen_at)
     end
+    let(:target_ids) { [bike1.id, bike_unclaimed.id, bike_recovered.id] }
+    let(:all_ids) { {bike1: bike1.id, bike_unclaimed: bike_unclaimed.id, bike2: bike2.id, bike3: bike3.id, bike_recovered: bike_recovered.id, bike_outside_survey_period: bike_outside_survey_period.id, bike_theft_survey_4_2022: bike_theft_survey_4_2022.id, bike_outside_us: bike_outside_us.id}}
 
     it "enqueues expected emails" do
-      expect(bike2.reload.claimed?).to be_truthy
       expect(bike1.reload.claimed?).to be_truthy
+      expect(bike_unclaimed.reload.claimed?).to be_falsey
+      expect(bike2.reload.claimed?).to be_truthy
       expect(bike3.reload.claimed?).to be_truthy
-      # Test that no_notify is the same for everyone
+      expect(bike_recovered.reload.claimed?).to be_falsey
+
       expect(instance.send_survey?(bike1)).to be_truthy
-      expect(instance.send_survey?(bike3)).to be_truthy
-      expect(instance.send_survey?(bike2)).to be_falsey
+      expect(instance.send_survey?(bike2)).to be_falsey # User No non-theft notifications
+      expect(instance.send_survey?(bike3)).to be_falsey # Stolen Record no-notify
+      expect(instance.send_survey?(bike_recovered)).to be_truthy # recovered
+      expect(instance.send_survey?(bike_unclaimed)).to be_truthy
       expect(instance.send_survey?(bike_outside_survey_period.reload)).to be_falsey
-      expect(Bike.unscoped.left_joins(:theft_surveys).where.not(notifications: {bike_id: nil}).pluck(:id)).to eq([bike_theft_survey_4_2022.id])
       expect(instance.send_survey?(bike_theft_survey_4_2022.reload)).to be_falsey
       expect(instance.send_survey?(bike_outside_us.reload)).to be_falsey
 
-      expect(bike_unclaimed.reload.claimed?).to be_falsey
-      expect(instance.send_survey?(bike_unclaimed)).to be_truthy # recovered
-      expect(bike5.reload.claimed?).to be_falsey
-      expect(instance.send_survey?(bike5)).to be_truthy
+      expect(Bike.pluck(:id)).to match_array all_ids.values
+      pp all_ids
+      expect(stolen_record_recovered.reload.current).to be_falsey
+      # pp Bike.unscoped.joins(:stolen_records).merge(StolenRecord.recovered).to_sql
+      # pp Bike.unscoped.joins(:stolen_records).merge(StolenRecord.recovered).pluck(:id)
+
+      # pp Bike.select("INNER JOINS stolen_records ON stolen_records.bike_id = bikes.id").merge(StolenRecord.recovered).to_sql
+      # pp Bike.joins(:all_stolen_records).merge(StolenRecord.recovered).pluck(:id)
+      # pp Bike.joins("INNER JOINS stolen_records ON stolen_records.bike_id = bikes.id").merge(StolenRecord.recovered).pluck(:id)
+
+      # pp Bike.select("INNER JOINS stolen_records ON stolen_records.bike_id = bikes.id").where(stolen_records: {id: stolen_record_recovered.id}).to_sql
+      # pp Bike.select("INNER JOINS stolen_records ON stolen_records.bike_id = bikes.id").where(stolen_records: {id: stolen_record_recovered.id}).pluck(:id)
+
+      # expect(instance.potential_bikes.pluck(:id)).to match_array target_ids
 
       Sidekiq::Worker.clear_all
       instance.perform
       # It enqueues the bikes that we want - even though some won't be surveyed
       enqueued_ids = ScheduledEmailSurveyWorker.jobs.map { |j| j["args"] }.flatten || []
-      expect(enqueued_ids).to match_array([bike1.id, bike3.id, bike_unclaimed.id, bike5.id])
+      expect(enqueued_ids).to match_array target_ids
 
       # Test notification creation
       notification = Notification.create(kind: "theft_survey_2023",
@@ -83,7 +96,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       # Now this is falsey because notification2 has the same email
       expect(instance.send_survey?(bike_unclaimed)).to be_falsey
       # But this is still truthy
-      expect(instance.send_survey?(bike5)).to be_truthy
+      expect(instance.send_survey?(bike_recovered)).to be_truthy
     end
   end
 
