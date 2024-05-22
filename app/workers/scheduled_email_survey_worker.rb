@@ -24,6 +24,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     end
     # Verify there are no theft survey notifications with the email
     return false if notifications.where(message_channel_target: bike.owner_email).limit(1).any?
+    # Update 2024-5 -> only sending to stolen registrants
     potential_stolen_records.where(bike_id: bike.id).any?
   end
 
@@ -38,15 +39,15 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     sent = 0
     potential_recovered_bikes.limit(enqueue_count).find_each do |bike|
       next if no_survey?(bike)
-      sent += 1
       break if sent > enqueue_limit
       ScheduledEmailSurveyWorker.perform_in((enqueue_count + sent) * 5, bike.id)
+      sent += 1
     end
     potential_stolen_bikes.limit(enqueue_count - sent).find_each do |bike|
       next if no_survey?(bike)
-      sent += 1
       break if sent > enqueue_limit
       ScheduledEmailSurveyWorker.perform_in((enqueue_count + sent) * 5, bike.id)
+      sent += 1
     end
   end
 
@@ -68,7 +69,6 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   def notifications
     Notification.theft_survey
   end
-
 
   def unsurveyed_bikes
     Bike.unscoped.left_joins(:theft_surveys).where(notifications: {bike_id: nil})

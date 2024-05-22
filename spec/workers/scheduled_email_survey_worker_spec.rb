@@ -38,7 +38,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       FactoryBot.create(:stolen_bike_in_amsterdam, :with_ownership, date_stolen: stolen_at)
     end
     let(:target_ids) { [bike1.id, bike_unclaimed.id, bike_recovered.id] }
-    let(:all_ids) { {bike1: bike1.id, bike_unclaimed: bike_unclaimed.id, bike2: bike2.id, bike3: bike3.id, bike_recovered: bike_recovered.id, bike_outside_survey_period: bike_outside_survey_period.id, bike_theft_survey_4_2022: bike_theft_survey_4_2022.id, bike_outside_us: bike_outside_us.id}}
+    let(:all_ids) { {bike1: bike1.id, bike_unclaimed: bike_unclaimed.id, bike2: bike2.id, bike3: bike3.id, bike_recovered: bike_recovered.id, bike_outside_survey_period: bike_outside_survey_period.id, bike_theft_survey_4_2022: bike_theft_survey_4_2022.id, bike_outside_us: bike_outside_us.id} }
 
     it "enqueues expected emails" do
       expect(bike1.reload.claimed?).to be_truthy
