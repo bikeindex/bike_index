@@ -16,10 +16,6 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     notification.update(delivery_status: "email_success", message_channel: "email")
   end
 
-  def notifications
-    Notification.theft_survey
-  end
-
   def send_survey?(bike = nil)
     return false if bike.blank?
     if bike.user_id.present?
@@ -54,13 +50,6 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     end
   end
 
-  # Split out to make it easier to individually send messages
-  def potential_stolen_records
-    StolenRecord.unscoped.where(no_notify: false, date_stolen: stolen_survey_period)
-      # .left_joins(:theft_surveys).where(notifications: {notifiable_id: nil})
-      .where(country_id: [nil, Country.united_states.id, Country.canada.id])
-  end
-
   def stolen_survey_period
     (Time.current - 5.years)..(Time.current - 1.week)
   end
@@ -76,7 +65,18 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
 
   private
 
+  def notifications
+    Notification.theft_survey
+  end
+
+
   def unsurveyed_bikes
     Bike.unscoped.left_joins(:theft_surveys).where(notifications: {bike_id: nil})
+  end
+
+  # Split out to make it easier to individually send messages
+  def potential_stolen_records
+    StolenRecord.unscoped.where(no_notify: false, date_stolen: stolen_survey_period)
+      .where(country_id: [nil, Country.united_states.id, Country.canada.id])
   end
 end
