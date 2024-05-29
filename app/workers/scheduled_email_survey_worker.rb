@@ -52,7 +52,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
   end
 
   def stolen_survey_period
-    (Time.current - 5.years)..(Time.current - 1.week)
+    (Time.current - 10.years)..(Time.current - 1.week)
   end
 
   # Split out to make it easier to individually send messages
