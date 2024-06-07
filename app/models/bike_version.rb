@@ -1,6 +1,8 @@
 class BikeVersion < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
+  include PgSearch::Model
+
   acts_as_paranoid without_default_scope: true
 
   VISIBILITY_ENUM = {
@@ -32,6 +34,11 @@ class BikeVersion < ApplicationRecord
   delegate :bike_versions,
     :no_serial?, :serial_number, :serial_unknown, :made_without_serial?,
     to: :bike, allow_nil: true
+
+  pg_search_scope :pg_search, against: {
+    cached_data: "B",
+    description: "C"
+  }
 
   def self.bike_override_attributes
     %i[manufacturer_id manufacturer_other mnfg_name frame_model frame_material

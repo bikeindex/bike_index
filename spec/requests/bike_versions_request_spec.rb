@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe BikeVersions::EditsController, type: :request do
+RSpec.describe BikeVersionsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bike_versions" }
-  let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user) }
+  let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user, description: "cool bike, boo") }
 
   describe "index" do
     it "renders" do
@@ -12,6 +12,16 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
       expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
+
+      get "#{base_url}?query_items%5B%5D=boo"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:index)
+      expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
+
+      get "#{base_url}?query_items%5B%5D=booboo"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:index)
+      expect(assigns(:bike_versions).pluck(:id)).to eq([])
     end
   end
 
