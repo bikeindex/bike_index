@@ -65,7 +65,8 @@ $primary-footer-top-margin: 6 * $vertical-height;
       li {
         display: block;
         float: left;
-        width: 33.33%;
+        width: 25%;
+        padding: 0 6px;
       }
 
       a {
@@ -78,6 +79,9 @@ $primary-footer-top-margin: 6 * $vertical-height;
             color: lighten($gray-light, 15%);
           }
         }
+      }
+      .fa-3x {
+        font-size: 2.5em; // Adjust font size to space out mastodon
       }
     }
   }
