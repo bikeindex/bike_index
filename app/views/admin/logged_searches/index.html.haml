@@ -123,10 +123,8 @@
               = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id)), class: "display-sortable-link small"
           %td
             - if logged_search.user_id.present?
-              %a{href: admin_user_path(logged_search.user_id)}
-                = logged_search.user_id
-              = link_to search_emoji, url_for(sortable_search_params.merge(user_id: logged_search.user_id)), class: "display-sortable-link small"
-              -# = render partial: "/shared/admin_user_cell", locals: {user: logged_search.user, render_search: true, cache: true}
+              = render partial: "/shared/admin_user_cell", locals: {user: logged_search.user, render_search: true, cache: true, user_id: logged_search.user_id}
+
           %td
             - unless logged_search.stolenness_all?
               %small= logged_search.stolenness

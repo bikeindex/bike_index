@@ -14,7 +14,6 @@ module AdminHelper
       {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
-      {title: "Dev: Logged searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true}
     ]
   end
@@ -60,6 +59,7 @@ module AdminHelper
       {title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true},
       {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false},
       {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
+      {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},

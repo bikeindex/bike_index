@@ -9,7 +9,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
     @logged_searches =
       matching_logged_searches
         .reorder("logged_searches.#{sort_column} #{sort_direction}")
-        # .includes(:organization, :user)
+        .includes(:organization, :user)
         .page(page)
         .per(@per_page)
   end

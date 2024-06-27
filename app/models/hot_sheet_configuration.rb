@@ -1,6 +1,8 @@
 class HotSheetConfiguration < ApplicationRecord
   include SearchRadiusMetricable
 
+  MISSING_LOCATION_ERROR = "Organization must have a location set to enable Hot Sheets".freeze
+
   belongs_to :organization
 
   has_many :hot_sheets, through: :organization
@@ -72,6 +74,6 @@ class HotSheetConfiguration < ApplicationRecord
     return true unless on?
     return true if search_coordinates.count(&:present?) == 2
     self.is_on = false
-    errors.add(:base, "Organization must have a location set to enable Hot Sheets")
+    errors.add(:base, MISSING_LOCATION_ERROR)
   end
 end

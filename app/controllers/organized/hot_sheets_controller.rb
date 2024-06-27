@@ -3,6 +3,7 @@ module Organized
     before_action :ensure_admin!, except: [:show]
     before_action :ensure_access_to_hot_sheet!
     before_action :set_current_hot_sheet_configuration
+    before_action :ensure_valid_hot_sheet_configuration!, only: [:show]
 
     def show
       @current = params[:day].blank?
@@ -27,6 +28,13 @@ module Organized
     end
 
     private
+
+    def ensure_valid_hot_sheet_configuration!
+      return true if @hot_sheet_configuration&.is_on? || current_organization.search_coordinates_set?
+      flash[:error] = HotSheetConfiguration::MISSING_LOCATION_ERROR
+      url_to_redirect_to = current_user&.admin_of?(current_organization) ? edit_organization_hot_sheet_path(current_organization) : organization_root_url(current_organization)
+      redirect_to(url_to_redirect_to) && return
+    end
 
     def ensure_access_to_hot_sheet!
       return unless ensure_current_organization!

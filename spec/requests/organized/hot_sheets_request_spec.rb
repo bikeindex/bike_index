@@ -46,6 +46,15 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(assigns(:day)).to eq Time.current.to_date
         end
       end
+      context "organization doesn't have location" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
+        it "redirects with error" do
+          get base_url
+          expect(flash[:error]).to match(/location/i)
+          expect(response).to redirect_to organization_root_path(current_organization)
+          expect(current_organization.reload.hot_sheet_configuration).to be_valid
+        end
+      end
     end
 
     describe "edit" do
@@ -66,6 +75,15 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
+      end
+      context "organization doesn't have location" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
+        it "redirects with error" do
+          get base_url
+          expect(flash[:error]).to match(/location/i)
+          expect(response).to redirect_to edit_organization_hot_sheet_path(current_organization)
+          expect(current_organization.reload.hot_sheet_configuration).to be_valid
+        end
       end
     end
 
