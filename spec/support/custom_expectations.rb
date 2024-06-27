@@ -10,7 +10,7 @@ def expect_attrs_to_match_hash(obj, hash, match_time_within: 1)
     obj_value = obj.send(key)
     # Just in case there are some type issues
     next if obj_value.to_s == value.to_s
-    expect_hashes_to_match({something: true, num: 12}, {something: "true", num: "12"})
+    # expect_hashes_to_match({something: true, num: 12}, {something: "true", num: "12"})
     if match_time_within.present? && (obj_value.is_a?(Time) || value.is_a?(Time))
       error_message = match_time_error(obj_value, value, match_time_within, timezone)
       unmatched_obj_attrs[key] = error_message if error_message.present?
