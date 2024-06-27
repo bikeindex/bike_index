@@ -24,8 +24,8 @@ class LoggedSearch < AnalyticsRecord
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3}.freeze
 
   # TODO: make the belongs to work across tables
-  # belongs_to :user
-  # belongs_to :organization
+  belongs_to :user
+  belongs_to :organization
 
   enum endpoint: ENDPOINT_ENUM
   enum stolenness: STOLENNESS_ENUM, _prefix: :stolenness
