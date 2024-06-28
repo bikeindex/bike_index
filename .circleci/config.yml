@@ -254,12 +254,15 @@ jobs:
             mkdir /tmp/test-results
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
 
-            bundle exec rspec --format documentation \
+            COVERAGE=true bundle exec rspec --format documentation \
                             --format RspecJunitFormatter \
                             --order random \
                             --out test-results/rspec/rspec.xml \
                             --format documentation \
                             $TEST_FILES
+      - store_artifacts:
+          path: coverage                        
+          
       - run:
           name: "Jest: Tests"
           command: |

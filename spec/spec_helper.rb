@@ -1,3 +1,10 @@
+ENV['RAILS_ENV'] ||= 'test'
+
+if ENV['COVERAGE']
+  require 'simplecov'
+  SimpleCov.start 'rails'
+end
+
 RSpec.configure do |config|
   # Use color in STDOUT
   config.color = true
