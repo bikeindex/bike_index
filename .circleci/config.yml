@@ -17,7 +17,6 @@ jobs:
       RAILS_ENV: test
       NODE_ENV: test
       RACK_ENV: test
-      SKIP_MEMOIZE_MANUFACTURER_OTHER: true
       TRANSLATION_BRANCH: main
       TZ: /usr/share/zoneinfo/America/Chicago
       RETRY_FLAKY: true

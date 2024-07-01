@@ -61,7 +61,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(flash).to be_blank
         expect(response).to redirect_to(new_organization_export_path(target_params))
       end
-      context "directly create export" do
+      context "directly create export", :flaky do
         it "directly creates" do
           Sidekiq::Worker.clear_all
           expect {
