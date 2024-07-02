@@ -24,9 +24,11 @@ class LogSearcher::Parser
     "/api/v3/bikes/check_if_registered" => :api_v3_check_if_registered
   }.freeze
 
-  FILTERED_PARAMS = %w[access_token organization_id organization_slug page].freeze
-  NON_QUERY_ITEMS = (FILTERED_PARAMS +
-    %w[stolenness location distance locale sort sort_direction render_chart utf8]).freeze
+  FILTERED_PARAMS = %w[access_token page].freeze
+  NON_QUERY_ITEMS = (
+    FILTERED_PARAMS +
+    %w[stolenness location distance locale organization_id organization_slug sort sort_direction render_chart utf8]
+  ).freeze
 
   class << self
     def parse_log_line(log_line)

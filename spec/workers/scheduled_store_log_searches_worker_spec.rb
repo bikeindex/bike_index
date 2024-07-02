@@ -19,6 +19,8 @@ RSpec.describe ScheduledStoreLogSearchesWorker, type: :job do
       expect(logged_search.stolenness).to eq "impounded"
       expect(logged_search.organization_id).to eq organization.id
       expect(logged_search.user_id).to eq 111
+      expect(logged_search.unprocessed?).to be_truthy
+      expect(ProcessLoggedSearchWorker).to have_enqueued_sidekiq_job(logged_search.id)
     end
   end
 
