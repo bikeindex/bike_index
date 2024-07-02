@@ -15,6 +15,7 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #
+
 class OrganizationFeature < ApplicationRecord
   include Amountable
   KIND_ENUM = {standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3}.freeze

@@ -16,6 +16,12 @@
 #  user_id                :bigint
 #
 
+# TODO: create notifications for each other notification model:
+# - graduated_notifications
+# - parking_notifications
+# - feedbacks
+# We're creating notifications for other notification models (e.g. StolenNotification),
+# with the long term goal of moving all the notification/emailing logic here and removing it from other models
 class Notification < ApplicationRecord
   KIND_ENUM = {
     confirmation_email: 0,

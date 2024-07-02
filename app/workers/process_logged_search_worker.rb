@@ -5,6 +5,5 @@ class ProcessLoggedSearchWorker < ApplicationWorker
   sidekiq_options queue: "droppable", retry: 1
 
   def perform(logged_search_id)
-
   end
 end

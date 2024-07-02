@@ -3,7 +3,7 @@ require "spec_helper"
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
-ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"] = 'true'
+ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"] = "true"
 
 require File.expand_path("../../config/environment", __FILE__)
 

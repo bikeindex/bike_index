@@ -20,6 +20,8 @@
 #  first_invoice_id            :integer
 #  organization_id             :integer
 #
+
+# daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ApplicationRecord
   include Amountable # included for formatting stuff
   belongs_to :organization

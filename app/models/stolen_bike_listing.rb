@@ -28,6 +28,8 @@
 #  secondary_frame_color_id :bigint
 #  tertiary_frame_color_id  :bigint
 #
+
+# Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model
   include Amountable

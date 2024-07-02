@@ -77,7 +77,7 @@ RSpec.describe LogSearcher::Parser do
             organization_id: organization.id,
             endpoint: :api_v3_check_if_registered,
             ip_address: "11.222.33.4",
-            query_items: {"serial" => "999xxxx", "manufacturer" => "salsa", "owner_email" => "example@bikeindex.org", organization_slug: organization.slug},
+            query_items: {"serial" => "999xxxx", "manufacturer" => "salsa", "owner_email" => "example@bikeindex.org", :organization_slug => organization.slug},
             stolenness: :all,
             serial_normalized: "999XXXX",
             page: nil,
