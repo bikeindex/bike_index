@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: organization_statuses
+#
+#  id                      :bigint           not null, primary key
+#  end_at                  :datetime
+#  kind                    :integer
+#  organization_deleted_at :datetime
+#  pos_kind                :integer
+#  start_at                :datetime
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  organization_id         :bigint
+#
 class OrganizationStatus < AnalyticsRecord
   belongs_to :organization
 

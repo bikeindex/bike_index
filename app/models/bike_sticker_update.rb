@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: bike_sticker_updates
+#
+#  id                  :bigint           not null, primary key
+#  creator_kind        :integer
+#  failed_claim_errors :text
+#  kind                :integer
+#  organization_kind   :integer
+#  update_number       :integer
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  bike_id             :bigint
+#  bike_sticker_id     :bigint
+#  bulk_import_id      :bigint
+#  export_id           :bigint
+#  organization_id     :bigint
+#  user_id             :bigint
+#
 class BikeStickerUpdate < ApplicationRecord
   KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
   CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_bike_creation: 3, creator_import: 4}.freeze

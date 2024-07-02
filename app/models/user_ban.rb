@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: user_bans
+#
+#  id          :bigint           not null, primary key
+#  deleted_at  :datetime
+#  description :text
+#  reason      :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  creator_id  :bigint
+#  user_id     :bigint
+#
 class UserBan < ApplicationRecord
   REASON_ENUM = {
     abuse: 0,

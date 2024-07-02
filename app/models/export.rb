@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: exports
+#
+#  id              :integer          not null, primary key
+#  file            :text
+#  file_format     :integer          default("csv")
+#  kind            :integer          default("organization")
+#  options         :jsonb
+#  progress        :integer          default("pending")
+#  rows            :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  organization_id :integer
+#  user_id         :integer
+#
 class Export < ApplicationRecord
   PROGRESS_ENUM = %i[pending ongoing finished errored].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze

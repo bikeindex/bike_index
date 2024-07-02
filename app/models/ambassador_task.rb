@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: ambassador_tasks
+#
+#  id          :integer          not null, primary key
+#  description :string           default(""), not null
+#  title       :string           default(""), not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
 class AmbassadorTask < ApplicationRecord
   has_many :ambassador_task_assignments
   has_many :ambassadors, through: :ambassador_task_assignments

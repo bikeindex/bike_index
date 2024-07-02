@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: invoices
+#
+#  id                          :integer          not null, primary key
+#  amount_due_cents            :integer
+#  amount_paid_cents           :integer
+#  child_enabled_feature_slugs :jsonb
+#  currency                    :string           default("USD"), not null
+#  force_active                :boolean          default(FALSE), not null
+#  is_active                   :boolean          default(FALSE), not null
+#  is_endless                  :boolean          default(FALSE)
+#  notes                       :text
+#  subscription_end_at         :datetime
+#  subscription_start_at       :datetime
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  first_invoice_id            :integer
+#  organization_id             :integer
+#
 # daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ApplicationRecord
   include Amountable # included for formatting stuff

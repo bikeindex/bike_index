@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: mailchimp_data
+#
+#  id                   :bigint           not null, primary key
+#  data                 :jsonb
+#  email                :string
+#  mailchimp_updated_at :datetime
+#  status               :integer
+#  user_deleted_at      :datetime
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  user_id              :bigint
+#
 class MailchimpDatum < ApplicationRecord
   STATUS_ENUM = {
     no_subscription_required: 0,

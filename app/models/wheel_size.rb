@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: wheel_sizes
+#
+#  id          :integer          not null, primary key
+#  description :string(255)
+#  iso_bsd     :integer
+#  name        :string(255)
+#  priority    :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
 class WheelSize < ApplicationRecord
   validates_presence_of :name, :priority, :description, :iso_bsd
   validates_uniqueness_of :description, :iso_bsd

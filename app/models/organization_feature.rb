@@ -1,5 +1,20 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: organization_features
+#
+#  id            :integer          not null, primary key
+#  amount_cents  :integer
+#  currency      :string           default("USD"), not null
+#  description   :text
+#  details_link  :string
+#  feature_slugs :text             default([]), is an Array
+#  kind          :integer          default("standard")
+#  name          :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
 # In reality, this should be something like OrganizationFeatures. Initially all features were paid though
 class OrganizationFeature < ApplicationRecord
   include Amountable

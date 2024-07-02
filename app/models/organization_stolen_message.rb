@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: organization_stolen_messages
+#
+#  id                  :bigint           not null, primary key
+#  body                :text
+#  content_added_at    :datetime
+#  is_enabled          :boolean          default(FALSE)
+#  kind                :integer
+#  latitude            :float
+#  longitude           :float
+#  report_url          :string
+#  search_radius_miles :float
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  organization_id     :bigint
+#  updator_id          :bigint
+#
 class OrganizationStolenMessage < ApplicationRecord
   MAX_BODY_LENGTH = 400
   KIND_ENUM = {area: 0, association: 1}

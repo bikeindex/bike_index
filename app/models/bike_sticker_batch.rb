@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: bike_sticker_batches
+#
+#  id                 :integer          not null, primary key
+#  code_number_length :integer
+#  notes              :text
+#  prefix             :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  organization_id    :integer
+#  user_id            :integer
+#
 class BikeStickerBatch < ApplicationRecord
   belongs_to :user # Creator of the batch
   belongs_to :organization

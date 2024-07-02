@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: user_phones
+#
+#  id                :bigint           not null, primary key
+#  confirmation_code :string
+#  confirmed_at      :datetime
+#  deleted_at        :datetime
+#  phone             :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  user_id           :bigint
+#
 class UserPhone < ApplicationRecord
   acts_as_paranoid
 

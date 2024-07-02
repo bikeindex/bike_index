@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: model_attestations
+#
+#  id                 :bigint           not null, primary key
+#  certification_type :string
+#  file               :string
+#  info               :text
+#  kind               :integer
+#  replaced           :boolean          default(FALSE)
+#  url                :text
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  model_audit_id     :bigint
+#  organization_id    :bigint
+#  user_id            :bigint
+#
 class ModelAttestation < ApplicationRecord
   # NOTE: This hash is ordered by the importance of the kind
   CERTIFICATION_KIND_ENUM = {

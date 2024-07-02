@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: impound_configurations
+#
+#  id                      :bigint           not null, primary key
+#  bulk_import_view        :boolean          default(FALSE)
+#  display_id_next_integer :integer
+#  display_id_prefix       :string
+#  email                   :string
+#  expiration_period_days  :integer
+#  public_view             :boolean          default(FALSE)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  organization_id         :bigint
+#
 class ImpoundConfiguration < ApplicationRecord
   belongs_to :organization
   has_many :impound_records, through: :organization

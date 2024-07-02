@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: ambassador_task_assignments
+#
+#  id                 :integer          not null, primary key
+#  completed_at       :datetime
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  ambassador_task_id :integer          not null
+#  user_id            :integer          not null
+#
+# Foreign Keys
+#
+#  fk_rails_...  (ambassador_task_id => ambassador_tasks.id) ON DELETE => cascade
+#  fk_rails_...  (user_id => users.id) ON DELETE => cascade
+#
 class AmbassadorTaskAssignment < ApplicationRecord
   belongs_to :ambassador_task
   belongs_to :ambassador,

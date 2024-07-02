@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: impound_claims
+#
+#  id                 :bigint           not null, primary key
+#  message            :text
+#  resolved_at        :datetime
+#  response_message   :text
+#  status             :integer
+#  submitted_at       :datetime
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  bike_claimed_id    :bigint
+#  bike_submitting_id :bigint
+#  impound_record_id  :bigint
+#  organization_id    :bigint
+#  stolen_record_id   :bigint
+#  user_id            :bigint
+#
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,

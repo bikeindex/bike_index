@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: logged_searches
+#
+#  id                :bigint           not null, primary key
+#  duration_ms       :integer
+#  endpoint          :integer
+#  includes_query    :boolean          default(FALSE)
+#  ip_address        :string
+#  latitude          :float
+#  log_line          :text
+#  longitude         :float
+#  page              :integer
+#  query_items       :jsonb
+#  request_at        :datetime
+#  serial_normalized :string
+#  stolenness        :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  organization_id   :bigint
+#  request_id        :uuid
+#  user_id           :bigint
+#
 class LoggedSearch < AnalyticsRecord
   ENDPOINT_ENUM = {
     web_bikes: 0,
