@@ -161,6 +161,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    colorize (1.1.0)
     concurrent-ruby (1.2.2)
     connection_pool (2.4.1)
     countries (3.1.0)
@@ -175,6 +176,7 @@ GEM
     database_cleaner (1.7.0)
     date (3.3.3)
     diff-lcs (1.4.4)
+    docile (1.4.0)
     dockerfile-rails (1.5.0)
       rails
     domain_name (0.5.20190701)
@@ -378,6 +380,8 @@ GEM
       addressable (~> 2.8)
     letter_opener (1.8.1)
       launchy (>= 2.2, < 3)
+    libyear-bundler (0.7.0)
+      bundler (>= 1.14, < 3)
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -442,6 +446,8 @@ GEM
       timeout
     net-smtp (0.3.3)
       net-protocol
+    next_rails (1.3.0)
+      colorize (>= 0.8.1)
     nio4r (2.5.9)
     nokogiri (1.15.5)
       mini_portile2 (~> 2.8.2)
@@ -662,6 +668,12 @@ GEM
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
     simple_oauth (0.3.1)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
     sitemap_generator (6.1.2)
       builder (~> 3.0)
     sixarm_ruby_unaccent (1.2.0)
@@ -787,6 +799,7 @@ DEPENDENCIES
   kramdown (= 2.3.1)
   kramdown-parser-gfm
   letter_opener
+  libyear-bundler
   lograge
   logstash-event
   memory_profiler
@@ -794,6 +807,7 @@ DEPENDENCIES
   money-rails (~> 1.11)
   multi_json
   net-http
+  next_rails
   oj
   omniauth (~> 1.6)
   omniauth-facebook
@@ -842,6 +856,7 @@ DEPENDENCIES
   secure_headers (~> 2.5.0)
   sidekiq
   sidekiq-failures
+  simplecov
   sitemap_generator (~> 6)
   skylight
   sprockets (= 4.0.0)
