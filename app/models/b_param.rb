@@ -18,6 +18,7 @@
 #  creator_id      :integer
 #  organization_id :integer
 #
+
 # b_param stands for Bike param
 class BParam < ApplicationRecord
   mount_uploader :image, ImageUploader

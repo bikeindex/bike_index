@@ -12,8 +12,8 @@
 #  updated_at   :datetime         not null
 #  mailchimp_id :string
 #
-# Mailchimp Values are the fields stored in Mailchimp
 
+# Mailchimp Values are the fields stored in Mailchimp
 class MailchimpValue < ApplicationRecord
   LIST_ENUM = {
     organization: 0,
