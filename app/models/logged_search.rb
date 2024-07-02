@@ -29,6 +29,8 @@
 #  user_id           :bigint
 #
 class LoggedSearch < AnalyticsRecord
+  include Geocodeable
+
   ENDPOINT_ENUM = {
     web_bikes: 0,
     api_v1_bikes: 1,
@@ -79,5 +81,9 @@ class LoggedSearch < AnalyticsRecord
 
   def unprocessed?
     !processed
+  end
+
+  def should_be_geocoded?
+    false # don't geocode automatically
   end
 end

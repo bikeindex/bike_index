@@ -8,11 +8,26 @@ class ProcessLoggedSearchWorker < ApplicationWorker
     logged_search = LoggedSearch.find logged_search_id
 
     assign_user_attributes(logged_search) if logged_search.user.present?
+    assign_ip_location(logged_search) if logged_search.ip_address.present?
+
     logged_search.processed = true
     logged_search.update(updated_at: Time.current) if logged_search.changed?
   end
 
   private
+
+  def assign_ip_location(logged_search)
+    return if logged_search.latitude.present?
+
+    geo_response = Geocoder.search(logged_search.ip_address)
+    # pp location
+    location = geo_response.first.data if defined?(geo_response.first.data)
+    pp location
+    if defined?(geo_response.first.data) && geo_response.first.data.is_a?(Array)
+      pp location
+      location = location.first.data.reverse.compact.select { |i| i.match?(/\A\D+\z/) }
+    end
+  end
 
   def assign_user_attributes(logged_search)
     return if logged_search.user.superuser? || logged_search.organization_id.present?
