@@ -11,6 +11,8 @@ http_interactions:
       - Stripe/v1 RubyBindings/5.35.0
       Content-Type:
       - application/x-www-form-urlencoded
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_cZMqp9zf7vSnMU","request_duration_ms":324}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -23,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sun, 31 Dec 2023 17:43:19 GMT
+      - Mon, 01 Jul 2024 17:52:30 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1922'
+      - '2175'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -48,12 +50,22 @@ http_interactions:
         block-all-mixed-content; default-src 'none'; base-uri 'none'; form-action
         'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample';
         style-src 'self'
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to="coop"
+      Report-To:
+      - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report?s=ocs-bapi-srv"}],"include_subdomains":true}'
+      Reporting-Endpoints:
+      - coop="https://q.stripe.com/coop-report?s=ocs-bapi-srv"
       Request-Id:
-      - req_PN9ee5Du4EbtAo
+      - req_vEbCECxS51puPU
       Stripe-Version:
       - '2014-12-08'
       Vary:
       - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Stripe-Priority-Routing-Enabled:
+      - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       Strict-Transport-Security:
@@ -70,6 +82,7 @@ http_interactions:
           "amount_total": 5000,
           "automatic_tax": {
             "enabled": false,
+            "liability": null,
             "status": null
           },
           "billing_address_collection": null,
@@ -110,7 +123,11 @@ http_interactions:
           "payment_link": null,
           "payment_method_collection": null,
           "payment_method_configuration_details": null,
-          "payment_method_options": {},
+          "payment_method_options": {
+            "card": {
+              "request_three_d_secure": "automatic"
+            }
+          },
           "payment_method_types": [
             "card"
           ],
@@ -119,6 +136,13 @@ http_interactions:
             "enabled": false
           },
           "recovered_from": null,
+          "saved_payment_method_options": {
+            "allow_redisplay_filters": [
+              "always"
+            ],
+            "payment_method_remove": null,
+            "payment_method_save": null
+          },
           "setup_intent": null,
           "shipping": null,
           "shipping_address_collection": null,
@@ -137,7 +161,7 @@ http_interactions:
           "url": null
         }
     http_version:
-  recorded_at: Sun, 31 Dec 2023 17:43:19 GMT
+  recorded_at: Mon, 01 Jul 2024 17:52:30 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -150,7 +174,7 @@ http_interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_PN9ee5Du4EbtAo","request_duration_ms":275}}'
+      - '{"last_request_metrics":{"request_id":"req_vEbCECxS51puPU","request_duration_ms":360}}'
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -163,7 +187,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sun, 31 Dec 2023 17:43:19 GMT
+      - Mon, 01 Jul 2024 17:52:31 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -188,12 +212,22 @@ http_interactions:
         block-all-mixed-content; default-src 'none'; base-uri 'none'; form-action
         'none'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'report-sample';
         style-src 'self'
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to="coop"
+      Report-To:
+      - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report?s=mono-bapi-srv"}],"include_subdomains":true}'
+      Reporting-Endpoints:
+      - coop="https://q.stripe.com/coop-report?s=mono-bapi-srv"
       Request-Id:
-      - req_49mzIBT9qJj8Lf
+      - req_HiW15FXlz24loC
       Stripe-Version:
       - '2014-12-08'
       Vary:
       - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Stripe-Priority-Routing-Enabled:
+      - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       Strict-Transport-Security:
@@ -271,5 +305,5 @@ http_interactions:
           "test_clock": null
         }
     http_version:
-  recorded_at: Sun, 31 Dec 2023 17:43:19 GMT
+  recorded_at: Mon, 01 Jul 2024 17:52:31 GMT
 recorded_with: VCR 5.0.0
