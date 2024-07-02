@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: tweets
+#
+#  id                 :integer          not null, primary key
+#  alignment          :string
+#  body               :text
+#  body_html          :text
+#  image              :string
+#  kind               :integer
+#  twitter_response   :json
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  original_tweet_id  :integer
+#  stolen_record_id   :integer
+#  twitter_account_id :integer
+#  twitter_id         :string
+#
 class Tweet < ApplicationRecord
   KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze

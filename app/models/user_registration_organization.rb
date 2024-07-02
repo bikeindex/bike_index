@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: user_registration_organizations
+#
+#  id                   :bigint           not null, primary key
+#  all_bikes            :boolean          default(FALSE)
+#  can_not_edit_claimed :boolean          default(FALSE)
+#  deleted_at           :datetime
+#  registration_info    :jsonb
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  organization_id      :bigint
+#  user_id              :bigint
+#
 class UserRegistrationOrganization < ApplicationRecord
   include RegistrationInfoable
 

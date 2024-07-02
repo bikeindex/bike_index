@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: user_alerts
+#
+#  id              :bigint           not null, primary key
+#  dismissed_at    :datetime
+#  kind            :integer
+#  message         :text
+#  resolved_at     :datetime
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  bike_id         :bigint
+#  organization_id :bigint
+#  theft_alert_id  :bigint
+#  user_id         :bigint
+#  user_phone_id   :bigint
+#
 class UserAlert < ApplicationRecord
   KIND_ENUM = {
     phone_waiting_confirmation: 0,

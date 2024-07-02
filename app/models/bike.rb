@@ -1,3 +1,77 @@
+# == Schema Information
+#
+# Table name: bikes
+#
+#  id                          :integer          not null, primary key
+#  address_set_manually        :boolean          default(FALSE)
+#  all_description             :text
+#  belt_drive                  :boolean          default(FALSE), not null
+#  cached_data                 :text
+#  city                        :string
+#  coaster_brake               :boolean          default(FALSE), not null
+#  credibility_score           :integer
+#  cycle_type                  :integer          default("bike")
+#  deleted_at                  :datetime
+#  description                 :text
+#  example                     :boolean          default(FALSE), not null
+#  extra_registration_number   :string(255)
+#  frame_material              :integer
+#  frame_model                 :text
+#  frame_size                  :string(255)
+#  frame_size_number           :float
+#  frame_size_unit             :string(255)
+#  front_tire_narrow           :boolean
+#  handlebar_type              :integer
+#  is_for_sale                 :boolean          default(FALSE), not null
+#  is_phone                    :boolean          default(FALSE)
+#  latitude                    :float
+#  likely_spam                 :boolean          default(FALSE)
+#  listing_order               :integer
+#  longitude                   :float
+#  made_without_serial         :boolean          default(FALSE), not null
+#  manufacturer_other          :string(255)
+#  mnfg_name                   :string(255)
+#  name                        :string(255)
+#  number_of_seats             :integer
+#  occurred_at                 :datetime
+#  owner_email                 :text
+#  pdf                         :string(255)
+#  propulsion_type             :integer          default("foot-pedal")
+#  rear_tire_narrow            :boolean          default(TRUE)
+#  serial_normalized           :string(255)
+#  serial_normalized_no_space  :string
+#  serial_number               :string(255)      not null
+#  serial_segments_migrated_at :datetime
+#  status                      :integer          default("status_with_owner")
+#  stock_photo_url             :string(255)
+#  street                      :string
+#  thumb_path                  :text
+#  updated_by_user_at          :datetime
+#  user_hidden                 :boolean          default(FALSE), not null
+#  video_embed                 :text
+#  year                        :integer
+#  zipcode                     :string(255)
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  country_id                  :integer
+#  creation_organization_id    :integer
+#  creator_id                  :integer
+#  current_impound_record_id   :bigint
+#  current_ownership_id        :bigint
+#  current_stolen_record_id    :integer
+#  front_gear_type_id          :integer
+#  front_wheel_size_id         :integer
+#  manufacturer_id             :integer
+#  model_audit_id              :bigint
+#  paint_id                    :integer
+#  primary_frame_color_id      :integer
+#  rear_gear_type_id           :integer
+#  rear_wheel_size_id          :integer
+#  secondary_frame_color_id    :integer
+#  state_id                    :bigint
+#  tertiary_frame_color_id     :integer
+#  updator_id                  :integer
+#
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable

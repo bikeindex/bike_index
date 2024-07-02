@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: mail_snippets
+#
+#  id                    :integer          not null, primary key
+#  body                  :text
+#  city                  :string
+#  is_enabled            :boolean          default(FALSE), not null
+#  is_location_triggered :boolean          default(FALSE), not null
+#  kind                  :integer          default("custom")
+#  latitude              :float
+#  longitude             :float
+#  proximity_radius      :integer
+#  street                :string
+#  subject               :text
+#  zipcode               :string
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  country_id            :bigint
+#  organization_id       :integer
+#  state_id              :bigint
+#
 class MailSnippet < ApplicationRecord
   include Geocodeable
 

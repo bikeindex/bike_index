@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: integrations
+#
+#  id            :integer          not null, primary key
+#  access_token  :text
+#  information   :text
+#  provider_name :string(255)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  user_id       :integer
+#
 class IntegrationAssociationError < StandardError
 end
 

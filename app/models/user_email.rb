@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: user_emails
+#
+#  id                 :integer          not null, primary key
+#  confirmation_token :text
+#  email              :string(255)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  old_user_id        :integer
+#  user_id            :integer
+#
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: "User", touch: true

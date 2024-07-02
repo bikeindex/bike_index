@@ -147,6 +147,7 @@ group :development do
   gem "letter_opener"
   gem "rerun"
   gem "terminal-notifier"
+  gem "annotate" # Annotate models with schema info
 end
 
 group :development, :test do

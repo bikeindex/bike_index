@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: content_tags
+#
+#  id          :bigint           not null, primary key
+#  description :text
+#  name        :string
+#  priority    :integer
+#  slug        :string
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
 class ContentTag < ApplicationRecord
   include FriendlySlugFindable
   has_many :blog_content_tags, dependent: :destroy

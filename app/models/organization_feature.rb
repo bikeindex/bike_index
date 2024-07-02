@@ -1,6 +1,21 @@
 # frozen_string_literal: true
 
-# In reality, this should be something like OrganizationFeatures. Initially all features were paid though
+# == Schema Information
+#
+# Table name: organization_features
+#
+#  id            :integer          not null, primary key
+#  amount_cents  :integer
+#  currency      :string           default("USD"), not null
+#  description   :text
+#  details_link  :string
+#  feature_slugs :text             default([]), is an Array
+#  kind          :integer          default("standard")
+#  name          :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
+
 class OrganizationFeature < ApplicationRecord
   include Amountable
   KIND_ENUM = {standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3}.freeze

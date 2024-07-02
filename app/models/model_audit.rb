@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: model_audits
+#
+#  id                   :bigint           not null, primary key
+#  bikes_count          :integer
+#  certification_status :integer
+#  cycle_type           :integer
+#  frame_model          :string
+#  manufacturer_other   :string
+#  mnfg_name            :string
+#  propulsion_type      :integer
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  manufacturer_id      :bigint
+#
 class ModelAudit < ApplicationRecord
   UNKNOWN_STRINGS = %w[na idk no unknown unkown none tbd no\ model].freeze
 

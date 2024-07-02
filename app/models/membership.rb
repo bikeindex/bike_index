@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: memberships
+#
+#  id                       :integer          not null, primary key
+#  claimed_at               :datetime
+#  created_by_magic_link    :boolean          default(FALSE)
+#  deleted_at               :datetime
+#  email_invitation_sent_at :datetime
+#  hot_sheet_notification   :integer          default("notification_never")
+#  invited_email            :string(255)
+#  receive_hot_sheet        :boolean          default(FALSE)
+#  role                     :integer
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  organization_id          :integer          not null
+#  sender_id                :integer
+#  user_id                  :integer
+#
 class Membership < ApplicationRecord
   MEMBERSHIP_TYPES = %w[admin member member_no_bike_edit].freeze
   HOT_SHEET_NOTIFICATION_ENUM = {notification_never: 0, notification_daily: 1}.freeze

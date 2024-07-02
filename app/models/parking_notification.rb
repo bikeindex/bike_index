@@ -1,5 +1,42 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: parking_notifications
+#
+#  id                    :integer          not null, primary key
+#  accuracy              :float
+#  city                  :string
+#  delivery_status       :string
+#  hide_address          :boolean          default(FALSE)
+#  image                 :text
+#  image_processing      :boolean          default(FALSE), not null
+#  internal_notes        :text
+#  kind                  :integer          default("appears_abandoned_notification")
+#  latitude              :float
+#  location_from_address :boolean          default(FALSE)
+#  longitude             :float
+#  message               :text
+#  neighborhood          :string
+#  repeat_number         :integer
+#  resolved_at           :datetime
+#  retrieval_link_token  :text
+#  retrieved_kind        :integer
+#  status                :integer          default("current")
+#  street                :string
+#  unregistered_bike     :boolean          default(FALSE)
+#  zipcode               :string
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  bike_id               :integer
+#  country_id            :bigint
+#  impound_record_id     :integer
+#  initial_record_id     :integer
+#  organization_id       :integer
+#  retrieved_by_id       :bigint
+#  state_id              :bigint
+#  user_id               :integer
+#
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze

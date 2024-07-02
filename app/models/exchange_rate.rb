@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: exchange_rates
+#
+#  id         :bigint           not null, primary key
+#  from       :string           not null
+#  rate       :float            not null
+#  to         :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 class ExchangeRate < ApplicationRecord
   validates :from, :to, :rate, presence: true
   validates :from, :to, format: {with: /\A[A-Z]{3}\z/, message: "must be a valid ISO currency code"}

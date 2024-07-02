@@ -1,5 +1,19 @@
-# Mailchimp Values are the fields stored in Mailchimp
+# == Schema Information
+#
+# Table name: mailchimp_values
+#
+#  id           :bigint           not null, primary key
+#  data         :jsonb
+#  kind         :integer
+#  list         :integer
+#  name         :string
+#  slug         :string
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  mailchimp_id :string
+#
 
+# Mailchimp Values are the fields stored in Mailchimp
 class MailchimpValue < ApplicationRecord
   LIST_ENUM = {
     organization: 0,

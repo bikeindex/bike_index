@@ -1,3 +1,34 @@
+# == Schema Information
+#
+# Table name: ownerships
+#
+#  id                            :integer          not null, primary key
+#  claimed                       :boolean          default(FALSE)
+#  claimed_at                    :datetime
+#  current                       :boolean          default(FALSE)
+#  example                       :boolean          default(FALSE), not null
+#  is_new                        :boolean          default(FALSE)
+#  is_phone                      :boolean          default(FALSE)
+#  organization_pre_registration :boolean          default(FALSE)
+#  origin                        :integer
+#  owner_email                   :string(255)
+#  owner_name                    :string
+#  pos_kind                      :integer
+#  registration_info             :jsonb
+#  skip_email                    :boolean          default(FALSE)
+#  status                        :integer
+#  token                         :text
+#  user_hidden                   :boolean          default(FALSE), not null
+#  created_at                    :datetime         not null
+#  updated_at                    :datetime         not null
+#  bike_id                       :integer
+#  bulk_import_id                :bigint
+#  creator_id                    :integer
+#  impound_record_id             :bigint
+#  organization_id               :bigint
+#  previous_ownership_id         :bigint
+#  user_id                       :integer
+#
 class Ownership < ApplicationRecord
   include RegistrationInfoable
   ORIGIN_ENUM = {

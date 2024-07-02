@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: normalized_serial_segments
+#
+#  id                      :integer          not null, primary key
+#  segment                 :string(255)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  bike_id                 :integer
+#  duplicate_bike_group_id :integer
+#
 class NormalizedSerialSegment < ApplicationRecord
   MINIMUM_LENGTH_FOR_DUPLICATE_GROUP = 5
   belongs_to :bike

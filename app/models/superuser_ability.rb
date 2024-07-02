@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: superuser_abilities
+#
+#  id              :bigint           not null, primary key
+#  action_name     :string
+#  controller_name :string
+#  deleted_at      :datetime
+#  kind            :integer          default("universal")
+#  su_options      :jsonb
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  user_id         :bigint
+#
+
 # TODO: make this the way that superuser is defined for everyone
 # e.g. if universal, update user to be superuser: true, remove superuser: true if deleted, etc
 class SuperuserAbility < ApplicationRecord

@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: bulk_imports
+#
+#  id              :integer          not null, primary key
+#  data            :jsonb
+#  file            :text
+#  file_cleaned    :boolean          default(FALSE)
+#  import_errors   :json
+#  is_ascend       :boolean          default(FALSE)
+#  kind            :integer
+#  no_notify       :boolean          default(FALSE)
+#  progress        :integer          default("pending")
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  organization_id :integer
+#  user_id         :integer
+#
 class BulkImport < ApplicationRecord
   PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze

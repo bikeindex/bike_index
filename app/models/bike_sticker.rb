@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: bike_stickers
+#
+#  id                        :integer          not null, primary key
+#  claimed_at                :datetime
+#  code                      :string
+#  code_integer              :bigint
+#  code_number_length        :integer
+#  code_prefix               :string
+#  kind                      :integer          default("sticker")
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  bike_id                   :integer
+#  bike_sticker_batch_id     :integer
+#  organization_id           :integer
+#  previous_bike_id          :integer
+#  secondary_organization_id :bigint
+#  user_id                   :integer
+#
 class BikeSticker < ApplicationRecord
   KIND_ENUM = {sticker: 0, spokecard: 1}.freeze
   MAX_UNORGANIZED = 20
