@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: payments
+#
+#  id                 :integer          not null, primary key
+#  amount_cents       :integer
+#  currency           :string           default("USD"), not null
+#  email              :string(255)
+#  first_payment_date :datetime
+#  is_current         :boolean          default(TRUE)
+#  is_recurring       :boolean          default(FALSE), not null
+#  kind               :integer
+#  last_payment_date  :datetime
+#  payment_method     :integer          default("stripe")
+#  referral_source    :text
+#  stripe_kind        :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  invoice_id         :integer
+#  organization_id    :integer
+#  stripe_id          :string(255)
+#  user_id            :integer
+#
 class Payment < ApplicationRecord
   include Amountable
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze

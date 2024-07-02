@@ -1,5 +1,33 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: stolen_bike_listings
+#
+#  id                       :bigint           not null, primary key
+#  amount_cents             :integer
+#  currency                 :string
+#  data                     :jsonb
+#  frame_model              :text
+#  frame_size               :string
+#  frame_size_number        :float
+#  frame_size_unit          :string
+#  group                    :integer
+#  line                     :integer
+#  listed_at                :datetime
+#  listing_order            :integer
+#  listing_text             :text
+#  manufacturer_other       :string
+#  mnfg_name                :string
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  bike_id                  :bigint
+#  initial_listing_id       :bigint
+#  manufacturer_id          :bigint
+#  primary_frame_color_id   :bigint
+#  secondary_frame_color_id :bigint
+#  tertiary_frame_color_id  :bigint
+#
 # Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model

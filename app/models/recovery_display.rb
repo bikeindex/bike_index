@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: recovery_displays
+#
+#  id               :integer          not null, primary key
+#  image            :string(255)
+#  link             :string(255)
+#  quote            :text
+#  quote_by         :string(255)
+#  recovered_at     :datetime
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  stolen_record_id :integer
+#
 class RecoveryDisplay < ActiveRecord::Base
   validates_presence_of :quote, :recovered_at
   mount_uploader :image, CircularImageUploader

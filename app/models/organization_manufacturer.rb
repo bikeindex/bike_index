@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: organization_manufacturers
+#
+#  id              :bigint           not null, primary key
+#  can_view_counts :boolean          default(FALSE)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  manufacturer_id :bigint
+#  organization_id :bigint
+#
 class OrganizationManufacturer < ApplicationRecord
   belongs_to :organization
   belongs_to :manufacturer

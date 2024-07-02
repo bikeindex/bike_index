@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: bike_organizations
+#
+#  id                   :integer          not null, primary key
+#  can_not_edit_claimed :boolean          default(FALSE), not null
+#  deleted_at           :datetime
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  bike_id              :integer
+#  organization_id      :integer
+#
 class BikeOrganization < ApplicationRecord
   acts_as_paranoid
 

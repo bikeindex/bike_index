@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: graduated_notifications
+#
+#  id                          :bigint           not null, primary key
+#  delivery_status             :string
+#  email                       :string
+#  marked_remaining_at         :datetime
+#  marked_remaining_link_token :text
+#  not_most_recent             :boolean          default(FALSE)
+#  processed_at                :datetime
+#  status                      :integer          default("pending")
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  bike_id                     :bigint
+#  bike_organization_id        :bigint
+#  marked_remaining_by_id      :bigint
+#  organization_id             :bigint
+#  primary_bike_id             :bigint
+#  primary_notification_id     :bigint
+#  user_id                     :bigint
+#
 class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
