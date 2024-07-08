@@ -257,7 +257,7 @@ jobs:
       - run:
           name: RSpec
           command: |
-            mkdir -p /tmp/test-results/rspec /tmp/test-artifacts coverage
+            mkdir -p /tmp/test-results/rspec coverage
             ./cc-test-reporter before-build
             RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out /tmp/test-results/rspec/rspec.xml --format progress --color --require spec_helper"
             circleci tests glob "spec/**/*_spec.rb" | circleci tests run --command="xargs $RSPEC_CMD" --verbose --split-by=timings
@@ -280,8 +280,7 @@ jobs:
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
-          path: /tmp/test-artifacts
-
+          path: coverage
 
   upload-coverage:
     docker:

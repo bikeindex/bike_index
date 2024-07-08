@@ -9,7 +9,6 @@ if ENV["COVERAGE"]
     add_group "Serializers", "app/serializers"
     add_group "Services", "app/services"
     add_group "Uploaders", "app/uploaders"
-    add_group "Libraries", "lib"
   end
 
   Rails.application.eager_load! if defined?(Rails)
