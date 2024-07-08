@@ -277,9 +277,9 @@ jobs:
       - run:
           name: Save Code Climate Test Coverage
           command: |
-            ./cc-test-reporter format-coverage -t simplecov -o "/tmp/test-artifacts/coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
       - persist_to_workspace:
-          root: /tmp/test-artifacts
+          root: coverage
           paths:
             - codeclimate.*.json
 
@@ -299,7 +299,7 @@ jobs:
             chmod +x ./cc-test-reporter
       - run:
           command: |
-            ./cc-test-reporter sum-coverage --output - /tmp/test-artifacts/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
+            ./cc-test-reporter sum-coverage --output - codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
 
   deploy_production:
     machine:
