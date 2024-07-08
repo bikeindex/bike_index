@@ -18,6 +18,7 @@ jobs:
       NODE_ENV: test
       RACK_ENV: test
       COVERAGE: true
+      CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
       TZ: /usr/share/zoneinfo/America/Chicago
       RETRY_FLAKY: true
