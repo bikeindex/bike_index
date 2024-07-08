@@ -1,3 +1,20 @@
+# simplecov must be required before anything else
+if ENV["COVERAGE"]
+  require "simplecov"
+  SimpleCov.start("rails") do
+    add_filter "/spec/"
+    add_filter "/config/"
+    add_filter "/vendor/"
+
+    add_group "Serializers", "app/serializers"
+    add_group "Services", "app/services"
+    add_group "Uploaders", "app/uploaders"
+    add_group "Libraries", "lib"
+  end
+
+  Rails.application.eager_load! if defined?(Rails)
+end
+
 require "spec_helper"
 
 # Assign here because only one .env file
