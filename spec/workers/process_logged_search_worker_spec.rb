@@ -71,10 +71,28 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
       end
 
       context "maxmind response" do
-        # require 'geocoder/results/base'
+        let(:geo_hash) { {country_code: "US", region_code: "CO", city_name: "Denver", latitude: "39.738800", longitude: "-104.986800", error: nil} }
+        let(:max_mind_result) { [OpenStruct.new(data_hash: geo_hash, cache_hit: true)] }
+        let!(:state) { FactoryBot.create(:state, abbreviation: "CO", name: "Colorado") }
+        before { allow(Geocoder).to receive(:search).and_return(max_mind_result) }
+        let(:target_location_attrs) do
+          {
+            latitude: "39.738800",
+            longitude: "-104.986800",
+            city: "Denver",
+            country_id: country.id,
+            state_id: state.id
+          }
+        end
+        it "geocodes ip address" do
+          expect(logged_search.reload.latitude).to be_blank
+          expect(logged_search.processed).to be_falsey
 
-        # let(:max_mind_result) { [OpenStruct.new(data: geo_list, cache_hit=true] }
-        # before { allow(Geocoder).to receive(:search).and_return(max_mind_result) }
+          instance.perform(logged_search.id)
+
+          expect(logged_search.reload.processed?).to be_truthy
+          expect_attrs_to_match_hash(logged_search, target_location_attrs)
+        end
       end
     end
   end
