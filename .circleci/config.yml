@@ -239,6 +239,12 @@ jobs:
           - tmp/cache/webpacker
 
       - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+
+      - run:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
@@ -269,7 +275,7 @@ jobs:
           path: /tmp/test-artifacts
 
       - run:
-          name: Code Climate Test Coverage
+          name: Save Code Climate Test Coverage
           command: |
             ./cc-test-reporter format-coverage -t simplecov -o "/tmp/test-artifacts/coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
       - persist_to_workspace:
