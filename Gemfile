@@ -139,7 +139,6 @@ end
 
 group :development do
   gem "bullet"
-  gem "dockerfile-rails", ">= 1.5"
   # Extra faraday response logging. Used in exchange rate api client and external registry
   # Commented out because of facebook upgrade
   # gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
