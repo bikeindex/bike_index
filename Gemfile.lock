@@ -179,8 +179,6 @@ GEM
     date (3.3.3)
     diff-lcs (1.4.4)
     docile (1.4.0)
-    dockerfile-rails (1.5.0)
-      rails
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.2.6)
@@ -763,7 +761,6 @@ DEPENDENCIES
   coderay
   coffee-rails
   database_cleaner
-  dockerfile-rails (>= 1.5)
   doorkeeper (~> 5.2.5)
   doorkeeper-i18n
   dotenv-rails
