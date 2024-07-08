@@ -262,6 +262,14 @@ jobs:
             RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out /tmp/test-results/rspec/rspec.xml --format progress --color --require spec_helper"
             circleci tests glob "spec/**/*_spec.rb" | circleci tests run --command="xargs $RSPEC_CMD" --verbose --split-by=timings
       - run:
+          name: Save Code Climate Test Coverage
+          command: |
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+      - persist_to_workspace:
+          root: coverage
+          paths:
+            - codeclimate.*.json
+      - run:
           name: "Jest: Tests"
           command: |
             mkdir -p /tmp/test-results/junit
@@ -274,14 +282,6 @@ jobs:
       - store_artifacts:
           path: /tmp/test-artifacts
 
-      - run:
-          name: Save Code Climate Test Coverage
-          command: |
-            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
-      - persist_to_workspace:
-          root: coverage
-          paths:
-            - codeclimate.*.json
 
   upload-coverage:
     docker:
