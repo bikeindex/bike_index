@@ -257,7 +257,7 @@ jobs:
       - run:
           name: RSpec
           command: |
-            mkdir -p /tmp/test-results/rspec /tmp/test-artifacts
+            mkdir -p /tmp/test-results/rspec /tmp/test-artifacts coverage
             ./cc-test-reporter before-build
             RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out /tmp/test-results/rspec/rspec.xml --format progress --color --require spec_helper"
             circleci tests glob "spec/**/*_spec.rb" | circleci tests run --command="xargs $RSPEC_CMD" --verbose --split-by=timings
@@ -299,7 +299,9 @@ jobs:
             chmod +x ./cc-test-reporter
       - run:
           command: |
-            ./cc-test-reporter sum-coverage --output - codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
+            echo $CIRCLE_NODE_TOTAL
+            ./cc-test-reporter sum-coverage codeclimate.*.json
+            ./cc-test-reporter upload-coverage --debug
 
   deploy_production:
     machine:
