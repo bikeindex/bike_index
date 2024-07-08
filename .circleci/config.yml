@@ -17,6 +17,8 @@ jobs:
       RAILS_ENV: test
       NODE_ENV: test
       RACK_ENV: test
+      COVERAGE: true
+      CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
       TZ: /usr/share/zoneinfo/America/Chicago
       RETRY_FLAKY: true
@@ -238,6 +240,12 @@ jobs:
           - tmp/cache/webpacker
 
       - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+
+      - run:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
@@ -250,20 +258,50 @@ jobs:
       - run:
           name: RSpec
           command: |
-            mkdir -p test-results/rspec
-            RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out test-results/rspec/rspec.xml --format progress --color --require spec_helper"
+            mkdir -p /tmp/test-results/rspec coverage
+            ./cc-test-reporter before-build
+            RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out /tmp/test-results/rspec/rspec.xml --format progress --color --require spec_helper"
             circleci tests glob "spec/**/*_spec.rb" | circleci tests run --command="xargs $RSPEC_CMD" --verbose --split-by=timings
+      - run:
+          name: Save Code Climate Test Coverage
+          command: |
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+      - persist_to_workspace:
+          root: coverage
+          paths:
+            - codeclimate.*.json
       - run:
           name: "Jest: Tests"
           command: |
-            mkdir -p test-results/junit
+            mkdir -p /tmp/test-results/junit
             yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
-            JEST_JUNIT_OUTPUT: "test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
-            JEST_JUNIT_OUTPUT_DIR: "test-results/junit/"
-
+            JEST_JUNIT_OUTPUT: "/tmp/test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
+            JEST_JUNIT_OUTPUT_DIR: "/tmp/test-results/junit/"
       - store_test_results:
-          path: test-results
+          path: /tmp/test-results
+      - store_artifacts:
+          path: coverage
+
+  upload-coverage:
+    docker:
+      - image: cimg/ruby:2.7.8-node
+    environment:
+      CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
+    working_directory: ~/bikeindex/bike_index
+    steps:
+      - attach_workspace:
+          at: ~/bikeindex/bike_index
+      - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run:
+          command: |
+            echo $CIRCLE_NODE_TOTAL
+            ./cc-test-reporter sum-coverage codeclimate.*.json
+            ./cc-test-reporter upload-coverage --debug
 
   deploy_production:
     machine:
@@ -281,6 +319,9 @@ workflows:
   commit:
     jobs:
       - build
+      - upload-coverage:
+          requires:
+            - build
       - deploy_production:
           requires:
             - build

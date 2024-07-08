@@ -145,7 +145,7 @@ group :development do
   gem "guard", require: false
   gem "guard-rspec", require: false
   gem "letter_opener"
-  gem "rerun"
+  gem "rerun" # restart sidekiq processes in development on app change
   gem "terminal-notifier"
   gem "annotate" # Annotate models with schema info
 end
@@ -175,9 +175,9 @@ group :test do
   gem "factory_bot_rails"
   gem "rails-controller-testing"
   gem "rspec-sidekiq"
+  gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry failures on CI
 end
 
-gem "dockerfile-rails", ">= 1.5", group: :development
