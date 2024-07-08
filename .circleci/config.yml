@@ -300,7 +300,7 @@ jobs:
       - run:
           command: |
             echo $CIRCLE_NODE_TOTAL
-            ./cc-test-reporter sum-coverage codeclimate.*.json --parts $CIRCLE_NODE_TOTAL
+            ./cc-test-reporter sum-coverage codeclimate.*.json
             ./cc-test-reporter upload-coverage --debug
 
   deploy_production:
