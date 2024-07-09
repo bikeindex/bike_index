@@ -49,7 +49,7 @@ gem "kaminari" # pagination
 gem "kramdown", "2.3.1" # Markdown
 gem "kramdown-parser-gfm" # Parser required to render grape-swagger
 gem "money-rails", "~> 1.11"
-gem "omniauth", "~> 1.6"
+gem "omniauth", "~> 2.0.0"
 gem "omniauth-facebook"
 gem "omniauth-globalid"
 gem "omniauth-strava"
