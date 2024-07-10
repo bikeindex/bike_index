@@ -117,9 +117,9 @@ nb:
       carrierwave_processing_error: kunne ikke behandles
       carrierwave_integrity_error: er ikke av en tillatt filtype
       carrierwave_download_error: kunne ikke lastes ned
-      extension_white_list_error: 'Du har ikke lov til å laste opp %{extension}-filer,
+      extension_whitelist_error: 'Du har ikke lov til å laste opp %{extension}-filer,
         tillatte typer: %{allowed_types}'
-      extension_black_list_error: 'Du har ikke lov til å laste opp %{extension}-filer,
+      extension_blacklist_error: 'Du har ikke lov til å laste opp %{extension}-filer,
         forbudte typer: %{prohibited_types}'
       rmagick_processing_error: 'Kunne ikke manipulere med rmagick, kanskje det ikke
         er et bilde? Opprinnelig feil: %{e}'

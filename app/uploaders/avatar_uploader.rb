@@ -8,7 +8,7 @@ class AvatarUploader < ApplicationUploader
 
   process :validate_dimensions
 
-  def extension_white_list
+  def extension_whitelist
     self.class.extensions
   end
 
