@@ -587,6 +587,28 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe 'reverse geocode' do
+    let(:stolen_record) do
+      FactoryBot.build(:stolen_record, skip_geocoding:, skip_geocoding,
+        latitude: latitude, longitude: longitude, street: nil, city: nil)
+    end
+    let(:skip_geocoding) { true }
+    it 'is not reverse geocode if skip_geocoding?' do
+      stolen_record.save!
+      expect(stolen_record.reload.street).to be_nil
+      expect(stolen_record.city).to be_nil
+    end
+    context 'with skip_geocoding: false' do
+      let(:skip_geocoding) { false }
+      it 'geocodes' do
+        stolen_record.save!
+        expect(stolen_record.reload.street).to eq '278 Broadway'
+        expect(stolen_record.city).to eq 'New York'
+        expect(stolen_record.zipcode).to eq '10007'
+      end
+    end
+  end
+
   describe "promoted alert recovery notification" do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do

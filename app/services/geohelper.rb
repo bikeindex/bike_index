@@ -22,38 +22,35 @@ class Geohelper
     end
 
     def bounding_box(search_location, distance)
-      Geocoder::Calculations.bounding_box(formatted_address(params[:proximity]), radius)
+      Geocoder::Calculations.bounding_box(search_location, radius)
     end
 
-    def address_hash_from_geocoder_result(result)
-      return {} if result.blank?
-      {
-        city: result.city,
-        latitude: result.latitude,
-        longitude: result.longitude,
-        state_id: State.friendly_find(result.state_code)&.id,
-        country_id: Country.friendly_find(result.country_code)&.id,
-        zipcode: result.postal_code
-      }
-    end
-
-    def assignable_address_hash(lookup_string = nil, latitude: nil, longitude: nil)
+    def lookup_assignable_address_hash(lookup_string = nil, latitude: nil, longitude: nil)
       addy_hash = if latitude.present? && longitude.present?
-        reverse_geocode(latitude, longitude)
-          .merge(latitude: latitude, longitude: longitude) # ensure passed coordinates are unchanged
+        address_hash_from_reverse_geocode(latitude, longitude)
+          .merge(latitude: latitude, longitude: longitude) # keep original coordinates!
       else
         formatted_address_hash(lookup_string)
       end
-      {street: addy_hash["street"],
-       city: addy_hash["city"],
-       zipcode: addy_hash["zipcode"],
-       country: Country.friendly_find(addy_hash["country"]),
-       state: State.friendly_find(addy_hash["state"]),
-       latitude: addy_hash["latitude"],
-       longitude: addy_hash["longitude"]}
+
+      assignable_address_hash(addy_hash)
+
+      # COERCE TO THIS:
+      # {street: addy_hash["street"],
+      #  city: addy_hash["city"],
+      #  zipcode: addy_hash["zipcode"],
+      #  country: Country.friendly_find(addy_hash["country"]),
+      #  state: State.friendly_find(addy_hash["state"]),
+      #  latitude: addy_hash["latitude"],
+      #  longitude: addy_hash["longitude"]}
     end
 
     private
+
+    # Maybe `formatted_address_string` will be useful in the future! Including for now!
+    def assignable_address_hash(formatted_address_hash)
+      formatted_address_hash.except(:formatted_address_string)
+    end
 
     # TODO: location refactor - make this return the updated location attrs
     # Given a string, return an address hash for that location
@@ -95,10 +92,24 @@ class Geohelper
       ].any? { |coord| coord[0] == latitude.round(5) && coord[1] == longitude.round(5) }
     end
 
-    def reverse_geocode(latitude, longitude)
-      result = Geocoder.search([latitude, longitude])
-      return nil unless result&.first
-      result.first.formatted_address || result.first.address
+    def address_hash_from_reverse_geocode(latitude, longitude)
+      address_hash_from_geocoder_result(Geocoder.search([latitude, longitude]))
+    end
+
+    def address_hash_from_geocoder_result(results)
+      return nil unless results&.first.present?
+      result = results.first # TODO - not done
+      # "CONTINUE WORK RIGHT HERE"
+      # result.first.formatted_address || result.first.address
+      # return {} if result.blank?
+      {
+        city: result.city,
+        latitude: result.latitude,
+        longitude: result.longitude,
+        state_id: State.friendly_find(result.state_code)&.id,
+        country_id: Country.friendly_find(result.country_code)&.id,
+        zipcode: result.postal_code
+      }
     end
   end
 end

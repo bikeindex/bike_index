@@ -484,6 +484,382 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version: 
+    http_version:
   recorded_at: Wed, 01 Aug 2018 15:30:43 GMT
-recorded_with: VCR 4.0.0
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?key=<GOOGLE_GEOCODER>&language=en&latlng=42.8490197,-106.3015341&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Fri, 12 Jul 2024 16:12:14 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - mafe
+      Content-Length:
+      - '25843'
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=111
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "{\n   \"plus_code\" : \n   {\n      \"compound_code\" : \"RMXX+J94
+        Casper, WY, USA\",\n      \"global_code\" : \"85JMRMXX+J94\"\n   },\n   \"results\"
+        : \n   [\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"1740\",\n               \"short_name\" :
+        \"1740\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"East 2nd Street\",\n               \"short_name\" : \"E 2nd St\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Casper\",\n               \"short_name\"
+        : \"Casper\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Natrona County\",\n               \"short_name\"
+        : \"Natrona County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"82601\",\n               \"short_name\" :
+        \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"3007\",\n               \"short_name\" : \"3007\",\n               \"types\"
+        : \n               [\n                  \"postal_code_suffix\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"1740 E 2nd
+        St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n            \"bounds\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 42.8490125,\n                  \"lng\" : -106.3013679\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 42.8489181,\n                  \"lng\" : -106.3015657\n               }\n
+        \           },\n            \"location\" : \n            {\n               \"lat\"
+        : 42.8489653,\n               \"lng\" : -106.3014667\n            },\n            \"location_type\"
+        : \"ROOFTOP\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 42.85031428029151,\n                  \"lng\"
+        : -106.3001178197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.84761631970851,\n                  \"lng\"
+        : -106.3028157802915\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJd_2x8IC8YIcRXpq0Mx1lH78\",\n         \"types\" : \n         [\n            \"premise\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"1740\",\n               \"short_name\"
+        : \"1740\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"East 2nd Street\",\n               \"short_name\" : \"E 2nd St\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Casper\",\n               \"short_name\"
+        : \"Casper\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Natrona County\",\n               \"short_name\"
+        : \"Natrona County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"82601\",\n               \"short_name\" :
+        \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"3007\",\n               \"short_name\" : \"3007\",\n               \"types\"
+        : \n               [\n                  \"postal_code_suffix\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"1740 E 2nd
+        St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n            \"location\"
+        : \n            {\n               \"lat\" : 42.8489298,\n               \"lng\"
+        : -106.3014617\n            },\n            \"location_type\" : \"ROOFTOP\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 42.8502787802915,\n                  \"lng\"
+        : -106.3001127197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.8475808197085,\n                  \"lng\"
+        : -106.3028106802915\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJ05jT_oC8YIcRE4qOVC2ScRo\",\n         \"plus_code\" : \n         {\n
+        \           \"compound_code\" : \"RMXX+HC Casper, WY, USA\",\n            \"global_code\"
+        : \"85JMRMXX+HC\"\n         },\n         \"types\" : \n         [\n            \"establishment\",\n
+        \           \"insurance_agency\",\n            \"point_of_interest\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"1712\",\n               \"short_name\" :
+        \"1712\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"East 2nd Street\",\n               \"short_name\" : \"E 2nd St\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Casper\",\n               \"short_name\"
+        : \"Casper\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Natrona County\",\n               \"short_name\"
+        : \"Natrona County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"82601\",\n               \"short_name\" :
+        \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"1712 E 2nd St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n
+        \           \"location\" : \n            {\n               \"lat\" : 42.848989,\n
+        \              \"lng\" : -106.301982\n            },\n            \"location_type\"
+        : \"ROOFTOP\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 42.8503379802915,\n                  \"lng\"
+        : -106.3006330197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.8476400197085,\n                  \"lng\"
+        : -106.3033309802915\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJN_Bc_IC8YIcRFCA7unDO_b0\",\n         \"plus_code\" : \n         {\n
+        \           \"compound_code\" : \"RMXX+H6 Casper, WY, USA\",\n            \"global_code\"
+        : \"85JMRMXX+H6\"\n         },\n         \"types\" : \n         [\n            \"street_address\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"1736\",\n               \"short_name\"
+        : \"1736\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"East 2nd Street\",\n               \"short_name\" : \"E 2nd St\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Casper\",\n               \"short_name\"
+        : \"Casper\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Natrona County\",\n               \"short_name\"
+        : \"Natrona County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"82601\",\n               \"short_name\" :
+        \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"3007\",\n               \"short_name\" : \"3007\",\n               \"types\"
+        : \n               [\n                  \"postal_code_suffix\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"1736 E 2nd
+        St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n            \"location\"
+        : \n            {\n               \"lat\" : 42.8487135,\n               \"lng\"
+        : -106.3015381\n            },\n            \"location_type\" : \"RANGE_INTERPOLATED\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 42.85006248029149,\n                  \"lng\"
+        : -106.3001891197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.8473645197085,\n                  \"lng\"
+        : -106.3028870802915\n               }\n            }\n         },\n         \"place_id\"
+        : \"EiQxNzM2IEUgMm5kIFN0LCBDYXNwZXIsIFdZIDgyNjAxLCBVU0EiGxIZChQKEglnhtX-gLxghxGRJr_xyUmyxxDIDQ\",\n
+        \        \"types\" : \n         [\n            \"street_address\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"RMXX+J9\",\n               \"short_name\"
+        : \"RMXX+J9\",\n               \"types\" : \n               [\n                  \"plus_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Casper\",\n               \"short_name\" : \"Casper\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Natrona County\",\n               \"short_name\" : \"Natrona County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"RMXX+J9 Casper, WY, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 42.849125,\n                  \"lng\"
+        : -106.3015\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 42.849,\n                  \"lng\" : -106.301625\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 42.8490197,\n               \"lng\" : -106.3015341\n
+        \           },\n            \"location_type\" : \"GEOMETRIC_CENTER\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 42.8504114802915,\n                  \"lng\" : -106.3002135197085\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 42.8477135197085,\n                  \"lng\" : -106.3029114802915\n               }\n
+        \           }\n         },\n         \"place_id\" : \"GhIJcpRyraxsRUARPoiuVUyTWsA\",\n
+        \        \"plus_code\" : \n         {\n            \"compound_code\" : \"RMXX+J9
+        Casper, WY, USA\",\n            \"global_code\" : \"85JMRMXX+J9\"\n         },\n
+        \        \"types\" : \n         [\n            \"plus_code\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"1701-1799\",\n               \"short_name\"
+        : \"1701-1799\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"East 2nd Street\",\n               \"short_name\" : \"E 2nd St\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Casper\",\n               \"short_name\"
+        : \"Casper\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Natrona County\",\n               \"short_name\"
+        : \"Natrona County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"82601\",\n               \"short_name\" :
+        \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"1701-1799 E 2nd St, Casper, WY 82601, USA\",\n         \"geometry\" :
+        \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 42.848715,\n                  \"lng\"
+        : -106.3010793\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 42.8487105,\n                  \"lng\" : -106.3024966\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 42.8487128,\n               \"lng\" : -106.301788\n
+        \           },\n            \"location_type\" : \"GEOMETRIC_CENTER\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 42.8500617302915,\n                  \"lng\" : -106.3004389697085\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 42.8473637697085,\n                  \"lng\" : -106.3031369302915\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJZ4bV_oC8YIcRkCa_8clJssc\",\n
+        \        \"types\" : \n         [\n            \"route\"\n         ]\n      },\n
+        \     {\n         \"address_components\" : \n         [\n            {\n               \"long_name\"
+        : \"Casper\",\n               \"short_name\" : \"Casper\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Natrona County\",\n               \"short_name\" : \"Natrona County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"Casper, WY, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 42.9076386,\n                  \"lng\"
+        : -106.2159009\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 42.7429397,\n                  \"lng\" : -106.4349685\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 42.84870900000001,\n               \"lng\" : -106.2980824\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 42.9076386,\n                  \"lng\" : -106.2159009\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 42.7429397,\n                  \"lng\" : -106.4349685\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJY3peyGWTYIcRUz40Fzn8zmk\",\n
+        \        \"types\" : \n         [\n            \"locality\",\n            \"political\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"82601\",\n               \"short_name\"
+        : \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Bar Nunn\",\n               \"short_name\" : \"Bar Nunn\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Natrona County\",\n               \"short_name\" : \"Natrona County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"Bar Nunn, WY 82601, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 43.4153499,\n                  \"lng\"
+        : -106.073188\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 42.6724999,\n                  \"lng\" : -106.6782201\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 43.0981345,\n               \"lng\" : -106.3934777\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 43.4153499,\n                  \"lng\" : -106.073188\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 42.6724999,\n                  \"lng\" : -106.6782201\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJISsLkDuFYIcRr5xjNr8ioNE\",\n
+        \        \"postcode_localities\" : \n         [\n            \"Bar Nunn\",\n
+        \           \"Casper\"\n         ],\n         \"types\" : \n         [\n            \"postal_code\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"Natrona County\",\n               \"short_name\"
+        : \"Natrona County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"Natrona County, WY, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 43.501897,\n                  \"lng\"
+        : -106.0705689\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 42.4304879,\n                  \"lng\" : -107.543526\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 42.8313837,\n               \"lng\" : -106.912251\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 43.501897,\n                  \"lng\" : -106.0705689\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 42.4304879,\n                  \"lng\" : -107.543526\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJ6ZENbZKQYIcR1BVum_c3z9s\",\n
+        \        \"types\" : \n         [\n            \"administrative_area_level_2\",\n
+        \           \"political\"\n         ]\n      },\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"Wyoming\",\n
+        \              \"short_name\" : \"WY\",\n               \"types\" : \n               [\n
+        \                 \"administrative_area_level_1\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"United States\",\n               \"short_name\" : \"US\",\n               \"types\"
+        : \n               [\n                  \"country\",\n                  \"political\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"Wyoming, USA\",\n         \"geometry\" : \n         {\n            \"bounds\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 45.005815,\n                  \"lng\" : -104.0522449\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.994772,\n                  \"lng\" : -111.0545581\n               }\n
+        \           },\n            \"location\" : \n            {\n               \"lat\"
+        : 43.0759678,\n               \"lng\" : -107.2902839\n            },\n            \"location_type\"
+        : \"APPROXIMATE\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 45.005815,\n                  \"lng\"
+        : -104.0522449\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.994772,\n                  \"lng\" : -111.0545581\n
+        \              }\n            }\n         },\n         \"place_id\" : \"ChIJaS7hSDTiXocRLzh90nkisCY\",\n
+        \        \"types\" : \n         [\n            \"administrative_area_level_1\",\n
+        \           \"political\"\n         ]\n      },\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"United States\",\n
+        \              \"short_name\" : \"US\",\n               \"types\" : \n               [\n
+        \                 \"country\",\n                  \"political\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"United States\",\n
+        \        \"geometry\" : \n         {\n            \"bounds\" : \n            {\n
+        \              \"northeast\" : \n               {\n                  \"lat\"
+        : 74.071038,\n                  \"lng\" : -66.885417\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 18.7763,\n                  \"lng\" : 166.9999999\n               }\n            },\n
+        \           \"location\" : \n            {\n               \"lat\" : 37.09024,\n
+        \              \"lng\" : -95.712891\n            },\n            \"location_type\"
+        : \"APPROXIMATE\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 74.071038,\n                  \"lng\"
+        : -66.885417\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 18.7763,\n                  \"lng\" : 166.9999999\n
+        \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
+        \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+    http_version:
+  recorded_at: Fri, 12 Jul 2024 16:12:14 GMT
+recorded_with: VCR 5.0.0
