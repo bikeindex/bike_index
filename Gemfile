@@ -7,7 +7,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
 ruby "2.7.8"
-gem "rack", "2.2.3"
+gem "rack", "~> 2.2.3"
 gem "rails", "~> 6.0"
 
 gem "puma" # App server
@@ -49,7 +49,7 @@ gem "kaminari" # pagination
 gem "kramdown", "2.3.1" # Markdown
 gem "kramdown-parser-gfm" # Parser required to render grape-swagger
 gem "money-rails", "~> 1.11"
-gem "omniauth", "~> 1.6"
+gem "omniauth", "~> 2.0.0"
 gem "omniauth-facebook"
 gem "omniauth-globalid"
 gem "omniauth-strava"
