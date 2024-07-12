@@ -10,6 +10,7 @@
 #  kind                  :integer          default("custom")
 #  latitude              :float
 #  longitude             :float
+#  neighborhood          :string
 #  proximity_radius      :integer
 #  street                :string
 #  subject               :text

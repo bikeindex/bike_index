@@ -11,6 +11,7 @@
 #  latitude                 :float
 #  longitude                :float
 #  name                     :string(255)
+#  neighborhood             :string
 #  not_publicly_visible     :boolean          default(FALSE)
 #  phone                    :string(255)
 #  shown                    :boolean          default(FALSE)
