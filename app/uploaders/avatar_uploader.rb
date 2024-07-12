@@ -2,7 +2,7 @@ class AvatarUploader < ApplicationUploader
   include CarrierWave::MiniMagick
 
   # Fallback so the page doesn't break if the image isn't there
-  def default_url
+  def default_url(*args)
     "https://files.bikeindex.org/blank.png"
   end
 
