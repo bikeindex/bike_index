@@ -180,4 +180,3 @@ group :test do
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry failures on CI
 end
-

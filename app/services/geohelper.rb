@@ -22,7 +22,7 @@ class Geohelper
     end
 
     def bounding_box(search_location, distance)
-      Geocoder::Calculations.bounding_box(search_location, radius)
+      Geocoder::Calculations.bounding_box(search_location, distance)
     end
 
     def lookup_assignable_address_hash(lookup_string = nil, latitude: nil, longitude: nil)
@@ -108,7 +108,8 @@ class Geohelper
         longitude: result.longitude,
         state_id: State.friendly_find(result.state_code)&.id,
         country_id: Country.friendly_find(result.country_code)&.id,
-        zipcode: result.postal_code
+        neighborhood: result.neighborhood,
+        zipcode: result.zipcode || result.postal_code
       }
     end
   end

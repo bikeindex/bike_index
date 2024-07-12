@@ -5,14 +5,14 @@ RSpec.describe Geohelper do
 
   describe "reverse_geocode" do
     context "point" do
-      let(:country) { Country.united_states}
-      let!(:state) { FactoryBot.create(:state, name: 'Wyoming', abbreviation: 'WY', country: country) }
+      let(:country) { Country.united_states }
+      let!(:state) { FactoryBot.create(:state, name: "Wyoming", abbreviation: "WY", country: country) }
       let(:address) { "1740 E 2nd St, Casper, WY 82601, USA" }
       let(:latitude) { 42.84901970000 }
       let(:longitude) { -106.30153410000 }
       let(:returned_hash) do
         {city: "Casper", latitude: 42.8489622, longitude: -106.3014293, zipcode: "82601",
-          state_id: state.id, country_id: country.id}
+         state_id: state.id, country_id: country.id}
       end
       it "returns correct location" do
         VCR.use_cassette("geohelper-reverse_geocode") do

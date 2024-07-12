@@ -19,7 +19,7 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
         expect(logged_search.organization_id).to eq organization.id
       end
 
-      context 'user is superuser' do
+      context "user is superuser" do
         let(:user) { FactoryBot.create(:admin, :with_organization) }
         it "doesn't associate" do
           expect(logged_search.user_id).to eq user.id
@@ -32,7 +32,7 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
         end
       end
 
-      context 'organization_id is assigned' do
+      context "organization_id is assigned" do
         before { logged_search.update(organization_id: 122) }
         it "doesn't update organization_id" do
           expect(logged_search.reload.processed?).to be_falsey
@@ -45,7 +45,7 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
       end
     end
 
-    context 'ip_address' do
+    context "ip_address" do
       let(:logged_search) { FactoryBot.create(:logged_search, ip_address: "181.41.206.24") }
       let!(:country) { Country.united_states }
       let!(:state) { FactoryBot.create(:state, abbreviation: "NY", name: "New York") }
@@ -54,8 +54,8 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
           latitude: 40.7143528,
           longitude: -74.0059731,
           neighborhood: "Tribeca",
-          city: 'New York',
-          zipcode: '10007',
+          city: "New York",
+          zipcode: "10007",
           country_id: country.id,
           state_id: state.id
         }

@@ -98,7 +98,6 @@ class StolenRecord < ApplicationRecord
   enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
 
   before_save :set_calculated_attributes
-  after_validation :reverse_geocode, unless: :skip_geocoding?
   after_commit :update_associations
 
   default_scope { current }
@@ -120,15 +119,6 @@ class StolenRecord < ApplicationRecord
   scope :without_location, -> { without_street } # References geocodeable without_street, we need to reconcile this
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
-
-  reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
-    if (geo = results.first)
-      stolen_record.country ||= Country.find_by(name: geo.country)
-      stolen_record.city ||= geo.city
-      stolen_record.state ||= State.find_by(abbreviation: geo.state_code)
-      stolen_record.neighborhood ||= geo.neighborhood
-    end
-  end
 
   def self.recovery_display_statuses
     RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s)
@@ -188,6 +178,27 @@ class StolenRecord < ApplicationRecord
       date = corrected
     end
     date
+  end
+
+  # override to enable reverse geocoding if applicable
+  def should_be_geocoded?
+    !skip_geocoding?
+  end
+
+  # Override to add reverse geocoding functionality
+  def bike_index_geocode
+    if address_changed?
+      self.attributes = if address_present?
+        Geohelper.coordinates_for(address) || {}
+      else
+        {latitude: nil, longitude: nil}
+      end
+    end
+    # Try to fill in missing attributes by reverse geocoding
+    return if latitude.blank? || longitude.blank? || location_attributes_present?
+    geohelper_attrs = Geohelper.lookup_assignable_address_hash(latitude: latitude, longitude: longitude)
+    attrs_to_assign = geohelper_attrs.keys.reject { |gattr| self[gattr].present? }
+    self.attributes = geohelper_attrs.slice(*attrs_to_assign)
   end
 
   def recovered?
@@ -405,5 +416,10 @@ class StolenRecord < ApplicationRecord
 
   def fix_date
     self.date_stolen = self.class.corrected_date_stolen(date_stolen)
+  end
+
+  def location_attributes_present?
+    return false if country_id.blank? || city.blank? || neighborhood.blank?
+    country_id == Country.united_states.id ? state_id.present? : true
   end
 end

@@ -84,6 +84,6 @@ class LoggedSearch < AnalyticsRecord
   end
 
   def should_be_geocoded?
-    false # don't geocode automatically
+    false # don't geocode automatically, handle it with background job
   end
 end
