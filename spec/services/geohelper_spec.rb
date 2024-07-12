@@ -59,18 +59,18 @@ RSpec.describe Geohelper do
       end
       it "returns our desires" do
         VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
-          expect(Geohelper.formatted_address_hash(address_str)).to eq target.as_json
+          expect(Geohelper.send(:formatted_address_hash, address_str)).to eq target.as_json
         end
       end
       context "blank" do
         it "returns empty" do
-          expect(Geohelper.formatted_address_hash(nil)).to eq({})
+          expect(Geohelper.send(:formatted_address_hash, nil)).to eq({})
         end
       end
       context "NA" do
         it "returns empty" do
           VCR.use_cassette("geohelper-na-formatted_address_hash", match_requests_on: [:path]) do
-            expect(Geohelper.formatted_address_hash("NA")).to eq({})
+            expect(Geohelper.send(:formatted_address_hash, "NA")).to eq({})
           end
         end
       end
@@ -83,7 +83,7 @@ RSpec.describe Geohelper do
         let(:address_str) { "188 King St, UNIT 201, San Francisco, CA 94107, USA" }
         let(:target) { {street: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "US"} }
         it "returns our desires" do
-          expect(Geohelper.address_hash_from_geocoder_string(address_str)).to eq target.as_json
+          expect(Geohelper.send(:address_hash_from_geocoder_string, address_str)).to eq target.as_json
         end
       end
     end

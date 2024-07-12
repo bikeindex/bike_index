@@ -65,7 +65,7 @@ class TsvCreator
   #   start_date ||= Time.current.beginning_of_year
   #   obikes = organization.bikes.where("created_at >= ?", start_date)
   #   organization_bikes = obikes.count
-  #   box = Geocoder::Calculations.bounding_box(organization.locations.first, 50)
+  #   box = Geohelper.bounding_box(organization.locations.first, 50)
   #   stolen_ids = StolenRecord.within_bounding_box(box).pluck(:bike_id)
   #   non_org_stolen_count = (stolen_ids - obikes.pluck(:ids)).count
   # end

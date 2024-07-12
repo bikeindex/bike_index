@@ -21,6 +21,7 @@ class ProcessLoggedSearchWorker < ApplicationWorker
 
     geo_response = Geocoder.search(logged_search.ip_address)
     location = location_attrs_from_geo_response(geo_response)
+    pp location
     logged_search.attributes = location if location.present?
   end
 

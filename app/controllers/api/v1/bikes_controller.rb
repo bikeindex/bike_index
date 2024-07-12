@@ -39,7 +39,7 @@ module API
         if params[:proximity].present?
           radius = 50
           radius = params[:proximity_radius] if params[:proximity_radius].present? && params[:proximity_radius].strip.length > 0
-          box = Geocoder::Calculations.bounding_box(Geohelper.formatted_address(params[:proximity]), radius)
+          box = Geohelper.bounding_box(params[:proximity], radius)
           stolen = stolen.within_bounding_box(box)
         end
         if params[:updated_since]

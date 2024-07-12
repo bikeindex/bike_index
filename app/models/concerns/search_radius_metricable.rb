@@ -20,7 +20,7 @@ module SearchRadiusMetricable
   end
 
   def bounding_box
-    Geocoder::Calculations.bounding_box(search_coordinates, search_radius_miles)
+    Geohelper.bounding_box(search_coordinates, search_radius_miles)
   end
 
   def search_radius_metric_units?
