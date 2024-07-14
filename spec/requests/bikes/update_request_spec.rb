@@ -58,7 +58,7 @@ RSpec.describe "BikesController#update", type: :request do
         end
       end
       bike.reload
-      expect(bike.street).to eq default_location[:street]
+      expect(bike.street).to eq default_location[:street_address]
       expect(bike.address_set_manually).to be_falsey
       expect(bike.updated_by_user_at).to be > (Time.current - 1)
       expect(bike.not_updated_by_user?).to be_falsey

@@ -106,7 +106,7 @@
 .mt-4
 - location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100
 - box = params[:location].present? && GeocodeHelper.bounding_box(params[:location], location_radius)
-- if box && !box[0].nan?
+- if box.present?
   %h4.mt-4
     Records
     %em
