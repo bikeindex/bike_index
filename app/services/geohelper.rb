@@ -102,15 +102,16 @@ class Geohelper
 
     def address_hash_from_geocoder_result(results)
       return {} unless results&.first.present?
-      # pp results
-      result = results.first # TODO - not done
-      geometry = defined?(result.data["geometry"]) ? result.data["geometry"] : nil
-      address_hash = if geometry && geometry["location"].present?
+      result = results.first # Maybe someday use multiple results? Not a priority
+      address_hash = if defined?(result.city)
         hash_for_google_response(result)
-      elsif geometry && geometry["bounds"].present?
+      elsif defined?(result.data["geometry"]) && result.data["geometry"]["bounds"].present?
         # Google returned a box that represents the area, return just one coordinate group from that box
-        coordinates_from_google_response(geometry["bounds"])
+        coordinates_from_google_response(result.data.dig("geometry", "bounds", "northeast"))
+      else
+        {failed: result}
       end
+      # pp results, address_hash
       ignored_coordinates?(address_hash[:latitude], address_hash[:longitude]) ? {} : address_hash
     end
 

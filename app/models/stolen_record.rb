@@ -188,11 +188,7 @@ class StolenRecord < ApplicationRecord
   # Override to add reverse geocoding functionality
   def bike_index_geocode
     if address_changed?
-      self.attributes = if address_present?
-        Geohelper.coordinates_for(address) || {}
-      else
-        {latitude: nil, longitude: nil}
-      end
+      self.attributes = Geohelper.coordinates_for(address) if address_present?
     end
     # Try to fill in missing attributes by reverse geocoding
     return if latitude.blank? || longitude.blank? || all_location_attributes_present?

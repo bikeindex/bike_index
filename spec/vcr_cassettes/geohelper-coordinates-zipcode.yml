@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 14 Jul 2024 18:27:33 GMT
+      - Sun, 14 Jul 2024 19:32:56 GMT
       Pragma:
       - no-cache
       Expires:
@@ -41,7 +41,7 @@ http_interactions:
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=74
+      - gfet4t7; dur=93
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -78,5 +78,5 @@ http_interactions:
         : \"ChIJ3fO3tQjND4gR1psfMQ0T28k\",\n         \"types\" : \n         [\n            \"postal_code\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Sun, 14 Jul 2024 18:27:33 GMT
+  recorded_at: Sun, 14 Jul 2024 19:32:56 GMT
 recorded_with: VCR 5.0.0
