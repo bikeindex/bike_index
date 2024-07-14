@@ -206,7 +206,7 @@ module BikeSearchable
       end
 
       bounding_box = Geohelper.bounding_box(location.to_s, distance)
-      return false if bounding_box.detect(&:nan?) # If we can't create a bounding box, skip
+      return false if bounding_box.empty? # If we can't create a bounding box, skip
       {
         bounding_box: bounding_box,
         stolenness: "proximity",

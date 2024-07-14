@@ -13,7 +13,7 @@ RSpec.shared_context :geocoder_default_location do
       neighborhood: "Tribeca",
       country: "United States",
       country_code: "US",
-      zipcode: "10007"
+      postal_code: "10007"
     }
   end
 

@@ -10,17 +10,21 @@ RSpec.describe Geohelper do
       let(:address) { "1740 E 2nd St, Casper, WY 82601, USA" }
       let(:latitude) { 42.84901970000 }
       let(:longitude) { -106.30153410000 }
-      let(:returned_hash) do
+      let(:result_hash) do
         {city: "Casper", latitude: 42.8489622, longitude: -106.3014293, zipcode: "82601",
-         state_id: state.id, country_id: country.id}
+         state_id: state.id, country_id: country.id, neighborhood: nil, street: "1740 East 2nd Street",
+         formatted_address: address}
+      end
+      let(:target_assignable_hash) do
+        result_hash.except(:formatted_address).merge(latitude: latitude, longitude: longitude)
       end
       it "returns address_hash, with original coordinates" do
         VCR.use_cassette("geohelper-reverse_geocode") do
-          expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude)).to eq returned_hash
+          expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude)).to eq result_hash
           result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude)
           # Ensure assignable_address_hash_for returns original lat & long
-          expect(result).to eq(returned_hash.merge(latitude: latitude, longitude: longitude))
-          expect(result.keys.sort).to eq Geocodeable.location_attrs.sort
+          expect(result).to eq target_assignable_hash
+          expect(result.keys.map(&:to_s).sort).to eq Geocodeable.location_attrs.sort
         end
       end
     end
@@ -31,6 +35,10 @@ RSpec.describe Geohelper do
           expect(described_class.assignable_address_hash_for("United States")).to eq({})
         end
       end
+    end
+
+    context "passed a bare zipcode" do
+      it "returns an address_hash"
     end
   end
 
@@ -47,8 +55,7 @@ RSpec.describe Geohelper do
 
     context "with blank" do
       it "handles it successfully" do
-        allow(Geocoder).to receive(:search) { [] }
-        expect(described_class.coordinates_for(address)).to be_nil
+        expect(described_class.coordinates_for(' ')).to eq({latitude: nil, longitude: nil})
       end
     end
 
@@ -62,8 +69,8 @@ RSpec.describe Geohelper do
 
     context "zipcode" do
       let(:address) { "60647" }
-      let(:latitude) { 41.9202661 }
-      let(:longitude) { -87.7156846 }
+      let(:latitude) { 41.9215421 }
+      let(:longitude) { -87.70248169999999 }
 
       it "queries using 'zipcode: ' because google likes that" do
         expect(Geocoder).to receive(:search).with("zipcode: #{address}") { [] }
@@ -77,19 +84,6 @@ RSpec.describe Geohelper do
       end
     end
   end
-
-  # # NOT SURE WE'RE KEEPING THIS ANYWAY!
-  # # This is an internal method, and probably shouldn't be called from elsewhere in the code
-  # # but it's useful to test independently so when inevitably it fails to parse an address, we can test and resolve that case
-  # describe "address_hash_from_geocoder_string" do
-  #   context "with secondary line" do
-  #     let(:address_str) { "188 King St, UNIT 201, San Francisco, CA 94107, USA" }
-  #     let(:target) { {street: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "US"} }
-  #     it "returns our desires" do
-  #       expect(described_class.send(:address_hash_from_geocoder_string, address_str)).to eq target.as_json
-  #     end
-  #   end
-  # end
 
   describe "ignored_coordinates?" do
     it "returns false" do
@@ -108,6 +102,19 @@ RSpec.describe Geohelper do
       end
     end
   end
+
+  # # NOT SURE WE'RE KEEPING THIS ANYWAY!
+  # # This is an internal method, and probably shouldn't be called from elsewhere in the code
+  # # but it's useful to test independently so when inevitably it fails to parse an address, we can test and resolve that case
+  # describe "address_hash_from_geocoder_string" do
+  #   context "with secondary line" do
+  #     let(:address_str) { "188 King St, UNIT 201, San Francisco, CA 94107, USA" }
+  #     let(:target) { {street: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "US"} }
+  #     it "returns our desires" do
+  #       expect(described_class.send(:address_hash_from_geocoder_string, address_str)).to eq target.as_json
+  #     end
+  #   end
+  # end
 
   # describe "formatted_address_hash" do
   #   let(:address_str) { "717 Market St, SF" }

@@ -4,29 +4,19 @@
 # e.g. geocoder returns arrays and varies slightly depending on the provider
 class Geohelper
   class << self
+    # Always returns latitude and longitude
     def coordinates_for(lookup_string)
-      geocoder_search(lookup_string).slice(:latitude, :longitude)
-      # result ||= Geocoder.search(formatted_address(addy))
-      # return nil unless result&.any?
-      # geometry = result.first&.data && result.first.data["geometry"]
-      # if geometry && geometry["location"].present?
-      #   location = geometry["location"]
-      # elsif geometry && geometry["bounds"].present?
-      #   # Google returns a box that represents the area, return just one coordinate group from that box
-      #   location = geometry["bounds"]["northeast"]
-      # elsif result.first&.data&.dig("latitude") # This is probably a test geocoder response...
-      #   location = {"lat" => result.first.data["latitude"], "lng" => result.first.data["longitude"]}
-      # end
-      # return nil unless location
-      # {latitude: location["lat"], longitude: location["lng"]}
+      coords = geocoder_search(lookup_string).slice(:latitude, :longitude)
+      coords.present? ? coords : {latitude: nil, longitude: nil}
     end
 
     def address_string_for(lookup_string)
-      geocoder_search(lookup_string).slice(:formatted_address_string)
+      geocoder_search(lookup_string).slice(:formatted_address)
     end
 
     def bounding_box(lookup_string, distance)
-      Geocoder::Calculations.bounding_box(geocoder_lookup_string(lookup_string), distance)
+      box = Geocoder::Calculations.bounding_box(geocoder_lookup_string(lookup_string), distance)
+      box.detect(&:nan?) ? [] : box
     end
 
     def assignable_address_hash_for(lookup_string = nil, latitude: nil, longitude: nil)
@@ -34,20 +24,11 @@ class Geohelper
         address_hash_from_reverse_geocode(latitude, longitude)
           .merge(latitude: latitude, longitude: longitude) # keep original coordinates!
       else
-        address_hash_from_geocoder_result(lookup_string)
+        geocoder_search(lookup_string)
       end
 
       assignable_address_hash(address_hash)
     end
-
-    # COERCE TO THIS:
-    # {street: addy_hash["street"],
-    #  city: addy_hash["city"],
-    #  zipcode: addy_hash["zipcode"],
-    #  country: Country.friendly_find(addy_hash["country"]),
-    #  state: State.friendly_find(addy_hash["state"]),
-    #  latitude: addy_hash["latitude"],
-    #  longitude: addy_hash["longitude"]}
 
     private
 
@@ -58,7 +39,7 @@ class Geohelper
     end
 
     def assignable_address_hash(address_hash)
-      address_hash.except(:formatted_address_string)
+      address_hash.except(:formatted_address)
     end
 
     # # TODO: location refactor - make this return the updated location attrs
@@ -105,22 +86,50 @@ class Geohelper
       address_hash_from_geocoder_result(Geocoder.search([latitude, longitude]))
     end
 
+    # result ||= Geocoder.search(formatted_address(addy))
+    # return nil unless result&.any?
+    # geometry = result.first&.data && result.first.data["geometry"]
+    # if geometry && geometry["location"].present?
+    #   location = geometry["location"]
+    # elsif geometry && geometry["bounds"].present?
+    #   # Google returns a box that represents the area, return just one coordinate group from that box
+    #   location = geometry["bounds"]["northeast"]
+    # elsif result.first&.data&.dig("latitude") # This is probably a test geocoder response...
+    #   location = {"lat" => result.first.data["latitude"], "lng" => result.first.data["longitude"]}
+    # end
+    # return nil unless location
+    # {latitude: location["lat"], longitude: location["lng"]}
+
     def address_hash_from_geocoder_result(results)
-      return nil unless results&.first.present?
+      return {} unless results&.first.present?
+      # pp results
       result = results.first # TODO - not done
-      # "CONTINUE WORK RIGHT HERE"
-      # result.first.formatted_address || result.first.address
-      # return {} if result.blank?
-      pp result.data.data_hash
+      geometry = defined?(result.data["geometry"]) ? result.data["geometry"] : nil
+      address_hash = if geometry && geometry["location"].present?
+        hash_for_google_response(result)
+      elsif geometry && geometry["bounds"].present?
+        # Google returned a box that represents the area, return just one coordinate group from that box
+        coordinates_from_google_response(geometry["bounds"])
+      end
+      ignored_coordinates?(address_hash[:latitude], address_hash[:longitude]) ? {} : address_hash
+    end
+
+    def hash_for_google_response(result)
       {
         city: result.city,
         latitude: result.latitude,
         longitude: result.longitude,
+        formatted_address: result.formatted_address,
         state_id: State.friendly_find(result.state_code)&.id,
         country_id: Country.friendly_find(result.country_code)&.id,
         neighborhood: result.neighborhood,
-        zipcode: result.zipcode || result.postal_code
+        street: result.street_address,
+        zipcode: result.postal_code
       }
+    end
+
+    def coordinates_from_google_response(coord_hash)
+      { latitude: coord_hash["lat"], longitude: coord_hash["lng"] }
     end
   end
 end
