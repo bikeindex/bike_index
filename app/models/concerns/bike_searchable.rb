@@ -201,7 +201,6 @@ module BikeSearchable
       return false unless location && !(location =~ /anywhere/i)
       distance = query_params[:distance]&.to_i
       bounding_box = if ["", "ip", "you"].include?(location.strip.downcase)
-        return false unless ip_address.present?
         address_hash = GeocodeHelper.address_hash_for(ip_address)
         location = address_hash[:formatted_address]
         GeocodeHelper.bounding_box([address_hash[:latitude], address_hash[:longitude]], distance)

@@ -86,8 +86,9 @@ RSpec.describe "BikesController#create", type: :request do
     end
     context "made_without_serial" do
       let(:ip_address) { "fake-ip-address" }
+      include_context :geocoder_default_location
       let(:default_location) do
-        {country_code: "US", region_code: "CA", state_code: "CA", city_name: "San Francisco", latitude: 37.75, longitude: -122.41, error: nil}
+        {country_code: "US", region_code: "CA", state_code: "CA", city: "San Francisco", latitude: 37.75, longitude: -122.41, error: nil}
       end
       it "creates, is made_without_serial" do
         expect(current_user.bikes.count).to eq 0

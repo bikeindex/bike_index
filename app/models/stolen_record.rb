@@ -197,7 +197,6 @@ class StolenRecord < ApplicationRecord
     # Try to fill in missing attributes by reverse geocoding
     return if latitude.blank? || longitude.blank? || all_location_attributes_present?
     geohelper_attrs = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
-    pp geohelper_attrs
     attrs_to_assign = geohelper_attrs.keys.reject { |gattr| self[gattr].present? }
     self.attributes = geohelper_attrs.slice(*attrs_to_assign)
   end
