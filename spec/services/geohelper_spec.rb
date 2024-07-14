@@ -42,8 +42,8 @@ RSpec.describe Geohelper do
       let(:address) { "60647" }
       let!(:state) { FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: country) }
       let(:target_assignable_hash) do
-        {city: "Chicago", latitude: 41.9215421, longitude:-87.70248169999999, zipcode: "60647",
-        state_id: state.id, country_id: country.id, neighborhood: nil, street: nil }
+        {city: "Chicago", latitude: 41.9215421, longitude: -87.70248169999999, zipcode: "60647",
+         state_id: state.id, country_id: country.id, neighborhood: nil, street: nil}
       end
 
       it "returns an address_hash" do
@@ -110,7 +110,7 @@ RSpec.describe Geohelper do
 
     context "with blank" do
       it "handles it successfully" do
-        expect(described_class.coordinates_for(' ')).to eq({latitude: nil, longitude: nil})
+        expect(described_class.coordinates_for(" ")).to eq({latitude: nil, longitude: nil})
       end
     end
 
