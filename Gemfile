@@ -42,7 +42,7 @@ gem "redlock" # Locking
 
 gem "eventmachine"
 gem "faraday_middleware" # Manage faraday request flow
-gem "geocoder"
+gem "geocoder" # Geolocation using external APIs
 gem "hamlit" # Faster haml, what we use for templating
 gem "httparty"
 gem "kaminari" # pagination
@@ -178,5 +178,5 @@ group :test do
   gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
-  gem "rspec-retry", require: false # Retry failures on CI
+  gem "rspec-retry", require: false # Retry flaky test failures on CI
 end

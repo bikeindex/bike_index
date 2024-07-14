@@ -36,9 +36,6 @@ RSpec.shared_context :geocoder_default_location do
       cache_hit: true
     }
   end
-  let(:legacy_production_ip_search_result) { [geo_hash] }
-
-  let(:production_ip_search_result) { [OpenStruct.new(geo_hash)] }
 
   let(:bounding_box) do
     [

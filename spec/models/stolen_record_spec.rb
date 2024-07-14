@@ -600,7 +600,7 @@ RSpec.describe StolenRecord, type: :model do
       expect(stolen_record.reload).to have_attributes target_attributes
     end
     context "with location attributes set" do
-      let(:location_attributes) { {country_id: country.id, state_id: FactoryBot.create(:state).id, neighborhood: "somewhere", city: "A City"} }
+      let(:location_attributes) { {country_id: country.id, state_id: FactoryBot.create(:state).id, zipcode: "99999", city: "A City"} }
       before { stolen_record.attributes = location_attributes }
       it "does not call geocoder" do
         expect(Geocoder).to_not receive(:search)
@@ -608,7 +608,7 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.reload).to have_attributes location_attributes
       end
       context "with canada (no state_id)" do
-        let(:location_attributes) { {country_id: Country.canada.id, state_id: nil, neighborhood: "somewhere", city: "A City"} }
+        let(:location_attributes) { {country_id: Country.canada.id, state_id: nil, zipcode: "99999", city: "A City"} }
         it "does not call geocoder" do
           expect(Geocoder).to_not receive(:search)
           stolen_record.save!

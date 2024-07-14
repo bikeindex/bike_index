@@ -186,7 +186,7 @@ RSpec.shared_examples "bike_searchable" do
         %w[ip you].each do |ip_string|
           context "Reverse geocode IP lookup for location: '#{ip_string}'" do
             let(:query_params) { {stolenness: "proximity", location: ip_string, distance: "twelve "} }
-            let(:target) { {stolenness: "proximity", distance: 100, location: "STUBBED response", bounding_box: bounding_box} }
+            let(:target) { {stolenness: "proximity", distance: 100, location: nil, bounding_box: bounding_box} }
             it "returns the location and the distance" do
               expect(Geocoder).to receive(:search).with(ip_address) { "STUBBED response" }
               expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target

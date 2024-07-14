@@ -6,18 +6,12 @@ class GeocodeHelper
   class << self
     # Always returns latitude and longitude
     def coordinates_for(lookup_string)
-      coords = geocoder_search(lookup_string).slice(:latitude, :longitude)
+      coords = address_hash_for(lookup_string).slice(:latitude, :longitude)
       coords.present? ? coords : {latitude: nil, longitude: nil}
     end
 
-    # This is used when the result of a search is put into a bounding box
-    def coord_array_for(lookup_string)
-      coords = coordinates_for(lookup_string)
-      [coords[:latitude], coords[:longitude]]
-    end
-
     def address_string_for(lookup_string)
-      geocoder_search(lookup_string).slice(:formatted_address)
+      address_hash_for(lookup_string).slice(:formatted_address)
     end
 
     def bounding_box(lookup_string, distance)
@@ -35,19 +29,19 @@ class GeocodeHelper
         address_hash_from_reverse_geocode(latitude, longitude)
           .merge(latitude: latitude, longitude: longitude) # keep original coordinates!
       else
-        geocoder_search(lookup_string)
+        address_hash_for(lookup_string)
       end
 
       assignable_address_hash(address_hash)
     end
 
-    private
-
-    def geocoder_search(lookup_string)
+    def address_hash_for(lookup_string)
       address_hash_from_geocoder_result(
         Geocoder.search(geocoder_lookup_string(lookup_string))
       )
     end
+
+    private
 
     def assignable_address_hash(address_hash)
       address_hash.except(:formatted_address)

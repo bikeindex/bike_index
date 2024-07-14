@@ -146,7 +146,11 @@ module Geocodeable
 
   def bike_index_geocode
     # Only geocode if there is specific location information
-    self.attributes = GeocodeHelper.coordinates_for(address) if address_present?
+    self.attributes = if address_present?
+      GeocodeHelper.coordinates_for(address)
+    else
+      {latitude: nil, longitude: nil}
+    end
   end
 
   # default address hash. Probably could be used more often/better
