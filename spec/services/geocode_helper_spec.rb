@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe GeocodeHelper do
   include_context :geocoder_real
+  let(:vcr_config) { {match_requests_on: [:path], re_record_interval: 3.months} }
 
   describe "assignable_address_hash_for" do
     let!(:country) { Country.united_states }
@@ -20,7 +21,7 @@ RSpec.describe GeocodeHelper do
         result_hash.except(:formatted_address).merge(latitude: latitude, longitude: longitude)
       end
       it "returns address_hash, with original coordinates" do
-        VCR.use_cassette("geohelper-reverse_geocode", match_requests_on: [:path], re_record_interval: 3.months) do
+        VCR.use_cassette("geohelper-reverse_geocode", vcr_config) do
           expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude)).to eq result_hash
           result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude)
           # Ensure assignable_address_hash_for returns original lat & long
@@ -32,7 +33,7 @@ RSpec.describe GeocodeHelper do
 
     context "with ignored_coordinates" do
       it "returns empty" do
-        VCR.use_cassette("geohelper-us", match_requests_on: [:path], re_record_interval: 3.months) do
+        VCR.use_cassette("geohelper-us", vcr_config) do
           expect(described_class.assignable_address_hash_for("United States")).to eq({})
         end
       end
@@ -47,7 +48,7 @@ RSpec.describe GeocodeHelper do
       end
 
       it "returns an address_hash" do
-        VCR.use_cassette("geohelper-zipcode", match_requests_on: [:path], re_record_interval: 3.months) do
+        VCR.use_cassette("geohelper-zipcode", vcr_config) do
           expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
         end
       end
@@ -68,7 +69,7 @@ RSpec.describe GeocodeHelper do
         }
       end
       it "returns our desires" do
-        VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path], re_record_interval: 3.months) do
+        VCR.use_cassette("geohelper-formatted_address_hash", vcr_config) do
           expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
         end
       end
@@ -90,7 +91,7 @@ RSpec.describe GeocodeHelper do
         }
       end
       it "finds the address" do
-        VCR.use_cassette("geohelper-ip_address", match_requests_on: [:path], re_record_interval: 3.months) do
+        VCR.use_cassette("geohelper-ip_address", vcr_config) do
           expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
         end
       end
@@ -103,7 +104,7 @@ RSpec.describe GeocodeHelper do
     let(:longitude) { -87.71563359999999 }
 
     it "returns correct location" do
-      VCR.use_cassette("geohelper-coordinates", match_requests_on: [:path], re_record_interval: 3.months) do
+      VCR.use_cassette("geohelper-coordinates", vcr_config) do
         expect(described_class.coordinates_for(address)).to eq(latitude: latitude, longitude: longitude)
       end
     end
@@ -116,7 +117,7 @@ RSpec.describe GeocodeHelper do
 
     context "with ignored_coordinates" do
       it "returns nil" do
-        VCR.use_cassette("geohelper-coordinates-US", match_requests_on: [:path], re_record_interval: 3.months) do
+        VCR.use_cassette("geohelper-coordinates-US", vcr_config) do
           expect(described_class.coordinates_for("United States")).to eq(latitude: nil, longitude: nil)
         end
       end
@@ -133,9 +134,30 @@ RSpec.describe GeocodeHelper do
       end
 
       it "returns coordinates" do
-        VCR.use_cassette("geohelper-zipcode", match_requests_on: [:path], re_record_interval: 3.months) do
+        VCR.use_cassette("geohelper-zipcode", vcr_config) do
           expect(described_class.coordinates_for(address)).to eq(latitude: latitude, longitude: longitude)
         end
+      end
+    end
+  end
+
+  describe "bounding_box" do
+    context "san francisco" do
+      let(:target) do
+        [37.63019771688915, -122.60252221724598, 37.91966128311085, -122.23630878275402]
+      end
+      it "returns the box" do
+        VCR.use_cassette("geohelper-boundingbox", vcr_config) do
+          expect(described_class.bounding_box("San Francisco, CA", 10)).to eq target
+        end
+      end
+    end
+    context "passed coordinate array" do
+      let(:target) do
+        [42.70428791688915, -106.498945433829, 42.99375148311085, -106.104122766171]
+      end
+      it "returns the box" do
+        expect(described_class.bounding_box([42.8490197, -106.3015341], 10)).to eq target
       end
     end
   end

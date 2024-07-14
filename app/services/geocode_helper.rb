@@ -10,17 +10,24 @@ class GeocodeHelper
       coords.present? ? coords : {latitude: nil, longitude: nil}
     end
 
+    # This is used when the result of a search is put into a bounding box
+    def coord_array_for(lookup_string)
+      coords = coordinates_for(lookup_string)
+      [coords[:latitude], coords[:longitude]]
+    end
+
     def address_string_for(lookup_string)
       geocoder_search(lookup_string).slice(:formatted_address)
     end
 
-    def coord_array_for(lookup_string)
-      coordinates_for
-    end
-
     def bounding_box(lookup_string, distance)
-      box = Geocoder::Calculations.bounding_box(geocoder_lookup_string(lookup_string), distance)
-      box.detect(&:nan?) ? [] : box
+      box_param = if lookup_string.is_a?(Array) && lookup_string.length == 2
+        lookup_string # It's a coordinate array, use it (rather than doing a lookup)
+      else
+        geocoder_lookup_string(lookup_string)
+      end
+      box_coords = Geocoder::Calculations.bounding_box(box_param, distance)
+      box_coords.detect(&:nan?) ? [] : box_coords
     end
 
     def assignable_address_hash_for(lookup_string = nil, latitude: nil, longitude: nil)
@@ -83,6 +90,8 @@ class GeocodeHelper
       # Google has street_address - use it if possible
       street = if result.respond_to?(:street_address)
         result.street_address
+      elsif result.respond_to?(:street)
+        result.street
       end
       # Google has formatted_address
       formatted_address = if result.respond_to?(:formatted_address)

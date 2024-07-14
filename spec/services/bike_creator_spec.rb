@@ -326,6 +326,9 @@ RSpec.describe BikeCreator do
           expect(parking_notification.owner_known?).to be_falsey
           expect(parking_notification.latitude).to eq bike.latitude
           expect(parking_notification.longitude).to eq bike.longitude
+          # Sanity check
+          expect(parking_notification.longitude.to_s).to eq attrs.dig(:params, :parking_notification, :longitude)
+          expect(parking_notification.street).to eq "278 Broadway"
           expect(parking_notification.address).to eq "278 Broadway, New York, NY 10007"
           expect(parking_notification.kind).to eq "parked_incorrectly_notification"
           expect(parking_notification.message).to eq "Some message to the user"
