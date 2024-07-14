@@ -202,10 +202,7 @@ module BikeSearchable
       distance = query_params[:distance]&.to_i
       if ["", "ip", "you"].include?(location.strip.downcase)
         return false unless ip_address.present?
-        location = Geocoder.search(ip_address)
-        if defined?(location.first.data) && location.first.data.is_a?(Array)
-          location = location.first.data.reverse.compact.select { |i| i.match?(/\A\D+\z/) }
-        end
+        location = Geohelper.address_string_for(ip_address)
       end
 
       bounding_box = Geohelper.bounding_box(location.to_s, distance)

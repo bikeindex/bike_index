@@ -355,7 +355,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.latitude).to_not eq latitude
           expect(impound_record.longitude).to_not eq longitude
           # It does not change, no re-geocoding
-          expect(Geohelper).to_not receive(:lookup_assignable_address_hash)
+          expect(Geohelper).to_not receive(:assignable_address_hash_for)
           impound_record.update(status: "retrieved_by_owner")
         end
       end

@@ -28,7 +28,7 @@ module API
           end
         end
         if params[:ip_test]
-          info = {ip: params[:proximity], location: Geocoder.search(params[:proximity])}
+          info = {ip: params[:proximity], location: Geohelper.assignable_address_hash_for(params[:proximity])}
           render json: info && return
         end
         render json: BikeSearcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer

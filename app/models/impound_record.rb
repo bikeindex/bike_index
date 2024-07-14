@@ -242,7 +242,7 @@ class ImpoundRecord < ApplicationRecord
     self.attributes = if parking_notification.present?
       parking_notification.attributes.slice(*Geocodeable.location_attrs)
     else
-      Geohelper.lookup_assignable_address_hash(address(force_show_address: true))
+      Geohelper.assignable_address_hash_for(address(force_show_address: true))
     end
   end
 
