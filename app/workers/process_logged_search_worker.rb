@@ -19,23 +19,12 @@ class ProcessLoggedSearchWorker < ApplicationWorker
   def assign_ip_location(logged_search)
     return if logged_search.latitude.present?
 
-    geo_response = Geocoder.searh(logged_search.ip_address)
-    location = location_attrs_from_geo_response(geo_response)
-    logged_search.attributes = location if location.present?
+    logged_search.attributes = GeocodeHelper.assignable_address_hash_for(logged_search.ip_address)
   end
 
   def assign_user_attributes(logged_search)
     return if logged_search.user.superuser? || logged_search.organization_id.present?
 
     logged_search.organization = logged_search.user.organization_prioritized
-  end
-
-  def location_attrs_from_geo_response(geo_response)
-    if defined?(geo_response.first.data) # Google response
-      geo_response.first.data
-    elsif defined?(geo_response.first.data_hash) # Maxmind response
-      data.data_hash
-      pp "dafsadf"
-    end
   end
 end

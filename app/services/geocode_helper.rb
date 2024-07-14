@@ -14,6 +14,10 @@ class GeocodeHelper
       geocoder_search(lookup_string).slice(:formatted_address)
     end
 
+    def coord_array_for(lookup_string)
+      coordinates_for
+    end
+
     def bounding_box(lookup_string, distance)
       box = Geocoder::Calculations.bounding_box(geocoder_lookup_string(lookup_string), distance)
       box.detect(&:nan?) ? [] : box
@@ -49,6 +53,7 @@ class GeocodeHelper
     end
 
     def ignored_coordinates?(latitude, longitude)
+      return true if latitude.blank?
       [
         [71.53880, -66.88542], # Google general can't find
         [37.09024, -95.71289] # USA can't find
@@ -90,7 +95,7 @@ class GeocodeHelper
         latitude: result.latitude,
         longitude: result.longitude,
         formatted_address: formatted_address,
-        state_id: State.friendly_find(result.state_code)&.id,
+        state_id: State.friendly_find(result.state_code)&.id, # TODO: Use region_code instead
         country_id: Country.friendly_find(result.country_code)&.id,
         neighborhood: result.respond_to?(:neighborhood) ? result.neighborhood : nil,
         street: street,

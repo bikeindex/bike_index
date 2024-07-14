@@ -71,14 +71,13 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
       end
 
       context "maxmind response" do
-        let(:geo_hash) { {country_code: "US", region_code: "CO", city_name: "Denver", latitude: "39.738800", longitude: "-104.986800", error: nil} }
-        let(:max_mind_result) { [OpenStruct.new(data_hash: geo_hash, cache_hit: true)] }
+        # Override default_location for geocoder_default_location, this is a Maxmind response
+        let(:default_location) { {country_code: "US", region_code: "CO", state_code: "CO", city: "Denver", latitude: 39.738800, longitude: -104.986800, error: nil} }
         let!(:state) { FactoryBot.create(:state, abbreviation: "CO", name: "Colorado") }
-        before { allow(Geocoder).to receive(:search).and_return(max_mind_result) }
         let(:target_location_attrs) do
           {
-            latitude: "39.738800",
-            longitude: "-104.986800",
+            latitude: 39.738800,
+            longitude: -104.986800,
             city: "Denver",
             country_id: country.id,
             state_id: state.id
