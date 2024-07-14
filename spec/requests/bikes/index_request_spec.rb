@@ -19,10 +19,11 @@ RSpec.describe "BikesController#index", type: :request do
 
   context "geocoder_stubbed_bounding_box" do
     let(:ip_address) { "23.115.69.69" }
-    let(:target_location) { ["New York", "NY", "US"] }
+    let(:target_location) { default_location[:formatted_address] }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
     let(:headers) { {"HTTP_CF_CONNECTING_IP" => ip_address} }
     include_context :geocoder_stubbed_bounding_box
+    include_context :geocoder_default_location
 
     describe "assignment" do
       context "no params" do
@@ -70,7 +71,6 @@ RSpec.describe "BikesController#index", type: :request do
         let(:query_params) { {location: "yoU", distance: 1, stolenness: "proximity"} }
         context "found location" do
           it "assigns passed parameters and close_serials" do
-            allow(Geocoder).to receive(:search) { legacy_production_ip_search_result }
             get base_url, params: query_params, headers: headers
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params
@@ -80,7 +80,6 @@ RSpec.describe "BikesController#index", type: :request do
         context "ip passed as parameter" do
           let(:ip_query_params) { query_params.merge(location: "IP") }
           it "assigns passed parameters and close_serials" do
-            allow(Geocoder).to receive(:search) { production_ip_search_result }
             get base_url, params: ip_query_params, headers: headers
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
@@ -90,7 +89,6 @@ RSpec.describe "BikesController#index", type: :request do
         context "no location" do
           let(:ip_query_params) { query_params.merge(location: "   ") }
           it "assigns passed parameters and close_serials" do
-            allow(Geocoder).to receive(:search) { production_ip_search_result }
             get base_url, params: ip_query_params, headers: headers
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)

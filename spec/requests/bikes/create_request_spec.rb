@@ -22,7 +22,7 @@ RSpec.describe "BikesController#create", type: :request do
   let(:chicago_stolen_params) do
     {
       country_id: country.id,
-      street: "2459 W Division St",
+      street: "2459 West Division Street",
       city: "Chicago",
       zipcode: "60622",
       state_id: state.id
@@ -85,10 +85,16 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
     context "made_without_serial" do
+      let(:ip_address) { "fake-ip-address" }
+      include_context :geocoder_default_location
+      let(:default_location) do
+        {country_code: "US", region_code: "CA", state_code: "CA", city: "San Francisco", latitude: 37.75, longitude: -122.41, error: nil}
+      end
       it "creates, is made_without_serial" do
         expect(current_user.bikes.count).to eq 0
         expect {
-          post base_url, params: {bike: bike_params.merge(made_without_serial: "1")}
+          post base_url, params: {bike: bike_params.merge(made_without_serial: "1")},
+            headers: {"HTTP_CF_CONNECTING_IP" => ip_address}
         }.to change(Ownership, :count).by(1)
         expect(current_user.bikes.count).to eq 1
         new_bike = current_user.bikes.first
@@ -99,6 +105,8 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.serial_number).to eq "made_without_serial"
         expect(new_bike.normalized_serial_segments).to eq([])
         expect(new_bike.current_ownership.impound_record_id).to be_blank
+        expect(new_bike.latitude).to be_present
+        expect(new_bike.longitude).to be_present
       end
     end
   end
@@ -425,6 +433,8 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.student_id).to eq nil
       expect(new_bike.cycle_type).to eq "personal-mobility"
       expect(new_bike.motorized?).to be_truthy
+      expect(new_bike.latitude).to be_present # Because IP address!
+      expect(new_bike.longitude).to be_present
 
       expect(new_bike.current_ownership.organization&.id).to eq organization.id
       expect(new_bike.current_ownership.origin).to eq "embed_extended"

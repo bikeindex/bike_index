@@ -32,6 +32,7 @@
 #  manufacturer_other          :string(255)
 #  mnfg_name                   :string(255)
 #  name                        :string(255)
+#  neighborhood                :string
 #  number_of_seats             :integer
 #  occurred_at                 :datetime
 #  owner_email                 :text

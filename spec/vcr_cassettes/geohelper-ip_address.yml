@@ -1,0 +1,48 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://geoip.maxmind.com/b?i=157.131.171.36&l=<MAXMIND_KEY>
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 14 Jul 2024 19:38:41 GMT
+      Content-Type:
+      - text/plain; charset=ISO-8859-1
+      Content-Length:
+      - '41'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Cache-Control:
+      - private, max-age=0
+      Expire:
+      - "-1"
+      Cf-Cache-Status:
+      - DYNAMIC
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 8a33f97b5bd61688-SJC
+    body:
+      encoding: UTF-8
+      string: US,CA,San Francisco,37.750600,-122.412100
+    http_version:
+  recorded_at: Sun, 14 Jul 2024 19:38:41 GMT
+recorded_with: VCR 5.0.0

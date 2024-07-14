@@ -3,6 +3,7 @@
 # Table name: logged_searches
 #
 #  id                :bigint           not null, primary key
+#  city              :string
 #  duration_ms       :integer
 #  endpoint          :integer
 #  includes_query    :boolean          default(FALSE)
@@ -10,18 +11,26 @@
 #  latitude          :float
 #  log_line          :text
 #  longitude         :float
+#  neighborhood      :string
 #  page              :integer
+#  processed         :boolean          default(FALSE)
 #  query_items       :jsonb
 #  request_at        :datetime
 #  serial_normalized :string
 #  stolenness        :integer
+#  street            :string
+#  zipcode           :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  country_id        :bigint
 #  organization_id   :bigint
 #  request_id        :uuid
+#  state_id          :bigint
 #  user_id           :bigint
 #
 class LoggedSearch < AnalyticsRecord
+  include Geocodeable
+
   ENDPOINT_ENUM = {
     web_bikes: 0,
     api_v1_bikes: 1,
@@ -59,6 +68,8 @@ class LoggedSearch < AnalyticsRecord
   scope :organized, -> { where(endpoint: organized_endpoints) }
   scope :serial, -> { where.not(serial_normalized: nil) }
   scope :includes_query, -> { where(includes_query: true) }
+  scope :processed, -> { where(processed: true) }
+  scope :unprocessed, -> { where(processed: true) }
 
   def self.organized_endpoints
     %i[org_bikes org_parking_notifications org_impounded].freeze
@@ -66,5 +77,13 @@ class LoggedSearch < AnalyticsRecord
 
   def self.endpoints_sym
     ENDPOINT_ENUM.keys.freeze
+  end
+
+  def unprocessed?
+    !processed
+  end
+
+  def should_be_geocoded?
+    false # don't geocode automatically, handle it with background job
   end
 end

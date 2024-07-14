@@ -1,5 +1,4 @@
 require "twitter"
-require "geocoder"
 require "tempfile"
 require "open-uri"
 

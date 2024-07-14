@@ -28,7 +28,7 @@ module API
           end
         end
         if params[:ip_test]
-          info = {ip: params[:proximity], location: Geocoder.search(params[:proximity])}
+          info = {ip: params[:proximity], location: GeocodeHelper.assignable_address_hash_for(params[:proximity])}
           render json: info && return
         end
         render json: BikeSearcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer
@@ -39,7 +39,7 @@ module API
         if params[:proximity].present?
           radius = 50
           radius = params[:proximity_radius] if params[:proximity_radius].present? && params[:proximity_radius].strip.length > 0
-          box = Geocoder::Calculations.bounding_box(Geohelper.formatted_address(params[:proximity]), radius)
+          box = GeocodeHelper.bounding_box(params[:proximity], radius)
           stolen = stolen.within_bounding_box(box)
         end
         if params[:updated_since]

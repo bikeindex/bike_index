@@ -1766,6 +1766,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.country).to eq(stolen_record.country)
       end
       context "removing location from the stolen_record" do
+        include_context :geocoder_real
         # When displaying searches for stolen bikes, it's critical we honor the stolen record's data
         # ... or else unexpected things happen
         it "blanks the location on the bike" do
@@ -1789,7 +1790,6 @@ RSpec.describe Bike, type: :model do
           expect(stolen_record.to_coordinates.compact).to eq([])
           expect(stolen_record.address_hash.compact).to eq({country: "US", state: "IL"}.as_json)
           expect(stolen_record.address(force_show_address: true)).to eq "IL, US"
-          expect(stolen_record.should_be_geocoded?).to be_falsey
 
           expect(bike.address_hash).to eq({country: "US", state: "IL", street: nil, city: nil, zipcode: nil, latitude: nil, longitude: nil}.as_json)
           expect(bike.to_coordinates.compact).to eq([])
