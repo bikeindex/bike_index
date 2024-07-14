@@ -22,7 +22,7 @@ RSpec.describe "BikesController#create", type: :request do
   let(:chicago_stolen_params) do
     {
       country_id: country.id,
-      street: "2459 W Division St",
+      street: "2459 West Division Street",
       city: "Chicago",
       zipcode: "60622",
       state_id: state.id
@@ -86,12 +86,12 @@ RSpec.describe "BikesController#create", type: :request do
     end
     context "made_without_serial" do
       let(:ip_address) { "fake-ip-address" }
-      let(:geocoder_result) do
-        {country_code: "US", region_code: "CA", city_name: "San Francisco", latitude: "37.75", longitude: "-122.41", error: nil}
+      let(:default_location) do
+        {country_code: "US", region_code: "CA", state_code: "CA", city_name: "San Francisco", latitude: 37.75, longitude: -122.41, error: nil}
       end
       it "creates, is made_without_serial" do
         expect(current_user.bikes.count).to eq 0
-        allow(Geocoder).to receive(:search).with(ip_address) { geocoder_result }
+        # allow(Geocoder).to receive(:search).with(ip_address) { geocoder_result }
         expect {
           post base_url, params: {bike: bike_params.merge(made_without_serial: "1")},
             headers: {"HTTP_CF_CONNECTING_IP" => ip_address}
