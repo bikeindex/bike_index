@@ -4,8 +4,9 @@ RSpec.describe Geohelper do
   include_context :geocoder_real
 
   describe "assignable_address_hash_for" do
+    let!(:country) { Country.united_states }
+
     context "passed coordinates" do
-      let(:country) { Country.united_states }
       let!(:state) { FactoryBot.create(:state, name: "Wyoming", abbreviation: "WY", country: country) }
       let(:address) { "1740 E 2nd St, Casper, WY 82601, USA" }
       let(:latitude) { 42.84901970000 }
@@ -38,7 +39,61 @@ RSpec.describe Geohelper do
     end
 
     context "passed a bare zipcode" do
-      it "returns an address_hash"
+      let(:address) { "60647" }
+      let!(:state) { FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: country) }
+      let(:target_assignable_hash) do
+        {city: "Chicago", latitude: 41.9215421, longitude:-87.70248169999999, zipcode: "60647",
+        state_id: state.id, country_id: country.id, neighborhood: nil, street: nil }
+      end
+
+      it "returns an address_hash" do
+        VCR.use_cassette("geohelper-zipcode", match_requests_on: [:path]) do
+          expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
+        end
+      end
+    end
+
+    context "passed an address" do
+      let(:address) { "717 Market St, SF" }
+      let(:target_assignable_hash) do
+        {
+          street: "717 Market Street",
+          city: "San Francisco",
+          state_id: nil,
+          zipcode: "94103",
+          country_id: country.id,
+          neighborhood: "Yerba Buena",
+          latitude: 37.7870205,
+          longitude: -122.403928
+        }
+      end
+      it "returns our desires" do
+        VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+          expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
+        end
+      end
+    end
+
+    context "passed an ip address" do
+      let(:address) { "157.131.171.36" }
+      let!(:state) { FactoryBot.create(:state_california) }
+      let(:target_assignable_hash) do
+        {
+          street: nil,
+          city: "San Francisco",
+          state_id: state.id,
+          zipcode: nil,
+          country_id: country.id,
+          neighborhood: nil,
+          latitude: 37.7506,
+          longitude: -122.4121
+        }
+      end
+      it "finds the address" do
+        VCR.use_cassette("geohelper-ip_address", match_requests_on: [:path]) do
+          expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
+        end
+      end
     end
   end
 
@@ -78,7 +133,7 @@ RSpec.describe Geohelper do
       end
 
       it "returns coordinates" do
-        VCR.use_cassette("geohelper-coordinates-zipcode", match_requests_on: [:path]) do
+        VCR.use_cassette("geohelper-zipcode", match_requests_on: [:path]) do
           expect(described_class.coordinates_for(address)).to eq(latitude: latitude, longitude: longitude)
         end
       end

@@ -104,27 +104,37 @@ class Geohelper
       return {} unless results&.first.present?
       result = results.first # Maybe someday use multiple results? Not a priority
       address_hash = if defined?(result.city)
-        hash_for_google_response(result)
+        hash_for_geocoder_response(result)
       elsif defined?(result.data["geometry"]) && result.data["geometry"]["bounds"].present?
         # Google returned a box that represents the area, return just one coordinate group from that box
         coordinates_from_google_response(result.data.dig("geometry", "bounds", "northeast"))
       else
-        {failed: result}
+        {}
       end
-      # pp results, address_hash
-      ignored_coordinates?(address_hash[:latitude], address_hash[:longitude]) ? {} : address_hash
+      return {} if ignored_coordinates?(address_hash[:latitude], address_hash[:longitude])
+      address_hash.transform_values { |v| v.blank? ? nil : v }
     end
 
-    def hash_for_google_response(result)
+    def hash_for_geocoder_response(result)
+      # Google has street_address - use it if possible
+      street = if defined?(result.street_address)
+        result.street_address
+      end
+      # Google has formatted_address
+      formatted_address = if defined?(result.formatted_address)
+        result.formatted_address
+      else
+        result.address
+      end
       {
         city: result.city,
         latitude: result.latitude,
         longitude: result.longitude,
-        formatted_address: result.formatted_address,
+        formatted_address: formatted_address,
         state_id: State.friendly_find(result.state_code)&.id,
         country_id: Country.friendly_find(result.country_code)&.id,
-        neighborhood: result.neighborhood,
-        street: result.street_address,
+        neighborhood: defined?(result.neighborhood) ? result.neighborhood : nil,
+        street: street,
         zipcode: result.postal_code
       }
     end
