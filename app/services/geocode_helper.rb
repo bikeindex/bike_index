@@ -2,7 +2,7 @@
 
 # A few things to make working with locations easier
 # e.g. geocoder returns arrays and varies slightly depending on the provider
-class Geohelper
+class GeocodeHelper
   class << self
     # Always returns latitude and longitude
     def coordinates_for(lookup_string)

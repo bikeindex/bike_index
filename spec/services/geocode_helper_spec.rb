@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Geohelper do
+RSpec.describe GeocodeHelper do
   include_context :geocoder_real
 
   describe "assignable_address_hash_for" do

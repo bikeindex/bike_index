@@ -122,7 +122,7 @@ class Admin::StolenBikesController < Admin::BaseController
     distance = params[:search_distance].to_i
     @distance = distance.present? && distance > 0 ? distance : 50
     if !@only_without_location && params[:search_location].present?
-      bounding_box = Geohelper.bounding_box(params[:search_location], @distance)
+      bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       available_stolen_records = available_stolen_records.within_bounding_box(bounding_box)
     end
 

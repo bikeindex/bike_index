@@ -161,7 +161,7 @@ class BikeCreator
     end
     # Check if the bike has a location, update with passed location if no
     bike.reload
-    bike.update(Geohelper.assignable_address_hash_for(@ip_address)) unless bike.latitude.present?
+    bike.update(GeocodeHelper.assignable_address_hash_for(@ip_address)) unless bike.latitude.present?
     bike
   end
 

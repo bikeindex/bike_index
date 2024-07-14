@@ -284,9 +284,9 @@ class ParkingNotification < ActiveRecord::Base
     # We need to geocode on creation, unless all the attributes are present
     return true if id.present? && street.present? && latitude.present? && longitude.present?
     if !use_entered_address && latitude.present? && longitude.present?
-      self.attributes = Geohelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
+      self.attributes = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
     else
-      coordinates = Geohelper.coordinates_for(address)
+      coordinates = GeocodeHelper.coordinates_for(address)
       self.attributes = coordinates if coordinates.present?
       self.location_from_address = true
     end

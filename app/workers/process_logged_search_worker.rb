@@ -19,9 +19,8 @@ class ProcessLoggedSearchWorker < ApplicationWorker
   def assign_ip_location(logged_search)
     return if logged_search.latitude.present?
 
-    geo_response = Geocoder.search(logged_search.ip_address)
+    geo_response = Geocoder.searh(logged_search.ip_address)
     location = location_attrs_from_geo_response(geo_response)
-    pp location
     logged_search.attributes = location if location.present?
   end
 

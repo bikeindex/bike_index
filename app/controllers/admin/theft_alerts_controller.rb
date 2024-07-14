@@ -153,7 +153,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     distance = params[:search_distance].to_i
     @distance = distance.present? && distance > 0 ? distance : 50
     if params[:search_location].present?
-      bounding_box = Geohelper.bounding_box(params[:search_location], @distance)
+      bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       theft_alerts = theft_alerts.within_bounding_box(bounding_box)
     end
 
