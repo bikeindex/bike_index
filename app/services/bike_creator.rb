@@ -27,7 +27,6 @@ class BikeCreator
     %w[street city state zipcode country timezone impounded_at_with_timezone display_id impounded_description].freeze
   end
 
-  # TODO: pass in location in create
   def initialize(ip_address: nil)
     @ip_address = ip_address
   end

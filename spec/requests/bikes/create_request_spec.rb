@@ -91,7 +91,6 @@ RSpec.describe "BikesController#create", type: :request do
       end
       it "creates, is made_without_serial" do
         expect(current_user.bikes.count).to eq 0
-        # allow(Geocoder).to receive(:search).with(ip_address) { geocoder_result }
         expect {
           post base_url, params: {bike: bike_params.merge(made_without_serial: "1")},
             headers: {"HTTP_CF_CONNECTING_IP" => ip_address}
@@ -433,7 +432,6 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.student_id).to eq nil
       expect(new_bike.cycle_type).to eq "personal-mobility"
       expect(new_bike.motorized?).to be_truthy
-      # TODO!
       expect(new_bike.latitude).to be_present # Because IP address!
       expect(new_bike.longitude).to be_present
 
