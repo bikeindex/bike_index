@@ -13,7 +13,9 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
     return if log_line.blank?
     log_line_attrs = LogSearcher::Parser.parse_log_line(log_line)
     return if log_line_attrs.blank?
-    LoggedSearch.create(log_line_attrs.merge(log_line: log_line))
+    logged_search = LoggedSearch.create(log_line_attrs.merge(log_line: log_line))
+    ProcessLoggedSearchWorker.perform_async(logged_search.id)
+    logged_search
   rescue => e
     raise "Error: #{e}, log_line: #{log_line}"
   end

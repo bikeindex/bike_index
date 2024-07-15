@@ -508,7 +508,8 @@ CREATE TABLE public.bikes (
     credibility_score integer,
     likely_spam boolean DEFAULT false,
     serial_segments_migrated_at timestamp without time zone,
-    model_audit_id bigint
+    model_audit_id bigint,
+    neighborhood character varying
 );
 
 
@@ -1678,7 +1679,8 @@ CREATE TABLE public.locations (
     state_id integer,
     not_publicly_visible boolean DEFAULT false,
     impound_location boolean DEFAULT false,
-    default_impound_location boolean DEFAULT false
+    default_impound_location boolean DEFAULT false,
+    neighborhood character varying
 );
 
 
@@ -1794,7 +1796,8 @@ CREATE TABLE public.mail_snippets (
     zipcode character varying,
     state_id bigint,
     country_id bigint,
-    subject text
+    subject text,
+    neighborhood character varying
 );
 
 
@@ -3402,7 +3405,8 @@ CREATE TABLE public.users (
     no_non_theft_notification boolean DEFAULT false,
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
-    deleted_at timestamp without time zone
+    deleted_at timestamp without time zone,
+    neighborhood character varying
 );
 
 
@@ -6647,6 +6651,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231206022455'),
 ('20231212023722'),
 ('20231212025929'),
-('20240517161713');
+('20240517161713'),
+('20240712181117');
 
 

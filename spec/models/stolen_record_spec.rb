@@ -554,21 +554,6 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.address).to eq("New Paltz")
       end
     end
-
-    context "given an address change" do
-      it "returns false unless there has been an address change" do
-        stolen_record = FactoryBot.create(
-          :stolen_record,
-          :in_los_angeles,
-          skip_geocoding: false
-        )
-        expect(stolen_record.should_be_geocoded?).to eq(false)
-
-        stolen_record.city = "New York"
-        stolen_record.valid? # triggers an update to address
-        expect(stolen_record.should_be_geocoded?).to eq(true)
-      end
-    end
   end
 
   describe "not_spam" do
@@ -587,6 +572,52 @@ RSpec.describe StolenRecord, type: :model do
     it "is rounded" do
       expect(stolen_record.latitude_public).to eq(-122.28)
       expect(stolen_record.longitude_public).to eq longitude.round(2)
+    end
+  end
+
+  describe "bike_index_geocode with reverse geocoding" do
+    let(:latitude) { -122.2824933 }
+    let(:longitude) { 37.837112 }
+    let(:stolen_record) do
+      FactoryBot.build(:stolen_record, skip_geocoding: false, city: " ",
+        latitude: latitude, longitude: longitude, street: "Special Broadway location")
+    end
+    let(:country) { Country.united_states }
+    let!(:state) { State.find_or_create_by(FactoryBot.attributes_for(:state_new_york)) }
+    let(:target_attributes) do
+      {
+        street: "Special Broadway location",
+        city: "New York",
+        zipcode: "10007",
+        neighborhood: "Tribeca",
+        state_id: state.id,
+        latitude: latitude,
+        longitude: longitude
+      }
+    end
+    # Block the initial Geocoding lookup
+    before { allow(stolen_record).to receive(:address_changed?) { false } }
+    it "geocodes" do
+      expect(Geocoder).to receive(:search).and_call_original
+      stolen_record.save!
+      expect(stolen_record.reload).to have_attributes target_attributes
+    end
+    context "with location attributes set" do
+      let(:location_attributes) { {country_id: country.id, state_id: FactoryBot.create(:state).id, zipcode: "99999", city: "A City"} }
+      before { stolen_record.attributes = location_attributes }
+      it "does not call geocoder" do
+        expect(Geocoder).to_not receive(:search)
+        stolen_record.save!
+        expect(stolen_record.reload).to have_attributes location_attributes
+      end
+      context "with canada (no state_id)" do
+        let(:location_attributes) { {country_id: Country.canada.id, state_id: nil, zipcode: "99999", city: "A City"} }
+        it "does not call geocoder" do
+          expect(Geocoder).to_not receive(:search)
+          stolen_record.save!
+          expect(stolen_record.reload).to have_attributes location_attributes
+        end
+      end
     end
   end
 

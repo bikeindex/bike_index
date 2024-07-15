@@ -27,9 +27,8 @@ class BikeCreator
     %w[street city state zipcode country timezone impounded_at_with_timezone display_id impounded_description].freeze
   end
 
-  # TODO: pass in location in create
-  def initialize(location: nil)
-    @location = location
+  def initialize(ip_address: nil)
+    @ip_address = ip_address
   end
 
   def build_bike(b_param, new_attrs = {})
@@ -161,7 +160,7 @@ class BikeCreator
     end
     # Check if the bike has a location, update with passed location if no
     bike.reload
-    bike.update(Geohelper.address_hash_from_geocoder_result(@location)) unless bike.latitude.present?
+    bike.update(GeocodeHelper.assignable_address_hash_for(@ip_address)) unless bike.latitude.present?
     bike
   end
 

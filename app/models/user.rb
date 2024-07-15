@@ -25,6 +25,7 @@
 #  magic_link_token                   :text
 #  my_bikes_hash                      :jsonb
 #  name                               :string(255)
+#  neighborhood                       :string
 #  no_address                         :boolean          default(FALSE)
 #  no_non_theft_notification          :boolean          default(FALSE)
 #  notification_newsletters           :boolean          default(FALSE), not null

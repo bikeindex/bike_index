@@ -1,127 +1,89 @@
 ---
 http_interactions:
-  - request:
-      method: get
-      uri: https://maps.googleapis.com/maps/api/geocode/json?address=717%20Market%20St,%20SF&language=en&sensor=false
-      body:
-        encoding: US-ASCII
-        string: ""
-      headers:
-        Accept-Encoding:
-          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-        Accept:
-          - "*/*"
-        User-Agent:
-          - Ruby
-    response:
-      status:
-        code: 200
-        message: OK
-      headers:
-        Content-Type:
-          - application/json; charset=UTF-8
-        Date:
-          - Mon, 20 Apr 2020 22:47:45 GMT
-        Pragma:
-          - no-cache
-        Expires:
-          - Fri, 01 Jan 1990 00:00:00 GMT
-        Cache-Control:
-          - no-cache, must-revalidate
-        Access-Control-Allow-Origin:
-          - "*"
-        X-Goog-Maps-Metro-Area:
-          - San Francisco, CA
-        Server:
-          - mafe
-        X-Xss-Protection:
-          - "0"
-        X-Frame-Options:
-          - SAMEORIGIN
-        Server-Timing:
-          - gfet4t7; dur=28
-        Alt-Svc:
-          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
-            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
-            ma=2592000,h3-T050=":443"; ma=2592000
-        Transfer-Encoding:
-          - chunked
-      body:
-        encoding: ASCII-8BIT
-        string: |
-          {
-             "results" : [
-                {
-                   "address_components" : [
-                      {
-                         "long_name" : "717",
-                         "short_name" : "717",
-                         "types" : [ "street_number" ]
-                      },
-                      {
-                         "long_name" : "Market Street",
-                         "short_name" : "Market St",
-                         "types" : [ "route" ]
-                      },
-                      {
-                         "long_name" : "Yerba Buena",
-                         "short_name" : "Yerba Buena",
-                         "types" : [ "neighborhood", "political" ]
-                      },
-                      {
-                         "long_name" : "San Francisco",
-                         "short_name" : "SF",
-                         "types" : [ "locality", "political" ]
-                      },
-                      {
-                         "long_name" : "San Francisco County",
-                         "short_name" : "San Francisco County",
-                         "types" : [ "administrative_area_level_2", "political" ]
-                      },
-                      {
-                         "long_name" : "California",
-                         "short_name" : "CA",
-                         "types" : [ "administrative_area_level_1", "political" ]
-                      },
-                      {
-                         "long_name" : "United States",
-                         "short_name" : "US",
-                         "types" : [ "country", "political" ]
-                      },
-                      {
-                         "long_name" : "94103",
-                         "short_name" : "94103",
-                         "types" : [ "postal_code" ]
-                      }
-                   ],
-                   "formatted_address" : "717 Market St, San Francisco, CA 94103, USA",
-                   "geometry" : {
-                      "location" : {
-                         "lat" : 37.7870205,
-                         "lng" : -122.403928
-                      },
-                      "location_type" : "ROOFTOP",
-                      "viewport" : {
-                         "northeast" : {
-                            "lat" : 37.78836948029149,
-                            "lng" : -122.4025790197085
-                         },
-                         "southwest" : {
-                            "lat" : 37.7856715197085,
-                            "lng" : -122.4052769802915
-                         }
-                      }
-                   },
-                   "place_id" : "ChIJhZ74MY-AhYARscx5mk67G-w",
-                   "plus_code" : {
-                      "compound_code" : "QHPW+RC Yerba Buena, San Francisco, CA, United States",
-                      "global_code" : "849VQHPW+RC"
-                   },
-                   "types" : [ "street_address" ]
-                }
-             ],
-             "status" : "OK"
-          }
-      http_version:
-    recorded_at: Mon, 20 Apr 2020 22:47:45 GMT
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=717%20Market%20St,%20SF&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 14 Jul 2024 20:06:45 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - San Francisco, CA
+      Server:
+      - mafe
+      Content-Length:
+      - '2886'
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=89
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "{\n   \"results\" : \n   [\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"717\",\n               \"short_name\"
+        : \"717\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Market Street\",\n               \"short_name\" : \"Market St\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Yerba Buena\",\n               \"short_name\"
+        : \"Yerba Buena\",\n               \"types\" : \n               [\n                  \"neighborhood\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"San Francisco\",\n               \"short_name\"
+        : \"SF\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"San Francisco County\",\n               \"short_name\"
+        : \"San Francisco County\",\n               \"types\" : \n               [\n
+        \                 \"administrative_area_level_2\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"California\",\n               \"short_name\" : \"CA\",\n               \"types\"
+        : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"94103\",\n               \"short_name\" :
+        \"94103\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"717 Market St, San Francisco, CA 94103, USA\",\n         \"geometry\"
+        : \n         {\n            \"location\" : \n            {\n               \"lat\"
+        : 37.78698199999999,\n               \"lng\" : -122.403855\n            },\n
+        \           \"location_type\" : \"ROOFTOP\",\n            \"viewport\" : \n
+        \           {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 37.7884582802915,\n                  \"lng\" : -122.4025791197085\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 37.7857603197085,\n                  \"lng\" : -122.4052770802915\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n
+        \        \"plus_code\" : \n         {\n            \"compound_code\" : \"QHPW+QF
+        Yerba Buena, San Francisco, CA\",\n            \"global_code\" : \"849VQHPW+QF\"\n
+        \        },\n         \"types\" : \n         [\n            \"street_address\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+    http_version:
+  recorded_at: Sun, 14 Jul 2024 20:06:45 GMT
 recorded_with: VCR 5.0.0

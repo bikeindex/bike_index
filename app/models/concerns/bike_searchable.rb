@@ -159,11 +159,11 @@ module BikeSearchable
       propulsion_type ? {propulsion_type: propulsion_type} : {}
     end
 
-    def searchable_query_stolenness(query_params, ip)
+    def searchable_query_stolenness(query_params, ip_address)
       if query_params[:stolenness] && %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
       else
-        extracted_searchable_proximity_hash(query_params, ip) || {stolenness: "stolen"}
+        extracted_searchable_proximity_hash(query_params, ip_address) || {stolenness: "stolen"}
       end
     end
 
@@ -195,21 +195,20 @@ module BikeSearchable
       color_ids.map { |i| i.gsub(/c_/, "").to_i }
     end
 
-    def extracted_searchable_proximity_hash(query_params, ip)
+    def extracted_searchable_proximity_hash(query_params, ip_address)
       return false unless query_params[:stolenness] == "proximity"
       location = query_params[:location]
       return false unless location && !(location =~ /anywhere/i)
       distance = query_params[:distance]&.to_i
-      if ["", "ip", "you"].include?(location.strip.downcase)
-        return false unless ip.present?
-        location = Geocoder.search(ip)
-        if defined?(location.first.data) && location.first.data.is_a?(Array)
-          location = location.first.data.reverse.compact.select { |i| i.match?(/\A\D+\z/) }
-        end
+      bounding_box = if ["", "ip", "you"].include?(location.strip.downcase)
+        address_hash = GeocodeHelper.address_hash_for(ip_address)
+        location = address_hash[:formatted_address]
+        GeocodeHelper.bounding_box([address_hash[:latitude], address_hash[:longitude]], distance)
+      else
+        GeocodeHelper.bounding_box(location, distance)
       end
 
-      bounding_box = Geocoder::Calculations.bounding_box(location.to_s, distance)
-      return false if bounding_box.detect(&:nan?) # If we can't create a bounding box, skip
+      return false if bounding_box.empty? # If we can't create a bounding box, skip
       {
         bounding_box: bounding_box,
         stolenness: "proximity",

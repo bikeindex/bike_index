@@ -73,7 +73,7 @@ class Admin::RecoveriesController < Admin::BaseController
     distance = params[:search_distance].to_i
     @distance = distance.present? && distance > 0 ? distance : 50
     if params[:search_location].present?
-      bounding_box = Geocoder::Calculations.bounding_box(params[:search_location], @distance)
+      bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       recoveries = recoveries.within_bounding_box(bounding_box)
     end
 
