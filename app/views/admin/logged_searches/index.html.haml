@@ -111,7 +111,7 @@
             %code.small= logged_search.ip_address
             = link_to search_emoji, url_for(sortable_search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link small"
           %td
-            %small= logged_search.address
+            %small= logged_search.address(country: [:iso, :skip_default])
           %td.data-cell.only-data.small
             .wrapper{style: "position: relative"}
               - if logged_search.query_items.present?
