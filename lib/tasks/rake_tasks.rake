@@ -12,6 +12,16 @@ task reset_autocomplete: :environment do
   AutocompleteLoaderWorker.new.perform(nil, true)
 end
 
+# TODO: Remove :processed attribute when processing finishes
+desc "Enqueue Logged Search Processing"
+task process_logged_searches: :environment do
+  enqueue_limit = ENV["LOGGED_SEARCHES_BACKFILL_COUNT"]
+  enqueue_limit = enqueue_limit.present? ? enqueue_limit.to_i : 1000
+
+  LoggedSearch.unprocessed.limit(enqueue_limit).pluck(:id)
+    .each { |i| ProcessLoggedSearchWorker.perform_async(i) }
+end
+
 desc "Load counts" # This is a rake task so it can be loaded from bin/update
 task load_counts: :environment do
   UpdateCountsWorker.new.perform
