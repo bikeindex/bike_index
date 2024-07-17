@@ -24,6 +24,8 @@
       %li.nav-item
         = link_to "serial", url_for(sortable_search_params.merge(search_serial: !@serial)), class: "nav-link #{@serial ? 'active' : ''}"
       %li.nav-item
+        = link_to "location", url_for(sortable_search_params.merge(search_with_location: !@with_location)), class: "nav-link #{@with_location ? 'active' : ''}"
+      %li.nav-item
         = link_to "include query", url_for(sortable_search_params.merge(search_includes_query: !@includes_query)), class: "nav-link #{@includes_query ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
@@ -75,6 +77,8 @@
       %th
         = sortable "ip_address"
       %th
+        %small= sortable "city", "IP Location"
+      %th
         Query
       %th
         = sortable "organization_id"
@@ -106,6 +110,8 @@
           %td
             %code.small= logged_search.ip_address
             = link_to search_emoji, url_for(sortable_search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link small"
+          %td
+            %small= logged_search.address(country: [:iso, :skip_default])
           %td.data-cell.only-data.small
             .wrapper{style: "position: relative"}
               - if logged_search.query_items.present?
@@ -119,7 +125,7 @@
                   = logged_search.log_line
           %td
             - if logged_search.organization_id.present?
-              = link_to logged_search.organization&.short_name, admin_organization_path(logged_search.organization_id), class: "text-link"
+              = link_to logged_search.organization&.short_name || "##{logged_search.organization_id}", admin_organization_path(logged_search.organization_id), class: "text-link"
               = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id)), class: "display-sortable-link small"
           %td
             - if logged_search.user_id.present?

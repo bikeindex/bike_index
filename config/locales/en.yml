@@ -2273,6 +2273,9 @@ en:
       not_an_integer: must be an integer
       odd: must be odd
       record_invalid: 'Validation failed: %{errors}'
+      rmagick_processing_error: >-
+        Failed to manipulate with rmagick, maybe it is not an image? Original Error:
+        %{e}
       taken: has already been taken
       too_long:
         one: is too long (maximum is 1 character)

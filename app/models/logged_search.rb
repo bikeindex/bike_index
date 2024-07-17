@@ -69,7 +69,7 @@ class LoggedSearch < AnalyticsRecord
   scope :serial, -> { where.not(serial_normalized: nil) }
   scope :includes_query, -> { where(includes_query: true) }
   scope :processed, -> { where(processed: true) }
-  scope :unprocessed, -> { where(processed: true) }
+  scope :unprocessed, -> { where(processed: false) }
 
   def self.organized_endpoints
     %i[org_bikes org_parking_notifications org_impounded].freeze

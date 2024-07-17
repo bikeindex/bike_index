@@ -266,7 +266,7 @@ RSpec.describe Admin::BikesController, type: :request do
         }.to change(Bike, :count).by(-1)
         expect(flash[:success]).to be_present
         expect(Bike.pluck(:id)).to eq([bike3.id])
-        expect(Bike.unscoped.where.not(deleted_at: nil).pluck(:id)).to eq([bike1.id, bike2.id])
+        expect(Bike.unscoped.where.not(deleted_at: nil).pluck(:id)).to match_array([bike1.id, bike2.id])
       end
     end
   end
