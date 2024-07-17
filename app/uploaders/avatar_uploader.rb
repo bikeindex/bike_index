@@ -2,13 +2,13 @@ class AvatarUploader < ApplicationUploader
   include CarrierWave::MiniMagick
 
   # Fallback so the page doesn't break if the image isn't there
-  def default_url(*args)
+  def default_url
     "https://files.bikeindex.org/blank.png"
   end
 
   process :validate_dimensions
 
-  def extension_whitelist
+  def extension_white_list
     self.class.extensions
   end
 

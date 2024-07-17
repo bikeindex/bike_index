@@ -4,7 +4,7 @@ class AlertImageUploader < ApplicationUploader
 
   delegate :stolen_record, to: :model
 
-  def extension_whitelist
+  def extension_white_list
     self.class.extensions
   end
 

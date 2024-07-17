@@ -5,7 +5,7 @@ class PartnerUploader < ApplicationUploader
     "partner/"
   end
 
-  def extension_whitelist
+  def extension_white_list
     self.class.extensions
   end
 

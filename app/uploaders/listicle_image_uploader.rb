@@ -20,7 +20,7 @@ class ListicleImageUploader < ApplicationUploader
     process resize_to_fill: [100, 100]
   end
 
-  def extension_whitelist
+  def extension_white_list
     self.class.extensions
   end
 
