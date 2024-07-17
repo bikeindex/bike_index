@@ -51,9 +51,9 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 
 [letter_opener]: https://github.com/ryanb/letter_opener
 
-## Internationalization
+## Localization
 
-See the [internationalization docs](docs/internationalization.markdown) for details (we use [translation.io](https://translation.io/) for localization).
+See the [localization docs](docs/localization.markdown) for details (we use [translation.io](https://translation.io/) for localization).
 
 ## Testing
 
