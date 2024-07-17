@@ -117,8 +117,8 @@ es:
       carrierwave_processing_error:
       carrierwave_integrity_error:
       carrierwave_download_error:
-      extension_white_list_error:
-      extension_black_list_error:
+      extension_whitelist_error:
+      extension_blacklist_error:
       rmagick_processing_error:
       mime_types_processing_error:
       mini_magick_processing_error:

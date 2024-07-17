@@ -115,9 +115,9 @@ nl:
       carrierwave_processing_error: niet verwerken
       carrierwave_integrity_error: is niet van een toegestane bestandstype
       carrierwave_download_error: kan niet worden gedownload
-      extension_white_list_error: 'U mag geen %{extension} bestanden uploaden, toegestane
+      extension_whitelist_error: 'U mag geen %{extension} bestanden uploaden, toegestane
         typen: %{allowed_types}'
-      extension_black_list_error: 'U mag geen %{extension} bestanden uploaden, verboden
+      extension_blacklist_error: 'U mag geen %{extension} bestanden uploaden, verboden
         typen: %{prohibited_types}'
       rmagick_processing_error: 'Mislukt om te manipuleren met rmagick, misschien
         is het geen afbeelding? Oorspronkelijke fout: %{e}'
