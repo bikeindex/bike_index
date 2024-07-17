@@ -75,6 +75,8 @@
       %th
         = sortable "ip_address"
       %th
+        = sortable "city (IP)"
+      %th
         Query
       %th
         = sortable "organization_id"
@@ -106,6 +108,8 @@
           %td
             %code.small= logged_search.ip_address
             = link_to search_emoji, url_for(sortable_search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link small"
+          %td
+
           %td.data-cell.only-data.small
             .wrapper{style: "position: relative"}
               - if logged_search.query_items.present?

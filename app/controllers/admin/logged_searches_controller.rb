@@ -55,6 +55,10 @@ class Admin::LoggedSearchesController < Admin::BaseController
       @includes_query = true
       logged_searches = logged_searches.includes_query
     end
+    if InputNormalizer.boolean(params[:search_with_location])
+      @with_location = true
+      logged_searches = logged_searches.with_location
+    end
 
     if params[:search_ip_address].present?
       logged_searches = logged_searches.where(ip_address: params[:search_ip_address])
