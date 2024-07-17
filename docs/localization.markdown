@@ -1,4 +1,4 @@
-Internationalization
+Localization
 ====================
 
 **Table of Contents**
@@ -29,7 +29,7 @@ check for missing or unused keys.
 Translation.io
 --------------
 
-We're using [translation.io](https://translation.io) to manage internationalization:
+We're using [translation.io](https://translation.io) to manage localization:
 [translation.io/bikeindex/bike_index](https://translation.io/bikeindex/bike_index)
 
 To contribute, sign up for an account there and ask to be added to the project
