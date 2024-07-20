@@ -92,11 +92,23 @@ RSpec.describe MyAccountsController, type: :request do
             expect {
               get base_url
               expect(response).to be_ok
-              expect(assigns(:show_general_alert)).to be_truthy
+              expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template("show")
-            }.to change(AfterUserChangeWorker.jobs, :count).by 1
-            AfterUserChangeWorker.drain
-            expect(current_user.reload.alert_slugs).to eq([])
+            }.to change(AfterUserChangeWorker.jobs, :count).by 0
+          end
+          context "with phone_verification enabled" do
+            before { Flipper.enable(:phone_verification) }
+            it "renders with show_general_alert" do
+              Sidekiq::Worker.clear_all
+              expect {
+                get base_url
+                expect(response).to be_ok
+                expect(assigns(:show_general_alert)).to be_truthy
+                expect(response).to render_template("show")
+              }.to change(AfterUserChangeWorker.jobs, :count).by 1
+              AfterUserChangeWorker.drain
+              expect(current_user.reload.alert_slugs).to eq([])
+            end
           end
         end
       end
