@@ -310,7 +310,33 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_phone.phone).to eq "15005550006"
         expect(user_phone.confirmed?).to be_falsey
         expect(user_phone.confirmation_code).to be_present
-        expect(user_phone.notifications.count).to eq 1
+        expect(user_phone.notifications.count).to eq 0
+      end
+      context "with phone_verification" do
+        before { Flipper.enabled?(:phone_verification) }
+        it "updates and adds the phone" do
+          current_user.reload
+          expect(current_user.phone).to be_blank
+          expect(current_user.user_phones.count).to eq 0
+          Sidekiq::Worker.clear_all
+          VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
+            Sidekiq::Testing.inline! {
+              put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
+            }
+          end
+          expect(flash[:success]).to be_present
+          current_user.reload
+          expect(current_user.phone).to eq "15005550006"
+          expect(current_user.user_phones.count).to eq 1
+          expect(current_user.phone_waiting_confirmation?).to be_truthy
+          expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
+
+          user_phone = current_user.user_phones.reorder(:created_at).last
+          expect(user_phone.phone).to eq "15005550006"
+          expect(user_phone.confirmed?).to be_falsey
+          expect(user_phone.confirmation_code).to be_present
+          expect(user_phone.notifications.count).to eq 1
+        end
       end
       context "without background" do
         it "still shows general alert" do
