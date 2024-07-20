@@ -46,7 +46,7 @@
     .form-well-input
       -# if the user was just updated, they might not have the user_phone assigned
       -# in which case, show the phone number to reduce confusion
-      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : @user.phone
+      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : phone_display(@user.phone)
       = f.text_field :phone, value: phone_value, placeholder: t(".add_new_phone_number"), class: "form-control"
     - if @user.user_phones.any?
       .form-well-input-static-full-width.ml-auto
