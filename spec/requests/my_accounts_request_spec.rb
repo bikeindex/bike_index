@@ -313,7 +313,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_phone.notifications.count).to eq 0
       end
       context "with phone_verification" do
-        before { Flipper.enabled?(:phone_verification) }
+        before { Flipper.enable(:phone_verification) }
         it "updates and adds the phone" do
           current_user.reload
           expect(current_user.phone).to be_blank
