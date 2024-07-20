@@ -17,7 +17,8 @@ RSpec.describe UserPhoneConfirmationWorker, type: :job do
     expect(user_phone.notifications.count).to eq 0
     expect(user.alert_slugs).to eq([])
   end
-  context 'with phone_verification enabled' do
+  context "with phone_verification enabled" do
+    before { Flipper.enable(:phone_verification) }
     it "adds the phone for the user" do
       expect(user_phone.confirmed?).to be_falsey
       expect(user_phone.notifications.count).to eq 0
