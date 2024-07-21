@@ -7,16 +7,17 @@
 
 .stolen-checklist-wrap.mt-2
   %ul.stolen-checklist
-    - verified_phone_number = current_user.phone_confirmed?
-    %li{ class: verified_phone_number ? "completed-item" : "" }
-      %span.checklist-checkbox
-        = "&#10003;".html_safe if verified_phone_number
-      %span.checklist-text
-        - verified_phone_number_text = "Verified phone number"
-        - if verified_phone_number
-          = verified_phone_number_text
-        - else
-          = link_to(verified_phone_number_text, edit_my_account_url)
+    - if Flipper.enabled?(:phone_verification)
+      - verified_phone_number = current_user.phone_confirmed?
+      %li{ class: verified_phone_number ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = "&#10003;".html_safe if verified_phone_number
+        %span.checklist-text
+          - verified_phone_number_text = "Verified phone number"
+          - if verified_phone_number
+            = verified_phone_number_text
+          - else
+            = link_to(verified_phone_number_text, edit_my_account_url)
 
     - theft_information = bike_submitting.current_stolen_record.street.present? && bike_submitting.current_stolen_record.date_stolen.present?
     %li{ class: theft_information ? "completed-item" : "" }

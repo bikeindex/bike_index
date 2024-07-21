@@ -315,46 +315,49 @@ RSpec.describe User, type: :model do
       user.update(phone: "6669996666")
       expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
     end
-    it "adds user phone, if blank" do
-      UserPhoneConfirmationWorker.new # Instantiate for stubbing
-      stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
-      user.reload
-      user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
-      expect(user.user_phones.count).to eq 0
-      expect(user.phone).to be_blank
-      Sidekiq::Worker.clear_all
-      Sidekiq::Testing.inline! do
-        expect {
-          user.update(phone: "6669996666")
-        }.to change(Notification, :count).by 1
-      end
-      user.reload
-      expect(user.phone).to eq "6669996666"
-      expect(user.user_phones.count).to eq 1
-      expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
-      user_phone = user.user_phones.reorder(:created_at).last
-      expect(user_phone.phone).to eq "6669996666"
-      expect(user_phone.confirmed?).to be_falsey
-      expect(user_phone.confirmation_code).to be_present
-      expect(user_phone.notifications.count).to eq 1
-      expect(user_phone.notifications.last.twilio_sid).to eq "party"
+    context "with phone_verification" do
+      before { Flipper.enable(:phone_verification) }
+      it "adds user phone, if blank" do
+        UserPhoneConfirmationWorker.new # Instantiate for stubbing
+        stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+        user.reload
+        user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
+        expect(user.user_phones.count).to eq 0
+        expect(user.phone).to be_blank
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          expect {
+            user.update(phone: "6669996666")
+          }.to change(Notification, :count).by 1
+        end
+        user.reload
+        expect(user.phone).to eq "6669996666"
+        expect(user.user_phones.count).to eq 1
+        expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
+        user_phone = user.user_phones.reorder(:created_at).last
+        expect(user_phone.phone).to eq "6669996666"
+        expect(user_phone.confirmed?).to be_falsey
+        expect(user_phone.confirmation_code).to be_present
+        expect(user_phone.notifications.count).to eq 1
+        expect(user_phone.notifications.last.twilio_sid).to eq "party"
 
-      # And it adds a new phone if updated again
-      Sidekiq::Testing.inline! do
-        expect {
-          user.update(phone: "9996669999")
-        }.to change(Notification, :count).by 1
+        # And it adds a new phone if updated again
+        Sidekiq::Testing.inline! do
+          expect {
+            user.update(phone: "9996669999")
+          }.to change(Notification, :count).by 1
+        end
+        user.reload
+        expect(user.phone).to eq "9996669999"
+        expect(user.user_phones.count).to eq 2
+        user_phone2 = user.user_phones.reorder(:created_at).last
+        expect(user_phone2.phone).to eq "9996669999"
+        expect(user_phone2.confirmation_code).to be_present
+        expect(user_phone2.confirmed?).to be_falsey
+        expect(user_phone2.id).to_not eq user_phone.id
+        expect(user_phone2.confirmation_code).to_not eq user_phone.confirmation_code
+        expect(user_phone.notifications.count).to eq 1
       end
-      user.reload
-      expect(user.phone).to eq "9996669999"
-      expect(user.user_phones.count).to eq 2
-      user_phone2 = user.user_phones.reorder(:created_at).last
-      expect(user_phone2.phone).to eq "9996669999"
-      expect(user_phone2.confirmation_code).to be_present
-      expect(user_phone2.confirmed?).to be_falsey
-      expect(user_phone2.id).to_not eq user_phone.id
-      expect(user_phone2.confirmation_code).to_not eq user_phone.confirmation_code
-      expect(user_phone.notifications.count).to eq 1
     end
   end
 

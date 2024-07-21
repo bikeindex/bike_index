@@ -3,6 +3,7 @@ class UserPhoneConfirmationWorker < ApplicationWorker
   UPDATE_TWILIO = ENV["UPDATE_TWILIO_ENABLED"] == "true"
 
   def perform(user_phone_id, skip_user_update = false)
+    return unless Flipper.enabled?(:phone_verification)
     user_phone = UserPhone.find(user_phone_id)
     notification = Notification.create(user: user_phone.user,
       kind: "phone_verification",

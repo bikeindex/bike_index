@@ -170,7 +170,7 @@
         %td
           - display_phone = @user.phone.present?
           - if display_phone || @user.user_phones.any?
-            %ul
+            %ul.mb-0
               - @user.user_phones.each do |user_phone|
                 %li
                   = phone_display(user_phone.phone)
@@ -184,6 +184,8 @@
                 %li
                   = phone_display(@user.phone)
                   %small.less-strong.text-warning unconfirmed
+            - unless Flipper.enabled?(:phone_verification)
+              %em.small.less-strong Phone verification is currently disabled, users don't see the option to confirm their phones
       %tr
         %td Website
         %td

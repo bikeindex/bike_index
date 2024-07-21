@@ -49,6 +49,7 @@ RSpec.describe UserPhone, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:phone) { "2342342345" }
     before do
+      Flipper.enable(:phone_verification)
       UserPhoneConfirmationWorker.new # Instantiate for stubbing
       stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
     end
