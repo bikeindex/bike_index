@@ -8,7 +8,7 @@ class ExportUploader < ApplicationUploader
     "uploads/"
   end
 
-  def extension_white_list
+  def extension_whitelist
     %w[csv tsv xls xlsx]
   end
 end
