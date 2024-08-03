@@ -192,7 +192,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "\nbicycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "tandem")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "e-bike ")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, " electric bicycle ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " electricbicycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "TRIcycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "e-trike ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric cargo trike")).to be_truthy
@@ -200,7 +200,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "cargo")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "cargod")).to be_falsey
         expect(described_class.send(:model_bare_vehicle_type?, "cargo-tricycle")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "tandem")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "tandem electric")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "unicycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "wheelchair")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "estroller")).to be_truthy
@@ -220,7 +220,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_without_varieties, "male lag")).to eq "lag"
 
         expect(described_class.send(:model_without_varieties, "folding large cargo electricdd")).to eq "dd"
-        expect(described_class.send(:model_without_varieties, "utility cargo electric X.X_2")).to eq "x-x-2"
+        expect(described_class.send(:model_without_varieties, "utility xxl cargo electric X.X_2")).to eq "x-x-2"
 
         expect(described_class.send(:model_bare_vehicle_type?, "Men's")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " Women's lg frame")).to be_truthy
@@ -231,7 +231,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "Mountain-bicycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "hybrid electric-bike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric-step-through")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "mtb ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "xs mtb ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "bmx\tbike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric-utility-trike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " Men's bike")).to be_truthy

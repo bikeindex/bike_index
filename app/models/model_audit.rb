@@ -18,8 +18,9 @@ class ModelAudit < ApplicationRecord
   UNKNOWN_STRINGS = %w[na idk no none nomodel tbd unknown unkown].freeze
   ADDITIONAL_CYCLE_TYPES = %w[bicycle dirtbike trike three-wheeler].freeze
   VARIETIES_MATCHERS = %w[
-    full.suspension frame step.?through step.?thru
-    men.?s male female lady.?s? ladies women.?s sm(all)? me?d(ium)? l(ar)?ge?
+    full.suspension frame step.?through step.?thru electric
+    men.?s male female lady.?s? ladies women.?s
+    sm(all)? me?d(ium)? l(ar)?ge? xx?s xx?l
     bmx city commuter cruiser folding hybrid mtb mountain utility
   ].freeze
 
@@ -142,12 +143,12 @@ class ModelAudit < ApplicationRecord
     end
 
     def model_without_varieties(frame_model)
-      # remove leading e/electric
       match_string = frame_model.downcase.strip.gsub(/\W|_/, " ")
       # Replace all varities with a space
       VARIETIES_MATCHERS.each { |v| match_string.gsub!(/(\A| )#{v}( |\z)/, " ") }
       # remove cargo (which is often compounded with other types) and convert spaces to dashes
-      match_string.gsub("cargo", " ").strip.gsub(/ +/, "-").gsub(/\A(electric|e)-?/, "")
+      match_string.gsub("cargo", " ").strip.gsub(/ +/, "-")
+        .gsub(/\A(electric|e)-?/, "") # remove leading e/electric ("electric" not leading removed by variety)
     end
 
     def vehicle_type_strings
