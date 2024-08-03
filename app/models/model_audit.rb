@@ -19,8 +19,8 @@ class ModelAudit < ApplicationRecord
   ADDITIONAL_CYCLE_TYPES = %w[bicycle dirtbike trike three-wheeler].freeze
   VARIETIES_MATCHERS = %w[
     men.?s male female lady.?s? ladies women.?s
-    sm(all)? me?d(ium)? l(ar)?ge? xx?s xx?l
-    bmx city commuter cruiser fat(.?tire)? folding hybrid mtb mountain utility
+    sm(all)? me?d(ium)? l(ar)?ge? xx?s xx?l regular
+    bmx city commuter cruiser fat(.?tire)? foldable folding hybrid mtb mountain utility
     electric full.suspension frame step.?through step.?thru mid.?step long.?tail mid.?tail
   ].freeze
 
