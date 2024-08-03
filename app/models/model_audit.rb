@@ -18,10 +18,10 @@ class ModelAudit < ApplicationRecord
   UNKNOWN_STRINGS = %w[na idk no none nomodel tbd unknown unkown].freeze
   ADDITIONAL_CYCLE_TYPES = %w[bicycle dirtbike trike three-wheeler].freeze
   VARIETIES_MATCHERS = %w[
-    full.suspension frame step.?through step.?thru electric
+    full.suspension frame step.?through step.?thru electric long.?tail
     men.?s male female lady.?s? ladies women.?s
-    sm(all)? me?d(ium)? l(ar)?ge? xx?s xx?l
-    bmx city commuter cruiser folding hybrid mtb mountain utility
+    sm(all)? me?d(ium)? l(ar)?ge? xx?s xx?l black
+    bmx city commuter cruiser fat(.?tire)? folding hybrid mtb mountain utility
   ].freeze
 
   enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM

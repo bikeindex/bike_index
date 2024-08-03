@@ -11,7 +11,7 @@ RSpec.describe Autocomplete::Loader do
     let!(:color) { Color.black }
     let!(:manufacturer) { Manufacturer.other }
     it "stores" do
-      expect(CycleType.all.count).to eq 20
+      expect(CycleType.all.count).to eq 21
       expect(Manufacturer.count).to eq 1
       expect(Color.count).to eq 1
       expect(PropulsionType.autocomplete_hashes.count).to eq 1
@@ -26,7 +26,7 @@ RSpec.describe Autocomplete::Loader do
 
     context "passing individual types" do
       it "stores the passed kind" do
-        expect(CycleType.all.count).to eq 20
+        expect(CycleType.all.count).to eq 21
         expect(Manufacturer.count).to eq 1
         expect(Color.count).to eq 1
         subject.clear_redis

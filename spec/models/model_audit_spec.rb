@@ -192,6 +192,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "\nbicycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "tandem")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "e-bike ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "e-fat bike ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " electricbicycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "TRIcycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "e-trike ")).to be_truthy
@@ -217,7 +218,9 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_without_varieties, "lady sm cargo electric")).to eq ""
         expect(described_class.send(:model_without_varieties, "ladys MD")).to eq ""
         expect(described_class.send(:model_without_varieties, "ladys MeDium\t")).to eq ""
-        expect(described_class.send(:model_without_varieties, "male lag")).to eq "lag"
+        expect(described_class.send(:model_without_varieties, "male lag longtail")).to eq "lag"
+        expect(described_class.send(:model_without_varieties, "male fat tire")).to eq ""
+        expect(described_class.send(:model_without_varieties, "black xl mountain bike")).to eq "bike"
 
         expect(described_class.send(:model_without_varieties, "folding large cargo electricdd")).to eq "dd"
         expect(described_class.send(:model_without_varieties, "utility xxl cargo electric X.X_2")).to eq "x-x-2"

@@ -134,6 +134,7 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
             expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
             # Should bikes with unknown models, which are marked e-vehicle be grouped together with non-e-vehicles?
             # Currently they do, which seems likely to get false positives
+            # THIS IS A PROBLEM. Someone marks a rockhopper as an e-vehicle, and then all orgs have all their rockhopper in model audits
             expect { instance.perform(bike2.id) }.to change(ModelAudit, :count).by 0
             expect(bike2.reload.model_audit_id).to eq new_model_audit.id
           end
