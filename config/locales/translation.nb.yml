@@ -854,6 +854,7 @@ nb:
         tricycle: Trehjulssykkel
         unicycle: Enhjuling
         wheelchair: Rullestol
+        e_motorcycle: e-motorsykkel (eller e-Dirtbike)
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt

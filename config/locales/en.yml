@@ -694,6 +694,7 @@ en:
         cargo_rear: Cargo Bike (rear storage)
         cargo_trike: Cargo Tricycle (front storage)
         cargo_trike_rear: Cargo Tricycle (rear storage)
+        e_motorcycle: e-Motorcycle (or e-Dirtbike)
         e_scooter: e-Scooter
         e_skateboard: e-Skateboard
         non_e_scooter: Scooter (not electric)
@@ -710,7 +711,6 @@ en:
         tricycle: Tricycle
         unicycle: Unicycle
         wheelchair: Wheelchair
-        e_motorcycle: e-Motorcycle (or e-Dirtbike)
       frame_material:
         aluminum: Aluminum
         composite: Carbon or composite
