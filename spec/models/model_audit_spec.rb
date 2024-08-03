@@ -207,6 +207,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "electric_cargobike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "motorcycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "dirtbike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "e-Three Wheeler")).to be_truthy
       end
 
       it "matches vehicle varieties combined with vehicle types" do

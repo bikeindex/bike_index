@@ -16,7 +16,7 @@
 #
 class ModelAudit < ApplicationRecord
   UNKNOWN_STRINGS = %w[na idk no none nomodel tbd unknown unkown].freeze
-  ADDITIONAL_CYCLE_TYPES = %w[bicycle trike dirtbike].freeze
+  ADDITIONAL_CYCLE_TYPES = %w[bicycle dirtbike trike three-wheeler].freeze
   VARIETIES_MATCHERS = %w[
     full.suspension frame step.?through step.?thru
     men.?s male female lady.?s? ladies women.?s sm(all)? me?d(ium)? l(ar)?ge?

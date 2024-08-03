@@ -83,7 +83,7 @@ RSpec.describe PropulsionType, type: :model do
         expect(PropulsionType.for_vehicle(:stroller, :"pedal-assist")).to eq :throttle
         expect(PropulsionType.for_vehicle(:"personal-mobility", :"pedal-assist")).to eq :throttle
         expect(PropulsionType.for_vehicle(:"e-scooter", :"pedal-assist-and-throttle")).to eq :throttle
-        expect(PropulsionType.for_vehicle(:"e-motorcycle", :"hand-pedal")).to eq :trottle
+        expect(PropulsionType.for_vehicle(:"e-motorcycle", :"hand-pedal")).to eq :throttle
         (CycleType.slugs_sym - CycleType::PEDAL - CycleType::NEVER_MOTORIZED).each do |cycle_type|
           expect(PropulsionType.for_vehicle(cycle_type, :motorized)).to eq :throttle
         end
