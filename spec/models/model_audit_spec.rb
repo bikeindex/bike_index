@@ -220,13 +220,11 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_without_varieties, "ladys MeDium\t")).to eq ""
         expect(described_class.send(:model_without_varieties, "male lag longtail")).to eq "lag"
         expect(described_class.send(:model_without_varieties, "male fat tire")).to eq ""
-        expect(described_class.send(:model_without_varieties, "black xl mountain bike")).to eq "bike"
+        expect(described_class.send(:model_bare_vehicle_type?, " Women's lg frame")).to be_truthy
 
         expect(described_class.send(:model_without_varieties, "folding large cargo electricdd")).to eq "dd"
         expect(described_class.send(:model_without_varieties, "utility xxl cargo electric X.X_2")).to eq "x-x-2"
 
-        expect(described_class.send(:model_bare_vehicle_type?, "Men's")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, " Women's lg frame")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "city bike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "commuter trike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "folding bike")).to be_truthy
@@ -237,8 +235,8 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "xs mtb ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "bmx\tbike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric-utility-trike")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, " Men's bike")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, " ladies unicycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "silver  Men's bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "\ngreen ladies unicycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " stepthru bike frame\n")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " ladies step through frame\n")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " ladies step-thru frame\n")).to be_truthy
@@ -262,7 +260,8 @@ RSpec.describe ModelAudit, type: :model do
     it "matches cycle types" do
       expect(described_class.unknown_model?("eScooter", manufacturer_id: 42)).to be_truthy
       expect(described_class.unknown_model?("electric-mens MTB", manufacturer_id: 42)).to be_truthy
-      expect(described_class.unknown_model?("cargo-bike", manufacturer_id: 42)).to be_truthy
+      expect(described_class.unknown_model?("purple small cargo-bike", manufacturer_id: 42)).to be_truthy
+      expect(described_class.unknown_model?("RED XXL electric Mountain", manufacturer_id: 42)).to be_truthy
     end
     context "when named the same as the manufacturer" do
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
