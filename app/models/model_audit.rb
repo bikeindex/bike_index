@@ -16,7 +16,12 @@
 #
 class ModelAudit < ApplicationRecord
   UNKNOWN_STRINGS = %w[na idk no none nomodel tbd unknown unkown].freeze
-  VEHICLE_TYPE_STRINGS = %w[bicycle mtb bmx trike].freeze
+  ADDITIONAL_CYCLE_TYPES = %w[bicycle trike dirtbike].freeze
+  VARIETIES_MATCHERS = %w[
+    full.suspension frame step.?through step.?thru
+    men.?s male female lady.?s? ladies women.?s sm(all)? me?d(ium)? l(ar)?ge?
+    bmx city commuter cruiser folding hybrid mtb mountain utility
+  ].freeze
 
   enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
   enum propulsion_type: PropulsionType::SLUGS
@@ -51,30 +56,25 @@ class ModelAudit < ApplicationRecord
       model_audits.or(where(manufacturer_id: manufacturer_id))
     end
 
-    def matching_frame_model(frame_model)
-      if unknown_model?(frame_model)
-        where(frame_model: nil)
-      else
-        where("frame_model ILIKE ?", frame_model)
-      end
-    end
-
     def find_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
       manufacturer_id ||= bike&.manufacturer_id
       mnfg_name ||= bike&.mnfg_name
       frame_model ||= bike&.frame_model
       matching_audits = matching_manufacturer(manufacturer_id, mnfg_name)
-        .matching_frame_model(frame_model).reorder(:id)
+        .matching_frame_model(frame_model, manufacturer_id: manufacturer_id).reorder(:id)
       return matching_audits.first if matching_audits.count < 2
       not_other = matching_audits.where.not(manufacturer_id: Manufacturer.other.id)
       not_other.present? ? not_other.first : matching_audits.first
     end
 
-    def unknown_model?(frame_model, manufacturer_id = nil)
-      return true if frame_model.blank?
-      UNKNOWN_STRINGS.include?(normalize_model_string(frame_model)) ||
+    def unknown_model?(frame_model, manufacturer_id:)
+      return true if frame_model.blank? ||
+        UNKNOWN_STRINGS.include?(normalize_model_string(frame_model)) ||
         model_bare_vehicle_type?(frame_model)
-      # || Manufacturer.friendly_find_id(frame_model) == manufacturer_id
+      # Ignore manufacturer other
+      return false if [Manufacturer.other.id, nil].include?(manufacturer_id)
+
+      Manufacturer.friendly_find_id(frame_model) == manufacturer_id
     end
 
     def audit?(bike)
@@ -85,7 +85,7 @@ class ModelAudit < ApplicationRecord
           return true if Manufacturer.find_by_id(manufacturer_id)&.motorized_only?
         end
       end
-      return false if unknown_model?(bike.frame_model)
+      return false if unknown_model?(bike.frame_model, manufacturer_id: bike.manufacturer_id)
       # Also enqueue if any matching bikes have a model_audit
       ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
     end
@@ -112,10 +112,18 @@ class ModelAudit < ApplicationRecord
       counted_matching_bikes(bikes).count
     end
 
+    def matching_frame_model(frame_model, manufacturer_id:)
+      if unknown_model?(frame_model, manufacturer_id: manufacturer_id)
+        where(frame_model: nil)
+      else
+        where("frame_model ILIKE ?", frame_model)
+      end
+    end
+
     private
 
-    def matching_bikes_for_frame_model(bikes, manufacturer_id: nil, frame_model: nil)
-      if unknown_model?(frame_model)
+    def matching_bikes_for_frame_model(bikes, manufacturer_id:, frame_model:)
+      if unknown_model?(frame_model, manufacturer_id: manufacturer_id)
         bikes = bikes.motorized unless Manufacturer.find_by_id(manufacturer_id)&.motorized_only
         bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))
       else
@@ -128,15 +136,22 @@ class ModelAudit < ApplicationRecord
     end
 
     def model_bare_vehicle_type?(frame_model)
+      match_string = model_without_varieties(frame_model)
+      match_string.blank? || vehicle_type_strings.include?(match_string)
+    end
+
+    def model_without_varieties(frame_model)
       # remove leading e/electric
-      model_match_str = frame_model.downcase.strip.gsub(/\W|_|\s/, "-")
-        .gsub(/\A(electric|e)-?/, "").gsub(/(\A|-)cargo-?/, "")
-      vehicle_type_strings.include?(model_match_str)
+      match_string = frame_model.downcase.strip.gsub(/\W|_/, " ")
+      # Replace all varities with a space
+      VARIETIES_MATCHERS.each { |v| match_string.gsub!(/(\A| )#{v}( |\z)/, " ") }
+      # remove cargo (which is often compounded with other types) and convert spaces to dashes
+      match_string.gsub("cargo", " ").strip.gsub(/ +/, "-").gsub(/\A(electric|e)-?/, "")
     end
 
     def vehicle_type_strings
       CycleType::SLUGS.keys.map { |s| s.to_s.split(/(\A|-)e-/).last }
-        .reject { |s| s.match?("cargo") } + VEHICLE_TYPE_STRINGS
+        .reject { |s| s.match?("cargo") } + ADDITIONAL_CYCLE_TYPES
     end
   end
 
@@ -151,7 +166,7 @@ class ModelAudit < ApplicationRecord
   end
 
   def matching_bike?(bike)
-    same_frame_model = if self.class.unknown_model?(bike.frame_model)
+    same_frame_model = if self.class.unknown_model?(bike.frame_model, manufacturer_id: manufacturer_id)
       unknown_model?
     else
       frame_model&.downcase == bike.frame_model&.downcase

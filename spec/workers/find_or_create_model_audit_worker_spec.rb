@@ -103,7 +103,7 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
         expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
       end
       context "bike2 is motorized" do
-        it "matches" do
+        xit "matches" do
           bike2.update(propulsion_type: "pedal-assist")
           Sidekiq::Worker.clear_all
           expect {

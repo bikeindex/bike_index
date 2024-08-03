@@ -45,7 +45,7 @@ RSpec.describe ModelAudit, type: :model do
     context "motorized" do
       let(:bike) { Bike.new(propulsion_type: "throttle") }
       it "returns true" do
-        expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
+        expect(ModelAudit.unknown_model?(bike.frame_model, manufacturer_id: 42)).to be_truthy
         expect(ModelAudit.audit?(bike)).to be_truthy
       end
     end
@@ -54,27 +54,27 @@ RSpec.describe ModelAudit, type: :model do
       let(:bike) { FactoryBot.build(:bike, frame_model: frame_model, propulsion_type: "hand-pedal", manufacturer: manufacturer) }
       let(:frame_model) { "unkown" }
       it "returns false" do
-        expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
+        expect(ModelAudit.unknown_model?(bike.frame_model, manufacturer_id: 42)).to be_truthy
         expect(ModelAudit.audit?(bike)).to be_falsey
       end
       context "with manufacturer motorized_only" do
         let(:manufacturer) { FactoryBot.create(:manufacturer, motorized_only: true) }
         let(:frame_model) { nil }
         it "returns true" do
-          expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
+          expect(ModelAudit.unknown_model?(bike.frame_model, manufacturer_id: 42)).to be_truthy
           expect(ModelAudit.audit?(bike)).to be_truthy
         end
       end
       context "existing model_audit" do
         let!(:existing_bike) { FactoryBot.create(:bike, manufacturer: manufacturer, frame_model: frame_model, model_audit_id: 12) }
         it "returns false" do
-          expect(ModelAudit.unknown_model?(bike.frame_model)).to be_truthy
+          expect(ModelAudit.unknown_model?(bike.frame_model, manufacturer_id: 42)).to be_truthy
           expect(ModelAudit.audit?(bike)).to be_falsey
         end
         context "with not unknown frame_model" do
           let(:frame_model) { "something" }
           it "returns true" do
-            expect(ModelAudit.unknown_model?(bike.frame_model)).to be_falsey
+            expect(ModelAudit.unknown_model?(bike.frame_model, manufacturer_id: 42)).to be_falsey
             expect(ModelAudit.audit?(bike)).to be_truthy
           end
         end
@@ -93,12 +93,12 @@ RSpec.describe ModelAudit, type: :model do
       let!(:bike6) { FactoryBot.create(:bike, frame_model: "No model") }
       let!(:bike_known) { FactoryBot.create(:bike, frame_model: "none coolest", manufacturer: manufacturer) }
       it "finds the matches" do
-        expect(ModelAudit.unknown_model?(bike1.frame_model)).to be_truthy
+        expect(ModelAudit.unknown_model?(bike1.frame_model, manufacturer_id: 42)).to be_truthy
         expect(bike6.manufacturer_id).to_not eq manufacturer.id
         (Bike.pluck(:frame_model) - ["none coolest"]).each do |frame_model|
-          expect(ModelAudit.unknown_model?(frame_model)).to be_truthy
+          expect(ModelAudit.unknown_model?(frame_model, manufacturer_id: 42)).to be_truthy
         end
-        expect(ModelAudit.unknown_model?(bike_known.frame_model)).to be_falsey
+        expect(ModelAudit.unknown_model?(bike_known.frame_model, manufacturer_id: 42)).to be_falsey
         expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike5.id])
         # TODO: This seems weird - it probably should return empty...
         expect(ModelAudit.matching_bikes_for(bike2).pluck(:id)).to match_array([bike1.id, bike5.id])
@@ -197,32 +197,86 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "e-trike ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric cargo trike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric cargoite")).to be_falsey
-        expect(described_class.send(:model_bare_vehicle_type?, "cargo")).to be_falsey
-        expect(described_class.send(:model_bare_vehicle_type?, "cargotricycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "cargo")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "cargod")).to be_falsey
+        expect(described_class.send(:model_bare_vehicle_type?, "cargo-tricycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "tandem")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "unicycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "wheelchair")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "estroller")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric_cargobike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "motorcycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "dirtbike")).to be_truthy
+      end
+
+      it "matches vehicle varieties combined with vehicle types" do
+        expect(described_class.send(:model_without_varieties, "men's")).to eq ""
+        expect(described_class.send(:model_without_varieties, "mens electric")).to eq ""
+        expect(described_class.send(:model_without_varieties, "mens electric CARGO")).to eq ""
+        expect(described_class.send(:model_without_varieties, "lady sm cargo electric")).to eq ""
+        expect(described_class.send(:model_without_varieties, "ladys MD")).to eq ""
+        expect(described_class.send(:model_without_varieties, "ladys MeDium\t")).to eq ""
+        expect(described_class.send(:model_without_varieties, "male lag")).to eq "lag"
+
+        expect(described_class.send(:model_without_varieties, "folding large cargo electricdd")).to eq "dd"
+        expect(described_class.send(:model_without_varieties, "utility cargo electric X.X_2")).to eq "x-x-2"
+
+        expect(described_class.send(:model_bare_vehicle_type?, "Men's")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " Women's lg frame")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "city bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "commuter trike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "folding bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "cruiser mtb")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "Mountain-bicycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "hybrid electric-bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "electric-step-through")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "mtb ")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "bmx\t")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "bmx\tbike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "electric-utility-trike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " Men's bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " ladies unicycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " stepthru bike frame\n")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " ladies step through frame\n")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " ladies step-thru frame\n")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " XP Step-Thru 3.0\n")).to be_falsey
+
+        expect(described_class.send(:model_bare_vehicle_type?, " Full Suspension e-bike\n")).to be_truthy
       end
     end
   end
 
   describe "unknown_model" do
     it "is false" do
-      expect(described_class.unknown_model?("bike 200", 42)).to be_falsey
+      expect(described_class.unknown_model?("bike 200", manufacturer_id: 42)).to be_falsey
     end
     it "matches unknown" do
-      expect(described_class.unknown_model?("na", 42)).to be_truthy
-      expect(described_class.unknown_model?("No model", 42)).to be_truthy
-      expect(described_class.unknown_model?("unkown", 42)).to be_truthy
+      expect(described_class.unknown_model?("na", manufacturer_id: 42)).to be_truthy
+      expect(described_class.unknown_model?("No model", manufacturer_id: 42)).to be_truthy
+      expect(described_class.unknown_model?("unkown", manufacturer_id: 42)).to be_truthy
+      expect(described_class.unknown_model?("medium", manufacturer_id: 42)).to be_truthy
     end
     it "matches cycle types" do
-      expect(described_class.unknown_model?("eScooter", 42)).to be_truthy
-      expect(described_class.unknown_model?("electric-MTB", 42)).to be_truthy
-      expect(described_class.unknown_model?("cargo-bike", 42)).to be_truthy
+      expect(described_class.unknown_model?("eScooter", manufacturer_id: 42)).to be_truthy
+      expect(described_class.unknown_model?("electric-mens MTB", manufacturer_id: 42)).to be_truthy
+      expect(described_class.unknown_model?("cargo-bike", manufacturer_id: 42)).to be_truthy
+    end
+    context "when named the same as the manufacturer" do
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
+      it "matches" do
+        expect(described_class.unknown_model?(" salsa", manufacturer_id: 42)).to be_falsey
+        expect(described_class.unknown_model?(" salsa", manufacturer_id: manufacturer.id)).to be_truthy
+        expect(described_class.unknown_model?(" salsa bike", manufacturer_id: manufacturer.id)).to be_truthy
+      end
+
+      context "with secondary name" do
+        let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "CVLN (Civilian)") }
+        it "matches for both name and secondary" do
+          expect(described_class.unknown_model?(" CVLN", manufacturer_id: 42)).to be_falsey
+          expect(described_class.unknown_model?(" cvln", manufacturer_id: manufacturer.id)).to be_truthy
+          expect(described_class.unknown_model?(" civilian\n", manufacturer_id: manufacturer.id)).to be_truthy
+          expect(described_class.unknown_model?(" civilian bicycle", manufacturer_id: manufacturer.id)).to be_truthy
+        end
+      end
     end
   end
 end
