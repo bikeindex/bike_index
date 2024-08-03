@@ -101,7 +101,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(ModelAudit.unknown_model?(bike_known.frame_model, manufacturer_id: 42)).to be_falsey
         expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike5.id])
         # TODO: This seems weird - it probably should return empty...
-        expect(ModelAudit.matching_bikes_for(bike2).pluck(:id)).to match_array([bike1.id, bike5.id])
+        expect(ModelAudit.matching_bikes_for(bike2).pluck(:id)).to match_array([bike1.id, bike2.id, bike5.id])
         # But - if you update to be motorized, it's all the bikes
         manufacturer.update(motorized_only: true)
         expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id, bike4.id, bike5.id])

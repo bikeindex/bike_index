@@ -98,9 +98,10 @@ class ModelAudit < ApplicationRecord
       if manufacturer_id != Manufacturer.other.id
         bikes = bikes.or(Bike.unscoped.where(manufacturer_id: manufacturer_id))
       end
-
-      matching_bikes_for_frame_model(bikes, manufacturer_id: manufacturer_id, frame_model: frame_model || bike&.frame_model)
-        .reorder(id: :desc)
+      bikes = matching_bikes_for_frame_model(bikes, manufacturer_id: manufacturer_id, frame_model: frame_model || bike&.frame_model)
+      # Include bike if it was passed
+      bikes = bikes.or(Bike.unscoped.where(id: bike.id)) if bike&.id.present?
+      bikes.reorder(id: :desc)
     end
 
     def counted_matching_bikes(bikes)

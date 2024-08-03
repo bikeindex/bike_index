@@ -79,7 +79,7 @@ class CycleType
   end
 
   def self.front_and_rear_wheels?(slug)
-    (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter])
+    (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter e-motorcycle])
       .include?(slug&.to_sym)
   end
 
