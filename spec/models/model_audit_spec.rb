@@ -237,7 +237,7 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "electric-utility-trike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "silver  Men's bike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "\ngreen ladies unicycle")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, " stepthru bike frame\n")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " stepthru folding bike frame\n")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " ladies step through frame\n")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " ladies step-thru frame\n")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " XP Step-Thru 3.0\n")).to be_falsey
