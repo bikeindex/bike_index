@@ -193,12 +193,12 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_bare_vehicle_type?, "tandem")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "e-bike ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "e-fat bike ")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, " electricbicycle ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " midstep electricbicycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "TRIcycle ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "e-trike ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric cargo trike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric cargoite")).to be_falsey
-        expect(described_class.send(:model_bare_vehicle_type?, "cargo")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "cargo midtail bike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "cargod")).to be_falsey
         expect(described_class.send(:model_bare_vehicle_type?, "cargo-tricycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "tandem electric")).to be_truthy
