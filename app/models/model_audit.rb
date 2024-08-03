@@ -15,8 +15,8 @@
 #  manufacturer_id      :bigint
 #
 class ModelAudit < ApplicationRecord
-  UNKNOWN_STRINGS = %w[na idk no unknown unkown none tbd nomodel].freeze
-  VEHICLE_TYPE_STRINGS = %w[scooter bike bicycle mtb cargobike trike unicycle].freeze
+  UNKNOWN_STRINGS = %w[na idk no none nomodel tbd unknown unkown].freeze
+  VEHICLE_TYPE_STRINGS = %w[bicycle mtb bmx trike].freeze
 
   enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
   enum propulsion_type: PropulsionType::SLUGS
@@ -32,97 +32,113 @@ class ModelAudit < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  def self.valid_kinds
-    (certification_statuses.keys - ["certification_proof_url"])
-  end
+  scope :unknown_model, -> { where(frame_model: nil) }
 
-  def self.manufacturer_id_corrected(manufacturer_id, mnfg_name)
-    return manufacturer_id if manufacturer_id != Manufacturer.other.id
-    Manufacturer.friendly_find_id(mnfg_name) || manufacturer_id
-  end
-
-  def self.matching_manufacturer(manufacturer_id, mnfg_name)
-    model_audits = where("mnfg_name ILIKE ?", mnfg_name)
-    manufacturer_id = manufacturer_id_corrected(manufacturer_id, mnfg_name)
-    return model_audits if manufacturer_id == Manufacturer.other.id
-    model_audits.or(where(manufacturer_id: manufacturer_id))
-  end
-
-  def self.matching_frame_model(frame_model)
-    if unknown_model?(frame_model)
-      where(frame_model: nil)
-    else
-      where("frame_model ILIKE ?", frame_model)
+  class << self
+    def valid_kinds
+      (certification_statuses.keys - ["certification_proof_url"])
     end
-  end
 
-  def self.find_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
-    manufacturer_id ||= bike&.manufacturer_id
-    mnfg_name ||= bike&.mnfg_name
-    frame_model ||= bike&.frame_model
-    matching_audits = matching_manufacturer(manufacturer_id, mnfg_name)
-      .matching_frame_model(frame_model).reorder(:id)
-    return matching_audits.first if matching_audits.count < 2
-    not_other = matching_audits.where.not(manufacturer_id: Manufacturer.other.id)
-    not_other.present? ? not_other.first : matching_audits.first
-  end
+    def manufacturer_id_corrected(manufacturer_id, mnfg_name)
+      return manufacturer_id if manufacturer_id != Manufacturer.other.id
+      Manufacturer.friendly_find_id(mnfg_name) || manufacturer_id
+    end
 
-  def self.normalized_frame_model(frame_model)
-    frame_model.downcase.gsub(/\W|_|\s/, "") # remove everything but numbers and letters
-    # remove leading e/electric
-  end
+    def matching_manufacturer(manufacturer_id, mnfg_name)
+      model_audits = where("mnfg_name ILIKE ?", mnfg_name)
+      manufacturer_id = manufacturer_id_corrected(manufacturer_id, mnfg_name)
+      return model_audits if manufacturer_id == Manufacturer.other.id
+      model_audits.or(where(manufacturer_id: manufacturer_id))
+    end
 
-  def self.unknown_model?(frame_model)
-    return true if frame_model.blank?
-    normed_frame_model = normed_frame_model(frame_model)
-    UNKNOWN_STRINGS.include?(normed_frame_model)
-  end
-
-  def self.audit?(bike)
-    return true if bike.motorized? || bike.manufacturer&.motorized_only?
-    if bike.manufacturer&.other?
-      manufacturer_id = manufacturer_id_corrected(bike.manufacturer_id, bike.mnfg_name)
-      if manufacturer_id != Manufacturer.other.id
-        return true if Manufacturer.find_by_id(manufacturer_id)&.motorized_only?
+    def matching_frame_model(frame_model)
+      if unknown_model?(frame_model)
+        where(frame_model: nil)
+      else
+        where("frame_model ILIKE ?", frame_model)
       end
     end
-    return false if unknown_model?(bike.frame_model)
-    # Also enqueue if any matching bikes have a model_audit
-    ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
-  end
 
-  def self.matching_bikes_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
-    manufacturer_id ||= bike&.manufacturer_id
-    mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.simple_name
-    # Always match by mnfg_name, to fix things if it previously was manufacturer_other
-    bikes = Bike.unscoped.where("mnfg_name ILIKE ?", mnfg_name)
-    if manufacturer_id != Manufacturer.other.id
-      bikes = bikes.or(Bike.unscoped.where(manufacturer_id: manufacturer_id))
+    def find_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
+      manufacturer_id ||= bike&.manufacturer_id
+      mnfg_name ||= bike&.mnfg_name
+      frame_model ||= bike&.frame_model
+      matching_audits = matching_manufacturer(manufacturer_id, mnfg_name)
+        .matching_frame_model(frame_model).reorder(:id)
+      return matching_audits.first if matching_audits.count < 2
+      not_other = matching_audits.where.not(manufacturer_id: Manufacturer.other.id)
+      not_other.present? ? not_other.first : matching_audits.first
     end
 
-    matching_bikes_for_frame_model(bikes, manufacturer_id: manufacturer_id, frame_model: frame_model || bike&.frame_model)
-      .reorder(id: :desc)
-  end
+    def unknown_model?(frame_model, manufacturer_id = nil)
+      return true if frame_model.blank?
+      UNKNOWN_STRINGS.include?(normalize_model_string(frame_model)) ||
+        model_bare_vehicle_type?(frame_model)
+      # || Manufacturer.friendly_find_id(frame_model) == manufacturer_id
+    end
 
-  def self.counted_matching_bikes(bikes)
-    bikes.where(example: false, deleted_at: nil, likely_spam: false)
-  end
+    def audit?(bike)
+      return true if bike.motorized? || bike.manufacturer&.motorized_only?
+      if bike.manufacturer&.other?
+        manufacturer_id = manufacturer_id_corrected(bike.manufacturer_id, bike.mnfg_name)
+        if manufacturer_id != Manufacturer.other.id
+          return true if Manufacturer.find_by_id(manufacturer_id)&.motorized_only?
+        end
+      end
+      return false if unknown_model?(bike.frame_model)
+      # Also enqueue if any matching bikes have a model_audit
+      ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
+    end
 
-  def self.counted_matching_bikes_count(bikes)
-    # As of now, user_hidden isn't normally visible in orgs. Not sure what to do about that?
-    counted_matching_bikes(bikes).count
-  end
+    def matching_bikes_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
+      manufacturer_id ||= bike&.manufacturer_id
+      mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.simple_name
+      # Always match by mnfg_name, to fix things if it previously was manufacturer_other
+      bikes = Bike.unscoped.where("mnfg_name ILIKE ?", mnfg_name)
+      if manufacturer_id != Manufacturer.other.id
+        bikes = bikes.or(Bike.unscoped.where(manufacturer_id: manufacturer_id))
+      end
 
-  def self.matching_bikes_for_frame_model(bikes, manufacturer_id: nil, frame_model: nil)
-    if unknown_model?(frame_model)
-      bikes = bikes.motorized unless Manufacturer.find_by_id(manufacturer_id)&.motorized_only
-      bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))
-    else
-      bikes.where("frame_model ILIKE ?", frame_model)
+      matching_bikes_for_frame_model(bikes, manufacturer_id: manufacturer_id, frame_model: frame_model || bike&.frame_model)
+        .reorder(id: :desc)
+    end
+
+    def counted_matching_bikes(bikes)
+      bikes.where(example: false, deleted_at: nil, likely_spam: false)
+    end
+
+    def counted_matching_bikes_count(bikes)
+      # As of now, user_hidden isn't normally visible in orgs. Not sure what to do about that?
+      counted_matching_bikes(bikes).count
+    end
+
+    private
+
+    def matching_bikes_for_frame_model(bikes, manufacturer_id: nil, frame_model: nil)
+      if unknown_model?(frame_model)
+        bikes = bikes.motorized unless Manufacturer.find_by_id(manufacturer_id)&.motorized_only
+        bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))
+      else
+        bikes.where("frame_model ILIKE ?", frame_model)
+      end
+    end
+
+    def normalize_model_string(frame_model)
+      frame_model.downcase.gsub(/\W|_|\s/, "") # remove everything but numbers and letters
+    end
+
+    def model_bare_vehicle_type?(frame_model)
+      # remove leading e/electric
+      model_match_str = frame_model.downcase.strip.gsub(/\W|_|\s/, "-")
+        .gsub(/\A(electric|e)-?/, "").gsub(/(\A|-)cargo-?/, "")
+      vehicle_type_strings.include?(model_match_str)
+    end
+
+    def vehicle_type_strings
+      CycleType::SLUGS.keys.map { |s| s.to_s.split(/(\A|-)e-/).last }
+        .reject { |s| s.match?("cargo") } + VEHICLE_TYPE_STRINGS
     end
   end
-
-  private_class_method :matching_bikes_for_frame_model
 
   # WARNING! This is a calculated query. You should probably use the association
   def matching_bikes

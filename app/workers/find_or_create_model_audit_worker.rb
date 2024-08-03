@@ -54,7 +54,11 @@ class FindOrCreateModelAuditWorker < ApplicationWorker
     propulsion_type ||= matching_bikes.first&.propulsion_type
     cycle_type = matching_bikes.detect { |b| b.cycle_type != "bike" }&.cycle_type
     cycle_type ||= matching_bikes.first&.cycle_type
-    frame_model = ModelAudit.unknown_model?(bike.frame_model) ? nil : bike.frame_model
+    frame_model = if ModelAudit.unknown_model?(bike.frame_model, bike.manufacturer_id)
+      nil
+    else
+      bike.frame_model
+    end
     ModelAudit.create!(manufacturer_id: bike.manufacturer_id,
       manufacturer_other: bike.manufacturer_other,
       frame_model: frame_model,

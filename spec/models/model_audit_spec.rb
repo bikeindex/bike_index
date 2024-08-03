@@ -175,37 +175,54 @@ RSpec.describe ModelAudit, type: :model do
     end
   end
 
+  describe "private unknown_model methods" do
+    # These private methods are tested because regular expressions are hard,
+    # I wanted test cases to show the intention and help make future bug fixing easier
+    describe "normalize_model_string" do
+      it "removes non-letters/numbers" do
+        expect(described_class.send(:normalize_model_string, "e-bike ")).to eq "ebike"
+        expect(described_class.send(:normalize_model_string, " n/a\n")).to eq "na"
+        expect(described_class.send(:normalize_model_string, "123_party")).to eq "123party"
+      end
+    end
+    describe "model_bare_vehicle_type?" do
+      it "matches on vehicle types and electric" do
+        # sanity check that we're not matching "rear" because of a bad split
+        expect(described_class.send(:vehicle_type_strings)).not_to include("rear")
+        expect(described_class.send(:model_bare_vehicle_type?, "\nbicycle ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "tandem")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "e-bike ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " electric bicycle ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "TRIcycle ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "e-trike ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "electric cargo trike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "electric cargoite")).to be_falsey
+        expect(described_class.send(:model_bare_vehicle_type?, "cargo")).to be_falsey
+        expect(described_class.send(:model_bare_vehicle_type?, "cargotricycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "tandem")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "unicycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "wheelchair")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "estroller")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "electric_cargobike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "mtb ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "bmx\t")).to be_truthy
+      end
+    end
+  end
+
   describe "unknown_model" do
     it "is false" do
-      expect(described_class.unknown_model?("bike 200")).to be_falsey
+      expect(described_class.unknown_model?("bike 200", 42)).to be_falsey
     end
-    it "matches na" do
-      expect(described_class.unknown_model?("na")).to be_truthy
-      expect(described_class.unknown_model?("N/A")).to be_truthy
-      expect(described_class.unknown_model?("N A")).to be_truthy
-      expect(described_class.unknown_model?("N-A ")).to be_truthy
+    it "matches unknown" do
+      expect(described_class.unknown_model?("na", 42)).to be_truthy
+      expect(described_class.unknown_model?("No model", 42)).to be_truthy
+      expect(described_class.unknown_model?("unkown", 42)).to be_truthy
     end
-    context "cycle type" do
-      it "is truthy for scooter" do
-        expect(described_class.unknown_model?("Scooter")).to be_truthy
-        expect(described_class.unknown_model?("eScooter")).to be_truthy
-        expect(described_class.unknown_model?("e-Scooter")).to be_truthy
-        expect(described_class.unknown_model?("Scooter ?")).to be_truthy
-        expect(described_class.unknown_model?("e-Scooter ?")).to be_truthy
-      end
-      it "is truthy for bikes" do
-        expect(described_class.unknown_model?("Bike")).to be_truthy
-        expect(described_class.unknown_model?("bicycle")).to be_truthy
-        expect(described_class.unknown_model?("e-bicycle")).to be_truthy
-        expect(described_class.unknown_model?("e-MTB")).to be_truthy
-        expect(described_class.unknown_model?("e-cargobike")).to be_truthy
-        expect(described_class.unknown_model?("trike")).to be_truthy
-      end
-    end
-    context "matching mnfg_name" do
-      it "is truthy" do
-
-      end
+    it "matches cycle types" do
+      expect(described_class.unknown_model?("eScooter", 42)).to be_truthy
+      expect(described_class.unknown_model?("electric-MTB", 42)).to be_truthy
+      expect(described_class.unknown_model?("cargo-bike", 42)).to be_truthy
     end
   end
 end
