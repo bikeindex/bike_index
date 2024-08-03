@@ -170,7 +170,7 @@ class ModelAudit < ApplicationRecord
   end
 
   def matching_bike?(bike)
-    same_frame_model = if self.class.unknown_model?(bike.frame_model, manufacturer_id: manufacturer_id)
+    same_frame_model = if self.class.unknown_model?(bike.frame_model, manufacturer_id: bike.manufacturer_id)
       unknown_model?
     else
       frame_model&.downcase == bike.frame_model&.downcase
@@ -185,6 +185,11 @@ class ModelAudit < ApplicationRecord
 
   def unknown_model?
     frame_model.blank?
+  end
+
+  def should_be_unknown_model?
+    frame_model.present? &&
+      self.class.unknown_model?(frame_model, manufacturer_id: manufacturer_id)
   end
 
   def certification_status_humanized
