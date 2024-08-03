@@ -217,29 +217,29 @@ RSpec.describe ModelAudit, type: :model do
         expect(described_class.send(:model_without_varieties, "mens electric CARGO")).to eq ""
         expect(described_class.send(:model_without_varieties, "lady sm cargo electric")).to eq ""
         expect(described_class.send(:model_without_varieties, "ladys MD")).to eq ""
-        expect(described_class.send(:model_without_varieties, "ladys MeDium\t")).to eq ""
+        expect(described_class.send(:model_without_varieties, "ladys MeDium\t road bike")).to eq "bike"
         expect(described_class.send(:model_without_varieties, "male lag longtail")).to eq "lag"
         expect(described_class.send(:model_without_varieties, "male fat tire")).to eq ""
-        expect(described_class.send(:model_bare_vehicle_type?, " Women's lg frame")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " Women's lg frame step in")).to be_truthy
 
         expect(described_class.send(:model_without_varieties, "folding large cargo electricdd")).to eq "dd"
         expect(described_class.send(:model_without_varieties, "utility xxl cargo electric X.X_2")).to eq "x-x-2"
 
-        expect(described_class.send(:model_bare_vehicle_type?, "city bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "high.step city bike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "commuter trike")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "folding bike")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "cruiser mtb")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "Mountain-bicycle")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "hybrid electric-bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "traditional folding bike")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "mtb (yellow)")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "Aluminum Mountain-bicycle")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "hybrid electric-cruiser bike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric-step-through")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, "xs mtb ")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, "xs mtb 3_wheeler")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "bmx\tbike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "electric-utility-trike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "silver  Men's bike")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, "\ngreen ladies unicycle")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " stepthru folding bike frame\n")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " ladies step through regular frame\n")).to be_truthy
-        expect(described_class.send(:model_bare_vehicle_type?, " ladies step-thru foldable frame\n")).to be_truthy
+        expect(described_class.send(:model_bare_vehicle_type?, " ladies step-thru foldable\ntrike ")).to be_truthy
         expect(described_class.send(:model_bare_vehicle_type?, " XP Step-Thru 3.0\n")).to be_falsey
 
         expect(described_class.send(:model_bare_vehicle_type?, " Full Suspension e-bike\n")).to be_truthy
