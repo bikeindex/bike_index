@@ -15,7 +15,8 @@
 #  manufacturer_id      :bigint
 #
 class ModelAudit < ApplicationRecord
-  UNKNOWN_STRINGS = %w[na idk no unknown unkown none tbd no\ model].freeze
+  UNKNOWN_STRINGS = %w[na idk no unknown unkown none tbd nomodel].freeze
+  VEHICLE_TYPE_STRINGS = %w[scooter bike bicycle mtb cargobike trike unicycle].freeze
 
   enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
   enum propulsion_type: PropulsionType::SLUGS
@@ -66,9 +67,15 @@ class ModelAudit < ApplicationRecord
     not_other.present? ? not_other.first : matching_audits.first
   end
 
+  def self.normalized_frame_model(frame_model)
+    frame_model.downcase.gsub(/\W|_|\s/, "") # remove everything but numbers and letters
+    # remove leading e/electric
+  end
+
   def self.unknown_model?(frame_model)
     return true if frame_model.blank?
-    UNKNOWN_STRINGS.include?(frame_model.downcase)
+    normed_frame_model = normed_frame_model(frame_model)
+    UNKNOWN_STRINGS.include?(normed_frame_model)
   end
 
   def self.audit?(bike)

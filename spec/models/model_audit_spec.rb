@@ -174,4 +174,38 @@ RSpec.describe ModelAudit, type: :model do
       end
     end
   end
+
+  describe "unknown_model" do
+    it "is false" do
+      expect(described_class.unknown_model?("bike 200")).to be_falsey
+    end
+    it "matches na" do
+      expect(described_class.unknown_model?("na")).to be_truthy
+      expect(described_class.unknown_model?("N/A")).to be_truthy
+      expect(described_class.unknown_model?("N A")).to be_truthy
+      expect(described_class.unknown_model?("N-A ")).to be_truthy
+    end
+    context "cycle type" do
+      it "is truthy for scooter" do
+        expect(described_class.unknown_model?("Scooter")).to be_truthy
+        expect(described_class.unknown_model?("eScooter")).to be_truthy
+        expect(described_class.unknown_model?("e-Scooter")).to be_truthy
+        expect(described_class.unknown_model?("Scooter ?")).to be_truthy
+        expect(described_class.unknown_model?("e-Scooter ?")).to be_truthy
+      end
+      it "is truthy for bikes" do
+        expect(described_class.unknown_model?("Bike")).to be_truthy
+        expect(described_class.unknown_model?("bicycle")).to be_truthy
+        expect(described_class.unknown_model?("e-bicycle")).to be_truthy
+        expect(described_class.unknown_model?("e-MTB")).to be_truthy
+        expect(described_class.unknown_model?("e-cargobike")).to be_truthy
+        expect(described_class.unknown_model?("trike")).to be_truthy
+      end
+    end
+    context "matching mnfg_name" do
+      it "is truthy" do
+
+      end
+    end
+  end
 end
