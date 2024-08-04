@@ -55,7 +55,8 @@
               Org Model Audit ID
               %code.mr-2= @organization_model_audit&.id
               Model Audit ID
-              %code= @model_audit.id
+              %code
+                = link_to @model_audit&.id, admin_bikes_path(search_model_audit_id: @model_audit&.id)
 
 %h2.uncap.mt-4
   Attestations

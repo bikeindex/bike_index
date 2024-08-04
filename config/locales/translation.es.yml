@@ -844,6 +844,7 @@ es:
         tricycle:
         unicycle:
         wheelchair:
+        e_motorcycle:
       frame_material:
         aluminum:
         composite:

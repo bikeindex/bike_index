@@ -19,7 +19,7 @@ module Organized
       @model_attestations = @model_audit.model_attestations
       @model_attestation ||= ModelAttestation.new
       @organization_model_audit = @model_audit.organization_model_audits.where(organization_id: current_organization.id).first
-      bikes = @organization_model_audit&.bikes
+      bikes = @organization_model_audit&.bikes&.reorder(created_at: :desc)
       @bikes_count = @organization_model_audit&.bikes_count || 0
       @per_page = 10
       @bikes = bikes&.page(1)&.per(@per_page) || Bike.none
