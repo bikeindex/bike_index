@@ -127,7 +127,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       TheftAlert
     end
     @search_paid_admin = available_paid_admin.include?(params[:search_paid_admin]) ? params[:search_paid_admin] : nil
-    theft_alerts = theft_alerts.send(@search_paid_admin) if @search_paid_admin.present?
+    theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin.present?
 
     @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
