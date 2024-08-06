@@ -33,7 +33,7 @@ class Admin::FeedbacksController < Admin::BaseController
     feedbacks = Feedback
     if params[:search_kind].present? && permitted_kinds.include?(params[:search_kind])
       @search_kind = params[:search_kind]
-      feedbacks = feedbacks.send(@search_kind) unless @search_kind == "all"
+      feedbacks = feedbacks.public_send(@search_kind) unless @search_kind == "all"
     else
       @search_kind = "all"
     end

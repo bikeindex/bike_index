@@ -40,7 +40,7 @@ class Admin::ImpoundRecordsController < Admin::BaseController
       impound_records = if ImpoundRecord.statuses.include?(@search_status)
         impound_records.where(status: @search_status)
       else
-        impound_records.send(@search_status)
+        impound_records.public_send(@search_status)
       end
     end
     @with_claims = InputNormalizer.boolean(params[:search_with_claims])

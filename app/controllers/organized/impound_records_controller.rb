@@ -70,7 +70,7 @@ module Organized
         a_impound_records = if ImpoundRecord.statuses.include?(@search_status)
           impound_records.where(status: @search_status)
         else
-          impound_records.send(@search_status)
+          impound_records.public_send(@search_status)
         end
       end
 

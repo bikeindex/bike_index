@@ -71,7 +71,7 @@ module Organized
         a_impound_claims = if ImpoundClaim.statuses.include?(@search_status)
           impound_claims.where(status: @search_status)
         else
-          impound_claims.send(@search_status)
+          impound_claims.public_send(@search_status)
         end
       end
 
