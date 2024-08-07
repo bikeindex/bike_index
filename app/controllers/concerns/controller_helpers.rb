@@ -141,22 +141,25 @@ module ControllerHelpers
       target = session[:return_to] || cookies[:return_to] || params[:return_to]
       session[:return_to] = nil
       cookies[:return_to] = nil
+
       return false if invalid_return_to?(target)
-      case target.downcase
-      when "password_reset"
-        flash[:success] =
-          translation(:reset_your_password,
-            scope: [:controllers, :concerns, :controller_helpers, __method__])
-        render(action: :update_password) && (return true)
-      when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-        if URI.parse(target).relative? || target.include?('/oauth/')
-          redirect_to(target) && (return true)
-        end
-      when "https://facebook.com/bikeindex"
-        redirect_to(target) && (return true)
-      end
+      handle_target(target)
     elsif session[:discourse_redirect]
       redirect_to(discourse_authentication_url) && (return true)
+    end
+  end
+
+  def handle_target(target)
+    case target.downcase
+    when "password_reset"
+      flash[:success] =
+        translation(:reset_your_password,
+          scope: [:controllers, :concerns, :controller_helpers, __method__])
+      render(action: :update_password) && (return true)
+    when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
+      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?('/oauth/')
+    when "https://facebook.com/bikeindex"
+      redirect_to(target) && (return true)
     end
   end
 
