@@ -9,6 +9,27 @@
 version: 2
 
 jobs:
+  brakeman_scan:
+    docker:
+      - image: cimg/ruby:2.7.8-node
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: bundle install
+      - run:
+          name: Run Brakeman
+          command: bundle exec brakeman --exit-on-warn
+      - run:
+          name: Check Brakeman Report
+          command: |
+            echo "Checking Brakeman report for warnings..."
+            WARNINGS=$(grep -c "WARN" brakeman-output.tabs)
+            echo "Number of warnings found: $WARNINGS"
+      - store_artifacts:
+          path: brakeman-output.tabs
+          destination: brakeman
+
   build:
     working_directory: ~/bikeindex/bike_index
     parallelism: 2
@@ -319,6 +340,7 @@ workflows:
   commit:
     jobs:
       - build
+      - brakeman_scan
       - upload-coverage:
           requires:
             - build
