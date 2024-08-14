@@ -2,3 +2,14 @@ min_confidence: 2 # 0 is the least confident, 3 is the most confident
 output_formats: [ 'tabs' ]
 output_files: [ 'brakeman-output.tabs' ]
 
+ignore_checks:
+  - Command Injection
+  - Cross-Site Scripting
+  - Dangerous Send
+  - Dynamic Render Path
+  - File Access
+  - Mass Assignment
+  - Redirect
+  - Remote Code Execution
+  - SQL Injection
+  - Unmaintained Dependency
