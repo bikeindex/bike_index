@@ -19,7 +19,7 @@ jobs:
           command: bundle install
       - run:
           name: Run Brakeman
-          command: bundle exec brakeman --no-exit-on-warn
+          command: bundle exec brakeman -I
       - run:
           name: Check Brakeman Report
           command: |
