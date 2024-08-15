@@ -19,7 +19,7 @@ jobs:
           command: bundle install
       - run:
           name: Run Brakeman
-          command: bundle exec brakeman
+          command: bundle exec brakeman || true
       - run:
           name: Check Brakeman Report
           command: |
