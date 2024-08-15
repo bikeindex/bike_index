@@ -222,7 +222,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(bike.status).to eq "status_with_owner"
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
-          # Sidekiq::Testing.inline! do
+          Sidekiq::Testing.inline! do
             expect {
               post base_url, params: {
                 organization_id: current_organization.to_param,
@@ -231,9 +231,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
               expect(response).to redirect_to organization_parking_notifications_path(organization_id: current_organization.to_param)
               expect(flash[:success]).to be_present
             }.to change(ParkingNotification, :count).by(1)
-          # end
-          ProcessParkingNotificationWorker.drain
-          Sidekiq::Worker.drain_all # Process the backgrounded image upload
+          end
           expect(ActionMailer::Base.deliveries.count).to eq 1
 
           parking_notification = ParkingNotification.last
