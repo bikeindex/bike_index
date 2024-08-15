@@ -22,7 +22,7 @@ class UpdateModelAuditWorker < ApplicationWorker
   def self.delete_model_audit?(model_audit)
     return true if model_audit.blank? || find_model_audit_id(model_audit) != model_audit.id
     return false unless model_audit.delete_if_no_bikes?
-    return true if model_audit.counted_matching_bikes_count == 0
+    return true if model_audit.should_be_unknown_model? || model_audit.counted_matching_bikes_count == 0
     return false if model_audit.manufacturer&.motorized_only?
     ModelAudit.counted_matching_bikes(model_audit.matching_bikes).motorized.limit(1).none?
   end
@@ -59,6 +59,7 @@ class UpdateModelAuditWorker < ApplicationWorker
       fix_manufacturer!(model_audit) if model_audit.manufacturer_id == mnfg_other_id
       return delete_model_audit!(model_audit) if self.class.delete_model_audit?(model_audit)
 
+      # model_audit.should_be_unknown_model?
       update_matching_bikes!(model_audit)
 
       # Update the model_audit to set the certification_status, bikes_count and bust admin cache
@@ -110,8 +111,14 @@ class UpdateModelAuditWorker < ApplicationWorker
   end
 
   def delete_model_audit!(model_audit)
-    # update any non-counted bikes (e.g. likely_spam) and delete it
-    Bike.unscoped.where(model_audit_id: model_audit.id).update_all(model_audit_id: nil)
+    # Match any non-counted bikes (e.g. likely_spam)
+    matching_bikes = Bike.unscoped.where(model_audit_id: model_audit.id)
+    # Enqueue re-processing of the matching bikes if this should_be_unknown
+    if model_audit.should_be_unknown_model?
+      enqueue_delayed_processing_for_bike_ids(matching_bikes.pluck(:id))
+    end
+
+    matching_bikes.update_all(model_audit_id: nil)
     OrganizationModelAudit.where(model_audit_id: model_audit.id).destroy_all
     model_audit.destroy
   end
@@ -131,11 +138,8 @@ class UpdateModelAuditWorker < ApplicationWorker
     # Update all non_matching bikes (so they aren't accidentally processed in update_org_model_audit)
     non_matching_bike_ids = model_audit.bikes.pluck(:id) - matching_bikes.pluck(:id)
     Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
-    # enqueue for any non-matching bikes. Space out processing, since non-matches might match each other
-    # Process 500 - that should cover the matching audits, but avoid overwhelming the queue
-    non_matching_bike_ids.sample(501).each_with_index do |id, inx|
-      FindOrCreateModelAuditWorker.perform_in(inx * 15, id)
-    end
+    # enqueue for any non-matching bikes
+    enqueue_delayed_processing_for_bike_ids(non_matching_bike_ids)
   end
 
   def update_org_model_audit(model_audit, organization_id)
@@ -153,6 +157,14 @@ class UpdateModelAuditWorker < ApplicationWorker
     elsif organization_model_audit.present?
       organization_model_audit.update!(bikes_count: bikes_count,
         last_bike_created_at: bike_at)
+    end
+  end
+
+  def enqueue_delayed_processing_for_bike_ids(bike_ids)
+    # Space out processing, since bikes might match each other
+    # Process 500 - that should cover the matching audits, but avoid overwhelming the queue
+    bike_ids.sample(501).each_with_index do |id, inx|
+      FindOrCreateModelAuditWorker.perform_in(inx * 15 + 3, id)
     end
   end
 end

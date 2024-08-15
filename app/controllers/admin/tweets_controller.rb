@@ -95,7 +95,7 @@ class Admin::TweetsController < Admin::BaseController
     tweets = Tweet
     tweets = tweets.not_retweet unless InputNormalizer.boolean(params[:search_retweet])
     @search_kind = permitted_search_kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
-    tweets = tweets.send(@search_kind) unless @search_kind == "all"
+    tweets = tweets.public_send(@search_kind) unless @search_kind == "all"
 
     if params[:search_twitter_account_id].present?
       @twitter_account = TwitterAccount.friendly_find(params[:search_twitter_account_id])

@@ -51,7 +51,7 @@ module Organized
         a_graduated_notifications = graduated_notifications
       else
         @search_status = GraduatedNotification.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
-        a_graduated_notifications = graduated_notifications.send(@search_status)
+        a_graduated_notifications = graduated_notifications.public_send(@search_status)
       end
 
       # Doesn't make sense to include unprocessed if sorting by processed_at

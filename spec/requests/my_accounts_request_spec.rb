@@ -92,11 +92,23 @@ RSpec.describe MyAccountsController, type: :request do
             expect {
               get base_url
               expect(response).to be_ok
-              expect(assigns(:show_general_alert)).to be_truthy
+              expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template("show")
-            }.to change(AfterUserChangeWorker.jobs, :count).by 1
-            AfterUserChangeWorker.drain
-            expect(current_user.reload.alert_slugs).to eq([])
+            }.to change(AfterUserChangeWorker.jobs, :count).by 0
+          end
+          context "with phone_verification enabled" do
+            before { Flipper.enable(:phone_verification) }
+            it "renders with show_general_alert" do
+              Sidekiq::Worker.clear_all
+              expect {
+                get base_url
+                expect(response).to be_ok
+                expect(assigns(:show_general_alert)).to be_truthy
+                expect(response).to render_template("show")
+              }.to change(AfterUserChangeWorker.jobs, :count).by 1
+              AfterUserChangeWorker.drain
+              expect(current_user.reload.alert_slugs).to eq([])
+            end
           end
         end
       end
@@ -298,7 +310,33 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_phone.phone).to eq "15005550006"
         expect(user_phone.confirmed?).to be_falsey
         expect(user_phone.confirmation_code).to be_present
-        expect(user_phone.notifications.count).to eq 1
+        expect(user_phone.notifications.count).to eq 0
+      end
+      context "with phone_verification" do
+        before { Flipper.enable(:phone_verification) }
+        it "updates and adds the phone" do
+          current_user.reload
+          expect(current_user.phone).to be_blank
+          expect(current_user.user_phones.count).to eq 0
+          Sidekiq::Worker.clear_all
+          VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
+            Sidekiq::Testing.inline! {
+              put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
+            }
+          end
+          expect(flash[:success]).to be_present
+          current_user.reload
+          expect(current_user.phone).to eq "15005550006"
+          expect(current_user.user_phones.count).to eq 1
+          expect(current_user.phone_waiting_confirmation?).to be_truthy
+          expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
+
+          user_phone = current_user.user_phones.reorder(:created_at).last
+          expect(user_phone.phone).to eq "15005550006"
+          expect(user_phone.confirmed?).to be_falsey
+          expect(user_phone.confirmation_code).to be_present
+          expect(user_phone.notifications.count).to eq 1
+        end
       end
       context "without background" do
         it "still shows general alert" do

@@ -26,6 +26,7 @@ RSpec.describe UserPhonesController, type: :request do
     let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone) }
     let!(:ownership) { FactoryBot.create(:ownership, is_phone: true, owner_email: phone, bike: bike) }
     it "resends if reasonable and verifies" do
+      Flipper.enable(:phone_verification)
       expect(current_user).to be_present
       user_phone.update_column :updated_at, Time.current - 5.minutes
       user_phone.reload
@@ -75,6 +76,7 @@ RSpec.describe UserPhonesController, type: :request do
     end
 
     describe "confirm" do
+      before { Flipper.enable(:phone_verification) }
       it "confirms" do
         expect(current_user).to be_present
         expect(user_phone.confirmed?).to be_falsey
@@ -139,6 +141,7 @@ RSpec.describe UserPhonesController, type: :request do
     end
 
     describe "resend_confirmation" do
+      before { Flipper.enable(:phone_verification) }
       context "not reasonable to resend" do
         it "does not resend" do
           user_phone.reload

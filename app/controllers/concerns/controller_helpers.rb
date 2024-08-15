@@ -112,7 +112,8 @@ module ControllerHelpers
 
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank?
-    return @show_general_alert = false unless current_user.alert_slugs.any?
+    ignored_alerts = Flipper.enabled?(:phone_verification) ? [] : %w[phone_waiting_confirmation]
+    return @show_general_alert = false unless (current_user.alert_slugs - ignored_alerts).any?
 
     no_alerts = %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
     @show_general_alert = !no_alerts
@@ -140,20 +141,25 @@ module ControllerHelpers
       target = session[:return_to] || cookies[:return_to] || params[:return_to]
       session[:return_to] = nil
       cookies[:return_to] = nil
+
       return false if invalid_return_to?(target)
-      case target.downcase
-      when "password_reset"
-        flash[:success] =
-          translation(:reset_your_password,
-            scope: [:controllers, :concerns, :controller_helpers, __method__])
-        render(action: :update_password) && (return true)
-      when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-        redirect_to(target) && (return true)
-      when "https://facebook.com/bikeindex"
-        redirect_to(target) && (return true)
-      end
+      handle_target(target)
     elsif session[:discourse_redirect]
       redirect_to(discourse_authentication_url) && (return true)
+    end
+  end
+
+  def handle_target(target)
+    case target.downcase
+    when "password_reset"
+      flash[:success] =
+        translation(:reset_your_password,
+          scope: [:controllers, :concerns, :controller_helpers, __method__])
+      render(action: :update_password) && (return true)
+    when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
+      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?('/oauth/')
+    when "https://facebook.com/bikeindex"
+      redirect_to(target) && (return true)
     end
   end
 

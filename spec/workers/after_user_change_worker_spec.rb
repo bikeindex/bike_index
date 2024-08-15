@@ -18,7 +18,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
     it "adds the phone, in a streamlined way without calling multiple times" do
       user.reload
-      expect_any_instance_of(TwilioIntegration).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
+      expect_any_instance_of(TwilioIntegration).not_to(receive(:send_message))
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
         expect {
@@ -32,10 +32,33 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       expect(user_phone.confirmed?).to be_falsey
       expect(user_phone.confirmation_code).to be_present
       expect(user_phone.phone).to eq phone
-      expect(user_phone.notifications.count).to eq 1
-      expect(user_phone.notifications.last.twilio_sid).to eq "asd7c80123123sdddf"
+      expect(user_phone.notifications.count).to eq 0
       # And it doesn't add a mailchimp datum
       expect(MailchimpDatum.count).to eq 0
+    end
+    context "with phone_verification enabled" do
+      before { Flipper.enable(:phone_verification) }
+      it "adds the phone, in a streamlined way without calling multiple times" do
+        user.reload
+        expect_any_instance_of(TwilioIntegration).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+          expect {
+            instance.perform(user.id)
+            user.update(phone: phone)
+            user.update(phone: nil)
+          }.to change(UserPhone, :count).by 1
+        end
+        user_phone = UserPhone.last
+        expect(user_phone.user_id).to eq user.id
+        expect(user_phone.confirmed?).to be_falsey
+        expect(user_phone.confirmation_code).to be_present
+        expect(user_phone.phone).to eq phone
+        expect(user_phone.notifications.count).to eq 1
+        expect(user_phone.notifications.last.twilio_sid).to eq "asd7c80123123sdddf"
+        # And it doesn't add a mailchimp datum
+        expect(MailchimpDatum.count).to eq 0
+      end
     end
     context "existing user phone" do
       let(:user_phone) { FactoryBot.create(:user_phone, phone: phone) }

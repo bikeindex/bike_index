@@ -46,7 +46,7 @@
     .form-well-input
       -# if the user was just updated, they might not have the user_phone assigned
       -# in which case, show the phone number to reduce confusion
-      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : @user.phone
+      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : phone_display(@user.phone)
       = f.text_field :phone, value: phone_value, placeholder: t(".add_new_phone_number"), class: "form-control"
     - if @user.user_phones.any?
       .form-well-input-static-full-width.ml-auto
@@ -55,15 +55,17 @@
             %li.row
               .col-sm-8
                 = phone_display(user_phone.phone)
-                - if user_phone.confirmed?
-                  %small.less-strong= t(".verified")
-                - else
-                  %small.text-danger= t(".unconfirmed")
-              .col-sm-4.text-right
-                - if user_phone.resend_confirmation?
-                  = link_to t(".resend_confirmation"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "patch", action: "update", class: "small"
-                - else
-                  = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
+                - if Flipper.enabled?(:phone_verification)
+                  - if user_phone.confirmed?
+                    %small.less-strong= t(".verified")
+                  - else
+                    %small.text-danger= t(".unconfirmed")
+              - if Flipper.enabled?(:phone_verification)
+                .col-sm-4.text-right
+                  - if user_phone.resend_confirmation?
+                    = link_to t(".resend_confirmation"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "patch", action: "update", class: "small"
+                  - else
+                    = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
 
   .related-fields
     - address_org = @user.uro_organization_reg_address
