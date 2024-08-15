@@ -84,6 +84,7 @@ class OrganizationFeature < ApplicationRecord
   scope :recurring, -> { where(kind: %w[standard custom]) }
   scope :upfront, -> { where(kind: %w[standard_upfront custom_upfront]) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
+  scope :has_feature_slugs, -> { where.not(feature_slugs: []) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -121,6 +122,10 @@ class OrganizationFeature < ApplicationRecord
 
   def self.feature_slugs
     pluck(:feature_slugs).flatten.uniq
+  end
+
+  def has_feature_slugs?
+    feature_slugs.any?
   end
 
   def one_time?
