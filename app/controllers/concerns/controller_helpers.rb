@@ -157,7 +157,7 @@ module ControllerHelpers
           scope: [:controllers, :concerns, :controller_helpers, __method__])
       render(action: :update_password) && (return true)
     when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?('/oauth/')
+      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?("/oauth/")
     when "https://facebook.com/bikeindex"
       redirect_to(target) && (return true)
     end
