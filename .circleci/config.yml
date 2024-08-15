@@ -24,8 +24,6 @@ jobs:
           name: Check Brakeman Report
           command: |
             echo "Checking Brakeman report for warnings..."
-            WARNINGS=$(grep -c "WARN" brakeman-output.tabs)
-            echo "Number of warnings found: $WARNINGS"
       - store_artifacts:
           path: brakeman-output.tabs
           destination: brakeman
