@@ -151,7 +151,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'brakeman', require: false
+  gem "brakeman", require: false
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "foreman"
