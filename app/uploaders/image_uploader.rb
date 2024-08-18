@@ -1,7 +1,7 @@
 class ImageUploader < ApplicationUploader
   include CarrierWave::MiniMagick
 
-  def extension_whitelist
+  def extension_allowlist
     self.class.extensions
   end
 

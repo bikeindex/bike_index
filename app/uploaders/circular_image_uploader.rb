@@ -22,7 +22,7 @@ class CircularImageUploader < ApplicationUploader
     process resize_to_fill: [100, 100]
   end
 
-  def extension_whitelist
+  def extension_allowlist
     self.class.extensions
   end
 
