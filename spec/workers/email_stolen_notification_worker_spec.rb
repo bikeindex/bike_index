@@ -29,7 +29,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
     mail = ActionMailer::Base.deliveries.last
     expect(mail.subject).to eq("Stolen notification blocked!")
-    expect(mail.to).to eq(["bryan@bikeindex.org"])
+    expect(mail.to).to eq(["contact@bikeindex.org"])
   end
 
   it "sends customer an email" do
