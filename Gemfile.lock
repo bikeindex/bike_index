@@ -140,6 +140,7 @@ GEM
     bootstrap (4.0.0.alpha4)
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
+    brakeman (5.4.1)
     buftok (0.2.0)
     builder (3.2.4)
     bullet (7.0.1)
@@ -779,6 +780,7 @@ DEPENDENCIES
   bcrypt (~> 3.1.7)
   bootsnap
   bootstrap (= 4.0.0.alpha4)
+  brakeman
   bullet
   carrierwave (~> 2.2.0)
   carrierwave_backgrounder
