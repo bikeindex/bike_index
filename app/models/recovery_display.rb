@@ -16,6 +16,7 @@ class RecoveryDisplay < ActiveRecord::Base
   validates_presence_of :quote, :recovered_at
   mount_uploader :image, CircularImageUploader
   process_in_background :image, CarrierWaveProcessWorker
+  attr_writer :image_cache
   belongs_to :stolen_record
 
   default_scope { order("recovered_at desc") }

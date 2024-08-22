@@ -24,6 +24,7 @@ class PublicImage < ApplicationRecord
   }.freeze
 
   mount_uploader :image, ImageUploader # Not processed in background, because they are uploaded directly
+  attr_writer :image_cache
   belongs_to :imageable, polymorphic: true
 
   default_scope { where(is_private: false).order(:listing_order) }
