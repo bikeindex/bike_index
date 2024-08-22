@@ -284,6 +284,8 @@ jobs:
       - run:
           name: Save Code Climate Test Coverage
           command: |
+            echo "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+            [ -f "coverage/codeclimate.$CIRCLE_NODE_INDEX.json" ] && echo "FILE PRESENT"
             [ -f "coverage/codeclimate.$CIRCLE_NODE_INDEX.json" ] && ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
       - persist_to_workspace:
           root: coverage
