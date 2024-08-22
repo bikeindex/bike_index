@@ -288,6 +288,7 @@ jobs:
               ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
             else
               echo "Coverage file doesn't exist"
+              ls -lah coverage/
             fi
       - persist_to_workspace:
           root: coverage
@@ -323,7 +324,7 @@ jobs:
       - run:
           command: |
             echo $CIRCLE_NODE_TOTAL
-            if [ -f "codeclimate.0.json" ]; then
+            if [ -f "coverage/codeclimate.0.json" ]; then
               ./cc-test-reporter sum-coverage codeclimate.*.json
               ./cc-test-reporter upload-coverage --debug
             else
