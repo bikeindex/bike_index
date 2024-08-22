@@ -342,6 +342,9 @@ workflows:
       - upload-coverage:
           requires:
             - build
+          when:
+            and:
+              - equal: [CIRCLE_WORKFLOW_ID, CIRCLE_WORKFLOW_WORKSPACE_ID]
       - deploy_production:
           requires:
             - build
