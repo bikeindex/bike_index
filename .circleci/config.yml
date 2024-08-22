@@ -323,8 +323,12 @@ jobs:
       - run:
           command: |
             echo $CIRCLE_NODE_TOTAL
-            ./cc-test-reporter sum-coverage codeclimate.*.json
-            ./cc-test-reporter upload-coverage --debug
+            if [ -f "codeclimate.0.json" ]; then
+              ./cc-test-reporter sum-coverage codeclimate.*.json
+              ./cc-test-reporter upload-coverage --debug
+            else
+              echo "Coverage file doesn't exist"
+            fi
 
   deploy_production:
     machine:
