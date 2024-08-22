@@ -22,7 +22,8 @@
 # b_param stands for Bike param
 class BParam < ApplicationRecord
   mount_uploader :image, ImageUploader
-  store_in_background :image, CarrierWaveStoreWorker
+  process_in_background :image, CarrierWaveStoreWorker
+  attr_writer :image_cache
 
   # serialize :params
   serialize :bike_errors
