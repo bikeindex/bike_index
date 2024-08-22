@@ -284,7 +284,7 @@ jobs:
       - run:
           name: Save Code Climate Test Coverage
           command: |
-            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+            [ -f "coverage/codeclimate.$CIRCLE_NODE_INDEX.json" ] && ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
       - persist_to_workspace:
           root: coverage
           paths:
@@ -342,9 +342,6 @@ workflows:
       - upload-coverage:
           requires:
             - build
-          when:
-            and:
-              - equal: [CIRCLE_WORKFLOW_ID, CIRCLE_WORKFLOW_WORKSPACE_ID]
       - deploy_production:
           requires:
             - build
