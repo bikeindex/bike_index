@@ -17,6 +17,15 @@ RSpec.describe RegistrationsController, type: :request do
     expect(response).to render_template(:embed)
   end
 
+  def page_form_inputs(response_body)
+    response_body.scan(/<input.*>/i).map do |input_str|
+      {
+        str: input_str,
+        name: input_str[/name="[^"]*/].gsub(/name=\"(b_param\[)?/i, "").tr("]", "")
+      }
+    end
+  end
+
   describe "new" do
     include_context :request_spec_logged_in_as_user
 
@@ -73,6 +82,7 @@ RSpec.describe RegistrationsController, type: :request do
       context "with user" do
         let!(:organization_child) { FactoryBot.create(:organization, parent_organization_id: organization.id) }
         include_context :request_spec_logged_in_as_user
+        let(:basic_field_names) { %w[owner_email manufacturer_id status commit] }
 
         it "renders, testing variables" do
           expect(organization.save).to eq(true)
@@ -86,6 +96,7 @@ RSpec.describe RegistrationsController, type: :request do
           owner_email_input = body[/value=.*id..b_param_owner_email*/i]
           email_value = owner_email_input.gsub(/value=./, "").match(/\A[^"]*/)[0]
           expect(email_value).to eq current_user.email
+          expect(page_form_inputs(body).map { |i| i[:name] }).to match_array(basic_field_names)
 
           expect(assigns(:simple_header)).to be_falsey
           expect(assigns(:stolen)).to be_truthy
