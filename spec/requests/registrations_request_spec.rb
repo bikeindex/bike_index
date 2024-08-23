@@ -18,10 +18,11 @@ RSpec.describe RegistrationsController, type: :request do
   end
 
   def page_form_inputs(response_body)
-    response_body.scan(/<input.*>/i).map do |input_str|
+    (response_body.scan(/<input.*>/i) + response_body.scan(/<select.*>/i)).map do |input_str|
       {
         str: input_str,
-        name: input_str[/name="[^"]*/].gsub(/name=\"(b_param\[)?/i, "").tr("]", "")
+        value: input_str[/value="[^"]*/]&.gsub(/value=\"/, ""),
+        name: input_str[/name="[^"]*/]&.gsub(/name=\"(b_param\[)?/i, "").tr("]", "")
       }
     end
   end
@@ -39,6 +40,10 @@ RSpec.describe RegistrationsController, type: :request do
   end
 
   describe "embed" do
+    let(:basic_field_names) do
+      %w[commit creation_organization_id manufacturer_id owner_email primary_frame_color_id status]
+    end
+
     context "no organization" do
       context "no user" do
         it "renders" do
@@ -64,7 +69,9 @@ RSpec.describe RegistrationsController, type: :request do
     context "with organization" do
       context "no user" do
         it "renders" do
-          get "#{base_url}/embed", params: {organization_id: organization.to_param, simple_header: true, select_child_organization: true}
+          get "#{base_url}/embed", params: {
+            organization_id: organization.to_param, simple_header: true, select_child_organization: true
+          }
           expect_it_to_render_embed_correctly
           expect(assigns(:stolen)).to be_falsey
           expect(assigns(:organization)).to eq organization
@@ -73,30 +80,32 @@ RSpec.describe RegistrationsController, type: :request do
           expect(assigns(:simple_header)).to be_truthy
           # Since we're creating these in line, actually test the rendered body
           body = response.body
-          # creation_organization
-          creator_organization_input = body[/value=.*id..b_param_creation_organization_id/i]
-          creator_organization_value = creator_organization_input.gsub(/value=./, "").match(/\A[^"]*/)[0]
-          expect(creator_organization_value).to eq organization.id.to_s
+
+          inputs = page_form_inputs(body)
+          expect(inputs.find { |i| i[:name] == "creation_organization_id" }[:value]).to eq organization.id.to_s
+          expect(inputs.map { |i| i[:name] }.sort).to eq basic_field_names
+          expect(body).to match(/register your bike/i)
         end
       end
       context "with user" do
         let!(:organization_child) { FactoryBot.create(:organization, parent_organization_id: organization.id) }
         include_context :request_spec_logged_in_as_user
-        let(:basic_field_names) { %w[owner_email manufacturer_id status commit] }
 
         it "renders, testing variables" do
           expect(organization.save).to eq(true)
 
-          get "#{base_url}/embed", params: {organization_id: organization.id, status: "status_stolen", select_child_organization: true}
+          get "#{base_url}/embed", params: {
+            organization_id: organization.id, status: "status_stolen", select_child_organization: true
+          }
 
           expect_it_to_render_embed_correctly
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
-          owner_email_input = body[/value=.*id..b_param_owner_email*/i]
-          email_value = owner_email_input.gsub(/value=./, "").match(/\A[^"]*/)[0]
-          expect(email_value).to eq current_user.email
-          expect(page_form_inputs(body).map { |i| i[:name] }).to match_array(basic_field_names)
+          inputs = page_form_inputs(body)
+          expect(inputs.find { |i| i[:name] == "owner_email" }[:value]).to eq current_user.email
+          expect(inputs.map { |i| i[:name] }.sort).to match_array(basic_field_names)
+          expect(body).to match(/register your bike/i)
 
           expect(assigns(:simple_header)).to be_falsey
           expect(assigns(:stolen)).to be_truthy

@@ -37,7 +37,7 @@ class RegistrationsController < ApplicationController
   private
 
   def simple_header
-    @simple_header ||= params[:simple_header]
+    @simple_header ||= InputNormalizer.boolean(params[:simple_header])
   end
 
   def find_selectable_child_organizations
