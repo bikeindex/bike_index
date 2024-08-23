@@ -125,12 +125,17 @@ nl:
       model_invalid: 'Validatie mislukt: %{errors}'
       required: moet bestaan
       in: moet in %{count} zijn
-      extension_white_list_error: 'U mag geen %{extension} bestanden uploaden, toegestane
+      extension_allowlist_error: 'U mag geen %{extension} bestanden uploaden, toegestane
         typen: %{allowed_types}'
-      extension_black_list_error: 'U mag geen %{extension} bestanden uploaden, verboden
+      extension_denylist_error: 'U mag geen %{extension} bestanden uploaden, verboden
         typen: %{prohibited_types}'
-      mime_types_processing_error: 'Kan bestand met MIME::Types niet verwerken, misschien
-        geen geldig inhoudstype? Oorspronkelijke fout: %{e}'
+      content_type_allowlist_error: 'Je mag geen %{content_type}-bestanden uploaden,
+        toegestane typen: %{allowed_types}'
+      content_type_denylist_error: U mag geen %{content_type}-bestanden uploaden
+      vips_processing_error: 'Kan niet worden gemanipuleerd met vips, misschien is
+        het geen afbeelding? Oorspronkelijke fout: %{e}'
+      min_size_error: Bestandsgrootte moet groter zijn dan %{min_size}
+      max_size_error: Bestandsgrootte moet kleiner zijn dan %{max_size}
     template:
       body: 'Er zijn problemen met de volgende velden:'
       header:
