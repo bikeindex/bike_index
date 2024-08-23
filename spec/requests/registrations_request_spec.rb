@@ -1,55 +1,62 @@
 require "rails_helper"
 
-RSpec.describe RegistrationsController, type: :controller do
-  let(:user) { FactoryBot.create(:user_confirmed) }
+RSpec.describe RegistrationsController, type: :request do
+  let(:current_user) { FactoryBot.create(:user_confirmed) }
   let(:auto_user) { FactoryBot.create(:organization_auto_user) }
   let(:organization) { auto_user.organizations.first }
-  let(:renders_embed_without_xframe) do
+  let(:base_url) { "/registrations" }
+
+  def expect_render_without_xframe
     expect(response.status).to eq(200)
     expect(response.headers["X-Frame-Options"]).to be_blank
     expect(flash).to_not be_present
   end
+
+  def expect_it_to_render_embed_correctly
+    expect_render_without_xframe
+    expect(response).to render_template(:embed)
+  end
+
   describe "new" do
+    include_context :request_spec_logged_in_as_user
+
     it "renders with the embeded form, no xframing" do
-      set_current_user(user)
-      get :new, params: {organization_id: organization.id, stolen: true}
+      get "#{base_url}/new", params: {organization_id: organization.id, stolen: true}
       expect(response).to render_template(:new)
       expect(response.status).to eq(200)
       expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       expect(flash).to_not be_present
     end
   end
+
   describe "embed" do
-    let(:expect_it_to_render_correctly) do
-      renders_embed_without_xframe
-      expect(response).to render_template(:embed)
-    end
     context "no organization" do
       context "no user" do
         it "renders" do
-          get :embed, params: {stolen: true}
-          expect_it_to_render_correctly
+          get "#{base_url}/embed", params: {stolen: true}
+          expect_it_to_render_embed_correctly
           expect(assigns(:stolen)).to be_truthy
           expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to be_nil
         end
       end
       context "with user" do
+        include_context :request_spec_logged_in_as_user
+
         it "renders does not set creator" do
-          set_current_user(user)
-          get :embed
-          expect_it_to_render_correctly
+          get "#{base_url}/embed"
+          expect_it_to_render_embed_correctly
           expect(assigns(:stolen)).to be_falsey
           expect(assigns(:creator)).to be_nil
-          expect(assigns(:owner_email)).to eq user.email
+          expect(assigns(:owner_email)).to eq current_user.email
         end
       end
     end
     context "with organization" do
       context "no user" do
         it "renders" do
-          get :embed, params: {organization_id: organization.to_param, simple_header: true, select_child_organization: true}
-          expect_it_to_render_correctly
+          get "#{base_url}/embed", params: {organization_id: organization.to_param, simple_header: true, select_child_organization: true}
+          expect_it_to_render_embed_correctly
           expect(assigns(:stolen)).to be_falsey
           expect(assigns(:organization)).to eq organization
           expect(assigns(:selectable_child_organizations)).to eq []
@@ -65,19 +72,20 @@ RSpec.describe RegistrationsController, type: :controller do
       end
       context "with user" do
         let!(:organization_child) { FactoryBot.create(:organization, parent_organization_id: organization.id) }
+        include_context :request_spec_logged_in_as_user
+
         it "renders, testing variables" do
-          set_current_user(user)
           expect(organization.save).to eq(true)
 
-          get :embed, params: {organization_id: organization.id, status: "status_stolen", select_child_organization: true}
+          get "#{base_url}/embed", params: {organization_id: organization.id, status: "status_stolen", select_child_organization: true}
 
-          expect_it_to_render_correctly
+          expect_it_to_render_embed_correctly
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
           owner_email_input = body[/value=.*id..b_param_owner_email*/i]
           email_value = owner_email_input.gsub(/value=./, "").match(/\A[^"]*/)[0]
-          expect(email_value).to eq user.email
+          expect(email_value).to eq current_user.email
 
           expect(assigns(:simple_header)).to be_falsey
           expect(assigns(:stolen)).to be_truthy
@@ -85,7 +93,7 @@ RSpec.describe RegistrationsController, type: :controller do
           expect(assigns(:selectable_child_organizations)).to eq([organization_child])
           expect(assigns(:b_param).creation_organization_id).to be_nil
           expect(assigns(:creator)).to be_nil
-          expect(assigns(:owner_email)).to eq user.email
+          expect(assigns(:owner_email)).to eq current_user.email
         end
       end
     end
@@ -106,9 +114,9 @@ RSpec.describe RegistrationsController, type: :controller do
             creation_organization_id: 9292
           }
           expect {
-            post :create, params: {simple_header: true, b_param: attrs}
+            post base_url, params: {simple_header: true, b_param: attrs}
           }.to change(BParam, :count).by 0
-          renders_embed_without_xframe
+          expect_render_without_xframe
           expect(response).to render_template(:new) # Because it redirects since unsuccessful
           expect(assigns(:simple_header)).to be_truthy
           b_param = assigns(:b_param)
@@ -121,15 +129,12 @@ RSpec.describe RegistrationsController, type: :controller do
       end
     end
     context "valid creation" do
-      let(:expect_it_to_render_correctly) do
-        renders_embed_without_xframe
-        expect(response).to render_template(:create)
-      end
       context "nothing except email set - unverified authenticity token" do
         include_context :test_csrf_token
         it "creates a new bparam and renders" do
-          post :create, params: {b_param: {owner_email: "something@stuff.com"}, simple_header: true}
-          expect_it_to_render_correctly
+          post base_url, params: {b_param: {owner_email: "something@stuff.com"}, simple_header: true}
+          expect_render_without_xframe
+          expect(response).to render_template(:create)
           b_param = BParam.last
           expect(b_param.owner_email).to eq "something@stuff.com"
           expect(b_param.origin).to eq "embed_partial"
@@ -148,8 +153,9 @@ RSpec.describe RegistrationsController, type: :controller do
             owner_email: "ks78xxxxxx@stuff.com",
             creation_organization_id: 21
           }
-          post :create, params: {b_param: attrs}
-          expect_it_to_render_correctly
+          post base_url, params: {b_param: attrs}
+          expect_render_without_xframe
+          expect(response).to render_template(:create)
           b_param = BParam.last
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
