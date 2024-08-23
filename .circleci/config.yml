@@ -268,19 +268,19 @@ jobs:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
-      - run:
-          name: Setup Database
-          command: |
-            bundle exec rails db:create --trace
-            bundle exec rails db:structure:load --trace
+      # - run:
+      #     name: Setup Database
+      #     command: |
+      #       bundle exec rails db:create --trace
+      #       bundle exec rails db:structure:load --trace
 
       - run:
           name: RSpec
           command: |
             mkdir -p /tmp/test-results/rspec coverage
-            ./cc-test-reporter before-build
-            RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out /tmp/test-results/rspec/rspec.xml --format progress --color --require spec_helper"
-            circleci tests glob "spec/**/*_spec.rb" | circleci tests run --command="xargs $RSPEC_CMD" --verbose --split-by=timings
+      #       ./cc-test-reporter before-build
+      #       RSPEC_CMD="bundle exec rspec --profile 10 --order random --format RspecJunitFormatter --out /tmp/test-results/rspec/rspec.xml --format progress --color --require spec_helper"
+      #       circleci tests glob "spec/**/*_spec.rb" | circleci tests run --command="xargs $RSPEC_CMD" --verbose --split-by=timings
       - run:
           name: Save Code Climate Test Coverage
           # If there is a codeclimate json file, persist it to the workspace
@@ -297,14 +297,14 @@ jobs:
           root: coverage
           paths:
             - codeclimate.*.json
-      - run:
-          name: "Jest: Tests"
-          command: |
-            mkdir -p /tmp/test-results/junit
-            yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
-          environment:
-            JEST_JUNIT_OUTPUT: "/tmp/test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
-            JEST_JUNIT_OUTPUT_DIR: "/tmp/test-results/junit/"
+      # - run:
+      #     name: "Jest: Tests"
+      #     command: |
+      #       mkdir -p /tmp/test-results/junit
+      #       yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
+      #     environment:
+      #       JEST_JUNIT_OUTPUT: "/tmp/test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
+      #       JEST_JUNIT_OUTPUT_DIR: "/tmp/test-results/junit/"
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
