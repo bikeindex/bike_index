@@ -76,15 +76,6 @@
                     %label.checkbox-inline
                       = check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist?
                       Pedal assist
-            .form-group.row.hidden-other#propulsionTypeFields
-              = f.label :propulsion_type, "Motor type", class: "form-well-label"
-              .form-well-input
-                %label.checkbox-inline.mr-2
-                  = check_box_tag :propulsion_type, "pedal-assist"
-                  Pedal assist
-                %label.checkbox-inline.mr-2
-                  = check_box_tag :propulsion_type, "throttle"
-                  Throttle
 
           .related-fields
             .form-group.row

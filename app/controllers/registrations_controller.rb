@@ -21,7 +21,7 @@ class RegistrationsController < ApplicationController
       @b_param = BParam.new(params: {bike: bike_params.as_json})
     end
     @stolen = @b_param.status_stolen?
-    @include_vehicle_select = InputNormalizer.boolean(params[:include_vehicle_select])
+    @vehicle_select = InputNormalizer.boolean(params[:vehicle_select])
   end
 
   def create
@@ -39,7 +39,6 @@ class RegistrationsController < ApplicationController
 
   def simple_header
     @simple_header ||= InputNormalizer.boolean(params[:simple_header])
-    @simple_header_text = params[:simple_header_text].presence
   end
 
   def find_selectable_child_organizations

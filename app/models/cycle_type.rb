@@ -87,6 +87,16 @@ class CycleType
     (NOT_CYCLE_TYPE + %i[trail-behind trailer unicycle]).include?(slug&.to_sym)
   end
 
+  def self.select_options(traditional_bike: false)
+    slugs.map do |slug|
+      if slug == "bike" && traditional_bike
+        [slug_translation('traditional_bike'), slug]
+      else
+        [slug_translation(slug), slug]
+      end
+    end
+  end
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]

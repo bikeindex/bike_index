@@ -690,6 +690,7 @@ en:
     enums:
       cycle_type:
         bike: Bike
+        traditional_bike: Traditional Bike (two wheels, one seat, no motor)
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike (rear storage)
         cargo_trike: Cargo Tricycle (front storage)
@@ -3848,6 +3849,7 @@ en:
       protect_your_bike_today: Protect your bike today
       register_on_bike_index: Register on Bike Index.
       register_your_bike: Register your bike
+      register_your_vehicle: Register your vehicle
     revised_messages:
       error: error
       please_fix_the_following: Please fix the following %{errors}
@@ -4979,14 +4981,16 @@ en:
         back
       youre_not_done: You're not done!
     embed:
-      bike_manufacturer: bike manufacturer
+      bike_manufacturer: Bike manufacturer
+      vehicle_manufacturer: Vehicle manufacturer
       choose_specific_organization_optional: Choose Specific Organization (optional)
       owner_email: "%{owner} email"
-      primary_frame_color: primary frame color
+      primary_frame_color: Primary frame color
       register: Register
       select_other_if_manufacturer_doesnt_show: Select 'Other' if manufacturer doesn't
         show up when entered
       this_bike_is_either_missing_or_stolen: This bike is either missing or stolen
+      this_vehicle_is_either_missing_or_stolen: This vehicle is either missing or stolen
       your: your
   sessions:
     magic_link:

@@ -122,6 +122,7 @@ class BikeIndex.BikesNew extends BikeIndex
 
   # Set motorized if it should be motorized.
   # Only show propulsion type options if there can be options
+  # NOTE: this logic is duplicated in embed_script.js.coffee
   updatePropulsionAndCycleType: ->
     cycleTypeValue = $('#bike_cycle_type').val()
     if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)

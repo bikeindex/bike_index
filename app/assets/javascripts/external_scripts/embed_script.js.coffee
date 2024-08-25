@@ -193,6 +193,31 @@ updateSubmitButtonDisabled = (is_disabled) ->
   else
     $(".submit-registration .please-wait-text").slideUp("fast")
 
+updatePropulsionAndCycleType = ->
+  cycleTypeValue = $('#b_param_cycle_type').val()
+  if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)
+    $('#propulsionTypeFields').collapse('hide')
+    $('#propulsion_type_motorized').prop('checked', true)
+    $('#propulsion_type_motorized').attr('disabled', true)
+    $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+  else if window.cycleTypesNeverMotorized.includes(cycleTypeValue)
+    $('#propulsion_type_motorized').prop('checked', false)
+    $('#propulsion_type_motorized').attr('disabled', true)
+    $('#propulsionTypeFields').collapse('hide')
+    $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+  else
+    $('#motorizedWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
+    $('#propulsion_type_motorized').attr('disabled', false)
+    if $('#propulsion_type_motorized').prop('checked')
+      if window.cycleTypesPedals.includes(cycleTypeValue)
+        $('#propulsionTypeFields').collapse('show')
+      else
+        $('#propulsionTypeFields').collapse('hide')
+    else
+      $('#propulsionTypeFields').collapse('hide')
+
+      $('#propulsion_type_throttle').prop('checked', false)
+      $('#propulsion_type_pedal_assist').prop('checked', false)
 
 $(document).ready ->
   window.root_url = $('#root_url').attr('data-url')
@@ -249,6 +274,12 @@ $(document).ready ->
 
   if $("#new-unregistered-parking-notification").length
     initializeUnregisteredParkingNotification()
+
+  if $("#motorizedWrapper").length
+    $('#b_param_cycle_type').change (e) =>
+      updatePropulsionAndCycleType()
+    $('#propulsion_type_motorized').change (e) =>
+      updatePropulsionAndCycleType()
 
   if $("#us_id_data").length
     initializeStateHiding()
