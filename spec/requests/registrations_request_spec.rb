@@ -78,6 +78,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(assigns(:selectable_child_organizations)).to eq []
           expect(assigns(:creator)).to be_nil
           expect(assigns(:simple_header)).to be_truthy
+          expect(assigns(:include_vehicle_select)).to be_falsey
           # Since we're creating these in line, actually test the rendered body
           body = response.body
 
@@ -114,6 +115,30 @@ RSpec.describe RegistrationsController, type: :request do
           expect(assigns(:b_param).creation_organization_id).to be_nil
           expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to eq current_user.email
+          expect(assigns(:include_vehicle_select)).to be_falsey
+        end
+      end
+      context "with defined simple_header_text and vehicle_type" do
+        it "renders" do
+          get "#{base_url}/embed", params: {
+            organization_id: organization.to_param,
+            simple_header: true,
+            simple_header_text: "Register your vehicle",
+            include_vehicle_select: true
+          }
+          expect_it_to_render_embed_correctly
+          expect(assigns(:stolen)).to be_falsey
+          expect(assigns(:organization)).to eq organization
+          expect(assigns(:selectable_child_organizations)).to eq []
+          expect(assigns(:creator)).to be_nil
+          expect(assigns(:simple_header)).to be_truthy
+          expect(assigns(:include_vehicle_select)).to be_truthy
+          # Since we're creating these in line, actually test the rendered body
+          body = response.body
+          inputs = page_form_inputs(body)
+          expect(inputs.find { |i| i[:name] == "creation_organization_id" }[:value]).to eq organization.id.to_s
+          expect(inputs.map { |i| i[:name] }.sort).to eq basic_field_names
+          expect(body).to match(/register your vehicle/i)
         end
       end
     end

@@ -17,7 +17,7 @@
           = image_tag 'revised/logo.svg', class: 'reg-header-logo'
       - elsif @simple_header
         %header
-          %h3= t(".register_your_bike")
+          %h3= @simple_header_text || t(".register_your_bike")
       - else
         %header.reg-header
           = image_tag 'revised/logo.svg', class: 'reg-header-logo'
