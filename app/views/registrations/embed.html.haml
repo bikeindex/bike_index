@@ -13,26 +13,10 @@
       = t(".select_other_if_manufacturer_doesnt_show")
 
   - if @vehicle_select
-    :javascript
-      window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
-      window.cycleTypesAlwaysMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
-      window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
-      window.cycleTypesNot = #{CycleType::NOT_CYCLE_TYPE.to_json};
     .form-group.fancy-select.unfancy.short-fancy-select
       - @b_param.cycle_type ||= 'bike'
       = f.select(:cycle_type, CycleType.select_options(traditional_bike: true), {prompt: false}, {required: true, class: 'form-control'})
-      %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
-        = check_box_tag :propulsion_type_motorized, true
-        %strong ⚡️
-        = t(".electric")
-        (motorized)
-      #propulsionTypeFields.collapse.pl-1
-        %label.checkbox-inline.mr-2
-          = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
-          Throttle
-        %label.checkbox-inline
-          = check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist?
-          Pedal assist
+
   .form-group.fancy-select.unfancy.short-fancy-select
     = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: t(".primary_frame_color"), class: "form-control")
 

@@ -50,6 +50,7 @@ class RegistrationsController < ApplicationController
     params.require(:b_param).permit(:manufacturer_id,
       :owner_email,
       :creation_organization_id,
+      :cycle_type,
       :primary_frame_color_id,
       :secondary_frame_color_id,
       :status,

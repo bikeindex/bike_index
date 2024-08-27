@@ -119,7 +119,7 @@ RSpec.describe RegistrationsController, type: :request do
         end
       end
       context "with vehicle_type" do
-        # let(:vehicle_field_names) { [] }
+        let(:vehicle_field_names) { (basic_field_names + ['cycle_type']).sort }
         it "renders" do
           get "#{base_url}/embed", params: {
             organization_id: organization.to_param,
@@ -137,7 +137,7 @@ RSpec.describe RegistrationsController, type: :request do
           body = response.body
           inputs = page_form_inputs(body)
           expect(inputs.find { |i| i[:name] == "creation_organization_id" }[:value]).to eq organization.id.to_s
-          expect(inputs.map { |i| i[:name] }.sort).to eq basic_field_names
+          expect(inputs.map { |i| i[:name] }.sort).to eq vehicle_field_names
           expect(body).to match(/register your vehicle/i)
         end
       end
@@ -194,6 +194,7 @@ RSpec.describe RegistrationsController, type: :request do
             manufacturer_id: manufacturer.id,
             primary_frame_color_id: color.id,
             secondary_frame_color_id: color.id,
+            cycle_type: 'cargo-rear',
             tertiary_frame_color_id: 222,
             owner_email: "ks78xxxxxx@stuff.com",
             creation_organization_id: 21

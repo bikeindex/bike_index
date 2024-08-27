@@ -176,16 +176,6 @@ class BParam < ApplicationRecord
     bike["cycle_type"]
   end
 
-  # used by partial registration
-  def propulsion_type_throttle?
-    bike["propulsion_type_slug"] == "throttle"
-  end
-
-  # used by partial registration
-  def propulsion_type_pedal_assist?
-    bike["propulsion_type_slug"] == "pedal-assist"
-  end
-
   def with_bike?
     created_bike_id.present?
   end
