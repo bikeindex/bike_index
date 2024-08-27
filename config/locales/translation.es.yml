@@ -849,6 +849,7 @@ es:
         unicycle:
         wheelchair:
         e_motorcycle:
+        traditional_bike:
       frame_material:
         aluminum:
         composite:
@@ -3255,6 +3256,7 @@ es:
       protect_your_bike_today:
       register_on_bike_index:
       register_your_bike:
+      register_your_vehicle:
     revised_messages:
       error:
       please_fix_the_following:
@@ -4135,6 +4137,8 @@ es:
       select_other_if_manufacturer_doesnt_show:
       this_bike_is_either_missing_or_stolen:
       your:
+      this_vehicle_is_either_missing_or_stolen:
+      vehicle_manufacturer:
   sessions:
     magic_link:
       enter_email_address:

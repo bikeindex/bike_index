@@ -166,6 +166,16 @@ class BParam < ApplicationRecord
     params["bike"]["status"] = val
   end
 
+  # Used by partial registration
+  def cycle_type=(val)
+    params["bike"]["cycle_type"] = val
+  end
+
+  # Used by partial registration
+  def cycle_type
+    bike["cycle_type"]
+  end
+
   def with_bike?
     created_bike_id.present?
   end
