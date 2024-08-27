@@ -860,6 +860,7 @@ nb:
         unicycle: Enhjuling
         wheelchair: Rullestol
         e_motorcycle: e-motorsykkel (eller e-Dirtbike)
+        traditional_bike: Tradisjonell sykkel (to hjul, ett sete, ingen motor)
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt
@@ -4233,6 +4234,7 @@ nb:
       protect_your_bike_today: Beskytt sykkelen din i dag
       register_on_bike_index: Registrer deg på Bike Index.
       register_your_bike: Registrer sykkelen din
+      register_your_vehicle: Registrer kjøretøyet ditt
     revised_messages:
       error: feil
       please_fix_the_following: Vennligst fiks følgende %{errors}
@@ -5284,6 +5286,9 @@ nb:
       this_bike_is_either_missing_or_stolen: Denne sykkelen er enten savnet eller
         stjålet
       your: din
+      this_vehicle_is_either_missing_or_stolen: Dette kjøretøyet er enten savnet eller
+        stjålet
+      vehicle_manufacturer: Kjøretøyprodusent
   sessions:
     magic_link:
       enter_email_address: Skriv inn e-postadressen din, vi sender deg en e-post med

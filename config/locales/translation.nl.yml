@@ -859,6 +859,7 @@ nl:
         non_e_scooter: Scooter (niet elektrisch)
         non_e_skateboard: Skateboard (niet elektrisch)
         e_motorcycle: e-motorfiets (of e-dirtbike)
+        traditional_bike: Traditionele fiets (twee wielen, één zadel, geen motor)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
@@ -4027,6 +4028,7 @@ nl:
       protect_your_bike_today: Bescherm uw fiets vandaag
       register_on_bike_index: Registreer je op Bike Index.
       register_your_bike: Registreer uw fiets
+      register_your_vehicle: Registreer uw voertuig
     revised_messages:
       error: Fout
       please_fix_the_following: Corrigeer het volgende %{errors}
@@ -5292,6 +5294,8 @@ nl:
         niet verschijnt wanneer deze wordt ingevoerd
       this_bike_is_either_missing_or_stolen: Deze fiets ontbreekt of is gestolen
       your: jouw
+      this_vehicle_is_either_missing_or_stolen: Dit voertuig is vermist of gestolen
+      vehicle_manufacturer: Voertuigfabrikant
   organizations:
     embed:
       add_a_color: Voeg een kleur toe
