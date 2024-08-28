@@ -49,8 +49,8 @@ RSpec.describe "custom_expectations spec" do
   end
 
   describe "expect_attrs_to_match_hash" do
-    let(:obj) { Rating.new(timezone: "", submitted_url: "https://example.com") }
-    let(:hash) { {timezone: "America/party", submitted_url: "https://example.com"} }
+    let(:obj) { User.new(name: "cool name", email: "example@bikeindex.org") }
+    let(:hash) { {name: "cool name", email: "example@bikeindex.org"} }
 
     it "matches" do
       expect_attrs_to_match_hash(obj, hash)
@@ -60,37 +60,27 @@ RSpec.describe "custom_expectations spec" do
     end
 
     context "match_timezone" do
-      let(:obj) { Rating.new(submitted_url: "http://example.com", learned_something: true, timezone: nil) }
-      let(:hash) { {submitted_url: "http://example.com", learned_something: "true", timezone: "Europe/Kyiv"} }
-      it "doesn't match if timezone is incorrect" do
-        expect(obj.timezone).to_not eq hash[:timezone]
-        # Timezone is ignored! This is the desired behavior, because timezone is submitted with requests and used to set the time
+      let(:hash) { {name: "cool name", email: "example@bikeindex.org", timezone: "Europe/Kyiv"} }
+      it "ignores timezone" do
         expect_attrs_to_match_hash(obj, hash)
-        # HOWEVER - sometimes we want to match timezone
-        expect {
-          expect_attrs_to_match_hash(obj, hash, match_timezone: true)
-        }.to raise_error(/timezone/)
-        # But if timezone is set, it does match
-        obj.timezone = "Europe/Kyiv"
-        expect_attrs_to_match_hash(obj, hash, match_timezone: true)
       end
     end
 
     context "boolean" do
-      let(:boolean_hash) { hash.merge(learned_something: "false") }
+      let(:boolean_hash) { hash.merge(time_single_format: "false") }
       it "uses params normalizer" do
-        expect(obj.learned_something).to be_falsey
+        expect(obj.time_single_format).to be_falsey
         expect_attrs_to_match_hash(obj, boolean_hash)
-        expect_attrs_to_match_hash(obj, boolean_hash.merge(learned_something: nil))
-        expect_attrs_to_match_hash(obj, boolean_hash.merge(learned_something: "0"))
+        expect_attrs_to_match_hash(obj, boolean_hash.merge(time_single_format: nil))
+        expect_attrs_to_match_hash(obj, boolean_hash.merge(time_single_format: "0"))
         expect_attrs_to_match_hash(obj, boolean_hash, match_time_within: 1)
       end
       context "truthy boolean" do
-        let(:boolean_hash) { hash.merge(learned_something: "true") }
+        let(:boolean_hash) { hash.merge(time_single_format: "true") }
         it "uses params normalizer" do
-          obj.learned_something = true
+          obj.time_single_format = true
           expect_attrs_to_match_hash(obj, boolean_hash)
-          expect_attrs_to_match_hash(obj, boolean_hash.merge(learned_something: "1"))
+          expect_attrs_to_match_hash(obj, boolean_hash.merge(time_single_format: "1"))
         end
       end
     end
@@ -120,7 +110,7 @@ RSpec.describe "custom_expectations spec" do
         let(:time) { Time.at(1657223244) } # 2022-07-07 14:47:24
         let(:hash_with_timezone) { hash.merge(updated_at: "2022-07-07 19:47:24", timezone: "UTC") }
         it "matches" do
-          time_utc = TranzitoUtils::TimeParser.parse(hash_with_timezone[:updated_at], hash_with_timezone[:timezone])
+          time_utc = TimeParser.parse(hash_with_timezone[:updated_at], hash_with_timezone[:timezone])
           expect(time_utc).to be_within(1).of time
           expect_attrs_to_match_hash(obj, hash_with_timezone)
 
