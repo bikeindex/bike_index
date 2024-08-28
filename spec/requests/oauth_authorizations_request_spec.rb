@@ -106,20 +106,35 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(access_token.reload.acceptable?(nil)).to be_truthy
         expect(access_token.resource_owner_id).to eq current_user.id
         expect(access_token.scopes).to match_array(%w[write_bikes read_bikes])
+        expect(access_token.expired?).to be_falsey
 
         expect(json_result["access_token"]).to eq access_token.token
         expect(json_result["token_type"]).to eq "Bearer"
         expect(json_result["refresh_token"]).to be_present
+        refresh_token = json_result["refresh_token"]
         # And then test that you can make an authorized request with the token
         get "/api/v3/me", params: {access_token: access_token.token}, headers: {format: :json}
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect_hashes_to_match(json_result, {id: current_user.id.to_s, bike_ids: []})
-        pp access_token
-
-        # Expire token
-        # Make refresh request
-        # Verify token is refreshed
-        fail
+        # Then, expire the token
+        access_token.update(created_at: Time.current - 3700)
+        expect(access_token.reload.expired?).to be_truthy
+        # ... And verify that it fails to make a request
+        get "/api/v3/me", params: {access_token: access_token.token}, headers: {format: :json}
+        expect(response.status).to eq 401
+        expect(response.body).to match(/access token expired/i)
+        # Refresh the token
+        post "/oauth/token?grant_type=refresh_token&client_id=#{doorkeeper_app.uid}&refresh_token=#{refresh_token}"
+        expect(Doorkeeper::AccessToken.count).to eq 2
+        access_token2 = Doorkeeper::AccessToken.last
+        expect(access_token2.expired?).to be_falsey
+        expect(access_token2.reload.acceptable?(nil)).to be_truthy
+        expect(access_token2.resource_owner_id).to eq current_user.id
+        expect(json_result["access_token"]).to eq access_token2.token
+        expect(json_result["token_type"]).to eq "Bearer"
+        expect(json_result["refresh_token"]).to_not eq refresh_token # Because it's a new refresh token!
+        # sanity check, original access token is still expired
+        expect(access_token.reload.expired?).to be_truthy
       end
 
       context "with scopes separated by space (%20)" do

@@ -40,6 +40,15 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
+  describe "select_options" do
+    let(:trad_bike) { ['Traditional Bike (2 wheels, 1 seat, no motor)', 'bike'] }
+    it "has the values" do
+      expect(CycleType.select_options).to include(['Bike', 'bike'])
+      expect(CycleType.select_options(traditional_bike: true)).to include(trad_bike)
+      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 21
+    end
+  end
+
   describe "slugify" do
     CycleType::SLUGS.keys.each do |slug|
       it "finds" do

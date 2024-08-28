@@ -20,6 +20,7 @@ class AlertImage < ApplicationRecord
 
   mount_uploader :image, AlertImageUploader
   process_in_background :image
+  attr_writer :image_cache
 
   before_destroy -> { image.remove! }
 end

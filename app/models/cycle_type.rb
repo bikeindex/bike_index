@@ -22,7 +22,8 @@ class CycleType
     "e-scooter": 16,
     "personal-mobility": 18,
     "non-e-scooter": 19,
-    "non-e-skateboard": 20
+    "non-e-skateboard": 20,
+    "e-motorcycle": 21
   }.freeze
 
   NAMES = {
@@ -42,19 +43,20 @@ class CycleType
     "cargo-trike-rear": "Cargo Tricycle (rear storage)",
     "trail-behind": "Trail behind (half bike)",
     "pedi-cab": "Pedi Cab (rickshaw)",
-    "e-scooter": "E-Scooter",
-    "personal-mobility": "E-Skateboard (E-Unicycle, Personal mobility device, etc)",
+    "e-scooter": "e-Scooter",
+    "personal-mobility": "e-Skateboard (e-Unicycle, Personal mobility device, etc)",
     "non-e-scooter": "Scooter (Not electric)",
-    "non-e-skateboard": "Skateboard (Not electric)"
+    "non-e-skateboard": "Skateboard (Not electric)",
+    "e-motorcycle": "e-Motorcycle (or e-Dirtbike)"
   }.freeze
 
   MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze
 
   PEDAL = %i[bike cargo cargo-rear cargo-trike cargo-trike-rear pedi-cab penny-farthing
     recumbent tall-bike tandem trail-behind tricycle unicycle].freeze
-  ALWAYS_MOTORIZED = %i[e-scooter personal-mobility].freeze
+  ALWAYS_MOTORIZED = %i[e-scooter personal-mobility e-motorcycle].freeze
   NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind].freeze
-  NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair].freeze
+  NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair e-motorcycle].freeze
 
   def self.searchable_names
     slugs
@@ -77,12 +79,22 @@ class CycleType
   end
 
   def self.front_and_rear_wheels?(slug)
-    (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter])
+    (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter e-motorcycle])
       .include?(slug&.to_sym)
   end
 
   def self.not_cycle_drivetrain?(slug)
     (NOT_CYCLE_TYPE + %i[trail-behind trailer unicycle]).include?(slug&.to_sym)
+  end
+
+  def self.select_options(traditional_bike: false)
+    slugs.map do |slug|
+      if slug == "bike" && traditional_bike
+        [slug_translation('traditional_bike'), slug]
+      else
+        [slug_translation(slug), slug]
+      end
+    end
   end
 
   def initialize(slug)

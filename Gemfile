@@ -58,7 +58,7 @@ gem "sitemap_generator", "~> 6"
 
 # Making other files
 gem "mini_magick" # Required for image processing
-gem "carrierwave", "~> 0.11.2" # File uploader
+gem "carrierwave", "~> 2.2.6" # File uploader
 gem "carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
@@ -151,6 +151,7 @@ group :development do
 end
 
 group :development, :test do
+  gem "brakeman", require: false
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "foreman"

@@ -35,7 +35,7 @@ class Admin::NotificationsController < Admin::BaseController
     notifications = Notification
     if permitted_scopes.include?(params[:search_kind])
       @kind = params[:search_kind]
-      notifications = notifications.send(@kind)
+      notifications = notifications.public_send(@kind)
     else
       @kind = "all"
     end

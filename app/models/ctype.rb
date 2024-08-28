@@ -17,7 +17,7 @@ class Ctype < ApplicationRecord
   # The name had to be shortened because of join table key length
   include FriendlySlugFindable
 
-  attr_accessor :cgroup_name
+  attr_accessor :cgroup_name, :image_cache
 
   belongs_to :cgroup
 

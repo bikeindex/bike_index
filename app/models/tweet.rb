@@ -138,12 +138,12 @@ class Tweet < ApplicationRecord
       self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
       self.alignment ||= VALID_ALIGNMENTS.first
       unless VALID_ALIGNMENTS.include?(alignment)
-        errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
+        errors.add "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
       end
     else
       if kind == "app_tweet" && twitter_id.blank?
-        errors[:base] << "You need to choose an account" unless twitter_account.present?
-        errors[:base] << "You need to include tweet text" unless body.present?
+        errors.add "You need to choose an account" unless twitter_account.present?
+        errors.add "You need to include tweet text" unless body.present?
       end
       self.twitter_id ||= trh[:id]
       self.body ||= tweeted_text

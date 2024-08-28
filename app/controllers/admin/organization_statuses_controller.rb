@@ -61,14 +61,14 @@ class Admin::OrganizationStatusesController < Admin::BaseController
 
     if permitted_pos_kinds.include?(params[:search_pos_kind])
       @pos_kind = params[:search_pos_kind]
-      organization_statuses = organization_statuses.send(@pos_kind)
+      organization_statuses = organization_statuses.public_send(@pos_kind)
     else
       @pos_kind = "all"
     end
 
     if permitted_kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
-      organization_statuses = organization_statuses.send(@kind)
+      organization_statuses = organization_statuses.public_send(@kind)
     else
       @kind = "all"
     end

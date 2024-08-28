@@ -73,8 +73,8 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
       expect(bike1.model_audit_id).to be_blank
       expect(bike2.model_audit_id).to be_blank
       Sidekiq::Worker.clear_all
+      expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
       expect {
-        expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
         instance.perform(bike1.id)
       }.to change(ModelAudit, :count).by 1
       new_model_audit = bike1.reload.model_audit
@@ -85,14 +85,14 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
       expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
     end
     context "unknown frame_model" do
-      let(:frame_model1) { "no model" }
+      let(:frame_model1) { "idk" }
       let(:frame_model2) { "unknown" }
       it "creates a model_audit" do
         expect(bike1.model_audit_id).to be_blank
         expect(bike2.model_audit_id).to be_blank
         Sidekiq::Worker.clear_all
+        expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id])
         expect {
-          expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id])
           instance.perform(bike1.id)
         }.to change(ModelAudit, :count).by 1
         new_model_audit = bike1.reload.model_audit
@@ -103,8 +103,8 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
         expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
       end
       context "bike2 is motorized" do
+        before { bike2.update(propulsion_type: "pedal-assist") }
         it "matches" do
-          bike2.update(propulsion_type: "pedal-assist")
           Sidekiq::Worker.clear_all
           expect {
             expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to match_array([bike1.id, bike2.id])
@@ -115,6 +115,29 @@ RSpec.describe FindOrCreateModelAuditWorker, type: :job do
           # NOTE: this uses the cycle_type of bike2
           expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(frame_model: nil, propulsion_type: "pedal-assist"))
           expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
+        end
+        context "frame model is a model_bare_vehicle_type" do
+          let(:frame_model1) { "ladies BIKE" }
+          let(:frame_model2) { "medium Men's folding utility bicycle" }
+          it "creates a model_audit" do
+            expect(ModelAudit.unknown_model?(bike1.frame_model, manufacturer_id: bike1.manufacturer_id)).to be_truthy
+            expect(ModelAudit.unknown_model?(bike2.frame_model, manufacturer_id: bike2.manufacturer_id)).to be_truthy
+            Sidekiq::Worker.clear_all
+            expect(ModelAudit.matching_bikes_for(bike1).pluck(:id)).to eq([bike1.id])
+            expect(ModelAudit.matching_bikes_for(bike2).pluck(:id)).to eq([bike2.id])
+            expect { instance.perform(bike1.id) }.to change(ModelAudit, :count).by 1
+            new_model_audit = bike1.reload.model_audit
+            expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
+            expect_attrs_to_match_hash(new_model_audit, basic_target_attributes.merge(frame_model: nil, cycle_type: "bike"))
+            # Organization model audits are created by UpdateModelAuditWorker
+            expect(new_model_audit.organization_model_audits.count).to eq 0
+            expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
+            # Should bikes with unknown models, which are marked e-vehicle be grouped together with non-e-vehicles?
+            # Currently they do, which seems likely to get false positives
+            # THIS IS A PROBLEM. Someone marks a rockhopper as an e-vehicle, and then all orgs have all their rockhopper in model audits
+            expect { instance.perform(bike2.id) }.to change(ModelAudit, :count).by 0
+            expect(bike2.reload.model_audit_id).to eq new_model_audit.id
+          end
         end
       end
     end

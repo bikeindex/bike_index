@@ -49,7 +49,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
 
     if SuperuserAbility.kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
-      superuser_abilities = superuser_abilities.send(@kind)
+      superuser_abilities = superuser_abilities.public_send(@kind)
     else
       @kind = "all"
     end

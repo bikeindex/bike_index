@@ -694,17 +694,19 @@ en:
         cargo_rear: Cargo Bike (rear storage)
         cargo_trike: Cargo Tricycle (front storage)
         cargo_trike_rear: Cargo Tricycle (rear storage)
-        e_scooter: E-Scooter
-        e_skateboard: E-Skateboard
+        e_motorcycle: e-Motorcycle (or e-Dirtbike)
+        e_scooter: e-Scooter
+        e_skateboard: e-Skateboard
         non_e_scooter: Scooter (not electric)
         non_e_skateboard: Skateboard (Not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: E-Skateboard (E-Unicycle, Personal mobility device, etc)
+        personal_mobility: e-Skateboard (e-Unicycle, Personal mobility device, etc)
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike
         tandem: Tandem
+        traditional_bike: Traditional Bike (2 wheels, 1 seat, no motor)
         trail_behind: Trail behind (half bike)
         trailer: Bike Trailer
         tricycle: Tricycle
@@ -3847,6 +3849,7 @@ en:
       protect_your_bike_today: Protect your bike today
       register_on_bike_index: Register on Bike Index.
       register_your_bike: Register your bike
+      register_your_vehicle: Register your vehicle
     revised_messages:
       error: error
       please_fix_the_following: Please fix the following %{errors}
@@ -4978,14 +4981,17 @@ en:
         back
       youre_not_done: You're not done!
     embed:
-      bike_manufacturer: bike manufacturer
+      bike_manufacturer: Bike manufacturer
       choose_specific_organization_optional: Choose Specific Organization (optional)
       owner_email: "%{owner} email"
-      primary_frame_color: primary frame color
+      primary_frame_color: Primary frame color
       register: Register
       select_other_if_manufacturer_doesnt_show: Select 'Other' if manufacturer doesn't
         show up when entered
       this_bike_is_either_missing_or_stolen: This bike is either missing or stolen
+      this_vehicle_is_either_missing_or_stolen: This vehicle is either missing or
+        stolen
+      vehicle_manufacturer: Vehicle manufacturer
       your: your
   sessions:
     magic_link:

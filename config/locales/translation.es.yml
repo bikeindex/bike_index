@@ -122,9 +122,13 @@ es:
       in:
       invalid_currency:
       record_invalid: 'La validación falló: %{errors}'
-      extension_white_list_error:
-      extension_black_list_error:
-      mime_types_processing_error:
+      extension_allowlist_error:
+      extension_denylist_error:
+      content_type_allowlist_error:
+      content_type_denylist_error:
+      vips_processing_error:
+      min_size_error:
+      max_size_error:
     template:
       body: 'Se encontraron problemas con los siguientes campos:'
       header:
@@ -844,6 +848,8 @@ es:
         tricycle:
         unicycle:
         wheelchair:
+        e_motorcycle:
+        traditional_bike:
       frame_material:
         aluminum:
         composite:
@@ -3250,6 +3256,7 @@ es:
       protect_your_bike_today:
       register_on_bike_index:
       register_your_bike:
+      register_your_vehicle:
     revised_messages:
       error:
       please_fix_the_following:
@@ -4130,6 +4137,8 @@ es:
       select_other_if_manufacturer_doesnt_show:
       this_bike_is_either_missing_or_stolen:
       your:
+      this_vehicle_is_either_missing_or_stolen:
+      vehicle_manufacturer:
   sessions:
     magic_link:
       enter_email_address:

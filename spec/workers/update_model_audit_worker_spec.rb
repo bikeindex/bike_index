@@ -49,12 +49,24 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
         end
       end
     end
+    context "unknown_model" do
+      let(:model_audit) { FactoryBot.create(:model_audit, frame_model: "ecargo black women's tricycle") }
+      it "returns true" do
+        expect(model_audit.reload.counted_matching_bikes_count).to eq 0
+        bike.update_attribute :model_audit_id, model_audit.id
+        expect(model_audit.unknown_model?).to be_falsey
+        expect(model_audit.reload.counted_matching_bikes_count).to eq 0
+        expect(model_audit.delete_if_no_bikes?).to be_truthy
+        expect(model_audit.should_be_unknown_model?).to be_truthy
+        expect(described_class.delete_model_audit?(model_audit)).to be_truthy
+      end
+    end
   end
 
   describe "perform" do
-    let!(:bike1) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1) }
+    let!(:bike1) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1, manufacturer: manufacturer) }
     let(:frame_model1) { "Party model" }
-    let(:manufacturer) { bike1.manufacturer }
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let(:bike2) { FactoryBot.create(:bike, manufacturer: manufacturer, frame_model: frame_model2, cycle_type: :cargo, model_audit_id: model_audit&.id, updated_at: Time.current - 10.minutes) }
     let(:frame_model2) { "Party MODEL " }
     let!(:model_audit) { FactoryBot.create(:model_audit, frame_model: bike1.frame_model, manufacturer: manufacturer) }
@@ -85,6 +97,27 @@ RSpec.describe UpdateModelAuditWorker, type: :job do
         }.to change(ModelAudit, :count).by 0
         expect(described_class.jobs.count).to eq 0
         expect(bike2.reload.updated_at).to be < (Time.current - 9.minutes)
+      end
+    end
+    context "should_be_unknown_model?" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Party Model Bikes") }
+      it "deletes model and re-enqueues" do
+        expect(bike2.reload.model_audit_id).to eq model_audit.id
+        expect(model_audit.reload.should_be_unknown_model?).to be_truthy
+        expect(model_audit.unknown_model?).to be_falsey
+        expect(ModelAudit.count).to eq 1
+        Sidekiq::Worker.clear_all
+        expect(described_class.locked_for?(model_audit.id)).to be_falsey
+        expect {
+          instance.perform(model_audit.id)
+        }.to change(ModelAudit, :count).by(-1)
+        expect(FindOrCreateModelAuditWorker.jobs.count).to eq 1
+
+        expect { FindOrCreateModelAuditWorker.drain }.to change(ModelAudit, :count).by 1
+        new_model_audit = ModelAudit.last
+        expect(new_model_audit.should_be_unknown_model?).to be_falsey
+        expect(new_model_audit.unknown_model?).to be_truthy
+        expect(bike2.reload.model_audit_id).to eq new_model_audit.id
       end
     end
     context "bike_organized organization" do

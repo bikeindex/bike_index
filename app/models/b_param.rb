@@ -22,7 +22,8 @@
 # b_param stands for Bike param
 class BParam < ApplicationRecord
   mount_uploader :image, ImageUploader
-  store_in_background :image, CarrierWaveStoreWorker
+  process_in_background :image, CarrierWaveStoreWorker
+  attr_writer :image_cache
 
   # serialize :params
   serialize :bike_errors
@@ -163,6 +164,16 @@ class BParam < ApplicationRecord
 
   def status=(val)
     params["bike"]["status"] = val
+  end
+
+  # Used by partial registration
+  def cycle_type=(val)
+    params["bike"]["cycle_type"] = val
+  end
+
+  # Used by partial registration
+  def cycle_type
+    bike["cycle_type"]
   end
 
   def with_bike?
