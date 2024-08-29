@@ -32,7 +32,7 @@
       "cwe_id": [
         79
       ],
-      "note": "To be confirmed"
+      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -89,7 +89,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Dangerous Send",
@@ -112,7 +112,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "File Access",
@@ -169,7 +169,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in documentation/authorize.html.haml) as not concerns"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -237,7 +237,7 @@
       "cwe_id": [
         22
       ],
-      "note": ""
+      "note": "edit_templates is already limits the potential values that @edit_template can have."
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -394,7 +394,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -428,7 +428,7 @@
       "cwe_id": [
         79
       ],
-      "note": "To be confirmed"
+      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -462,7 +462,7 @@
       "cwe_id": [
         79
       ],
-      "note": "To be confirmed"
+      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
     },
     {
       "warning_type": "SQL Injection",
@@ -542,7 +542,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
     },
     {
       "warning_type": "Dangerous Send",
@@ -565,7 +565,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -622,7 +622,7 @@
       "cwe_id": [
         601
       ],
-      "note": ""
+      "note": "url is validated before we use redirect_to"
     },
     {
       "warning_type": "Mass Assignment",
@@ -668,7 +668,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Dangerous Send",
@@ -691,7 +691,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Unmaintained Dependency",
@@ -710,7 +710,7 @@
       "cwe_id": [
         1104
       ],
-      "note": ""
+      "note": "Work to upgrade Ruby has been prioritised."
     },
     {
       "warning_type": "Remote Code Execution",
@@ -776,7 +776,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -887,7 +887,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All seem like false positives to me"
     },
     {
       "warning_type": "Dangerous Send",
@@ -910,7 +910,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1058,7 +1058,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Command Injection",
@@ -1138,7 +1138,7 @@
       "cwe_id": [
         601
       ],
-      "note": ""
+      "note": "Non risk. The later lines in that method verify that the user has access to the BikeVersion or Bike"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1249,7 +1249,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1272,7 +1272,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Command Injection",
