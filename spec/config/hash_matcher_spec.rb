@@ -60,19 +60,18 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
 
     context "with timezone" do
       let(:time) { Time.at(1657223244) } # 2022-07-07 14:47:24
-      let(:hash_1) { { updated_at: time.in_time_zone("Amsterdam") } }
-      let(:hash_2) { { updated_at: "2022-07-07 19:47:24", timezone: "UTC" } }
+      let(:hash_1) { {updated_at: time.in_time_zone("Amsterdam")} }
+      let(:hash_2) { {updated_at: time.utc.to_s, timezone: "UTC"} }
       it "matches" do
-        pp hash_1, hash_2
         expect(hash_1).to match_hash_indifferently(hash_2)
       end
 
       context "active record obj has timestamp stored" do
         # NOTE: This is hacky and weird, but I think it's useful to test - and this was easy to set up
-        let(:obj) { User.new(email: "something@stuff.com", updated_at: time.to_i) }
-        let(:hash) { {email: "something@stuff.com", updated_at: time, 'timezone' => 'UTC'} }
+        let(:obj) { User.new(email: "something@stuff.com", updated_at: time) }
+        let(:hash) { {:email => "something@stuff.com", :updated_at => time.to_i, "timezone" => "UTC"} }
         it "matches" do
-          expect(obj).to match_hash_indifferently hash, match_time_within: 1)
+          expect(obj).to match_hash_indifferently hash
         end
       end
     end
@@ -158,6 +157,30 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
       it "is falsey for different arrays" do
         expect(RspecHashMatcher.send(:values_match?, [], [2, 1], options: options)).to be_falsey
         expect(RspecHashMatcher.send(:values_match?, %w[a b c], %w[a c], options: options)).to be_falsey
+      end
+
+      context "with match_array_order" do
+        let(:options) { RspecHashMatcher::DEFAULT_OPTS.merge(match_array_order: true) }
+        it "matches based on array order" do
+          expect(RspecHashMatcher.send(:values_match?, [1, 2], [2, 1], options: options)).to be_falsey
+          expect(RspecHashMatcher.send(:values_match?, %w[a b c], %w[b a c], options: options)).to be_falsey
+        end
+      end
+    end
+
+    context "with times" do
+      let(:time_1) { Time.at(1657223244) } # 2022-07-07 14:47:24
+      let(:time_2) { time_1.in_time_zone("Amsterdam") } # We
+
+      it "is truthy for times" do
+        expect(RspecHashMatcher.send(:values_match?, time_1, time_2, options: options)).to be_truthy
+        expect(RspecHashMatcher.send(:values_match?, time_2, time_1, options: options)).to be_truthy
+      end
+
+      it "is truthy if a time is a timestamp" do
+        expect(options[:match_timezone]).to be_falsey # Sanity check default options
+        expect(RspecHashMatcher.send(:values_match?, time_1.to_i, time_2, options: options)).to be_truthy
+        expect(RspecHashMatcher.send(:values_match?, time_1, time_2.to_i, options: options)).to be_truthy
       end
     end
   end
