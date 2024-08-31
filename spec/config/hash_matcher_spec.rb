@@ -57,6 +57,25 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
         end
       end
     end
+
+    context "with timezone" do
+      let(:time) { Time.at(1657223244) } # 2022-07-07 14:47:24
+      let(:hash_1) { { updated_at: time.in_time_zone("Amsterdam") } }
+      let(:hash_2) { { updated_at: "2022-07-07 19:47:24", timezone: "UTC" } }
+      it "matches" do
+        pp hash_1, hash_2
+        expect(hash_1).to match_hash_indifferently(hash_2)
+      end
+
+      context "active record obj has timestamp stored" do
+        # NOTE: This is hacky and weird, but I think it's useful to test - and this was easy to set up
+        let(:obj) { User.new(email: "something@stuff.com", updated_at: time.to_i) }
+        let(:hash) { {email: "something@stuff.com", updated_at: time, 'timezone' => 'UTC'} }
+        it "matches" do
+          expect(obj).to match_hash_indifferently hash, match_time_within: 1)
+        end
+      end
+    end
   end
 
   context "with ActiveRecord model" do

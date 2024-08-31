@@ -5,7 +5,7 @@ class RspecHashMatcher
     match_time_within: 1.01, # Times within 1 second match
     match_array_order: false,
     match_number_types: false, # i.e. 1 == 1.0
-    coerce_values_to_json: false # JSON doesn't have booleans
+    coerce_values_to_json: false # JSON doesn't have boolean
   }
   class << self
     def recursive_match_hashes_errors(hash_1, hash_2, inside: [], options: {})
@@ -156,4 +156,11 @@ RSpec::Matchers.define :match_hash_indifferently do |expected|
   end
 
   diffable
+end
+
+# Previously there was a method `expect_hashes_to_match` (rather than a customer expectation)
+# This method was added to ease the transition. It should be removed when all the
+def expect_hashes_to_match(hash1, hash2)
+  puts 'expect_hashes_to_match is deprecated, replace with: expect(hash1).to match_hash_indifferently(hash2)'
+  expect(hash1).to match_hash_indifferently hash2
 end

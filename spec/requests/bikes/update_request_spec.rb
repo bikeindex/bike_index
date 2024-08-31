@@ -426,7 +426,7 @@ RSpec.describe "BikesController#update", type: :request do
       impound_record.reload
       expect(impound_record.latitude).to be_present
       expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
-      expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
+      expect_hashes_to_match(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
     end
   end
 end

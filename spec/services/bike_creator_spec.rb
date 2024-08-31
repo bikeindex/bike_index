@@ -82,7 +82,7 @@ RSpec.describe BikeCreator do
         expect(bike.creator&.id).to eq user.id
         expect(bike.current_ownership&.id).to be_present
         expect(bike.claimed?).to be_falsey
-        expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "pedal-assist-and-throttle"))
+        expect_hashes_to_match(bike, passed_params[:bike].merge(propulsion_type: "pedal-assist-and-throttle"))
         expect(bike.motorized?).to be_truthy
         expect(Bike.motorized.count).to eq 1
       end
@@ -95,7 +95,7 @@ RSpec.describe BikeCreator do
           }.to change(Bike, :count).by 1
           expect(BikeOrganization.count).to eq 0
           bike = Bike.last
-          expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "throttle"))
+          expect_hashes_to_match(bike, passed_params[:bike].merge(propulsion_type: "throttle"))
           expect(bike.motorized?).to be_truthy
         end
       end
@@ -108,7 +108,7 @@ RSpec.describe BikeCreator do
           }.to change(Bike, :count).by 1
           expect(BikeOrganization.count).to eq 0
           bike = Bike.last
-          expect_attrs_to_match_hash(bike, passed_params[:bike].merge(propulsion_type: "foot-pedal"))
+          expect_hashes_to_match(bike, passed_params[:bike].merge(propulsion_type: "foot-pedal"))
           expect(bike.motorized?).to be_falsey
           expect(Bike.motorized.count).to eq 0
         end
@@ -135,7 +135,7 @@ RSpec.describe BikeCreator do
           bike = Bike.last
           expect(bike.creator&.id).to eq user.id
           expect(bike.current_ownership&.id).to be_present
-          expect_attrs_to_match_hash(bike, target_created_attrs)
+          expect_hashes_to_match(bike, target_created_attrs)
         end
       end
       context "with organization" do
@@ -148,7 +148,7 @@ RSpec.describe BikeCreator do
           expect(bike.current_ownership&.id).to be_present
           expect(bike.bike_organizations.first.organization).to eq organization
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect_attrs_to_match_hash(bike, target_created_attrs)
+          expect_hashes_to_match(bike, target_created_attrs)
         end
         context "with spam_registrations" do
           let(:organization) { FactoryBot.create(:organization, spam_registrations: true) }
@@ -185,7 +185,7 @@ RSpec.describe BikeCreator do
             expect(bike.likely_spam).to be_truthy
             expect(bike.bike_organizations.first.organization).to eq organization
             expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-            expect_attrs_to_match_hash(bike, target_created_attrs)
+            expect_hashes_to_match(bike, target_created_attrs)
           end
         end
       end
@@ -204,7 +204,7 @@ RSpec.describe BikeCreator do
           expect(bike.organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
           expect(bike.can_edit_claimed_organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
           expect(bike.current_ownership_id).to be_present
-          expect_attrs_to_match_hash(bike, target_created_attrs)
+          expect_hashes_to_match(bike, target_created_attrs)
         end
       end
       context "extra attributes" do
@@ -234,7 +234,7 @@ RSpec.describe BikeCreator do
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.registration_address).to eq({"street" => "Somewhere Ville"})
-          expect_attrs_to_match_hash(bike, bike_params.except(:user_name, :propulsion_type_slug, :manufacturer_id, :manufacturer_other))
+          expect_hashes_to_match(bike, bike_params.except(:user_name, :propulsion_type_slug, :manufacturer_id, :manufacturer_other))
           expect(bike.manufacturer_id).to eq manufacturer.id
           expect(bike.manufacturer_other).to be_nil
           expect(bike.mnfg_name).to eq "BH Bikes" # Because that's the short name
@@ -426,13 +426,13 @@ RSpec.describe BikeCreator do
         expect(b_param.bike_errors).to be_blank
         expect(b_param.skip_email?).to be_truthy
         expect(bike.id).to be_present
-        expect_attrs_to_match_hash(bike, bike_params)
+        expect_hashes_to_match(bike, bike_params)
         expect(bike.cycle_type).to eq "bike"
         expect(bike.status).to eq "status_impounded"
         expect(bike.status_humanized).to eq "found"
         expect(bike.impound_records.count).to eq 1
         impound_record = bike.impound_records.last
-        expect_attrs_to_match_hash(bike, bike_params)
+        expect_hashes_to_match(bike, bike_params)
         expect(impound_record.id).to eq bike.current_impound_record&.id
         expect(impound_record.status).to eq "current"
         expect(impound_record.organized?).to be_falsey

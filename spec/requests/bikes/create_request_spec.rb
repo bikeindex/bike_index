@@ -212,10 +212,10 @@ RSpec.describe "BikesController#create", type: :request do
         expect(BParam.all.count).to eq 1
         expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
         bike = assigns(:bike)
-        expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+        expect_hashes_to_match(bike, bike_params.except(:manufacturer_id, :phone))
         expect(bike.status).to eq "status_stolen"
         # we retain the stolen record attrs, test that they are assigned correctly too
-        expect_attrs_to_match_hash(bike.stolen_records.first, chicago_stolen_params)
+        expect_hashes_to_match(bike.stolen_records.first, chicago_stolen_params)
       end
     end
   end
@@ -239,12 +239,12 @@ RSpec.describe "BikesController#create", type: :request do
           expect(new_bike.status).to eq "status_impounded"
           expect(new_bike.status_humanized).to eq "found"
           expect(new_bike.current_ownership.status).to eq "status_impounded" # Make sure this status matches
-          expect_attrs_to_match_hash(new_bike, testable_bike_params)
+          expect_hashes_to_match(new_bike, testable_bike_params)
           expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
           impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
           expect(new_bike.current_impound_record&.id).to eq impound_record.id
           expect(impound_record.kind).to eq "found"
-          expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
+          expect_hashes_to_match(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
           expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
           expect(impound_record.send(:calculated_unregistered_bike?)).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
@@ -265,10 +265,10 @@ RSpec.describe "BikesController#create", type: :request do
             expect(BParam.all.count).to eq 1
             expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
             bike = assigns(:bike)
-            expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+            expect_hashes_to_match(bike, bike_params.except(:manufacturer_id, :phone))
             expect(bike.status).to eq "status_impounded"
             # we retain the stolen record attrs, test that they are assigned correctly too
-            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
+            expect_hashes_to_match(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
           end
         end
       end
@@ -332,7 +332,7 @@ RSpec.describe "BikesController#create", type: :request do
         new_bike.reload
         expect(new_bike.b_params.count).to eq 0
         expect(testable_bike_params.keys.count).to be > 10
-        expect_attrs_to_match_hash(new_bike, testable_bike_params)
+        expect_hashes_to_match(new_bike, testable_bike_params)
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.user_id).to eq current_user.id
         expect(new_bike.ownerships.count).to eq 1
@@ -370,7 +370,7 @@ RSpec.describe "BikesController#create", type: :request do
         end
         expect(flash[:success]).to be_present
         new_bike = Bike.last
-        expect_attrs_to_match_hash(new_bike, testable_bike_params.merge(cycle_type: "non-e-scooter"))
+        expect_hashes_to_match(new_bike, testable_bike_params.merge(cycle_type: "non-e-scooter"))
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.user_id).to eq current_user.id
         expect(new_bike.ownerships.count).to eq 1
@@ -510,7 +510,7 @@ RSpec.describe "BikesController#create", type: :request do
       b_param.reload
       expect(b_param.created_bike_id).to eq new_bike.id
       expect(b_param.phone).to eq "18887776666"
-      expect_attrs_to_match_hash(new_bike, testable_bike_params)
+      expect_hashes_to_match(new_bike, testable_bike_params)
       expect(new_bike.manufacturer).to eq manufacturer
       expect(new_bike.current_ownership.origin).to eq "embed_partial"
       expect(new_bike.current_ownership.creator).to eq new_bike.creator
@@ -549,7 +549,7 @@ RSpec.describe "BikesController#create", type: :request do
         new_bike = Bike.last
         b_param.reload
         expect(b_param.created_bike_id).to eq new_bike.id
-        expect_attrs_to_match_hash(new_bike, testable_bike_params)
+        expect_hashes_to_match(new_bike, testable_bike_params)
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.current_ownership.origin).to eq "embed_partial"
         expect(new_bike.current_ownership.creator).to eq new_bike.creator
@@ -585,7 +585,7 @@ RSpec.describe "BikesController#create", type: :request do
           b_param.reload
           expect(b_param.address_hash.except("country")).to eq target_address.as_json
           expect(b_param.created_bike_id).to eq new_bike.id
-          expect_attrs_to_match_hash(new_bike, testable_bike_params)
+          expect_hashes_to_match(new_bike, testable_bike_params)
           expect(new_bike.manufacturer).to eq manufacturer
           expect(new_bike.current_ownership.origin).to eq "embed_partial"
           expect(new_bike.current_ownership.creator).to eq new_bike.creator
