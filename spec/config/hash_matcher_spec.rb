@@ -178,9 +178,23 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
       end
 
       it "is truthy if a time is a timestamp" do
-        expect(options[:match_timezone]).to be_falsey # Sanity check default options
         expect(RspecHashMatcher.send(:values_match?, time_1.to_i, time_2, options: options)).to be_truthy
         expect(RspecHashMatcher.send(:values_match?, time_1, time_2.to_i, options: options)).to be_truthy
+      end
+    end
+
+    context "blanks" do
+      it "is truthy for blank vs nil" do
+        expect(options[:match_blanks]).to be_falsey # Sanity check default options
+        expect(RspecHashMatcher.send(:values_match?, "", nil, options: options)).to be_truthy
+        expect(RspecHashMatcher.send(:values_match?, nil, " ", options: options)).to be_truthy
+        expect(RspecHashMatcher.send(:values_match?, "", "\n", options: options)).to be_truthy
+      end
+      context "with match_blanks" do
+        let(:options) { RspecHashMatcher::DEFAULT_OPTS.merge(match_blanks: true) }
+        it "matches based on array order" do
+          expect(RspecHashMatcher.send(:values_match?, "", nil, options: options)).to be_falsey
+        end
       end
     end
   end

@@ -6,7 +6,8 @@ class RspecHashMatcher
     match_array_order: false,
     match_number_types: false, # i.e. 1 == 1.0
     coerce_values_to_json: false, # JSON doesn't have boolean
-    match_timezone_key: false # timezone is passed in parameters regularly, ignore by default
+    match_timezone_key: false, # timezone is passed in parameters regularly, ignore by default
+    match_blanks: false # if false, nil and '' match
   }
   class << self
     def recursive_match_hashes_errors(hash_1, hash_2, inside: [], options: {})
@@ -103,6 +104,7 @@ class RspecHashMatcher
       elsif options[:coerce_values_to_json]
         value.to_s == match_value.to_s
       else
+        return true if !options[:match_blanks] && value.blank? && match_value.blank?
         value == match_value
       end
     end
