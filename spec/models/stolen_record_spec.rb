@@ -114,11 +114,11 @@ RSpec.describe StolenRecord, type: :model do
     context "given alert image creation fails" do
       it "returns falsey with no changes" do
         stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
-         
+
         # image: can no longer be an integer due to changes in carrierwave
-        # We updated the test to stub the value of `image` to be a file of a type 
+        # We updated the test to stub the value of `image` to be a file of a type
         # that was no longer in the whitelist, i.e. a csv file.
-        bad_image = double(:image, image: File.open(Rails.root.join('spec', 'fixtures', 'manufacturer-test-import.csv')))
+        bad_image = double(:image, image: File.open(Rails.root.join("spec", "fixtures", "manufacturer-test-import.csv")))
         result = stolen_record.generate_alert_image(bike_image: bad_image)
 
         expect(result).to be_nil
