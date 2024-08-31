@@ -9,6 +9,7 @@ class RspecHashMatcher
     match_timezone_key: false, # timezone is passed in parameters regularly, ignore by default
     match_blanks: false # if false, nil and '' match
   }
+  BOOLEANS = [true, false]
   class << self
     def recursive_match_hashes_errors(hash_1, hash_2, inside: [], options: {})
       options = DEFAULT_OPTS.merge(options)
@@ -103,6 +104,8 @@ class RspecHashMatcher
         value.to_s == match_value.to_s
       elsif options[:coerce_values_to_json]
         value.to_s == match_value.to_s
+      elsif BOOLEANS.include?(value) || BOOLEANS.include?(match_value)
+        InputNormalizer.boolean(value) == InputNormalizer.boolean(match_value)
       else
         return true if !options[:match_blanks] && value.blank? && match_value.blank?
         value == match_value

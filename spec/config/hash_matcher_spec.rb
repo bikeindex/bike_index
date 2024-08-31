@@ -56,6 +56,15 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
           end
         end
       end
+
+      context "with boolean" do
+        let(:hash_1) { {bool: "1", bool_false: false} }
+        let(:hash_2) { {bool: true, bool_false: ""} }
+
+        it "matches" do
+          expect(hash_1).to match_hash_indifferently hash_2
+        end
+      end
     end
 
     context "with timezone" do
