@@ -554,7 +554,7 @@ jobs:
           name: Setup Database
           command: |
             bundle exec rails db:create --trace
-            bundle exec rails db:structure:load --trace
+            bundle exec rails db:schema:load --trace
 
       - run:
           name: RSpec
