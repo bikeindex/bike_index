@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+def next?
+  File.basename(__FILE__) == "Gemfile.next"
+end
+
 source "https://rubygems.org"
 
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
@@ -9,7 +13,11 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 ruby "2.7.8"
 gem "rack", "~> 2.2.3"
 
-gem "rails", "~> 7.0.8.4"
+if next?
+  gem "rails", "~> 7.1.4"
+else
+  gem "rails", "~> 7.0.8.4"
+end
 
 gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
