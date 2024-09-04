@@ -71,7 +71,7 @@ RSpec.describe BParam, type: :model do
       b_param.clean_params
       clean_params2 = b_param.params
 
-      expect_hashes_to_match(clean_params2["bike"], clean_params1["bike"])
+      expect(clean_params2["bike"]).to match_hash_indifferently clean_params1["bike"]
       expect(clean_params2["bike"].keys).to match_array(clean_params1["bike"].keys)
       expect(clean_params2).to eq(clean_params1)
     end
@@ -297,13 +297,13 @@ RSpec.describe BParam, type: :model do
     before { b_param.set_color_keys }
 
     it "sets the color if it's a color and remove the color attr" do
-      expect_hashes_to_match(b_param.bike, {primary_frame_color_id: color.id})
+      expect(b_param.bike).to match_hash_indifferently({primary_frame_color_id: color.id})
     end
     context "not a color" do
       let(:bike) { {color: "Goop"} }
       let(:target) { {paint_name: "goop", primary_frame_color_id: Color.black.id} }
       it "sets paint and makes primary_frame_color black" do
-        expect_hashes_to_match(b_param.bike.except("paint_id"), target)
+        expect(b_param.bike.except("paint_id")).to match_hash_indifferently target
         expect(b_param.bike["paint_id"]).to eq Paint.friendly_find_id("goop")
       end
     end
@@ -311,18 +311,18 @@ RSpec.describe BParam, type: :model do
       let(:bike) { {color: "Sea Green", primary_frame_color: "teal"} }
       let(:target) { {paint_name: "sea green", primary_frame_color_id: color.id} }
       it "sets the color keys" do
-        expect_hashes_to_match(b_param.bike.except("paint_id"), target)
+        expect(b_param.bike.except("paint_id")).to match_hash_indifferently target
       end
       context "unknown secondary_frame_color" do
         let(:bike) { {color: "Sea green", primary_frame_color: "teal", secondary_frame_color: "something else"} }
         it "ignores secondary_frame_color" do
-          expect_hashes_to_match(b_param.bike.except("paint_id"), target)
+          expect(b_param.bike.except("paint_id")).to match_hash_indifferently target
         end
       end
       context "secondary_frame_color" do
         let(:bike) { {color: "Sea green", primary_frame_color: "teal", secondary_frame_color: " TEAL\n"} }
         it "ignores secondary_frame_color" do
-          expect_hashes_to_match(b_param.bike.except("paint_id"), target.merge(secondary_frame_color_id: color.id))
+          expect(b_param.bike.except("paint_id")).to match_hash_indifferently target.merge(secondary_frame_color_id: color.id)
         end
       end
     end
@@ -651,18 +651,18 @@ RSpec.describe BParam, type: :model do
       }
     end
     it "responds with bike_attrs" do
-      expect_hashes_to_match(b_param.safe_bike_attrs({}), target)
+      expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
     end
     context "with new_attrs" do
       it "uses the new_attrs" do
-        expect_hashes_to_match(b_param.safe_bike_attrs({"owner_email" => "e@f.g"}), target.merge(owner_email: "e@f.g"))
+        expect(b_param.safe_bike_attrs({"owner_email" => "e@f.g"})).to match_hash_indifferently target.merge(owner_email: "e@f.g")
       end
     end
     context "top_level_propulsion_type" do
       let(:params) { {propulsion_type_motorized: 1, propulsion_type_throttle: 0, propulsion_type_pedal_assist: 1, bike: bike_params} }
       it "returns with propulsion_type overridden" do
         result = b_param.safe_bike_attrs({})
-        expect_hashes_to_match(result, target.merge(propulsion_type_slug: "pedal-assist"))
+        expect(result).to match_hash_indifferently target.merge(propulsion_type_slug: "pedal-assist")
         expect(result.keys.last.to_s).to eq "propulsion_type_slug"
       end
     end
@@ -672,7 +672,7 @@ RSpec.describe BParam, type: :model do
       # if cycle_type hasn't been set yet, it doesn't work. So test that it is in the back
       it "makes propulsion_type_slug the last element" do
         result = b_param.safe_bike_attrs({})
-        expect_hashes_to_match(result, target.merge(cycle_type: "tandem", propulsion_type_slug: "foot-pedal"))
+        expect(result).to match_hash_indifferently target.merge(cycle_type: "tandem", propulsion_type_slug: "foot-pedal")
         expect(result.keys.last.to_s).to eq "propulsion_type_slug"
       end
     end
