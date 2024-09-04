@@ -56,7 +56,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
     it "updates available attributes" do
       put "#{base_url}/#{subject.to_param}", params: {manufacturer: permitted_attributes}
       expect(flash[:success]).to be_present
-      expect_attrs_to_match_hash(subject.reload, permitted_attributes)
+      expect_hashes_to_match(subject.reload, permitted_attributes)
     end
   end
 
@@ -68,7 +68,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       }.to change(Manufacturer, :count).by 1
       new_manufacturer = Manufacturer.where(name: "new name and things").first
       expect(flash[:success]).to be_present
-      expect_attrs_to_match_hash(new_manufacturer, permitted_attributes)
+      expect_hashes_to_match(new_manufacturer, permitted_attributes)
       # permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }
     end
   end

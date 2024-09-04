@@ -90,7 +90,7 @@ class CycleType
   def self.select_options(traditional_bike: false)
     slugs.map do |slug|
       if slug == "bike" && traditional_bike
-        [slug_translation('traditional_bike'), slug]
+        [slug_translation("traditional_bike"), slug]
       else
         [slug_translation(slug), slug]
       end
