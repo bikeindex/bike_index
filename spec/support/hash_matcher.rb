@@ -121,12 +121,19 @@ class RspecHashMatcher
       time_2.utc.between?(time_1.utc - match_time_within, time_1.utc + match_time_within)
     end
 
+    def indifferent_array(array)
+      array.map do |item|
+        # If the array has hashes, sort them and make them json for better comparison
+        item.is_a?(Hash) ? item.as_json.sort.to_json : item.to_s
+      end.sort
+    end
+
     # By default, match arrays without worrying about order
     def arrays_match?(array_1, array_2, match_array_order: nil)
       match_array_order ||= false
       return array_1 == array_2 if match_array_order
 
-      array_1.map(&:to_s).sort == array_2.map(&:to_s).sort
+      indifferent_array(array_1) == indifferent_array(array_2)
     end
 
     def match_error_for(key:, value:, match_value:, inside:, match_with: "equal")
