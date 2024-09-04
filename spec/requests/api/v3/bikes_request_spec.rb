@@ -80,8 +80,8 @@ RSpec.describe "Bikes API V3", type: :request do
     context "user is organization member" do
       let(:user) { FactoryBot.create(:organization_member) }
       let!(:organization) { user.organizations.first }
-      let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "with_user"} }
-      let(:unmatched_result) { {registered: false, claimed: false, can_edit: false, state: "no_matching_bike"} }
+      let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "with_user", authorized_bike_id: nil} }
+      let(:unmatched_result) { {registered: false, claimed: false, can_edit: false, state: "no_matching_bike", authorized_bike_id: nil} }
       let(:organized_bike) { {} }
       let(:required_params) { search_params.slice(:serial, :owner_email, :organization_slug) }
       it "returns target" do
@@ -178,7 +178,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect_hashes_to_match(json_result, target_result)
         end
         context "recovered" do
-          let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "recovered"} }
+          let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "recovered", authorized_bike_id: nil} }
           it "returns target" do
             stolen_record.add_recovery_information(recovered_at: Time.current - 1.week)
             post check_if_registered_url, params: search_params.to_json, headers: json_headers
@@ -193,7 +193,7 @@ RSpec.describe "Bikes API V3", type: :request do
         end
       end
       context "state: impounded" do
-        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "impounded"} }
+        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "impounded", authorized_bike_id: nil} }
         it "returns impounded for impounded statuses" do
           %w[unregistered_parking_notification status_abandoned status_impounded].each do |status|
             bike.update_column :status, status
@@ -205,7 +205,7 @@ RSpec.describe "Bikes API V3", type: :request do
         end
       end
       context "state: transferred" do
-        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "transferred"} }
+        let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "transferred", authorized_bike_id: nil} }
         it "returns target" do
           ownership = bike.current_ownership
           BikeUpdator.new(bike: bike, b_params: {bike: {owner_email: "newemail@example.com"}}.as_json).update_ownership
@@ -219,7 +219,7 @@ RSpec.describe "Bikes API V3", type: :request do
         end
       end
       context "state: removed" do
-        let(:target_result) { {registered: false, claimed: false, can_edit: false, state: "removed"} }
+        let(:target_result) { {registered: false, claimed: false, can_edit: false, state: "removed", authorized_bike_id: nil} }
         it "returns target" do
           bike.delete
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
