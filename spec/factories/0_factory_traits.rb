@@ -1,3 +1,4 @@
+# named 0_factories so it's loaded first, since it has
 FactoryBot.define do
   sequence :unique_email do |n|
     "user#{n}s@bikeiasdndex.org"
@@ -17,69 +18,6 @@ FactoryBot.define do
 
   sequence :unique_iso do |n|
     "#{n}0"
-  end
-
-  factory :front_gear_type do
-    sequence(:name) { |n| "Front Gear #{n}" }
-    count { 1 }
-  end
-
-  factory :rear_gear_type do
-    sequence(:name) { |n| "Rear Gear #{n}" }
-    count { 1 }
-  end
-
-  factory :wheel_size do
-    sequence(:name) { |n| "Wheel size #{n}" }
-    iso_bsd { FactoryBot.generate(:unique_iso) }
-    priority { 1 }
-    sequence(:description) { |n| "Wheel Description #{n}" }
-  end
-
-  factory :paint do
-    sequence(:name) { |n| "Paint #{n}" }
-  end
-
-  factory :cgroup do
-    sequence(:name) { |n| "Cgroup #{n}" }
-  end
-
-  factory :ctype do
-    sequence(:name) { |n| "Component type#{n}" }
-    cgroup { FactoryBot.create(:cgroup) }
-  end
-
-  factory :component do
-    bike { FactoryBot.create(:bike) }
-    ctype { FactoryBot.create(:ctype) }
-  end
-
-  factory :lock_type do
-    sequence(:name) { |n| "Lock type #{n}" }
-  end
-
-  factory :lock do
-    user { FactoryBot.create(:user) }
-    manufacturer { FactoryBot.create(:manufacturer) }
-    lock_type { FactoryBot.create(:lock_type) }
-  end
-
-  factory :integration do
-    access_token { "12345teststststs" }
-  end
-
-  factory :blog do
-    user { FactoryBot.create(:user) }
-    body { "Some sweet blog content that everyone loves" }
-    sequence(:title) { |n| "Blog title #{n}" }
-
-    trait :published do
-      published { true }
-    end
-
-    trait :dutch do
-      language { "nl" }
-    end
   end
 
   # Location traits

@@ -21,8 +21,8 @@ RSpec.describe RegistrationsController, type: :request do
     (response_body.scan(/<input.*>/i) + response_body.scan(/<select.*>/i)).map do |input_str|
       {
         str: input_str,
-        value: input_str[/value="[^"]*/]&.gsub(/value=\"/, ""),
-        name: input_str[/name="[^"]*/]&.gsub(/name=\"(b_param\[)?/i, "").tr("]", "")
+        value: input_str[/value="[^"]*/]&.gsub(/value="/, ""),
+        name: input_str[/name="[^"]*/]&.gsub(/name="(b_param\[)?/i, "")&.tr("]", "")
       }
     end
   end
@@ -119,12 +119,12 @@ RSpec.describe RegistrationsController, type: :request do
         end
       end
       context "with vehicle_type" do
-        let(:vehicle_field_names) { (basic_field_names + ['cycle_type']).sort }
+        let(:vehicle_field_names) { (basic_field_names + ["cycle_type"]).sort }
         it "renders" do
           get "#{base_url}/embed", params: {
             organization_id: organization.to_param,
-            simple_header: '1',
-            vehicle_select: '1'
+            simple_header: "1",
+            vehicle_select: "1"
           }
           expect_it_to_render_embed_correctly
           expect(assigns(:stolen)).to be_falsey
@@ -194,7 +194,7 @@ RSpec.describe RegistrationsController, type: :request do
             manufacturer_id: manufacturer.id,
             primary_frame_color_id: color.id,
             secondary_frame_color_id: color.id,
-            cycle_type: 'cargo-rear',
+            cycle_type: "cargo-rear",
             tertiary_frame_color_id: 222,
             owner_email: "ks78xxxxxx@stuff.com",
             creation_organization_id: 21
