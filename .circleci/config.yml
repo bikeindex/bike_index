@@ -309,7 +309,6 @@ jobs:
           path: /tmp/test-results
       - store_artifacts:
           path: coverage
-  
   upload-coverage:
     docker:
       - image: cimg/ruby:2.7.8-node
