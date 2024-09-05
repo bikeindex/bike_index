@@ -200,7 +200,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.creator_unregistered_parking_notification?).to be_truthy
         expect(bike.public_images.count).to eq 1
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
-        expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number))
+        expect_hashes_to_match(bike, testable_bike_params.except(:serial_number))
 
         ownership = bike.ownerships.first
         expect(ownership.send_email).to be_falsey
@@ -234,7 +234,7 @@ RSpec.describe Organized::BikesController, type: :request do
           }.to change(Bike, :count).by 0
           expect(flash[:error]).to match(/manufacturer/i)
           expect(b_param.reload.bike_errors.to_s).to match(/manufacturer/i)
-          expect_attrs_to_match_hash(assigns(:bike), testable_bike_params.except(:manufacturer_id, :serial_number))
+          expect_hashes_to_match(assigns(:bike), testable_bike_params.except(:manufacturer_id, :serial_number))
           expect(ParkingNotification.count).to eq 0
         end
       end
@@ -284,7 +284,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.user_hidden).to be_falsey
           expect(bike.status).to eq "status_impounded"
           expect(bike.creator_unregistered_parking_notification?).to be_truthy
-          expect_attrs_to_match_hash(bike, testable_bike_params.except(:serial_number, :latitude, :longitude))
+          expect_hashes_to_match(bike, testable_bike_params.except(:serial_number, :latitude, :longitude))
 
           ownership = bike.ownerships.first
           expect(ownership.send_email).to be_falsey

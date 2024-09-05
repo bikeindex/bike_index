@@ -67,7 +67,7 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
         instance.perform(logged_search.id)
 
         expect(logged_search.reload.processed?).to be_truthy
-        expect_attrs_to_match_hash(logged_search, target_location_attrs)
+        expect_hashes_to_match(logged_search, target_location_attrs)
       end
 
       context "maxmind response" do
@@ -90,7 +90,7 @@ RSpec.describe ProcessLoggedSearchWorker, type: :job do
           instance.perform(logged_search.id)
 
           expect(logged_search.reload.processed?).to be_truthy
-          expect_attrs_to_match_hash(logged_search, target_location_attrs)
+          expect_hashes_to_match(logged_search, target_location_attrs)
         end
       end
     end
