@@ -498,7 +498,7 @@ GEM
       omniauth-oauth (~> 1.1)
       rack
     parallel (1.22.1)
-    parallel_tests (2.30.0)
+    parallel_tests (3.5.2)
       parallel
     paranoia (2.5.2)
       activerecord (>= 5.1, < 7.1)
@@ -835,7 +835,7 @@ DEPENDENCIES
   omniauth-globalid
   omniauth-strava
   omniauth-twitter
-  parallel_tests
+  parallel_tests (~> 3.5.2)
   paranoia
   pg (~> 1.0)
   pg_search
