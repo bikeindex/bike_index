@@ -1167,7 +1167,7 @@ CREATE TABLE public.flipper_gates (
     id integer NOT NULL,
     feature_key character varying NOT NULL,
     key character varying NOT NULL,
-    value character varying,
+    value text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -6652,6 +6652,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231212023722'),
 ('20231212025929'),
 ('20240517161713'),
-('20240712181117');
+('20240712181117'),
+('20240908151325');
 
 
