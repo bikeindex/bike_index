@@ -59,8 +59,10 @@ RSpec.describe Organized::BikesController, type: :request do
           get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
         }.to change(Export, :count).by 0
         expect(flash).to be_blank
-        # TODO: make this not flaky by matching bike ids in either position
-        expect(response).to redirect_to(new_organization_export_path(target_params))
+        redirected_to = response.redirect_url
+        expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+\&/, '')).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
+        custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)\&/)[1,2]
+        expect(custom_bike_ids).to eq([bike.id, bike2.id].map(&:to_s))
       end
       context "directly create export", :flaky do
         it "directly creates" do
@@ -72,7 +74,7 @@ RSpec.describe Organized::BikesController, type: :request do
           export = Export.last
           expect(export.organization_id).to eq current_organization.id
           expect(export.kind).to eq "organization"
-          expect(export.custom_bike_ids).to eq([bike.id, bike2.id])
+          expect(export.custom_bike_ids).to match_array([bike.id, bike2.id])
           expect(export.user_id).to eq current_user.id
           expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
           expect(OrganizationExportWorker.jobs.count).to eq 1
@@ -200,7 +202,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.creator_unregistered_parking_notification?).to be_truthy
         expect(bike.public_images.count).to eq 1
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
-        expect_hashes_to_match(bike, testable_bike_params.except(:serial_number))
+        expect(bike).to match_hash_indifferently testable_bike_params.except(:serial_number)
 
         ownership = bike.ownerships.first
         expect(ownership.send_email).to be_falsey
@@ -234,7 +236,7 @@ RSpec.describe Organized::BikesController, type: :request do
           }.to change(Bike, :count).by 0
           expect(flash[:error]).to match(/manufacturer/i)
           expect(b_param.reload.bike_errors.to_s).to match(/manufacturer/i)
-          expect_hashes_to_match(assigns(:bike), testable_bike_params.except(:manufacturer_id, :serial_number))
+          expect(assigns(:bike)).to match_hash_indifferently  testable_bike_params.except(:manufacturer_id, :serial_number)
           expect(ParkingNotification.count).to eq 0
         end
       end
@@ -284,7 +286,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.user_hidden).to be_falsey
           expect(bike.status).to eq "status_impounded"
           expect(bike.creator_unregistered_parking_notification?).to be_truthy
-          expect_hashes_to_match(bike, testable_bike_params.except(:serial_number, :latitude, :longitude))
+          expect(bike).to match_hash_indifferently testable_bike_params.except(:serial_number, :latitude, :longitude)
 
           ownership = bike.ownerships.first
           expect(ownership.send_email).to be_falsey
