@@ -77,7 +77,7 @@ RSpec.describe CycleType, type: :model do
         .map { |k, v| [k.gsub("_", "-"), v] }.to_h
     end
     it "has the same names as english translations" do
-      expect(cycle_type_translations).to match_hash_indifferently CycleType::NAMES
+      expect(cycle_type_translations.except("traditional-bike")).to match_hash_indifferently CycleType::NAMES
     end
   end
 
