@@ -69,6 +69,18 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
+  describe "names and translations" do
+    let(:en_yaml) { YAML.load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
+    let(:cycle_type_translations) do
+      # For dumb historical reasons, slugs have dashes rather than underscores
+      en_yaml.dig("en", "activerecord", "enums", "cycle_type")
+        .map { |k, v| [k.gsub("_", "-"), v] }.to_h
+    end
+    it "has the same names as english translations" do
+      expect(cycle_type_translations).to match_hash_indifferently CycleType::NAMES
+    end
+  end
+
   describe "not_cycle_drivetrain?" do
     it "is falsey" do
       expect(CycleType.not_cycle_drivetrain?(:bike)).to be_falsey
