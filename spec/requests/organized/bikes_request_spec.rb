@@ -74,7 +74,7 @@ RSpec.describe Organized::BikesController, type: :request do
           export = Export.last
           expect(export.organization_id).to eq current_organization.id
           expect(export.kind).to eq "organization"
-          expect(export.custom_bike_ids).to eq([bike.id, bike2.id])
+          expect(export.custom_bike_ids).to match_array([bike.id, bike2.id])
           expect(export.user_id).to eq current_user.id
           expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
           expect(OrganizationExportWorker.jobs.count).to eq 1
