@@ -59,8 +59,10 @@ RSpec.describe Organized::BikesController, type: :request do
           get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
         }.to change(Export, :count).by 0
         expect(flash).to be_blank
-        # TODO: make this not flaky by matching bike ids in either position
-        expect(response).to redirect_to(new_organization_export_path(target_params))
+        redirected_to = response.redirect_url
+        expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+\&/, '')).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
+        custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)\&/)[1,2]
+        expect(custom_bike_ids).to eq([bike.id, bike2.id].map(&:to_s))
       end
       context "directly create export", :flaky do
         it "directly creates" do
