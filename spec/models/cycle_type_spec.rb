@@ -41,7 +41,7 @@ RSpec.describe CycleType, type: :model do
   end
 
   describe "select_options" do
-    let(:trad_bike) { ["Traditional Bike (2 wheels, 1 seat, no motor)", "bike"] }
+    let(:trad_bike) { ["Traditional Bike (2 wheels, 1 seat, pedals)", "bike"] }
     it "has the values" do
       expect(CycleType.select_options).to include(["Bike", "bike"])
       expect(CycleType.select_options(traditional_bike: true)).to include(trad_bike)
@@ -171,7 +171,7 @@ RSpec.describe CycleType, type: :model do
     end
     let(:cycle_type) { CycleType.find(0) }
     it "is target" do
-      expect_hashes_to_match(cycle_type.autocomplete_hash, target)
+      expect(cycle_type.autocomplete_hash).to match_hash_indifferently target
       target_result_hash = target.except(:data).merge(target[:data])
       expect(cycle_type.autocomplete_result_hash).to eq target_result_hash.as_json
     end

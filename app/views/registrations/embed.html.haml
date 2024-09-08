@@ -4,6 +4,11 @@
     - email_placeholder ||= t(".owner_email", owner: current_organization&.school? ? current_organization.short_name : t(".your"))
     = f.email_field :owner_email, required: true, value: @owner_email, placeholder: email_placeholder, class: "form-control"
 
+  - if @vehicle_select
+    .form-group.fancy-select.unfancy.short-fancy-select
+      - @b_param.cycle_type ||= 'bike'
+      = f.select(:cycle_type, CycleType.select_options(traditional_bike: true), {prompt: false}, {required: true, class: 'form-control'})
+
   .form-group
     - initial_mnfg = @b_param.manufacturer && { id: @b_param.manufacturer.id, text: @b_param.manufacturer.name }.to_json
     = f.text_field :manufacturer_id, value: @b_param.manufacturer&.name, class: "form-control unfancy",
@@ -11,11 +16,6 @@
       data: { initial: initial_mnfg }
     %span.below-input-help
       = t(".select_other_if_manufacturer_doesnt_show")
-
-  - if @vehicle_select
-    .form-group.fancy-select.unfancy.short-fancy-select
-      - @b_param.cycle_type ||= 'bike'
-      = f.select(:cycle_type, CycleType.select_options(traditional_bike: true), {prompt: false}, {required: true, class: 'form-control'})
 
   .form-group.fancy-select.unfancy.short-fancy-select
     = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: t(".primary_frame_color"), class: "form-control")
