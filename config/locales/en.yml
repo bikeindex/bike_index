@@ -727,11 +727,11 @@ en:
         rearward: Rear facing
       propulsion_type:
         foot_pedal: Foot Pedal
-        hand_pedal: Hand Pedal
+        hand_pedal: Hand Cycle (hand pedal)
         human_not_pedal: Human powered (not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
-        throttle: Throttle
+        throttle: Electric Throttle
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.
