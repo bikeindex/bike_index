@@ -55,7 +55,7 @@
           .related-fields
             .form-group.row
               = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
-              .form-well-input-large
+              .form-well-input
                 - if @bike.cycle_type == "bike"
                   %label.collapse.in.pt-1.pl-1.cursor-pointer
                     = check_box_tag :traditional_bike_checkbox, true, true

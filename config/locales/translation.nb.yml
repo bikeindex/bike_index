@@ -859,7 +859,7 @@ nb:
         unicycle: Enhjuling
         wheelchair: Rullestol
         e_motorcycle: e-motorsykkel (eller e-Dirtbike)
-        traditional_bike: Tradisjonell sykkel (to hjul, ett sete, ingen motor)
+        traditional_bike: Tradisjonell sykkel (2 hjul, 1 sete, pedal)
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt
@@ -1854,7 +1854,7 @@ nb:
       student_id: Student ID
       this_is_a: Dette er en
       traditional_bike: Tradisjonell sykkel
-      traditional_bike_definition: To hjul, ett sete, ingen motor
+      traditional_bike_definition: 2 hjul, 1 sete, pedal
       unknown_year: Ukjent årstall
       unsure_or_unknown: Usikker eller ukjent
       was_made_before_1970: Ble laget før 1970
@@ -2183,7 +2183,7 @@ nb:
       propulsion_type: Fremdrift
       submit_correction: Send inn rettelse
       submit_update: Send inn oppdatering
-      traditional_bike_definition: To hjul, ett sete, ingen motor
+      traditional_bike_definition: 2 hjul, 1 sete, pedal
       update_propulsion: Oppdater fremdrift
       update_vehicle_type: Oppdater kjøretøytype
       vehicle_type: Bil type
