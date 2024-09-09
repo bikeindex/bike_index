@@ -38,16 +38,16 @@ class CycleType
     cargo: "Cargo Bike (front storage)",
     "tall-bike": "Tall Bike",
     "penny-farthing": "Penny Farthing",
-    "cargo-rear": "Cargo Bike (rear storage)",
+    "cargo-rear": "Cargo Bike Rear (e.g. longtail)",
     "cargo-trike": "Cargo Tricycle (front storage)",
     "cargo-trike-rear": "Cargo Tricycle (rear storage)",
     "trail-behind": "Trail behind (half bike)",
     "pedi-cab": "Pedi Cab (rickshaw)",
     "e-scooter": "e-Scooter",
     "personal-mobility": "e-Skateboard (e-Unicycle, Personal mobility device, etc)",
-    "non-e-scooter": "Scooter (Not electric)",
-    "non-e-skateboard": "Skateboard (Not electric)",
-    "e-motorcycle": "e-Motorcycle (or e-Dirtbike)"
+    "non-e-scooter": "Scooter (not electric)",
+    "non-e-skateboard": "Skateboard (not electric)",
+    "e-motorcycle": "e-Motorcycle/e-Dirtbike (no pedals)"
   }.freeze
 
   MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze

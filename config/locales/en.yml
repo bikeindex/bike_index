@@ -691,14 +691,13 @@ en:
       cycle_type:
         bike: Bike
         cargo: Cargo Bike (front storage)
-        cargo_rear: Cargo Bike (rear storage)
+        cargo_rear: Cargo Bike Rear (e.g. longtail)
         cargo_trike: Cargo Tricycle (front storage)
         cargo_trike_rear: Cargo Tricycle (rear storage)
-        e_motorcycle: e-Motorcycle (or e-Dirtbike)
+        e_motorcycle: e-Motorcycle/e-Dirtbike (no pedals)
         e_scooter: e-Scooter
-        e_skateboard: e-Skateboard
         non_e_scooter: Scooter (not electric)
-        non_e_skateboard: Skateboard (Not electric)
+        non_e_skateboard: Skateboard (not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
         personal_mobility: e-Skateboard (e-Unicycle, Personal mobility device, etc)
@@ -706,7 +705,7 @@ en:
         stroller: Stroller
         tall_bike: Tall Bike
         tandem: Tandem
-        traditional_bike: Traditional Bike (2 wheels, 1 seat, no motor)
+        traditional_bike: Traditional Bike (2 wheels, 1 seat, pedals)
         trail_behind: Trail behind (half bike)
         trailer: Bike Trailer
         tricycle: Tricycle
@@ -728,11 +727,11 @@ en:
         rearward: Rear facing
       propulsion_type:
         foot_pedal: Foot Pedal
-        hand_pedal: Hand Pedal
+        hand_pedal: Hand Cycle (hand pedal)
         human_not_pedal: Human powered (not by pedals)
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
-        throttle: Throttle
+        throttle: Electric Throttle
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.
@@ -1112,7 +1111,7 @@ en:
       student_id: Student ID
       this_is_a: This is a
       traditional_bike: Traditional bicycle
-      traditional_bike_definition: Two wheels, one seat, no motor
+      traditional_bike_definition: 2 wheels, 1 seat, pedals
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
       very_few_vehicles_html: Very few %{type_html} are made without serials.
@@ -1453,7 +1452,7 @@ en:
       select_cog_count: Select cog count
       submit_correction: Submit correction
       submit_update: Submit update
-      traditional_bike_definition: Two wheels, one seat, no motor
+      traditional_bike_definition: 2 wheels, 1 seat, pedals
       update_propulsion: Update propulsion
       update_vehicle_type: Update vehicle type
       vehicle_type: Vehicle type
