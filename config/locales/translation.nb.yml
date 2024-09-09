@@ -844,7 +844,6 @@ nb:
         cargo_trike: Cargo trehjulssykkel (oppbevaring foran)
         cargo_trike_rear: Laste trehjulssykkel (oppbevaring bak)
         e_scooter: E-scooter
-        e_skateboard: E-skateboard
         non_e_scooter: Scooter (ikke elektrisk)
         non_e_skateboard: Skateboard (ikke elektrisk)
         pedi_cab: Pedi Cab (rickshaw)
