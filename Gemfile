@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+def next?
+  File.basename(__FILE__) == "Gemfile.next"
+end
+
 source "https://rubygems.org"
 
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
@@ -160,7 +164,7 @@ group :development, :test do
   # the gem version hasn't been updated in a long time github.com/pry/pry-coolline/issues/22
   # https://github.com/pry/pry-coolline/commit/f3a130c9829969732977015a04e90b9fb5d281b2
   # gem "jazz_fingers"
-  gem "parallel_tests"
+  gem "parallel_tests", "~> 3.5.2"
   gem "pry-byebug"
   gem "pry-rails"
   gem "rb-fsevent", "~> 0.10.3"

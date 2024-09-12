@@ -27,4 +27,14 @@ RSpec.describe FrameMaterial, type: :model do
       end
     end
   end
+
+  describe "names and translations" do
+    let(:en_yaml) { YAML.load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
+    let(:enum_translations) do
+      en_yaml.dig("en", "activerecord", "enums", "frame_material")
+    end
+    it "has the same names as english translations" do
+      expect(enum_translations).to match_hash_indifferently FrameMaterial::NAMES
+    end
+  end
 end

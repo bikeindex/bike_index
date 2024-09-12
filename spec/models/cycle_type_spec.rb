@@ -41,7 +41,7 @@ RSpec.describe CycleType, type: :model do
   end
 
   describe "select_options" do
-    let(:trad_bike) { ["Traditional Bike (2 wheels, 1 seat, no motor)", "bike"] }
+    let(:trad_bike) { ["Traditional Bike (2 wheels, 1 seat, pedals)", "bike"] }
     it "has the values" do
       expect(CycleType.select_options).to include(["Bike", "bike"])
       expect(CycleType.select_options(traditional_bike: true)).to include(trad_bike)
@@ -66,6 +66,18 @@ RSpec.describe CycleType, type: :model do
   describe "find" do
     it "finds" do
       expect(CycleType.find(3).as_json).to eq CycleType.new(:tricycle).as_json
+    end
+  end
+
+  describe "names and translations" do
+    let(:en_yaml) { YAML.load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
+    let(:cycle_type_translations) do
+      # For dumb historical reasons, slugs have dashes rather than underscores
+      en_yaml.dig("en", "activerecord", "enums", "cycle_type")
+        .map { |k, v| [k.gsub("_", "-"), v] }.to_h
+    end
+    it "has the same names as english translations" do
+      expect(cycle_type_translations.except("traditional-bike")).to match_hash_indifferently CycleType::NAMES
     end
   end
 
@@ -171,7 +183,7 @@ RSpec.describe CycleType, type: :model do
     end
     let(:cycle_type) { CycleType.find(0) }
     it "is target" do
-      expect_hashes_to_match(cycle_type.autocomplete_hash, target)
+      expect(cycle_type.autocomplete_hash).to match_hash_indifferently target
       target_result_hash = target.except(:data).merge(target[:data])
       expect(cycle_type.autocomplete_result_hash).to eq target_result_hash.as_json
     end

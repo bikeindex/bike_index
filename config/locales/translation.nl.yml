@@ -855,11 +855,10 @@ nl:
         personal_mobility: Persoonlijk mobiliteitshulpmiddel (elektrische scooter,
           skateboard, eenwieler, enz.)
         e_scooter: E-scooter
-        e_skateboard: E-skateboard
         non_e_scooter: Scooter (niet elektrisch)
         non_e_skateboard: Skateboard (niet elektrisch)
         e_motorcycle: e-motorfiets (of e-dirtbike)
-        traditional_bike: Traditionele fiets (twee wielen, één zadel, geen motor)
+        traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
@@ -1833,7 +1832,7 @@ nl:
       electric: Elektrisch
       required: vereist - of markering ontbreekt
       traditional_bike: Traditionele fiets
-      traditional_bike_definition: Twee wielen, één stoel, geen motor
+      traditional_bike_definition: 2 wielen, 1 zadel, pedaal
       enter_bike_type_details_html: Voer %{type_html}-gegevens in
       enter_found_bike_type_details_html: Voer de gevonden %{type_html}-gegevens in
       enter_stolen_bike_type_details_html: Voer gegevens over gestolen %{type_html}
@@ -5829,7 +5828,7 @@ nl:
       propulsion_type: Voortstuwing
       submit_correction: Correctie indienen
       submit_update: Update verzenden
-      traditional_bike_definition: Twee wielen, één stoel, geen motor
+      traditional_bike_definition: 2 wielen, 1 zadel, pedaal
       update_propulsion: Aandrijving bijwerken
       update_vehicle_type: Voertuigtype bijwerken
       vehicle_type: 'Voertuigtype:'

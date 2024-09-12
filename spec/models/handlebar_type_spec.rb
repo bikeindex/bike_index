@@ -23,4 +23,14 @@ RSpec.describe HandlebarType, type: :model do
       end
     end
   end
+
+  describe "names and translations" do
+    let(:en_yaml) { YAML.load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
+    let(:enum_translations) do
+      en_yaml.dig("en", "activerecord", "enums", "handlebar_type")
+    end
+    it "has the same names as english translations" do
+      expect(enum_translations).to match_hash_indifferently HandlebarType::NAMES
+    end
+  end
 end
