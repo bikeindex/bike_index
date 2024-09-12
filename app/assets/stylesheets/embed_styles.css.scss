@@ -681,3 +681,11 @@ a {
 .less-strong {
   opacity: 0.65;
 }
+
+// cursor classes required for #motorizedWrapper
+.cusor-pointer {
+  cursor: pointer;
+}
+.cursor-not-allowed {
+  cursor: not-allowed;
+}

@@ -12,7 +12,7 @@
     .form-group.fancy-select.unfancy.short-fancy-select{style: 'margin-bottom: 0.5rem;'}
       - @b_param.cycle_type ||= 'bike'
       = f.select(:cycle_type, CycleType.select_options(traditional_bike: true), {prompt: false}, {required: true, class: 'form-control'})
-      %label#motorizedWrapper{style: 'margin: 0; padding-left: 0.25rem; cursor: pointer;'}
+      %label#motorizedWrapper.cusor-pointer{style: 'margin: 0; padding-left: 0.25rem; cursor: pointer;'}
         = check_box_tag :propulsion_type_motorized, true
         %strong ⚡️
         = t(".electric_motorized")

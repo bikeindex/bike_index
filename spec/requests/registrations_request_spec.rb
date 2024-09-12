@@ -119,7 +119,7 @@ RSpec.describe RegistrationsController, type: :request do
         end
       end
       context "with vehicle_type" do
-        let(:vehicle_field_names) { (basic_field_names + ["cycle_type"]).sort }
+        let(:vehicle_field_names) { (basic_field_names + ["cycle_type", "propulsion_type_motorized"]).sort }
         it "renders" do
           get "#{base_url}/embed", params: {
             organization_id: organization.to_param,
@@ -195,6 +195,7 @@ RSpec.describe RegistrationsController, type: :request do
             primary_frame_color_id: color.id,
             secondary_frame_color_id: color.id,
             cycle_type: "cargo-rear",
+            propulsion_type_motorized: true,
             tertiary_frame_color_id: 222,
             owner_email: "ks78xxxxxx@stuff.com",
             creation_organization_id: 21

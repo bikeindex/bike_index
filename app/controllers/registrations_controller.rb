@@ -47,11 +47,12 @@ class RegistrationsController < ApplicationController
   end
 
   def permitted_params
-    params.require(:b_param).permit(:manufacturer_id,
-      :owner_email,
-      :creation_organization_id,
+    params.require(:b_param).permit(:creation_organization_id,
       :cycle_type,
+      :manufacturer_id,
+      :owner_email,
       :primary_frame_color_id,
+      :propulsion_type_motorized,
       :secondary_frame_color_id,
       :status,
       :tertiary_frame_color_id)
