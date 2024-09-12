@@ -193,21 +193,6 @@ updateSubmitButtonDisabled = (is_disabled) ->
   else
     $(".submit-registration .please-wait-text").slideUp("fast")
 
-# Matches bikes/new.coffee - except doesn't include propulsionTypeFields or translations
-updatePropulsionAndCycleType = ->
-  cycleTypeValue = $('#bike_cycle_type').val()
-  if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)
-    $('#propulsionTypeFields').collapse('hide')
-    $('#propulsion_type_motorized').prop('checked', true)
-    $('#propulsion_type_motorized').attr('disabled', true)
-    $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
-  else if window.cycleTypesNeverMotorized.includes(cycleTypeValue)
-    $('#propulsion_type_motorized').prop('checked', false)
-    $('#propulsion_type_motorized').attr('disabled', true)
-    $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
-  else
-    $('#motorizedWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
-    $('#propulsion_type_motorized').attr('disabled', false)
 
 $(document).ready ->
   window.root_url = $('#root_url').attr('data-url')
@@ -244,9 +229,6 @@ $(document).ready ->
 
   $('#stolen_fields').appendTo('#stolen_fields_store')
   toggleRegistrationType() if $('#stolen_registration_first').length > 0
-
-  $('#b_param_cycle_type').change (e) =>
-    updatePropulsionAndCycleType()
 
   # Update any hidden fields with current timezone
   window.localTimezone ||= moment.tz.guess()

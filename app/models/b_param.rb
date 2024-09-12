@@ -97,8 +97,8 @@ class BParam < ApplicationRecord
     # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
     %w[abandoned accuracy address address_city address_country address_state address_state
       address_zipcode bike_code bike_sticker cycle_type_name cycle_type_slug
-      front_gear_type_slug handlebar_type_slug is_bulk is_new is_pos no_duplicate
-      rear_gear_type_slug revised_new stolen]
+      front_gear_type_slug handlebar_type_slug is_bulk is_new is_pos propulsion_type propulsion_type_slug
+      no_duplicate rear_gear_type_slug revised_new stolen]
   end
 
   def self.registration_info_attrs
@@ -125,16 +125,20 @@ class BParam < ApplicationRecord
     {}
   end
 
-  def self.top_level_propulsion_type(passed_params)
+  # NOTE: Does not restrict to valid propulsion_types, it's allow-listed in safe_bike_attrs
+  def self.propulsion_type(passed_params)
     throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
     pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
-    if pedal_assist
+    top_level_propulsion_type = if pedal_assist
       throttle ? "pedal-assist-and-throttle" : "pedal-assist"
     elsif throttle
       "throttle"
     elsif InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
       "motorized"
     end&.to_sym
+
+    top_level_propulsion_type || passed_params["bike"]["propulsion_type_slug"] ||
+      passed_params["bike"]["propulsion_type"]
   end
 
   # Crazy new shit
@@ -174,6 +178,16 @@ class BParam < ApplicationRecord
   # Used by partial registration
   def cycle_type
     bike["cycle_type"]
+  end
+
+  # Used by partial registration
+  def propulsion_type_motorized=(val)
+    params["propulsion_type_motorized"] = val
+  end
+
+  # Used by partial registration
+  def propulsion_type_motorized
+    PropulsionType.motorized?(self.class.propulsion_type(params))
   end
 
   def with_bike?
@@ -529,11 +543,7 @@ class BParam < ApplicationRecord
         "updator_id" => creator_id)
       .merge(address_hash)
     # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
-    propulsion_type = self.class.top_level_propulsion_type(params) ||
-      safe_attrs["propulsion_type_slug"] || safe_attrs["propulsion_type"]
-    # propulsion_type_slug needs to be the last key in the hash
-    safe_attrs.except("propulsion_type", "propulsion_type_slug")
-      .merge("propulsion_type_slug" => propulsion_type)
+    safe_attrs.merge("propulsion_type_slug" => self.class.propulsion_type(new_attrs))
   end
 
   private

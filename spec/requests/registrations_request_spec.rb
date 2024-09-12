@@ -204,6 +204,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect_render_without_xframe
           expect(response).to render_template(:create)
           b_param = BParam.last
+          pp b_param
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
           end

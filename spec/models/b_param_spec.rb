@@ -600,32 +600,52 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  describe "top_level_propulsion_type" do
-    it "is foot-pedal" do
-      expect(BParam.top_level_propulsion_type({})).to be_nil
+  describe "propulsion_type" do
+    context "with propulsion_type" do
+      let(:passed_params) { {bike: {propulsion_type: "not-a-valid-propulsion-type"}} }
+      it "assigns the propulsion_type_slug" do
+        expect(BParam.propulsion_type(passed_params.as_json)).to eq "not-a-valid-propulsion-type"
+      end
     end
-    context "propulsion_type_throttle" do
-      let(:pparams) { {"propulsion_type_throttle" => "1"} }
-      it "is throttle" do
-        expect(BParam.top_level_propulsion_type(pparams)).to eq :throttle
+    context "with propulsion_type_slug" do
+      let(:passed_params) { {bike: {propulsion_type_slug: "human-not-pedal"}} }
+      it "assigns the propulsion_type_slug" do
+        expect(BParam.propulsion_type(passed_params.as_json)).to eq "human-not-pedal"
       end
-      context "with propulsion_type_pedal_assist" do
-        let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
-        it "is pedal-assist-and-throttle" do
-          expect(BParam.top_level_propulsion_type(pparams_with_assist)).to eq :"pedal-assist-and-throttle"
-        end
+    end
+    context "with propulsion_type_slug and top_level_propulsion_type" do
+      let(:passed_params) { {propulsion_type_motorized: "1", bike: {propulsion_type_slug: "human-not-pedal"}} }
+      it "assigns the top_level_propulsion_type" do
+        expect(BParam.propulsion_type(passed_params.as_json)).to eq "motorized"
       end
-      context "with propulsion_type_motorized" do
-        let(:pparams_motorized) { pparams.merge("propulsion_type_motorized" => "1") }
+    end
+    context "propulsion_type" do
+      it "is foot-pedal" do
+        expect(BParam.propulsion_type({})).to be_nil
+      end
+      context "propulsion_type_throttle" do
+        let(:pparams) { {"propulsion_type_throttle" => "1"} }
         it "is throttle" do
-          expect(BParam.top_level_propulsion_type(pparams)).to eq :throttle
+          expect(BParam.propulsion_type(pparams)).to eq :throttle
+        end
+        context "with propulsion_type_pedal_assist" do
+          let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
+          it "is pedal-assist-and-throttle" do
+            expect(BParam.propulsion_type(pparams_with_assist)).to eq :"pedal-assist-and-throttle"
+          end
+        end
+        context "with propulsion_type_motorized" do
+          let(:pparams_motorized) { pparams.merge("propulsion_type_motorized" => "1") }
+          it "is throttle" do
+            expect(BParam.propulsion_type(pparams)).to eq :throttle
+          end
         end
       end
-    end
-    context "propulsion_type_motorized" do
-      let(:pparams) { {"propulsion_type_motorized" => "1"} }
-      it "is throttle" do
-        expect(BParam.top_level_propulsion_type(pparams)).to eq :motorized
+      context "propulsion_type_motorized" do
+        let(:pparams) { {"propulsion_type_motorized" => "1"} }
+        it "is throttle" do
+          expect(BParam.propulsion_type(pparams)).to eq :motorized
+        end
       end
     end
   end
