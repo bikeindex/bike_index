@@ -52,10 +52,10 @@ class RegistrationsController < ApplicationController
       :manufacturer_id,
       :owner_email,
       :primary_frame_color_id,
-      :propulsion_type_motorized,
       :secondary_frame_color_id,
       :status,
       :tertiary_frame_color_id)
-      .merge(origin: "embed_partial")
+      .merge(origin: "embed_partial",
+             propulsion_type_motorized: params[:propulsion_type_motorized])
   end
 end

@@ -608,7 +608,7 @@ RSpec.describe BParam, type: :model do
       end
     end
     context "with propulsion_type_slug" do
-      let(:passed_params) { {bike: {propulsion_type_slug: "human-not-pedal"}} }
+      let(:passed_params) { {bike: {propulsion_type_slug: "human-not-pedal", propulsion_type: "not-a-valid-propulsion-type"}} }
       it "assigns the propulsion_type_slug" do
         expect(BParam.propulsion_type(passed_params.as_json)).to eq "human-not-pedal"
       end
@@ -616,7 +616,7 @@ RSpec.describe BParam, type: :model do
     context "with propulsion_type_slug and top_level_propulsion_type" do
       let(:passed_params) { {propulsion_type_motorized: "1", bike: {propulsion_type_slug: "human-not-pedal"}} }
       it "assigns the top_level_propulsion_type" do
-        expect(BParam.propulsion_type(passed_params.as_json)).to eq "motorized"
+        expect(BParam.propulsion_type(passed_params.as_json)).to eq :motorized
       end
     end
     context "propulsion_type" do

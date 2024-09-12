@@ -127,6 +127,7 @@ class BParam < ApplicationRecord
 
   # NOTE: Does not restrict to valid propulsion_types, it's allow-listed in safe_bike_attrs
   def self.propulsion_type(passed_params)
+    return nil if passed_params.blank?
     throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
     pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
     top_level_propulsion_type = if pedal_assist
@@ -137,8 +138,8 @@ class BParam < ApplicationRecord
       "motorized"
     end&.to_sym
 
-    top_level_propulsion_type || passed_params["bike"]["propulsion_type_slug"] ||
-      passed_params["bike"]["propulsion_type"]
+    top_level_propulsion_type || passed_params.dig("bike", "propulsion_type_slug") ||
+      passed_params.dig("bike", "propulsion_type")
   end
 
   # Crazy new shit
@@ -543,7 +544,7 @@ class BParam < ApplicationRecord
         "updator_id" => creator_id)
       .merge(address_hash)
     # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
-    safe_attrs.merge("propulsion_type_slug" => self.class.propulsion_type(new_attrs))
+    safe_attrs.merge("propulsion_type_slug" => self.class.propulsion_type(new_attrs.as_json))
   end
 
   private
