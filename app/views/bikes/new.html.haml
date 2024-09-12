@@ -67,8 +67,7 @@
                 %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
                   = check_box_tag :propulsion_type_motorized, true
                   %strong ⚡️
-                  = t(".electric")
-                  (motorized)
+                  = t(".electric_motorized")
                 #propulsionTypeFields.collapse.pl-1
                   %label.checkbox-inline.mr-2
                     = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?

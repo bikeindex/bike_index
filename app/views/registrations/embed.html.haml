@@ -5,9 +5,17 @@
     = f.email_field :owner_email, required: true, value: @owner_email, placeholder: email_placeholder, class: "form-control"
 
   - if @vehicle_select
-    .form-group.fancy-select.unfancy.short-fancy-select
+    :javascript
+      window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
+      window.cycleTypesAlwaysMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
+      window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
+    .form-group.fancy-select.unfancy.short-fancy-select{style: 'margin-bottom: 0.5rem;'}
       - @b_param.cycle_type ||= 'bike'
       = f.select(:cycle_type, CycleType.select_options(traditional_bike: true), {prompt: false}, {required: true, class: 'form-control'})
+      %label#motorizedWrapper{style: 'margin: 0; padding-left: 0.25rem; cursor: pointer;'}
+        = check_box_tag :propulsion_type_motorized, true
+        %strong ⚡️
+        = t(".electric_motorized")
 
   .form-group
     - initial_mnfg = @b_param.manufacturer && { id: @b_param.manufacturer.id, text: @b_param.manufacturer.name }.to_json
