@@ -89,7 +89,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Dangerous Send",
@@ -112,7 +112,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "File Access",
@@ -394,7 +394,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -668,7 +668,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Dangerous Send",
@@ -691,7 +691,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Unmaintained Dependency",
@@ -776,7 +776,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -910,7 +910,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1058,7 +1058,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Command Injection",
@@ -1249,7 +1249,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1272,7 +1272,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for whitelisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Command Injection",
