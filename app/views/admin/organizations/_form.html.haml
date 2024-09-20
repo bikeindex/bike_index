@@ -210,13 +210,19 @@
             - elsif @organization.enabled?(reg_field)
               - reg_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
               - reg_attr_title = reg_attr.titleize(keep_id_suffix: true)
+              - label_required = reg_attr == "true_false_question"
               .form-group.small
                 = label_tag "reg_label-#{reg_field}" do
                   Custom Label for
                   %em= reg_attr_title
-                  %small.less-strong
-                    leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred
-                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), {class: "form-control"}
+                  - if label_required
+                    %span.text-danger
+                      This needs a label!
+                    the default is blank
+                  - else
+                    %small.less-strong
+                      leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred
+                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), {class: "form-control", required: label_required}
 
           - if @organization.enabled?("organization_stolen_message")
             - organization_stolen_message = OrganizationStolenMessage.for(@organization)
