@@ -1,31 +1,51 @@
-class @CheckEmail # Use mailcheck to find emails with problems
-  msg_selector =
-    'email_check_message'
-  constructor: (target_selector) ->
-    $target = $(target_selector)
-    @runMailcheck($target)
-    @initializeMailCheck($target)
+class @UpdatePropulsionType
+  # model_name can be 'bike' or 'b_param'
+  constructor: (model_name) ->
+    $("##{model_name}_cycle_type").change (e) =>
+      @updateTypes(model_name)
+    $('#propulsion_type_motorized').change (e) =>
+      @updateTypes(model_name)
+    $('.modal').on 'show.bs.modal', =>
+      # Need to trigger correct text on modal
+      @updateTypes(model_name)
 
-  initializeMailCheck: ($target) ->
-    $target.on 'blur', (e) =>
-      # Remove any existing warning
-      $target.parents('.form-group').removeClass('has-warning')
-      $("##{msg_selector}").slideUp 'fast', ->
-        $("##{msg_selector}").remove()
-      @runMailcheck($target)
+  # Set motorized if it should be motorized.
+  # Only show propulsion type options if there can be options
+  # embed_script.js.coffee has a simpler version of this method
+  updateTypes: (model_name) ->
+    cycleTypeValue = $("##{model_name}_cycle_type").val()
+    if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)
+      $('#propulsionTypeFields').collapse('hide')
+      $('#propulsion_type_motorized').prop('checked', true)
+      $('#propulsion_type_motorized').attr('disabled', true)
+      $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+    else if window.cycleTypesNeverMotorized.includes(cycleTypeValue)
+      $('#propulsion_type_motorized').prop('checked', false)
+      $('#propulsion_type_motorized').attr('disabled', true)
+      $('#propulsionTypeFields').collapse('hide')
+      $('#motorizedWrapper').addClass('less-strong cursor-not-allowed').removeClass('cursor-pointer')
+    else
+      $('#motorizedWrapper').addClass('cursor-pointer').removeClass('less-strong cursor-not-allowed')
+      $('#propulsion_type_motorized').attr('disabled', false)
+      if $('#propulsion_type_motorized').prop('checked')
+        if window.cycleTypesPedals.includes(cycleTypeValue)
+          $('#propulsionTypeFields').collapse('show')
+        else
+          $('#propulsionTypeFields').collapse('hide')
+      else
+        $('#propulsionTypeFields').collapse('hide')
 
-  runMailcheck: ($target) ->
-    Mailcheck.run
-      email: $target.val()
-      suggested: (result) =>
-        $target.parents('.form-group').addClass('has-warning')
-        msg = "Did you mean <ins>#{result.full}</ins> ?"
-        $target.after("<div id='#{msg_selector}'>#{msg}</div>")
-        $("##{msg_selector}").slideDown('fast')
-        $("##{msg_selector}").on 'click', (e) =>
-          # Replace the target's value with the message value
-          $target.val($("##{msg_selector} ins").text())
-          # remove the evidence
-          $("##{msg_selector}").slideUp 'fast', ->
-            $("##{msg_selector}").remove()
-          $target.parents('.form-group').removeClass('has-warning')
+        $('#propulsion_type_throttle').prop('checked', false)
+        $('#propulsion_type_pedal_assist').prop('checked', false)
+
+    if window.cycleTypeTranslations
+      # Update cycle_type text on the page (if there is a )
+      newTypeText = window.cycleTypeTranslations[cycleTypeValue]
+      if newTypeText.length
+        $(".cycleTypeText").text(newTypeText)
+      if window.cycleTypesNot.includes(cycleTypeValue)
+        $(".cycleTypeOnly").collapse("hide")
+        $(".notCycleTypeOnly").collapse("show")
+      else
+        $(".cycleTypeOnly").collapse("show")
+        $(".notCycleTypeOnly").collapse("hide")
