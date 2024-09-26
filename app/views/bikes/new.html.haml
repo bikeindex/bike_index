@@ -53,29 +53,29 @@
                 = t(".missing_serial")
 
           .related-fields
-            .form-group.row.unnested-field
+            .form-group.row
               = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
               .form-well-input
                 - if @bike.cycle_type == "bike"
                   %label.collapse.in.pt-1.pl-1.cursor-pointer
                     = check_box_tag :traditional_bike_checkbox, true, true
                     = t(".traditional_bike")
-                    %span.below-input-help{style: "font-size: 100%; padding: 0 0 0 1.1em"}
-                      %em= t(".traditional_bike_definition")
+                    %em= t(".traditional_bike_definition")
+
                 .cycle-type-select.fancy-select.unfancy{class: @bike.cycle_type == "bike" ? "collapse" : ""}
                   = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
-                  %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
-                    = check_box_tag :propulsion_type_motorized, true
-                    %strong ⚡️
-                    = t(".electric")
-                    (motorized)
-                  #propulsionTypeFields.collapse.pl-1
-                    %label.checkbox-inline.mr-2
-                      = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
-                      Throttle
-                    %label.checkbox-inline
-                      = check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist?
-                      Pedal assist
+                %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
+                  = check_box_tag :propulsion_type_motorized, true
+                  %strong ⚡️
+                  = t(".electric")
+                  (motorized)
+                #propulsionTypeFields.collapse.pl-1
+                  %label.checkbox-inline.mr-2
+                    = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
+                    Throttle
+                  %label.checkbox-inline
+                    = check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist?
+                    Pedal assist
 
           .related-fields
             .form-group.row
