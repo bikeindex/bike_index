@@ -161,7 +161,7 @@ end
 
 group :development, :test do
   gem "brakeman", require: false
-  gem "database_cleaner"
+  gem "database_cleaner", "~> 2.0.0"
   gem "dotenv-rails"
   gem "foreman"
   # Commented out because jazz_fingers relies on pry-coolline, which currently errors on load

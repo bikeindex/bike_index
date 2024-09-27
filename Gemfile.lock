@@ -185,7 +185,12 @@ GEM
     crass (1.0.6)
     css_parser (1.7.1)
       addressable
-    database_cleaner (1.7.0)
+    database_cleaner (2.0.2)
+      database_cleaner-active_record (>= 2, < 3)
+    database_cleaner-active_record (2.2.0)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     date (3.3.4)
     diff-lcs (1.4.4)
     docile (1.4.0)
@@ -793,7 +798,7 @@ DEPENDENCIES
   chartkick
   coderay
   coffee-rails
-  database_cleaner
+  database_cleaner (~> 2.0.0)
   doorkeeper (~> 5.2.5)
   doorkeeper-i18n
   dotenv-rails
