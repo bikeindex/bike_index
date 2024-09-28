@@ -545,8 +545,7 @@ class BParam < ApplicationRecord
         "creator_id" => creator_id,
         "updator_id" => creator_id,
         # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
-        "propulsion_type_slug" => self.class.propulsion_type(params.merge("bike" => attrs_merged))
-        )
+        "propulsion_type_slug" => self.class.propulsion_type(params.merge("bike" => attrs_merged)))
       .merge(address_hash)
   end
 

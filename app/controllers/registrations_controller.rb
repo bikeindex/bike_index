@@ -47,6 +47,7 @@ class RegistrationsController < ApplicationController
   end
 
   def permitted_params
+    # p_params = params.permit(:propulsion_type_motorized)
     params.require(:b_param).permit(:creation_organization_id,
       :cycle_type,
       :manufacturer_id,
@@ -56,6 +57,13 @@ class RegistrationsController < ApplicationController
       :status,
       :tertiary_frame_color_id)
       .merge(origin: "embed_partial",
-             propulsion_type_motorized: params[:propulsion_type_motorized])
+        propulsion_type_motorized: params[:propulsion_type_motorized])
+    # pp pp_params.permit(:propulsion_type_motorized)
+    # .tap do |internal|
+
+    # end
+    # pp_params
+    # pp_params[:propulsion_type_motorized] ||= params[:propulsion_type_motorized]
+    # pp_params
   end
 end

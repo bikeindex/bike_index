@@ -681,11 +681,19 @@ RSpec.describe BParam, type: :model do
       end
     end
     context "top_level_propulsion_type" do
-      let(:params) { {propulsion_type_motorized: 1, propulsion_type_throttle: 0, propulsion_type_pedal_assist: 1, bike: bike_params} }
+      let(:params) { {propulsion_type_motorized: 1, bike: bike_params} }
       it "returns with propulsion_type overridden" do
         result = b_param.safe_bike_attrs({})
-        expect(result).to match_hash_indifferently target.merge(propulsion_type_slug: "pedal-assist")
+        expect(result).to match_hash_indifferently target.merge(propulsion_type_slug: "motorized")
         expect(result.keys).to include "propulsion_type_slug"
+      end
+      context "more top_level_propulsion_type options" do
+        let(:params) { {propulsion_type_motorized: 1, propulsion_type_throttle: 0, propulsion_type_pedal_assist: 1, bike: bike_params} }
+        it "returns with propulsion_type overridden" do
+          result = b_param.safe_bike_attrs({})
+          expect(result).to match_hash_indifferently target.merge(propulsion_type_slug: "pedal-assist")
+          expect(result.keys).to include "propulsion_type_slug"
+        end
       end
     end
     context "with cycle_type" do

@@ -176,11 +176,11 @@ RSpec.describe PropulsionType, type: :model do
   end
 
   describe "names and translations" do
-    let(:en_yaml) { YAML.load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
+    let(:en_yaml) { YAML.safe_load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
     let(:enum_translations) do
       # For dumb historical reasons, slugs have dashes rather than underscores
       en_yaml.dig("en", "activerecord", "enums", "propulsion_type")
-        .map { |k, v| [k.gsub("_", "-"), v] }.to_h
+        .map { |k, v| [k.tr("_", "-"), v] }.to_h
     end
     it "has the same names as english translations" do
       expect(enum_translations).to match_hash_indifferently PropulsionType::NAMES
