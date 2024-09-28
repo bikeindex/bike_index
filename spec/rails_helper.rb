@@ -29,6 +29,7 @@ require "rspec/rails"
 require "database_cleaner"
 require "rspec-sidekiq"
 require "vcr"
+require "super_diff/rspec-rails"
 
 ActiveRecord::Migration.maintain_test_schema!
 

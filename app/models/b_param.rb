@@ -128,18 +128,20 @@ class BParam < ApplicationRecord
   # NOTE: Does not restrict to valid propulsion_types, it's allow-listed in safe_bike_attrs
   def self.propulsion_type(passed_params)
     return nil if passed_params.blank?
+
     throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
     pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
-    top_level_propulsion_type = if pedal_assist
+    propul_type = if pedal_assist
       throttle ? "pedal-assist-and-throttle" : "pedal-assist"
     elsif throttle
       "throttle"
     elsif InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
       "motorized"
-    end&.to_sym
+    else
+      passed_params["propulsion_type_slug"] || passed_params["propulsion_type"]
+    end
 
-    top_level_propulsion_type || passed_params.dig("bike", "propulsion_type_slug") ||
-      passed_params.dig("bike", "propulsion_type")
+    propul_type || propulsion_type(passed_params["bike"])
   end
 
   # Crazy new shit
@@ -535,16 +537,17 @@ class BParam < ApplicationRecord
 
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
-    safe_attrs = bike.merge("status" => status).merge(new_attrs.as_json)
-      .select { |_k, v| InputNormalizer.present_or_false?(v) }
+    attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
+    attrs_merged.select { |_k, v| InputNormalizer.present_or_false?(v) }
       .except(*BParam.skipped_bike_attrs)
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,
         "creator_id" => creator_id,
-        "updator_id" => creator_id)
+        "updator_id" => creator_id,
+        # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
+        "propulsion_type_slug" => self.class.propulsion_type(params.merge("bike" => attrs_merged))
+        )
       .merge(address_hash)
-    # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
-    safe_attrs.merge("propulsion_type_slug" => self.class.propulsion_type(new_attrs.as_json))
   end
 
   private

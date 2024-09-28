@@ -119,6 +119,7 @@ GEM
       rake (>= 10.4, < 14.0)
     api-pagination (5.0.0)
     ast (2.4.2)
+    attr_extras (7.1.0)
     autoprefixer-rails (9.7.3)
       execjs
     axlsx (3.0.0.pre)
@@ -497,6 +498,7 @@ GEM
     omniauth-twitter (1.4.0)
       omniauth-oauth (~> 1.1)
       rack
+    optimist (3.1.0)
     parallel (1.22.1)
     parallel_tests (3.5.2)
       parallel
@@ -505,6 +507,8 @@ GEM
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
+    patience_diff (1.2.0)
+      optimist (~> 3.0)
     pg (1.5.6)
     pg_search (2.3.6)
       activerecord (>= 5.2)
@@ -713,6 +717,10 @@ GEM
       rubocop (= 1.32.0)
       rubocop-performance (= 1.14.3)
     stripe (5.35.0)
+    super_diff (0.9.0)
+      attr_extras (>= 6.2.4)
+      diff-lcs
+      patience_diff
     temple (0.8.2)
     terminal-notifier (2.0.0)
     terminal-table (3.0.2)
@@ -885,6 +893,7 @@ DEPENDENCIES
   stackprof
   standard
   stripe
+  super_diff
   swagger-ui_rails!
   terminal-notifier
   thor
