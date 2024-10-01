@@ -148,16 +148,19 @@ RSpec.describe RegistrationsController, type: :request do
     let(:color) { FactoryBot.create(:color) }
     context "invalid creation" do
       context "email not set, sets simple_header" do
-        it "does not create a bparam, rerenders new with all assigned values" do
-          attrs = {
+        let(:attrs) do
+          {
             manufacturer_id: manufacturer.id,
             status: "status_stolen",
             creator_id: 21,
             primary_frame_color_id: color.id,
             secondary_frame_color_id: 12,
             tertiary_frame_color_id: 222,
-            creation_organization_id: 9292
+            creation_organization_id: 9292,
+            cycle_type: "bike"
           }
+        end
+        it "does not create a bparam, rerenders new with all assigned values" do
           expect {
             post base_url, params: {simple_header: true, b_param: attrs}
           }.to change(BParam, :count).by 0
@@ -165,10 +168,8 @@ RSpec.describe RegistrationsController, type: :request do
           expect(response).to render_template(:new) # Because it redirects since unsuccessful
           expect(assigns(:simple_header)).to be_truthy
           b_param = assigns(:b_param)
-          expect(attrs.except(:creator_id)).to match_hash_indifferently b_param
-          # attrs.except(:creator_id).each do |key, value|
-          #   expect(b_param.send(key).to_s).to eq value.to_s
-          # end
+          expect(attrs.except(:creator_id, :cycle_type)).to match_hash_indifferently b_param
+          expect(b_param.cycle_type).to eq "bike"
           expect(b_param.creator_id).to be_nil
           expect(b_param.origin).to eq "embed_partial"
         end
@@ -190,8 +191,8 @@ RSpec.describe RegistrationsController, type: :request do
         end
       end
       context "all values set" do
-        it "creates a new bparam and renders" do
-          attrs = {
+        let(:attrs) do
+          {
             manufacturer_id: manufacturer.id,
             primary_frame_color_id: color.id,
             secondary_frame_color_id: color.id,
@@ -200,15 +201,33 @@ RSpec.describe RegistrationsController, type: :request do
             owner_email: "ks78xxxxxx@stuff.com",
             creation_organization_id: 21
           }
+        end
+        it "creates a new bparam and renders" do
           post base_url, params: {b_param: attrs, propulsion_type_motorized: "true"}
           expect_render_without_xframe
           expect(response).to render_template(:create)
           b_param = BParam.last
           expect(attrs).to match_hash_indifferently b_param
           expect(b_param.origin).to eq "embed_partial"
-          expect(b_param.propulsion_type_motorized).to be_truthy
+          expect(b_param.motorized?).to be_truthy
           expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
           expect(b_param.partial_registration?).to be_truthy
+        end
+
+        context "with invalid cycle_type" do
+          it "creates a new bparam and renders" do
+            post base_url, params: {b_param: attrs.merge(cycle_type: "fake cycle type"),
+                                    propulsion_type_motorized: "true"}
+            expect_render_without_xframe
+            expect(response).to render_template(:create)
+            b_param = BParam.last
+            expect(attrs.except(:cycle_type)).to match_hash_indifferently b_param
+            expect(b_param.origin).to eq "embed_partial"
+            expect(b_param.cycle_type).to eq "bike"
+            expect(b_param.motorized?).to be_truthy
+            expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+            expect(b_param.partial_registration?).to be_truthy
+          end
         end
       end
     end

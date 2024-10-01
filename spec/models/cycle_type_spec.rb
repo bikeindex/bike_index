@@ -57,9 +57,19 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
-  describe "slug_hash_lowecase" do
-    it "makes a hash" do
+  describe "slug_translation" do
+    it "returns short name" do
+      expect(CycleType.slug_translation("cargo")).to eq "Cargo Bike (front storage)"
       expect(CycleType.slug_translation_hash_lowercase_short["cargo"]).to eq "cargo bike"
+    end
+
+    context "with invalid name" do
+      it "raises error for slug_translation" do
+        expect { CycleType.slug_translation("asdfasdf") }.to raise_error(I18n::MissingTranslationData)
+      end
+      it "slug_translation_hash_lowercase_short returns nothing" do
+        expect(CycleType.slug_translation_hash_lowercase_short["asdfasdf"]).to be_nil
+      end
     end
   end
 

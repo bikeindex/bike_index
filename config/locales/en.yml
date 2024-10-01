@@ -4438,6 +4438,8 @@ en:
         bike: Bike
         email: email
         incomplete: incomplete
+        vehicle_type: Type
+        motorized: e-vehicle?
         matching: matching
         only_resend_with_permission: >-
           Only re-send partial registrations with the user's permission! Otherwise

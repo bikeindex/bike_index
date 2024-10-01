@@ -189,7 +189,7 @@ class BParam < ApplicationRecord
   end
 
   # Used by partial registration
-  def propulsion_type_motorized
+  def motorized?
     PropulsionType.motorized?(self.class.propulsion_type(params))
   end
 
@@ -418,12 +418,12 @@ class BParam < ApplicationRecord
   end
 
   def set_cycle_type_key
-    if (key = (bike["cycle_type"] || bike["cycle_type_slug"] || bike["cycle_type_name"]).presence)
-      ct = CycleType.friendly_find(key)
-      params["bike"]["cycle_type"] = ct&.slug
-      params["bike"].delete("cycle_type_slug")
-      params["bike"].delete("cycle_type_name")
-    end
+    key = (bike["cycle_type"] || bike["cycle_type_slug"] || bike["cycle_type_name"]).presence
+    cycle_type_slug = CycleType.friendly_find(key)&.slug
+    params["bike"].delete("cycle_type_slug")
+    params["bike"].delete("cycle_type_name")
+
+    params["bike"]["cycle_type"] = cycle_type_slug || CycleType.default_slug
   end
 
   def set_wheel_size_key
