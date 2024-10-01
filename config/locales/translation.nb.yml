@@ -4758,6 +4758,8 @@ nb:
         search_emails: Søk i e-poster
         sent: Sendt
         through_org: gjennom %{org_name}
+        motorized: e-kjøretøy?
+        vehicle_type: Type
       index:
         connected_to_bike_html: Den er koblet til denne %{bike_link}.
         enter_url_of_the_bike_html: 'Du kan skrive inn URL-en til sykkelen du vil
