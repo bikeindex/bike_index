@@ -119,7 +119,7 @@ RSpec.describe RegistrationsController, type: :request do
         end
       end
       context "with vehicle_type" do
-        let(:vehicle_field_names) { (basic_field_names + ["cycle_type"]).sort }
+        let(:vehicle_field_names) { (basic_field_names + ["cycle_type", "propulsion_type_motorized"]).sort }
         it "renders" do
           get "#{base_url}/embed", params: {
             organization_id: organization.to_param,
@@ -165,9 +165,10 @@ RSpec.describe RegistrationsController, type: :request do
           expect(response).to render_template(:new) # Because it redirects since unsuccessful
           expect(assigns(:simple_header)).to be_truthy
           b_param = assigns(:b_param)
-          attrs.except(:creator_id).each do |key, value|
-            expect(b_param.send(key).to_s).to eq value.to_s
-          end
+          expect(attrs.except(:creator_id)).to match_hash_indifferently b_param
+          # attrs.except(:creator_id).each do |key, value|
+          #   expect(b_param.send(key).to_s).to eq value.to_s
+          # end
           expect(b_param.creator_id).to be_nil
           expect(b_param.origin).to eq "embed_partial"
         end
@@ -199,14 +200,13 @@ RSpec.describe RegistrationsController, type: :request do
             owner_email: "ks78xxxxxx@stuff.com",
             creation_organization_id: 21
           }
-          post base_url, params: {b_param: attrs}
+          post base_url, params: {b_param: attrs, propulsion_type_motorized: "true"}
           expect_render_without_xframe
           expect(response).to render_template(:create)
           b_param = BParam.last
-          attrs.each do |key, value|
-            expect(b_param.send(key).to_s).to eq value.to_s
-          end
+          expect(attrs).to match_hash_indifferently b_param
           expect(b_param.origin).to eq "embed_partial"
+          expect(b_param.propulsion_type_motorized).to be_truthy
           expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
           expect(b_param.partial_registration?).to be_truthy
         end

@@ -60,8 +60,8 @@ RSpec.describe Organized::BikesController, type: :request do
         }.to change(Export, :count).by 0
         expect(flash).to be_blank
         redirected_to = response.redirect_url
-        expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+\&/, '')).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
-        custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)\&/)[1,2]
+        expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
+        custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
         expect(custom_bike_ids).to eq([bike.id, bike2.id].map(&:to_s))
       end
       context "directly create export", :flaky do
@@ -236,7 +236,7 @@ RSpec.describe Organized::BikesController, type: :request do
           }.to change(Bike, :count).by 0
           expect(flash[:error]).to match(/manufacturer/i)
           expect(b_param.reload.bike_errors.to_s).to match(/manufacturer/i)
-          expect(assigns(:bike)).to match_hash_indifferently  testable_bike_params.except(:manufacturer_id, :serial_number)
+          expect(assigns(:bike)).to match_hash_indifferently testable_bike_params.except(:manufacturer_id, :serial_number)
           expect(ParkingNotification.count).to eq 0
         end
       end

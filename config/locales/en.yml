@@ -1076,7 +1076,7 @@ en:
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
       city: City
-      electric: Electric
+      electric_motorized: Electric (motorized)
       enter_bike_type_details_html: Enter %{type_html} details
       enter_found_bike_type_details_html: Enter Found %{type_html} details
       enter_stolen_bike_type_details_html: Enter Stolen %{type_html} details
@@ -4982,6 +4982,7 @@ en:
     embed:
       bike_manufacturer: Bike manufacturer
       choose_specific_organization_optional: Choose Specific Organization (optional)
+      electric_motorized: Electric (motorized)
       owner_email: "%{owner} email"
       primary_frame_color: Primary frame color
       register: Register

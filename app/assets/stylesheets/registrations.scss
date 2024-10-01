@@ -236,6 +236,14 @@ img {
 // ------------------------------
 //
 
+// cursor classes required for #motorizedWrapper
+.cusor-pointer {
+  cursor: pointer;
+}
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
 //
 // REGISTRATION FORM SPECIFIC STYLES
 //

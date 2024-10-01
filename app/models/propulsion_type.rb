@@ -25,7 +25,7 @@ class PropulsionType
 
   class << self
     def motorized?(slug)
-      MOTORIZED.include?(slug&.to_sym)
+      (MOTORIZED + [:motorized]).include?(slug&.to_sym)
     end
 
     def not_motorized?(slug)

@@ -170,6 +170,7 @@ RSpec::Matchers.define :match_hash_indifferently do |expected|
     # Redefine expected  'actual' to be what we're actually comparing against for the diff
     # Symbolize keys because in general, expected has symbolized keys and it improves the diff
     @actual = RspecHashMatcher.indifferent_hash(actual, expected).deep_symbolize_keys
+
     match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual)
     RspecHashMatcher.match_errors_message(match_errors)
   end

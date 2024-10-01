@@ -47,14 +47,17 @@ class RegistrationsController < ApplicationController
   end
 
   def permitted_params
-    params.require(:b_param).permit(:manufacturer_id,
-      :owner_email,
-      :creation_organization_id,
+    params.require(:b_param).permit(:creation_organization_id,
       :cycle_type,
+      :manufacturer_id,
+      :owner_email,
       :primary_frame_color_id,
       :secondary_frame_color_id,
       :status,
       :tertiary_frame_color_id)
-      .merge(origin: "embed_partial")
+      .merge(
+        origin: "embed_partial",
+        propulsion_type_motorized: params[:propulsion_type_motorized]
+      )
   end
 end
