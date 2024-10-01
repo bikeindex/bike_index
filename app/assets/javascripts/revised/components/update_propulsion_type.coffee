@@ -1,6 +1,7 @@
 class @UpdatePropulsionType
   # model_name can be 'bike' or 'b_param'
   constructor: (model_name) ->
+    @updateTypes(model_name)
     $("##{model_name}_cycle_type").change (e) =>
       @updateTypes(model_name)
     $('#propulsion_type_motorized').change (e) =>

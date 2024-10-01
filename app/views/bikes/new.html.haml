@@ -65,7 +65,7 @@
                 .cycle-type-select.fancy-select.unfancy{class: @bike.cycle_type == "bike" ? "collapse" : ""}
                   = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
                 %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
-                  = check_box_tag :propulsion_type_motorized, true
+                  = check_box_tag :propulsion_type_motorized, true, @bike.motorized?
                   %strong ⚡️
                   = t(".electric_motorized")
                 #propulsionTypeFields.collapse.pl-1

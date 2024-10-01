@@ -131,17 +131,17 @@ class BParam < ApplicationRecord
 
     throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
     pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
-    propul_type = if pedal_assist
+
+    if pedal_assist
       throttle ? "pedal-assist-and-throttle" : "pedal-assist"
     elsif throttle
       "throttle"
     elsif InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
       "motorized"
     else
-      passed_params["propulsion_type_slug"] || passed_params["propulsion_type"]
+      passed_params["propulsion_type_slug"] || passed_params["propulsion_type"] ||
+        propulsion_type(passed_params["bike"])
     end
-
-    propul_type || propulsion_type(passed_params["bike"])
   end
 
   # Crazy new shit

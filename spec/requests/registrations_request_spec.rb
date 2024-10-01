@@ -204,7 +204,6 @@ RSpec.describe RegistrationsController, type: :request do
           expect_render_without_xframe
           expect(response).to render_template(:create)
           b_param = BParam.last
-          pp b_param
           expect(attrs).to match_hash_indifferently b_param
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.propulsion_type_motorized).to be_truthy
