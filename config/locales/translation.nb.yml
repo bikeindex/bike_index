@@ -1824,7 +1824,6 @@ nb:
       affiliation: "%{org_name} tilknytning"
       are_you_certain: Er du sikker?
       city: By
-      electric: Elektrisk
       how_to_find_serial: hvordan du finner serienummeret ditt
       i_just_dont_know_the_serial: Jeg kjenner bare ikke serien
       im_100_sure: Jeg er 100% sikker
@@ -1868,6 +1867,7 @@ nb:
         number
       very_very_few_bikes_html: 'Veldig <em>svært</em> få %{type_html} er laget uten
         serier. Med mindre dette %{type_html}:'
+      electric_motorized: Elektrisk (motorisert)
     organization_stolen_message:
       report_link_text: på denne linken
       report_the_theft_to_the_organization_html: <span class="text-warning">Rapporter
@@ -5288,6 +5288,7 @@ nb:
       this_vehicle_is_either_missing_or_stolen: Dette kjøretøyet er enten savnet eller
         stjålet
       vehicle_manufacturer: Kjøretøyprodusent
+      electric_motorized: Elektrisk (motorisert)
   sessions:
     magic_link:
       enter_email_address: Skriv inn e-postadressen din, vi sender deg en e-post med
