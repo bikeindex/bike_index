@@ -13,7 +13,7 @@
       - @b_param.cycle_type ||= 'bike'
       = f.select(:cycle_type, CycleType.select_options(traditional_bike: true), {}, {required: true, class: 'form-control'})
       %label#motorizedWrapper.cusor-pointer{style: 'margin: 0; padding-left: 0.25rem; cursor: pointer;'}
-        = check_box_tag :propulsion_type_motorized, true
+        = check_box_tag :propulsion_type_motorized, true, @b_param.propulsion_type_motorized
         %strong ⚡️
         = t(".electric_motorized")
 
