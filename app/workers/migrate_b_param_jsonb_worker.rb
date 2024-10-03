@@ -1,9 +1,11 @@
 class MigrateBParamJsonbWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
+  MIGRATE_COUNT = (ENV["MIGRATE_BPARAM_COUNT"] || 10_000).to_i
   sidekiq_options queue: "low_priority", retry: false
 
+
   def self.frequency
-    5.minutes
+    1.minute
   end
 
   def self.unmigrated
@@ -19,8 +21,10 @@ class MigrateBParamJsonbWorker < ScheduledWorker
     b_param.update_column :params_jsonb, new_params
   end
 
+  private
+
   def enqueue_workers
-    self.class.unmigrated.limit(1000).pluck(:id).each do |id|
+    self.class.unmigrated.limit(MIGRATE_COUNT).pluck(:id).each do |id|
       self.class.perform_async(id)
     end
   end
