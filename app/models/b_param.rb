@@ -390,6 +390,7 @@ class BParam < ApplicationRecord
     set_foreign_keys
     self.organization_id = creation_organization_id
     self.email = owner_email
+    self.params_jsonb = params.to_h
     self
   end
 
@@ -412,9 +413,10 @@ class BParam < ApplicationRecord
 
   def set_handlebar_type_key
     key = bike["handlebar_type"] || bike["handlebar_type_slug"]
-    ht = HandlebarType.friendly_find(key)
-    params["bike"]["handlebar_type"] = ht&.slug
+    params["bike"].delete("handlebar_type")
     params["bike"].delete("handlebar_type_slug")
+    ht = HandlebarType.friendly_find(key)
+    params["bike"]["handlebar_type"] = ht&.slug if ht.present?
   end
 
   def set_cycle_type_key

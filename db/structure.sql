@@ -191,7 +191,8 @@ CREATE TABLE public.b_params (
     params json DEFAULT '{"bike":{}}'::json,
     origin character varying,
     organization_id integer,
-    email character varying
+    email character varying,
+    params_jsonb jsonb
 );
 
 
@@ -6653,6 +6654,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231212025929'),
 ('20240517161713'),
 ('20240712181117'),
-('20240908151325');
+('20240908151325'),
+('20241003155715');
 
 
