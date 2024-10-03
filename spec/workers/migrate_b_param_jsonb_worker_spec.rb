@@ -11,7 +11,7 @@ RSpec.describe MigrateBParamJsonbWorker, type: :lib do
   end
 
   describe "perform" do
-    let!(:b_param) { FactoryBot.create(:b_param, params: target_params) }
+    let!(:b_param) { FactoryBot.create(:b_param, params: {bike: {owner_email: "s@t.com"}}) }
     let!(:b_param_migrated) { FactoryBot.create(:b_param, params: target_params) }
     let(:target_params) { {bike: {owner_email: "s@t.com", cycle_type: "bike"}} }
     before { b_param.update_column :params_jsonb, nil }
@@ -22,7 +22,7 @@ RSpec.describe MigrateBParamJsonbWorker, type: :lib do
       expect(described_class).to have_enqueued_sidekiq_job(b_param.id)
 
       described_class.drain
-      expect(b_param_migrated.reload.params_jsonb).to match_hash_indifferently target_params
+      expect(b_param.reload.params_jsonb).to match_hash_indifferently target_params
     end
   end
 end
