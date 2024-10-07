@@ -147,36 +147,36 @@ class BParam < ApplicationRecord
 
   # Crazy new shit
   def manufacturer_id=(val)
-    params["bike"]["manufacturer_id"] = val
+    assign_bike_val("manufacturer_id", val)
   end
 
   def creation_organization_id=(val)
-    params["bike"]["creation_organization_id"] = val
+    assign_bike_val("creation_organization_id", val)
   end
 
   def owner_email=(val)
-    params["bike"]["owner_email"] = val
+    assign_bike_val("owner_email", val)
   end
 
   def primary_frame_color_id=(val)
-    params["bike"]["primary_frame_color_id"] = val
+    assign_bike_val("primary_frame_color_id", val)
   end
 
   def secondary_frame_color_id=(val)
-    params["bike"]["secondary_frame_color_id"] = val
+    assign_bike_val("secondary_frame_color_id", val)
   end
 
   def tertiary_frame_color_id=(val)
-    params["bike"]["tertiary_frame_color_id"] = val
+    assign_bike_val("tertiary_frame_color_id", val)
   end
 
   def status=(val)
-    params["bike"]["status"] = val
+    assign_bike_val("status", val)
   end
 
   # Used by partial registration
   def cycle_type=(val)
-    params["bike"]["cycle_type"] = val
+    assign_bike_val("cycle_type", val)
   end
 
   # Used by partial registration
@@ -384,7 +384,7 @@ class BParam < ApplicationRecord
   # write illegal things to the bikes
   # args are not named so we can pass in the params
   def clean_params(updated_params = {})
-    self.params ||= {bike: {}} # ensure valid json object
+    self.params ||= {"bike" => {}} # ensure valid json object
     process_image_if_required
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
@@ -553,10 +553,17 @@ class BParam < ApplicationRecord
 
   private
 
+  def assign_bike_val(key, val)
+    self.params ||= {"bike" => {}}
+    self.params["bike"][key] = val
+  end
+
   def clean_key_value(key, value)
     return unless InputNormalizer.present_or_false?(value)
+    # external_image_urls is an array
+    clean_value = value.is_a?(String) ? InputNormalizer.sanitize(value) : value
 
-    [key, InputNormalizer.sanitize(value)]
+    [key, clean_value]
   end
 
   def process_image_if_required
