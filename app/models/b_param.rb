@@ -11,7 +11,7 @@
 #  image_processed :boolean          default(FALSE)
 #  image_tmp       :string(255)
 #  origin          :string
-#  params          :json
+#  params          :jsonb
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  created_bike_id :integer
@@ -391,7 +391,6 @@ class BParam < ApplicationRecord
     set_foreign_keys
     self.organization_id = creation_organization_id
     self.email = owner_email
-    self.params_jsonb = params.to_h
     self
   end
 

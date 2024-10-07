@@ -43,7 +43,6 @@ class ScheduledWorkerRunner < ScheduledWorker
       FetchProject529BikesWorker,
       FileCacheMaintenanceWorker,
       ImpoundExpirationWorker,
-      MigrateBParamJsonbWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
       ScheduledAutocompleteCheckWorker,
