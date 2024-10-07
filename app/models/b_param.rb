@@ -40,6 +40,7 @@ class BParam < ApplicationRecord
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :cycle_type_ordered, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') IS NOT 'bike'") }
 
+  after_initialize :ensure_valid_params
   before_create :generate_id_token
   before_save :clean_params
 
@@ -512,7 +513,7 @@ class BParam < ApplicationRecord
   end
 
   def parking_notification_params
-    return nil unless params["parking_notification"].present?
+    return nil unless params&.dig("parking_notification").present?
     attrs = params["parking_notification"].with_indifferent_access
       .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
         :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
@@ -553,16 +554,19 @@ class BParam < ApplicationRecord
 
   private
 
-  def assign_bike_val(key, val)
+  def ensure_valid_params
     self.params ||= {"bike" => {}}
+  end
+
+  def assign_bike_val(key, val)
+    ensure_valid_params
     self.params["bike"][key] = val
   end
 
   def clean_key_value(key, value)
     return unless InputNormalizer.present_or_false?(value)
-    # external_image_urls is an array
-    clean_value = value.is_a?(String) ? InputNormalizer.sanitize(value) : value
 
+    clean_value = value.is_a?(String) ? InputNormalizer.sanitize(value) : value
     [key, clean_value]
   end
 
