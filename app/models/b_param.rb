@@ -38,6 +38,7 @@ class BParam < ApplicationRecord
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
+  scope :cycle_type_ordered, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') IS NOT 'bike'") }
 
   before_create :generate_id_token
   before_save :clean_params
