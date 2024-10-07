@@ -34,6 +34,8 @@
       = t(".sent")
       %small.convertTimezone
     %th= t(".bike")
+    %th= t(".vehicle_type")
+    %th= t(".motorized")
     %th= t(".email")
   %tbody
     - @b_params.each do |b_param|
@@ -45,6 +47,11 @@
           %strong
             = b_param.primary_frame_color
           = b_param.mnfg_name
+        %td
+          - cycle_type = b_param.cycle_type
+          = CycleType.slug_translation(cycle_type) if cycle_type.present? && cycle_type != 'bike'
+        %td
+          = check_mark if b_param.motorized?
         %td
           = b_param.owner_email
           - if include_child_org && b_param.organization != current_organization

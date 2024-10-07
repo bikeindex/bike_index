@@ -4439,6 +4439,7 @@ en:
         email: email
         incomplete: incomplete
         matching: matching
+        motorized: e-vehicle?
         only_resend_with_permission: >-
           Only re-send partial registrations with the user's permission! Otherwise
           the emails qualify as spam.
@@ -4449,6 +4450,7 @@ en:
         search_emails: Search emails
         sent: Sent
         through_org: through %{org_name}
+        vehicle_type: Type
       index:
         connected_to_bike_html: It is connected to this %{bike_link}.
         enter_url_of_the_bike_html: >-

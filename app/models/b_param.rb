@@ -11,7 +11,7 @@
 #  image_processed :boolean          default(FALSE)
 #  image_tmp       :string(255)
 #  origin          :string
-#  params          :json
+#  params          :jsonb
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  created_bike_id :integer
@@ -38,7 +38,9 @@ class BParam < ApplicationRecord
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
+  scope :cycle_type_ordered, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') IS NOT 'bike'") }
 
+  after_initialize :ensure_valid_params
   before_create :generate_id_token
   before_save :clean_params
 
@@ -146,36 +148,36 @@ class BParam < ApplicationRecord
 
   # Crazy new shit
   def manufacturer_id=(val)
-    params["bike"]["manufacturer_id"] = val
+    assign_bike_val("manufacturer_id", val)
   end
 
   def creation_organization_id=(val)
-    params["bike"]["creation_organization_id"] = val
+    assign_bike_val("creation_organization_id", val)
   end
 
   def owner_email=(val)
-    params["bike"]["owner_email"] = val
+    assign_bike_val("owner_email", val)
   end
 
   def primary_frame_color_id=(val)
-    params["bike"]["primary_frame_color_id"] = val
+    assign_bike_val("primary_frame_color_id", val)
   end
 
   def secondary_frame_color_id=(val)
-    params["bike"]["secondary_frame_color_id"] = val
+    assign_bike_val("secondary_frame_color_id", val)
   end
 
   def tertiary_frame_color_id=(val)
-    params["bike"]["tertiary_frame_color_id"] = val
+    assign_bike_val("tertiary_frame_color_id", val)
   end
 
   def status=(val)
-    params["bike"]["status"] = val
+    assign_bike_val("status", val)
   end
 
   # Used by partial registration
   def cycle_type=(val)
-    params["bike"]["cycle_type"] = val
+    assign_bike_val("cycle_type", val)
   end
 
   # Used by partial registration
@@ -189,7 +191,7 @@ class BParam < ApplicationRecord
   end
 
   # Used by partial registration
-  def propulsion_type_motorized
+  def motorized?
     PropulsionType.motorized?(self.class.propulsion_type(params))
   end
 
@@ -383,7 +385,7 @@ class BParam < ApplicationRecord
   # write illegal things to the bikes
   # args are not named so we can pass in the params
   def clean_params(updated_params = {})
-    self.params ||= {bike: {}} # ensure valid json object
+    self.params ||= {"bike" => {}} # ensure valid json object
     process_image_if_required
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
@@ -412,18 +414,19 @@ class BParam < ApplicationRecord
 
   def set_handlebar_type_key
     key = bike["handlebar_type"] || bike["handlebar_type_slug"]
-    ht = HandlebarType.friendly_find(key)
-    params["bike"]["handlebar_type"] = ht&.slug
+    params["bike"].delete("handlebar_type")
     params["bike"].delete("handlebar_type_slug")
+    ht = HandlebarType.friendly_find(key)
+    params["bike"]["handlebar_type"] = ht&.slug if ht.present?
   end
 
   def set_cycle_type_key
-    if (key = (bike["cycle_type"] || bike["cycle_type_slug"] || bike["cycle_type_name"]).presence)
-      ct = CycleType.friendly_find(key)
-      params["bike"]["cycle_type"] = ct&.slug
-      params["bike"].delete("cycle_type_slug")
-      params["bike"].delete("cycle_type_name")
-    end
+    key = (bike["cycle_type"] || bike["cycle_type_slug"] || bike["cycle_type_name"]).presence
+    cycle_type_slug = CycleType.friendly_find(key)&.slug
+    params["bike"].delete("cycle_type_slug")
+    params["bike"].delete("cycle_type_name")
+
+    params["bike"]["cycle_type"] = cycle_type_slug || CycleType.default_slug
   end
 
   def set_wheel_size_key
@@ -510,7 +513,7 @@ class BParam < ApplicationRecord
   end
 
   def parking_notification_params
-    return nil unless params["parking_notification"].present?
+    return nil unless params&.dig("parking_notification").present?
     attrs = params["parking_notification"].with_indifferent_access
       .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
         :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
@@ -538,8 +541,8 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
-    attrs_merged.select { |_k, v| InputNormalizer.present_or_false?(v) }
-      .except(*BParam.skipped_bike_attrs)
+    attrs_merged.except(*BParam.skipped_bike_attrs)
+      .map { |k, v| clean_key_value(k, v) }.compact.to_h
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,
         "creator_id" => creator_id,
@@ -550,6 +553,22 @@ class BParam < ApplicationRecord
   end
 
   private
+
+  def ensure_valid_params
+    self.params ||= {"bike" => {}}
+  end
+
+  def assign_bike_val(key, val)
+    ensure_valid_params
+    self.params["bike"][key] = val
+  end
+
+  def clean_key_value(key, value)
+    return unless InputNormalizer.present_or_false?(value)
+
+    clean_value = value.is_a?(String) ? InputNormalizer.sanitize(value) : value
+    [key, clean_value]
+  end
 
   def process_image_if_required
     return true if image_processed || image.blank?

@@ -14,6 +14,8 @@ class InputNormalizer
   end
 
   def self.sanitize(str)
+    return str if [true, false].include?(str) || str.is_a?(Numeric)
+
     Rails::Html::FullSanitizer.new.sanitize(str)&.strip
   end
 

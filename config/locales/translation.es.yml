@@ -3681,6 +3681,8 @@ es:
         search_emails:
         sent:
         through_org:
+        motorized:
+        vehicle_type:
       index:
         connected_to_bike_html:
         enter_url_of_the_bike_html:
