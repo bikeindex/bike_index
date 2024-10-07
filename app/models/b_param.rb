@@ -541,8 +541,8 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
-    attrs_merged.select { |_k, v| InputNormalizer.present_or_false?(v) }
-      .except(*BParam.skipped_bike_attrs)
+    attrs_merged.except(*BParam.skipped_bike_attrs)
+      .map { |k, v| clean_key_value(k, v) }.compact.to_h
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,
         "creator_id" => creator_id,
@@ -553,6 +553,12 @@ class BParam < ApplicationRecord
   end
 
   private
+
+  def clean_key_value(key, value)
+    return unless InputNormalizer.present_or_false?(value)
+
+    [key, InputNormalizer.sanitize(value)]
+  end
 
   def process_image_if_required
     return true if image_processed || image.blank?

@@ -696,6 +696,14 @@ RSpec.describe BParam, type: :model do
         end
       end
     end
+    context "with untranslateable unicode escape sequence" do
+      let(:bike_params) { {owner_email: "\nsomething@ss.\u0000", cycle_type: "\n", propulsion_type_motorized: "false"} }
+      let(:target_result) { target.merge(owner_email: "something@ss.", propulsion_type_motorized: "false", propulsion_type_slug: nil) }
+      it "makes it valid" do
+        result = b_param.safe_bike_attrs({})
+        expect(result).to match_hash_indifferently target_result
+      end
+    end
     context "with cycle_type" do
       let(:bike_params) { {owner_email: "stuff@something.com", propulsion_type_slug: "foot-pedal", cycle_type: "tandem"} }
       # propulsion_type_slug verifies the propulsion type is valid for the cycle type in bike_attributable,
