@@ -179,13 +179,15 @@ RSpec.describe RegistrationsController, type: :request do
       context "nothing except email set - unverified authenticity token" do
         include_context :test_csrf_token
         it "creates a new bparam and renders" do
-          post base_url, params: {b_param: {owner_email: "something@stuff.com"}, simple_header: true}
+          post base_url, params: {b_param: {owner_email: "something@stuff.com", propulsion_type_motorized: "false"}, simple_header: true}
           expect_render_without_xframe
           expect(response).to render_template(:create)
           b_param = BParam.last
           expect(b_param.owner_email).to eq "something@stuff.com"
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.partial_registration?).to be_truthy
+          expect(b_param.motorized?).to be_falsey
+          expect(b_param.params["propulsion_type_motorized"]).to be_blank
           expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
           expect(assigns(:simple_header)).to be_truthy
         end

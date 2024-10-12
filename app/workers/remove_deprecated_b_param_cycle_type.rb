@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class RemoveDeprecatedBParamCycleType < ApplicationWorker
   def perform
     BParam.deprectated_cycle_type_bike.find_each do |b_param|

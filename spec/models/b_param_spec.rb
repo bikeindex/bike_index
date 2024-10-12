@@ -3,18 +3,24 @@ require "rails_helper"
 RSpec.describe BParam, type: :model do
   describe "scopes" do
     let!(:b_param_empty) { FactoryBot.create(:b_param, params: {}) }
-    let!(:b_param_no_cycle_type) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
+    let!(:b_param_no_cycle_type) { FactoryBot.create(:b_param, params: {bike: bike_params, propulsion_type_motorized: true}) }
     let(:bike_params) { {owner_email: "test@bikeindex.org"} }
-    let!(:b_param_bike) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "bike")}) }
+    let!(:b_param_bike) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "bike", propulsion_type_slug: "pedal-assist")}) }
     let!(:b_param_mobility) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "e-Skateboard")}) }
     it "scopes correctly" do
       expect(b_param_empty.reload.params).to match_hash_indifferently({bike: {}})
-      expect(b_param_bike.reload.params).to match_hash_indifferently({bike: bike_params})
+      expect(b_param_bike.reload.params).to match_hash_indifferently({bike: bike_params.merge(propulsion_type_slug: "pedal-assist")})
+      expect(b_param_bike.motorized?).to be_truthy
       expect(b_param_mobility.reload.cycle_type).to eq "personal-mobility"
+      expect(b_param_mobility.motorized?).to be_truthy
       expect(BParam.bike_params.pluck(:id)).to match_array([b_param_empty.id, b_param_no_cycle_type.id, b_param_bike.id, b_param_mobility.id])
       expect(BParam.with_cycle_type.pluck(:id)).to match_array([b_param_mobility.id])
       expect(BParam.cycle_type_not_bike.pluck(:id)).to match_array([b_param_mobility.id])
       expect(BParam.cycle_type_bike.pluck(:id)).to match_array([b_param_empty.id, b_param_no_cycle_type.id, b_param_bike.id])
+      expect(BParam.top_level_motorized.pluck(:id)).to match_array([b_param_no_cycle_type.id])
+      # currently not matching propulsion_type_slug (e.g. b_param_bike)
+      expect(BParam.motorized.pluck(:id)).to match_array([b_param_mobility.id, b_param_no_cycle_type.id])
+      expect(BParam.cycle_type_not_bike.motorized.pluck(:id)).to match_array([b_param_mobility.id])
     end
   end
 

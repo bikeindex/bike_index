@@ -40,13 +40,24 @@ class BParam < ApplicationRecord
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
-  scope :deprectated_cycle_type_bike, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') = ?", 'bike') }
+  scope :deprectated_cycle_type_bike, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') = ?", "bike") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
   scope :cycle_type_not_bike, -> { with_cycle_type } # currently just an alias
+  scope :top_level_motorized, -> { bike_params.where("(params -> 'propulsion_type_motorized') IS NOT NULL") }
 
   after_initialize :ensure_valid_params
   before_create :generate_id_token
   before_save :clean_params
+
+  def self.motorized
+    # TODO: check if this scope just works in rails 7:
+    # where("(params -> 'bike' ->> 'cycle_type') = ?", CycleType::ALWAYS_MOTORIZED)
+    matching = top_level_motorized
+    CycleType::ALWAYS_MOTORIZED.each do |cycle_type|
+      matching = matching.or(where("(params -> 'bike' ->> 'cycle_type') = ?", cycle_type.to_s))
+    end
+    matching
+  end
 
   def self.v2_params(hash)
     h = hash["bike"].present? ? hash : {"bike" => hash.with_indifferent_access}
@@ -197,7 +208,8 @@ class BParam < ApplicationRecord
 
   # Used by partial registration
   def motorized?
-    PropulsionType.motorized?(self.class.propulsion_type(params))
+    PropulsionType.motorized?(self.class.propulsion_type(params)) ||
+      PropulsionType.for_vehicle(cycle_type) # Fallback to PropulsionType lookup
   end
 
   def with_bike?
@@ -333,7 +345,7 @@ class BParam < ApplicationRecord
   end
 
   def primary_frame_color
-    primary_frame_color_id.present? && Color.find(primary_frame_color_id)&.name
+    primary_frame_color_id.present? && Color.find_by_id(primary_frame_color_id)&.name
   end
 
   def revised_new?
