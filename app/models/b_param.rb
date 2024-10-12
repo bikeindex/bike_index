@@ -40,6 +40,7 @@ class BParam < ApplicationRecord
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
+  scope :deprectated_cycle_type_bike, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') = ?", 'bike') }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
   scope :cycle_type_not_bike, -> { with_cycle_type } # currently just an alias
 
