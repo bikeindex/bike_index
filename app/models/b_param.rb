@@ -49,6 +49,7 @@ class BParam < ApplicationRecord
 
   def self.v2_params(hash)
     h = hash["bike"].present? ? hash : {"bike" => hash.with_indifferent_access}
+    h["bike"].delete("bike") if h["bike"]["bike"].blank? # it's assigned before save :/
     # Only assign if the key hasn't been assigned - since it's boolean, can't use conditional assignment
     h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
     h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
@@ -185,7 +186,7 @@ class BParam < ApplicationRecord
 
   # Used by partial registration
   def cycle_type
-    bike["cycle_type"]
+    bike["cycle_type"] || CycleType.default_slug
   end
 
   # Used by partial registration

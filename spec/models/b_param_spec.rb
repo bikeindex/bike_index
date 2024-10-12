@@ -111,7 +111,7 @@ RSpec.describe BParam, type: :model do
       new_params = b_param.bike
       expect(new_params.key?("serial_number")).to be_truthy
       expect(new_params.key?("manufacturer")).to be_truthy
-      expect(new_params.keys).to match_array(%w[manufacturer bike serial_number send_email])
+      expect(new_params.keys).to match_array(%w[manufacturer serial_number send_email])
       expect(b_param.params["test"]).to be_truthy
       expect(b_param.params["stolen"]).to be_falsey
       expect(b_param.params["stolen_record"]).not_to be_present
