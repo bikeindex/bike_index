@@ -37,8 +37,11 @@ class BParam < ApplicationRecord
   scope :without_creator, -> { where(creator_id: nil) }
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
+  scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
-  scope :cycle_type_ordered, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') IS NOT 'bike'") }
+  scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
+  scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
+  scope :cycle_type_not_bike, -> { with_cycle_type } # currently just an alias
 
   after_initialize :ensure_valid_params
   before_create :generate_id_token
@@ -385,7 +388,7 @@ class BParam < ApplicationRecord
   # write illegal things to the bikes
   # args are not named so we can pass in the params
   def clean_params(updated_params = {})
-    self.params ||= {"bike" => {}} # ensure valid json object
+    ensure_valid_params
     process_image_if_required
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
@@ -401,7 +404,7 @@ class BParam < ApplicationRecord
   end
 
   def set_foreign_keys
-    return true unless params.present? && bike.present?
+    return true unless bike.present?
     set_wheel_size_key
     set_manufacturer_key
     set_color_keys
@@ -423,10 +426,12 @@ class BParam < ApplicationRecord
   def set_cycle_type_key
     key = (bike["cycle_type"] || bike["cycle_type_slug"] || bike["cycle_type_name"]).presence
     cycle_type_slug = CycleType.friendly_find(key)&.slug
+    params["bike"].delete("cycle_type")
     params["bike"].delete("cycle_type_slug")
     params["bike"].delete("cycle_type_name")
+    return if cycle_type_slug.blank? || cycle_type_slug&.to_s == CycleType.default_slug
 
-    params["bike"]["cycle_type"] = cycle_type_slug || CycleType.default_slug
+    params["bike"]["cycle_type"] = cycle_type_slug
   end
 
   def set_wheel_size_key
@@ -556,6 +561,7 @@ class BParam < ApplicationRecord
 
   def ensure_valid_params
     self.params ||= {"bike" => {}}
+    self.params["bike"] ||= {}
   end
 
   def assign_bike_val(key, val)

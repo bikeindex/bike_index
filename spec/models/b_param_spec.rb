@@ -1,6 +1,23 @@
 require "rails_helper"
 
 RSpec.describe BParam, type: :model do
+  describe "scopes" do
+    let!(:b_param_empty) { FactoryBot.create(:b_param, params: {}) }
+    let!(:b_param_no_cycle_type) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
+    let(:bike_params) { {owner_email: "test@bikeindex.org"} }
+    let!(:b_param_bike) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "bike")}) }
+    let!(:b_param_mobility) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "e-Skateboard")}) }
+    it "scopes correctly" do
+      expect(b_param_empty.reload.params).to match_hash_indifferently({bike: {}})
+      expect(b_param_bike.reload.params).to match_hash_indifferently({bike: bike_params})
+      expect(b_param_mobility.reload.cycle_type).to eq "personal-mobility"
+      expect(BParam.bike_params.pluck(:id)).to match_array([b_param_empty.id, b_param_no_cycle_type.id, b_param_bike.id, b_param_mobility.id])
+      expect(BParam.with_cycle_type.pluck(:id)).to match_array([b_param_mobility.id])
+      expect(BParam.cycle_type_not_bike.pluck(:id)).to match_array([b_param_mobility.id])
+      expect(BParam.cycle_type_bike.pluck(:id)).to match_array([b_param_empty.id, b_param_no_cycle_type.id, b_param_bike.id])
+    end
+  end
+
   describe "bike" do
     it "returns the bike attribs" do
       b_param = BParam.new(params: {bike: {serial_number: "XXX"}})
@@ -12,6 +29,7 @@ RSpec.describe BParam, type: :model do
       expect(b_param.save).to be_truthy
     end
   end
+
   describe "clean_params" do
     context "passed params" do
       it "calls the things we want it to call" do
@@ -93,7 +111,7 @@ RSpec.describe BParam, type: :model do
       new_params = b_param.bike
       expect(new_params.key?("serial_number")).to be_truthy
       expect(new_params.key?("manufacturer")).to be_truthy
-      expect(new_params.keys.length).to eq(3)
+      expect(new_params.keys).to match_array(%w[manufacturer bike serial_number send_email])
       expect(b_param.params["test"]).to be_truthy
       expect(b_param.params["stolen"]).to be_falsey
       expect(b_param.params["stolen_record"]).not_to be_present
