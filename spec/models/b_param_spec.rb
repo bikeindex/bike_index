@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe BParam, type: :model do
   describe "scopes" do
-    let!(:b_param_empty) { FactoryBot.create(:b_param, params: {}) }
+    let!(:b_param_empty) { FactoryBot.create(:b_param, params: {bike: {}, propulsion_type_motorized: nil}) }
     let!(:b_param_no_cycle_type) { FactoryBot.create(:b_param, params: {bike: bike_params, propulsion_type_motorized: true}) }
     let(:bike_params) { {owner_email: "test@bikeindex.org"} }
     let!(:b_param_bike) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "bike", propulsion_type_slug: "pedal-assist")}) }
