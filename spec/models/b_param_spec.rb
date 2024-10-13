@@ -17,10 +17,11 @@ RSpec.describe BParam, type: :model do
       expect(BParam.with_cycle_type.pluck(:id)).to match_array([b_param_mobility.id])
       expect(BParam.cycle_type_not_bike.pluck(:id)).to match_array([b_param_mobility.id])
       expect(BParam.cycle_type_bike.pluck(:id)).to match_array([b_param_empty.id, b_param_no_cycle_type.id, b_param_bike.id])
+
       expect(BParam.top_level_motorized.pluck(:id)).to match_array([b_param_no_cycle_type.id])
-      # currently not matching propulsion_type_slug (e.g. b_param_bike)
       expect(BParam.motorized.pluck(:id)).to match_array([b_param_mobility.id, b_param_no_cycle_type.id])
       expect(BParam.cycle_type_not_bike.motorized.pluck(:id)).to match_array([b_param_mobility.id])
+      expect(BParam.cycle_type_not_bike_ordered.pluck(:id)).to eq([b_param_mobility.id]) # Verify scope is valid
     end
   end
 

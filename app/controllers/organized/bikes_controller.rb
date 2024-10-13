@@ -149,7 +149,7 @@ module Organized
     def incompletes_sorted(b_params)
       if sort_column == "cycle_type"
         if sort_direction == "desc"
-          b_params.cycle_type_not_bike # TODO: order by cycle_type
+          b_params.cycle_type_not_bike_ordered
         else
           b_params.cycle_type_bike
         end

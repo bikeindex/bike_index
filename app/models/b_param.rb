@@ -43,6 +43,7 @@ class BParam < ApplicationRecord
   scope :deprectated_cycle_type_bike, -> { bike_params.where("(params -> 'bike' ->> 'cycle_type') = ?", "bike") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
   scope :cycle_type_not_bike, -> { with_cycle_type } # currently just an alias
+  scope :cycle_type_not_bike_ordered, -> { with_cycle_type.order(Arel.sql("(params -> 'bike' ->> 'cycle_type') DESC")) }
   scope :top_level_motorized, -> { bike_params.where("(params -> 'propulsion_type_motorized') IS NOT NULL") }
 
   after_initialize :ensure_valid_params
@@ -50,7 +51,7 @@ class BParam < ApplicationRecord
   before_save :clean_params
 
   def self.motorized
-    # TODO: check if this scope just works in rails 7:
+    # TODO: check if this scope just works in Rails 7:
     # where("(params -> 'bike' ->> 'cycle_type') = ?", CycleType::ALWAYS_MOTORIZED)
     matching = top_level_motorized
     CycleType::ALWAYS_MOTORIZED.each do |cycle_type|
