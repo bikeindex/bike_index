@@ -350,7 +350,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             serial: bike.serial_number,
             status: nil,
             thumbnail: nil,
-            vehicle_type: "Cargo Bike (front Storage)",
+            vehicle_type: "Cargo Bike (front storage)",
             bike_sticker: "FF 333 333",
             organization_affiliation: "community_member",
             phone: "7177423423",
@@ -420,7 +420,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             serial: nil,
             status: nil,
             thumbnail: nil,
-            vehicle_type: "personal-mobility",
+            vehicle_type: "e-Skateboard (e-Unicycle, Personal mobility device, etc)",
             bike_sticker: nil,
             organization_affiliation: nil,
             phone: nil,
@@ -470,7 +470,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
               serial: bike.serial_number,
               status: nil,
               thumbnail: nil,
-              vehicle_type: "Cargo Bike (front Storage)",
+              vehicle_type: "e-Skateboard (e-Unicycle, Personal mobility device, etc)",
               bike_sticker: nil,
               organization_affiliation: "community_member",
               phone: "7177423423",
@@ -484,7 +484,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           end
           it "returns expected values" do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
-              bike.reload
+              bike.reload.update(cycle_type: "personal-mobility")
               expect(bike.registration_address_source).to eq "initial_creation"
               expect(bike.registration_address(true).except("latitude", "longitude")).to eq target_address
               expect(bike.registration_address).to eq target_address
@@ -505,6 +505,8 @@ RSpec.describe OrganizationExportWorker, type: :job do
             partial_line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
             expect(partial_line_hash.keys).to eq target_partial_row.keys # again, order is CRITICAL
             expect(partial_line_hash).to match_hash_indifferently(target_partial_row)
+            # Verify cycle_type is EXACTLY the same (including capitalization)
+            expect(partial_line_hash[:vehicle_type]).to eq complete_line_hash[:vehicle_type]
 
             expect(export.exported_bike_ids).to eq([bike.id])
 
