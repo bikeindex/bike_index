@@ -24,7 +24,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
   let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
 
   def csv_line_to_hash(line_str, headers:)
-    line = line_str.gsub(/\A\"/, "").gsub(/\"\z/, "").split('","')
+    line = line_str.gsub(/\A"/, "").gsub(/"\z/, "").split('","')
       .map { |v| v.blank? ? nil : v }
     headers.map(&:to_sym).zip(line).to_h
   end
@@ -412,7 +412,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             link: nil,
             manufacturer: "Other",
             model: nil,
-            motorized: nil,
+            motorized: "true",
             owner_email: "something@stuff.com",
             owner_name: nil,
             registered_at: partial_registration.created_at.utc.to_s,
@@ -420,7 +420,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
             serial: nil,
             status: nil,
             thumbnail: nil,
-            vehicle_type: nil,
+            vehicle_type: "personal-mobility",
             bike_sticker: nil,
             organization_affiliation: nil,
             phone: nil,

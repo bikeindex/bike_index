@@ -20,7 +20,7 @@ class Export < ApplicationRecord
     ongoing: 1,
     finished: 2,
     errored: 3
-   }.freeze
+  }.freeze
   VALID_KINDS = {
     organization: 0,
     stolen: 1,
@@ -33,7 +33,8 @@ class Export < ApplicationRecord
     link
     manufacturer
     model
-    registered_at serial
+    registered_at
+    serial
   ].freeze
   EXTRA_HEADERS = %w[
     extra_registration_number
