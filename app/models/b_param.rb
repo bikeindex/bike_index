@@ -209,7 +209,7 @@ class BParam < ApplicationRecord
   # Used by partial registration
   def motorized?
     PropulsionType.motorized?(self.class.propulsion_type(params)) ||
-      PropulsionType.for_vehicle(cycle_type) # Fallback to PropulsionType lookup
+      PropulsionType.motorized?(PropulsionType.for_vehicle(cycle_type)) # Fallback to PropulsionType lookup
   end
 
   def with_bike?

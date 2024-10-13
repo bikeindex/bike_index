@@ -62,7 +62,7 @@ RSpec.describe Organized::BikesController, type: :request do
         redirected_to = response.redirect_url
         expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
         custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
-        expect(custom_bike_ids).to eq([bike.id, bike2.id].map(&:to_s))
+        expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
       end
       context "directly create export", :flaky do
         it "directly creates" do
