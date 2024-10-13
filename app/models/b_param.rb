@@ -407,6 +407,8 @@ class BParam < ApplicationRecord
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
     set_foreign_keys
+    # Remove false top level param (this is gross and I wish it wasn't necessary)
+    self.params.delete("propulsion_type_motorized") unless InputNormalizer.boolean(params["propulsion_type_motorized"])
     self.organization_id = creation_organization_id
     self.email = owner_email
     self
