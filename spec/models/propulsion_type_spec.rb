@@ -169,7 +169,7 @@ RSpec.describe PropulsionType, type: :model do
     end
     describe "autocomplete_hash" do
       it "is the target" do
-        expect_hashes_to_match(PropulsionType.send(:motorized_autocomplete_hash), motorized_hash)
+        expect(PropulsionType.send(:motorized_autocomplete_hash)).to match_hash_indifferently motorized_hash
         expect(PropulsionType.autocomplete_hashes.count).to eq 1
       end
     end

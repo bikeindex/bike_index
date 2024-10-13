@@ -11,7 +11,7 @@
 #  image_processed :boolean          default(FALSE)
 #  image_tmp       :string(255)
 #  origin          :string
-#  params          :json
+#  params          :jsonb
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  created_bike_id :integer
@@ -37,13 +37,31 @@ class BParam < ApplicationRecord
   scope :without_creator, -> { where(creator_id: nil) }
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
+  scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
+  scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
+  scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
+  scope :cycle_type_not_bike, -> { with_cycle_type } # currently just an alias
+  scope :cycle_type_not_bike_ordered, -> { with_cycle_type.order(Arel.sql("(params -> 'bike' ->> 'cycle_type') DESC")) }
+  scope :top_level_motorized, -> { bike_params.where("(params -> 'propulsion_type_motorized') IS NOT NULL") }
 
+  after_initialize :ensure_valid_params
   before_create :generate_id_token
   before_save :clean_params
 
+  def self.motorized
+    # TODO: check if this scope just works in Rails 7:
+    # where("(params -> 'bike' ->> 'cycle_type') = ?", CycleType::ALWAYS_MOTORIZED)
+    matching = top_level_motorized
+    CycleType::ALWAYS_MOTORIZED.each do |cycle_type|
+      matching = matching.or(where("(params -> 'bike' ->> 'cycle_type') = ?", cycle_type.to_s))
+    end
+    matching
+  end
+
   def self.v2_params(hash)
     h = hash["bike"].present? ? hash : {"bike" => hash.with_indifferent_access}
+    h["bike"].delete("bike") if h["bike"]["bike"].blank? # it's assigned before save :/
     # Only assign if the key hasn't been assigned - since it's boolean, can't use conditional assignment
     h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
     h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
@@ -146,41 +164,41 @@ class BParam < ApplicationRecord
 
   # Crazy new shit
   def manufacturer_id=(val)
-    params["bike"]["manufacturer_id"] = val
+    assign_bike_val("manufacturer_id", val)
   end
 
   def creation_organization_id=(val)
-    params["bike"]["creation_organization_id"] = val
+    assign_bike_val("creation_organization_id", val)
   end
 
   def owner_email=(val)
-    params["bike"]["owner_email"] = val
+    assign_bike_val("owner_email", val)
   end
 
   def primary_frame_color_id=(val)
-    params["bike"]["primary_frame_color_id"] = val
+    assign_bike_val("primary_frame_color_id", val)
   end
 
   def secondary_frame_color_id=(val)
-    params["bike"]["secondary_frame_color_id"] = val
+    assign_bike_val("secondary_frame_color_id", val)
   end
 
   def tertiary_frame_color_id=(val)
-    params["bike"]["tertiary_frame_color_id"] = val
+    assign_bike_val("tertiary_frame_color_id", val)
   end
 
   def status=(val)
-    params["bike"]["status"] = val
+    assign_bike_val("status", val)
   end
 
   # Used by partial registration
   def cycle_type=(val)
-    params["bike"]["cycle_type"] = val
+    assign_bike_val("cycle_type", val)
   end
 
   # Used by partial registration
   def cycle_type
-    bike["cycle_type"]
+    bike["cycle_type"] || CycleType.default_slug
   end
 
   # Used by partial registration
@@ -189,8 +207,9 @@ class BParam < ApplicationRecord
   end
 
   # Used by partial registration
-  def propulsion_type_motorized
-    PropulsionType.motorized?(self.class.propulsion_type(params))
+  def motorized?
+    PropulsionType.motorized?(self.class.propulsion_type(params)) ||
+      PropulsionType.motorized?(PropulsionType.for_vehicle(cycle_type)) # Fallback to PropulsionType lookup
   end
 
   def with_bike?
@@ -326,7 +345,7 @@ class BParam < ApplicationRecord
   end
 
   def primary_frame_color
-    primary_frame_color_id.present? && Color.find(primary_frame_color_id)&.name
+    primary_frame_color_id.present? && Color.find_by_id(primary_frame_color_id)&.name
   end
 
   def revised_new?
@@ -383,7 +402,7 @@ class BParam < ApplicationRecord
   # write illegal things to the bikes
   # args are not named so we can pass in the params
   def clean_params(updated_params = {})
-    self.params ||= {bike: {}} # ensure valid json object
+    ensure_valid_params
     process_image_if_required
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
@@ -399,7 +418,7 @@ class BParam < ApplicationRecord
   end
 
   def set_foreign_keys
-    return true unless params.present? && bike.present?
+    return true unless bike.present?
     set_wheel_size_key
     set_manufacturer_key
     set_color_keys
@@ -412,18 +431,21 @@ class BParam < ApplicationRecord
 
   def set_handlebar_type_key
     key = bike["handlebar_type"] || bike["handlebar_type_slug"]
-    ht = HandlebarType.friendly_find(key)
-    params["bike"]["handlebar_type"] = ht&.slug
+    params["bike"].delete("handlebar_type")
     params["bike"].delete("handlebar_type_slug")
+    ht = HandlebarType.friendly_find(key)
+    params["bike"]["handlebar_type"] = ht&.slug if ht.present?
   end
 
   def set_cycle_type_key
-    if (key = (bike["cycle_type"] || bike["cycle_type_slug"] || bike["cycle_type_name"]).presence)
-      ct = CycleType.friendly_find(key)
-      params["bike"]["cycle_type"] = ct&.slug
-      params["bike"].delete("cycle_type_slug")
-      params["bike"].delete("cycle_type_name")
-    end
+    key = (bike["cycle_type"] || bike["cycle_type_slug"] || bike["cycle_type_name"]).presence
+    cycle_type_slug = CycleType.friendly_find(key)&.slug
+    params["bike"].delete("cycle_type")
+    params["bike"].delete("cycle_type_slug")
+    params["bike"].delete("cycle_type_name")
+    return if cycle_type_slug.blank? || cycle_type_slug&.to_s == CycleType.default_slug
+
+    params["bike"]["cycle_type"] = cycle_type_slug
   end
 
   def set_wheel_size_key
@@ -510,7 +532,7 @@ class BParam < ApplicationRecord
   end
 
   def parking_notification_params
-    return nil unless params["parking_notification"].present?
+    return nil unless params&.dig("parking_notification").present?
     attrs = params["parking_notification"].with_indifferent_access
       .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
         :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
@@ -538,8 +560,8 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
-    attrs_merged.select { |_k, v| InputNormalizer.present_or_false?(v) }
-      .except(*BParam.skipped_bike_attrs)
+    attrs_merged.except(*BParam.skipped_bike_attrs)
+      .map { |k, v| clean_key_value(k, v) }.compact.to_h
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,
         "creator_id" => creator_id,
@@ -550,6 +572,23 @@ class BParam < ApplicationRecord
   end
 
   private
+
+  def ensure_valid_params
+    self.params ||= {"bike" => {}}
+    self.params["bike"] ||= {}
+  end
+
+  def assign_bike_val(key, val)
+    ensure_valid_params
+    self.params["bike"][key] = val
+  end
+
+  def clean_key_value(key, value)
+    return unless InputNormalizer.present_or_false?(value)
+
+    clean_value = value.is_a?(String) ? InputNormalizer.sanitize(value) : value
+    [key, clean_value]
+  end
 
   def process_image_if_required
     return true if image_processed || image.blank?

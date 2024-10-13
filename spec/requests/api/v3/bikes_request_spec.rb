@@ -667,8 +667,8 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(ownership.origin).to eq "api_v3"
 
       # We return things will alert if they're written directly to the dom - worth noting, since it might be a problem
-      expect(result["description"]).to eq "<svg/onload=alert(document.cookie)>"
-      expect(bike.description).to eq "<svg/onload=alert(document.cookie)>"
+      expect(result["description"]).to eq ""
+      expect(bike.description).to eq ""
     end
 
     it "doesn't send an email" do

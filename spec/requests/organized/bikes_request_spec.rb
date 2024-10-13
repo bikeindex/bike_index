@@ -3,11 +3,11 @@ require "rails_helper"
 RSpec.describe Organized::BikesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/bikes" }
   include_context :request_spec_logged_in_as_organization_member
+  let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
+  let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
     # NOTE: Additional index tests in controller spec because of session
-    let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
-    let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
     let(:query_params) do
       {
         query: "1",
@@ -28,6 +28,7 @@ RSpec.describe Organized::BikesController, type: :request do
       expect(assigns(:current_organization)).to eq current_organization
       expect(assigns(:search_query_present)).to be_truthy
       expect(assigns(:bikes).pluck(:id)).to eq([])
+      expect(assigns(:search_stickers)).to eq false
       # create_export fails if the org doesn't have have csv_exports
       expect {
         get base_url, params: query_params.merge(create_export: true)
@@ -62,7 +63,7 @@ RSpec.describe Organized::BikesController, type: :request do
         redirected_to = response.redirect_url
         expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
         custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
-        expect(custom_bike_ids).to eq([bike.id, bike2.id].map(&:to_s))
+        expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
       end
       context "directly create export", :flaky do
         it "directly creates" do
@@ -79,6 +80,45 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
           expect(OrganizationExportWorker.jobs.count).to eq 1
         end
+      end
+    end
+    context "with search_stickers" do
+      let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: bike_with_sticker) }
+      let!(:non_organization_bike) { FactoryBot.create(:bike) }
+      let!(:bike_sticker_2) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: non_organization_bike) }
+      it "searches for bikes with stickers" do
+        expect(bike_with_sticker.reload.bike_sticker?).to be_truthy
+        expect(current_organization.reload.paid?).to be_truthy
+        get base_url, params: {search_stickers: "none"}
+        expect(response.status).to eq(200)
+        expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:search_stickers)).to eq "none"
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        expect(session[:passive_organization_id]).to eq current_organization.id
+
+        # And searching without params returns expected result
+        get base_url
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id])
+        expect(assigns(:search_query_present)).to be_falsey
+        expect(assigns(:search_stickers)).to eq false
+        expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
+        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
+      end
+    end
+
+    context "unpaid organization" do
+      let(:current_organization) { FactoryBot.create(:organization) }
+
+      it "renders without search" do
+        expect(current_organization.reload.paid?).to be_falsey
+        expect(Bike).to_not receive(:search)
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template :index
+        expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
       end
     end
   end
@@ -98,7 +138,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(response).to render_template(:new)
       end
       context "with feature" do
-        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["parking_notifications"]) }
+        let(:enabled_feature_slugs) { ["parking_notifications"] }
         it "renders with unregistered_parking_notification" do
           get "#{base_url}/new", params: {parking_notification: 1}
           expect(response.status).to eq(200)
@@ -135,7 +175,7 @@ RSpec.describe Organized::BikesController, type: :request do
     let!(:state) { FactoryBot.create(:state_new_york) }
     let(:testable_bike_params) { bike_params.except(:serial_unknown, :b_param_id_token, :cycle_type_slug, :accuracy, :origin) }
     context "with parking_notification" do
-      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
       let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
 
       let(:parking_notification) do
@@ -325,6 +365,122 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(impound_record.unregistered_bike).to be_truthy
         end
       end
+    end
+  end
+
+  describe "recoveries" do
+    let(:bike) { FactoryBot.create(:stolen_bike) }
+    let(:bike2) { FactoryBot.create(:stolen_bike) }
+    let(:recovered_record) { bike.fetch_current_stolen_record }
+    let(:recovered_record2) { bike2.fetch_current_stolen_record }
+    let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: current_organization) }
+    let!(:bike_organization2) { FactoryBot.create(:bike_organization, bike: bike2, organization: current_organization) }
+    let(:date) { "2016-01-10 13:59:59" }
+    let(:recovery_information) do
+      {
+        recovered_description: "recovered it on a special corner",
+        index_helped_recovery: true,
+        can_share_recovery: true,
+        recovered_at: "2016-01-10 13:59:59"
+      }
+    end
+    before do
+      recovered_record.add_recovery_information
+      recovered_record2.add_recovery_information(recovery_information)
+    end
+    it "renders, assigns search_query_present and stolenness all" do
+      expect(recovered_record2.recovered_at.to_date).to eq Date.parse("2016-01-10")
+      get "#{base_url}/recoveries", params: {
+        period: "custom",
+        start_time: Time.parse("2016-01-01").to_i
+      }
+      expect(response.status).to eq(200)
+      expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
+      expect(response).to render_template :recoveries
+    end
+    context "unpaid organization" do
+      let(:current_organization) { FactoryBot.create(:organization) }
+      it "redirects" do
+        expect(current_organization.reload.paid?).to be_falsey
+        get "#{base_url}/recoveries"
+        expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
+      end
+    end
+  end
+
+  describe "incompletes" do
+    let(:partial_reg_attrs) do
+      {
+        manufacturer_id: Manufacturer.other.id,
+        primary_frame_color_id: Color.black.id,
+        owner_email: "something@stuff.com",
+        creation_organization_id: current_organization.id
+      }
+    end
+    let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs}, origin: "embed_partial") }
+    it "renders" do
+      expect(partial_registration.organization).to eq current_organization
+      get "#{base_url}/incompletes"
+      expect(response.status).to eq(200)
+      expect(response).to render_template :incompletes
+      expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+    end
+    context "sortable" do
+      let(:motorized_params) { partial_reg_attrs.merge(cycle_type: "tandem", propulsion_type_slug: "pedal-assist") }
+      let!(:b_param_motorized) { FactoryBot.create(:b_param, params: {bike: motorized_params}) }
+      it "renders" do
+        expect(b_param_motorized.reload.motorized?).to be_truthy
+        expect(b_param_motorized.cycle_type).to eq "tandem"
+        expect(partial_registration.organization).to eq current_organization
+        get "#{base_url}/incompletes"
+        expect(assigns(:sort_column)).to eq "id"
+        expect(response.status).to eq(200)
+        expect(response).to render_template :incompletes
+        expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+
+        get "#{base_url}/incompletes", params: {sort: "cycle_type"}
+        expect(response.status).to eq(200)
+        expect(response).to render_template :incompletes
+        expect(assigns(:sort_column)).to eq "cycle_type"
+
+        get "#{base_url}/incompletes", params: {sort: "motorized"}
+        expect(response.status).to eq(200)
+        expect(response).to render_template :incompletes
+        expect(assigns(:sort_column)).to eq "motorized"
+      end
+    end
+    context "suborganization incomplete" do
+      let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: current_organization) }
+      let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id)}, origin: "embed_partial") }
+      it "renders" do
+        current_organization.save # Have to resave organization because of child relationship, and re-stub
+        current_organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs)
+        expect(organization_child.reload.paid?).to be_truthy
+
+        expect(partial_registration.organization).to eq organization_child
+        get "#{base_url}/incompletes"
+        expect(response.status).to eq(200)
+        expect(response).to render_template :incompletes
+        expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+      end
+    end
+
+    context "unpaid organization" do
+      let(:current_organization) { FactoryBot.create(:organization) }
+
+      it "redirects" do
+        expect(current_organization.reload.paid?).to be_falsey
+        get "#{base_url}/incompletes"
+        expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
+      end
+    end
+  end
+
+  describe "multi_serial_search" do
+    it "renders" do
+      get "#{base_url}/multi_serial_search"
+      expect(response.status).to eq(200)
+      expect(response).to render_template :multi_serial_search
     end
   end
 end

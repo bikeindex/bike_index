@@ -21,7 +21,7 @@ class RegistrationsController < ApplicationController
       @b_param = BParam.new(params: {bike: bike_params.as_json})
     end
     @stolen = @b_param.status_stolen?
-    @vehicle_select = InputNormalizer.boolean(params[:vehicle_select])
+    @vehicle_select = !InputNormalizer.boolean(params[:skip_vehicle_select])
   end
 
   def create

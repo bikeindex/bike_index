@@ -188,10 +188,10 @@ CREATE TABLE public.b_params (
     image_tmp character varying(255),
     image_processed boolean DEFAULT false,
     id_token text,
-    params json DEFAULT '{"bike":{}}'::json,
     origin character varying,
     organization_id integer,
-    email character varying
+    email character varying,
+    params jsonb
 );
 
 
@@ -6653,6 +6653,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231212025929'),
 ('20240517161713'),
 ('20240712181117'),
-('20240908151325');
+('20240908151325'),
+('20241003155715'),
+('20241007164353');
 
 

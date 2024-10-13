@@ -97,6 +97,10 @@ class CycleType
     end
   end
 
+  def self.default_slug
+    "bike"
+  end
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
