@@ -151,6 +151,7 @@ class OrganizationExportWorker < ApplicationWorker
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     when "vehicle_type" then bike.type_titleize
+    when "motorized" then bike.motorized?
     when "status" then bike.status_humanized_no_with_owner
     end
   end

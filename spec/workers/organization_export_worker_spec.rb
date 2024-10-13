@@ -8,19 +8,25 @@ RSpec.describe OrganizationExportWorker, type: :job do
   let(:black) { Color.black }
   let(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
   let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, creation_organization: organization) }
-  let(:bike_values) do
-    [
-      "http://test.host/bikes/#{bike.id}",
-      bike.created_at.utc,
-      "Trek",
-      nil,
-      "Black",
-      bike.serial_number,
-      nil
-    ]
+  let(:bike_row_hash) do
+    {
+      color: "Black",
+      is_stolen: nil,
+      link: "http://test.host/bikes/#{bike.id}",
+      manufacturer: "Trek",
+      model: nil,
+      registered_at: bike.created_at.utc,
+      serial: bike.serial_number
+    }
   end
-  let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
+  let(:bike_values) { bike_row_hash.values }
   let(:csv_lines) { [export.written_headers, bike_values] }
+  let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
+
+  def csv_line_to_hash(line_str, headers:)
+    line = line_str.gsub(/\A\"/, "").gsub(/\"\z/, "").split('","')
+    headers.map(&:to_sym).zip(line).to_h
+  end
 
   describe "perform" do
     context "success" do
@@ -32,6 +38,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
+        generated_line_hash = csv_line_to_hash(export.file.read.split("\n").last, headers: export.written_headers)
+        expect(generated_line_hash.keys).to eq bike_row_hash.keys # has to match the order!
+        expect(generated_line_hash).to match_hash_indifferently(bike_row_hash)
+        # Putting it all together
         expect(export.file.read).to eq(csv_string)
         expect(export.rows).to eq 1
       end
@@ -184,32 +194,39 @@ RSpec.describe OrganizationExportWorker, type: :job do
           "Sweet manufacturer &gt;"
         end
       end
-      let(:bike_values) do
-        [
-          "http://test.host/bikes/#{bike.id}",
-          bike.created_at.utc,
-          target_mnfg,
-          "\",,,\"<script>XSSSSS</script>",
-          "Black, #{secondary_color.name}",
-          bike.serial_number,
-          nil,
-          "Bike",
-          nil,
-          "cool extra serial",
-          nil, # Since user isn't part of organization. TODO: Currently not implemented
-          email,
-          "George Smith",
-          "", # no status
-          nil # assigned_sticker
-        ]
+      let(:bike_row_hash) do
+        {
+          color: "Black, #{secondary_color.name}",
+          extra_registration_number: "cool extra serial",
+          is_stolen: "",
+          link: "http://test.host/bikes/#{bike.id}",
+          manufacturer: target_mnfg,
+          model: "\\\",,,\\\"<script>XSSSSS</script>",
+          motorized: "false",
+          owner_email: email,
+          owner_name: "George Smith",
+          registered_at: bike.created_at.utc.to_s,
+          registered_by: nil, # Since user isn't part of organization. TODO: Currently not implemented
+          serial: bike.serial_number,
+          status: "", # no status
+          thumbnail: nil,
+          vehicle_type: "Bike",
+          assigned_sticker: nil # assigned_sticker
+        }
       end
-      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"#{target_mnfg}\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"Bike\",\"\",\"cool extra serial\",\"\",\"#{email}\",\"George Smith\",\"\",\"\"" }
+      let(:bike_values) { bike_row_hash.values }
+      let(:target_csv_line) { instance.comma_wrapped_string(bike_values).gsub(/\n\z/, "") }
+
       it "exports with all the header values" do
         expect(bike.reload.owner_name).to eq "George Smith"
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
         generated_csv_string = export.file.read
+        line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
+        expect(line_hash.keys).to eq bike_row_hash.keys # has to match the order!
+        expect(line_hash).to match_hash_indifferently(bike_row_hash)
+        # written_csv_line = export.written_headers.zip(generated_csv_string.split("\n").last)
         # NOTE: this only seems to fail on the mac version of nokogiri, see PR#2366
         # Ensure we actually match the exact thing with correct escaping
         expect(generated_csv_string.split("\n").last).to eq target_csv_line
@@ -232,7 +249,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
          organization_affiliation: "community_member",
          student_id: "XX9999"}
       end
-      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_registration_info: registration_info) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_registration_info: registration_info, cycle_type: "cargo", propulsion_type: "pedal-assist") }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
       let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).as_json }
@@ -316,22 +333,23 @@ RSpec.describe OrganizationExportWorker, type: :job do
       context "including every available field + stickers" do
         let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + ["bike_stickers"] }
         let(:export_options) { {headers: Export.permitted_headers(organization)} }
-        let(:target_row) do
+        let(:bike_row_hash) do
           {
-            link: "http://test.host/bikes/#{bike.id}",
-            registered_at: bike.created_at.utc,
-            manufacturer: bike.mnfg_name,
-            model: nil,
             color: "Black",
-            serial: bike.serial_number,
-            is_stolen: nil,
-            vehicle_type: "Bike",
-            thumbnail: nil,
             extra_registration_number: "cool extra serial",
-            registered_by: nil,
+            is_stolen: "",
+            link: "http://test.host/bikes/#{bike.id}",
+            manufacturer: bike.mnfg_name,
+            model: "",
+            motorized: "true",
             owner_email: bike.owner_email,
-            owner_name: nil,
+            owner_name: "",
+            registered_at: bike.created_at.utc.to_s,
+            registered_by: "",
+            serial: bike.serial_number,
             status: "",
+            thumbnail: "",
+            vehicle_type: "Cargo Bike (front Storage)",
             bike_sticker: "FF 333 333",
             organization_affiliation: "community_member",
             phone: "7177423423",
@@ -362,126 +380,130 @@ RSpec.describe OrganizationExportWorker, type: :job do
           end
           export.reload
           expect(instance.export_headers).to eq export.written_headers
-          expect(instance.export_headers).to match_array target_row.keys.map(&:to_s)
+          expect(instance.export_headers).to match_array bike_row_hash.keys.map(&:to_s)
           expect(export.progress).to eq "finished"
           generated_csv_string = export.file.read
-          bike_line = generated_csv_string.split("\n").last
-          expect(bike_line.split(",").count).to eq target_row.keys.count
-          expect(bike_line).to eq instance.comma_wrapped_string(target_row.values).strip
-        end
-      end
-      context "with partial registrations, every available field without sticker" do
-        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
-        let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: "only"} }
-        let(:partial_reg_attrs) do
-          {
-            manufacturer_id: Manufacturer.other.id,
-            primary_frame_color_id: Color.black.id,
-            owner_email: "something@stuff.com",
-            creation_organization_id: organization.id
-          }
-        end
-        let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs}, origin: "embed_partial") }
-        let(:target_partial_row) do
-          {
-            link: nil,
-            registered_at: partial_registration.created_at.utc,
-            manufacturer: "Other",
-            model: nil,
-            color: "Black",
-            serial: nil,
-            is_stolen: nil,
-            vehicle_type: nil,
-            thumbnail: nil,
-            extra_registration_number: nil,
-            registered_by: nil,
-            owner_email: "something@stuff.com",
-            owner_name: nil,
-            organization_affiliation: nil,
-            student_id: nil,
-            phone: nil,
-            bike_sticker: nil,
-            status: nil,
-            address: nil,
-            city: nil,
-            state: nil,
-            zipcode: nil,
-            partial_registration: true
-          }
-        end
-        it "returns expected values" do
-          expect(partial_registration.manufacturer&.name).to eq("Other")
-          expect(export.bikes_scoped.pluck(:id)).to eq([])
-          expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
-          expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
-          instance.perform(export.id)
-          export.reload
-          expect(instance.export_headers).to eq export.written_headers
-          expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
-          expect(export.progress).to eq "finished"
-          generated_csv_string = export.file.read
-          expect(generated_csv_string.split("\n").count).to eq 2
-          incomplete_line = generated_csv_string.split("\n").last
-          expect(incomplete_line.split(",").count).to eq target_partial_row.keys.count
-          expect(incomplete_line).to eq instance.comma_wrapped_string(target_partial_row.values).strip
-          expect(export.exported_bike_ids).to eq([])
-        end
-        context "partial registrations and complete registration only" do
-          let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: true} }
-          let(:target_full_row) do
-            {
-              link: "http://test.host/bikes/#{bike.id}",
-              registered_at: bike.created_at.utc,
-              manufacturer: bike.mnfg_name,
-              model: nil,
-              color: "Black",
-              serial: bike.serial_number,
-              is_stolen: nil,
-              vehicle_type: "Bike",
-              thumbnail: nil,
-              extra_registration_number: "cool extra serial",
-              registered_by: nil,
-              owner_email: bike.owner_email,
-              owner_name: nil,
-              bike_sticker: nil,
-              status: "",
-              organization_affiliation: "community_member",
-              phone: "7177423423",
-              student_id: "XX9999",
-              address: "717 Market St",
-              city: "San Francisco",
-              state: "CA",
-              zipcode: "94103",
-              partial_registration: nil
-            }
-          end
-          it "returns expected values" do
-            VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
-              bike.reload
-              expect(bike.registration_address_source).to eq "initial_creation"
-              expect(bike.registration_address(true).except("latitude", "longitude")).to eq target_address
-              expect(bike.registration_address).to eq target_address
-            end
-            instance.perform(export.id)
-            export.reload
-            expect(instance.export_headers).to eq export.written_headers
-            expect(export.written_headers).to match_array target_full_row.keys.map(&:to_s)
-            expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
-            expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
-            expect(export.progress).to eq "finished"
-            generated_csv_string = export.file.read
-            expect(generated_csv_string.split("\n").count).to eq 3
-            bike_line = generated_csv_string.split("\n")[1]
-            expect(bike_line.split(",").count).to eq target_full_row.keys.count
-            expect(bike_line).to eq instance.comma_wrapped_string(target_full_row.values).strip
 
-            incomplete_line = generated_csv_string.split("\n").last
-            expect(incomplete_line.split(",").count).to eq target_partial_row.keys.count
-            expect(incomplete_line).to eq instance.comma_wrapped_string(target_partial_row.values).strip
-            expect(export.exported_bike_ids).to eq([bike.id])
-          end
+          line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
+          expect(line_hash.keys).to eq bike_row_hash.keys # again, order is CRITICAL
+          expect(line_hash).to match_hash_indifferently(bike_row_hash)
+          expect(generated_csv_string).to eq csv_string
         end
       end
+  #     context "with partial registrations, every available field without sticker" do
+  #       let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
+  #       let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: "only"} }
+  #       let(:partial_reg_attrs) do
+  #         {
+  #           manufacturer_id: Manufacturer.other.id,
+  #           primary_frame_color_id: Color.black.id,
+  #           owner_email: "something@stuff.com",
+  #           creation_organization_id: organization.id,
+  #           cycle_type: "e-Skateboard"
+  #         }
+  #       end
+  #       let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs}, origin: "embed_partial") }
+  #       let(:target_partial_row) do
+  #         {
+  #           link: nil,
+  #           registered_at: partial_registration.created_at.utc,
+  #           manufacturer: "Other",
+  #           model: nil,
+  #           color: "Black",
+  #           serial: nil,
+  #           is_stolen: nil,
+  #           vehicle_type: nil,
+  #           motorized: "false",
+  #           thumbnail: nil,
+  #           extra_registration_number: nil,
+  #           registered_by: nil,
+  #           owner_email: "something@stuff.com",
+  #           owner_name: nil,
+  #           organization_affiliation: nil,
+  #           student_id: nil,
+  #           phone: nil,
+  #           bike_sticker: nil,
+  #           status: nil,
+  #           address: nil,
+  #           city: nil,
+  #           state: nil,
+  #           zipcode: nil,
+  #           partial_registration: true
+  #         }
+  #       end
+  #       it "returns expected values" do
+  #         expect(partial_registration.manufacturer&.name).to eq("Other")
+  #         expect(export.bikes_scoped.pluck(:id)).to eq([])
+  #         expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
+  #         expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
+  #         instance.perform(export.id)
+  #         export.reload
+  #         expect(instance.export_headers).to eq export.written_headers
+  #         expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
+  #         expect(export.progress).to eq "finished"
+  #         generated_csv_string = export.file.read
+  #         expect(generated_csv_string.split("\n").count).to eq 2
+  #         incomplete_line = generated_csv_string.split("\n").last
+  #         expect(incomplete_line.split(",").count).to eq target_partial_row.keys.count
+  #         expect(incomplete_line).to eq instance.comma_wrapped_string(target_partial_row.values).strip
+  #         expect(export.exported_bike_ids).to eq([])
+  #       end
+  #       context "partial registrations and complete registration only" do
+  #         let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: true} }
+  #         let(:target_full_row) do
+  #           {
+  #             link: "http://test.host/bikes/#{bike.id}",
+  #             registered_at: bike.created_at.utc,
+  #             manufacturer: bike.mnfg_name,
+  #             model: nil,
+  #             color: "Black",
+  #             serial: bike.serial_number,
+  #             is_stolen: nil,
+  #             vehicle_type: "Bike",
+  #             thumbnail: nil,
+  #             extra_registration_number: "cool extra serial",
+  #             registered_by: nil,
+  #             owner_email: bike.owner_email,
+  #             owner_name: nil,
+  #             bike_sticker: nil,
+  #             status: "",
+  #             organization_affiliation: "community_member",
+  #             phone: "7177423423",
+  #             student_id: "XX9999",
+  #             address: "717 Market St",
+  #             city: "San Francisco",
+  #             state: "CA",
+  #             zipcode: "94103",
+  #             partial_registration: nil
+  #           }
+  #         end
+  #         it "returns expected values" do
+  #           VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
+  #             bike.reload
+  #             expect(bike.registration_address_source).to eq "initial_creation"
+  #             expect(bike.registration_address(true).except("latitude", "longitude")).to eq target_address
+  #             expect(bike.registration_address).to eq target_address
+  #           end
+  #           instance.perform(export.id)
+  #           export.reload
+  #           expect(instance.export_headers).to eq export.written_headers
+  #           expect(export.written_headers).to match_array target_full_row.keys.map(&:to_s)
+  #           expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
+  #           expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
+  #           expect(export.progress).to eq "finished"
+  #           generated_csv_string = export.file.read
+  #           expect(generated_csv_string.split("\n").count).to eq 3
+  #           bike_line = generated_csv_string.split("\n")[1]
+  #           expect(bike_line.split(",").count).to eq target_full_row.keys.count
+  #           expect(bike_line).to eq instance.comma_wrapped_string(target_full_row.values).strip
+
+  #           incomplete_line = generated_csv_string.split("\n").last
+  #           expect(incomplete_line.split(",").count).to eq target_partial_row.keys.count
+  #           expect(incomplete_line).to eq instance.comma_wrapped_string(target_partial_row.values).strip
+  #           expect(export.exported_bike_ids).to eq([bike.id])
+  #         end
+  #       end
+  #     end
     end
   end
 

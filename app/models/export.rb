@@ -46,7 +46,7 @@ class Export < ApplicationRecord
     vehicle_type
   ].freeze
   AVERY_HEADERS = %w[address owner_name].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
 
   mount_uploader :file, ExportUploader
 
