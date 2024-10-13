@@ -16,17 +16,16 @@
     Bikes past year
   = column_chart variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true, thousands: ","
 
-- else
+- elsif @kind == "bikes"
   - show_search_statuses = !@ignored_only && @kind == "bikes"
-  - if @kind == "bikes"
-    %ul.nav.justify-content-end.small
-      - unless @ignored_only
-        %li.nav-item
-          = link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "nav-link"
-      - if show_search_statuses
-        %li.nav-item
-          %a.nav-link#showStatusesSearch{href: "#", class: (@not_default_statuses ? "active" : "")}
-            Search statuses
+  %ul.nav.justify-content-end.small
+    - unless @ignored_only
+      %li.nav-item
+        = link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "nav-link"
+    - if show_search_statuses
+      %li.nav-item
+        %a.nav-link#showStatusesSearch{href: "#", class: (@not_default_statuses ? "active" : "")}
+          Search statuses
   .row.mt-4.mb-4
     .col-md-6.order-2.order-md-1
       - if params[:search_manufacturer].present?
@@ -64,8 +63,8 @@
             = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 
-  - if @ignored_only
-    = column_chart variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "ignored")), stacked: true, thousands: ","
+    - if @ignored_only
+      = column_chart variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "ignored")), stacked: true, thousands: ","
 
   .mt-4
   = column_chart variable_admin_graphs_path(sortable_params), thousands: ","
@@ -78,7 +77,7 @@
   -# Don't render all the extra stuff if looking at a period that is longer than 1 year
   - render_other_bike_graphs = time_range_length(@time_range) < 367.days.to_i
 
-  - if @kind == "bikes" && render_other_bike_graphs
+  - if render_other_bike_graphs
     - shown_bike_graph_kinds.each do |graph_kind|
       - if graph_kind == "stolen"
         - next # because that's already rendered above
@@ -155,3 +154,11 @@
                     = organization.pos_kind.humanize
                 %td.text-right
                   = admin_number_display(bike_count)
+- else
+  - if @total_count.present?
+    %p.mt-4
+      #{admin_number_display(@total_count)} matching #{@kind}
+      %em
+        = humanized_time_range(@time_range)
+  .mt-4
+  = column_chart variable_admin_graphs_path(sortable_params), thousands: ","
