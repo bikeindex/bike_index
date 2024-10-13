@@ -203,7 +203,7 @@ RSpec.describe OrganizedHelper, type: :helper do
       expect(registration_field_label(organization, "owner_email")).to be_nil
     end
     context "with enabled features" do
-      let(:labels) { {reg_phone: "You have to put this in, jerk", reg_extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
+      let(:labels) { {}.as_json }
       let(:feature_slugs) { %w[reg_extra_registration_number reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker] }
       let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
       it "includes" do
@@ -213,14 +213,59 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(include_field_reg_address?(organization, user)).to be_truthy
         expect(include_field_reg_extra_registration_number?(organization)).to be_truthy
         expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
+        expect(include_field_reg_true_false_question?(organization)).to be_falsey
         # And test the labels
-        expect(registration_field_label(organization, "reg_extra_registration_number")).to eq "XXXZZZZ"
+        expect(registration_field_label(organization, "reg_extra_registration_number")).to be_nil
         expect(registration_field_label(organization, "reg_address")).to be_nil
-        expect(registration_field_label(organization, "reg_phone")).to eq labels["reg_phone"]
+        expect(registration_field_label(organization, "reg_phone")).to be_nil
         expect(registration_field_label(organization, "reg_organization_affiliation")).to be_nil
-        expect(registration_field_label(organization, "reg_student_id")).to eq "PUT in student ID!"
+        expect(registration_field_label(organization, "reg_student_id")).to be_nil
         expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
         expect(registration_field_label(organization, "owner_email")).to be_nil
+        expect(registration_field_label(organization, "reg_true_false_question")).to be_nil
+      end
+      context "with reg_true_false_question" do
+        let(:feature_slugs) { %w[reg_true_false_question] }
+        it "includes" do
+          expect(registration_field_label(organization, "reg_true_false_question")).to be_nil
+          # False because it doesn't have
+          expect(include_field_reg_true_false_question?(organization)).to be_falsey
+          expect(include_field_reg_true_false_question?(organization, user)).to be_falsey
+        end
+      end
+      context "with all fields and all labels" do
+        let(:feature_slugs) { OrganizationFeature::REG_FIELDS }
+        let(:labels) do
+          {
+            reg_phone: "You have to put this in, jerk",
+            reg_extra_registration_number: "XXXZZZZ",
+            reg_student_id: "PUT in student ID!",
+            reg_address: "1",
+            reg_organization_affiliation: "2",
+            reg_bike_sticker: "3",
+            owner_email: "4",
+            reg_true_false_question: "5"
+          }.as_json
+        end
+        it "includes" do
+          expect(include_field_reg_phone?(organization)).to be_truthy
+          expect(include_field_reg_phone?(organization, user)).to be_truthy
+          expect(include_field_reg_address?(organization)).to be_truthy
+          expect(include_field_reg_address?(organization, user)).to be_truthy
+          expect(include_field_reg_extra_registration_number?(organization)).to be_truthy
+          expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
+          expect(include_field_reg_true_false_question?(organization)).to be_truthy
+          expect(include_field_reg_true_false_question?(organization, user)).to be_truthy
+          # And test the labels
+          expect(registration_field_label(organization, "reg_extra_registration_number")).to eq "XXXZZZZ"
+          expect(registration_field_label(organization, "reg_address")).to eq "1"
+          expect(registration_field_label(organization, "reg_phone")).to eq labels["reg_phone"]
+          expect(registration_field_label(organization, "reg_organization_affiliation")).to eq "2"
+          expect(registration_field_label(organization, "reg_student_id")).to eq "PUT in student ID!"
+          expect(registration_field_label(organization, "reg_bike_sticker")).to eq "3"
+          expect(registration_field_label(organization, "owner_email")).to eq "4"
+          expect(registration_field_label(organization, "reg_true_false_question")).to eq "5"
+        end
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }
@@ -234,7 +279,8 @@ RSpec.describe OrganizedHelper, type: :helper do
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
         end
         context "with user_registration_organization" do
-          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
+          let(:labels) { {reg_true_false_question: "Can we email you?"}.as_json }
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
           let(:registration_info) { {} }
           let(:user) { FactoryBot.create(:user_confirmed) }
           let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: user, organization: organization, registration_info: registration_info) }
@@ -248,7 +294,8 @@ RSpec.describe OrganizedHelper, type: :helper do
             expect(include_field_reg_student_id?(organization)).to be_truthy
             expect(include_field_reg_student_id?(organization, user)).to be_truthy
           end
-          context "with registration_info" do
+          context "with registration_info and address" do
+            let(:feature_slugs) { OrganizationFeature::REG_FIELDS }
             let(:user) { FactoryBot.create(:user_confirmed, :in_edmonton, phone: "7773335555", address_set_manually: true) }
             let(:registration_info) { {student_id: "12", organization_affiliation: "staff"} }
             it "is falsey" do
@@ -257,9 +304,24 @@ RSpec.describe OrganizedHelper, type: :helper do
               expect(include_field_reg_address?(organization, user)).to be_falsey
               expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
               expect(include_field_reg_student_id?(organization, user)).to be_falsey
+              expect(include_field_reg_true_false_question?(organization, user)).to be_truthy
               # Each bike needs to have these fields - regardless of user_registration_organization
               expect(include_field_reg_extra_registration_number?(organization, user)).to be_truthy
               expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
+            end
+            context "with true_false_question" do
+              let(:registration_info) { {true_false_question: "false", organization_affiliation_33: "true"} }
+              it "is falsey" do
+                expect(user.reload.street).to be_present
+                expect(include_field_reg_phone?(organization, user)).to be_falsey
+                expect(include_field_reg_address?(organization, user)).to be_falsey
+                expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
+                expect(include_field_reg_student_id?(organization, user)).to be_truthy
+                expect(include_field_reg_true_false_question?(organization, user)).to be_falsey
+                # Each bike needs to have these fields - regardless of user_registration_organization
+                expect(include_field_reg_extra_registration_number?(organization, user)).to be_truthy
+                expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
+              end
             end
           end
         end

@@ -26,4 +26,24 @@ RSpec.shared_examples "registration_infoable" do
       expect(subject.class.with_organization_affiliation(organization.id + 2222).pluck(:id)).to match_array([instance.id, instance3.id])
     end
   end
+
+  describe "true_false_question" do
+    let(:registration_info2) { {"true_false_question_#{organization.id}" => "true"} }
+    let!(:instance2) { FactoryBot.create(model_sym, registration_info: registration_info2) }
+    let(:organization) { FactoryBot.create(:organization) }
+    it "is expected" do
+      expect(instance.true_false_question).to be_nil
+      expect(instance.true_false_question(organization.id)).to be_nil
+      expect(instance2.true_false_question).to eq "true"
+      expect(instance2.true_false_question(organization.id)).to eq "true"
+      # expect(instance.organization_affiliation).to eq "student"
+      # expect(instance.organization_affiliation(organization.slug)).to eq "student"
+      expect(subject.class.pluck(:id)).to match_array([instance.id, instance2.id])
+      expect(subject.class.with_true_false_question(organization).pluck(:id)).to match_array([instance2.id])
+      expect(subject.class.with_true_false_question(organization.id).pluck(:id)).to match_array([instance2.id])
+
+      instance.true_false_question = false, organization
+      expect(instance.reload.true_false_question).to eq 'false'
+    end
+  end
 end
