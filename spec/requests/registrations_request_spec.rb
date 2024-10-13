@@ -70,7 +70,8 @@ RSpec.describe RegistrationsController, type: :request do
       context "no user" do
         it "renders" do
           get "#{base_url}/embed", params: {
-            organization_id: organization.to_param, simple_header: true, select_child_organization: true
+            organization_id: organization.to_param, simple_header: true, select_child_organization: true,
+            skip_vehicle_select: 1
           }
           expect_it_to_render_embed_correctly
           expect(assigns(:stolen)).to be_falsey
@@ -96,7 +97,8 @@ RSpec.describe RegistrationsController, type: :request do
           expect(organization.save).to eq(true)
 
           get "#{base_url}/embed", params: {
-            organization_id: organization.id, status: "status_stolen", select_child_organization: true
+            organization_id: organization.id, status: "status_stolen", select_child_organization: true,
+            skip_vehicle_select: "true"
           }
 
           expect_it_to_render_embed_correctly
@@ -123,8 +125,7 @@ RSpec.describe RegistrationsController, type: :request do
         it "renders" do
           get "#{base_url}/embed", params: {
             organization_id: organization.to_param,
-            simple_header: "1",
-            vehicle_select: "1"
+            simple_header: "1"
           }
           expect_it_to_render_embed_correctly
           expect(assigns(:stolen)).to be_falsey
