@@ -1,6 +1,30 @@
 require "rails_helper"
 
 RSpec.describe BParam, type: :model do
+  describe "scopes" do
+    let!(:b_param_empty) { FactoryBot.create(:b_param, params: {bike: {}, propulsion_type_motorized: nil}) }
+    let!(:b_param_no_cycle_type) { FactoryBot.create(:b_param, params: {bike: bike_params, propulsion_type_motorized: true}) }
+    let(:bike_params) { {owner_email: "test@bikeindex.org"} }
+    let!(:b_param_bike) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "bike", propulsion_type_slug: "pedal-assist")}) }
+    let!(:b_param_mobility) { FactoryBot.create(:b_param, params: {bike: bike_params.merge(cycle_type: "e-Skateboard")}) }
+    it "scopes correctly" do
+      expect(b_param_empty.reload.params).to match_hash_indifferently({bike: {}})
+      expect(b_param_bike.reload.params).to match_hash_indifferently({bike: bike_params.merge(propulsion_type_slug: "pedal-assist")})
+      expect(b_param_bike.motorized?).to be_truthy
+      expect(b_param_mobility.reload.cycle_type).to eq "personal-mobility"
+      expect(b_param_mobility.motorized?).to be_truthy
+      expect(BParam.bike_params.pluck(:id)).to match_array([b_param_empty.id, b_param_no_cycle_type.id, b_param_bike.id, b_param_mobility.id])
+      expect(BParam.with_cycle_type.pluck(:id)).to match_array([b_param_mobility.id])
+      expect(BParam.cycle_type_not_bike.pluck(:id)).to match_array([b_param_mobility.id])
+      expect(BParam.cycle_type_bike.pluck(:id)).to match_array([b_param_empty.id, b_param_no_cycle_type.id, b_param_bike.id])
+
+      expect(BParam.top_level_motorized.pluck(:id)).to match_array([b_param_no_cycle_type.id])
+      expect(BParam.motorized.pluck(:id)).to match_array([b_param_mobility.id, b_param_no_cycle_type.id])
+      expect(BParam.cycle_type_not_bike.motorized.pluck(:id)).to match_array([b_param_mobility.id])
+      expect(BParam.cycle_type_not_bike_ordered.pluck(:id)).to eq([b_param_mobility.id]) # Verify scope is valid
+    end
+  end
+
   describe "bike" do
     it "returns the bike attribs" do
       b_param = BParam.new(params: {bike: {serial_number: "XXX"}})
@@ -12,6 +36,7 @@ RSpec.describe BParam, type: :model do
       expect(b_param.save).to be_truthy
     end
   end
+
   describe "clean_params" do
     context "passed params" do
       it "calls the things we want it to call" do
@@ -93,7 +118,7 @@ RSpec.describe BParam, type: :model do
       new_params = b_param.bike
       expect(new_params.key?("serial_number")).to be_truthy
       expect(new_params.key?("manufacturer")).to be_truthy
-      expect(new_params.keys.length).to eq(3)
+      expect(new_params.keys).to match_array(%w[manufacturer serial_number send_email])
       expect(b_param.params["test"]).to be_truthy
       expect(b_param.params["stolen"]).to be_falsey
       expect(b_param.params["stolen_record"]).not_to be_present
@@ -600,32 +625,54 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  describe "top_level_propulsion_type" do
-    it "is foot-pedal" do
-      expect(BParam.top_level_propulsion_type({})).to be_nil
+  describe "propulsion_type" do
+    context "with propulsion_type" do
+      let(:passed_params) { {bike: {propulsion_type: "not-a-valid-propulsion-type"}} }
+      it "assigns the propulsion_type_slug" do
+        expect(BParam.propulsion_type(passed_params.as_json)).to eq "not-a-valid-propulsion-type"
+        expect(BParam.propulsion_type(passed_params[:bike].as_json)).to eq "not-a-valid-propulsion-type"
+      end
     end
-    context "propulsion_type_throttle" do
-      let(:pparams) { {"propulsion_type_throttle" => "1"} }
-      it "is throttle" do
-        expect(BParam.top_level_propulsion_type(pparams)).to eq :throttle
+    context "with propulsion_type_slug" do
+      let(:passed_params) { {bike: {propulsion_type_slug: "human-not-pedal", propulsion_type: "not-a-valid-propulsion-type"}} }
+      it "assigns the propulsion_type_slug" do
+        expect(BParam.propulsion_type(passed_params.as_json)).to eq "human-not-pedal"
+        expect(BParam.propulsion_type(passed_params[:bike].as_json)).to eq "human-not-pedal"
       end
-      context "with propulsion_type_pedal_assist" do
-        let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
-        it "is pedal-assist-and-throttle" do
-          expect(BParam.top_level_propulsion_type(pparams_with_assist)).to eq :"pedal-assist-and-throttle"
-        end
+    end
+    context "with propulsion_type_slug and top_level_propulsion_type" do
+      let(:passed_params) { {propulsion_type_motorized: "1", bike: {propulsion_type_slug: "human-not-pedal"}} }
+      it "assigns the top_level_propulsion_type" do
+        expect(BParam.propulsion_type(passed_params.as_json)).to eq "motorized"
       end
-      context "with propulsion_type_motorized" do
-        let(:pparams_motorized) { pparams.merge("propulsion_type_motorized" => "1") }
+    end
+    context "propulsion_type" do
+      it "is foot-pedal" do
+        expect(BParam.propulsion_type({})).to be_nil
+      end
+      context "propulsion_type_throttle" do
+        let(:pparams) { {"propulsion_type_throttle" => "1"} }
         it "is throttle" do
-          expect(BParam.top_level_propulsion_type(pparams)).to eq :throttle
+          expect(BParam.propulsion_type(pparams)).to eq "throttle"
+        end
+        context "with propulsion_type_pedal_assist" do
+          let(:pparams_with_assist) { pparams.merge("propulsion_type_pedal_assist" => true) }
+          it "is pedal-assist-and-throttle" do
+            expect(BParam.propulsion_type(pparams_with_assist)).to eq "pedal-assist-and-throttle"
+          end
+        end
+        context "with propulsion_type_motorized" do
+          let(:pparams_motorized) { pparams.merge("propulsion_type_motorized" => "1") }
+          it "is throttle" do
+            expect(BParam.propulsion_type(pparams)).to eq "throttle"
+          end
         end
       end
-    end
-    context "propulsion_type_motorized" do
-      let(:pparams) { {"propulsion_type_motorized" => "1"} }
-      it "is throttle" do
-        expect(BParam.top_level_propulsion_type(pparams)).to eq :motorized
+      context "propulsion_type_motorized" do
+        let(:pparams) { {"propulsion_type_motorized" => "1"} }
+        it "is throttle" do
+          expect(BParam.propulsion_type(pparams)).to eq "motorized"
+        end
       end
     end
   end
@@ -659,11 +706,27 @@ RSpec.describe BParam, type: :model do
       end
     end
     context "top_level_propulsion_type" do
-      let(:params) { {propulsion_type_motorized: 1, propulsion_type_throttle: 0, propulsion_type_pedal_assist: 1, bike: bike_params} }
+      let(:params) { {propulsion_type_motorized: 1, bike: bike_params} }
       it "returns with propulsion_type overridden" do
         result = b_param.safe_bike_attrs({})
-        expect(result).to match_hash_indifferently target.merge(propulsion_type_slug: "pedal-assist")
-        expect(result.keys.last.to_s).to eq "propulsion_type_slug"
+        expect(result).to match_hash_indifferently target.merge(propulsion_type_slug: "motorized")
+        expect(result.keys).to include "propulsion_type_slug"
+      end
+      context "more top_level_propulsion_type options" do
+        let(:params) { {propulsion_type_motorized: 1, propulsion_type_throttle: 0, propulsion_type_pedal_assist: 1, bike: bike_params} }
+        it "returns with propulsion_type overridden" do
+          result = b_param.safe_bike_attrs({})
+          expect(result).to match_hash_indifferently target.merge(propulsion_type_slug: "pedal-assist")
+          expect(result.keys).to include "propulsion_type_slug"
+        end
+      end
+    end
+    context "with untranslateable unicode escape sequence" do
+      let(:bike_params) { {owner_email: "\nsomething@ss.\u0000", cycle_type: "\n", propulsion_type_motorized: "false"} }
+      let(:target_result) { target.merge(owner_email: "something@ss.", propulsion_type_motorized: "false", propulsion_type_slug: nil) }
+      it "makes it valid" do
+        result = b_param.safe_bike_attrs({})
+        expect(result).to match_hash_indifferently target_result
       end
     end
     context "with cycle_type" do
@@ -673,7 +736,7 @@ RSpec.describe BParam, type: :model do
       it "makes propulsion_type_slug the last element" do
         result = b_param.safe_bike_attrs({})
         expect(result).to match_hash_indifferently target.merge(cycle_type: "tandem", propulsion_type_slug: "foot-pedal")
-        expect(result.keys.last.to_s).to eq "propulsion_type_slug"
+        expect(result.keys).to include "propulsion_type_slug"
       end
     end
   end

@@ -1829,7 +1829,6 @@ nl:
       student_id: Student-ID
       owner_email: E-mailadres eigenaar
       register_with: Registreer bij %{organization_name}
-      electric: Elektrisch
       required: vereist - of markering ontbreekt
       traditional_bike: Traditionele fiets
       traditional_bike_definition: 2 wielen, 1 zadel, pedaal
@@ -1844,6 +1843,7 @@ nl:
         number
       very_very_few_bikes_html: 'Er zijn heel <em>weinig</em> %{type_html} gemaakt
         zonder serienummers. Tenzij dit %{type_html}:'
+      electric_motorized: Elektrisch (gemotoriseerd)
     organized_access_panel:
       access_panel: Toegangspaneel
       address: 'Adres:'
@@ -4253,6 +4253,8 @@ nl:
         only_resend_with_permission: Deelregistraties alleen opnieuw verzenden met
           toestemming van de gebruiker! Anders kwalificeren de e-mails als spam.
         re_send: opnieuw versturen
+        motorized: e-voertuig?
+        vehicle_type: Type
       index:
         connected_to_bike_html: Het is hiermee verbonden %{bike_link}.
         enter_url_of_the_bike_html: 'U kunt de URL invoeren van de fiets waaraan u
@@ -5295,6 +5297,7 @@ nl:
       your: jouw
       this_vehicle_is_either_missing_or_stolen: Dit voertuig is vermist of gestolen
       vehicle_manufacturer: Voertuigfabrikant
+      electric_motorized: Elektrisch (gemotoriseerd)
   organizations:
     embed:
       add_a_color: Voeg een kleur toe

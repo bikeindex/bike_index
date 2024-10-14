@@ -15,13 +15,39 @@
 #  user_id         :integer
 #
 class Export < ApplicationRecord
-  PROGRESS_ENUM = %i[pending ongoing finished errored].freeze
-  VALID_KINDS = %i[organization stolen manufacturer].freeze
+  PROGRESS_ENUM = {
+    pending: 0,
+    ongoing: 1,
+    finished: 2,
+    errored: 3
+  }.freeze
+  VALID_KINDS = {
+    organization: 0,
+    stolen: 1,
+    manufacturer: 2
+  }.freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
-  DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  AVERY_HEADERS = %w[owner_name address].freeze
-  EXTRA_HEADERS = %w[vehicle_type thumbnail extra_registration_number registered_by owner_email owner_name status].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).freeze
+  DEFAULT_HEADERS = %w[
+    color
+    is_stolen
+    link
+    manufacturer
+    model
+    registered_at
+    serial
+  ].freeze
+  EXTRA_HEADERS = %w[
+    extra_registration_number
+    motorized
+    owner_email
+    owner_name
+    registered_by
+    status
+    thumbnail
+    vehicle_type
+  ].freeze
+  AVERY_HEADERS = %w[address owner_name].freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
 
   mount_uploader :file, ExportUploader
 
