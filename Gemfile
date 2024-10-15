@@ -13,7 +13,11 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 ruby "2.7.8"
 gem "rack", "~> 2.2.3"
 
-gem "rails", "~> 7.0.8.4"
+if next?
+  gem "rails", "~> 7.1.4"
+else
+  gem "rails", "~> 7.0.8.4"
+end
 
 gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
@@ -157,7 +161,7 @@ end
 
 group :development, :test do
   gem "brakeman", require: false
-  gem "database_cleaner"
+  gem "database_cleaner", "~> 2.0.0"
   gem "dotenv-rails"
   gem "foreman"
   # Commented out because jazz_fingers relies on pry-coolline, which currently errors on load
