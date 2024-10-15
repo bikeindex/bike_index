@@ -64,8 +64,9 @@ module Organized
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
-      @b_params_total = b_params.where(created_at: @time_range)
-      @b_params = @b_params_total.order(created_at: :desc).page(@page).per(@per_page)
+
+      @b_params_total = incompletes_sorted(b_params.where(created_at: @time_range))
+      @b_params = @b_params_total.page(@page).per(@per_page)
     end
 
     def resend_incomplete_email
@@ -141,7 +142,25 @@ module Organized
     end
 
     def sortable_columns
-      %w[id updated_by_user_at owner_email manufacturer_id frame_model cycle_type]
+      %w[id updated_by_user_at owner_email manufacturer_id frame_model cycle_type] +
+        %w[email motorized] # incompletes/b_param specific
+    end
+
+    def incompletes_sorted(b_params)
+      if sort_column == "cycle_type"
+        if sort_direction == "desc"
+          b_params.cycle_type_not_bike_ordered
+        else
+          b_params.cycle_type_bike
+        end
+      elsif sort_column == "motorized"
+        # NOTE: don't have a 'not_motorized' scope - it would be complicated and I don't think it's desired
+        b_params.motorized
+      else
+        @sort_column = "id" unless %w[id email].include?(sort_column)
+
+        b_params.order("b_params.#{sort_column} #{sort_direction}")
+      end
     end
 
     def organization_bikes

@@ -88,7 +88,7 @@ module BikeAttributable
 
   def type_titleize
     return "" unless type.present?
-    type.split(/(\s|-)/).map(&:capitalize).join("")
+    CycleType.slug_translation(cycle_type)
   end
 
   def propulsion_titleize

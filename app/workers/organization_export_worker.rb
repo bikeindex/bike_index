@@ -107,6 +107,8 @@ class OrganizationExportWorker < ApplicationWorker
           color_id.present? ? Color.find(color_id).name : nil
         }.compact.join(", ")
       when "owner_email" then b_param.owner_email
+      when "vehicle_type" then CycleType.slug_translation(b_param.cycle_type)
+      when "motorized" then b_param.motorized?
       when "partial_registration" then true
       end
     end
@@ -151,6 +153,7 @@ class OrganizationExportWorker < ApplicationWorker
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     when "vehicle_type" then bike.type_titleize
+    when "motorized" then bike.motorized?
     when "status" then bike.status_humanized_no_with_owner
     end
   end

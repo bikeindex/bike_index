@@ -169,18 +169,18 @@ RSpec.describe PropulsionType, type: :model do
     end
     describe "autocomplete_hash" do
       it "is the target" do
-        expect_hashes_to_match(PropulsionType.send(:motorized_autocomplete_hash), motorized_hash)
+        expect(PropulsionType.send(:motorized_autocomplete_hash)).to match_hash_indifferently motorized_hash
         expect(PropulsionType.autocomplete_hashes.count).to eq 1
       end
     end
   end
 
   describe "names and translations" do
-    let(:en_yaml) { YAML.load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
+    let(:en_yaml) { YAML.safe_load(File.read(Rails.root.join("config", "locales", "en.yml")), [Symbol]) }
     let(:enum_translations) do
       # For dumb historical reasons, slugs have dashes rather than underscores
       en_yaml.dig("en", "activerecord", "enums", "propulsion_type")
-        .map { |k, v| [k.gsub("_", "-"), v] }.to_h
+        .map { |k, v| [k.tr("_", "-"), v] }.to_h
     end
     it "has the same names as english translations" do
       expect(enum_translations).to match_hash_indifferently PropulsionType::NAMES

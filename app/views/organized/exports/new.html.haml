@@ -38,7 +38,10 @@
             .form-group.col-xs-6.col-md-4
               %label.checkbox
                 = f.check_box :headers, {multiple: true, checked: checked_headers.include?(header)}, header, 1
-                = header.titleize(keep_id_suffix: true)
+                - if header == "motorized"
+                  Motorized / e-vehicle
+                - else
+                  = header.titleize(keep_id_suffix: true)
     .form-group.row.mt-4.hiddenOnOnlyCustom
       = f.label :start_at, "Registered after", class: "org-form-label"
       .col-sm-4

@@ -1076,7 +1076,7 @@ en:
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
       city: City
-      electric: Electric
+      electric_motorized: Electric (motorized)
       enter_bike_type_details_html: Enter %{type_html} details
       enter_found_bike_type_details_html: Enter Found %{type_html} details
       enter_stolen_bike_type_details_html: Enter Stolen %{type_html} details
@@ -4439,6 +4439,7 @@ en:
         email: email
         incomplete: incomplete
         matching: matching
+        motorized: e-vehicle?
         only_resend_with_permission: >-
           Only re-send partial registrations with the user's permission! Otherwise
           the emails qualify as spam.
@@ -4449,6 +4450,7 @@ en:
         search_emails: Search emails
         sent: Sent
         through_org: through %{org_name}
+        vehicle_type: Type
       index:
         connected_to_bike_html: It is connected to this %{bike_link}.
         enter_url_of_the_bike_html: >-
@@ -4982,6 +4984,7 @@ en:
     embed:
       bike_manufacturer: Bike manufacturer
       choose_specific_organization_optional: Choose Specific Organization (optional)
+      electric_motorized: Electric (motorized)
       owner_email: "%{owner} email"
       primary_frame_color: Primary frame color
       register: Register

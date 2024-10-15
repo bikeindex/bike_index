@@ -57,9 +57,19 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
-  describe "slug_hash_lowecase" do
-    it "makes a hash" do
+  describe "slug_translation" do
+    it "returns short name" do
+      expect(CycleType.slug_translation("cargo")).to eq "Cargo Bike (front storage)"
       expect(CycleType.slug_translation_hash_lowercase_short["cargo"]).to eq "cargo bike"
+    end
+
+    context "with invalid name" do
+      it "raises error for slug_translation" do
+        expect { CycleType.slug_translation("asdfasdf") }.to raise_error(I18n::MissingTranslationData)
+      end
+      it "slug_translation_hash_lowercase_short returns nothing" do
+        expect(CycleType.slug_translation_hash_lowercase_short["asdfasdf"]).to be_nil
+      end
     end
   end
 
@@ -70,11 +80,11 @@ RSpec.describe CycleType, type: :model do
   end
 
   describe "names and translations" do
-    let(:en_yaml) { YAML.load(File.read(Rails.root.join("config", "locales", "en.yml"))) }
+    let(:en_yaml) { YAML.safe_load(File.read(Rails.root.join("config", "locales", "en.yml")), [Symbol]) }
     let(:cycle_type_translations) do
       # For dumb historical reasons, slugs have dashes rather than underscores
       en_yaml.dig("en", "activerecord", "enums", "cycle_type")
-        .map { |k, v| [k.gsub("_", "-"), v] }.to_h
+        .map { |k, v| [k.tr("_", "-"), v] }.to_h
     end
     it "has the same names as english translations" do
       expect(cycle_type_translations.except("traditional-bike")).to match_hash_indifferently CycleType::NAMES
