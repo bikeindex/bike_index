@@ -632,6 +632,7 @@ workflows:
   commit:
     jobs:
       - build
+      - build_next
       - brakeman_scan
       - upload-coverage:
           requires:
