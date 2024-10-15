@@ -19,7 +19,7 @@ jobs:
           command: bundle install
       - run:
           name: Run Brakeman
-          command: bundle exec brakeman || true
+          command: bundle exec brakeman
       - run:
           name: Check Brakeman Report
           command: |
@@ -632,7 +632,6 @@ workflows:
   commit:
     jobs:
       - build
-      - build_next
       - brakeman_scan
       - upload-coverage:
           requires:

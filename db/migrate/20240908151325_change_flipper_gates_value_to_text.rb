@@ -9,7 +9,7 @@ class ChangeFlipperGatesValueToText < ActiveRecord::Migration[6.1]
       remove_index :flipper_gates, [:feature_key, :key, :value]
     end
     change_column :flipper_gates, :value, :text
-    add_index :flipper_gates, [:feature_key, :key, :value], unique: true, length: { value: 255 }
+    add_index :flipper_gates, [:feature_key, :key, :value], unique: true, length: {value: 255}
   end
 
   def down

@@ -1774,7 +1774,6 @@ es:
       affiliation:
       are_you_certain:
       city:
-      electric:
       how_to_find_serial:
       i_just_dont_know_the_serial:
       im_100_sure:
@@ -1814,6 +1813,7 @@ es:
       without_serial_html:
       without_serial_number_html:
       very_very_few_bikes_html:
+      electric_motorized:
     organization_stolen_message:
       report_link_text:
       report_the_theft_to_the_organization_html:
@@ -3681,6 +3681,8 @@ es:
         search_emails:
         sent:
         through_org:
+        motorized:
+        vehicle_type:
       index:
         connected_to_bike_html:
         enter_url_of_the_bike_html:
@@ -4138,6 +4140,7 @@ es:
       your:
       this_vehicle_is_either_missing_or_stolen:
       vehicle_manufacturer:
+      electric_motorized:
   sessions:
     magic_link:
       enter_email_address:

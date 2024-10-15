@@ -255,7 +255,7 @@ RSpec.shared_examples "bike_searchable" do
       it "returns target" do
         result = Bike.selected_query_items_options({cycle_type: "pedi-cab", stolenness: "all"})
         expect(result.count).to eq 1
-        expect_hashes_to_match(result.first, target)
+        expect(result.first).to match_hash_indifferently target
       end
     end
   end

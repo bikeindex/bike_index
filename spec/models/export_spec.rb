@@ -218,7 +218,7 @@ RSpec.describe Export, type: :model do
     let(:additional_headers) { %w[address bike_sticker organization_affiliation phone student_id] }
     let(:all_headers) { permitted_headers + additional_headers }
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 14
+      expect(permitted_headers.count).to eq 15
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers("include_paid")).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
@@ -230,7 +230,7 @@ RSpec.describe Export, type: :model do
     context "with impounded and partial" do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
       it "returns the array we expect" do
-        expect(permitted_headers.count).to eq 14
+        expect(permitted_headers.count).to eq 15
         expect(Export.permitted_headers).to eq permitted_headers
         expect(Export.permitted_headers("include_paid")).to match_array all_headers
         expect(Export.permitted_headers(organization)).to match_array(permitted_headers + %w[is_impounded partial_registration])

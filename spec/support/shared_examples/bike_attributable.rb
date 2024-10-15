@@ -44,12 +44,21 @@ RSpec.shared_examples "bike_attributable" do
       expect(obj.type_titleize).to eq("Bike Trailer")
       expect(obj.propulsion_titleize).to eq("Pedal")
     end
-    context "e_scooter" do
+    context "e-scooter" do
       let(:type) { "e-scooter" }
       let(:propulsion_type) { "throttle" }
       it "returns expected" do
         expect(obj.type).to eq "e-scooter"
-        expect(obj.type_titleize).to eq "E-Scooter"
+        expect(obj.type_titleize).to eq "e-Scooter"
+        expect(obj.propulsion_titleize).to eq "Throttle"
+      end
+    end
+    context "personal-mobility" do
+      let(:type) { "personal-mobility" }
+      let(:propulsion_type) { "throttle" }
+      it "returns expected" do
+        expect(obj.type).to eq "e-skateboard (e-unicycle, personal mobility device, etc)"
+        expect(obj.type_titleize).to eq "e-Skateboard (e-Unicycle, Personal mobility device, etc)"
         expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
@@ -80,7 +89,8 @@ RSpec.shared_examples "bike_attributable" do
   end
 
   describe "propulsion_type_slug" do
-    let(:obj) { FactoryBot.build(model_sym, propulsion_type_slug: propulsion_type) }
+    let(:obj) { FactoryBot.build(model_sym, propulsion_type_slug: propulsion_type, cycle_type: cycle_type) }
+    let(:cycle_type) { "bike" }
     let(:propulsion_type) { "hand-pedal" }
     it "assigns" do
       expect(obj.propulsion_type).to eq "hand-pedal"
@@ -113,6 +123,24 @@ RSpec.shared_examples "bike_attributable" do
       let(:propulsion_type) { "random-thing" }
       it "assigns default type" do
         expect(obj.propulsion_type).to eq "foot-pedal"
+      end
+      context "e-scooter" do
+        let(:cycle_type) { "e-scooter" }
+        it "assigns default type for scooter" do
+          expect(obj.propulsion_type).to eq "throttle"
+        end
+      end
+    end
+    context "motorized" do
+      let(:propulsion_type) { "motorized" }
+      it "assigns pedal-assist" do
+        expect(obj.propulsion_type).to eq "pedal-assist"
+      end
+      context "not cycle_type" do
+        let(:cycle_type) { "wheelchair" }
+        it "assigns throttle" do
+          expect(obj.propulsion_type).to eq "throttle"
+        end
       end
     end
   end

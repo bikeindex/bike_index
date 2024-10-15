@@ -6,7 +6,7 @@ module SortableTable
   end
 
   def sort_column
-    sortable_columns.include?(params[:sort]) ? params[:sort] : default_column
+    @sort_column ||= sortable_columns.include?(params[:sort]) ? params[:sort] : default_column
   end
 
   def sort_direction
