@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# change to test CI
+
 def next?
   File.basename(__FILE__) == "Gemfile.next"
 end
