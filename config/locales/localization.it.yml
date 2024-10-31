@@ -10,21 +10,29 @@
 # https://github.com/translation/rails#custom-localization-key-prefixes
 #
 ---
-nl:
+it:
   date:
     formats:
-      default: "%d-%m-%Y"
-      long: "%e %B %Y"
-      short: "%e %b"
+      default: "%d/%m/%Y"
+      long: "%d %B %Y"
+      short: "%d %b"
     order:
     - :day
     - :month
     - :year
+  devise:
+    registrations:
+      signed_up: Iscrizione eseguita correttamente. Se abilitata, una conferma è stata
+        inviata al tuo indirizzo email.
+    sessions:
+      already_signed_out: Sei uscito correttamente.
+      signed_in: Accesso effettuato con successo.
+      signed_out: Sei uscito correttamente.
   number:
     currency:
       format:
         delimiter: "."
-        format: "%u %n"
+        format: "%n %u"
         precision: 2
         separator: ","
         significant: false
@@ -57,18 +65,11 @@ nl:
         delimiter: ''
   support:
     array:
-      last_word_connector: " en "
-      two_words_connector: " en "
+      last_word_connector: " e "
+      two_words_connector: " e "
       words_connector: ", "
   time:
     formats:
-      default: "%a %d %b %Y %H:%M:%S %Z"
+      default: "%a %d %b %Y, %H:%M:%S %z"
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
-  devise:
-    registrations:
-      signed_up: Je bent ingeschreven.
-    sessions:
-      already_signed_out: Je bent succesvol uitgelogd.
-      signed_in: Je bent succesvol ingelogd.
-      signed_out: Je bent succesvol uitgelogd.
