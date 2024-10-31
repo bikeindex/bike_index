@@ -48,8 +48,11 @@ class SuperuserAbility < ApplicationRecord
   end
 
   def self.can_access?(controller_name: nil, action_name: nil)
-    universal.any? || controller.where(controller_name: controller_name).any? ||
-      action.where(controller_name: controller_name, action_name: action_name).any?
+    return true if universal.any? || controller.where(controller_name: controller_name).any?
+    return false if action_name.blank?
+    # if permitted to view edit, also permitted to view show (lazy hack because there aren't groups)
+    action_name = %w[show edit] if action_name == 'show'
+    action.where(controller_name: controller_name).where(action_name: action_name).any?
   end
 
   def self.su_inverse_option?(option)

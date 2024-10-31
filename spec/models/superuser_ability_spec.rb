@@ -50,4 +50,52 @@ RSpec.describe SuperuserAbility, type: :model do
       expect(user2.su_option?(:hide_spam)).to be_falsey
     end
   end
+
+  describe "can_access" do
+    let(:superuser_ability) { FactoryBot.create(:superuser_ability) }
+    let(:user) { superuser_ability.user }
+    it "is accessible for universal" do
+      expect(user.superuser_abilities.can_access?).to be_truthy
+      expect(user.superuser_abilities.can_access?(controller_name: "bikes")).to be_truthy
+      expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "edit")).to be_truthy
+    end
+    context "with controller_name: bikes" do
+      let(:superuser_ability) { FactoryBot.create(:superuser_ability, controller_name: "bikes") }
+      it "is correctly accessible" do
+        expect(user.superuser_abilities.can_access?).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes")).to be_truthy
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "show")).to be_truthy
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "edit")).to be_truthy
+      end
+    end
+    context "with controller_name: bikes, action_name: edit" do
+      let(:superuser_ability) { FactoryBot.create(:superuser_ability, controller_name: "bikes", action_name: "edit") }
+      it "is correctly accessible" do
+        user.reload
+        expect(user.superuser_abilities.can_access?).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes")).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "show")).to be_truthy
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "edit")).to be_truthy
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "update")).to be_falsey
+      end
+    end
+    context "with controller_name: bikes, action_name: show" do
+      let(:superuser_ability) { FactoryBot.create(:superuser_ability, controller_name: "bikes", action_name: "show") }
+      it "is correctly accessible" do
+        expect(user.superuser_abilities.can_access?).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes")).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "show")).to be_truthy
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "edit")).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "update")).to be_falsey
+      end
+    end
+    context "with controller_name: graphs" do
+      let(:superuser_ability) { FactoryBot.create(:superuser_ability, controller_name: "graphs") }
+      it "is correctly accessible" do
+        expect(user.superuser_abilities.can_access?).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes")).to be_falsey
+        expect(user.superuser_abilities.can_access?(controller_name: "bikes", action_name: "edit")).to be_falsey
+      end
+    end
+  end
 end
