@@ -8,7 +8,7 @@
         - show_credibility_badges = current_user.su_option?(:always_show_credibility) || passive_organization&.enabled?("credibility_badges")
         - col_classes = show_credibility_badges ? "col-md-7" : "col-xs-12"
         .clearfix{class: col_classes}
-          - if current_user.superuser
+          - if current_user.superuser?(controller_name: 'bikes')
             = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info less-strong superuser-bike-button"
           - if passive_organization.present?
             %h3.secondary-bike-title.mb-2
@@ -23,7 +23,7 @@
 
 
 
-  - if current_user&.superuser
+  - if current_user&.superuser?(controller_name: "bikes")
     - if !@bike.unregistered_parking_notification? && @bike.user_hidden
       %h2.text-warning.mb-4.mt-2
         = t(".hidden_by_owner")
