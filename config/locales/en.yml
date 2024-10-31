@@ -4005,9 +4005,9 @@ en:
       en: USD
       en-GB: GBP
       es: EUR
+      it: EUR
       nb: EUR
       nl: EUR
-      it: EUR
   my_accounts:
     delete_account:
       delete_account: Delete account
