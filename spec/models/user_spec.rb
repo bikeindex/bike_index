@@ -197,6 +197,51 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "superuser?" do
+    let(:user) { User.new }
+    it "is true for superuser attribute" do
+      expect(user.superuser?).to be_falsey
+      expect(user.superuser?(controller_name: "bikes")).to be_falsey
+      expect(user.superuser?(controller_name: "bikes", action_name: "edit")).to be_falsey
+    end
+
+    context "with superuser" do
+      let(:user) { FactoryBot.build(:admin) }
+
+      it "is true for superuser attribute" do
+        expect(user.superuser?).to be_truthy
+        expect(user.superuser?(controller_name: "bikes")).to be_truthy
+        expect(user.superuser?(controller_name: "bikes", action_name: "edit")).to be_truthy
+      end
+    end
+
+    context "with superuser_ability universal" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { FactoryBot.create(:superuser_ability, user: user) }
+      it "is truthy" do
+        expect(user.reload.superuser?).to be_truthy
+        expect(user.superuser?(controller_name: "bikes")).to be_truthy
+        expect(user.superuser?(controller_name: "bikes", action_name: "edit")).to be_truthy
+      end
+    end
+
+    context "with superuser_ability for bikes controller" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { FactoryBot.create(:superuser_ability, user: user, controller_name: "bikes") }
+
+      it "is truthy" do
+        expect(user.reload.superuser?).to be_falsey
+        expect(user.superuser?(controller_name: "bikes")).to be_truthy
+        expect(user.superuser?(controller_name: "bikes", action_name: "edit")).to be_truthy
+
+        superuser_ability.update(action_name: "edit")
+        expect(user.reload.superuser?).to be_falsey
+        expect(user.superuser?(controller_name: "bikes")).to be_falsey
+        expect(user.superuser?(controller_name: "bikes", action_name: "edit")).to be_truthy
+      end
+    end
+  end
+
   describe "fuzzy finds" do
     before do
       expect(user).to be_present

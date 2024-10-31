@@ -421,31 +421,75 @@ RSpec.describe Bike, type: :model do
   describe "visible_by?" do
     let(:owner) { User.new }
     let(:superuser) { User.new(superuser: true) }
+    let(:bike) { Bike.new }
+    let(:bike_user_hidden) { Bike.new(user_hidden: true) }
+    let(:bike_deleted) { Bike.new(deleted_at: Time.current) }
     it "is visible if not hidden" do
-      bike = Bike.new
       expect(bike.visible_by?).to be_truthy
       expect(bike.visible_by?(User.new)).to be_truthy
     end
     context "user hidden" do
       it "is visible to owner" do
-        bike = Bike.new(user_hidden: true)
-        allow(bike).to receive(:owner).and_return(owner)
-        allow(bike).to receive(:user_hidden).and_return(true)
-        expect(bike.visible_by?(owner)).to be_truthy
-        expect(bike.visible_by?(User.new)).to be_falsey
-        expect(bike.visible_by?(superuser)).to be_truthy
+        allow(bike_user_hidden).to receive(:owner).and_return(owner)
+        allow(bike_user_hidden).to receive(:user_hidden).and_return(true)
+        expect(bike_user_hidden.visible_by?(owner)).to be_truthy
+        expect(bike_user_hidden.visible_by?(User.new)).to be_falsey
+        expect(bike_user_hidden.visible_by?(superuser)).to be_truthy
       end
     end
     context "deleted?" do
       it "is not visible to owner" do
-        bike = Bike.new(deleted_at: Time.current)
-        allow(bike).to receive(:owner).and_return(owner)
-        expect(bike.deleted?).to be_truthy
-        expect(bike.visible_by?(owner)).to be_falsey
-        expect(bike.visible_by?(User.new)).to be_falsey
+        allow(bike_deleted).to receive(:owner).and_return(owner)
+        expect(bike_deleted.deleted?).to be_truthy
+        expect(bike_deleted.visible_by?(owner)).to be_falsey
+        expect(bike_deleted.visible_by?(User.new)).to be_falsey
+        expect(bike_deleted.visible_by?(superuser)).to be_truthy
+        bike_deleted.user_hidden = true
+        expect(bike_deleted.visible_by?(superuser)).to be_truthy
+      end
+    end
+    context "superuser_ability" do
+      let(:superuser_ability) { FactoryBot.create(:superuser_ability) }
+      let(:superuser) { superuser_ability.user }
+      before do
+        allow(bike_user_hidden).to receive(:owner).and_return(owner)
+        allow(bike_user_hidden).to receive(:user_hidden).and_return(true)
+        allow(bike_deleted).to receive(:owner).and_return(owner)
+        bike_deleted.user_hidden = true
+      end
+      it "is visible" do
+        expect(superuser_ability.universal?).to be_truthy
         expect(bike.visible_by?(superuser)).to be_truthy
-        bike.user_hidden = true
-        expect(bike.visible_by?(superuser)).to be_truthy
+        expect(bike_user_hidden.visible_by?(superuser)).to be_truthy
+        expect(bike_deleted.visible_by?(superuser)).to be_truthy
+        expect(bike_deleted.visible_by?(superuser)).to be_truthy
+      end
+      context "with controller_name: bikes" do
+        let(:superuser_ability) { FactoryBot.create(:superuser_ability, controller_name: "bikes") }
+        it "is visible" do
+          expect(bike.visible_by?(superuser)).to be_truthy
+          expect(bike_user_hidden.visible_by?(superuser)).to be_truthy
+          expect(bike_deleted.visible_by?(superuser)).to be_truthy
+          expect(bike_deleted.visible_by?(superuser)).to be_truthy
+        end
+      end
+      context "with controller_name: bikes, action_name: show" do
+        let(:superuser_ability) { FactoryBot.create(:superuser_ability, controller_name: "bikes", action_name: "edit") }
+        it "is visible" do
+          expect(bike.visible_by?(superuser)).to be_truthy
+          expect(bike_user_hidden.visible_by?(superuser)).to be_truthy
+          expect(bike_deleted.visible_by?(superuser)).to be_truthy
+          expect(bike_deleted.visible_by?(superuser)).to be_truthy
+        end
+      end
+      context "with controller_name: graphs" do
+        let(:superuser_ability) { FactoryBot.create(:superuser_ability, controller_name: "graphs") }
+        it "is not visible" do
+          expect(bike.visible_by?(superuser)).to be_truthy
+          expect(bike_user_hidden.visible_by?(superuser)).to be_falsey
+          expect(bike_deleted.visible_by?(superuser)).to be_falsey
+          expect(bike_deleted.visible_by?(superuser)).to be_falsey
+        end
       end
     end
   end

@@ -7,7 +7,7 @@ class UserSerializer < ApplicationSerializer
   end
 
   def is_superuser
-    true if object.superuser
+    true if object.superuser?
   end
 
   def is_content_admin
