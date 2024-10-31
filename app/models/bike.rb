@@ -575,7 +575,7 @@ class Bike < ApplicationRecord
 
   def phoneable_by?(passed_user = nil)
     return false unless phone.present?
-    return true if passed_user&.superuser
+    return true if passed_user&.superuser?(controller_name: "bikes")
     if current_stolen_record.blank?
       return false unless contact_owner?(passed_user) # This return false if user isn't present
       return !passed_user.ambassador? # we aren't giving ambassadors access to phones rn
