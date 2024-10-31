@@ -421,9 +421,9 @@ RSpec.describe Bike, type: :model do
   describe "visible_by?" do
     let(:owner) { User.new }
     let(:superuser) { User.new(superuser: true) }
-    let(:bike) {  Bike.new }
-    let(:bike_user_hidden) {  Bike.new(user_hidden: true) }
-    let(:bike_deleted) {  Bike.new(deleted_at: Time.current) }
+    let(:bike) { Bike.new }
+    let(:bike_user_hidden) { Bike.new(user_hidden: true) }
+    let(:bike_deleted) { Bike.new(deleted_at: Time.current) }
     it "is visible if not hidden" do
       expect(bike.visible_by?).to be_truthy
       expect(bike.visible_by?(User.new)).to be_truthy

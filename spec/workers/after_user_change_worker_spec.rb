@@ -112,10 +112,13 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
     context "user no longer superuser" do
       it "removes superuser_abilities" do
-        SuperuserAbility.create(user: user)
+        superuser_ability = SuperuserAbility.create(user: user)
         expect(user.reload.superuser).to be_falsey
         expect(user.superuser_abilities.count).to eq 1
+        expect(superuser_ability.universal?).to be_truthy
+        pp user.superuser_abilities
         instance.perform(user)
+        pp user.reload.superuser_abilities
         expect(user.reload.superuser_abilities.count).to eq 0
         superuser_ability = SuperuserAbility.unscoped.first
         expect(superuser_ability.deleted?).to be_truthy

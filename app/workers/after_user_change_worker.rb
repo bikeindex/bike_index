@@ -118,7 +118,7 @@ class AfterUserChangeWorker < ApplicationWorker
 
   def update_superuser_abilities(user)
     universal_abilities = user.superuser_abilities.universal.order(:id)
-    if user.superuser?
+    if user.superuser # NOTE: NOT THE METHOD, checking attribute
       if universal_abilities.count > 1
         kept_ability = universal_abilities.first
         universal_abilities.where.not(id: kept_ability.id).destroy_all
