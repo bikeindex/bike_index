@@ -4383,6 +4383,7 @@ nb:
       es: EUR
       nb: EUR
       nl: EUR
+      it: EUR
   my_accounts:
     edit:
       save_changes: Lagre endringer

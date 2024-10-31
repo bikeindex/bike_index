@@ -256,132 +256,133 @@ it:
         secret: Secret
         uid:
       ad:
-        body:
-        image:
-        live:
-        target_url:
-        title:
+        body: Corpo
+        image: Immagine
+        live: Pubblicato
+        target_url: URL di destinazione
+        title: Titolo
       ambassador:
-        ambassador_task_assignments:
-        ambassador_tasks:
-        auth_token:
-        avatar:
-        banned:
-        can_send_many_stolen_notifications:
-        city:
+        ambassador_task_assignments: Assegnazione dei compiti agli ambasciatori
+        ambassador_tasks: Compiti degli ambasciatori
+        auth_token: Token di autorizzazione
+        avatar: Avatar
+        banned: Vietato
+        can_send_many_stolen_notifications: Può inviare molte notifiche di furto
+        city: Città
         confirmation_token: Token di conferma
-        confirmed:
-        created_bikes:
-        created_ownerships:
-        creation_states:
-        current_ownerships:
-        currently_owned_bikes:
-        description:
-        developer:
+        confirmed: Confermato
+        created_bikes: Biciclette create
+        created_ownerships: Proprietà create
+        creation_states: Stati di creazione
+        current_ownerships: Proprietà attuali
+        currently_owned_bikes: Biciclette attualmente possedute
+        description: Descrizione
+        developer: Sviluppatore
         email: Email
-        integrations:
-        last_login_at:
-        last_login_ip:
-        latitude:
-        locks:
-        longitude:
-        magic_link_token:
-        memberships:
-        my_bikes_hash:
+        integrations: Integrazioni
+        last_login_at: Ultimo accesso il
+        last_login_ip: Ultimo ip di accesso
+        latitude: Latitudine
+        locks: Lucchetti
+        longitude: Longitudine
+        magic_link_token: Token magic link
+        memberships: Iscrizioni
+        my_bikes_hash: Hash delle mie biciclette
         name: Nome
-        notification_newsletters:
-        notification_unstolen:
-        oauth_applications:
-        organization_embeds:
-        organizations:
-        owned_bikes:
-        ownerships:
-        partner_data:
+        notification_newsletters: Newsletter di notifica
+        notification_unstolen: Notifica non rubata
+        oauth_applications: Applicazioni Oauth
+        organization_embeds: Embed Organizzazioni
+        organizations: Organizzazioni
+        owned_bikes: Bici possedute
+        ownerships: Proprietà
+        partner_data: Dati dei partner
         password: Password
-        password_digest:
-        password_reset_token:
-        payments:
-        phone:
-        preferred_language:
-        received_stolen_notifications:
-        sent_memberships:
-        sent_stolen_notifications:
-        show_bikes:
-        show_phone:
-        show_twitter:
-        show_website:
-        street:
-        subscriptions:
-        superuser:
-        terms_of_service:
-        title:
-        twitter:
-        user_emails:
-        username:
-        vendor_terms_of_service:
-        website:
-        when_vendor_terms_of_service:
-        zipcode:
+        password_digest: Digest della password
+        password_reset_token: Token per la reimpostazione della password
+        payments: Pagamenti
+        phone: Telefono
+        preferred_language: Lingua preferita
+        received_stolen_notifications: Notifiche di furto ricevute
+        sent_memberships: Iscrizioni inviate
+        sent_stolen_notifications: Notifiche di furto inviate
+        show_bikes: Mostra biciclette
+        show_phone: Mostra il telefono
+        show_twitter: Mostra twitter
+        show_website: Mostra il sito web
+        street: Via
+        subscriptions: Abbonamenti
+        superuser: Superutente
+        terms_of_service: Termini di servizio
+        title: Titolo
+        twitter: Twitter
+        user_emails: Email dell'utente
+        username: Nome utente
+        vendor_terms_of_service: Termini di servizio del fornitore
+        website: Sito web
+        when_vendor_terms_of_service: Quando i termini di servizio del venditore
+        zipcode: Codice postale
       ambassador_task:
-        ambassador_task_assignments:
-        ambassadors:
-        description:
-        title:
+        ambassador_task_assignments: Assegnazione dei compiti agli ambasciatori
+        ambassadors: Ambasciatori
+        description: Descrizione
+        title: Titolo
       ambassador_task_assignment:
-        completed_at:
+        completed_at: Completato il
       b_param:
-        bike_errors:
-        bike_title:
+        bike_errors: Errori della bicicletta
+        bike_title: Titolo della bicicletta
         email: Email
-        id_token:
-        image:
-        image_processed:
-        image_tmp:
-        old_params:
-        origin:
-        params:
+        id_token: Id token
+        image: Immagine
+        image_processed: Immagine elaborata
+        image_tmp: Immagine temporanea
+        old_params: Vecchi parametri
+        origin: Origine
+        params: Parametri
       bike:
-        abandoned:
-        all_description:
-        approved_stolen:
-        b_params:
-        belt_drive:
-        bike_organizations:
-        bike_stickers:
-        cached_data:
-        can_edit_claimed_bike_organizations:
-        can_edit_claimed_organizations:
-        coaster_brake:
-        components:
-        creation_states:
-        cycle_type:
-        description:
-        duplicate_bike_groups:
-        example:
-        extra_registration_number:
-        frame_material:
-        frame_model:
-        frame_size:
-        frame_size_number:
-        frame_size_unit:
-        front_tire_narrow:
-        handlebar_type:
-        hidden:
-        is_for_sale:
-        listing_order:
-        made_without_serial:
-        manufacturer_other:
+        abandoned: Abbandonato
+        all_description: Tutte le descrizioni
+        approved_stolen: Furto approvato
+        b_params: Parametri B
+        belt_drive: Trasmissione a cinghia
+        bike_organizations: Organizzazioni ciclistiche
+        bike_stickers: Codici bicicletta
+        cached_data: Dati in cache
+        can_edit_claimed_bike_organizations: Può modificare le organizzazioni ciclistiche
+          rivendicate
+        can_edit_claimed_organizations: Può modificare le organizzazioni rivendicate
+        coaster_brake: Freno a contropedale
+        components: Componenti
+        creation_states: Stati di creazione
+        cycle_type: Tipo di ciclo
+        description: Descrizione
+        duplicate_bike_groups: Duplica gruppi di biciclette
+        example: Esempio
+        extra_registration_number: Numero di registrazione extra
+        frame_material: Materiale del telaio
+        frame_model: Modello di telaio
+        frame_size: Taglia del telaio
+        frame_size_number: Numero di taglia del telaio
+        frame_size_unit: Unità della taglia del telaio
+        front_tire_narrow: Pneumatico anteriore stretto
+        handlebar_type: Tipo di manubrio
+        hidden: Nascosto
+        is_for_sale: È in vendita
+        listing_order: Ordine di inserimento
+        made_without_serial: Realizzato senza numero di serie
+        manufacturer_other: Altro
         mnfg_name:
         name: Nome
-        normalized_serial_segments:
-        number_of_seats:
-        organizations:
-        owner_email:
-        ownerships:
-        pdf:
-        propulsion_type:
-        public_images:
-        rear_tire_narrow:
+        normalized_serial_segments: Segmenti seriali normalizzati
+        number_of_seats: Numero di selle
+        organizations: Organizzazioni
+        owner_email: Email del proprietario
+        ownerships: Proprietà
+        pdf: PDF
+        propulsion_type: Tipo di propulsione
+        public_images: Immagini pubbliche
+        rear_tire_narrow: Pneumatico posteriore stretto
         recovered_records:
         registered_new:
         serial_normalized:
@@ -2617,7 +2618,7 @@ it:
     about:
       about_bike_index:
       alumni:
-      bike_registration_that_works:
+      bike_registration_that_works: Registrazione della bicicletta che funziona.
       bryan_hance_bio_new_html:
       cofounded_by_html:
       craig_dalton_bio_html:
@@ -3377,11 +3378,12 @@ it:
     welcome_index:
   money:
     currencies:
-      en:
-      en-GB:
-      es:
-      nb:
-      nl:
+      en: USD
+      en-GB: GBP
+      es: EUR
+      nb: EUR
+      nl: EUR
+      it: EUR
   my_accounts:
     delete_account:
       delete_account:
@@ -4533,7 +4535,7 @@ it:
       bike_index_statistics:
       bikes_registered_this_week:
       but_how_does_it_work:
-      hero:
+      hero: Registrazione della bicicletta che funziona
       how_it_works:
       identifying_your_bike:
       if_your_bike_goes_missing:
@@ -4549,7 +4551,7 @@ it:
       total_bikes_registered:
       total_recovery_value:
       used_by:
-      value_of_bikes_recovered:
+      value_of_bikes_recovered: Recuperato oltre %{value} di biciclette
       you_get_your_bike_back:
     recovery_stories:
       recovery_stories:

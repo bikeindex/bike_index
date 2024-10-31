@@ -3180,11 +3180,11 @@ es:
       you_have_the_authority_to_bring_html:
       youre_the_first_one:
     for_organizations_photo_list:
-      bike_shops:
-      cities:
-      community_groups:
-      for:
-      schools:
+      bike_shops: Tiendas de bicicletas
+      cities: Ciudades
+      community_groups: Grupos comunitarios
+      for: para
+      schools: Escuelas
     for_schools:
       bike_index_for_universities:
       bike_index_users_provide:
@@ -3215,21 +3215,22 @@ es:
       year:
   layouts:
     application:
-      blog:
-      donate:
-      help:
-      log_in:
-      logout:
-      register_a_new_bike:
-      search_bikes:
-      sign_up:
-      stolen_bike:
-      the_nonprofit_bike_registry:
-      user_settings:
-      view_org:
-      your_bikes:
+      blog: Blog
+      donate: Donar
+      help: Ayuda
+      log_in: conectarse
+      logout: Cierre de sesión
+      register_a_new_bike: Registre su bicicleta
+      search_bikes: Buscar bicicletas
+      sign_up: Inscríbete
+      stolen_bike: "¿Bicicleta robada?"
+      the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
+      user_settings: "%{user_email} ajustes"
+      view_org: Ver %{org_name}
+      your_bikes: Sus bicicletas
     application_bikehub:
-      accounts_powered_by_bike_index:
+      accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
+        Bike Index, el principal registro de bicicletas.
       contact:
       home: Home
       login:
@@ -3260,9 +3261,9 @@ es:
       error:
       please_fix_the_following:
   locales:
-    en:
-    nb:
-    nl:
+    en: Inglés
+    nb: Noruego (Bokmål)
+    nl: Nederlands (neerlandés)
   locks:
     edit:
       are_you_sure: "¿Estás seguro?"
@@ -3306,7 +3307,7 @@ es:
       only_makes_components:
       thats_not_actually_surprising:
   meta_descriptions:
-    bikes_index:
+    bikes_index: Bicicletas registradas esta semana
     bikes_new:
     bikes_new_stolen:
     documentation_api_v1:
@@ -3332,7 +3333,7 @@ es:
     stolen_index:
     stolen_merging:
     users_new:
-    welcome_index:
+    welcome_index: 'El mejor registro de bicicletas: Sencillo, seguro y gratuito.'
   meta_titles:
     about:
     bikes_index:
@@ -3385,6 +3386,7 @@ es:
       es:
       nb:
       nl:
+      it:
   my_accounts:
     edit:
       save_changes:
@@ -4284,52 +4286,55 @@ es:
       why_public:
       your_personal_information_is_never_viewed:
     footer:
-      about_bike_index:
-      bike_index_news:
-      bike_index_partner_organizations:
-      bike_index_resources:
-      contact_us:
-      help:
-      list_of_manufacturers:
-      privacy_policy:
-      register_a_bike:
-      sign_up_a_shop_or_organization:
-      terms_and_conditions:
-      vendor_terms:
+      about_bike_index: Acerca de Bike Index
+      bike_index_news: Noticias Bike Index
+      bike_index_partner_organizations: Organizaciones asociadas al Bike Index
+      bike_index_resources: Recursos del Bike Index
+      contact_us: 'Contacta
+
+        '
+      help: Ayuda
+      list_of_manufacturers: Lista de fabricantes
+      privacy_policy: Política de privacidad
+      register_a_bike: Registre su bicicleta
+      sign_up_a_shop_or_organization: Inscribir una tienda o organización
+      terms_and_conditions: condiciones generales
+      vendor_terms: condiciones de venta
     footer_revised:
-      about:
-      ambassadors:
-      api_documentation:
-      bike_index:
-      bike_manufacturer_list:
-      bike_shops:
-      blog:
-      change_preferred_language:
-      cities:
-      community_groups:
-      copyright_html:
-      design_logos:
-      dev_resources:
-      donate:
-      faq:
-      help:
-      how_to_get_your_stolen_bike_back:
-      language:
-      law_enforcement:
-      press_inquiries:
-      privacy_policy:
-      protect_your_bike:
-      resources:
-      schools_and_universities:
-      security:
-      stolen_bike_map:
-      stolen_bike_recoveries:
-      store:
-      support_us:
-      terms_and_conditions:
-      vendor_terms:
-      where_we_are:
-      who_we_serve:
+      about: Acerca
+      ambassadors: Embajadores
+      api_documentation: Documentación API
+      bike_index: Bike Index
+      bike_manufacturer_list: Lista de fabricantes de bicicletas
+      bike_shops: Tiendas de bicicletas
+      blog: Blog
+      change_preferred_language: cambiar el idioma preferido
+      cities: Ciudades
+      community_groups: Grupos comunitarios
+      copyright_html: "%{current_year} &copy; Bike Index, una organización sin ánimo
+        de lucro 501(c)(3) - EIN 81-4296194"
+      design_logos: Diseño y logotipos
+      dev_resources: Recursos de desarrollo
+      donate: Donar
+      faq: PREGUNTAS FRECUENTES
+      help: Ayuda
+      how_to_get_your_stolen_bike_back: Recupera su bicicleta
+      language: Idioma
+      law_enforcement: Fuerzas y Cuerpos de Seguridad
+      press_inquiries: Consultas de prensa
+      privacy_policy: Política de privacidad
+      protect_your_bike: Registre su bicicleta
+      resources: Recursos
+      schools_and_universities: Escuelas y universidades
+      security: Seguridad
+      stolen_bike_map: Mapa de bicicletas robadas
+      stolen_bike_recoveries: Recuperación de bicicletas robadas
+      store: Tienda
+      support_us: Apóyanos
+      terms_and_conditions: condiciones generales
+      vendor_terms: condiciones de venta
+      where_we_are: Dónde estamos
+      who_we_serve: A quién servimos
     form_well_footer_save:
       save_changes:
     header_nav:
@@ -4532,28 +4537,34 @@ es:
       come_back_soon:
       youve_been_logged_out:
     index:
-      alert_the_community:
-      bike_index_statistics:
-      bikes_registered_this_week:
-      but_how_does_it_work:
-      hero:
-      how_it_works:
-      identifying_your_bike:
-      if_your_bike_goes_missing:
-      partner_organizations:
-      read_more_recovery_stories:
-      recent_recovery_stories:
-      recover_your_bike_for_free:
-      register_now:
-      register_your_bike:
-      stolen_bikes_recovered:
-      stolen_bikes_registered:
-      the_community_responds:
-      total_bikes_registered:
-      total_recovery_value:
-      used_by:
-      value_of_bikes_recovered:
-      you_get_your_bike_back:
+      alert_the_community: Alertar a la Comunidad
+      bike_index_statistics: Estadísticas del Bike Index
+      bikes_registered_this_week: Bicicletas registradas esta semana
+      but_how_does_it_work: Pero, ¿cómo funciona?
+      hero: Registro de bicicletas que funciona
+      how_it_works: Es muy sencillo. Envíe su nombre, fabricante de la bicicleta,
+        número de serie e información sobre los componentes para introducir su bicicleta
+        en el registro de bicicletas más utilizado del planeta.
+      identifying_your_bike: Un usuario o socio encuentra su bicicleta, utiliza Bike
+        Index para identificarla y se pone en contacto con usted.
+      if_your_bike_goes_missing: Si pierdes tu bicicleta, márcala como perdida o robada
+        para notificarlo a toda la comunidad Bike Index y a sus socios.
+      partner_organizations: Organizaciones asociadas
+      read_more_recovery_stories: Leer más historias de recuperación
+      recent_recovery_stories: 'Bicicletas robadas que ayudamos a recuperar recientemente:'
+      recover_your_bike_for_free: Con la ayuda de la comunidad Bike Index y sus socios,
+        dispones de la información necesaria para recuperar tu bicicleta perdida o
+        robada sin coste alguno para ti. Es lo que hacemos.
+      register_now: Registro ahora
+      register_your_bike: Registre su bicicleta
+      stolen_bikes_recovered: Recuperación de bicicletas robadas
+      stolen_bikes_registered: Bicicletas robadas Registradas
+      the_community_responds: La comunidad responde
+      total_bikes_registered: Total de bicicletas registradas
+      total_recovery_value: Valor total de recuperación
+      used_by: Usado por
+      value_of_bikes_recovered: Más de %{value} bicicletas recuperadas
+      you_get_your_bike_back: Recupera tu bicicleta
     recovery_stories:
       recovery_stories:
     update_browser:

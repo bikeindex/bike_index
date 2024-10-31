@@ -4007,6 +4007,7 @@ en:
       es: EUR
       nb: EUR
       nl: EUR
+      it: EUR
   my_accounts:
     delete_account:
       delete_account: Delete account
