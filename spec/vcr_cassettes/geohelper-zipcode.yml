@@ -78,5 +78,5 @@ http_interactions:
         : \"ChIJ3fO3tQjND4gR1psfMQ0T28k\",\n         \"types\" : \n         [\n            \"postal_code\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Sun, 14 Jul 2024 19:34:24 GMT
+  recorded_at: Fri, 16 Aug 2024 19:34:24 GMT
 recorded_with: VCR 5.0.0
