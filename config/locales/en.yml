@@ -4918,7 +4918,6 @@ en:
       duplicate registrations and bike credibility scores</li><li>Ability to message
       users even if they haven't marked bikes as stolen</li><li>Cross-database search</li><li>Integration
       with LeadsOnline</li><li>Daily stolen bikes hot sheet</li></ol>
-    mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
     organization_dashboard: >-
       City and Law enforcement dashboard - analyze statistics on local registration
       based on zip code
