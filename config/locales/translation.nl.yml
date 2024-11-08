@@ -3979,10 +3979,6 @@ nl:
         samenwerking met Bike Index.
       related_articles: 'Gerelateerde artikelen:'
       trusted_by_top_universities: Vertrouwd door topuniversiteiten
-      universities_should_use_bike_index_as_the: Universiteiten moeten Bike Index
-        gebruiken als hun registratiesysteem naar keuze
-      university_of_pittsburgh_partners_with_bi: Universiteit van Pittsburgh werkt
-        samen met Bike Index om campusfietsen te beschermen
       weve_designed_a_platform: 'We hebben een platform ontworpen om een fundamentele
         barrière op te lossen bij het beschermen van fietsen: het ontbreken van een
         universeel fietsregister. Met onze geconsolideerde universitaire registratiesites
@@ -4000,6 +3996,8 @@ nl:
         op uw website
       check_out: Bekijk onze
       schools_deck: universitair partnerdeck
+      bike_index_admin_guide: Bike Index Campus Management Admin-handleiding
+      how_to_use_bike_index_qr_stickers: Hoe gebruik je Bike Index QR-stickers?
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -4693,7 +4691,6 @@ nl:
     create_organization_account: Maak een organisatieaccount en neem contact op met
       registranten
     export_custom_data: Aangepaste gegevens exporteren naar CSV / XLSX-bestanden
-    mailing_stickers: Elk postadres opgemaakt XLS-export voor poststickers
     qr_sticker: QR sticker scannen en berichten verzenden
     social_media_and_email_marketing: Social media en e-mail marketing campagneactiva
     staff_accounts: Personeelsrekeningen

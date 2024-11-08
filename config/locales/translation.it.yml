@@ -372,7 +372,7 @@ it:
         listing_order: Ordine di inserimento
         made_without_serial: Realizzato senza numero di serie
         manufacturer_other: Altro
-        mnfg_name:
+        mnfg_name: Nome
         name: Nome
         normalized_serial_segments: Segmenti seriali normalizzati
         number_of_seats: Numero di selle
@@ -388,7 +388,7 @@ it:
         serial_normalized:
         serial_number:
         stock_photo_url:
-        stolen:
+        stolen: Rubata
         stolen_notifications:
         stolen_records:
         thumb_path:
@@ -3199,10 +3199,10 @@ it:
       schools_deck:
       six_best_features_for_schools:
       trusted_by_top_universities:
-      universities_should_use_bike_index_as_the:
-      university_of_pittsburgh_partners_with_bi:
       weve_designed_a_platform:
       your_students_can_register_their_bikes:
+      bike_index_admin_guide:
+      how_to_use_bike_index_qr_stickers:
     packages_list:
       forever:
       free:
@@ -4073,7 +4073,6 @@ it:
     import_registrations_from_previous:
     impound_bikes:
     law_enforcement_list_html:
-    mailing_stickers:
     organization_dashboard:
     priority_programming_support:
     qr_sticker:
