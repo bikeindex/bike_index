@@ -38,7 +38,7 @@ class Admin::GraphsController < Admin::BaseController
   protected
 
   def set_variable_graph_kind
-    @graph_kinds = %w[general users bikes recoveries]
+    @graph_kinds = %w[general users bikes recoveries pos_integrations]
     @kind = @graph_kinds.include?(params[:search_kind]) ? params[:search_kind] : @graph_kinds.first
   end
 
