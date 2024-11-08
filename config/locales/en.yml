@@ -3750,6 +3750,7 @@ en:
       for: for
       schools: Schools
     for_schools:
+      bike_index_admin_guide: Bike Index Campus Management Admin Guide
       bike_index_for_universities: Bike Index for Universities
       bike_index_users_provide: >-
         Bike Index users provide serial numbers, proof of ownership and identifying
@@ -3763,6 +3764,7 @@ en:
         website
       features_amp_pricing: Features & Pricing
       how_it_works: How it works
+      how_to_use_bike_index_qr_stickers: How to use Bike Index QR stickers
       keep_campus_bikes_in_order: Keep campus bikes in order
       make_bike_registration_better: Make bike registration better
       must_read: Must read -
@@ -3777,10 +3779,6 @@ en:
       six_best_features_for_schools: Bike Index’s six best features for campus bike
         management
       trusted_by_top_universities: Trusted by top universities
-      universities_should_use_bike_index_as_the: Universities should use Bike Index
-        as their registration system of choice
-      university_of_pittsburgh_partners_with_bi: University of Pittsburgh partners
-        with Bike Index to protect campus bicycles
       weve_designed_a_platform: >-
         We've designed a platform to solve a fundamental barrier in safeguarding bicycles:
         the lack of a universal bike registry. With our consolidated university registration
