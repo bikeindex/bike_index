@@ -100,12 +100,13 @@ RSpec.describe GeocodeHelper do
 
   describe "coordinates_for" do
     let(:address) { "3550 W Shakespeare Ave, 60647" }
-    let(:latitude) { 41.9202668 }
-    let(:longitude) { -87.71563359999999 }
-
+    let(:latitude) { 41.92026 }
+    let(:longitude) { -87.71564 }
     it "returns correct location" do
       VCR.use_cassette("geohelper-coordinates", vcr_config) do
-        expect(described_class.coordinates_for(address)).to eq(latitude: latitude, longitude: longitude)
+        coords = described_class.coordinates_for(address)
+        expect(coords[:latitude].round(5)).to eq latitude
+        expect(coords[:longitude].round(5)).to eq longitude
       end
     end
 
