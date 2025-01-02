@@ -10,7 +10,7 @@ module MoneyHelper
     t(I18n.locale, scope: [:money, :currencies])
   # Don't error when unknown currency- return USD
   rescue I18n::MissingTranslationData
-    'USD'
+    "USD"
   end
 
   # Return a list of currency abbreviations (USD, EUR) for all available locales.

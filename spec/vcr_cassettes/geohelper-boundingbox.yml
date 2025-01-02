@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 14 Jul 2024 20:45:45 GMT
+      - Thu, 02 Jan 2025 19:33:48 GMT
       Pragma:
       - no-cache
       Expires:
@@ -32,6 +32,12 @@ http_interactions:
       - "*"
       X-Goog-Maps-Metro-Area:
       - San Francisco, CA
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=coop_reporting
+      Report-To:
+      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
       Server:
       - mafe
       Content-Length:
@@ -41,7 +47,7 @@ http_interactions:
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=71
+      - gfet4t7; dur=46
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -75,5 +81,5 @@ http_interactions:
         : \"ChIJIQBpAG2ahYAR_6128GcTUEo\",\n         \"types\" : \n         [\n            \"locality\",\n
         \           \"political\"\n         ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Fri, 16 Aug 2024 20:45:45 GMT
+  recorded_at: Thu, 02 Jan 2025 19:33:48 GMT
 recorded_with: VCR 5.0.0

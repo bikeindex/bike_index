@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 14 Jul 2024 19:34:24 GMT
+      - Thu, 02 Jan 2025 19:33:48 GMT
       Pragma:
       - no-cache
       Expires:
@@ -32,6 +32,12 @@ http_interactions:
       - "*"
       X-Goog-Maps-Metro-Area:
       - Chicago, IL
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=coop_reporting
+      Report-To:
+      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
       Server:
       - mafe
       Content-Length:
@@ -41,7 +47,7 @@ http_interactions:
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=46
+      - gfet4t7; dur=92
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -78,5 +84,5 @@ http_interactions:
         : \"ChIJ3fO3tQjND4gR1psfMQ0T28k\",\n         \"types\" : \n         [\n            \"postal_code\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Fri, 16 Aug 2024 19:34:24 GMT
+  recorded_at: Thu, 02 Jan 2025 19:33:48 GMT
 recorded_with: VCR 5.0.0

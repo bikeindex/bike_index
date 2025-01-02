@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 14 Jul 2024 18:27:33 GMT
+      - Thu, 02 Jan 2025 19:33:48 GMT
       Pragma:
       - no-cache
       Expires:
@@ -30,16 +30,22 @@ http_interactions:
       - no-cache, must-revalidate
       Access-Control-Allow-Origin:
       - "*"
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=coop_reporting
+      Report-To:
+      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '1425'
+      - '1429'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=49
+      - gfet4t7; dur=44
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -54,8 +60,8 @@ http_interactions:
         : 74.071038,\n                  \"lng\" : -66.885417\n               },\n
         \              \"southwest\" : \n               {\n                  \"lat\"
         : 18.7763,\n                  \"lng\" : 166.9999999\n               }\n            },\n
-        \           \"location\" : \n            {\n               \"lat\" : 37.09024,\n
-        \              \"lng\" : -95.712891\n            },\n            \"location_type\"
+        \           \"location\" : \n            {\n               \"lat\" : 38.7945952,\n
+        \              \"lng\" : -106.5348379\n            },\n            \"location_type\"
         : \"APPROXIMATE\",\n            \"viewport\" : \n            {\n               \"northeast\"
         : \n               {\n                  \"lat\" : 72.70871579999999,\n                  \"lng\"
         : -66.3193754\n               },\n               \"southwest\" : \n               {\n
@@ -64,5 +70,5 @@ http_interactions:
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Fri, 16 Aug 2024 18:27:33 GMT
+  recorded_at: Thu, 02 Jan 2025 19:33:48 GMT
 recorded_with: VCR 5.0.0
