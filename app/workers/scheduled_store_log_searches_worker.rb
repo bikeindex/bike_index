@@ -25,6 +25,11 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
   end
 
   def enqueue_workers
+    # If there are too many workers enqueued, don't enqueue more
+    if Sidekiq::Queue.new(ProcessLoggedSearchWorker.sidekiq_options["queue"]).count > (MAX_W * 3)
+      return
+    end
+
     workers_to_enqueue = LogSearcher::Reader.log_lines_in_redis
     if workers_to_enqueue > MAX_W
       workers_to_enqueue = MAX_W
@@ -36,3 +41,6 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
     end
   end
 end
+
+Sidekiq::Queue.new("droppable").each { |job| job.delete if job.klass == 'ScheduledStoreLogSearchesWorker' }
+Sidekiq::Queue.new("droppable").each { |job| job.delete if job.klass == 'ProcessLoggedSearchWorker' }
