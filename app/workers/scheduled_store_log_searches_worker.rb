@@ -41,6 +41,3 @@ class ScheduledStoreLogSearchesWorker < ScheduledWorker
     end
   end
 end
-
-Sidekiq::Queue.new("droppable").each { |job| job.delete if job.klass == 'ScheduledStoreLogSearchesWorker' }
-Sidekiq::Queue.new("droppable").each { |job| job.delete if job.klass == 'ProcessLoggedSearchWorker' }
