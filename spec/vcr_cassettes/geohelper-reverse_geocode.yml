@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sat, 12 Oct 2024 19:20:51 GMT
+      - Mon, 13 Jan 2025 16:07:57 GMT
       Pragma:
       - no-cache
       Expires:
@@ -31,21 +31,21 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:221:0
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to=coop_reporting
       Report-To:
-      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
+      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:221:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '25848'
+      - '26546'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=131
+      - gfet4t7; dur=110
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -87,7 +87,10 @@ http_interactions:
         : \n               {\n                  \"lat\" : 42.85031428029151,\n                  \"lng\"
         : -106.3001178197085\n               },\n               \"southwest\" : \n
         \              {\n                  \"lat\" : 42.84761631970851,\n                  \"lng\"
-        : -106.3028157802915\n               }\n            }\n         },\n         \"place_id\"
+        : -106.3028157802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
+        : -106.3014656\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJd_2x8IC8YIcRXpq0Mx1lH78\",\n         \"types\" : \n         [\n            \"premise\"\n
         \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
         \           {\n               \"long_name\" : \"1740\",\n               \"short_name\"
@@ -120,7 +123,10 @@ http_interactions:
         \n               {\n                  \"lat\" : 42.8502787802915,\n                  \"lng\"
         : -106.3001127197085\n               },\n               \"southwest\" : \n
         \              {\n                  \"lat\" : 42.8475808197085,\n                  \"lng\"
-        : -106.3028106802915\n               }\n            }\n         },\n         \"place_id\"
+        : -106.3028106802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
+        : -106.3014608\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJ05jT_oC8YIcRE4qOVC2ScRo\",\n         \"plus_code\" : \n         {\n
         \           \"compound_code\" : \"RMXX+HC Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+HC\"\n         },\n         \"types\" : \n         [\n            \"establishment\",\n
@@ -153,7 +159,10 @@ http_interactions:
         : \n               {\n                  \"lat\" : 42.8503449802915,\n                  \"lng\"
         : -106.3006440197085\n               },\n               \"southwest\" : \n
         \              {\n                  \"lat\" : 42.8476470197085,\n                  \"lng\"
-        : -106.3033419802915\n               }\n            }\n         },\n         \"place_id\"
+        : -106.3033419802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8487751,\n                  \"longitude\"
+        : -106.3019917\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJN_Bc_IC8YIcRFCA7unDO_b0\",\n         \"plus_code\" : \n         {\n
         \           \"compound_code\" : \"RMXX+H6 Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+H6\"\n         },\n         \"types\" : \n         [\n            \"street_address\"\n
@@ -273,16 +282,16 @@ http_interactions:
         \                 \"political\"\n               ]\n            }\n         ],\n
         \        \"formatted_address\" : \"Casper, WY, USA\",\n         \"geometry\"
         : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
-        : \n               {\n                  \"lat\" : 42.9076386,\n                  \"lng\"
-        : -106.2159009\n               },\n               \"southwest\" : \n               {\n
-        \                 \"lat\" : 42.7429397,\n                  \"lng\" : -106.4349685\n
+        : \n               {\n                  \"lat\" : 42.9076391,\n                  \"lng\"
+        : -106.2157061\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 42.742942,\n                  \"lng\" : -106.434969\n
         \              }\n            },\n            \"location\" : \n            {\n
         \              \"lat\" : 42.84870900000001,\n               \"lng\" : -106.2980824\n
         \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
         : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
-        : 42.9076386,\n                  \"lng\" : -106.2159009\n               },\n
+        : 42.9076391,\n                  \"lng\" : -106.2157061\n               },\n
         \              \"southwest\" : \n               {\n                  \"lat\"
-        : 42.7429397,\n                  \"lng\" : -106.4349685\n               }\n
+        : 42.742942,\n                  \"lng\" : -106.434969\n               }\n
         \           }\n         },\n         \"place_id\" : \"ChIJY3peyGWTYIcRUz40Fzn8zmk\",\n
         \        \"types\" : \n         [\n            \"locality\",\n            \"political\"\n
         \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
@@ -381,7 +390,7 @@ http_interactions:
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Sat, 12 Oct 2024 19:20:51 GMT
+  recorded_at: Mon, 13 Jan 2025 16:07:57 GMT
 - request:
     method: get
     uri: https://maps.googleapis.com/maps/api/geocode/json?key=<GOOGLE_GEOCODER>&language=en&latlng=42.8490197,-106.3015341&sensor=false
@@ -403,7 +412,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sat, 12 Oct 2024 19:20:51 GMT
+      - Mon, 13 Jan 2025 16:07:58 GMT
       Pragma:
       - no-cache
       Expires:
@@ -413,21 +422,21 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:221:0
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to=coop_reporting
       Report-To:
-      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
+      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:221:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '25848'
+      - '26546'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=54
+      - gfet4t7; dur=53
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -469,7 +478,10 @@ http_interactions:
         : \n               {\n                  \"lat\" : 42.85031428029151,\n                  \"lng\"
         : -106.3001178197085\n               },\n               \"southwest\" : \n
         \              {\n                  \"lat\" : 42.84761631970851,\n                  \"lng\"
-        : -106.3028157802915\n               }\n            }\n         },\n         \"place_id\"
+        : -106.3028157802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
+        : -106.3014656\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJd_2x8IC8YIcRXpq0Mx1lH78\",\n         \"types\" : \n         [\n            \"premise\"\n
         \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
         \           {\n               \"long_name\" : \"1740\",\n               \"short_name\"
@@ -502,7 +514,10 @@ http_interactions:
         \n               {\n                  \"lat\" : 42.8502787802915,\n                  \"lng\"
         : -106.3001127197085\n               },\n               \"southwest\" : \n
         \              {\n                  \"lat\" : 42.8475808197085,\n                  \"lng\"
-        : -106.3028106802915\n               }\n            }\n         },\n         \"place_id\"
+        : -106.3028106802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
+        : -106.3014608\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJ05jT_oC8YIcRE4qOVC2ScRo\",\n         \"plus_code\" : \n         {\n
         \           \"compound_code\" : \"RMXX+HC Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+HC\"\n         },\n         \"types\" : \n         [\n            \"establishment\",\n
@@ -535,7 +550,10 @@ http_interactions:
         : \n               {\n                  \"lat\" : 42.8503449802915,\n                  \"lng\"
         : -106.3006440197085\n               },\n               \"southwest\" : \n
         \              {\n                  \"lat\" : 42.8476470197085,\n                  \"lng\"
-        : -106.3033419802915\n               }\n            }\n         },\n         \"place_id\"
+        : -106.3033419802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8487751,\n                  \"longitude\"
+        : -106.3019917\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJN_Bc_IC8YIcRFCA7unDO_b0\",\n         \"plus_code\" : \n         {\n
         \           \"compound_code\" : \"RMXX+H6 Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+H6\"\n         },\n         \"types\" : \n         [\n            \"street_address\"\n
@@ -655,16 +673,16 @@ http_interactions:
         \                 \"political\"\n               ]\n            }\n         ],\n
         \        \"formatted_address\" : \"Casper, WY, USA\",\n         \"geometry\"
         : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
-        : \n               {\n                  \"lat\" : 42.9076386,\n                  \"lng\"
-        : -106.2159009\n               },\n               \"southwest\" : \n               {\n
-        \                 \"lat\" : 42.7429397,\n                  \"lng\" : -106.4349685\n
+        : \n               {\n                  \"lat\" : 42.9076391,\n                  \"lng\"
+        : -106.2157061\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 42.742942,\n                  \"lng\" : -106.434969\n
         \              }\n            },\n            \"location\" : \n            {\n
         \              \"lat\" : 42.84870900000001,\n               \"lng\" : -106.2980824\n
         \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
         : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
-        : 42.9076386,\n                  \"lng\" : -106.2159009\n               },\n
+        : 42.9076391,\n                  \"lng\" : -106.2157061\n               },\n
         \              \"southwest\" : \n               {\n                  \"lat\"
-        : 42.7429397,\n                  \"lng\" : -106.4349685\n               }\n
+        : 42.742942,\n                  \"lng\" : -106.434969\n               }\n
         \           }\n         },\n         \"place_id\" : \"ChIJY3peyGWTYIcRUz40Fzn8zmk\",\n
         \        \"types\" : \n         [\n            \"locality\",\n            \"political\"\n
         \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
@@ -763,5 +781,5 @@ http_interactions:
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Sat, 12 Oct 2024 19:20:51 GMT
+  recorded_at: Mon, 13 Jan 2025 16:07:58 GMT
 recorded_with: VCR 5.0.0
