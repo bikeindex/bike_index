@@ -45,7 +45,7 @@ Conventions
 ### Views and Helpers
 
 In the view layer (templates and helper modules), externalize strings using the
-`I18n.t()` translation helper directly. Templates typically use the
+`i18n_translate_with_args()` translation helper directly. Templates typically use the
 ["lazy" lookup][i18n-lazy] form.
 
 ### Semantic completeness
@@ -148,7 +148,7 @@ implementation details
 def translation(key, scope: nil, controller_method: nil, **kwargs)
   # . .
   scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
-  I18n.t(key, **kwargs, scope: scope.compact)
+  i18n_translate_with_args(key, **kwargs, scope: scope.compact)
 end
 ```
 
@@ -164,11 +164,11 @@ javascript:
   bikes_search:
 ```
 
-The translation method can be invoked directly as `I18n.t()` and passed a
+The translation method can be invoked directly as `i18n_translate_with_args()` and passed a
 complete scope:
 
 ```jsx
-<span className="attr-title">{I18n.t("javascript.bikes_search.registry")}</span>
+<span className="attr-title">{i18n_translate_with_args("javascript.bikes_search.registry")}</span>
 ```
 
 Equivalently, a curried instance of `I18n.t` can be initiated locally (by
