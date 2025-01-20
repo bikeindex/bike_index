@@ -68,7 +68,7 @@
       - if @bike.front_wheel_size_id.present?
         - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
         - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-          = attr_list_item(@bike.front_wheel_size&.name, t('.wheel_diameter'))
+          = attr_list_item(@bike.front_wheel_size&.name, translate_with_args('.wheel_diameter'))
         - else
           = attr_list_item(@bike.front_wheel_size&.name, translate_with_args(".front_wheel_diameter"))
           - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
