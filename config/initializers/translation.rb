@@ -17,15 +17,15 @@ end
 
 #
 # TODO: remove after updating to Ruby 3.1 - #2605
-# added these methods in #2608 to make the update backward compatible
-# (See also spec/i18n_spec.rb)
+# added these methods in #2609 to make the update backward compatible
+# (See also i18n_spec.rb and application_helper.rb)
 #
-# translate_with_args( replaced t(
-def translate_with_args(key, ...)
-  t(key, ...)
+# i18n_translate_with_args( replaced I18n.t(
+def i18n_translate_with_args(key, ...)
+  I18n.t(key, ...)
 end
 
 # translation_with_args( replaced translation(
 def translation_with_args(key, ...)
-  t(key, ...)
+  I18n.t(key, ...)
 end
