@@ -172,11 +172,7 @@ group :development, :test do
   gem "pry-byebug"
   gem "pry-rails"
   gem "rb-fsevent", "~> 0.10.3"
-  if next?
-    gem "rspec", "~> 3.12.0"
-  else
-    gem "rspec", "~> 3.4"
-  end
+  gem "rspec", "~> 3.12.0"
   gem "rspec-rails", "~> 4.0"
   gem "rspec_junit_formatter" # For circle ci
   gem "standard" # Ruby linter
