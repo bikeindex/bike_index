@@ -32,13 +32,12 @@ RSpec.describe OwnershipsController, type: :request do
       end
 
       context "ownership isn't current" do
-        let(:ownership) { FactoryBot.create(:ownership, owner_email: current_user.email, current: false) }
+        before { ownership.update(owner_email: current_user.email, current: false) }
 
         it "redirects and not change the ownership if it isn't current" do
           get "#{base_url}/#{ownership.id}"
           expect(response.code).to eq("302")
-          pp flash
-          expect(flash).to be_present
+          expect(flash[:error]).to be_present
           expect(ownership.reload.claimed).to be_falsey
         end
       end
