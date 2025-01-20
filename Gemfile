@@ -168,7 +168,7 @@ group :development, :test do
   gem "pry-byebug"
   gem "pry-rails"
   gem "rb-fsevent", "~> 0.10.3"
-  gem "rspec", "~> 3.4"
+  gem "rspec", "~> 3.12"
   gem "rspec-rails", "~> 4.0"
   gem "rspec_junit_formatter" # For circle ci
   gem "standard" # Ruby linter
