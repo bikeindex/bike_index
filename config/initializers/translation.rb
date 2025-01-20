@@ -15,6 +15,7 @@ TranslationIO.configure do |config|
   # https://github.com/translation/rails#readme
 end
 
+
 #
 # TODO: remove after updating to Ruby 3.1 - #2605
 # added these methods in #2608 to make the update backward compatible

@@ -35,7 +35,7 @@ class OrganizedMailer < ApplicationMailer
     }
     @organization = @ownership.organization
     @vars[:donation_message] = @bike.status_stolen? && !(@organization && !@organization.paid?)
-    subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
+    subject = translate_with_args("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
     tag = __callee__
     tag = "#{tag}_pos" if @ownership.pos? && @ownership.new_registration?
     I18n.with_locale(@user&.preferred_language) do

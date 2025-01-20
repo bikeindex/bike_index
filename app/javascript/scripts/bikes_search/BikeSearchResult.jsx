@@ -27,16 +27,16 @@ const BikeSerialSearchResult = ({bike}) => (
           {
             bike.frame_colors.length
               ? bike.frame_colors.join(", ")
-              : t("unknown")
+              : translate_with_args("unknown")
           }
         </li>
         <li>
           <span className="attr-title">{t("serial")}:&nbsp;</span>
           {
             bike.serial === "absent"
-              ? t("absent")
+              ? translate_with_args("absent")
               : bike.serial === "Hidden"
-              ? t("hidden")
+              ? translate_with_args("hidden")
               : bike.serial
           }
         </li>
@@ -58,7 +58,7 @@ const AbandonedOrStolenDateItem = ({bike}) => {
   return (
     <li>
       <span className="attr-title text-danger">
-        {bike.stolen ? t("stolen") : t("abandoned") }:&nbsp;
+        {bike.stolen ? translate_with_args("stolen") : translate_with_args("abandoned") }:&nbsp;
       </span>
       <span className="convertTime">{bike.date_stolen}</span>
     </li>

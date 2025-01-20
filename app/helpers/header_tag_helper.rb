@@ -47,7 +47,7 @@ module HeaderTagHelper
 
   def auto_description
     return translation_description if translation_description.present?
-    t("meta_descriptions.welcome_index")
+    translate_with_args("meta_descriptions.welcome_index")
   end
 
   def default_meta_hash
