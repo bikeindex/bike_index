@@ -57,7 +57,7 @@ RSpec.describe LocksController, type: :request do
       end
       context "unauthenticated_redirect" do
         it "redirects to sign up" do
-          get "#{base_url}/#{lock.id}/edit", params: { unauthenticated_redirect: "sign_up"}
+          get "#{base_url}/#{lock.id}/edit", params: {unauthenticated_redirect: "sign_up"}
           expect(flash).to be_blank
           expect(response).to redirect_to(new_user_path)
         end
