@@ -69,6 +69,18 @@ RSpec.describe SessionsController, type: :request do
       user.reload
       expect(user.last_login_at).to be_within(1.second).of Time.current
     end
+    context "unconfirmed" do
+      let(:user) { FactoryBot.create(:user, password: password, password_confirmation: password) }
+      it "does not sign in" do
+        expect(user.reload.confirmed).to be_falsey
+        post "/session", params: {session: {email: user.email, password: password}}
+        expect(response).to redirect_to please_confirm_email_users_path
+        user.reload
+        expect(user.last_login_at).to be_within(1.second).of Time.current
+        get "/my_account"
+        expect(response).to redirect_to please_confirm_email_users_path
+      end
+    end
     context "banned" do
       let(:banned) { true }
       it "renders" do
