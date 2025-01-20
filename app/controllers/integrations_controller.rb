@@ -20,7 +20,7 @@ class IntegrationsController < ApplicationController
     provider_name = request.env["omniauth.auth"] && request.env["omniauth.auth"]["provider"]
     provider_name ||= params[:strategy]
 
-    flash[:error] = translation(:problem_authenticating_with_provider,
+    flash[:error] = translation_with_args(:problem_authenticating_with_provider,
       provider_name: provider_name)
     redirect_to(new_session_path) && return
   end
