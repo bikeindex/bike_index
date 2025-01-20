@@ -25,7 +25,7 @@ def translate_with_args(key, ...)
   t(key, ...)
 end
 
-# translation_with_args( replaced translation(
+# translation_with_args( replaced translation_with_args(
 def translation_with_args(key, ...)
   t(key, ...)
 end
