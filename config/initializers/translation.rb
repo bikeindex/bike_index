@@ -14,3 +14,18 @@ TranslationIO.configure do |config|
   # Find other useful usage information here:
   # https://github.com/translation/rails#readme
 end
+
+#
+# TODO: remove after updating to Ruby 3.1 - #2605
+# added these methods in #2608 to make the update backward compatible
+# (See also spec/i18n_spec.rb)
+#
+# translate_with_args( replaced t(
+def translate_with_args(key, ...)
+  t(key, ...)
+end
+
+# translation_with_args( replaced translation(
+def translation_with_args(key, ...)
+  t(key, ...)
+end

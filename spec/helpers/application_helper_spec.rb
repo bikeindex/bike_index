@@ -1,6 +1,13 @@
 require "rails_helper"
 
 RSpec.describe ApplicationHelper, type: :helper do
+  describe "translate_with_args" do
+    let(:target) { "User Settings" }
+    it "translates" do
+      expect(translate_with_args(:user_settings, scope: [:controllers, :my_accounts, :edit])).to eq target
+    end
+  end
+
   describe "phone_link and phone_display" do
     it "displays phone with an area code and country code" do
       expect(phone_display("999 999 9999")).to eq("999-999-9999")
