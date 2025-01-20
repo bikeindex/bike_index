@@ -251,6 +251,7 @@ GEM
       faraday (~> 1.0)
     fast_blank (1.0.0)
     ffi (1.17.0)
+    ffi (1.17.0-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -913,7 +914,7 @@ DEPENDENCIES
   webpacker
 
 RUBY VERSION
-   ruby 2.7.8p225
+   ruby 3.1.6p260
 
 BUNDLED WITH
    2.4.22
