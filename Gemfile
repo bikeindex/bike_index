@@ -14,10 +14,11 @@ ruby "2.7.8"
 gem "rack", "~> 2.2.3"
 
 gem "rails", "~> 7.0.8.4"
+gem "concurrent-ruby", "1.3.4" # Required by rails < 7.1
 
 gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
-gem "bootsnap" # Faster bootup
+# gem "bootsnap" # Faster bootup
 gem "pg", "~> 1.0" # Postgres
 gem "paranoia"
 gem "pg_search"
