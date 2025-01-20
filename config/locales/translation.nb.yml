@@ -4165,10 +4165,6 @@ nb:
       six_best_features_for_schools: Bike Indexs seks beste funksjoner for sykkeladministrasjon
         på campus
       trusted_by_top_universities: Godkjent av toppuniversiteter
-      universities_should_use_bike_index_as_the: Universiteter bør bruke Bike Index
-        som sitt valg av registreringssystem
-      university_of_pittsburgh_partners_with_bi: University of Pittsburgh samarbeider
-        med Bike Index for å beskytte campussykler
       weve_designed_a_platform: 'Vi har utviklet en plattform for å løse en grunnleggende
         barriere for å beskytte sykler: mangelen på et universelt sykkelregister.
         Med våre konsoliderte universitetsregistreringssider er det lettere for politi
@@ -4178,6 +4174,8 @@ nb:
         som helst. Alt de trenger er en hvilken som helst smarttelefon eller bærbar
         datamaskin. Du har tilgang til dataene bak det hele for å forstå hvordan du
         best kan beskytte sykler på campus.
+      bike_index_admin_guide: Bike Index Campus Management Admin Guide
+      how_to_use_bike_index_qr_stickers: Hvordan bruke Bike Index QR-klistremerker
     packages_list:
       forever: For alltid
       free: Gratis
@@ -4383,6 +4381,7 @@ nb:
       es: EUR
       nb: EUR
       nl: EUR
+      it: EUR
   my_accounts:
     edit:
       save_changes: Lagre endringer
@@ -5215,7 +5214,6 @@ nb:
       å sende meldinger til brukere selv om de ikke har merket sykler som stjålne</li><li>
       Søk på tvers av databaser</li><li> Integrasjon med LeadsOnline</li><li> Daglig
       stjålne sykler hot sheet</li></ol>
-    mailing_stickers: Avery postadresse formatert XLS eksport for postklistremerker
     organization_dashboard: By- og rettshåndhevelsesdashbord - analyser statistikk
       om lokal registrering basert på postnummer
     priority_programming_support: Prioritert programmering, hosting og støtte

@@ -98,28 +98,5 @@ Rails.application.configure do
 
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
-
-  # Make sure we reload the API after every request!
-  @last_api_change = Time.current
-  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/**/**/*.rb"]) { |reloader|
-    times = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| File.mtime(f) }
-    files = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| f }
-
-    Rails.logger.debug "! Change detected: reloading following files:"
-    files.each_with_index do |s, i|
-      if times[i] > @last_api_change
-        Rails.logger.debug " - #{s}"
-        load s
-      end
-    end
-
-    Rails.application.reload_routes!
-    Rails.application.routes_reloader.reload!
-    Rails.application.eager_load!
-  }
-
-  ActiveSupport::Reloader.to_prepare do
-    api_reloader.execute_if_updated
-  end
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 end

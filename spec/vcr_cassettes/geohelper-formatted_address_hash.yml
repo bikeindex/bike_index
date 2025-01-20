@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 14 Jul 2024 20:06:45 GMT
+      - Thu, 02 Jan 2025 19:33:48 GMT
       Pragma:
       - no-cache
       Expires:
@@ -32,16 +32,22 @@ http_interactions:
       - "*"
       X-Goog-Maps-Metro-Area:
       - San Francisco, CA
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=coop_reporting
+      Report-To:
+      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '2886'
+      - '3120'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=89
+      - gfet4t7; dur=71
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -79,11 +85,14 @@ http_interactions:
         : 37.7884582802915,\n                  \"lng\" : -122.4025791197085\n               },\n
         \              \"southwest\" : \n               {\n                  \"lat\"
         : 37.7857603197085,\n                  \"lng\" : -122.4052770802915\n               }\n
-        \           }\n         },\n         \"place_id\" : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n
+        \           }\n         },\n         \"navigation_points\" : \n         [\n
+        \           {\n               \"location\" : \n               {\n                  \"latitude\"
+        : 37.7871928,\n                  \"longitude\" : -122.4039456\n               }\n
+        \           }\n         ],\n         \"place_id\" : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n
         \        \"plus_code\" : \n         {\n            \"compound_code\" : \"QHPW+QF
         Yerba Buena, San Francisco, CA\",\n            \"global_code\" : \"849VQHPW+QF\"\n
         \        },\n         \"types\" : \n         [\n            \"street_address\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
     http_version:
-  recorded_at: Sun, 14 Jul 2024 20:06:45 GMT
+  recorded_at: Thu, 02 Jan 2025 19:33:48 GMT
 recorded_with: VCR 5.0.0

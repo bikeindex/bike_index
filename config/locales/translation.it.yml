@@ -2,10 +2,10 @@
 # IF YOU UPDATE IT, YOUR CHANGES WILL BE LOST AT THE NEXT SYNC.
 #
 # To update this file, use this translation interface:
-# https://translation.io/bikeindex/bike_index/es
+# https://translation.io/bikeindex/bike_index/it
 #
 ---
-es:
+it:
   gflash:
     titles:
       warning:
@@ -13,127 +13,59 @@ es:
       notice:
       progress:
       success:
-  date:
-    day_names:
-    - domingo
-    - lunes
-    - martes
-    - miércoles
-    - jueves
-    - viernes
-    - sábado
-    abbr_day_names:
-    - dom
-    - lun
-    - mar
-    - mié
-    - jue
-    - vie
-    - sáb
-    month_names:
-    -
-    - enero
-    - febrero
-    - marzo
-    - abril
-    - mayo
-    - junio
-    - julio
-    - agosto
-    - septiembre
-    - octubre
-    - noviembre
-    - diciembre
-    abbr_month_names:
-    -
-    - ene
-    - feb
-    - mar
-    - abr
-    - may
-    - jun
-    - jul
-    - ago
-    - sep
-    - oct
-    - nov
-    - dic
-  time:
-    am: am
-    pm: pm
-  number:
-    human:
-      storage_units:
-        units:
-          byte:
-            one: Byte
-            other: Bytes
-          kb: KB
-          mb: MB
-          gb: GB
-          tb: TB
-          pb: PB
-          eb: EB
-      decimal_units:
-        units:
-          thousand: mil
-          million:
-          billion: mil millones
-          trillion:
-          quadrillion: mil billones
   errors:
-    format: "%{attribute} %{message}"
     messages:
-      model_invalid: 'La validación falló: %{errors}'
-      inclusion: no está incluido en la lista
-      exclusion: está reservado
-      invalid: no es válido
-      confirmation: no coincide
-      accepted: debe ser aceptado
-      empty: no puede estar vacío
-      blank: no puede estar en blanco
-      present: debe estar en blanco
-      too_long:
-        one: es demasiado largo (1 carácter máximo)
-        other: es demasiado largo (%{count} caracteres máximo)
-      too_short:
-        one: es demasiado corto (1 carácter mínimo)
-        other: es demasiado corto (%{count} caracteres mínimo)
-      wrong_length:
-        one: no tiene la longitud correcta (1 carácter exactos)
-        other: no tiene la longitud correcta (%{count} caracteres exactos)
-      not_a_number: no es un número
-      not_an_integer: debe ser un entero
-      greater_than: debe ser mayor que %{count}
-      greater_than_or_equal_to: debe ser mayor que o igual a %{count}
-      equal_to: debe ser igual a %{count}
-      less_than: debe ser menor que %{count}
-      less_than_or_equal_to: debe ser menor que o igual a %{count}
-      other_than: debe ser distinto de %{count}
-      odd: debe ser impar
-      even: debe ser par
-      required: debe existir
-      taken: ya está en uso
-      carrierwave_processing_error:
       carrierwave_integrity_error:
       carrierwave_download_error:
-      rmagick_processing_error:
-      mini_magick_processing_error:
-      in:
-      invalid_currency:
-      record_invalid: 'La validación falló: %{errors}'
       extension_allowlist_error:
       extension_denylist_error:
       content_type_allowlist_error:
       content_type_denylist_error:
+      rmagick_processing_error:
+      mini_magick_processing_error:
       vips_processing_error:
       min_size_error:
       max_size_error:
+      model_invalid: 'Validazione fallita: %{errors}'
+      inclusion: non è compreso tra le opzioni disponibili
+      exclusion: è riservato
+      invalid: non è valido
+      confirmation: non coincide con %{attribute}
+      accepted: deve essere accettata
+      empty: non può essere vuoto
+      blank: non può essere lasciato in bianco
+      present: deve essere lasciato in bianco
+      too_long:
+        one: è troppo lungo (il massimo è 1 carattere)
+        other: è troppo lungo (il massimo è %{count} caratteri)
+      too_short:
+        one: è troppo corto (il minimo è 1 carattere)
+        other: è troppo corto (il minimo è %{count} caratteri)
+      wrong_length:
+        one: è della lunghezza sbagliata (deve essere di 1 carattere)
+        other: è della lunghezza sbagliata (deve essere di %{count} caratteri)
+      not_a_number: non è un numero
+      not_an_integer: non è un numero intero
+      greater_than: deve essere maggiore di %{count}
+      greater_than_or_equal_to: deve essere maggiore o uguale a %{count}
+      equal_to: deve essere uguale a %{count}
+      less_than: deve essere minore di %{count}
+      less_than_or_equal_to: deve essere minore o uguale a %{count}
+      other_than: devono essere di numero diverso da %{count}
+      in:
+      odd: deve essere dispari
+      even: deve essere pari
+      required: deve esistere
+      taken: è già presente
+      invalid_currency:
+      record_invalid: 'Validazione fallita: %{errors}'
+      carrierwave_processing_error:
+    format: "%{attribute} %{message}"
     template:
-      body: 'Se encontraron problemas con los siguientes campos:'
+      body: 'Ricontrolla i seguenti campi:'
       header:
-        one: No se pudo guardar este/a %{model} porque se encontró 1 error
-        other: No se pudo guardar este/a %{model} porque se encontraron %{count} errores
+        one: 'Non posso salvare questo %{model}: 1 errore'
+        other: 'Non posso salvare questo %{model}: %{count} errori.'
     bad_request:
       explanation:
       send_me_back:
@@ -151,66 +83,134 @@ es:
       contact_email:
       explanation_html:
       send_me_back:
+  date:
+    day_names:
+    - domenica
+    - lunedì
+    - martedì
+    - mercoledì
+    - giovedì
+    - venerdì
+    - sabato
+    abbr_day_names:
+    - dom
+    - lun
+    - mar
+    - mer
+    - gio
+    - ven
+    - sab
+    month_names:
+    -
+    - gennaio
+    - febbraio
+    - marzo
+    - aprile
+    - maggio
+    - giugno
+    - luglio
+    - agosto
+    - settembre
+    - ottobre
+    - novembre
+    - dicembre
+    abbr_month_names:
+    -
+    - gen
+    - feb
+    - mar
+    - apr
+    - mag
+    - giu
+    - lug
+    - ago
+    - set
+    - ott
+    - nov
+    - dic
+  time:
+    am: am
+    pm: pm
+  number:
+    human:
+      storage_units:
+        units:
+          byte:
+            one: Byte
+            other: Byte
+          kb: KB
+          mb: MB
+          gb: GB
+          tb: TB
+          pb:
+          eb:
+      decimal_units:
+        units:
+          thousand: Mila
+          million: Milioni
+          billion: Miliardi
+          trillion: Bilioni
+          quadrillion: Biliardi
   activerecord:
     errors:
       messages:
-        record_invalid: 'La validación falló: %{errors}'
+        record_invalid: 'Validazione fallita: %{errors}'
         restrict_dependent_destroy:
-          has_one: No se puede eliminar el registro porque existe un %{record} dependiente
-          has_many: No se puede eliminar el registro porque existen %{record} dependientes
-        access_denied: El propietario del recurso o el servidor de autorización han
-          denegado la petición.
+          has_one: Il record non può essere cancellato perchè esiste un %{record}
+            dipendente
+          has_many: Il record non può essere cancellato perchè esistono %{record}
+            dipendenti
+        access_denied: Il proprietario della risorsa o il server di autorizzazione
+          rifiuta la richiesta.
         admin_authenticator_not_configured: Access to admin panel is forbidden due
           to Doorkeeper.configure.admin_authenticator being unconfigured.
-        credential_flow_not_configured: El flujo de credenciales del propietario del
-          recurso ha fallado porque Doorkeeper.configure.resource_owner_from_credentials
-          no está configurado.
-        invalid_client: La autenticación del cliente ha fallado por cliente desconocido,
-          cliente no autenticado, o método de autenticación incompatible.
+        credential_flow_not_configured: Il flusso di credenziali utente è fallito
+          perchè Doorkeeper.configure.resource_owner_from_credentials deve essere
+          configurato.
+        invalid_client: L'autenticazione client è fallita a causa di client sconosciuto,
+          nessuna autenticazione client inclusa, o metodo di autenticazione non supportato.
         invalid_code_challenge_method: The code challenge method must be plain or
           S256.
-        invalid_grant: La autorización proporcionada no es válida, ha expirado, se
-          ha revocado, no coincide con la URI de redirección utilizada en la petición
-          de autorización, o ha sido solicitada por otro cliente.
-        invalid_redirect_uri: La uri de redirección no es valida.
+        invalid_grant: L'autorizzazione richiesta non è valida, scaduta, revocata,
+          non corrisponde all'uri di redirezione usato nella richiesta di autorizzazione,
+          o è stata richiesta da un altro client.
+        invalid_redirect_uri: L'uri di redirect incluso non è valido.
         invalid_request:
           missing_param: 'Missing required parameter: %{value}.'
           request_not_authorized: Request need to be authorized. Required parameter
             for authorizing request is missing or invalid.
-          unknown: La petición no tiene un parámetro obligatorio, incluye un valor
-            de parámetro incompatible, o tiene un formato incorrecto.
-        invalid_scope: El scope solicitado no es válido, es desconocido, o tiene un
-          formato incorrecto.
+          unknown: Manca un parametro obbligatorio nella richiesta, include un valore
+            non supportato, oppure è malformata.
+        invalid_scope: Lo scope della richiesta non è valido, sconosciuto, o malformato.
         invalid_token:
-          expired: El token de acceso ha expirado
-          revoked: El token de acceso ha sido revocado
-          unknown: El token de acceso es inválido
-        resource_owner_authenticator_not_configured: La búsqueda del propietario del
-          recurso ha fallado porque Doorkeeper.configure.resource_owner_authenticator
-          no está configurado.
+          expired: Il token di accesso è scaduto
+          revoked: Il token di accesso è stato revocato
+          unknown: Il token di accesso non è valido
+        resource_owner_authenticator_not_configured: La ricerca dell'utente è fallita
+          perchè Doorkeeper.configure.resource_owner_authenticator deve essere configurato.
         revoke:
-          unauthorized: No tiene autorización para revocar este token
-        server_error: El servidor de autorización ha encontrado una condición inesperada
-          que le ha impedido completar la petición.
-        temporarily_unavailable: El servidor de autorización no ha podido manejar
-          la petición por una sobrecarga temporal o por mantenimiento del servidor.
-        unauthorized_client: El cliente no tiene autorización para realizar esta petición
-          utilizando este método.
-        unsupported_grant_type: El tipo de autorización no está soportada por el servidor
-          de autorización.
+          unauthorized: Non sei autorizzato a revocare questo token
+        server_error: Il server di autorizzazione ha rilevato una condizione inaspettata
+          che ha impedito di soddisfare la richiesta.
+        temporarily_unavailable: Il server di autorizzazione non è momentaneamente
+          disponibile a causa di un sovraccarico temporaneo o di manutenzione.
+        unauthorized_client: Il client non è autorizzato per effettuare questa richiesta
+          utilizzando questo metodo.
+        unsupported_grant_type: Il tipo di autorizzazione richista non è supportato
+          dal server di autorizzazione.
         unsupported_response_mode:
-        unsupported_response_type: El servidor de autorización no soporta este tipo
-          de respuesta.
+        unsupported_response_type: Il server di autorizzazione non supporta questo
+          response type.
       models:
         doorkeeper/application:
           attributes:
             redirect_uri:
-              fragment_present: no puede contener un fragmento.
-              invalid_uri: debe ser una URI válida.
-              unspecified_scheme: debe especificar un esquema.
-              relative_uri: debe ser una URI absoluta.
-              secured_uri: debe ser una URI HTTPS/SSL.
-              forbidden_uri: está prohibido por el servidor.
+              fragment_present: non può contenere un fragment.
+              invalid_uri: deve essere un URI valido.
+              unspecified_scheme: deve specificare uno schema.
+              relative_uri: deve essere un URI assoluto.
+              secured_uri: deve essere un URI HTTPS/SSL.
+              forbidden_uri: è vietato dal server.
             scopes:
               not_match_configured: doesn't match configured on the server.
         bike:
@@ -243,9 +243,9 @@ es:
         duplicate_short_name:
     attributes:
       doorkeeper/application:
-        name: Nombre
-        redirect_uri: URI de redirección
-        scopes: Ámbitos
+        name: Nome
+        redirect_uri: Redirect URI
+        scopes:
         access_grants:
         access_tokens:
         authorized_applications:
@@ -256,143 +256,144 @@ es:
         secret: Secret
         uid:
       ad:
-        body:
-        image:
-        live:
-        target_url:
-        title:
+        body: Corpo
+        image: Immagine
+        live: Pubblicato
+        target_url: URL di destinazione
+        title: Titolo
       ambassador:
-        ambassador_task_assignments:
-        ambassador_tasks:
-        auth_token:
-        avatar:
-        banned:
-        can_send_many_stolen_notifications:
-        city:
-        confirmation_token: Código de confirmación
-        confirmed:
-        created_bikes:
-        created_ownerships:
-        creation_states:
-        current_ownerships:
-        currently_owned_bikes:
-        description:
-        developer:
+        ambassador_task_assignments: Assegnazione dei compiti agli ambasciatori
+        ambassador_tasks: Compiti degli ambasciatori
+        auth_token: Token di autorizzazione
+        avatar: Avatar
+        banned: Vietato
+        can_send_many_stolen_notifications: Può inviare molte notifiche di furto
+        city: Città
+        confirmation_token: Token di conferma
+        confirmed: Confermato
+        created_bikes: Biciclette create
+        created_ownerships: Proprietà create
+        creation_states: Stati di creazione
+        current_ownerships: Proprietà attuali
+        currently_owned_bikes: Biciclette attualmente possedute
+        description: Descrizione
+        developer: Sviluppatore
         email: Email
-        integrations:
-        last_login_at:
-        last_login_ip:
-        latitude:
-        locks:
-        longitude:
-        magic_link_token:
-        memberships:
-        my_bikes_hash:
-        name: Nombre
-        notification_newsletters:
-        notification_unstolen:
-        oauth_applications:
-        organization_embeds:
-        organizations:
-        owned_bikes:
-        ownerships:
-        partner_data:
-        password: Contraseña
-        password_digest:
-        password_reset_token:
-        payments:
-        phone:
-        preferred_language:
-        received_stolen_notifications:
-        sent_memberships:
-        sent_stolen_notifications:
-        show_bikes:
-        show_phone:
-        show_twitter:
-        show_website:
-        street:
-        subscriptions:
-        superuser:
-        terms_of_service:
-        title:
-        twitter:
-        user_emails:
-        username:
-        vendor_terms_of_service:
-        website:
-        when_vendor_terms_of_service:
-        zipcode:
+        integrations: Integrazioni
+        last_login_at: Ultimo accesso il
+        last_login_ip: Ultimo ip di accesso
+        latitude: Latitudine
+        locks: Lucchetti
+        longitude: Longitudine
+        magic_link_token: Token magic link
+        memberships: Iscrizioni
+        my_bikes_hash: Hash delle mie biciclette
+        name: Nome
+        notification_newsletters: Newsletter di notifica
+        notification_unstolen: Notifica non rubata
+        oauth_applications: Applicazioni Oauth
+        organization_embeds: Embed Organizzazioni
+        organizations: Organizzazioni
+        owned_bikes: Bici possedute
+        ownerships: Proprietà
+        partner_data: Dati dei partner
+        password: Password
+        password_digest: Digest della password
+        password_reset_token: Token per la reimpostazione della password
+        payments: Pagamenti
+        phone: Telefono
+        preferred_language: Lingua preferita
+        received_stolen_notifications: Notifiche di furto ricevute
+        sent_memberships: Iscrizioni inviate
+        sent_stolen_notifications: Notifiche di furto inviate
+        show_bikes: Mostra biciclette
+        show_phone: Mostra il telefono
+        show_twitter: Mostra twitter
+        show_website: Mostra il sito web
+        street: Via
+        subscriptions: Abbonamenti
+        superuser: Superutente
+        terms_of_service: Termini di servizio
+        title: Titolo
+        twitter: Twitter
+        user_emails: Email dell'utente
+        username: Nome utente
+        vendor_terms_of_service: Termini di servizio del fornitore
+        website: Sito web
+        when_vendor_terms_of_service: Quando i termini di servizio del venditore
+        zipcode: Codice postale
       ambassador_task:
-        ambassador_task_assignments:
-        ambassadors:
-        description:
-        title:
+        ambassador_task_assignments: Assegnazione dei compiti agli ambasciatori
+        ambassadors: Ambasciatori
+        description: Descrizione
+        title: Titolo
       ambassador_task_assignment:
-        completed_at:
+        completed_at: Completato il
       b_param:
-        bike_errors:
-        bike_title:
+        bike_errors: Errori della bicicletta
+        bike_title: Titolo della bicicletta
         email: Email
-        id_token:
-        image:
-        image_processed:
-        image_tmp:
-        old_params:
-        origin:
-        params:
+        id_token: Id token
+        image: Immagine
+        image_processed: Immagine elaborata
+        image_tmp: Immagine temporanea
+        old_params: Vecchi parametri
+        origin: Origine
+        params: Parametri
       bike:
-        abandoned:
-        all_description:
-        approved_stolen:
-        b_params:
-        belt_drive:
-        bike_organizations:
-        bike_stickers:
-        cached_data:
-        can_edit_claimed_bike_organizations:
-        can_edit_claimed_organizations:
-        coaster_brake:
-        components:
-        creation_states:
-        cycle_type:
-        description:
-        duplicate_bike_groups:
-        example:
-        extra_registration_number:
-        frame_material:
-        frame_model:
-        frame_size:
-        frame_size_number:
-        frame_size_unit:
-        front_tire_narrow:
-        handlebar_type:
-        hidden:
-        is_for_sale:
-        listing_order:
-        made_without_serial:
-        manufacturer_other:
-        mnfg_name:
-        name: Nombre
-        normalized_serial_segments:
-        number_of_seats:
-        organizations:
-        owner_email:
-        ownerships:
-        pdf:
-        propulsion_type:
-        public_images:
-        rear_tire_narrow:
+        abandoned: Abbandonato
+        all_description: Tutte le descrizioni
+        approved_stolen: Furto approvato
+        b_params: Parametri B
+        belt_drive: Trasmissione a cinghia
+        bike_organizations: Organizzazioni ciclistiche
+        bike_stickers: Codici bicicletta
+        cached_data: Dati in cache
+        can_edit_claimed_bike_organizations: Può modificare le organizzazioni ciclistiche
+          rivendicate
+        can_edit_claimed_organizations: Può modificare le organizzazioni rivendicate
+        coaster_brake: Freno a contropedale
+        components: Componenti
+        creation_states: Stati di creazione
+        cycle_type: Tipo di ciclo
+        description: Descrizione
+        duplicate_bike_groups: Duplica gruppi di biciclette
+        example: Esempio
+        extra_registration_number: Numero di registrazione extra
+        frame_material: Materiale del telaio
+        frame_model: Modello di telaio
+        frame_size: Taglia del telaio
+        frame_size_number: Numero di taglia del telaio
+        frame_size_unit: Unità della taglia del telaio
+        front_tire_narrow: Pneumatico anteriore stretto
+        handlebar_type: Tipo di manubrio
+        hidden: Nascosto
+        is_for_sale: È in vendita
+        listing_order: Ordine di inserimento
+        made_without_serial: Realizzato senza numero di serie
+        manufacturer_other: Altro
+        mnfg_name: Nome
+        name: Nome
+        normalized_serial_segments: Segmenti seriali normalizzati
+        number_of_seats: Numero di selle
+        organizations: Organizzazioni
+        owner_email: Email del proprietario
+        ownerships: Proprietà
+        pdf: PDF
+        propulsion_type: Tipo di propulsione
+        public_images: Immagini pubbliche
+        rear_tire_narrow: Pneumatico posteriore stretto
         recovered_records:
         registered_new:
         serial_normalized:
         serial_number:
         stock_photo_url:
-        stolen:
+        stolen: Rubata
         stolen_notifications:
         stolen_records:
         thumb_path:
         video_embed:
-        year: Año
+        year: Anno
         zipcode:
       bike_organization:
         can_not_edit_claimed:
@@ -433,12 +434,12 @@ es:
       cgroup:
         ctypes:
         description:
-        name: Nombre
+        name: Nome
         slug:
       color:
         bikes:
         display:
-        name: Nombre
+        name: Nome
         paints:
         priority:
       component:
@@ -450,11 +451,11 @@ es:
         manufacturer_other:
         rear:
         serial_number:
-        year: Año
+        year: Anno
       country:
         iso:
         locations:
-        name: Nombre
+        name: Nome
         stolen_records:
       creation_state:
         is_bulk:
@@ -466,7 +467,7 @@ es:
         components:
         has_multiple:
         image:
-        name: Nombre
+        name: Nome
         secondary_name:
         slug:
       customer_contact:
@@ -481,13 +482,13 @@ es:
         expires_in:
         redirect_uri:
         revoked_at:
-        scopes: Ámbitos
+        scopes:
         token:
       doorkeeper/access_token:
         expires_in:
         refresh_token:
         revoked_at:
-        scopes: Ámbitos
+        scopes:
         token:
       duplicate_bike_group:
         added_bike_at:
@@ -506,7 +507,7 @@ es:
         email: Email
         feedback_hash:
         feedback_type:
-        name: Nombre
+        name: Nome
         title:
       flipper/adapters/active_record/feature:
         key:
@@ -518,7 +519,7 @@ es:
         bikes:
         count:
         internal:
-        name: Nombre
+        name: Nome
         slug:
         standard:
       integration:
@@ -554,7 +555,7 @@ es:
         email: Email
         latitude:
         longitude:
-        name: Nombre
+        name: Nome
         phone:
         shown:
         street:
@@ -568,7 +569,7 @@ es:
         manufacturer_other:
         notes:
       lock_type:
-        name: Nombre
+        name: Nome
         slug:
       mail_snippet:
         address:
@@ -578,7 +579,7 @@ es:
         kind:
         latitude:
         longitude:
-        name: Nombre
+        name: Nome
         proximity_radius:
         public_images:
       manufacturer:
@@ -590,7 +591,7 @@ es:
         locks:
         logo:
         logo_source:
-        name: Nombre
+        name: Nome
         notes:
         open_year:
         paints:
@@ -628,7 +629,7 @@ es:
         lock_show_on_map:
         mail_snippets:
         memberships:
-        name: Nombre
+        name: Nome
         payments:
         pos_kind:
         previous_slug:
@@ -648,7 +649,7 @@ es:
         invoice_organization_features:
         invoices:
         kind:
-        name: Nombre
+        name: Nome
       ownership:
         claimed:
         current:
@@ -658,7 +659,7 @@ es:
         user_hidden:
       paint:
         bikes:
-        name: Nombre
+        name: Nome
       payment:
         amount_cents:
         email: Email
@@ -674,12 +675,12 @@ es:
         imageable_type:
         is_private:
         listing_order:
-        name: Nombre
+        name: Nome
       rear_gear_type:
         bikes:
         count:
         internal:
-        name: Nombre
+        name: Nome
         slug:
         standard:
       recovery_display:
@@ -691,7 +692,7 @@ es:
       state:
         abbreviation:
         locations:
-        name: Nombre
+        name: Nome
         stolen_records:
       stolen_notification:
         message:
@@ -745,7 +746,7 @@ es:
         amount_cents:
         description:
         duration_days:
-        name: Nombre
+        name: Nome
         stolen_records:
         theft_alerts:
         views:
@@ -763,7 +764,7 @@ es:
         banned:
         can_send_many_stolen_notifications:
         city:
-        confirmation_token: Código de confirmación
+        confirmation_token: Token di conferma
         confirmed:
         created_bikes:
         created_ownerships:
@@ -782,7 +783,7 @@ es:
         magic_link_token:
         memberships:
         my_bikes_hash:
-        name: Nombre
+        name: Nome
         notification_newsletters:
         notification_unstolen:
         oauth_applications:
@@ -791,7 +792,7 @@ es:
         owned_bikes:
         ownerships:
         partner_data:
-        password: Contraseña
+        password: Password
         password_digest:
         password_reset_token:
         payments:
@@ -817,13 +818,13 @@ es:
         when_vendor_terms_of_service:
         zipcode:
       user_email:
-        confirmation_token: Código de confirmación
+        confirmation_token: Token di conferma
         email: Email
       wheel_size:
         bikes:
         description:
         iso_bsd:
-        name: Nombre
+        name: Nome
         priority:
     enums:
       cycle_type:
@@ -832,6 +833,7 @@ es:
         cargo_rear:
         cargo_trike:
         cargo_trike_rear:
+        e_motorcycle:
         e_scooter:
         non_e_scooter:
         non_e_skateboard:
@@ -842,13 +844,12 @@ es:
         stroller:
         tall_bike:
         tandem:
+        traditional_bike:
         trail_behind:
         trailer:
         tricycle:
         unicycle:
         wheelchair:
-        e_motorcycle:
-        traditional_bike:
       frame_material:
         aluminum:
         composite:
@@ -1026,57 +1027,57 @@ es:
         with_owner:
   datetime:
     distance_in_words:
-      half_a_minute: medio minuto
+      half_a_minute: mezzo minuto
       less_than_x_seconds:
-        one: menos de 1 segundo
-        other: menos de %{count} segundos
+        one: meno di un secondo
+        other: meno di %{count} secondi
       x_seconds:
-        one: 1 segundo
-        other: "%{count} segundos"
+        one: 1 secondo
+        other: "%{count} secondi"
       less_than_x_minutes:
-        one: menos de 1 minuto
-        other: menos de %{count} minutos
+        one: meno di un minuto
+        other: meno di %{count} minuti
       x_minutes:
         one: 1 minuto
-        other: "%{count} minutos"
+        other: "%{count} minuti"
       about_x_hours:
-        one: alrededor de 1 hora
-        other: alrededor de %{count} horas
+        one: circa un'ora
+        other: circa %{count} ore
       x_days:
-        one: 1 día
-        other: "%{count} días"
+        one: 1 giorno
+        other: "%{count} giorni"
       about_x_months:
-        one: alrededor de 1 mes
-        other: alrededor de %{count} meses
+        one: circa un mese
+        other: circa %{count} mesi
       x_months:
-        one: 1 mes
-        other: "%{count} meses"
+        one: 1 mese
+        other: "%{count} mesi"
       about_x_years:
-        one: alrededor de 1 año
-        other: alrededor de %{count} años
+        one: circa un anno
+        other: circa %{count} anni
       over_x_years:
-        one: más de 1 año
-        other: más de %{count} años
+        one: oltre un anno
+        other: oltre %{count} anni
       almost_x_years:
-        one: casi 1 año
-        other: casi %{count} años
+        one: circa 1 anno
+        other: circa %{count} anni
       x_years:
-        one: 1 año
-        other: "%{count} años"
+        one: 1 anno
+        other: "%{count} anni"
     prompts:
-      year: Año
-      month: Mes
-      day: Día
-      hour: Hora
+      year: Anno
+      month: Mese
+      day: Giorno
+      hour: Ora
       minute: Minuto
-      second: Segundo
+      second: Secondi
   helpers:
     select:
-      prompt: Por favor seleccione
+      prompt: Seleziona...
     submit:
-      create: Crear %{model}
-      update: Actualizar %{model}
-      submit: Guardar %{model}
+      create: Crea %{model}
+      update: Aggiorna %{model}
+      submit: Invia %{model}
     page_entries_info:
       entry:
         zero:
@@ -1084,12 +1085,12 @@ es:
         other:
       one_page:
         display_entries:
-          zero: No se han encontrado %{entry_name}
-          one: Mostrando <b>%{count}</b> %{entry_name}
-          other: Mostrando <b>un total de %{count}</b> %{entry_name}
+          zero:
+          one: "<b>%{count}</b> %{entry_name}"
+          other: "<b>Tutti %{count}</b> %{entry_name}"
       more_pages:
-        display_entries: Mostrando <b>%{first}&nbsp;-&nbsp;%{last}</b> %{entry_name}
-          de <b>%{total}</b> en total
+        display_entries: "%{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> di <b>%{total}</b>
+          totali"
     bike_helper:
       hidden:
       hidden_because_status:
@@ -1104,9 +1105,9 @@ es:
     errors:
       format:
       messages:
-        coerce: no es válido
+        coerce: non è valido
         presence:
-        regexp: no es válido
+        regexp: non è valido
         blank:
         values:
         except_values:
@@ -1535,137 +1536,134 @@ es:
   doorkeeper:
     applications:
       confirmations:
-        destroy: "¿Estás seguro?"
+        destroy: Sei sicuro?
       buttons:
-        edit: Editar
-        destroy: Eliminar
-        submit: Enviar
-        cancel: Cancelar
-        authorize: Autorizar
+        edit: Modifica
+        destroy: Elimina
+        submit: Invia
+        cancel: Annulla
+        authorize: Autorizza
       form:
-        error: Ups! Verifica tu formulario por posibles errores
+        error: Ops! Controlla la form per possibili errori
       help:
         confidential: Application will be used where the client secret can be kept
           confidential. Native mobile apps and Single Page Apps are considered non-confidential.
-        redirect_uri: Usa una linea por URI
+        redirect_uri: Usa una riga per URI
         blank_redirect_uri: Leave it blank if you configured your provider to use
           Client Credentials, Resource Owner Password Credentials or any other grant
           type that doesn't require redirect URI.
-        scopes: Separa los ámbitos con espacios. Deja en blanco para usar los ámbitos
-          predeterminados.
+        scopes:
         native_redirect_uri:
       edit:
-        title: Editar aplicación
+        title: Modifica l'applicazione
       index:
-        title: Tus aplicaciones
-        new: Nueva aplicación
-        name: Nombre
+        title: Le tue applicazioni
+        new: Nuova Applicazione
+        name: Nome
         callback_url: Callback URL
         confidential: Confidential?
         actions: Actions
         confidentiality:
-          'yes': Sí
+          'yes': Sì
           'no': 'No'
       new:
-        title: Nueva aplicación
+        title: Nuova Applicazione
       show:
-        title: 'Aplicación: %{name}'
-        application_id: Identificador de aplicación
+        title: 'Applicazione: %{name}'
+        application_id: Id Applicazione
         secret: Secret
-        scopes: Ámbitos
+        scopes:
         confidential: Confidential
         callback_urls: Callback urls
-        actions: Acciones
+        actions: Azioni
     authorizations:
       buttons:
-        authorize: Autorizar
-        deny: Denegar
+        authorize: Autorizza
+        deny: Nega
       error:
-        title: Ha ocurrido un error
+        title: Si è verificato un errore
       new:
-        title: Autorización requerida
-        prompt: "¿Autorizas a %{client_name} para usar tu cuenta?"
-        able_to: Está aplicación tendrá permisos para
+        title: Richiesta di autorizzazione
+        prompt: Autorizzi %{client_name} ad usare il tuo account?
+        able_to: Questa applicazione portà
       show:
-        title: Código de autorización
+        title: Codide di autorizzazione
     authorized_applications:
       confirmations:
-        revoke: "¿Estás seguro?"
+        revoke: Sei sicuro?
       buttons:
-        revoke: Revocar
+        revoke: Revoca
       index:
-        title: Tus aplicaciones autorizadas
-        application: Aplicación
-        created_at: Creada el
-        date_format: "%d/%m/%Y %H:%M:%S"
+        title: Applicazioni autorizzate
+        application: Applicazione
+        created_at: Creata il
+        date_format: "%Y-%m-%d %H:%M:%S"
     pre_authorization:
       status: Pre-authorization
     errors:
       messages:
         invalid_request:
-          unknown: La petición no tiene un parámetro obligatorio, incluye un valor
-            de parámetro incompatible, o tiene un formato incorrecto.
+          unknown: Manca un parametro obbligatorio nella richiesta, include un valore
+            non supportato, oppure è malformata.
           missing_param: 'Missing required parameter: %{value}.'
           not_support_pkce:
           request_not_authorized: Request need to be authorized. Required parameter
             for authorizing request is missing or invalid.
-        invalid_redirect_uri: La uri de redirección no es valida.
-        unauthorized_client: El cliente no tiene autorización para realizar esta petición
-          utilizando este método.
-        access_denied: El propietario del recurso o el servidor de autorización han
-          denegado la petición.
-        invalid_scope: El scope solicitado no es válido, es desconocido, o tiene un
-          formato incorrecto.
+        invalid_redirect_uri: L'uri di redirect incluso non è valido.
+        unauthorized_client: Il client non è autorizzato per effettuare questa richiesta
+          utilizzando questo metodo.
+        access_denied: Il proprietario della risorsa o il server di autorizzazione
+          rifiuta la richiesta.
+        invalid_scope: Lo scope della richiesta non è valido, sconosciuto, o malformato.
         invalid_code_challenge_method: The code challenge method must be plain or
           S256.
-        server_error: El servidor de autorización ha encontrado una condición inesperada
-          que le ha impedido completar la petición.
-        temporarily_unavailable: El servidor de autorización no ha podido manejar
-          la petición por una sobrecarga temporal o por mantenimiento del servidor.
-        credential_flow_not_configured: El flujo de credenciales del propietario del
-          recurso ha fallado porque Doorkeeper.configure.resource_owner_from_credentials
-          no está configurado.
-        resource_owner_authenticator_not_configured: La búsqueda del propietario del
-          recurso ha fallado porque Doorkeeper.configure.resource_owner_authenticator
-          no está configurado.
+        server_error: Il server di autorizzazione ha rilevato una condizione inaspettata
+          che ha impedito di soddisfare la richiesta.
+        temporarily_unavailable: Il server di autorizzazione non è momentaneamente
+          disponibile a causa di un sovraccarico temporaneo o di manutenzione.
+        credential_flow_not_configured: Il flusso di credenziali utente è fallito
+          perchè Doorkeeper.configure.resource_owner_from_credentials deve essere
+          configurato.
+        resource_owner_authenticator_not_configured: La ricerca dell'utente è fallita
+          perchè Doorkeeper.configure.resource_owner_authenticator deve essere configurato.
         admin_authenticator_not_configured: Access to admin panel is forbidden due
           to Doorkeeper.configure.admin_authenticator being unconfigured.
-        unsupported_response_type: El servidor de autorización no soporta este tipo
-          de respuesta.
-        invalid_client: La autenticación del cliente ha fallado por cliente desconocido,
-          cliente no autenticado, o método de autenticación incompatible.
-        invalid_grant: La autorización proporcionada no es válida, ha expirado, se
-          ha revocado, no coincide con la URI de redirección utilizada en la petición
-          de autorización, o ha sido solicitada por otro cliente.
-        unsupported_grant_type: El tipo de autorización no está soportada por el servidor
-          de autorización.
+        unsupported_response_type: Il server di autorizzazione non supporta questo
+          response type.
+        invalid_client: L'autenticazione client è fallita a causa di client sconosciuto,
+          nessuna autenticazione client inclusa, o metodo di autenticazione non supportato.
+        invalid_grant: L'autorizzazione richiesta non è valida, scaduta, revocata,
+          non corrisponde all'uri di redirezione usato nella richiesta di autorizzazione,
+          o è stata richiesta da un altro client.
+        unsupported_grant_type: Il tipo di autorizzazione richista non è supportato
+          dal server di autorizzazione.
         invalid_token:
-          revoked: El token de acceso ha sido revocado
-          expired: El token de acceso ha expirado
-          unknown: El token de acceso es inválido
+          revoked: Il token di accesso è stato revocato
+          expired: Il token di accesso è scaduto
+          unknown: Il token di accesso non è valido
         revoke:
-          unauthorized: No tiene autorización para revocar este token
+          unauthorized: Non sei autorizzato a revocare questo token
         invalid_resource_owner:
     flash:
       applications:
         create:
-          notice: Aplicación creada.
+          notice: Applicazione creata.
         destroy:
-          notice: Aplicación eliminada.
+          notice: Applicazione eliminata.
         update:
-          notice: Aplicación actualizada.
+          notice: Applicazione aggiornata.
       authorized_applications:
         destroy:
-          notice: Aplicación revocada.
+          notice: Applicazione revocata.
     layouts:
       admin:
         title: Doorkeeper
         nav:
-          oauth2_provider: Proveedor OAuth2
-          applications: Aplicaciones
+          oauth2_provider: OAuth2 Provider
+          applications: Applicazioni
           home: Home
       application:
-        title: Autorización OAuth requerida
+        title: Richiesta autorizzazione OAuth
     scopes:
       public:
       read_bikes:
@@ -1679,10 +1677,10 @@ es:
       write_user:
   views:
     pagination:
-      first: "&laquo; Primera"
-      last: Última &raquo;
-      previous: "&lsaquo; Anterior"
-      next: Siguiente &rsaquo;
+      first: "&laquo; Inizio"
+      last: Fine &raquo;
+      previous: "&lsaquo; Prec."
+      next: Succ. &rsaquo;
       truncate: "&hellip;"
   bike_versions:
     index:
@@ -1700,7 +1698,7 @@ es:
       claim_bike_type:
       claim_it_so_you_can_update_your_listing:
       did_we_help:
-      edit: Editar
+      edit: Modifica
       how_did_you_get_it_back:
       its_also_how_we_get_better_at_recovering:
       mark_graduated_resolved:
@@ -1753,7 +1751,7 @@ es:
       locking_description:
       manufacturer:
       model:
-      name: Nombre
+      name: Nome
       other:
       other_serial:
       paint_description:
@@ -1766,14 +1764,18 @@ es:
       stock_photo:
       stolen_at:
       stolen_details:
-      wheel_diameter:
-      year: Año
       vehicle_type:
+      wheel_diameter:
+      year: Anno
     new:
       additional_serial_sticker_number:
       affiliation:
       are_you_certain:
       city:
+      electric_motorized:
+      enter_bike_type_details_html:
+      enter_found_bike_type_details_html:
+      enter_stolen_bike_type_details_html:
       how_to_find_serial:
       i_just_dont_know_the_serial:
       im_100_sure:
@@ -1804,16 +1806,12 @@ es:
       traditional_bike_definition:
       unknown_year:
       unsure_or_unknown:
-      was_made_before_1970:
-      zipcode:
-      enter_bike_type_details_html:
-      enter_found_bike_type_details_html:
-      enter_stolen_bike_type_details_html:
       very_few_vehicles_html:
+      very_very_few_bikes_html:
+      was_made_before_1970:
       without_serial_html:
       without_serial_number_html:
-      very_very_few_bikes_html:
-      electric_motorized:
+      zipcode:
     organization_stolen_message:
       report_link_text:
       report_the_theft_to_the_organization_html:
@@ -1840,7 +1838,7 @@ es:
       contact_the_owner_it_is_stolen:
       creation_description:
       creator:
-      edit: Editar
+      edit: Modifica
       email_to_deal_with_this_html:
       is_false:
       is_not_registered_html:
@@ -2078,25 +2076,25 @@ es:
     drivetrain:
       belt_drive:
       coaster_brake:
+      cycle_type:
       drivetrain:
       drivetrain_type:
       fixed:
       front_gears:
       internal_front_gears:
       internal_rear_gears:
+      nevermind:
+      propulsion_type:
       rear_gears:
       select_chainring_count:
       select_cog_count:
-      wheels:
-      cycle_type:
-      nevermind:
-      propulsion_type:
       submit_correction:
       submit_update:
       traditional_bike_definition:
       update_propulsion:
       update_vehicle_type:
       vehicle_type:
+      wheels:
     edit_bike_organization:
       can_edit_this_bike:
       manage_organization_information:
@@ -2306,11 +2304,11 @@ es:
         not_your_lock:
     my_accounts:
       edit:
-        password: Contraseña
+        delete_account:
+        password: Password
         registration_organizations:
         sharing:
         user_settings:
-        delete_account:
       update:
         current_password_doesnt_match:
         successfully_updated:
@@ -2606,7 +2604,7 @@ es:
   feedbacks:
     form:
       email_address:
-      name: Nombre
+      name: Nome
       send_it:
       subject:
       your_message:
@@ -2620,7 +2618,7 @@ es:
     about:
       about_bike_index:
       alumni:
-      bike_registration_that_works:
+      bike_registration_that_works: Registrazione della bicicletta che funziona.
       bryan_hance_bio_new_html:
       cofounded_by_html:
       craig_dalton_bio_html:
@@ -3180,11 +3178,11 @@ es:
       you_have_the_authority_to_bring_html:
       youre_the_first_one:
     for_organizations_photo_list:
-      bike_shops: Tiendas de bicicletas
-      cities: Ciudades
-      community_groups: Grupos comunitarios
-      for: para
-      schools: Escuelas
+      bike_shops:
+      cities:
+      community_groups:
+      for:
+      schools:
     for_schools:
       bike_index_for_universities:
       bike_index_users_provide:
@@ -3215,22 +3213,21 @@ es:
       year:
   layouts:
     application:
-      blog: Blog
-      donate: Donar
-      help: Ayuda
-      log_in: conectarse
-      logout: Cierre de sesión
-      register_a_new_bike: Registre su bicicleta
-      search_bikes: Buscar bicicletas
-      sign_up: Inscríbete
-      stolen_bike: "¿Bicicleta robada?"
-      the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
-      user_settings: "%{user_email} ajustes"
-      view_org: Ver %{org_name}
-      your_bikes: Sus bicicletas
+      blog:
+      donate:
+      help:
+      log_in:
+      logout:
+      register_a_new_bike:
+      search_bikes:
+      sign_up:
+      stolen_bike:
+      the_nonprofit_bike_registry:
+      user_settings:
+      view_org:
+      your_bikes:
     application_bikehub:
-      accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
-        Bike Index, el principal registro de bicicletas.
+      accounts_powered_by_bike_index:
       contact:
       home: Home
       login:
@@ -3261,12 +3258,12 @@ es:
       error:
       please_fix_the_following:
   locales:
-    en: Inglés
-    nb: Noruego (Bokmål)
-    nl: Nederlands (neerlandés)
+    en:
+    nb:
+    nl:
   locks:
     edit:
-      are_you_sure: "¿Estás seguro?"
+      are_you_sure: Sei sicuro?
       back_to_viewing_all_locks:
       delete_this_lock:
       edit_the_lock:
@@ -3302,12 +3299,12 @@ es:
     index:
       give_us_a_heads_up_in_a_comment_below:
       manufacturers_we_know_about:
-      name: Nombre
+      name: Nome
       oh_no_were_missing_a_manufacturer:
       only_makes_components:
       thats_not_actually_surprising:
   meta_descriptions:
-    bikes_index: Bicicletas registradas esta semana
+    bikes_index:
     bikes_new:
     bikes_new_stolen:
     documentation_api_v1:
@@ -3333,7 +3330,7 @@ es:
     stolen_index:
     stolen_merging:
     users_new:
-    welcome_index: 'El mejor registro de bicicletas: Sencillo, seguro y gratuito.'
+    welcome_index:
   meta_titles:
     about:
     bikes_index:
@@ -3381,16 +3378,22 @@ es:
     welcome_index:
   money:
     currencies:
-      en:
-      en-GB:
-      es:
-      nb:
-      nl:
-      it:
+      en: USD
+      en-GB: GBP
+      es: EUR
+      nb: EUR
+      nl: EUR
+      it: EUR
   my_accounts:
+    delete_account:
+      delete_account:
+      delete_my_account:
+      delete_warning_html:
+      modal_title:
+      nevermind:
     edit:
-      save_changes:
       edit_pages:
+      save_changes:
     password:
       better_password:
       for_password_update:
@@ -3482,7 +3485,7 @@ es:
       bike_sticker:
       bikes:
       combination:
-      edit: Editar
+      edit: Modifica
       edit_bike:
       generally_connect_to_org:
       ignore:
@@ -3510,12 +3513,6 @@ es:
       welcome:
       you_have_no_registered_bikes:
       you_have_no_registered_locks:
-    delete_account:
-      delete_account:
-      delete_my_account:
-      delete_warning_html:
-      modal_title:
-      nevermind:
   news:
     index:
       bike_index_blog:
@@ -3665,7 +3662,7 @@ es:
         completed:
         completed_activities:
         leaderboard:
-        name: Nombre
+        name: Nome
         suggested_activities:
         this_page_contains_the_resources_you_need:
         welcome_to_your_ambassador_homepage:
@@ -3675,6 +3672,7 @@ es:
         email:
         incomplete:
         matching:
+        motorized:
         only_resend_with_permission:
         org_incomplete_registrations_html:
         re_send:
@@ -3683,7 +3681,6 @@ es:
         search_emails:
         sent:
         through_org:
-        motorized:
         vehicle_type:
       index:
         connected_to_bike_html:
@@ -3859,7 +3856,7 @@ es:
         choose_country:
         city:
         location_name:
-        name: Nombre
+        name: Nome
         phone_number:
         remove:
         state:
@@ -3877,7 +3874,7 @@ es:
         contact_to_update_html:
         delete_organization:
         i_would_like_to_terminate_my_account:
-        name: Nombre
+        name: Nome
         org_email_address_html:
         org_settings:
         organization_logo:
@@ -3950,6 +3947,7 @@ es:
         signed_up:
         update:
       index:
+        admin:
         claimed:
         created:
         current_users:
@@ -3959,8 +3957,11 @@ es:
         manage_users:
         manually_invite_email:
         matching_user:
+        member:
+        no_bike_edit:
         permitted_domain_info_html:
         remaining_invites_html:
+        role:
         search:
         sender:
         to:
@@ -3968,10 +3969,14 @@ es:
         user:
         you_can_also:
         you_have_invited_html:
-        role:
-        admin:
-        member:
-        no_bike_edit:
+      membership_role_fields:
+        admin_access:
+        admin_of_organization:
+        member_access:
+        member_no_bikes:
+        member_no_bikes_access:
+        member_of_organization:
+        membership_type:
       new:
         1_email_per_line:
         automatic_passwordless:
@@ -3986,14 +3991,6 @@ es:
         user:
         you_have_a_permitted_domain:
         you_have_invited_html:
-      membership_role_fields:
-        member_of_organization:
-        member_no_bikes:
-        membership_type:
-        admin_of_organization:
-        admin_access:
-        member_access:
-        member_no_bikes_access:
   organized_mailer:
     custom_message:
       subject:
@@ -4112,11 +4109,11 @@ es:
       photo_uncategorized:
       processing:
     show:
-      are_you_sure: "¿Estás seguro?"
+      are_you_sure: Sei sicuro?
       back_to_images:
       bike_image:
-      destroy: Eliminar
-      edit: Editar
+      destroy: Elimina
+      edit: Modifica
       image_from:
       looks_like_this_is_your_image:
   recovery_displays:
@@ -4133,15 +4130,15 @@ es:
     embed:
       bike_manufacturer:
       choose_specific_organization_optional:
+      electric_motorized:
       owner_email:
       primary_frame_color:
       register:
       select_other_if_manufacturer_doesnt_show:
       this_bike_is_either_missing_or_stolen:
-      your:
       this_vehicle_is_either_missing_or_stolen:
       vehicle_manufacturer:
-      electric_motorized:
+      your:
   sessions:
     magic_link:
       enter_email_address:
@@ -4213,12 +4210,12 @@ es:
     donation_modal:
       donation_header:
     edit_bike_skeleton:
-      edit: Editar
+      edit: Modifica
+      edit_pages:
       owned_but_hasnt_been_claimed_html:
       owned_with_permission_to_edit_html:
       view_bike:
       view_bike_version:
-      edit_pages:
     email_bike_box:
       color:
       color_may_be_incorrect:
@@ -4285,55 +4282,52 @@ es:
       why_public:
       your_personal_information_is_never_viewed:
     footer:
-      about_bike_index: Acerca de Bike Index
-      bike_index_news: Noticias Bike Index
-      bike_index_partner_organizations: Organizaciones asociadas al Bike Index
-      bike_index_resources: Recursos del Bike Index
-      contact_us: 'Contacta
-
-        '
-      help: Ayuda
-      list_of_manufacturers: Lista de fabricantes
-      privacy_policy: Política de privacidad
-      register_a_bike: Registre su bicicleta
-      sign_up_a_shop_or_organization: Inscribir una tienda o organización
-      terms_and_conditions: condiciones generales
-      vendor_terms: condiciones de venta
+      about_bike_index:
+      bike_index_news:
+      bike_index_partner_organizations:
+      bike_index_resources:
+      contact_us:
+      help:
+      list_of_manufacturers:
+      privacy_policy:
+      register_a_bike:
+      sign_up_a_shop_or_organization:
+      terms_and_conditions:
+      vendor_terms:
     footer_revised:
-      about: Acerca
-      ambassadors: Embajadores
-      api_documentation: Documentación API
-      bike_index: Bike Index
-      bike_manufacturer_list: Lista de fabricantes de bicicletas
-      bike_shops: Tiendas de bicicletas
-      blog: Blog
-      change_preferred_language: cambiar el idioma preferido
-      cities: Ciudades
-      community_groups: Grupos comunitarios
-      copyright_html: "%{current_year} &copy; Bike Index, una organización sin ánimo
-        de lucro 501(c)(3) - EIN 81-4296194"
-      design_logos: Diseño y logotipos
-      dev_resources: Recursos de desarrollo
-      donate: Donar
-      faq: PREGUNTAS FRECUENTES
-      help: Ayuda
-      how_to_get_your_stolen_bike_back: Recupera su bicicleta
-      language: Idioma
-      law_enforcement: Fuerzas y Cuerpos de Seguridad
-      press_inquiries: Consultas de prensa
-      privacy_policy: Política de privacidad
-      protect_your_bike: Registre su bicicleta
-      resources: Recursos
-      schools_and_universities: Escuelas y universidades
-      security: Seguridad
-      stolen_bike_map: Mapa de bicicletas robadas
-      stolen_bike_recoveries: Recuperación de bicicletas robadas
-      store: Tienda
-      support_us: Apóyanos
-      terms_and_conditions: condiciones generales
-      vendor_terms: condiciones de venta
-      where_we_are: Dónde estamos
-      who_we_serve: A quién servimos
+      about:
+      ambassadors:
+      api_documentation:
+      bike_index:
+      bike_manufacturer_list:
+      bike_shops:
+      blog:
+      change_preferred_language:
+      cities:
+      community_groups:
+      copyright_html:
+      design_logos:
+      dev_resources:
+      donate:
+      faq:
+      help:
+      how_to_get_your_stolen_bike_back:
+      language:
+      law_enforcement:
+      press_inquiries:
+      privacy_policy:
+      protect_your_bike:
+      resources:
+      schools_and_universities:
+      security:
+      stolen_bike_map:
+      stolen_bike_recoveries:
+      store:
+      support_us:
+      terms_and_conditions:
+      vendor_terms:
+      where_we_are:
+      who_we_serve:
     form_well_footer_save:
       save_changes:
     header_nav:
@@ -4467,10 +4461,10 @@ es:
   users:
     accept_terms:
       i_agree_to_tos_html:
-      submit: Enviar
+      submit: Invia
     accept_vendor_terms:
       i_agree_to_tos_html:
-      submit: Enviar
+      submit: Invia
     confirm_error_404:
       we_couldnt_find_a_user_with_that_id:
       woops:
@@ -4520,7 +4514,7 @@ es:
       and_try_not_to_forget_it:
       better_password:
       choose_a_new_password:
-      password: Contraseña
+      password: Password
       password_confirmation:
       password_helper_text_html:
       update_password:
@@ -4536,34 +4530,28 @@ es:
       come_back_soon:
       youve_been_logged_out:
     index:
-      alert_the_community: Alertar a la Comunidad
-      bike_index_statistics: Estadísticas del Bike Index
-      bikes_registered_this_week: Bicicletas registradas esta semana
-      but_how_does_it_work: Pero, ¿cómo funciona?
-      hero: Registro de bicicletas que funciona
-      how_it_works: Es muy sencillo. Envíe su nombre, fabricante de la bicicleta,
-        número de serie e información sobre los componentes para introducir su bicicleta
-        en el registro de bicicletas más utilizado del planeta.
-      identifying_your_bike: Un usuario o socio encuentra su bicicleta, utiliza Bike
-        Index para identificarla y se pone en contacto con usted.
-      if_your_bike_goes_missing: Si pierdes tu bicicleta, márcala como perdida o robada
-        para notificarlo a toda la comunidad Bike Index y a sus socios.
-      partner_organizations: Organizaciones asociadas
-      read_more_recovery_stories: Leer más historias de recuperación
-      recent_recovery_stories: 'Bicicletas robadas que ayudamos a recuperar recientemente:'
-      recover_your_bike_for_free: Con la ayuda de la comunidad Bike Index y sus socios,
-        dispones de la información necesaria para recuperar tu bicicleta perdida o
-        robada sin coste alguno para ti. Es lo que hacemos.
-      register_now: Registro ahora
-      register_your_bike: Registre su bicicleta
-      stolen_bikes_recovered: Recuperación de bicicletas robadas
-      stolen_bikes_registered: Bicicletas robadas Registradas
-      the_community_responds: La comunidad responde
-      total_bikes_registered: Total de bicicletas registradas
-      total_recovery_value: Valor total de recuperación
-      used_by: Usado por
-      value_of_bikes_recovered: Más de %{value} bicicletas recuperadas
-      you_get_your_bike_back: Recupera tu bicicleta
+      alert_the_community:
+      bike_index_statistics:
+      bikes_registered_this_week:
+      but_how_does_it_work:
+      hero: Registrazione della bicicletta che funziona
+      how_it_works:
+      identifying_your_bike:
+      if_your_bike_goes_missing:
+      partner_organizations:
+      read_more_recovery_stories:
+      recent_recovery_stories:
+      recover_your_bike_for_free:
+      register_now:
+      register_your_bike:
+      stolen_bikes_recovered:
+      stolen_bikes_registered:
+      the_community_responds:
+      total_bikes_registered:
+      total_recovery_value:
+      used_by:
+      value_of_bikes_recovered: Recuperato oltre %{value} di biciclette
+      you_get_your_bike_back:
     recovery_stories:
       recovery_stories:
     update_browser:

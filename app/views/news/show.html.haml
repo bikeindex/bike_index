@@ -1,7 +1,7 @@
 - blogger = @blog.user
 .blog-header
   %h1.global-title
-    - if current_user&.superuser
+    - if current_user&.superuser?(controller_name: "news")
       .clearfix
         = link_to "edit", edit_admin_news_path(@blog.to_param), class: "btn btn-outline-info less-strong uncap float-right"
     = @blog.title

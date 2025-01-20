@@ -227,8 +227,9 @@ class User < ApplicationRecord
     AfterUserChangeWorker.perform_async(id) if id.present? && !skip_update
   end
 
-  def superuser?
-    superuser
+  def superuser?(controller_name: nil, action_name: nil)
+    superuser ||
+      superuser_abilities.can_access?(controller_name: controller_name, action_name: action_name)
   end
 
   def developer?

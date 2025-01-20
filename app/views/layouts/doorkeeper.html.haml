@@ -15,7 +15,7 @@
           = image_tag 'revised/logo.svg', class: 'primary-nav', alt: 'Bike Index home'
     = render 'layouts/revised_messages'
     .doorkeeper-container
-      - if @current_user && @current_user.superuser && @application.present? && @application.owner.present?
+      - if @current_user && @current_user.superuser? && @application.present? && @application.owner.present?
         Application by
         %strong
           = @application.owner.display_name

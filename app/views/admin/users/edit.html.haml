@@ -263,14 +263,14 @@
 - if @user.memberships.count > 0
   = render partial: "/admin/memberships/table", locals: {memberships: @user.memberships}
 
-- notifications = Notification.notifications_sent_or_received_by(@user)
+- notifications = Notification.notifications_sent_or_received_by(@user).order(id: :desc)
 %h4.mt-4
   Notifications
   %small= link_to admin_number_display(notifications.count), admin_notifications_path(user_id: @user.id)
 - if notifications.count > 0
   = render partial: "/admin/notifications/table", locals: {notifications: notifications, skip_user: true}
 
-- feedbacks = Feedback.where(user_id: @user.id)
+- feedbacks = Feedback.where(user_id: @user.id).order(id: :desc)
 %h4.mt-4
   Feedbacks
   %small= link_to admin_number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)

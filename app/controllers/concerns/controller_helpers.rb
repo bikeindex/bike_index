@@ -101,7 +101,7 @@ module ControllerHelpers
 
   def user_root_url
     return root_url unless current_user.present? && current_user.confirmed?
-    return admin_root_url if current_user.superuser
+    return admin_root_url if current_user.superuser?
     return my_account_url unless current_user.default_organization.present?
     if user_root_bike_search?
       default_bike_search_path

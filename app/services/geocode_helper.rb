@@ -57,7 +57,8 @@ class GeocodeHelper
       return true if latitude.blank?
       [
         [71.53880, -66.88542], # Google general can't find
-        [37.09024, -95.71289] # USA can't find
+        [37.09024, -95.71289], # USA can't find
+        [38.79460, -106.53484] # USA can't find also
       ].any? { |coord| coord[0] == latitude.round(5) && coord[1] == longitude.round(5) }
     end
 

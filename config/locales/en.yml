@@ -1693,8 +1693,8 @@ en:
         require_admin!:
           not_an_org_admin: You have to be an organization administrator to do that!
         require_index_admin!:
-          not_permitted_to_do_that: You have to be a Bike Index administrator to do
-            that
+          not_permitted_to_do_that: You have to be a full Bike Index administrator
+            to do that
         require_member!:
           not_an_org_member: You're not a member of that organization!
         return_to_if_present:
@@ -3750,6 +3750,7 @@ en:
       for: for
       schools: Schools
     for_schools:
+      bike_index_admin_guide: Bike Index Campus Management Admin Guide
       bike_index_for_universities: Bike Index for Universities
       bike_index_users_provide: >-
         Bike Index users provide serial numbers, proof of ownership and identifying
@@ -3763,6 +3764,7 @@ en:
         website
       features_amp_pricing: Features & Pricing
       how_it_works: How it works
+      how_to_use_bike_index_qr_stickers: How to use Bike Index QR stickers
       keep_campus_bikes_in_order: Keep campus bikes in order
       make_bike_registration_better: Make bike registration better
       must_read: Must read -
@@ -3777,10 +3779,6 @@ en:
       six_best_features_for_schools: Bike Index’s six best features for campus bike
         management
       trusted_by_top_universities: Trusted by top universities
-      universities_should_use_bike_index_as_the: Universities should use Bike Index
-        as their registration system of choice
-      university_of_pittsburgh_partners_with_bi: University of Pittsburgh partners
-        with Bike Index to protect campus bicycles
       weve_designed_a_platform: >-
         We've designed a platform to solve a fundamental barrier in safeguarding bicycles:
         the lack of a universal bike registry. With our consolidated university registration
@@ -4005,6 +4003,7 @@ en:
       en: USD
       en-GB: GBP
       es: EUR
+      it: EUR
       nb: EUR
       nl: EUR
   my_accounts:
@@ -4919,7 +4918,6 @@ en:
       duplicate registrations and bike credibility scores</li><li>Ability to message
       users even if they haven't marked bikes as stolen</li><li>Cross-database search</li><li>Integration
       with LeadsOnline</li><li>Daily stolen bikes hot sheet</li></ol>
-    mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
     organization_dashboard: >-
       City and Law enforcement dashboard - analyze statistics on local registration
       based on zip code

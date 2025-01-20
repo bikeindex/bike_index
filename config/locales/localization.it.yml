@@ -10,12 +10,12 @@
 # https://github.com/translation/rails#custom-localization-key-prefixes
 #
 ---
-es:
+it:
   date:
     formats:
-      default: "%-d/%-m/%Y"
-      long: "%-d de %B de %Y"
-      short: "%-d de %b"
+      default: "%d/%m/%Y"
+      long: "%d %B %Y"
+      short: "%d %b"
     order:
     - :day
     - :month
@@ -32,8 +32,7 @@ es:
         unit: "€"
     format:
       delimiter: "."
-      precision: 3
-      round_mode: default
+      precision: 2
       separator: ","
       significant: false
       strip_insignificant_zeros: false
@@ -52,37 +51,17 @@ es:
     percentage:
       format:
         delimiter: ''
-        format: "%n %"
-        precision: 1
+        format: "%n%"
     precision:
       format:
         delimiter: ''
   support:
     array:
-      last_word_connector: " y "
-      two_words_connector: " y "
+      last_word_connector: " e "
+      two_words_connector: " e "
       words_connector: ", "
   time:
     formats:
-      default: "%A, %-d de %B de %Y %H:%M:%S %z"
-      long: "%-d de %B de %Y %H:%M"
-      short: "%-d de %b %H:%M"
-  i18n:
-    transliterate:
-      rule:
-        á: a
-        é: e
-        í: i
-        ó: o
-        ú: u
-        ü: u
-        ñ: "n"
-        Á: A
-        É: E
-        Í: I
-        Ó: O
-        Ú: U
-        Ü: U
-        Ñ: "N"
-  spree:
-    say_no: false
+      default: "%a %d %b %Y, %H:%M:%S %z"
+      long: "%d %B %Y %H:%M"
+      short: "%d %b %H:%M"

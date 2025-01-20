@@ -177,8 +177,8 @@ RSpec.describe "BikesController#show", type: :request do
     end
     context "Admin viewing" do
       let(:current_user) { FactoryBot.create(:organization_admin, superuser: true) }
-      let(:organization) { current_user.default_organization }
-      let(:organization2) { FactoryBot.create(:organization) }
+      let!(:organization) { current_user.default_organization }
+      let!(:organization2) { FactoryBot.create(:organization) }
       it "responds with success" do
         current_user.reload
         expect(current_user.default_organization).to be_present
@@ -203,6 +203,20 @@ RSpec.describe "BikesController#show", type: :request do
         expect(assigns(:current_organization_force_blank)).to be_truthy
         expect(assigns(:current_organization)&.id).to be_blank
         expect(session[:passive_organization_id]).to eq "0"
+      end
+    end
+    context "SuperuserAbility viewing" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { FactoryBot.create(:superuser_ability, user: current_user, controller_name: "bikes", action_name: "edit") }
+      it "responds with success" do
+        current_user.reload
+        expect(current_user.superuser?(controller_name: "bikes", action_name: "edit")).to be_truthy
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:bike).id).to eq bike.id
+        expect(flash).to_not be_present
+        expect(assigns(:current_organization)&.id).to be_blank
       end
     end
     context "non-owner non-admin viewing" do
