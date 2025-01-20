@@ -2,7 +2,7 @@
 
 #
 # TODO: uncomment after updating to Ruby 3.1 - #2605
-# replaced translation methods in #2608 to make upgrade backward compatible
+# replaced translation methods in #2609 to make upgrade backward compatible
 # It broke these specs.
 # (See also config/initializers/translation.rb)
 #
