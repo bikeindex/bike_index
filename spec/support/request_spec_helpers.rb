@@ -8,6 +8,7 @@ module RequestSpecHelpers
   end
 
   def log_in(current_user = nil)
+    return if current_user == false # Allow skipping log in by setting current_user: false
     current_user ||= FactoryBot.create(:user_confirmed)
     allow(User).to receive(:from_auth) { current_user }
   end
