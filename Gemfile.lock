@@ -141,6 +141,8 @@ GEM
       parser (>= 2.4)
       smart_properties
     bigdecimal (3.1.5)
+    bootsnap (1.18.4)
+      msgpack (~> 1.2)
     bootstrap (4.0.0.alpha4)
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
@@ -442,6 +444,7 @@ GEM
       monetize (~> 1.9)
       money (~> 6.13)
       railties (>= 3.0)
+    msgpack (1.7.5)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.3.0)
@@ -787,6 +790,7 @@ DEPENDENCIES
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt (~> 3.1.7)
+  bootsnap
   bootstrap (= 4.0.0.alpha4)
   brakeman
   bullet
