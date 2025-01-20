@@ -1,5 +1,5 @@
 # To bump cache:
-# Increment & Replace: 'CACHE_V4' in this config
+# Increment & Replace: 'CACHE_V1' in this config
 
 # NB: It would be great to use Pipeline parameters instead of search and replacing the cache key
 # ... but that doesn't work with this config version, and workflows don't work with version 2.1
@@ -89,8 +89,8 @@ jobs:
       - restore_cache:
           name: "Dockerize: cache restore"
           keys:
-            - CACHE_V4-dockerize-0.6.1
-            - CACHE_V4-dockerize-
+            - CACHE_V1-dockerize-0.6.1
+            - CACHE_V1-dockerize-
 
       - run:
           name: "Dockerize: install"
@@ -105,7 +105,7 @@ jobs:
 
       - type: cache-save
         name: "Dockerize: cache save"
-        key: CACHE_V4-dockerize-0.6.1
+        key: CACHE_V1-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
 
@@ -113,8 +113,8 @@ jobs:
       - restore_cache:
           name: "Git: cache restore"
           keys:
-            - CACHE_V4-git-2.22.0
-            - CACHE_V4-git-
+            - CACHE_V1-git-2.22.0
+            - CACHE_V1-git-
 
       - run:
           name: "Git: install"
@@ -149,15 +149,15 @@ jobs:
 
       - type: cache-save
         name: "Git: cache save"
-        key: CACHE_V4-git-2.22.0
+        key: CACHE_V1-git-2.22.0
         paths:
           - ~/.cache/git/git-2.22.0
 
       - restore_cache:
           name: "Hub: cache restore"
           keys:
-            - CACHE_V4-hub-2.12.3
-            - CACHE_V4-hub-
+            - CACHE_V1-hub-2.12.3
+            - CACHE_V1-hub-
 
       - run:
           name: "Hub: install"
@@ -182,8 +182,8 @@ jobs:
       - restore_cache:
           name: "Hub: cache save"
           keys:
-            - CACHE_V4-hub-2.12.3
-            - CACHE_V4-hub-
+            - CACHE_V1-hub-2.12.3
+            - CACHE_V1-hub-
           paths:
             - ~/.cache/hub
 
@@ -194,8 +194,8 @@ jobs:
       - restore_cache:
           name: "Ruby dependencies: cache restore"
           keys:
-            - CACHE_V4-gems-{{ checksum "Gemfile.lock" }}
-            - CACHE_V4-gems-
+            - CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
+            - CACHE_V1-gems-
 
       - run:
           name: "Ruby dependencies: install"
@@ -206,7 +206,7 @@ jobs:
 
       - type: cache-save
         name: "Ruby dependencies: cache save"
-        key: CACHE_V4-gems-{{ checksum "Gemfile.lock" }}
+        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
         paths:
           - ~/.cache/bundle
 
@@ -217,8 +217,8 @@ jobs:
       - restore_cache:
           name: "Node dependencies: cache restore"
           keys:
-            - CACHE_V4-yarn-{{ checksum "yarn.lock" }}
-            - CACHE_V4-yarn-
+            - CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+            - CACHE_V1-yarn-
 
       - run:
           name: "Node dependencies: install"
@@ -229,15 +229,15 @@ jobs:
 
       - type: cache-save
         name: "Node dependencies: cache save"
-        key: CACHE_V4-yarn-{{ checksum "yarn.lock" }}
+        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
         paths:
           - ~/.cache/yarn
 
       - restore_cache:
           name: "Assets: cache restore"
           keys:
-            - CACHE_V4-assets-{{ .Environment.CIRCLE_SHA1 }}
-            - CACHE_V4-assets-
+            - CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
+            - CACHE_V1-assets-
 
       - run:
           name: "Assets: precompile"
@@ -249,7 +249,7 @@ jobs:
 
       - type: cache-save
         name: "Assets: cache save"
-        key: CACHE_V4-assets-{{ .Environment.CIRCLE_SHA1 }}
+        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
         paths:
           - .sass-cache
           - public/assets
