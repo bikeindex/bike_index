@@ -1,4 +1,10 @@
 module LocalizationHelper
+  # TODO: remove after updating to Ruby 3.1 - #2605
+  # translate_with_args( replaced t(
+  def translate_with_args(key, ...)
+    t(key, ...)
+  end
+
   def theft_alert_plan_title(plan)
     duration = [
       plan.duration_days,
