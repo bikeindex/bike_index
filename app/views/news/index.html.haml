@@ -1,7 +1,7 @@
 .row
   .col-md-12.col-lg-8.col-xl-9
     %h1
-      = t(".bike_index_blog")
+      = translate_with_args(".bike_index_blog")
       = link_to image_tag('feed_icon.svg', class: "rss-svg"),
         news_index_url(format: 'atom'),
         title: t('.bike_index_blog_feed'),

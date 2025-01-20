@@ -1,6 +1,6 @@
 <section class="bibox-top">
   <%= link_to edit_bike_url(@public_image.imageable), class: "back" do %>
-    <%= t(".editing_bike_html") %>
+    <%= translate_with_args(".editing_bike_html") %>
   <% end %>
 
   <h2>
@@ -9,7 +9,7 @@
   </h2>
 
   <div class="headline-content-edit">
-    <h1><%= t(".editing_image") %></h1>
+    <h1><%= translate_with_args(".editing_image") %></h1>
   </div>
 </section>
 
