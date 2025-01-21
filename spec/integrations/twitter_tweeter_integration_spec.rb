@@ -93,38 +93,40 @@ RSpec.describe TwitterTweeterIntegration do
   describe "#create_tweet" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
 
-    it "posts a text only tweet properly", vcr: true do
-      twitter_account = FactoryBot.build(:twitter_account_1, :active, id: 99)
-      allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account]))
+    # Commented out in #2616 - twitter is disabled
+    #
+    # it "posts a text only tweet properly", vcr: true do
+    #   twitter_account = FactoryBot.build(:twitter_account_1, :active, id: 99)
+    #   allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account]))
 
-      integration = TwitterTweeterIntegration.new(bike)
-      tweet = integration.create_tweet
+    #   integration = TwitterTweeterIntegration.new(bike)
+    #   tweet = integration.create_tweet
 
-      expect(tweet).to be_an_instance_of(Tweet)
-      expect(integration.retweets&.first).to be_an_instance_of(Tweet)
-      expect(tweet.twitter_response).to be_an_instance_of(Hash)
-      expect(tweet.tweetor_avatar).to be_present
-      expect(tweet.body).to eq "STOLEN - Black Special_name10 in Tribeca https://t.co/6gqhQpUUsC"
-      expect(tweet.tweeted_image).to be_blank
-    end
+    #   expect(tweet).to be_an_instance_of(Tweet)
+    #   expect(integration.retweets&.first).to be_an_instance_of(Tweet)
+    #   expect(tweet.twitter_response).to be_an_instance_of(Hash)
+    #   expect(tweet.tweetor_avatar).to be_present
+    #   expect(tweet.body).to eq "STOLEN - Black Special_name10 in Tribeca https://t.co/6gqhQpUUsC"
+    #   expect(tweet.tweeted_image).to be_blank
+    # end
 
-    it "creates a media tweet with retweets", vcr: true do
-      expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
+    # it "creates a media tweet with retweets", vcr: true do
+    #   expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
 
-      twitter_account = FactoryBot.build(:twitter_account_1, :active, id: 99)
-      secondary_twitter_account = FactoryBot.build(:twitter_account_2, :active, id: 9)
+    #   twitter_account = FactoryBot.build(:twitter_account_1, :active, id: 99)
+    #   secondary_twitter_account = FactoryBot.build(:twitter_account_2, :active, id: 9)
 
-      allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account, secondary_twitter_account]))
+    #   allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account, secondary_twitter_account]))
 
-      integration = TwitterTweeterIntegration.new(bike)
-      expect { integration.create_tweet }.to change { Tweet.count }.by(2)
+    #   integration = TwitterTweeterIntegration.new(bike)
+    #   expect { integration.create_tweet }.to change { Tweet.count }.by(2)
 
-      tweet = integration.tweet
-      expect(tweet).to be_an_instance_of(Tweet)
-      expect(tweet.kind).to eq "stolen_tweet"
-      expect(integration.retweets.first).to be_an_instance_of(Tweet)
-      expect(tweet.tweeted_image).to be_blank # Because this BS is blank, legacy formatting presumably
-    end
+    #   tweet = integration.tweet
+    #   expect(tweet).to be_an_instance_of(Tweet)
+    #   expect(tweet.kind).to eq "stolen_tweet"
+    #   expect(integration.retweets.first).to be_an_instance_of(Tweet)
+    #   expect(tweet.tweeted_image).to be_blank # Because this BS is blank, legacy formatting presumably
+    # end
   end
 
   describe "close_twitter_accounts" do
