@@ -105,7 +105,7 @@ class ApplicationController < ActionController::Base
   # Handle localization / currency conversion exceptions by redirecting to the
   # root url with the default locale and a flash message.
   def localization_failure
-    locale = translate_with_args(requested_locale, scope: [:locales])
+    locale = translation_with_args(requested_locale, scope: [:locales])
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url
