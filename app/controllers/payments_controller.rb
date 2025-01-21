@@ -18,6 +18,10 @@ class PaymentsController < ApplicationController
   end
 
   def create
+    if permitted_create_parameters[:amount_cents].blank?
+      flash[:notice] = "Please enter an amount"
+      redirect_back(fallback_location: new_payment_path) && return
+    end
     @payment = Payment.new(permitted_create_parameters)
     stripe_session = Stripe::Checkout::Session.create(@payment.stripe_session_hash)
 
