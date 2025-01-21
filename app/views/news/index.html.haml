@@ -4,7 +4,7 @@
       = translate_with_args(".bike_index_blog")
       = link_to image_tag('feed_icon.svg', class: "rss-svg"),
         news_index_url(format: 'atom'),
-        title: t('.bike_index_blog_feed'),
+        title: translate_with_args('.bike_index_blog_feed'),
         class: "blog-rss-link"
 
   -# We have no posts in other languages :/

@@ -36,7 +36,7 @@
           .input-group-addon
             = translate_with_args("number.currency.format.unit")
 
-          %input#arbitrary-amount.form-control{type: 'number', min: '0', placeholder: t('.other_amount'), step: 0.01, value: arbitrary_initial_value, class: ('active' if arbitrary_initial_value.present?)}
+          %input#arbitrary-amount.form-control{type: 'number', min: '0', placeholder: translate_with_args('.other_amount'), step: 0.01, value: arbitrary_initial_value, class: ('active' if arbitrary_initial_value.present?)}
 
     - if kind == "modal"
       %li.col-xs-6.text-left.next-steps
