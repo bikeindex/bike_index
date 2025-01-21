@@ -144,7 +144,7 @@ class StolenRecord < ApplicationRecord
     translation_scope = [:activerecord, :select_options, name.underscore]
 
     locking_description.map do |name|
-      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      localized_name = i18n_translate_with_args(normalize.call(name), scope: translation_scope)
       [localized_name, name]
     end
   end
@@ -159,7 +159,7 @@ class StolenRecord < ApplicationRecord
     translation_scope = [:activerecord, :select_options, name.underscore]
 
     locking_defeat_description.map do |name|
-      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      localized_name = i18n_translate_with_args(normalize.call(name), scope: translation_scope)
       [localized_name, name]
     end
   end

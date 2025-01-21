@@ -9,7 +9,7 @@
     = javascript_include_tag 'application_revised'
     :javascript
       window.BikeIndex.translator = (keyspace) => {
-        return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
+        return (key, args={}) => i18n_translate_with_args(`javascript.${keyspace}.${key}`, args);
       }
     - if current_user&.time_single_format
       <script>window.timeParserSingleFormat = true</script>

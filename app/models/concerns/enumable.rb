@@ -3,7 +3,7 @@ module Enumable
 
   class_methods do
     def slug_translation(slug)
-      I18n.t(
+      i18n_translate_with_args(
         slug.to_s.underscore,
         scope: [:activerecord, :enums, name.underscore]
       )
