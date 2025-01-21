@@ -36,7 +36,7 @@
             = f.label :serial_number, class: 'form-well-label'
             .form-well-input
               #serial-input
-                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.required'), class: 'form-control'
+                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: translate_with_args('.required'), class: 'form-control'
                 %a.inline-input-help{title: translate_with_args(".serial_help"), data: {toggle: 'popover', content: serial_help_content}}
                   ?
               #made-without-serial-input
@@ -251,7 +251,7 @@
       %p.mb-1
         = translate_with_args(".it_probably_has_a_serial_number")
       %p.mb-1
-        - how_to_find_link = link_to t('.how_to_find_serial'), serials_url, target: "_blank"
+        - how_to_find_link = link_to translate_with_args('.how_to_find_serial'), serials_url, target: "_blank"
         = translate_with_args(".read_how_to_find_html", how_to_find_link: how_to_find_link)
     .collapse.notCycleTypeOnly
       = translate_with_args(".very_few_vehicles_html", type_html: type_html)
@@ -266,4 +266,4 @@
           = translate_with_args(".im_100_sure")
         = translate_with_args(".without_serial_html", type_html: type_html)
 
-= render partial: 'shared/modal', locals: {title: t('.are_you_certain'), id: 'made-without-serial-modal', modal_body: modal_body}
+= render partial: 'shared/modal', locals: {title: translate_with_args('.are_you_certain'), id: 'made-without-serial-modal', modal_body: modal_body}
