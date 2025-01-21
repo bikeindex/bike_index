@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe SessionsController, type: :controller do
   describe "new" do
     it "renders and calls store_return_to" do

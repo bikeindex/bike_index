@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe IntegrationsController, type: :controller do
   context "facebook" do
     let!(:omniauth_facebook_mock) do
