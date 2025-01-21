@@ -71,7 +71,7 @@ class Autocomplete::Loader
 
     def frame_mnfg_count
       RedisPool.conn do |r|
-        r.scan_each({match: "#{Autocomplete.category_key("frame_mnfg")}*"})
+        r.scan_each(match: "#{Autocomplete.category_key("frame_mnfg")}*")
       end.count
     end
 
@@ -195,11 +195,11 @@ class Autocomplete::Loader
     end
 
     def fetch_category_keys(redis_block)
-      redis_block.scan_each({match: Autocomplete.category_key.gsub(/all:\z/, "*")})
+      redis_block.scan_each(match: Autocomplete.category_key.gsub(/all:\z/, "*"))
     end
 
     def fetch_cache_keys(redis_block)
-      redis_block.scan_each({match: Autocomplete.cache_key.gsub(/all:\z/, "*")})
+      redis_block.scan_each(match: Autocomplete.cache_key.gsub(/all:\z/, "*"))
     end
 
     def delete_data(id = nil)
