@@ -93,7 +93,7 @@ RSpec.describe TwitterTweeterIntegration do
   describe "#create_tweet" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
 
-    # Commented out in #2616 - twitter is disabled
+    # Commented out in #2618 - twitter is disabled
     #
     # it "posts a text only tweet properly", vcr: true do
     #   twitter_account = FactoryBot.build(:twitter_account_1, :active, id: 99)
