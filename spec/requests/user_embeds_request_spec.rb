@@ -1,11 +1,12 @@
 require "rails_helper"
 
-RSpec.describe UserEmbedsController, type: :controller do
+base_url = "/user_embeds"
+RSpec.describe UserEmbedsController, type: :request do
   describe "show" do
     it "renders the page if username is found" do
       user = FactoryBot.create(:user, show_bikes: true)
       ownership = FactoryBot.create(:ownership, user_id: user.id, current: true)
-      get :show, params: {id: user.username}
+      get "#{base_url}/#{user.username}"
       expect(response.code).to eq("200")
       expect(assigns(:bikes).first).to eq(ownership.bike)
       expect(assigns(:bikes).count).to eq(1)
@@ -17,7 +18,7 @@ RSpec.describe UserEmbedsController, type: :controller do
       bike = public_image.imageable
       bike.save && bike.reload
       expect(bike.thumb_path).to be_present
-      get :show, params: {id: "NOT A USER"}
+      get "#{base_url}/NOT-AUSER"
       expect(response.code).to eq("200")
       expect(assigns(:bikes).count).to eq(1)
       expect(response.headers["X-Frame-Options"]).to be_blank
