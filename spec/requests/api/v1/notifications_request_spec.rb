@@ -1,13 +1,14 @@
 require "rails_helper"
 
-RSpec.describe API::V1::NotificationsController, type: :controller do
+base_url = "/api/v1/notifications"
+RSpec.describe API::V1::NotificationsController, type: :request do
   describe "send_notification_email" do
     it "returns correct code if authentication fails" do
       bike = FactoryBot.create(:bike)
       options = {some_stuff: "things",
                  other_stuff: "Things",
                  bike_id: bike.id}
-      post :create, params: options
+      post base_url, params: options
       expect(response.code).to eq("401")
     end
 
@@ -28,7 +29,7 @@ RSpec.describe API::V1::NotificationsController, type: :controller do
         }
       }
       expect {
-        post :create, params: options
+        post base_url, params: options
       }.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)

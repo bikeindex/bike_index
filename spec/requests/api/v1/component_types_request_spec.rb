@@ -1,10 +1,11 @@
 require "rails_helper"
 
-RSpec.describe API::V1::ComponentTypesController, type: :controller do
+base_url = "/api/v1/component_types"
+RSpec.describe API::V1::ComponentTypesController, type: :request do
   describe "index" do
     it "loads the request" do
       FactoryBot.create(:ctype)
-      get :index, format: :json
+      get base_url, headers: {format: :json}
       expect(response.code).to eq("200")
     end
   end

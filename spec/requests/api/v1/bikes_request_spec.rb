@@ -1,10 +1,11 @@
 require "rails_helper"
 
-RSpec.describe API::V1::BikesController, type: :controller do
+base_url = "/api/v1/bikes"
+RSpec.describe API::V1::BikesController, type: :request do
   describe "index" do
     it "loads the page and have the correct headers" do
       FactoryBot.create(:bike, handlebar_type: "flat")
-      get :index, params: {format: :json}
+      get base_url, params: {format: :json}
       bike = json_result["bikes"].first
       expect(bike["id"]).to be_present
       expect(bike["handlebar_type"]).to eq "Flat or riser"
@@ -16,7 +17,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
       it "returns with public latitude" do
         bike.reload
         expect(bike.fetch_current_stolen_record.latitude_public).to eq(40.71)
-        get :index, params: {format: :json}
+        get base_url, params: {format: :json}
         expect(json_result["bikes"].count).to eq 1
         bike_response = json_result["bikes"].first
         expect(bike_response["stolen_record"]["latitude"]).to eq 40.71
@@ -28,7 +29,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
   describe "stolen_ids" do
     it "returns correct code if no org" do
       FactoryBot.create(:color)
-      get :stolen_ids, params: {format: :json}
+      get "#{base_url}/stolen_ids", params: {format: :json}
       expect(response.code).to eq("401")
     end
 
@@ -40,7 +41,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
       user = FactoryBot.create(:user)
       FactoryBot.create(:membership_claimed, user: user, organization: organization)
       options = {stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
-      get :stolen_ids, params: options.as_json
+      get "#{base_url}/stolen_ids", params: options.as_json
       expect(response.code).to eq("200")
       bikes = JSON.parse(response.body)["bikes"]
       expect(bikes.count).to eq(1)
@@ -51,7 +52,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
   describe "show" do
     it "loads the page" do
       bike = FactoryBot.create(:bike)
-      get :show, params: {id: bike.id, format: :json}
+      get "#{base_url}/#{bike.id}", params: {format: :json}
       expect(response.code).to eq("200")
     end
   end
@@ -121,7 +122,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
 
       it "creates a bike and does not duplicate" do
         expect {
-          post :create, params: bike_hash.as_json
+          post base_url, params: bike_hash.as_json
         }.to change(Ownership, :count).by(1)
 
         expect(response.code).to eq("200")
@@ -130,7 +131,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
         og_ownership = bike.current_ownership
 
         expect {
-          post :create, params: bike_hash.as_json
+          post base_url, params: bike_hash.as_json
         }.to change(Ownership, :count).by 0
 
         bike.reload
@@ -147,7 +148,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
         it "creates correctly" do
           Sidekiq::Testing.inline! do
             expect {
-              post :create, params: bike_hash.merge(organization_slug: organization.id).as_json
+              post base_url, params: bike_hash.merge(organization_slug: organization.id).as_json
             }.to change(Ownership, :count).by(1)
           end
 
@@ -158,8 +159,8 @@ RSpec.describe API::V1::BikesController, type: :controller do
 
           expect {
             # And do it a couple more times
-            post :create, params: bike_hash
-            post :create, params: bike_hash
+            post base_url, params: bike_hash
+            post base_url, params: bike_hash
           }.to change(Ownership, :count).by 0
 
           Sidekiq::Worker.drain_all
@@ -169,7 +170,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
         context "with risky email" do
           it "registers but doesn't send an email" do
             expect {
-              post :create, params: bike_hash.merge(bike: bike_hash[:bike].merge(owner_email: "carolyn@hotmail.co")).as_json
+              post base_url, params: bike_hash.merge(bike: bike_hash[:bike].merge(owner_email: "carolyn@hotmail.co")).as_json
             }.to change(Ownership, :count).by(1)
 
             expect(response.code).to eq("200")
@@ -191,7 +192,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
             expect(bike_sticker.bike_sticker_updates.count).to eq 0
             Sidekiq::Testing.inline! do
               expect {
-                post :create, params: post_hash.as_json
+                post base_url, params: post_hash.as_json
               }.to change(Ownership, :count).by(1)
             end
             expect(response.code).to eq("200")
@@ -232,20 +233,20 @@ RSpec.describe API::V1::BikesController, type: :controller do
 
       it "returns correct code if not logged in" do
         c = FactoryBot.create(:color)
-        post :create, params: {bike: {serial_number: "69", color: c.name}}
+        post base_url, params: {bike: {serial_number: "69", color: c.name}}
         expect(response.code).to eq("401")
       end
 
       it "returns correct code if bike has errors" do
         c = FactoryBot.create(:color)
-        post :create, params: {bike: {serial_number: "69", color: c.name}, organization_slug: @organization.slug, access_token: @organization.access_token}
+        post base_url, params: {bike: {serial_number: "69", color: c.name}, organization_slug: @organization.slug, access_token: @organization.access_token}
         expect(response.code).to eq("422")
       end
 
       it "emails us if it can't create a record" do
         c = FactoryBot.create(:color)
         expect {
-          post :create, params: {bike: {serial_number: "69", color: c.name}, organization_slug: @organization.slug, access_token: @organization.access_token}
+          post base_url, params: {bike: {serial_number: "69", color: c.name}, organization_slug: @organization.slug, access_token: @organization.access_token}
         }.to change(Feedback, :count).by(1)
       end
 
@@ -298,7 +299,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
         VCR.use_cassette("v1_bikes_create-images", match_requests_on: [:path], re_record_interval: 1.month) do
           Sidekiq::Testing.inline! do
             expect {
-              post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
+              post base_url, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
             }.to change(Ownership, :count).by(1)
           end
         end
@@ -354,7 +355,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
           "http://bikeindex.org/not_actually_a_thing_404_and_shit"
         ]
         VCR.use_cassette("v1_bikes_create-images2", match_requests_on: [:path], re_record_interval: 1.month) do
-          post :create, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
+          post base_url, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
         end
         bike = Bike.unscoped.where(serial_number: "69 photo-test").first
         expect(bike.example).to be_falsey
@@ -397,7 +398,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
           ActionMailer::Base.deliveries = []
           Sidekiq::Worker.clear_all
           expect {
-            post :create, params: {bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token}
+            post base_url, params: {bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token}
           }.to change(Ownership, :count).by(1)
           expect(response.code).to eq("200")
           bike = Bike.unscoped.where(serial_number: "69 stolen bike").first
@@ -438,7 +439,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         expect {
-          post :create, params: {bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token}
+          post base_url, params: {bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token}
         }.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -472,7 +473,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         expect {
-          post :create, params: options
+          post base_url, params: options
         }.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -498,7 +499,7 @@ RSpec.describe API::V1::BikesController, type: :controller do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         expect {
-          post :create, params: options
+          post base_url, params: options
         }.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq(0)
