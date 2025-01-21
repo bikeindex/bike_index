@@ -146,6 +146,22 @@ RSpec.describe PaymentsController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
+    context "with blank amount" do
+      it "redirects back" do
+        expect {
+            post base_url, params: {
+              is_arbitrary: false,
+              payment: {
+                referral_source: "stuffffffff",
+                amount_cents: "",
+                currency: "USD",
+                kind: "payment"
+              }
+            }
+            expect(response).to redirect_to(new_payment_path)
+          }.to change(Payment, :count).by(0)
+      end
+    end
     context "with user" do
       include_context :request_spec_logged_in_as_user
       it "makes a onetime payment with current user" do
@@ -155,7 +171,7 @@ RSpec.describe PaymentsController, type: :request do
             post base_url, params: {
               is_arbitrary: false,
               payment: {
-                amount_cents: 4000,
+                amount_cents: "4000",
                 currency: "USD",
                 kind: "donation"
               }

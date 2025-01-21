@@ -1,11 +1,12 @@
 require "rails_helper"
 
-RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
-  include_context :logged_in_as_superuser
+base_url = "/admin/twitter_accounts"
+RSpec.describe Admin::TwitterAccountsController, type: :request, vcr: true do
+  include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
     it "renders" do
-      get :index
+      get base_url
       expect(response).to be_ok
       expect(response).to render_template(:index)
     end
@@ -14,7 +15,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
   describe "edit" do
     it "renders" do
       twitter_account = FactoryBot.create(:twitter_account_1)
-      get :edit, params: {id: twitter_account.id}
+      get "#{base_url}/#{twitter_account.id}/edit"
       expect(response).to be_ok
       expect(response).to render_template(:edit)
     end
@@ -26,9 +27,8 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
     it "updates without check_credentials" do
       expect(twitter_account.errored?).to be_truthy
       expect_any_instance_of(TwitterAccount).to_not receive(:twitter_client)
-      patch :update,
+      patch "#{base_url}/#{twitter_account.id}",
         params: {
-          id: twitter_account.id,
           check_credentials: "0",
           twitter_account: {append_block: "Something special"}
         }
@@ -43,9 +43,8 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
         expect(twitter_account.errored?).to be_truthy
         allow_any_instance_of(TwitterAccount).to receive(:twitter_client) { twitter_client }
         expect(twitter_client).to receive(:verify_credentials) { true }
-        patch :update,
+        patch "#{base_url}/#{twitter_account.id}",
           params: {
-            id: twitter_account.id,
             check_credentials: true,
             twitter_account: {active: true}
           }
@@ -61,7 +60,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
       it "deletes the tweet, redirects to tweet index url with an appropriate flash" do
         twitter_account = FactoryBot.create(:twitter_account_1)
 
-        delete :destroy, params: {id: twitter_account.id}
+        delete "#{base_url}/#{twitter_account.id}"
 
         expect(response).to redirect_to(admin_twitter_accounts_url)
         expect(flash[:error]).to be_blank
@@ -76,7 +75,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
         allow(TwitterAccount)
           .to(receive(:find).with(twitter_account.id.to_s).and_return(twitter_account))
 
-        delete :destroy, params: {id: twitter_account.id}
+        delete "#{base_url}/#{twitter_account.id}"
 
         expect(response).to redirect_to(edit_admin_twitter_account_url(twitter_account))
         expect(flash[:info]).to be_blank

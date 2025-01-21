@@ -1,16 +1,18 @@
 require "rails_helper"
 
-RSpec.describe UserEmailsController, type: :controller do
+base_url = "/user_emails"
+RSpec.describe UserEmailsController, type: :request do
   let(:user_email) { FactoryBot.create(:user_email, confirmation_token: "sometoken-or-something") }
   let(:user) { user_email.user }
 
   describe "resend_confirmation" do
     before { expect(user_email.confirmed?).to be_falsey }
+
     context "user who has user_email" do
       it "enqueues a job to send an additional email confirmation" do
-        set_current_user(user)
+        log_in(user)
         expect {
-          post :resend_confirmation, params: {id: user_email.id}
+          post "#{base_url}/#{user_email.id}/resend_confirmation"
         }.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 1
         expect(flash[:success]).to be_present
       end
@@ -18,9 +20,9 @@ RSpec.describe UserEmailsController, type: :controller do
 
     context "not user's user_email" do
       it "does not enqueue a job and sets the flash" do
-        set_current_user(FactoryBot.create(:user_confirmed))
+        log_in(FactoryBot.create(:user_confirmed))
         expect {
-          post :resend_confirmation, params: {id: user_email.id}
+          post "#{base_url}/#{user_email.id}/resend_confirmation"
         }.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
@@ -29,7 +31,7 @@ RSpec.describe UserEmailsController, type: :controller do
     context "no user, no email_id" do
       it "does not enqueue a job and sets the flash (and does not break)" do
         expect {
-          post :resend_confirmation, params: {id: 33333}
+          post "#{base_url}/33333/resend_confirmation"
         }.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
@@ -39,13 +41,13 @@ RSpec.describe UserEmailsController, type: :controller do
   describe "confirm" do
     context "user's user email" do
       before do
-        set_current_user(user)
+        log_in(user)
         expect(user_email.confirmed?).to be_falsey
       end
       context "unconfirmed" do
         it "confirms and enqueues merge job" do
           expect {
-            get :confirm, params: {id: user_email.id, confirmation_token: user_email.confirmation_token}
+            get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
           }.to change(MergeAdditionalEmailWorker.jobs, :size).by 1
           user_email.reload
           expect(user_email.confirmed?).to be_truthy
@@ -56,7 +58,7 @@ RSpec.describe UserEmailsController, type: :controller do
         it "sets flash info and does not add job" do
           user_email.confirm(user_email.confirmation_token)
           expect {
-            get :confirm, params: {id: user_email.id, confirmation_token: "sometoken-or-something"}
+            get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: "sometoken-or-something"}
           }.to change(MergeAdditionalEmailWorker.jobs, :size).by 0
           expect(flash[:info]).to be_present
         end
@@ -64,7 +66,7 @@ RSpec.describe UserEmailsController, type: :controller do
       context "incorrect token" do
         it "sets flash error and does not add job" do
           expect {
-            get :confirm, params: {id: user_email.id, confirmation_token: "somethingelse-"}
+            get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: "somethingelse-"}
           }.to change(MergeAdditionalEmailWorker.jobs, :size).by 0
           expect(flash[:error]).to be_present
         end
@@ -73,9 +75,9 @@ RSpec.describe UserEmailsController, type: :controller do
 
     context "not user's user_email" do
       it "does not enqueue a job and sets the flash" do
-        set_current_user(FactoryBot.create(:user_confirmed))
+        log_in(FactoryBot.create(:user_confirmed))
         expect {
-          get :confirm, params: {id: user_email.id, confirmation_token: user_email.confirmation_token}
+          get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
         }.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
@@ -84,7 +86,7 @@ RSpec.describe UserEmailsController, type: :controller do
     context "no user, no email_id" do
       it "does not enqueue a job and sets the flash (and does not break)" do
         expect {
-          get :confirm, params: {id: user_email.id, confirmation_token: user_email.confirmation_token}
+          get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
         }.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
@@ -96,12 +98,12 @@ RSpec.describe UserEmailsController, type: :controller do
       let(:user) { FactoryBot.create(:user_confirmed) }
       let(:user_email_primary) { user.user_emails.first }
       let!(:user_email1) { FactoryBot.create(:user_email, user: user, confirmation_token: "sometoken") }
-      before { set_current_user(user) }
+      before { log_in(user) }
       context "unconfirmed" do
         it "deletes the email" do
           expect(user_email1.confirmed?).to be_falsey
           expect(user.user_emails.count).to eq 2
-          delete :destroy, params: {id: user_email1.id}
+          delete "#{base_url}/#{user_email1.id}"
           expect(UserEmail.where(id: user_email1.id)).to_not be_present
           expect(flash[:success]).to be_present
         end
@@ -114,7 +116,7 @@ RSpec.describe UserEmailsController, type: :controller do
           expect(user.user_emails.count).to eq 1
           expect(user.user_emails.confirmed.count).to eq 0
           expect {
-            delete :destroy, params: {id: user.user_emails.first.id}
+            delete "#{base_url}/#{user.user_emails.first.id}"
           }.to_not change(UserEmail, :count)
           user.reload
           expect(user.user_emails.confirmed.count).to eq 0
@@ -132,7 +134,7 @@ RSpec.describe UserEmailsController, type: :controller do
           expect(user_email1.primary?).to be_falsey
           expect(user_email_primary.primary?).to be_truthy
           expect {
-            delete :destroy, params: {id: user_email1.id}
+            delete "#{base_url}/#{user_email1.id}"
           }.to change(UserEmail, :count).by(-1)
           expect(flash[:success]).to be_present
           expect(UserEmail.where(id: user_email1.id)).to_not be_present
@@ -146,7 +148,7 @@ RSpec.describe UserEmailsController, type: :controller do
             expect(user_email1.confirmed?).to be_truthy
             expect(user.user_emails.confirmed.count).to eq 2
             expect {
-              delete :destroy, params: {id: user_email_primary.id}
+              delete "#{base_url}/#{user_email_primary.id}"
             }.to_not change(UserEmail, :count)
             expect(flash[:info]).to be_present
             user.reload
@@ -160,9 +162,9 @@ RSpec.describe UserEmailsController, type: :controller do
 
     context "not user's user_email" do
       it "does not delete the email and sets an error flash" do
-        set_current_user(FactoryBot.create(:user_confirmed))
+        log_in(FactoryBot.create(:user_confirmed))
         expect {
-          delete :destroy, params: {id: user_email.id}
+          delete "#{base_url}/#{user_email.id}"
         }.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
@@ -171,7 +173,7 @@ RSpec.describe UserEmailsController, type: :controller do
     context "no user, no email_id" do
       it "does not delete the email and sets an error flash" do
         expect {
-          delete :destroy, params: {id: user_email.id}
+          delete "#{base_url}/#{user_email.id}"
         }.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
@@ -181,11 +183,11 @@ RSpec.describe UserEmailsController, type: :controller do
   describe "make_primary" do
     context "user's user email" do
       before do
-        set_current_user(user)
+        log_in(user)
       end
       context "unconfirmed" do
         it "does not make primary" do
-          post :make_primary, params: {id: user_email.id}
+          post "#{base_url}/#{user_email.id}/make_primary"
           user_email.reload
           expect(user_email.primary?).to be_falsey
           expect(user_email.confirmed?).to be_falsey
@@ -196,7 +198,7 @@ RSpec.describe UserEmailsController, type: :controller do
         it "sets flash success and makes primary" do
           user_email.confirm(user_email.confirmation_token)
           expect(user.user_emails.confirmed.count).to eq 2
-          post :make_primary, params: {id: user_email.id}
+          post "#{base_url}/#{user_email.id}/make_primary"
           user_email.reload
           user.reload
           expect(user_email.primary?).to be_truthy
@@ -209,7 +211,7 @@ RSpec.describe UserEmailsController, type: :controller do
         it "user_email remains primary" do
           user_email.confirm(user_email.confirmation_token)
           user_email.make_primary
-          post :make_primary, params: {id: user_email.id}
+          post "#{base_url}/#{user_email.id}/make_primary"
           user_email.reload
           expect(user_email.primary?).to be_truthy
         end
@@ -218,8 +220,8 @@ RSpec.describe UserEmailsController, type: :controller do
 
     context "not user's user_email" do
       it "does not enqueue a job and sets the flash" do
-        set_current_user(FactoryBot.create(:user_confirmed))
-        post :make_primary, params: {id: user_email.id}
+        log_in(FactoryBot.create(:user_confirmed))
+        post "#{base_url}/#{user_email.id}/make_primary"
         user_email.reload
         expect(user_email.primary?).to be_falsey
         expect(flash[:error]).to match(/signed in with primary email/)
@@ -228,7 +230,7 @@ RSpec.describe UserEmailsController, type: :controller do
 
     context "no user, no email_id" do
       it "does not enqueue a job and sets the flash (and does not break)" do
-        post :make_primary, params: {id: user_email.id}
+        post "#{base_url}/#{user_email.id}/make_primary"
         user_email.reload
         expect(user_email.primary?).to be_falsey
         expect(flash[:error]).to match(/signed in with primary email/)

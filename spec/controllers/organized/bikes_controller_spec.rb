@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe Organized::BikesController, type: :controller do
   context "given an authenticated ambassador" do
     include_context :logged_in_as_ambassador
