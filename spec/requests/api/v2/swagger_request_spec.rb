@@ -33,7 +33,6 @@ RSpec.describe "Swagger API V2 docs", type: :request do
         next if code == 404
         endpoint_response = JSON.parse(response.body)
 
-        pp endpoint_response if endpoint_response&.dig("resourcePath").blank?
         expect(endpoint_response["resourcePath"]).to eq path
         expect(endpoint_response["apis"].first["path"]).to match("/v2#{path}")
       end

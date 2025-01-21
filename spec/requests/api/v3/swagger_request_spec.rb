@@ -23,17 +23,15 @@ RSpec.describe "Swagger API V3 docs", type: :request do
         .to eq target_apis.map { |i| i[:description] }.sort
 
       json_result["apis"].each do |endpoint|
-        path, desc = endpoint["path"], endpoint["description"]
+        path, _desc = endpoint["path"], endpoint["description"]
 
-        pp path
-        get "/api/v2/swagger_doc#{path}"
+        get "/api/v3/swagger_doc#{path}"
 
         expect(response.status).to eq(200)
-        next if code == 404
         endpoint_response = JSON.parse(response.body)
 
         expect(endpoint_response["resourcePath"]).to eq path
-        expect(endpoint_response["apis"].first["path"]).to match("/v2#{path}")
+        expect(endpoint_response["apis"].first["path"]).to match("/v3#{path}")
       end
     end
   end
