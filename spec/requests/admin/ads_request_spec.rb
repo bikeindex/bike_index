@@ -1,12 +1,12 @@
 require "rails_helper"
 
-RSpec.describe Admin::AdsController, type: :controller do
+base_url = "/admin/ads"
+RSpec.describe Admin::AdsController, type: :request do
+  include_context :request_spec_logged_in_as_superuser
+
   describe "index" do
     it "responds with OK and renders the index template" do
-      user = FactoryBot.create(:admin)
-      set_current_user(user)
-
-      get :index
+      get base_url
 
       expect(response).to be_ok
       expect(response.status).to eq(200)
