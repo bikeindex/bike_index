@@ -162,7 +162,7 @@ class TwitterAccount < ApplicationRecord
   def tweet(text, photo = nil, **opts)
     return unless text.present?
 
-    # Commented out in Ruby upgrade to 3.1 - #2605
+    # Commented out in #2616 - twitter is disabled
     #
     # if photo.present?
     #   twitter_client.update_with_media(text, photo, opts)
