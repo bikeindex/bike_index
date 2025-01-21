@@ -12,7 +12,6 @@ RSpec.describe ExternalImageUrlStoreWorker, type: :job do
         external_image_url: "https://files.bikeindex.org/email_assets/logo.png")
     end
     it "downloads and processes the image" do
-      pp public_image
       expect(public_image.id).to be_present
       Sidekiq::Worker.clear_all
       expect(public_image.image).to_not be_present
