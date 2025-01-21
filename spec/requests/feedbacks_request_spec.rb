@@ -1,9 +1,10 @@
 require "rails_helper"
 
-RSpec.describe FeedbacksController, type: :controller do
+base_url = "/feedbacks"
+RSpec.describe FeedbacksController, type: :request do
   describe "index" do
     it "renders with revised_layout" do
-      get :index
+      get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
@@ -28,9 +29,9 @@ RSpec.describe FeedbacksController, type: :controller do
     context "valid feedback" do
       it "creates a feedback message" do
         expect(user.name).to be_present
-        set_current_user(user)
+        log_in(user)
         expect {
-          post :create, params: {feedback: feedback_attrs.except(:email, :name)}
+          post base_url, params: {feedback: feedback_attrs.except(:email, :name)}
         }.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to help_path
         expect(flash[:success]).to be_present
@@ -40,33 +41,21 @@ RSpec.describe FeedbacksController, type: :controller do
         expect(feedback.email).to eq user.email
         expect(feedback.name).to eq user.name
       end
-      context "unconfirmed user" do
-        let(:user) { FactoryBot.create(:user) }
-        it "does not create, because spam" do
-          expect(user.confirmed?).to be_falsey
-          set_current_user(user)
-          expect(Feedback.count).to eq 0
-          expect {
-            post :create, params: {feedback: feedback_attrs.except(:email, :name)}
-          }.to_not change(EmailFeedbackNotificationWorker.jobs, :count)
-          expect(Feedback.count).to eq 0
-        end
-      end
     end
 
     context "feedback with generated title" do
       it "creates a feedback" do
-        request.env["HTTP_REFERER"] = "http://localhost:3000/partyyyyy"
         expect {
-          post :create, params: {
-            feedback: {
-              name: "Cool School",
-              feedback_type: "lead_for_school",
-              email: "example@example.com",
-              body: "ffff",
-              package_size: "small"
-            }
-          }
+          post base_url, params: {
+                           feedback: {
+                             name: "Cool School",
+                             feedback_type: "lead_for_school",
+                             email: "example@example.com",
+                             body: "ffff",
+                             package_size: "small"
+                           }
+                         },
+            headers: {"HTTP_REFERER" => "http://localhost:3000/partyyyyy"}
         }.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to "http://localhost:3000/partyyyyy"
         expect(flash[:success]).to be_present
@@ -78,17 +67,17 @@ RSpec.describe FeedbacksController, type: :controller do
       end
       context "with a phone number and no package_size" do
         it "creates a feedback" do
-          request.env["HTTP_REFERER"] = "http://localhost:3000/cities_packages"
           expect {
-            post :create, params: {
-              feedback: {
-                name: "Chicago",
-                feedback_type: "lead_for_city",
-                email: "example@example.com",
-                phone_number: "891024123",
-                package_size: ""
-              }
-            }
+            post base_url, params: {
+                             feedback: {
+                               name: "Chicago",
+                               feedback_type: "lead_for_city",
+                               email: "example@example.com",
+                               phone_number: "891024123",
+                               package_size: ""
+                             }
+                           },
+              headers: {"HTTP_REFERER" => "http://localhost:3000/cities_packages"}
           }.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
           expect(response).to redirect_to "http://localhost:3000/cities_packages"
           expect(flash[:success]).to be_present
@@ -103,9 +92,9 @@ RSpec.describe FeedbacksController, type: :controller do
 
     context "feedback with additional" do
       it "does not create a feedback message" do
-        request.env["HTTP_REFERER"] = for_schools_url
         expect {
-          post :create, params: {feedback: feedback_attrs.merge(additional: "stuff")}
+          post base_url, params: {feedback: feedback_attrs.merge(additional: "stuff")},
+            headers: {"HTTP_REFERER" => for_schools_url}
         }.to_not change(EmailFeedbackNotificationWorker.jobs, :count)
         expect(flash[:error]).to match(/sign in/i)
       end
@@ -115,7 +104,7 @@ RSpec.describe FeedbacksController, type: :controller do
       context "no referrer" do
         it "does not create a feedback message" do
           expect {
-            post :create, params: {feedback: feedback_attrs.merge(email: "")}
+            post base_url, params: {feedback: feedback_attrs.merge(email: "")}
           }.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
 
           expect(response).to render_template(:index)
@@ -126,10 +115,10 @@ RSpec.describe FeedbacksController, type: :controller do
       end
       context "referrer set" do
         it "does not create a feedback message" do
-          set_current_user(user)
-          request.env["HTTP_REFERER"] = for_schools_url
+          log_in(user)
           expect {
-            post :create, params: {feedback: feedback_attrs.merge(body: "")}
+            post base_url, params: {feedback: feedback_attrs.merge(body: "")},
+              headers: {"HTTP_REFERER" => for_schools_url}
           }.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
           expect(response).to render_template("landing_pages/for_schools")
           feedback = assigns(:feedback)

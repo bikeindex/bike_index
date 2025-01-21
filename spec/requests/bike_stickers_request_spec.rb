@@ -1,21 +1,22 @@
 require "rails_helper"
 
-RSpec.describe BikeStickersController, type: :controller do
+base_url = "/bike_stickers"
+RSpec.describe BikeStickersController, type: :request do
   describe "update" do
     let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
     let(:bike) { FactoryBot.create(:bike) }
     context "no user" do
       it "responds with 401" do
-        put :update, params: {id: bike_sticker.code, bike_id: "9"}
+        put "#{base_url}/#{bike_sticker.code}", params: {bike_id: "9"}
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(scanned_bike_path(bike_sticker.code))
       end
     end
     context "user present" do
-      include_context :logged_in_as_user
+      include_context :request_spec_logged_in_as_user
       it "succeeds" do
         expect {
-          put :update, params: {id: bike_sticker.code, bike_id: bike.id.to_s}
+          put "#{base_url}/#{bike_sticker.code}", params: {bike_id: bike.id.to_s}
         }.to change(BikeStickerUpdate, :count).by 1
         expect(flash[:success]).to be_present
         bike_sticker.reload
@@ -25,7 +26,7 @@ RSpec.describe BikeStickersController, type: :controller do
       context "bikeindex url" do
         it "succeeds" do
           expect {
-            put :update, params: {id: bike_sticker.code, bike_id: "https://bikeindex.org/bikes/#{bike.id} "}
+            put "#{base_url}/#{bike_sticker.code}", params: {bike_id: "https://bikeindex.org/bikes/#{bike.id} "}
           }.to change(BikeStickerUpdate, :count).by 1
           expect(flash[:success]).to be_present
           bike_sticker.reload
@@ -36,7 +37,7 @@ RSpec.describe BikeStickersController, type: :controller do
       context "bike not found" do
         it "shows error message" do
           expect {
-            put :update, params: {id: bike_sticker.code, bike_id: "https://bikeindex.org/bikes/ "}
+            put "#{base_url}/#{bike_sticker.code}", params: {bike_id: "https://bikeindex.org/bikes/ "}
           }.to change(BikeStickerUpdate, :count).by 1
           expect(flash[:error]).to be_present
           bike_sticker.reload
@@ -48,7 +49,7 @@ RSpec.describe BikeStickersController, type: :controller do
       context "code not found" do
         it "responds with flash error" do
           expect {
-            put :update, params: {id: "asdffdf", organization_id: "cvxcvcv"}
+            put "#{base_url}/asdffdf", params: {organization_id: "cvxcvcv"}
           }.to_not change(BikeStickerUpdate, :count)
           expect(flash[:error]).to be_present
         end
@@ -58,7 +59,7 @@ RSpec.describe BikeStickersController, type: :controller do
         let(:bike2) { FactoryBot.create(:bike) }
         it "responds with flash error" do
           expect {
-            put :update, params: {id: bike_sticker.code, bike_id: "https://bikeindex.org/bikes/#{bike2.id} "}
+            put "#{base_url}/#{bike_sticker.code}", params: {bike_id: "https://bikeindex.org/bikes/#{bike2.id} "}
           }.to change(BikeStickerUpdate, :count).by 1
           expect(flash[:error]).to be_present
           bike_sticker.reload
@@ -67,11 +68,11 @@ RSpec.describe BikeStickersController, type: :controller do
         end
         context "organized" do
           let(:organization) { FactoryBot.create(:organization) }
-          let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
           let(:bike_sticker) { FactoryBot.create(:bike_sticker, bike_id: bike.id, organization: organization) }
           it "succeeds" do
             expect {
-              put :update, params: {id: bike_sticker.code, bike_id: "  #{bike2.id} "}
+              put "#{base_url}/#{bike_sticker.code}", params: {bike_id: "  #{bike2.id} "}
             }.to change(BikeStickerUpdate, :count).by 1
             expect(flash[:success]).to be_present
             bike_sticker.reload

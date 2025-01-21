@@ -1,9 +1,10 @@
 require "rails_helper"
 
-RSpec.describe API::V1::UsersController, type: :controller do
+base_url = "/api/v1/users"
+RSpec.describe API::V1::UsersController, type: :request do
   describe "current" do
     it "returns user_present = false if there is no user present" do
-      get :current, format: :json
+      get "#{base_url}/current", headers: {format: :json}
       expect(response.code).to eq("200")
       expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
       expect(response.headers["Access-Control-Request-Method"]).not_to be_present
@@ -12,8 +13,8 @@ RSpec.describe API::V1::UsersController, type: :controller do
     it "returns user_present if a user is present" do
       # We need to test that cors isn't present
       u = FactoryBot.create(:user_confirmed)
-      set_current_user(u)
-      get :current, format: :json
+      log_in(u)
+      get "#{base_url}/current", headers: {format: :json}
       expect(response.code).to eq("200")
       expect(json_result).to include("user_present" => true)
       expect(json_result["email"]).to_not be_present
@@ -38,9 +39,9 @@ RSpec.describe API::V1::UsersController, type: :controller do
             request_bike_id: bike.id,
             request_reason: "Some reason"
           }
-          set_current_user(user)
+          log_in(user)
           ActionMailer::Base.deliveries = []
-          post :send_request, params: delete_request
+          post "#{base_url}/send_request", params: delete_request
           expect(response.code).to eq("200")
           expect(ActionMailer::Base.deliveries).to be_empty
           bike.reload
@@ -64,9 +65,9 @@ RSpec.describe API::V1::UsersController, type: :controller do
               request_bike_id: bike.id,
               request_reason: "Some reason"
             }
-            set_current_user(user)
+            log_in(user)
             ActionMailer::Base.deliveries = []
-            post :send_request, params: delete_request
+            post "#{base_url}/send_request", params: delete_request
             expect(response.code).to eq("200")
             expect(ActionMailer::Base.deliveries).to be_empty
             bike.reload
@@ -88,8 +89,8 @@ RSpec.describe API::V1::UsersController, type: :controller do
           request_reason: "Need to update manufacturer",
           manufacturer_update_manufacturer: manufacturer.slug
         }
-        set_current_user(user)
-        post :send_request, params: update_manufacturer_request
+        log_in(user)
+        post "#{base_url}/send_request", params: update_manufacturer_request
         expect(response.code).to eq("200")
         bike.reload
         expect(bike.manufacturer).to eq manufacturer
@@ -108,8 +109,8 @@ RSpec.describe API::V1::UsersController, type: :controller do
           request_reason: "Need to update manufacturer",
           manufacturer_update_manufacturer: "doadsfizxcv"
         }
-        set_current_user(user)
-        post :send_request, params: update_manufacturer_request
+        log_in(user)
+        post "#{base_url}/send_request", params: update_manufacturer_request
         expect(response.code).to eq("200")
         bike.reload
         expect(bike.manufacturer).to be_present
@@ -128,10 +129,10 @@ RSpec.describe API::V1::UsersController, type: :controller do
           request_reason: "Some reason",
           serial_update_serial: "some new serial"
         }
-        set_current_user(user)
+        log_in(user)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         expect {
-          post :send_request, params: serial_request
+          post "#{base_url}/send_request", params: serial_request
         }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
         expect(response.code).to eq("200")
         expect(bike.reload.serial_number).to eq("some new serial")
@@ -153,9 +154,9 @@ RSpec.describe API::V1::UsersController, type: :controller do
         request_reason: "Some reason",
         serial_update_serial: "some new serial"
       }
-      set_current_user(user)
+      log_in(user)
       expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-      post :send_request, params: serial_request
+      post "#{base_url}/send_request", params: serial_request
       expect(response.code).to eq("200")
       bike.reload
       expect(bike.serial_number).to eq("some new serial")
@@ -182,14 +183,14 @@ RSpec.describe API::V1::UsersController, type: :controller do
 
       before do
         expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
-        set_current_user(user)
+        log_in(user)
       end
 
       it "recovers the bike" do
         bike.reload
         expect(bike.current_stolen_record_id).to eq stolen_record.id
         og_updated_at = bike.updated_at
-        post :send_request, params: recovery_request.as_json
+        post "#{base_url}/send_request", params: recovery_request.as_json
         expect(response.code).to eq("200")
         bike.reload
         stolen_record.reload
@@ -222,7 +223,7 @@ RSpec.describe API::V1::UsersController, type: :controller do
           Sidekiq::Worker.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
-            post :send_request, params: recovery_request.as_json
+            post "#{base_url}/send_request", params: recovery_request.as_json
           end
           expect(response.code).to eq("200")
           bike.reload
@@ -247,7 +248,7 @@ RSpec.describe API::V1::UsersController, type: :controller do
     it "does not create a new serial request mailer if a user isn't present" do
       bike = FactoryBot.create(:bike)
       message = {request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason"}
-      post :send_request, params: message.merge(format: :json)
+      post "#{base_url}/send_request", params: message.merge(format: :json)
       expect(response.code).to eq("403")
     end
 
@@ -255,9 +256,9 @@ RSpec.describe API::V1::UsersController, type: :controller do
       o = FactoryBot.create(:ownership)
       bike = o.bike
       user = FactoryBot.create(:user_confirmed)
-      set_current_user(user)
+      log_in(user)
       params = {request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason"}
-      post :send_request, params: params
+      post "#{base_url}/send_request", params: params
       expect(response.code).to eq("403")
     end
   end

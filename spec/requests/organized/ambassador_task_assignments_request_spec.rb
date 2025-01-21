@@ -1,17 +1,17 @@
 require "rails_helper"
 
-RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller do
+RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
+  let(:base_url) { "/o/#{current_organization.to_param}/ambassador_task_assignments" }
+
   describe "#update" do
-    include_context :logged_in_as_ambassador
+    include_context :request_spec_logged_in_as_ambassador
 
     context "given completed: false" do
       it "unsets the task's completed_at value" do
         assignment = FactoryBot.create(:ambassador_task_assignment, :completed)
 
-        patch :update,
+        patch "#{base_url}/#{assignment.to_param}",
           params: {
-            organization_id: organization,
-            id: assignment,
             completed: "false"
           }
 
@@ -27,10 +27,8 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller
         assignment = FactoryBot.create(:ambassador_task_assignment)
         expect(assignment.reload.completed_at).to be_nil
 
-        patch :update,
+        patch "#{base_url}/#{assignment.to_param}",
           params: {
-            organization_id: organization,
-            id: assignment,
             completed: "true"
           }
 
@@ -47,10 +45,8 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller
         allow(assignment).to receive(:update).and_return(false)
         allow(AmbassadorTaskAssignment).to receive(:find).and_return(assignment)
 
-        patch :update,
+        patch "#{base_url}/#{assignment.to_param}",
           params: {
-            organization_id: organization,
-            id: assignment,
             completed: "true"
           }
 

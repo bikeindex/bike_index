@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe UsersController, type: :controller do
   let(:user) { FactoryBot.create(:user_confirmed) }
   describe "new" do
