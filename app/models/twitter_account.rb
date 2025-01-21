@@ -162,11 +162,13 @@ class TwitterAccount < ApplicationRecord
   def tweet(text, photo = nil, **opts)
     return unless text.present?
 
-    if photo.present?
-      twitter_client.update_with_media(text, photo, opts)
-    else
-      twitter_client.update(text, opts)
-    end
+    # Commented out in Ruby upgrade to 3.1 - #2605
+    #
+    # if photo.present?
+    #   twitter_client.update_with_media(text, photo, opts)
+    # else
+    #   twitter_client.update(text, opts)
+    # end
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     nil
