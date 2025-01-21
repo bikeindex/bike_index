@@ -1132,7 +1132,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
       expect(response.code).to eq("403")
       expect(response.body).to match(/oauth/i)
-      expect(response.body).to match(/permission/i)
+      expect(response.body).to match(/scope/i)
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do
@@ -1453,7 +1453,7 @@ RSpec.describe "Bikes API V3", type: :request do
         put url, params: valid_params.to_json, headers: json_headers
         expect(response.code).to eq("403")
         expect(json_result["error"].present?).to be_truthy
-        expect(json_result["error"]).to match(/permission/i)
+        expect(json_result["error"]).to match(/scope/i)
       end
     end
 
@@ -1544,7 +1544,7 @@ RSpec.describe "Bikes API V3", type: :request do
       post url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("403")
       expect(response.body).to match("OAuth")
-      expect(response.body).to match(/permission/i)
+      expect(response.body).to match(/scope/i)
       expect(response.body).to_not match("is not stolen")
     end
 

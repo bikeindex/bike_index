@@ -82,7 +82,7 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
-gem "doorkeeper", "~> 5.2.5" # OAuth providing
+gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape", "~> 1.8.0" # API DSL
 gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
