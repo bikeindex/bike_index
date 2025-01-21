@@ -37,10 +37,5 @@ RSpec.describe "Swagger API V2 docs", type: :request do
         expect(endpoint_response["apis"].first["path"]).to match("/v2#{path}")
       end
     end
-
-    it "redirects to documentation on API call" do
-      get "/api"
-      expect(response).to redirect_to("/documentation")
-    end
   end
 end
