@@ -149,17 +149,17 @@ RSpec.describe PaymentsController, type: :request do
     context "with blank amount" do
       it "redirects back" do
         expect {
-            post base_url, params: {
-              is_arbitrary: false,
-              payment: {
-                referral_source: "stuffffffff",
-                amount_cents: "",
-                currency: "USD",
-                kind: "payment"
-              }
+          post base_url, params: {
+            is_arbitrary: false,
+            payment: {
+              referral_source: "stuffffffff",
+              amount_cents: "",
+              currency: "USD",
+              kind: "payment"
             }
-            expect(response).to redirect_to(new_payment_path)
-          }.to change(Payment, :count).by(0)
+          }
+          expect(response).to redirect_to(new_payment_path)
+        }.to change(Payment, :count).by(0)
       end
     end
     context "with user" do
