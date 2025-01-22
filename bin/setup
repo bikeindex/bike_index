@@ -17,9 +17,6 @@ chdir APP_ROOT do
   system! "gem install bundler --conservative"
   system("bundle check") || system!("bundle install")
 
-  # Install JavaScript dependencies
-  system! "bin/yarn"
-
   puts "== Starting redis so database can be migrated =="
   system "redis-server &"
   # Install JavaScript dependencies if using Yarn
