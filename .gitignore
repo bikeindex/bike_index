@@ -49,6 +49,8 @@ yarn-error.log
 .yarn-integrity
 .nvmrc
 package-lock.json
+!/public/assets/.keep
+/public/assets/
 
 # Ignore jest coverage files
 coverage

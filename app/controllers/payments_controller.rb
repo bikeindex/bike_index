@@ -18,8 +18,8 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    if permitted_create_parameters[:amount_cents].blank?
-      flash[:notice] = "Please enter an amount"
+    if invalid_amount_cents?(permitted_create_parameters[:amount_cents])
+      flash[:notice] = "Please enter a valid amount"
       redirect_back(fallback_location: new_payment_path) && return
     end
     @payment = Payment.new(permitted_create_parameters)
@@ -30,6 +30,12 @@ class PaymentsController < ApplicationController
   end
 
   private
+
+  def invalid_amount_cents?(amount_cents)
+    return true if amount_cents.blank?
+
+    !amount_cents.to_i.between?(1, 99_999_999)
+  end
 
   def permitted_create_parameters
     params.require(:payment)
