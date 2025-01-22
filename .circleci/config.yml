@@ -113,13 +113,13 @@ jobs:
       - restore_cache:
           name: "Git: cache restore"
           keys:
-            - CACHE_V1-git-2.22.0
+            - CACHE_V1-git-2.48.1
             - CACHE_V1-git-
 
       - run:
           name: "Git: install"
           environment:
-            GIT_VERSION: 2.22.0
+            GIT_VERSION: 2.48.1
           command: |
             set -x
 
@@ -149,9 +149,9 @@ jobs:
 
       - type: cache-save
         name: "Git: cache save"
-        key: CACHE_V1-git-2.22.0
+        key: CACHE_V1-git-2.48.1
         paths:
-          - ~/.cache/git/git-2.22.0
+          - ~/.cache/git/git-2.48.1
 
       - restore_cache:
           name: "Hub: cache restore"
