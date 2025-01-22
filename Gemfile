@@ -103,7 +103,6 @@ gem "sass-rails"
 gem "sprockets", "4.0.0"
 gem "sprockets-rails"
 gem "uglifier"
-gem "webpacker"
 
 # Show performance metrics
 gem "flamegraph", require: false
