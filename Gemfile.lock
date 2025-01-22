@@ -507,8 +507,8 @@ GEM
     parallel (1.26.3)
     parallel_tests (3.5.2)
       parallel
-    paranoia (2.5.2)
-      activerecord (>= 5.1, < 7.1)
+    paranoia (3.0.1)
+      activerecord (>= 6, < 8.1)
     parser (3.3.7.0)
       ast (~> 2.4.1)
       racc
