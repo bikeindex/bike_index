@@ -52,7 +52,7 @@ gem "geocoder" # Geolocation using external APIs
 gem "hamlit" # Faster haml, what we use for templating
 gem "httparty"
 gem "kaminari" # pagination
-gem "kramdown", "2.3.1" # Markdown
+gem "kramdown" # Markdown
 gem "money-rails", "~> 1.11"
 gem "omniauth", "~> 2.0.0"
 gem "omniauth-facebook"

@@ -389,8 +389,8 @@ GEM
       activerecord
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
-    kramdown (2.3.1)
-      rexml
+    kramdown (2.5.1)
+      rexml (>= 3.3.9)
     launchy (2.5.2)
       addressable (~> 2.8)
     letter_opener (1.8.1)
@@ -818,7 +818,7 @@ DEPENDENCIES
   i18n_generators
   jquery-rails
   kaminari
-  kramdown (= 2.3.1)
+  kramdown
   letter_opener
   lograge
   logstash-event
