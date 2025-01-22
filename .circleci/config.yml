@@ -153,39 +153,39 @@ jobs:
       #   paths:
       #     - ~/.cache/git/git-2.48.1
 
-      # - restore_cache:
-      #     name: "Hub: cache restore"
-      #     keys:
-      #       - CACHE_V1-hub-2.12.3
-      #       - CACHE_V1-hub-
+      - restore_cache:
+          name: "Hub: cache restore"
+          keys:
+            - CACHE_V1-hub-2.12.3
+            - CACHE_V1-hub-
 
-      # - run:
-      #     name: "Hub: install"
-      #     environment:
-      #       HUB_VERSION: 2.12.3
-      #     command: |
-      #       set -x
+      - run:
+          name: "Hub: install"
+          environment:
+            HUB_VERSION: 2.12.3
+          command: |
+            set -x
 
-      #       hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
+            hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
 
-      #       if [[ ! -f ${hub_binary} ]]; then
-      #         rm -rf ~/.cache/hub
-      #         mkdir -p ~/.cache/hub
-      #         cd ~/.cache/hub
+            if [[ ! -f ${hub_binary} ]]; then
+              rm -rf ~/.cache/hub
+              mkdir -p ~/.cache/hub
+              cd ~/.cache/hub
 
-      #         wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-      #         tar -xzf hub.tgz
-      #       fi
+              wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+              tar -xzf hub.tgz
+            fi
 
-      #       sudo cp ${hub_binary} /usr/local/bin/hub
+            sudo cp ${hub_binary} /usr/local/bin/hub
 
-      # - restore_cache:
-      #     name: "Hub: cache save"
-      #     keys:
-      #       - CACHE_V1-hub-2.12.3
-      #       - CACHE_V1-hub-
-      #     paths:
-      #       - ~/.cache/hub
+      - restore_cache:
+          name: "Hub: cache save"
+          keys:
+            - CACHE_V1-hub-2.12.3
+            - CACHE_V1-hub-
+          paths:
+            - ~/.cache/hub
 
       - run:
           name: "Bundler: install"
