@@ -1,5 +1,5 @@
 module LocalizationHelper
-  # TODO: remove after updating to Ruby 3.1 - #2605
+  # Replace this!
   # translate_with_args( replaced t(
   def translate_with_args(key, args = {})
     t(key, **args)
