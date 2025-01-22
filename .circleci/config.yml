@@ -110,82 +110,82 @@ jobs:
           - ~/.cache/dockerize
 
       # Updated all restore_cache to make things more functional when changing a single dependency, see PR#2366
-      - restore_cache:
-          name: "Git: cache restore"
-          keys:
-            - CACHE_V1-git-2.22.0
-            - CACHE_V1-git-
+      # - restore_cache:
+      #     name: "Git: cache restore"
+      #     keys:
+      #       - CACHE_V1-git-2.48.1
+      #       - CACHE_V1-git-
 
-      - run:
-          name: "Git: install"
-          environment:
-            GIT_VERSION: 2.22.0
-          command: |
-            set -x
+      # - run:
+      #     name: "Git: install"
+      #     environment:
+      #       GIT_VERSION: 2.48.1
+      #     command: |
+      #       set -x
 
-            git_binary=~/.cache/git/git-${GIT_VERSION}/git
+      #       git_binary=~/.cache/git/git-${GIT_VERSION}/git
 
-            if [[ ! -f $git_binary ]]; then
-              rm -rf ~/.cache/git
-              mkdir -p ~/.cache/git
-              cd ~/.cache/git
+      #       if [[ ! -f $git_binary ]]; then
+      #         rm -rf ~/.cache/git
+      #         mkdir -p ~/.cache/git
+      #         cd ~/.cache/git
 
-              wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
-              tar -xzf git.tgz
-              cd git-${GIT_VERSION}
+      #         wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
+      #         tar -xzf git.tgz
+      #         cd git-${GIT_VERSION}
 
-              export DEFAULT_HELP_FORMAT="man"
-              autoconf
-              ./configure
+      #         export DEFAULT_HELP_FORMAT="man"
+      #         autoconf
+      #         ./configure
 
-              sudo make man
-              sudo make install-man
-            fi
+      #         sudo make man
+      #         sudo make install-man
+      #       fi
 
-            cd ~/.cache/git/git-${GIT_VERSION}
-            sudo make prefix=/usr/local all
-            sudo make install
-            sudo cp ${git_binary} /usr/local/bin/git
+      #       cd ~/.cache/git/git-${GIT_VERSION}
+      #       sudo make prefix=/usr/local all
+      #       sudo make install
+      #       sudo cp ${git_binary} /usr/local/bin/git
 
-      - type: cache-save
-        name: "Git: cache save"
-        key: CACHE_V1-git-2.22.0
-        paths:
-          - ~/.cache/git/git-2.22.0
+      # - type: cache-save
+      #   name: "Git: cache save"
+      #   key: CACHE_V1-git-2.48.1
+      #   paths:
+      #     - ~/.cache/git/git-2.48.1
 
-      - restore_cache:
-          name: "Hub: cache restore"
-          keys:
-            - CACHE_V1-hub-2.12.3
-            - CACHE_V1-hub-
+      # - restore_cache:
+      #     name: "Hub: cache restore"
+      #     keys:
+      #       - CACHE_V1-hub-2.12.3
+      #       - CACHE_V1-hub-
 
-      - run:
-          name: "Hub: install"
-          environment:
-            HUB_VERSION: 2.12.3
-          command: |
-            set -x
+      # - run:
+      #     name: "Hub: install"
+      #     environment:
+      #       HUB_VERSION: 2.12.3
+      #     command: |
+      #       set -x
 
-            hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
+      #       hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
 
-            if [[ ! -f ${hub_binary} ]]; then
-              rm -rf ~/.cache/hub
-              mkdir -p ~/.cache/hub
-              cd ~/.cache/hub
+      #       if [[ ! -f ${hub_binary} ]]; then
+      #         rm -rf ~/.cache/hub
+      #         mkdir -p ~/.cache/hub
+      #         cd ~/.cache/hub
 
-              wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-              tar -xzf hub.tgz
-            fi
+      #         wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+      #         tar -xzf hub.tgz
+      #       fi
 
-            sudo cp ${hub_binary} /usr/local/bin/hub
+      #       sudo cp ${hub_binary} /usr/local/bin/hub
 
-      - restore_cache:
-          name: "Hub: cache save"
-          keys:
-            - CACHE_V1-hub-2.12.3
-            - CACHE_V1-hub-
-          paths:
-            - ~/.cache/hub
+      # - restore_cache:
+      #     name: "Hub: cache save"
+      #     keys:
+      #       - CACHE_V1-hub-2.12.3
+      #       - CACHE_V1-hub-
+      #     paths:
+      #       - ~/.cache/hub
 
       - run:
           name: "Bundler: install"
@@ -214,24 +214,25 @@ jobs:
       #     name: Sync translations (only on main by default)
       #     command: bin/check_translations
 
-      - restore_cache:
-          name: "Node dependencies: cache restore"
-          keys:
-            - CACHE_V1-yarn-{{ checksum "yarn.lock" }}
-            - CACHE_V1-yarn-
+      # NO LONGER
+      # - restore_cache:
+      #     name: "Node dependencies: cache restore"
+      #     keys:
+      #       - CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+      #       - CACHE_V1-yarn-
 
-      - run:
-          name: "Node dependencies: install"
-          command: |
-            set -x
-            [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
-            yarn install --cache-folder ~/.cache/yarn $use_local
+      # - run:
+      #     name: "Node dependencies: install"
+      #     command: |
+      #       set -x
+      #       [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
+      #       yarn install --cache-folder ~/.cache/yarn $use_local
 
-      - type: cache-save
-        name: "Node dependencies: cache save"
-        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
-        paths:
-          - ~/.cache/yarn
+      # - type: cache-save
+      #   name: "Node dependencies: cache save"
+      #   key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+      #   paths:
+      #     - ~/.cache/yarn
 
       - restore_cache:
           name: "Assets: cache restore"
@@ -244,7 +245,6 @@ jobs:
           command: |
             set -x
             node --version
-            bin/webpack
             bundle exec rails assets:precompile assets:clean --trace
 
       - type: cache-save
@@ -256,7 +256,6 @@ jobs:
           - public/packs
           - public/packs-test
           - tmp/cache/assets
-          - tmp/cache/webpacker
 
       - run:
           name: Install Code Climate Test Reporter
@@ -297,14 +296,6 @@ jobs:
           root: coverage
           paths:
             - codeclimate.*.json
-      - run:
-          name: "Jest: Tests"
-          command: |
-            mkdir -p /tmp/test-results/junit
-            yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
-          environment:
-            JEST_JUNIT_OUTPUT: "/tmp/test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
-            JEST_JUNIT_OUTPUT_DIR: "/tmp/test-results/junit/"
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
