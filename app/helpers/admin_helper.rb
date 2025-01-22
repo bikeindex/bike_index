@@ -149,7 +149,7 @@ module AdminHelper
           "organization member -",
           Organization.kind_humanized(icon_hash[:organization][:kind])
         ].compact.join(" ")
-        concat(content_tag(:span, org_icon_text(icon_hash[:organization]), class: "org-member-icon user-icon ml-1", title: org_full_text))
+        concat(content_tag(:span, org_icon_text(**icon_hash[:organization]), class: "org-member-icon user-icon ml-1", title: org_full_text))
         concat(content_tag(:span, org_full_text, class: "ml-1 less-strong")) if full_text
       end
 

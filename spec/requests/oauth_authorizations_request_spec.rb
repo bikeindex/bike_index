@@ -59,7 +59,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         it "errors" do
           # We require a scope parameter to be passed
           get authorization_url
-          expect(response.code).to eq("200")
+          expect(response.code).to eq("400")
           expect(response).to render_template(:error)
           expect(response.body).to match("Missing required parameter: scope")
         end

@@ -10,7 +10,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
-ruby "2.7.8"
+ruby "3.1.6"
 gem "rack", "~> 2.2.3"
 
 gem "rails", "~> 7.1"
@@ -53,7 +53,6 @@ gem "hamlit" # Faster haml, what we use for templating
 gem "httparty"
 gem "kaminari" # pagination
 gem "kramdown", "2.3.1" # Markdown
-gem "kramdown-parser-gfm" # Parser required to render grape-swagger
 gem "money-rails", "~> 1.11"
 gem "omniauth", "~> 2.0.0"
 gem "omniauth-facebook"
@@ -82,10 +81,9 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
-gem "doorkeeper", "~> 5.2.5" # OAuth providing
+gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape", "~> 1.8.0" # API DSL
-gem "grape-swagger", "0.11" # auto generate swagger (OpenAPI)
 gem "hashie" # required for some Grape endpoints
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 

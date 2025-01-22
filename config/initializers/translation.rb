@@ -21,11 +21,11 @@ end
 # (See also i18n_spec.rb and application_helper.rb)
 #
 # i18n_translate_with_args( replaced I18n.t(
-def i18n_translate_with_args(key, ...)
-  I18n.t(key, ...)
+def i18n_translate_with_args(key, args = {})
+  I18n.t(key, **args)
 end
 
 # translation_with_args( replaced translation(
-def translation_with_args(key, ...)
-  I18n.t(key, ...)
+def translation_with_args(key, args = {})
+  I18n.t(key, **args)
 end
