@@ -146,22 +146,41 @@ RSpec.describe PaymentsController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
-    context "with blank amount" do
-      it "redirects back" do
-        expect {
-          post base_url, params: {
-            is_arbitrary: false,
-            payment: {
-              referral_source: "stuffffffff",
-              amount_cents: "",
-              currency: "USD",
-              kind: "payment"
+    context "with invalid amount" do
+      shared_examples 'redirects back and shows flash message' do
+        it "does not raise an error" do
+          expect {
+            post base_url, params: {
+              is_arbitrary: false,
+              payment: {
+                referral_source: "stuffffffff",
+                amount_cents: amount_cents,
+                currency: "USD",
+                kind: "payment"
+              }
             }
-          }
-          expect(response).to redirect_to(new_payment_path)
-        }.to change(Payment, :count).by(0)
+            expect(response).to redirect_to(new_payment_path)
+            expect(flash[:notice]).to match(/valid amount/)
+          }.to change(Payment, :count).by(0)
+        end
+      end
+      context "with blank amount" do
+        let(:amount_cents) { " " }
+
+        include_examples 'redirects back and shows flash message'
+      end
+      context "with 0" do
+        let(:amount_cents) { "000" }
+
+        include_examples 'redirects back and shows flash message'
+      end
+      context "with to large amount" do
+        let(:amount_cents) { 100000000 }
+
+        include_examples 'redirects back and shows flash message'
       end
     end
+
     context "with user" do
       include_context :request_spec_logged_in_as_user
       it "makes a onetime payment with current user" do
