@@ -100,10 +100,8 @@ gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
 gem "sass-rails"
-gem "sprockets", "4.0.0"
 gem "sprockets-rails"
 gem "uglifier"
-gem "webpacker"
 
 # Show performance metrics
 gem "flamegraph", require: false

@@ -214,24 +214,25 @@ jobs:
       #     name: Sync translations (only on main by default)
       #     command: bin/check_translations
 
-      - restore_cache:
-          name: "Node dependencies: cache restore"
-          keys:
-            - CACHE_V1-yarn-{{ checksum "yarn.lock" }}
-            - CACHE_V1-yarn-
+      # NO LONGER
+      # - restore_cache:
+      #     name: "Node dependencies: cache restore"
+      #     keys:
+      #       - CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+      #       - CACHE_V1-yarn-
 
-      - run:
-          name: "Node dependencies: install"
-          command: |
-            set -x
-            [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
-            yarn install --cache-folder ~/.cache/yarn $use_local
+      # - run:
+      #     name: "Node dependencies: install"
+      #     command: |
+      #       set -x
+      #       [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
+      #       yarn install --cache-folder ~/.cache/yarn $use_local
 
-      - type: cache-save
-        name: "Node dependencies: cache save"
-        key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
-        paths:
-          - ~/.cache/yarn
+      # - type: cache-save
+      #   name: "Node dependencies: cache save"
+      #   key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
+      #   paths:
+      #     - ~/.cache/yarn
 
       - restore_cache:
           name: "Assets: cache restore"
@@ -244,7 +245,6 @@ jobs:
           command: |
             set -x
             node --version
-            bin/webpack
             bundle exec rails assets:precompile assets:clean --trace
 
       - type: cache-save
@@ -256,7 +256,6 @@ jobs:
           - public/packs
           - public/packs-test
           - tmp/cache/assets
-          - tmp/cache/webpacker
 
       - run:
           name: Install Code Climate Test Reporter
@@ -297,14 +296,6 @@ jobs:
           root: coverage
           paths:
             - codeclimate.*.json
-      - run:
-          name: "Jest: Tests"
-          command: |
-            mkdir -p /tmp/test-results/junit
-            yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
-          environment:
-            JEST_JUNIT_OUTPUT: "/tmp/test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
-            JEST_JUNIT_OUTPUT_DIR: "/tmp/test-results/junit/"
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
