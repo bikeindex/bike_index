@@ -16,7 +16,7 @@ TranslationIO.configure do |config|
 end
 
 #
-# TODO: remove after updating to Ruby 3.1 - #2605
+# Replace this!
 # added these methods in #2609 to make the update backward compatible
 # (See also i18n_spec.rb and application_helper.rb)
 #
