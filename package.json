@@ -10,9 +10,7 @@
     "@babel/preset-react": "^7.0.0",
     "@emotion/core": "^10.0.10",
     "@honeybadger-io/react": "^0.0.2",
-    "@rails/webpacker": "^5.4.3",
-    "webpack": "^4.46.0",
-    "webpack-cli": "^3.3.12",
+    "@rails/webpacker": "6.0.0-rc.6",
     "@uppy/core": "^1.1.0",
     "@uppy/dashboard": "^1.1.0",
     "@uppy/drag-drop": "^1.1.0",
@@ -48,6 +46,8 @@
     "sass": "^1.15.2",
     "sass-loader": "^10",
     "selectize": "^0.12.6",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12",
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {

@@ -682,7 +682,7 @@ GEM
       tilt
     secure_headers (2.5.3)
       user_agent_parser
-    semantic_range (3.0.0)
+    semantic_range (3.1.0)
     shellany (0.0.1)
     sidekiq (6.5.5)
       connection_pool (>= 2.2.2)
@@ -764,7 +764,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    webpacker (5.4.4)
+    webpacker (6.0.0.rc.6)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)
@@ -900,7 +900,7 @@ DEPENDENCIES
   uglifier
   vcr
   webmock
-  webpacker
+  webpacker (= 6.0.0.rc.6)
 
 RUBY VERSION
    ruby 3.1.6p260
