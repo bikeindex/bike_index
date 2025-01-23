@@ -55,8 +55,9 @@ RSpec.describe BikeVersionsController, type: :request do
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
         bike_version.update(visibility: "user_hidden")
-        get "#{base_url}/#{bike_version.to_param}"
-        expect(response.status).to eq 404
+        expect {
+          get "#{base_url}/#{bike_version.to_param}"
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

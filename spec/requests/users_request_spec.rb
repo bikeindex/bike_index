@@ -423,8 +423,9 @@ RSpec.describe UsersController, type: :request do
   describe "show" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     it "404s if the user doesn't exist" do
-      get "#{base_url}/fake_user-extra-stuff"
-      expect(response.status).to eq 404
+      expect {
+        get "#{base_url}/fake_user-extra-stuff"
+      }.to raise_error(ActionController::RoutingError)
     end
 
     it "redirects to user home url if the user exists but doesn't want to show their page" do

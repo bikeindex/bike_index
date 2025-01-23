@@ -409,8 +409,9 @@ RSpec.describe BikesController, type: :request do
         get "/bikes/scanned/U01101"
         expect(response).to render_template("scanned")
         expect(assigns(:bike_sticker)&.id).to eq bike_sticker3.id
-        get "/bikes/scannedU01101"
-        expect(response.status).to eq 404
+        expect {
+          get "/bikes/scannedU01101"
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
