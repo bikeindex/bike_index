@@ -907,7 +907,7 @@ DEPENDENCIES
   responders
   rqrcode (= 0.10.1)
   rspec (~> 3.12)
-  rspec-rails (~> 4.0)
+  rspec-rails
   rspec-retry
   rspec-sidekiq
   rspec_junit_formatter
