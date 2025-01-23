@@ -14,7 +14,7 @@ module ControllerHelpers
     before_action do
       if Rails.env.production?
         unless request.host == base_url_host
-          redirect_to("https://#{base_url_host}#{request.fullpath}", status: :moved_permanently)
+          redirect_to("https://#{base_url_host}#{request.fullpath}", status: :moved_permanently, allow_other_host: true)
         end
         if current_user.present?
           Honeybadger.context(user_id: current_user.id, user_email: current_user.email)
