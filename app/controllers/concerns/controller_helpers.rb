@@ -145,7 +145,7 @@ module ControllerHelpers
       return false if invalid_return_to?(target)
       handle_target(target)
     elsif session[:discourse_redirect]
-      redirect_to(discourse_authentication_url) && (return true)
+      redirect_to(discourse_authentication_url, allow_other_host: true) && (return true)
     end
   end
 
@@ -159,7 +159,7 @@ module ControllerHelpers
     when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
       redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?("/oauth/")
     when "https://facebook.com/bikeindex"
-      redirect_to(target) && (return true)
+      redirect_to(target, allow_other_host: true) && (return true)
     end
   end
 
