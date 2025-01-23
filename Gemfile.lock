@@ -681,10 +681,12 @@ GEM
     secure_headers (2.5.3)
       user_agent_parser
     shellany (0.0.1)
-    sidekiq (6.5.5)
-      connection_pool (>= 2.2.2)
-      rack (~> 2.0)
-      redis (>= 4.5.0)
+    sidekiq (7.3.8)
+      base64
+      connection_pool (>= 2.3.0)
+      logger
+      rack (>= 2.2.4)
+      redis-client (>= 0.22.2)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
     simple_oauth (0.3.1)
