@@ -51,7 +51,7 @@ class UsersController < ApplicationController
       if current_user.present? && sign_in_partner.present?
         session.delete(:partner) # Only removing once signed in, PR#1435
         session.delete(:company)
-        redirect_to(bikehub_url("account?reauthenticate_bike_index=true")) && return # Only partner rn is bikehub, hardcode it
+        redirect_to(bikehub_url("account?reauthenticate_bike_index=true"), allow_other_host: true) && return # Only partner rn is bikehub, hardcode it
       else
         render_partner_or_default_signin_layout(redirect_path: new_session_path)
       end
