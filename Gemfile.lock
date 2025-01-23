@@ -207,7 +207,7 @@ GEM
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
     date (3.4.1)
-    diff-lcs (1.4.4)
+    diff-lcs (1.5.1)
     docile (1.4.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -525,7 +525,7 @@ GEM
       omniauth-oauth (~> 1.1)
       rack
     parallel (1.26.3)
-    parallel_tests (3.5.2)
+    parallel_tests (4.9.0)
       parallel
     paranoia (3.0.1)
       activerecord (>= 6, < 8.1)
@@ -873,7 +873,7 @@ DEPENDENCIES
   omniauth-globalid
   omniauth-strava
   omniauth-twitter
-  parallel_tests (~> 3.5.2)
+  parallel_tests
   paranoia
   pg (~> 1.0)
   pg_search
@@ -900,13 +900,12 @@ DEPENDENCIES
   rails-assets-waypoints (~> 3.1.1)!
   rails-controller-testing
   rails-i18n
-  rb-fsevent (~> 0.10.3)
   redis
   redlock
   rerun
   responders
   rqrcode (= 0.10.1)
-  rspec (~> 3.12)
+  rspec
   rspec-rails
   rspec-retry
   rspec-sidekiq
