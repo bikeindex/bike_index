@@ -122,6 +122,7 @@ RSpec.describe InputNormalizer do
       expect(InputNormalizer.sanitize("🧹")).to eq "🧹"
     end
     it "removes angle brackets" do
+      pp Rails::Html::Sanitizer.full_sanitizer.new.sanitize("Bike < Ski")
       expect(InputNormalizer.sanitize("Bike < Ski")).to eq "Bike"
       expect(InputNormalizer.sanitize("Bike > Ski")).to eq "Bike &gt; Ski"
       expect(InputNormalizer.sanitize("Bike &lt; Ski")).to eq "Bike &lt; Ski"

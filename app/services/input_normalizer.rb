@@ -15,7 +15,7 @@ class InputNormalizer
     end
 
     def sanitize(str = nil)
-      Rails::Html::Sanitizer.full_sanitizer.new.sanitize(str.to_s)
+      Rails::Html::Sanitizer.full_sanitizer.new.sanitize(str.to_s, encode_special_chars: true)
         .strip
         .gsub("&amp;", "&") # ampersands are commonly used - keep them normal
         .gsub(/\s+/, " ") # remove extra whitespace
