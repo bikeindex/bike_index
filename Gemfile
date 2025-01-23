@@ -157,7 +157,7 @@ group :development, :test do
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "foreman"
-  gem "parallel_tests", "~> 3.5.2"
+  gem "parallel_tests"
   gem "pry-byebug"
   gem "pry-rails"
   gem "rspec"
