@@ -25,8 +25,7 @@ class BParam < ApplicationRecord
   process_in_background :image, CarrierWaveStoreWorker
   attr_writer :image_cache
 
-  # serialize :params
-  serialize :bike_errors
+  serialize :bike_errors, coder: YAML
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
