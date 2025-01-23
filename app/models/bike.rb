@@ -438,9 +438,7 @@ class Bike < ApplicationRecord
   def serial_display(u = nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_organization?
-      return "Hidden" unless authorized?(u) ||
-        u&.id.present? && u.id == user&.id ||
-        current_impound_record.present? && current_impound_record.authorized?(u)
+      return "Hidden" unless can_see_hidden_serial?(u)
     end
     return serial_number.humanize if no_serial?
     serial_number&.upcase
@@ -906,6 +904,12 @@ class Bike < ApplicationRecord
   def authorization_requires_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
+  end
+
+  def can_see_hidden_serial?(u = nil)
+      authorized?(u) ||
+        u&.id.present? && u.id == user&.id ||
+        current_impound_record.present? && current_impound_record.authorized?(u)
   end
 
   def calculated_current_ownership
