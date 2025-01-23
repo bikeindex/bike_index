@@ -17,7 +17,7 @@ class Integration < ApplicationRecord
   validates_presence_of :access_token
   validates_presence_of :information
 
-  serialize :information, JSON
+  serialize :information, coder: JSON
 
   belongs_to :user
 

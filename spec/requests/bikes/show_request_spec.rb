@@ -222,9 +222,8 @@ RSpec.describe "BikesController#show", type: :request do
     context "non-owner non-admin viewing" do
       let(:current_user) { FactoryBot.create(:user_confirmed) }
       it "404s" do
-        expect {
-          get "#{base_url}/#{bike.id}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
       end
     end
     context "organization viewing" do
@@ -242,9 +241,8 @@ RSpec.describe "BikesController#show", type: :request do
         expect(bike.user).to_not eq current_user
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         expect(bike.visible_by?(current_user)).to be_falsey
-        expect {
-          get "#{base_url}/#{bike.id}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
       end
       context "bike organization editable" do
         let(:can_edit_claimed) { true }
@@ -273,9 +271,8 @@ RSpec.describe "BikesController#show", type: :request do
     let!(:bike) { parking_notification.bike }
 
     it "404s" do
-      expect {
-        get "#{base_url}/#{bike.id}"
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq 404
     end
     context "with org member" do
       include_context :request_spec_logged_in_as_organization_member
