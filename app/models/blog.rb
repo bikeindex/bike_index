@@ -208,7 +208,7 @@ class Blog < ApplicationRecord
         markdown = Kramdown::Document.new(body)
         body_html = markdown.to_html
       end
-      abbr = strip_tags(body_html)
+      abbr = InputNormalizer.sanitize(body_html)
       # strip tags, then remove extra spaces
       abbr = abbr.tr("\n", " ").gsub(/\s+/, " ").strip if abbr.present?
       self.body_abbr = truncate(abbr, length: 200)

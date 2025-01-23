@@ -460,7 +460,7 @@ class User < ApplicationRecord
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
-    self.title = strip_tags(title) if title.present?
+    self.title = InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification
       self.notification_newsletters = false
       memberships.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }

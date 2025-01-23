@@ -18,11 +18,11 @@ module HeaderTagHelper
   end
 
   def page_title=(val)
-    @page_title = strip_tags(val).strip.gsub("&amp;", "&")
+    @page_title = InputNormalizer.sanitize(val)
   end
 
   def page_description=(val)
-    @page_description = strip_tags(val).strip
+    @page_description = InputNormalizer.sanitize(val)
   end
 
   def page_title
