@@ -169,7 +169,7 @@
       "cwe_id": [
         79
       ],
-      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in documentation/authorize.html.haml) as not concerns"
+      "note": ""
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -313,6 +313,29 @@
       "confidence": "Weak",
       "cwe_id": [
         89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/discourse_authentication_controller.rb",
+      "line": 15,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url), :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DiscourseAuthenticationController",
+        "method": "index"
+      },
+      "user_input": "SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url)",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
       ],
       "note": ""
     },
@@ -602,29 +625,6 @@
       "note": ""
     },
     {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "7bea5fb2c5c91ab7a798747d36860236c56b4ace79a0a509a40a3af6dbc9d60b",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/discourse_authentication_controller.rb",
-      "line": 15,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DiscourseAuthenticationController",
-        "method": "index"
-      },
-      "user_input": "SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url)",
-      "confidence": "High",
-      "cwe_id": [
-        601
-      ],
-      "note": "url is validated before we use redirect_to"
-    },
-    {
       "warning_type": "Mass Assignment",
       "warning_code": 105,
       "fingerprint": "843e0b97c05d7b25ce5dc66ef0215dfcf907b68522225416e1ed7355ede83732",
@@ -692,25 +692,6 @@
         77
       ],
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
-    },
-    {
-      "warning_type": "Unmaintained Dependency",
-      "warning_code": 121,
-      "fingerprint": "9a3951031616a07c8e02c86652f537e92c08685da97f5ec2b12d5d3602b55bb8",
-      "check_name": "EOLRuby",
-      "message": "Support for Ruby 2.7.8 ended on 2023-03-31",
-      "file": "Gemfile.lock",
-      "line": 900,
-      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
-      "code": null,
-      "render_path": null,
-      "location": null,
-      "user_input": null,
-      "confidence": "High",
-      "cwe_id": [
-        1104
-      ],
-      "note": "Work to upgrade Ruby has been prioritised."
     },
     {
       "warning_type": "Remote Code Execution",
@@ -1067,7 +1048,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/models/export.rb",
-      "line": 225,
+      "line": 251,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`wc -l \"#{tmp_file.path}\"`",
       "render_path": null,
@@ -1116,29 +1097,6 @@
         79
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "c587d53816af6e79f4c2431dc261ef8a492b525d5c10f0d7e9c87ef06472ad8c",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/public_images_controller.rb",
-      "line": 31,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to((if PublicImage.new(permitted_parameters).present? then\n  ((BikeVersion.unscoped.find(params[:bike_id]) or Bike.unscoped.find(params[:bike_id])) or (Blog.find(params[:blog_id]) or (MailSnippet.find(params[:mail_snippet_id]) or current_organization)))\nelse\n  user_root_url\nend))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "PublicImagesController",
-        "method": "create"
-      },
-      "user_input": "BikeVersion.unscoped.find(params[:bike_id])",
-      "confidence": "High",
-      "cwe_id": [
-        601
-      ],
-      "note": "Non risk. The later lines in that method verify that the user has access to the BikeVersion or Bike"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1412,6 +1370,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-08-23 14:59:47 -0300",
+  "updated": "2025-01-22 19:38:27 -0800",
   "brakeman_version": "5.4.1"
 }

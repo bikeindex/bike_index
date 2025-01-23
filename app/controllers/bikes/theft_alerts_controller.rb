@@ -41,7 +41,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     @payment.update!(stripe_id: stripe_session.id)
     theft_alert.update(payment: @payment)
 
-    redirect_to stripe_session.url
+    redirect_to stripe_session.url, allow_other_host: true
     image_id = params[:selected_bike_image_id]
     if image_id.present? && image_id != @bike.public_images&.first&.id
       @bike.current_stolen_record&.generate_alert_image(bike_image: PublicImage.find_by_id(image_id))
