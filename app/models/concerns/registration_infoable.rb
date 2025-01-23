@@ -47,7 +47,7 @@ module RegistrationInfoable
     end
     return "student_id" if reg_info.key?("student_id")
     return nil if org.present?
-    reg_info.keys.find { |k| k.start_with?(/student_id/) } || "student_id"
+    reg_info.keys.find { |k| k.start_with?("student_id") } || "student_id"
   end
 
   # Accepts organization or organization.id
@@ -64,7 +64,7 @@ module RegistrationInfoable
     end
     return "organization_affiliation" if reg_info.key?("organization_affiliation")
     return nil if org.present?
-    reg_info.keys.find { |k| k.start_with?(/organization_affiliation/) } || "organization_affiliation"
+    reg_info.keys.find { |k| k.start_with?("organization_affiliation") } || "organization_affiliation"
   end
 
   # Accepts organization or organization.id

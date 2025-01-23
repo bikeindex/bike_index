@@ -209,7 +209,7 @@ class Bike < ApplicationRecord
 
     def status_humanized(str)
       status = str.to_s&.gsub("status_", "")&.tr("_", " ")
-      status == "unregistered parking notification" ? "unregistered" : status
+      (status == "unregistered parking notification") ? "unregistered" : status
     end
 
     def status_humanized_translated(str)
@@ -365,7 +365,7 @@ class Bike < ApplicationRecord
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
     t = (updated_by_user_fallback || Time.current).to_i / 10000
-    stock_photo_url.present? || public_images.limit(1).present? ? t : t / 100
+    (stock_photo_url.present? || public_images.limit(1).present?) ? t : t / 100
   end
 
   def credibility_scorer

@@ -71,7 +71,7 @@ RSpec.describe InputNormalizer do
       expect(InputNormalizer.string(" ")).to be_nil
     end
     it "replaces" do
-      expect(InputNormalizer.regex_escape("(((\..{?}")).to eq "........"
+      expect(InputNormalizer.regex_escape("(((..{?}")).to eq "........"
     end
   end
 end

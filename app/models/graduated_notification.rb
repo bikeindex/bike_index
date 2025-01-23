@@ -328,7 +328,7 @@ class GraduatedNotification < ApplicationRecord
     # Because prior to commit, the value for the current notification isn't set
     return "marked_remaining" if marked_remaining_at.present?
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
-    email_success? || primary_notification.present? && primary_notification.email_success? ? "bike_graduated" : "pending"
+    (email_success? || primary_notification.present? && primary_notification.email_success?) ? "bike_graduated" : "pending"
   end
 
   def calculated_email

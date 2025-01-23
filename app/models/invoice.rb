@@ -205,7 +205,7 @@ class Invoice < ApplicationRecord
 
   def amount_due
     amnt = (amount_due_cents.to_i / 100.00)
-    amnt % 1 != 0 ? amnt : amnt.round
+    (amnt % 1 != 0) ? amnt : amnt.round
   end
 
   def amount_due=(val)

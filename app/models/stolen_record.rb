@@ -237,7 +237,7 @@ class StolenRecord < ApplicationRecord
   def address(force_show_address: false, country: [:iso, :optional])
     Geocodeable.address(
       self,
-      street: (force_show_address || show_address),
+      street: force_show_address || show_address,
       country: country
     ).presence
   end
@@ -420,6 +420,6 @@ class StolenRecord < ApplicationRecord
 
   def all_location_attributes_present?
     return false if country_id.blank? || city.blank? || zipcode.blank?
-    country_id == Country.united_states.id ? state_id.present? : true
+    (country_id == Country.united_states.id) ? state_id.present? : true
   end
 end
