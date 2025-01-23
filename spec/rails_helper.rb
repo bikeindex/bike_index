@@ -152,7 +152,7 @@ end
 #
 class DirtyDatabaseError < RuntimeError
   def initialize(meta)
-    super "#{meta[:full_description]}\n\t#{meta[:location]}"
+    super("#{meta[:full_description]}\n\t#{meta[:location]}")
   end
 end
 

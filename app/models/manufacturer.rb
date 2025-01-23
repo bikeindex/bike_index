@@ -177,7 +177,7 @@ class Manufacturer < ApplicationRecord
     return 100 if b_count > 999
     return 0 if (b_count + c_count) == 0
     pop = (2 * b_count + c_count) / 20 + 10
-    pop > 100 ? 100 : pop
+    (pop > 100) ? 100 : pop
   end
 
   private

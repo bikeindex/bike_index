@@ -84,7 +84,7 @@ module ControllerHelpers
   end
 
   def render_partner_or_default_signin_layout(render_action: nil, redirect_path: nil)
-    layout = sign_in_partner == "bikehub" ? "application_bikehub" : "application"
+    layout = (sign_in_partner == "bikehub") ? "application_bikehub" : "application"
     if redirect_path
       redirect_to redirect_path, layout: layout
     elsif render_action
@@ -167,7 +167,7 @@ module ControllerHelpers
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)
     # Either starting with our URL or /
-    return target if target.start_with?(/#{ENV["BASE_URL"]}/, "/")
+    target if target.start_with?(/#{ENV["BASE_URL"]}/, "/")
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away
@@ -224,7 +224,7 @@ module ControllerHelpers
   def page_id
     @page_id ||= [
       controller_namespace,
-      controller_name == "manages" ? "manage" : controller_name, # HACK: remove pluralization
+      (controller_name == "manages") ? "manage" : controller_name, # HACK: remove pluralization
       action_name
     ].compact.join("_")
   end
@@ -339,7 +339,7 @@ module ControllerHelpers
     partner = session[:partner]
     partner ||= params[:partner]
     # fallback to assigning via session, but if partner was set via param, still remove the session partner.
-    @sign_in_partner = partner&.downcase == "bikehub" ? "bikehub" : nil # For now, only permit bikehub partner
+    @sign_in_partner = (partner&.downcase == "bikehub") ? "bikehub" : nil # For now, only permit bikehub partner
   end
 
   def remove_session
@@ -411,7 +411,7 @@ module ControllerHelpers
     # Get redirect uris from BikeHub app and BikeHub dev app (by their ids)
     valid_redirect_urls = Doorkeeper::Application.where(id: [264, 356]).pluck(:redirect_uri)
       .map { |u| u.downcase.split("\s") }.flatten.map(&:strip)
-    valid_redirect_urls.any? { |u| u.start_with?(redirect_site) } ? redirect_site : nil
+    (valid_redirect_urls.any? { |u| u.start_with?(redirect_site) }) ? redirect_site : nil
   end
 
   def set_time_range_from_period

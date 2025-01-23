@@ -1273,8 +1273,11 @@ RSpec.describe Bike, type: :model do
         expect(impound_record.authorized?(impound_user)).to be_truthy
         expect(bike.authorized?(bike.user)).to be_truthy
         expect(bike.authorized?(impound_user)).to be_falsey
+        expect(bike.send(:can_see_hidden_serial?)).to be_falsey
         expect(bike.serial_display).to eq "Hidden"
+        expect(bike.send(:can_see_hidden_serial?, bike.user)).to be_truthy
         expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
+        expect(bike.send(:can_see_hidden_serial?, impound_user)).to be_truthy
         expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
       end
       context "organized" do

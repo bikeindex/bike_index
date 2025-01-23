@@ -86,7 +86,7 @@ class Feedback < ApplicationRecord
 
   def self.kind_humanized(str)
     return nil unless str.present?
-    return "#{str.gsub(/lead_for_/, "").strip.humanize} lead" if str.match?("lead")
+    return "#{str.gsub("lead_for_", "").strip.humanize} lead" if str.match?("lead")
     str.gsub("_request", "").strip.humanize
   end
 
@@ -186,7 +186,7 @@ class Feedback < ApplicationRecord
     return nil unless lead?
     kind_str = feedback_type if feedback_type.present?
     kind_str ||= kind
-    kind_str.gsub(/lead_for_/, "").humanize
+    kind_str.gsub("lead_for_", "").humanize
   end
 
   private

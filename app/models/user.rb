@@ -188,7 +188,7 @@ class User < ApplicationRecord
   end
 
   def self.from_auth(auth)
-    return nil unless auth&.kind_of?(Array)
+    return nil unless auth&.is_a?(Array)
     where(id: auth[0], auth_token: auth[1]).first
   end
 
@@ -402,7 +402,7 @@ class User < ApplicationRecord
   end
 
   def partner_sign_up
-    partner_data && partner_data["sign_up"].present? ? partner_data["sign_up"] : nil
+    (partner_data && partner_data["sign_up"].present?) ? partner_data["sign_up"] : nil
   end
 
   def bikes(user_hidden = true)
@@ -460,7 +460,7 @@ class User < ApplicationRecord
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
-    self.title = strip_tags(title) if title.present?
+    self.title = InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification
       self.notification_newsletters = false
       memberships.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }
@@ -479,7 +479,7 @@ class User < ApplicationRecord
   end
 
   def mb_link_title
-    (my_bikes_hash && my_bikes_hash["link_title"])
+    my_bikes_hash && my_bikes_hash["link_title"]
   end
 
   def userlink
