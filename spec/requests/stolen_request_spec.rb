@@ -15,4 +15,14 @@ RSpec.describe StolenController, type: :request do
       expect(response).to redirect_to stolen_index_url
     end
   end
+
+  describe "current_tsv" do
+    it "redirects to current_tsv" do
+      get "/stolen/current_tsv"
+      expect(response).to redirect_to StolenController::CURRENT_TSV_URL
+
+      get "/stolen/current_tsv_rapid"
+      expect(response).to redirect_to StolenController::CURRENT_TSV_URL
+    end
+  end
 end
