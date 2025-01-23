@@ -22,7 +22,7 @@ RSpec.describe BulkImportWorker, type: :job do
     ]
   end
   # Only handling organization_import and impounded for now, Fuck it
-  let(:csv_lines) { kind == "impounded" ? sample_csv_impounded_lines : sample_csv_lines }
+  let(:csv_lines) { (kind == "impounded") ? sample_csv_impounded_lines : sample_csv_lines }
   let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
   let(:tempfile) do
     file = Tempfile.new

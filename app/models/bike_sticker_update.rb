@@ -102,7 +102,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def add_failed_claim_error(str_or_array)
     self.failed_claim_errors = [
-      (failed_claim_errors || nil),
+      failed_claim_errors || nil,
       Array(str_or_array)
     ].flatten.compact.join(", ")
   end

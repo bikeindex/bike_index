@@ -1,6 +1,6 @@
 module MailerHelper
   def render_donation?(organization = nil)
-    return true unless organization.present? && organization.paid_money?
+    true unless organization.present? && organization.paid_money?
   end
 
   def render_supporters?(organization = nil)

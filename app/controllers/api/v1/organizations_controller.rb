@@ -14,7 +14,7 @@ module API
           redirect_to(api_v1_not_found_url) && return
         elsif params[:access_token] == @organization.access_token
           if Organization.pos_kinds.include?(params[:manual_pos_kind])
-            m_kind = params[:manual_pos_kind] == "no_pos" ? nil : params[:manual_pos_kind]
+            m_kind = (params[:manual_pos_kind] == "no_pos") ? nil : params[:manual_pos_kind]
             # We really only want to update orgs when there is a change, otherwise it breaks where
             unless @organization.manual_pos_kind == m_kind
               @organization.update(manual_pos_kind: m_kind)

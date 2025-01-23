@@ -244,7 +244,7 @@ class Export < ApplicationRecord
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["#{kind == "organization" ? organization.slug : kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["#{(kind == "organization") ? organization.slug : kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows
@@ -292,7 +292,7 @@ class Export < ApplicationRecord
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
-    (created_at || Time.current) < Time.current - 10.minutes ? "errored" : progress
+    ((created_at || Time.current) < Time.current - 10.minutes) ? "errored" : progress
   end
 
   def validated_options(opts)

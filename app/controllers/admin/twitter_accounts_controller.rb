@@ -86,7 +86,7 @@ class Admin::TwitterAccountsController < Admin::BaseController
 
   def matching_twitter_accounts
     if sort_column == "last_error_at" # If sorting by last_error_at, show the error
-      sort_direction == "desc" ? TwitterAccount.errored : TwitterAccount.where(last_error_at: nil)
+      (sort_direction == "desc") ? TwitterAccount.errored : TwitterAccount.where(last_error_at: nil)
     elsif sort_column == "national" # If national, show only national one direction, only non the other
       TwitterAccount.where(national: sort_direction == "asc")
     else

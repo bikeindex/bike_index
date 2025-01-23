@@ -5,7 +5,7 @@ module Organized
 
     def update
       ambassador_task_assignment = AmbassadorTaskAssignment.find(params[:id])
-      completed_at = params[:completed] == "true" ? Time.current : nil
+      completed_at = (params[:completed] == "true") ? Time.current : nil
 
       if ambassador_task_assignment.update(completed_at: completed_at)
         flash[:info] = translation_with_args(:status_updated)

@@ -48,13 +48,13 @@ module OrganizedHelper
 
   def export_progress_class(export)
     return "text-danger" if export.calculated_progress == "errored"
-    export.calculated_progress == "finished" ? "text-success" : "text-warning"
+    (export.calculated_progress == "finished") ? "text-success" : "text-warning"
   end
 
   def organized_container
     fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits]
     return "container-fluid" if fluid.include?(controller_name)
-    controller_name == "bikes" && action_name == "index" ? "container-fluid" : "container"
+    (controller_name == "bikes" && action_name == "index") ? "container-fluid" : "container"
   end
 
   def organized_include_javascript_pack?
