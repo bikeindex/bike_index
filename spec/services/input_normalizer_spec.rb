@@ -130,10 +130,10 @@ RSpec.describe InputNormalizer do
       else
         expect(InputNormalizer.sanitize("Bike < Ski")).to eq "Bike &lt; Ski"
         expect(InputNormalizer.sanitize("Bike &lt; Ski")).to eq "Bike &lt; Ski"
-        expect(InputNormalizer.sanitize("Bike &rt; Ski")).to eq "Bike &rt; Ski"
-        expect(InputNormalizer.sanitize("Bike &lt; Ski")).to eq "Bike &lt; Ski"
-        expect(InputNormalizer.sanitize("Bike <> Ski")).to eq "Bike &lt;&rt; Ski"
-        expect(InputNormalizer.sanitize("Bike &lt;&rt; Ski")).to eq "Bike &lt;&rt; Ski"
+        expect(InputNormalizer.sanitize("Bike > Ski")).to eq "Bike &gt; Ski"
+        expect(InputNormalizer.sanitize("Bike &rt; Ski")).to eq "Bike &gt; Ski"
+        expect(InputNormalizer.sanitize("Bike <> Ski")).to eq "Bike &lt;&gt; Ski"
+        expect(InputNormalizer.sanitize("Bike &lt;&gt; Ski")).to eq "Bike &lt;&gt; Ski"
       end
     end
   end
