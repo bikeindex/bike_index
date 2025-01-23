@@ -104,7 +104,7 @@ RSpec.describe InputNormalizer do
     it "strips out script" do
       expect(InputNormalizer.sanitize("<script>alert();</script>")).to eq ""
       expect(InputNormalizer.sanitize("<b>Hello</b><script>alert()</script>")).to eq "Hello"
-      expect(InputNormalizer.sanitize('<b class="something">Hello</b><script>alert()</script>\\')).to eq 'Hello\\'
+      expect(InputNormalizer.sanitize('<b class="something">Hello</b><script>alert()</script>\\')).to eq "Hello\\"
     end
     it "returns bare ampersands" do
       expect(InputNormalizer.sanitize("Bike & Ski")).to eq "Bike & Ski"
