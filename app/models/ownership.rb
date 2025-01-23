@@ -197,7 +197,7 @@ class Ownership < ApplicationRecord
     return false if skip_email || bike.blank? || phone_registration? || bike.example? || bike.likely_spam?
     return false if spam_risky_email? || user&.no_non_theft_notification
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
-    return true unless organization.present? && organization.enabled?("skip_ownership_email")
+    true unless organization.present? && organization.enabled?("skip_ownership_email")
   end
 
   # This got a little unwieldy in #2110 - TODO, maybe - clean up

@@ -152,7 +152,7 @@ class Blog < ApplicationRecord
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
     unless listicle?
-      self.kind = !InputNormalizer.boolean(info_kind) ? "blog" : "info"
+      self.kind = (!InputNormalizer.boolean(info_kind)) ? "blog" : "info"
     end
     self.published_at = Time.current if info?
     update_title_save

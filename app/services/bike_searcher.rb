@@ -65,7 +65,7 @@ class BikeSearcher
   def stolenness
     return nil unless @params[:non_stolen].present? || @params[:stolen].present?
     return "stolen" if @params[:stolen].present? && @params[:stolen]
-    return "non_stolen" if @params[:non_stolen].present? && @params[:non_stolen]
+    "non_stolen" if @params[:non_stolen].present? && @params[:non_stolen]
   end
 
   def is_proximity
@@ -81,7 +81,7 @@ class BikeSearcher
 
   def matching_stolenness(bikes)
     return @bikes unless stolenness.present?
-    @bikes = stolenness == "stolen" ? bikes.status_stolen : bikes.not_stolen
+    @bikes = (stolenness == "stolen") ? bikes.status_stolen : bikes.not_stolen
   end
 
   def parsed_attributes

@@ -31,7 +31,7 @@ class CircularImageUploader < ApplicationUploader
       path = img.path
       new_tmp_path = File.join(cache_dir, "round_#{File.basename(path)}")
       width, height = img[:dimensions]
-      radius_point = (width > height ? [width / 2, height] : [width, height / 2]).join(",")
+      radius_point = ((width > height) ? [width / 2, height] : [width, height / 2]).join(",")
       imagemagick_command = ["convert",
         "-size #{width}x#{height}",
         "xc:transparent",

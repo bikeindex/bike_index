@@ -8,7 +8,7 @@ module HeaderTagHelper
   def header_tag_array
     return bikes_header_tags if %w[bikes bike_versions].include?(controller_namespace) # eg bikes_edit
     return default_header_tag_array unless page_with_custom_header_tags?
-    send("#{controller_name}_header_tags")
+    send(:"#{controller_name}_header_tags")
   end
 
   def page_with_custom_header_tags?
@@ -61,7 +61,7 @@ module HeaderTagHelper
       "twitter:image" => twitter_image || page_image,
       "og:site_name" => "Bike Index",
       "fb:app_id" => "223376277803071",
-      "twitter:card" => (page_image == DEFAULT_IMAGE ? "summary" : "summary_large_image"),
+      "twitter:card" => ((page_image == DEFAULT_IMAGE) ? "summary" : "summary_large_image"),
       "twitter:creator" => "@bikeindex",
       "twitter:site" => "@bikeindex"
     }

@@ -125,7 +125,7 @@ module Organized
           permitted_p.except(:kind) # Remove kind, so it can be calculated independently
         end
       end.merge(creator_attributes)
-      pparams[:kind] == "stolen" ? pparams.merge(stolen_attributes) : pparams
+      (pparams[:kind] == "stolen") ? pparams.merge(stolen_attributes) : pparams
     end
 
     def creator_attributes

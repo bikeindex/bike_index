@@ -63,7 +63,7 @@ module Organized
       if params[:search_bike].present?
         searched_codes = searched_codes.claimed.where(bike_id: Bike.friendly_find(params[:search_bike])&.id)
       elsif params[:search_claimedness] && params[:search_claimedness] != "all"
-        searched_codes = params[:search_claimedness] == "claimed" ? searched_codes.claimed : searched_codes.unclaimed
+        searched_codes = (params[:search_claimedness] == "claimed") ? searched_codes.claimed : searched_codes.unclaimed
       end
       searched_codes.sticker_code_search(params[:query])
     end
