@@ -70,9 +70,8 @@ RSpec.describe Organized::ExportsController, type: :request do
         let(:export) { FactoryBot.create(:export_organization) }
         it "404s" do
           expect(export.organization.id).to_not eq current_organization.id
-          expect {
-            get "#{base_url}/#{export.id}"
-          }.to raise_error(ActiveRecord::RecordNotFound)
+          get "#{base_url}/#{export.id}"
+          expect(response.status).to eq 404
         end
       end
       context "avery_export" do

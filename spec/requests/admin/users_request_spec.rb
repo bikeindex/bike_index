@@ -23,9 +23,8 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "edit" do
     context "user doesn't exist" do
       it "404s" do
-        expect {
-          get "#{base_url}/STUFFFFFF/edit"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/STUFFFFFF/edit"
+        expect(response.status).to eq 404
       end
     end
     context "username" do

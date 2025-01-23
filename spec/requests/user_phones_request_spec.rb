@@ -227,9 +227,8 @@ RSpec.describe UserPhonesController, type: :request do
           expect(user_phone.resend_confirmation?).to be_truthy
           Sidekiq::Worker.clear_all
           Sidekiq::Testing.inline! do
-            expect {
-              patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
-            }.to raise_error(ActiveRecord::RecordNotFound)
+            patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
+            expect(response.status).to eq 404
           end
           current_user.reload
           expect(current_user.user_phones.count).to eq 0
@@ -275,9 +274,8 @@ RSpec.describe UserPhonesController, type: :request do
           user_phone.reload
           current_user.reload
           expect(current_user.user_phones.count).to eq 1
-          expect {
-            delete "#{base_url}/#{user_phone2.to_param}"
-          }.to raise_error(ActiveRecord::RecordNotFound)
+          delete "#{base_url}/#{user_phone2.to_param}"
+          expect(response.status).to eq 404
 
           current_user.reload
           expect(current_user.user_phones.count).to eq 1
