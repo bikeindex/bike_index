@@ -284,7 +284,7 @@ class GraduatedNotification < ApplicationRecord
     return true if processed?
     return false unless organization.deliver_graduated_notifications?
     # The primary notification should be the first one to process, so skip processing if it isn't
-    return false unless primary_notification? || (primary_notification.present? && primary_notification.processed?)
+    return false unless primary_notification? || primary_notification&.presence&.processed?
     if primary_notification? && associated_bike_ids_missing_notifications.any?
       # We haven't created all the relevant graduated notifications, create them before processing
       associated_bike_ids_missing_notifications.each do |b_id|

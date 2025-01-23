@@ -551,7 +551,6 @@ RSpec.describe Organization, type: :model do
       it "protects from naming collisions from deleted things, by renaming deleted things" do
         org1 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
         org1.reload
-        org1.id = org1.id
         expect(org1.short_name).to eq "buckshot"
         org1.delete
         expect(org1.reload.deleted_at).to be_present
