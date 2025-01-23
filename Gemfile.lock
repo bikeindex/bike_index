@@ -207,7 +207,7 @@ GEM
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
     date (3.4.1)
-    diff-lcs (1.4.4)
+    diff-lcs (1.5.1)
     docile (1.4.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -906,7 +906,7 @@ DEPENDENCIES
   rerun
   responders
   rqrcode (= 0.10.1)
-  rspec (~> 3.12)
+  rspec
   rspec-rails
   rspec-retry
   rspec-sidekiq

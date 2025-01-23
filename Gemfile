@@ -157,15 +157,10 @@ group :development, :test do
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "foreman"
-  # Commented out because jazz_fingers relies on pry-coolline, which currently errors on load
-  # the gem version hasn't been updated in a long time github.com/pry/pry-coolline/issues/22
-  # https://github.com/pry/pry-coolline/commit/f3a130c9829969732977015a04e90b9fb5d281b2
-  # gem "jazz_fingers"
   gem "parallel_tests", "~> 3.5.2"
   gem "pry-byebug"
   gem "pry-rails"
-  gem "rb-fsevent", "~> 0.10.3"
-  gem "rspec", "~> 3.12"
+  gem "rspec"
   gem "rspec-rails"
   gem "rspec_junit_formatter" # For circle ci
   gem "standard" # Ruby linter
