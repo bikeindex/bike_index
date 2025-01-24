@@ -107,6 +107,7 @@ class Admin::UsersController < Admin::BaseController
     @search_superusers = InputNormalizer.boolean(params[:search_superusers])
     @search_deleted = InputNormalizer.boolean(params[:search_deleted])
     @updated_at = InputNormalizer.boolean(params[:search_updated_at])
+    @search_unconfirmed = InputNormalizer.boolean(params[:search_unconfirmed])
     users = if current_organization.present?
       current_organization.users
     else
@@ -116,6 +117,8 @@ class Admin::UsersController < Admin::BaseController
     users = users.ambassadors if @search_ambassadors
     users = users.superuser_abilities if @search_superusers
     users = users.banned if @search_banned
+    users = users.unconfirmed if @search_unconfirmed
+
     users = users.admin_text_search(params[:query]) if params[:query].present?
     if params[:search_phone].present?
       users = users.search_phone(params[:search_phone])
