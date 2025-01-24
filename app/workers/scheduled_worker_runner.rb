@@ -45,6 +45,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       ImpoundExpirationWorker,
       ProcessGraduatedNotificationWorker,
       ProcessHotSheetWorker,
+      RemoveUnconfirmedUsersWorker,
       ScheduledAutocompleteCheckWorker,
       ScheduledBikePossiblyFoundNotificationWorker,
       ScheduledEmailSurveyWorker,
