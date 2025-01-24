@@ -893,7 +893,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   puma
-  rack (~> 2.2.3)
+  rack (> 2.2.3)
   rack-mini-profiler
   rack-throttle
   rails (< 7.2)
