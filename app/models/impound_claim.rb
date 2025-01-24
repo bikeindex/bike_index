@@ -75,7 +75,7 @@ class ImpoundClaim < ApplicationRecord
 
   def self.status_humanized(str)
     # It doesn't make sense to display "submitting"
-    str == "submitting" ? "submitted" : str&.to_s&.tr("_", " ")
+    (str == "submitting") ? "submitted" : str&.to_s&.tr("_", " ")
   end
 
   def self.involving_bike_id(bike_id)

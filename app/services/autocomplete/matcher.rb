@@ -35,7 +35,7 @@ class Autocomplete::Matcher
         cache_key: cache_key_from_opts(categories, opts[:q_array]),
         interkeys: interkeys_from_opts(opts[:category_cache_key], opts[:q_array]),
         offset: offset,
-        limit: limit < 0 ? 0 : limit
+        limit: (limit < 0) ? 0 : limit
       )
     end
 

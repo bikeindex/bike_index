@@ -70,7 +70,7 @@ class Admin::BikesController < Admin::BaseController
           AfterBikeSaveWorker.perform_async(id)
         end
         # Lazy pluralize hack
-        flash[:success] = "#{bike_ids.count} #{bike_ids.count == 1 ? "bike" : "bikes"} deleted!"
+        flash[:success] = "#{bike_ids.count} #{(bike_ids.count == 1) ? "bike" : "bikes"} deleted!"
       else
         flash[:error] = "No bikes selected to delete!"
       end

@@ -206,8 +206,8 @@ module Organized
         bikes = Bike.search(@interpreted_params)
       end
       if params[:search_stickers].present?
-        @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
-        bikes = @search_stickers == "none" ? bikes.no_bike_sticker : bikes.bike_sticker
+        @search_stickers = (params[:search_stickers] == "none") ? "none" : "with"
+        bikes = (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
       else
         @search_stickers = false
       end

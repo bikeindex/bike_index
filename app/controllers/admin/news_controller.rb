@@ -109,7 +109,7 @@ class Admin::NewsController < Admin::BaseController
       blogs = blogs.with_tag_ids(@tags.pluck(:id))
     end
     blogs = blogs.published if sort_column == "published_at"
-    @time_range_column = sort_column == "updated_at" ? "updated_at" : "created_at"
+    @time_range_column = (sort_column == "updated_at") ? "updated_at" : "created_at"
     blogs.where(@time_range_column => @time_range)
   end
 

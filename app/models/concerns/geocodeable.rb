@@ -126,7 +126,7 @@ module Geocodeable
 
   def address_changed?
     %i[street city state_id zipcode country_id]
-      .any? { |col| public_send("#{col}_changed?") }
+      .any? { |col| public_send(:"#{col}_changed?") }
   end
 
   def address_present?

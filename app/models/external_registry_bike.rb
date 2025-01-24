@@ -97,7 +97,7 @@ class ExternalRegistryBike < ApplicationRecord
   def short_address
     return nil unless location_found.present?
     addy = location_found.split(",")
-    shorter_length = addy.length > 3 ? 3 : addy.length
+    shorter_length = (addy.length > 3) ? 3 : addy.length
     addy[-shorter_length..].reject(&:blank?).map(&:strip).join(", ")
   end
 

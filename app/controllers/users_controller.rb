@@ -28,7 +28,7 @@ class UsersController < ApplicationController
       redirect_to(new_session_path) && return unless unconfirmed_current_user.present?
     end
     @user = unconfirmed_current_user
-    render layout: sign_in_partner == "bikehub" ? "application_bikehub" : "application"
+    render layout: (sign_in_partner == "bikehub") ? "application_bikehub" : "application"
   end
 
   def resend_confirmation_email

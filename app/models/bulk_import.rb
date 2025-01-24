@@ -56,7 +56,7 @@ class BulkImport < ApplicationRecord
   end
 
   def self.kind_humanized(str)
-    str == "organization_import" ? "standard" : str&.gsub("_", " ")
+    (str == "organization_import") ? "standard" : str&.tr("_", " ")
   end
 
   # NOTE: Headers were added in PR#1914 - 2021-3-11 - many bulk imports don't have them stored

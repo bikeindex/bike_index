@@ -359,7 +359,7 @@ class MailchimpDatum < ApplicationRecord
       updated_interests << mailchimp_organization.kind
     else
       updated_interests += calculated_feedbacks.select { |f| f.lead? }
-        .map { |f| f.kind.gsub(/lead_for_/, "") }
+        .map { |f| f.kind.gsub("lead_for_", "") }
     end
     updated_interests << "donors" if user&.payments&.donation&.any?
     updated_interests << "recovered_bike_owners" if stolen_records_recovered.any?

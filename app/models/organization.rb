@@ -589,7 +589,7 @@ class Organization < ApplicationRecord
   end
 
   def strip_name_tags(str)
-    strip_tags(name&.strip).gsub("&amp;", "&")
+    InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
   end
 
   def name_shortener(str)

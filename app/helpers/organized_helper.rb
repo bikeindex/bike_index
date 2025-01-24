@@ -48,13 +48,13 @@ module OrganizedHelper
 
   def export_progress_class(export)
     return "text-danger" if export.calculated_progress == "errored"
-    export.calculated_progress == "finished" ? "text-success" : "text-warning"
+    (export.calculated_progress == "finished") ? "text-success" : "text-warning"
   end
 
   def organized_container
     fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits]
     return "container-fluid" if fluid.include?(controller_name)
-    controller_name == "bikes" && action_name == "index" ? "container-fluid" : "container"
+    (controller_name == "bikes" && action_name == "index") ? "container-fluid" : "container"
   end
 
   def organized_include_javascript_pack?
@@ -150,7 +150,7 @@ module OrganizedHelper
   def registration_field_label(organization = nil, field_slug = nil, strip_tags: false)
     txt = organization&.registration_field_labels&.dig(field_slug.to_s)
     return nil unless txt.present?
-    strip_tags ? strip_tags(txt) : txt.html_safe
+    strip_tags ? InputNormalizer.sanitize(txt) : txt.html_safe
   end
 
   def registration_field_address_placeholder(organization = nil)

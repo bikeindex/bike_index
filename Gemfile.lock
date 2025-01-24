@@ -201,7 +201,7 @@ GEM
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
     date (3.4.1)
-    diff-lcs (1.4.4)
+    diff-lcs (1.5.1)
     docile (1.4.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -404,10 +404,12 @@ GEM
     kaminari-core (1.2.2)
     kramdown (2.5.1)
       rexml (>= 3.3.9)
+    language_server-protocol (3.17.0.3)
     launchy (2.5.2)
       addressable (~> 2.8)
     letter_opener (1.8.1)
       launchy (>= 2.2, < 3)
+    lint_roller (1.1.0)
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -518,7 +520,7 @@ GEM
       omniauth-oauth (~> 1.1)
       rack
     parallel (1.26.3)
-    parallel_tests (3.5.2)
+    parallel_tests (4.9.0)
       parallel
     paranoia (3.0.1)
       activerecord (>= 6, < 8.1)
@@ -666,21 +668,21 @@ GEM
     rspec-support (3.13.2)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (1.32.0)
+    rubocop (1.70.0)
       json (~> 2.3)
+      language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
-      parser (>= 3.1.0.0)
+      parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.8, < 3.0)
-      rexml (>= 3.2.5, < 4.0)
-      rubocop-ast (>= 1.19.1, < 2.0)
+      regexp_parser (>= 2.9.3, < 3.0)
+      rubocop-ast (>= 1.36.2, < 2.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 3.0)
+      unicode-display_width (>= 2.4.0, < 4.0)
     rubocop-ast (1.37.0)
       parser (>= 3.3.1.0)
-    rubocop-performance (1.14.3)
-      rubocop (>= 1.7.0, < 2.0)
-      rubocop-ast (>= 0.4.0)
+    rubocop-performance (1.23.1)
+      rubocop (>= 1.48.1, < 2.0)
+      rubocop-ast (>= 1.31.1, < 2.0)
     ruby-progressbar (1.13.0)
     ruby-vips (2.2.2)
       ffi (~> 1.12)
@@ -742,9 +744,18 @@ GEM
       sprockets (>= 3.0.0)
     ssrf_filter (1.1.2)
     stackprof (0.2.14)
-    standard (1.14.0)
-      rubocop (= 1.32.0)
-      rubocop-performance (= 1.14.3)
+    standard (1.44.0)
+      language_server-protocol (~> 3.17.0.2)
+      lint_roller (~> 1.0)
+      rubocop (~> 1.70.0)
+      standard-custom (~> 1.0.0)
+      standard-performance (~> 1.6)
+    standard-custom (1.0.2)
+      lint_roller (~> 1.0)
+      rubocop (~> 1.50)
+    standard-performance (1.6.0)
+      lint_roller (~> 1.1)
+      rubocop-performance (~> 1.23.0)
     stringio (3.1.2)
     stripe (5.35.0)
     temple (0.8.2)
@@ -867,7 +878,7 @@ DEPENDENCIES
   omniauth-globalid
   omniauth-strava
   omniauth-twitter
-  parallel_tests (~> 3.5.2)
+  parallel_tests
   paranoia
   pg (~> 1.0)
   pg_search
@@ -894,13 +905,12 @@ DEPENDENCIES
   rails-assets-waypoints (~> 3.1.1)!
   rails-controller-testing
   rails-i18n
-  rb-fsevent (~> 0.10.3)
   redis
   redlock
   rerun
   responders
   rqrcode (= 0.10.1)
-  rspec (~> 3.12)
+  rspec
   rspec-rails
   rspec-retry
   rspec-sidekiq
