@@ -259,6 +259,7 @@ Rails.application.routes.draw do
       collection { post :import }
     end
     resources :users, only: [:index, :show, :edit, :update, :destroy]
+    resources :banned_email_domain, only: [:index]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
       :constraints => AdminRestriction,
