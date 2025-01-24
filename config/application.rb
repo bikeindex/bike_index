@@ -30,9 +30,6 @@ module Bikeindex
     # Use our custom error pages
     config.exceptions_app = routes
 
-    # Configure sensitive parameters which will be filtered from the log file.
-    Rails.application.config.filter_parameters += [:password, :file]
-
     config.time_zone = "Central Time (US & Canada)"
 
     # Force sql schema use so we get psql extensions
