@@ -907,9 +907,9 @@ class Bike < ApplicationRecord
   end
 
   def can_see_hidden_serial?(u = nil)
-      authorized?(u) ||
-        u&.id.present? && u.id == user&.id ||
-        current_impound_record.present? && current_impound_record.authorized?(u)
+    authorized?(u) ||
+      u&.id.present? && u.id == user&.id ||
+      current_impound_record.present? && current_impound_record.authorized?(u)
   end
 
   def calculated_current_ownership

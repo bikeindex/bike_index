@@ -91,7 +91,7 @@ RSpec.describe InputNormalizer do
       expect(InputNormalizer.sanitize(5_000)).to eq "5000"
       expect(InputNormalizer.sanitize(" 5000 ")).to eq "5000"
       expect(InputNormalizer.sanitize(5.000)).to eq "5.0"
-      expect(InputNormalizer.sanitize(BigDecimal("0"))).to eq "0.0"
+      expect(InputNormalizer.sanitize(BigDecimal(0))).to eq "0.0"
     end
     it "doesn't remove text but does remove whitespace" do
       expect(InputNormalizer.sanitize("Some cool text ")).to eq "Some cool text"
