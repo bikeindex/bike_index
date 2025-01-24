@@ -11,7 +11,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
 ruby "3.2.6"
-gem "rack", "~> 2.2.3"
+gem "rack"
 
 gem "rails", "~> 7.2"
 gem "concurrent-ruby", "1.3.4" # Required by rails < 7.1
