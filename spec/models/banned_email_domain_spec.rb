@@ -24,4 +24,38 @@ RSpec.describe BannedEmailDomain, type: :model do
       end
     end
   end
+
+  describe "allow_creation?" do
+    it "is truthy for incorrect format" do
+      # These can just be handled by the domain_is_expected_format validation
+      expect(BannedEmailDomain.allow_creation?("something.com")).to be_truthy
+      expect(BannedEmailDomain.allow_creation?("@somethingcom")).to be_truthy
+    end
+  end
+
+  describe "likely_new_spam_domain?" do
+    it "is falsey for domain when nothing matches" do
+      expect(BannedEmailDomain.likely_new_spam_domain?("@something.com")).to be_falsey
+    end
+
+    context "with email over EMAIL_MIN_COUNT" do
+      let(:domain) { "@something.com" }
+      let!(:user) { FactoryBot.create(:user_confirmed, email: "fff#{domain}") }
+
+      before { stub_const("BannedEmailDomain::EMAIL_MIN_COUNT", 0) }
+
+      it "is truthy" do
+        expect(BannedEmailDomain.likely_new_spam_domain?(domain)).to be_truthy
+      end
+
+      context "3 bikes in domain" do
+        let!(:bike1) { FactoryBot.create(:bike, owner_email: "fff#{domain}") }
+        let!(:bike2) { FactoryBot.create(:bike, owner_email: "ffg#{domain}") }
+        let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh#{domain}") }
+        it "is falsey" do
+          expect(BannedEmailDomain.likely_new_spam_domain?(domain)).to be_falsey
+        end
+      end
+    end
+  end
 end

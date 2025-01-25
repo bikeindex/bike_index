@@ -1,0 +1,8 @@
+.container
+  %h1 New Banned Email Domain
+
+  = render "form",
+    banned_email_domain: @banned_email_domain,
+    action: admin_banned_email_domains_path,
+    method: :post,
+    submit_label: "Create"

@@ -258,8 +258,8 @@ Rails.application.routes.draw do
     resources :manufacturers do
       collection { post :import }
     end
-    resources :users, only: [:index, :show, :edit, :update, :destroy]
-    resources :banned_email_domain, only: [:index]
+    resources :users, only: %i[index show edit update destroy]
+    resources :banned_email_domains, only: %i[index new create destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
       :constraints => AdminRestriction,
