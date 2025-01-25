@@ -95,7 +95,7 @@ class StolenRecord < ApplicationRecord
 
   validates_presence_of :date_stolen
 
-  enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
+  enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
 
   before_save :set_calculated_attributes
   after_commit :update_associations

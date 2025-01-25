@@ -46,7 +46,7 @@ class Blog < ApplicationRecord
   before_save :set_calculated_attributes
   before_create :set_title_slug
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
 

@@ -150,7 +150,7 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   delegate :bulk_import, :claimed?, :creation_description,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,

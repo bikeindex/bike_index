@@ -48,7 +48,7 @@ class StolenBikeListing < ActiveRecord::Base
 
   before_save :set_calculated_attributes
 
-  enum group: GROUP_ENUM
+  enum :group, GROUP_ENUM
 
   scope :listing_ordered, -> { reorder(listing_order: :desc) }
   scope :initial, -> { where(initial_listing_id: nil) }

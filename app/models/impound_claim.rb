@@ -43,7 +43,7 @@ class ImpoundClaim < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :send_triggered_notifications
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   scope :unsubmitted, -> { where(submitted_at: nil) }
   scope :submitted, -> { where.not(submitted_at: nil) }

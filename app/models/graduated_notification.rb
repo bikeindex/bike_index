@@ -39,7 +39,7 @@ class GraduatedNotification < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associated_notifications, if: :persisted?
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   attr_accessor :skip_update
 

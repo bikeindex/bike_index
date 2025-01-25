@@ -27,7 +27,7 @@ class ModelAttestation < ApplicationRecord
     uncertified_by_your_org: 11
   }.freeze
 
-  enum kind: CERTIFICATION_KIND_ENUM
+  enum :kind, CERTIFICATION_KIND_ENUM
 
   belongs_to :model_audit
   belongs_to :user

@@ -64,8 +64,8 @@ class BikeVersion < ApplicationRecord
 
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
-  enum visibility: VISIBILITY_ENUM
-  enum status: Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
+  enum :visibility, VISIBILITY_ENUM
+  enum :status, Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
 
   attr_accessor :timezone
   attr_writer :end_at_shown, :start_at_shown
