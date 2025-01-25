@@ -10,7 +10,7 @@ RSpec.describe EmailConfirmationWorker, type: :job do
 
   context "with banned_email_domain" do
     let!(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "@rustymails.com") }
-    let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com")}
+    let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com") }
 
     it "deletes the user" do
       expect(User.unscoped.count).to eq 2 # Because the admin from banned_email_domain

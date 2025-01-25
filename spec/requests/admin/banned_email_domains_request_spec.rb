@@ -75,7 +75,7 @@ RSpec.describe Admin::BannedEmailDomainsController, type: :request do
     let!(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "gmail.com") }
     it "soft deletes" do
       expect do
-        delete "#{base_url}/#{banned_email_domain}"
+        delete "#{base_url}/#{banned_email_domain.id}"
       end.to change(BannedEmailDomain, :count).by(-1)
 
       expect(flash[:success]).to be_present

@@ -37,9 +37,7 @@ class Admin::BannedEmailDomainsController < Admin::BaseController
     @banned_email_domain = BannedEmailDomain.find(params[:id])
     @banned_email_domain.destroy
     flash[:success] = "Ban removed"
-    redirect_back(fallback_location: admin_banned_email_domains_url)
-  end
-
+    redirect_back(fallback_location: admin_banned_email_domains_path)
   end
 
   private

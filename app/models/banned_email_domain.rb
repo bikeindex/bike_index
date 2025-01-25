@@ -27,7 +27,7 @@ class BannedEmailDomain < ApplicationRecord
   # NOTE: This is called in the admin controller on create, but not if done in console!
   def self.allow_creation?(str)
     domain = str.strip
-    return true unless domain.match(/\./)
+    return true unless /\./.match?(domain)
 
     !too_few_emails?(domain) && !too_many_bikes?(domain)
   end
