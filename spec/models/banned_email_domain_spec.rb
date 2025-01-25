@@ -18,6 +18,26 @@ RSpec.describe BannedEmailDomain, type: :model do
     end
   end
 
+  describe "contained in another" do
+    let(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "fetely.click") }
+    let(:banned_email_domain_extended) { FactoryBot.build(:banned_email_domain, domain: "@fetely.click") }
+
+    it "is not valid" do
+      expect(banned_email_domain).to be_valid
+      expect(banned_email_domain_extended).to_not be_valid
+      expect(banned_email_domain_extended.errors.full_messages.join).to match("fetely.click")
+    end
+
+    context "when larger string exists" do
+      it "doesn't block" do
+        banned_email_domain_extended.save!
+        expect(banned_email_domain_extended.reload).to be_valid
+
+        expect(banned_email_domain).to be_valid
+      end
+    end
+  end
+
   describe "allow_creation?" do
     it "is truthy for incorrect format" do
       # These can just be handled by the domain_is_expected_format validation
