@@ -37,6 +37,9 @@ RSpec.describe BannedEmailDomain, type: :model do
       before { stub_const("BannedEmailDomain::EMAIL_MIN_COUNT", 0) }
 
       it "is truthy" do
+        expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
+        expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
+        expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
         expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
       end
 
@@ -46,6 +49,26 @@ RSpec.describe BannedEmailDomain, type: :model do
         let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh#{domain}") }
         it "is falsey" do
           expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
+        end
+      end
+
+      context "with a membership in the domain" do
+        let(:organization) { FactoryBot.create(:organization, approved: true) }
+        let!(:membership) { FactoryBot.create(:membership, organization:, user:) }
+        it "is falsey" do
+          expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
+        end
+
+        context "with organization unapproved" do
+          before { organization.update(approved: false) }
+
+          it "is truthy" do
+            expect(Membership.count).to eq 1
+            expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
+            expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
+            expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
+            expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
+          end
         end
       end
     end

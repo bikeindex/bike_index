@@ -23,21 +23,30 @@ class BannedEmailDomain < ApplicationRecord
   validates_presence_of :domain
   validates_uniqueness_of :domain
   validate :domain_is_expected_format
+  class << self
+    # NOTE: This is called in the admin controller on create, but not if done in console!
+    def allow_creation?(str)
+      domain = str.strip
+      return true unless /\./.match?(domain)
 
-  # NOTE: This is called in the admin controller on create, but not if done in console!
-  def self.allow_creation?(str)
-    domain = str.strip
-    return true unless /\./.match?(domain)
+      return false
 
-    !too_few_emails?(domain) && !too_many_bikes?(domain)
-  end
+      !too_few_emails?(domain) && !too_many_bikes?(domain) && no_valid_memberships?(domain)
+    end
 
-  def self.too_few_emails?(domain)
-    User.unscoped.matching_domain(domain).count < EMAIL_MIN_COUNT
-  end
+    def no_valid_memberships?(domain)
+      org_ids = Membership.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
+      pp org_ids
+      Organization.approved.where(id: org_ids).none?
+    end
 
-  def self.too_many_bikes?(domain)
-    Bike.unscoped.where("owner_email ILIKE ?", "%#{domain}").count > BIKE_MAX_COUNT
+    def too_few_emails?(domain)
+      User.unscoped.matching_domain(domain).count < EMAIL_MIN_COUNT
+    end
+
+    def too_many_bikes?(domain)
+      Bike.unscoped.where("owner_email ILIKE ?", "%#{domain}").count > BIKE_MAX_COUNT
+    end
   end
 
   def domain_is_expected_format

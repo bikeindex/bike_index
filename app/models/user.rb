@@ -181,8 +181,7 @@ class User < ApplicationRecord
   end
 
   def self.matching_domain(str)
-    q = "%#{str.to_s.strip}%"
-    where("email ILIKE ?", q)
+    where("email ILIKE ?", "%#{str.to_s.strip}")
   end
 
   def self.search_phone(str)
