@@ -5,6 +5,7 @@
 # Table name: banned_email_domains
 #
 #  id         :bigint           not null, primary key
+#  deleted_at :datetime
 #  domain     :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
@@ -13,6 +14,8 @@
 class BannedEmailDomain < ApplicationRecord
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 500
+
+  acts_as_paranoid
 
   belongs_to :creator, class_name: "User"
 
@@ -24,7 +27,7 @@ class BannedEmailDomain < ApplicationRecord
   # NOTE: This is called in the admin controller on create, but not if done in console!
   def self.allow_creation?(str)
     domain = str.strip
-    return true unless domain.start_with?("@") && domain.match(/\./)
+    return true unless /\./.match?(domain)
 
     !too_few_emails?(domain) && !too_many_bikes?(domain)
   end
@@ -40,7 +43,6 @@ class BannedEmailDomain < ApplicationRecord
   def domain_is_expected_format
     self.domain = domain.strip
 
-    errors.add(:domain, "Must start with @") unless domain.start_with?("@")
     errors.add(:domain, "Must include a .") unless domain.match?(/\./)
   end
 end
