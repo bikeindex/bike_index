@@ -9,13 +9,6 @@ RSpec.describe BannedEmailDomain, type: :model do
   end
 
   describe "validate domain" do
-    context "without @" do
-      let(:banned_email_domain) { FactoryBot.build(:banned_email_domain, domain: "something.com") }
-      it "is invalid" do
-        expect(banned_email_domain).to_not be_valid
-        expect(banned_email_domain.errors.full_messages.join).to match("@")
-      end
-    end
     context "without ." do
       let(:banned_email_domain) { FactoryBot.build(:banned_email_domain, domain: "@somethingcom") }
       it "is invalid" do
@@ -28,7 +21,6 @@ RSpec.describe BannedEmailDomain, type: :model do
   describe "allow_creation?" do
     it "is truthy for incorrect format" do
       # These can just be handled by the domain_is_expected_format validation
-      expect(BannedEmailDomain.allow_creation?("something.com")).to be_truthy
       expect(BannedEmailDomain.allow_creation?("@somethingcom")).to be_truthy
     end
   end

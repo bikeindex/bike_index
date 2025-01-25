@@ -223,7 +223,8 @@ CREATE TABLE public.banned_email_domains (
     domain character varying,
     creator_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -6143,6 +6144,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250125023931'),
 ('20250124230102'),
 ('20241007164353'),
 ('20241003155715'),
