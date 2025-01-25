@@ -9,7 +9,10 @@ class RemoveUnconfirmedUsersWorker < ScheduledWorker
 
   def perform
     unconfirmed_to_remove.find_each { |user| user.really_destroy! }
-    banned_email_domain_users.find_each { |user| user.really_destroy! }
+
+    banned_email_domains.each do |domain|
+      User.matching_domain(domain).find_each { |user| user.really_destroy! }
+    end
   end
 
   def unconfirmed_to_remove
@@ -17,7 +20,7 @@ class RemoveUnconfirmedUsersWorker < ScheduledWorker
       .unconfirmed
   end
 
-  def banned_email_domain_users
-    User.none
+  def banned_email_domains
+    BannedEmailDomain.pluck(:domain)
   end
 end

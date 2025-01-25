@@ -13,19 +13,19 @@
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header
-      %th= sortable "domain"
       %th= sortable "created_at"
+      %th= sortable "domain"
       %th= sortable "creator_id"
       %th
         Matching Users
     %tbody
       - @banned_email_domains.each do |banned_email_domain|
         %tr
-          %td= banned_email_domain.domain
           %td.convertTime
-            = banned_email_domain.created_at
+            = l(banned_email_domain.created_at, format: :convert_time)
+          %td= banned_email_domain.domain
           %td
-            = render partial: "/shared/admin_user_cell", locals: {user_id: banned_email_domain.creator_id, cache: false}
+            = render partial: "/shared/admin_user_cell", locals: {user: banned_email_domain.creator, user_id: banned_email_domain.creator_id, cache: false}
           %td
             = number_with_delimiter(User.matching_domain(banned_email_domain.domain).count)
 

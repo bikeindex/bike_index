@@ -8,7 +8,7 @@ RSpec.describe Admin::BannedEmailDomainsController, type: :request do
   base_url = "/admin/banned_email_domains"
 
   describe "#index" do
-    let!(:banned_email_domain) { FactoryBot.create(:banned_email_domain)}
+    let!(:banned_email_domain) { FactoryBot.create(:banned_email_domain) }
     it "responds with ok" do
       get base_url
       expect(response.status).to eq(200)
