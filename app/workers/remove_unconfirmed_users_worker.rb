@@ -8,16 +8,15 @@ class RemoveUnconfirmedUsersWorker < ScheduledWorker
   end
 
   def perform
-    unconfirmed_to_remove.find_each { |user| user.really_destroy! }
+    unconfirmed_users_to_remove.find_each { |user| user.really_destroy! }
 
     banned_email_domains.each do |domain|
       User.matching_domain(domain).find_each { |user| user.really_destroy! }
     end
   end
 
-  def unconfirmed_to_remove
-    User.where("created_at < ?", Time.current - REMOVE_DELAY)
-      .unconfirmed
+  def unconfirmed_users_to_remove
+    User.where("created_at < ?", Time.current - REMOVE_DELAY).unconfirmed
   end
 
   def banned_email_domains

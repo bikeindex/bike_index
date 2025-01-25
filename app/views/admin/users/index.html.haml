@@ -35,6 +35,9 @@
   = render partial: "/shared/hidden_search_fields"
   = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
   = hidden_field_tag :search_superusers, params[:search_superusers]
+  = hidden_field_tag :search_deleted, params[:search_deleted]
+  = hidden_field_tag :search_confirmed, params[:search_confirmed]
+  = hidden_field_tag :search_unconfirmed, params[:search_unconfirmed]
   .mt-4.mb-4.d-flex.justify-content-md-end.flex-wrap
     - if display_dev_info?
       .mt-2.mr-2.only-dev-visible
