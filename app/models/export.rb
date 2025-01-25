@@ -53,9 +53,9 @@ class Export < ApplicationRecord
 
   belongs_to :organization
   belongs_to :user # Creator of export
-  enum progress: PROGRESS_ENUM
-  enum kind: VALID_KINDS
-  enum file_format: VALID_FILE_FORMATS
+  enum :progress, PROGRESS_ENUM
+  enum :kind, VALID_KINDS
+  enum :file_format, VALID_FILE_FORMATS
 
   before_validation :set_calculated_attributes
 

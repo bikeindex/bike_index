@@ -65,9 +65,9 @@ class Ownership < ApplicationRecord
 
   has_many :notifications, as: :notifiable
 
-  enum status: Bike::STATUS_ENUM
-  enum pos_kind: Organization::POS_KIND_ENUM
-  enum origin: ORIGIN_ENUM
+  enum :status, Bike::STATUS_ENUM
+  enum :pos_kind, Organization::POS_KIND_ENUM
+  enum :origin, ORIGIN_ENUM
 
   default_scope { order(:id) }
   scope :current, -> { where(current: true) }

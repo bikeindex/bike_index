@@ -59,8 +59,8 @@ class LoggedSearch < AnalyticsRecord
   belongs_to :user
   belongs_to :organization
 
-  enum endpoint: ENDPOINT_ENUM
-  enum stolenness: STOLENNESS_ENUM, _prefix: :stolenness
+  enum :endpoint, ENDPOINT_ENUM
+  enum :stolenness, STOLENNESS_ENUM, prefix: :stolenness
 
   validates_presence_of :log_line, :request_at
   validates_uniqueness_of :request_id, allow_nil: false

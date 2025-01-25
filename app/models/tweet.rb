@@ -35,7 +35,7 @@ class Tweet < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :retweet, -> { where.not(original_tweet: nil) }
   scope :not_retweet, -> { where(original_tweet: nil) }

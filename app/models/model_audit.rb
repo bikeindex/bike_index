@@ -25,9 +25,9 @@ class ModelAudit < ApplicationRecord
     long.?tail mid.?tail high.?step mid.?step step.?through step.?thru step.?in
   ].freeze
 
-  enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
-  enum propulsion_type: PropulsionType::SLUGS
-  enum cycle_type: CycleType::SLUGS
+  enum :certification_status, ModelAttestation::CERTIFICATION_KIND_ENUM
+  enum :propulsion_type, PropulsionType::SLUGS
+  enum :cycle_type, CycleType::SLUGS
 
   belongs_to :manufacturer
 

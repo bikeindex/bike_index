@@ -33,7 +33,7 @@ class PublicImage < ApplicationRecord
   before_save :set_calculated_attributes
   after_commit :enqueue_after_commit_jobs
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   def default_name
     if bike?

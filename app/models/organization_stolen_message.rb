@@ -34,7 +34,7 @@ class OrganizationStolenMessage < ApplicationRecord
 
   delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :present, -> { where.not(body: nil) }
   scope :enabled, -> { where(is_enabled: true) }

@@ -39,7 +39,7 @@ class StolenNotification < ApplicationRecord
 
   # Kind enum was added to track how often various types of messages were sent
   # in #2275 - it isn't currently used for logic, just data analysis
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   def notify_receiver
     EmailStolenNotificationWorker.perform_async(id)

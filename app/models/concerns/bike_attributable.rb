@@ -16,10 +16,10 @@ module BikeAttributable
 
     accepts_nested_attributes_for :components, allow_destroy: true
 
-    enum frame_material: FrameMaterial::SLUGS
-    enum handlebar_type: HandlebarType::SLUGS
-    enum cycle_type: CycleType::SLUGS
-    enum propulsion_type: PropulsionType::SLUGS
+    enum :frame_material, FrameMaterial::SLUGS
+    enum :handlebar_type, HandlebarType::SLUGS
+    enum :cycle_type, CycleType::SLUGS
+    enum :propulsion_type, PropulsionType::SLUGS
 
     scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   end

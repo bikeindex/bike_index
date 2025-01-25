@@ -34,7 +34,7 @@ class MailchimpDatum < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_association_and_mailchimp, if: :persisted?
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   attr_accessor :creator_feedback, :skip_update
 
