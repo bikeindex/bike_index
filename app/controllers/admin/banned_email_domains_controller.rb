@@ -20,13 +20,18 @@ class Admin::BannedEmailDomainsController < Admin::BaseController
     @banned_email_domain = BannedEmailDomain.new(banned_email_domain_params)
     @banned_email_domain.creator = current_user
 
-    if @banned_email_domain.save
-      flash[:success] = "New banned email domain created"
-      redirect_to admin_banned_email_domains_url
+    if BannedEmailDomain.allow_creation?(@banned_email_domain.domain)
+      if @banned_email_domain.save
+        flash[:success] = "New banned email domain created"
+        redirect_to admin_banned_email_domains_url and return
+      else
+        flash.now[:error] = @banned_email_domain.errors.full_messages.to_sentence
+      end
     else
-      flash.now[:error] = @banned_email_domain.errors.full_messages.to_sentence
-      render :new
+      flash.now[:error] = "Doesn't seem like a new spam email domain - " \
+        "not enough users with the domain or too many bikes have the domain"
     end
+    render :new
   end
 
 

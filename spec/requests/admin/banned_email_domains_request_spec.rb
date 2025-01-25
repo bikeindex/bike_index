@@ -27,21 +27,47 @@ RSpec.describe Admin::BannedEmailDomainsController, type: :request do
   end
 
   describe "#create" do
-    let(:valid_attributes) { {domain: "@something.com"} }
-    it "responds with ok" do
+    let(:valid_attributes) { {domain: "@rustymails.com"} }
+
+    it "responds with not likely spam" do
       expect do
         post base_url, params: {banned_email_domain: valid_attributes}
-      end.to change(BannedEmailDomain, :count).by 1
+      end.to change(BannedEmailDomain, :count).by 0
 
-      expect(flash[:success]).to be_present
-      expect(response).to redirect_to(banned_email_domains_path)
-      banned_email_domain = BannedEmailDomain.last
-      expect(banned_email_domain.creator_id).to eq current_user.id
-      expect(banned_email_domain.domain).to eq "@something.com"
+      expect(flash[:error]).to be_present
+      expect(response).to render_template(:new)
     end
 
-    context "with likely_new_spam_domain?" do
+    context "with over required user count" do
+      let!(:user) { FactoryBot.create(:user_confirmed, email: "fff@rustymails.com") }
+      before { stub_const("BannedEmailDomain::EMAIL_MIN_COUNT", 0) }
 
+      it "creates" do
+        expect do
+          post base_url, params: {banned_email_domain: valid_attributes}
+        end.to change(BannedEmailDomain, :count).by 1
+
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to(admin_banned_email_domains_path)
+        banned_email_domain = BannedEmailDomain.last
+        expect(banned_email_domain.creator_id).to eq current_user.id
+        expect(banned_email_domain.domain).to eq "@rustymails.com"
+      end
+
+      context "with more bikes created" do
+        let!(:bike1) { FactoryBot.create(:bike, owner_email: "fff@rustymails.com") }
+        let!(:bike2) { FactoryBot.create(:bike, owner_email: "ffg@rustymails.com") }
+        let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh@rustymails.com") }
+
+        it "responds with not likely spam" do
+          expect do
+            post base_url, params: {banned_email_domain: valid_attributes}
+          end.to change(BannedEmailDomain, :count).by 0
+
+          expect(flash[:error]).to be_present
+          expect(response).to render_template(:new)
+        end
+      end
     end
   end
 end

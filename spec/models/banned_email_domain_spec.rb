@@ -33,9 +33,9 @@ RSpec.describe BannedEmailDomain, type: :model do
     end
   end
 
-  describe "likely_new_spam_domain?" do
+  describe "allow_creation?" do
     it "is falsey for domain when nothing matches" do
-      expect(BannedEmailDomain.likely_new_spam_domain?("@something.com")).to be_falsey
+      expect(BannedEmailDomain.allow_creation?("@something.com")).to be_falsey
     end
 
     context "with email over EMAIL_MIN_COUNT" do
@@ -45,7 +45,7 @@ RSpec.describe BannedEmailDomain, type: :model do
       before { stub_const("BannedEmailDomain::EMAIL_MIN_COUNT", 0) }
 
       it "is truthy" do
-        expect(BannedEmailDomain.likely_new_spam_domain?(domain)).to be_truthy
+        expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
       end
 
       context "3 bikes in domain" do
@@ -53,7 +53,7 @@ RSpec.describe BannedEmailDomain, type: :model do
         let!(:bike2) { FactoryBot.create(:bike, owner_email: "ffg#{domain}") }
         let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh#{domain}") }
         it "is falsey" do
-          expect(BannedEmailDomain.likely_new_spam_domain?(domain)).to be_falsey
+          expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
         end
       end
     end
