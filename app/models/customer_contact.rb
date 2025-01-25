@@ -27,7 +27,7 @@ class CustomerContact < ApplicationRecord
     bike_possibly_found: 2
   }.freeze
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   validates \
     :bike,

@@ -31,8 +31,8 @@ class MailchimpValue < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum list: LIST_ENUM
-  enum kind: KIND_ENUM
+  enum :list, LIST_ENUM
+  enum :kind, KIND_ENUM
 
   def self.lists
     LIST_ENUM.keys.map(&:to_s)

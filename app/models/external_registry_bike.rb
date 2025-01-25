@@ -37,7 +37,7 @@ class ExternalRegistryBike < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum status: Bike::STATUS_ENUM
+  enum :status, Bike::STATUS_ENUM
 
   class << self
     def registry_name(str)

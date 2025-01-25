@@ -18,6 +18,26 @@ RSpec.describe BannedEmailDomain, type: :model do
     end
   end
 
+  describe "contained in another" do
+    let(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "fetely.click") }
+    let(:banned_email_domain_extended) { FactoryBot.build(:banned_email_domain, domain: "@fetely.click") }
+
+    it "is not valid" do
+      expect(banned_email_domain).to be_valid
+      expect(banned_email_domain_extended).to_not be_valid
+      expect(banned_email_domain_extended.errors.full_messages.join).to match("fetely.click")
+    end
+
+    context "when larger string exists" do
+      it "doesn't block" do
+        banned_email_domain_extended.save!
+        expect(banned_email_domain_extended.reload).to be_valid
+
+        expect(banned_email_domain).to be_valid
+      end
+    end
+  end
+
   describe "allow_creation?" do
     it "is truthy for incorrect format" do
       # These can just be handled by the domain_is_expected_format validation
@@ -37,6 +57,9 @@ RSpec.describe BannedEmailDomain, type: :model do
       before { stub_const("BannedEmailDomain::EMAIL_MIN_COUNT", 0) }
 
       it "is truthy" do
+        expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
+        expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
+        expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
         expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
       end
 
@@ -46,6 +69,26 @@ RSpec.describe BannedEmailDomain, type: :model do
         let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh#{domain}") }
         it "is falsey" do
           expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
+        end
+      end
+
+      context "with a membership in the domain" do
+        let(:organization) { FactoryBot.create(:organization, approved: true) }
+        let!(:membership) { FactoryBot.create(:membership, organization:, user:) }
+        it "is falsey" do
+          expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
+        end
+
+        context "with organization unapproved" do
+          before { organization.update(approved: false) }
+
+          it "is truthy" do
+            expect(Membership.count).to eq 1
+            expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
+            expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
+            expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
+            expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
+          end
         end
       end
     end

@@ -29,8 +29,8 @@ class BulkImport < ApplicationRecord
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
-  enum progress: PROGRESS_ENUM
-  enum kind: KIND_ENUM
+  enum :progress, PROGRESS_ENUM
+  enum :kind, KIND_ENUM
 
   scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
   scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }

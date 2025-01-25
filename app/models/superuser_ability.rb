@@ -39,7 +39,7 @@ class SuperuserAbility < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :non_universal, -> { where.not(kind: "universal") }
 

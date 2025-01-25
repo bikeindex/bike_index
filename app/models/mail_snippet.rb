@@ -50,7 +50,7 @@ class MailSnippet < ApplicationRecord
   scope :with_organizations, -> { where.not(organization_id: nil) }
   scope :without_organizations, -> { where(organization_id: nil) }
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   after_commit :update_associations
 

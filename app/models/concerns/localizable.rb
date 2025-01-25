@@ -6,7 +6,7 @@ module Localizable
   extend ActiveSupport::Concern
 
   included do
-    enum language: I18n.available_locales.sort.map.with_index.to_h.freeze
+    enum :language, I18n.available_locales.sort.map.with_index.to_h.freeze
 
     scope :in_language, ->(code) { where(language: languages[code.presence || I18n.locale.to_s]) }
   end

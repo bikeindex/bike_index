@@ -39,7 +39,7 @@ class Feedback < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   attr_accessor :additional
 
