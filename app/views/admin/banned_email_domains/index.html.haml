@@ -36,8 +36,10 @@
     %tbody
       - @banned_email_domains.each do |banned_email_domain|
         %tr
-          %td.convertTime
-            = l(banned_email_domain.created_at, format: :convert_time)
+          %td
+            %span.convertTime= l(banned_email_domain.created_at, format: :convert_time)
+            - if display_dev_info?
+              %code.small.only-dev-visible= banned_email_domain.id
           %td= banned_email_domain.domain
           %td
             = render partial: "/shared/admin_user_cell", locals: {user: banned_email_domain.creator, user_id: banned_email_domain.creator_id, cache: false}
