@@ -273,50 +273,6 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "2d973d9d92bd159549b81dfc42f49ac6fb2d107936e4e9c93ac723af8175a487",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/views/shared/_pagination.html.haml",
-      "line": 32,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "matching_bike_sticker_updates.reorder(\"bike_sticker_updates.#{sort_column} #{sort_direction}\").includes(:organization, :user, :bike).page((params[:page] or 1)).per((params[:per_page] or 25)).where(\"#{matching_bike_sticker_updates.reorder(\"bike_sticker_updates.#{sort_column} #{sort_direction}\").includes(:organization, :user, :bike).page((params[:page] or 1)).per((params[:per_page] or 25)).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::BikeStickerUpdatesController",
-          "method": "index",
-          "line": 10,
-          "file": "app/controllers/admin/bike_sticker_updates_controller.rb",
-          "rendered": {
-            "name": "admin/bike_sticker_updates/index",
-            "file": "app/views/admin/bike_sticker_updates/index.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "admin/bike_sticker_updates/index",
-          "line": 134,
-          "file": "app/views/admin/bike_sticker_updates/index.html.haml",
-          "rendered": {
-            "name": "shared/_pagination",
-            "file": "app/views/shared/_pagination.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "shared/_pagination"
-      },
-      "user_input": "@time_range_column",
-      "confidence": "Weak",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
@@ -354,7 +310,7 @@
           "type": "controller",
           "class": "InfoController",
           "method": "show",
-          "line": 13,
+          "line": 17,
           "file": "app/controllers/info_controller.rb",
           "rendered": {
             "name": "info/show",
@@ -525,7 +481,7 @@
           "type": "controller",
           "class": "InfoController",
           "method": "why_donate",
-          "line": 53,
+          "line": 57,
           "file": "app/controllers/info_controller.rb",
           "rendered": {
             "name": "news/show",
@@ -1279,6 +1235,50 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "dffaf0efe12dc10011f6d8b661bbcf78ce000d6bb6ad873cad7cdcbf986ad9a3",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/views/shared/_pagination.html.haml",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "BannedEmailDomain.order(sort_column => sort_direction).includes(:creator).page((params[:page] or 1)).per((params[:per_page] or 25)).where(\"#{BannedEmailDomain.order(sort_column => sort_direction).includes(:creator).page((params[:page] or 1)).per((params[:per_page] or 25)).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::BannedEmailDomainsController",
+          "method": "index",
+          "line": 10,
+          "file": "app/controllers/admin/banned_email_domains_controller.rb",
+          "rendered": {
+            "name": "admin/banned_email_domains/index",
+            "file": "app/views/admin/banned_email_domains/index.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "admin/banned_email_domains/index",
+          "line": 11,
+          "file": "app/views/admin/banned_email_domains/index.html.haml",
+          "rendered": {
+            "name": "shared/_pagination",
+            "file": "app/views/shared/_pagination.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/_pagination"
+      },
+      "user_input": "@time_range_column",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "f6bb958371112922b9eddeb22df6e807997a17d369d2fa055f9e487425bd495f",
@@ -1370,6 +1370,6 @@
       "note": ""
     }
   ],
-  "updated": "2025-01-22 19:38:27 -0800",
+  "updated": "2025-01-24 17:15:51 -0800",
   "brakeman_version": "5.4.1"
 }

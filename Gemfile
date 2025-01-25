@@ -156,6 +156,7 @@ group :development, :test do
   gem "brakeman", require: false
   gem "database_cleaner"
   gem "dotenv-rails"
+  gem "factory_bot_rails"
   gem "foreman"
   gem "parallel_tests"
   gem "pry-byebug"
@@ -170,7 +171,6 @@ group :development, :test do
 end
 
 group :test do
-  gem "factory_bot_rails"
   gem "rails-controller-testing"
   gem "rspec-sidekiq"
   gem "simplecov", require: false

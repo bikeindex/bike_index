@@ -63,7 +63,6 @@ module Bikeindex
     end
 
     config.generators do |g|
-      g.factory_bot "true"
       g.helper nil
       g.javascripts nil
       g.stylesheets nil

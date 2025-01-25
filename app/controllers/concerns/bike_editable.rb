@@ -90,7 +90,7 @@ module BikeEditable
     return true unless Flipper.enabled?(:bike_versions, @current_user) && @bike.present?
     @bike_og ||= @bike # Already assigned by bike_versions controller
     @bike_versions = @bike_og.bike_versions
-      .where(owner_id: @current_user.id)
+      .where(owner_id: @current_user&.id)
   end
 
   def edits_controller_name_for(requested_page)

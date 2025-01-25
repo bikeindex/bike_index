@@ -180,6 +180,11 @@ class User < ApplicationRecord
       .distinct.references(:user_emails)
   end
 
+  def self.matching_domain(str)
+    q = "%#{str.to_s.strip}%"
+    where("email ILIKE ?", q)
+  end
+
   def self.search_phone(str)
     q = "%#{Phonifyer.phonify(str)}%"
     includes(:user_phones)
