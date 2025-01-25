@@ -7,6 +7,20 @@ RSpec.describe EmailConfirmationWorker, type: :job do
     EmailConfirmationWorker.new.perform(user.id)
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end
+
+  context "with banned_email_domain" do
+    let!(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "@rustymails.com") }
+    let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com") }
+
+    it "deletes the user" do
+      expect(User.unscoped.count).to eq 2 # Because the admin from banned_email_domain
+      expect(described_class.banned_email_domain?(user.email)).to be_truthy
+      ActionMailer::Base.deliveries = []
+      EmailConfirmationWorker.new.perform(user.id)
+      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+      expect(User.unscoped.count).to eq 1
+    end
+  end
   context "user with email already exists" do
     let(:email) { "test@test.com" }
     let!(:user1) { FactoryBot.create(:user, email: email) }

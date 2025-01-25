@@ -217,10 +217,9 @@ CREATE INDEX index_organization_statuses_on_organization_id ON public.organizati
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20231025160704'),
-('20231027162602'),
-('20231027173606'),
+('20240702144929'),
 ('20231209193453'),
-('20240702144929');
-
+('20231027173606'),
+('20231027162602'),
+('20231025160704');
 
