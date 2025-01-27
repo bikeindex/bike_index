@@ -4858,13 +4858,6 @@ CREATE INDEX index_ambassador_task_assignments_on_ambassador_task_id ON public.a
 
 
 --
--- Name: index_ambassador_task_assignments_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_ambassador_task_assignments_on_user_id ON public.ambassador_task_assignments USING btree (user_id);
-
-
---
 -- Name: index_ambassador_tasks_on_title; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6215,6 +6208,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250127224140'),
 ('20250127223414'),
 ('20250125023931'),
 ('20250124230102'),
