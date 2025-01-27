@@ -23,6 +23,20 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
 
 
+--
+-- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -2676,6 +2690,41 @@ ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
+-- Name: pghero_query_stats; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pghero_query_stats (
+    id bigint NOT NULL,
+    database text,
+    "user" text,
+    query text,
+    query_hash bigint,
+    total_time double precision,
+    calls bigint,
+    captured_at timestamp without time zone
+);
+
+
+--
+-- Name: pghero_query_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pghero_query_stats_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pghero_query_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_stats.id;
+
+
+--
 -- Name: public_images; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3959,6 +4008,13 @@ ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.pay
 
 
 --
+-- Name: pghero_query_stats id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('public.pghero_query_stats_id_seq'::regclass);
+
+
+--
 -- Name: public_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4625,6 +4681,14 @@ ALTER TABLE ONLY public.parking_notifications
 
 ALTER TABLE ONLY public.payments
     ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pghero_query_stats pghero_query_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_query_stats
+    ADD CONSTRAINT pghero_query_stats_pkey PRIMARY KEY (id);
 
 
 --
@@ -5788,6 +5852,13 @@ CREATE INDEX index_payments_on_user_id ON public.payments USING btree (user_id);
 
 
 --
+-- Name: index_pghero_query_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghero_query_stats USING btree (database, captured_at);
+
+
+--
 -- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6144,6 +6215,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250127223414'),
 ('20250125023931'),
 ('20250124230102'),
 ('20241007164353'),
