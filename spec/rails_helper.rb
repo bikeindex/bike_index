@@ -29,6 +29,8 @@ require "rspec/rails"
 require "database_cleaner"
 require "rspec-sidekiq"
 require "vcr"
+require 'view_component/test_helpers'
+require 'view_component/system_test_helpers'
 
 ActiveRecord::Migration.maintain_test_schema!
 
@@ -42,6 +44,9 @@ RSpec.configure do |config|
 
   # include translation / localization methods
   config.include AbstractController::Translation
+  # View components
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include ViewComponent::SystemTestHelpers, type: :component
 
   # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
