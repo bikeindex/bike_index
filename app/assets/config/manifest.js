@@ -17,3 +17,6 @@
 //= link og_application.css
 //= link registrations.css
 //= link revised.css
+//= link_tree ../../javascript .js
+//= link_tree ../../../vendor/javascript .js
+//= link_tree ../builds
