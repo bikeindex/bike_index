@@ -56,7 +56,7 @@ class BannedEmailDomain < ApplicationRecord
 
   # TODO: This is really inefficient
   def domain_is_not_contained_in_existing
-    broader_ban =  BannedEmailDomain.pluck(:domain).detect { |d| domain.match?(d) }
+    broader_ban = BannedEmailDomain.pluck(:domain).detect { |d| domain.match?(d) }
     return if broader_ban.blank?
 
     errors.add(:domain, "already banned: '#{broader_ban}'")

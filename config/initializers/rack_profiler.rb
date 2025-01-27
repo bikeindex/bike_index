@@ -9,4 +9,12 @@ if Rails.env != "test"
   Rack::MiniProfiler.config.storage_options = {}
   Rack::MiniProfiler.config.storage = Rack::MiniProfiler::RedisStore
   Rack::MiniProfiler.config.position = "left"
+
+  Rack::MiniProfilerRails.subscribe("render.view_component") do |_name, start, finish, _id, payload|
+    Rack::MiniProfilerRails.render_notification_handler(
+      Rack::MiniProfilerRails.shorten_identifier(payload[:identifier]),
+      finish,
+      start
+    )
+  end
 end

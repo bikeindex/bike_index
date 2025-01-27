@@ -62,6 +62,9 @@ module Bikeindex
       Doorkeeper::AuthorizedApplicationsController.layout "doorkeeper"
     end
 
+    # Enable insturmentation for ViewComponents (used by rack-mini-profiler)
+    config.view_component.instrumentation_enabled = true
+
     config.generators do |g|
       g.helper nil
       g.javascripts nil
