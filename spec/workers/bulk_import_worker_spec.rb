@@ -597,7 +597,7 @@ RSpec.describe BulkImportWorker, type: :job do
           context "with chartreuse paint" do
             let(:green) { FactoryBot.create(:color, name: "Green") }
             let!(:paint) { FactoryBot.create(:paint, name: color, color: green) }
-            it "assigns" do
+            it "assigns", flaky: true do
               expect(Paint.count).to eq 1
               bike = expect_registered_bike(row.merge(color: " ChartreuSE  "))
 

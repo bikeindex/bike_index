@@ -6,12 +6,14 @@
 # And circleci's documentation bounces between the two versions and everything is a pain.
 # See #2257
 
-version: 2
+version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@1.5.0
 
 jobs:
   brakeman_scan:
     docker:
-      - image: cimg/ruby:3.2.6-node
+      - image: cimg/ruby:3.2.6-browsers
     steps:
       - checkout
       - run:
@@ -28,7 +30,7 @@ jobs:
           path: brakeman-output.tabs
           destination: brakeman
 
-  build:
+  test:
     working_directory: ~/bikeindex/bike_index
     parallelism: 2
     shell: /bin/bash --login
@@ -108,6 +110,8 @@ jobs:
         key: CACHE_V1-dockerize-0.6.1
         paths:
           - ~/.cache/dockerize
+
+      - browser-tools/install-chromedriver
 
       # Updated all restore_cache to make things more functional when changing a single dependency, see PR#2366
       # - restore_cache:
@@ -340,14 +344,14 @@ workflows:
   version: 2
   commit:
     jobs:
-      - build
+      - test
       - brakeman_scan
       - upload-coverage:
           requires:
-            - build
+            - test
       - deploy_production:
           requires:
-            - build
+            - test
           filters:
             branches:
               only: main

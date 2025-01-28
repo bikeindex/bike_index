@@ -15,24 +15,30 @@ if ENV["COVERAGE"]
   Rails.application.eager_load! if defined?(Rails)
 end
 
-require "spec_helper"
-
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"] = "true"
 
+require "spec_helper"
 require File.expand_path("../../config/environment", __FILE__)
-
 require "rspec/rails"
 
-require "database_cleaner"
-require "rspec-sidekiq"
-require "vcr"
-
-require "capybara/rails" # view component
+# Include capybara for view component system specs
+require "capybara/rails"
 require "capybara/rspec"
-Capybara.default_driver = :selenium_chrome_headless
+Capybara.register_driver :chrome_headless do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--headless')
+  options.add_argument('--window-size=1920,1080')
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+# Configure Capybara
+Capybara.configure do |config|
+  config.default_driver = :chrome_headless
+  config.javascript_driver = :chrome_headless
+end
+
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
 
@@ -48,10 +54,6 @@ RSpec.configure do |config|
 
   # include translation / localization methods
   config.include AbstractController::Translation
-  # View components
-  config.include ViewComponent::TestHelpers, type: :component
-  config.include ViewComponent::SystemTestHelpers, type: :component
-  config.include Capybara::RSpecMatchers, type: :component
 
   # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
@@ -64,8 +66,15 @@ RSpec.configure do |config|
 
   # Set default geocoder location
   config.include_context :geocoder_default_location
+
+  # View components
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include ViewComponent::SystemTestHelpers, type: :component
+  config.include Capybara::RSpecMatchers, type: :component
+  config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
 end
 
+require "vcr"
 VCR.configure do |config|
   config.cassette_library_dir = "spec/vcr_cassettes"
   config.allow_http_connections_when_no_cassette = false
@@ -107,19 +116,12 @@ if ENV["RETRY_FLAKY"]
   end
 end
 
+require "rspec-sidekiq"
 RSpec::Sidekiq.configure do |config|
   config.warn_when_jobs_not_processed_by_sidekiq = false
 end
 
-# Doesn't seem to be important
-# RSpec.configure do |config|
-#   config.before(:each) do
-#     # Reset feature-flipping between examples
-#     # (In test examples, stub Flipper as needed, passing specific args to #with)
-#     allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
-#   end
-# end
-
+require "database_cleaner"
 # DB Cleaner metadata tags
 # ========================
 #
