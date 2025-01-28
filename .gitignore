@@ -47,7 +47,6 @@ manufacturer.tsv
 /public/packs-test
 /node_modules
 .nvmrc
-package-lock.json
 !/public/assets/.keep
 /public/assets/
 /app/assets/builds/*

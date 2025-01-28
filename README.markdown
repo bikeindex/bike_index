@@ -109,7 +109,7 @@ See the [how do I run standard in my editor](standardrb-plugin) section of the S
 
 ### ESLint
 
-ESlint is configured to run on project JavaScript. To run it, issue `yarn lint`.
+ESlint is configured to run on project JavaScript. To run it, issue `npm lint`.
 
 ## Bug tracker
 
