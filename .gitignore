@@ -41,6 +41,8 @@ manufacturer.tsv
 
 # Ignore special configuration env file
 .env.*
+
+# Ignore asset stuff
 /public/packs
 /public/packs-test
 /node_modules
@@ -51,6 +53,8 @@ yarn-error.log
 package-lock.json
 !/public/assets/.keep
 /public/assets/
+/app/assets/builds/*
+!/app/assets/builds/.keep
 
 # Ignore jest coverage files
 coverage

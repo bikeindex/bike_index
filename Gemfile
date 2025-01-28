@@ -103,6 +103,14 @@ gem "sass-rails"
 gem "sprockets-rails"
 gem "uglifier"
 
+# new frontend
+gem "importmap-rails" # New JS setup
+gem "turbo-rails" # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
+gem "stimulus-rails" # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
+gem "tailwindcss-rails" # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
+gem "view_component" # view components!
+gem "lookbook" # view_component preview
+
 # Show performance metrics
 gem "flamegraph", require: false
 gem "memory_profiler", require: false
@@ -178,4 +186,6 @@ group :test do
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
+  gem "capybara" # For view components
+  gem "selenium-webdriver" # For capybara
 end
