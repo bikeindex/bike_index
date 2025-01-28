@@ -5,17 +5,18 @@ module RegistrationInfoable
 
   # Currently not used, keeping it around for reference
   # REGISTRATION_INFO_KEYS = %w[
-  #   organization_affiliation
-  #   student_id
-  #   phone
   #   bike_sticker
   #   city
   #   country
-  #   state
-  #   street
-  #   zipcode
   #   latitude
   #   longitude
+  #   organization_affiliation
+  #   phone
+  #   state
+  #   street
+  #   student_id
+  #   true_false_question
+  #   zipcode
   # ].freeze
 
   class_methods do
@@ -31,11 +32,18 @@ module RegistrationInfoable
     def with_organization_affiliation(org)
       where("(registration_info -> 'organization_affiliation') is not null OR (registration_info -> 'organization_affiliation_#{org_id_for_org(org)}') is not null")
     end
+
+    def with_true_false_question(org)
+      where("(registration_info -> 'true_false_question') is not null OR (registration_info -> 'true_false_question_#{org_id_for_org(org)}') is not null")
+    end
   end
 
   def registration_info_uniq_keys
-    [reg_info[student_id_key].present? ? "student_id" : nil,
-      reg_info[student_id_key].present? ? "organization_affiliation" : nil].compact
+    [
+      reg_info[student_id_key].present? ? "student_id" : nil,
+      reg_info[organization_affiliation_key].present? ? "organization_affiliation" : nil,
+      reg_info[true_false_question_key].present? ? "true_false_question" : nil
+    ].compact
   end
 
   # Accepts organization or organization.id
@@ -72,6 +80,23 @@ module RegistrationInfoable
     reg_info[organization_affiliation_key(org)]
   end
 
+  # Accepts organization or organization.id
+  def true_false_question_key(org = nil)
+    # If org is passed, first priority is the key with the matching org_id
+    if org.present?
+      key = ["true_false_question", self.class.org_id_for_org(org)].compact.join("_")
+      return key if reg_info.key?(key)
+    end
+    return "true_false_question" if reg_info.key?("true_false_question")
+    return nil if org.present?
+    reg_info.keys.find { |k| k.start_with?(/true_false_question/) } || "true_false_question"
+  end
+
+  # Accepts organization or organization.id
+  def true_false_question(org = nil)
+    reg_info[true_false_question_key(org)]
+  end
+
   def update_registration_information(key, value)
     update(registration_info: registration_info.merge(key => value))
     value
@@ -83,6 +108,10 @@ module RegistrationInfoable
 
   def student_id=(val, org = nil)
     update_registration_information(student_id_key(org), val)
+  end
+
+  def true_false_question=(val, org = nil)
+    update_registration_information(true_false_question_key(org), val)
   end
 
   def address_hash
