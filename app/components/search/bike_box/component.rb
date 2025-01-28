@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module BikeListBlock
-  class Component < ViewComponent::Base
+module Search::BikeBox
+  class Component < ApplicationComponent
     def initialize
     end
   end

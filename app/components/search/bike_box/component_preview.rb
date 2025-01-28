@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module BikeListBlock
+module Search::BikeBox
   class ComponentPreview < ApplicationComponentPreview
     def default
-      render(BikeListBlock::Component.new)
+      render(Search::BikeBox::Component.new)
     end
   end
 end
