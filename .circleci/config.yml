@@ -6,7 +6,7 @@
 # And circleci's documentation bounces between the two versions and everything is a pain.
 # See #2257
 
-# version: 2.1
+version: 2.1
 # orbs:
 #   browser-tools: circleci/browser-tools@1.5.0
 
