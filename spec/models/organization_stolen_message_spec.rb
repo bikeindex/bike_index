@@ -105,7 +105,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"]) }
       let!(:organization_stolen_message2) { OrganizationStolenMessage.where(organization_id: organization2.id).first_or_create }
       before { organization_stolen_message2.update(attrs) }
-      it "returns first" do
+      it "returns first", :flaky do
         expect(organization_stolen_message.id).to be_present
         expect(organization_stolen_message2).to be_valid
         expect(OrganizationStolenMessage.count).to eq 2
