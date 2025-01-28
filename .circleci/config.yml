@@ -7,13 +7,11 @@
 # See #2257
 
 version: 2.1
-# orbs:
-#   browser-tools: circleci/browser-tools@1.5.0
 
 jobs:
   brakeman_scan:
     docker:
-      - image: cimg/ruby:3.2.6-browsers
+      - image: cimg/ruby:3.2.6-node
     steps:
       - checkout
       - run:
@@ -82,12 +80,6 @@ jobs:
               postgresql-client \
               ripgrep
 
-      - run:
-          name: "Update Node.js and npm"
-          command: |
-            curl -sSL "https://nodejs.org/download/release/v20.18.2/node-v20.18.2-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v20.18.2-linux-x64/bin/node
-            # curl https://www.npmjs.com/install.sh | sudo bash
-
       - restore_cache:
           name: "Dockerize: cache restore"
           keys:
@@ -105,92 +97,11 @@ jobs:
             fi
             sudo tar -C /usr/local/bin -xzvf ${dockerize_tar}
 
-      - type: cache-save
-        name: "Dockerize: cache save"
-        key: CACHE_V1-dockerize-0.6.1
-        paths:
-          - ~/.cache/dockerize
-
-      # - browser-tools/install-chromedriver
-
-      # Updated all restore_cache to make things more functional when changing a single dependency, see PR#2366
-      # - restore_cache:
-      #     name: "Git: cache restore"
-      #     keys:
-      #       - CACHE_V1-git-2.48.1
-      #       - CACHE_V1-git-
-
-      # - run:
-      #     name: "Git: install"
-      #     environment:
-      #       GIT_VERSION: 2.48.1
-      #     command: |
-      #       set -x
-
-      #       git_binary=~/.cache/git/git-${GIT_VERSION}/git
-
-      #       if [[ ! -f $git_binary ]]; then
-      #         rm -rf ~/.cache/git
-      #         mkdir -p ~/.cache/git
-      #         cd ~/.cache/git
-
-      #         wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
-      #         tar -xzf git.tgz
-      #         cd git-${GIT_VERSION}
-
-      #         export DEFAULT_HELP_FORMAT="man"
-      #         autoconf
-      #         ./configure
-
-      #         sudo make man
-      #         sudo make install-man
-      #       fi
-
-      #       cd ~/.cache/git/git-${GIT_VERSION}
-      #       sudo make prefix=/usr/local all
-      #       sudo make install
-      #       sudo cp ${git_binary} /usr/local/bin/git
-
-      # - type: cache-save
-      #   name: "Git: cache save"
-      #   key: CACHE_V1-git-2.48.1
-      #   paths:
-      #     - ~/.cache/git/git-2.48.1
-
-      # - restore_cache:
-      #     name: "Hub: cache restore"
-      #     keys:
-      #       - CACHE_V1-hub-2.12.3
-      #       - CACHE_V1-hub-
-
-      # - run:
-      #     name: "Hub: install"
-      #     environment:
-      #       HUB_VERSION: 2.12.3
-      #     command: |
-      #       set -x
-
-      #       hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
-
-      #       if [[ ! -f ${hub_binary} ]]; then
-      #         rm -rf ~/.cache/hub
-      #         mkdir -p ~/.cache/hub
-      #         cd ~/.cache/hub
-
-      #         wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-      #         tar -xzf hub.tgz
-      #       fi
-
-      #       sudo cp ${hub_binary} /usr/local/bin/hub
-
-      # - restore_cache:
-      #     name: "Hub: cache save"
-      #     keys:
-      #       - CACHE_V1-hub-2.12.3
-      #       - CACHE_V1-hub-
-      #     paths:
-      #       - ~/.cache/hub
-
+      - save_cache:
+          name: "Dockerize: cache save"
+          key: CACHE_V1-dockerize-0.6.1
+          paths:
+            - ~/.cache/dockerize
       - run:
           name: "Bundler: install"
           command: gem install bundler -v 2.4.22
@@ -208,35 +119,15 @@ jobs:
             bundle config set --local path '~/.cache/bundle'
             bundle install
 
-      - type: cache-save
-        name: "Ruby dependencies: cache save"
-        key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
-        paths:
-          - ~/.cache/bundle
+      - save_cache:
+          name: "Ruby dependencies: cache save"
+          key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ~/.cache/bundle
 
       # - run:
       #     name: Sync translations (only on main by default)
       #     command: bin/check_translations
-
-      # NO LONGER
-      # - restore_cache:
-      #     name: "Node dependencies: cache restore"
-      #     keys:
-      #       - CACHE_V1-yarn-{{ checksum "yarn.lock" }}
-      #       - CACHE_V1-yarn-
-
-      # - run:
-      #     name: "Node dependencies: install"
-      #     command: |
-      #       set -x
-      #       [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
-      #       yarn install --cache-folder ~/.cache/yarn $use_local
-
-      # - type: cache-save
-      #   name: "Node dependencies: cache save"
-      #   key: CACHE_V1-yarn-{{ checksum "yarn.lock" }}
-      #   paths:
-      #     - ~/.cache/yarn
 
       - restore_cache:
           name: "Assets: cache restore"
@@ -251,15 +142,15 @@ jobs:
             node --version
             bundle exec rails assets:precompile assets:clean --trace
 
-      - type: cache-save
-        name: "Assets: cache save"
-        key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
-        paths:
-          - .sass-cache
-          - public/assets
-          - public/packs
-          - public/packs-test
-          - tmp/cache/assets
+      - save_cache:
+          name: "Assets: cache save"
+          key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - .sass-cache
+            - public/assets
+            - public/packs
+            - public/packs-test
+            - tmp/cache/assets
 
       - run:
           name: Install Code Climate Test Reporter
@@ -341,7 +232,6 @@ jobs:
             curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
-  version: 2
   commit:
     jobs:
       - test
