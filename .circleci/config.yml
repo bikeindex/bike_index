@@ -7,11 +7,13 @@
 # See #2257
 
 version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@1.5.0
 
 jobs:
   brakeman_scan:
     docker:
-      - image: cimg/ruby:3.2.6-node
+      - image: cimg/ruby:3.2.6-browsers
     steps:
       - checkout
       - run:
@@ -157,6 +159,8 @@ jobs:
           command: |
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
+
+      - browser-tools/install-chromedriver
 
       - run:
           name: Wait for PostgreSQL to start
