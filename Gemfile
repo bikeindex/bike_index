@@ -185,4 +185,6 @@ group :test do
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
+  gem "capybara" # For view components
+  gem "selenium-webdriver" # For capybara
 end

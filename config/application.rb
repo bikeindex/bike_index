@@ -66,12 +66,13 @@ module Bikeindex
     config.view_component.instrumentation_enabled = true
     config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
     # ^ remove after upgrading to ViewComponent 4
+    config.default_preview_layout = "component_preview"
     config.view_component.preview_paths << "#{Rails.root}/app/components/"
     # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
-    initializer 'app_assets', after: 'importmap.assets' do
-      Rails.application.config.assets.paths << Rails.root.join('app')
+    initializer "app_assets", after: "importmap.assets" do
+      Rails.application.config.assets.paths << Rails.root.join("app")
     end
-    config.importmap.cache_sweepers << Rails.root.join('app/components') # Sweep importmap cache
+    config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
 
     config.generators do |g|
       g.helper nil

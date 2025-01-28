@@ -29,8 +29,12 @@ require "rspec/rails"
 require "database_cleaner"
 require "rspec-sidekiq"
 require "vcr"
-require 'view_component/test_helpers'
-require 'view_component/system_test_helpers'
+
+require "capybara/rails" # view component
+require "capybara/rspec"
+Capybara.default_driver = :selenium_chrome_headless
+require "view_component/test_helpers"
+require "view_component/system_test_helpers"
 
 ActiveRecord::Migration.maintain_test_schema!
 
@@ -47,6 +51,7 @@ RSpec.configure do |config|
   # View components
   config.include ViewComponent::TestHelpers, type: :component
   config.include ViewComponent::SystemTestHelpers, type: :component
+  config.include Capybara::RSpecMatchers, type: :component
 
   # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
@@ -71,6 +76,7 @@ VCR.configure do |config|
     record: :new_episodes,
     match_requests_on: [:method, :host, :path]
   }
+  config.ignore_hosts("127.0.0.1", "0.0.0.0") # for capybara selenium
 
   %w[GOOGLE_GEOCODER MAILCHIMP_KEY FACEBOOK_AD_TOKEN CLOUDFLARE_TOKEN MAXMIND_KEY].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }

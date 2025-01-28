@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe <%= component_class %>, :js, type: :system do
+  let(:preview_path) { "<%= preview_path %>" }
+
+  it "default preview" do
+    visit(preview_path)
+
+    expect(page).to have_content "<%= component_class %>"
+  end
+end
