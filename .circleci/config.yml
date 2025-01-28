@@ -125,6 +125,10 @@ jobs:
           paths:
             - ~/.cache/bundle
 
+      # - run:
+      #     name: Sync translations (only on main by default)
+      #     command: bin/check_translations
+
       - restore_cache:
           name: "Assets: cache restore"
           keys:
