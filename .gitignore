@@ -46,9 +46,6 @@ manufacturer.tsv
 /public/packs
 /public/packs-test
 /node_modules
-yarn-debug.log*
-yarn-error.log
-.yarn-integrity
 .nvmrc
 package-lock.json
 !/public/assets/.keep

@@ -21,7 +21,7 @@ _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby an
 
 - [Rails 5.2](http://rubyonrails.org/)
 
-- [Node 12.18](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/)
+- [Node 12.18](https://nodejs.org/en/)
 
 - PostgreSQL >= 9.6
 
