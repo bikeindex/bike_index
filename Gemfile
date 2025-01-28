@@ -108,6 +108,7 @@ gem "flamegraph", require: false
 gem "memory_profiler", require: false
 gem "rack-mini-profiler", require: ["prepend_net_http_patch"] # If you can't see it you can't make it better
 gem "stackprof", require: false
+gem "pghero" # PG Info
 
 gem "responders"
 gem "thor"
