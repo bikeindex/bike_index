@@ -1595,14 +1595,14 @@ RSpec.describe Bike, type: :model do
       yesterday = Time.current - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
       allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      expect(bike.calculated_listing_order).to eq(yesterday.to_time.to_i)
+      expect(bike.calculated_listing_order).to eq((Time.current - 1.day).to_i)
     end
 
     it "is the updated_at" do
       last_week = Time.current - 7.days
       bike.updated_at = last_week
       allow(bike).to receive(:stock_photo_url).and_return("https://some_photo.cum")
-      expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
+      expect(bike.calculated_listing_order).to eq((Time.current - 1.week).to_i / 10000)
     end
 
     context "stolen_record date" do
