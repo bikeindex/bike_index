@@ -9,8 +9,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 ruby "3.2.6"
 gem "rack"
 
-gem "rails", "~> 7.2"
-gem "concurrent-ruby", "1.3.4" # Required by rails < 7.1
+gem "rails"
 
 gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
@@ -80,7 +79,6 @@ gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape", "~> 1.8.0" # API DSL
-gem "hashie" # required for some Grape endpoints
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 
 # Secure things
