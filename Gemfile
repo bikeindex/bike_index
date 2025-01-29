@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-def next?
-  File.basename(__FILE__) == "Gemfile.next"
-end
-
 source "https://rubygems.org"
 
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
@@ -101,7 +97,6 @@ gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
 gem "sass-rails"
 gem "sprockets-rails"
-gem "uglifier"
 
 # new frontend
 gem "importmap-rails" # New JS setup

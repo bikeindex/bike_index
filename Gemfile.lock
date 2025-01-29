@@ -844,8 +844,6 @@ GEM
       simple_oauth (~> 0.3.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uglifier (4.2.0)
-      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
@@ -1006,7 +1004,6 @@ DEPENDENCIES
   turbo-rails
   twilio-ruby
   twitter
-  uglifier
   vcr
   view_component
   webmock
