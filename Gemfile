@@ -9,7 +9,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 ruby "3.2.6"
 gem "rack"
 
-gem "rails"
+gem "rails", "~> 8"
 
 gem "puma" # App server
 gem "bcrypt", "~> 3.1.7" # encryption
