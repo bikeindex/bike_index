@@ -7,14 +7,13 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
 ruby "3.2.6"
-gem "rack"
 
 gem "rails"
 
 gem "puma" # App server
-gem "bcrypt", "~> 3.1.7" # encryption
+gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
-gem "pg", "~> 1.0" # Postgres
+gem "pg" # Postgres
 gem "paranoia"
 gem "pg_search"
 
@@ -41,10 +40,9 @@ gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
 gem "redlock" # Locking
 
-gem "eventmachine"
 gem "faraday_middleware" # Manage faraday request flow
 gem "geocoder" # Geolocation using external APIs
-gem "hamlit" # Faster haml, what we use for templating
+gem "haml" # Template language
 gem "httparty"
 gem "kaminari" # pagination
 gem "kramdown" # Markdown
