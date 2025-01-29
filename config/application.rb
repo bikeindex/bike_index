@@ -1,20 +1,18 @@
 require_relative "boot"
 
 require "rails"
-
 # Pick the frameworks you want:
 require "active_model/railtie"
-# require "active_job/railtie"
+require "active_job/railtie"
 require "active_record/railtie"
 require "active_storage/engine"
 require "action_controller/railtie"
 require "action_mailer/railtie"
+# require "action_mailbox/engine"
+# require "action_text/engine"
 require "action_view/railtie"
 # require "action_cable/engine"
-require "sprockets/railtie"
 # require "rails/test_unit/railtie"
-
-require "rack/throttle"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -22,72 +20,26 @@ Bundler.require(*Rails.groups)
 
 module Bikeindex
   class Application < Rails::Application
-    config.redis_default_url = ENV["REDIS_URL"]
-    config.redis_cache_url = ENV["REDIS_CACHE_URL"]
-
+    # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1
 
-    # Use our custom error pages
-    config.exceptions_app = routes
-
-    config.time_zone = "Central Time (US & Canada)"
+    config.redis_default_url = ENV["REDIS_URL"]
+    config.redis_cache_url = ENV["REDIS_CACHE_URL"]
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks rails])
+    config.autoload_lib(ignore: %w[assets tasks])
 
-    # Force sql schema use so we get psql extensions
-    config.active_record.schema_format = :sql
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    # config.time_zone = "Central Time (US & Canada)"
+    # config.eager_load_paths << Rails.root.join("extras")
 
-    # Remove deprecation warning for Rails 8.1
-    config.active_support.to_time_preserves_timezone = :zone
-
-    # Disable default implicit presence validation for belongs_to relations
-    config.active_record.belongs_to_required_by_default = false
-
-    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
-    config.i18n.enforce_available_locales = false
-    config.i18n.default_locale = :en
-    config.i18n.available_locales = %i[en es it nl nb]
-    config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
-
-    config.middleware.use Rack::Throttle::Minute,
-      max: ENV["MIN_MAX_RATE"].to_i,
-      cache: Redis.new(url: config.redis_cache_url),
-      key_prefix: :throttle
-
-    # Add middleware to make i18n configuration thread-safe
-    config.middleware.use I18n::Middleware
-
-    ActiveSupport::Reloader.to_prepare do
-      Doorkeeper::ApplicationsController.layout "doorkeeper"
-      Doorkeeper::AuthorizationsController.layout "doorkeeper"
-      Doorkeeper::AuthorizedApplicationsController.layout "doorkeeper"
-    end
-
-    # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
-    config.view_component.instrumentation_enabled = true
-    config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
-    # ^ remove after upgrading to ViewComponent 4
-    config.default_preview_layout = "component_preview"
-    config.view_component.preview_paths << "#{Rails.root}/app/components/"
-    # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
-    initializer "app_assets", after: "importmap.assets" do
-      Rails.application.config.assets.paths << Rails.root.join("app")
-    end
-    config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
-
-    config.generators do |g|
-      g.helper nil
-      g.javascripts nil
-      g.stylesheets nil
-      g.template_engine nil
-      g.serializer nil
-      g.assets nil
-      g.test_framework :rspec, view_specs: false, routing_specs: false, controller_specs: false
-      g.system_tests nil
-    end
+    # Don't generate system test files.
+    config.generators.system_tests = nil
   end
 end
