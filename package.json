@@ -1,0 +1,15 @@
+{
+  "name": "bike_index-webapp",
+  "devDependencies": {
+    "standard": "*"
+  },
+  "scripts": {
+    "lint": "standard --fix"
+  },
+  "standard": {
+    "ignore": [
+      "/app/assets/",
+      "/public/"
+    ]
+  }
+}

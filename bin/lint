@@ -12,4 +12,5 @@ end
 
 chdir APP_ROOT do
   system!("bundle exec standardrb --fix")
+  system!("npm run lint")
 end

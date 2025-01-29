@@ -29,8 +29,8 @@ require "capybara/rails"
 require "capybara/rspec"
 Capybara.register_driver :chrome_headless do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument('--headless')
-  options.add_argument('--window-size=1920,1080')
+  options.add_argument("--headless")
+  options.add_argument("--window-size=1920,1080")
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
 # Configure Capybara
