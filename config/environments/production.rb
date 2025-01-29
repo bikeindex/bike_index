@@ -1,3 +1,5 @@
+require "active_support/core_ext/integer/time"
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   # Use lograge for logging to production
@@ -16,7 +18,7 @@ Rails.application.configure do
   config.action_controller.action_on_unpermitted_parameters :log
 
   # Code is not reloaded between requests.
-  config.cache_classes = true
+  config.enable_reloading = false
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
@@ -51,7 +53,7 @@ Rails.application.configure do
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.action_controller.asset_host = 'http://assets.example.com'
+  # config.asset_host = "http://assets.example.com"
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
@@ -109,4 +111,7 @@ Rails.application.configure do
   config.action_mailer.postmark_settings = {
     api_token: ENV["POSTMARK_API_TOKEN"]
   }
+
+  # Only use :id for inspections in production.
+  config.active_record.attributes_for_inspect = [:id]
 end

@@ -1,8 +1,8 @@
 module Organized
   class StickersController < Organized::BaseController
     include SortableTable
-    before_action :ensure_access_to_bike_stickers!, except: [:create] # Because this checks ensure_admin
-    before_action :find_bike_sticker, only: [:edit, :update]
+    before_action :ensure_access_to_bike_stickers! # Because this checks ensure_admin
+    before_action :find_bike_sticker, only: %i[edit update]
 
     def index
       page = params[:page] || 1
