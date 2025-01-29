@@ -57,7 +57,8 @@ gem "sitemap_generator", "~> 6"
 # Making other files
 gem "mini_magick" # Required for image processing
 gem "carrierwave", "~> 2.2.6" # File uploader
-gem "carrierwave_backgrounder" # background processing of images
+# Using bikeindex fork to support rails 8
+gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused

@@ -150,7 +150,7 @@ Rails.application.routes.draw do
   get "bike_versions/:id/edit(/:edit_template)", to: "bike_versions/edits#show", as: :edit_bike_version
 
   resources :bike_stickers, only: [:update]
-  resources :locks, except: %(show index)
+  resources :locks, except: %i[show index]
   resources :impound_claims, only: [:create, :update]
   resources :review_impound_claims, only: [:show, :update]
 

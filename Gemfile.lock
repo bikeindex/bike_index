@@ -1,4 +1,12 @@
 GIT
+  remote: https://github.com/bikeindex/carrierwave_backgrounder.git
+  revision: 7b2b0e9bc43f2ec20f09db3fea7bbc5f167f52c7
+  specs:
+    carrierwave_backgrounder (1.0.2)
+      carrierwave (> 2.0, < 4.0)
+      rails
+
+GIT
   remote: https://github.com/bikeindex/swagger-ui_rails.git
   revision: 0377d8ecd0714901351a6bfc68491d255ad86093
   branch: bike_index_0.1.7
@@ -178,10 +186,7 @@ GEM
       marcel (~> 1.0.0)
       mini_mime (>= 0.1.3)
       ssrf_filter (~> 1.0)
-    carrierwave_backgrounder (1.0.2)
-      carrierwave (> 2.0, < 4.0)
-      rails (> 6.0, < 8.0)
-    chartkick (4.1.3)
+    chartkick (5.1.2)
     chunky_png (1.4.0)
     coderay (1.1.3)
     coffee-rails (4.2.2)
@@ -324,8 +329,8 @@ GEM
     grape_logging (1.8.4)
       grape
       rack
-    groupdate (6.0.1)
-      activesupport (>= 5.2)
+    groupdate (6.5.1)
+      activesupport (>= 7)
     guard (2.16.2)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
@@ -885,7 +890,7 @@ DEPENDENCIES
   bullet
   capybara
   carrierwave (~> 2.2.6)
-  carrierwave_backgrounder
+  carrierwave_backgrounder!
   chartkick
   coderay
   coffee-rails

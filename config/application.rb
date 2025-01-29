@@ -25,7 +25,7 @@ module Bikeindex
     config.redis_default_url = ENV["REDIS_URL"]
     config.redis_cache_url = ENV["REDIS_CACHE_URL"]
 
-    config.load_defaults 7.1
+    config.load_defaults 7.2
 
     # Use our custom error pages
     config.exceptions_app = routes
