@@ -564,7 +564,7 @@ RSpec.describe User, type: :model do
         expect(user.send_password_reset_email).to be_falsey
       }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
-      pp user.auth_token_time("password_reset_token")
+      # pp user.auth_token_time("password_reset_token")
       expect(user.password_reset_token).to eq current_token
     end
   end

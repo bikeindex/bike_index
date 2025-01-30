@@ -33,7 +33,7 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
-#  password_reset_token               :text
+#  token_for_password_reset           :text
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null
@@ -195,10 +195,6 @@ class User < ApplicationRecord
     def from_auth(auth)
       return nil unless auth&.is_a?(Array)
       where(id: auth[0], auth_token: auth[1]).first
-    end
-
-    def for_password_reset_token(password_reset_token)
-      where(password_reset_token: password_reset_token)
     end
   end
 

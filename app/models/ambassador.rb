@@ -33,7 +33,7 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
-#  password_reset_token               :text
+#  token_for_password_reset           :text
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null

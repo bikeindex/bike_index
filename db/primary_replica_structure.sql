@@ -3441,7 +3441,7 @@ CREATE TABLE public.users (
     password text,
     last_login_at timestamp without time zone,
     superuser boolean DEFAULT false NOT NULL,
-    password_reset_token text,
+    token_for_password_reset text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     password_digest character varying(255),
@@ -6125,10 +6125,10 @@ CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
 
 
 --
--- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
+-- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_password_reset_token ON public.users USING btree (password_reset_token);
+CREATE INDEX index_users_on_token_for_password_reset ON public.users USING btree (token_for_password_reset);
 
 
 --
@@ -6208,6 +6208,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250130185756'),
 ('20250127224140'),
 ('20250127223414'),
 ('20250125023931'),
