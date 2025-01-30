@@ -309,7 +309,7 @@ nb:
         partner_data: Partnerdata
         password: Passord
         password_digest: Passordsammendrag
-        password_reset_token: Token for tilbakestilling av passord
+        token_for_password_reset: Token for tilbakestilling av passord
         payments: Betalinger
         phone: Telefon
         preferred_language: Foretrukket Språk
@@ -804,7 +804,7 @@ nb:
         partner_data: Partnerdata
         password: Passord
         password_digest: Passordsammendrag
-        password_reset_token: Token for tilbakestilling av passord
+        token_for_password_reset: Token for tilbakestilling av passord
         payments: Betalinger
         phone: Telefon
         preferred_language: Foretrukket Språk
@@ -2620,7 +2620,7 @@ nb:
       confirm:
         already_confirmed: Brukerkontoen din er allerede bekreftet. Vennligst Logg
           inn.
-      find_user_from_password_reset_token!:
+      find_user_from_token_for_password_reset!:
         does_not_match_token: Tilsvarer ikke brukerens tilbakestillingstoken for passord
         token_expired: Token for tilbakestilling av passord er utløpt. Prøv å tilbakestille
           passordet på nytt.

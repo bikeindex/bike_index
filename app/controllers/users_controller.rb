@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   include Sessionable
   before_action :skip_if_signed_in, only: %i[new]
-  before_action :find_user_from_password_reset_token!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
+  before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
 
   def new
     @user ||= User.new(email: params[:email])
@@ -183,10 +183,10 @@ class UsersController < ApplicationController
     params.require(:user).permit(:password, :password_confirmation)
   end
 
-  def find_user_from_password_reset_token!
+  def find_user_from_token_for_password_reset!
     @token = params[:token]
-    @user = User.find_by_password_reset_token(@token) if @token.present?
-    return true if @user.present? && !@user.auth_token_expired?("password_reset_token")
+    @user = User.find_by_token_for_password_reset(@token) if @token.present?
+    return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
     remove_session
     flash[:error] = @user.blank? ? translation_with_args(:does_not_match_token) : translation_with_args(:token_expired)
     redirect_to(request_password_reset_form_users_path) && return

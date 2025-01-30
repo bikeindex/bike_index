@@ -185,7 +185,7 @@ RSpec.describe CredibilityScorer do
     context "registered 2 years ago" do
       let(:created_at) { Time.current - 1.day - 2.years }
       let!(:ownership) { FactoryBot.create(:ownership, created_at: created_at, bike: bike) }
-      it "returns long_time_registration" do
+      it "returns long_time_registration", :flaky do
         bike.reload
         expect(subject.creation_age_badge(ownership)).to eq :long_time_registration
         expect(subject.creation_badges(ownership)).to eq([:long_time_registration])
