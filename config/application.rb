@@ -40,6 +40,9 @@ module Bikeindex
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
 
+    # Remove after Rails 8
+    config.active_support.to_time_preserves_timezone = :zone
+
     # Disable default implicit presence validation for belongs_to relations
     config.active_record.belongs_to_required_by_default = false
 

@@ -493,14 +493,23 @@ RSpec.describe User, type: :model do
   end
 
   describe "auth_token_time" do
+    let(:user) { FactoryBot.create(:user) }
     context "password_reset_token" do
-      it "gets long time ago if not there" do
-        user = User.new(password_reset_token: "c7c3b99a319ac09e2b0080a8s89asd89afsd6734n")
-        expect(user.auth_token_time("password_reset_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
+      context "not there" do
+        let(:user) { User.new(password_reset_token: "c7c3b99a319ac09e2b0080a8s89asd89afsd6734n") }
+        it "gets long time ago if not there" do
+          expect(user.auth_token_time("password_reset_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
+        end
+      end
+      context "generated from has_secure_password" do
+        # NOTE: has secure password generates password_reset_token on start
+        # See https://github.com/rails/rails/pull/52483
+        it "gets long time ago" do
+          expect(user.reload.password_reset_token).to be_present
+          expect(user.auth_token_time("password_reset_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
+        end
       end
       it "gets the time" do
-        user = FactoryBot.create(:user)
-        expect(user.password_reset_token).to be_blank
         user.update_auth_token("password_reset_token")
         user.reload
         expect(user.password_reset_token).to be_present
@@ -539,7 +548,6 @@ RSpec.describe User, type: :model do
   describe "send_password_reset_email" do
     it "enqueues sending the password reset" do
       user = FactoryBot.create(:user)
-      expect(user.password_reset_token).to be_nil
       expect {
         expect(user.send_password_reset_email).to be_truthy
       }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
@@ -549,12 +557,14 @@ RSpec.describe User, type: :model do
     it "doesn't send another one immediately" do
       user = FactoryBot.create(:user)
       expect(user.send_password_reset_email).to be_truthy
+      user.reload
       current_token = user.password_reset_token
       expect {
         expect(user.send_password_reset_email).to be_falsey
         expect(user.send_password_reset_email).to be_falsey
       }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
+      pp user.auth_token_time("password_reset_token")
       expect(user.password_reset_token).to eq current_token
     end
   end
