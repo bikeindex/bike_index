@@ -33,6 +33,15 @@ GIT
       excon (~> 0.76.0)
       json (~> 2.1, >= 2.1.0)
 
+GIT
+  remote: https://github.com/msuliq/annotate_models.git
+  revision: 5d96dffe8d057743a2478fabbf00e41179b19099
+  branch: community-maintained
+  specs:
+    annotate (3.2.0)
+      activerecord (>= 3.2)
+      rake (>= 10.4, < 14.0)
+
 GEM
   remote: https://rails-assets.org/
   specs:
@@ -134,9 +143,6 @@ GEM
       tzinfo (~> 2.0, >= 2.0.5)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    annotate (3.2.0)
-      activerecord (>= 3.2, < 8.0)
-      rake (>= 10.4, < 14.0)
     api-pagination (5.0.0)
     ast (2.4.2)
     autoprefixer-rails (9.7.3)
@@ -880,7 +886,7 @@ PLATFORMS
 DEPENDENCIES
   MailchimpMarketing!
   active_model_serializers (~> 0.8.3)
-  annotate
+  annotate!
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt
