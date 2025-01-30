@@ -162,7 +162,8 @@ GEM
     bootstrap (4.0.0.alpha4)
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
-    brakeman (5.4.1)
+    brakeman (7.0.0)
+      racc
     buftok (0.2.0)
     builder (3.3.0)
     bullet (8.0.0)
