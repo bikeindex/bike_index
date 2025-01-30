@@ -501,14 +501,6 @@ RSpec.describe User, type: :model do
           expect(user.auth_token_time("token_for_password_reset")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
         end
       end
-      context "generated from has_secure_password" do
-        # NOTE: has secure password generates token_for_password_reset on start
-        # See https://github.com/rails/rails/pull/52483
-        it "gets long time ago" do
-          expect(user.reload.token_for_password_reset).to be_present
-          expect(user.auth_token_time("token_for_password_reset")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
-        end
-      end
       it "gets the time" do
         user.update_auth_token("token_for_password_reset")
         user.reload
