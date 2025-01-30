@@ -48,7 +48,7 @@ en:
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        password_reset_token: Password reset token
+        token_for_password_reset: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
@@ -652,7 +652,7 @@ en:
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        password_reset_token: Password reset token
+        token_for_password_reset: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
@@ -1917,7 +1917,7 @@ en:
     users:
       confirm:
         already_confirmed: Your user account is already confirmed. Please log in.
-      find_user_from_password_reset_token!:
+      find_user_from_token_for_password_reset!:
         does_not_match_token: Doesn't match user's password reset token
         token_expired: Password reset token expired, try resetting password again.
       resend_confirmation_email:

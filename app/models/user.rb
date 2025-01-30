@@ -333,8 +333,8 @@ class User < ApplicationRecord
 
   def send_password_reset_email
     # If the auth token was just created, don't create a new one, it's too error prone
-    return false if auth_token_time("password_reset_token").to_i > (Time.current - 2.minutes).to_i
-    update_auth_token("password_reset_token")
+    return false if auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+    update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
     EmailResetPasswordWorker.perform_async(id)
     true

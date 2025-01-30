@@ -37,13 +37,13 @@ RSpec.describe CustomerMailer, type: :mailer do
 
   describe "password_reset_email" do
     it "renders email" do
-      user.update_auth_token("password_reset_token")
+      user.update_auth_token("token_for_password_reset")
       mail = CustomerMailer.password_reset_email(user)
       expect(mail.subject).to eq("Instructions to reset your password")
       expect(mail.from).to eq(["contact@bikeindex.org"])
-      expect(mail.body.encoded).to match(user.password_reset_token)
+      expect(mail.body.encoded).to match(user.token_for_password_reset)
       # And just to be sure, test the route a little more
-      expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.password_reset_token}/)
+      expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.token_for_password_reset}/)
       expect(mail.tag).to eq "password_reset_email"
     end
   end
