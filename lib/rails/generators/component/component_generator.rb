@@ -17,42 +17,25 @@ class ComponentGenerator < Rails::Generators::NamedBase
     template("component.html.erb", File.join(app_component_dir, "component.html.erb"))
     template("component_controller.js", stimulus_controller_path)
     template("preview.rb", File.join(app_component_dir, "component_preview.rb"))
-    # Create locales
-    create_file(File.join(app_component_dir, "component.yml"),
-      translations_hash(I18n.available_locales).to_yaml)
+
+    # Create locales (in app/componentss)
+    create_file(File.join(app_component_dir, "component.yml"), translations_hash.to_yaml)
+
 
     # Create files in spec/components/
     template("component_spec.rb", File.join(spec_component_dir, "component_spec.rb"))
     template("component_system_spec.rb", File.join(spec_component_dir, "component_system_spec.rb"))
   end
 
-  def create_locale_file
-    # I18n.available_locales.each do |locale|
-    #   create_file locale_destination(locale), translations_hash([locale]).to_yaml
-    # end
-    # else
-    # create_file(File.join(app_component_dir, "component.yml"), translations_hash(I18n.available_locales).to_yaml)
-    # end
-  end
-
   private
 
-  def translations_hash(locales)
-    locales.map { |locale| [locale.to_s, translation_keys] }.to_h
+  def translations_hash
+    I18n.available_locales.map { |locale| [locale.to_s, translation_keys] }.to_h
   end
 
   def translation_keys
-    keys = attributes.map(&:name)
-    keys = %w[hello] if keys.empty?
+    keys = attributes.any? ? attributes.map(&:name) : %w[hello]
     keys.map { |name| [name, name.capitalize] }.to_h
-  end
-
-  def locale_destination(locale = nil)
-    extension = ".#{locale}" if locale
-    File.join(app_component_dir, "component.yml")
-    # else
-    #   File.join(component_path, class_path, "#{file_name}_component#{extension}.yml")
-    # end
   end
 
   private
