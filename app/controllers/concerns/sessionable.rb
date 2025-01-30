@@ -58,7 +58,7 @@ module Sessionable
 
   def update_user_authentication_for_new_password
     @user.generate_auth_token("auth_token") # Doesn't save user
-    @user.update_auth_token("password_reset_token") # saves users
+    @user.update_auth_token("token_for_password_reset") # saves users
     @user.reload
   end
 end

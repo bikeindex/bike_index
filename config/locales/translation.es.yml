@@ -299,7 +299,7 @@ es:
         partner_data:
         password: Contraseña
         password_digest:
-        password_reset_token:
+        token_for_password_reset:
         payments:
         phone:
         preferred_language:
@@ -793,7 +793,7 @@ es:
         partner_data:
         password: Contraseña
         password_digest:
-        password_reset_token:
+        token_for_password_reset:
         payments:
         phone:
         preferred_language:
@@ -2447,7 +2447,7 @@ es:
     users:
       confirm:
         already_confirmed:
-      find_user_from_password_reset_token!:
+      find_user_from_token_for_password_reset!:
         does_not_match_token:
         token_expired:
       resend_confirmation_email:
