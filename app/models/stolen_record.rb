@@ -246,9 +246,7 @@ class StolenRecord < ApplicationRecord
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
-    pp date_stolen
     self.date_stolen = self.class.corrected_date_stolen(date_stolen)
-    pp date_stolen
     self.street = nil unless street.present? # Make it easier to find blank addresses
     if city.present?
       self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize

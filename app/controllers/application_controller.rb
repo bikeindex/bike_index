@@ -99,7 +99,7 @@ class ApplicationController < ActionController::Base
     end
     I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
-    Time.zone = TimeParser::DEFAULT_TIMEZONE
+    Time.zone = TimeParser::DEFAULT_TIME_ZONE
   end
 
   # Handle localization / currency conversion exceptions by redirecting to the

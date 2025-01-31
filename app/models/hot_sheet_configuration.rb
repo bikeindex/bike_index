@@ -46,7 +46,7 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def timezone
-    TimeParser.parse_timezone(timezone_str)
+    TimeZoneParser.parse(timezone_str)
   end
 
   def time_in_zone
@@ -79,7 +79,7 @@ class HotSheetConfiguration < ApplicationRecord
 
   def set_calculated_attributes
     # Store a parsed value - needs to store name, because timeparser can't parse timezone.to_s
-    self.timezone_str = TimeParser.parse_timezone(timezone_str)&.name
+    self.timezone_str = TimeZoneParser.parse(timezone_str)&.name
     self.send_seconds_past_midnight ||= 21_600 # 6am
   end
 
