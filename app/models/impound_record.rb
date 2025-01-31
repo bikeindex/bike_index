@@ -45,7 +45,7 @@ class ImpoundRecord < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  enum status: ImpoundRecordUpdate::KIND_ENUM
+  enum :status, ImpoundRecordUpdate::KIND_ENUM
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
@@ -136,7 +136,7 @@ class ImpoundRecord < ApplicationRecord
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     Geocodeable.address(
       self,
-      street: (force_show_address || show_address),
+      street: force_show_address || show_address,
       country: country
     ).presence
   end

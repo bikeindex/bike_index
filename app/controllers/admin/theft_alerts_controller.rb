@@ -151,7 +151,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     end
     # We always render distance
     distance = params[:search_distance].to_i
-    @distance = distance.present? && distance > 0 ? distance : 50
+    @distance = (distance.present? && distance > 0) ? distance : 50
     if params[:search_location].present?
       bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       theft_alerts = theft_alerts.within_bounding_box(bounding_box)
@@ -177,7 +177,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       theft_alert_attrs[:start_at] = nil
       theft_alert_attrs[:end_at] = nil
     else
-      timezone = TimeParser.parse_timezone(params[:timezone])
+      timezone = TimeZoneParser.parse(params[:timezone])
       theft_alert_attrs[:start_at] = TimeParser.parse(theft_alert_attrs[:start_at], timezone)
       theft_alert_attrs[:end_at] = TimeParser.parse(theft_alert_attrs[:end_at], timezone)
     end

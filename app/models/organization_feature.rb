@@ -77,7 +77,7 @@ class OrganizationFeature < ApplicationRecord
   validates_uniqueness_of :name
   validates :currency, presence: true
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   after_commit :update_invoices
 

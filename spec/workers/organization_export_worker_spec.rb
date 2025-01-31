@@ -187,21 +187,13 @@ RSpec.describe OrganizationExportWorker, type: :job do
           owner_email: email)
       end
       # let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
-      let(:target_mnfg) do
-        # NOTE: this is different on the mac version of nokogiri, see PR#2366
-        if ENV["CI"]
-          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;"
-        else
-          "Sweet manufacturer &gt;"
-        end
-      end
       let(:bike_row_hash) do
         {
           color: "Black, #{secondary_color.name}",
           extra_registration_number: "cool extra serial",
           is_stolen: nil,
           link: "http://test.host/bikes/#{bike.id}",
-          manufacturer: target_mnfg,
+          manufacturer: "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;",
           model: "\\\",,,\\\"<script>XSSSSS</script>",
           motorized: "false",
           owner_email: email,

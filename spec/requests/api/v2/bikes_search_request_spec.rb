@@ -72,7 +72,7 @@ RSpec.describe "Bikes API V2", type: :request do
 
     it "proximity square does not overwrite the proximity_radius" do
       opts = {proximity_square: 100, proximity_radius: "10"}
-      target = Hashie::Mash.new(opts.merge(proximity: "ip"))
+      target = opts.merge(proximity: "ip")
       expect_any_instance_of(BikeSearcher).to receive(:initialize).with(target)
       get "/api/v2/bikes_search/count", params: opts.merge(format: :json)
     end

@@ -25,18 +25,23 @@ module Bikeindex
     config.redis_default_url = ENV["REDIS_URL"]
     config.redis_cache_url = ENV["REDIS_CACHE_URL"]
 
-    config.load_defaults 6.1
+    config.load_defaults 7.2
 
     # Use our custom error pages
     config.exceptions_app = routes
 
-    # Configure sensitive parameters which will be filtered from the log file.
-    Rails.application.config.filter_parameters += [:password, :file]
-
     config.time_zone = "Central Time (US & Canada)"
+
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w[assets tasks rails])
 
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
+
+    # Remove after Rails 8
+    config.active_support.to_time_preserves_timezone = :zone
 
     # Disable default implicit presence validation for belongs_to relations
     config.active_record.belongs_to_required_by_default = false
@@ -62,8 +67,19 @@ module Bikeindex
       Doorkeeper::AuthorizedApplicationsController.layout "doorkeeper"
     end
 
+    # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
+    config.view_component.instrumentation_enabled = true
+    config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
+    # ^ remove after upgrading to ViewComponent 4
+    config.default_preview_layout = "component_preview"
+    config.view_component.preview_paths << "#{Rails.root}/app/components/"
+    # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
+    initializer "app_assets", after: "importmap.assets" do
+      Rails.application.config.assets.paths << Rails.root.join("app")
+    end
+    config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
+
     config.generators do |g|
-      g.factory_bot "true"
       g.helper nil
       g.javascripts nil
       g.stylesheets nil

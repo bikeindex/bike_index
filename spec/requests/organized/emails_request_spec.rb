@@ -93,9 +93,8 @@ RSpec.describe Organized::EmailsController, type: :request do
         context "different org" do
           let!(:parking_notification) { FactoryBot.create(:parking_notification) }
           it "404s" do
-            expect {
-              get "#{base_url}/appears_abandoned_notification", params: {parking_notification_id: parking_notification.id}
-            }.to raise_error(ActiveRecord::RecordNotFound)
+            get "#{base_url}/appears_abandoned_notification", params: {parking_notification_id: parking_notification.id}
+            expect(response.status).to eq 404
           end
         end
       end
@@ -128,9 +127,8 @@ RSpec.describe Organized::EmailsController, type: :request do
         context "different org" do
           let!(:graduated_notification) { FactoryBot.create(:graduated_notification) }
           it "404s" do
-            expect {
-              get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
-            }.to raise_error(ActiveRecord::RecordNotFound)
+            get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
+            expect(response.status).to eq 404
           end
         end
       end

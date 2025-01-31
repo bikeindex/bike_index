@@ -86,7 +86,7 @@ class BikeCreator
   def add_bike_book_data(b_param = nil)
     return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
     return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
-    bb_data = BikeBookIntegration.new.get_model({
+    bb_data = Integrations::BikeBook.new.get_model({
       manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
       year: b_param.bike["year"],
       frame_model: b_param.bike["frame_model"]

@@ -77,11 +77,11 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def default_column
-    action_name == "reassign" ? "code_integer" : sortable_columns.first
+    (action_name == "reassign") ? "code_integer" : sortable_columns.first
   end
 
   def default_direction
-    action_name == "reassign" ? "asc" : "desc"
+    (action_name == "reassign") ? "asc" : "desc"
   end
 
   def matching_bike_stickers

@@ -52,9 +52,9 @@ class SpamEstimator
       susness = if str_length < 6
         [0, 100].include?(vowel_percent) ? 40 : 0
       elsif vowel_percent < 5
-        str_length < 11 ? 80 : 100
+        (str_length < 11) ? 80 : 100
       elsif vowel_percent < 20
-        offset = vowel_percent > 12 ? 90 : 120
+        offset = (vowel_percent > 12) ? 90 : 120
         if str_length < 9
           offset -= 50
         elsif str_length < 14
@@ -126,13 +126,13 @@ class SpamEstimator
 
       spaces_count = str.count(" -")
       if str_length < 20
-        return spaces_count < 1 ? 10 : 0
+        return (spaces_count < 1) ? 10 : 0
       end
 
       target_space_count = (str_length / 12).floor
       return 0 if spaces_count >= target_space_count
 
-      multiplier = str_length < 31 ? 40 : 60
+      multiplier = (str_length < 31) ? 40 : 60
       susness = (target_space_count - spaces_count) * multiplier
 
       within_bounds(susness)
@@ -140,7 +140,7 @@ class SpamEstimator
 
     def within_bounds(num)
       return 0 if num < 0
-      num < 100 ? num : 100
+      (num < 100) ? num : 100
     end
 
     def downcase_transliterate(str)

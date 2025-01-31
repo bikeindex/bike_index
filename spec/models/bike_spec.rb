@@ -1273,8 +1273,11 @@ RSpec.describe Bike, type: :model do
         expect(impound_record.authorized?(impound_user)).to be_truthy
         expect(bike.authorized?(bike.user)).to be_truthy
         expect(bike.authorized?(impound_user)).to be_falsey
+        expect(bike.send(:can_see_hidden_serial?)).to be_falsey
         expect(bike.serial_display).to eq "Hidden"
+        expect(bike.send(:can_see_hidden_serial?, bike.user)).to be_truthy
         expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
+        expect(bike.send(:can_see_hidden_serial?, impound_user)).to be_truthy
         expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
       end
       context "organized" do
@@ -1592,14 +1595,14 @@ RSpec.describe Bike, type: :model do
       yesterday = Time.current - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
       allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      expect(bike.calculated_listing_order).to eq(yesterday.to_time.to_i)
+      expect(bike.calculated_listing_order).to eq((Time.current - 1.day).to_i)
     end
 
     it "is the updated_at" do
       last_week = Time.current - 7.days
       bike.updated_at = last_week
       allow(bike).to receive(:stock_photo_url).and_return("https://some_photo.cum")
-      expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
+      expect(bike.calculated_listing_order).to eq((Time.current - 1.week).to_i / 10000)
     end
 
     context "stolen_record date" do

@@ -21,7 +21,7 @@ RSpec.describe RegistrationsController, type: :request do
     (response_body.scan(/<input.*>/i) + response_body.scan(/<select.*>/i)).map do |input_str|
       {
         str: input_str,
-        value: input_str[/value="[^"]*/]&.gsub(/value="/, ""),
+        value: input_str[/value="[^"]*/]&.gsub('value="', ""),
         name: input_str[/name="[^"]*/]&.gsub(/name="(b_param\[)?/i, "")&.tr("]", "")
       }
     end

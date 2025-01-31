@@ -276,9 +276,8 @@ RSpec.describe PublicImagesController, type: :request do
     context "private" do
       let(:public_image) { FactoryBot.create(:public_image, is_private: true) }
       it "redirects" do
-        expect {
-          get "#{base_url}/#{public_image.id}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{public_image.id}"
+        expect(response.status).to eq 404
       end
     end
   end

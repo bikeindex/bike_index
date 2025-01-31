@@ -12,7 +12,7 @@ class DiscourseAuthenticationController < ApplicationController
     url = sso.to_url(discourse_redirect_url)
 
     if url.include?("session/sso_login?")
-      redirect_to(url) && return
+      redirect_to(url, allow_other_host: true) && return
     end
   end
 

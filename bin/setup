@@ -19,8 +19,9 @@ chdir APP_ROOT do
 
   puts "== Starting redis so database can be migrated =="
   system "redis-server &"
-  # Install JavaScript dependencies if using Yarn
-  system('bin/yarn')
+
+  # Install JavaScript dependencies
+  system('npm install')
 
   puts "\n== Preparing and seeding database =="
   # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev

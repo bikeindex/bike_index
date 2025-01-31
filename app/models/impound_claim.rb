@@ -43,7 +43,7 @@ class ImpoundClaim < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :send_triggered_notifications
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   scope :unsubmitted, -> { where(submitted_at: nil) }
   scope :submitted, -> { where.not(submitted_at: nil) }
@@ -75,7 +75,7 @@ class ImpoundClaim < ApplicationRecord
 
   def self.status_humanized(str)
     # It doesn't make sense to display "submitting"
-    str == "submitting" ? "submitted" : str&.to_s&.tr("_", " ")
+    (str == "submitting") ? "submitted" : str&.to_s&.tr("_", " ")
   end
 
   def self.involving_bike_id(bike_id)

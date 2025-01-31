@@ -18,7 +18,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
     end
     it "adds the phone, in a streamlined way without calling multiple times" do
       user.reload
-      expect_any_instance_of(TwilioIntegration).not_to(receive(:send_message))
+      expect_any_instance_of(Integrations::Twilio).not_to(receive(:send_message))
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
         expect {
@@ -40,7 +40,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       before { Flipper.enable(:phone_verification) }
       it "adds the phone, in a streamlined way without calling multiple times" do
         user.reload
-        expect_any_instance_of(TwilioIntegration).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
+        expect_any_instance_of(Integrations::Twilio).to(receive(:send_message).exactly(1).time) { OpenStruct.new(sid: "asd7c80123123sdddf") }
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           expect {
@@ -116,9 +116,9 @@ RSpec.describe AfterUserChangeWorker, type: :job do
         expect(user.reload.superuser).to be_falsey
         expect(user.superuser_abilities.count).to eq 1
         expect(superuser_ability.universal?).to be_truthy
-        pp user.superuser_abilities
+
         instance.perform(user)
-        pp user.reload.superuser_abilities
+
         expect(user.reload.superuser_abilities.count).to eq 0
         superuser_ability = SuperuserAbility.unscoped.first
         expect(superuser_ability.deleted?).to be_truthy

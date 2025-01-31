@@ -160,7 +160,7 @@ class TwitterAccount < ApplicationRecord
   end
 
   def tweet(text, photo = nil, **opts)
-    return unless text.present?
+    nil unless text.present?
 
     # Commented out in #2618 - twitter is disabled
     #

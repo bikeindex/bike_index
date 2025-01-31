@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+module <%= class_name %>
+  class Component < <%= parent_class %>
+    def initialize(<%= initialize_signature %>)
+      <%= initialize_body %>
+    end
+  end
+end

@@ -40,7 +40,7 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   after_commit :update_associations
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :active, -> { where(kind: active_kinds) }
   scope :resolved, -> { where(kind: resolved_kinds) }

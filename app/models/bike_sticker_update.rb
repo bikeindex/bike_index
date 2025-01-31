@@ -29,9 +29,9 @@ class BikeStickerUpdate < ApplicationRecord
   belongs_to :export
   belongs_to :bulk_import
 
-  enum kind: KIND_ENUM
-  enum creator_kind: CREATOR_KIND_ENUM
-  enum organization_kind: ORGANIZATION_KIND_ENUM
+  enum :kind, KIND_ENUM
+  enum :creator_kind, CREATOR_KIND_ENUM
+  enum :organization_kind, ORGANIZATION_KIND_ENUM
 
   scope :successful, -> { where(kind: successful_kinds) }
   scope :unauthorized_organization, -> { where(organization_kind: organization_kinds_unauthorized) }
@@ -102,7 +102,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def add_failed_claim_error(str_or_array)
     self.failed_claim_errors = [
-      (failed_claim_errors || nil),
+      failed_claim_errors || nil,
       Array(str_or_array)
     ].flatten.compact.join(", ")
   end

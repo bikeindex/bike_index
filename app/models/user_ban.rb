@@ -21,7 +21,7 @@ class UserBan < ApplicationRecord
 
   acts_as_paranoid
 
-  enum reason: REASON_ENUM
+  enum :reason, REASON_ENUM
 
   belongs_to :user
   belongs_to :creator, class_name: "User"

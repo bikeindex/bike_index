@@ -32,7 +32,7 @@ class OrganizedMailer < ApplicationMailer
       new_bike: @ownership.new_registration?,
       email: @ownership.owner_email,
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-      registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
+      registered_by_owner: @ownership.user.present? && @bike.creator_id == @ownership.user_id
     }
     @organization = @ownership.organization
     @vars[:donation_message] = @bike.status_stolen? && !(@organization && !@organization.paid?)
@@ -153,6 +153,6 @@ class OrganizedMailer < ApplicationMailer
   end
 
   def reply_to
-    @organization && @organization.auto_user.present? ? @organization.auto_user.email : "contact@bikeindex.org"
+    (@organization && @organization.auto_user.present?) ? @organization.auto_user.email : "contact@bikeindex.org"
   end
 end

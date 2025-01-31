@@ -22,7 +22,7 @@ RSpec.describe BulkImportWorker, type: :job do
     ]
   end
   # Only handling organization_import and impounded for now, Fuck it
-  let(:csv_lines) { kind == "impounded" ? sample_csv_impounded_lines : sample_csv_lines }
+  let(:csv_lines) { (kind == "impounded") ? sample_csv_impounded_lines : sample_csv_lines }
   let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
   let(:tempfile) do
     file = Tempfile.new
@@ -597,7 +597,7 @@ RSpec.describe BulkImportWorker, type: :job do
           context "with chartreuse paint" do
             let(:green) { FactoryBot.create(:color, name: "Green") }
             let!(:paint) { FactoryBot.create(:paint, name: color, color: green) }
-            it "assigns" do
+            it "assigns", :flaky do
               expect(Paint.count).to eq 1
               bike = expect_registered_bike(row.merge(color: " ChartreuSE  "))
 

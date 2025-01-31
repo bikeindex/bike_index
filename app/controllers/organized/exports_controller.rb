@@ -11,7 +11,7 @@ module Organized
 
     def show
       @avery_export_redirect = params[:avery_redirect].present?
-      redirect_to @export.avery_export_url if @avery_export_redirect && @export.avery_export_url.present?
+      redirect_to(@export.avery_export_url, allow_other_host: true) if @avery_export_redirect && @export.avery_export_url.present?
     end
 
     def new

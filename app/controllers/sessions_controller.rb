@@ -64,7 +64,7 @@ class SessionsController < ApplicationController
   def destroy
     remove_session
     if params[:partner] == "bikehub"
-      redirect_to(bikehub_website_url) && return
+      redirect_to(bikehub_website_url, allow_other_host: true) && return
     elsif params[:redirect_location].present?
       if params[:redirect_location].match?("new_user")
         redirect_to(new_user_path, notice: "Logged out!") && return

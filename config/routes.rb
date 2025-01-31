@@ -4,6 +4,7 @@ require "sidekiq/web"
 
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
+  mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -149,7 +150,7 @@ Rails.application.routes.draw do
   get "bike_versions/:id/edit(/:edit_template)", to: "bike_versions/edits#show", as: :edit_bike_version
 
   resources :bike_stickers, only: [:update]
-  resources :locks, except: %(show index)
+  resources :locks, except: %i[show index]
   resources :impound_claims, only: [:create, :update]
   resources :review_impound_claims, only: [:show, :update]
 
@@ -258,7 +259,8 @@ Rails.application.routes.draw do
     resources :manufacturers do
       collection { post :import }
     end
-    resources :users, only: [:index, :show, :edit, :update, :destroy]
+    resources :users, only: %i[index show edit update destroy]
+    resources :banned_email_domains, only: %i[index new create destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
       :constraints => AdminRestriction,
@@ -332,6 +334,8 @@ Rails.application.routes.draw do
   resources :info, only: [:show]
 
   %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
+
+  mount Lookbook::Engine, at: "/lookbook"
 
   get "/400", to: "errors#bad_request", via: :all
   get "/401", to: "errors#unauthorized", via: :all

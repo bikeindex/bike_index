@@ -50,7 +50,7 @@ class BikeStickerBatch < ApplicationRecord
     estimated_finish_integer = (initial_code_integer&.to_i || max_code_integer) + to_create_count
     estimated_code_length = estimated_finish_integer.to_s.length
     # minimum of 4. Return a larger number if there's a larger code in the batch
-    estimated_code_length > 4 ? estimated_code_length : 4
+    (estimated_code_length > 4) ? estimated_code_length : 4
   end
 
   # Shouldn't occur anymore, but included for legacy diagnostic purposes

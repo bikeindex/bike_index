@@ -37,7 +37,7 @@ class ExternalRegistryBike < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum status: Bike::STATUS_ENUM
+  enum :status, Bike::STATUS_ENUM
 
   class << self
     def registry_name(str)
@@ -97,7 +97,7 @@ class ExternalRegistryBike < ApplicationRecord
   def short_address
     return nil unless location_found.present?
     addy = location_found.split(",")
-    shorter_length = addy.length > 3 ? 3 : addy.length
+    shorter_length = (addy.length > 3) ? 3 : addy.length
     addy[-shorter_length..].reject(&:blank?).map(&:strip).join(", ")
   end
 

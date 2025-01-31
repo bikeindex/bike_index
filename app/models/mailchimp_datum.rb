@@ -34,7 +34,7 @@ class MailchimpDatum < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_association_and_mailchimp, if: :persisted?
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   attr_accessor :creator_feedback, :skip_update
 
@@ -244,7 +244,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def member_hash(list = nil)
-    MailchimpIntegration.member_hash(self, list)
+    Integrations::Mailchimp.member_hash(self, list)
   end
 
   def calculated_data
@@ -359,7 +359,7 @@ class MailchimpDatum < ApplicationRecord
       updated_interests << mailchimp_organization.kind
     else
       updated_interests += calculated_feedbacks.select { |f| f.lead? }
-        .map { |f| f.kind.gsub(/lead_for_/, "") }
+        .map { |f| f.kind.gsub("lead_for_", "") }
     end
     updated_interests << "donors" if user&.payments&.donation&.any?
     updated_interests << "recovered_bike_owners" if stolen_records_recovered.any?

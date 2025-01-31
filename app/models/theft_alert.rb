@@ -36,7 +36,7 @@ class TheftAlert < ApplicationRecord
   # Timestamp 1s before first alert was automated
   AUTOMATION_START = 1625586988 # 2021-7-6
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   validates :theft_alert_plan,
     :status,

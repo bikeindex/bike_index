@@ -169,7 +169,7 @@
       "cwe_id": [
         79
       ],
-      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in documentation/authorize.html.haml) as not concerns"
+      "note": ""
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -273,46 +273,25 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "2d973d9d92bd159549b81dfc42f49ac6fb2d107936e4e9c93ac723af8175a487",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/views/shared/_pagination.html.haml",
-      "line": 32,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "matching_bike_sticker_updates.reorder(\"bike_sticker_updates.#{sort_column} #{sort_direction}\").includes(:organization, :user, :bike).page((params[:page] or 1)).per((params[:per_page] or 25)).where(\"#{matching_bike_sticker_updates.reorder(\"bike_sticker_updates.#{sort_column} #{sort_direction}\").includes(:organization, :user, :bike).page((params[:page] or 1)).per((params[:per_page] or 25)).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::BikeStickerUpdatesController",
-          "method": "index",
-          "line": 10,
-          "file": "app/controllers/admin/bike_sticker_updates_controller.rb",
-          "rendered": {
-            "name": "admin/bike_sticker_updates/index",
-            "file": "app/views/admin/bike_sticker_updates/index.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "admin/bike_sticker_updates/index",
-          "line": 134,
-          "file": "app/views/admin/bike_sticker_updates/index.html.haml",
-          "rendered": {
-            "name": "shared/_pagination",
-            "file": "app/views/shared/_pagination.html.haml"
-          }
-        }
-      ],
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/discourse_authentication_controller.rb",
+      "line": 15,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url), :allow_other_host => true)",
+      "render_path": null,
       "location": {
-        "type": "template",
-        "template": "shared/_pagination"
+        "type": "method",
+        "class": "DiscourseAuthenticationController",
+        "method": "index"
       },
-      "user_input": "@time_range_column",
+      "user_input": "SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url)",
       "confidence": "Weak",
       "cwe_id": [
-        89
+        601
       ],
       "note": ""
     },
@@ -331,7 +310,7 @@
           "type": "controller",
           "class": "InfoController",
           "method": "show",
-          "line": 13,
+          "line": 17,
           "file": "app/controllers/info_controller.rb",
           "rendered": {
             "name": "info/show",
@@ -502,7 +481,7 @@
           "type": "controller",
           "class": "InfoController",
           "method": "why_donate",
-          "line": 53,
+          "line": 57,
           "file": "app/controllers/info_controller.rb",
           "rendered": {
             "name": "news/show",
@@ -602,29 +581,6 @@
       "note": ""
     },
     {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "7bea5fb2c5c91ab7a798747d36860236c56b4ace79a0a509a40a3af6dbc9d60b",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/discourse_authentication_controller.rb",
-      "line": 15,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DiscourseAuthenticationController",
-        "method": "index"
-      },
-      "user_input": "SingleSignOn.parse(session[:discourse_redirect], discourse_secret).to_url(discourse_redirect_url)",
-      "confidence": "High",
-      "cwe_id": [
-        601
-      ],
-      "note": "url is validated before we use redirect_to"
-    },
-    {
       "warning_type": "Mass Assignment",
       "warning_code": 105,
       "fingerprint": "843e0b97c05d7b25ce5dc66ef0215dfcf907b68522225416e1ed7355ede83732",
@@ -694,23 +650,27 @@
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
-      "warning_type": "Unmaintained Dependency",
-      "warning_code": 121,
-      "fingerprint": "9a3951031616a07c8e02c86652f537e92c08685da97f5ec2b12d5d3602b55bb8",
-      "check_name": "EOLRuby",
-      "message": "Support for Ruby 2.7.8 ended on 2023-03-31",
-      "file": "Gemfile.lock",
-      "line": 900,
-      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
-      "code": null,
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "9633ca0cf6c75c9b3f30547832a4b08b925b099f8adf107e14c6747ea3ca16f5",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/log_searcher/reader.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{rgrep_command_str(time, :log_path => log_path)} | wc -l`",
       "render_path": null,
-      "location": null,
-      "user_input": null,
-      "confidence": "High",
+      "location": {
+        "type": "method",
+        "class": "LogSearcher::Reader",
+        "method": "s(:self).rgrep_log_lines_count"
+      },
+      "user_input": "rgrep_command_str(time, :log_path => log_path)",
+      "confidence": "Medium",
       "cwe_id": [
-        1104
+        77
       ],
-      "note": "Work to upgrade Ruby has been prioritised."
+      "note": ""
     },
     {
       "warning_type": "Remote Code Execution",
@@ -1067,7 +1027,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/models/export.rb",
-      "line": 225,
+      "line": 251,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`wc -l \"#{tmp_file.path}\"`",
       "render_path": null,
@@ -1116,29 +1076,6 @@
         79
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "c587d53816af6e79f4c2431dc261ef8a492b525d5c10f0d7e9c87ef06472ad8c",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/public_images_controller.rb",
-      "line": 31,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to((if PublicImage.new(permitted_parameters).present? then\n  ((BikeVersion.unscoped.find(params[:bike_id]) or Bike.unscoped.find(params[:bike_id])) or (Blog.find(params[:blog_id]) or (MailSnippet.find(params[:mail_snippet_id]) or current_organization)))\nelse\n  user_root_url\nend))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "PublicImagesController",
-        "method": "create"
-      },
-      "user_input": "BikeVersion.unscoped.find(params[:bike_id])",
-      "confidence": "High",
-      "cwe_id": [
-        601
-      ],
-      "note": "Non risk. The later lines in that method verify that the user has access to the BikeVersion or Bike"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1275,29 +1212,6 @@
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "d8da8ee7a70773f264d1ee33b44fd664227586cbd3b7ca689811909da303a313",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/services/log_searcher/reader.rb",
-      "line": 35,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`#{rgrep_command_str(time, :log_path => log_path)} | wc -l`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "LogSearcher::Reader",
-        "method": "rgrep_log_lines_count"
-      },
-      "user_input": "rgrep_command_str(time, :log_path => log_path)",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "dc387e2ec0a85438fbaa42a77b840e29a0c3de2dbd6be0a8311442f03564b1a8",
@@ -1317,6 +1231,50 @@
       "confidence": "Medium",
       "cwe_id": [
         915
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "dffaf0efe12dc10011f6d8b661bbcf78ce000d6bb6ad873cad7cdcbf986ad9a3",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/views/shared/_pagination.html.haml",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "BannedEmailDomain.order(sort_column => sort_direction).includes(:creator).page((params[:page] or 1)).per((params[:per_page] or 25)).where(\"#{BannedEmailDomain.order(sort_column => sort_direction).includes(:creator).page((params[:page] or 1)).per((params[:per_page] or 25)).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::BannedEmailDomainsController",
+          "method": "index",
+          "line": 10,
+          "file": "app/controllers/admin/banned_email_domains_controller.rb",
+          "rendered": {
+            "name": "admin/banned_email_domains/index",
+            "file": "app/views/admin/banned_email_domains/index.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "admin/banned_email_domains/index",
+          "line": 22,
+          "file": "app/views/admin/banned_email_domains/index.html.haml",
+          "rendered": {
+            "name": "shared/_pagination",
+            "file": "app/views/shared/_pagination.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/_pagination"
+      },
+      "user_input": "@time_range_column",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -1412,6 +1370,5 @@
       "note": ""
     }
   ],
-  "updated": "2024-08-23 14:59:47 -0300",
-  "brakeman_version": "5.4.1"
+  "brakeman_version": "7.0.0"
 }

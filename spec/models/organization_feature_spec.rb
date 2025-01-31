@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe OrganizationFeature, type: :model do
   it_behaves_like "amountable"
+
   describe "constant ordering" do
     it "is ordered" do
       expect(OrganizationFeature::REG_FIELDS.sort).to eq OrganizationFeature::REG_FIELDS
@@ -24,7 +25,7 @@ RSpec.describe OrganizationFeature, type: :model do
   describe "child organization" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement", enabled_feature_slugs: %w[child_organizations bike_stickers]) }
     let(:invoice) { organization.current_invoices.first }
-    let(:organization_child) { FactoryBot.create(:organization_with_organization_features, parent_organization: organization, kind: "bike_shop", enabled_feature_slugs: "bike_search") }
+    let!(:organization_child) { FactoryBot.create(:organization_with_organization_features, parent_organization: organization, kind: "bike_shop", enabled_feature_slugs: "bike_search") }
     context "without child_enabled_feature_slugs" do
       it "does not inherit from the parent" do
         Sidekiq::Testing.inline! do
@@ -51,7 +52,7 @@ RSpec.describe OrganizationFeature, type: :model do
           expect(organization.enabled_feature_slugs).to eq %w[bike_stickers child_organizations reg_bike_sticker]
 
           expect(organization.reload.child_ids).to eq([organization_child.id])
-          expect(organization_child.enabled_feature_slugs).to match_array(%w[bike_search bike_stickers reg_bike_sticker])
+          expect(organization_child.reload.enabled_feature_slugs).to match_array(%w[bike_search bike_stickers reg_bike_sticker])
         end
       end
     end

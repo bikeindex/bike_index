@@ -58,7 +58,7 @@
             - else
               %small
                 - if tweet.body_html.present?
-                  = strip_tags(tweet.body_html)
+                  = InputNormalizer.sanitize(tweet.body_html)
                 - else
                   = tweet.body
           - unless skip_stolen_record

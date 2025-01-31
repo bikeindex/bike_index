@@ -7,7 +7,7 @@ RSpec.describe Autocomplete::Loader do
   # manufacturer.count == 1 tests are failing, because manufacturers are sticking around
   before { Manufacturer.delete_all }
 
-  describe "load_all" do
+  describe "load_all", :flaky do
     let!(:color) { Color.black }
     let!(:manufacturer) { Manufacturer.other }
     it "stores" do

@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   include Sessionable
-  before_action :skip_if_signed_in, only: %i[new globalid]
-  before_action :find_user_from_password_reset_token!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
+  before_action :skip_if_signed_in, only: %i[new]
+  before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
 
   def new
     @user ||= User.new(email: params[:email])
@@ -28,7 +28,7 @@ class UsersController < ApplicationController
       redirect_to(new_session_path) && return unless unconfirmed_current_user.present?
     end
     @user = unconfirmed_current_user
-    render layout: sign_in_partner == "bikehub" ? "application_bikehub" : "application"
+    render layout: (sign_in_partner == "bikehub") ? "application_bikehub" : "application"
   end
 
   def resend_confirmation_email
@@ -51,7 +51,7 @@ class UsersController < ApplicationController
       if current_user.present? && sign_in_partner.present?
         session.delete(:partner) # Only removing once signed in, PR#1435
         session.delete(:company)
-        redirect_to(bikehub_url("account?reauthenticate_bike_index=true")) && return # Only partner rn is bikehub, hardcode it
+        redirect_to(bikehub_url("account?reauthenticate_bike_index=true"), allow_other_host: true) && return # Only partner rn is bikehub, hardcode it
       else
         render_partner_or_default_signin_layout(redirect_path: new_session_path)
       end
@@ -183,10 +183,10 @@ class UsersController < ApplicationController
     params.require(:user).permit(:password, :password_confirmation)
   end
 
-  def find_user_from_password_reset_token!
+  def find_user_from_token_for_password_reset!
     @token = params[:token]
-    @user = User.find_by_password_reset_token(@token) if @token.present?
-    return true if @user.present? && !@user.auth_token_expired?("password_reset_token")
+    @user = User.find_by_token_for_password_reset(@token) if @token.present?
+    return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
     remove_session
     flash[:error] = @user.blank? ? translation_with_args(:does_not_match_token) : translation_with_args(:token_expired)
     redirect_to(request_password_reset_form_users_path) && return

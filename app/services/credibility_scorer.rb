@@ -93,7 +93,7 @@ class CredibilityScorer
   def self.ownership_badges(bike)
     return [] unless bike.current_ownership.present?
     [
-      bike.ownerships.count > 1 ? :multiple_ownerships : nil,
+      (bike.ownerships.count > 1) ? :multiple_ownerships : nil,
       bike.claimed? ? :current_ownership_claimed : nil
     ].compact
   end
@@ -154,7 +154,7 @@ class CredibilityScorer
 
   def self.creation_age_badge(obj)
     return :long_time_registration if obj.created_at < Time.current - 1.year
-    obj.created_at > Time.current - 1.month ? :created_this_month : nil
+    (obj.created_at > Time.current - 1.month) ? :created_this_month : nil
   end
 
   def self.suspiscious_handle?(str)
@@ -198,7 +198,7 @@ class CredibilityScorer
   def score
     badge_value = BASE_SCORE + self.class.badge_value(badges)
     return 0 if badge_value < 0
-    badge_value > MAX_SCORE ? MAX_SCORE : badge_value
+    (badge_value > MAX_SCORE) ? MAX_SCORE : badge_value
   end
 
   private

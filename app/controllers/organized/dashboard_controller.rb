@@ -3,6 +3,7 @@ module Organized
     before_action :set_fallback_period
     before_action :set_period, only: [:index]
     helper_method :bikes_for_graph
+    skip_before_action :ensure_not_ambassador_organization!, only: [:root]
 
     def root
       if current_organization.ambassador?

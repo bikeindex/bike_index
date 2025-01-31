@@ -27,8 +27,8 @@ class Membership < ApplicationRecord
   belongs_to :organization
   belongs_to :sender, class_name: "User"
 
-  enum role: MEMBERSHIP_TYPES
-  enum hot_sheet_notification: HOT_SHEET_NOTIFICATION_ENUM
+  enum :role, MEMBERSHIP_TYPES
+  enum :hot_sheet_notification, HOT_SHEET_NOTIFICATION_ENUM
 
   validates_presence_of :role, :organization_id, :invited_email
 

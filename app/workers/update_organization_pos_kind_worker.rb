@@ -21,7 +21,7 @@ class UpdateOrganizationPosKindWorker < ScheduledWorker
         bikes.where("bikes.created_at > ?", Time.current - 1.year).count > 100
     end
     return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
-    bikes.any_pos.count > 0 ? "broken_ascend_pos" : "no_pos"
+    (bikes.any_pos.count > 0) ? "broken_ascend_pos" : "no_pos"
   end
 
   def perform(org_id = nil)

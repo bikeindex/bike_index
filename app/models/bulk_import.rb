@@ -29,8 +29,8 @@ class BulkImport < ApplicationRecord
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
-  enum progress: PROGRESS_ENUM
-  enum kind: KIND_ENUM
+  enum :progress, PROGRESS_ENUM
+  enum :kind, KIND_ENUM
 
   scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
   scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }
@@ -56,7 +56,7 @@ class BulkImport < ApplicationRecord
   end
 
   def self.kind_humanized(str)
-    str == "organization_import" ? "standard" : str&.gsub("_", " ")
+    (str == "organization_import") ? "standard" : str&.tr("_", " ")
   end
 
   # NOTE: Headers were added in PR#1914 - 2021-3-11 - many bulk imports don't have them stored

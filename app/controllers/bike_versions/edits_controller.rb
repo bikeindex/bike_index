@@ -14,6 +14,6 @@ class BikeVersions::EditsController < BikeVersionsController
         .where(is_private: true)
     end
 
-    render "/bikes_edit/#{@edit_template}".to_sym
+    render :"/bikes_edit/#{@edit_template}"
   end
 end

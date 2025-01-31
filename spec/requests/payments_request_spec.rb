@@ -147,7 +147,7 @@ RSpec.describe PaymentsController, type: :request do
       end
     end
     context "with invalid amount" do
-      shared_examples 'redirects back and shows flash message' do
+      shared_examples "redirects back and shows flash message" do
         it "does not raise an error" do
           expect {
             post base_url, params: {
@@ -167,17 +167,17 @@ RSpec.describe PaymentsController, type: :request do
       context "with blank amount" do
         let(:amount_cents) { " " }
 
-        include_examples 'redirects back and shows flash message'
+        include_examples "redirects back and shows flash message"
       end
       context "with 0" do
         let(:amount_cents) { "000" }
 
-        include_examples 'redirects back and shows flash message'
+        include_examples "redirects back and shows flash message"
       end
       context "with to large amount" do
         let(:amount_cents) { 100000000 }
 
-        include_examples 'redirects back and shows flash message'
+        include_examples "redirects back and shows flash message"
       end
     end
 

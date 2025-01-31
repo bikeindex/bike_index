@@ -1,7 +1,7 @@
 class Admin::StolenBikesController < Admin::BaseController
   include SortableTable
-  before_action :find_bike, only: [:edit, :destroy, :update, :regenerate_alert_image]
-  before_action :set_period, only: [:index]
+  before_action :find_bike, only: %i[edit update]
+  before_action :set_period, only: %i[index]
   helper_method :available_stolen_records
 
   def index
@@ -21,7 +21,7 @@ class Admin::StolenBikesController < Admin::BaseController
           ApproveStolenListingWorker.perform_async(stolen_record.bike_id)
         end
         # Lazy pluralize hack
-        flash[:success] = "#{stolen_record_ids.count} stolen #{stolen_record_ids.count == 1 ? "bike" : "bikes"} approved!"
+        flash[:success] = "#{stolen_record_ids.count} stolen #{(stolen_record_ids.count == 1) ? "bike" : "bikes"} approved!"
       else
         flash[:error] = "No stolen records selected to approve!"
       end
@@ -120,7 +120,7 @@ class Admin::StolenBikesController < Admin::BaseController
 
     # We always render distance
     distance = params[:search_distance].to_i
-    @distance = distance.present? && distance > 0 ? distance : 50
+    @distance = (distance.present? && distance > 0) ? distance : 50
     if !@only_without_location && params[:search_location].present?
       bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       available_stolen_records = available_stolen_records.within_bounding_box(bounding_box)

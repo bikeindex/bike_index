@@ -27,9 +27,8 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
       let(:impound_record) { FactoryBot.create(:impound_record) }
       it "raises" do
         expect(impound_record.reload.authorized?(current_user)).to be_falsey
-        expect {
-          get "#{base_url}/#{impound_claim.to_param}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{impound_claim.to_param}"
+        expect(response.status).to eq 404
         # unless user is a superuser
         current_user.update(superuser: true)
         get "#{base_url}/#{impound_claim.to_param}"

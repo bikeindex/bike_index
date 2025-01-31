@@ -40,7 +40,7 @@ RSpec.describe Admin::DashboardController, type: :request do
         expect(session[:timezone]).to eq timezone
         expect(assigns(:time_range).first).to be_within(2.seconds).of time_range_start
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-        expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
+        expect(Time.zone).to eq TimeParser::DEFAULT_TIME_ZONE
         # If current user has no_hide_spam, it shows likely_spam though
         SuperuserAbility.create(user: current_user, su_options: [:no_hide_spam])
         get "/admin", params: {timezone: timezone}
@@ -55,7 +55,7 @@ RSpec.describe Admin::DashboardController, type: :request do
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(session[:timezone]).to be_blank
-          expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
+          expect(Time.zone).to eq TimeParser::DEFAULT_TIME_ZONE
         end
       end
     end

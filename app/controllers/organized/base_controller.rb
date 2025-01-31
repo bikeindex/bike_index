@@ -1,6 +1,6 @@
 module Organized
   class BaseController < ApplicationController
-    before_action :ensure_not_ambassador_organization!, except: :root
+    before_action :ensure_not_ambassador_organization! # , except: :root
     before_action :ensure_current_organization!
     before_action :ensure_member!
 

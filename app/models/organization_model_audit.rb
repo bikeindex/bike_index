@@ -12,7 +12,7 @@
 #  organization_id      :bigint
 #
 class OrganizationModelAudit < ApplicationRecord
-  enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
+  enum :certification_status, ModelAttestation::CERTIFICATION_KIND_ENUM
 
   belongs_to :organization
   belongs_to :model_audit

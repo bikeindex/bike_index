@@ -107,6 +107,8 @@ class Admin::UsersController < Admin::BaseController
     @search_superusers = InputNormalizer.boolean(params[:search_superusers])
     @search_deleted = InputNormalizer.boolean(params[:search_deleted])
     @updated_at = InputNormalizer.boolean(params[:search_updated_at])
+    @search_unconfirmed = InputNormalizer.boolean(params[:search_unconfirmed])
+    @search_confirmed = @search_unconfirmed ? false : InputNormalizer.boolean(params[:search_confirmed])
     users = if current_organization.present?
       current_organization.users
     else
@@ -116,9 +118,15 @@ class Admin::UsersController < Admin::BaseController
     users = users.ambassadors if @search_ambassadors
     users = users.superuser_abilities if @search_superusers
     users = users.banned if @search_banned
+    users = users.unconfirmed if @search_unconfirmed
+    users = users.confirmed if @search_confirmed
+
     users = users.admin_text_search(params[:query]) if params[:query].present?
     if params[:search_phone].present?
       users = users.search_phone(params[:search_phone])
+    end
+    if params[:search_domain].present?
+      users = users.matching_domain(params[:search_domain])
     end
 
     @time_range_column = sort_column if %w[updated_at deleted_at].include?(sort_column)

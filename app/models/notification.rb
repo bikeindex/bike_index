@@ -63,8 +63,8 @@ class Notification < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
-  enum message_channel: MESSAGE_CHANNEL_ENUM
+  enum :kind, KIND_ENUM
+  enum :message_channel, MESSAGE_CHANNEL_ENUM
 
   scope :email_success, -> { where(delivery_status: "email_success") }
   scope :delivered, -> { where(delivery_status: "email_success").or(where(delivery_status: "text_success")) }
@@ -193,7 +193,7 @@ class Notification < ApplicationRecord
 
   def twilio_response
     return nil unless twilio_sid.present?
-    TwilioIntegration.new.get_message(twilio_sid)
+    Integrations::Twilio.new.get_message(twilio_sid)
   end
 
   def notifiable_display_name

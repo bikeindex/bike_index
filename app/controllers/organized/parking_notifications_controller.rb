@@ -29,7 +29,7 @@ module Organized
         "all"
       end
       # If we're searching impound_notifications, you can't search current or replaced
-      @unpermitted_statuses = @search_kind == "impound_notification" ? %w[current replaced] : []
+      @unpermitted_statuses = (@search_kind == "impound_notification") ? %w[current replaced] : []
       permitted_statuses = ParkingNotification.statuses + %w[all resolved]
       @search_status = permitted_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
       @search_status = "all" if @unpermitted_statuses.include?(@search_status)

@@ -15,8 +15,8 @@
 class OrganizationStatus < AnalyticsRecord
   belongs_to :organization
 
-  enum pos_kind: Organization::POS_KIND_ENUM
-  enum kind: Organization::KIND_ENUM
+  enum :pos_kind, Organization::POS_KIND_ENUM
+  enum :kind, Organization::KIND_ENUM
 
   has_one :notification, as: :notifiable
 

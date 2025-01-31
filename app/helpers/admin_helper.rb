@@ -61,6 +61,7 @@ module AdminHelper
       {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
       {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
+      {title: "Config: Banned Email Domains", path: admin_banned_email_domains_path, match_controller: true},
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
@@ -109,11 +110,11 @@ module AdminHelper
   end
 
   def credibility_scorer_color_table(score)
-    score < 31 ? credibility_scorer_color(score) : ""
+    (score < 31) ? credibility_scorer_color(score) : ""
   end
 
   def admin_number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: (number == 0 ? "less-less-strong" : ""))
+    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
   end
 
   def user_icon_hash(user = nil)

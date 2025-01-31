@@ -176,7 +176,7 @@ RSpec.describe PropulsionType, type: :model do
   end
 
   describe "names and translations" do
-    let(:en_yaml) { YAML.safe_load(File.read(Rails.root.join("config", "locales", "en.yml")), permitted_classes: [Symbol]) }
+    let(:en_yaml) { YAML.safe_load_file(Rails.root.join("config", "locales", "en.yml"), permitted_classes: [Symbol]) }
     let(:enum_translations) do
       # For dumb historical reasons, slugs have dashes rather than underscores
       en_yaml.dig("en", "activerecord", "enums", "propulsion_type")

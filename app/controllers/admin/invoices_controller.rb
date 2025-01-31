@@ -46,7 +46,7 @@ class Admin::InvoicesController < Admin::BaseController
 
     if %w[only_paid only_free].include?(params[:search_paid])
       @search_paid = params[:search_paid]
-      invoices = @search_paid == "only_paid" ? invoices.paid : invoices.free
+      invoices = (@search_paid == "only_paid") ? invoices.paid : invoices.free
     end
 
     if %w[subscription_start_at subscription_end_at].include?(params[:time_range_column])
@@ -58,7 +58,7 @@ class Admin::InvoicesController < Admin::BaseController
 
     if %w[endless_only not_endless].include?(params[:search_endless])
       @search_endless ||= params[:search_endless]
-      invoices = @search_endless == "endless_only" ? invoices.endless : invoices.not_endless
+      invoices = (@search_endless == "endless_only") ? invoices.endless : invoices.not_endless
     end
 
     if current_organization.present?

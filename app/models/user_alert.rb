@@ -31,9 +31,9 @@ class UserAlert < ApplicationRecord
 
   has_one :notification, as: :notifiable
 
-  validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
+  validates :user_phone_id, uniqueness: {scope: %i[kind user_id]}, allow_blank: true
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   before_validation :set_calculated_attributes
 

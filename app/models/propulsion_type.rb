@@ -76,7 +76,7 @@ class PropulsionType
 
     def autocomplete_hashes
       autocomplete_ids.map do |id|
-        id == 10 ? motorized_autocomplete_hash : new(id).autocomplete_hash
+        (id == 10) ? motorized_autocomplete_hash : new(id).autocomplete_hash
       end
     end
 

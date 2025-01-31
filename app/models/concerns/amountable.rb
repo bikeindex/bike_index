@@ -5,7 +5,7 @@ module Amountable
 
   def amount
     amnt = (amount_cents.to_i / 100.00)
-    amnt % 1 != 0 ? amnt : amnt.round
+    (amnt % 1 != 0) ? amnt : amnt.round
   end
 
   def amount=(val)

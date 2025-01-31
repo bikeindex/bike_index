@@ -62,9 +62,9 @@ class ParkingNotification < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :process_notification
 
-  enum kind: KIND_ENUM
-  enum status: STATUS_ENUM
-  enum retrieved_kind: RETRIEVED_KIND_ENUM
+  enum :kind, KIND_ENUM
+  enum :status, STATUS_ENUM
+  enum :retrieved_kind, RETRIEVED_KIND_ENUM
 
   attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
 
@@ -260,7 +260,7 @@ class ParkingNotification < ActiveRecord::Base
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     Geocodeable.address(
       self,
-      street: (force_show_address || show_address),
+      street: force_show_address || show_address,
       country: country
     ).presence
   end

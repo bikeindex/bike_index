@@ -30,9 +30,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
     context "unknown organization" do
       it "raises" do
-        expect {
-          get "#{base_url}/d89safdf"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/d89safdf"
+        expect(response.status).to eq 404
       end
     end
   end

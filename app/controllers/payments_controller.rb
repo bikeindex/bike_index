@@ -26,7 +26,7 @@ class PaymentsController < ApplicationController
     stripe_session = Stripe::Checkout::Session.create(@payment.stripe_session_hash)
 
     @payment.update(stripe_id: stripe_session.id)
-    redirect_to stripe_session.url
+    redirect_to stripe_session.url, allow_other_host: true
   end
 
   private

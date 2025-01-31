@@ -14,9 +14,6 @@ class TsvCreatorWorker < ScheduledWorker
   end
 
   def create_tsv(tsv_method, true_and_false)
-    require "tsv_creator"
-    require "file_cache_maintainer"
-
     creator = TsvCreator.new
 
     if true_and_false

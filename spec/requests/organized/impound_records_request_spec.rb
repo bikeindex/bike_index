@@ -94,9 +94,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     end
     context "not found" do
       it "raises" do
-        expect {
-          get "#{base_url}/2812912"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/2812912"
+        expect(response.status).to eq 404
       end
     end
   end

@@ -34,9 +34,9 @@ class Payment < ApplicationRecord
   scope :incomplete, -> { where(first_payment_date: nil) }
   scope :paid, -> { where.not(first_payment_date: nil) }
 
-  enum payment_method: PAYMENT_METHOD_ENUM
-  enum kind: KIND_ENUM
-  enum stripe_kind: STRIPE_KIND_ENUM
+  enum :payment_method, PAYMENT_METHOD_ENUM
+  enum :kind, KIND_ENUM
+  enum :stripe_kind, STRIPE_KIND_ENUM
 
   belongs_to :user
   belongs_to :organization

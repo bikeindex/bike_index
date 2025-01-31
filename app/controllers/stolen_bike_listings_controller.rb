@@ -27,7 +27,7 @@ class StolenBikeListingsController < ApplicationController
 
   def calculated_render_info
     # Duplicates ApplicationHelper#sortable_search_params
-    sortable_search_params = params.permit(*params.keys.select { |k| k.to_s.start_with?(/search_/) }, # params starting with search_
+    sortable_search_params = params.permit(*params.keys.select { |k| k.to_s.start_with?("search_") }, # params starting with search_
       :direction, :sort, # sorting params
       :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
       :user_id, :organization_id, :query, # General search params

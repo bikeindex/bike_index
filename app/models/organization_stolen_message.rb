@@ -34,7 +34,7 @@ class OrganizationStolenMessage < ApplicationRecord
 
   delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :present, -> { where.not(body: nil) }
   scope :enabled, -> { where(is_enabled: true) }
@@ -77,8 +77,7 @@ class OrganizationStolenMessage < ApplicationRecord
 
   def self.clean_body(str)
     return nil if str.blank?
-    ActionController::Base.helpers.strip_tags(str).gsub("&amp;", "&")
-      .strip.gsub(/\s+/, " ").truncate(MAX_BODY_LENGTH, omission: "")
+    InputNormalizer.sanitize(str).truncate(MAX_BODY_LENGTH, omission: "")
   end
 
   def self.default_kind_for_organization_kind(org_kind)

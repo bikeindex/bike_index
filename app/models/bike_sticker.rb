@@ -34,7 +34,7 @@ class BikeSticker < ApplicationRecord
   scope :claimed, -> { where.not(bike_id: nil) }
   scope :unclaimed, -> { where(bike_id: nil) }
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   validates_presence_of :code
   validates_uniqueness_of :code, scope: [:organization_id], allow_nil: false

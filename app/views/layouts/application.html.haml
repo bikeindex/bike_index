@@ -2,14 +2,14 @@
 %html{ lang: I18n.locale }
   %head
     = header_tags
-    = stylesheet_link_tag 'revised', media: 'all'
+    = stylesheet_link_tag 'revised'
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <script src="https://kit.fontawesome.com/82eb17360c.js"></script>
     = javascript_include_tag 'application_revised'
     :javascript
       window.BikeIndex.translator = (keyspace) => {
-        return (key, args={}) => i18n_translate_with_args(`javascript.${keyspace}.${key}`, args);
+        return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
       }
     - if current_user&.time_single_format
       <script>window.timeParserSingleFormat = true</script>

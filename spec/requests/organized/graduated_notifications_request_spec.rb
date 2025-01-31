@@ -66,9 +66,8 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
     context "different organization's" do
       let!(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated) }
       it "raises not found" do
-        expect {
-          get "#{base_url}/#{graduated_notification.id}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{graduated_notification.id}"
+        expect(response.status).to eq 404
       end
     end
   end

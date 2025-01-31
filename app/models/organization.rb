@@ -113,9 +113,9 @@ class Organization < ApplicationRecord
   accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  enum kind: KIND_ENUM
-  enum pos_kind: POS_KIND_ENUM
-  enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
+  enum :kind, KIND_ENUM
+  enum :pos_kind, POS_KIND_ENUM
+  enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: i18n_translate_with_args(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
@@ -589,7 +589,7 @@ class Organization < ApplicationRecord
   end
 
   def strip_name_tags(str)
-    strip_tags(name&.strip).gsub("&amp;", "&")
+    InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
   end
 
   def name_shortener(str)

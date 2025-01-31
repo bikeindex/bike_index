@@ -4,13 +4,13 @@
     = render partial: "/shared/errors", locals: { name: "Component Type", obj: @ctype }
   .form-group
     = f.label :name, "Name"
-    = f.text_field :name, class: "form-control w-25"
+    = f.text_field :name, class: "form-control"
   .form-group
     = f.label :secondary_name, "Secondary Name"
-    = f.text_field :secondary_name, class: "form-control w-25"
+    = f.text_field :secondary_name, class: "form-control"
   .form-group
     = f.label :cgroup, "Component Group"
-    = collection_select :ctype, :cgroup_id, Cgroup.all, :id, :name, {prompt: "Select the component group"}, class: "form-control w-25"
+    = collection_select :ctype, :cgroup_id, Cgroup.all, :id, :name, {prompt: "Select the component group"}, class: "form-control"
   .form-group
     = f.label :image, "Component type avatar", class: "mt-2"
     - if @ctype.image?

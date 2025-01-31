@@ -35,7 +35,7 @@ class Tweet < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :retweet, -> { where.not(original_tweet: nil) }
   scope :not_retweet, -> { where(original_tweet: nil) }
@@ -48,7 +48,7 @@ class Tweet < ApplicationRecord
   def self.friendly_find(id)
     return nil if id.blank?
     id = id.to_s
-    query = id.length > 15 ? {twitter_id: id} : {id: id}
+    query = (id.length > 15) ? {twitter_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
   end
 

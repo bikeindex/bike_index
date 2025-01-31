@@ -146,11 +146,10 @@ RSpec.describe ImpoundClaimsController, type: :request do
     context "submitted claim" do
       let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record, user: current_user, status: "submitting") }
       it "does not update" do
-        expect {
-          patch "#{base_url}/#{impound_claim.id}", params: {
-            impound_claim: {message: "A new message", status: "pending"}
-          }
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        patch "#{base_url}/#{impound_claim.id}", params: {
+          impound_claim: {message: "A new message", status: "pending"}
+        }
+        expect(response.status).to eq 404
         impound_claim.reload
         expect(impound_claim.message).to be_blank
         expect(impound_claim.status).to eq "submitting"
@@ -159,11 +158,10 @@ RSpec.describe ImpoundClaimsController, type: :request do
     context "not users impound_claim" do
       let(:impound_claim) { FactoryBot.create(:impound_claim, impound_record: impound_record) }
       it "does not update" do
-        expect {
-          patch "#{base_url}/#{impound_claim.id}", params: {
-            impound_claim: {message: "A new message"}
-          }
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        patch "#{base_url}/#{impound_claim.id}", params: {
+          impound_claim: {message: "A new message"}
+        }
+        expect(response.status).to eq 404
         impound_claim.reload
         expect(impound_claim.message).to be_blank
       end

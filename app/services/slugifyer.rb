@@ -2,7 +2,7 @@ class Slugifyer
   def self.slugify(string)
     slug = I18n.transliterate(string.to_s.downcase).strip
     slug.gsub("%20", " ").gsub(/\s/, "-")
-      .gsub(/-&-/, "-amp-") # Replace singular & with amp - since we permit & in names
+      .gsub("-&-", "-amp-") # Replace singular & with amp - since we permit & in names
       .gsub(/([^A-Za-z0-9_\-]+)/, "") # Remove any weird characters
       .downcase
   end
