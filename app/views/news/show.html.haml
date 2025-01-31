@@ -9,7 +9,7 @@
   %article.blogger-info.pl-2
     - unless @blog.canonical_url?
       %h4
-        = translate_with_args(".by")
+        = t(".by")
         - if blogger.userlink.present?
           %a{href: blogger.userlink}
             = blogger.name
@@ -35,7 +35,7 @@
 - if @blog.canonical_url?
   .mt-4
     %h4.less-strong
-      = translate_with_args(".also_published")
+      = t(".also_published")
       = link_to @blog.pretty_canonical, @blog.canonical_url
 
 

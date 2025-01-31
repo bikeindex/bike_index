@@ -2,7 +2,7 @@ require "twitter"
 require "tempfile"
 require "open-uri"
 
-class TwitterTweeterIntegration
+class Integrations::TwitterTweeter
   TWEET_LENGTH = 280
   MAX_RETWEET_COUNT = (ENV["MAX_RETWEET_COUNT"] || 3).to_i
 
@@ -33,7 +33,7 @@ class TwitterTweeterIntegration
   end
 
   # To manually send a tweet (e.g. if authentication failed)
-  # TwitterTweeterIntegration.new(Bike.find(XXX)).create_tweet
+  # Integrations::TwitterTweeter.new(Bike.find(XXX)).create_tweet
   def create_tweet
     return if stolen_record.blank? || nearest_twitter_account.blank?
 

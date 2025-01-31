@@ -1,13 +1,13 @@
 %p
-  = translate_with_args(".we_sent_an_email_to")
+  = t(".we_sent_an_email_to")
   %strong #{@b_param.owner_email}
 
 %h2.uncap
-  = translate_with_args(".youre_not_done")
+  = t(".youre_not_done")
 
 %p
-  = translate_with_args(".follow_link_in_email")
+  = t(".follow_link_in_email")
 
 - if @b_param.status_stolen?
   %p
-    = translate_with_args(".well_do_our_best_to_help_you_recover_it")
+    = t(".well_do_our_best_to_help_you_recover_it")

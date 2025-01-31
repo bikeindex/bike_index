@@ -16,7 +16,7 @@
               - if @bike.likely_spam?
                 %small.text-danger likely spam
               - if @bike.example
-                %small.text-danger= translate_with_args(".test_registration")
+                %small.text-danger= t(".test_registration")
         - if show_credibility_badges
           .col-md-5.text-right
             = render partial: "/bikes/credibility_score", locals: {bike: @bike}
@@ -26,9 +26,9 @@
   - if current_user&.superuser?(controller_name: "bikes", action_name: "show")
     - if !@bike.unregistered_parking_notification? && @bike.user_hidden
       %h2.text-warning.mb-4.mt-2
-        = translate_with_args(".hidden_by_owner")
+        = t(".hidden_by_owner")
         %small.less-strong.uncap.d-block
-          = translate_with_args(".no_one_but_the_user_and_bike_index_admins")
+          = t(".no_one_but_the_user_and_bike_index_admins")
     - if @bike.deleted?
       %h2.text-danger.uncap.mb-4.mt-2
         Deleted
@@ -38,21 +38,21 @@
 
   - if @bike_sticker.present?
     .alert.alert-success
-      %p= translate_with_args(".you_scanned_this_sticker_html", pretty_code: @bike_sticker.pretty_code, bike_type: @bike.type)
+      %p= t(".you_scanned_this_sticker_html", pretty_code: @bike_sticker.pretty_code, bike_type: @bike.type)
       - if current_user&.authorized?(@bike_sticker)
         %p.mt-2
           %em.less-strong
-            = translate_with_args(".is_this_linked_to_incorrect_bike")
+            = t(".is_this_linked_to_incorrect_bike")
             %a.gray-link{ href: "#updateBikeCodeLink", data: { toggle: "collapse" } }
-              = translate_with_args(".change_the_bike_sticker_linked_to")
+              = t(".change_the_bike_sticker_linked_to")
         .collapse#updateBikeCodeLink
           = form_tag bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id), method: :put, class: "row mt-4" do
             .col-sm-8.col-lg-10
               .form-group
-                = label_tag :bike_id, translate_with_args(".switch_to_new_bike_id")
+                = label_tag :bike_id, t(".switch_to_new_bike_id")
                 = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
             .col-sm-4.col-lg-2.mt-4
-              = submit_tag translate_with_args(".update"), class: "btn btn-success"
+              = submit_tag t(".update"), class: "btn btn-success"
 
   -# Authorize check here, even though we're checking in controller too, because
   -# otherwise we're displaying user data - so it's critical to be sure
@@ -81,15 +81,15 @@
         = bike_status_span(@bike)
         %span.uncap= bike_title_html(@bike)
         - if @bike.example?
-          %small.text-warning.uncap= translate_with_args(".test_registration")
+          %small.text-warning.uncap= t(".test_registration")
 
       - if @bike.status_impounded?
-        %strong.text-warning= translate_with_args(".looking_for_correct_owner", bike_type: @bike.type)
+        %strong.text-warning= t(".looking_for_correct_owner", bike_type: @bike.type)
       - elsif !@bike.status_with_owner? && @bike.created_by_notification_or_impounding?
         -# This should only show up if the bike isn't registered
-        %strong.text-warning= translate_with_args(".not_registered_by_user")
+        %strong.text-warning= t(".not_registered_by_user")
         - if @bike.current_ownership&.origin == "unregistered_parking_notification"
-          %em= translate_with_args(".created_to_record_parking_notification", bike_type: @bike.type_titleize, organization: @bike.creation_organization.short_name)
+          %em= t(".created_to_record_parking_notification", bike_type: @bike.type_titleize, organization: @bike.creation_organization.short_name)
 
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
@@ -100,12 +100,12 @@
           %small.convertTimezone
           - if (@stolen_record || @bike.current_impound_record).address.present?
             %strong
-              = @bike.status_found? ? translate_with_args(".in") : translate_with_args(".from")
+              = @bike.status_found? ? t(".in") : t(".from")
             = (@stolen_record || @bike.current_impound_record).address
 
       - if @bike.user&.show_bikes?
         %h4
-          = link_to translate_with_args(".view_users_other_registrations"), user_path(@bike.owner.username)
+          = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
 
     .col-md-4.ad-col
       .ad-block.ad-binx.ad468x60
@@ -116,37 +116,37 @@
       .social-share-bike.mb-4.mt-4
         %h4
           - if @bike.status_stolen_or_impounded?
-            = translate_with_args(".spread_the_word")
+            = t(".spread_the_word")
           - else
-            = translate_with_args(".share_it")
+            = t(".share_it")
         = render 'shared/share_this'
       - if BikeDisplayer.display_contact_owner?(@bike, current_user)
         .contact-the-owner
           %p.preface
             %em
-              = translate_with_args(".know_something_about_this_bike_type", bike_type: @bike.type)
+              = t(".know_something_about_this_bike_type", bike_type: @bike.type)
           %h3
-            = translate_with_args(".contact_the_owner")
+            = t(".contact_the_owner")
           - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
           #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
             %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
-              = translate_with_args(".write_them_a_message")
+              = t(".write_them_a_message")
 
           .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
             - @stolen_notification ||= StolenNotification.new(bike: @bike)
             = form_for @stolen_notification do |f|
               = f.hidden_field :bike_id, value: @bike.id
-              = f.text_area :message, required: true, placeholder: translate_with_args(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
-              = f.text_field :reference_url, placeholder: translate_with_args(".link_url"), class: "form-control additional-field"
+              = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
+              = f.text_field :reference_url, placeholder: t(".link_url"), class: "form-control additional-field"
 
               .send-message
-                = f.submit translate_with_args(".send_message"), class: 'btn btn-primary btn-lg'
+                = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
           - if @bike.phoneable_by?(current_user)
             %p.phoneable-by
               %em
-                = translate_with_args(".or_call")
+                = t(".or_call")
               %strong
-                = translate_with_args(".owners_phone_number")
+                = t(".owners_phone_number")
               = phone_link(@stolen_record.phone)
 
       -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page

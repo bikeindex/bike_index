@@ -1,6 +1,6 @@
 require "MailchimpMarketing"
 
-class MailchimpIntegration
+class Integrations::Mailchimp
   API_KEY = ENV["MAILCHIMP_KEY"]
   SERVER_PREFIX = "us6" # I don't think this changes?
 

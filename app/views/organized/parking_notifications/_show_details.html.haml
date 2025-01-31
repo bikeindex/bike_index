@@ -8,12 +8,12 @@
     %table.table-list
       %tbody
         %tr
-          %td= translate_with_args(".created")
+          %td= t(".created")
           %td
             %span.convertTime
               = l(@parking_notification.created_at, format: :convert_time)
         %tr
-          %td= translate_with_args(".by")
+          %td= t(".by")
           %td= @parking_notification.user.display_name
         %tr
           %td Type
@@ -90,7 +90,7 @@
             - else
               = status_display(@parking_notification.status)
         %tr
-          %td= translate_with_args(".bike")
+          %td= t(".bike")
           %td
             - if passed_bike.present?
               = link_to organized_bike_text(passed_bike), bike_path(passed_bike, organization_id: current_organization.to_param)
@@ -104,7 +104,7 @@
     %table.table-list
       %tbody
         %tr
-          %td= translate_with_args(".address")
+          %td= t(".address")
           %td= address_formatted(@parking_notification)
         %tr
           %td Location
@@ -123,7 +123,7 @@
                     #{@parking_notification.accuracy} accuracy
 
         %tr
-          %td= translate_with_args(".notification_number")
+          %td= t(".notification_number")
           %td
             - if @parking_notification.initial_record?
               %span.less-strong First notification
@@ -138,7 +138,7 @@
                   - else
                     = @parking_notification.initial_record_id
         %tr
-          %td= translate_with_args(".resolved")
+          %td= t(".resolved")
           %td
             - if @parking_notification.resolved?
               %span.less-strong
@@ -152,10 +152,10 @@
                 %span.convertTime
                   = l(@parking_notification.resolved_at, format: :convert_time)
         %tr
-          %td= translate_with_args(".message")
+          %td= t(".message")
           %td= @parking_notification.message
         %tr
-          %td= translate_with_args(".internal_notes")
+          %td= t(".internal_notes")
           %td= @parking_notification.internal_notes
 
 - if @parking_notification.image.present? || @parking_notification.image_processing

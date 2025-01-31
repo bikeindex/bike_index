@@ -1,9 +1,9 @@
 .embed-success-block
   = image_tag "resources/logo_striped.svg"
   %h1
-    = translate_with_args(".your_bike_has_been_added_to_bike_index", bike_type: @bike.type)
+    = t(".your_bike_has_been_added_to_bike_index", bike_type: @bike.type)
   %p
     - bike_link = link_to bike_title_html(@bike), bike_url(@bike), target: "_blank"
-    = translate_with_args(".bike_was_registered_to_you_html", bike_link: bike_link, org_name: @organization.name)
+    = t(".bike_was_registered_to_you_html", bike_link: bike_link, org_name: @organization.name)
   %p
-    = translate_with_args(".you_will_receive_an_email_confirmation")
+    = t(".you_will_receive_an_email_confirmation")

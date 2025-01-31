@@ -6,7 +6,13 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
-ruby "3.2.6"
+ruby "3.3.7"
+
+# Gems that are no longer in standard library as Ruby 3.4
+gem "csv"
+gem "observer"
+gem "prime"
+# Maybe these can be removed after 3.4 upgrade? Added to silence deprecation warnings
 
 gem "rails"
 
@@ -47,11 +53,6 @@ gem "httparty"
 gem "kaminari" # pagination
 gem "kramdown" # Markdown
 gem "money-rails", "~> 1.11"
-gem "omniauth", "~> 2.0.0"
-gem "omniauth-facebook"
-gem "omniauth-globalid"
-gem "omniauth-strava"
-gem "omniauth-twitter"
 gem "sitemap_generator", "~> 6"
 
 # Making other files
@@ -77,7 +78,7 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
-gem "grape", "~> 1.8.0" # API DSL
+gem "grape" # API DSL
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 
 # Secure things

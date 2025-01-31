@@ -5,7 +5,7 @@ module BikeHelper
     return "" if serial_text.blank?
     serial_html = if ["hidden", "unknown", "made without serial"].include?(serial_text)
       content_tag(:span,
-        i18n_translate_with_args(serial_text.tr(" ", "_"), scope: %i[helpers bike_helper]),
+        I18n.t(serial_text.tr(" ", "_"), scope: %i[helpers bike_helper]),
         class: "less-strong")
     else
       content_tag(:code, bike.serial_display(user), class: "bike-serial")
@@ -14,9 +14,9 @@ module BikeHelper
     serial_html << " "
     serial_html << content_tag(:em, class: "small less-less-strong") do
       if bike.authorized?(user)
-        i18n_translate_with_args("hidden_for_unauthorized_users", scope: %i[helpers bike_helper])
+        I18n.t("hidden_for_unauthorized_users", scope: %i[helpers bike_helper])
       else
-        i18n_translate_with_args("hidden_because_status",
+        I18n.t("hidden_because_status",
           bike_type: bike.type, status: bike.status_humanized_translated,
           scope: %i[helpers bike_helper])
       end

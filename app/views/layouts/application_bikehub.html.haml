@@ -35,24 +35,24 @@
             %ul.navbar-nav
               %li.nav-item
                 %a.nav-link{ href: "https://bikehub.com/" }
-                  = translate_with_args(".home")
+                  = t(".home")
               %li.nav-item
                 %a.nav-link{ href: "https://bikehub.com/contact/" }
-                  = translate_with_args(".contact")
+                  = t(".contact")
               %li.nav-item
                 %a.nav-link{ href: new_user_path(partner: sign_in_partner), class: (signup_page ? "active" : "") }
-                  = translate_with_args(".register")
+                  = t(".register")
               %li.nav-item
                 %a.nav-link{ href:  new_session_path(partner: sign_in_partner), class: (signup_page ? "" : "active") }
-                  = translate_with_args(".login")
+                  = t(".login")
 
       .landing-page
         %header.bikehub-banner-header
           .teamed-up-with-bike-index
             = image_tag "bikehub/high-five.svg", alt: "Bikehub and Bike Index together", class: "bikehub-high-five"
-            %h1= translate_with_args(".teamed_up")
+            %h1= t(".teamed_up")
             %p
-              = translate_with_args(".accounts_powered_by_bike_index")
+              = t(".accounts_powered_by_bike_index")
 
 
       = render "layouts/revised_messages"
@@ -63,10 +63,10 @@
           .col-xl-8.offset-xl-2.col-md-10.offset-md-1.bikehub-bottom-info
             %p
               %em
-                = translate_with_args(".non_profit")
+                = t(".non_profit")
             %p
               %em
-                = translate_with_args(".partnership")
+                = t(".partnership")
 
   = render "/shared/analytics"
 

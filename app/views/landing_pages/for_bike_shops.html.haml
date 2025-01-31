@@ -7,13 +7,13 @@
         .icon-wrapper
           = render "landing_pages/icons/header_#{landing_page_target}_svg"
         .banner-text
-          %h1= translate_with_args(".bike_index_for_bike_shops")
-          %h3= translate_with_args(".bikes_before_they")
-          %h3= translate_with_args(".do_right_by_your_customers")
+          %h1= t(".bike_index_for_bike_shops")
+          %h3= t(".bikes_before_they")
+          %h3= t(".do_right_by_your_customers")
 
     .ribbon.mobile-contact-link
       .container
-        %h2= link_to translate_with_args(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+        %h2= link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
 
   .container
     .row.main-body-row
@@ -21,74 +21,74 @@
         .embeded-tweet-break-top
           = render partial: "landing_pages/tweet", locals: { tweet_id: 840324239425073152 }
 
-        %h3= translate_with_args(".register_bikes_for_your_customers")
+        %h3= t(".register_bikes_for_your_customers")
         %p
-          = translate_with_args(".build_goodwill_with_your_customers_with_a")
+          = t(".build_goodwill_with_your_customers_with_a")
         %p
-          - network_link = link_to translate_with_args(".network_of_shop_partners"), where_path
-          = translate_with_args(".join_our_network_link_html", network_link: network_link)
-          - new_org_link = link_to translate_with_args(".here"), new_organization_path
-          = translate_with_args(".sign_up_for_a_free_bike_index_account_html", new_org_link: new_org_link)
+          - network_link = link_to t(".network_of_shop_partners"), where_path
+          = t(".join_our_network_link_html", network_link: network_link)
+          - new_org_link = link_to t(".here"), new_organization_path
+          = t(".sign_up_for_a_free_bike_index_account_html", new_org_link: new_org_link)
 
         .video-responsive
           <iframe src="https://www.youtube.com/embed/Gq1Omxev9II" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
         %h3{ style: "margin-top: 30px;"}
-          = translate_with_args(".automatic_registration_at_point_of_sale")
+          = t(".automatic_registration_at_point_of_sale")
         %p
-          = translate_with_args(".for_free_we_provide_you_with_t")
+          = t(".for_free_we_provide_you_with_t")
 
         %p
           = render partial: "landing_pages/tweet", locals: { tweet_id: 1319724415840481280 }
 
         %p
-          - security_link = link_to translate_with_args(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"
-          = translate_with_args(".curious_what_information_html", security_link: security_link)
+          - security_link = link_to t(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"
+          = t(".curious_what_information_html", security_link: security_link)
 
 
         %h3.clearfix.with-landing-pos-logo
           = image_tag "lightspeed_logo.png", class: "", alt: "Lightspeed logo"
-          = translate_with_args(".use_lightspeed_retail")
-        %p= translate_with_args(".our_official_lightspeed_integration_provi")
+          = t(".use_lightspeed_retail")
+        %p= t(".our_official_lightspeed_integration_provi")
 
         %p
-          = link_to translate_with_args(".learn_more"), lightspeed_path
-          = translate_with_args(".or")
-          = link_to translate_with_args(".connect_your_lightspeed_account"), lightspeed_interface_path(organization_id: passive_organization&.id)
+          = link_to t(".learn_more"), lightspeed_path
+          = t(".or")
+          = link_to t(".connect_your_lightspeed_account"), lightspeed_interface_path(organization_id: passive_organization&.id)
 
         %h3.clearfix.with-landing-pos-logo
           = image_tag "ascend-logo.png", class: "landing-ascend-logo", alt: "Ascend logo"
-          = translate_with_args(".use_ascend")
+          = t(".use_ascend")
 
         %p
-          - ascend_link = link_to translate_with_args(".here"), ascend_path
-          = translate_with_args(".connect_your_ascend_account_html", ascend_link: ascend_link)
+          - ascend_link = link_to t(".here"), ascend_path
+          = t(".connect_your_ascend_account_html", ascend_link: ascend_link)
 
         %p
-          - printed_materials_link = link_to translate_with_args(".printed_materials"), store_path
-          = translate_with_args(".dont_use_ascend_or_lightspeed_html", printed_materials: printed_materials_link)
+          - printed_materials_link = link_to t(".printed_materials"), store_path
+          = t(".dont_use_ascend_or_lightspeed_html", printed_materials: printed_materials_link)
 
-        %h4= translate_with_args(".related_articles")
+        %h4= t(".related_articles")
         %ul
           %li
-            = translate_with_args(".check_out")
-            = link_to translate_with_args(".bike_shops_deck"), "https://docs.google.com/presentation/d/1oQ3b96NRtAgJmYNhNfrAP3khDvB8lO_0gFG1cq86Rx0/edit?usp=sharing"
+            = t(".check_out")
+            = link_to t(".bike_shops_deck"), "https://docs.google.com/presentation/d/1oQ3b96NRtAgJmYNhNfrAP3khDvB8lO_0gFG1cq86Rx0/edit?usp=sharing"
           %li
-            = link_to translate_with_args(".driving_service_revenues_with_bicycle_reg"), news_path("driving-service-revenues-with-bicycle-registration")
+            = link_to t(".driving_service_revenues_with_bicycle_reg"), news_path("driving-service-revenues-with-bicycle-registration")
           %li
-            = link_to translate_with_args(".5_ways_to_grow_community_for_your_bike_sh"), news_path("5-ways-to-grow-community-for-your-bike-shop")
+            = link_to t(".5_ways_to_grow_community_for_your_bike_sh"), news_path("5-ways-to-grow-community-for-your-bike-shop")
           %li
-            = link_to translate_with_args(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
+            = link_to t(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
 
         .trusted-by.hidden-lg-up
-          %h3= translate_with_args(".used_at_bike_shops_everywhere")
+          %h3= t(".used_at_bike_shops_everywhere")
           = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"
 
       .next-steps-col
         .next-steps-wrap
           %header
-            = translate_with_args(".used_at_bike_shops_everywhere")
-            = link_to translate_with_args(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+            = t(".used_at_bike_shops_everywhere")
+            = link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
           .trusted-by
-            .header= translate_with_args(".trusted_by_bike_shops_everywhere")
+            .header= t(".trusted_by_bike_shops_everywhere")
             = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"

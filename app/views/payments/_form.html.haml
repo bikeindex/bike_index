@@ -6,8 +6,8 @@
     .col-xs-12
       %h3.uncap
         - if @is_payment
-          = translate_with_args(".pay_bike_index")
+          = t(".pay_bike_index")
         - else
-          = translate_with_args(".donation_header")
+          = t(".donation_header")
     .select-amount
       = render partial: "/shared/donation_form", locals: {kind: "page", initial_amount: @initial_amount, is_payment: @is_payment}

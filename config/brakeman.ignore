@@ -650,6 +650,29 @@
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "9633ca0cf6c75c9b3f30547832a4b08b925b099f8adf107e14c6747ea3ca16f5",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/log_searcher/reader.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{rgrep_command_str(time, :log_path => log_path)} | wc -l`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "LogSearcher::Reader",
+        "method": "s(:self).rgrep_log_lines_count"
+      },
+      "user_input": "rgrep_command_str(time, :log_path => log_path)",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Remote Code Execution",
       "warning_code": 110,
       "fingerprint": "9ae68e59cfee3e5256c0540dadfeb74e6b72c91997fdb60411063a6e8518144a",
@@ -1189,29 +1212,6 @@
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "d8da8ee7a70773f264d1ee33b44fd664227586cbd3b7ca689811909da303a313",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/services/log_searcher/reader.rb",
-      "line": 35,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`#{rgrep_command_str(time, :log_path => log_path)} | wc -l`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "LogSearcher::Reader",
-        "method": "rgrep_log_lines_count"
-      },
-      "user_input": "rgrep_command_str(time, :log_path => log_path)",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "dc387e2ec0a85438fbaa42a77b840e29a0c3de2dbd6be0a8311442f03564b1a8",
@@ -1259,7 +1259,7 @@
         {
           "type": "template",
           "name": "admin/banned_email_domains/index",
-          "line": 11,
+          "line": 22,
           "file": "app/views/admin/banned_email_domains/index.html.haml",
           "rendered": {
             "name": "shared/_pagination",
@@ -1370,6 +1370,5 @@
       "note": ""
     }
   ],
-  "updated": "2025-01-24 17:15:51 -0800",
-  "brakeman_version": "5.4.1"
+  "brakeman_version": "7.0.0"
 }

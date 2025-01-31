@@ -1,36 +1,36 @@
 %h1.mb-4.uncap
-  = translate_with_args(".org_settings", org_name: @organization.short_name)
+  = t(".org_settings", org_name: @organization.short_name)
 
 = form_for @organization, {url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: {class: "organized-form"}} do |f|
 
   .form-group.row
-    = f.label :name, translate_with_args(".name"), class: "org-form-label"
+    = f.label :name, t(".name"), class: "org-form-label"
     .col-sm-4
       = f.text_field :name, required: true, class: "form-control"
 
   .form-group.row
-    = f.label :short_name, translate_with_args(".abbreviation"), class: "org-form-label"
+    = f.label :short_name, t(".abbreviation"), class: "org-form-label"
     .col-sm-4
       = f.text_field :short_name, class: "form-control", disabled: @organization.block_short_name_edit?
       - if @organization.block_short_name_edit?
         - email_link = link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"
-        %span.below-input-help= translate_with_args(".contact_to_update_html", link: email_link)
+        %span.below-input-help= t(".contact_to_update_html", link: email_link)
   .form-group.row.fancy-select.unfancy
     = f.label :embedable_user_email, class: "org-form-label" do
-      = translate_with_args(".registration_email")
+      = t(".registration_email")
     .col-sm-4
       = f.select :embedable_user_email,
       @organization.users.pluck(:email),
-      prompt: translate_with_args(".select_email"),
+      prompt: t(".select_email"),
       selected: (@organization.auto_user && @organization.auto_user.email),
       class: "form-control"
       %span.below-input-help
-        = translate_with_args(".org_email_address_html", org_name: @organization.name)
+        = t(".org_email_address_html", org_name: @organization.name)
 
   - unless Organization.admin_required_kinds.include?(@organization.kind)
     .form-group.row
       %label.org-form-label
-        = translate_with_args(".organization_type")
+        = t(".organization_type")
       .col-sm-4
         - select_opts = Organization.user_creatable_kinds.map { |k| [Organization.kind_humanized(k), k] }
         = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control"
@@ -61,7 +61,7 @@
 
   .form-group.row.avatar-upload-wrapper
     %label.org-form-label
-      = translate_with_args(".organization_logo")
+      = t(".organization_logo")
     .col-sm-4
       - if @organization.avatar?
         = link_to image_tag(@organization.avatar_url(:thumb)), @organization.avatar_url
@@ -69,38 +69,38 @@
       %label.file
         = f.file_field :avatar, class: "avatar-upload-field", accept: ImageUploader.permitted_extensions.join(",")
         %span.file-custom
-          %span.file-upload-text= translate_with_args(".choose_file")
+          %span.file-upload-text= t(".choose_file")
         = f.hidden_field :avatar_cache
       %span.below-input-help
-        = translate_with_args(".square_image")
+        = t(".square_image")
 
 
   .form-group.row.mt-4
     .form-submit-button
-      = f.submit translate_with_args(".update"), class: "btn btn-success btn-lg"
+      = f.submit t(".update"), class: "btn btn-success btn-lg"
 
   .form-group.row.mt-5
     %label.org-form-label
-      = translate_with_args(".stolen_emails")
+      = t(".stolen_emails")
     .col-sm-4
       .checkbox{style: "line-height: 1.5em;"}
         %label
           = f.check_box :direct_unclaimed_notifications
-          = translate_with_args(".send_emails_directly")
-        %span.d-block= translate_with_args(".unclaimed_registration_definition")
+          = t(".send_emails_directly")
+        %span.d-block= t(".unclaimed_registration_definition")
         %span.below-input-help.mt-2
-          = translate_with_args(".when_checked_go_direct")
-          %em.less-strong= translate_with_args(".why_no_direct_by_default")
+          = t(".when_checked_go_direct")
+          %em.less-strong= t(".why_no_direct_by_default")
 
 - unless current_organization.paid?
   %hr.delete-organization-section
   %p.text-md-center
     %a.collapsed{href: "#", data: {toggle: "collapse", target: "#delete-organization"}}
-      = translate_with_args(".i_would_like_to_terminate_my_account")
+      = t(".i_would_like_to_terminate_my_account")
   #delete-organization.collapse
     .text-md-center
-      = link_to translate_with_args(".delete_organization"),
+      = link_to t(".delete_organization"),
         organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
         method: :delete,
-        data: {confirm: translate_with_args(".removal_confirmation", org_name: current_organization.name)},
+        data: {confirm: t(".removal_confirmation", org_name: current_organization.name)},
         class: "btn btn-danger"

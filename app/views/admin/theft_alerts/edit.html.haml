@@ -83,9 +83,10 @@
             - if @theft_alert.activating_at.present?
               %span.convertTime
                 = l @theft_alert.activating_at, format: :convert_time
-              %small.ml-2.less-strong
-                = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
-                after payment
+              - if @theft_alert.paid_at.present?
+                %small.ml-2.less-strong
+                  = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
+                  after payment
         %tr
           %td last FB update
           %td

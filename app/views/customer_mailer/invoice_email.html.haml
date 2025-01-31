@@ -1,13 +1,13 @@
 %h1
-  = translate_with_args(".html.thank_you_so_much")
+  = t(".html.thank_you_so_much")
 
 %p
-  = translate_with_args(".html.we_really_appreciate_your_support")
+  = t(".html.we_really_appreciate_your_support")
 
 - if @payment.is_recurring
-  %p= translate_with_args(".html.thanks_for_signing_up")
+  %p= t(".html.thanks_for_signing_up")
 %p
   - if @payment.donation?
-    = translate_with_args(".html.donation_will_help", amount: @payment.amount_formatted)
+    = t(".html.donation_will_help", amount: @payment.amount_formatted)
   - else
-    = translate_with_args(".html.payment_received", amount: @payment.amount_formatted)
+    = t(".html.payment_received", amount: @payment.amount_formatted)

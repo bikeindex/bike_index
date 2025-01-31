@@ -353,7 +353,7 @@ RSpec.describe User, type: :model do
 
   describe "updating phone" do
     let(:user) { FactoryBot.create(:user, phone: " ") }
-    before { allow_any_instance_of(TwilioIntegration).to receive(:send_message) { OpenStruct.new(sid: "party") } }
+    before { allow_any_instance_of(Integrations::Twilio).to receive(:send_message) { OpenStruct.new(sid: "party") } }
     it "updates general alerts without background processing" do
       user.reload
       expect(user.alert_slugs).to be_blank
@@ -493,25 +493,26 @@ RSpec.describe User, type: :model do
   end
 
   describe "auth_token_time" do
-    context "password_reset_token" do
-      it "gets long time ago if not there" do
-        user = User.new(password_reset_token: "c7c3b99a319ac09e2b0080a8s89asd89afsd6734n")
-        expect(user.auth_token_time("password_reset_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
+    let(:user) { FactoryBot.create(:user) }
+    context "token_for_password_reset" do
+      context "not there" do
+        let(:user) { User.new(token_for_password_reset: "c7c3b99a319ac09e2b0080a8s89asd89afsd6734n") }
+        it "gets long time ago if not there" do
+          expect(user.auth_token_time("token_for_password_reset")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
+        end
       end
       it "gets the time" do
-        user = FactoryBot.create(:user)
-        expect(user.password_reset_token).to be_blank
-        user.update_auth_token("password_reset_token")
+        user.update_auth_token("token_for_password_reset")
         user.reload
-        expect(user.password_reset_token).to be_present
-        expect(user.auth_token_time("password_reset_token")).to be > Time.current - 2.seconds
-        expect(user.auth_token_expired?("password_reset_token")).to be_falsey
+        expect(user.token_for_password_reset).to be_present
+        expect(user.auth_token_time("token_for_password_reset")).to be > Time.current - 2.seconds
+        expect(user.auth_token_expired?("token_for_password_reset")).to be_falsey
       end
       it "input time" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("password_reset_token", (Time.current - 121.minutes).to_i)
-        expect(user.reload.auth_token_time("password_reset_token")).to be < (Time.current - 1.hours)
-        expect(user.auth_token_expired?("password_reset_token")).to be_truthy
+        user.update_auth_token("token_for_password_reset", (Time.current - 121.minutes).to_i)
+        expect(user.reload.auth_token_time("token_for_password_reset")).to be < (Time.current - 1.hours)
+        expect(user.auth_token_expired?("token_for_password_reset")).to be_truthy
       end
     end
 
@@ -539,23 +540,23 @@ RSpec.describe User, type: :model do
   describe "send_password_reset_email" do
     it "enqueues sending the password reset" do
       user = FactoryBot.create(:user)
-      expect(user.password_reset_token).to be_nil
       expect {
         expect(user.send_password_reset_email).to be_truthy
       }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
-      expect(user.reload.password_reset_token).not_to be_nil
+      expect(user.reload.token_for_password_reset).not_to be_nil
     end
 
     it "doesn't send another one immediately" do
       user = FactoryBot.create(:user)
       expect(user.send_password_reset_email).to be_truthy
-      current_token = user.password_reset_token
+      user.reload
+      current_token = user.token_for_password_reset
       expect {
         expect(user.send_password_reset_email).to be_falsey
         expect(user.send_password_reset_email).to be_falsey
       }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
       user.reload
-      expect(user.password_reset_token).to eq current_token
+      expect(user.token_for_password_reset).to eq current_token
     end
   end
 

@@ -308,7 +308,7 @@ nl:
         partner_data: Partner gegevens
         password: Wachtwoord
         password_digest: Wachtwoord samenvatting
-        password_reset_token: Wachtwoord reset token
+        token_for_password_reset: Wachtwoord reset token
         payments: Betalingen
         phone: Telefoon
         preferred_language: Voorkeurstaal
@@ -783,7 +783,7 @@ nl:
         partner_data: Partner gegevens
         password: Wachtwoord
         password_digest: Wachtwoord samenvatting
-        password_reset_token: Wachtwoord reset token
+        token_for_password_reset: Wachtwoord reset token
         payments: Betalingen
         phone: Telefoon
         preferred_language: Voorkeurstaal
@@ -2291,7 +2291,7 @@ nl:
       resend_confirmation_email:
         please_sign_in: Log in om de bevestiging opnieuw te verzenden
         resending_email: E-mailbevestiging opnieuw verzonden
-      find_user_from_password_reset_token!:
+      find_user_from_token_for_password_reset!:
         does_not_match_token: Komt niet overeen met het wachtwoord-reset-token van
           de gebruiker
         token_expired: Wachtwoord-reset-token is verlopen, probeer het wachtwoord

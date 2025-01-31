@@ -1,4 +1,4 @@
-class BikeBookIntegration
+class Integrations::BikeBook
   require "net/http"
 
   def make_request(query, method = nil)

@@ -19,14 +19,14 @@
                 = description
         .edit-form-well-submit-wrapper
           = hidden_field_tag :edit_template, @edit_template
-          = submit_tag translate_with_args(".save_changes"), class: 'btn btn-lg btn-primary'
+          = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary'
 
       .col-md-8.form-well
         = render partial: @edit_template, locals: { f: f }
 
 .mobile-nonfloating-menu.pl-1.pr-1.text-center
   %strong.d-inline-block
-    = translate_with_args(".edit_pages")
+    = t(".edit_pages")
   - menu_link_count = @edit_templates.keys.count
   - @edit_templates.each_with_index do |t_d, i|
     - template, description = t_d[0], t_d[1]

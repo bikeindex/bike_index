@@ -3,6 +3,6 @@
 %hr{ style: 'margin: 40px 0;' }
 
 %p.less-strong.center-text
-  = translate_with_args(".html.this_email_is_about", bike: @bike.type, registration_date: @bike.created_at.strftime('%m.%d.%y'))
+  = t(".html.this_email_is_about", bike: @bike.type, registration_date: @bike.created_at.strftime('%m.%d.%y'))
 
 = render partial: "shared/email_bike_box"

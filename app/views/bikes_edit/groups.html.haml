@@ -8,21 +8,21 @@
       .col-md-8.form-well
         .form-wrap#edit_bike_organizations
           .form-well-form-header
-            %h3= translate_with_args(".groups_and_organizations")
+            %h3= t(".groups_and_organizations")
           .col-xs-12
-            %p= translate_with_args(".are_you_part_of_a_school_want_to_bolster_")
+            %p= t(".are_you_part_of_a_school_want_to_bolster_")
 
           - if @bike.bike_organizations.any?
             = hidden_field_tag :organization_ids_can_edit_claimed_present, true
             .related-fields.no-divider-row
               - if @bike.bike_organizations.where(organization_id: @bike.creation_organization_id).present? && @bike.creation_organization.present?
                 - bike_organization = @bike.bike_organizations.where(organization_id: @bike.creation_organization_id).first
-                = render partial: "/bikes_edit/edit_bike_organization", locals: {bike_organization: bike_organization, main_label: translate_with_args(".creation_organization")}
+                = render partial: "/bikes_edit/edit_bike_organization", locals: {bike_organization: bike_organization, main_label: t(".creation_organization")}
 
               - displayed_other_organizations = false
               - @bike.bike_organizations.reorder(:created_at).each_with_index do |bike_organization, index|
                 - next if bike_organization.organization == @bike.creation_organization
-                - main_label = displayed_other_organizations ? nil : translate_with_args(".other_organizations")
+                - main_label = displayed_other_organizations ? nil : t(".other_organizations")
                 - displayed_other_organizations = true
                 = render partial: "/bikes_edit/edit_bike_organization", locals: {bike_organization: bike_organization, main_label: main_label}
 
@@ -60,6 +60,6 @@
             %a.add_fields#add_additional_organization{ href: '#', role: 'button' }
               %span.context-display-help
                 +
-              = translate_with_args(".add_an_organization")
+              = t(".add_an_organization")
 
           = render "/shared/form_well_footer_save"

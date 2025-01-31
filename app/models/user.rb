@@ -33,7 +33,7 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
-#  password_reset_token               :text
+#  token_for_password_reset           :text
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null
@@ -145,55 +145,57 @@ class User < ApplicationRecord
 
   attr_accessor :skip_update
 
-  def self.fuzzy_email_find(email)
-    UserEmail.confirmed.fuzzy_user_find(email)
-  end
-
-  def self.fuzzy_unconfirmed_primary_email_find(email)
-    find_by_email(EmailNormalizer.normalize(email))
-  end
-
-  def self.fuzzy_confirmed_or_unconfirmed_email_find(email)
-    fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
-  end
-
-  def self.username_friendly_find(str)
-    if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
-      where(id: str).first
-    else
-      find_by_username(str)
+  class << self
+    def fuzzy_email_find(email)
+      UserEmail.confirmed.fuzzy_user_find(email)
     end
-  end
 
-  def self.friendly_find(str)
-    fuzzy_email_find(str) || username_friendly_find(str)
-  end
+    def fuzzy_unconfirmed_primary_email_find(email)
+      find_by_email(EmailNormalizer.normalize(email))
+    end
 
-  def self.friendly_find_id(str)
-    friendly_find(str)&.id
-  end
+    def fuzzy_confirmed_or_unconfirmed_email_find(email)
+      fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
+    end
 
-  def self.admin_text_search(str)
-    q = "%#{str.to_s.strip}%"
-    unscoped.includes(:user_emails)
-      .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
-      .distinct.references(:user_emails)
-  end
+    def username_friendly_find(str)
+      if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
+        where(id: str).first
+      else
+        find_by_username(str)
+      end
+    end
 
-  def self.matching_domain(str)
-    where("email ILIKE ?", "%#{str.to_s.strip}")
-  end
+    def friendly_find(str)
+      fuzzy_email_find(str) || username_friendly_find(str)
+    end
 
-  def self.search_phone(str)
-    q = "%#{Phonifyer.phonify(str)}%"
-    includes(:user_phones)
-      .where("users.phone ILIKE ? OR user_phones.phone ILIKE ?", q, q)
-      .distinct.references(:user_phones)
-  end
+    def friendly_find_id(str)
+      friendly_find(str)&.id
+    end
 
-  def self.from_auth(auth)
-    return nil unless auth&.is_a?(Array)
-    where(id: auth[0], auth_token: auth[1]).first
+    def admin_text_search(str)
+      q = "%#{str.to_s.strip}%"
+      unscoped.includes(:user_emails)
+        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
+        .distinct.references(:user_emails)
+    end
+
+    def matching_domain(str)
+      where("email ILIKE ?", "%#{str.to_s.strip}")
+    end
+
+    def search_phone(str)
+      q = "%#{Phonifyer.phonify(str)}%"
+      includes(:user_phones)
+        .where("users.phone ILIKE ? OR user_phones.phone ILIKE ?", q, q)
+        .distinct.references(:user_phones)
+    end
+
+    def from_auth(auth)
+      return nil unless auth&.is_a?(Array)
+      where(id: auth[0], auth_token: auth[1]).first
+    end
   end
 
   def additional_emails=(value)
@@ -331,8 +333,8 @@ class User < ApplicationRecord
 
   def send_password_reset_email
     # If the auth token was just created, don't create a new one, it's too error prone
-    return false if auth_token_time("password_reset_token") > Time.current - 2.minutes
-    update_auth_token("password_reset_token")
+    return false if auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+    update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
     EmailResetPasswordWorker.perform_async(id)
     true
