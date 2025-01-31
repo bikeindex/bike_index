@@ -6,7 +6,7 @@
     .edit-bike-header
       %h1.uncap
         - if @bike.status_with_owner?
-          = translate_with_args(".edit")
+          = t(".edit")
         - else
           = bike_status_span(@bike)
         - if @bike.version?
@@ -26,20 +26,20 @@
       - unless @bike.user?
         %p.mb-0
           - if @bike.authorized_by_organization?(u: current_user, org: passive_organization)
-            = translate_with_args(".owned_with_permission_to_edit_html", owner_email: @og_email || @bike.owner_email, org_name: passive_organization&.short_name)
+            = t(".owned_with_permission_to_edit_html", owner_email: @og_email || @bike.owner_email, org_name: passive_organization&.short_name)
           - else # it's almost certainly because the user hasn't claimed it
-            = translate_with_args(".owned_but_hasnt_been_claimed_html", owner_email: @og_email || @bike.owner_email)
+            = t(".owned_but_hasnt_been_claimed_html", owner_email: @og_email || @bike.owner_email)
 
       %p.mb-4
         - if @bike.version?
-          = link_to translate_with_args(".view_bike_version", bike_type: @bike.type_titleize), bike_version_path(@bike), class: "gray-link"
+          = link_to t(".view_bike_version", bike_type: @bike.type_titleize), bike_version_path(@bike), class: "gray-link"
         - else
-          = link_to translate_with_args(".view_bike", bike_type: @bike.type_titleize), bike_path(@bike), class: "gray-link"
+          = link_to t(".view_bike", bike_type: @bike.type_titleize), bike_path(@bike), class: "gray-link"
   = yield
 
   .mobile-nonfloating-menu.pl-1.pr-1.text-center
     %strong.d-inline-block
-      = translate_with_args(".edit_pages", bike_type: @bike.type)
+      = t(".edit_pages", bike_type: @bike.type)
     - menu_link_count = @edit_templates.keys.count
     - @edit_templates.each_with_index do |t_d, i|
       - template, description = t_d[0], t_d[1]

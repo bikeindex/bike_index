@@ -17,11 +17,11 @@
       %td.info-holder
         %ul
           %li
-            %strong= translate_with_args(".make")
+            %strong= t(".make")
             = @bike.mnfg_name
 
           %li
-            %strong= translate_with_args(".serial")
+            %strong= t(".serial")
             = render_serial_display(@bike, skip_explanation: true)
 
           %li
@@ -35,15 +35,15 @@
             - stolen_record = @bike.current_stolen_record
             %li
               %strong
-                = @bike.status_impounded? ? translate_with_args(".found") : translate_with_args(".stolen_from")
+                = @bike.status_impounded? ? t(".found") : t(".stolen_from")
               = stolen_record.address(country: [:skip_default])
             %li
               %strong
-                = translate_with_args(".stolen_at")
+                = t(".stolen_at")
               = l stolen_record.date_stolen, format: :dotted
 
           - if @bike.current_ownership&.new_registration? && @bike.pos?
             %li
               %em.less-strong
-                = translate_with_args(".color_may_be_incorrect")
+                = t(".color_may_be_incorrect")
 

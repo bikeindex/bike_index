@@ -1,22 +1,22 @@
 %h1#top
-  = translate_with_args(".help_with_bike_index")
+  = t(".help_with_bike_index")
 
 = render "/shared/faq"
 
 %hr
 
 %h3.padded#contact_us_section
-  = translate_with_args(".contact_us")
+  = t(".contact_us")
 
-%p= translate_with_args(".have_a_question_we_havent_answered")
+%p= t(".have_a_question_we_havent_answered")
 
 - contact_link = link_to "contact@bikeindex.org", "mailto:contact@bikeindex.org"
-%p= translate_with_args(".you_can_reach_us_at_contact_html", contact_link: contact_link)
+%p= t(".you_can_reach_us_at_contact_html", contact_link: contact_link)
 
 - if current_user.present?
   %article
     = render "/feedbacks/form"
 - else
   %h3
-    = link_to translate_with_args(".log_in_to_send_a_comment"),
+    = link_to t(".log_in_to_send_a_comment"),
       new_session_url(return_to: help_path(anchor: "contact_us_section"))

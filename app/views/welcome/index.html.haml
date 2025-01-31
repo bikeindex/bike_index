@@ -2,66 +2,66 @@
   %header.jumbotron.root-landing-banner-header.bg-image-bike-hero
     .container
       .root-landing-header-text
-        %h2= translate_with_args(".value_of_bikes_recovered", value: as_currency(Counts.recoveries_value))
-        %h1.upcase= translate_with_args(".hero")
+        %h2= t(".value_of_bikes_recovered", value: as_currency(Counts.recoveries_value))
+        %h1.upcase= t(".hero")
         %h2
           = link_to new_bike_path do
-            = translate_with_args(".register_now")
+            = t(".register_now")
             %span.chevron &raquo;
   = render partial: "/landing_pages/for_organizations_photo_list"
   - cache("root_recovery_stories-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do
     .root-landing-recovery-stories
       .container
-        %h3= translate_with_args(".recent_recovery_stories")
+        %h3= t(".recent_recovery_stories")
         #recovery-stories-container.extras-hidden
           = render @recovery_displays.limit(5)
           .recovery-block.recovery-see-more
-            = link_to translate_with_args(".read_more_recovery_stories"),
+            = link_to t(".read_more_recovery_stories"),
               recovery_stories_path,
               class: "see-more-link"
 
   - cache("root_body") do
     .root-landing-how-it-works
       .container
-        %h3.landing-container-label= translate_with_args(".but_how_does_it_work")
+        %h3.landing-container-label= t(".but_how_does_it_work")
         .row
           .col-md-2.root-landing-how-icon
             = render "/landing_pages/icons/how_icon_register_svg"
             = image_tag "landing_pages/dashed_line.svg", class: "root-icon-connector", alt: "" # Decorative image
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4= translate_with_args(".register_your_bike")
-              %p= translate_with_args(".how_it_works")
+              %h4= t(".register_your_bike")
+              %p= t(".how_it_works")
         .row
           .col-md-2.root-landing-how-icon
             = render "/landing_pages/icons/how_icon_alert_svg"
             = image_tag "landing_pages/dashed_line.svg", class: "root-icon-connector", alt: "" # Decorative image
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4= translate_with_args(".alert_the_community")
-              %p= translate_with_args(".if_your_bike_goes_missing")
+              %h4= t(".alert_the_community")
+              %p= t(".if_your_bike_goes_missing")
         .row
           .col-md-2.root-landing-how-icon
             = render "/landing_pages/icons/how_icon_responds_svg"
             = image_tag "landing_pages/dashed_line.svg", class: "root-icon-connector", alt: "" # Decorative image
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4= translate_with_args(".the_community_responds")
-              %p= translate_with_args(".identifying_your_bike")
+              %h4= t(".the_community_responds")
+              %p= t(".identifying_your_bike")
         .row
           .col-md-2.root-landing-how-icon
             = render "/landing_pages/icons/how_icon_recover_svg"
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4= translate_with_args(".you_get_your_bike_back")
-              %p= translate_with_args(".recover_your_bike_for_free")
+              %h4= t(".you_get_your_bike_back")
+              %p= t(".recover_your_bike_for_free")
 
       %a.btn.btn-lg.btn-success.root-action-btn{ href: new_bike_path }
-        = translate_with_args(".register_now")
+        = t(".register_now")
 
   .root-landing-who
     .container
-      %h3.landing-container-label= translate_with_args(".used_by")
+      %h3.landing-container-label= t(".used_by")
 
       -# These images have a color overlay (aka fill) of #676767
       .root-landing-who-wrap
@@ -109,7 +109,7 @@
 
   .root-by-the-numbers
     .container-fluid
-      %h3.landing-container-label= translate_with_args(".bike_index_statistics")
+      %h3.landing-container-label= t(".bike_index_statistics")
       .row
         .col-md-10.charted
           :ruby
@@ -132,30 +132,30 @@
 
           = column_chart Counts.week_creation_chart, thousands: ",", library: chartkick_library_props
           %h4.chart-label
-            = translate_with_args(".bikes_registered_this_week")
+            = t(".bikes_registered_this_week")
         .col-md-2
           .count-block
             %h4
-              = translate_with_args(".total_bikes_registered")
+              = t(".total_bikes_registered")
               %span.count-display
                 = number_with_delimiter(Counts.total_bikes)
           .count-block
             %h4
-              = translate_with_args(".stolen_bikes_registered")
+              = t(".stolen_bikes_registered")
               %span.count-display
                 = number_with_delimiter(Counts.stolen_bikes)
           .count-block
             %h4
-              = translate_with_args(".stolen_bikes_recovered")
+              = t(".stolen_bikes_recovered")
               %span.count-display
                 = number_with_delimiter(Counts.recoveries)
           .count-block
             %h4
-              = translate_with_args(".total_recovery_value")
+              = t(".total_recovery_value")
               %span.count-display
                 $#{number_with_delimiter(Counts.recoveries_value)}
           .count-block
             %h4
-              = translate_with_args(".partner_organizations")
+              = t(".partner_organizations")
               %span.count-display
                 = number_with_delimiter(Counts.organizations)

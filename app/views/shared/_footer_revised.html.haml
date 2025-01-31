@@ -3,43 +3,43 @@
     .container
       .row
         %nav.col-md-2.pull-right
-          %h4= translate_with_args(".bike_index")
+          %h4= t(".bike_index")
           %ul
-            %li= active_link translate_with_args(".faq"), support_path
-            %li= active_link translate_with_args(".blog"), news_index_path
-            %li= active_link translate_with_args(".help"), help_path
-            %li= active_link translate_with_args(".about"), about_path
-            %li= active_link translate_with_args(".where_we_are"), where_path
-            %li= active_link translate_with_args(".stolen_bike_recoveries"), recovery_stories_path
-            %li= active_link translate_with_args(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path
+            %li= active_link t(".faq"), support_path
+            %li= active_link t(".blog"), news_index_path
+            %li= active_link t(".help"), help_path
+            %li= active_link t(".about"), about_path
+            %li= active_link t(".where_we_are"), where_path
+            %li= active_link t(".stolen_bike_recoveries"), recovery_stories_path
+            %li= active_link t(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path
 
         %nav.col-md-2.pull-right
-          %h4= translate_with_args(".support_us")
+          %h4= t(".support_us")
           %ul
-            %li= active_link translate_with_args(".donate"), why_donate_path
-            %li= active_link translate_with_args(".store"), store_path
-            %li= active_link translate_with_args(".ambassadors"), ambassadors_how_to_path
+            %li= active_link t(".donate"), why_donate_path
+            %li= active_link t(".store"), store_path
+            %li= active_link t(".ambassadors"), ambassadors_how_to_path
 
         %nav.col-md-2.pull-right
-          %h4= translate_with_args(".resources")
+          %h4= t(".resources")
           %ul
-            %li= active_link translate_with_args(".api_documentation"), documentation_index_path
-            %li= active_link translate_with_args(".dev_resources"), dev_and_design_path
-            %li= active_link translate_with_args(".design_logos"), image_resources_path
-            %li= active_link translate_with_args(".security"), security_path
-            %li= active_link translate_with_args(".bike_manufacturer_list"), manufacturers_path
-            %li= active_link translate_with_args(".protect_your_bike"), protect_your_bike_path
-            %li= active_link translate_with_args(".stolen_bike_map"), "https://map.bikewise.org/"
+            %li= active_link t(".api_documentation"), documentation_index_path
+            %li= active_link t(".dev_resources"), dev_and_design_path
+            %li= active_link t(".design_logos"), image_resources_path
+            %li= active_link t(".security"), security_path
+            %li= active_link t(".bike_manufacturer_list"), manufacturers_path
+            %li= active_link t(".protect_your_bike"), protect_your_bike_path
+            %li= active_link t(".stolen_bike_map"), "https://map.bikewise.org/"
 
         %nav.col-md-2.pull-right
-          %h4= translate_with_args(".who_we_serve")
+          %h4= t(".who_we_serve")
           %ul
-            %li= active_link translate_with_args(".bike_shops"), for_bike_shops_path
-            %li= active_link translate_with_args(".schools_and_universities"), for_schools_path
-            %li= active_link translate_with_args(".cities"), for_cities_path
-            %li= active_link translate_with_args(".law_enforcement"), for_law_enforcement_path
-            %li= active_link translate_with_args(".community_groups"), for_community_groups_path
-            %li= link_to translate_with_args(".press_inquiries"), "mailto:bryan@bikeindex.org,gavin@bikeindex.org"
+            %li= active_link t(".bike_shops"), for_bike_shops_path
+            %li= active_link t(".schools_and_universities"), for_schools_path
+            %li= active_link t(".cities"), for_cities_path
+            %li= active_link t(".law_enforcement"), for_law_enforcement_path
+            %li= active_link t(".community_groups"), for_community_groups_path
+            %li= link_to t(".press_inquiries"), "mailto:bryan@bikeindex.org,gavin@bikeindex.org"
 
         %nav.col-md-2.pull-right
 
@@ -69,14 +69,14 @@
           = form_tag nil, method: :get, class: "locale-form" do
             .row
               .form-group
-                = label_tag(:locale, translate_with_args(".language"))
+                = label_tag(:locale, t(".language"))
                 = select_tag(:locale,
                   options_for_select(language_choices, selected: I18n.locale),
                   class: "form-control-sm",
                   onchange: "this.form.submit()")
                 - if current_user.present? && current_user.preferred_language != I18n.locale
                   %em.below-input-help.text-right
-                    = link_to translate_with_args(".change_preferred_language"), edit_my_account_path
+                    = link_to t(".change_preferred_language"), edit_my_account_path
                 = submit_tag "update", name: "Update", class: "btn btn-primary btn-sm sr-only"
         .col-md-6.text-right
           %p
@@ -86,7 +86,7 @@
 
           %p
             %span{data: {license: "https://github.com/bikeindex/bike_index/blob/main/LICENSE"}}
-              = translate_with_args(".copyright_html", current_year: Time.current.year)
+              = t(".copyright_html", current_year: Time.current.year)
 
 -# Facebook pixel
 <script>

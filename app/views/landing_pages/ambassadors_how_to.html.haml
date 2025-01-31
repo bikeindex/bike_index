@@ -8,11 +8,11 @@
           = render "landing_pages/icons/header_ambassadors_svg"
 
         .banner-text
-          %h1= translate_with_args(".become_a_bike_index_ambassador")
+          %h1= t(".become_a_bike_index_ambassador")
           %h2
-            = translate_with_args(".want_to_help_fight_bike_theft_in_your_com")
+            = t(".want_to_help_fight_bike_theft_in_your_com")
             %br
-            = translate_with_args(".start_here")
+            = t(".start_here")
 
     .ribbon
       .container
@@ -21,92 +21,92 @@
   .container
     .row.main-body-row
       .landing-why-col
-        %h3#ambassadors_why= translate_with_args(".why_work_with_bike_index")
+        %h3#ambassadors_why= t(".why_work_with_bike_index")
         %p
-          = translate_with_args(".bike_index_is_a_nonprofit_with_a_big_miss")
+          = t(".bike_index_is_a_nonprofit_with_a_big_miss")
 
         %p
-          = translate_with_args(".anyone_can_help_bike_index_we_are_always_")
+          = t(".anyone_can_help_bike_index_we_are_always_")
 
         %p.mb-4
-          = translate_with_args(".you_bring_the_ideas_make_the_connections_")
+          = t(".you_bring_the_ideas_make_the_connections_")
 
-        = link_to translate_with_args(".apply_to_be_an_ambassador_here"), new_ambassador_path, class: "btn btn-primary"
+        = link_to t(".apply_to_be_an_ambassador_here"), new_ambassador_path, class: "btn btn-primary"
 
         = image_tag 'landing_pages/ambassador.jpg', alt: 'A Bike Index Ambassador', class: "mt-4"
 
-        %h3#ambassadors_how= translate_with_args(".how_it_works")
+        %h3#ambassadors_how= t(".how_it_works")
 
         %p
-          = translate_with_args(".we_provide_you_with_the_resources_to_make")
+          = t(".we_provide_you_with_the_resources_to_make")
         %ul
           %li
-            = translate_with_args(".access_to_ambassadors_slack_channel_for_s")
+            = t(".access_to_ambassadors_slack_channel_for_s")
           %li
-            = translate_with_args(".give_you_shoutouts_on_social_media")
+            = t(".give_you_shoutouts_on_social_media")
 
         %p
-          = translate_with_args(".to_become_a_bike_index_ambassador_fill_ou")
+          = t(".to_become_a_bike_index_ambassador_fill_ou")
 
         %h3#ambassador_activities
-          = translate_with_args(".typical_ambassador_activities_include")
+          = t(".typical_ambassador_activities_include")
 
         %ul
           %li
-            = translate_with_args(".monitoring_online_sales_platforms_like_cr")
+            = t(".monitoring_online_sales_platforms_like_cr")
           %li
-            = translate_with_args(".share_bike_index_on_social_channels_inclu")
+            = t(".share_bike_index_on_social_channels_inclu")
           %li
-            = translate_with_args(".follow_bike_index_on_twitter_facebook_and")
+            = t(".follow_bike_index_on_twitter_facebook_and")
           %li
-            = translate_with_args(".get_bike_shops_signed_up_for_bike_index_u")
-            = link_to translate_with_args(".pos_integrations"), for_shops_path
+            = t(".get_bike_shops_signed_up_for_bike_index_u")
+            = link_to t(".pos_integrations"), for_shops_path
           %li
-            = translate_with_args(".connect_us_with_city_officials_law_enforc")
+            = t(".connect_us_with_city_officials_law_enforc")
 
         %p
-          = translate_with_args(".join_our_list_of_ambassadors_and_advocate")
+          = t(".join_our_list_of_ambassadors_and_advocate")
 
         %p
-          = translate_with_args(".check_out_our_media_resources")
-          = link_to translate_with_args(".here"), resources_path
+          = t(".check_out_our_media_resources")
+          = link_to t(".here"), resources_path
         %p
-          = translate_with_args(".relevant_articles")
+          = t(".relevant_articles")
         %p
-          = link_to translate_with_args(".9_steps_for_getting_your_stolen_bike_back"),
+          = link_to t(".9_steps_for_getting_your_stolen_bike_back"),
             news_path("9-steps-for-getting-your-stolen-bike-back")
         %p
-          = link_to translate_with_args(".bike_index_launches_new_ambassador_progra"),
+          = link_to t(".bike_index_launches_new_ambassador_progra"),
             news_path("bike-index-launches-ambassadors-program")
         %p
-          = link_to translate_with_args(".be_a_bike_saver"),
+          = link_to t(".be_a_bike_saver"),
             news_path("be-a-bike-saver---donate-to-bike-index-on-giving-tuesday")
 
         %h3#current_ambassadors
-          =link_to translate_with_args(".view_current_ambassadors"), ambassadors_current_path
+          =link_to t(".view_current_ambassadors"), ambassadors_current_path
 
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg{ href: new_ambassador_path }
-            = translate_with_args(".apply_today")
+            = t(".apply_today")
 
       .next-steps-col
         .next-steps-wrap
           %header
-            = translate_with_args(".become_an_ambassador")
+            = t(".become_an_ambassador")
             %a.btn.btn-primary.btn-lg{ href: 'https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform' }
-              = translate_with_args(".apply_today")
+              = t(".apply_today")
           .trusted-by
             %ul.mt-2
               %li
                 %a{ href: '#ambassadors_why', class: 'scroll-to-ref', data: { offset: -80 } }
-                  = translate_with_args(".why_work_with_bike_index")
+                  = t(".why_work_with_bike_index")
               %li
                 %a{ href: '#ambassadors_how', class: 'scroll-to-ref', data: { offset: -80 } }
-                  = translate_with_args(".how_it_works")
+                  = t(".how_it_works")
               %li
                 %a{ href: '#ambassador_activities', class: 'scroll-to-ref', data: { offset: -80 } }
-                  = translate_with_args(".typical_ambassador_activities")
+                  = t(".typical_ambassador_activities")
               %li
                 %a{ href: ambassadors_current_path }
-                  = translate_with_args(".current_ambassadors")
+                  = t(".current_ambassadors")
 

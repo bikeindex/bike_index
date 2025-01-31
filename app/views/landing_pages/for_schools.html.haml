@@ -8,57 +8,57 @@
           = render "landing_pages/icons/header_#{landing_page_target}_svg"
 
         .banner-text
-          %h1= translate_with_args(".bike_index_for_universities")
-          %h3= translate_with_args(".protecting_bikes_on_campus_can_be")
+          %h1= t(".bike_index_for_universities")
+          %h3= t(".protecting_bikes_on_campus_can_be")
 
     .ribbon.mobile-contact-link
       .container
         %h2
           = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
-            = translate_with_args(".features_amp_pricing")
+            = t(".features_amp_pricing")
             %span.chevron &raquo;
 
   .container
     .row.main-body-row
       .landing-why-col
-        %h3= translate_with_args(".make_bike_registration_better")
-        %p= translate_with_args(".weve_designed_a_platform")
+        %h3= t(".make_bike_registration_better")
+        %p= t(".weve_designed_a_platform")
         %p.text-center
           %em=t(".must_read")
           %strong
-            = link_to translate_with_args(".six_best_features_for_schools"), "https://bikeindex.org/info/university-bike-management-with-bike-index"
-        %p= translate_with_args(".your_students_can_register_their_bikes")
+            = link_to t(".six_best_features_for_schools"), "https://bikeindex.org/info/university-bike-management-with-bike-index"
+        %p= t(".your_students_can_register_their_bikes")
         %p= render partial: "landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
 
-        %h3= translate_with_args(".how_it_works")
-        %p= translate_with_args(".bike_index_users_provide")
-        %p= translate_with_args(".read_about_our_html", count: number_with_delimiter(Counts.recoveries))
+        %h3= t(".how_it_works")
+        %p= t(".bike_index_users_provide")
+        %p= t(".read_about_our_html", count: number_with_delimiter(Counts.recoveries))
 
-        %h4= translate_with_args(".related_articles")
+        %h4= t(".related_articles")
         %ul
           %li
-            = translate_with_args(".check_out")
-            = link_to translate_with_args(".schools_deck"), "https://docs.google.com/presentation/d/1oQ3b96NRtAgJmYNhNfrAP3khDvB8lO_0gFG1cq86Rx0/edit?usp=sharing"
+            = t(".check_out")
+            = link_to t(".schools_deck"), "https://docs.google.com/presentation/d/1oQ3b96NRtAgJmYNhNfrAP3khDvB8lO_0gFG1cq86Rx0/edit?usp=sharing"
           %li
-            = link_to translate_with_args(".how_to_use_bike_index_qr_stickers"), news_path("how-to-use-bike-index-qr-stickers")
+            = link_to t(".how_to_use_bike_index_qr_stickers"), news_path("how-to-use-bike-index-qr-stickers")
           %li
-            = link_to translate_with_args(".bike_index_admin_guide"), "https://docs.google.com/document/d/1fmAroTjxF3m74vvFh3EFGLIlIYVy4Si8GgCZe1vHQjk/edit?usp=sharing"
+            = link_to t(".bike_index_admin_guide"), "https://docs.google.com/document/d/1fmAroTjxF3m74vvFh3EFGLIlIYVy4Si8GgCZe1vHQjk/edit?usp=sharing"
           %li
-            = link_to translate_with_args(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
+            = link_to t(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
 
         .trusted-by.hidden-lg-up
           %h3
-            = translate_with_args(".trusted_by_top_universities")
+            = t(".trusted_by_top_universities")
           = image_tag "landing_pages/logos/universities.png", alt: "university partners"
 
       .next-steps-col
         .next-steps-wrap
           %header
-            = translate_with_args(".keep_campus_bikes_in_order")
+            = t(".keep_campus_bikes_in_order")
             = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
-              = translate_with_args(".features_amp_pricing")
+              = t(".features_amp_pricing")
               %span.chevron &raquo;
           .trusted-by
             .header
-              = translate_with_args(".trusted_by_top_universities")
+              = t(".trusted_by_top_universities")
             = image_tag "landing_pages/logos/universities.png", alt: "university partners"

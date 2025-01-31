@@ -1,10 +1,10 @@
 .mb-4
   %h1
-    = translate_with_args(".edit_sticker")
+    = t(".edit_sticker")
     %strong= @bike_sticker.pretty_code
   - if @bike_sticker.bike_id.present?
     %p.text-right
-      = link_to translate_with_args(".remove_bike_link"),
+      = link_to t(".remove_bike_link"),
         organization_sticker_path(id: @bike_sticker.code, organization_id: current_organization.to_param, bike_id: nil),
         method: :put,
         class: "btn btn-danger"
@@ -12,30 +12,30 @@
 %table.table-list
   %tbody
     %tr
-      %td= translate_with_args(".sticker")
+      %td= t(".sticker")
       %td= @bike_sticker.pretty_code
     %tr
-      %td= translate_with_args(".claimed")
+      %td= t(".claimed")
       %td
         - if @bike_sticker.claimed_at.present?
           %span.convertTime
             = l(@bike_sticker.created_at, format: :convert_time)
     %tr
-      %td= translate_with_args(".bike")
+      %td= t(".bike")
       %td
         - if @bike_sticker.claimed?
           = link_to(organized_bike_text(@bike_sticker.bike), bike_path(@bike_sticker.bike, organization_id: current_organization.to_param))
         - elsif @bike_sticker.bike_id.present?
-          %span.text-danger= translate_with_args(".bike_is_unavailable")
+          %span.text-danger= t(".bike_is_unavailable")
         - else
-          %strong= translate_with_args(".unclaimed")
+          %strong= t(".unclaimed")
     %tr
-      %td= translate_with_args(".claimed_by")
+      %td= t(".claimed_by")
       %td= @bike_sticker.user&.display_name
 
     - if @bike_sticker.previous_bike_id
       %tr
-        %td= translate_with_args(".previous_bike")
+        %td= t(".previous_bike")
         %td
           - previous_bike = Bike.find_by_id(@bike_sticker.previous_bike_id)
           - label = previous_bike&.title_string || @bike_sticker.previous_bike_id
@@ -50,14 +50,14 @@
     html: { class: "organized-form" } } do |f|
 
   .form-group.row
-    = f.label :bike_id, translate_with_args(".bike_id_or_url"), class: "org-form-label"
+    = f.label :bike_id, t(".bike_id_or_url"), class: "org-form-label"
 
     .col-sm-4
       = f.text_field :bike_id, required: true, class: "form-control"
 
   .row.mt-4
     .form-submit-button
-      = f.submit translate_with_args(".update"), class: "btn btn-success btn-lg"
+      = f.submit t(".update"), class: "btn btn-success btn-lg"
 
 -# de-emphasize the updates
 - bike_sticker_updates = @bike_sticker.bike_sticker_updates
@@ -98,7 +98,7 @@
               - if bike_sticker_update.bike.present?
                 = link_to(organized_bike_text(bike_sticker_update.bike), bike_path(bike_sticker_update.bike, organization_id: current_organization.to_param))
               - elsif bike_sticker_update.bike_id.present?
-                %span.text-danger= translate_with_args(".bike_is_unavailable")
+                %span.text-danger= t(".bike_is_unavailable")
                 %small.less-strong ID: #{bike_sticker_update.bike_id}
             %td
               = bike_sticker_update.kind_humanized

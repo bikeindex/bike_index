@@ -1,7 +1,7 @@
-%h2= translate_with_args(".whoops_that_link_isnt_connected_to_a_bike")
+%h2= t(".whoops_that_link_isnt_connected_to_a_bike")
 
-%p= translate_with_args(".perhaps_that_link_has_already_been_used_t")
+%p= t(".perhaps_that_link_has_already_been_used_t")
 
 %p
-  - link = link_to translate_with_args(".contact_us"), contact_us_url
-  = translate_with_args(".contact_us_if_you_think_were_wrong_html", contact_us_link: link)
+  - link = link_to t(".contact_us"), contact_us_url
+  = t(".contact_us_if_you_think_were_wrong_html", contact_us_link: link)
