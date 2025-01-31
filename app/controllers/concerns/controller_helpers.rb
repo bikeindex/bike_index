@@ -68,7 +68,7 @@ module ControllerHelpers
     else
       force_sign_up = params[:unauthenticated_redirect] == "sign_up" # other option is sign_in
       unless force_sign_up # Force signup doesn't show a flash message
-        flash[flash_type] = I18n.t(
+        flash[flash_type] = translation(
           translation_key,
           **translation_args,
           scope: [:controllers, :concerns, :controller_helpers, __method__]
@@ -153,7 +153,7 @@ module ControllerHelpers
     case target.downcase
     when "password_reset"
       flash[:success] =
-        I18n.t(:reset_your_password,
+        translation(:reset_your_password,
           scope: [:controllers, :concerns, :controller_helpers, __method__])
       render(action: :update_password) && (return true)
     when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
@@ -189,17 +189,17 @@ module ControllerHelpers
   #
   # For example, in `ApplicationController#handle_unverified_request` we have
   #
-  #   flash[:error] = I18n.t(:csrf_invalid, scope: [:controllers, :application, __method__])
+  #   flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
   #
   # which maps to controllers.application.handle_unverified_request.csrf_invalid.
   #
   # In `LocksController#find_lock`, by contrast, the full scope can be inferred
   # from the method invocation:
   #
-  #   flash[:error] = I18n.t(:not_your_lock)
+  #   flash[:error] = translation(:not_your_lock)
   #
   # maps to controllers.locks.find_lock.not_your_lock.
-  def I18n.t(key, scope: nil, controller_method: nil, **kwargs)
+  def translation(key, scope: nil, controller_method: nil, **kwargs)
     if scope.blank? && controller_method.blank?
       controller_method =
         caller_locations
@@ -270,7 +270,7 @@ module ControllerHelpers
     return true unless params[:sign_in_if_not].present? && current_user.blank?
     return ensure_member_of!(current_organization) if params[:organization_id].present?
     store_return_to
-    flash[:notice] = I18n.t(:please_sign_in,
+    flash[:notice] = translation(:please_sign_in,
       scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(new_session_path) && return
   end
@@ -349,13 +349,13 @@ module ControllerHelpers
 
   def require_member!
     return true if current_user.member_of?(current_organization)
-    flash[:error] = I18n.t(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
+    flash[:error] = translation(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(my_account_url) && return
   end
 
   def require_admin!
     return true if current_user.admin_of?(current_organization)
-    flash[:error] = I18n.t(:not_an_org_admin, scope: [:controllers, :concerns, :controller_helpers, __method__])
+    flash[:error] = translation(:not_an_org_admin, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(my_account_url) && return
   end
 
@@ -364,25 +364,25 @@ module ControllerHelpers
       return true if current_user.superuser?
       return true if current_user.superuser_abilities.can_access?(controller_name: controller_name, action_name: action_name)
     end
-    flash[:error] = I18n.t(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
+    flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(user_root_url) && return
   end
 
   def ensure_member_of!(passed_organization)
     if current_user&.member_of?(passed_organization)
       return true if current_user.accepted_vendor_terms_of_service?
-      flash[:success] = I18n.t(:accept_tos_for_orgs,
+      flash[:success] = translation(:accept_tos_for_orgs,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
       redirect_to(accept_vendor_terms_path) && return
     elsif current_user.blank?
-      flash[:notice] = I18n.t(:please_sign_in,
+      flash[:notice] = translation(:please_sign_in,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
       store_return_to
       sign_in_path = set_passive_organization(passed_organization)&.enabled?("passwordless_users") ? magic_link_session_path : new_session_path
       redirect_to(sign_in_path) && return
     end
     set_passive_organization(nil) # remove the active organization, because it failed so don't show it anymore
-    flash[:error] = I18n.t(:not_a_member_of_that_org,
+    flash[:error] = translation(:not_a_member_of_that_org,
       scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(user_root_url) && return
   end

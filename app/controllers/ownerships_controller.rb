@@ -7,14 +7,14 @@ class OwnershipsController < ApplicationController
     if @ownership.claimable_by?(current_user)
       if @ownership.current
         @ownership.mark_claimed
-        flash[:success] = I18n.t(:you_claimed_it, bike_type: bike.type)
+        flash[:success] = translation(:you_claimed_it, bike_type: bike.type)
         redirect_to edit_bike_url(bike)
       else
-        flash[:error] = I18n.t(:no_longer_your_bike, bike_type: bike.type)
+        flash[:error] = translation(:no_longer_your_bike, bike_type: bike.type)
         redirect_to bike_url(bike)
       end
     else
-      flash[:error] = I18n.t(:not_your_bike, bike_type: bike.type)
+      flash[:error] = translation(:not_your_bike, bike_type: bike.type)
       redirect_to bike_url(bike)
     end
   end

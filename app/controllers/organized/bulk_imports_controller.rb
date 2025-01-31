@@ -19,7 +19,7 @@ module Organized
     def show
       @bulk_import = bulk_imports.where(id: params[:id]).first
       unless @bulk_import.present?
-        flash[:error] = I18n.t(:unable_to_find_import)
+        flash[:error] = translation(:unable_to_find_import)
         redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
       page = params[:page] || 1
@@ -39,15 +39,15 @@ module Organized
       if @bulk_import.save
         BulkImportWorker.perform_async(@bulk_import.id)
         if @is_api
-          render json: {success: I18n.t(:file_imported)}, status: 201
+          render json: {success: translation(:file_imported)}, status: 201
         else
-          flash[:success] = I18n.t(:bulk_import_created)
+          flash[:success] = translation(:bulk_import_created)
           redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param)
         end
       elsif @is_api
         render json: {error: @bulk_import.errors.full_messages}
       else
-        flash[:error] = I18n.t(:unable_to_create_bulk_import)
+        flash[:error] = translation(:unable_to_create_bulk_import)
         render action: :new
       end
     end

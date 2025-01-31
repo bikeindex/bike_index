@@ -9,14 +9,14 @@ module Sessionable
     end
     if current_user.present?
       return if return_to_if_present # If this returns true, we're returning already
-      flash[:success] = I18n.t(:already_signed_in, scope: [:controllers, :concerns, :sessionable, __method__])
+      flash[:success] = translation(:already_signed_in, scope: [:controllers, :concerns, :sessionable, __method__])
       redirect_to(user_root_url) && return
     end
   end
 
   def sign_in_and_redirect(user)
     if user.banned? # If user is banned, tell them about it.
-      flash.now[:error] = I18n.t(:user_is_banned, scope: [:controllers, :concerns, :sessionable, __method__])
+      flash.now[:error] = translation(:user_is_banned, scope: [:controllers, :concerns, :sessionable, __method__])
       redirect_back(fallback_location: new_session_url) && return
     end
     session[:last_seen] = Time.current
@@ -36,7 +36,7 @@ module Sessionable
     elsif user.unconfirmed?
       render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) && return
     elsif !return_to_if_present
-      flash[:success] = I18n.t(:logged_in, scope: [:controllers, :concerns, :sessionable, __method__])
+      flash[:success] = translation(:logged_in, scope: [:controllers, :concerns, :sessionable, __method__])
       redirect_to(user_root_url) && return
     end
   end

@@ -22,7 +22,7 @@ class BikeStickersController < ApplicationController
 
   def find_bike_sticker
     unless current_user.present?
-      flash[:error] = I18n.t(:must_be_signed_in)
+      flash[:error] = translation(:must_be_signed_in)
       redirect_back(fallback_location: scanned_bike_path(params[:id], organization_id: params[:organization_id]))
       return
     end
@@ -30,7 +30,7 @@ class BikeStickersController < ApplicationController
     # use the loosest lookup
     @bike_sticker = bike_sticker if bike_sticker.present?
     return @bike_sticker if @bike_sticker.present?
-    flash[:error] = I18n.t(:unable_to_find_sticker, code: bike_sticker_code)
+    flash[:error] = translation(:unable_to_find_sticker, code: bike_sticker_code)
     redirect_back(fallback_location: root_url) && return
   end
 end

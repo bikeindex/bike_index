@@ -37,10 +37,10 @@ module BikeEditable
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = I18n.t(:theft_details, scope: t_scope)
-      h[:publicize] = I18n.t(:publicize, scope: t_scope)
-      h[:alert] = I18n.t(:alert, scope: t_scope)
-      h[:report_recovered] = I18n.t(:report_recovered, scope: t_scope)
+      h[:theft_details] = translation(:theft_details, scope: t_scope)
+      h[:publicize] = translation(:publicize, scope: t_scope)
+      h[:alert] = translation(:alert, scope: t_scope)
+      h[:report_recovered] = translation(:report_recovered, scope: t_scope)
     end
   end
 
@@ -49,21 +49,21 @@ module BikeEditable
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = I18n.t(:bike_details, scope: t_scope)
-      h[:found_details] = I18n.t(:found_details, scope: t_scope) if @bike.status_found?
-      h[:photos] = I18n.t(:photos, scope: t_scope)
-      h[:drivetrain] = I18n.t(:drivetrain, scope: t_scope)
-      h[:accessories] = I18n.t(:accessories, scope: t_scope)
+      h[:bike_details] = translation(:bike_details, scope: t_scope)
+      h[:found_details] = translation(:found_details, scope: t_scope) if @bike.status_found?
+      h[:photos] = translation(:photos, scope: t_scope)
+      h[:drivetrain] = translation(:drivetrain, scope: t_scope)
+      h[:accessories] = translation(:accessories, scope: t_scope)
       unless @bike.version?
-        h[:ownership] = I18n.t(:ownership, scope: t_scope)
-        h[:groups] = I18n.t(:groups, scope: t_scope)
+        h[:ownership] = translation(:ownership, scope: t_scope)
+        h[:groups] = translation(:groups, scope: t_scope)
       end
-      h[:remove] = I18n.t(:remove, scope: t_scope)
+      h[:remove] = translation(:remove, scope: t_scope)
       if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
-        h[:versions] = I18n.t(:versions, scope: t_scope)
+        h[:versions] = translation(:versions, scope: t_scope)
       end
       unless @bike.status_stolen_or_impounded? || @bike.version?
-        h[:report_stolen] = I18n.t(:report_stolen, scope: t_scope)
+        h[:report_stolen] = translation(:report_stolen, scope: t_scope)
       end
     end
   end

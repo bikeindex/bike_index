@@ -28,10 +28,10 @@ module Organized
       if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportWorker.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
-          flash[:success] = I18n.t(:with_avery_redirect)
+          flash[:success] = translation(:with_avery_redirect)
           redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)
         else
-          flash[:success] = I18n.t(:wait_to_download)
+          flash[:success] = translation(:wait_to_download)
           redirect_to organization_exports_path(organization_id: current_organization.to_param)
         end
       else
@@ -43,9 +43,9 @@ module Organized
     def update
       if params[:remove_bike_stickers] && @export.assign_bike_codes?
         @export.remove_bike_stickers_and_record!(current_user)
-        flash[:success] = I18n.t(:bike_stickers_removed)
+        flash[:success] = translation(:bike_stickers_removed)
       else
-        flash[:error] = I18n.t(:unknown_update_action)
+        flash[:error] = translation(:unknown_update_action)
       end
       redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id)
     end
@@ -53,7 +53,7 @@ module Organized
     def destroy
       @export.remove_bike_stickers(current_user)
       @export.destroy
-      flash[:success] = I18n.t(:export_deleted)
+      flash[:success] = translation(:export_deleted)
       redirect_to organization_exports_path(organization_id: current_organization.to_param)
     end
 
@@ -65,10 +65,10 @@ module Organized
         bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
 
         if bike_sticker.present? && bike_sticker.claimed?
-          flash[:error] = I18n.t(:sticker_already_assigned)
+          flash[:error] = translation(:sticker_already_assigned)
         end
       else
-        flash[:error] = I18n.t(:do_not_have_permission)
+        flash[:error] = translation(:do_not_have_permission)
       end
     end
 

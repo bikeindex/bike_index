@@ -22,7 +22,7 @@ class MyAccountsController < ApplicationController
     @user = current_user
     if params.dig(:user, :password).present?
       unless @user.authenticate(params.dig(:user, :current_password))
-        @user.errors.add(:base, I18n.t(:current_password_doesnt_match))
+        @user.errors.add(:base, translation(:current_password_doesnt_match))
       end
     end
     unless @user.errors.any?
@@ -36,7 +36,7 @@ class MyAccountsController < ApplicationController
         end
       end
       if successfully_updated
-        flash[:success] ||= I18n.t(:successfully_updated)
+        flash[:success] ||= translation(:successfully_updated)
         # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
         redirect_back(fallback_location: edit_my_account_url(edit_template: @edit_template)) && return
       end
@@ -69,16 +69,16 @@ class MyAccountsController < ApplicationController
 
   def edit_templates
     @edit_templates ||= {
-      root: I18n.t(:user_settings, scope: [:controllers, :my_accounts, :edit]),
-      password: I18n.t(:password, scope: [:controllers, :my_accounts, :edit]),
-      sharing: I18n.t(:sharing, scope: [:controllers, :my_accounts, :edit]),
-      delete_account: I18n.t(:delete_account, scope: [:controllers, :my_accounts, :edit])
+      root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
+      password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
+      sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
     }.merge(registration_organization_template).as_json
   end
 
   def registration_organization_template
     return {} unless current_user&.user_registration_organizations.present?
-    {registration_organizations: I18n.t(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
+    {registration_organizations: translation(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
   end
 
   def assign_edit_template
