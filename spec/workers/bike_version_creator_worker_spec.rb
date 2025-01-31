@@ -133,7 +133,7 @@ RSpec.describe BikeVersionCreatorWorker, type: :job do
       expect(version_component1.front).to be_truthy
 
       version_component2 = bike_version.components.where.not(id: version_component1.id).first
-      expect_hashes_to_match(version_component2, component_attrs.except(:bike_id))
+      expect(version_component2).to match_hash_indifferently component_attrs.except(:bike_id)
     end
   end
   context "with public_images" do

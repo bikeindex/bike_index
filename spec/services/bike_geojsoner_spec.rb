@@ -28,10 +28,10 @@ RSpec.describe BikeGeojsoner do
       it "returns target" do
         expect(bike.reload.to_coordinates).to eq([40.7143528, -74.0059731])
         expect(bike.current_stolen_record.date_stolen).to be_within(1).of date_stolen
-        expect_hashes_to_match(described_class.feature(bike), target)
-        expect_hashes_to_match(described_class.feature(bike, true), target_extended)
+        expect(described_class.feature(bike)).to match_hash_indifferently target
+        expect(described_class.feature(bike, true)).to match_hash_indifferently target_extended
         plucked = described_class.feature_from_plucked(bike.id, bike.occurred_at, bike.latitude, bike.longitude)
-        expect_hashes_to_match(plucked, target)
+        expect(plucked).to match_hash_indifferently target
       end
     end
   end
