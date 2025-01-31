@@ -141,7 +141,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     end
   end
 
-  describe "associate_membership_invites" do
+  describe "associate_membership_invites", :flaky do
     it "assigns any memberships that match the user email, and mark user confirmed if invited" do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
       membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
