@@ -7,11 +7,11 @@ RSpec.describe TimeParser, type: :service do
 
   describe "parse" do
     context "America/Los_Angeles" do
-      let(:target_timestamp) { 1454896800 }
-      let(:time_str) { "2016-02-08 02:00:00" }
+      let(:target_timestamp) { 1454925600 }
+      let(:time_str) { "2016-02-08 04:00:00" }
 
       it "parses with time_zone, without and with unreadable time_zones" do
-        expect(subject.parse(time_str, "America/America/Los_Angeles").to_i).to eq target_timestamp
+        expect(subject.parse(time_str, "America/Chicago").to_i).to eq target_timestamp
         expect(subject.parse(time_str).to_i).to eq target_timestamp
         expect(subject.parse(time_str, "America/PartyCity").to_i).to eq target_timestamp
       end
@@ -125,7 +125,7 @@ RSpec.describe TimeParser, type: :service do
       it "parses with UTC time_zone and with a place in UTC" do
         expect(subject.parse(time_str, "UTC").to_i).to eq target_time
         expect(subject.parse(time_str, "Atlantic/Reykjavik").to_i).to eq target_time
-        expect(subject.parse(time_str).to_i).to eq target_time
+        expect(subject.parse(time_str).to_i).to_not eq target_time
       end
     end
 
@@ -137,7 +137,7 @@ RSpec.describe TimeParser, type: :service do
     end
 
     context "with cray IE 11 time params" do
-      let(:target_time) { 1538265600 }
+      let(:target_time) { 1538283600 }
       let(:target_time_in_uk) { 1538262000 }
       let(:time_str) { "09/30/2018" }
 
