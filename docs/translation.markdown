@@ -1,4 +1,4 @@
-Localization
+Translation / Localization
 ====================
 
 **Table of Contents**

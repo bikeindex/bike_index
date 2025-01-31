@@ -26,7 +26,7 @@
 #
 class Blog < ApplicationRecord
   include ActionView::Helpers::TextHelper
-  include Localizable
+  include Translatable
   include PgSearch::Model
 
   KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
