@@ -30,7 +30,7 @@ class Ctype < ApplicationRecord
     translation_scope = [:activerecord, :select_options, name.underscore]
 
     pluck(:id, :name).map do |id, name|
-      localized_name = i18n_translate_with_args(normalize.call(name), scope: translation_scope)
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
       [localized_name, id]
     end
   end
