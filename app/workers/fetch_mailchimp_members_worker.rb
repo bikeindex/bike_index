@@ -13,7 +13,7 @@ class FetchMailchimpMembersWorker < ApplicationWorker
   end
 
   def mailchimp_integration
-    @mailchimp_integration ||= MailchimpIntegration.new
+    @mailchimp_integration ||= Integrations::Mailchimp.new
   end
 
   def find_or_create_datum(list, data)

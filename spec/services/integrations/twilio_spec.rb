@@ -1,11 +1,11 @@
 require "rails_helper"
 
-RSpec.describe TwilioIntegration do
+RSpec.describe Integrations::Twilio do
   let(:instance) { described_class.new }
 
   describe "twilio_formatted" do
     it "strips leading zeros" do
-      expect(TwilioIntegration.twilio_formatted("00100000000")).to eq "100000000"
+      expect(Integrations::Twilio.twilio_formatted("00100000000")).to eq "100000000"
     end
   end
 

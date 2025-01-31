@@ -193,7 +193,7 @@ class Notification < ApplicationRecord
 
   def twilio_response
     return nil unless twilio_sid.present?
-    TwilioIntegration.new.get_message(twilio_sid)
+    Integrations::Twilio.new.get_message(twilio_sid)
   end
 
   def notifiable_display_name

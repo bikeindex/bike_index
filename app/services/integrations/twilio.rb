@@ -1,6 +1,6 @@
 require "twilio-ruby"
 
-class TwilioIntegration
+class Integrations::Twilio
   ACCOUNT_SID = ENV["TWILIO_SID"]
   AUTH_TOKEN = ENV["TWILIO_TOKEN"]
   OUTGOING_NUMBER = ENV["TWILIO_NUMBER"]

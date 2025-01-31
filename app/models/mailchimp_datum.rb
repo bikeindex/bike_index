@@ -244,7 +244,7 @@ class MailchimpDatum < ApplicationRecord
   end
 
   def member_hash(list = nil)
-    MailchimpIntegration.member_hash(self, list)
+    Integrations::Mailchimp.member_hash(self, list)
   end
 
   def calculated_data

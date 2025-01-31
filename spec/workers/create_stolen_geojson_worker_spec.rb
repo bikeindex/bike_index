@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe CreateStolenGeojsonWorker, type: :job do
   let(:instance) { described_class.new }
   # Have to do this here so that the scheduled worker test don't make requests
-  before { allow_any_instance_of(CloudflareIntegration).to receive(:expire_cache) { true } }
+  before { allow_any_instance_of(Integrations::Cloudflare).to receive(:expire_cache) { true } }
 
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests

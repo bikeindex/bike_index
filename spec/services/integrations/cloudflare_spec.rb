@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe CloudflareIntegration do
+RSpec.describe Integrations::Cloudflare do
   let(:instance) { described_class.new }
 
   describe "expire_cache" do

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MailchimpIntegration do
+RSpec.describe Integrations::Mailchimp do
   let(:instance) { described_class.new }
 
   describe "get_lists" do

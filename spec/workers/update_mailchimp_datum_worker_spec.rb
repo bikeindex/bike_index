@@ -44,7 +44,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.should_update?).to be_truthy
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq(target_body[:interests])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields
-          expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
+          expect(Integrations::Mailchimp.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
           expect(mailchimp_datum.tags).to match_array target_tags
 
           VCR.use_cassette("update_mailchimp_datum_worker-organization-create", match_requests_on: [:method]) do
@@ -58,7 +58,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
           expect(mailchimp_datum.interests).to eq(%w[school])
           expect(mailchimp_datum.mailchimp_interests("organization")).to eq(target_body[:interests])
           expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq target_merge_fields
-          expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
+          expect(Integrations::Mailchimp.new.member_update_hash(mailchimp_datum, "organization")).to eq target_body
           expect(mailchimp_datum.tags).to match_array(["in_bike_index", "not_org_creator", "paid"])
         end
       end
@@ -148,7 +148,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
             expect(mailchimp_datum.mailchimp_merge_fields("organization")).to eq merge_address_fields
             expect(mailchimp_datum.should_update?).to be_falsey
             target = target_body.merge(interests: {}, merge_fields: merge_address_fields)
-            expect(MailchimpIntegration.new.member_update_hash(mailchimp_datum, "organization")).to eq target
+            expect(Integrations::Mailchimp.new.member_update_hash(mailchimp_datum, "organization")).to eq target
             expect(mailchimp_datum.tags).to match_array target_tags
 
             expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])

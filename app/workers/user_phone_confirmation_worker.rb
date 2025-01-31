@@ -11,7 +11,7 @@ class UserPhoneConfirmationWorker < ApplicationWorker
       notifiable: user_phone)
 
     if UPDATE_TWILIO
-      TwilioIntegration.new.send_notification(notification,
+      Integrations::Twilio.new.send_notification(notification,
         to: user_phone.phone,
         body: user_phone.confirmation_message)
     end

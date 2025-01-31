@@ -39,7 +39,7 @@
                   Make sure the text is under the character count
               = f.text_area :body, rows: 4, class: "form-control"
               :javascript
-                window.maxCharacterCount = #{TwitterTweeterIntegration::TWEET_LENGTH};
+                window.maxCharacterCount = #{Integrations::TwitterTweeter::TWEET_LENGTH};
               %p.text-info.text-right{ style: "margin-top: -0.4rem; font-size: 150%;" }
                 %span#characterTotal
 

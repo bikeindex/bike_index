@@ -27,7 +27,7 @@ class UpdateMailchimpValuesWorker < ApplicationWorker
   end
 
   def mailchimp_integration
-    @mailchimp_integration ||= MailchimpIntegration.new
+    @mailchimp_integration ||= Integrations::Mailchimp.new
   end
 
   def update_merge_fields(list)

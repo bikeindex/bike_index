@@ -1,4 +1,4 @@
-class CloudflareIntegration
+class Integrations::Cloudflare
   API_TOKEN = ENV["CLOUDFLARE_TOKEN"]
   ZONE = "82c727a79571ff204a7ddc188d1806ec"
 
