@@ -151,7 +151,7 @@
     .control-group.special-select-single
       = f.label :handlebar_type, class: "control-label"
       .controls
-        = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, required: true, prompt: translate_with_args(".choose_handlebar") })
+        = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, prompt: translate_with_args(".choose_handlebar") })
   .input-group
     .control-group
       = f.label :description, translate_with_args(".other_defining_features"), class: "control-label"
