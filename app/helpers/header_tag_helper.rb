@@ -224,12 +224,12 @@ module HeaderTagHelper
 
   def translation_title(location: nil, translation_args: default_translation_args)
     location ||= "meta_titles.#{page_id}"
-    t(location, translation_args)
+    t(location, **translation_args)
   end
 
   def translation_description(location: nil, translation_args: default_translation_args)
     location ||= "meta_descriptions.#{page_id}"
-    t(location, translation_args)
+    t(location, **translation_args)
   end
 
   def auto_controller_and_action_title
