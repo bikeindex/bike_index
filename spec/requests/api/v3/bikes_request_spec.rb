@@ -773,6 +773,7 @@ RSpec.describe "Bikes API V3", type: :request do
         }
         expect {
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+          pp json_result
         }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
         expect(json_result).to include("bike")
         expect(json_result["bike"]["serial"]).to eq "Unknown"
