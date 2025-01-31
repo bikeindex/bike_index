@@ -74,7 +74,7 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
         }
         expect(response).to redirect_to edit_organization_manage_impounding_path(organization_id: current_organization.to_param)
         expect(flash[:success]).to be_present
-        expect_hashes_to_match(impound_configuration.reload, update.except(:display_id_next_integer))
+        expect(impound_configuration.reload).to match_hash_indifferently update.except(:display_id_next_integer)
         # TODO: this should be updateable for organizations in the future. But skipping for now,
         # to be able to enable, we need to add validations that check that the display_id_next_integer
         expect(impound_configuration.display_id_next_integer).to eq nil

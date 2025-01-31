@@ -7,7 +7,7 @@ RSpec.describe "Selections API V3", type: :request do
     it "responds on index" do
       get "/api/v3/selections/colors"
       expect(response.code).to eq("200")
-      expect_hashes_to_match(json_result["colors"][0], target)
+      expect(json_result["colors"][0]).to match_hash_indifferently target
     end
   end
 
