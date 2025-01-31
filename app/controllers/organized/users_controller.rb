@@ -20,13 +20,13 @@ module Organized
 
     def update
       @membership.update(permitted_update_params)
-      flash[:success] = translation_with_args(:updated_membership, user_email: @membership.user&.email)
+      flash[:success] = translation(:updated_membership, user_email: @membership.user&.email)
       redirect_to current_root_path
     end
 
     def destroy
       @membership.destroy
-      flash[:success] = translation_with_args(:deleted_user)
+      flash[:success] = translation(:deleted_user)
       redirect_to current_root_path
     end
 
@@ -37,19 +37,19 @@ module Organized
 
     def create
       if current_organization.restrict_invitations? && current_organization.remaining_invitation_count < 1
-        flash[:error] = translation_with_args(:no_remaining_user_invitations, org_name: current_organization.name)
+        flash[:error] = translation(:no_remaining_user_invitations, org_name: current_organization.name)
         redirect_to(current_root_path) && return
       end
       @membership = Membership.new(permitted_create_params)
       if params[:multiple_emails_invited].present?
         if current_organization.restrict_invitations? && (multiple_emails_invited.count > current_organization.remaining_invitation_count)
-          flash[:error] = translation_with_args(:insufficient_invitations,
+          flash[:error] = translation(:insufficient_invitations,
             invite_count: multiple_emails_invited.count,
             org_name: current_organization.name,
             remaining_invite_count: current_organization.remaining_invitation_count)
           render :new
         else
-          flash[:success] = translation_with_args(:users_invited,
+          flash[:success] = translation(:users_invited,
             invite_count: multiple_emails_invited.count,
             org_name: current_organization.name)
           multiple_emails_invited
@@ -58,7 +58,7 @@ module Organized
           redirect_to(current_root_path) && return
         end
       elsif @membership.save
-        flash[:success] = translation_with_args(:user_was_invited,
+        flash[:success] = translation(:user_was_invited,
           invited_email: @membership.invited_email,
           org_name: current_organization.name)
         redirect_to current_root_path
@@ -89,7 +89,7 @@ module Organized
 
     def reject_self_updates
       if @membership && @membership.user == current_user
-        flash[:error] = translation_with_args(:cannot_remove_yourself)
+        flash[:error] = translation(:cannot_remove_yourself)
         redirect_to(organization_users_path(organization_id: current_organization)) && return
       end
     end
