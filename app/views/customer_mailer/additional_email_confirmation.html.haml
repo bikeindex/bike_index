@@ -1,17 +1,17 @@
 %h2.center-text
-  = translate_with_args(".html.please_confirm_your_additional_email")
+  = t(".html.please_confirm_your_additional_email")
   %br
   %small
     %em= @user_email.email
 
 %p.center-text{ style: 'margin-bottom: 3em;' }
-  = translate_with_args(".html.user_would_like_to_merge", name: @user.display_name, email: @user.email)
+  = t(".html.user_would_like_to_merge", name: @user.display_name, email: @user.email)
 
 - tokenized_url = @email_preview ? @email_preview_tokenized_url : confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token)
-= link_to translate_with_args(".html.verify_email"), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
+= link_to t(".html.verify_email"), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
 
-%p.center-text.less-strong= translate_with_args(".html.click_verify_email_html")
+%p.center-text.less-strong= t(".html.click_verify_email_html")
 
 %hr
 
-%p.center-text= translate_with_args(".html.if_you_didnt_request_this")
+%p.center-text= t(".html.if_you_didnt_request_this")

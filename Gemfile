@@ -78,7 +78,7 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
-gem "grape", "~> 1.8.0" # API DSL
+gem "grape" # API DSL
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 
 # Secure things

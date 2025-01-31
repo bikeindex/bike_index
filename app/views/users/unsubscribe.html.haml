@@ -1,9 +1,9 @@
 .container
   .text-center
     %h3
-      = translate_with_args(".you_should_be_unsubscribed_automatically")
-    %p= translate_with_args(".if_not_click_button")
+      = t(".you_should_be_unsubscribed_automatically")
+    %p= t(".if_not_click_button")
     = form_tag unsubscribe_update_user_path(@user.to_param), id: "unsubscribe_update", method: "post" do
-      %input{ type: "submit", value: translate_with_args(".unsubscribe"), class: 'btn btn-success btn-lg' }
+      %input{ type: "submit", value: t(".unsubscribe"), class: 'btn btn-success btn-lg' }
     :javascript
       document.forms["unsubscribe_update"].submit()

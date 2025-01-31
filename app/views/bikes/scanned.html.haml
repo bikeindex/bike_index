@@ -2,46 +2,46 @@
   %h2
     = @bike_sticker.kind
     %em= @bike_sticker.pretty_code
-    = translate_with_args(".isnt_linked_to_a_bike")
+    = t(".isnt_linked_to_a_bike")
   %hr.mb-4.mb-4
 
   - if current_user.present?
     - if !@bike_sticker.claimable_by?(current_user)
-      %h3= translate_with_args(".you_have_claimed_the_maximum_permitted")
+      %h3= t(".you_have_claimed_the_maximum_permitted")
       %p
         - support_email = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
-        = translate_with_args(".please_email_support_html", support_email_link: support_email)
+        = t(".please_email_support_html", support_email_link: support_email)
     - else
       %p
-        = translate_with_args(".you_can_enter_the_url", bike_sticker_kind: @bike_sticker.kind)
+        = t(".you_can_enter_the_url", bike_sticker_kind: @bike_sticker.kind)
       = form_tag bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id), method: :put, class: "row" do
         .col-sm-8.col-lg-10
           .form-group
             = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
         .col-sm-4.col-lg-2
-          = submit_tag translate_with_args(".update"), class: "btn btn-success"
+          = submit_tag t(".update"), class: "btn btn-success"
       %p.mt-5.mb-5
         - new_bike_link = link_to(t(".new_bike_link_text"), new_bike_url(bike_sticker: @bike_sticker.code), class: "btn ml-1 mr-1 btn-primary")
-        = translate_with_args(".register_a_new_bike_html", new_bike_link: new_bike_link)
+        = t(".register_a_new_bike_html", new_bike_link: new_bike_link)
 
       - if current_user.bikes.any?
         %p
-          = translate_with_args(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
+          = t(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
 
         %table.table.table-striped.table-bordered.table-sm.without-exterior-border
           %thead.small-header
             %tr
               %th.date-added
-                = translate_with_args(".added")
+                = t(".added")
                 %small.convertTimezone
-              %th.hidden-xs-down= translate_with_args(".manufacturer")
-              %th.hidden-xs-down= translate_with_args(".model")
-              %th.hidden-xs-down= translate_with_args(".color")
+              %th.hidden-xs-down= t(".manufacturer")
+              %th.hidden-xs-down= t(".model")
+              %th.hidden-xs-down= t(".color")
               %th.hidden-sm-up.hidden-sm-up
                 %small
-                  = translate_with_args(".mnfg_model_color_html")
+                  = t(".mnfg_model_color_html")
               %th
-                = translate_with_args(".link_it")
+                = t(".link_it")
           %tbody
             - @bikes.each do |bike|
               %tr
@@ -63,8 +63,8 @@
                     %br
                 %td
                   %small
-                    = link_to translate_with_args(".link_bike_sticker_kind", bike_sticker_kind: @bike_sticker.kind), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: :put
+                    = link_to t(".link_bike_sticker_kind", bike_sticker_kind: @bike_sticker.kind), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: :put
   - else
     %p{ style: "margin-top: 24px;" }
-      = translate_with_args(".to_link_that_card_with_a_bike")
-      = link_to translate_with_args(".please_sign_in"), new_session_url(return_to: scanned_bike_path(@bike_sticker.code, params: { organization_id: @bike_sticker.organization_id }))
+      = t(".to_link_that_card_with_a_bike")
+      = link_to t(".please_sign_in"), new_session_url(return_to: scanned_bike_path(@bike_sticker.code, params: { organization_id: @bike_sticker.organization_id }))

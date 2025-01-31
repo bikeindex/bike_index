@@ -2,12 +2,12 @@
   %li
     - if plan == :free
       - unless render_features # Bottom section doesn't render this duplicate "free"
-        %h4= translate_with_args(".free")
+        %h4= t(".free")
       %section
-        %h3= translate_with_args(".free")
-        %p= translate_with_args(".forever")
+        %h3= t(".free")
+        %p= t(".forever")
         %a.btn.btn-primary{ href: new_organization_path }
-          = translate_with_args(".sign_up_now")
+          = t(".sign_up_now")
     - else
       %h4= plan.to_s.titleize
       %section
@@ -16,19 +16,19 @@
         %p
           = default_currency
           = "/"
-          = translate_with_args(".year")
+          = t(".year")
 
         %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => plan.to_s }
-          = translate_with_args(".try_for_free")
+          = t(".try_for_free")
 
     - if render_features
       .plan-features
         %a.showPlanFeatures.collapsed{ href: "##{plan}_features", "aria-controls" => "#{plan}_features", "data-toggle" => "collapse" }
           %span.uncollapsed
-            = translate_with_args(".see_features")
+            = t(".see_features")
             %i.fas.fa-chevron-down
           %span.incollapsed
-            = translate_with_args(".hide_features")
+            = t(".hide_features")
             %i.fas.fa-chevron-up
         %ul.collapse{ id: "#{plan}_features" }
           - plan_features.select { |f| f[plan].present? }.each do |feature|

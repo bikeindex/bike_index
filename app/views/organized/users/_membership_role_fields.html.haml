@@ -1,18 +1,18 @@
 .form-group.row
-  %label.org-form-label= translate_with_args(".membership_type")
+  %label.org-form-label= t(".membership_type")
   .col-sm-4
     .radio.mb-3
       %label.less-line-height
         = f.radio_button :role, Membership.membership_types.first
-        = translate_with_args(".admin_of_organization")
-        %span.less-strong.d-block= translate_with_args(".admin_access")
+        = t(".admin_of_organization")
+        %span.less-strong.d-block= t(".admin_access")
     .radio.mb-3
       %label.less-line-height
         = f.radio_button :role, Membership.membership_types.second
-        = translate_with_args(".member_of_organization")
-        %span.less-strong.d-block= translate_with_args(".member_access")
+        = t(".member_of_organization")
+        %span.less-strong.d-block= t(".member_access")
     .radio.mb-3
       %label.less-line-height
         = f.radio_button :role, Membership.membership_types.third
-        = translate_with_args(".member_no_bikes")
-        %span.less-strong.d-block= translate_with_args(".member_no_bikes_access")
+        = t(".member_no_bikes")
+        %span.less-strong.d-block= t(".member_no_bikes_access")

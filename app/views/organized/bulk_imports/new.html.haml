@@ -1,13 +1,13 @@
 .organized-page-header.mb-4
-  %h1.uncap= translate_with_args(".register_bikes_from_a_csv")
+  %h1.uncap= t(".register_bikes_from_a_csv")
 
 .mt-4.pt-4.mb-4.pb-4
-  %h5= translate_with_args(".notes_on_successfully_importing")
+  %h5= t(".notes_on_successfully_importing")
   %ul
-    %li= translate_with_args(".you_must_upload_a_dot_csv_html")
-    %li= translate_with_args(".for_best_results")
-    %li= translate_with_args(".your_headers_must_match_html")
-    %li= translate_with_args(".doing_an_import")
+    %li= t(".you_must_upload_a_dot_csv_html")
+    %li= t(".for_best_results")
+    %li= t(".your_headers_must_match_html")
+    %li= t(".doing_an_import")
 
 - render_tabs = @permitted_kinds.count > 1
 
@@ -37,28 +37,28 @@
       .mb-4
         %p
           %strong
-            = translate_with_args(".must_have_required_headers_html")
-          = translate_with_args(".required_headers_are_html")
+            = t(".must_have_required_headers_html")
+          = t(".required_headers_are_html")
 
         %p
-          - link_to_example_csv = link_to translate_with_args(".our_example_csv_here"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv"
+          - link_to_example_csv = link_to t(".our_example_csv_here"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv"
           #{t(".look_at_example_csv_and_html", link_to_example_csv: link_to_example_csv)} #{link_to(t(".example_csv_with_all_options"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv")}.
 
       = form_for @bulk_import, {url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}} do |f|
         = f.hidden_field :kind, value: "organization_import"
         .card.col-sm-6
           .card-block
-            = f.label :file, translate_with_args(".csv_file_with_bikes")
+            = f.label :file, t(".csv_file_with_bikes")
             .form-group.row.file-upload-wrapper
               .form-well-input
                 %label.file
                   = f.file_field :file, class: "avatar-upload-field"
                   %span.file-custom
-                    %span.file-upload-text= translate_with_args(".choose_file")
+                    %span.file-upload-text= t(".choose_file")
 
             .form-group.row
               .form-well-input
-                = f.submit translate_with_args(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
+                = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
 
   - if @permitted_kinds.include?("impounded")
     - tab_classes = "tab-pane fade"
@@ -67,7 +67,7 @@
       .mb-4
         %p
           %strong
-            = translate_with_args(".must_have_required_headers_html")
+            = t(".must_have_required_headers_html")
           -# only  show this warning if they can see other import kinds
           - if @permitted_kinds.count > 1
             %strong.text-warning.upcase Note:
@@ -100,11 +100,11 @@
                 %label.file
                   = f.file_field :file, class: "avatar-upload-field"
                   %span.file-custom
-                    %span.file-upload-text= translate_with_args(".choose_file")
+                    %span.file-upload-text= t(".choose_file")
 
             .form-group.row
               .form-well-input
-                = f.submit translate_with_args(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
+                = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
   - if @permitted_kinds.include?("stolen")
     - tab_classes = "tab-pane fade"
     - tab_classes += " in active" if @active_kind == "stolen"
@@ -112,11 +112,11 @@
       .mb-4
         %p
           %strong
-            = translate_with_args(".must_have_required_headers_html")
-          = translate_with_args(".required_headers_are_html")
+            = t(".must_have_required_headers_html")
+          = t(".required_headers_are_html")
 
         %p
-          - link_to_example_csv = link_to translate_with_args(".our_example_csv_here"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv"
+          - link_to_example_csv = link_to t(".our_example_csv_here"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_only_required.csv"
           #{t(".look_at_example_csv_and_html", link_to_example_csv: link_to_example_csv)} #{link_to(t(".example_csv_with_all_options"), "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv")}.
 
         %p
@@ -141,38 +141,38 @@
                 = render partial: "/bikes_edit/theft_details_partial", locals: {srecord: srecord, rendering_bulk_import: true}
 
               .mt-5
-              = f.label :file, translate_with_args(".csv_file_with_bikes")
+              = f.label :file, t(".csv_file_with_bikes")
               .form-group.row.file-upload-wrapper
                 .form-well-input
                   %label.file
                     = f.file_field :file, required: true, class: "avatar-upload-field"
                     %span.file-custom
-                      %span.file-upload-text= translate_with_args(".choose_file")
+                      %span.file-upload-text= t(".choose_file")
 
               .form-group.row
                 .form-well-input
-                  = f.submit translate_with_args(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
+                  = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
 
 
 %hr.mt-4
 %h5.mt-4
-  = translate_with_args(".optional_additions")
+  = t(".optional_additions")
 %ul
-  %li= translate_with_args(".we_support_a_few_additional")
-  %li= translate_with_args(".if_only_some_of_your_bikes_html")
+  %li= t(".we_support_a_few_additional")
+  %li= t(".if_only_some_of_your_bikes_html")
   - if current_organization.enabled?("bike_stickers")
-    %li= translate_with_args(".importing_stickers_html")
+    %li= t(".importing_stickers_html")
   %li
-    = translate_with_args(".if_you_are_including_photo_url_html")
+    = t(".if_you_are_including_photo_url_html")
     %ul{style: "word-break: break-word;"}
       %li.mt-3{style: "line-height: 1.5;"}
-        = translate_with_args(".correct_actual_image_url_html")
+        = t(".correct_actual_image_url_html")
         - spokecard_image_url = "https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg"
         = link_to spokecard_image_url, spokecard_image_url, style: "word-wrap: break-word;", class: "small"
       %li.mt-3{style: "line-height: 1.5;"}
-        = translate_with_args(".incorrect_image_on_webpage_html")
+        = t(".incorrect_image_on_webpage_html")
         - spokecard_page_url = "https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg"
         = link_to spokecard_page_url, spokecard_page_url, style: "word-wrap: break-word;", class: "small"
         %em.text-danger
           \-
-          = translate_with_args(".this_will_not_work")
+          = t(".this_will_not_work")

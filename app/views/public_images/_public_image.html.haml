@@ -3,25 +3,25 @@
 %li.col-xs-6.col-sm-4.edit-photo-display-list-item{id: image.id}
   .edit-photo-display-wrap
     .kind-select-wrap
-      - kind_select_options = {photo_uncategorized: translate_with_args(".photo_uncategorized", bike_type: bike_type),
-          photo_stock: translate_with_args(".photo_stock"),
-          photo_of_user_with_bike: translate_with_args(".photo_of_user_with_bike", bike_type: bike_type),
-          photo_of_serial: translate_with_args(".photo_of_serial"),
-          photo_of_receipt: translate_with_args(".photo_of_receipt")}
+      - kind_select_options = {photo_uncategorized: t(".photo_uncategorized", bike_type: bike_type),
+          photo_stock: t(".photo_stock"),
+          photo_of_user_with_bike: t(".photo_of_user_with_bike", bike_type: bike_type),
+          photo_of_serial: t(".photo_of_serial"),
+          photo_of_receipt: t(".photo_of_receipt")}
       -# Give the select tag an ID so browsers aren't sad
       = select_tag("kind_#{image.id}", options_for_select(kind_select_options.map { |k, v| [v, k.to_s] }, selected: image.kind), class: "form-control kind_select")
 
     .processing
-      = translate_with_args(".processing")
+      = t(".processing")
     - if image.image?
       %img{ src: image.image_url(:small) }
     - else
       %em.missing-image
-        = translate_with_args(".missing_image")
+        = t(".missing_image")
     .bottom-photo-edit-wrap
       %label.keep-private
         %input.is_private_check{type: 'checkbox', checked: image.is_private}
-        = translate_with_args(".keep_image_private")
+        = t(".keep_image_private")
       .remove-wrapper
         %a.photo-remove{href: public_image_url(image, imageable_type: @bike.class.name, edit_template: 'photos', return_url: edit_bike_url(@bike, edit_template: 'photos')), rel: 'nofollow', 'data-method' => 'delete'}
           = render 'shared/trash_icon'

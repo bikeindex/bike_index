@@ -14,13 +14,13 @@
     window.shop_locations = #{locations};
 
   %h1#where-bike-index
-    = translate_with_args(".bike_index_partners")
-    %small= link_to translate_with_args(".sign_up_your_organization"), new_organization_path
+    = t(".bike_index_partners")
+    %small= link_to t(".sign_up_your_organization"), new_organization_path
   %article
     .map-of-shops
       = render '/shared/shops_map'
   %h3.padded
-    = translate_with_args(".us_partner_organizations")
+    = t(".us_partner_organizations")
 
   %article.where-shops-list#list_of_partners
     - @states.each do |state|
@@ -42,12 +42,12 @@
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
               - if location.street.present?
                 %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
-                  = translate_with_args(".show_location_on_map", location_name: location.display_name)
+                  = t(".show_location_on_map", location_name: location.display_name)
                 %p= [location.street, location.city, "#{location.state.abbreviation} #{location.zipcode}"].join(", ")
               - if location.phone.present?
                 %p= phone_link(location.phone)
               - if location&.organization&.website.present?
-                %p= link_to translate_with_args(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
+                %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
               .map-window
                 .window-content
                   %h3= location.display_name
@@ -59,7 +59,7 @@
                     .map-telephone
                       = link_to number_to_phone(location.phone), "tel:#{ location.phone }"
     %h3.padded
-      = translate_with_args(".international_partner_organizations")
+      = t(".international_partner_organizations")
 
     - @countries.each do |country|
       - next unless country.locations.where(shown: true).any?
@@ -80,14 +80,14 @@
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
               - if location.street.present?
                 %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
-                  = translate_with_args(".show_location_on_map", location_name: location.display_name)
+                  = t(".show_location_on_map", location_name: location.display_name)
                 %p= [location.street, location.city, location.zipcode, location.country.name].join(", ")
 
               - if location.phone.present?
                 %p= phone_link(location.phone)
 
               - if location&.organization&.website.present?
-                %p= link_to translate_with_args(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
+                %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
 
               .map-window
                 .window-content
@@ -105,5 +105,5 @@
   %hr.where-add-shops
 
   %p
-    - signup_link = link_to translate_with_args(".signup_page"), new_organization_path
-    = translate_with_args(".if_you_would_like_to_join_html", signup_link: signup_link)
+    - signup_link = link_to t(".signup_page"), new_organization_path
+    = t(".if_you_would_like_to_join_html", signup_link: signup_link)

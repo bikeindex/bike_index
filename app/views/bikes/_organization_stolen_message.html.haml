@@ -8,4 +8,4 @@
       .mb-2
   - if shown_report_url
     - report_link = link_to(t(".report_link_text"), organization_stolen_message.report_url, target: "_blank")
-    %span.d-block= translate_with_args(".report_the_theft_to_the_organization_html", organization: organization_stolen_message.organization.name, report_link: report_link)
+    %span.d-block= t(".report_the_theft_to_the_organization_html", organization: organization_stolen_message.organization.name, report_link: report_link)

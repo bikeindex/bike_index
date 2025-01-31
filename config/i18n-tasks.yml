@@ -82,7 +82,7 @@ search:
   ## Alternatively, the only files or `File.fnmatch patterns` to search in `paths`:
   ## If specified, this settings takes priority over `exclude`, but `exclude` still applies.
   # only: ["*.rb", "*.html.slim"]
-  ## If `strict` is `false`, guess usages such as translate_with_args("categories.#{category}.title"). The default is `true`.
+  ## If `strict` is `false`, guess usages such as t("categories.#{category}.title"). The default is `true`.
   # strict: true
   ## Multiple scanners can be used. Their results are merged.
   ## The options specified above are passed down to each scanner. Per-scanner options can be specified as well.

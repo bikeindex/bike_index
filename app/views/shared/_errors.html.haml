@@ -3,8 +3,8 @@
 
 .alert.alert-danger
   %h4
-    - errors_count = pluralize(obj.errors.count, translate_with_args(".error"))
-    = translate_with_args(".errors_prevented_this_from_being_saved", errors_count: errors_count, object_name: name)
+    - errors_count = pluralize(obj.errors.count, t(".error"))
+    = t(".errors_prevented_this_from_being_saved", errors_count: errors_count, object_name: name)
   %ul
     - obj.errors.full_messages.each do |message|
       %li

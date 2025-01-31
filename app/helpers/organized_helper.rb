@@ -154,13 +154,13 @@ module OrganizedHelper
   end
 
   def registration_field_address_placeholder(organization = nil)
-    i18n_translate_with_args(organization&.school? ? :address_school : :address, scope: %i[helpers organization_helper])
+    I18n.t(organization&.school? ? :address_school : :address, scope: %i[helpers organization_helper])
   end
 
   def registration_address_required_below_helper(organization = nil)
     return nil unless organization&.additional_registration_fields&.include?("reg_address")
     content_tag(:span,
-      i18n_translate_with_args(:your_full_address_is_required, scope: %i[helpers organization_helper], org_name: organization.short_name),
+      I18n.t(:your_full_address_is_required, scope: %i[helpers organization_helper], org_name: organization.short_name),
       class: "below-input-help text-warning")
   end
 end

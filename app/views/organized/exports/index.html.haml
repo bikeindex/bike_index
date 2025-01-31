@@ -1,34 +1,34 @@
 .organized-exports
   .organized-page-header
-    %h1= translate_with_args(".org_exports_html", org_name: current_organization.name)
+    %h1= t(".org_exports_html", org_name: current_organization.name)
 
   .text-right
-    = link_to translate_with_args(".new_export"),
+    = link_to t(".new_export"),
     new_organization_export_path(organization_id: current_organization.to_param),
     class: "btn btn-secondary"
 
   .full-screen-table.mt-4
     %p{ style: "margin-bottom: 0;" }
       %strong
-        = pluralize(number_with_delimiter(@exports.total_count), translate_with_args(".export"))
+        = pluralize(number_with_delimiter(@exports.total_count), t(".export"))
 
     - show_assigned_bike_codes = current_organization.enabled?("avery_export") || @exports.any? { |e| e.assign_bike_codes? }
 
     %table.table.table-striped.table-bordered.table-sm.without-exterior-border
       %thead.small-header
         %th
-          = translate_with_args(".created")
+          = t(".created")
           %small.convertTimezone
-        %th= translate_with_args(".creator")
-        %th= translate_with_args(".progress")
+        %th= t(".creator")
+        %th= t(".progress")
         - if show_assigned_bike_codes
           %td.small.text-center
             - if current_organization.enabled?("avery_export")
               Avery Export
             - else
-              = translate_with_args(".stickers_assigned")
-        %th= translate_with_args(".bikes_in_export")
-        %td= translate_with_args(".download")
+              = t(".stickers_assigned")
+        %th= t(".bikes_in_export")
+        %td= t(".download")
         %td
       %tbody
         - @exports.each do |export|
@@ -50,7 +50,7 @@
               = link_to(t(".download"), export.file.url) if export.file.url.present?
             %td
               %small
-                = link_to translate_with_args(".delete"),
+                = link_to t(".delete"),
                 organization_export_path(export, organization_id: current_organization.to_param),
                 method: :delete
 

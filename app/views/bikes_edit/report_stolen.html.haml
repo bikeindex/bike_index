@@ -16,4 +16,4 @@
               -# Report Stolen or Missing
               %h3= @edit_templates[@edit_template]
             .no-divider-row.full-width-button
-              = submit_tag translate_with_args(".this_bike_type_is_stolen_or_missing", bike_type: @bike.type), class: "btn btn-danger btn-lg"
+              = submit_tag t(".this_bike_type_is_stolen_or_missing", bike_type: @bike.type), class: "btn btn-danger btn-lg"

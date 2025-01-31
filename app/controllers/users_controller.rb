@@ -36,9 +36,9 @@ class UsersController < ApplicationController
     user_subject ||= User.unconfirmed.fuzzy_unconfirmed_primary_email_find(params[:email])
     if user_subject.present?
       EmailConfirmationWorker.new.perform(user_subject.id)
-      flash[:success] = translation_with_args(:resending_email)
+      flash[:success] = translation(:resending_email)
     else
-      flash[:error] = translation_with_args(:please_sign_in)
+      flash[:error] = translation(:please_sign_in)
     end
     redirect_to please_confirm_email_users_path
   end
@@ -46,7 +46,7 @@ class UsersController < ApplicationController
   def confirm
     @user = User.find(params[:id])
     if @user.confirmed?
-      flash[:success] = translation_with_args(:already_confirmed)
+      flash[:success] = translation(:already_confirmed)
       # If signed in, redirect to partner if it should
       if current_user.present? && sign_in_partner.present?
         session.delete(:partner) # Only removing once signed in, PR#1435
@@ -70,9 +70,9 @@ class UsersController < ApplicationController
   def send_password_reset_email
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
     if @user.present?
-      flash[:error] = translation_with_args(:reset_just_sent_wait_a_sec) unless @user.send_password_reset_email
+      flash[:error] = translation(:reset_just_sent_wait_a_sec) unless @user.send_password_reset_email
     else
-      flash[:error] = translation_with_args(:email_not_found)
+      flash[:error] = translation(:email_not_found)
       redirect_to request_password_reset_form_users_path
     end
   end
@@ -82,7 +82,7 @@ class UsersController < ApplicationController
 
   def update_password_with_reset_token
     if @user.present? && @user.update(permitted_password_reset_parameters)
-      flash[:success] = translation_with_args(:password_reset_successfully)
+      flash[:success] = translation(:password_reset_successfully)
       # They got the password reset email, which counts as confirming their email
       @user.confirm(@user.confirmation_token) if @user.unconfirmed?
       update_user_authentication_for_new_password
@@ -101,7 +101,7 @@ class UsersController < ApplicationController
     @owner = user
     @user = user
     unless user == current_user || @user.show_bikes
-      redirect_to(my_account_url, notice: translation_with_args(:user_not_sharing)) && return
+      redirect_to(my_account_url, notice: translation(:user_not_sharing)) && return
     end
     @page = params[:page] || 1
     @per_page = params[:per_page] || 15
@@ -114,23 +114,23 @@ class UsersController < ApplicationController
     if @user.present? && params[:user].present? && @user.update(permitted_parameters)
       if params.dig(:user, :terms_of_service).present?
         if InputNormalizer.boolean(params.dig(:user, :terms_of_service))
-          flash[:success] = translation_with_args(:you_can_use_bike_index)
+          flash[:success] = translation(:you_can_use_bike_index)
           redirect_to(my_account_url) && return
         else
-          flash[:notice] = translation_with_args(:accept_tos)
+          flash[:notice] = translation(:accept_tos)
           redirect_to(accept_terms_url) && return
         end
       elsif params.dig(:user, :vendor_terms_of_service).present?
         if InputNormalizer.boolean(params.dig(:user, :vendor_terms_of_service))
           @user.update(accepted_vendor_terms_of_service: true)
           flash[:success] = if @user.memberships.any?
-            translation_with_args(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
+            translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
           else
-            translation_with_args(:thanks_for_accepting_tos)
+            translation(:thanks_for_accepting_tos)
           end
           redirect_to(user_root_url) && return
         else
-          redirect_to(accept_vendor_terms_path, notice: translation_with_args(:accept_tos_to_use_as_org)) && return
+          redirect_to(accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org)) && return
         end
       end
     end
@@ -158,7 +158,7 @@ class UsersController < ApplicationController
     @user = current_user || User.find_by_username(params[:id])
     # If unable to find a user, everything is probably fine ;)
     if @user.blank?
-      flash[:success] = translation_with_args(:successfully_unsubscribed)
+      flash[:success] = translation(:successfully_unsubscribed)
       redirect_to(user_root_url) && return
     end
   end
@@ -166,7 +166,7 @@ class UsersController < ApplicationController
   def unsubscribe_update
     user = current_user || User.find_by_username(params[:id])
     user.update_attribute :notification_newsletters, false if user.present?
-    flash[:success] = translation_with_args(:successfully_unsubscribed)
+    flash[:success] = translation(:successfully_unsubscribed)
     redirect_to(user_root_url) && return
   end
 
@@ -188,7 +188,7 @@ class UsersController < ApplicationController
     @user = User.find_by_token_for_password_reset(@token) if @token.present?
     return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
     remove_session
-    flash[:error] = @user.blank? ? translation_with_args(:does_not_match_token) : translation_with_args(:token_expired)
+    flash[:error] = @user.blank? ? translation(:does_not_match_token) : translation(:token_expired)
     redirect_to(request_password_reset_form_users_path) && return
   end
 end

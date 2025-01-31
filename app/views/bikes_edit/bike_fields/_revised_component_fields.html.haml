@@ -10,15 +10,15 @@
       %span.context-display-help
         &ndash;
       = f.check_box :_destroy
-      = translate_with_args(".remove_part")
+      = t(".remove_part")
 
   .related-fields
     .form-group.row
-      = f.label :ctype_id, translate_with_args(".part_type"), class: 'form-well-label'
+      = f.label :ctype_id, t(".part_type"), class: 'form-well-label'
 
       .form-well-input.fancy-select.unfancy
         = f.collection_select(:ctype_id, Ctype.reorder(:name), :id, :name,
-          { prompt: translate_with_args(".component_type") },
+          { prompt: t(".component_type") },
           { required: true, class: 'form-control component-ctype-input' })
 
     -# We really should display Position here, but we aren't right now because of implementation issues
@@ -35,12 +35,12 @@
     -#     = f.hidden_field :front_or_rear, class: 'front-or-rear'
 
     .form-group.row.hidden-other.hidden-ctype{ class: other_ctype_show }
-      = f.label :ctype_other, translate_with_args(".unknown_part_type"), class: 'form-well-label'
+      = f.label :ctype_other, t(".unknown_part_type"), class: 'form-well-label'
       .form-well-input
         = f.text_field :ctype_other, class: 'form-control'
 
   .form-group.row.unnested-field
-    = f.label :description, translate_with_args(".part_description"), class: 'form-well-label form-well-label-large-input'
+    = f.label :description, t(".part_description"), class: 'form-well-label form-well-label-large-input'
     .form-well-input-large
       = f.text_area :description, rows: 2, class: 'form-control'
 
@@ -50,22 +50,22 @@
       .form-well-input
         = f.text_field :manufacturer_id, class: 'form-control component-manufacturer-input unfancy', data: { initial: initial_manufacturer }
         %span.below-input-help
-          = translate_with_args(".select_other")
+          = t(".select_other")
     .hidden-other.form-group.row{ class: other_mnfg_show }
-      = f.label :manufacturer_other, translate_with_args(".other_manufacturer"), class: 'form-well-label'
+      = f.label :manufacturer_other, t(".other_manufacturer"), class: 'form-well-label'
       .form-well-input
         = f.text_field :manufacturer_other, class: 'form-control'
 
   .related-fields
     .form-group.row
-      = f.label :component_model, translate_with_args(".model"), class: 'form-well-label'
+      = f.label :component_model, t(".model"), class: 'form-well-label'
       .form-well-input.form-well-input.component_model
         = f.text_field :component_model, class: 'form-control'
     .form-group.row.hidden-other{ class: other_model_show }
-      = f.label :year, translate_with_args(".model_year"), class: 'form-well-label'
+      = f.label :year, t(".model_year"), class: 'form-well-label'
       .form-well-input
         = f.text_field :year, class: 'form-control'
     .form-group.row.hidden-other{ class: other_model_show }
-      = f.label :serial_number, translate_with_args(".part_serial"), class: 'form-well-label'
+      = f.label :serial_number, t(".part_serial"), class: 'form-well-label'
       .form-well-input
         = f.text_field :serial_number, class: 'form-control', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'

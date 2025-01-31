@@ -1,66 +1,66 @@
 .vendor-signup.page-content
   %h1
-    = translate_with_args(".how_to_lightspeed_retail")
+    = t(".how_to_lightspeed_retail")
   %article
     %p.mt-4
-      = translate_with_args(".this_page_gives_instructions_html", about_url: about_path)
+      = t(".this_page_gives_instructions_html", about_url: about_path)
 
   .video-responsive
     <iframe src="https://www.youtube.com/embed/MKUNw4zfLJY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
   %article.mt-4
     %p
-      = translate_with_args(".we_believe_that_bicycle_registration")
+      = t(".we_believe_that_bicycle_registration")
 
     - if current_user.present? && current_user.memberships.present?
       - link = link_to 'bikeindex.org/lightspeed_interface', lightspeed_interface_path(organization_id: passive_organization&.id)
-      - security_link = link_to translate_with_args(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"
-      %p= translate_with_args(".all_you_have_to_do_is_html", link: link, security_link: security_link)
+      - security_link = link_to t(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"
+      %p= t(".all_you_have_to_do_is_html", link: link, security_link: security_link)
     - else
-      %p= translate_with_args(".the_first_step_is_to_create_an_account_html")
-      %p= translate_with_args(".once_you_have_a_bike_index_account_set_up")
+      %p= t(".the_first_step_is_to_create_an_account_html")
+      %p= t(".once_you_have_a_bike_index_account_set_up")
 
-    %p= translate_with_args(".a_listing_on_bike_index_will_be_created")
+    %p= t(".a_listing_on_bike_index_will_be_created")
 
   %article.mt-4
-    %p= translate_with_args(".the_bicycles_owner_will_receive_an_email")
+    %p= t(".the_bicycles_owner_will_receive_an_email")
 
-    %h3= translate_with_args(".a_few_things_to_note")
+    %h3= t(".a_few_things_to_note")
 
   %ul.fancy-bullets
     - email_link = link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"
     %li
       %span.blue-bullet
-      %p= translate_with_args(".write_do_not_register")
+      %p= t(".write_do_not_register")
     %li
       %span.blue-bullet
-      %p= translate_with_args(".bicycles_sold_before_you_activated_lights")
+      %p= t(".bicycles_sold_before_you_activated_lights")
     %li
       %span.blue-bullet
-      %p= translate_with_args(".registering_with_a_sticker_html")
+      %p= t(".registering_with_a_sticker_html")
     %li
-      - link = link_to translate_with_args(".privacy_policy_here"), privacy_url
+      - link = link_to t(".privacy_policy_here"), privacy_url
       %span.blue-bullet
-      %p= translate_with_args(".we_know_you_and_your_customers_html", link: link)
-    %li
-      %span.blue-bullet
-      %p= translate_with_args(".already_have_a_sophisticated_html", link: email_link)
+      %p= t(".we_know_you_and_your_customers_html", link: link)
     %li
       %span.blue-bullet
-      %p= translate_with_args(".were_happy_to_answer_any_questions_html", link: email_link)
+      %p= t(".already_have_a_sophisticated_html", link: email_link)
+    %li
+      %span.blue-bullet
+      %p= t(".were_happy_to_answer_any_questions_html", link: email_link)
 
   %blockquote.mt-4
-    = translate_with_args(".i_started_bike_index_because")
+    = t(".i_started_bike_index_because")
 
   .blockquote-cite
     Seth Herr,
-    = translate_with_args(".bike_index_cofounder")
+    = t(".bike_index_cofounder")
 
   .row.mt-4{ style: "align-items: center;" }
     .col-xs-6
-      = translate_with_args(".learn_more_about")
+      = t(".learn_more_about")
       %a{ href: "https://www.lightspeedhq.com/pos/retail/bike-shop/?utm_medium=partner&utm_source=Reseller&utm_campaign=001G00000118MwjIAE&ref=001G00000118MwjIAE", style: "display: inline-block;" }
-        = translate_with_args(".lightspeed_retail")
+        = t(".lightspeed_retail")
     .col-xs-6
       %a{ href: "https://www.lightspeedhq.com/pos/retail/bike-shop/?utm_medium=partner&utm_source=Reseller&utm_campaign=001G00000118MwjIAE&ref=001G00000118MwjIAE", style: "display: block; margin: 0 auto; max-width: 200px;" }
         = image_tag "lightspeed_partner_logo.png"
@@ -68,6 +68,6 @@
 
 
   %article.padded.vendor-signup-form.bottom-padded#add_organization
-    %h3= translate_with_args(".sign_your_shop_up")
+    %h3= t(".sign_your_shop_up")
 
     = render "/organizations/new_form"

@@ -9,7 +9,7 @@
 
     .lock-types-select
       .lock-type-title
-        %label= translate_with_args(".lock_type")
+        %label= t(".lock_type")
 
       - lock_types.each do |lock|
         .lock-type
@@ -26,20 +26,20 @@
         .related-fields
           .form-group.unfancy.fancy-select.manufacturer-select{ data: { otherid: Manufacturer.other.id } }
             = f.label :manufacturer_id, class: "form-label"
-            = f.collection_select(:manufacturer_id, Manufacturer.all, :id, :name, { required: true, prompt: translate_with_args(".choose_manufacturer") }, class: 'form-control')
+            = f.collection_select(:manufacturer_id, Manufacturer.all, :id, :name, { required: true, prompt: t(".choose_manufacturer") }, class: 'form-control')
           .hidden-other.form-group
-            = f.label :manufacturer_other, translate_with_args(".other_lock_manufacturer"), class: "form-label"
+            = f.label :manufacturer_other, t(".other_lock_manufacturer"), class: "form-label"
             = f.text_field :manufacturer_other, class: 'form-control'
 
         .form-check
           %label.form-check-label
             = f.check_box :has_key, class: "form-check-input"
-            = translate_with_args(".has_key")
+            = t(".has_key")
 
         .form-check
           %label.form-check-label
             = f.check_box :has_combination, class: "form-check-input"
-            = translate_with_args(".has_combination")
+            = t(".has_combination")
 
         #serial-group.form-group
           .form-label
@@ -47,9 +47,9 @@
             = f.text_field :key_serial, class: 'form-control'
         .form-group.submit-button
           - if @lock.id.present?
-            = submit_tag translate_with_args(".update_the_lock"), class: 'btn btn-success btn-lg'
+            = submit_tag t(".update_the_lock"), class: 'btn btn-success btn-lg'
           - else
-            = submit_tag translate_with_args(".add_the_lock"), class: 'btn btn-success btn-lg'
+            = submit_tag t(".add_the_lock"), class: 'btn btn-success btn-lg'
 
       .col-md-6
         #combination.form-group.initially-hidden
@@ -65,24 +65,24 @@
 
           .form-group.lock-notes
             %label.form-label{ for: 'notes' }
-              = translate_with_args(".additional_notes")
+              = t(".additional_notes")
             .controls
-              = f.text_area :notes, toolbar: translate_with_args(".basic"), class: 'ckeditor, form-control'
+              = f.text_area :notes, toolbar: t(".basic"), class: 'ckeditor, form-control'
 
 
     .card.lock-pictures
       .card-block
         %h3.card-title
-          = translate_with_args(".examples_of_serial_numbers_found_on_diffe")
+          = t(".examples_of_serial_numbers_found_on_diffe")
         %section
           %a.lock-picture{ data: { target: image_path('locks/krypto_small_key.jpg') } }
-            = image_tag('locks/krypto_small_key.jpg', alt: translate_with_args(".small_kryptonite_key"))
-          %p= translate_with_args(".small_kryptonite_key")
+            = image_tag('locks/krypto_small_key.jpg', alt: t(".small_kryptonite_key"))
+          %p= t(".small_kryptonite_key")
         %section
           %a.lock-picture{ data: { target: image_path('locks/krypto_large_key.jpg') } }
-            = image_tag('locks/krypto_large_key.jpg', alt: translate_with_args(".large_kryptonite_key"))
-          %p= translate_with_args(".large_kryptonite_key")
+            = image_tag('locks/krypto_large_key.jpg', alt: t(".large_kryptonite_key"))
+          %p= t(".large_kryptonite_key")
         %section
           %a.lock-picture{ data: { target: image_path('locks/pinhead_key.jpg') } }
-            = image_tag('locks/pinhead_key.jpg', alt: translate_with_args(".pinhead_key"))
-          %p= translate_with_args(".pinhead_locking_skewer_key")
+            = image_tag('locks/pinhead_key.jpg', alt: t(".pinhead_key"))
+          %p= t(".pinhead_locking_skewer_key")

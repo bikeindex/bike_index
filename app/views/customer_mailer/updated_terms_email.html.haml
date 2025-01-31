@@ -13,38 +13,38 @@
         - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
         %h2
-          = translate_with_args(".html.hello", name: @user.display_name)
+          = t(".html.hello", name: @user.display_name)
 
         %p
-          - link = link_to translate_with_args(".html.here"), news_url("bike-index--now-a-nonprofit")
-          %strong= translate_with_args(".html.you_may_not_know_but_bike_index_recently_")
-          = translate_with_args(".html.weve_always_wanted_to_provide_html", link: link)
+          - link = link_to t(".html.here"), news_url("bike-index--now-a-nonprofit")
+          %strong= t(".html.you_may_not_know_but_bike_index_recently_")
+          = t(".html.weve_always_wanted_to_provide_html", link: link)
 
         %p
-          = translate_with_args(".html.were_emailing_you_because_we_updated_our_")
+          = t(".html.were_emailing_you_because_we_updated_our_")
 
           %ul
-            %li= link_to translate_with_args(".html.bike_index_privacy_policy"), privacy_url
-            %li= link_to translate_with_args(".html.bike_index_terms_of_service"), terms_url
+            %li= link_to t(".html.bike_index_privacy_policy"), privacy_url
+            %li= link_to t(".html.bike_index_terms_of_service"), terms_url
             - if @user.has_membership?
-              %li= link_to translate_with_args(".html.bike_index_vendor_terms_of_service"), vendor_terms_url
+              %li= link_to t(".html.bike_index_vendor_terms_of_service"), vendor_terms_url
 
         %p
-          = translate_with_args(".html.nothing_significant_has_changed_about_how")
+          = t(".html.nothing_significant_has_changed_about_how")
 
         %p
-          - link = link_to translate_with_args(".html.here"), "https://bikeindex.org/news"
-          = translate_with_args(".html.check_link_to_see_more_html", link: link)
+          - link = link_to t(".html.here"), "https://bikeindex.org/news"
+          = t(".html.check_link_to_see_more_html", link: link)
 
         %p{ style: "margin-top: 40px;" }
-          = translate_with_args(".html.as_always_thanks_for_helping_register_bik")
+          = t(".html.as_always_thanks_for_helping_register_bik")
           %br
-          = translate_with_args(".html.gavin_hoover_and_the_bike_index_team")
+          = t(".html.gavin_hoover_and_the_bike_index_team")
 
         %p{ style: "margin-bottom: 40px;" }
-          %em.less-strong= translate_with_args(".html.ps_if_you_like_reading_these_kinds_of_doc")
+          %em.less-strong= t(".html.ps_if_you_like_reading_these_kinds_of_doc")
 
       .binx-footer
         %h5
-          - link = link_to translate_with_args(".html.make_a_donation"), support_the_index_url
-          = translate_with_args(".html.help_prevent_bike_theft_html", link: link)
+          - link = link_to t(".html.make_a_donation"), support_the_index_url
+          = t(".html.help_prevent_bike_theft_html", link: link)

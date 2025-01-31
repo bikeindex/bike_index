@@ -1,11 +1,11 @@
 - if current_user.present?
   %p
     %em
-      = translate_with_args(".your_current_account_will_be_a_member_html", user_email: current_user.email)
+      = t(".your_current_account_will_be_a_member_html", user_email: current_user.email)
   %p
     %em
-      - logout_link = link_to translate_with_args(".log_out"), session_path(redirect_location: 'new_user'), method: :delete
-      = translate_with_args(".if_you_dont_want_that_to_be_the_case_html", logout_link: logout_link)
+      - logout_link = link_to t(".log_out"), session_path(redirect_location: 'new_user'), method: :delete
+      = t(".if_you_dont_want_that_to_be_the_case_html", logout_link: logout_link)
 
   = form_for @organization, html: { class: 'organized-form mt-4' } do |f|
 
@@ -14,24 +14,24 @@
         .alert.alert-error
           %a.close{"data-dismiss" => "alert"} ×
           %h4
-            = translate_with_args(".please_fix_the_following_errors", errors: pluralize(@organization.errors.count, translate_with_args(".error")))
+            = t(".please_fix_the_following_errors", errors: pluralize(@organization.errors.count, t(".error")))
           %ul
             - @organization.errors.full_messages.each do |msg|
               %li= msg
     .card
       .card-block
         %h3.card-title
-          = translate_with_args(".new_organization")
+          = t(".new_organization")
         - if current_user.memberships.count > 0
           .alert.alert-info.mt-4.mb-4
             - org = current_user.organizations.first
             %h3.padded.header-font-alt.text-center
               - org_link = link_to org.name, organization_root_path(org.slug)
-              = translate_with_args(".you_are_already_a_member_of_org_html", org_link: org_link)
+              = t(".you_are_already_a_member_of_org_html", org_link: org_link)
             %p.text-center
-              = translate_with_args(".filling_out_this_form_will_create_a_new_org")
+              = t(".filling_out_this_form_will_create_a_new_org")
         .form-group.row.mt-4
-          = f.label :name, translate_with_args(".organization_name"), class: 'org-form-label'
+          = f.label :name, t(".organization_name"), class: 'org-form-label'
           .col-sm-4
             = f.text_field :name, required: true, class: 'form-control'
 
@@ -42,7 +42,7 @@
 
         .form-group.row
           %label.org-form-label
-            = translate_with_args(".organization_kind")
+            = t(".organization_kind")
           .col-sm-4
             - Organization.user_creatable_kinds.each do |kind|
               .radio
@@ -56,15 +56,15 @@
 
         .form-group.row
           .col-sm-4.col-sm-push-4
-            = f.submit translate_with_args(".add_organization"), class: 'btn btn-success'
+            = f.submit t(".add_organization"), class: 'btn btn-success'
 - else
   %h3.header-font-alt
-    = translate_with_args(".add_your_organization_to_bike_index")
+    = t(".add_your_organization_to_bike_index")
   %ol
     %li
-      - new_account_link = link_to translate_with_args(".bike_index_account"), new_user_url(return_to: "/organizations/new")
-      = translate_with_args(".sign_up_for_a_new_account_html", new_account_link: new_account_link)
+      - new_account_link = link_to t(".bike_index_account"), new_user_url(return_to: "/organizations/new")
+      = t(".sign_up_for_a_new_account_html", new_account_link: new_account_link)
     %li
-      = translate_with_args(".confirm_your_email")
+      = t(".confirm_your_email")
     %li
-      = translate_with_args(".fill_out_the_form_that_will_appear")
+      = t(".fill_out_the_form_that_will_appear")

@@ -1,14 +1,14 @@
 %h4{ style: 'margin-bottom: 2em;' }
-  = translate_with_args(".html.click_the_button")
+  = t(".html.click_the_button")
 
 - tokenized_url = @email_preview ? @email_preview_tokenized_url : @url
-= link_to translate_with_args(".html.sign_in"), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
+= link_to t(".html.sign_in"), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
 
 %p
   %em.less-strong
-    = translate_with_args(".html.only_valid_once")
+    = t(".html.only_valid_once")
 
 %hr{ style: 'margin-top: 40px;' }
 
 %p.center-text.less-strong
-  = translate_with_args(".html.if_you_did_not_request")
+  = t(".html.if_you_did_not_request")
