@@ -177,7 +177,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       theft_alert_attrs[:start_at] = nil
       theft_alert_attrs[:end_at] = nil
     else
-      timezone = TimeParser.parse_timezone(params[:timezone])
+      timezone = TimeZoneParser.parse(params[:timezone])
       theft_alert_attrs[:start_at] = TimeParser.parse(theft_alert_attrs[:start_at], timezone)
       theft_alert_attrs[:end_at] = TimeParser.parse(theft_alert_attrs[:end_at], timezone)
     end
