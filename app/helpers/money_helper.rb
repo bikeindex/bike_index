@@ -7,7 +7,7 @@ module MoneyHelper
 
   # Return the currency abbreviation (USD, EUR) for the current locale.
   def default_currency
-    translation_with_args(I18n.locale, scope: [:money, :currencies])
+    translation(I18n.locale, scope: [:money, :currencies])
   # Don't error when unknown currency- return USD
   rescue I18n::MissingTranslationData
     "USD"

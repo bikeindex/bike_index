@@ -14,11 +14,11 @@ module Organized
 
     def update
       if @impound_configuration.update(permitted_parameters)
-        flash[:success] = translation_with_args(:updated_successfully, org_name: current_organization.name)
+        flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
         redirect_back(fallback_location: edit_organization_manage_impounding_path(organization_id: current_organization.to_param))
       else
         @page_errors = @impound_configuration.errors
-        flash[:error] = translation_with_args(:could_not_update, org_name: current_organization.name)
+        flash[:error] = translation(:could_not_update, org_name: current_organization.name)
         render :edit
       end
     end
