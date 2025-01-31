@@ -19,27 +19,27 @@
               - if current_user.present?
                 = current_user.email
               - else
-                = translate_with_args(".you")
+                = t(".you")
 
           %li.super_user.hidden
-            = link_to translate_with_args(".superuser_home"), admin_root_path, class: "follow-link"
+            = link_to t(".superuser_home"), admin_root_path, class: "follow-link"
 
           %li.expand_t.no_user.hidden
             %a.expand-sign-in{href: "#signup"}
-              = translate_with_args(".log_in")
+              = t(".log_in")
           %li.no_user.hidden
-            = link_to translate_with_args(".sign_up"), new_user_url, class: "follow-link"
+            = link_to t(".sign_up"), new_user_url, class: "follow-link"
 
         .tab-content
           #you.tab-pane.yes_user.hidden
             %ul
               %li
-                = link_to translate_with_args(".your_bikes"), my_account_url, class: "follow-link"
+                = link_to t(".your_bikes"), my_account_url, class: "follow-link"
               %li
-                %a{ title: translate_with_args(".your_preferences"), href: "/edit_my_account"}
-                  = translate_with_args(".preferences")
+                %a{ title: t(".your_preferences"), href: "/edit_my_account"}
+                  = t(".preferences")
               %li
-                = link_to translate_with_args(".log_out"), session_path, method: :delete
+                = link_to t(".log_out"), session_path, method: :delete
 
       #head-search-bikes
         .search-fields

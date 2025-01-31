@@ -1,79 +1,79 @@
 %h1
-  = translate_with_args(".bike_serial_numbers")
+  = t(".bike_serial_numbers")
 
 %p#fnref-all-bikes-serials
-  = translate_with_args(".all_bikes")
-  = translate_with_args(".all_have_unique_serial_numbers")
+  = t(".all_bikes")
+  = t(".all_have_unique_serial_numbers")
   %sup
     %a.footnote-ref{ href: '#fn-all-bikes-serials' }
       1
 
 %h3.header-font-uncap#find-serial-number.mt-4
-  = translate_with_args(".finding_a_bicycle_serial_number")
+  = t(".finding_a_bicycle_serial_number")
 
-%p= translate_with_args(".most_bicycles_have_their_serial_number_en")
+%p= t(".most_bicycles_have_their_serial_number_en")
 
 
 %ul.serial-pictures
   %li
-    = link_to image_tag('serials/serial_bb.jpg', alt: translate_with_args('.bike_with_bottom_circled')), image_path('serials/serial_bb.jpg'), class: 'serial-image'
-    %p= translate_with_args(".the_bottom_bracket_html")
+    = link_to image_tag('serials/serial_bb.jpg', alt: t('.bike_with_bottom_circled')), image_path('serials/serial_bb.jpg'), class: 'serial-image'
+    %p= t(".the_bottom_bracket_html")
   %li
-    = link_to image_tag('serials/serial_peters.jpg', alt: translate_with_args('.standard_serial_number')), image_path('serials/serial_peters.jpg'), class: 'serial-image'
-    %p= translate_with_args(".a_serial_number_on_the_underside_html")
+    = link_to image_tag('serials/serial_peters.jpg', alt: t('.standard_serial_number')), image_path('serials/serial_peters.jpg'), class: 'serial-image'
+    %p= t(".a_serial_number_on_the_underside_html")
   %li
-    = link_to image_tag('serials/serial_fixie.jpg', alt: translate_with_args('.another_standard_serial_number')), image_path('serials/serial_fixie.jpg'), class: 'serial-image'
-    %p= translate_with_args(".another_serial_number_beneath_html")
+    = link_to image_tag('serials/serial_fixie.jpg', alt: t('.another_standard_serial_number')), image_path('serials/serial_fixie.jpg'), class: 'serial-image'
+    %p= t(".another_serial_number_beneath_html")
   %li
-    = link_to image_tag('serials/serial_rad_power.jpg', alt: translate_with_args('.rad_power_serial')), image_path('serials/serial_rad_power.jpg'), class: 'serial-image'
-    %p= translate_with_args(".rad_power_serials_html")
+    = link_to image_tag('serials/serial_rad_power.jpg', alt: t('.rad_power_serial')), image_path('serials/serial_rad_power.jpg'), class: 'serial-image'
+    %p= t(".rad_power_serials_html")
   %li
-    = link_to image_tag('serials/serial_headtube.jpg', alt: translate_with_args('.schwinn_serial')), image_path('serials/serial_headtube.jpg'), class: 'serial-image'
-    %p= translate_with_args(".some_schwinn_bicycles_also")
+    = link_to image_tag('serials/serial_headtube.jpg', alt: t('.schwinn_serial')), image_path('serials/serial_headtube.jpg'), class: 'serial-image'
+    %p= t(".some_schwinn_bicycles_also")
   %li
-    = link_to image_tag('serials/serial_pinsch.jpg', alt: translate_with_args('.doberman_serial')), image_path('serials/serial_pinsch.jpg'), class: 'serial-image'
-    %p= translate_with_args(".a_serial_number_located_on_a_html")
+    = link_to image_tag('serials/serial_pinsch.jpg', alt: t('.doberman_serial')), image_path('serials/serial_pinsch.jpg'), class: 'serial-image'
+    %p= t(".a_serial_number_located_on_a_html")
 
   %li#fnref-second-serial-number
-    = link_to image_tag('serials/serial_look.jpg', alt: translate_with_args('.look_serial')), image_path('serials/serial_look.jpg'), class: 'serial-image'
+    = link_to image_tag('serials/serial_look.jpg', alt: t('.look_serial')), image_path('serials/serial_look.jpg'), class: 'serial-image'
     %p
-      = translate_with_args(".some_bikes_have_multiple_html")
+      = t(".some_bikes_have_multiple_html")
       %sup
         %a.footnote-ref{ href: '#fn-second-serial-number' }
           2
-      = translate_with_args(".when_adding_a_bike_to_the_index")
+      = t(".when_adding_a_bike_to_the_index")
 
 %p
   - link = link_to 'contact@bikeindex.org', 'mailto:contact@bikeindex.org'
-  = translate_with_args(".hopefully_you_can_find_the_serial_html", link: link)
+  = t(".hopefully_you_can_find_the_serial_html", link: link)
 
 %h3.header-font-uncap#searching-bike-index-serials.mt-4
-  = translate_with_args(".searching_serials_on_bike_index")
+  = t(".searching_serials_on_bike_index")
 
 %p
-  - search_form_link = link_to translate_with_args(".our_search_form"), default_bike_search_path
-  = translate_with_args(".finding_bicycles_by_serial_number_html", search_form_link: search_form_link)
+  - search_form_link = link_to t(".our_search_form"), default_bike_search_path
+  = t(".finding_bicycles_by_serial_number_html", search_form_link: search_form_link)
 
-= link_to image_tag("serials/serial_search_bar.png", alt: translate_with_args(".serial_search_input")), default_bike_search_path, class: "serial-search-screenshot"
+= link_to image_tag("serials/serial_search_bar.png", alt: t(".serial_search_input")), default_bike_search_path, class: "serial-search-screenshot"
 
 %p.mt-2{ style: "margin-bottom: 0;" }
-  = translate_with_args(".weve_done_a_few_things_to_make_it_more_li")
+  = t(".weve_done_a_few_things_to_make_it_more_li")
 
 %ul
-  %li= translate_with_args(".certain_numbers_and_letters_html")
-  %li= translate_with_args(".we_split_bike_serials_up_by_html")
-  %li= translate_with_args(".we_do_close_serial_matching_html")
-  %li= translate_with_args(".we_do_not_currently_do_partial_html")
+  %li= t(".certain_numbers_and_letters_html")
+  %li= t(".we_split_bike_serials_up_by_html")
+  %li= t(".we_do_close_serial_matching_html")
+  %li= t(".we_do_not_currently_do_partial_html")
 
 
 
 .footnotes
   %ol
     %li#fn-all-bikes-serials
-      = translate_with_args(".okay_fine_so_maybe_html")
-      %a.footnote-back-link{ href: "#fnref-all-bikes-serials", title: translate_with_args(".jump_back_to_footnote", num: 1) }
+      = t(".okay_fine_so_maybe_html")
+      %a.footnote-back-link{ href: "#fnref-all-bikes-serials", title: t(".jump_back_to_footnote", num: 1) }
         &#8617;
     %li#fn-second-serial-number
-      = translate_with_args(".in_this_picture_html")
-      %a.footnote-back-link{ href: "#fnref-second-serial-number", title: translate_with_args(".jump_back_to_footnote", num: 2) }
+      = t(".in_this_picture_html")
+      %a.footnote-back-link{ href: "#fnref-second-serial-number", title: t(".jump_back_to_footnote", num: 2) }
         &#8617;

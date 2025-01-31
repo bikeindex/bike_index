@@ -15,7 +15,7 @@
           - if @bike.version?
             .related-fields.no-divider-row.form-group.row.unnested-field
               %label.form-well-label.less-strong
-                = translate_with_args(".visibility")
+                = t(".visibility")
               .form-well-input-full-width
                 %label.radio-inline.d-block.mt-1
                   = f.radio_button :visibility, :visible_not_related
@@ -37,14 +37,14 @@
             .delete-from-index.no-divider-row
               = link_to bike_version_path(@bike_version), method: :delete, confirm: "Are you sure?" do
                 = render "/shared/trash_icon"
-                = translate_with_args(".delete_this_version_html", version_name: @bike.display_name)
+                = t(".delete_this_version_html", version_name: @bike.display_name)
           - else
             .related-fields.hide-this-bike.no-divider-row
               .form-group.row
                 - unless @bike.user_hidden?
                   .hide-this-bike-link
                     %a.collapsed{ href: "#hide_bike_toggle_group", data: { toggle: "collapse" } }
-                      = translate_with_args(".hide_this_bike", bike_type: @bike.type)
+                      = t(".hide_this_bike", bike_type: @bike.type)
 
                 .collapse#hide_bike_toggle_group{class: (@bike.user_hidden? ? "show in" : "")}
                   - if @bike.user_hidden?
@@ -53,48 +53,48 @@
                     = f.hidden_field :marked_user_hidden
                   .hide-explanation
                     %p.mt-2
-                      %strong= translate_with_args(".keeping_your_bike_public")
+                      %strong= t(".keeping_your_bike_public")
                     %p
-                      - faq_link = link_to translate_with_args(".faqs"), support_path(anchor: "public-serials")
-                      = translate_with_args(".you_can_read_more_html", faq_link: faq_link)
+                      - faq_link = link_to t(".faqs"), support_path(anchor: "public-serials")
+                      = t(".you_can_read_more_html", faq_link: faq_link)
                     %p
-                      = translate_with_args(".we_strongly_recommend", bike_type: @bike.type)
+                      = t(".we_strongly_recommend", bike_type: @bike.type)
                     %p.text-xs-center
                       - btn_type = @bike.user_hidden? ? "btn-success" : "btn-danger"
                       %a.btn.btn-lg#hide_bike_toggle{role: "button", class: btn_type }
                         - if @bike.user_hidden?
-                          = translate_with_args(".unhide_this_bike", bike_type: @bike.type)
+                          = t(".unhide_this_bike", bike_type: @bike.type)
                         - else
-                          = translate_with_args(".hide_this_bike", bike_type: @bike.type)
+                          = t(".hide_this_bike", bike_type: @bike.type)
             %hr
 
             .delete-from-index.no-divider-row
               %a{data: { toggle: "modal", target: "#request-delete" } }
                 = render "/shared/trash_icon"
-                = translate_with_args(".delete_this_bike", bike_type: @bike.type)
+                = t(".delete_this_bike", bike_type: @bike.type)
 
 -# Explicitly redirect to my_account - other locations (e.g. admin) don't include js for rendering BikeIndexAlerts
 -# Referenced by the edit_remove.coffee file, so we can redirect there afterward
 :javascript
   window.userRootUrl = "#{my_account_path}";
 -# NOTE: This modal needs to be outside of form - or else the modal's form is wrapped in the other form and it submits the parent form
-- modal_title = translate_with_args(".modal_title", bike_type: @bike.type)
+- modal_title = t(".modal_title", bike_type: @bike.type)
 - modal_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: "shared/alert", locals: { body: translate_with_args(".reason_modal_body", bike_type: @bike.type), title: translate_with_args(".reason_modal_title"), class_names: "currently-hidden" }
+      = render partial: "shared/alert", locals: { body: t(".reason_modal_body", bike_type: @bike.type), title: t(".reason_modal_title"), class_names: "currently-hidden" }
       = hidden_field_tag :bike_delete_bike_id, @bike.id
 
       .form-group
         %label{ for: :bike_delete_reason }
-          = translate_with_args(".reason_for_deletion")
+          = t(".reason_for_deletion")
         = text_area_tag :bike_delete_reason, "", required: true, class: "form-control"
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag translate_with_args(".delete_bike"), class: "btn btn-danger"
+          = submit_tag t(".delete_bike"), class: "btn btn-danger"
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{ "data-dismiss" => "modal", type: "button" }
-            = translate_with_args(".nevermind")
+            = t(".nevermind")
 
 = render partial: "/shared/modal", locals: { title: modal_title, id: "request-delete", modal_body: modal_body }

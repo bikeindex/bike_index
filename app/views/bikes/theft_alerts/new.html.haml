@@ -4,7 +4,7 @@
   = hidden_field_tag :bike_id, @bike.id
   = hidden_field_tag :selected_bike_image_id
   = hidden_field_tag :currency, default_currency
-  = hidden_field_tag :description, translate_with_args(".bike_index_promoted_alert")
+  = hidden_field_tag :description, t(".bike_index_promoted_alert")
   = hidden_field_tag :locale, params[:locale] if params[:locale].present?
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
@@ -17,8 +17,8 @@
             %h3.uncap= @edit_templates[@edit_template]
           .row
             .col-sm-12
-              %p= translate_with_args(".targeted_sharing_html")
-              %p= translate_with_args(".bike_index_can_help", bike_type: @bike.type)
+              %p= t(".targeted_sharing_html")
+              %p= t(".bike_index_can_help", bike_type: @bike.type)
 
           .row
             - preferred_plan = @theft_alert_plans.max_by(&:amount_cents)
@@ -30,14 +30,14 @@
                   .detail-card-title
                     = theft_alert_plan.name
                     - if is_preferred
-                      .preferred-tag= translate_with_args(".best_value")
+                      .preferred-tag= t(".best_value")
                   .detail-card
                     .detail-card-subtitle
                       %strong= number_with_delimiter(theft_alert_plan.views)
-                      = translate_with_args(".views")
+                      = t(".views")
                     .detail-card-subtitle
                       %strong= theft_alert_plan.duration_days
-                      = translate_with_args(".days")
+                      = t(".days")
                     .detail-card-subtitle.detail-card-price
                       = number_to_currency(theft_alert_plan.amount_cents / 100.0)
                   .detail-card-content-main
@@ -46,11 +46,11 @@
 
           -# Select an image
           %h3.text-center.mt-4.w-100.mb-1
-            = translate_with_args(".select_an_image")
+            = t(".select_an_image")
           .row
             .col-sm-12.mt-4
               - if @bike.public_images.none?
-                %p= translate_with_args(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos, return_to: "/bikes/#{@bike.id}/edit/alert")))
+                %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, edit_template: :photos, return_to: "/bikes/#{@bike.id}/edit/alert")))
               - else
                 .image-selection-container#js-select-image-container
                   -# Promoted Alert Image Preview
@@ -62,9 +62,9 @@
                         -# Display a generic location "City, State - Country"
                            since users may see this preview before having
                            entered theft details.
-                        = translate_with_args(".city_state_country")
-                    %strong= translate_with_args(".preview")
-                  %em= translate_with_args(".select_an_image_to_see_preview")
+                        = t(".city_state_country")
+                    %strong= t(".preview")
+                  %em= t(".select_an_image_to_see_preview")
                   %ul
                     - @bike.public_images.each_with_index do |image, i|
                       = content_tag "li",
@@ -74,7 +74,7 @@
 
             -# Submit form / purchase a plan - force display even on small screens
             .mt-5.text-center.w-100
-              = submit_tag translate_with_args(".purchase_alert"), class: 'btn btn-lg btn-primary'
+              = submit_tag t(".purchase_alert"), class: 'btn btn-lg btn-primary'
 
       .col-md-8.form-well
         .mt-4

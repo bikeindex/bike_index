@@ -1,67 +1,67 @@
 .form-wrap
   .form-well-form-header-always-visible
-    %h3= translate_with_args(".sharing_and_personal_page_settings")
+    %h3= t(".sharing_and_personal_page_settings")
 
   .related-fields
     .form-group.row.sharing-collapser{ data: { target: '#twitter-field' } }
       %label.form-well-label
-        = translate_with_args(".show_twitter")
+        = t(".show_twitter")
       .form-well-input.form-well-input-checks
         %label.radio-inline.mr-2
           = f.radio_button :show_twitter, true
-          = translate_with_args(".show_twitter")
+          = t(".show_twitter")
         %label.radio-inline
           = f.radio_button :show_twitter, false
-          = translate_with_args(".no_twitter")
+          = t(".no_twitter")
     #twitter-field.form-group.row.collapse
-      = f.label :twitter, translate_with_args(".twitter_handle"), class: 'form-well-label'
+      = f.label :twitter, t(".twitter_handle"), class: 'form-well-label'
       .form-well-input
-        = f.text_field :twitter, placeholder: translate_with_args(".twitter_handle"), class: 'form-control'
+        = f.text_field :twitter, placeholder: t(".twitter_handle"), class: 'form-control'
 
     .form-group.row.sharing-collapser{ data: { target: '#instagram-field' } }
       %label.form-well-label
-        = translate_with_args(".show_instagram")
+        = t(".show_instagram")
       .form-well-input.form-well-input-checks
         %label.radio-inline.mr-2
           = f.radio_button :show_instagram, true
-          = translate_with_args(".show_instagram")
+          = t(".show_instagram")
         %label.radio-inline
           = f.radio_button :show_instagram, false
-          = translate_with_args(".no_instagram")
+          = t(".no_instagram")
     #instagram-field.form-group.row.collapse
-      = f.label :instagram, translate_with_args(".instagram_handle"), class: 'form-well-label'
+      = f.label :instagram, t(".instagram_handle"), class: 'form-well-label'
       .form-well-input
-        = f.text_field :instagram, placeholder: translate_with_args(".instagram_handle"), class: 'form-control'
+        = f.text_field :instagram, placeholder: t(".instagram_handle"), class: 'form-control'
 
     .form-group.row.sharing-collapser{ data: { target: '#personal-field' } }
       %label.form-well-label
-        = translate_with_args(".show_personal_site")
+        = t(".show_personal_site")
       .form-well-input.form-well-input-checks
         %label.radio-inline.mr-2
           = f.radio_button :show_website, true
-          = translate_with_args(".show_personal_website")
+          = t(".show_personal_website")
         %label.radio-inline
           = f.radio_button :show_website, false
-          = translate_with_args(".no_personal_site")
+          = t(".no_personal_site")
 
   .related-fields
     .form-group.row
-      = f.label :my_bikes_link_target, translate_with_args(".personal_site_url"), class: 'form-well-label'
+      = f.label :my_bikes_link_target, t(".personal_site_url"), class: 'form-well-label'
       .form-well-input
         = f.text_field :my_bikes_link_target,
         value: @user.mb_link_target,
-        placeholder: translate_with_args(".example_url"),
+        placeholder: t(".example_url"),
         class: 'form-control'
         - if @user.mb_link_target.present? && !@user.show_website
           .below-input-help.text-warning
-            = translate_with_args(".will_not_show_up")
+            = t(".will_not_show_up")
 
     .form-group.row
-      = f.label :my_bikes_link_target, translate_with_args(".title_for_link"), class: 'form-well-label'
+      = f.label :my_bikes_link_target, t(".title_for_link"), class: 'form-well-label'
       .form-well-input
         = f.text_field :my_bikes_link_title,
         value: @user.mb_link_title,
-        placeholder: translate_with_args(".my_awesome_link"),
+        placeholder: t(".my_awesome_link"),
         class: 'form-control'
 
   .form-group.row.unnested-field.no-divider-row
@@ -69,27 +69,27 @@
     .form-well-input
       = f.text_field :username, class: 'form-control'
       .below-input-help
-        = translate_with_args(".your_username_is_the_url_for_your_sharing")
+        = t(".your_username_is_the_url_for_your_sharing")
   %hr
   .col-xs-12
     %p
-      = translate_with_args(".the_bike_index_can_create_a_page")
-      - preview_page = translate_with_args(".preview_page")
+      = t(".the_bike_index_can_create_a_page")
+      - preview_page = t(".preview_page")
       = link_to "(#{preview_page})", user_url(@user), target: '_blank'
     .form-group.unnested-field.row.sharing-collapser{ data: { target: '#personal-page' } }
       %label.form-well-label
-        = translate_with_args(".create_public_page")
+        = t(".create_public_page")
       .form-well-input.form-well-input-checks
         %label.radio-inline
           = f.radio_button :show_bikes, true
-          = translate_with_args(".create_page")
+          = t(".create_page")
         %label.radio-inline
           = f.radio_button :show_bikes, false
-          = translate_with_args(".no_please_dont_create_me_a_page")
+          = t(".no_please_dont_create_me_a_page")
     .related-fields#personal-page.collapse.no-divider-row
       .form-group.row.avatar-upload-wrapper
         %label.form-well-label
-          = translate_with_args(".profile_avatar")
+          = t(".profile_avatar")
         .form-well-input
           - if @user.avatar?
             = image_tag(@user.avatar_url(:thumb))
@@ -97,15 +97,15 @@
           %label.file
             = f.file_field :avatar, class: 'avatar-upload-field', accept: ImageUploader.permitted_extensions.join(",")
             %span.file-custom
-              %span.file-upload-text= translate_with_args(".choose_file")
+              %span.file-upload-text= t(".choose_file")
             = f.hidden_field :avatar_cache
 
       .form-group.row
-        = f.label :title, translate_with_args(".page_title"), class:  'form-well-label'
+        = f.label :title, t(".page_title"), class:  'form-well-label'
         .form-well-input
-          = f.text_field :title, placeholder: translate_with_args(".this_users_bikes"), class: 'form-control'
+          = f.text_field :title, placeholder: t(".this_users_bikes"), class: 'form-control'
       .form-group.row
-        = f.label :description, translate_with_args(".page_text"), class:  'form-well-label'
+        = f.label :description, t(".page_text"), class:  'form-well-label'
         .form-well-input-large
           = f.text_area :description, rows: 6, class: 'form-control'
 

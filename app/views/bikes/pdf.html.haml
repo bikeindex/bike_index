@@ -30,7 +30,7 @@
     %h1
       - if @bike.status_stolen?
         %span.stolen-color
-          = translate_with_args(".stolen")
+          = t(".stolen")
       = bike_title_html(@bike)
 
   - if @stolen_record.present?
@@ -38,19 +38,19 @@
       - if @stolen_record.theft_description.present?
         %p
           %em
-            = translate_with_args(".description_of_theft")
+            = t(".description_of_theft")
           = @stolen_record.theft_description.truncate(300)
       .bike-details
         %table.table.table-striped
           %tbody
             %tr
               %td.td-title
-                = translate_with_args(".date_stolen")
+                = t(".date_stolen")
               %td
                 = @stolen_record.date_stolen.strftime("time.format.short_with_hour")
             %tr
               %td.td-title
-                = translate_with_args(".location")
+                = t(".location")
               %td
                 = @stolen_record.address
 
@@ -60,26 +60,26 @@
             - if @stolen_record.phone.present?
               %tr
                 %td.td-title
-                  = translate_with_args(".owner_phone")
+                  = t(".owner_phone")
                 %td
                   = phone_link(@stolen_record.phone, class: "phone-number-link")
             - if @stolen_record.police_report_number.present?
               %tr
                 %td.td-title
-                  = translate_with_args(".police_report")
+                  = t(".police_report")
                 %td
                   = @stolen_record.police_report_number
             - if @stolen_record.police_report_department.present?
               %tr
                 %td.td-title
-                  = translate_with_args(".department")
+                  = t(".department")
                 %td
                   = @stolen_record.police_report_department
   - if @bike.description.present?
     .description
       %p
         %em
-          = translate_with_args(".bike_description")
+          = t(".bike_description")
         - if @bike.status_stolen?
           = @bike.description.truncate(500)
         - else
@@ -90,63 +90,63 @@
         %tbody
           %tr
             %td.td-title
-              = translate_with_args(".registered")
+              = t(".registered")
             %td.convertTime
               = @bike.created_at.strftime("time.format.convert_time")
-              = translate_with_args(".to")
+              = t(".to")
               - if @bike.owner.present? && @bike.owner.name.present?
                 = @bike.owner.name
               - else
                 = @bike.owner_email
           %tr
             %td.td-title
-              = translate_with_args(".bike_serial")
+              = t(".bike_serial")
             %td
               = @bike.serial_display
           %tr
             %td.td-title
-              = translate_with_args(".manufacturer")
+              = t(".manufacturer")
             %td
               = @bike.mnfg_name
           - if @bike.frame_model.present?
             %tr
               %td.td-title
-                = translate_with_args(".model")
+                = t(".model")
               %td
                 = @bike.frame_model
           - unless @bike.status_stolen? and @stolen_record.present?
             - if @bike.frame_size.present?
               %tr
                 %td.td-title
-                  = translate_with_args(".frame_size")
+                  = t(".frame_size")
                 %td
                   = @bike.frame_size
           - if @bike.paint.present?
             %tr
               %td.td-title
-                = translate_with_args(".paint")
+                = t(".paint")
               %td
                 = @bike.paint.name
           - else
             %tr
               %td.td-title
-                = translate_with_args(".color").pluralize(@bike.frame_colors.count)
+                = t(".color").pluralize(@bike.frame_colors.count)
               %td
                 = @bike.frame_colors.to_sentence
           - unless @bike.status_stolen? and @stolen_record.present?
             - if @bike.front_gear_type.present?
               %tr
                 %td.td-title
-                  = translate_with_args(".front_gears")
+                  = t(".front_gears")
                 %td
                   = @bike.front_gear_type.name
             - if @bike.rear_gear_type.present?
               %tr
                 %td.td-title
-                  = translate_with_args(".rear_gears")
+                  = t(".rear_gears")
                 %td
                   = @bike.rear_gear_type.name
-                  = translate_with_args(".with_coaster_brake") if @bike.coaster_brake
+                  = t(".with_coaster_brake") if @bike.coaster_brake
                   - if @bike.components.where(ctype_id: Ctype.find_by_name('hub').id).present?
                     - hubs = @bike.components.where(ctype_id: Ctype.find_by_name('hub').id)
                     - if hubs.where(rear: true)
@@ -163,34 +163,34 @@
           %tbody
             %tr
               %td.td-title
-                = translate_with_args(".front_wheel")
+                = t(".front_wheel")
               %td
                 = @bike.front_wheel_size.name if @bike.front_wheel_size.present?
-                = translate_with_args(".with")
+                = t(".with")
                 - if @bike.front_tire_narrow
-                  = translate_with_args(".narrow_tires")
+                  = t(".narrow_tires")
                 - else
-                  = translate_with_args(".wide_tires")
+                  = t(".wide_tires")
             - if @bike.rear_wheel_size.present?
               %tr
                 %td.td-title
-                  = translate_with_args(".rear_wheel")
+                  = t(".rear_wheel")
                 %td
                   = @bike.rear_wheel_size.name
-                  = translate_with_args(".with")
+                  = t(".with")
                   - if @bike.rear_tire_narrow
-                    = translate_with_args(".narrow_tires")
+                    = t(".narrow_tires")
                   - else
-                    = translate_with_args(".wide_tires")
+                    = t(".wide_tires")
             - if @bike.components.where(ctype_id: Ctype.find_by_name('saddle').id).present?
               %tr
                 %td.td-title
-                  = translate_with_args(".saddle")
+                  = t(".saddle")
                 %td
                   - seat = @bike.components.where(ctype_id: Ctype.find_by_name('saddle').id).first
                   = seat.component_model if seat.component_model.present?
                   - if seat.manufacturer.present?
-                    = translate_with_args(".by")
+                    = t(".by")
                     = seat.manufacturer.name
                   = seat.description
 
@@ -200,10 +200,10 @@
           %img{ src: "https://files.bikeindex.org/logo.png" }
         .index-text
           %h2
-            = translate_with_args(".registration")
+            = t(".registration")
           %h3
-            = translate_with_args(".printout")
+            = t(".printout")
           %p
-            = translate_with_args(".online")
+            = t(".online")
             @
-            = link_to translate_with_args(".bikeindex_org", bike_path: bike_path(@bike)), bike_url(@bike)
+            = link_to t(".bikeindex_org", bike_path: bike_path(@bike)), bike_url(@bike)

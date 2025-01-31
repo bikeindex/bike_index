@@ -1,23 +1,23 @@
 .container-fluid
   .row.donate-block
     .col-xs-12
-      %h3= translate_with_args(".thank_you_for_supporting_bike_index")
+      %h3= t(".thank_you_for_supporting_bike_index")
     .select-amount
       - if @payment.present?
         - payment_amount = "#{@payment.amount}"
 
         - if @payment.donation?
           %p
-            = translate_with_args(".your_donation_saved_bikes", amount: payment_amount)
+            = t(".your_donation_saved_bikes", amount: payment_amount)
           %p.padded
-            = translate_with_args(".xoxo")
+            = t(".xoxo")
             %br
-            = translate_with_args(".bike_index_team")
+            = t(".bike_index_team")
         - else
           %p
-            = translate_with_args(".we_received_your_payment_of", amount: payment_amount)
+            = t(".we_received_your_payment_of", amount: payment_amount)
       - else
         %p.padded
-          = translate_with_args(".xoxo")
+          = t(".xoxo")
           %br
-          = translate_with_args(".bike_index_team")
+          = t(".bike_index_team")

@@ -19,11 +19,11 @@
           = render_serial_display(bike)
         - else # Show the user specific info
           = render_serial_display(bike, current_user)
-      = attr_list_item(bike.frame_colors.to_sentence, translate_with_args(".primary_colors"))
+      = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
     - if bike.occurred_at.present?
       %ul.attr-list
         %li
           #{bike_status_span(bike)}:
           %span.convertTime
             = l bike.occurred_at, format: :convert_time
-        = attr_list_item(bike.current_record.address(country: [:iso]), translate_with_args(".location"))
+        = attr_list_item(bike.current_record.address(country: [:iso]), t(".location"))

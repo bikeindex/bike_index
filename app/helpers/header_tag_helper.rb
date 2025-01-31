@@ -47,7 +47,7 @@ module HeaderTagHelper
 
   def auto_description
     return translation_description if translation_description.present?
-    translate_with_args("meta_descriptions.welcome_index")
+    t("meta_descriptions.welcome_index")
   end
 
   def default_meta_hash
@@ -224,12 +224,12 @@ module HeaderTagHelper
 
   def translation_title(location: nil, translation_args: default_translation_args)
     location ||= "meta_titles.#{page_id}"
-    translate_with_args(location, translation_args)
+    t(location, **translation_args)
   end
 
   def translation_description(location: nil, translation_args: default_translation_args)
     location ||= "meta_descriptions.#{page_id}"
-    translate_with_args(location, translation_args)
+    t(location, **translation_args)
   end
 
   def auto_controller_and_action_title

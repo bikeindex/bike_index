@@ -4,18 +4,18 @@
 
 - modal_body = capture_haml do
   .modal-body
-    %p= translate_with_args(".greeting", user_name: current_user&.display_name)
-    %p= translate_with_args(".thank_you")
-    %p= translate_with_args(".law_enforcement_features")
+    %p= t(".greeting", user_name: current_user&.display_name)
+    %p= t(".thank_you")
+    %p= t(".law_enforcement_features")
 
     %ul
-      %li= link_to translate_with_args(".contact_bike_owners"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen", target: "_blank"
-      %li= translate_with_args(".multiple_serial_search_pane")
+      %li= link_to t(".contact_bike_owners"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen", target: "_blank"
+      %li= t(".multiple_serial_search_pane")
 
     %p
-      = translate_with_args(".email_for_access_html", email_link: link_to("support@bikeindex.org", "mailto:support@bikeindex.org"))
+      = t(".email_for_access_html", email_link: link_to("support@bikeindex.org", "mailto:support@bikeindex.org"))
 
     %p.less-strong.text-center{ style: "text-align: center;" }
-      %em= translate_with_args(".bikeindex_is_a_nonprofit", org_name: org_name)
+      %em= t(".bikeindex_is_a_nonprofit", org_name: org_name)
 
-= render partial: "shared/modal", locals: { title: translate_with_args(".thanks_for_using_bike_index"), modal_body: modal_body, id: "donateMessageModal", start_open: true}
+= render partial: "shared/modal", locals: { title: t(".thanks_for_using_bike_index"), modal_body: modal_body, id: "donateMessageModal", start_open: true}

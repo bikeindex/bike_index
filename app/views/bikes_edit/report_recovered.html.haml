@@ -16,40 +16,40 @@
               %h3= @edit_templates[@edit_template]
             .no-divider-row.full-width-button
               %a.btn.btn-success.btn-lg{data: { toggle: "modal", target: "#toggle-stolen" } }
-                = translate_with_args(".this_bike_has_been_returned", bike_type: @bike.type)
+                = t(".this_bike_has_been_returned", bike_type: @bike.type)
 
 
-- modal_title = translate_with_args(".were_so_glad", bike_type: @bike.type)
+- modal_title = t(".were_so_glad", bike_type: @bike.type)
 
 - alert_body = capture_haml do
-  %p= translate_with_args(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
-  %p= translate_with_args(".its_how_we_get_better_at_recovering_bikes")
+  %p= t(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
+  %p= t(".its_how_we_get_better_at_recovering_bikes")
 
 - modal_body = capture_haml do
   .modal-body
-    = render partial: 'shared/alert', locals: { body: alert_body, title: translate_with_args(".not_enough_info"), class_names: 'currently-hidden' }
+    = render partial: 'shared/alert', locals: { body: alert_body, title: t(".not_enough_info"), class_names: 'currently-hidden' }
     = form_tag do |t|
       = hidden_field_tag :mark_recovered_bike_id, @bike.id
       = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
       .form-group
         %label{ for: :mark_recovered_reason }
-          = translate_with_args(".how_did_you_get_it_back")
+          = t(".how_did_you_get_it_back")
         = text_area_tag :mark_recovered_reason, '', required: true, class: 'form-control'
       .checkbox
         %label
           %input#mark_recovered_we_helped{ type: 'checkbox' }
-          = translate_with_args(".did_we_help")
+          = t(".did_we_help")
       .checkbox
         %label
           %input#mark_recovered_can_share_recovery{ type: 'checkbox' }
-          = translate_with_args(".can_we_share_your_story")
+          = t(".can_we_share_your_story")
       .modal-btn-footer
         .row
           .col-xs-6.col-xs-push-6
-            = submit_tag translate_with_args(".mark_recovered"), class: 'btn btn-success'
+            = submit_tag t(".mark_recovered"), class: 'btn btn-success'
           .col-xs-6.col-xs-pull-6
             %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-              = translate_with_args(".nevermind")
+              = t(".nevermind")
 
 -# Only one modal if stolen, only one (different) modal if not stolen
 

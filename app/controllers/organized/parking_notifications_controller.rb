@@ -64,9 +64,9 @@ module Organized
       else
         @parking_notification = ParkingNotification.new(permitted_parameters)
         if @parking_notification.save
-          flash[:success] = translation_with_args(:successfully_created, bike_type: @parking_notification.bike.type)
+          flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
         else
-          flash[:error] = translation_with_args(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
+          flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
         end
       end
       if @redirect_location.present?

@@ -25,7 +25,7 @@
                       = [bike_version.year, bike_version.mnfg_name].reject(&:blank?).join(' ')
                     = bike_version.frame_model.to_s
                 %ul.attr-list
-                  = attr_list_item(bike_version.frame_colors.to_sentence, translate_with_args(".primary_colors"))
+                  = attr_list_item(bike_version.frame_colors.to_sentence, t(".primary_colors"))
         .row
           .col-md-4.mt-4.offset-md-2
             .ad-block.ad-binx.ad468x60

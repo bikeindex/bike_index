@@ -19,7 +19,7 @@
       - if render_sortable
         = sortable "created_at"
       - else
-        = translate_with_args(".created")
+        = t(".created")
       %small.convertTimezone
     - unless skip_bike
       %th=t(".bike")
@@ -36,7 +36,7 @@
       %th
         %small
           - if render_sortable
-            = sortable "repeat_number", translate_with_args(".notification_number")
+            = sortable "repeat_number", t(".notification_number")
           - else
             =t(".notification_number")
     %th.status-cell Status

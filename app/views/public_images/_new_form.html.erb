@@ -3,12 +3,12 @@
     <%= hidden_field_tag :bike_id, @bike.id %>
     <div class="upload-buttons">
       <div class="multifilefield-button">
-        <%= translate_with_args(".upload_photos") %>
+        <%= t(".upload_photos") %>
         <%= f.file_field :image, multiple: true, name: "public_image[image]" %>
       </div>
     </div>
     <p class="extra-info">
-      <%= translate_with_args(".drag_and_drop_html") %>
+      <%= t(".drag_and_drop_html") %>
     </p>
   </div>
 <% end %>

@@ -5,8 +5,8 @@
         %a.close{ herf: "#", data: {dismiss: "alert"}}
           x
         %h4
-          - count = pluralize(@public_image.errors.count, translate_with_args(".error"))
-          = translate_with_args(".errors_prevented_photo_from_saving", errors_count: count)
+          - count = pluralize(@public_image.errors.count, t(".error"))
+          = t(".errors_prevented_photo_from_saving", errors_count: count)
         %ul
           - @public_image.errors.full_messages.each do |msg|
             %li= msg
@@ -14,19 +14,19 @@
   %section.padded
     .form
       .control-group.padded
-        = f.label :name, translate_with_args(".image_name"), class: "control-label"
+        = f.label :name, t(".image_name"), class: "control-label"
         .controls
           = f.text_field :name
       .clearfix
         .alert.alert-notice
           %p
-            = translate_with_args(".use_this_if_youd_like_to_attach_a_photo")
+            = t(".use_this_if_youd_like_to_attach_a_photo")
           .control-group.padded
             = f.label :is_private, class: "control-label" do
-              = translate_with_args(".do_not_display")
-              %em= translate_with_args(".no_one_will_be_able_to_see_this_image_exc")
+              = t(".do_not_display")
+              %em= t(".no_one_will_be_able_to_see_this_image_exc")
               .controls
                 = f.check_box :is_private
     .bibox-btn.padded
-      = f.submit translate_with_args(".save_image"), class: "button-green"
-      = link_to translate_with_args(".cancel_update"), edit_bike_url(@public_image.imageable), class: "button-red"
+      = f.submit t(".save_image"), class: "button-green"
+      = link_to t(".cancel_update"), edit_bike_url(@public_image.imageable), class: "button-red"

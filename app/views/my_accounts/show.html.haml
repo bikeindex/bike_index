@@ -2,7 +2,7 @@
   .row.first-row
     .col-md-8
       %h1
-        = translate_with_args(".user_bikes", current_user_name: current_user.display_name)
+        = t(".user_bikes", current_user_name: current_user.display_name)
 
     .col-md-4.ad-col
       .ad-block.ad-binx.ad468x60.d-none.d-sm-block
@@ -11,10 +11,10 @@
       %ul.user-items-nav.nav.nav-tabs{ role: 'tablist' }
         %li.nav-item
           %a.nav-link{ class: ('active' unless @locks_active_tab), href: '#bikes_tab_content', data: { toggle: 'tab', role: 'tab' } }
-            = translate_with_args(".bikes")
+            = t(".bikes")
         %li.nav-item
           %a.nav-link{ class: ('active' if @locks_active_tab), href: '#locks_tab_content', data: { toggle: 'tab', role: 'tab' } }
-            = translate_with_args(".locks")
+            = t(".locks")
       .user-items-content.tab-content
         .tab-pane#bikes_tab_content{ class: ('active' unless @locks_active_tab) }
           - if @bikes.present?
@@ -29,7 +29,7 @@
                       - unless bike.thumb_path
                         .thumb-overlay
                           = image_tag 'revised/photo_icon.svg'
-                          %h4= translate_with_args(".add_a_photo")
+                          %h4= t(".add_a_photo")
                       = bike_thumb_image(bike)
                     .bike-information.multi-attr-lists
                       %h5.title-link
@@ -38,7 +38,7 @@
                         %li
                           %strong.attr-title #{t(".serial")}:
                           = render_serial_display(bike, current_user, skip_explanation: true)
-                        = attr_list_item(bike.frame_colors.to_sentence, translate_with_args(".primary_colors"))
+                        = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                         %li.less-strong
                           %strong.attr-title #{t(".registered")}:
                           %span.convertTime= l bike.created_at, format: :convert_time
@@ -50,7 +50,7 @@
                         - if bike.bike_stickers.any?
                           - sticker_count = bike.bike_stickers.count
                           %li
-                            %strong= translate_with_args(".bike_sticker").pluralize(sticker_count)
+                            %strong= t(".bike_sticker").pluralize(sticker_count)
                             - if sticker_count > 1
                               %ul.multi-sticker
                                 - bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
@@ -64,13 +64,13 @@
                             %strong.attr-title #{bike.status_humanized.titleize}:
                             %span.convertTime= l bike.occurred_at, format: :convert_time
                         - if bike.current_record.present?
-                          = attr_list_item(bike.current_record.address(country: [:skip_default]), translate_with_args(".location"))
+                          = attr_list_item(bike.current_record.address(country: [:skip_default]), t(".location"))
 
-                        %li= link_to translate_with_args(".edit_bike"), edit_bike_path(bike, edit_template: bike.default_edit_template)
+                        %li= link_to t(".edit_bike"), edit_bike_path(bike, edit_template: bike.default_edit_template)
                         - if bike.status_stolen?
                           -# %li
                           -#   # Hide printable PDF because it isn't working right now :(
-                          -#     = link_to translate_with_args(".printable_pdf"), pdf_bike_path(bike)
+                          -#     = link_to t(".printable_pdf"), pdf_bike_path(bike)
                           - if bike.impound_claims_submitting.active.any?
                             - impound_claim = bike.impound_claims_submitting.active.last
                             %li
@@ -80,32 +80,32 @@
                               = link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type}", bike_path(impound_claim.bike_claimed)
                         - elsif bike.status_with_owner?
                           %li
-                            = link_to translate_with_args(".mark_bike_stolen"), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
+                            = link_to t(".mark_bike_stolen"), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
                         - if bike.user_hidden
                           %li
-                            %em.small.text-warning= translate_with_args(".user_hidden")
+                            %em.small.text-warning= t(".user_hidden")
 
                 - if bike_alerts.any?
                   - alert = bike_alerts.find { |a| a.kind == "unassigned_bike_org" }
                   - if alert.present?
                     .account-user-alert.alert.alert-info.mb-0
-                      = translate_with_args(".generally_connect_to_org", org_name: alert.organization&.short_name)
-                      = link_to translate_with_args(".add_it_now"), user_alert_path(id: alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success"
+                      = t(".generally_connect_to_org", org_name: alert.organization&.short_name)
+                      = link_to t(".add_it_now"), user_alert_path(id: alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success"
                       .small.less-strong.dismiss-wrapper
-                        = link_to translate_with_args(".ignore"), user_alert_path(id: alert.id, alert_action: "dismiss"), method: :patch, action: "update"
+                        = link_to t(".ignore"), user_alert_path(id: alert.id, alert_action: "dismiss"), method: :patch, action: "update"
 
             .paginate-container.paginate-container-bottom
               = paginate @bikes
           - else
-            %h2= translate_with_args(".you_have_no_registered_bikes")
+            %h2= t(".you_have_no_registered_bikes")
         .tab-pane#locks_tab_content{ class: ('active' if @locks_active_tab) }
           - if @locks.present?
             %table.table.table-striped.table-bordered
               %thead
-                %th= translate_with_args(".lock_type")
-                %th= translate_with_args(".manufacturer")
-                %th= translate_with_args(".key_serial")
-                %th= translate_with_args(".combination")
+                %th= t(".lock_type")
+                %th= t(".manufacturer")
+                %th= t(".key_serial")
+                %th= t(".combination")
               %tbody
                 - @locks.each do |lock|
                   %tr
@@ -116,16 +116,16 @@
                     %td= lock.key_serial
                     %td= lock.combination
           - else
-            %h2= translate_with_args(".you_have_no_registered_locks")
+            %h2= t(".you_have_no_registered_locks")
     .col-md-4
       .side-box
         %h3.first-item
-          = translate_with_args(".register_new_items")
+          = t(".register_new_items")
         .inner
-          = link_to translate_with_args(".add_a_bike"), choose_registration_path, class: "btn btn-primary btn-lg"
-          = link_to translate_with_args(".add_a_lock"), new_lock_url, class: "btn btn-primary-offset btn-lg"
+          = link_to t(".add_a_bike"), choose_registration_path, class: "btn btn-primary btn-lg"
+          = link_to t(".add_a_lock"), new_lock_url, class: "btn btn-primary-offset btn-lg"
         %h3
-          = translate_with_args(".next")
+          = t(".next")
         .inner.last-item
           - if @bikes.present?
             .lock-group
@@ -138,28 +138,28 @@
                 %p
                   - if @bikes.count > 0
                     - if @bikes.last.status_stolen?
-                      = translate_with_args(".sorry_your_bike_was_stolen", bikes_last_type: @bikes.last.type)
+                      = t(".sorry_your_bike_was_stolen", bikes_last_type: @bikes.last.type)
                     - else
-                      = translate_with_args(".thanks_for_adding_your_bike", bikes_last_type: @bikes.last.type)
+                      = t(".thanks_for_adding_your_bike", bikes_last_type: @bikes.last.type)
                   - else
-                    %strong= translate_with_args(".welcome")
-                    = translate_with_args(".to_bike_index_thanks_for_signing_up")
+                    %strong= t(".welcome")
+                    = t(".to_bike_index_thanks_for_signing_up")
           .lock-group
             .image-column
               = image_tag 'revised/lock_icon.svg'
             .col-xs-10
               %p
                 %strong
-                  = translate_with_args(".tell_us_more_about_yourself")
-                = link_to translate_with_args(".update_your_profile"), edit_my_account_url
+                  = t(".tell_us_more_about_yourself")
+                = link_to t(".update_your_profile"), edit_my_account_url
           - if @bikes.present?
             .lock-group
               .image-column
                 = image_tag "logos/bikefair.svg"
               .col-xs-10
                 %p
-                  = translate_with_args(".want_to_sell_your_bikes")
-                  = link_to translate_with_args(".list_a_bike_on_bikefair"), "https://bikefair.org/auth/bikeindex"
+                  = t(".want_to_sell_your_bikes")
+                  = link_to t(".list_a_bike_on_bikefair"), "https://bikefair.org/auth/bikeindex"
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do

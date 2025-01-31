@@ -8,66 +8,66 @@
           = render "landing_pages/icons/header_#{landing_page_target}_svg"
 
         .banner-text
-          %h1= translate_with_args(".bike_index_for_law_enforcement")
-          %h3= translate_with_args(".is_your_department_equipped_to_fight_bike")
+          %h1= t(".bike_index_for_law_enforcement")
+          %h3= t(".is_your_department_equipped_to_fight_bike")
 
     .ribbon.mobile-contact-link
       .container
         %h2
-          = link_to translate_with_args(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+          = link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
 
   .container
     .row.main-body-row
       .landing-why-col
-        %h3= translate_with_args(".recover_your_citizens_bikes")
+        %h3= t(".recover_your_citizens_bikes")
 
-        %p= translate_with_args(".youre_the_first_one")
+        %p= t(".youre_the_first_one")
 
-        - automated_tweets_link = link_to translate_with_args(".automated_tweets"), "https://twitter.com/stolenbikessfo"
-        - local_ambassadors_link = link_to translate_with_args(".local_ambassadors"), ambassadors_how_to_path
+        - automated_tweets_link = link_to t(".automated_tweets"), "https://twitter.com/stolenbikessfo"
+        - local_ambassadors_link = link_to t(".local_ambassadors"), ambassadors_how_to_path
         %p
-          = translate_with_args(".you_have_the_authority_to_bring_html", automated_tweets_link: automated_tweets_link, local_ambassadors_link: local_ambassadors_link)
+          = t(".you_have_the_authority_to_bring_html", automated_tweets_link: automated_tweets_link, local_ambassadors_link: local_ambassadors_link)
 
-        %p= translate_with_args(".with_over_registrations_and_almost", registrations:number_with_delimiter(Counts.total_bikes), stolen_recoveries: number_with_delimiter(Counts.recoveries))
+        %p= t(".with_over_registrations_and_almost", registrations:number_with_delimiter(Counts.total_bikes), stolen_recoveries: number_with_delimiter(Counts.recoveries))
 
         %p= render partial: "landing_pages/tweet", locals: { tweet_id: 839247587521679360 }
 
-        %h3= translate_with_args(".put_a_lock_on_bike_theft")
+        %h3= t(".put_a_lock_on_bike_theft")
 
-        %p= translate_with_args(".our_extensive_archive_has_helped_officers")
+        %p= t(".our_extensive_archive_has_helped_officers")
 
-        %p= translate_with_args(".with_over_600_partnerships_html", link: link_to(t(".here"), new_organization_path), organization_counts: number_with_delimiter(Counts.organizations))
+        %p= t(".with_over_600_partnerships_html", link: link_to(t(".here"), new_organization_path), organization_counts: number_with_delimiter(Counts.organizations))
 
         %p
-          = translate_with_args(".if_you_want_to_collaborate_html", link: link_to(t(".here"), for_cities_path))
+          = t(".if_you_want_to_collaborate_html", link: link_to(t(".here"), for_cities_path))
 
         %p= render partial: "landing_pages/tweet", locals: { tweet_id: 890211853942407168 }
 
-        %h4= translate_with_args(".related_articles")
+        %h4= t(".related_articles")
         %ul
           %li
-            = translate_with_args(".check_out")
-            = link_to translate_with_args(".law_enforcement_deck"), "https://docs.google.com/presentation/d/1De4TeyXdqshjhxBdrP9YL_f2AmzRkNx8VuRVCiniUic/edit?usp=sharing"
+            = t(".check_out")
+            = link_to t(".law_enforcement_deck"), "https://docs.google.com/presentation/d/1De4TeyXdqshjhxBdrP9YL_f2AmzRkNx8VuRVCiniUic/edit?usp=sharing"
           %li
-            = link_to translate_with_args(".bend_reduces_bike_theft_by_60_percent"), news_path("bend-reduces-bike-theft-by-60-percent-with-help-from-pine-mountain-spo")
+            = link_to t(".bend_reduces_bike_theft_by_60_percent"), news_path("bend-reduces-bike-theft-by-60-percent-with-help-from-pine-mountain-spo")
           %li
-            = link_to translate_with_args(".calgary_doubles"), news_path("calgary-doubles-bike-recovery-rate-with-bike-index")
+            = link_to t(".calgary_doubles"), news_path("calgary-doubles-bike-recovery-rate-with-bike-index")
           %li
-            = link_to translate_with_args(".bike_index_organization_impounding"), news_path("found-a-bike-register-it-as-abandoned-or-impounded")
+            = link_to t(".bike_index_organization_impounding"), news_path("found-a-bike-register-it-as-abandoned-or-impounded")
           %li
-            = link_to translate_with_args(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
+            = link_to t(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
 
         .trusted-by.hidden-lg-up
           %h3
-            = translate_with_args(".trusted_by_law_enforcement_everywhere")
+            = t(".trusted_by_law_enforcement_everywhere")
           = image_tag "landing_pages/logos/law-enforcement.png", alt: "law enforcement partners"
 
       .next-steps-col
         .next-steps-wrap
           %header
-            = translate_with_args(".trusted_by_law_enforcement_everywhere")
-            = link_to translate_with_args(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+            = t(".trusted_by_law_enforcement_everywhere")
+            = link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
           .trusted-by
             .header
-              = translate_with_args(".used_by_law_enforcement_everywhere")
+              = t(".used_by_law_enforcement_everywhere")
             = image_tag "landing_pages/logos/law-enforcement.png", alt: "law enforcement partners"
