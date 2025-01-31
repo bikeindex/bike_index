@@ -20,6 +20,7 @@ RSpec.describe TimeParser, type: :service do
     context "with in_time_zone" do
       let(:time_str) { "2016-02-08 02:00:00" }
       let(:target_time) { Time.at(1454896800) }
+      let(:target_time_central) { Time.at(1454918400) }
       let(:utc_name) { "UTC" }
 
       context "times with unreadable time_zones" do
@@ -31,7 +32,7 @@ RSpec.describe TimeParser, type: :service do
           expect(time_in_los_angeles).to match_time target_time_in_los_angeles
           expect(time_in_los_angeles.time_zone.name).to eq "America/Los_Angeles"
 
-          expect(time_in_fake).to match_time target_time
+          expect(time_in_fake).to match_time target_time_central
           expect(time_in_fake.time_zone.name).to eq utc_name
         end
       end
@@ -39,10 +40,10 @@ RSpec.describe TimeParser, type: :service do
         let(:time_not_zoned) { subject.parse(time_str, in_time_zone: true) }
         let(:time_in_blank) { subject.parse(time_str, "", in_time_zone: true) }
         it "parses" do
-          expect(time_not_zoned).to match_time target_time
+          expect(time_not_zoned).to match_time target_time_central
           expect(time_not_zoned.time_zone.name).to eq utc_name
 
-          expect(time_in_blank).to match_time target_time
+          expect(time_in_blank).to match_time target_time_central
           expect(time_in_blank.time_zone.name).to eq utc_name
           # current zone is reset
           expect(Time.zone.name).to eq default_time_zone.name
