@@ -353,7 +353,7 @@ RSpec.describe User, type: :model do
 
   describe "updating phone" do
     let(:user) { FactoryBot.create(:user, phone: " ") }
-    before { allow_any_instance_of(TwilioIntegration).to receive(:send_message) { OpenStruct.new(sid: "party") } }
+    before { allow_any_instance_of(Integrations::Twilio).to receive(:send_message) { OpenStruct.new(sid: "party") } }
     it "updates general alerts without background processing" do
       user.reload
       expect(user.alert_slugs).to be_blank
