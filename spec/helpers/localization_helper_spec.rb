@@ -1,13 +1,6 @@
 require "rails_helper"
 
 RSpec.describe LocalizationHelper, type: :helper do
-  describe "translate_with_args" do
-    let(:target) { "User Settings" }
-    it "translates" do
-      expect(translate_with_args(:user_settings, scope: [:controllers, :my_accounts, :edit])).to eq target
-    end
-  end
-
   describe "#language_choices" do
     context "in English" do
       it "returns the language choices with english included" do

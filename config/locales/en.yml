@@ -48,7 +48,6 @@ en:
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        token_for_password_reset: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
@@ -65,6 +64,7 @@ en:
         superuser: Superuser
         terms_of_service: Terms of service
         title: Title
+        token_for_password_reset: Password reset token
         twitter: Twitter
         user_emails: User emails
         username: Username
@@ -652,7 +652,6 @@ en:
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        token_for_password_reset: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
@@ -669,6 +668,7 @@ en:
         superuser: Superuser
         terms_of_service: Terms of service
         title: Title
+        token_for_password_reset: Password reset token
         twitter: Twitter
         user_emails: User emails
         username: Username
