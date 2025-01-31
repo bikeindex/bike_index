@@ -65,22 +65,22 @@ class Bikes::BaseController < ApplicationController
 
     if @bike.current_impound_record.present?
       error = if @bike.current_impound_record.organized?
-        translation(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name,
+        I18n.t(:bike_impounded_by_organization, bike_type: type, org_name: @bike.current_impound_record.organization.name,
           scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       else
-        translation(:bike_impounded, bike_type: type,
+        I18n.t(:bike_impounded, bike_type: type,
           scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       end
     elsif current_user.present?
-      error = translation(:you_dont_own_that, bike_type: type,
+      error = I18n.t(:you_dont_own_that, bike_type: type,
         scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
     else
       store_return_to
       error = if @current_ownership && @bike.current_ownership.claimed
-        translation(:you_have_to_sign_in, bike_type: type,
+        I18n.t(:you_have_to_sign_in, bike_type: type,
           scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       else
-        translation(:bike_has_not_been_claimed_yet, bike_type: type,
+        I18n.t(:bike_has_not_been_claimed_yet, bike_type: type,
           scope: [:controllers, :bikes, :ensure_user_allowed_to_edit])
       end
     end
@@ -100,14 +100,14 @@ class Bikes::BaseController < ApplicationController
   def assign_bike_stickers(bike_sticker)
     bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
     unless bike_sticker.present?
-      return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker,
+      return flash[:error] = I18n.t(:unable_to_find_sticker, bike_sticker: bike_sticker,
         scope: [:controllers, :bikes, :assign_bike_stickers])
     end
     bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
     if bike_sticker.errors.any?
       flash[:error] = bike_sticker.errors.full_messages
     else
-      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type,
+      flash[:success] = I18n.t(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type,
         scope: [:controllers, :bikes, :assign_bike_stickers])
     end
   end

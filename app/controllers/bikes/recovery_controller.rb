@@ -12,7 +12,7 @@ class Bikes::RecoveryController < Bikes::BaseController
   def update
     if @stolen_record.add_recovery_information(permitted_params.to_h)
       EmailRecoveredFromLinkWorker.perform_async(@stolen_record.id)
-      flash[:success] = translation(:bike_recovered)
+      flash[:success] = I18n.t(:bike_recovered)
     else
       session[:recovery_link_token] = params[:token]
     end
@@ -36,9 +36,9 @@ class Bikes::RecoveryController < Bikes::BaseController
       recovery_link_token: params[:token])
     if @stolen_record.present?
       return true if @bike.status_stolen?
-      flash[:info] = translation(:already_recovered)
+      flash[:info] = I18n.t(:already_recovered)
     else
-      flash[:error] = translation(:incorrect_token)
+      flash[:error] = I18n.t(:incorrect_token)
     end
     redirect_to(bike_path(@bike)) && return
   end

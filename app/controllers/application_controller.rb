@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
     x_permitted_cross_domain_policies: false)
 
   def handle_unverified_request
-    flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
+    flash[:error] = I18n.t(:csrf_invalid, scope: [:controllers, :application, __method__])
     redirect_to user_root_url
   end
 
@@ -105,7 +105,7 @@ class ApplicationController < ActionController::Base
   # Handle localization / currency conversion exceptions by redirecting to the
   # root url with the default locale and a flash message.
   def localization_failure
-    locale = translation(requested_locale, scope: [:locales])
+    locale = I18n.t(requested_locale, scope: [:locales])
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url

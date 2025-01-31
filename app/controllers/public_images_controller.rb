@@ -27,7 +27,7 @@ class PublicImagesController < ApplicationController
       @public_image.save
       render(json: {public_image: @public_image}) && return
     end
-    flash[:error] = translation(:cannot_create)
+    flash[:error] = I18n.t(:cannot_create)
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
   end
 
@@ -49,7 +49,7 @@ class PublicImagesController < ApplicationController
       @public_image.update(kind: params[:kind])
       head :ok
     elsif @public_image.update(permitted_parameters)
-      redirect_to edit_bike_url(@public_image.imageable), notice: translation(:image_updated)
+      redirect_to edit_bike_url(@public_image.imageable), notice: I18n.t(:image_updated)
     else
       render :edit
     end
@@ -60,11 +60,11 @@ class PublicImagesController < ApplicationController
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
     if imageable_type == "MailSnippet"
-      flash[:error] = translation(:cannot_delete)
+      flash[:error] = I18n.t(:cannot_delete)
       redirect_to(admin_organization_custom_layouts_path(imageable_id)) && return
     end
     @public_image.destroy
-    flash[:success] = translation(:image_deleted)
+    flash[:success] = I18n.t(:image_deleted)
     if imageable_type == "Blog"
       redirect_to(edit_admin_news_url(@imageable.title_slug), status: 303) && return
     else
@@ -123,7 +123,7 @@ class PublicImagesController < ApplicationController
   def ensure_authorized_to_update!
     @public_image = PublicImage.unscoped.find(params[:id])
     unless current_user_image_authorized?(@public_image)
-      flash[:error] = translation(:no_permission_to_edit)
+      flash[:error] = I18n.t(:no_permission_to_edit)
       redirecting_path = @public_image.bike? ? bike_path(@public_image.imageable) : user_root_url
       redirect_to(redirecting_path) && return
     end

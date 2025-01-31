@@ -36,10 +36,10 @@ class SessionsController < ApplicationController
     end
     if user.present?
       user.send_magic_link_email
-      flash[:success] = translation(:link_sent)
+      flash[:success] = I18n.t(:link_sent)
       redirect_to root_path
     else
-      flash[:error] = translation(:user_not_found)
+      flash[:error] = I18n.t(:user_not_found)
       redirect_to new_user_path
     end
   end
@@ -51,12 +51,12 @@ class SessionsController < ApplicationController
         sign_in_and_redirect(@user)
       else
         # User couldn't authenticate, so password is invalid
-        flash.now[:error] = translation(:invalid_email_or_password)
+        flash.now[:error] = I18n.t(:invalid_email_or_password)
         render_partner_or_default_signin_layout(render_action: :new)
       end
     else
       # Email address is not in the DB
-      flash.now[:error] = translation(:invalid_email_or_password)
+      flash.now[:error] = I18n.t(:invalid_email_or_password)
       render_partner_or_default_signin_layout(render_action: :new)
     end
   end
