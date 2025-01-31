@@ -6,15 +6,10 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update CircleCI config if Ruby version is bumped
-ruby "3.3.7"
+ruby "3.4.1"
 
 # Gems that are no longer in standard library as Ruby 3.4
-gem "csv"
-gem "observer"
-gem "prime"
-# Maybe these can be removed after 3.4 upgrade? Added to silence deprecation warnings
-
-# Gems that are no longer in standard library as Ruby 3.4
+gem "ostruct"
 gem "csv"
 gem "observer"
 gem "prime"
