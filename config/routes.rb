@@ -317,9 +317,6 @@ Rails.application.routes.draw do
   get "theft-ring", to: redirect("theft-rings")
   resources :stolen_bike_listings, only: [:index]
 
-  resource :integrations, only: [:create]
-  get "/auth/twitter/callback", to: "admin/twitter_accounts#create"
-  get "/auth/:provider/callback", to: "integrations#create"
   get "/auth/failure", to: "integrations#integrations_controller_creation_error"
 
   %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
