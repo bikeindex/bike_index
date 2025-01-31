@@ -14,23 +14,23 @@
           %h3.header-font-alt
             %span.hidden-sm-down
               = passive_organization.short_name
-            = translate_with_args(".access_panel")
+            = t(".access_panel")
         .col-xs-6
           - if @bike.unregistered_parking_notification?
             %p.strong.text-warning.text-right
-              = translate_with_args(".unregistered_parking_notification")
+              = t(".unregistered_parking_notification")
           - elsif @passive_organization_registered
             %p.text-success.text-right
               %span.hidden-md-down
-                = translate_with_args(".bike_is_registered", bike_type: @bike.type, org_name: passive_organization.short_name)
+                = t(".bike_is_registered", bike_type: @bike.type, org_name: passive_organization.short_name)
               %span.hidden-lg-up
-                = translate_with_args(".is_registered", org_name: passive_organization.short_name)
+                = t(".is_registered", org_name: passive_organization.short_name)
           - else
             %p.text-warning.text-right
               %span.hidden-md-down
-                = translate_with_args(".bike_is_not_registered_html", bike_type: @bike.type, org_name: passive_organization.short_name)
+                = t(".bike_is_not_registered_html", bike_type: @bike.type, org_name: passive_organization.short_name)
               %span.hidden-lg-up
-                = translate_with_args(".is_not_registered_html", org_name: passive_organization.short_name)
+                = t(".is_not_registered_html", org_name: passive_organization.short_name)
     .card-body
       .row
         -# Only show the unstolen notification form if bike is with_owner (ie, not if bike is found)
@@ -38,31 +38,31 @@
         - if passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
-              = translate_with_args(".as_a_bikeindex_ambassador_html")
+              = t(".as_a_bikeindex_ambassador_html")
 
-              = link_to translate_with_args(".mark_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
+              = link_to t(".mark_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
 
         .mb-2{class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12"}
           %table.table-list
             %tbody
               %tr
-                %td= translate_with_args(".permission")
+                %td= t(".permission")
                 %td
                   - if @passive_organization_authorized
-                    = translate_with_args(".org_can_edit_bike", org_name: passive_organization.short_name, bike_type: @bike.type)
+                    = t(".org_can_edit_bike", org_name: passive_organization.short_name, bike_type: @bike.type)
                     - if @bike.can_edit_claimed_organizations.pluck(:id).include?(passive_organization.id)
                       %em.small
-                        = translate_with_args(".organization_can_edit_after_claimed", bike_type: @bike.type)
+                        = t(".organization_can_edit_after_claimed", bike_type: @bike.type)
                     - if @bike.authorized?(current_user)
-                      = link_to translate_with_args(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "btn btn-success btn-sm float-right"
+                      = link_to t(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "btn btn-success btn-sm float-right"
                   - else
                     %em.small.less-strong
-                      = translate_with_args(".org_cannot_edit", org_name: passive_organization.short_name)
+                      = t(".org_cannot_edit", org_name: passive_organization.short_name)
               - if passive_organization.enabled?("bike_stickers") # Always display stickers if org has paid for them
                 - show_sticker_modal = true
                 %tr
                   %td
-                    = translate_with_args(".sticker")
+                    = t(".sticker")
                   %td
                     - stickers = @bike.bike_stickers.reorder(claimed_at: :desc)
                     - if stickers.any?
@@ -80,42 +80,42 @@
                                   = l bike_sticker.claimed_at, format: :convert_time
                     .small.text-right
                       %a.less-strong{href: "#", style: "opacity: 0.8; text-align: right;", data: {toggle: "modal", target: "#assignStickerModal"}}
-                        = translate_with_args(".link_sticker")
+                        = t(".link_sticker")
               - if @bike.unregistered_parking_notification?
                 %tr
                   %td{colspan: 2, style: "text-align: center; font-size: 1rem;"}
-                    = translate_with_args(".added_to_track_parking_notification", bike_type: @bike.type)
+                    = t(".added_to_track_parking_notification", bike_type: @bike.type)
               - elsif @passive_organization_registered # Only display information about the bike if bike is registered through org
                 - if passive_organization.parent?
                   %tr
                     %td
-                      = translate_with_args(".organization_registered")
+                      = t(".organization_registered")
                     %td
                       - if @bike.creation_organization == passive_organization
                         %small= @bike.creation_organization.name
                       - else
-                        %em.small= translate_with_args(".organization_child")
+                        %em.small= t(".organization_child")
                         = @bike.creation_organization&.name
                 %tr
-                  %td= translate_with_args(".owner_name")
+                  %td= t(".owner_name")
                   %td= @bike.owner_name
                 %tr
-                  %td= translate_with_args(".owner_email")
+                  %td= t(".owner_email")
                   %td= @bike.owner_email
                 %tr
-                  %td= translate_with_args(".registered")
+                  %td= t(".registered")
                   %td
                     %span.convertTime
                       = l @bike.created_at, format: :convert_time
                 %tr
-                  %td= translate_with_args(".claimed")
+                  %td= t(".claimed")
                   %td= check_mark if @bike.claimed?
                 %tr
-                  %td= translate_with_args(".creator")
+                  %td= t(".creator")
                   %td
                     = @bike.creator&.display_name
                 %tr
-                  %td= translate_with_args(".creation_description")
+                  %td= t(".creation_description")
                   %td
                     %em.less-strong
                       = origin_display(@bike.creation_description)
@@ -125,7 +125,7 @@
                   - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                   - if bike_attr == "address"
                     %tr
-                      %td= translate_with_args(".address")
+                      %td= t(".address")
                       %td
                         - address = @bike.registration_address
                         - if @bike.valid_mailing_address?
@@ -163,23 +163,23 @@
 
                 - if passive_organization.enabled?("avery_export")
                   %tr
-                    %td= translate_with_args(".avery_exportable")
+                    %td= t(".avery_exportable")
                     %td
                       - if @bike.avery_exportable?
                         %span.text-success
-                          = translate_with_args(".is_true")
+                          = t(".is_true")
                       - else
                         %span.text-danger
-                          = translate_with_args(".is_false")
+                          = t(".is_false")
                         %small.em
                           - unless @bike.owner_name.present?
-                            = translate_with_args(".missing_owner_name")
+                            = t(".missing_owner_name")
                           - unless @bike.valid_mailing_address?
-                            = translate_with_args(".missing_address")
+                            = t(".missing_address")
 
                 - if passive_organization.enabled?("model_audits") && @bike.motorized?
                   %tr
-                    %td= translate_with_args(".model_audit")
+                    %td= t(".model_audit")
                     %td
                       - model_audit = @bike.model_audit if @bike.model_audit_id.present?
                       - organization_model_audit = OrganizationModelAudit.where(organization_id: passive_organization.id, model_audit_id: @bike.model_audit_id).first if model_audit.present?
@@ -188,24 +188,24 @@
                         %span.ml-2{class: status_display_class(organization_model_audit.certification_status)}
                           = organization_model_audit.certification_status_humanized
                       - else
-                        %span.less-strong= translate_with_args(".not_audited")
+                        %span.less-strong= t(".not_audited")
 
 
           - if !@passive_organization_registered # Apologize, bike isn't organizations
             %p.less-strong.mt-4
               %em
-                = translate_with_args(".unable_to_display_additional_information", bike_type: @bike.type, org_name: passive_organization.name)
+                = t(".unable_to_display_additional_information", bike_type: @bike.type, org_name: passive_organization.name)
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
             %p.mb-2
-              %em= translate_with_args(".bike_not_marked_stolen", bike_type: @bike.type_titleize)
-              %strong= translate_with_args(".believe_it_is_anyway")
+              %em= t(".bike_not_marked_stolen", bike_type: @bike.type_titleize)
+              %strong= t(".believe_it_is_anyway")
             - if @bike.contact_owner?(current_user)
               - redirect = new_session_url(return_to: bike_path(@bike, params: {contact_owner: true})) unless current_user.present?
               #write_them_a_message.collapse{class: ("in" unless @contact_owner_open), data: {redirect: redirect}}
                 %a{href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse'}
-                  = translate_with_args(".write_a_message")
-                = translate_with_args(".contact_the_owner_it_is_stolen", bike_type: @bike.type)
+                  = t(".write_a_message")
+                = t(".contact_the_owner_it_is_stolen", bike_type: @bike.type)
 
               .collapse#new_stolen_message{class: ("in" if @contact_owner_open)}
                 - @stolen_notification ||= StolenNotification.new(bike: @bike, sender: current_user)
@@ -214,22 +214,22 @@
                   - if current_user.ambassador?
                     = f.text_area :message, required: true, value: @stolen_notification.default_message, rows: 6, class: "form-control"
                   - else
-                    = f.text_area :message, required: true, placeholder: translate_with_args(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
-                  = f.text_field :reference_url, placeholder: translate_with_args(".link_url_for_online_sighting"), class: "form-control additional-field"
+                    = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
+                  = f.text_field :reference_url, placeholder: t(".link_url_for_online_sighting"), class: "form-control additional-field"
 
                   .send-message
-                    = f.submit translate_with_args(".send_message"), class: 'btn btn-primary btn-lg'
+                    = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
 
               - if @bike.phoneable_by?(current_user)
                 %p.phoneable-by.mt-4
-                  = translate_with_args(".or_call_owner_html")
+                  = t(".or_call_owner_html")
                   = phone_link(@bike.phone)
             - else
               %p
-                = translate_with_args(".user_revoked_permission_html")
+                = t(".user_revoked_permission_html")
               %p
                 = support_link = link_to(t(".support_email"), "mailto:#{t('.support_email')}")
-                = translate_with_args(".email_to_deal_with_this_html", support_link: support_link)
+                = t(".email_to_deal_with_this_html", support_link: support_link)
 
       / Additional law enforcement information
       - if passive_organization.enabled?("additional_registrations_information")
@@ -238,16 +238,16 @@
         .row.law-enforcement-wrapper.mt-4
           .col-xs-12.mt-2
             %p.mt-2.mb-2
-              = translate_with_args(".additional_registrations_information")
+              = t(".additional_registrations_information")
               %em.less-strong.hidden-md-down
-                = translate_with_args(".additional_registrations_information_visible_because", org_name: passive_organization.short_name)
+                = t(".additional_registrations_information_visible_because", org_name: passive_organization.short_name)
             %table.table.table-striped.table-bordered.table-sm.without-exterior-border
               %tbody
                 %thead
                   %th
-                    = translate_with_args(".additional_registrations_registered_at")
+                    = t(".additional_registrations_registered_at")
                   %th
-                    = translate_with_args(".creation_description")
+                    = t(".creation_description")
                   %th
 
                 - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
@@ -260,7 +260,7 @@
                         = origin_display(@bike.creation_description)
                     %td
                       - if other_bike.id == @bike.id
-                        %em.less-strong= translate_with_args(".additional_registrations_this_bike", bike_type: @bike.type)
+                        %em.less-strong= t(".additional_registrations_this_bike", bike_type: @bike.type)
                       - else
                         = link_to organized_bike_text(other_bike, skip_creation: true), bike_path(other_bike)
             - if other_user_bikes.count > 25
@@ -270,7 +270,7 @@
         - duplicate_bikes = @bike.duplicate_bikes
         - if duplicate_bikes.any?
           %p.mt-2.mb-2
-            = translate_with_args(".additional_registrations_potential_duplicates")
+            = t(".additional_registrations_potential_duplicates")
             - @bike.normalized_serial_segments.considered_for_duplicate.each do |normalized_segment|
               %code= normalized_segment.segment
           %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -430,7 +430,7 @@
           .row.mt-4
             .col-md-6#choseLocationMethod
               %span.less-strong.waitingOnLocationText.hideOnLocationFind.collapse.in
-                = translate_with_args(".waiting_on_device_location")
+                = t(".waiting_on_device_location")
               .use-entered-address-radios.showOnLocationFind.collapse.mb-2
                 .radio
                   %label
@@ -443,23 +443,23 @@
 
               .form-group.address-group.related-fields.collapse
                 .ifManualRequired
-                  = f.text_field :street, placeholder: translate_with_args(".address_or_intersection"), class: "form-control"
+                  = f.text_field :street, placeholder: t(".address_or_intersection"), class: "form-control"
 
                 .ifManualRequired
-                  = f.text_field :city, placeholder: translate_with_args(".city"), class: "form-control"
+                  = f.text_field :city, placeholder: t(".city"), class: "form-control"
 
                 .row.countrystatezip
                   .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.hidden-other{class: (@parking_notification.country_id == Country.united_states.id ? "unhidden" : "")}
-                    = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: translate_with_args(".state")}, {class: "form-control"})
+                    = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
                   .col-sm-4
-                    = f.text_field :zipcode, placeholder: translate_with_args(".zipcode"), class: "form-control"
+                    = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
                   .col-sm-4.fancy-select.unfancy.no-restore-on-backspace.ifManualRequired#us_id_data{data: {usid: Country.united_states.id}}
                     = f.select(:country_id, Country.select_options,
-                      {prompt: translate_with_args(".choose_country")},
+                      {prompt: t(".choose_country")},
                       {class: 'country-select-input form-control'} )
             .col-md-6
               .form-group.less-strong
-                = f.label :internal_notes, translate_with_args(".parking_notification_notes_html", org_name: passive_organization.short_name)
+                = f.label :internal_notes, t(".parking_notification_notes_html", org_name: passive_organization.short_name)
                 = f.text_area :internal_notes, class: "form-control"
 
 - if show_sticker_modal
@@ -468,10 +468,10 @@
       = form_for BikeSticker.new, {url: organization_sticker_path(id: "code", organization_id: passive_organization.to_param), action: "update", method: "PUT"} do |f|
         = f.hidden_field :bike_id, value: @bike.id
         .form-group
-          = f.label :code, translate_with_args(".sticker_code"), class: "org-form-label"
+          = f.label :code, t(".sticker_code"), class: "org-form-label"
           = f.text_field :code, required: true, class: "form-control"
         .modal-btn-footer
           .form-submit-button
-            = f.submit translate_with_args(".assign_sticker"), class: "btn btn-success btn-lg"
+            = f.submit t(".assign_sticker"), class: "btn btn-success btn-lg"
 
-  = render partial: "shared/modal", locals: {title: translate_with_args(".assign_sticker"), modal_body: sticker_modal_body, id: "assignStickerModal"}
+  = render partial: "shared/modal", locals: {title: t(".assign_sticker"), modal_body: sticker_modal_body, id: "assignStickerModal"}

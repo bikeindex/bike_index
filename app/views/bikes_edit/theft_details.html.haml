@@ -11,7 +11,7 @@
           .form-wrap.stolen-checklist-wrap
             .form-well-form-header-always-visible
               %h3.header-font-alt
-                = translate_with_args(".do_these_things_for_the_best_chance")
+                = t(".do_these_things_for_the_best_chance")
             = render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
 
         .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
@@ -31,11 +31,11 @@
 - session_key = "promoted_theft_alert_modal_#{stolen_record_id}_seen"
 - if stolen_record_id.present? && session[session_key].blank? && TheftAlert.paid.where(stolen_record_id: stolen_record_id).none?
   - session[session_key] = true
-  - modal_title = translate_with_args(".promoted_theft_alerts")
+  - modal_title = t(".promoted_theft_alerts")
   - modal_body = capture_haml do
     .modal-body
       %p
-        = translate_with_args(".we_can_create_fb_ads_for_you")
+        = t(".we_can_create_fb_ads_for_you")
 
       .mb-4.text-center
         = image_tag "promoted_alerts/sample.jpg",
@@ -43,19 +43,19 @@
           class: "m-auto mw-100"
 
       %p
-        = translate_with_args(".promoted_theft_alert_service_description")
+        = t(".promoted_theft_alert_service_description")
 
       %p
-        - blog_post_link = link_to translate_with_args(".here"),
+        - blog_post_link = link_to t(".here"),
           news_url("bike-indexs-new-promoted-alerts-are-the-megaphone-crooks-dont-want-you"),
           target: :_blank
-        = translate_with_args(".click_to_see_promoted_alert_blog_post_html", link: blog_post_link)
+        = t(".click_to_see_promoted_alert_blog_post_html", link: blog_post_link)
 
       %p
-        = translate_with_args(".charges_go_to_cost_of_ad")
+        = t(".charges_go_to_cost_of_ad")
 
       %p.text-center
-        = link_to translate_with_args(".try_one_now"),
+        = link_to t(".try_one_now"),
           edit_bike_path(@bike, edit_template: :alert),
           class: "btn btn-md btn-primary"
 

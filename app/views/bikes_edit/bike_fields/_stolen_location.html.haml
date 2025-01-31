@@ -3,28 +3,28 @@
 .related-fields
   .form-group.row.fancy-select.unfancy
     %label.form-well-label
-      = translate_with_args(".where_was_it_stolen_type", stolen_type: @bike.status_humanized_translated)
+      = t(".where_was_it_stolen_type", stolen_type: @bike.status_humanized_translated)
     .form-well-input#us_id_data{ data: { usid: Country.united_states.id } }
       = srecord.select(:country_id, Country.select_options,
-        { required: true, prompt: translate_with_args(".choose_country") },
+        { required: true, prompt: t(".choose_country") },
         { class: "country-select-input form-control" } )
 
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = srecord.text_field :street, required: true, placeholder: translate_with_args(".address_or_intersection"), class: "form-control"
+      = srecord.text_field :street, required: true, placeholder: t(".address_or_intersection"), class: "form-control"
 
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = srecord.text_field :city, required: true, placeholder: translate_with_args(".city"), class: "form-control"
+      = srecord.text_field :city, required: true, placeholder: t(".city"), class: "form-control"
 
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = srecord.text_field :zipcode, placeholder: translate_with_args(".zipcode"), class: "form-control"
+      = srecord.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
 
   .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
     %label.form-well-label
     .form-well-input
-      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: translate_with_args(".state") }, { class: "form-control" })
+      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })

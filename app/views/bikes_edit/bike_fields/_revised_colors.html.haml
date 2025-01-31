@@ -6,37 +6,37 @@
 
 .related-fields{ class: classname }
   .form-group.row
-    = f.label :primary_frame_color_id, translate_with_args(".primary_frame_color"), class: 'form-well-label'
+    = f.label :primary_frame_color_id, t(".primary_frame_color"), class: 'form-well-label'
 
     .form-well-input.fancy-select.unfancy
-      = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: translate_with_args(".choose_color") )
-      %a.inline-input-help{ title: translate_with_args(".color_help"), data: { toggle: 'popover', content: translate_with_args(".primary_color_help_content_html") } }
+      = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: t(".choose_color") )
+      %a.inline-input-help{ title: t(".color_help"), data: { toggle: 'popover', content: t(".primary_color_help_content_html") } }
         ?
     .right-input-help
       %a#add-secondary.optional-form-block{ class: ('currently-hidden' if display_secondary_color), data: { target: '#secondary-color', toggle: '#rm-secondary' } }
         %span.context-display-help
           +
-        = translate_with_args(".add_a_color")
+        = t(".add_a_color")
       %a#rm-secondary.optional-form-block{ class: ('currently-hidden' unless display_secondary_color), data: { target: '#secondary-color', toggle: '#add-secondary', action: 'rm-block' } }
         %span.context-display-help
           &ndash;
-        = translate_with_args(".remove_color")
+        = t(".remove_color")
 
   #secondary-color.form-group.row.hidden-other{ class: ('unhidden' if display_secondary_color) }
-    = f.label :secondary_frame_color_id, translate_with_args(".secondary_frame_color"), class: 'form-well-label'
+    = f.label :secondary_frame_color_id, t(".secondary_frame_color"), class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
-      = f.select(:secondary_frame_color_id, Color.select_options, prompt: translate_with_args(".choose_color") )
+      = f.select(:secondary_frame_color_id, Color.select_options, prompt: t(".choose_color") )
     .right-input-help
       %a#add-tertiary.optional-form-block{ class: ('currently-hidden' if display_tertiary_color), data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
         %span.context-display-help
           +
-        = translate_with_args(".add_a_color")
+        = t(".add_a_color")
       %a#rm-tertiary.optional-form-block{ class: ('currently-hidden' unless display_tertiary_color), data: { target: '#tertiary-color', toggle: '#add-tertiary', action: 'rm-block' } }
         %span.context-display-help
           &ndash;
-        = translate_with_args(".remove_color")
+        = t(".remove_color")
 
   #tertiary-color.form-group.row.hidden-other{ class: ('unhidden' if display_tertiary_color) }
-    = f.label :tertiary_frame_color_id, translate_with_args(".tertiary_frame_color"), class: 'form-well-label'
+    = f.label :tertiary_frame_color_id, t(".tertiary_frame_color"), class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
-      = f.select(:tertiary_frame_color_id, Color.select_options, prompt: translate_with_args(".choose_color") )
+      = f.select(:tertiary_frame_color_id, Color.select_options, prompt: t(".choose_color") )
