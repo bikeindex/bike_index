@@ -214,7 +214,7 @@ class Bike < ApplicationRecord
 
     def status_humanized_translated(str)
       return "" unless str.present?
-      i18n_translate_with_args(str.tr(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
+      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
     end
 
     def text_search(query)
@@ -648,7 +648,7 @@ class Bike < ApplicationRecord
     organization = Organization.friendly_find(organization_id)
     return organization.id if organization.present?
 
-    not_found = i18n_translate_with_args(:not_found, scope: %i[activerecord errors models bike])
+    not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
     errors.add(:organizations, "#{organization_id} #{not_found}")
     nil
   end
