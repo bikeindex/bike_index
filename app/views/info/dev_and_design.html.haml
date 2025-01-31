@@ -2,38 +2,38 @@
 - bikeindex_github_url = "#{bikeindex_github_root_url}/bike_index"
 - stolen_bikes_widget_url = "#{bikeindex_github_root_url}/stolen_bikes_widget_html"
 
-%h5= translate_with_args(".meant_to_be_usable")
+%h5= t(".meant_to_be_usable")
 
-%h3.mt-4= translate_with_args(".design_resources")
+%h3.mt-4= t(".design_resources")
 
 %ul
   %li
-    - image_assets_link = link_to translate_with_args(".image_assets"), image_resources_path
-    = translate_with_args(".bike_index_logos_html", link: image_assets_link)
+    - image_assets_link = link_to t(".image_assets"), image_resources_path
+    = t(".bike_index_logos_html", link: image_assets_link)
   %li
-    - trifold_flyer_link = link_to translate_with_args(".trifold_flyer"), translate_with_args(".trifold_flyer_pdf_url")
-    = translate_with_args(".flyers_html", link: trifold_flyer_link)
+    - trifold_flyer_link = link_to t(".trifold_flyer"), t(".trifold_flyer_pdf_url")
+    = t(".flyers_html", link: trifold_flyer_link)
   %li
-    - bike_shop_card_link = link_to(t(".bike_shop_card"), translate_with_args(".bike_shop_card_pdf_url"))
-    = translate_with_args(".bike_shop_cards_html", link: bike_shop_card_link)
+    - bike_shop_card_link = link_to(t(".bike_shop_card"), t(".bike_shop_card_pdf_url"))
+    = t(".bike_shop_cards_html", link: bike_shop_card_link)
 
-%h3.mt-4= translate_with_args(".development_resources")
+%h3.mt-4= t(".development_resources")
 %ul
   %li
-    - github_link = link_to translate_with_args(".on_github"), bikeindex_github_url
-    = translate_with_args(".open_source_html", link: github_link)
+    - github_link = link_to t(".on_github"), bikeindex_github_url
+    = t(".open_source_html", link: github_link)
   %li
-    = link_to translate_with_args(".our_api_documentation"), documentation_index_path
+    = link_to t(".our_api_documentation"), documentation_index_path
   %li
-    - nearby_stolen_widget_link = link_to translate_with_args(".nearby_stolen_widget"), stolen_bikes_widget_url
-    = translate_with_args(".nearby_stolen_widget_html", link: nearby_stolen_widget_link)
+    - nearby_stolen_widget_link = link_to t(".nearby_stolen_widget"), stolen_bikes_widget_url
+    = t(".nearby_stolen_widget_html", link: nearby_stolen_widget_link)
   %li
     - url_for_embed = current_user ? user_embed_path(current_user) : new_user_url(return_to: dev_and_design_path)
     - display_widget_link = link_to "Personal bike display widget", url_for_embed
-    = translate_with_args(".display_widget_html", link: display_widget_link)
+    = t(".display_widget_html", link: display_widget_link)
   %li
     - oauth_apps_link = link_to "OAuth Applications you've made", oauth_applications_path
-    = translate_with_args(".oauth_apps_html", link: oauth_apps_link).html_safe
+    = t(".oauth_apps_html", link: oauth_apps_link).html_safe
   %li
     - oauth_authorized_apps_link = link_to "OAuth Applications you've authorized", oauth_authorized_applications_path
-    = translate_with_args(".oauth_authorized_apps_html", link: oauth_authorized_apps_link).html_safe
+    = t(".oauth_authorized_apps_html", link: oauth_authorized_apps_link).html_safe

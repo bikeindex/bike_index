@@ -2,7 +2,7 @@
 %html
   %head
     %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type" }
-    %title= content_for?(:title) ? yield(:title) : translate_with_args(".bike_index")
+    %title= content_for?(:title) ? yield(:title) : t(".bike_index")
     = stylesheet_link_tag "email"
 
     -# Remove the top and bottom margin on email preview, because they look funky
@@ -43,14 +43,14 @@
           %span &#9829;
           %span &#9829;
           %span &#9829;
-        %h4= translate_with_args(".the_bike_index_team")
+        %h4= t(".the_bike_index_team")
 
       .binx-footer
         %h5
           #{Time.current.year} &copy; #{t(".bike_index")}.
 
           - if render_donation?(@organization)
-            = translate_with_args(".help_prevent_theft")
+            = t(".help_prevent_theft")
             = link_to(t(".make_a_donation"), support_the_index_url)
 
         - if render_supporters?(@organization)

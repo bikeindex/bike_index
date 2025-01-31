@@ -1,9 +1,9 @@
 .organized-page-header.mb-4
   %h1.uncap
     - if current_organization.ascend_or_broken_ascend?
-      = translate_with_args(".org_ascend_imports_html", org_name: current_organization.name)
+      = t(".org_ascend_imports_html", org_name: current_organization.name)
     - else
-      = translate_with_args(".org_bulk_imports_html", org_name: current_organization.name)
+      = t(".org_bulk_imports_html", org_name: current_organization.name)
 
 - if @render_chart
   = column_chart time_range_counts(collection: available_bulk_imports), stacked: true, thousands: ","
@@ -22,29 +22,29 @@
       = humanized_time_range(@time_range)
   .col-sm-6.text-right
     - if @show_empty
-      = link_to translate_with_args(".exclude_empty_imports"),
+      = link_to t(".exclude_empty_imports"),
       organization_bulk_imports_path(organization_id: current_organization.to_param, without_empty: true),
       class: "btn btn-sm btn-outline-secondary"
     - else
-      = link_to translate_with_args(".include_empty_imports"),
+      = link_to t(".include_empty_imports"),
       organization_bulk_imports_path(organization_id: current_organization.to_param),
       class: "btn btn-sm btn-outline-secondary"
-    = link_to translate_with_args(".new_import"),
+    = link_to t(".new_import"),
       new_organization_bulk_import_path(organization_id: current_organization.to_param),
       class: "btn btn-primary ml-2"
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header
     %th
-      = sortable "created_at", translate_with_args(".added")
-    %th= translate_with_args(".progress")
+      = sortable "created_at", t(".added")
+    %th= t(".progress")
     - if @show_kind
       %th
-        = sortable "kind", translate_with_args(".kind")
-    %th= translate_with_args(".errors")
+        = sortable "kind", t(".kind")
+    %th= t(".errors")
     %th
-      = sortable "user_id", translate_with_args(".creator")
-    %th= translate_with_args(".bikes")
+      = sortable "user_id", t(".creator")
+    %th= t(".bikes")
   %tbody
     - @bulk_imports.each do |bulk_import|
       %tr
@@ -57,7 +57,7 @@
         %td
           - if bulk_import.blocking_error?
             %span.text-danger
-              = translate_with_args(".unable_to_process")
+              = t(".unable_to_process")
           - else
             = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
         %td

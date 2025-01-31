@@ -1,54 +1,54 @@
-%h1= translate_with_args(".bike_index_image_assets")
+%h1= t(".bike_index_image_assets")
 
 %ul.serial-pictures
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_bordered.svg') }
-      = image_tag('resources/logo_bordered.svg', alt: translate_with_args('.basic_logo_alt'))
+      = image_tag('resources/logo_bordered.svg', alt: t('.basic_logo_alt'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_bordered.svg')
       - png_link = link_to 'png', image_path('resources/logo_bordered.png')
-      = translate_with_args(".logo_with_blue_shield_html", svg_link: svg_link, png_link: png_link)
+      = t(".logo_with_blue_shield_html", svg_link: svg_link, png_link: png_link)
       %br
       %small.less-strong
-        = translate_with_args(".black_background_shown_here")
+        = t(".black_background_shown_here")
   %li
     %a.serial-image{ href: image_path('resources/logo_striped.svg') }
-      = image_tag('resources/logo_striped_short.svg', alt: translate_with_args('.logo_with_stripes'))
+      = image_tag('resources/logo_striped_short.svg', alt: t('.logo_with_stripes'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_striped.svg')
       - png_link = link_to 'png', image_path('resources/logo_striped.png')
-      = translate_with_args(".striped_logo_html", svg_link: svg_link, png_link: png_link)
+      = t(".striped_logo_html", svg_link: svg_link, png_link: png_link)
   %li
     %a.serial-image{ href: image_path('resources/logo.svg') }
-      = image_tag('resources/logo.svg', alt: translate_with_args('.single_color_logo'))
+      = image_tag('resources/logo.svg', alt: t('.single_color_logo'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo.svg')
       - png_link = link_to 'png', image_path('resources/logo.png')
-      = translate_with_args(".basic_logo_html", svg_link: svg_link, png_link: png_link)
+      = t(".basic_logo_html", svg_link: svg_link, png_link: png_link)
 
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_white.svg') }
-      = image_tag('resources/logo_white.svg', alt: translate_with_args('.single_color_logo_in_white'))
+      = image_tag('resources/logo_white.svg', alt: t('.single_color_logo_in_white'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_white.svg')
       - png_link = link_to 'png', image_path('resources/logo_white.png')
-      = translate_with_args(".basic_logo_in_white_html", svg_link: svg_link, png_link: png_link)
+      = t(".basic_logo_in_white_html", svg_link: svg_link, png_link: png_link)
       %br
       %small.less-strong
-        = translate_with_args(".image_has_no_background")
+        = t(".image_has_no_background")
 
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_backgrounded.svg') }
-      = image_tag('resources/logo_backgrounded.svg', alt: translate_with_args('.logo_with_cutout'))
+      = image_tag('resources/logo_backgrounded.svg', alt: t('.logo_with_cutout'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_backgrounded.svg')
       - png_link = link_to 'png', image_path('resources/logo_backgrounded.png')
-      = translate_with_args(".logo_with_background_cutout_html", svg_link: svg_link, png_link: png_link)
+      = t(".logo_with_background_cutout_html", svg_link: svg_link, png_link: png_link)
       %br
       %small.less-strong
-        = translate_with_args(".black_background_shown_here")
+        = t(".black_background_shown_here")
 
 
 %h5
   - resources_link = link_to "Dev and Design resources", dev_and_design_path
-  = translate_with_args(".check_out_resources_html", resources_link: resources_link)
+  = t(".check_out_resources_html", resources_link: resources_link)

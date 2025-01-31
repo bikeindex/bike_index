@@ -97,8 +97,8 @@ Embedded links are typically translated separately and passed to an enclosing
 translation key):
 
 ```haml
-- logout_link = link_to translate_with_args(".log_out"), session_path(redirect_location: 'new_user'), method: :delete
-= translate_with_args(".if_you_dont_want_that_to_be_the_case_html", logout_link: logout_link)
+- logout_link = link_to t(".log_out"), session_path(redirect_location: 'new_user'), method: :delete
+= t(".if_you_dont_want_that_to_be_the_case_html", logout_link: logout_link)
 ```
 
 [i18n-lazy]: https://guides.rubyonrails.org/i18n.html#lazy-lookup
@@ -122,13 +122,13 @@ organization_invitation:
 ```haml
 -# app/views/organized_mailer/organization_invitation.html.haml
 
-%p= translate_with_args(".html.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
+%p= t(".html.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
 ```
 
 ```haml
 -# app/views/organized_mailer/organization_invitation.text.haml
 
-= translate_with_args(".text.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
+= t(".text.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
 ```
 
 ### Controllers

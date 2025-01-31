@@ -2,51 +2,51 @@
 - partners_count = number_with_precision(Organization.count.round(-1), precision: 0, delimiter: ",")
 - nonprofit_blog_link = link_to(t(".nonprofit_status"), news_path("bike-index--now-a-nonprofit"))
 
-%h1= translate_with_args(".about_bike_index")
+%h1= t(".about_bike_index")
 
 - cache("about_counts", expires_in: 24.hours) do
-  %p= translate_with_args(".cofounded_by_html", description_link: nonprofit_blog_link)
-  %p= translate_with_args(".widely_used", bikes_count: bikes_count, partners_count: partners_count)
+  %p= t(".cofounded_by_html", description_link: nonprofit_blog_link)
+  %p= t(".widely_used", bikes_count: bikes_count, partners_count: partners_count)
 
-%p= translate_with_args(".seth_built")
+%p= t(".seth_built")
 
-%p= translate_with_args(".merging_the_services")
+%p= t(".merging_the_services")
 
-%p= translate_with_args(".simple_efficient_effective")
+%p= t(".simple_efficient_effective")
 
 %p
-  %strong= translate_with_args(".bike_registration_that_works")
+  %strong= t(".bike_registration_that_works")
 
-%h2= translate_with_args(".the_team")
+%h2= t(".the_team")
 
 %ul.about-people
   %li
     %p
-      = image_tag "who/seth-herr2.jpg", alt: "Seth Herr", title: translate_with_args(".seth_herr_image_title")
-      = translate_with_args(".seth_herr_bio_html")
+      = image_tag "who/seth-herr2.jpg", alt: "Seth Herr", title: t(".seth_herr_image_title")
+      = t(".seth_herr_bio_html")
   %li
     %p
       = image_tag "who/bryan-hance.jpg", alt: "Bryan Hance"
-      = translate_with_args(".bryan_hance_bio_new_html")
+      = t(".bryan_hance_bio_new_html")
   %li
     %p
       = image_tag "who/craig-dalton1.jpg", alt: "Craig Dalton"
-      = translate_with_args(".craig_dalton_bio_html")
+      = t(".craig_dalton_bio_html")
   %li
     %p
       = image_tag "who/gavin-hoover.jpg", alt: "Gavin Hoover"
-      = translate_with_args(".gavin_hoover_bio_html")
+      = t(".gavin_hoover_bio_html")
   %li
     %p
       = image_tag "who/jan-pecnik.jpg", alt: "Jan Pecnik"
-      = translate_with_args(".jan_pecnik_bio_html")
+      = t(".jan_pecnik_bio_html")
   %li
     %p
       = image_tag "who/mike-oleon.jpg", alt: "Mike Oleon"
-      = translate_with_args(".mike_oleon_bio_html")
+      = t(".mike_oleon_bio_html")
 
 %h2.the-alumni.mt-4.d-none
-  = translate_with_args(".alumni")
+  = t(".alumni")
 
 %ul.about-list.about-alumni-list.d-none
   %li

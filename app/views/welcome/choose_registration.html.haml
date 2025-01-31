@@ -9,25 +9,25 @@
                 %a.organization-choice.choose-type{data: {target: new_bike_url(organization_id: membership.organization.id)}}
                   %span.add-selected
                     &#10004
-                  = translate_with_args(".add_a_bike_through")
+                  = t(".add_a_bike_through")
                   %em
                     = membership.organization.name
           %li
             %a.purchase-choice.choose-type{data: {target: new_bike_url}}
               %span.add-selected
                 &#10004
-              = translate_with_args(".add_your_own_bike")
+              = t(".add_your_own_bike")
 
           %li
             %a.choose-type{data: {target: new_bike_url(status: "stolen")}}
               %span.add-selected
                 &#10004
-              = translate_with_args(".add_a_stolen_bike")
+              = t(".add_a_stolen_bike")
           %li
             %a.choose-type{data: {target: new_bike_url(status: "impounded")}}
               %span.add-selected
                 &#10004
-              = translate_with_args(".add_abandoned_bike_you_found")
+              = t(".add_abandoned_bike_you_found")
       .col-sm-6.add-bike-column
         %a#add-bike.btn.btn-success.btn-lg{href: new_bike_url}
-          = translate_with_args(".register_bike")
+          = t(".register_bike")

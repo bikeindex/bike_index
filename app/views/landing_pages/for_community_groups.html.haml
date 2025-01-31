@@ -8,49 +8,49 @@
           = render "landing_pages/icons/header_#{landing_page_target}_svg"
 
         .banner-text
-          %h1= translate_with_args(".bike_index_for_community_groups")
-          %h3= translate_with_args(".the_most_widereaching_and_effective_tools")
+          %h1= t(".bike_index_for_community_groups")
+          %h3= t(".the_most_widereaching_and_effective_tools")
 
     .ribbon.mobile-contact-link
       .container
-        %h2= link_to translate_with_args(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+        %h2= link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
 
   .container
     .row.main-body-row
       .landing-why-col
-        %h3= translate_with_args(".help_us_help_you")
+        %h3= t(".help_us_help_you")
 
-        %p= translate_with_args(".we_provide_free_and_easy_access_to_our_re")
+        %p= t(".we_provide_free_and_easy_access_to_our_re")
 
-        %p= translate_with_args(".spread_the_bike_index_word_html", link: link_to(t(".here"), new_organization_path))
+        %p= t(".spread_the_bike_index_word_html", link: link_to(t(".here"), new_organization_path))
 
         %p= render partial: "landing_pages/tweet", locals: { tweet_id: 875377223322259457 }
 
-        %h3= translate_with_args(".partners_made_in_heaven")
-        %p= translate_with_args(".gone_are_the_days_where_you_had_to_regist")
+        %h3= t(".partners_made_in_heaven")
+        %p= t(".gone_are_the_days_where_you_had_to_regist")
 
-        %p= translate_with_args(".registrations_are_free_forever_join_bike_")
+        %p= t(".registrations_are_free_forever_join_bike_")
 
-        %p= translate_with_args(".purchase_a_pack_of_advocacy_html", link: link_to(t(".here"), store_path))
+        %p= t(".purchase_a_pack_of_advocacy_html", link: link_to(t(".here"), store_path))
 
-        %h4= translate_with_args(".related_articles")
+        %h4= t(".related_articles")
         %ul
-          %li= link_to translate_with_args(".bike_index_launches_new_ambassadors_progr"), news_path("bike-index-launches-ambassadors-program")
-          %li= link_to translate_with_args(".registration_drive"), news_path("san-jose-registers-local-school-bikes-using-bike-index-mobile-registra")
-          %li= link_to translate_with_args(".bike_index_welcomes_stolen_bikes_nola"), news_path("bike-index-welcomes-our-newest-partner---stolen-bikes-nola")
-          %li= link_to translate_with_args(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
+          %li= link_to t(".bike_index_launches_new_ambassadors_progr"), news_path("bike-index-launches-ambassadors-program")
+          %li= link_to t(".registration_drive"), news_path("san-jose-registers-local-school-bikes-using-bike-index-mobile-registra")
+          %li= link_to t(".bike_index_welcomes_stolen_bikes_nola"), news_path("bike-index-welcomes-our-newest-partner---stolen-bikes-nola")
+          %li= link_to t(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
 
 
         .trusted-by.hidden-lg-up
-          %h3= translate_with_args(".trusted_by_community_groups_everywhere")
+          %h3= t(".trusted_by_community_groups_everywhere")
           = image_tag "landing_pages/logos/community-groups.png", alt: "community group partners"
 
       .next-steps-col
         .next-steps-wrap
           %header
-            = translate_with_args(".trusted_by_community_groups_everywhere")
-            = link_to translate_with_args(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+            = t(".trusted_by_community_groups_everywhere")
+            = link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
           .trusted-by
             .header
-              = translate_with_args(".used_by_community_groups_everywhere")
+              = t(".used_by_community_groups_everywhere")
             = image_tag "landing_pages/logos/community-groups.png", alt: "community group partners"

@@ -1,6 +1,6 @@
 .organized-page-header
   %h1
-    = translate_with_args(".parking_notifications")
+    = t(".parking_notifications")
 
 = render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
 
@@ -17,7 +17,7 @@
     .col-xs-4
       .recordsCount
         %span.number 0
-        = translate_with_args(".matches_visible")
+        = t(".matches_visible")
     .col-xs-8
       .recordsTotalCount.less-strong.text-right
         %span.number 0

@@ -3,21 +3,21 @@
 
 \--------------------------------
 
-= translate_with_args(".text.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)
+= t(".text.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)
 
-= translate_with_args(".text.we_sent_out_this_tweet_from", twitter_handle: @tweet_account_screen_name)
+= t(".text.we_sent_out_this_tweet_from", twitter_handle: @tweet_account_screen_name)
 
 = @tweet_url
 
 \---
 
-= translate_with_args(".text.make")
+= t(".text.make")
 = @customer_contact.bike.mnfg_name
 
-= translate_with_args(".text.serial")
+= t(".text.serial")
 = @customer_contact.bike.serial_number
 
-= translate_with_args(".text.color")
+= t(".text.color")
 - if BikeDisplayer.paint_description?(@customer_contact.bike)
   = @customer_contact.bike.paint_description
 = @customer_contact.bike.frame_colors.to_sentence
@@ -28,7 +28,7 @@
 - bike_url = bike_url(@customer_contact.bike)
 
 - if @customer_contact.bike.status_stolen?
-  = translate_with_args(".text.hopefully_you_find_the_bike_soon", bike_type: bike_type)
+  = t(".text.hopefully_you_find_the_bike_soon", bike_type: bike_type)
 
 
 \--------------------------------

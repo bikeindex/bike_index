@@ -45,7 +45,7 @@
               - if !blog.blog?
                 %span.text-info= blog.kind.humanize
           %td
-            = translate_with_args(blog.language, scope: [:locales])
+            = t(blog.language, scope: [:locales])
           %td
             - if blog.published? && blog.published_at.present?
               %small.convertTime= l blog.published_at, format: :convert_time

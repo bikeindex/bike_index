@@ -1200,7 +1200,7 @@ nb:
           nostdin: Ikke les fra stdin
           out_format: 'Utdataformat: %{valid_text}'
           pattern_router: 'Bruk mønsterruter: nøkler flyttet per config data.write'
-          strict: Unngå å utlede dynamiske nøkkelbruk som translate_with_args("cats.#{cat}.name"). Har
+          strict: Unngå å utlede dynamiske nøkkelbruk som t("cats.#{cat}.name"). Har
             forrang over konfigurasjonsinnstillingen hvis den er angitt.
           translation_backend: Oversettelsesstøtte (google eller deepl)
           value: 'Verdi. Interpolerer: %{value}, %{human_key}, %{key}, %{default},

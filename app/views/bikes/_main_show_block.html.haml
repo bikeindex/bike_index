@@ -5,7 +5,7 @@
     - if bike_image_url.present? && bike_image.present?
       #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
         .current-photo{ id: "image#{bike_image.id}"}
-          = image_tag(bike_image_url, alt: translate_with_args(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: @bike.image_url })
+          = image_tag(bike_image_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: @bike.image_url })
       - if @bike.public_images.count > 1
         %span.thumbnail-shadow
         %span.thumbnail-shadow-r
@@ -25,10 +25,10 @@
     - elsif @bike.stock_photo_url.present?
       #selected-photo.image-holder.just1photo
         %h3.stock-photo
-          = translate_with_args(".stock_photo", year: @bike.year, model: @bike.frame_model)
-          %em= translate_with_args(".color_may_not_match")
+          = t(".stock_photo", year: @bike.year, model: @bike.frame_model)
+          %em= t(".color_may_not_match")
         .current-photo#stock_photo_img
-          = image_tag(@bike.stock_photo_url, alt: translate_with_args(".bike_photo", bike_type: @bike.type_titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
+          = image_tag(@bike.stock_photo_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
   .show-bike-details
     %ul.attr-list.split-sm
@@ -37,11 +37,11 @@
           %strong.attr-title #{t(".serial")}:
           = render_serial_display(@bike, current_user)
         - unless @bike.serial_hidden?
-          = attr_list_item(@bike.extra_registration_number, translate_with_args(".other_serial"))
+          = attr_list_item(@bike.extra_registration_number, t(".other_serial"))
       - unless @bike.type == "bike"
-        = attr_list_item(@bike.type_titleize, translate_with_args(".vehicle_type"))
+        = attr_list_item(@bike.type_titleize, t(".vehicle_type"))
       - unless @bike.propulsion_type == "foot-pedal"
-        = attr_list_item(@bike.propulsion_type, translate_with_args(".propulsion_type"))
+        = attr_list_item(@bike.propulsion_type, t(".propulsion_type"))
 
       %li
         %strong.attr-title #{t(".manufacturer")}:
@@ -51,9 +51,9 @@
           = @bike.mnfg_name
         - else
           = @bike.manufacturer&.name
-      = attr_list_item(@bike.name, translate_with_args(".name"))
-      = attr_list_item(@bike.frame_model, translate_with_args(".model"))
-      = attr_list_item(@bike.year.to_s, translate_with_args(".year"))
+      = attr_list_item(@bike.name, t(".name"))
+      = attr_list_item(@bike.frame_model, t(".model"))
+      = attr_list_item(@bike.year.to_s, t(".year"))
       %li.color-attrs
         %strong.attr-title #{t(".primary_colors")}:
         = @bike.frame_colors.to_sentence
@@ -63,44 +63,44 @@
               #{t(".paint_description")}:
             = @bike.paint_description
 
-      = attr_list_item(@bike.frame_size&.upcase, translate_with_args(".frame_size"))
+      = attr_list_item(@bike.frame_size&.upcase, t(".frame_size"))
 
       - if @bike.front_wheel_size_id.present?
         - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
         - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-          = attr_list_item(@bike.front_wheel_size&.name, translate_with_args('.wheel_diameter'))
+          = attr_list_item(@bike.front_wheel_size&.name, t('.wheel_diameter'))
         - else
-          = attr_list_item(@bike.front_wheel_size&.name, translate_with_args(".front_wheel_diameter"))
+          = attr_list_item(@bike.front_wheel_size&.name, t(".front_wheel_diameter"))
           - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
-          = attr_list_item(@bike.rear_wheel_size&.name, translate_with_args(".rear_wheel_diameter"))
+          = attr_list_item(@bike.rear_wheel_size&.name, t(".rear_wheel_diameter"))
 
-      = attr_list_item(@bike.frame_material_name, translate_with_args(".frame_material"))
-      = attr_list_item(@bike.handlebar_type_name, translate_with_args(".handlebar_type"))
+      = attr_list_item(@bike.frame_material_name, t(".frame_material"))
+      = attr_list_item(@bike.handlebar_type_name, t(".handlebar_type"))
     - if @bike.description.present?
       %h3
-        = translate_with_args(".distinguishing_features")
+        = t(".distinguishing_features")
       %p
         = @bike.description
 
     - if @bike.status_stolen? && @stolen_record.present?
       %h3
-        = translate_with_args(".stolen_details")
+        = t(".stolen_details")
       .row
         - if @bike.current_stolen_record.latitude.present?
           = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
         .col-md-4
           %ul.attr-list.separate-lines
-            = attr_list_item(@stolen_record.address(country: [:skip_default]), translate_with_args(".location"))
-            = attr_list_item(@stolen_record.locking_description, translate_with_args(".locking_description"))
-            = attr_list_item(@stolen_record.lock_defeat_description, translate_with_args(".locking_circumvented"))
+            = attr_list_item(@stolen_record.address(country: [:skip_default]), t(".location"))
+            = attr_list_item(@stolen_record.locking_description, t(".locking_description"))
+            = attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
             %li
               %strong.attr-title
                 #{t(".stolen_at")}:&nbsp;
               %span.convertTime= l @stolen_record.date_stolen, format: :convert_time
-            = attr_list_item(@stolen_record.police_report_number, translate_with_args(".police_report"))
-            = attr_list_item(@stolen_record.police_report_department, translate_with_args(".department_city"))
+            = attr_list_item(@stolen_record.police_report_number, t(".police_report"))
+            = attr_list_item(@stolen_record.police_report_department, t(".department_city"))
       - if @stolen_record.theft_description.present?
-        %h3= translate_with_args(".description_of_incident")
+        %h3= t(".description_of_incident")
         %p= @stolen_record.theft_description
     - elsif !@bike.version? && @bike.current_impound_record.present?
       - impound_record = @bike.current_impound_record
@@ -111,18 +111,18 @@
           = render partial: "stolen_map", locals: { mapping_record: impound_record }
         .col-md-4
           %ul.attr-list.separate-lines
-            = attr_list_item(impound_record.address, translate_with_args(".location"))
+            = attr_list_item(impound_record.address, t(".location"))
             %li
               %strong.attr-title
                 - if @bike.status_found?
-                  = translate_with_args(".found_at")
+                  = t(".found_at")
                 - else
-                  = translate_with_args(".impounded_at")
+                  = t(".impounded_at")
                 \:&nbsp;
               %span.convertTime.preciseTime= l impound_record.impounded_at, format: :convert_time
               %span.convertTimezone
       - if impound_record.impounded_description.present?
-        %h3= translate_with_args(".description_of_incident")
+        %h3= t(".description_of_incident")
         %p= impound_record.impounded_description
 
   - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
@@ -145,17 +145,17 @@
               %li
                 %strong.attr-title
                   - if component.front && component.rear
-                    = translate_with_args(".front_rear")
+                    = t(".front_rear")
                   - elsif component.front
-                    = translate_with_args(".front")
+                    = t(".front")
                   - elsif component.rear
-                    = translate_with_args(".rear")
+                    = t(".rear")
                   - if component.component_type == "unknown"
-                    = translate_with_args(".other")
+                    = t(".other")
                   - else
                     = component.component_type.titleize if component.component_type.present?
                 = component.description
                 - if component.year.present? || component.component_model.present? || component.manufacturer.present?
                   = component.component_model
-                  = translate_with_args(".componentyear", componentyear: component.year) if component.year.present?
+                  = t(".componentyear", componentyear: component.year) if component.year.present?
                   = "(#{component.mnfg_name})"

@@ -8,56 +8,56 @@
           = render "landing_pages/icons/header_#{landing_page_target}_svg"
 
         .banner-text
-          %h1= translate_with_args(".bike_index_for_cities")
-          %h3= translate_with_args(".actually_get_people_registered_and_do_it_")
-          %h3= translate_with_args(".plug_your_city_in_nationally")
+          %h1= t(".bike_index_for_cities")
+          %h3= t(".actually_get_people_registered_and_do_it_")
+          %h3= t(".plug_your_city_in_nationally")
 
     .ribbon.mobile-contact-link
       .container
         %h2
           = link_to cities_packages_path, class: "btn btn-primary btn-lg" do
-            = translate_with_args(".features_amp_pricing")
+            = t(".features_amp_pricing")
             %span.chevron &raquo;
 
   .container
     .row.main-body-row
       .landing-why-col
-        %h3= translate_with_args(".mitigate_the_registration_mess")
-        %p= translate_with_args(".no_more_index_cards_or_excel_sheets_give_")
-        %p= translate_with_args(".bring_together_bike_shops_schools_municip")
+        %h3= t(".mitigate_the_registration_mess")
+        %p= t(".no_more_index_cards_or_excel_sheets_give_")
+        %p= t(".bring_together_bike_shops_schools_municip")
         %p= render partial: "/landing_pages/tweet", locals: { tweet_id: 1033174779585605633 }
 
-        %h3= translate_with_args(".our_community_is_your_community")
-        %p= translate_with_args(".bike_index_is_the_community_registration_", organization_counts: number_with_delimiter(Counts.organizations))
-        %p= translate_with_args(".engage_your_residents_and_recover_their_b")
+        %h3= t(".our_community_is_your_community")
+        %p= t(".bike_index_is_the_community_registration_", organization_counts: number_with_delimiter(Counts.organizations))
+        %p= t(".engage_your_residents_and_recover_their_b")
 
-        %h4= translate_with_args(".related_articles")
+        %h4= t(".related_articles")
         %ul
           %li
-            = translate_with_args(".check_out")
-            = link_to translate_with_args(".cities_deck"), "https://docs.google.com/presentation/d/1De4TeyXdqshjhxBdrP9YL_f2AmzRkNx8VuRVCiniUic/edit?usp=sharing"
+            = t(".check_out")
+            = link_to t(".cities_deck"), "https://docs.google.com/presentation/d/1De4TeyXdqshjhxBdrP9YL_f2AmzRkNx8VuRVCiniUic/edit?usp=sharing"
           %li
-            = link_to translate_with_args(".bike_index_new_dashboard"), news_path("portland-implements-bike-indexs-new-law-enforcement-dashboard")
+            = link_to t(".bike_index_new_dashboard"), news_path("portland-implements-bike-indexs-new-law-enforcement-dashboard")
           %li
-            = link_to translate_with_args(".bike_index_unveils_partnership_with_the_c"), news_path("bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa")
+            = link_to t(".bike_index_unveils_partnership_with_the_c"), news_path("bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa")
           %li
-            = link_to translate_with_args(".bike_index_organization_impounding"), news_path("found-a-bike-register-it-as-abandoned-or-impounded")
+            = link_to t(".bike_index_organization_impounding"), news_path("found-a-bike-register-it-as-abandoned-or-impounded")
           %li
-            = link_to translate_with_args(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
+            = link_to t(".embed_a_bike_index_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")
 
         .trusted-by.hidden-lg-up
-          %h3= translate_with_args(".trusted_by_municipalities_everywhere")
+          %h3= t(".trusted_by_municipalities_everywhere")
           = image_tag "landing_pages/logos/law-enforcement.png", alt: "municipal partners"
 
       .next-steps-col
         .next-steps-wrap
           %header
-            = translate_with_args(".trusted_by_municipalities_everywhere")
+            = t(".trusted_by_municipalities_everywhere")
             = link_to cities_packages_path, class: "btn btn-primary btn-lg" do
-              = translate_with_args(".features_amp_pricing")
+              = t(".features_amp_pricing")
               %span.chevron &raquo;
 
           .trusted-by
             .header
-              = translate_with_args(".used_by_municipalities_everywhere")
+              = t(".used_by_municipalities_everywhere")
             = image_tag "landing_pages/logos/law-enforcement.png", alt: "municipal partners"

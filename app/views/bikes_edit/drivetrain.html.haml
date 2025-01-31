@@ -1,4 +1,4 @@
-- type_text = @bike.not_cycle? ? translate_with_args(".vehicle_type") : translate_with_args(".cycle_type")
+- type_text = @bike.not_cycle? ? t(".vehicle_type") : t(".cycle_type")
 - valid_propulsion_types = PropulsionType.valid_propulsion_types_for(@bike.cycle_type)
 
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
@@ -19,24 +19,24 @@
                 = CycleType.slug_translation(@bike.cycle_type)
                 - if @bike.cycle_type == "bike"
                   %span.below-input-help
-                    %em= translate_with_args(".traditional_bike_definition")
+                    %em= t(".traditional_bike_definition")
               .right-input-help.right-text-help
                 %a{data: {toggle: "modal", target: "#cycle_type-correction"}}
-                  = translate_with_args(".submit_correction")
+                  = t(".submit_correction")
           .related-fields
             .form-group.row
-              %label.form-well-label= translate_with_args(".propulsion_type")
+              %label.form-well-label= t(".propulsion_type")
               %p.form-well-input-static
                 = PropulsionType.slug_translation(@bike.propulsion_type)
               - if valid_propulsion_types.count > 1
                 .right-input-help.right-text-help
                   %a{data: {toggle: "modal", target: "#propulsion_type-correction"}}
-                    = translate_with_args(".update_propulsion")
+                    = t(".update_propulsion")
 
         .form-wrap.secondary-form-wrap
           .form-well-form-header-always-visible
             %h3
-              = translate_with_args(".wheels")
+              = t(".wheels")
           - side_title = CycleType.front_and_rear_wheels?(@bike.cycle_type) ? "front" : "general"
           = render partial: "/bikes_edit/wheels", locals: {f: f, side: "front", side_title: side_title}
           - if CycleType.front_and_rear_wheels?(@bike.cycle_type)
@@ -46,33 +46,33 @@
           .form-wrap.secondary-form-wrap#edit_drivetrain
             .form-well-form-header-always-visible
               %h3
-                = translate_with_args(".drivetrain")
+                = t(".drivetrain")
             - rear_fixed = RearGearType.fixed.id
             - front_fixed = FrontGearType.fixed.id
             - fixed = @bike.rear_gear_type_id == rear_fixed
             .form-group.row.unnested-field
               %label.form-well-label
-                = translate_with_args(".drivetrain_type")
+                = t(".drivetrain_type")
               .form-well-input-large.form-well-input-checks
                 %label.checkbox-inline.mr-2
                   %input#fixed_gear_check.checkbox.drive-check{type: "checkbox", checked: fixed}
-                  = translate_with_args(".fixed")
+                  = t(".fixed")
                 %label.checkbox-inline.mr-2.not-fixed
                   = f.check_box :coaster_brake
-                  = translate_with_args(".coaster_brake")
+                  = t(".coaster_brake")
                 %label.checkbox-inline.not-fixed
                   = f.check_box :belt_drive
-                  = translate_with_args(".belt_drive")
+                  = t(".belt_drive")
 
             .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
               .form-group.row
                 %label.form-well-label{ for: 'front_gear_select'}
-                  = translate_with_args(".front_gears")
+                  = t(".front_gears")
                 .form-well-input
                   // ignore this select in dirty forms
                   %select#front_gear_select.form-control.dirtyignore
                     %option.placeholder{ value: ''}
-                      = translate_with_args(".select_chainring_count")
+                      = t(".select_chainring_count")
                     - FrontGearType.standard.each do |gt|
                       %option{ value: gt.count }
                         = gt.name
@@ -80,7 +80,7 @@
                   - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
                   %label.cursor-pointer
                     %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
-                    = translate_with_args(".internal_front_gears")
+                    = t(".internal_front_gears")
                 .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
                   = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
                   - FrontGearType.all.each do |gt|
@@ -89,12 +89,12 @@
             .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
               .form-group.row
                 %label.form-well-label{ for: 'rear_gear_select' }
-                  = translate_with_args(".rear_gears")
+                  = t(".rear_gears")
                 .form-well-input
                   // ignore this select in dirty forms
                   %select#rear_gear_select.form-control.dirtyignore
                     %option.placeholder{ value: '' }
-                      = translate_with_args(".select_cog_count")
+                      = t(".select_cog_count")
                     - RearGearType.standard.each do |gt|
                       %option{ value: gt.count }
                         = gt.name
@@ -102,7 +102,7 @@
                   - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
                   %label.cursor-pointer
                     %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
-                    = translate_with_args(".internal_rear_gears")
+                    = t(".internal_rear_gears")
 
                 .row.currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
                   = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'
@@ -128,12 +128,12 @@
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag translate_with_args(".submit_update"), class: "btn btn-primary"
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
-            = translate_with_args(".nevermind")
+            = t(".nevermind")
 
-= render partial: 'shared/modal', locals: {title: translate_with_args(".update_vehicle_type"), id: 'cycle_type-correction', modal_body: vehicle_type_body}
+= render partial: 'shared/modal', locals: {title: t(".update_vehicle_type"), id: 'cycle_type-correction', modal_body: vehicle_type_body}
 
 - propulsion_type_body = capture_haml do
   = form_for @bike, multipart: true do |f|
@@ -149,9 +149,9 @@
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag translate_with_args(".submit_update"), class: "btn btn-primary"
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
-            = translate_with_args(".nevermind")
+            = t(".nevermind")
 
-= render partial: 'shared/modal', locals: {title: translate_with_args(".update_propulsion"), id: 'propulsion_type-correction', modal_body: propulsion_type_body}
+= render partial: 'shared/modal', locals: {title: t(".update_propulsion"), id: 'propulsion_type-correction', modal_body: propulsion_type_body}

@@ -13,7 +13,7 @@
 
           - if @bike.version?
             .form-group.row.unnested-field
-              = f.label :name, translate_with_args(".version_name"), class: "form-well-label"
+              = f.label :name, t(".version_name"), class: "form-well-label"
               .form-well-input
                 = f.text_field :name, class: "form-control"
             .related-fields
@@ -26,7 +26,7 @@
                   %a#add-start-at.mt-1.toggle-version-date.optional-form-block{class: ("currently-hidden" if show_start_at), data: {target: "#start-at", toggle: "#rm-start-at"}}
                     %span.context-display-help
                       +
-                    = translate_with_args(".add_start")
+                    = t(".add_start")
                   #start-at.hidden-other.mb-0{ class: (show_start_at ? "unhidden" : "") }
                     - @bike.start_at = TimeParser.round(@bike.start_at || Time.current)
                     = f.datetime_local_field :start_at, max: TimeParser.round(Time.current + 1.day), step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.start_at, format: :convert_time)
@@ -34,7 +34,7 @@
                   %a#rm-start-at.toggle-version-date.optional-form-block{class: (show_start_at ? "" : "currently-hidden"), data: {target: "#start-at", toggle: "#add-start-at", action: "rm-block"}}
                     %span.context-display-help
                       &ndash;
-                    = translate_with_args(".remove_start")
+                    = t(".remove_start")
               .form-group.row
                 - show_end_at = @bike.end_at.present?
                 = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
@@ -44,7 +44,7 @@
                   %a#add-end-at.mt-1.toggle-version-date.optional-form-block{class: ("currently-hidden" if show_end_at), data: {target: "#end-at", toggle: "#rm-end-at"}}
                     %span.context-display-help
                       +
-                    = translate_with_args(".add_end")
+                    = t(".add_end")
                   #end-at.hidden-other.mb-0{ class: (show_end_at ? "unhidden" : "") }
                     - @bike.end_at = TimeParser.round(@bike.end_at || Time.current)
                     = f.datetime_local_field :end_at, max: TimeParser.round(Time.current + 1.day), step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.end_at, format: :convert_time)
@@ -52,24 +52,24 @@
                   %a#rm-end-at.toggle-version-date.optional-form-block{class: (show_end_at ? "" : "currently-hidden"), data: {target: "#end-at", toggle: "#add-end-at", action: "rm-block"}}
                     %span.context-display-help
                       &ndash;
-                    = translate_with_args(".remove_end")
+                    = t(".remove_end")
 
           .related-fields
             .form-group.row
               = f.label :serial_number, class: "form-well-label"
               %p.form-well-input-static
                 - if @bike.made_without_serial?
-                  = translate_with_args(".made_without_serial")
+                  = t(".made_without_serial")
                 - else
                   = @bike.serial_number
                 - if @bike.version?
-                  - bike_registration_link = link_to translate_with_args(".bike_registration", bike_type: @bike.type), edit_bike_path(@bike.bike)
-                  %a.ml-1.inline-input-help{title: translate_with_args(".update_on_bike", bike_type: @bike.type), data: {toggle: "popover", content: translate_with_args(".update_these_attributes_on_bike_html", bike_type: @bike.type, bike_registration_link: bike_registration_link)}}
+                  - bike_registration_link = link_to t(".bike_registration", bike_type: @bike.type), edit_bike_path(@bike.bike)
+                  %a.ml-1.inline-input-help{title: t(".update_on_bike", bike_type: @bike.type), data: {toggle: "popover", content: t(".update_these_attributes_on_bike_html", bike_type: @bike.type, bike_registration_link: bike_registration_link)}}
                     ?
               - unless @bike.version?
                 .right-input-help.right-text-help
                   %a{data: {toggle: "modal", target: "#serial-correction"}}
-                    = translate_with_args(".submit_serial_correction")
+                    = t(".submit_serial_correction")
             .form-group.row
               = f.label :manufacturer, class: "form-well-label"
               %p.form-well-input-static
@@ -77,7 +77,7 @@
               - unless @bike.version?
                 .right-input-help.right-text-help
                   %a{data: {toggle: "modal", target: "#manufacturer-correction"}}
-                    = translate_with_args(".submit_manufacturer_correction")
+                    = t(".submit_manufacturer_correction")
             - if @bike.version?
               - if @bike.year.present?
                 .form-group.row
@@ -91,14 +91,14 @@
 
           - unless @bike.version?
             .form-group.row.fancy-select-placeholder.unfancy.unnested-field
-              = f.label :year, translate_with_args(".model_year"), class: "form-well-label"
+              = f.label :year, t(".model_year"), class: "form-well-label"
               .form-well-input
                 - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
-                = f.select :year, years, prompt: translate_with_args(".unsure_or_unknown"), allow_blank: true
+                = f.select :year, years, prompt: t(".unsure_or_unknown"), allow_blank: true
               .right-input-help
                 %label.cursor-pointer
                   %input#bike_unknown_year{type: "checkbox", tabindex: -1}
-                  = translate_with_args(".unknown_year")
+                  = t(".unknown_year")
 
             .form-group.row.unnested-field
               = f.label :frame_model, class: "form-well-label"
@@ -120,13 +120,13 @@
                   = @bike.frame_size.upcase
           - else
             .form-group.row.unnested-field
-              = f.label :frame_material, translate_with_args(".main_frame_material"), class: "form-well-label"
+              = f.label :frame_material, t(".main_frame_material"), class: "form-well-label"
               .form-well-input.fancy-select-placeholder.unfancy
-                = select(:bike, :frame_material, FrameMaterial.select_options , {include_blank: true, prompt: translate_with_args(".choose_material")})
+                = select(:bike, :frame_material, FrameMaterial.select_options , {include_blank: true, prompt: t(".choose_material")})
             .related-fields
               .form-group.row.frame-sizes{class: ("unexpanded-unit-size" unless %w(cm in).include?(@bike.frame_size_unit))}
                 %label.form-well-label
-                  = translate_with_args(".frame_size")
+                  = t(".frame_size")
                 .form-well-input
                   .ordinal-sizes.btn-group{role: "group", "aria-label" => "Size", data: {toggle: "buttons"}}
                     - %w(xxs xs s m l xl xxl).each do |size|
@@ -142,7 +142,7 @@
                         %input{type: "radio", name: "frame_size", autocomplete: "off", checked: active}
                         = unit.upcase
               .form-group.row.hidden-other.frame-size-other
-                = f.label :frame_size, translate_with_args(".seat_tube_length"), class: "form-well-label"
+                = f.label :frame_size, t(".seat_tube_length"), class: "form-well-label"
                 .form-well-input
                   = f.hidden_field :frame_size_unit
                   = f.hidden_field :frame_size
@@ -151,17 +151,17 @@
                   = f.number_field :frame_size_number, class: "form-control", step: 0.1
 
             .form-group.row.unnested-field
-              = f.label :name, translate_with_args(".bike_name"), class: "form-well-label"
+              = f.label :name, t(".bike_name"), class: "form-well-label"
               .form-well-input
                 = f.text_field :name, class: "form-control"
 
           .form-group.row.unnested-field
-            = f.label :description, translate_with_args(".general_description"), class: "form-well-label form-well-label-large-input"
+            = f.label :description, t(".general_description"), class: "form-well-label form-well-label-large-input"
             .form-well-input-large
-              = f.text_area :description, rows: 3, class: "form-control", placeholder: translate_with_args(".tell_us_about_your_bike")
+              = f.text_area :description, rows: 3, class: "form-control", placeholder: t(".tell_us_about_your_bike")
 
           .form-group.row.unnested-field
-            = f.label :extra_registration_number, translate_with_args(".other_serial_or_registration_number"), class: "form-well-label"
+            = f.label :extra_registration_number, t(".other_serial_or_registration_number"), class: "form-well-label"
             .form-well-input
               = f.text_field :extra_registration_number, class: "form-control"
 
@@ -171,29 +171,29 @@
                 .form-group.row
                   = f.label :street, class: "form-well-label"
                   .form-well-input
-                    = f.text_field :street, class: "form-control", required: true, placeholder: translate_with_args(".street")
+                    = f.text_field :street, class: "form-control", required: true, placeholder: t(".street")
               .form-group.row
                 = f.label :city, class: "form-well-label"
                 .form-well-input
-                  = f.text_field :city, class: "form-control", required: true, placeholder: translate_with_args(".city")
+                  = f.text_field :city, class: "form-control", required: true, placeholder: t(".city")
 
               .form-group.row
                 = f.label :zipcode, class: "form-well-label"
                 .form-well-input
-                  = f.text_field :zipcode, class: "form-control", required: true, placeholder: translate_with_args(".zipcode")
+                  = f.text_field :zipcode, class: "form-control", required: true, placeholder: t(".zipcode")
 
               .form-group.row.fancy-select-placeholder.unfancy#us_id_data{data: {usid: Country.united_states.id}}
                 = f.label :country_id, class: "form-well-label"
                 .form-well-input
                   = f.select :country_id, Country.select_options,
-                    {required: true, prompt: translate_with_args(".choose_country")},
+                    {required: true, prompt: t(".choose_country")},
                     {class: "country-select-input form-control"}
 
               - if @bike.state.present?
                 .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
                   = f.label :state_id, class: "form-well-label"
                   .form-well-input
-                    = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: translate_with_args(".state")}, {class: "form-control"})
+                    = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
 
           -# need to check if any stickers, because maybe it has some that aren't user editable
           - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
@@ -205,7 +205,7 @@
               - if @bike.bike_stickers.any?
                 .form-group.row
                   %label.form-well-label
-                    = translate_with_args(".existing_stickers")
+                    = t(".existing_stickers")
                   %p.form-well-input-static
 
                     - @bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
@@ -214,8 +214,8 @@
               - if BikeDisplayer.display_sticker_edit?(@bike, current_user)
                 .form-group.row.no-divider-row.mb-0
                   = label_tag :bike_sticker, class: "form-well-label" do
-                    - sticker_information_link = link_to translate_with_args(".a_qr_sticker"), "https://bikeindex.org/news/bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa"
-                    = translate_with_args(".add_a_sticker_label_html", sticker_information_link: sticker_information_link)
+                    - sticker_information_link = link_to t(".a_qr_sticker"), "https://bikeindex.org/news/bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa"
+                    = t(".add_a_sticker_label_html", sticker_information_link: sticker_information_link)
                   .form-well-input
                     -# Not using "bike_stickers_user_editable here because if they have permission to see this field, we want to show them a compatible sticker
                     - bike_code_from_org = @bike.organizations.with_enabled_feature_slugs("bike_stickers").last&.bike_stickers&.claimed&.reorder(:code_integer)&.second&.pretty_code
@@ -226,45 +226,45 @@
 - serial_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: "shared/alert", locals: {body: translate_with_args(".please_fill_in_both_fields"), class_names: "currently-hidden"}
+      = render partial: "shared/alert", locals: {body: t(".please_fill_in_both_fields"), class_names: "currently-hidden"}
       = hidden_field_tag :serial_update_bike_id, @bike.id
       .form-group
         %label{for: :serial_update_serial}
-          = translate_with_args(".updated_serial")
+          = t(".updated_serial")
         = text_field_tag :serial_update_serial, "", class: "form-control"
       .form-group
         %label{for: :serial_update_reason}
-          = translate_with_args(".reason_for_update")
+          = t(".reason_for_update")
         = text_area_tag :serial_update_reason, "", class: "form-control"
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag translate_with_args(".submit_update"), class: "btn btn-primary"
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
-            = translate_with_args(".nevermind")
+            = t(".nevermind")
 
-= render partial: 'shared/modal', locals: {title: translate_with_args(".update_serial_number"), id: 'serial-correction', modal_body: serial_correction_body}
+= render partial: 'shared/modal', locals: {title: t(".update_serial_number"), id: 'serial-correction', modal_body: serial_correction_body}
 
 - manufacturer_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: 'shared/alert', locals: {body: translate_with_args(".please_fill_in_both_fields"), class_names: "currently-hidden"}
+      = render partial: 'shared/alert', locals: {body: t(".please_fill_in_both_fields"), class_names: "currently-hidden"}
       = hidden_field_tag :manufacturer_update_bike_id, @bike.id
       .form-group
         %label{for: :manufacturer_update_manufacturer}
-          = translate_with_args(".manufacturer")
+          = t(".manufacturer")
         = text_field_tag :manufacturer_update_manufacturer, "", class: "form-control unfancy"
       .form-group
         %label{for: :manufacturer_update_reason}
-          = translate_with_args(".reason_for_update")
+          = t(".reason_for_update")
         = text_area_tag :manufacturer_update_reason, "", class: "form-control"
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag translate_with_args(".submit_update"), class: "btn btn-primary"
+          = submit_tag t(".submit_update"), class: "btn btn-primary"
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
-            = translate_with_args(".nevermind")
+            = t(".nevermind")
 
 = render partial: "shared/modal", locals: {title: "Update manufacturer", id: "manufacturer-correction", modal_body: manufacturer_correction_body}
