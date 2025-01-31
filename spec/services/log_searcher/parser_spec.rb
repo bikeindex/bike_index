@@ -20,7 +20,7 @@ RSpec.describe LogSearcher::Parser do
     it "parses into attrs" do
       # request_time actually takes line_data (not log_line) - but, it works either way
       expect(described_class.send(:parse_request_time, log_line)).to eq time
-      expect_hashes_to_match(described_class.parse_log_line(log_line), target)
+      expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
     end
     context "API" do
       let(:log_line) { 'I, [2023-10-23T00:20:29.448035 #666684]  INFO -- : [8f46986c-7d36-46f5-aeb6-9d4851de15b7] {"status":200,"method":"GET","path":"/api/v3/search/serials_containing","params":{"serial":"WCo2001xxxxx","serial_no_space":"WC02001XXXXX","raw_serial":"WC02001XXXXX","stolenness":"proximity","location":"you"},"host":"bikeindex.org","remote_ip":"11.222.33.4","u_id":1321,"format":"json","db":1879.08,"view":12.02999999999997,"duration":1891.11}' }
@@ -41,7 +41,7 @@ RSpec.describe LogSearcher::Parser do
         }
       end
       it "parses" do
-        expect_hashes_to_match(described_class.parse_log_line(log_line), target)
+        expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
       end
     end
     context "organized" do
@@ -64,7 +64,7 @@ RSpec.describe LogSearcher::Parser do
         }
       end
       it "parses" do
-        expect_hashes_to_match(described_class.parse_log_line(log_line), target)
+        expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
       end
       context "/v3/bikes/check_if_registered" do
         let(:log_line) { 'I, [2023-10-23T00:20:31.0000 #149741]  INFO -- : [7e0645ff-032e-4095-9a75-81afb12b8892] {"status":201,"method":"POST","path":"/api/v3/bikes/check_if_registered","params":{"access_token":"[FILTERED]","serial":"999xxxx","owner_email":"example@bikeindex.org","organization_slug":"hogwarts","manufacturer":"salsa"},"host":"bikeindex.org","remote_ip":"11.222.33.4","format":"json","db":1076.85,"view":15.86000000000013,"duration":1092.71}' }
@@ -85,7 +85,7 @@ RSpec.describe LogSearcher::Parser do
           }
         end
         it "parses" do
-          expect_hashes_to_match(described_class.parse_log_line(log_line), target)
+          expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
         end
       end
     end

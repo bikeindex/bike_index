@@ -177,10 +177,3 @@ RSpec::Matchers.define :match_hash_indifferently do |expected|
 
   diffable
 end
-
-# Previously there was a method `expect_hashes_to_match` (rather than a customer expectation)
-# This method was added to ease the transition. It should be removed when all the
-def expect_hashes_to_match(hash1, hash2)
-  puts "expect_hashes_to_match is deprecated, replace with: expect(hash1).to match_hash_indifferently(hash2)"
-  expect(hash1).to match_hash_indifferently hash2
-end
