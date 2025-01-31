@@ -1,7 +1,7 @@
 # Every email in here has the potential to be owned by an organization -
 # but they aren't necessarily
 class OrganizedMailer < ApplicationMailer
-  helper LocalizationHelper
+  helper TranslationHelper
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
