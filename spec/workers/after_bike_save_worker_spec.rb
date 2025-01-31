@@ -297,7 +297,7 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
     it "makes the things equal" do
       bike.update(update_attributes)
       instance.perform(bike.id)
-      expect_hashes_to_match(bike_version.reload, update_attributes)
+      expect(bike_version.reload).to match_hash_indifferently update_attributes
       expect(bike_version.mnfg_name).to eq "Some cool thing"
       expect(bike_version.frame_size_unit).to eq "ordinal"
     end
