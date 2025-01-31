@@ -27,20 +27,6 @@ class Admin::TwitterAccountsController < Admin::BaseController
     end
   end
 
-  def create
-    twitter_account =
-      TwitterAccount.find_or_create_from_twitter_oauth(request.env["omniauth.auth"])
-
-    if twitter_account.persisted?
-      twitter_account.check_credentials
-      flash[:notice] = "Twitter account #{twitter_account.screen_name} is persisted."
-      redirect_to admin_twitter_account_url(twitter_account)
-    else
-      flash[:error] = twitter_account.errors.full_messages.to_sentence
-      redirect_to admin_twitter_accounts_url
-    end
-  end
-
   def destroy
     if @twitter_account.present? && @twitter_account.destroy
       flash[:info] = "Twitter account deleted."
