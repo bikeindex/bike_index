@@ -578,9 +578,9 @@ GEM
       postmark (>= 1.21.3, < 2.0)
     pp (0.6.2)
       prettyprint
-    premailer (1.11.1)
+    premailer (1.27.0)
       addressable
-      css_parser (>= 1.6.0)
+      css_parser (>= 1.19.0)
       htmlentities (>= 4.0.0)
     premailer-rails (1.10.3)
       actionmailer (>= 3)
