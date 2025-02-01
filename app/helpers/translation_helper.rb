@@ -1,4 +1,4 @@
-module LocalizationHelper
+module TranslationHelper
   def theft_alert_plan_title(plan)
     duration = [
       plan.duration_days,

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe LocalizationHelper, type: :helper do
+RSpec.describe TranslationHelper, type: :helper do
   describe "#language_choices" do
     context "in English" do
       it "returns the language choices with english included" do

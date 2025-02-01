@@ -2,7 +2,7 @@
 # same set of languages (e.g. News, TheftAlertPlan models).
 #
 # Expects a `language` column defined on the corresponding table.
-module Localizable
+module Translatable
   extend ActiveSupport::Concern
 
   included do
