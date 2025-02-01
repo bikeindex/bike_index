@@ -87,7 +87,7 @@ class ComponentGenerator < Rails::Generators::NamedBase
   def translation_hash(locale)
     translation_scope_array = [locale.to_s, "components"] + class_name.underscore.downcase.split("/")
 
-    translation_scope_array.reverse.inject(translation_keys) { |hash, key| { key => hash } }
+    translation_scope_array.reverse.inject(translation_keys) { |hash, key| {key => hash} }
   end
 
   def translation_keys

@@ -1,8 +1,0 @@
----
-nl:
-  components:
-    search:
-      bike_box:
-        bike: Bike
-        other_thing: Something super cool
-        primary_colors: WHOOP

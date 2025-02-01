@@ -988,6 +988,11 @@ en:
   bike_versions:
     index:
       primary_colors: Primary colors
+  attributes:
+    bikes:
+      location: Location
+      primary_colors: Primary colors
+      serial: Serial
   bikes:
     bike:
       location: Location

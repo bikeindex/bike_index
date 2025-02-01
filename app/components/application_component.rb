@@ -7,6 +7,14 @@ class ApplicationComponent < ViewComponent::Base
     raise ArgumentError, "Invalid #{attribute}: #{value}. Must be one of: #{options.join(", ")}"
   end
 
+  def component_list_item(desc, title)
+    return nil unless desc.present?
+    content_tag(:li) do
+      content_tag(:strong, "#{title}: ", class: "") +
+        content_tag(:span, desc)
+    end
+  end
+
   private
 
   # Wrap `I18n.translate` for use in components, abstracting away

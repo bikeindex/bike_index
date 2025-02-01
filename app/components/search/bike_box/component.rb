@@ -2,7 +2,11 @@
 
 module Search::BikeBox
   class Component < ApplicationComponent
-    def initialize(bike:, current_user:)
+    include BikeHelper
+
+    # NOTE: be cautious about passing in current_user and caching,
+    # since current_user shows their hidden serials
+    def initialize(bike:, current_user: nil)
       @bike = bike
       @current_user = current_user
     end
