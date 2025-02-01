@@ -149,6 +149,7 @@ ignore_unused:
   - "activerecord.enums.*"
   - "activerecord.select_options.*"
   - "activerecord.status_humanized.*"
+  - "attributes.*"
   - "{devise,kaminari,will_paginate,doorkeeper,gflash}.*"
   - "simple_form.{yes,no}"
   - "simple_form.{placeholders,hints,labels}.*"
