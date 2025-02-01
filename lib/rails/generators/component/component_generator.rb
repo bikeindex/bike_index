@@ -17,8 +17,9 @@ class ComponentGenerator < Rails::Generators::NamedBase
     template("component.html.erb", File.join(app_component_dir, "component.html.erb"))
     template("component_controller.js", stimulus_controller_path)
     template("preview.rb", File.join(app_component_dir, "component_preview.rb"))
-    # locale yaml files are in app/components/
-    I18n.available_locales.each { |locale| create_locale_file(locale) }
+    # initially generated all the locale files with `I18n.available_locales.each`
+    # but now just generate :en, i18n-tasks handles the rest
+    create_locale_file(:en)
 
     # Create tests in spec/components/
     template("component_spec.rb", File.join(spec_component_dir, "component_spec.rb"))
@@ -80,8 +81,14 @@ class ComponentGenerator < Rails::Generators::NamedBase
   def create_locale_file(locale)
     create_file(
       File.join(app_component_dir, "component.#{locale}.yml"),
-      {locale.to_s => translation_keys}.to_yaml
+      translation_hash(locale).to_yaml
     )
+  end
+
+  def translation_hash(locale)
+    translation_scope_array = [locale.to_s, "components"] + class_name.underscore.downcase.split("/")
+
+    translation_scope_array.reverse.inject(translation_keys) { |hash, key| { key => hash } }
   end
 
   def translation_keys
