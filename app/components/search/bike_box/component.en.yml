@@ -1,4 +1,8 @@
 ---
 en:
-  bike: Bike
-  current_user: Current_user
+  search:
+    bike_box:
+      component:
+        bike: Bike
+        current_user: Current_user
+        primary_colors: WHOOP
