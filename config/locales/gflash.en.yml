@@ -1,9 +1,0 @@
----
-en:
-  gflash:
-    titles:
-      error: Error
-      notice: Notice
-      progress: Progress
-      success: Success
-      warning: Warning
