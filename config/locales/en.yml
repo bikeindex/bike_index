@@ -290,8 +290,10 @@ en:
         authorized_tokens: Authorized tokens
         can_send_stolen_notifications: Can send stolen notifications
         is_internal: Is internal
+        name: Name
         owner: :activerecord.models.owner
         owner_type: Owner type
+        redirect_uri: Redirect URI
         scopes: Scopes
         secret: Secret
         uid: Uid
@@ -794,6 +796,13 @@ en:
         bike_sticker:
           not_found: not found
           unauthorized_to_claim: does not have permission to claim this
+        doorkeeper/application:
+          attributes:
+            redirect_uri:
+              fragment_present: cannot contain a fragment.
+              invalid_uri: must be a valid URI.
+              relative_uri: must be an absolute URI.
+              secured_uri: must be an HTTPS/SSL URI.
         export:
           required: required
         impound_record:
@@ -976,6 +985,11 @@ en:
         stolen: stolen
         unregistered: unregistered
         with_owner: with owner
+  attributes:
+    bikes:
+      location: Location
+      primary_colors: Primary colors
+      serial: Serial
   bike_versions:
     index:
       primary_colors: Primary colors
@@ -2323,6 +2337,13 @@ en:
       log_in_to_send_a_comment: Log in to send a comment!
       you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
         your message right here.
+  gflash:
+    titles:
+      error: Error
+      notice: Notice
+      progress: Progress
+      success: Success
+      warning: Warning
   helpers:
     bike_helper:
       hidden: hidden

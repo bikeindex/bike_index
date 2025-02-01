@@ -1198,11 +1198,9 @@ nb:
           data_format: 'Dataformat: %{valid_text}.'
           keep_order: Hold rekkefølgen på nøklene
           key_pattern: Filtrer etter nøkkelmønster (f.eks. 'common.*')
-          key_pattern_to_rename: Full nøkkel (mønster) for å gi nytt navn. Obligatorisk
           locale_to_translate_from: Sted å oversette fra
           locales_filter: 'Språk(er) som skal behandles. Spesiell: base'
           missing_types: 'Filtrer etter typer: %{valid}'
-          new_key_name: Nytt navn, interpolerer opprinnelig navn som %{key}. Obligatorisk
           nostdin: Ikke les fra stdin
           out_format: 'Utdataformat: %{valid_text}'
           pattern_router: 'Bruk mønsterruter: nøkler flyttet per config data.write'
@@ -1244,6 +1242,7 @@ nb:
         tree_subtract: tre A minus nøklene i tre B
         tree_translate: Google Oversett et tre til rotlokaliteter
         unused: vis ubrukte oversettelser
+        cp: kopier nøklene i lokalitetsdata som samsvarer med det gitte mønsteret
       encourage:
       - Godt jobbet!
       - Bra gjort!
@@ -5838,3 +5837,8 @@ nb:
       go_here_to_learn_more: Gå hit for å lære mer
       oh_no: Å nei!
       unsupported_browser: Vi beklager, Bike Index støtter ikke nettleseren din.
+  attributes:
+    bikes:
+      location: plassering
+      primary_colors: Primærfarger
+      serial: Seriell

@@ -1178,11 +1178,9 @@ es:
           data_format:
           keep_order:
           key_pattern:
-          key_pattern_to_rename:
           locale_to_translate_from:
           locales_filter:
           missing_types:
-          new_key_name:
           nostdin:
           out_format:
           pattern_router:
@@ -1217,6 +1215,7 @@ es:
         tree_subtract:
         tree_translate:
         unused:
+        cp:
       encourage:
       -
       -
@@ -4585,3 +4584,8 @@ es:
       go_here_to_learn_more:
       oh_no:
       unsupported_browser:
+  attributes:
+    bikes:
+      location:
+      primary_colors:
+      serial:

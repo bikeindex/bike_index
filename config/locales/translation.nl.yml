@@ -1132,12 +1132,9 @@ nl:
           data_format: 'Gegevensindeling: %{valid_text}.'
           keep_order: Houd de volgorde van de sleutels aan
           key_pattern: Filter door de belangrijkste patroon (bijv. 'Common. *')
-          key_pattern_to_rename: Volledige toets (patroon) te hernoemen. Verplicht
           locale_to_translate_from: Locale te vertalen van
           locales_filter: 'Locale (s) te verwerken. Special: base'
           missing_types: 'Filteren op typen: %{valid}'
-          new_key_name: Nieuwe naam, interpoleert de oorspronkelijke naam als %{key}.
-            Verplicht
           nostdin: Niet lezen van stdin
           out_format: 'Uitvoerformaat: %{valid_text}'
           pattern_router: 'Gebruik patroon router: toetsen verplaatst per config data.write'
@@ -1181,6 +1178,8 @@ nl:
         tree_subtract: boom A minus de toetsen in boom B
         tree_translate: Google Vertaal een boom naar root-locales
         unused: tonen ongebruikte vertalingen
+        cp: kopieer de sleutels in landinstellingen die overeenkomen met het gegeven
+          patroon
       encourage:
       - Goed gedaan!
       - Goed gedaan!
@@ -5991,3 +5990,8 @@ nl:
   bike_versions:
     index:
       primary_colors: Primaire kleuren
+  attributes:
+    bikes:
+      location: Plaats
+      primary_colors: Primaire kleuren
+      serial: Serie
