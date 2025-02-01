@@ -17,25 +17,12 @@ class ComponentGenerator < Rails::Generators::NamedBase
     template("component.html.erb", File.join(app_component_dir, "component.html.erb"))
     template("component_controller.js", stimulus_controller_path)
     template("preview.rb", File.join(app_component_dir, "component_preview.rb"))
+    # locale yaml files are in app/components/
+    I18n.available_locales.each { |locale| create_locale_file(locale) }
 
-    # Create locales (in app/componentss)
-    create_file(File.join(app_component_dir, "component.yml"), translations_hash.to_yaml)
-
-
-    # Create files in spec/components/
+    # Create tests in spec/components/
     template("component_spec.rb", File.join(spec_component_dir, "component_spec.rb"))
     template("component_system_spec.rb", File.join(spec_component_dir, "component_system_spec.rb"))
-  end
-
-  private
-
-  def translations_hash
-    I18n.available_locales.map { |locale| [locale.to_s, translation_keys] }.to_h
-  end
-
-  def translation_keys
-    keys = attributes.any? ? attributes.map(&:name) : %w[hello]
-    keys.map { |name| [name, name.capitalize] }.to_h
   end
 
   private
@@ -88,5 +75,17 @@ class ComponentGenerator < Rails::Generators::NamedBase
 
   def preview_path
     "/rails/view_components/#{component_dir}/component/default"
+  end
+
+  def create_locale_file(locale)
+    create_file(
+      File.join(app_component_dir, "component.#{locale}.yml"),
+      {locale.to_s => translation_keys}.to_yaml
+    )
+  end
+
+  def translation_keys
+    keys = attributes.any? ? attributes.map(&:name) : %w[hello]
+    keys.map { |name| [name, name.capitalize] }.to_h
   end
 end
