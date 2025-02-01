@@ -985,14 +985,14 @@ en:
         stolen: stolen
         unregistered: unregistered
         with_owner: with owner
-  bike_versions:
-    index:
-      primary_colors: Primary colors
   attributes:
     bikes:
       location: Location
       primary_colors: Primary colors
       serial: Serial
+  bike_versions:
+    index:
+      primary_colors: Primary colors
   bikes:
     bike:
       location: Location
