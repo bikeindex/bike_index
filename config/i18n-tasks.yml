@@ -16,16 +16,17 @@ data:
   # Locale files or `Dir.glob` patterns where translations are read from:
   read:
     - config/locales/doorkeeper.%{locale}.yml
-    - config/locales/%{locale}.yml
     - app/components/**/*.%{locale}.yml
+    - config/locales/%{locale}.yml
 
   # Locale files to write new keys to, based on a list of key pattern => file rules. Matched from top to bottom:
   # `i18n-tasks normalize -p` will force move the keys according to these rules
   write:
     - ["{doorkeeper}.*", 'config/locales/\1.%{locale}.yml']
+    # handle namespaced components manually.
+    # This is definitely hack :/
     - ['components.{:}.{:}.:', 'app/components/\1/\2/component.%{locale}.yml']
     - ['components.{:}.:', 'app/components/\1/component.%{locale}.yml']
-    # - ['components.{*}.{:}', 'app/components/\1/component.%{locale}.yml']
     ## Catch-all default:
     - config/locales/%{locale}.yml
 
@@ -55,9 +56,9 @@ data:
 # Find translate calls
 search:
   ## Paths or `Find.find` patterns to search in:
-  paths:
-    # - app/views
-    # - app/components
+  # paths:
+  #   # - app/views
+  #   # - app/components
 
   ## Root directories for relative keys resolution.
   relative_roots:
