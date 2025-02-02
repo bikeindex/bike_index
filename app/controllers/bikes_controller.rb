@@ -1,4 +1,5 @@
 class BikesController < Bikes::BaseController
+  MAX_PAGE = 100
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[index show]
@@ -14,9 +15,9 @@ class BikesController < Bikes::BaseController
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
-    page = (params[:page] || 1).to_i
-    page = 1 if page > 100 # web search isn't meant for paging through everything. So block it
-    @bikes = Bike.search(@interpreted_params).page(page).per(params[:per_page] || 10)
+    @page = (params[:page] || 1).to_i
+    @page = 1 if @page > MAX_PAGE # web search isn't meant for paging through everything. So block it
+    @bikes = Bike.search(@interpreted_params).page(@page).per(params[:per_page] || 10)
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
 

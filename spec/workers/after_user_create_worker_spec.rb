@@ -141,8 +141,8 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     end
   end
 
-  describe "associate_membership_invites", :flaky do
-    it "assigns any memberships that match the user email, and mark user confirmed if invited" do
+  describe "associate_membership_invites" do
+    it "assigns any memberships that match the user email, and mark user confirmed if invited", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
       membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
       membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
@@ -162,7 +162,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
 
     # We are processing the first organization inline so we can
     # redirect users to the organization they belong to
-    it "synchronously associates the first memberhsip" do
+    it "synchronously associates the first memberhsip", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
       membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
       membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
