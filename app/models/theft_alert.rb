@@ -30,8 +30,9 @@
 #  fk_rails_...  (theft_alert_plan_id => theft_alert_plans.id) ON DELETE => cascade
 #  fk_rails_...  (user_id => users.id)
 #
-# Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
+  # NOTE: TheftAlert is called "Promoted alert" on the frontend
+
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
   # Timestamp 1s before first alert was automated
   AUTOMATION_START = 1625586988 # 2021-7-6
