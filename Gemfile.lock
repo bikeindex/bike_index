@@ -137,7 +137,7 @@ GEM
     annotate (2.6.5)
       activerecord (>= 2.3.0)
       rake (>= 0.8.7)
-    api-pagination (5.0.0)
+    api-pagination (6.0.0)
     ast (2.4.2)
     autoprefixer-rails (9.7.3)
       execjs
