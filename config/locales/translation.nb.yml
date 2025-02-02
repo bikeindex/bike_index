@@ -74,6 +74,7 @@ nb:
           tb: TB
           pb: PB
           eb: EB
+          zb: ZB
       decimal_units:
         units:
           thousand: tusen
@@ -136,6 +137,7 @@ nb:
         et bilde? Opprinnelig feil: %{e}'
       min_size_error: Filstørrelsen skal være større enn %{min_size}
       max_size_error: Filstørrelsen skal være mindre enn %{max_size}
+      password_too_long: er for lang
     template:
       body: 'Det oppstod problemer med følgende felt:'
       header:
@@ -309,7 +311,6 @@ nb:
         partner_data: Partnerdata
         password: Passord
         password_digest: Passordsammendrag
-        password_reset_token: Token for tilbakestilling av passord
         payments: Betalinger
         phone: Telefon
         preferred_language: Foretrukket Språk
@@ -332,6 +333,7 @@ nb:
         website: Nettsted
         when_vendor_terms_of_service: Når leverandørens vilkår for bruk
         zipcode: postnummer
+        token_for_password_reset: Token for tilbakestilling av passord
       ambassador_task:
         ambassador_task_assignments: Ambassadøroppgaver
         ambassadors: Ambassadører
@@ -804,7 +806,6 @@ nb:
         partner_data: Partnerdata
         password: Passord
         password_digest: Passordsammendrag
-        password_reset_token: Token for tilbakestilling av passord
         payments: Betalinger
         phone: Telefon
         preferred_language: Foretrukket Språk
@@ -827,6 +828,7 @@ nb:
         website: Nettsted
         when_vendor_terms_of_service: Når leverandørens vilkår for bruk
         zipcode: Postnummer
+        token_for_password_reset: Token for tilbakestilling av passord
       user_email:
         confirmation_token: Bekreftelseskode
         email: E-post
@@ -1167,6 +1169,10 @@ nb:
           problem: ugyldig versjonsoverskrift
           resolution: "%{message}"
         invalid_response: Ugyldig svar
+        length: forventes å ha lengde innenfor %{min} og %{max}
+        length_is: forventes å ha lengde nøyaktig lik %{is}
+        length_min: forventes å ha lengde større enn eller lik %{min}
+        length_max: forventes å ha lengde mindre enn eller lik %{max}
   flash:
     actions:
       create:
@@ -1192,15 +1198,13 @@ nb:
           data_format: 'Dataformat: %{valid_text}.'
           keep_order: Hold rekkefølgen på nøklene
           key_pattern: Filtrer etter nøkkelmønster (f.eks. 'common.*')
-          key_pattern_to_rename: Full nøkkel (mønster) for å gi nytt navn. Obligatorisk
           locale_to_translate_from: Sted å oversette fra
           locales_filter: 'Språk(er) som skal behandles. Spesiell: base'
           missing_types: 'Filtrer etter typer: %{valid}'
-          new_key_name: Nytt navn, interpolerer opprinnelig navn som %{key}. Obligatorisk
           nostdin: Ikke les fra stdin
           out_format: 'Utdataformat: %{valid_text}'
           pattern_router: 'Bruk mønsterruter: nøkler flyttet per config data.write'
-          strict: Unngå å utlede dynamiske nøkkelbruk som translate_with_args("cats.#{cat}.name"). Har
+          strict: Unngå å utlede dynamiske nøkkelbruk som t("cats.#{cat}.name"). Har
             forrang over konfigurasjonsinnstillingen hvis den er angitt.
           translation_backend: Oversettelsesstøtte (google eller deepl)
           value: 'Verdi. Interpolerer: %{value}, %{human_key}, %{key}, %{default},
@@ -1238,6 +1242,7 @@ nb:
         tree_subtract: tre A minus nøklene i tre B
         tree_translate: Google Oversett et tre til rotlokaliteter
         unused: vis ubrukte oversettelser
+        cp: kopier nøklene i lokalitetsdata som samsvarer med det gitte mønsteret
       encourage:
       - Godt jobbet!
       - Bra gjort!
@@ -1613,6 +1618,8 @@ nb:
         confidential: Konfidensiell
         callback_urls: Callback url-er
         actions: Handlinger
+        secret_hashed: Hemmelig hash
+        not_defined: Ikke definert
     authorizations:
       buttons:
         authorize: Autoriser
@@ -1625,6 +1632,8 @@ nb:
         able_to: Denne applikasjonen vil ha tilgang til å gjøre følgende
       show:
         title: Autorisasjonskode
+      form_post:
+        title: Send inn dette skjemaet
     authorized_applications:
       confirmations:
         revoke: Er du sikker?
@@ -1653,8 +1662,6 @@ nb:
         access_denied: Ressurs-eieren eller autorisasjonsserveren nektet forespørelsen
           fra å fullføre.
         invalid_scope: Forespørselens omfang er ugyldig, ukjent, eller feilskrevet.
-        invalid_code_challenge_method: The code challenge method must be plain or
-          S256.
         server_error: Autoriseringsserveren har møtt en uforventet betingelse som
           har forhindret serveren fra å fullføre forespørselen.
         temporarily_unavailable: Autorisasjonsserveren er for øyeblikket utilgjengelig
@@ -1683,6 +1690,14 @@ nb:
           unauthorized: You are not authorized to revoke this token
         invalid_resource_owner: Den oppgitte påloggingsinformasjonen for ressurseier
           er ikke gyldig, eller ressurseieren kan ikke finnes
+        invalid_code_challenge_method:
+          zero: Autorisasjonsserveren støtter ikke PKCE ettersom det ikke er aksepterte
+            verdier for code_challenge_method.
+          one: Code_challenge_method må være %{challenge_methods}.
+          other: Code_challenge_method må være en av %{challenge_methods}.
+        unsupported_response_mode: Autorisasjonsserveren støtter ikke denne responsmodusen.
+        forbidden_token:
+          missing_scope: Tilgang til denne ressursen krever omfanget "%{oauth_scopes}".
     flash:
       applications:
         create:
@@ -2620,10 +2635,6 @@ nb:
       confirm:
         already_confirmed: Brukerkontoen din er allerede bekreftet. Vennligst Logg
           inn.
-      find_user_from_password_reset_token!:
-        does_not_match_token: Tilsvarer ikke brukerens tilbakestillingstoken for passord
-        token_expired: Token for tilbakestilling av passord er utløpt. Prøv å tilbakestille
-          passordet på nytt.
       resend_confirmation_email:
         please_sign_in: Kan ikke finne en bruker som samsvarer med den e-postadressen!
         resending_email: E-postbekreftelse sendt på nytt
@@ -2649,6 +2660,10 @@ nb:
       update_password_with_reset_token:
         password_reset_successfully: Passord tilbakestilt. Du har blitt logget på
           Bike Index.
+      find_user_from_token_for_password_reset!:
+        does_not_match_token: Tilsvarer ikke brukerens tilbakestillingstoken for passord
+        token_expired: Token for tilbakestilling av passord er utløpt. Prøv å tilbakestille
+          passordet på nytt.
     welcome:
       recovery_stories:
         no_stories_to_display: Ingen gjenopprettingshistorier å vise
@@ -5822,3 +5837,8 @@ nb:
       go_here_to_learn_more: Gå hit for å lære mer
       oh_no: Å nei!
       unsupported_browser: Vi beklager, Bike Index støtter ikke nettleseren din.
+  attributes:
+    bikes:
+      location: plassering
+      primary_colors: Primærfarger
+      serial: Seriell

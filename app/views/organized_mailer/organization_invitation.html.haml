@@ -1,10 +1,10 @@
-%h1= translate_with_args(".html.hello", name: @membership.invited_display_name)
+%h1= t(".html.hello", name: @membership.invited_display_name)
 
 - if @is_new_user
-  %h2= translate_with_args(".html.welcome_to_bike_index")
+  %h2= t(".html.welcome_to_bike_index")
 
 - if @sender.present?
-  %p= translate_with_args(".html.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
+  %p= t(".html.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
 
 - tokenized_url = @email_preview ? @email_preview_tokenized_url : new_user_url(email: @vars[:email])
-= link_to translate_with_args(".html.join_org", org_name: @organization.short_name), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'
+= link_to t(".html.join_org", org_name: @organization.short_name), tokenized_url, "data-pm-no-track" => true, class: 'binx-button'

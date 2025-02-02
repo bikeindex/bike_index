@@ -2,39 +2,39 @@
   - unless sign_in_partner.present?
     .sign-in-up-header.container
       .row
-        %h1= translate_with_args(".get_on_bike_index")
+        %h1= t(".get_on_bike_index")
   .container
     .sign-in-up-wrap
       .row
         .oauth-providers
           -# %a.facebook-login{ href: '/auth/facebook' }
           -#   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
-          /    %span.oauth-text-block= translate_with_args(".sign_up_using_facebook")
+          /    %span.oauth-text-block= t(".sign_up_using_facebook")
           -# %a.strava-login{ href: '/auth/strava' }
           -#   %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
-          /   %span.oauth-text-block= translate_with_args(".sign_up_using_strava")
+          /   %span.oauth-text-block= t(".sign_up_using_strava")
           -# %a.globalid-login{ href: '/auth/globalid' }
           -#   %span.oauth-logo-block= image_tag 'revised/globalid_logo.svg'
-          /   %span.oauth-text-block= translate_with_args(".sign_up_using_globalid")
+          /   %span.oauth-text-block= t(".sign_up_using_globalid")
         .sign-in-up-or
         .main-form
           - company = session[:company] if sign_in_partner.present? && session[:company].present?
           %h3.sign-in-up-main-form-header{ class: (company.present? ? "mb-1" : "") }
             %small
               - if sign_in_partner.present?
-                = translate_with_args(".already_have_a_bike_index_account")
+                = t(".already_have_a_bike_index_account")
               - else
-                = translate_with_args(".already_have_an_account")
-              = link_to translate_with_args(".log_in"), new_session_path(partner: sign_in_partner, email: params[:email])
+                = t(".already_have_an_account")
+              = link_to t(".log_in"), new_session_path(partner: sign_in_partner, email: params[:email])
             - if company.present?
               - image_path = company.match?(/metro/i) ? "bikehub/metro_logo.png" : "bikehub/bikehub_logo_nosubtitle.png"
               = image_tag image_path, alt: "", class: "company-logo"
-              = translate_with_args(".sign_up")
+              = t(".sign_up")
               %span.company-text.uncap
                 for
                 %em= company
             - else
-              = translate_with_args(".sign_up")
+              = t(".sign_up")
 
           = form_for @user do |f|
             - if sign_in_partner
@@ -50,23 +50,23 @@
               = f.label :password, class: 'sr-only'
               = f.password_field :password, placeholder: 'password', class: 'form-control'
               .password-help-text
-                = translate_with_args(".password_helper_text_html", better_password_link: link_to(t(".better_password"), "https://xkcd.com/936/", tabindex: -1))
+                = t(".password_helper_text_html", better_password_link: link_to(t(".better_password"), "https://xkcd.com/936/", tabindex: -1))
 
             .checkbox.terms-and-conditions
               %label
                 -# BikeHub requires TOC agreement
                 = f.check_box :terms_of_service, required: sign_in_partner == "bikehub"
                 - if sign_in_partner == "bikehub"
-                  = translate_with_args(".agree_bikeindex_bikehub_toc_html",
+                  = t(".agree_bikeindex_bikehub_toc_html",
                   bikehub_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: "https://bikehub.com/legal/" }, class: "no-tab"),
                   bikeindex_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: terms_path }, class: "no-tab"))
                 - else
-                  = translate_with_args(".agree_bikeindex_toc_html", bikeindex_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: terms_path }, class: "no-tab"))
+                  = t(".agree_bikeindex_toc_html", bikeindex_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: terms_path }, class: "no-tab"))
 
             - unless sign_in_partner.present?
               .checkbox
                 %label
                   = f.check_box :notification_newsletters
-                  = translate_with_args(".get_bike_indexs_newsletter")
+                  = t(".get_bike_indexs_newsletter")
 
-            = f.submit translate_with_args(".sign_up"), class: 'btn btn-primary btn-lg'
+            = f.submit t(".sign_up"), class: 'btn btn-primary btn-lg'

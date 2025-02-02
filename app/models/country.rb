@@ -17,7 +17,7 @@ class Country < ApplicationRecord
 
   def self.select_options
     pluck(:id, :iso).map do |id, iso|
-      [i18n_translate_with_args(iso, scope: :countries), id]
+      [I18n.t(iso, scope: :countries), id]
     end
   end
 

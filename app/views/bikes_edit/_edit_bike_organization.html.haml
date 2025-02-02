@@ -13,17 +13,17 @@
     %span.can-edit-checkbox
       - if bike_organization.overridden_by_user_registration?
         %em
-          = link_to translate_with_args(".manage_organization_information_via"), edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link"
+          = link_to t(".manage_organization_information_via"), edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link"
       - else
         %label.checkbox-inline.not-fixed.pt-0
           = check_box_tag "organization_ids_can_edit_claimed[]", organization.id, bike_organization.can_edit_claimed, multiple: true
-          = translate_with_args(".can_edit_this_bike", bike_type: @bike.type)
+          = t(".can_edit_this_bike", bike_type: @bike.type)
         - if bike_organization.user_registration_organization&.manages_information?
           %br
-          = link_to translate_with_args(".manage_organization_information"), edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link mb-2"
+          = link_to t(".manage_organization_information"), edit_my_account_path(edit_template: "registration_organizations"), class: "gray-link mb-2"
   - unless bike_organization.overridden_by_user_registration?
     .right-input-help.pt-sm-2
       %a.optional-form-block.remove-organization{ href: '#' }
         %span.context-display-help
           &ndash;
-        = translate_with_args(".remove")
+        = t(".remove")

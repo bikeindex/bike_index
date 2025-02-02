@@ -1,17 +1,17 @@
 .container
   %h1
-    = translate_with_args(".thanks_for_signing_up_for_bike_index")
+    = t(".thanks_for_signing_up_for_bike_index")
   %h3
-    = translate_with_args(".please_verify_your_email")
+    = t(".please_verify_your_email")
 
   - if @user.present?
-    %p= translate_with_args(".we_sent_an_email_to_user_email_html", user_email: @user.email)
+    %p= t(".we_sent_an_email_to_user_email_html", user_email: @user.email)
     %p
-      = translate_with_args(".did_not_get_an_email")
-      = link_to translate_with_args(".resend_confirmation_email"), resend_confirmation_email_users_path, method: :post
+      = t(".did_not_get_an_email")
+      = link_to t(".resend_confirmation_email"), resend_confirmation_email_users_path, method: :post
   - else
-    %p= translate_with_args(".we_sent_an_email")
-    %p= translate_with_args(".did_not_get_an_email")
+    %p= t(".we_sent_an_email")
+    %p= t(".did_not_get_an_email")
 
     = form_tag resend_confirmation_email_users_path, method: :post do
       .row
@@ -22,7 +22,7 @@
             = email_field_tag :email, nil, required: true, class: 'form-control'
         .col-md-6
           .actions{ style: "margin-top: 2.5rem;" }
-            = submit_tag translate_with_args(".resend_confirmation_email"), class: 'btn btn-primary'
+            = submit_tag t(".resend_confirmation_email"), class: 'btn btn-primary'
 
 
 :plain

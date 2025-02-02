@@ -1,5 +1,5 @@
 .mb-4
-  %h1.uncap= translate_with_args(".location_settings_html", org_name: @organization.name)
+  %h1.uncap= t(".location_settings_html", org_name: @organization.name)
 
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   = hidden_field_tag :locations_page, true
@@ -11,10 +11,10 @@
           = f.check_box :show_on_map # Note: This ID is called by the JS
           = f.label :show_on_map do
             - map_link = link_to(t(".bike_index_partner_map"), where_path, target: "_blank" )
-            = translate_with_args(".display_org_on_map_html", org_name: @organization.name, map_link: map_link)
+            = t(".display_org_on_map_html", org_name: @organization.name, map_link: map_link)
 
     .col-sm-6.text-right.mt-2
-      = link_to_add_fields translate_with_args(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
+      = link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
 
   - @organization.locations.build unless @organization.locations.first.present?
 
@@ -25,4 +25,4 @@
 
   .form-group.row
     .col-sm-4.col-sm-push-4
-      = f.submit translate_with_args(".save"), class: "btn btn-success btn-lg"
+      = f.submit t(".save"), class: "btn btn-success btn-lg"

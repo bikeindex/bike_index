@@ -48,7 +48,6 @@ en:
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        password_reset_token: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
@@ -65,6 +64,7 @@ en:
         superuser: Superuser
         terms_of_service: Terms of service
         title: Title
+        token_for_password_reset: Password reset token
         twitter: Twitter
         user_emails: User emails
         username: Username
@@ -290,8 +290,10 @@ en:
         authorized_tokens: Authorized tokens
         can_send_stolen_notifications: Can send stolen notifications
         is_internal: Is internal
+        name: Name
         owner: :activerecord.models.owner
         owner_type: Owner type
+        redirect_uri: Redirect URI
         scopes: Scopes
         secret: Secret
         uid: Uid
@@ -652,7 +654,6 @@ en:
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        password_reset_token: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
@@ -669,6 +670,7 @@ en:
         superuser: Superuser
         terms_of_service: Terms of service
         title: Title
+        token_for_password_reset: Password reset token
         twitter: Twitter
         user_emails: User emails
         username: Username
@@ -794,6 +796,13 @@ en:
         bike_sticker:
           not_found: not found
           unauthorized_to_claim: does not have permission to claim this
+        doorkeeper/application:
+          attributes:
+            redirect_uri:
+              fragment_present: cannot contain a fragment.
+              invalid_uri: must be a valid URI.
+              relative_uri: must be an absolute URI.
+              secured_uri: must be an HTTPS/SSL URI.
         export:
           required: required
         impound_record:
@@ -976,6 +985,11 @@ en:
         stolen: stolen
         unregistered: unregistered
         with_owner: with owner
+  attributes:
+    bikes:
+      location: Location
+      primary_colors: Primary colors
+      serial: Serial
   bike_versions:
     index:
       primary_colors: Primary colors
@@ -1917,7 +1931,7 @@ en:
     users:
       confirm:
         already_confirmed: Your user account is already confirmed. Please log in.
-      find_user_from_password_reset_token!:
+      find_user_from_token_for_password_reset!:
         does_not_match_token: Doesn't match user's password reset token
         token_expired: Password reset token expired, try resetting password again.
       resend_confirmation_email:
@@ -2323,6 +2337,13 @@ en:
       log_in_to_send_a_comment: Log in to send a comment!
       you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
         your message right here.
+  gflash:
+    titles:
+      error: Error
+      notice: Notice
+      progress: Progress
+      success: Success
+      warning: Warning
   helpers:
     bike_helper:
       hidden: hidden

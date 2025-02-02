@@ -37,10 +37,10 @@ module BikeEditable
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation_with_args(:theft_details, scope: t_scope)
-      h[:publicize] = translation_with_args(:publicize, scope: t_scope)
-      h[:alert] = translation_with_args(:alert, scope: t_scope)
-      h[:report_recovered] = translation_with_args(:report_recovered, scope: t_scope)
+      h[:theft_details] = translation(:theft_details, scope: t_scope)
+      h[:publicize] = translation(:publicize, scope: t_scope)
+      h[:alert] = translation(:alert, scope: t_scope)
+      h[:report_recovered] = translation(:report_recovered, scope: t_scope)
     end
   end
 
@@ -49,21 +49,21 @@ module BikeEditable
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation_with_args(:bike_details, scope: t_scope)
-      h[:found_details] = translation_with_args(:found_details, scope: t_scope) if @bike.status_found?
-      h[:photos] = translation_with_args(:photos, scope: t_scope)
-      h[:drivetrain] = translation_with_args(:drivetrain, scope: t_scope)
-      h[:accessories] = translation_with_args(:accessories, scope: t_scope)
+      h[:bike_details] = translation(:bike_details, scope: t_scope)
+      h[:found_details] = translation(:found_details, scope: t_scope) if @bike.status_found?
+      h[:photos] = translation(:photos, scope: t_scope)
+      h[:drivetrain] = translation(:drivetrain, scope: t_scope)
+      h[:accessories] = translation(:accessories, scope: t_scope)
       unless @bike.version?
-        h[:ownership] = translation_with_args(:ownership, scope: t_scope)
-        h[:groups] = translation_with_args(:groups, scope: t_scope)
+        h[:ownership] = translation(:ownership, scope: t_scope)
+        h[:groups] = translation(:groups, scope: t_scope)
       end
-      h[:remove] = translation_with_args(:remove, scope: t_scope)
+      h[:remove] = translation(:remove, scope: t_scope)
       if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
-        h[:versions] = translation_with_args(:versions, scope: t_scope)
+        h[:versions] = translation(:versions, scope: t_scope)
       end
       unless @bike.status_stolen_or_impounded? || @bike.version?
-        h[:report_stolen] = translation_with_args(:report_stolen, scope: t_scope)
+        h[:report_stolen] = translation(:report_stolen, scope: t_scope)
       end
     end
   end

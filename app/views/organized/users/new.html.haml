@@ -1,42 +1,42 @@
 .mb-4
   %h1
-    = translate_with_args(".invite_user")
+    = t(".invite_user")
   - if current_organization.restrict_invitations?
     %p
       - count = number_with_delimiter(current_organization.sent_invitation_count)
-      = translate_with_args(".you_have_invited_html", users_count: pluralize(count, translate_with_args(".user")))
+      = t(".you_have_invited_html", users_count: pluralize(count, t(".user")))
     %p
       - count = number_with_delimiter(current_organization.remaining_invitation_count)
-      = translate_with_args(".remaining_invites_html", invitations_count: count)
+      = t(".remaining_invites_html", invitations_count: count)
   - if current_organization.enabled?("passwordless_users")
-    %p= translate_with_args(".automatic_passwordless")
+    %p= t(".automatic_passwordless")
 
     - if current_organization.passwordless_user_domain.present?
       .alert.alert-info.mt-4.col-md-8.offset-md-1
         %strong
-          = translate_with_args(".you_have_a_permitted_domain")
+          = t(".you_have_a_permitted_domain")
         %br
-        = translate_with_args(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
+        = t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
 
 = form_for @membership, { as: :membership, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 
   - if @membership.errors.any?
-    = render partial: "shared/errors", locals: { name: translate_with_args(".membership"), obj: @membership }
+    = render partial: "shared/errors", locals: { name: t(".membership"), obj: @membership }
 
   - display_multi_invite = params[:multiple_emails_invited].present?
   .form-group.row#singleEmailInvite{ class: display_multi_invite ? "currently-hidden" : "" }
-    = f.label :invited_email, translate_with_args(".email_youre_inviting"), class: "org-form-label"
+    = f.label :invited_email, t(".email_youre_inviting"), class: "org-form-label"
     .col-sm-4
       = f.email_field :invited_email, class: "form-control"
       .below-input-help
         %a#multipleUserSelect{ href: "#" }
-          = translate_with_args(".invite_multiple_emails")
+          = t(".invite_multiple_emails")
 
   .form-group.row#multipleEmailInvite{ class: display_multi_invite ? "" : "currently-hidden" }
     = label_tag :multiple_emails_invited, class: "org-form-label" do
-      = translate_with_args(".multiple_emails")
+      = t(".multiple_emails")
       %br
-      %em.small= translate_with_args(".1_email_per_line")
+      %em.small= t(".1_email_per_line")
 
     .col-sm-4#multipleEmailInviteField{ class: display_multi_invite ? "" : "currently-hidden" }
       = text_area_tag :multiple_emails_invited,
@@ -49,4 +49,4 @@
 
   .form-group.row
     .form-submit-button
-      = f.submit translate_with_args(".send_invitation"), class: 'btn btn-success btn-lg'
+      = f.submit t(".send_invitation"), class: 'btn btn-success btn-lg'

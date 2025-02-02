@@ -8,9 +8,9 @@ module Organized
       completed_at = (params[:completed] == "true") ? Time.current : nil
 
       if ambassador_task_assignment.update(completed_at: completed_at)
-        flash[:info] = translation_with_args(:status_updated)
+        flash[:info] = translation(:status_updated)
       else
-        flash[:error] = translation_with_args(:could_not_update)
+        flash[:error] = translation(:could_not_update)
       end
 
       redirect_to organization_ambassador_dashboard_url(current_organization)

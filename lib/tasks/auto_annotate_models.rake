@@ -1,3 +1,4 @@
+# Annotate is only used in development
 if Rails.env.development?
   require "annotate"
   task :set_annotation_options do
@@ -51,6 +52,5 @@ if Rails.env.development?
       "with_comment" => "true"
     )
   end
-
   Annotate.load_tasks
 end

@@ -32,7 +32,7 @@ class ExchangeRate < ApplicationRecord
   end
 
   def self.required_targets
-    I18n.available_locales.map { |locale| i18n_translate_with_args(locale, scope: [:money, :currencies]) }
+    I18n.available_locales.map { |locale| I18n.t(locale, scope: [:money, :currencies]) }
   end
 
   private

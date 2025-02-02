@@ -74,6 +74,7 @@ nl:
           tb: TB
           eb: EB
           pb: PB
+          zb: ZB
       decimal_units:
         units:
           thousand: duizend
@@ -136,6 +137,7 @@ nl:
         het geen afbeelding? Oorspronkelijke fout: %{e}'
       min_size_error: Bestandsgrootte moet groter zijn dan %{min_size}
       max_size_error: Bestandsgrootte moet kleiner zijn dan %{max_size}
+      password_too_long: is te lang
     template:
       body: 'Er zijn problemen met de volgende velden:'
       header:
@@ -308,7 +310,6 @@ nl:
         partner_data: Partner gegevens
         password: Wachtwoord
         password_digest: Wachtwoord samenvatting
-        password_reset_token: Wachtwoord reset token
         payments: Betalingen
         phone: Telefoon
         preferred_language: Voorkeurstaal
@@ -331,6 +332,7 @@ nl:
         website: Website
         when_vendor_terms_of_service: Wanneer servicevoorwaarden van de verkoper
         zipcode: Postcode
+        token_for_password_reset: Wachtwoord reset token
       ambassador_task:
         ambassador_task_assignments: Taken van ambassadeurs
         ambassadors: Ambassadors
@@ -783,7 +785,6 @@ nl:
         partner_data: Partner gegevens
         password: Wachtwoord
         password_digest: Wachtwoord samenvatting
-        password_reset_token: Wachtwoord reset token
         payments: Betalingen
         phone: Telefoon
         preferred_language: Voorkeurstaal
@@ -806,6 +807,7 @@ nl:
         website: Website
         when_vendor_terms_of_service: Wanneer servicevoorwaarden van de verkoper
         zipcode: Postcode
+        token_for_password_reset: Wachtwoord reset token
       user_email:
         confirmation_token: Bevestigingstoken
         email: E-mailadres
@@ -1130,12 +1132,9 @@ nl:
           data_format: 'Gegevensindeling: %{valid_text}.'
           keep_order: Houd de volgorde van de sleutels aan
           key_pattern: Filter door de belangrijkste patroon (bijv. 'Common. *')
-          key_pattern_to_rename: Volledige toets (patroon) te hernoemen. Verplicht
           locale_to_translate_from: Locale te vertalen van
           locales_filter: 'Locale (s) te verwerken. Special: base'
           missing_types: 'Filteren op typen: %{valid}'
-          new_key_name: Nieuwe naam, interpoleert de oorspronkelijke naam als %{key}.
-            Verplicht
           nostdin: Niet lezen van stdin
           out_format: 'Uitvoerformaat: %{valid_text}'
           pattern_router: 'Gebruik patroon router: toetsen verplaatst per config data.write'
@@ -1179,6 +1178,8 @@ nl:
         tree_subtract: boom A minus de toetsen in boom B
         tree_translate: Google Vertaal een boom naar root-locales
         unused: tonen ongebruikte vertalingen
+        cp: kopieer de sleutels in landinstellingen die overeenkomen met het gegeven
+          patroon
       encourage:
       - Goed gedaan!
       - Goed gedaan!
@@ -1310,6 +1311,12 @@ nl:
         empty_message_body: lege berichttekst geleverd met %{body_format} inhoudstype
         too_many_multipart_files: het aantal geüploade bestanden overschreed de geconfigureerde
           limiet van het systeem (%{limit})
+        length: wordt verwacht een lengte te hebben binnen %{min} en %{max}
+        length_is: wordt verwacht een lengte te hebben die exact gelijk is aan %{is}
+        length_min: wordt verwacht een lengte te hebben die groter is dan of gelijk
+          is aan %{min}
+        length_max: wordt verwacht een lengte te hebben die kleiner is dan of gelijk
+          is aan %{max}
   flash:
     actions:
       create:
@@ -1629,6 +1636,8 @@ nl:
         callback_urls: Callback urls
         actions: Acties
         confidential: Confidential
+        secret_hashed: Geheim gehasht
+        not_defined: Niet gedefinieerd
     authorizations:
       buttons:
         authorize: Authoriseren
@@ -1641,6 +1650,8 @@ nl:
         able_to: Deze applicatie zal in staat zijn om
       show:
         title: Authorisatie code
+      form_post:
+        title: Dit formulier indienen
     authorized_applications:
       confirmations:
         revoke: Weet je het zeker?
@@ -1682,8 +1693,6 @@ nl:
           revoked: Het toegangstoken is geweigerd
           expired: Het toegangstoken is verlopen
           unknown: Het toegangstoken is ongeldig
-        invalid_code_challenge_method: The code challenge method must be plain or
-          S256.
         admin_authenticator_not_configured: Access to admin panel is forbidden due
           to Doorkeeper.configure.admin_authenticator being unconfigured.
         revoke:
@@ -1696,6 +1705,15 @@ nl:
             pkce niet.
           request_not_authorized: Verzoek moet worden geautoriseerd. Vereiste parameter
             voor het autoriseren van de aanvraag ontbreekt of is ongeldig.
+        invalid_code_challenge_method:
+          zero: De autorisatieserver ondersteunt PKCE niet omdat er geen geaccepteerde
+            code_challenge_method-waarden zijn.
+          one: De code_challenge_method moet %{challenge_methods} zijn.
+          other: De code_challenge_method moet een van %{challenge_methods} zijn.
+        unsupported_response_mode: De autorisatieserver ondersteunt deze reactiemodus
+          niet.
+        forbidden_token:
+          missing_scope: Voor toegang tot deze bron is bereik "%{oauth_scopes}" vereist.
     flash:
       applications:
         create:
@@ -2291,11 +2309,6 @@ nl:
       resend_confirmation_email:
         please_sign_in: Log in om de bevestiging opnieuw te verzenden
         resending_email: E-mailbevestiging opnieuw verzonden
-      find_user_from_password_reset_token!:
-        does_not_match_token: Komt niet overeen met het wachtwoord-reset-token van
-          de gebruiker
-        token_expired: Wachtwoord-reset-token is verlopen, probeer het wachtwoord
-          opnieuw in te stellen.
       reset_password_token_update_form:
         link_no_longer_valid: Het spijt ons, maar die link is niet langer geldig.
       send_password_reset_email:
@@ -2308,6 +2321,11 @@ nl:
           bij Bike Index.
       unsubscribe_update:
         successfully_unsubscribed: U bent afgemeld voor updates van Bike Index.
+      find_user_from_token_for_password_reset!:
+        does_not_match_token: Komt niet overeen met het wachtwoord-reset-token van
+          de gebruiker
+        token_expired: Wachtwoord-reset-token is verlopen, probeer het wachtwoord
+          opnieuw in te stellen.
     concerns:
       controller_helpers:
         authenticate_user:
@@ -5972,3 +5990,8 @@ nl:
   bike_versions:
     index:
       primary_colors: Primaire kleuren
+  attributes:
+    bikes:
+      location: Plaats
+      primary_colors: Primaire kleuren
+      serial: Serie

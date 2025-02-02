@@ -17,8 +17,10 @@ class ComponentGenerator < Rails::Generators::NamedBase
     template("component.html.erb", File.join(app_component_dir, "component.html.erb"))
     template("component_controller.js", stimulus_controller_path)
     template("preview.rb", File.join(app_component_dir, "component_preview.rb"))
+    # generate the locales
+    I18n.available_locales.each { |locale| create_locale_file(locale) }
 
-    # Create files in spec/components/
+    # Create tests in spec/components/
     template("component_spec.rb", File.join(spec_component_dir, "component_spec.rb"))
     template("component_system_spec.rb", File.join(spec_component_dir, "component_system_spec.rb"))
   end
@@ -73,5 +75,23 @@ class ComponentGenerator < Rails::Generators::NamedBase
 
   def preview_path
     "/rails/view_components/#{component_dir}/component/default"
+  end
+
+  def create_locale_file(locale)
+    create_file(
+      File.join(app_component_dir, "component.#{locale}.yml"),
+      translation_hash(locale).to_yaml
+    )
+  end
+
+  def translation_hash(locale)
+    translation_scope_array = [locale.to_s, "components"] + class_name.underscore.downcase.split("/")
+
+    translation_scope_array.reverse.inject(translation_keys) { |hash, key| {key => hash} }
+  end
+
+  def translation_keys
+    keys = attributes.any? ? attributes.map(&:name) : []
+    keys.map { |name| [name, name.capitalize] }.to_h
   end
 end

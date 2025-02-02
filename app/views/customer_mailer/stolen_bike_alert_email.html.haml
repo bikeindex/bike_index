@@ -1,16 +1,16 @@
 %h1{style: "font-weight: 400; font-size: 30px;"}
-  = translate_with_args(".html.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)
+  = t(".html.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)
 
 %p
-  = translate_with_args(".html.we_sent_out_this_tweet_from")
+  = t(".html.we_sent_out_this_tweet_from")
 
   = succeed "," do
     = link_to "@#{@tweet_account_screen_name}", @twitter_account_url
 
   - if @location.present?
     = @location
-    = translate_with_args(".html.area")
-  = translate_with_args(".html.stolen_bike_alerter")
+    = t(".html.area")
+  = t(".html.stolen_bike_alerter")
 
 - if @tweet_text.blank?
   = link_to @tweet_url, @tweet_url
@@ -32,12 +32,12 @@
     - if @retweet_screen_names.present?
       - retweets = @retweet_screen_names.map{ |sn| "<a href='https://twitter.com/#{sn}'>@#{sn}</a>" }
       %p{style: "color: #95A5A5; font-size: .9em; text-align: center; margin: 0 auto; clear: both; padding: .25em 1em .75em; width: 90%; background: #f7f7f7; border: 1px solid #dfe3ee; border-radius: 0 0 4px 4px;"}
-        = translate_with_args(".html.alert_retweeted_by_html", retweets: retweets.to_sentence.html_safe)
+        = t(".html.alert_retweeted_by_html", retweets: retweets.to_sentence.html_safe)
 
 
 - if @bike.current_stolen_record&.display_checklist?
   %h3{style: "margin: 2rem 0 1rem"}
-    = translate_with_args(".html.improve_your_chances_of_recovery_by_doing")
+    = t(".html.improve_your_chances_of_recovery_by_doing")
   = render partial: "/bikes/stolen_checklist",
   locals: { stolen_record: @bike.current_stolen_record }
 
@@ -45,6 +45,6 @@
 
 %p{style: "margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;"}
   - date = @bike.created_at.strftime("%m.%d.%y")
-  = translate_with_args(".html.this_email_is_about_the_stolen_bike", bike_type: @bike_type, date: date)
+  = t(".html.this_email_is_about_the_stolen_bike", bike_type: @bike_type, date: date)
 
 = render partial: 'shared/email_bike_box', locals: {bike_url_path: bike_url(@bike)}

@@ -6,7 +6,7 @@
   .row.first-row
     .col-md-12
       %h1
-        = translate_with_args(".search_for_stolenness_desc_bikes", stolenness_desc: stolenness_desc)
+        = t(".search_for_stolenness_desc_bikes", stolenness_desc: stolenness_desc)
 
   .row
     .col-md-12
@@ -16,24 +16,24 @@
         %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
           %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }
             %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'proximity')), class: ('active' if @stolenness == 'proximity'), role: 'tab' }
-              = translate_with_args(".stolen_within")
+              = t(".stolen_within")
               %span#search_distance
                 X
-              = translate_with_args(".miles_of")
+              = t(".miles_of")
               %span#search_location
-                = translate_with_args(".you")
+                = t(".you")
               %span.count
           %li#stolenness_tab_stolen.nav-item{ data: { stolenness: 'stolen' } }
             %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'stolen')), class: ('active' if @stolenness == 'stolen'), role: 'tab' }
-              = translate_with_args(".stolen_anywhere")
+              = t(".stolen_anywhere")
               %span.count
           %li#stolenness_tab_non.nav-item{ data: { stolenness: 'non' } }
             %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'non')), class: ('active' if @stolenness == 'non'), role: 'tab' }
-              = translate_with_args(".not_marked_stolen")
+              = t(".not_marked_stolen")
               %span.count
           %li#stolenness_tab_all.nav-item{ data: { stolenness: 'all' } }
             %a.nav-link{ href: bikes_path(sortable_search_params.merge(stolenness: 'all')), class: ('active' if @stolenness == 'all'), role: 'tab' }
-              = translate_with_args(".all")
+              = t(".all")
   .row.bikes-searched-default
     .col-md-12
       - if @bikes.present?
@@ -50,7 +50,7 @@
             = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}
       - else
         %h3.no-exact-results
-          = translate_with_args(".no_bikes_matched")
+          = t(".no_bikes_matched")
 
   #js-secondary-searches
 

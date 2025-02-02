@@ -13,7 +13,7 @@
               - if @user.title.present?
                 = @user.title
               - else
-                = translate_with_args(".this_users_bikes")
+                = t(".this_users_bikes")
             %p.sharing-links
               = show_sharing_links(@user)
       -# .col-md-6.ad-col
@@ -25,7 +25,7 @@
             = @user.description
     .row
       .col-md-8
-        %h3= translate_with_args(".bikes")
+        %h3= t(".bikes")
       .sharing-section.col-md-4
         = render '/shared/share_this'
     .row.shared-bikes-row
@@ -39,7 +39,7 @@
                     = bike_thumb_image(bike)
                     - if bike.status_stolen?
                       %span.personal-page-stolen-tag
-                        = translate_with_args(".stolen")
+                        = t(".stolen")
                   .card-title
                     %h4
                       = link_to bike.title_string, bike_path(bike)
@@ -49,4 +49,4 @@
                 = paginate @bikes
         - else
           %h2
-            = translate_with_args(".this_user_has_no_bikes_yet")
+            = t(".this_user_has_no_bikes_yet")

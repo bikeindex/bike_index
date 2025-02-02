@@ -10,7 +10,7 @@
     = render partial: "/shared/alert", locals: { body: msg, type: name }
 
   - if @page_errors.present? # Primarily used for form object errors
-    - title = translate_with_args(".please_fix_the_following", errors: pluralize(@page_errors.count, translate_with_args(".error")))
+    - title = t(".please_fix_the_following", errors: pluralize(@page_errors.count, t(".error")))
     - error_body = capture_haml do
       %ul
         - @page_errors = @page_errors.full_messages if @page_errors.is_a?(ActiveModel::Errors)

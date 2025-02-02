@@ -40,11 +40,15 @@ module Bikeindex
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
 
+    # Remove after Rails 8
+    config.active_support.to_time_preserves_timezone = :zone
+
     # Disable default implicit presence validation for belongs_to relations
     config.active_record.belongs_to_required_by_default = false
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
+    config.i18n.load_path += Dir[Rails.root.join("app", "components", "**", "*.{yml}").to_s]
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en es it nl nb]
@@ -75,6 +79,7 @@ module Bikeindex
       Rails.application.config.assets.paths << Rails.root.join("app")
     end
     config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
+    config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option
 
     config.generators do |g|
       g.helper nil

@@ -1,21 +1,21 @@
 %h2.header-font-uncap
-  = translate_with_args(".ambassador_resources")
+  = t(".ambassador_resources")
 
 %p.mt-4
-  = translate_with_args(".as_an_ambassador_you_have_access_to_a_num")
+  = t(".as_an_ambassador_you_have_access_to_a_num")
 %ul
-  %li= translate_with_args(".youre_a_moderator_on_discuss_html")
-  %li= translate_with_args(".you_can_send_stolen_messages_html")
-  %li= translate_with_args(".you_can_mark_stolen_bikes")
-  %li= translate_with_args(".access_to_quick_communication")
-  %li= translate_with_args(".periodic_discount_codes")
+  %li= t(".youre_a_moderator_on_discuss_html")
+  %li= t(".you_can_send_stolen_messages_html")
+  %li= t(".you_can_mark_stolen_bikes")
+  %li= t(".access_to_quick_communication")
+  %li= t(".periodic_discount_codes")
 
 
 %p.mt-4
-  = translate_with_args(".some_additional_resources")
+  = t(".some_additional_resources")
 
 %ol
-  %li= link_to(t(".qr_sticker_org_instructions"), translate_with_args(".qr_sticker_org_instructions_url"))
-  %li= link_to(t(".qr_sticker_instructions"), translate_with_args(".qr_sticker_instructions_url"))
-  %li= translate_with_args(".page_on_bike_index_html", signup_link: link_to(t(".organizations_sign_up"), new_organization_path))
-  %li= link_to translate_with_args(".tips_for_talking_to_bike_shops"), translate_with_args(".tips_for_talking_to_bike_shops_url")
+  %li= link_to(t(".qr_sticker_org_instructions"), t(".qr_sticker_org_instructions_url"))
+  %li= link_to(t(".qr_sticker_instructions"), t(".qr_sticker_instructions_url"))
+  %li= t(".page_on_bike_index_html", signup_link: link_to(t(".organizations_sign_up"), new_organization_path))
+  %li= link_to t(".tips_for_talking_to_bike_shops"), t(".tips_for_talking_to_bike_shops_url")

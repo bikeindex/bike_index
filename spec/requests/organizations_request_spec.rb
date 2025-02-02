@@ -47,7 +47,7 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.website).to eq "http://example.com"
 
       expect(organization.locations.count).to eq 1
-      expect_hashes_to_match(organization.locations.first, location_attrs)
+      expect(organization.locations.first).to match_hash_indifferently location_attrs
     end
 
     it "creates org, membership, filters approved attrs & redirect to org with current_user and mails" do

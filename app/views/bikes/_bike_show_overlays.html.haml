@@ -26,21 +26,21 @@
           - if @matching_notification&.resolved?
             %strong.text-info{ style: "font-size: 125%;" }
               - if @token_type == "graduated_notification"
-                = translate_with_args(".you_have_already_marked_remaining", bike_type: @bike.type)
+                = t(".you_have_already_marked_remaining", bike_type: @bike.type)
               - else
-                = translate_with_args(".you_have_already_marked_resolved")
+                = t(".you_have_already_marked_resolved")
             .mt-1
               %em.small.less-strong=t(".no_futher_action_necessary")
           - else
             = form_tag resolve_token_bike_path(@bike), method: "PUT" do
               = hidden_field_tag :token, @token
               = hidden_field_tag :token_type, @token_type
-              - button_value = @token_type == "graduated_notification" ? translate_with_args(".mark_graduated_resolved", bike_type: @bike.type) : translate_with_args(".mark_parking_resolved", bike_type: @bike.type)
+              - button_value = @token_type == "graduated_notification" ? t(".mark_graduated_resolved", bike_type: @bike.type) : t(".mark_parking_resolved", bike_type: @bike.type)
               %input{ type: "submit", value: button_value, class: 'btn btn-success btn-lg' }
 
           - if @matching_notification.organization.present?
             .mt-2.small.less-strong
-              = translate_with_args(".organization_sent_this_message", org_name: @matching_notification.organization.name)
+              = t(".organization_sent_this_message", org_name: @matching_notification.organization.name)
               - if @matching_notification.sent_at.present?
                 %span.convertTime.preciseTime.withPreposition
                   = l @matching_notification.sent_at, format: :convert_time
@@ -48,7 +48,7 @@
             - organization_email = @matching_notification.organization.auto_user&.email
             - if organization_email.present?
               .mt-1
-                = translate_with_args(".please_email_organization_with_questions_html", email_link: link_to(organization_email, "mailto:#{organization_email}"))
+                = t(".please_email_organization_with_questions_html", email_link: link_to(organization_email, "mailto:#{organization_email}"))
 
   - if modal_title.blank? || @bike.status_stolen? && session[:recovery_link_token].present?
     -# Delete token so modal doesn't keep rendering
@@ -60,49 +60,49 @@
       - modal_body = capture_haml do
         .modal-body
           %p
-            = translate_with_args(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
+            = t(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
             %br
             %strong
-              = translate_with_args(".its_also_how_we_get_better_at_recovering")
+              = t(".its_also_how_we_get_better_at_recovering")
 
           = form_for @stolen_record, url: bike_recovery_path(bike_id: @bike.id) do |f|
             = hidden_field_tag :token, stolen_record.recovery_link_token
             .form-group
-              = f.label :recovered_description, translate_with_args(".how_did_you_get_it_back")
+              = f.label :recovered_description, t(".how_did_you_get_it_back")
               = f.text_area :recovered_description, class: 'form-control'
             .form-group
-              = f.label :recovered_at, translate_with_args(".when_did_you_recover_it"), class: 'form-well-label'
+              = f.label :recovered_at, t(".when_did_you_recover_it"), class: 'form-well-label'
               - f.object.recovered_at = TimeParser.round(f.object.recovered_at || Time.current)
               = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = f.datetime_local_field :recovered_at, max: Time.current.end_of_day, step: 3600, required: true, class: 'form-control'
             .checkbox
               %label
                 = f.check_box :index_helped_recovery
-                = translate_with_args(".did_we_help")
+                = t(".did_we_help")
             .checkbox
               %label
                 = f.check_box :can_share_recovery
-                = translate_with_args(".can_we_share_your_story")
+                = t(".can_we_share_your_story")
             .modal-btn-footer
               .row
                 .col-xs-6.col-xs-push-6
-                  = submit_tag translate_with_args(".mark_recovered"), class: 'btn btn-success'
+                  = submit_tag t(".mark_recovered"), class: 'btn btn-success'
                 .col-xs-6.col-xs-pull-6
                   %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-                    = translate_with_args(".nevermind")
+                    = t(".nevermind")
 
   - unless modal_title.present? || @bike.creator_unregistered_parking_notification? # We don't want to show claiming info for parking notification unregistered bikes
     - if current_user.present?
       - if @bike.claimable_by?(current_user)
-        - modal_title = translate_with_args(".your_bike", bike_type: @bike.type)
+        - modal_title = t(".your_bike", bike_type: @bike.type)
         - modal_body = capture_haml do
           .modal-body
-            %p= translate_with_args(".were_honored_to_have_your_bike", bike_type: @bike.type)
-            %p= translate_with_args(".claim_it_so_you_can_update_your_listing")
+            %p= t(".were_honored_to_have_your_bike", bike_type: @bike.type)
+            %p= t(".claim_it_so_you_can_update_your_listing")
           .modal-btn-footer
             .row
               .col-xs-6.col-xs-push-3
-                = link_to translate_with_args(".claim_bike_type", bike_type: @bike.type), ownership_path(@bike.current_ownership), class: "btn btn-success"
+                = link_to t(".claim_bike_type", bike_type: @bike.type), ownership_path(@bike.current_ownership), class: "btn btn-success"
       - else
         - bike_edit_overlay_possible = true
   - if modal_title.present?
@@ -117,31 +117,31 @@
         - if @bike.user == current_user
           - if @bike.user_hidden?
             - if @bike.version?
-              %strong.text-warning= translate_with_args(".this_bike_version_is_hidden_html", version_name: @bike.display_name)
+              %strong.text-warning= t(".this_bike_version_is_hidden_html", version_name: @bike.display_name)
             - else
-              %strong.text-warning= translate_with_args(".this_bike_type_is_hidden", bike_type: @bike.type)
-            = translate_with_args(".no_one_can_see_it_but_you")
+              %strong.text-warning= t(".this_bike_type_is_hidden", bike_type: @bike.type)
+            = t(".no_one_can_see_it_but_you")
 
           - if @bike.user?
             - if @bike.status_impounded?
-              = translate_with_args(".thank_you_for_registering_this_found_bike_type", bike_type: @bike.type)
+              = t(".thank_you_for_registering_this_found_bike_type", bike_type: @bike.type)
             - elsif @bike.status_stolen?
-              = translate_with_args(".were_really_bummed_your_bike_type_was_stolen", bike_type: @bike.type)
+              = t(".were_really_bummed_your_bike_type_was_stolen", bike_type: @bike.type)
             - elsif !@bike.user_hidden? # user hidden bikes don't get "whoa"
               - if @bike.version?
-                = translate_with_args(".whoa_this_awesome_version_is_yours", version_name: @bike.display_name)
+                = t(".whoa_this_awesome_version_is_yours", version_name: @bike.display_name)
               - else
-                = translate_with_args(".whoa_this_awesome_bike_type_is_yours", bike_type: @bike.type)
+                = t(".whoa_this_awesome_bike_type_is_yours", bike_type: @bike.type)
 
             - if @bike.public_images.any?
-              = translate_with_args(".add_some_more_information_about_it")
+              = t(".add_some_more_information_about_it")
             - else
               - if @bike.status_with_owner?
-                = translate_with_args(".add_a_picture_of_it")
+                = t(".add_a_picture_of_it")
               - else
-                = translate_with_args(".add_a_picture_so_people_know_what_to_look")
+                = t(".add_a_picture_so_people_know_what_to_look")
         - else
           -# The bike has been sent to someone other than the current_user
-          = translate_with_args(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
+          = t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
         - bike_or_version_link = @bike.version? ? edit_bike_version_path(@bike, edit_template: @bike.default_edit_template) : edit_bike_path(@bike, edit_template: @bike.default_edit_template)
-        = link_to translate_with_args(".edit"), bike_or_version_link, class: "btn btn-secondary"
+        = link_to t(".edit"), bike_or_version_link, class: "btn btn-secondary"

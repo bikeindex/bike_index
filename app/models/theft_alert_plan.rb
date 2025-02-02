@@ -18,7 +18,7 @@
 #
 class TheftAlertPlan < ApplicationRecord
   include Amountable
-  include Localizable
+  include Translatable
 
   validates :name,
     :amount_cents,

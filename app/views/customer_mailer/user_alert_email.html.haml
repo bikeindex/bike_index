@@ -41,7 +41,7 @@
 
   %p.less-strong.center-text
     - date = l @bike.created_at, format: :dotted
-    = translate_with_args(".html.this_email_is_about_the_bike_type_register", bike_type: @bike.type, date: date)
+    = t(".html.this_email_is_about_the_bike_type_register", bike_type: @bike.type, date: date)
 
 
   = render partial: 'shared/email_bike_box'

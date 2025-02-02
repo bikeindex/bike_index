@@ -120,64 +120,65 @@ class StolenRecord < ApplicationRecord
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
-  def self.recovery_display_statuses
-    RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s)
-  end
-
-  def self.find_matching_token(bike_id:, recovery_link_token:)
-    return nil unless bike_id.present? && recovery_link_token.present?
-    unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
-  end
-
-  # Rough time that PR#790 was merged
-  def self.recovering_user_recording_start
-    Time.at(1558821440)
-  end
-
-  def self.locking_description
-    LOCKING_DESCRIPTIONS
-  end
-
-  def self.locking_description_select_options
-    # TODO: normalize with slugifyer, not this random thing
-    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, name.underscore]
-
-    locking_description.map do |name|
-      localized_name = i18n_translate_with_args(normalize.call(name), scope: translation_scope)
-      [localized_name, name]
+  class << self
+    def recovery_display_statuses
+      RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s)
     end
-  end
 
-  def self.locking_defeat_description
-    LOCKING_DEFEAT_DESCRIPTIONS
-  end
-
-  def self.locking_defeat_description_select_options
-    # TODO: normalize with slugifyer, not this random thing
-    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
-    translation_scope = [:activerecord, :select_options, name.underscore]
-
-    locking_defeat_description.map do |name|
-      localized_name = i18n_translate_with_args(normalize.call(name), scope: translation_scope)
-      [localized_name, name]
+    def find_matching_token(bike_id:, recovery_link_token:)
+      return nil unless bike_id.present? && recovery_link_token.present?
+      unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
     end
-  end
 
-  def self.corrected_date_stolen(date = nil)
-    date ||= Time.current
-    date = TimeParser.parse(date) if date.is_a?(String)
-    year = date.year
-    if year < (Time.current - 100.years).year
-      decade = year.to_s[-2..].chars.join("")
-      corrected = date.change(year: "20#{decade}".to_i)
-      date = corrected
+    # Rough time that PR#790 was merged
+    def recovering_user_recording_start
+      Time.at(1558821440)
     end
-    if date > Time.current + 2.days
-      corrected = date.change(year: Time.current.year - 1)
-      date = corrected
+
+    def locking_description
+      LOCKING_DESCRIPTIONS
     end
-    date
+
+    def locking_description_select_options
+      # TODO: normalize with slugifyer, not this random thing
+      normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+      translation_scope = [:activerecord, :select_options, name.underscore]
+
+      locking_description.map do |name|
+        localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+        [localized_name, name]
+      end
+    end
+
+    def locking_defeat_description
+      LOCKING_DEFEAT_DESCRIPTIONS
+    end
+
+    def locking_defeat_description_select_options
+      # TODO: normalize with slugifyer, not this random thing
+      normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+      translation_scope = [:activerecord, :select_options, name.underscore]
+
+      locking_defeat_description.map do |name|
+        localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+        [localized_name, name]
+      end
+    end
+
+    def corrected_date_stolen(date = nil)
+      date = TimeParser.parse(date) || Time.current
+      year = date.year
+      if year < (Time.current - 100.years).year
+        decade = year.to_s[-2..].chars.join("")
+        corrected = date.change(year: "20#{decade}".to_i)
+        date = corrected
+      end
+      if date > Time.current + 2.days
+        corrected = date.change(year: Time.current.year - 1)
+        date = corrected
+      end
+      date
+    end
   end
 
   # override to enable reverse geocoding if applicable
@@ -245,7 +246,7 @@ class StolenRecord < ApplicationRecord
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
-    fix_date
+    self.date_stolen = self.class.corrected_date_stolen(date_stolen)
     self.street = nil unless street.present? # Make it easier to find blank addresses
     if city.present?
       self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
@@ -412,10 +413,6 @@ class StolenRecord < ApplicationRecord
 
     EmailTheftAlertNotificationWorker
       .perform_async(theft_alerts.last.id, "theft_alert_recovered")
-  end
-
-  def fix_date
-    self.date_stolen = self.class.corrected_date_stolen(date_stolen)
   end
 
   def all_location_attributes_present?

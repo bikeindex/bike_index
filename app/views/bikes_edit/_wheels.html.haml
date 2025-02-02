@@ -4,15 +4,15 @@
 .related-fields
   .form-group.row
     %label.form-well-label{for: "#{side}_standard" }
-      = translate_with_args(".#{side_title}_wheel")
+      = t(".#{side_title}_wheel")
     .form-well-input.fancy-select-placeholder.unfancy
       .standard-diams{id: "#{side}_standard"}
         -# ignore this select in dirty forms
         %select.form-control.dirtyignore
           %option{ value: '' }
-            = translate_with_args(".choose_diameter")
+            = t(".choose_diameter")
           %option{ value: WheelSize.id_for_bsd(622) }
-            = translate_with_args(".diameter_700c")
+            = t(".diameter_700c")
           %option{ value: WheelSize.id_for_bsd(584) }
             650b / 27.5
           %option{ value: WheelSize.id_for_bsd(630) }
@@ -28,20 +28,20 @@
           %option{ value: WheelSize.id_for_bsd(203) }
             12in
       .all-diams.currently-hidden{ id: "#{side}_all" }
-        = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: translate_with_args(".all_diameters", ))
+        = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: t(".all_diameters", ))
     .right-input-help
       %a.wh_sw.show-all-diams.optional-form-block{ id: "show_#{side}_wheel_diams", data: { target: "##{side}_all", toggle: "#hide_#{side}_wheel_diams", action: 'swap', swap: "##{side}_standard" } }
-        = translate_with_args(".show_more_sizes")
+        = t(".show_more_sizes")
       %a.wh_sw.optional-form-block.currently-hidden{ id: "hide_#{side}_wheel_diams", data: { target: "##{side}_standard", toggle: "#show_#{side}_wheel_diams", action: 'swap', swap: "##{side}_all" } }
-        = translate_with_args(".hide_extra_sizes")
+        = t(".hide_extra_sizes")
 .form-group.row.unnested-field
   %label.form-well-label
-    = translate_with_args(".#{side_title}_tire")
+    = t(".#{side_title}_tire")
   .form-well-input.form-well-input-checks
-    %label.radio-inline.mr-2{title: translate_with_args(".narrow_title")}
+    %label.radio-inline.mr-2{title: t(".narrow_title")}
       = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
-      = translate_with_args(".narrow")
-    %label.radio-inline{title: translate_with_args(".wide_title")}
+      = t(".narrow")
+    %label.radio-inline{title: t(".wide_title")}
       = f.radio_button "#{side}_tire_narrow".to_sym, 'false'
-      = translate_with_args(".wide")
-      %small= translate_with_args(".wide_help")
+      = t(".wide")
+      %small= t(".wide_help")

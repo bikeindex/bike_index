@@ -1,50 +1,44 @@
-# i18n-tasks finds and manages missing and unused translations:
-# https://github.com/glebm/i18n-tasks
+# i18n-tasks finds and manages missing and unused translations: https://github.com/glebm/i18n-tasks
 
 # The "main" locale.
 base_locale: en
-
-# All available locales are inferred from the data by default. Alternatively,
-# specify them explicitly:
-# locales: [nl]
-
-# Reporting locale, default: en. Available: en, ru.
+## All available locales are inferred from the data by default. Alternatively, specify them explicitly:
+# locales: [es, fr]
+## Reporting locale, default: en. Available: en, ru.
 internal_locale: en
 
+# Read and write translations.
 data:
   ## Translations are read from the file system. Supported format: YAML, JSON.
   ## Provide a custom adapter:
   # adapter: I18n::Tasks::Data::FileSystem
 
-  # Locale files or `File.find` patterns where translations are read from:
+  # Locale files or `Dir.glob` patterns where translations are read from:
   read:
-    ## Default:
-    - config/locales/doorkeeper.en.yml
-    - config/locales/doorkeeper.nl.yml
-    - config/locales/doorkeeper.nb.yml
-    - config/locales/gflash.en.yml
-    - config/locales/gflash.nl.yml
-    - config/locales/gflash.nb.yml
-    - config/locales/en.yml
-    - config/locales/nl.yml
-    - config/locales/nb.yml
+    - config/locales/doorkeeper.%{locale}.yml
+    - app/components/**/*.%{locale}.yml
+    - config/locales/%{locale}.yml
 
-  # Locale files to write new keys to, based on a list of key pattern => file
-  # rules. Matched from top to bottom:
+  # Locale files to write new keys to, based on a list of key pattern => file rules. Matched from top to bottom:
   # `i18n-tasks normalize -p` will force move the keys according to these rules
   write:
-    ## For example, write devise and simple form keys to their respective files:
     - ["{doorkeeper}.*", 'config/locales/\1.%{locale}.yml']
+    # handle namespaced components manually.
+    # This is definitely hack :/
+    - ['components.{:}.{:}.:', 'app/components/\1/\2/component.%{locale}.yml']
+    - ['components.{:}.:', 'app/components/\1/component.%{locale}.yml']
+    ## Catch-all default:
     - config/locales/%{locale}.yml
 
   # External locale data (e.g. gems).
   # This data is not considered unused and is never written to.
   external:
     ## Example (replace %#= with %=):
-    # - "<%#= %x[bundle show vagrant].chomp %>/templates/locales/%{locale}.yml"
+    # - "<%#= %x[bundle info vagrant --path].chomp %>/templates/locales/%{locale}.yml"
 
   ## Specify the router (see Readme for details). Valid values: conservative_router, pattern_router, or a custom class.
-  # router: conservative_router
+  # router: I18n::Tasks::BikeIndexRouter
+  router: pattern_router
 
   yaml:
     write:
@@ -61,20 +55,29 @@ data:
 
 # Find translate calls
 search:
-  ## Paths or `File.find` patterns to search in:
+  ## Paths or `Find.find` patterns to search in:
   # paths:
-  #  - app/
+  #   # - app/views
+  #   # - app/components
 
   ## Root directories for relative keys resolution.
   relative_roots:
     - app/controllers
     - app/helpers
     - app/mailers
-    - app/presenters
     - app/views
+    - app/components
+
+  ## Directories where method names which should not be part of a relative key resolution.
+  # By default, if a relative translation is used inside a method, the name of the method will be considered part of the resolved key.
+  # Directories listed here will not consider the name of the method part of the resolved key
+  #
+  # relative_exclude_method_name_paths:
+  #  -
 
   ## Files or `File.fnmatch` patterns to exclude from search. Some files are always excluded regardless of this setting:
-  ##   %w(*.jpg *.png *.gif *.svg *.ico *.eot *.otf *.ttf *.woff *.woff2 *.pdf *.css *.sass *.scss *.less *.yml *.json)
+  ##   *.jpg *.jpeg *.png *.gif *.svg *.ico *.eot *.otf *.ttf *.woff *.woff2 *.pdf *.css *.sass *.scss *.less
+  ##   *.yml *.json *.zip *.tar.gz *.swf *.flv *.mp3 *.wav *.flac *.webm *.mp4 *.ogg *.opus *.webp *.map *.xlsx
   exclude:
     - app/assets
     - app/javascript
@@ -82,21 +85,58 @@ search:
   ## Alternatively, the only files or `File.fnmatch patterns` to search in `paths`:
   ## If specified, this settings takes priority over `exclude`, but `exclude` still applies.
   # only: ["*.rb", "*.html.slim"]
-  ## If `strict` is `false`, guess usages such as translate_with_args("categories.#{category}.title"). The default is `true`.
+
+  ## If `strict` is `false`, guess usages such as t("categories.#{category}.title"). The default is `true`.
   # strict: true
+
+  ## Allows adding ast_matchers for finding translations using the AST-scanners
+  ## The available matchers are:
+  ## - RailsModelMatcher
+  ##     Matches ActiveRecord translations like
+  ##     User.human_attribute_name(:email) and User.model_name.human
+  ## - DefaultI18nSubjectMatcher
+  ##     Matches ActionMailer's default_i18n_subject method
+  ##
+  ## To implement your own, please see `I18n::Tasks::Scanners::AstMatchers::BaseMatcher`.
+  # ast_matchers:
+  #   - 'I18n::Tasks::Scanners::AstMatchers::RailsModelMatcher'
+  #   - 'I18n::Tasks::Scanners::AstMatchers::DefaultI18nSubjectMatcher'
+
   ## Multiple scanners can be used. Their results are merged.
   ## The options specified above are passed down to each scanner. Per-scanner options can be specified as well.
   ## See this example of a custom scanner: https://github.com/glebm/i18n-tasks/wiki/A-custom-scanner-example
 
 ## Translation Services
-translation:
-  # Google Translate
-  # Get an API key and set billing info at https://code.google.com/apis/console
-  # to use Google Translate
-  # google_translate_api_key: "AbC-dEf5"
-  # DeepL Pro Translate
-  # Get an API key and subscription at https://www.deepl.com/pro to use DeepL Pro
-  # deepl_api_key: "48E92789-57A3-466A-9959-1A1A1A1A1A1A"
+# translation:
+#   # Google Translate
+#   # Get an API key and set billing info at https://code.google.com/apis/console to use Google Translate
+#   google_translate_api_key: "AbC-dEf5"
+#   # DeepL Pro Translate
+#   # Get an API key and subscription at https://www.deepl.com/pro to use DeepL Pro
+#   deepl_api_key: "48E92789-57A3-466A-9959-1A1A1A1A1A1A"
+#   # deepl_host: "https://api.deepl.com"
+#   # deepl_version: "v2"
+#   # deepl_glossary_ids:
+#   #   - f28106eb-0e06-489e-82c6-8215d6f95089
+#   #   - 2c6415be-1852-4f54-9e1b-d800463496b4
+#   # add additional options to the DeepL.translate call: https://www.deepl.com/docs-api/translate-text/translate-text/
+#   deepl_options:
+#     formality: prefer_less
+#   # OpenAI
+#   openai_api_key: "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+#   # openai_model: "gpt-3.5-turbo" # see https://platform.openai.com/docs/models
+#   # may contain `%{from}` and `%{to}`, which will be replaced by source and target locale codes, respectively (using `Kernel.format`)
+#   # openai_system_prompt: >-
+#   #   You are a professional translator that translates content from the %{from} locale
+#   #   to the %{to} locale in an i18n locale array.
+#   #
+#   #   The array has a structured format and contains multiple strings. Your task is to translate
+#   #   each of these strings and create a new array with the translated strings.
+#   #
+#   #   HTML markups (enclosed in < and > characters) must not be changed under any circumstance.
+#   #   Variables (starting with %%{ and ending with }) must not be changed under any circumstance.
+#   #
+#   #   Keep in mind the context of all the strings for a more accurate translation.
 
 ## Do not consider these keys missing:
 ignore_missing:
@@ -109,13 +149,15 @@ ignore_unused:
   - "activerecord.enums.*"
   - "activerecord.select_options.*"
   - "activerecord.status_humanized.*"
+  - "attributes.*"
   - "{devise,kaminari,will_paginate,doorkeeper,gflash}.*"
   - "simple_form.{yes,no}"
   - "simple_form.{placeholders,hints,labels}.*"
   - "simple_form.{error_notification,required}.:"
   - "activerecord.errors.*"
   - "activerecord.models.*"
-  - "controllers.*"
+  - "controllers.*" # our translation helper component blocks detection
+  - "components.*" # our translation helper component blocks detection
   - "*_mailer.*"
   - "date.*"
   - "datetime.*"
