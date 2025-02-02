@@ -1080,10 +1080,6 @@ es:
       update: Actualizar %{model}
       submit: Guardar %{model}
     page_entries_info:
-      entry:
-        zero:
-        one:
-        other:
       one_page:
         display_entries:
           zero: No se han encontrado %{entry_name}

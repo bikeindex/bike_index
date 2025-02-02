@@ -14,12 +14,12 @@
         For #{link_to organization.name, admin_organization_path(organization.to_param)}
     - if !sortable_search_params?
       %p= pluralize |
-          number_with_delimiter(@pagy.count), |
+          number_with_delimiter(@ambassador_task_assignments.count), |
           "completed activities"
     - else
       %p
         = pluralize |
-          number_with_delimiter(@pagy.count), |
+          number_with_delimiter(@ambassador_task_assignments.count), |
           "matching completed activities"
         %em= link_to "view all", admin_ambassador_task_assignments_path
   .col-md-6

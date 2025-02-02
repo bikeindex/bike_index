@@ -1095,10 +1095,6 @@ nl:
       update: "%{model} bijwerken"
       submit: "%{model} opslaan"
     page_entries_info:
-      entry:
-        zero: inzendingen
-        one: binnenkomst
-        other: inzendingen
       one_page:
         display_entries:
           zero: Geen %{entry_name} gevonden

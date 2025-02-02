@@ -9,7 +9,7 @@
 - humanized_time_range_column_override ||= nil
 -# Currently only used in admin, but worth preparing for the future
 - views_prefix ||= controller_namespace == "admin" ? "admin" : nil
-- viewing ||= collection.table_name.humanize
+- viewing ||= (defined?(collection.table_name) ? collection.table_name.humanize : collection.first.class.table_name).humanize
 
 .row.mt-4.mb-4
   - unless skip_total
@@ -30,7 +30,7 @@
         - elsif !skip_total && defined?(collection.total_count)
           %em.less-strong
             (#{number_with_delimiter(collection.where("#{collection.table_name}.#{@time_range_column || "created_at"} >= ?", Time.current.beginning_of_day).total_count)} today)
-  - unless skip_pagination
+  - unless skip_pagination || !defined?(@pagy)
     .pagination-flex.justify-content-md-end{class: (skip_total ? "col-12" : "col-md-7")}
       -#= paginate collection, views_prefix: views_prefix
       = pagy_bootstrap_nav(@pagy).html_safe

@@ -1,5 +1,5 @@
 class BikesController < Bikes::BaseController
-  MAX_PAGE = 100
+  MAX_INDEX_PAGE = 100
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[index show]
@@ -16,8 +16,8 @@ class BikesController < Bikes::BaseController
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
     @page = (params[:page] || 1).to_i
-    @page = 1 if @page > MAX_PAGE # web search isn't meant for paging through everything. So block it
-    @pagy, @bikes = pagy(Bike.search(@interpreted_params))
+    @page = MAX_INDEX_PAGE if @page > MAX_INDEX_PAGE # web search isn't meant for paging through everything. So block it
+    @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
 

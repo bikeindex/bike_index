@@ -75,7 +75,7 @@ RSpec.describe "BikesController#index", type: :request do
           expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
           get base_url, params: {page: 101}
           expect(response.status).to eq 200
-          expect(assigns(:page)).to eq 1
+          expect(assigns(:page)).to eq 100
           expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
         end
       end

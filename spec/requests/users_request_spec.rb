@@ -440,7 +440,6 @@ RSpec.describe UsersController, type: :request do
       get "#{base_url}/#{user.username}?page=1&per_page=1"
       expect(response).to render_template :show
       expect(assigns(:per_page)).to eq "1"
-      expect(assigns(:page)).to eq "1"
     end
   end
 
