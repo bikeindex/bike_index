@@ -49,8 +49,8 @@ gem "redlock" # Locking
 gem "faraday_middleware" # Manage faraday request flow
 gem "geocoder" # Geolocation using external APIs
 gem "haml" # Template language
-gem "httparty"
-gem "kaminari" # pagination
+gem "httparty" # http connection client
+gem "pagy" # pagination
 gem "kramdown" # Markdown
 gem "money-rails", "~> 1.11"
 gem "sitemap_generator", "~> 6"
