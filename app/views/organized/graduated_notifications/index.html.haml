@@ -59,4 +59,4 @@
 = render partial: "/organized/graduated_notifications/table", locals: {graduated_notifications: @graduated_notifications, render_sortable: true, render_remaining_at: !skip_remaining, separate_secondary_notifications: separate_secondary_notifications?}
 
 .paginate-container.paginate-container-bottom
-  = paginate @graduated_notifications
+  = pagy_bootstrap_nav(@pagy).html_safe

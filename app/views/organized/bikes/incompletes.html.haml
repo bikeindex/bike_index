@@ -78,4 +78,4 @@
                 = link_to t(".re_send"), resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: {confirm: t(".only_resend_with_permission")}, class: "gray-link"
 
 .paginate-container.paginate-container-bottom
-  = paginate @b_params
+  = pagy_bootstrap_nav(@pagy).html_safe

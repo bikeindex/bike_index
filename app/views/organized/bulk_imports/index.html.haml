@@ -68,4 +68,4 @@
           = bulk_import.ownerships.count # Don't need to do bikes through ownerships
 
 .paginate-container.paginate-container-bottom
-  = paginate @bulk_imports
+  = pagy_bootstrap_nav(@pagy).html_safe

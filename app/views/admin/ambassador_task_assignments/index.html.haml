@@ -36,7 +36,8 @@
       = submit_tag "Filter", name: "search", class: "btn btn-primary ml-2"
 
 
-= paginate @ambassador_task_assignments, views_prefix: "admin"
+= pagination @ambassador_task_assignments, views_prefix: "admin"
+= render partial: "/shared/pagination", locals: {collection: @ambassador_task_assignments}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -63,6 +64,3 @@
               admin_ambassador_task_assignments_path(sortable_search_params.merge(search_ambassador_id: assignment.user_id))
             - else
               %small.text-danger missing ambassador
-
-
-= paginate @ambassador_task_assignments, views_prefix: "admin"

@@ -38,7 +38,7 @@
     = submit_tag "Search", name: "search", class: "btn btn-success"
 
 - if @paints.present?
-  = paginate @paints, views_prefix: "admin"
+  = render partial: "/shared/pagination", locals: {collection: @paints}
 
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
@@ -86,7 +86,7 @@
                   %li
                     = paint.tertiary_color.name
 
-  = paginate @paints, views_prefix: "admin"
+  = render partial: "/shared/pagination", locals: {collection: @paints, skip_total: true}
 
 
 - else

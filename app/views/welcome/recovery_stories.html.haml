@@ -11,4 +11,4 @@
         = render @slice2
 
     .paginate-container.paginate-container-bottom
-      = paginate @recovery_displays, window: 3
+      = pagy_bootstrap_nav(@pagy).html_safe

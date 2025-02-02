@@ -57,7 +57,7 @@
               = impound_record.address
 
   .paginate-container.paginate-container-bottom
-    = paginate @impound_records
+    = pagy_bootstrap_nav(@pagy).html_safe
 
 -# include javascript because of period select
 <script src="/vendored_assets/application.js"></script>

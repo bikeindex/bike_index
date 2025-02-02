@@ -55,4 +55,4 @@
                 method: :delete
 
   .paginate-container.paginate-container-bottom
-    = paginate @exports
+    = pagy_bootstrap_nav(@pagy).html_safe

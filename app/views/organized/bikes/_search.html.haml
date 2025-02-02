@@ -281,6 +281,6 @@
 - if !only_show_bikes && @bikes.total_count > @bikes.count
   .paginate-container.paginate-container-bottom.row
     .col-sm-6.mb-2
-      = paginate @bikes
+      = pagy_bootstrap_nav(@pagy).html_safe
     .col-sm-6.text-right
       = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] }, selected: @per_page), {class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;"}

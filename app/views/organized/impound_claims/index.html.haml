@@ -41,4 +41,4 @@
   = render partial: "/organized/impound_claims/table", locals: { impound_claims: @impound_claims, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, skip_impound_record: @impound_record.present? }
 
 .paginate-container.paginate-container-bottom
-  = paginate @impound_claims
+  = pagy_bootstrap_nav(@pagy).html_safe

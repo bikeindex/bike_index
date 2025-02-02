@@ -128,7 +128,7 @@
       .col-md-4.mt-4
         .ad-block.ad-binx.ad468x60
       .col-md-8.col-lg-4.mt-4
-        = paginate @stolen_bike_listings
+        = pagy_bootstrap_nav(@pagy).html_safe
 
 
   - unless @stolen_bike_listings.present?

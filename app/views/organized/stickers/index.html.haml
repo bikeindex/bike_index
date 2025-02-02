@@ -76,4 +76,4 @@
             %strong= bike_sticker.pretty_code
 
 .paginate-container.paginate-container-bottom
-  = paginate @bike_stickers
+  = pagy_bootstrap_nav(@pagy).html_safe

@@ -70,6 +70,6 @@
             update
 
 .paginate-container.paginate-container-bottom
-  = paginate @organization_model_audits
+  = pagy_bootstrap_nav(@pagy).html_safe
 
 = render partial: "/organized/model_audits/submit_model_attestation"
