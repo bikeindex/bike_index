@@ -10,14 +10,7 @@ RSpec.describe Search::BikeBox::Component, type: :component do
   let(:current_user) { User.new }
 
   it "renders" do
-    pp component.text
     expect(component).to be_present
-  end
-
-  describe "translation" do
-    xit "returns the expected translation" do
-      expect(instance.send(:translation, "primary_colors")).to eq "dddddd"
-    end
   end
 
   describe "component_translation_scope" do
