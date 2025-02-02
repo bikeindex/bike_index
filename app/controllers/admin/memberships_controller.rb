@@ -5,7 +5,7 @@ class Admin::MembershipsController < Admin::BaseController
 
   def index
     @per_page = params[:per_page] || 50
-    @memberships = pagy(
+    @pagy, @memberships = pagy(
       matching_memberships.includes(:user, :sender, :organization).reorder("memberships.#{sort_column} #{sort_direction}"),
       limit: @per_page)
   end
