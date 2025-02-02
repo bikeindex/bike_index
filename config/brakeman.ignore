@@ -49,7 +49,7 @@
           "type": "controller",
           "class": "StolenBikeListingsController",
           "method": "index",
-          "line": 18,
+          "line": 16,
           "file": "app/controllers/stolen_bike_listings_controller.rb",
           "rendered": {
             "name": "stolen_bike_listings/index",
@@ -75,7 +75,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/organized/impound_claims_controller.rb",
-      "line": 74,
+      "line": 73,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "impound_claims.public_send((params[:search_status] or available_statuses.first))",
       "render_path": null,
@@ -98,7 +98,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/impound_records_controller.rb",
-      "line": 43,
+      "line": 42,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "ImpoundRecord.public_send((params[:search_status] or available_statuses.first))",
       "render_path": null,
@@ -121,7 +121,7 @@
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
-      "line": 61,
+      "line": 62,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\", \"wb\")",
       "render_path": null,
@@ -220,7 +220,7 @@
           "type": "controller",
           "class": "MyAccountsController",
           "method": "edit",
-          "line": 19,
+          "line": 18,
           "file": "app/controllers/my_accounts_controller.rb",
           "rendered": {
             "name": "my_accounts/edit",
@@ -359,7 +359,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/notifications_controller.rb",
-      "line": 38,
+      "line": 37,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "Notification.public_send(params[:search_kind])",
       "render_path": null,
@@ -501,13 +501,57 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "500b4287397d732b3b8b3782fefe554bd988b9659a2548f254811b8a59b7c3c0",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/views/shared/_pagination.html.haml",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :memberships => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).where(\"#{AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :memberships => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::AmbassadorTaskAssignmentsController",
+          "method": "index",
+          "line": 11,
+          "file": "app/controllers/admin/ambassador_task_assignments_controller.rb",
+          "rendered": {
+            "name": "admin/ambassador_task_assignments/index",
+            "file": "app/views/admin/ambassador_task_assignments/index.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "admin/ambassador_task_assignments/index",
+          "line": 38,
+          "file": "app/views/admin/ambassador_task_assignments/index.html.haml",
+          "rendered": {
+            "name": "shared/_pagination",
+            "file": "app/views/shared/_pagination.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/_pagination"
+      },
+      "user_input": "@time_range_column",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "512e4e329b58c9c5a4916c68462284a0aa87450fd4e3bdac0b0799c3121929d7",
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/superuser_abilities_controller.rb",
-      "line": 52,
+      "line": 50,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "(SuperuserAbility.unscoped or SuperuserAbility).public_send(params[:search_kind])",
       "render_path": null,
@@ -561,7 +605,7 @@
           "type": "controller",
           "class": "Admin::ExternalRegistryBikesController",
           "method": "show",
-          "line": 16,
+          "line": 14,
           "file": "app/controllers/admin/external_registry_bikes_controller.rb",
           "rendered": {
             "name": "admin/external_registry_bikes/show",
@@ -610,7 +654,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/organization_statuses_controller.rb",
-      "line": 71,
+      "line": 68,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "OrganizationStatus.all.where(:organization_id => current_organization.id).current.ended.deleted.public_send(params[:search_pos_kind]).public_send(params[:search_kind])",
       "render_path": null,
@@ -633,7 +677,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/theft_alerts_controller.rb",
-      "line": 130,
+      "line": 129,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  TheftAlert.where(:stolen_record_id => StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  TheftAlert\nend).public_send((params[:search_paid_admin] or nil))",
       "render_path": null,
@@ -722,7 +766,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/tweets_controller.rb",
-      "line": 98,
+      "line": 95,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "Tweet.not_retweet.public_send((params[:search_kind] or \"all\"))",
       "render_path": null,
@@ -753,7 +797,7 @@
           "type": "controller",
           "class": "Organized::ImpoundClaimsController",
           "method": "show",
-          "line": 17,
+          "line": 16,
           "file": "app/controllers/organized/impound_claims_controller.rb",
           "rendered": {
             "name": "organized/impound_claims/show",
@@ -797,7 +841,7 @@
           "type": "controller",
           "class": "Organized::ImpoundClaimsController",
           "method": "show",
-          "line": 17,
+          "line": 16,
           "file": "app/controllers/organized/impound_claims_controller.rb",
           "rendered": {
             "name": "organized/impound_claims/show",
@@ -856,7 +900,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/organized/impound_records_controller.rb",
-      "line": 73,
+      "line": 71,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "impound_records.public_send((params[:search_status] or available_statuses.first))",
       "render_path": null,
@@ -887,7 +931,7 @@
           "type": "controller",
           "class": "Organized::ModelAuditsController",
           "method": "show",
-          "line": 26,
+          "line": 24,
           "file": "app/controllers/organized/model_audits_controller.rb",
           "rendered": {
             "name": "organized/model_audits/show",
@@ -944,7 +988,7 @@
           "type": "controller",
           "class": "Admin::BulkImportsController",
           "method": "show",
-          "line": 16,
+          "line": 15,
           "file": "app/controllers/admin/bulk_imports_controller.rb",
           "rendered": {
             "name": "admin/bulk_imports/show",
@@ -978,7 +1022,7 @@
           "type": "controller",
           "class": "Admin::TheftAlertsController",
           "method": "edit",
-          "line": 22,
+          "line": 21,
           "file": "app/controllers/admin/theft_alerts_controller.rb",
           "rendered": {
             "name": "admin/theft_alerts/edit",
@@ -1004,7 +1048,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/organized/graduated_notifications_controller.rb",
-      "line": 54,
+      "line": 53,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "graduated_notifications.public_send((params[:search_status] or \"current\"))",
       "render_path": null,
@@ -1172,7 +1216,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/organization_statuses_controller.rb",
-      "line": 64,
+      "line": 61,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "OrganizationStatus.all.where(:organization_id => current_organization.id).current.ended.deleted.public_send(params[:search_pos_kind])",
       "render_path": null,
@@ -1231,50 +1275,6 @@
       "confidence": "Medium",
       "cwe_id": [
         915
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "dffaf0efe12dc10011f6d8b661bbcf78ce000d6bb6ad873cad7cdcbf986ad9a3",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/views/shared/_pagination.html.haml",
-      "line": 32,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "BannedEmailDomain.order(sort_column => sort_direction).includes(:creator).page((params[:page] or 1)).per((params[:per_page] or 25)).where(\"#{BannedEmailDomain.order(sort_column => sort_direction).includes(:creator).page((params[:page] or 1)).per((params[:per_page] or 25)).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::BannedEmailDomainsController",
-          "method": "index",
-          "line": 10,
-          "file": "app/controllers/admin/banned_email_domains_controller.rb",
-          "rendered": {
-            "name": "admin/banned_email_domains/index",
-            "file": "app/views/admin/banned_email_domains/index.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "admin/banned_email_domains/index",
-          "line": 22,
-          "file": "app/views/admin/banned_email_domains/index.html.haml",
-          "rendered": {
-            "name": "shared/_pagination",
-            "file": "app/views/shared/_pagination.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "shared/_pagination"
-      },
-      "user_input": "@time_range_column",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
       ],
       "note": ""
     },
@@ -1353,7 +1353,7 @@
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
-      "line": 65,
+      "line": 66,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\")",
       "render_path": null,

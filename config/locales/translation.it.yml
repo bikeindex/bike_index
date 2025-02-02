@@ -1695,13 +1695,6 @@ it:
       write_bikewise:
       write_organizations:
       write_user:
-  views:
-    pagination:
-      first: "&laquo; Inizio"
-      last: Fine &raquo;
-      previous: "&lsaquo; Prec."
-      next: Succ. &rsaquo;
-      truncate: "&hellip;"
   bike_versions:
     index:
       primary_colors: Colori primari

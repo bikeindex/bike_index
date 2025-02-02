@@ -1582,13 +1582,6 @@ nl:
     ZA: Zuid-Afrika
     ZM: Zambia
     ZW: Zimbabwe
-  views:
-    pagination:
-      first: "&laquo; Eerste"
-      last: Laatste &raquo;
-      previous: "&lsaquo; Vorige"
-      next: Volgende &rsaquo;
-      truncate: "&hellip;"
   doorkeeper:
     applications:
       confirmations:

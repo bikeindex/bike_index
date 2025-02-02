@@ -5544,13 +5544,6 @@ en:
         %{better_password_link}.
       update_password: Update password
       update_your_password: Update your password
-  views:
-    pagination:
-      first: "&laquo;"
-      last: "&raquo;"
-      next: Next
-      previous: Prev
-      truncate: "&hellip;"
   welcome:
     choose_registration:
       add_a_bike_through: Add a bike through

@@ -1687,13 +1687,6 @@ es:
       write_bikewise:
       write_organizations:
       write_user:
-  views:
-    pagination:
-      first: "&laquo; Primera"
-      last: Última &raquo;
-      previous: "&lsaquo; Anterior"
-      next: Siguiente &rsaquo;
-      truncate: "&hellip;"
   bike_versions:
     index:
       primary_colors:
