@@ -123,7 +123,7 @@
                 - else
                   %em.less-strong We haven't uploaded the photos for this bike yet
 
-  - if @stolen_bike_listings.total_count > @stolen_bike_listings.count
+  - if @pagy.count > @stolen_bike_listings.count
     .paginate-container.paginate-container-bottom.row
       .col-md-4.mt-4
         .ad-block.ad-binx.ad468x60

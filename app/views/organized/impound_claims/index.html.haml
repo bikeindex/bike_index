@@ -11,7 +11,7 @@
 
 .row.mb-4
   .col-md-7.col-lg-9.mt-4
-    = pluralize(number_with_delimiter(@impound_claims.total_count), "matching impound claim")
+    = pluralize(number_with_delimiter(@pagy.count), "matching impound claim")
     %em
       = humanized_time_range(@time_range)
     - if @impound_record.present?

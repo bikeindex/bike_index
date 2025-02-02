@@ -17,7 +17,7 @@
 
 .row.pt-4.mt-4.mb-4
   .col-sm-6
-    = pluralize(number_with_delimiter(@bulk_imports.total_count), "matching import")
+    = pluralize(number_with_delimiter(@pagy.count), "matching import")
     %em
       = humanized_time_range(@time_range)
   .col-sm-6.text-right

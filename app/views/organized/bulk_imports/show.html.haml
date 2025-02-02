@@ -55,7 +55,7 @@
   %h2.uncap.float-left{ style: "margin-top: 28px;" }
     = t(".bikes")
     %small
-      = @bikes.total_count
+      = @pagy.count
   .paginate{ style: "margin: 12px auto 12px 0;" }
     = pagy_bootstrap_nav(@pagy).html_safe
 

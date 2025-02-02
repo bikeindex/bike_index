@@ -10,10 +10,10 @@
 
 %p.mt-4
   %strong
-    = @b_params.total_count
+    = @pagy.count
     = t(".matching") if params[:query].present?
   = t(".incomplete")
-  = t(".registration").pluralize(@b_params.total_count)
+  = t(".registration").pluralize(@pagy.count)
   %em
     = humanized_time_range(@time_range)
 

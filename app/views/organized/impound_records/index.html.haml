@@ -16,7 +16,7 @@
 
 .row.mt-4.mb-4
   .col-sm-9
-    = pluralize(number_with_delimiter(@impound_records.total_count), "matching impound record")
+    = pluralize(number_with_delimiter(@pagy.count), "matching impound record")
     %em
       = humanized_time_range(@time_range)
     .dropdown.d-inline-block.ml-2

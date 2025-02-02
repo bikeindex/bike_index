@@ -111,10 +111,10 @@
   - else
     %p.mt-4
       - if @search_query_present || params[:search_stickers].present? || params[:search_address].present? || @model_audit.present?
-        = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type))
+        = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type))
       - else
         = t(".registered_bikes_html",
-        bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type),
+        bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type),
         org_name: current_organization.short_name)
       %em
         = humanized_time_range(@time_range)
@@ -278,7 +278,7 @@
             %td.hiddenColumn.hidden-xs-down{class: "avery_cell"}
               = check_mark if bike.avery_exportable?
 
-- if !only_show_bikes && @bikes.total_count > @bikes.count
+- if !only_show_bikes && @pagy.count > @bikes.count
   .paginate-container.paginate-container-bottom.row
     .col-sm-6.mb-2
       = pagy_bootstrap_nav(@pagy).html_safe

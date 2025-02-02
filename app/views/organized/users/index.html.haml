@@ -43,8 +43,8 @@
 - if @show_matching_count
   %p.mt-2.mb-2
     %strong
-      = number_with_delimiter(@memberships.total_count)
-    = t(".matching_user").pluralize(@memberships.total_count)
+      = number_with_delimiter(@pagy.count)
+    = t(".matching_user").pluralize(@pagy.count)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm

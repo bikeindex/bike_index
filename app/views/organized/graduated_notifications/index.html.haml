@@ -21,7 +21,7 @@
 
 .row.mt-4.mb-4
   .col-sm-6
-    = pluralize(number_with_delimiter(@graduated_notifications.total_count), "matching graduated notifications")
+    = pluralize(number_with_delimiter(@pagy.count), "matching graduated notifications")
     %em
       = humanized_time_range(@time_range)
     - if user_search_params_present?
