@@ -4,9 +4,8 @@ module Organized
     before_action :find_export, except: %i[index new create]
 
     def index
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @exports = exports.order(created_at: :desc).page(@page).per(@per_page)
+      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page)
     end
 
     def show

@@ -4,11 +4,11 @@ class Admin::ImpoundClaimsController < Admin::BaseController
   before_action :find_impound_claim, except: [:index]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @impound_claims = matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
-      .order(sort_column + " " + sort_direction)
-      .page(page).per(@per_page)
+    @pagy, @impound_claims = pagy(
+      matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
+        .order(sort_column + " " + sort_direction),
+      limit: @per_page)
   end
 
   def show

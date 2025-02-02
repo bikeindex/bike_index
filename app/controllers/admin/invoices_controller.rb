@@ -3,14 +3,11 @@ class Admin::InvoicesController < Admin::BaseController
   before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @invoices =
-      matching_invoices
+    @pagy, @invoices =
+      pagy(matching_invoices
         .includes(:organization, :payments, :organization_features, :first_invoice)
-        .reorder(sort_column + " " + sort_direction)
-        .page(page)
-        .per(@per_page)
+        .reorder(sort_column + " " + sort_direction), limit: @per_page)
   end
 
   helper_method :matching_invoices

@@ -5,11 +5,9 @@ module Organized
     before_action :find_bike_sticker, only: %i[edit update]
 
     def index
-      page = params[:page] || 1
-      per_page = params[:per_page] || 25
-      @bike_stickers = searched.includes(:bike)
-        .reorder("bike_stickers.#{sort_column} #{sort_direction}")
-        .page(page).per(per_page)
+      @per_page = params[:per_page] || 25
+      @pagy, @bike_stickers = pagy(searched.includes(:bike)
+        .reorder("bike_stickers.#{sort_column} #{sort_direction}"), limit: @per_page)
     end
 
     def show

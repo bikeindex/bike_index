@@ -5,19 +5,17 @@ class Admin::BikesController < Admin::BaseController
   around_action :set_reading_role, only: %i[index show]
 
   def index
-    @page = params[:page] || 1
     @per_page = params[:per_page] || 100
 
-    @bikes = available_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .reorder("bikes.#{sort_column} #{sort_direction}")
-      .page(@page).per(@per_page)
+    @pagy, @bikes = pagy(available_bikes.includes(:creation_organization, :current_ownership, :paint)
+      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
   end
 
   def missing_manufacturer
-    @page = params[:page] || 1
     @per_page = params[:per_page] || 100
-    @bikes = missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .page(@page).per(@per_page)
+    @pagy, @bikes = pagy(
+      missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
+      limit: @per_page)
   end
 
   def update_manufacturers
@@ -43,10 +41,9 @@ class Admin::BikesController < Admin::BaseController
     else
       DuplicateBikeGroup.unignored.order("created_at desc")
     end
-    @page = params[:page] || 1
     @per_page = params[:per_page] || 25
     @duplicate_groups_count = duplicate_groups.size
-    @duplicate_groups = duplicate_groups.page(@page).per(@per_page)
+    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page)
   end
 
   def ignore_duplicate_toggle

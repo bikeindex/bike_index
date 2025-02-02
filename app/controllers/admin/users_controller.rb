@@ -4,10 +4,10 @@ class Admin::UsersController < Admin::BaseController
   before_action :find_user, only: [:show, :edit, :update, :destroy]
 
   def index
-    page = params[:page] || 1
     per_page = params[:per_page] || 25
-    @users = matching_users.reorder("users.#{sort_column} #{sort_direction}").page(page).per(per_page)
-      .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :memberships, :ambassador_tasks)
+    @pagy, @users = pagy(matching_users.reorder("users.#{sort_column} #{sort_direction}")
+      .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :memberships, :ambassador_tasks),
+      limit: @per_page)
   end
 
   def show

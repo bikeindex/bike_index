@@ -4,11 +4,9 @@ class Admin::BannedEmailDomainsController < Admin::BaseController
   include SortableTable
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 25
-    @banned_email_domains = BannedEmailDomain.order(sort_column => sort_direction)
-      .includes(:creator)
-      .page(page).per(@per_page)
+    @pagy, @banned_email_domains = pagy(BannedEmailDomain.order(sort_column => sort_direction)
+      .includes(:creator), limit: @per_page)
   end
 
   def new

@@ -5,14 +5,12 @@ module Organized
     before_action :find_impound_record, except: [:index]
 
     def index
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
 
-      @impound_records = available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-        .page(@page).per(@per_page)
-        .includes(:user, :bike, :location)
+      @pagy, @impound_records = pagy(available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
+        .includes(:user, :bike, :location), limit: @per_page)
     end
 
     def show

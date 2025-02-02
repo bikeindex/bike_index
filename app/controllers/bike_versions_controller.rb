@@ -5,8 +5,8 @@ class BikeVersionsController < ApplicationController
 
   def index
     @interpreted_params = BikeVersion.searchable_interpreted_params(permitted_search_params)
-
-    @bike_versions = BikeVersion.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10)
+    per_page = params[:per_page] || 10
+    @pagy, @bike_versions = pagy(BikeVersion.search(@interpreted_params), limit: per_page)
     @selected_query_items_options = BikeVersion.selected_query_items_options(@interpreted_params)
   end
 

@@ -8,9 +8,8 @@ module Organized
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
 
-      @impound_claims = available_impound_claims.reorder("impound_claims.#{sort_column} #{sort_direction}")
-        .page(@page).per(@per_page)
-        .includes(:user, :stolen_record, :impound_record)
+      @pagy, @impound_claims = pagy(available_impound_claims.reorder("impound_claims.#{sort_column} #{sort_direction}")
+        .includes(:user, :stolen_record, :impound_record), limit: @per_page)
     end
 
     def show

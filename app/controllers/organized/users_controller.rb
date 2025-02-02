@@ -9,10 +9,9 @@ module Organized
       per_page = params[:per_page] || 25
       @show_user_search = params[:query].present? || current_organization.memberships.count > per_page
       @show_matching_count = @show_user_search && params[:query].present?
-      @memberships =
-        matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}")
-          .page(page)
-          .per(per_page)
+      @pagy, @memberships = pagy(
+        matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}"),
+        limit: @per_page)
     end
 
     def edit

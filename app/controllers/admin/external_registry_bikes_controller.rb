@@ -4,12 +4,10 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
   before_action :find_bike, only: %i[show]
 
   def index
-    @page = params[:page] || 1
-    @bikes =
-      matching_bikes
-        .reorder("external_registry_bikes.#{sort_column} #{sort_direction}")
-        .page(@page)
-        .per(params[:per_page] || 100)
+    @per_page = params[:page] || 100
+    @pagy, @bikes =
+      pagy(matching_bikes
+        .reorder("external_registry_bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
   end
 
   def show

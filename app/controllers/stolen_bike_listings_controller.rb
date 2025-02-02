@@ -8,11 +8,9 @@ class StolenBikeListingsController < ApplicationController
       @blog = Blog.friendly_find(Blog.theft_rings_id)
       per_page = 10
     end
-    page = params[:page] || 1
     per_page ||= params[:per_page] || 25
-    @stolen_bike_listings = matching_stolen_bike_listings
-      .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}")
-      .page(page).per(per_page)
+    @pagy, @stolen_bike_listings = pagy(matching_stolen_bike_listings
+      .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}"), limit: per_page)
 
     @selected_query_items_options = StolenBikeListing.selected_query_items_options(@interpreted_params)
   end
