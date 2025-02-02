@@ -8,9 +8,9 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - Stripe/v1 RubyBindings/5.35.0
-      Content-Type:
-      - application/x-www-form-urlencoded
+      - Stripe/v1 RubyBindings/13.4.1
+      Stripe-Version:
+      - 2025-01-27.acacia
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -23,11 +23,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 21 Jan 2025 00:57:12 GMT
+      - Sun, 02 Feb 2025 18:31:59 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2203'
+      - '2230'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -46,7 +46,7 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; upgrade-insecure-requests;
-        report-uri https://q.stripe.com/csp-violation?q=dpXnBBq_F87LtHAozP0OATbjn59v8TNlSMzlPC8STJqkYKH-XFMcT3qzJT8p0d_vgYGRDmUtKyO5LU1Y
+        report-uri https://q.stripe.com/csp-violation?q=IQkklOI2EdbPM2y6AnSaVuT6_fRrCepIuGGuky-roxkok6XNoxgOuOI7FNjX8GkRahUqHf9-n_hg8zel
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Report-To:
@@ -54,19 +54,17 @@ http_interactions:
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_MtISpVrT27uu2O
+      - req_2zje8LfpN2gcj7
       Stripe-Version:
-      - '2014-12-08'
+      - 2025-01-27.acacia
       Vary:
       - Origin
-      X-Content-Type-Options:
-      - nosniff
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       X-Wc:
-      - ABC
+      - AB
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
     body:
@@ -112,6 +110,7 @@ http_interactions:
             "tax_ids": []
           },
           "customer_email": null,
+          "discounts": [],
           "expires_at": 1625334867,
           "invoice": null,
           "invoice_creation": null,
@@ -144,10 +143,10 @@ http_interactions:
             "payment_method_save": null
           },
           "setup_intent": null,
-          "shipping": null,
           "shipping_address_collection": null,
+          "shipping_cost": null,
+          "shipping_details": null,
           "shipping_options": [],
-          "shipping_rate": null,
           "status": "complete",
           "submit_type": "donate",
           "subscription": null,
@@ -160,8 +159,7 @@ http_interactions:
           "ui_mode": "hosted",
           "url": null
         }
-    http_version:
-  recorded_at: Tue, 21 Jan 2025 00:57:12 GMT
+  recorded_at: Sun, 02 Feb 2025 18:31:59 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -170,11 +168,11 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - Stripe/v1 RubyBindings/5.35.0
-      Content-Type:
-      - application/x-www-form-urlencoded
+      - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_MtISpVrT27uu2O","request_duration_ms":195}}'
+      - '{"last_request_metrics":{"request_id":"req_2zje8LfpN2gcj7","request_duration_ms":536}}'
+      Stripe-Version:
+      - 2025-01-27.acacia
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -187,11 +185,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 21 Jan 2025 00:57:12 GMT
+      - Sun, 02 Feb 2025 18:32:00 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '1526'
+      - '761'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -210,7 +208,7 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; upgrade-insecure-requests;
-        report-uri https://q.stripe.com/csp-violation?q=G9A8C8LeyGO25WJVO811Todu04V5_ekXGo6w83ti8YdHjV0-8dt8w7P1U_fwJZlquawUez0PVSUaEYTw
+        report-uri https://q.stripe.com/csp-violation?q=JF20kzjnC6OfVpMM8733X2_t-8rdEeqkmDQHC1EeqHOdkWxCuBmnxjXgXfeuWfAqi2bil5PECQUMIfKu
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Report-To:
@@ -218,19 +216,17 @@ http_interactions:
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_wm0SJZN7VIvovo
+      - req_H3klIy3US8LbWp
       Stripe-Version:
-      - '2014-12-08'
+      - 2025-01-27.acacia
       Vary:
       - Origin
-      X-Content-Type-Options:
-      - nosniff
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       X-Wc:
-      - ABC
+      - AB
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
     body:
@@ -239,7 +235,6 @@ http_interactions:
         {
           "id": "cus_JmPqQDidyY7LDB",
           "object": "customer",
-          "account_balance": 0,
           "address": {
             "city": null,
             "country": "US",
@@ -249,17 +244,8 @@ http_interactions:
             "state": null
           },
           "balance": 0,
-          "cards": {
-            "object": "list",
-            "data": [],
-            "has_more": false,
-            "total_count": 0,
-            "url": "/v1/customers/cus_JmPqQDidyY7LDB/cards"
-          },
           "created": 1625250198,
           "currency": null,
-          "default_card": null,
-          "default_currency": null,
           "default_source": null,
           "delinquent": false,
           "description": null,
@@ -279,32 +265,8 @@ http_interactions:
           "phone": null,
           "preferred_locales": [],
           "shipping": null,
-          "sources": {
-            "object": "list",
-            "data": [],
-            "has_more": false,
-            "total_count": 0,
-            "url": "/v1/customers/cus_JmPqQDidyY7LDB/sources"
-          },
-          "subscriptions": {
-            "object": "list",
-            "data": [],
-            "has_more": false,
-            "total_count": 0,
-            "url": "/v1/customers/cus_JmPqQDidyY7LDB/subscriptions"
-          },
           "tax_exempt": "none",
-          "tax_ids": {
-            "object": "list",
-            "data": [],
-            "has_more": false,
-            "total_count": 0,
-            "url": "/v1/customers/cus_JmPqQDidyY7LDB/tax_ids"
-          },
-          "tax_info": null,
-          "tax_info_verification": null,
           "test_clock": null
         }
-    http_version:
-  recorded_at: Tue, 21 Jan 2025 00:57:12 GMT
-recorded_with: VCR 5.0.0
+  recorded_at: Sun, 02 Feb 2025 18:32:00 GMT
+recorded_with: VCR 6.3.1

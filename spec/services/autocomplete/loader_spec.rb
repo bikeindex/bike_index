@@ -7,10 +7,10 @@ RSpec.describe Autocomplete::Loader do
   # manufacturer.count == 1 tests are failing, because manufacturers are sticking around
   before { Manufacturer.delete_all }
 
-  describe "load_all", :flaky do
+  describe "load_all" do
     let!(:color) { Color.black }
     let!(:manufacturer) { Manufacturer.other }
-    it "stores" do
+    it "stores", :flaky do
       expect(CycleType.all.count).to eq 21
       expect(Manufacturer.count).to eq 1
       expect(Color.count).to eq 1
@@ -25,7 +25,7 @@ RSpec.describe Autocomplete::Loader do
     end
 
     context "passing individual types" do
-      it "stores the passed kind" do
+      it "stores the passed kind", :flaky do
         expect(CycleType.all.count).to eq 21
         expect(Manufacturer.count).to eq 1
         expect(Color.count).to eq 1

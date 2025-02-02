@@ -67,6 +67,18 @@ RSpec.describe "BikesController#index", type: :request do
           expect(assigns(:bikes).map(&:id)).to eq([])
         end
       end
+      context "over MAX_PAGE" do
+        it "renders page 1" do
+          get base_url, params: {page: 100}
+          expect(response.status).to eq 200
+          expect(assigns(:page)).to eq 100
+          expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
+          get base_url, params: {page: 101}
+          expect(response.status).to eq 200
+          expect(assigns(:page)).to eq 1
+          expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
+        end
+      end
       context "ip proximity" do
         let(:query_params) { {location: "yoU", distance: 1, stolenness: "proximity"} }
         context "found location" do
