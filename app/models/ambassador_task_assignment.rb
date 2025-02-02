@@ -86,9 +86,9 @@ class AmbassadorTaskAssignment < ApplicationRecord
       SQL
 
       filter_to_sql_clause = {
-        organization_id: ->(filter_val) { "AND organizations.id = #{filter_val}" },
-        ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val}" },
-        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val}" }
+        organization_id: ->(filter_val) { "AND organizations.id = #{filter_val} " },
+        ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val} " },
+        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val} " }
       }
       sql << filters
         .map { |col, val| filter_to_sql_clause[col]&.call(val) }
