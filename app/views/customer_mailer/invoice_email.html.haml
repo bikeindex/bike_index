@@ -4,8 +4,6 @@
 %p
   = t(".html.we_really_appreciate_your_support")
 
-- if @payment.is_recurring
-  %p= t(".html.thanks_for_signing_up")
 %p
   - if @payment.donation?
     = t(".html.donation_will_help", amount: @payment.amount_formatted)

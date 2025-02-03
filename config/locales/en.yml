@@ -501,7 +501,6 @@ en:
       payment:
         amount_cents: Amount cents
         email: Email
-        first_payment_date: First payment date
         invoice: :activerecord.models.invoice
         is_current: Is current
         is_payment: Is payment
@@ -509,6 +508,7 @@ en:
         kind: Kind
         last_payment_date: Last payment date
         organization: :activerecord.models.organization
+        paid_at: First payment date
         theft_alert: :activerecord.models.theft_alert
         user: :activerecord.models.user
       public_image:

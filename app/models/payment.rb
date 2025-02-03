@@ -2,24 +2,21 @@
 #
 # Table name: payments
 #
-#  id                 :integer          not null, primary key
-#  amount_cents       :integer
-#  currency           :string           default("USD"), not null
-#  email              :string(255)
-#  first_payment_date :datetime
-#  is_current         :boolean          default(TRUE)
-#  is_recurring       :boolean          default(FALSE), not null
-#  kind               :integer
-#  last_payment_date  :datetime
-#  payment_method     :integer          default("stripe")
-#  referral_source    :text
-#  stripe_kind        :integer
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  invoice_id         :integer
-#  organization_id    :integer
-#  stripe_id          :string(255)
-#  user_id            :integer
+#  id              :integer          not null, primary key
+#  amount_cents    :integer
+#  currency        :string           default("USD"), not null
+#  email           :string(255)
+#  kind            :integer
+#  paid_at         :datetime
+#  payment_method  :integer          default("stripe")
+#  referral_source :text
+#  stripe_kind     :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  invoice_id      :integer
+#  organization_id :integer
+#  stripe_id       :string(255)
+#  user_id         :integer
 #
 class Payment < ApplicationRecord
   include Amountable
@@ -27,12 +24,10 @@ class Payment < ApplicationRecord
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
   STRIPE_KIND_ENUM = {stripe_charge: 0, stripe_session: 1}
 
-  scope :current, -> { where(is_current: true) }
-  scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
   scope :non_donation, -> { where.not(kind: "donation") }
-  scope :incomplete, -> { where(first_payment_date: nil) }
-  scope :paid, -> { where.not(first_payment_date: nil) }
+  scope :incomplete, -> { where(paid_at: nil) }
+  scope :paid, -> { where.not(paid_at: nil) }
 
   enum :payment_method, PAYMENT_METHOD_ENUM
   enum :kind, KIND_ENUM
@@ -85,7 +80,7 @@ class Payment < ApplicationRecord
   end
 
   def paid?
-    first_payment_date.present?
+    paid_at.present?
   end
 
   def incomplete?
@@ -167,7 +162,7 @@ class Payment < ApplicationRecord
   # Right now, this method is only good for updating unpaid payments to be paid, when stripe says they are paid
   def update_from_stripe_session
     return unless incomplete? && stripe_session.payment_status == "paid"
-    update(first_payment_date: Time.current,
+    update(paid_at: Time.current,
       amount_cents: stripe_session.amount_total)
     # Update email if we can
     return unless stripe_customer.present?

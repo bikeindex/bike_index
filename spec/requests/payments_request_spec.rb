@@ -137,7 +137,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.stripe_kind).to eq "stripe_session"
         expect(payment.currency).to eq "USD"
         expect(payment.amount_cents).to eq 4000
-        expect(payment.first_payment_date).to be_blank # Ensure this gets set
+        expect(payment.paid_at).to be_blank # Ensure this gets set
         expect(payment.last_payment_date).to be_blank
         expect(payment.paid?).to be_falsey
         expect(payment.referral_source).to eq "stuffffffff"
@@ -202,7 +202,7 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.kind).to eq "donation"
           expect(payment.currency).to eq "USD"
           expect(payment.amount_cents).to eq 4000
-          expect(payment.first_payment_date).to be_blank # Ensure this gets set
+          expect(payment.paid_at).to be_blank # Ensure this gets set
           expect(payment.last_payment_date).to be_blank
           expect(payment.paid?).to be_falsey
           expect(payment.stripe_customer).to be_blank
@@ -230,7 +230,7 @@ RSpec.describe PaymentsController, type: :request do
             expect(payment.kind).to eq "donation"
             expect(payment.currency).to eq "USD"
             expect(payment.amount_cents).to eq 7500
-            expect(payment.first_payment_date).to be_blank # Ensure this gets set
+            expect(payment.paid_at).to be_blank # Ensure this gets set
             expect(payment.last_payment_date).to be_blank
             expect(payment.paid?).to be_falsey
             expect(payment.stripe_customer).to be_present

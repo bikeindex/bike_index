@@ -33,7 +33,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
-    @payment.first_payment_date = @payment.created_at
+    @payment.paid_at = @payment.created_at
     valid_method = Payment.admin_creatable_payment_methods.include?(permitted_create_parameters[:payment_method])
 
     if valid_method && valid_invoice_parameters? && @payment.save
