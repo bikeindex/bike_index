@@ -1,9 +1,9 @@
 .row.mt-4.mb-4
   .col-sm-8
     %p
-      - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
-      - num_bikes = pluralize(number_with_delimiter(count), translate_with_args(".bike"))
-      = translate_with_args(".num_bikes_registered_html", num_bikes: num_bikes)
+      - count = defined?(@pagy) ? @pagy.count : @bikes.count
+      - num_bikes = pluralize(number_with_delimiter(count), t(".bike"))
+      = t(".num_bikes_registered_html", num_bikes: num_bikes)
       %em
         = humanized_time_range(@time_range)
 
@@ -25,20 +25,20 @@
     %thead.small-header
       %tr
         %th.date-added
-          = translate_with_args(".added")
+          = t(".added")
           %small.convertTimezone
-        %th= translate_with_args(".manufacturer")
-        %th= translate_with_args(".model")
-        %th= translate_with_args(".color")
-        %th= translate_with_args(".sent_to")
+        %th= t(".manufacturer")
+        %th= t(".model")
+        %th= t(".color")
+        %th= t(".sent_to")
         -# %th Claimed
         - if current_organization.enabled?("bike_stickers")
           %th Stickers
         - if @bike_sticker.present?
           %th
-            = translate_with_args(".link")
+            = t(".link")
             %br
-            = translate_with_args(".sticker")
+            = t(".sticker")
     %tbody
       - @bikes.each do |bike|
         %tr
@@ -71,10 +71,10 @@
           - if @bike_sticker.present?
             %td
               %small
-                = link_to translate_with_args(".link"),
+                = link_to t(".link"),
                 bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id),
                 method: "PUT"
 
-- if defined?(@bikes.total_count)
+- if defined?(@pagy)
   .paginate-container.paginate-container-bottom
-    = paginate @bikes
+    = pagy_bootstrap_nav(@pagy).html_safe

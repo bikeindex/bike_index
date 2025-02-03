@@ -25,13 +25,13 @@
                       = [bike_version.year, bike_version.mnfg_name].reject(&:blank?).join(' ')
                     = bike_version.frame_model.to_s
                 %ul.attr-list
-                  = attr_list_item(bike_version.frame_colors.to_sentence, translate_with_args(".primary_colors"))
+                  = attr_list_item(bike_version.frame_colors.to_sentence, t(".primary_colors"))
         .row
           .col-md-4.mt-4.offset-md-2
             .ad-block.ad-binx.ad468x60
           .col-md-8.col-lg-4.mt-4
             .paginate-container.paginate-container-bottom
-              = paginate @bike_versions
+              = pagy_bootstrap_nav(@pagy).html_safe
         .row
           .col-md-8.mt-4.offset-md-2
             = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}

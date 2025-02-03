@@ -4,11 +4,9 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   before_action :find_superuser_ability, except: [:index]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @superuser_abilities = searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
-      .includes(:user)
-      .page(page).per(@per_page)
+    @pagy, @superuser_abilities = pagy(searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
+      .includes(:user), limit: @per_page)
   end
 
   def edit

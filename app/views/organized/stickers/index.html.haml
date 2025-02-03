@@ -1,7 +1,7 @@
 .organized-page-header.mb-4
   %h1
     %em= current_organization.name
-    = translate_with_args(".stickers")
+    = t(".stickers")
 
 - claimedness = "claimed" if params[:search_claimedness] == "claimed"
 - claimedness ||= "unclaimed" if params[:search_claimedness] == "unclaimed"
@@ -15,48 +15,48 @@
   .row
     .col-md-4
       = text_field_tag :query, params[:query],
-        placeholder: translate_with_args(".search_sticker_id"),
+        placeholder: t(".search_sticker_id"),
         class: "form-control"
 
     .col-md-4
       = text_field_tag :search_bike,
         params[:search_bike],
-        placeholder: translate_with_args(".search_bike_url_or_id"),
+        placeholder: t(".search_bike_url_or_id"),
         class: "form-control"
 
     .col-sm-2.text-right
-      = submit_tag translate_with_args(".search"), class: "btn btn-primary"
+      = submit_tag t(".search"), class: "btn btn-primary"
 
     .col-md-12
       .btn-group#organized-bike-code-claimedness{ role: "group", "aria-label" => "Claimedness", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "all") }
           %input{ type: "radio", name: "search_claimedness", autocomplete: "off", checked: claimedness == "all", value: "all" }
-          = translate_with_args(".all")
+          = t(".all")
 
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "claimed") }
           %input{ type: "radio", name: "search_claimedness", autocomplete: "off", checked: claimedness == "claimed", value: "claimed" }
-          = translate_with_args(".claimed")
+          = t(".claimed")
 
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "unclaimed") }
           %input{ type: "radio", name: "search_claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
-          = translate_with_args(".unclaimed")
+          = t(".unclaimed")
 
 .full-screen-table.mt-4
   %p{ style: "margin-bottom: 0;" }
-    %strong= pluralize(number_with_delimiter(@bike_stickers.total_count), translate_with_args(".sticker"))
+    %strong= pluralize(number_with_delimiter(@pagy.count), t(".sticker"))
 
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.sortable
       %th
-        = sortable "created_at", translate_with_args(".added_html")
+        = sortable "created_at", t(".added_html")
       %th
         - if claimedness == "claimed"
-          = sortable "claimed_at", translate_with_args(".claimed")
+          = sortable "claimed_at", t(".claimed")
         - else
-          = translate_with_args(".claimed")
-      %th= translate_with_args(".bike")
+          = t(".claimed")
+      %th= t(".bike")
       %th
-        = sortable "code_integer", translate_with_args(".coded")
+        = sortable "code_integer", t(".coded")
 
     %tbody
       - @bike_stickers.each do |bike_sticker|
@@ -76,4 +76,4 @@
             %strong= bike_sticker.pretty_code
 
 .paginate-container.paginate-container-bottom
-  = paginate @bike_stickers
+  = pagy_bootstrap_nav(@pagy).html_safe

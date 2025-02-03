@@ -372,10 +372,10 @@ RSpec.describe BulkImportWorker, type: :job do
             bike1 = bulk_import.bikes.reorder(:created_at).first
             expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect_hashes_to_match(bike1, bike1_tareget)
+            expect(bike1).to match_hash_indifferently bike1_tareget
             expect(bike1.created_by_notification_or_impounding?).to be_truthy
             bike1_impound_record = bike1.current_impound_record
-            expect_hashes_to_match(bike1_impound_record, impound_record1_target)
+            expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
             expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
             expect(bike1.address_hash).to eq bike1_impound_record.address_hash
@@ -393,13 +393,13 @@ RSpec.describe BulkImportWorker, type: :job do
             expect(bike_sticker_update.creator_kind).to eq "creator_import"
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
-            expect_hashes_to_match(bike2, bike2_target)
+            expect(bike2).to match_hash_indifferently bike2_target
             expect(bike2.public_images.count).to eq 1
             expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike1.current_ownership.status).to eq "status_impounded"
             expect(bike2.created_by_notification_or_impounding?).to be_truthy
             bike2_impound_record = bike2.current_impound_record
-            expect_hashes_to_match(bike2_impound_record, impound_record2_target)
+            expect(bike2_impound_record).to match_hash_indifferently impound_record2_target
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
             expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
             expect(bike2.address_hash).to eq bike2_impound_record.address_hash

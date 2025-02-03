@@ -9,7 +9,6 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 ruby "3.4.1"
 
 # Gems that are no longer in standard library as Ruby 3.4
-gem "ostruct"
 gem "csv"
 gem "observer"
 gem "prime"
@@ -50,15 +49,10 @@ gem "redlock" # Locking
 gem "faraday_middleware" # Manage faraday request flow
 gem "geocoder" # Geolocation using external APIs
 gem "haml" # Template language
-gem "httparty"
-gem "kaminari" # pagination
+gem "httparty" # http connection client
+gem "pagy" # pagination
 gem "kramdown" # Markdown
 gem "money-rails", "~> 1.11"
-gem "omniauth", "~> 2.0.0"
-gem "omniauth-facebook"
-gem "omniauth-globalid"
-gem "omniauth-strava"
-gem "omniauth-twitter"
 gem "sitemap_generator", "~> 6"
 
 # Making other files
@@ -84,7 +78,7 @@ gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "
 gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
-gem "grape", "~> 1.8.0" # API DSL
+gem "grape" # API DSL
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 
 # Secure things
@@ -157,7 +151,8 @@ group :development do
   gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
   gem "terminal-notifier"
-  gem "annotate" # Annotate models with schema info
+  # Use community-maintained fork to support rails 8 - hopefully, eventually mainlined
+  gem "annotate", github: "msuliq/annotate_models", branch: "community-maintained" # Annotate models with schema info
 end
 
 group :development, :test do

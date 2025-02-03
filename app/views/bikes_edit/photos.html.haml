@@ -11,7 +11,7 @@
           %h3= @edit_templates[@edit_template]
 
           %h5.light-italic
-            = translate_with_args(".drag_the_uploaded_photos")
+            = t(".drag_the_uploaded_photos")
 
         %ul#public_images.row.edit-photo-display-list{ data: { orderurl: order_public_images_url, imagesurl: public_images_url } }
           = render partial: 'public_images/public_image', collection: @bike.public_images, as: :image
@@ -25,7 +25,7 @@
             = hidden_field_tag :imageable_type, @bike.class.name
             .col-xs-12
               %h5.light-italic
-                = translate_with_args(".drag_and_drop_files_here_html")
+                = t(".drag_and_drop_files_here_html")
               %label.file
                 = f.file_field :image, multiple: true, name: "public_image[image]", accept: ImageUploader.permitted_extensions.join(",")
                 %span.file-custom

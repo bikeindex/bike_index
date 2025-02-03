@@ -116,7 +116,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         bike.reload.update(updated_at: Time.current)
         expect(bike.reload.registration_address_source).to eq "initial_creation"
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
-        expect_hashes_to_match(bike.send(:location_record_address_hash), target_address_hash.except(:latitude, :longitude).merge(skip_geocoding: false))
+        expect(bike.send(:location_record_address_hash)).to match_hash_indifferently target_address_hash.except(:latitude, :longitude).merge(skip_geocoding: false)
 
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
         user.reload
@@ -141,8 +141,8 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     end
   end
 
-  describe "associate_membership_invites", :flaky do
-    it "assigns any memberships that match the user email, and mark user confirmed if invited" do
+  describe "associate_membership_invites" do
+    it "assigns any memberships that match the user email, and mark user confirmed if invited", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
       membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
       membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
@@ -162,7 +162,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
 
     # We are processing the first organization inline so we can
     # redirect users to the organization they belong to
-    it "synchronously associates the first memberhsip" do
+    it "synchronously associates the first memberhsip", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
       membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
       membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")

@@ -50,7 +50,7 @@ jobs:
           PGHOST: 127.0.0.1
           PGUSER: root
           PSQL_PAGER: ""
-      - image: cimg/postgres:13.5-postgis
+      - image: cimg/postgres:17.1-postgis
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test
@@ -127,9 +127,9 @@ jobs:
           paths:
             - ~/.cache/bundle
 
-      # - run:
-      #     name: Sync translations (only on main by default)
-      #     command: bin/check_translations
+      - run:
+          name: Sync translations (only on main by default)
+          command: bin/check_translations
 
       - restore_cache:
           name: "Assets: cache restore"

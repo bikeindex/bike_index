@@ -1,7 +1,7 @@
 .container
   .row
     %h3
-      = translate_with_args(".recovery_stories")
+      = t(".recovery_stories")
 
   #recovery-stories-listing
     .container.clearfix
@@ -11,4 +11,4 @@
         = render @slice2
 
     .paginate-container.paginate-container-bottom
-      = paginate @recovery_displays, window: 3
+      = pagy_bootstrap_nav(@pagy).html_safe

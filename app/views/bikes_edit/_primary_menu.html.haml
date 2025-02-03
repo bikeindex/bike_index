@@ -8,7 +8,7 @@
   - if @permitted_return_to.present?
     %span#permittedReturnTo{ "data-path" => @permitted_return_to }
   - if @bike.status_stolen?
-    %h3.nav-group-header= translate_with_args(".theft_information")
+    %h3.nav-group-header= t(".theft_information")
     %ul
       - @theft_templates.each do |template, description|
         %li{ class: "edit-menu-#{template}" }
@@ -17,7 +17,7 @@
             %h4= description
   - if @bike.status_stolen?
     %h3.nav-group-header
-      = translate_with_args(".bike_type_information", bike_type: @bike.type)
+      = t(".bike_type_information", bike_type: @bike.type)
   %ul
     - @bike_templates.each do |template, description|
       %li{ class: "edit-menu-#{template}" }
@@ -35,6 +35,6 @@
     .edit-form-well-submit-wrapper
       = hidden_field_tag :edit_template, @edit_template
       - if purchase_plan_button
-        = submit_tag translate_with_args(".purchase_alert"), class: 'btn btn-lg btn-primary'
+        = submit_tag t(".purchase_alert"), class: 'btn btn-lg btn-primary'
       - else
-        = submit_tag translate_with_args(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'
+        = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges'

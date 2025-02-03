@@ -40,12 +40,10 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          @page = params[:page] || 1
-          records = matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record)
-            .page(@page).per(@per_page)
-          set_pagination_headers(records, @page, @per_page) # Can't use api-pagination, because it blocks overriding max_per_page
-
+          pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+            .includes(:user, :bike, :impound_record), limit: @per_page)
+          # This was already set up, so I left it when upgrading to pagy
+          set_pagination_headers(pagy, @per_page)
           render json: records,
             root: "parking_notifications",
             each_serializer: ParkingNotificationSerializer
@@ -64,9 +62,9 @@ module Organized
       else
         @parking_notification = ParkingNotification.new(permitted_parameters)
         if @parking_notification.save
-          flash[:success] = translation_with_args(:successfully_created, bike_type: @parking_notification.bike.type)
+          flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
         else
-          flash[:error] = translation_with_args(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
+          flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
         end
       end
       if @redirect_location.present?
@@ -222,9 +220,9 @@ module Organized
     end
 
     # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
-    def set_pagination_headers(collection, page, per_page)
+    def set_pagination_headers(pagy, per_page)
       url = request.base_url + request.path_info
-      pages = ApiPagination.pages_from(collection)
+      pages = ApiPagination.pages_from(pagy)
       links = []
 
       pages.each do |k, v|
@@ -232,10 +230,10 @@ module Organized
         links << %(<#{url}?#{new_params.to_param}>; rel="#{k}")
       end
 
-      headers["Page"] = page
+      headers["Page"] = pagy.page
       headers["Link"] = links.join(", ") unless links.empty?
       headers["Per-Page"] = per_page.to_s
-      headers["Total"] = collection.total_count.to_s
+      headers["Total"] = pagy.count.to_s
     end
   end
 end

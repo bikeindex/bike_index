@@ -1,5 +1,5 @@
 .organized-page-header
-  %h1= translate_with_args(".org_incomplete_registrations_html", org_name: current_organization.name)
+  %h1= t(".org_incomplete_registrations_html", org_name: current_organization.name)
 
 - if @render_chart
   = column_chart time_range_counts(collection: @b_params_total, column: "b_params.created_at"), stacked: true, thousands: ","
@@ -10,10 +10,10 @@
 
 %p.mt-4
   %strong
-    = @b_params.total_count
-    = translate_with_args(".matching") if params[:query].present?
-  = translate_with_args(".incomplete")
-  = translate_with_args(".registration").pluralize(@b_params.total_count)
+    = @pagy.count
+    = t(".matching") if params[:query].present?
+  = t(".incomplete")
+  = t(".registration").pluralize(@pagy.count)
   %em
     = humanized_time_range(@time_range)
 
@@ -22,10 +22,10 @@
     .row
       .col-sm-8.col-md-10
         .form-group
-          = text_field_tag :query, params[:query], placeholder: translate_with_args(".search_emails"), class: "form-control"
+          = text_field_tag :query, params[:query], placeholder: t(".search_emails"), class: "form-control"
       .col-sm-4.col-md-2
         .actions
-          = submit_tag translate_with_args(".search"), class: "btn btn-primary"
+          = submit_tag t(".search"), class: "btn btn-primary"
 
 - include_child_org = current_organization.child_ids.present?
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
@@ -33,12 +33,12 @@
   %thead.sortable
     %th
       = sortable "id" do
-        = translate_with_args(".sent")
+        = t(".sent")
         %small.convertTimezone
-    %th= translate_with_args(".bike")
-    %th= sortable "cycle_type", translate_with_args(".vehicle_type")
-    %th= sortable "motorized", translate_with_args(".motorized")
-    %th= sortable "email", translate_with_args(".email")
+    %th= t(".bike")
+    %th= sortable "cycle_type", t(".vehicle_type")
+    %th= sortable "motorized", t(".motorized")
+    %th= sortable "email", t(".email")
   %tbody
     - @b_params.each do |b_param|
       %tr
@@ -63,7 +63,7 @@
           = b_param.owner_email
           - if include_child_org && b_param.organization != current_organization
             %small.less-strong{ style: "display: block; line-height: 1;" }
-              = translate_with_args(".through_org", org_name: b_param.organization.short_name)
+              = t(".through_org", org_name: b_param.organization.short_name)
         %td
           - resend_notifications = b_param.partial_notification_resends.pluck(:created_at, :delivery_status)
           .less-strong-hold{style: "min-width:2rem;"}
@@ -75,7 +75,7 @@
             -# Hacky restriction on the number of resends you can do
             - unless resend_notifications.count > 3
               %span.less-strong-right
-                = link_to translate_with_args(".re_send"), resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: {confirm: translate_with_args(".only_resend_with_permission")}, class: "gray-link"
+                = link_to t(".re_send"), resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: {confirm: t(".only_resend_with_permission")}, class: "gray-link"
 
 .paginate-container.paginate-container-bottom
-  = paginate @b_params
+  = pagy_bootstrap_nav(@pagy).html_safe

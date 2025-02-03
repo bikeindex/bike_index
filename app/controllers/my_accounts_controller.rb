@@ -5,10 +5,9 @@ class MyAccountsController < ApplicationController
   around_action :set_reading_role, only: %i[show]
 
   def show
-    page = params[:page] || 1
     @locks_active_tab = params[:active_tab] == "locks"
     @per_page = params[:per_page] || 20
-    @bikes = current_user.bikes.reorder(updated_at: :desc).page(page).per(@per_page)
+    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page)
     @locks = current_user.locks
   end
 
@@ -22,7 +21,7 @@ class MyAccountsController < ApplicationController
     @user = current_user
     if params.dig(:user, :password).present?
       unless @user.authenticate(params.dig(:user, :current_password))
-        @user.errors.add(:base, translation_with_args(:current_password_doesnt_match))
+        @user.errors.add(:base, translation(:current_password_doesnt_match))
       end
     end
     unless @user.errors.any?
@@ -36,7 +35,7 @@ class MyAccountsController < ApplicationController
         end
       end
       if successfully_updated
-        flash[:success] ||= translation_with_args(:successfully_updated)
+        flash[:success] ||= translation(:successfully_updated)
         # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
         redirect_back(fallback_location: edit_my_account_url(edit_template: @edit_template)) && return
       end
@@ -69,16 +68,16 @@ class MyAccountsController < ApplicationController
 
   def edit_templates
     @edit_templates ||= {
-      root: translation_with_args(:user_settings, scope: [:controllers, :my_accounts, :edit]),
-      password: translation_with_args(:password, scope: [:controllers, :my_accounts, :edit]),
-      sharing: translation_with_args(:sharing, scope: [:controllers, :my_accounts, :edit]),
-      delete_account: translation_with_args(:delete_account, scope: [:controllers, :my_accounts, :edit])
+      root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
+      password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
+      sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
     }.merge(registration_organization_template).as_json
   end
 
   def registration_organization_template
     return {} unless current_user&.user_registration_organizations.present?
-    {registration_organizations: translation_with_args(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
+    {registration_organizations: translation(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
   end
 
   def assign_edit_template

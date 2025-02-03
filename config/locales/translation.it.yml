@@ -60,6 +60,7 @@ it:
       invalid_currency:
       record_invalid: 'Validazione fallita: %{errors}'
       carrierwave_processing_error:
+      password_too_long:
     format: "%{attribute} %{message}"
     template:
       body: 'Ricontrolla i seguenti campi:'
@@ -144,6 +145,7 @@ it:
           tb: TB
           pb:
           eb:
+          zb:
       decimal_units:
         units:
           thousand: Mila
@@ -198,7 +200,8 @@ it:
           utilizzando questo metodo.
         unsupported_grant_type: Il tipo di autorizzazione richista non è supportato
           dal server di autorizzazione.
-        unsupported_response_mode:
+        unsupported_response_mode: Il server di autorizzazione non supporta questa
+          modalità di risposta.
         unsupported_response_type: Il server di autorizzazione non supporta questo
           response type.
       models:
@@ -214,47 +217,49 @@ it:
             scopes:
               not_match_configured: doesn't match configured on the server.
         bike:
-          not_found:
+          not_found: non trovato
         bike_sticker:
-          not_found:
-          unauthorized_to_claim:
+          not_found: non trovato
+          unauthorized_to_claim: non ha il permesso di rivendicarlo
         export:
-          required:
+          required: richiesto
         impound_record:
-          user_not_authorized:
+          user_not_authorized: non ha il permesso di confiscare questa bicicletta
         manufacturer:
-          cannot_match_a_color_name:
+          cannot_match_a_color_name: non può essere uguale al nome del colore
         organization_message:
-          latlon_required:
-          required:
+          latlon_required: latitudine e longitudine richieste
+          required: richiesto
         parking_notification:
           address_required:
         payment:
-          requires_email_or_org:
+          requires_email_or_org: Richiede un indirizzo e-mail o un'organizzazione
         recovery_display:
-          quote_too_long:
+          quote_too_long: Quella citazione è troppo lunga. La preghiamo di accorciarla
+            in modo che sia inferiore a 300 caratteri
         theft_alert:
-          must_be_later_than_start_time:
-          must_be_present:
+          must_be_later_than_start_time: deve essere successivo all'orario di inizio
+          must_be_present: deve essere presente
         user:
-          email_already_exists:
-          not_an_available_language:
+          email_already_exists: L'e-mail è già registrata su Bike Index.
+          not_an_available_language: non è una lingua disponibile
       organization:
-        duplicate_short_name:
+        duplicate_short_name: già in uso da un'altra organizzazione. Se pensate che
+          non sia corretto, contattate support@bikeindex.org
     attributes:
       doorkeeper/application:
         name: Nome
         redirect_uri: Redirect URI
         scopes:
         access_grants:
-        access_tokens:
-        authorized_applications:
-        authorized_tokens:
-        can_send_stolen_notifications:
-        is_internal:
-        owner_type:
+        access_tokens: Token di accesso
+        authorized_applications: Applicazioni autorizzate
+        authorized_tokens: Token autorizzati
+        can_send_stolen_notifications: Può inviare notifiche di furto
+        is_internal: È interno
+        owner_type: Tipo di proprietario
         secret: Secret
-        uid:
+        uid: UID
       ad:
         body: Corpo
         image: Immagine
@@ -299,7 +304,6 @@ it:
         partner_data: Dati dei partner
         password: Password
         password_digest: Digest della password
-        token_for_password_reset: Token per la reimpostazione della password
         payments: Pagamenti
         phone: Telefono
         preferred_language: Lingua preferita
@@ -322,6 +326,7 @@ it:
         website: Sito web
         when_vendor_terms_of_service: Quando i termini di servizio del venditore
         zipcode: Codice postale
+        token_for_password_reset: Token per la reimpostazione della password
       ambassador_task:
         ambassador_task_assignments: Assegnazione dei compiti agli ambasciatori
         ambassadors: Ambasciatori
@@ -383,648 +388,654 @@ it:
         propulsion_type: Tipo di propulsione
         public_images: Immagini pubbliche
         rear_tire_narrow: Pneumatico posteriore stretto
-        recovered_records:
+        recovered_records: Record recuperati
         registered_new:
         serial_normalized:
-        serial_number:
-        stock_photo_url:
+        serial_number: Numero di serie
+        stock_photo_url: Url della foto stock
         stolen: Rubata
-        stolen_notifications:
-        stolen_records:
-        thumb_path:
-        video_embed:
+        stolen_notifications: Notifiche di furto
+        stolen_records: Record rubati
+        thumb_path: Percorso del thumb
+        video_embed: Embed video
         year: Anno
-        zipcode:
+        zipcode: Codice postale
       bike_organization:
         can_not_edit_claimed:
-        deleted_at:
+        deleted_at: Eliminato il
       bike_sticker:
         claimed_at:
-        code:
+        code: Codice
         code_integer:
-        code_prefix:
-        kind:
+        code_prefix: Prefisso del codice
+        kind: Tipo
       bike_sticker_batch:
-        bike_stickers:
-        code_number_length:
-        notes:
+        bike_stickers: Codici bici
+        code_number_length: Lunghezza del numero di codice
+        notes: Note
       blog:
-        body:
-        body_abbr:
-        description_abbr:
+        body: Corpo
+        body_abbr: Abbreviazione corpo
+        description_abbr: Abbreviazione descrizione
         index_image:
         index_image_lg:
         is_listicle:
         listicles:
         old_title_slug:
-        public_images:
-        published:
-        published_at:
-        tags:
-        title:
+        public_images: Immagini pubbliche
+        published: Pubblicato
+        published_at: Pubblicato il
+        tags: Tag
+        title: Titolo
         title_slug:
       bulk_import:
-        bikes:
+        bikes: Biciclette
         creation_states:
-        file:
-        import_errors:
+        file: File
+        import_errors: Errori di importazione
         is_ascend:
         no_notify:
-        progress:
+        progress: Progresso
       cgroup:
         ctypes:
-        description:
+        description: Descrizione
         name: Nome
         slug:
       color:
-        bikes:
-        display:
+        bikes: Biciclette
+        display: Visualizzato
         name: Nome
-        paints:
-        priority:
+        paints: Vernici
+        priority: Priorità
       component:
-        component_model:
+        component_model: Modello del componente
         ctype_other:
-        description:
-        front:
+        description: Descrizione
+        front: Anteriore
         is_stock:
         manufacturer_other:
-        rear:
-        serial_number:
+        rear: Posteriore
+        serial_number: Numero di serie
         year: Anno
       country:
         iso:
-        locations:
+        locations: Luoghi
         name: Nome
-        stolen_records:
+        stolen_records: Record rubati
       creation_state:
         is_bulk:
-        is_new:
+        is_new: È nuovo
         is_pos:
-        origin:
+        origin: Origine
         pos_kind:
       ctype:
-        components:
-        has_multiple:
-        image:
+        components: Componenti
+        has_multiple: Ha multipli
+        image: Immagine
         name: Nome
-        secondary_name:
+        secondary_name: Nome secondario
         slug:
       customer_contact:
-        body:
-        contact_type:
-        creator_email:
-        info_hash:
-        kind:
-        title:
-        user_email:
+        body: Corpo
+        contact_type: Tipo di contatto
+        creator_email: Email del creatore
+        info_hash: Hash informazioni
+        kind: Tipo
+        title: Titolo
+        user_email: Email dell'utente
       doorkeeper/access_grant:
-        expires_in:
-        redirect_uri:
-        revoked_at:
+        expires_in: Scade in
+        redirect_uri: URI redirect
+        revoked_at: Revocato il
         scopes:
-        token:
+        token: Token
       doorkeeper/access_token:
-        expires_in:
-        refresh_token:
-        revoked_at:
+        expires_in: Scade in
+        refresh_token: Token aggiornamento
+        revoked_at: Revocato il
         scopes:
-        token:
+        token: Token
       duplicate_bike_group:
-        added_bike_at:
-        bikes:
-        ignore:
+        added_bike_at: Bicicletta aggiunta il
+        bikes: Biciclette
+        ignore: Ignora
         normalized_serial_segments:
       export:
-        file:
-        file_format:
-        kind:
-        options:
-        progress:
-        rows:
+        file: File
+        file_format: Formato del file
+        kind: Tipo
+        options: Opzioni
+        progress: Progresso
+        rows: Righe
       feedback:
-        body:
+        body: Corpo
         email: Email
-        feedback_hash:
-        feedback_type:
+        feedback_hash: Hash di feedback
+        feedback_type: Tipo di feedback
         name: Nome
-        title:
+        title: Titolo
       flipper/adapters/active_record/feature:
-        key:
+        key: Chiave
       flipper/adapters/active_record/gate:
-        feature_key:
-        key:
-        value:
+        feature_key: Chiave feature
+        key: Chiave
+        value: Valore
       front_gear_type:
-        bikes:
-        count:
-        internal:
+        bikes: Biciclette
+        count: Conteggio
+        internal: Interno
         name: Nome
         slug:
-        standard:
+        standard: Standard
       integration:
-        access_token:
-        information:
-        provider_name:
+        access_token: Token di accesso
+        information: Informazione
+        provider_name: Nome del fornitore
       invoice:
-        amount_due_cents:
-        amount_paid_cents:
-        force_active:
-        invoice_organization_features:
-        is_active:
-        notes:
-        organization_features:
-        payments:
-        subscription_end_at:
-        subscription_start_at:
+        amount_due_cents: Importo dovuto in centesimi
+        amount_paid_cents: Importo pagato in centesimi
+        force_active: Forza attivo
+        invoice_organization_features: Caratteristiche dell'organizzazione delle fatture
+        is_active: È attivo
+        notes: Note
+        organization_features: Caratteristiche dell'organizzazione
+        payments: Pagamenti
+        subscription_end_at: Fine abbonamento il
+        subscription_start_at: Inizio abbonamento il
       listicle:
-        body:
-        body_html:
+        body: Corpo
+        body_html: Corpo HTML
         crop_top_offset:
-        image:
-        image_credits:
-        image_credits_html:
-        image_height:
-        image_width:
+        image: Immagine
+        image_credits: Crediti immagine
+        image_credits_html: Crediti immagine HTML
+        image_height: Altezza dell'immagine
+        image_width: Larghezza dell'immagine
         list_order:
-        title:
+        title: Titolo
       location:
-        bikes:
-        city:
-        deleted_at:
+        bikes: Biciclette
+        city: Città
+        deleted_at: Eliminato il
         email: Email
-        latitude:
-        longitude:
+        latitude: Latitudine
+        longitude: Longitudine
         name: Nome
-        phone:
-        shown:
-        street:
-        zipcode:
+        phone: Telefono
+        shown: Mostrato
+        street: Via
+        zipcode: Codice postale
       lock:
-        combination:
-        has_combination:
-        has_key:
-        key_serial:
-        lock_model:
-        manufacturer_other:
-        notes:
+        combination: Combinazione
+        has_combination: Ha una combinazione
+        has_key: Ha la chiave
+        key_serial: Numero di serie della chiave
+        lock_model: Modello di lucchetto
+        manufacturer_other: Altro
+        notes: Note
       lock_type:
         name: Nome
         slug:
       mail_snippet:
-        address:
-        body:
-        is_enabled:
+        address: Indirizzo
+        body: Corpo
+        is_enabled: È abilitato
         is_location_triggered:
-        kind:
-        latitude:
-        longitude:
+        kind: Tipo
+        latitude: Latitudine
+        longitude: Longitudine
         name: Nome
-        proximity_radius:
-        public_images:
+        proximity_radius: Raggio di prossimità
+        public_images: Immagini pubbliche
       manufacturer:
-        bikes:
+        bikes: Biciclette
         close_year:
-        components:
-        description:
-        frame_maker:
-        locks:
-        logo:
+        components: Componenti
+        description: Descrizione
+        frame_maker: Costruttore del telaio
+        locks: Lucchetti
+        logo: Logo
         logo_source:
         name: Nome
-        notes:
+        notes: Note
         open_year:
-        paints:
+        paints: Vernici
         slug:
-        total_years_active:
-        website:
+        total_years_active: Totale anni di attività
+        website: Sito web
       membership:
         claimed_at:
-        deleted_at:
-        email_invitation_sent_at:
+        deleted_at: Eliminato il
+        email_invitation_sent_at: Invito via e-mail inviato il
         invited_email:
-        role:
+        role: Ruolo
       normalized_serial_segment:
-        segment:
+        segment: Segmento
       organization:
-        access_token:
-        api_access_approved:
-        approved:
+        access_token: Token di accesso
+        api_access_approved: Accesso API approvato
+        approved: Approvato
         ascend_name:
-        avatar:
-        b_params:
+        avatar: Avatar
+        b_params: Parametri B
         bike_organizations:
-        bike_stickers:
-        bikes:
+        bike_stickers: Codici bicicletta
+        bikes: Biciclette
         child_organizations:
-        created_bikes:
+        created_bikes: Biciclette create
         creation_states:
-        deleted_at:
+        deleted_at: Eliminato il
         enabled_feature_slugs:
-        invoices:
-        is_paid:
-        kind:
+        invoices: Fatture
+        is_paid: È pagato
+        kind: Tipo
         landing_html:
-        locations:
+        locations: Luoghi
         lock_show_on_map:
         mail_snippets:
-        memberships:
+        memberships: Iscrizioni
         name: Nome
-        payments:
+        payments: Pagamenti
         pos_kind:
         previous_slug:
-        public_images:
+        public_images: Immagini pubbliche
         recovered_records:
         registration_field_labels:
-        short_name:
-        show_on_map:
+        short_name: Nome abbreviato
+        show_on_map: Mostra sulla mappa
         slug:
-        users:
-        website:
+        users: Utenti
+        website: Sito web
       organization_feature:
-        amount_cents:
-        description:
-        details_link:
+        amount_cents: Importo in centesimi
+        description: Descrizione
+        details_link: Link ai dettagli
         feature_slugs:
         invoice_organization_features:
-        invoices:
-        kind:
+        invoices: Fatture
+        kind: Tipo
         name: Nome
       ownership:
-        claimed:
-        current:
-        example:
-        owner_email:
-        send_email:
-        user_hidden:
+        claimed: Rivendicato
+        current: Attuale
+        example: Esempio
+        owner_email: Email del proprietario
+        send_email: Invia l'e-mail
+        user_hidden: Utente nascosto
       paint:
-        bikes:
+        bikes: Biciclette
         name: Nome
       payment:
-        amount_cents:
+        amount_cents: Importo in centesimi
         email: Email
-        first_payment_date:
-        is_current:
-        is_payment:
-        is_recurring:
-        kind:
-        last_payment_date:
+        first_payment_date: Prima data di pagamento
+        is_current: È attuale
+        is_payment: È pagamento
+        is_recurring: È ricorrente
+        kind: Tipo
+        last_payment_date: Data dell'ultimo pagamento
       public_image:
-        external_image_url:
-        image:
-        imageable_type:
-        is_private:
-        listing_order:
+        external_image_url: URL dell'immagine esterna
+        image: Immagine
+        imageable_type: Tipo immagine
+        is_private: È privato
+        listing_order: Ordine lista
         name: Nome
       rear_gear_type:
-        bikes:
-        count:
-        internal:
+        bikes: Biciclette
+        count: Conteggio
+        internal: Interno
         name: Nome
         slug:
-        standard:
+        standard: Standard
       recovery_display:
-        image:
-        link:
+        image: Immagine
+        link: Collegamento
         quote:
         quote_by:
-        recovered_at:
+        recovered_at: Data di recupero
       state:
-        abbreviation:
-        locations:
+        abbreviation: Abbreviazione
+        locations: Luoghi
         name: Nome
-        stolen_records:
+        stolen_records: Record rubati
       stolen_notification:
-        message:
-        receiver_email:
-        reference_url:
+        message: Messaggio
+        receiver_email: Email del destinatario
+        reference_url: URL di riferimento
         send_dates:
-        subject:
+        subject: Oggetto
       stolen_record:
-        approved:
+        approved: Approvato
         can_share_recovery:
-        city:
+        city: Città
         create_open311:
-        current:
-        date_stolen:
-        estimated_value:
+        current: Attuale
+        date_stolen: Data del furto
+        estimated_value: Valore stimato
         index_helped_recovery:
-        latitude:
+        latitude: Latitudine
         lock_defeat_description:
         locking_description:
-        longitude:
-        phone:
-        phone_for_everyone:
-        phone_for_police:
-        phone_for_shops:
-        phone_for_users:
-        police_report_department:
-        police_report_number:
-        proof_of_ownership:
-        receive_notifications:
-        recovered_at:
-        recovered_description:
+        longitude: Longitudine
+        phone: Telefono
+        phone_for_everyone: Telefono per tutti
+        phone_for_police: Telefono per la polizia
+        phone_for_shops: Telefono per negozi
+        phone_for_users: Telefono per gli utenti
+        police_report_department: Dipartimento di polizia del rapporto
+        police_report_number: Numero del rapporto di polizia
+        proof_of_ownership: Prova di proprietà
+        receive_notifications: Ricevi notifiche
+        recovered_at: Data di recupero
+        recovered_description: Descrizione del recupero
         recovery_display_status:
         recovery_link_token:
         recovery_posted:
-        recovery_share:
-        recovery_tweet:
-        secondary_phone:
-        street:
+        recovery_share: Share recupero
+        recovery_tweet: Tweet recupero
+        secondary_phone: Telefono secondario
+        street: Via
         theft_alerts:
         theft_description:
-        time:
+        time: Ora
         tsved_at:
-        zipcode:
+        zipcode: Codice postale
       theft_alert:
-        end_at:
-        notes:
-        start_at:
-        status:
+        end_at: Finisce il
+        notes: Note
+        start_at: Inizia il
+        status: Stato
       theft_alert_plan:
-        active:
-        amount_cents:
-        description:
-        duration_days:
+        active: Attivo
+        amount_cents: Importo in centesimi
+        description: Descrizione
+        duration_days: Giorni di durata
         name: Nome
-        stolen_records:
-        theft_alerts:
+        stolen_records: Record rubati
+        theft_alerts: Avvisi di furto
         views:
       tweet:
-        alignment:
-        body_html:
-        image:
-        public_images:
-        twitter_response:
+        alignment: Allineamento
+        body_html: Corpo HTML
+        image: Immagine
+        public_images: Immagini pubbliche
+        twitter_response: Risposte Twitter
       user:
         ambassador_task_assignments:
         ambassador_tasks:
-        auth_token:
-        avatar:
+        auth_token: Token di autorizzazione
+        avatar: Avatar
         banned:
-        can_send_many_stolen_notifications:
-        city:
+        can_send_many_stolen_notifications: Può inviare molte notifiche di furto
+        city: Città
         confirmation_token: Token di conferma
-        confirmed:
-        created_bikes:
-        created_ownerships:
-        creation_states:
-        current_ownerships:
-        currently_owned_bikes:
-        description:
-        developer:
+        confirmed: Confermato
+        created_bikes: Biciclette create
+        created_ownerships: Proprietà create
+        creation_states: Stati di creazione
+        current_ownerships: Proprietà attuali
+        currently_owned_bikes: Biciclette attualmente possedute
+        description: Descrizione
+        developer: Sviluppatore
         email: Email
-        integrations:
-        last_login_at:
-        last_login_ip:
-        latitude:
-        locks:
-        longitude:
+        integrations: Integrazioni
+        last_login_at: Ultimo accesso il
+        last_login_ip: Ultimo IP di accesso
+        latitude: Latitudine
+        locks: Lucchetti
+        longitude: Longitudine
         magic_link_token:
-        memberships:
+        memberships: Iscrizioni
         my_bikes_hash:
         name: Nome
         notification_newsletters:
         notification_unstolen:
         oauth_applications:
         organization_embeds:
-        organizations:
-        owned_bikes:
-        ownerships:
+        organizations: Organizzazioni
+        owned_bikes: Bici possedute
+        ownerships: Proprietà
         partner_data:
         password: Password
-        password_digest:
-        token_for_password_reset:
-        payments:
-        phone:
-        preferred_language:
+        password_digest: Digest della password
+        payments: Pagamenti
+        phone: Telefono
+        preferred_language: Lingua preferita
         received_stolen_notifications:
         sent_memberships:
         sent_stolen_notifications:
-        show_bikes:
-        show_phone:
-        show_twitter:
-        show_website:
-        street:
-        subscriptions:
-        superuser:
-        terms_of_service:
-        title:
-        twitter:
-        user_emails:
-        username:
+        show_bikes: Mostra le biciclette
+        show_phone: Mostra il telefono
+        show_twitter: Mostra twitter
+        show_website: Mostra il sito web
+        street: Via
+        subscriptions: Abbonamenti
+        superuser: Superutente
+        terms_of_service: Termini di servizio
+        title: Titolo
+        twitter: Twitter
+        user_emails: Email dell'utente
+        username: Nome utente
         vendor_terms_of_service:
-        website:
+        website: Sito web
         when_vendor_terms_of_service:
-        zipcode:
+        zipcode: Codice postale
+        token_for_password_reset: Token per la reimpostazione della password
       user_email:
         confirmation_token: Token di conferma
         email: Email
       wheel_size:
-        bikes:
-        description:
+        bikes: Biciclette
+        description: Descrizione
         iso_bsd:
         name: Nome
-        priority:
+        priority: Priorità
     enums:
       cycle_type:
-        bike:
-        cargo:
+        bike: Bicicletta
+        cargo: Cargo Bike (carico anteriore)
         cargo_rear:
-        cargo_trike:
-        cargo_trike_rear:
-        e_motorcycle:
-        e_scooter:
-        non_e_scooter:
-        non_e_skateboard:
-        pedi_cab:
-        penny_farthing:
-        personal_mobility:
-        recumbent:
-        stroller:
-        tall_bike:
-        tandem:
-        traditional_bike:
+        cargo_trike: Triciclo Cargo (carico anteriore)
+        cargo_trike_rear: Triciclo cargo (carico posteriore)
+        e_motorcycle: Motociclo/Dirtbike elettrica (senza pedali)
+        e_scooter: Scooter elettrico
+        non_e_scooter: Scooter (non elettrico)
+        non_e_skateboard: Skateboard (non elettrico)
+        pedi_cab: Pedi Cab (risciò)
+        penny_farthing: Biciclo
+        personal_mobility: Skateboard elettrico (Monociclo, dispositivo di mobilità
+          personale, ecc.)
+        recumbent: Reclinabile
+        stroller: Passeggino
+        tall_bike: Bicicletta alta
+        tandem: Tandem
+        traditional_bike: Bicicletta tradizionale (2 ruote, 1 sella, pedali)
         trail_behind:
-        trailer:
-        tricycle:
-        unicycle:
-        wheelchair:
+        trailer: Rimorchio per biciclette
+        tricycle: Triciclo
+        unicycle: Monociclo
+        wheelchair: Sedia a rotelle
       frame_material:
-        aluminum:
-        composite:
-        magnesium:
-        organic:
-        steel:
-        titanium:
+        aluminum: Alluminio
+        composite: Carbonio o composito
+        magnesium: Magnesio
+        organic: Legno o materiale organico
+        steel: Acciaio
+        titanium: Titanio
       handlebar_type:
-        bmx:
-        drop_bar:
-        flat:
-        forward:
-        other:
-        rearward:
+        bmx: Stile BMX
+        drop_bar: Piega
+        flat: Dritto o riser
+        forward: Rivolto in avanti
+        other: Non manubri
+        rearward: Rivolto all'indietro
       propulsion_type:
-        foot_pedal:
-        hand_pedal:
+        foot_pedal: Pedale
+        hand_pedal: Hand bike
         human_not_pedal:
-        pedal_assist:
-        pedal_assist_and_throttle:
-        throttle:
+        pedal_assist: Pedalata assisita
+        pedal_assist_and_throttle: Pedalata assistita e acceleratore
+        throttle: Acceleratore elettrico
     models:
-      ad:
-      ambassador:
+      ad: Annuncio
+      ambassador: Ambasciatore
       ambassador_task:
       ambassador_task_assignment:
-      b_param:
-      bike:
-      bike_organization:
-      bike_sticker:
-      bike_sticker_batch:
-      blog:
-      bulk_import:
+      b_param: Parametri B
+      bike: Bicicletta
+      bike_organization: Organizzazione
+      bike_sticker: Adesivo
+      bike_sticker_batch: Lotto dell'adesivo
+      blog: Blog
+      bulk_import: Importazione massiva
       cgroup:
-      color:
-      component:
-      country:
-      creation_state:
+      color: Colore
+      component: Componente
+      country: Paese
+      creation_state: Stato di creazione
       ctype:
-      customer_contact:
+      customer_contact: Contatto del cliente
       doorkeeper/access_grant:
       doorkeeper/access_token:
       doorkeeper/application:
-      duplicate_bike_group:
-      export:
-      feedback:
+      duplicate_bike_group: Gruppo bici duplicato
+      export: Esportazione
+      feedback: Feedback
       flipper/adapters/active_record/feature:
       flipper/adapters/active_record/gate:
-      front_gear_type:
-      integration:
-      invoice:
+      front_gear_type: Tipo del cambio anteriore
+      integration: Integrazione
+      invoice: Fattura
       invoice_organization_feature:
       listicle:
-      location:
-      lock:
-      lock_type:
+      location: Luogo
+      lock: Lucchetto
+      lock_type: Tipo di lucchetto
       mail_snippet:
-      manufacturer:
-      membership:
+      manufacturer: Produttore
+      membership: Iscrizione
       normalized_serial_segment:
-      organization:
+      organization: Organizzazione
       organization_feature:
-      organization_message:
+      organization_message: Messaggio dell'organizzazione
       other_listing:
-      ownership:
-      paint:
-      payment:
-      public_image:
-      rear_gear_type:
+      ownership: Proprietà
+      paint: Vernice
+      payment: Pagamento
+      public_image: Immagine pubblica
+      rear_gear_type: Tipo di cambio posteriore
       recovery_display:
-      state:
-      stolen_notification:
-      stolen_record:
-      theft_alert:
+      state: Stato
+      stolen_notification: Notifica di furto
+      stolen_record: Record rubato
+      theft_alert: Avvisi di furto
       theft_alert_plan:
-      tweet:
-      user:
-      user_email:
-      wheel_size:
+      tweet: Tweet
+      user: Utente
+      user_email: Email dell'utente
+      wheel_size: Dimensione della ruota
     select_options:
       color:
-        black:
-        blue:
-        brown:
-        green:
-        orange:
-        pink:
-        purple:
-        red:
-        silver_gray_or_bare_metal:
-        stickers_tape_or_other_cover_up:
-        teal:
-        white:
-        yellow_or_gold:
+        black: Nero
+        blue: Blu
+        brown: Marrone
+        green: Verde
+        orange: Arancione
+        pink: Rosa
+        purple: Viola
+        red: Rosso
+        silver_gray_or_bare_metal: Argento, grigio o metallo nudo
+        stickers_tape_or_other_cover_up: Adesivi, nastro o altra copertura
+        teal: Verde acqua
+        white: Bianco
+        yellow_or_gold: Giallo o oro
       ctype:
-        aero_bars_extensions_bar_ends:
-        axle_nuts:
-        bashguard_chain_guide:
-        basket:
-        bell_noisemaker:
-        bottom_bracket:
-        brake:
-        brake_cable:
-        brake_lever:
-        brake_pad:
-        brake_rotor:
-        chain:
-        chain_tensioners:
-        chainrings:
-        cog_cassette_freewheel:
-        computer:
-        crankset:
-        derailleur:
+        aero_bars_extensions_bar_ends: Estensioni/protesi aero
+        axle_nuts: dadi dell'asse
+        bashguard_chain_guide: Bashguard/Guidacatena
+        basket: cestino
+        bell_noisemaker: campanello
+        bottom_bracket: movimento centrale
+        brake: freno
+        brake_cable: cavo del freno
+        brake_lever: leva del freno
+        brake_pad: pattino del freno
+        brake_rotor: disco del freno
+        chain: catena
+        chain_tensioners: tendicatena
+        chainrings: corone
+        cog_cassette_freewheel: pignone/cassetta/ruota libera
+        computer: computer
+        crankset: guarnitura
+        derailleur: deragliatore
         detangler:
-        fairing:
-        fender:
-        fork:
-        generator_dynamo:
-        grips_tape:
-        handlebar:
-        headset:
-        hub:
-        hub_guard:
-        kickstand:
-        lights:
-        other:
-        pedals:
-        pegs:
-        rack:
-        rear_suspension:
-        rim:
-        saddle:
-        seatpost:
-        seatpost_clamp:
-        shift_and_brake_lever:
-        shift_cable:
-        shifter:
-        spokes:
+        fairing: carenatura
+        fender: parafango
+        fork: forcella
+        generator_dynamo: generatore/dinamo
+        grips_tape: manopole/nastro
+        handlebar: manubrio
+        headset: serie sterzo
+        hub: mozzo
+        hub_guard: protezione del mozzo
+        kickstand: cavalletto
+        lights: luci
+        other: altro
+        pedals: pedali
+        pegs: pedane
+        rack: portapacchi
+        rear_suspension: sospensione posteriore
+        rim: cerchio
+        saddle: sella
+        seatpost: reggisella
+        seatpost_clamp: morsetto del reggisella
+        shift_and_brake_lever: leva del cambio e del freno
+        shift_cable: cavo del cambio
+        shifter: cambio
+        spokes: raggi
         stem:
-        tire:
-        toe_clips:
-        training_wheels:
-        tube:
-        unknown:
-        water_bottle_cage:
-        wheel:
+        tire: pneumatico
+        toe_clips: 'gabbia '
+        training_wheels: ruote da allenamento
+        tube: camera d'aria
+        unknown: sconosciuto
+        water_bottle_cage: portaborraccia
+        wheel: ruota
       organization:
         organization_affiliation_options:
-          community_member:
-          employee:
-          graduate_student:
-          student:
+          community_member: Membro della comunità
+          employee: Dipendente
+          graduate_student: Studente laureato
+          student: Studente universitario
       stolen_record:
-        bike_was_not_locked:
-        cable_lock:
-        chain_with_padlock:
-        heavy_duty_bicycle_security_chain:
-        lock_is_missing_along_with_the_bike:
-        lock_was_cut_and_left_at_the_scene:
-        lock_was_opened_and_left_unharmed_at_the_scene:
-        not_locked:
-        object_that_bike_was_locked_to_was_broken_removed_or_otherwise_compromised:
-        other:
-        other_situation_please_describe_below:
-        two_u_locks:
-        u_lock:
-        u_lock_and_cable:
+        bike_was_not_locked: La bicicletta non era legata
+        cable_lock: Lucchetto a cavo
+        chain_with_padlock: Catena con lucchetto
+        heavy_duty_bicycle_security_chain: Catena ad alta sicurezza
+        lock_is_missing_along_with_the_bike: Il lucchetto è mancante, insieme alla
+          bicicletta
+        lock_was_cut_and_left_at_the_scene: Il lucchetto è stato tagliato e lasciato
+          sul luogo
+        lock_was_opened_and_left_unharmed_at_the_scene: La serratura è stata aperta
+          e lasciata illesa sul luogo
+        not_locked: Non legata
+        object_that_bike_was_locked_to_was_broken_removed_or_otherwise_compromised: L'oggetto
+          a cui la bicicletta era legata è stato rotto, rimosso o compromesso
+        other: Altro
+        other_situation_please_describe_below: Altra situazione, si prega di descriverla
+          di seguito
+        two_u_locks: Due lucchetti a U
+        u_lock: Lucchetto a U
+        u_lock_and_cable: Lucchetto a U e cavo
     status_humanized:
       bike:
-        abandoned:
-        found:
-        impounded:
-        stolen:
-        unregistered:
-        with_owner:
+        abandoned: abbandonato
+        found: trovato
+        impounded: sequestrato
+        stolen: rubato
+        unregistered: non registrato
+        with_owner: con il proprietario
   datetime:
     distance_in_words:
       half_a_minute: mezzo minuto
@@ -1079,10 +1090,6 @@ it:
       update: Aggiorna %{model}
       submit: Invia %{model}
     page_entries_info:
-      entry:
-        zero:
-        one:
-        other:
       one_page:
         display_entries:
           zero:
@@ -1149,6 +1156,10 @@ it:
           problem:
           resolution:
         invalid_response:
+        length:
+        length_is:
+        length_min:
+        length_max:
   flash:
     actions:
       create:
@@ -1173,11 +1184,9 @@ it:
           data_format:
           keep_order:
           key_pattern:
-          key_pattern_to_rename:
           locale_to_translate_from:
           locales_filter:
           missing_types:
-          new_key_name:
           nostdin:
           out_format:
           pattern_router:
@@ -1212,6 +1221,7 @@ it:
         tree_subtract:
         tree_translate:
         unused:
+        cp:
       encourage:
       -
       -
@@ -1576,6 +1586,8 @@ it:
         confidential: Confidential
         callback_urls: Callback urls
         actions: Azioni
+        secret_hashed:
+        not_defined:
     authorizations:
       buttons:
         authorize: Autorizza
@@ -1588,6 +1600,8 @@ it:
         able_to: Questa applicazione portà
       show:
         title: Codide di autorizzazione
+      form_post:
+        title:
     authorized_applications:
       confirmations:
         revoke: Sei sicuro?
@@ -1615,8 +1629,6 @@ it:
         access_denied: Il proprietario della risorsa o il server di autorizzazione
           rifiuta la richiesta.
         invalid_scope: Lo scope della richiesta non è valido, sconosciuto, o malformato.
-        invalid_code_challenge_method: The code challenge method must be plain or
-          S256.
         server_error: Il server di autorizzazione ha rilevato una condizione inaspettata
           che ha impedito di soddisfare la richiesta.
         temporarily_unavailable: Il server di autorizzazione non è momentaneamente
@@ -1644,6 +1656,14 @@ it:
         revoke:
           unauthorized: Non sei autorizzato a revocare questo token
         invalid_resource_owner:
+        invalid_code_challenge_method:
+          zero:
+          one:
+          other:
+        unsupported_response_mode: Il server di autorizzazione non supporta questa
+          modalità di risposta.
+        forbidden_token:
+          missing_scope:
     flash:
       applications:
         create:
@@ -1675,48 +1695,50 @@ it:
       write_bikewise:
       write_organizations:
       write_user:
-  views:
-    pagination:
-      first: "&laquo; Inizio"
-      last: Fine &raquo;
-      previous: "&lsaquo; Prec."
-      next: Succ. &rsaquo;
-      truncate: "&hellip;"
   bike_versions:
     index:
-      primary_colors:
+      primary_colors: Colori primari
   bikes:
     bike:
-      location:
-      primary_colors:
-      serial:
+      location: Luogo
+      primary_colors: Colori primari
+      serial: Seriale
     bike_show_overlays:
-      add_a_picture_of_it:
-      add_a_picture_so_people_know_what_to_look:
-      add_some_more_information_about_it:
-      can_we_share_your_story:
-      claim_bike_type:
-      claim_it_so_you_can_update_your_listing:
-      did_we_help:
+      add_a_picture_of_it: Aggiungi una foto, in modo che tutti possano ammirarne
+        la bellezza!
+      add_a_picture_so_people_know_what_to_look: Aggiungi un'immagine in modo che
+        le persone sappiano cosa cercare!
+      add_some_more_information_about_it: 'Aggiungi altre informazioni su di essa:'
+      can_we_share_your_story: Possiamo condividere la sua storia?
+      claim_bike_type: Rivendica %{bike_type}
+      claim_it_so_you_can_update_your_listing: Rivendicala per poter aggiornare il
+        tuo annuncio.
+      did_we_help: Siamo stati di aiuto?
       edit: Modifica
-      how_did_you_get_it_back:
-      its_also_how_we_get_better_at_recovering:
-      mark_graduated_resolved:
-      mark_parking_resolved:
-      mark_recovered:
-      nevermind:
-      no_futher_action_necessary:
-      no_one_can_see_it_but_you:
-      organization_sent_this_message:
-      please_email_organization_with_questions_html:
-      please_tell_us_how_you_got_your_bike:
-      thank_you_for_registering_this_found_bike_type:
-      this_bike_type_is_hidden:
-      this_bike_version_is_hidden_html:
-      were_honored_to_have_your_bike:
-      were_really_bummed_your_bike_type_was_stolen:
-      when_did_you_recover_it:
-      whoa_this_awesome_bike_type_is_yours:
+      how_did_you_get_it_back: Come l'hai recuperata?
+      its_also_how_we_get_better_at_recovering: È anche il modo in cui miglioriamo
+        il recupero delle biciclette.
+      mark_graduated_resolved: Contrassegna %{bike_type} rimanente
+      mark_parking_resolved: Contrassegna %{bike_type} recuperata
+      mark_recovered: Contrassegna recuperata
+      nevermind: Non importa
+      no_futher_action_necessary: non sono necessarie altre azioni!
+      no_one_can_see_it_but_you: Nessuno può vederlo tranne tu.
+      organization_sent_this_message: "%{org_name} ha inviato questa notifica"
+      please_email_organization_with_questions_html: Per qualsiasi domanda, invia
+        un'e-mail a %{email_link}
+      please_tell_us_how_you_got_your_bike: Raccontaci come hai recuperato la tua
+        %{bike_type}, ci interessa davvero!
+      thank_you_for_registering_this_found_bike_type: Grazie per aver registrato questa
+        %{bike_type} ritrovata!
+      this_bike_type_is_hidden: Questa %{bike_type} è nascosta!
+      this_bike_version_is_hidden_html: "<em>%{version_name}</em> è nascosto!"
+      were_honored_to_have_your_bike: Siamo onorati di avere la tua %{bike_type} sull'Index.
+      were_really_bummed_your_bike_type_was_stolen: Siamo davvero dispiaciuti che
+        la tua %{bike_type} sia stata rubata.
+      when_did_you_recover_it: Quando l'hai recuperata?
+      whoa_this_awesome_bike_type_is_yours: Wow, questa fantastica %{bike_type} è
+        tua!
       whoa_this_awesome_version_is_yours:
       you_have_already_marked_remaining:
       you_have_already_marked_resolved:
@@ -2445,9 +2467,6 @@ it:
     users:
       confirm:
         already_confirmed:
-      find_user_from_token_for_password_reset!:
-        does_not_match_token:
-        token_expired:
       resend_confirmation_email:
         please_sign_in:
         resending_email:
@@ -2470,6 +2489,9 @@ it:
         you_can_use_bike_index_as_org:
       update_password_with_reset_token:
         password_reset_successfully:
+      find_user_from_token_for_password_reset!:
+        does_not_match_token:
+        token_expired:
     welcome:
       recovery_stories:
         no_stories_to_display:
@@ -4556,5 +4578,10 @@ it:
       recovery_stories:
     update_browser:
       go_here_to_learn_more:
-      oh_no:
-      unsupported_browser:
+      oh_no: Oh No!
+      unsupported_browser: Siamo spiacenti, Bike Index non supporta il tuo browser.
+  attributes:
+    bikes:
+      location: Luogo
+      primary_colors: Colori primari
+      serial: Seriale

@@ -4,11 +4,9 @@ class Admin::PaintsController < Admin::BaseController
   before_action :find_paint, only: [:show, :edit, :update, :destroy]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 100
-    @paints = matching_paints.reorder("paints.#{sort_column} #{sort_direction}")
-      .includes(:color, :secondary_color, :tertiary_color)
-      .page(page).per(@per_page)
+    @pagy, @paints = pagy(matching_paints.reorder("paints.#{sort_column} #{sort_direction}")
+      .includes(:color, :secondary_color, :tertiary_color), limit: @per_page)
   end
 
   def show
@@ -16,12 +14,11 @@ class Admin::PaintsController < Admin::BaseController
   end
 
   def edit
-    page = params[:page] || 1
     @per_page = params[:per_page] || 20
     bikes = Bike.unscoped.default_includes.includes(:paint)
       .where(paint_id: @paint.id).order("created_at desc")
     @bikes_count = bikes.size
-    @bikes = bikes.page(page).per(@per_page)
+    @pagy, @bikes = pagy(bikes, limit: @per_page)
   end
 
   def update

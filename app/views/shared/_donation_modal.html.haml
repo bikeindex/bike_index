@@ -8,6 +8,6 @@
             &times;
         = image_tag "revised/logo_blue_black.svg", class: "modal-title-logo", alt: "Bike Index home"
         %h2.modal-title.uncap
-          = translate_with_args(".donation_header")
+          = t(".donation_header")
         %hr
         = render partial: "/shared/donation_form", locals: {kind: "modal", is_cached: true}

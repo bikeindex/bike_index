@@ -1,61 +1,61 @@
 %h1.uncap
-  = translate_with_args(".manage_users")
+  = t(".manage_users")
 
 
 - unless @show_matching_count
   - user_count = number_with_delimiter(current_organization.sent_invitation_count)
   - if current_organization.restrict_invitations?
     %p
-      = translate_with_args(".you_have_invited_html", users_count: pluralize(user_count, translate_with_args(".user")))
+      = t(".you_have_invited_html", users_count: pluralize(user_count, t(".user")))
     %p
       - remaining_count = number_with_delimiter(current_organization.remaining_invitation_count)
-      = translate_with_args(".remaining_invites_html", invitations_count: remaining_count)
+      = t(".remaining_invites_html", invitations_count: remaining_count)
 
       - if current_organization.remaining_invitation_count > 0
-        = link_to translate_with_args(".invite_more_users"), new_organization_user_path(organization_id: current_organization.to_param)
+        = link_to t(".invite_more_users"), new_organization_user_path(organization_id: current_organization.to_param)
   - else
     %p
       %strong
         #{user_count}
-      = translate_with_args(".current_users")
+      = t(".current_users")
     %p
-      = translate_with_args(".permitted_domain_info_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
+      = t(".permitted_domain_info_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
       %em.less-strong
-        = translate_with_args(".you_can_also")
-        #{link_to translate_with_args(".manually_invite_email"), new_organization_user_path(organization_id: current_organization.to_param)}.
+        = t(".you_can_also")
+        #{link_to t(".manually_invite_email"), new_organization_user_path(organization_id: current_organization.to_param)}.
   %p
     - if current_organization.auto_user.present?
-      = translate_with_args(".emails_are_currently_sent_from_html", email: current_organization.auto_user.email)
-      =  link_to translate_with_args(".update_email"), organization_manage_path(organization_id: current_organization.to_param)
+      = t(".emails_are_currently_sent_from_html", email: current_organization.auto_user.email)
+      =  link_to t(".update_email"), organization_manage_path(organization_id: current_organization.to_param)
 
 .row.mb-4.mt-4
   .col-md-6
     .paginate-container.text-left
-      = paginate @memberships
+      = pagy_bootstrap_nav(@pagy).html_safe
   - if @show_user_search
     .col-md-6.text-right{ style: "margin-top: 0.25rem;" }
       = form_tag organization_users_path(organization_id: current_organization.to_param), method: :get, class: "form-inline" do
         = render partial: "/shared/hidden_search_fields"
         .form-group
-          = text_field_tag :query, params[:query], placeholder: translate_with_args(".find_by_name_or_email"), class: "form-control mt-2"
-          = submit_tag translate_with_args(".search"), name: "search", class: "btn btn-primary ml-2 mt-2"
+          = text_field_tag :query, params[:query], placeholder: t(".find_by_name_or_email"), class: "form-control mt-2"
+          = submit_tag t(".search"), name: "search", class: "btn btn-primary ml-2 mt-2"
 
 - if @show_matching_count
   %p.mt-2.mb-2
     %strong
-      = number_with_delimiter(@memberships.total_count)
-    = translate_with_args(".matching_user").pluralize(@memberships.total_count)
+      = number_with_delimiter(@pagy.count)
+    = t(".matching_user").pluralize(@pagy.count)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.sortable
-      %th= sortable "created_at", translate_with_args(".created")
-      %th= sortable "invited_email", translate_with_args(".to")
-      %th= sortable "claimed_at", translate_with_args(".claimed")
-      %th= sortable "role", translate_with_args(".role")
+      %th= sortable "created_at", t(".created")
+      %th= sortable "invited_email", t(".to")
+      %th= sortable "claimed_at", t(".claimed")
+      %th= sortable "role", t(".role")
       %th
         %small
-          = sortable "sender_id", translate_with_args(".sender")
+          = sortable "sender_id", t(".sender")
     %tbody
       - @memberships.each do |membership|
         %tr
@@ -72,11 +72,11 @@
                 = l(membership.created_at, format: :convert_time)
           %td
             - if membership.admin?
-              %span.text-info= translate_with_args(".admin")
+              %span.text-info= t(".admin")
             - else
-              %span.less-strong= translate_with_args(".member")
+              %span.less-strong= t(".member")
               - if membership.member_no_bike_edit?
-                %small= translate_with_args(".no_bike_edit")
+                %small= t(".no_bike_edit")
 
           %td
             - if membership.sender.present?

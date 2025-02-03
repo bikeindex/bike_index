@@ -1,46 +1,46 @@
 .mb-4
   %h1.uncap
-    = translate_with_args(".edit_membership_html", email: @membership.invited_email)
+    = t(".edit_membership_html", email: @membership.invited_email)
 
 %p.text-right
-  = link_to translate_with_args(".remove_from_organization"),
+  = link_to t(".remove_from_organization"),
     organization_user_path(id: @membership.id, organization_id: current_organization.to_param),
     method: :delete,
-    data: { confirm: translate_with_args(".confirmation", user_name: @name, org_name: current_organization.name) },
+    data: { confirm: t(".confirmation", user_name: @name, org_name: current_organization.name) },
     class: "btn btn-danger"
 
 %table.table-list
   %tbody
     %tr
       %td
-        = translate_with_args(".invited")
+        = t(".invited")
       %td
         %span.convertTime.preciseTime
           = l(@membership.created_at, format: :convert_time)
     %tr
       %td
-        = translate_with_args(".signed_up")
+        = t(".signed_up")
       %td
         - if @membership.claimed?
           %span.convertTime.preciseTime= l(@membership.claimed_at, format: :convert_time)
         - else
-          = translate_with_args(".has_not_signed_up_html", name: @membership.invited_display_name)
+          = t(".has_not_signed_up_html", name: @membership.invited_display_name)
     %tr
       %td
-        = translate_with_args(".last_login")
+        = t(".last_login")
       %td
         - if @membership&.user&.last_login_at&.present?
           %span.convertTime.preciseTime= l(@membership.user.last_login_at, format: :convert_time)
     %tr
       %td
-        = translate_with_args(".last_login_ip")
+        = t(".last_login_ip")
       %td
         - if @membership&.user&.last_login_ip&.present?
           %code= @membership.user.last_login_ip
 
 = form_for @membership, { as: :membership, url: organization_user_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   .form-group.row
-    %label.org-form-label= translate_with_args(".email")
+    %label.org-form-label= t(".email")
     .col-sm-4
       %p.static-form-control= @membership.user&.email
 
@@ -48,4 +48,4 @@
 
   .row.mt-4.form-group
     .form-submit-button
-      = f.submit translate_with_args(".update"), class: "btn btn-success btn-lg"
+      = f.submit t(".update"), class: "btn btn-success btn-lg"

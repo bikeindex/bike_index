@@ -1,59 +1,59 @@
 %h1
-  = translate_with_args(".protect_your_bike")
+  = t(".protect_your_bike")
 %h2#fnref-bike-theft-estimate
-  = translate_with_args(".over_a_million_bikes_are_stolen_yearly")
+  = t(".over_a_million_bikes_are_stolen_yearly")
   %sup
     %a.footnote-ref{ href: "#fn-bike-theft-estimate" }
       1
 
   %br
   %strong
-    = translate_with_args(".make_sure_your_bike_isnt_one_of_them")
+    = t(".make_sure_your_bike_isnt_one_of_them")
 
 %article.padded
   %ol
     %li
       %p
-        %strong= translate_with_args(".cable_locks_should_never_be_used_as_primary")
-        = translate_with_args(".cheaper_and_older_ulocks_can_often_be_broken")
-        %strong= translate_with_args(".use_a_ulock_that_costs_at_least_40")
+        %strong= t(".cable_locks_should_never_be_used_as_primary")
+        = t(".cheaper_and_older_ulocks_can_often_be_broken")
+        %strong= t(".use_a_ulock_that_costs_at_least_40")
         - bestbikelock_link = link_to "thebestbikelock.com", "http://thebestbikelock.com/"
-        = translate_with_args(".checkout_out_bestbikelock_html", link: bestbikelock_link)
+        = t(".checkout_out_bestbikelock_html", link: bestbikelock_link)
 
     %li
-      %p= translate_with_args(".aim_to_have_the_hardest_bike_to_steal_on_")
+      %p= t(".aim_to_have_the_hardest_bike_to_steal_on_")
     %li
-      %p= translate_with_args(".dont_rely_on_foot_traffic_to_keep_your_bi")
+      %p= t(".dont_rely_on_foot_traffic_to_keep_your_bi")
     %li
-      %p= translate_with_args(".dont_rely_on_the_presence_of_cameras_to_k")
+      %p= t(".dont_rely_on_the_presence_of_cameras_to_k")
     %li
-      %p= translate_with_args(".tug_on_whatever_youre_about_to_lock_to_ma")
+      %p= t(".tug_on_whatever_youre_about_to_lock_to_ma")
     %li
-      %p= translate_with_args(".many_bicycles_are_stolen_from_garages_and")
+      %p= t(".many_bicycles_are_stolen_from_garages_and")
 
 
 %article
   #locking-demonstration
     .locked
-      = image_tag "Locking.svg", alt: translate_with_args(".correctly_locking_a_bike"), title: translate_with_args(".pink_power_ulocks")
+      = image_tag "Locking.svg", alt: t(".correctly_locking_a_bike"), title: t(".pink_power_ulocks")
     %p
-      %strong= translate_with_args(".a_correctly_locked_bicycle")
+      %strong= t(".a_correctly_locked_bicycle")
       %br
-      = translate_with_args(".the_frame_is_locked_to_an_immovable_objec")
+      = t(".the_frame_is_locked_to_an_immovable_objec")
 
 %p
   - chicago_link = link_to "Chicago.StolenBike.org", "http://chicago.stolenbike.org"
   - sweethome_link = link_to "Sweethome", "http://thesweethome.com/reviews/best-bike-lock/"
   %em.less-strong
-    = translate_with_args(".thanks_to_researchers_html", chicago_link: chicago_link, sweethome_link: sweethome_link)
+    = t(".thanks_to_researchers_html", chicago_link: chicago_link, sweethome_link: sweethome_link)
 
 
 
 .footnotes
-  - stolen_link = link_to translate_with_args(".211547_bikes_were_reported_stolen"), "https://www.fbi.gov/about-us/cjis/ucr/crime-in-the-u.s/2014/crime-in-the-u.s.-2014/tables/table-7"
-  - theft_link = link_to translate_with_args(".9_in_10_incidents_of_bike_theft"), "http://www.transalt.org/files/resources/blueprint/chapter11/"
-  - priceonomics_link = link_to translate_with_args(".exploration"), "http://blog.priceonomics.com/post/30393216796/what-happens-to-stolen-bicycles"
-  - back_link = link_to "↩", "#fnref-bike-theft-estimate", title: translate_with_args(".jump_to_footnote_1"), class: "footnote-back-link"
+  - stolen_link = link_to t(".211547_bikes_were_reported_stolen"), "https://www.fbi.gov/about-us/cjis/ucr/crime-in-the-u.s/2014/crime-in-the-u.s.-2014/tables/table-7"
+  - theft_link = link_to t(".9_in_10_incidents_of_bike_theft"), "http://www.transalt.org/files/resources/blueprint/chapter11/"
+  - priceonomics_link = link_to t(".exploration"), "http://blog.priceonomics.com/post/30393216796/what-happens-to-stolen-bicycles"
+  - back_link = link_to "↩", "#fnref-bike-theft-estimate", title: t(".jump_to_footnote_1"), class: "footnote-back-link"
   %ol
     %li#fn-bike-theft-estimate
-      = translate_with_args(".according_to_fbi_statistics_html", stolen_link: stolen_link, theft_link: theft_link, priceonomics_link: priceonomics_link, back_link: back_link)
+      = t(".according_to_fbi_statistics_html", stolen_link: stolen_link, theft_link: theft_link, priceonomics_link: priceonomics_link, back_link: back_link)

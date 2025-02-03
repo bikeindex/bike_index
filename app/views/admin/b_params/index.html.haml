@@ -43,6 +43,8 @@
         = text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
+= render partial: "/shared/pagination", locals: {collection: @b_params}
+
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light.sortable
@@ -99,5 +101,5 @@
             %div{ style: "max-width: 450px; overflow: scroll; white-space: nowrap;" }
               = pretty_print_json(b_param.params)
 
-.paginate-container
-  = paginate @b_params
+= render partial: "/shared/pagination", locals: {collection: @b_params, skip_total: true}
+

@@ -18,8 +18,8 @@
         - referral_source ||= @blog.title_slug
         .next-steps-wrap.donation
           %header
-            = translate_with_args(".make_a_difference")
-            = link_to translate_with_args(".donate_today"), donate_path(source: referral_source), class: "btn btn-primary"
+            = t(".make_a_difference")
+            = link_to t(".donate_today"), donate_path(source: referral_source), class: "btn btn-primary"
           %ul
             %li.mt-3
               = link_to "Donate $5", donate_path(initial_amount: 5, source: referral_source), class: "btn btn-secondary donate-btn"
@@ -51,52 +51,52 @@
               Value of bikes recovered with Bike Index
       - else
         %nav.content-nav-group
-          %h3= translate_with_args(".related")
+          %h3= t(".related")
           %ul
             - if content_page_type == "news"
               %li
                 - all_active = action_name == "index" && !sortable_search_params?
-                = link_to translate_with_args(".bike_index_news"), news_index_path, class: (all_active ? "active" : "")
+                = link_to t(".bike_index_news"), news_index_path, class: (all_active ? "active" : "")
             - if @related_blogs.present?
               - @related_blogs.each do |blog|
                 %li.mt-3
                   = link_to blog.title, news_url(blog)
             - else
               %li
-                = active_link translate_with_args(".about"), about_path
+                = active_link t(".about"), about_path
             - unless content_page_type == 'news'
               %li
-                = active_link translate_with_args(".forum"), discuss_url
+                = active_link t(".forum"), discuss_url
               %li
-                = active_link translate_with_args(".help"), help_url
+                = active_link t(".help"), help_url
               %li
-                = active_link translate_with_args(".where"), where_path
+                = active_link t(".where"), where_path
               - if %w(manufacturers where).include?(content_page_type)
                 %li
-                  = active_link translate_with_args(".sign_up_your_organization"), new_organization_path
+                  = active_link t(".sign_up_your_organization"), new_organization_path
 
         %nav.content-nav-group
-          %h3= translate_with_args(".other_pages")
+          %h3= t(".other_pages")
           %ul
             %li
-              = active_link translate_with_args(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path
+              = active_link t(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path
             - unless content_page_type == "news"
               %li
-                = active_link translate_with_args(".bike_index_news"), news_index_path
+                = active_link t(".bike_index_news"), news_index_path
             %li
-              = active_link translate_with_args(".protect_your_bike"), protect_your_bike_path
+              = active_link t(".protect_your_bike"), protect_your_bike_path
             %li
-              = active_link translate_with_args(".bicycle_serials"), serials_path
+              = active_link t(".bicycle_serials"), serials_path
             - if %w(news about manufacturers).include?(content_page_type)
               %li
-                = active_link translate_with_args(".donate"), why_donate_path
+                = active_link t(".donate"), why_donate_path
             - if %w(news serials manufacturers).include?(content_page_type)
               %li
-                = active_link translate_with_args(".bike_index_store"), store_path
+                = active_link t(".bike_index_store"), store_path
             %li
-              = active_link translate_with_args(".design_and_developer_resources"), dev_and_design_path
+              = active_link t(".design_and_developer_resources"), dev_and_design_path
             %li
-              = active_link translate_with_args(".sign_up_your_organization"), new_organization_path
+              = active_link t(".sign_up_your_organization"), new_organization_path
 
         .ad-block.ad-binx.ad300x600.d-none.d-md-block
         = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-3 d-none d-md-block"}

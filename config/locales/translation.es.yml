@@ -74,6 +74,7 @@ es:
           tb: TB
           pb: PB
           eb: EB
+          zb:
       decimal_units:
         units:
           thousand: mil
@@ -129,6 +130,7 @@ es:
       vips_processing_error:
       min_size_error:
       max_size_error:
+      password_too_long:
     template:
       body: 'Se encontraron problemas con los siguientes campos:'
       header:
@@ -299,7 +301,6 @@ es:
         partner_data:
         password: Contraseña
         password_digest:
-        token_for_password_reset:
         payments:
         phone:
         preferred_language:
@@ -322,6 +323,7 @@ es:
         website:
         when_vendor_terms_of_service:
         zipcode:
+        token_for_password_reset:
       ambassador_task:
         ambassador_task_assignments:
         ambassadors:
@@ -793,7 +795,6 @@ es:
         partner_data:
         password: Contraseña
         password_digest:
-        token_for_password_reset:
         payments:
         phone:
         preferred_language:
@@ -816,6 +817,7 @@ es:
         website:
         when_vendor_terms_of_service:
         zipcode:
+        token_for_password_reset:
       user_email:
         confirmation_token: Código de confirmación
         email: Email
@@ -1078,10 +1080,6 @@ es:
       update: Actualizar %{model}
       submit: Guardar %{model}
     page_entries_info:
-      entry:
-        zero:
-        one:
-        other:
       one_page:
         display_entries:
           zero: No se han encontrado %{entry_name}
@@ -1148,6 +1146,10 @@ es:
           problem:
           resolution:
         invalid_response:
+        length:
+        length_is:
+        length_min:
+        length_max:
   flash:
     actions:
       create:
@@ -1172,11 +1174,9 @@ es:
           data_format:
           keep_order:
           key_pattern:
-          key_pattern_to_rename:
           locale_to_translate_from:
           locales_filter:
           missing_types:
-          new_key_name:
           nostdin:
           out_format:
           pattern_router:
@@ -1211,6 +1211,7 @@ es:
         tree_subtract:
         tree_translate:
         unused:
+        cp:
       encourage:
       -
       -
@@ -1576,6 +1577,8 @@ es:
         confidential: Confidential
         callback_urls: Callback urls
         actions: Acciones
+        secret_hashed:
+        not_defined:
     authorizations:
       buttons:
         authorize: Autorizar
@@ -1588,6 +1591,8 @@ es:
         able_to: Está aplicación tendrá permisos para
       show:
         title: Código de autorización
+      form_post:
+        title:
     authorized_applications:
       confirmations:
         revoke: "¿Estás seguro?"
@@ -1616,8 +1621,6 @@ es:
           denegado la petición.
         invalid_scope: El scope solicitado no es válido, es desconocido, o tiene un
           formato incorrecto.
-        invalid_code_challenge_method: The code challenge method must be plain or
-          S256.
         server_error: El servidor de autorización ha encontrado una condición inesperada
           que le ha impedido completar la petición.
         temporarily_unavailable: El servidor de autorización no ha podido manejar
@@ -1646,6 +1649,13 @@ es:
         revoke:
           unauthorized: No tiene autorización para revocar este token
         invalid_resource_owner:
+        invalid_code_challenge_method:
+          zero:
+          one:
+          other:
+        unsupported_response_mode:
+        forbidden_token:
+          missing_scope:
     flash:
       applications:
         create:
@@ -1677,13 +1687,6 @@ es:
       write_bikewise:
       write_organizations:
       write_user:
-  views:
-    pagination:
-      first: "&laquo; Primera"
-      last: Última &raquo;
-      previous: "&lsaquo; Anterior"
-      next: Siguiente &rsaquo;
-      truncate: "&hellip;"
   bike_versions:
     index:
       primary_colors:
@@ -2447,9 +2450,6 @@ es:
     users:
       confirm:
         already_confirmed:
-      find_user_from_token_for_password_reset!:
-        does_not_match_token:
-        token_expired:
       resend_confirmation_email:
         please_sign_in:
         resending_email:
@@ -2472,6 +2472,9 @@ es:
         you_can_use_bike_index_as_org:
       update_password_with_reset_token:
         password_reset_successfully:
+      find_user_from_token_for_password_reset!:
+        does_not_match_token:
+        token_expired:
     welcome:
       recovery_stories:
         no_stories_to_display:
@@ -4570,3 +4573,8 @@ es:
       go_here_to_learn_more:
       oh_no:
       unsupported_browser:
+  attributes:
+    bikes:
+      location:
+      primary_colors:
+      serial:

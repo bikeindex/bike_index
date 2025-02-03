@@ -118,7 +118,7 @@ class Organization < ApplicationRecord
   enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
 
   validates_presence_of :name
-  validates_uniqueness_of :short_name, case_sensitive: false, message: i18n_translate_with_args(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
+  validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
@@ -445,7 +445,7 @@ class Organization < ApplicationRecord
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
     %w[student graduate_student employee community_member]
-      .map { |e| [i18n_translate_with_args(e, scope: translation_scope), e] }
+      .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
   def block_short_name_edit?

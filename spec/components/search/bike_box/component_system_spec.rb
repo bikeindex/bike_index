@@ -8,6 +8,6 @@ RSpec.describe Search::BikeBox::Component, :js, type: :system do
   it "default preview" do
     visit(preview_path)
 
-    expect(page).to have_content "Search::BikeBox::Component"
+    expect(page).to have_content "XXX999 999XXXX"
   end
 end

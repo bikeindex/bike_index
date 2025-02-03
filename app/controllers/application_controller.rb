@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
+  include Pagy::Backend
   protect_from_forgery
 
   around_action :set_locale
@@ -14,7 +15,7 @@ class ApplicationController < ActionController::Base
     x_permitted_cross_domain_policies: false)
 
   def handle_unverified_request
-    flash[:error] = translation_with_args(:csrf_invalid, scope: [:controllers, :application, __method__])
+    flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
     redirect_to user_root_url
   end
 
@@ -105,7 +106,7 @@ class ApplicationController < ActionController::Base
   # Handle localization / currency conversion exceptions by redirecting to the
   # root url with the default locale and a flash message.
   def localization_failure
-    locale = translation_with_args(requested_locale, scope: [:locales])
+    locale = translation(requested_locale, scope: [:locales])
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url

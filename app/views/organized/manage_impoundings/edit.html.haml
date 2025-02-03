@@ -1,6 +1,6 @@
 .mb-4
   %h1.uncap
-    = translate_with_args(".impound_settings_html", org_name: @organization.name)
+    = t(".impound_settings_html", org_name: @organization.name)
 
 = form_for @impound_configuration, { url: organization_manage_impounding_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
 
@@ -70,7 +70,7 @@
 
   .form-group.row.mt-4.small-line-height
     .form-submit-button
-      = f.submit translate_with_args(".save"), class: "btn btn-success btn-lg"
+      = f.submit t(".save"), class: "btn btn-success btn-lg"
 
   - if @organization.enabled?("show_bulk_import_impound")
     .form-group.row.mt-4.pt-4.small-line-height

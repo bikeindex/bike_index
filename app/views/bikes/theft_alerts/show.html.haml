@@ -7,12 +7,12 @@
         .form-wrap
           .form-well-form-header-always-visible
             %h3
-              = translate_with_args(".thank_you")
+              = t(".thank_you")
           .row.mt-4
             .col-sm-12
               %p
-                = translate_with_args(".your_order_is_pending")
+                = t(".your_order_is_pending")
               %p
-                = translate_with_args(".stay_tuned_for_an_update_once_weve_proces")
+                = t(".stay_tuned_for_an_update_once_weve_proces")
 
         = render partial: "table", locals: { theft_alerts: @theft_alerts }

@@ -8,23 +8,20 @@ module Organized
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
-      page = params[:page] || 1
-      per_page = params[:per_page] || 25
-      @bulk_imports = available_bulk_imports.includes(:ownerships)
-        .reorder("bulk_imports.#{sort_column} #{sort_direction}")
-        .page(page).per(per_page)
+      params[:per_page] || 25
+      @pagy, @bulk_imports = pagy(available_bulk_imports.includes(:ownerships)
+        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 
     def show
       @bulk_import = bulk_imports.where(id: params[:id]).first
       unless @bulk_import.present?
-        flash[:error] = translation_with_args(:unable_to_find_import)
+        flash[:error] = translation(:unable_to_find_import)
         redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
-      page = params[:page] || 1
-      per_page = params[:per_page] || 25
-      @bikes = @bulk_import.bikes.order(created_at: :desc).page(page).per(per_page)
+      @per_page = params[:per_page] || 25
+      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page)
     end
 
     def new
@@ -39,15 +36,15 @@ module Organized
       if @bulk_import.save
         BulkImportWorker.perform_async(@bulk_import.id)
         if @is_api
-          render json: {success: translation_with_args(:file_imported)}, status: 201
+          render json: {success: translation(:file_imported)}, status: 201
         else
-          flash[:success] = translation_with_args(:bulk_import_created)
+          flash[:success] = translation(:bulk_import_created)
           redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param)
         end
       elsif @is_api
         render json: {error: @bulk_import.errors.full_messages}
       else
-        flash[:error] = translation_with_args(:unable_to_create_bulk_import)
+        flash[:error] = translation(:unable_to_create_bulk_import)
         render action: :new
       end
     end

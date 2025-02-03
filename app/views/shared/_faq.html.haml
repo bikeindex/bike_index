@@ -13,133 +13,133 @@
 
 %article
   .faq-block#main-faq-block
-    %h3= translate_with_args(".faqs")
+    %h3= t(".faqs")
     %dl
       %dt.collapse-faq
         %a.collapsed{ href: "#who-can-register", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".who_can_register_bikes")
+          = t(".who_can_register_bikes")
 
       %dd#who-can-register.collapse
-        %p= translate_with_args(".everyone_can_register_bikes_for_free")
+        %p= t(".everyone_can_register_bikes_for_free")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#how-verify", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".how_bikes_are_verified")
+          = t(".how_bikes_are_verified")
 
       %dd#how-verify.collapse
-        %p= translate_with_args(".registration_html", partner_link: link_to(t(".partner_link"), where_url))
-        %p= translate_with_args(".verification_questions")
+        %p= t(".registration_html", partner_link: link_to(t(".partner_link"), where_url))
+        %p= t(".verification_questions")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#bike-by-serial", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".can_you_tell_me_what_bike_by_serial")
+          = t(".can_you_tell_me_what_bike_by_serial")
 
       %dd#bike-by-serial.collapse
-        %p= translate_with_args(".not_yet")
-        %p= translate_with_args(".we_recommend_searching")
+        %p= t(".not_yet")
+        %p= t(".we_recommend_searching")
 
         = form_tag bikes_path, method: :get do
           = text_field_tag :serial,
           params[:serial],
-          placeholder: translate_with_args(".bike_serial_number"),
+          placeholder: t(".bike_serial_number"),
           class: 'faq-search-search-field'
 
           = button_tag(type: "submit", class: "searchit") do
             = image_tag "stolen/search.svg"
-        %p= translate_with_args(".similar_serials")
+        %p= t(".similar_serials")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#what-if-i-sell", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".what_if_i_sell_my_bike")
+          = t(".what_if_i_sell_my_bike")
 
       %dd#what-if-i-sell.collapse
-        %p= translate_with_args(".free_to_transfer")
+        %p= t(".free_to_transfer")
 
-        %p.steps= translate_with_args(".go_to_edit_page")
+        %p.steps= t(".go_to_edit_page")
 
-        %p.steps= translate_with_args(".reveal_owner_email_html")
+        %p.steps= t(".reveal_owner_email_html")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#how-vendor", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".can_partner_with_bikeindex")
+          = t(".can_partner_with_bikeindex")
 
       %dd#how-vendor.collapse
-        %p= translate_with_args(".absolutely")
-        %p= translate_with_args(".organization_signup_html", signup_link: link_to(t(".organization_signup_link"), new_organization_path))
+        %p= t(".absolutely")
+        %p= t(".organization_signup_html", signup_link: link_to(t(".organization_signup_link"), new_organization_path))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#how-advertising", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".how_can_i_advertise")
+          = t(".how_can_i_advertise")
 
       %dd#how-advertising.collapse
-        %p= translate_with_args(".in_the_process_of_setting_up_advertising")
-        %p= translate_with_args(".email_us_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org"))
+        %p= t(".in_the_process_of_setting_up_advertising")
+        %p= t(".email_us_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org"))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#already-stolen", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".bike_was_already_stolen")
+          = t(".bike_was_already_stolen")
 
         %dd#already-stolen.collapse
           %p
-            %strong= translate_with_args(".add_details")
-          %p= translate_with_args(".comprehensive_public_database")
-          %p= translate_with_args(".visit_or_add_html", add_link: link_to(t(".add_a_stolen_bike_link"), new_bike_url(status: "stolen")))
+            %strong= t(".add_details")
+          %p= t(".comprehensive_public_database")
+          %p= t(".visit_or_add_html", add_link: link_to(t(".add_a_stolen_bike_link"), new_bike_url(status: "stolen")))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#does-this-prevent-theft", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".how_does_this_prevent_bike_theft")
+          = t(".how_does_this_prevent_bike_theft")
 
       %dd#does-this-prevent-theft.collapse
-        %p= translate_with_args(".people_with_good_intentions")
-        %p= translate_with_args(".bike_index_is_that_resource")
-        %p= translate_with_args(".we_offer_bike_shops")
-        %p= translate_with_args(".we_successfully_recover")
+        %p= t(".people_with_good_intentions")
+        %p= t(".bike_index_is_that_resource")
+        %p= t(".we_offer_bike_shops")
+        %p= t(".we_successfully_recover")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#kit-bro", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".how_can_i_stay_up_to_date")
+          = t(".how_can_i_stay_up_to_date")
 
         %dd#kit-bro.collapse
-          %p= translate_with_args(".read_our_blog_html", blog_link: link_to(t(".blog_link"), blogs_url))
-          %p= translate_with_args(".follow_us_html", twitter_link: link_to("Twitter", "https://twitter.com/BikeIndex"), facebook_link: link_to("Facebook", "https://facebook.com/bikeindex"))
+          %p= t(".read_our_blog_html", blog_link: link_to(t(".blog_link"), blogs_url))
+          %p= t(".follow_us_html", twitter_link: link_to("Twitter", "https://twitter.com/BikeIndex"), facebook_link: link_to("Facebook", "https://facebook.com/bikeindex"))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#used-for-evil", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".can_thieves_search")
+          = t(".can_thieves_search")
         %dd#used-for-evil.collapse
-          %p= translate_with_args(".possible_but_uncommon")
+          %p= t(".possible_but_uncommon")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#what-about-privacy", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".what_about_my_privacy")
+          = t(".what_about_my_privacy")
 
       %dd#what-about-privacy.collapse
-        %p= translate_with_args(".your_personal_information_is_never_viewed")
-        %p= translate_with_args(".bikes_are_public_and_searchable")
-        %p= translate_with_args(".to_learn_more_html", article_link: link_to(t(".article_link"), "https://www.bikeindex.org/news/privacy-on-the-bike-index"))
+        %p= t(".your_personal_information_is_never_viewed")
+        %p= t(".bikes_are_public_and_searchable")
+        %p= t(".to_learn_more_html", article_link: link_to(t(".article_link"), "https://www.bikeindex.org/news/privacy-on-the-bike-index"))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#public-serials", data: { toggle: "collapse"} }
           %span &#x25B6;
-          = translate_with_args(".why_public")
+          = t(".why_public")
 
         %dd#public-serials.collapse
           %p
-            %strong= translate_with_args(".serial_numbers_public")
-            = translate_with_args(".the_faster_and_easier_it_is")
-          %p= translate_with_args(".this_isnt_optimistic_speculation")
-          %p= translate_with_args(".weve_recovered_bikes")
-          %p= translate_with_args(".other_registries_html", wikipedia_link: link_to(t(".security_by_obscurity_link"), "https://en.wikipedia.org/wiki/Security_through_obscurity"))
-          %p= translate_with_args(".while_serial_numbers")
-          %p= translate_with_args(".we_care_about_your_privacy")
+            %strong= t(".serial_numbers_public")
+            = t(".the_faster_and_easier_it_is")
+          %p= t(".this_isnt_optimistic_speculation")
+          %p= t(".weve_recovered_bikes")
+          %p= t(".other_registries_html", wikipedia_link: link_to(t(".security_by_obscurity_link"), "https://en.wikipedia.org/wiki/Security_through_obscurity"))
+          %p= t(".while_serial_numbers")
+          %p= t(".we_care_about_your_privacy")

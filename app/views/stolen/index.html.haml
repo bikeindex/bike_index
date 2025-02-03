@@ -1,40 +1,40 @@
 .container
-  %h2= translate_with_args(".what_to_do_if_your_bike_is_stolen")
+  %h2= t(".what_to_do_if_your_bike_is_stolen")
 
-  %p= translate_with_args(".if_you_are_here_your_bike_was_probably_stolen")
-
-  %ol
-    %li= translate_with_args(".file_a_police_report")
-    %li= translate_with_args(".make_sure_your_bike_is_registered_html", new_bike_link: link_to(t(".bike_index"), new_bike_url(status: "stolen")))
-    %li= translate_with_args(".look_for_local_stolen_bike_groups_on_face")
-    %li= translate_with_args(".tell_everyone_you_know")
-
-  %h2= translate_with_args(".what_happens_next")
+  %p= t(".if_you_are_here_your_bike_was_probably_stolen")
 
   %ol
-    %li= translate_with_args(".your_local_police_department_will_do_what")
-    %li= translate_with_args(".bike_index_will_broadcast")
-    %li= translate_with_args(".keep_an_eye_on_craigslist")
-    %li= translate_with_args(".check_out_your_local_flea_market")
+    %li= t(".file_a_police_report")
+    %li= t(".make_sure_your_bike_is_registered_html", new_bike_link: link_to(t(".bike_index"), new_bike_url(status: "stolen")))
+    %li= t(".look_for_local_stolen_bike_groups_on_face")
+    %li= t(".tell_everyone_you_know")
+
+  %h2= t(".what_happens_next")
+
+  %ol
+    %li= t(".your_local_police_department_will_do_what")
+    %li= t(".bike_index_will_broadcast")
+    %li= t(".keep_an_eye_on_craigslist")
+    %li= t(".check_out_your_local_flea_market")
 
 
   %p
     - recoveries_count = number_with_delimiter(Counts.recoveries)
-    - donations_link = link_to translate_with_args(".donation"), why_donate_path
-    - ambassadors_link = link_to translate_with_args(".ambassador"), ambassadors_url
-    = translate_with_args(".we_wish_you_the_best_of_luck_html", recoveries_count: recoveries_count, donations_link: donations_link, ambassadors_link: ambassadors_link)
+    - donations_link = link_to t(".donation"), why_donate_path
+    - ambassadors_link = link_to t(".ambassador"), ambassadors_url
+    = t(".we_wish_you_the_best_of_luck_html", recoveries_count: recoveries_count, donations_link: donations_link, ambassadors_link: ambassadors_link)
 
   %hr.mt-4.mb-4
 
 
   %section.sbr-get-involved.mt-4.mb-4
     %h2.text-center.mt-4
-      = translate_with_args(".other_recovery_tools")
+      = t(".other_recovery_tools")
 
     .involve-yerself.mt-4
       .involve-report
         %h3.header-font-alt
-          = translate_with_args(".report_bike_theft_issues")
+          = t(".report_bike_theft_issues")
         .involve-report-form
 
           = form_for @feedback do |f|
@@ -44,7 +44,7 @@
                 .alert.alert-error
                   %a.close{"data-dismiss" => "alert"} ×
                   %h4
-                    = translate_with_args(".please_fix_the_following", errors: pluralize(@feedback.errors.count, translate_with_args(".error")))
+                    = t(".please_fix_the_following", errors: pluralize(@feedback.errors.count, t(".error")))
                   %ul
                     - @feedback.errors.full_messages.each do |msg|
                       %li
@@ -52,30 +52,30 @@
             .report-type
               %label
                 = f.radio_button :title, "Someone is selling a stolen bike", checked: true
-                = translate_with_args(".report_someone_selling_a_stolen_bike")
+                = t(".report_someone_selling_a_stolen_bike")
               %label
                 = f.radio_button :title, "Bike ChopShop report"
-                = translate_with_args(".report_a_bicycle_chop_shop")
+                = t(".report_a_bicycle_chop_shop")
             %label
-              - register_it_link = link_to translate_with_args(".register_it"), new_bike_path, style: "font-weight: bold; color: #fff; text-decoration: underline;"
-              = translate_with_args(".reporting_your_own_bike_stolen_html", register_it_link: register_it_link)
+              - register_it_link = link_to t(".register_it"), new_bike_path, style: "font-weight: bold; color: #fff; text-decoration: underline;"
+              = t(".reporting_your_own_bike_stolen_html", register_it_link: register_it_link)
 
             .contact-text
-              = f.text_area :body, placeholder: translate_with_args(".where_is_this_happening"), rows: 5, class: 'form-control'
+              = f.text_area :body, placeholder: t(".where_is_this_happening"), rows: 5, class: 'form-control'
             - if current_user.present?
               .contact-actions.control-group
-                = f.email_field :email, placeholder: translate_with_args(".your_email_address"), class: 'form-control'
+                = f.email_field :email, placeholder: t(".your_email_address"), class: 'form-control'
 
-                = f.submit translate_with_args(".send_alert"), class: 'btn pull-right'
+                = f.submit t(".send_alert"), class: 'btn pull-right'
             - else
               .contact-actions.control-group{ style: "text-align: center;" }
-                - login_link = link_to translate_with_args(".sign_in"), new_session_url, style: "color: #ccc;"
-                = translate_with_args(".please_login_to_make_report_html", login_link: login_link)
+                - login_link = link_to t(".sign_in"), new_session_url, style: "color: #ccc;"
+                = t(".please_login_to_make_report_html", login_link: login_link)
 
       .involve-widget
         %h3.header-font-alt
-          - stolen_widget_link = link_to translate_with_args(".stolen_widget"), "https://github.com/bikeindex/stolen_bikes_widget_html"
-          = translate_with_args(".list_recent_stolen_bikes_html", stolen_widget_link: stolen_widget_link)
+          - stolen_widget_link = link_to t(".stolen_widget"), "https://github.com/bikeindex/stolen_bikes_widget_html"
+          = t(".list_recent_stolen_bikes_html", stolen_widget_link: stolen_widget_link)
         #binx_stolen_widget
 
   #multi-serial-search

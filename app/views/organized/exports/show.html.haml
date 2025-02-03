@@ -1,36 +1,36 @@
 .organized-exports
   .organized-page-header
     %h1
-      = translate_with_args(".exports")
+      = t(".exports")
       - if @export.finished?
         %small
-          = link_to translate_with_args(".download_export"), @export.file.url, class: "btn btn-secondary pull-right"
+          = link_to t(".download_export"), @export.file.url, class: "btn btn-secondary pull-right"
 
   - if @avery_export_redirect
     .mb-4
-      = render partial: "shared/alert", locals: { body: translate_with_args(".shared_alert_body"), type: "success" }
+      = render partial: "shared/alert", locals: { body: t(".shared_alert_body"), type: "success" }
 
   %table.table-list
     %tbody
       %tr
-        %td= translate_with_args(".created")
+        %td= t(".created")
         %td
           %span.convertTime.preciseTime
             = l(@export.created_at, format: :convert_time)
       %tr
-        %td= translate_with_args(".by")
+        %td= t(".by")
         %td= @export.user.display_name if @export.user.present?
       %tr
-        %td= translate_with_args(".format")
+        %td= t(".format")
         %td= @export.file_format
       %tr
-        %td= translate_with_args(".progress")
+        %td= t(".progress")
         %td#exportProgress{ class: @export.progress, "data-createdat" => @export.created_at.to_i }
           %span{ class: export_progress_class(@export) }
             = @export.calculated_progress
       - if current_organization.enabled?("show_partial_registrations")
         %tr
-          %td= translate_with_args(".registration_types")
+          %td= t(".registration_types")
           %td
             - if @export.partial_registrations == "only"
               %strong Only incomplete
@@ -40,7 +40,7 @@
             - else
               Only registered bikes
       %tr
-        %td= translate_with_args(".bikes_exported")
+        %td= t(".bikes_exported")
         %td
           = @export.rows
           - bike_ids = @export.exported_bike_ids
@@ -50,9 +50,9 @@
                                  'aria-controls' => 'show_exported_bikes',
                                  'data-toggle' => 'collapse' }
               - if @export&.rows.to_i > 100
-                = translate_with_args(".show_first_100_bikes_in_export")
+                = t(".show_first_100_bikes_in_export")
               - else
-                = translate_with_args(".show_bikes_in_export")
+                = t(".show_bikes_in_export")
 
             .collapse#show_exported_bikes
               %ul.exported-link-list
@@ -62,7 +62,7 @@
       - unless @export.only_custom_bike_ids
         %tr
           %td
-            = translate_with_args(".bikes_registered_after")
+            = t(".bikes_registered_after")
           %td
             - if @export.start_at.present?
               %span.convertTime.preciseTime
@@ -72,7 +72,7 @@
                 \-
         %tr
           %td
-            = translate_with_args(".bikes_registered_before")
+            = t(".bikes_registered_before")
           %td
             - if @export.end_at.present?
               %span.convertTime.preciseTime
@@ -82,7 +82,7 @@
                 \-
       - if @export.custom_bike_ids.present?
         %tr
-          %td= translate_with_args(".specific_bikes")
+          %td= t(".specific_bikes")
           %td
             - if @export.only_custom_bike_ids
               %small.d-block.mb-1 Only these specific bikes are included in this export:
@@ -98,21 +98,21 @@
                       %small.text-warning
                         = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning text-underline")
                         \:
-                        %em= translate_with_args(".unable_to_export")
+                        %em= t(".unable_to_export")
       - if @export.avery_export?
         %tr
-          %td= translate_with_args(".avery_export")
+          %td= t(".avery_export")
           %td
             - if @export.finished?
               %strong= link_to(t(".view_avery_labels"), @export.avery_export_url, class: "avery_export_url")
             - else
-              %em.text-success= translate_with_args(".pending")
+              %em.text-success= t(".pending")
       - if @export.assign_bike_codes? || @export.avery_export?
         %tr
-          %td= translate_with_args(".stickers")
+          %td= t(".stickers")
           %td
             - if @export.assign_bike_codes?
-              %em= translate_with_args(".stickers_exported", bike_stickers_count: @export.bike_stickers_assigned&.count.to_i)
+              %em= t(".stickers_exported", bike_stickers_count: @export.bike_stickers_assigned&.count.to_i)
               - if @export.bike_stickers_assigned.any?
                 %ul.exported-link-list
                   - bike_code_links = @export.bike_stickers_assigned.each do |code, i|
@@ -120,19 +120,19 @@
                       #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_stickers_assigned.count - 1) ? "" : ","}
 
                 - if @export.bike_codes_removed?
-                  %em.text-danger= translate_with_args(".stickers_have_been_unassigned")
+                  %em.text-danger= t(".stickers_have_been_unassigned")
                 - else
                   = link_to(t(".unassign_stickers"),
                     organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_stickers: true),
                     method: :put,
                     class: "btn btn-warning float-right")
               - else
-                %small.less-strong= translate_with_args(".no_stickers_assigned")
+                %small.less-strong= t(".no_stickers_assigned")
             - else
-              = translate_with_args(".not_assigned")
+              = t(".not_assigned")
 
       %tr
-        %td= translate_with_args(".columns_in_csv")
+        %td= t(".columns_in_csv")
         %td
           %ul.mb-0
             - @export.written_headers.each do |header|

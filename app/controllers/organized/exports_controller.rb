@@ -4,9 +4,8 @@ module Organized
     before_action :find_export, except: %i[index new create]
 
     def index
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @exports = exports.order(created_at: :desc).page(@page).per(@per_page)
+      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page)
     end
 
     def show
@@ -28,10 +27,10 @@ module Organized
       if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportWorker.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
-          flash[:success] = translation_with_args(:with_avery_redirect)
+          flash[:success] = translation(:with_avery_redirect)
           redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)
         else
-          flash[:success] = translation_with_args(:wait_to_download)
+          flash[:success] = translation(:wait_to_download)
           redirect_to organization_exports_path(organization_id: current_organization.to_param)
         end
       else
@@ -43,9 +42,9 @@ module Organized
     def update
       if params[:remove_bike_stickers] && @export.assign_bike_codes?
         @export.remove_bike_stickers_and_record!(current_user)
-        flash[:success] = translation_with_args(:bike_stickers_removed)
+        flash[:success] = translation(:bike_stickers_removed)
       else
-        flash[:error] = translation_with_args(:unknown_update_action)
+        flash[:error] = translation(:unknown_update_action)
       end
       redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id)
     end
@@ -53,7 +52,7 @@ module Organized
     def destroy
       @export.remove_bike_stickers(current_user)
       @export.destroy
-      flash[:success] = translation_with_args(:export_deleted)
+      flash[:success] = translation(:export_deleted)
       redirect_to organization_exports_path(organization_id: current_organization.to_param)
     end
 
@@ -65,10 +64,10 @@ module Organized
         bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
 
         if bike_sticker.present? && bike_sticker.claimed?
-          flash[:error] = translation_with_args(:sticker_already_assigned)
+          flash[:error] = translation(:sticker_already_assigned)
         end
       else
-        flash[:error] = translation_with_args(:do_not_have_permission)
+        flash[:error] = translation(:do_not_have_permission)
       end
     end
 

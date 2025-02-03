@@ -1,4 +1,5 @@
 class BikesController < Bikes::BaseController
+  MAX_INDEX_PAGE = 100
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[index show]
@@ -12,11 +13,11 @@ class BikesController < Bikes::BaseController
     @stolenness = @interpreted_params[:stolenness]
 
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
-      flash[:info] = translation_with_args(:we_dont_know_location, location: params[:location])
+      flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
-    page = (params[:page] || 1).to_i
-    page = 1 if page > 100 # web search isn't meant for paging through everything. So block it
-    @bikes = Bike.search(@interpreted_params).page(page).per(params[:per_page] || 10)
+    @page = (params[:page] || 1).to_i
+    @page = MAX_INDEX_PAGE if @page > MAX_INDEX_PAGE # web search isn't meant for paging through everything. So block it
+    @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
 
@@ -72,13 +73,11 @@ class BikesController < Bikes::BaseController
   def scanned
     @bike_sticker = BikeSticker.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
     if @bike_sticker.blank?
-      flash[:error] = translation_with_args(:unable_to_find_sticker, scanned_id: params[:scanned_id])
+      flash[:error] = translation(:unable_to_find_sticker, scanned_id: params[:scanned_id])
       redirect_to user_root_url
     elsif @bike_sticker.bike.present?
       redirect_to(bike_url(@bike_sticker.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id])) && return
     elsif current_user.present?
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
       if current_user.member_of?(@bike_sticker.organization)
         set_passive_organization(@bike_sticker.organization)
         redirect_to(organization_bikes_path(organization_id: passive_organization.to_param, bike_sticker: @bike_sticker.code)) && return
@@ -96,13 +95,13 @@ class BikesController < Bikes::BaseController
   def new
     unless current_user.present?
       store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
-      flash[:info] = translation_with_args(:please_sign_in_to_register)
+      flash[:info] = translation(:please_sign_in_to_register)
       redirect_to(new_user_path) && return
     end
     find_or_new_b_param
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
-    flash[:info] = translation_with_args(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
+    flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= BikeCreator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
@@ -131,7 +130,7 @@ class BikesController < Bikes::BaseController
           redirect_to(embed_organization_url(id: org_param, b_param_id_token: @b_param.id_token)) && return
         end
       elsif params[:bike][:embeded_extended]
-        flash[:success] = translation_with_args(:bike_was_sent_to, bike_type: @bike.type, owner_email: @bike.owner_email)
+        flash[:success] = translation(:bike_was_sent_to, bike_type: @bike.type, owner_email: @bike.owner_email)
         @persist_email = InputNormalizer.boolean(params[:persist_email])
         redirect_to(embed_extended_organization_url(org_param, email: @persist_email ? @bike.owner_email : nil)) && return
       else
@@ -146,7 +145,7 @@ class BikesController < Bikes::BaseController
       if @bike.errors.any?
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
-        flash[:success] = translation_with_args(:bike_was_added)
+        flash[:success] = translation(:bike_was_added)
         redirect_to edit_bike_url(@bike)
       end
     else
@@ -177,7 +176,7 @@ class BikesController < Bikes::BaseController
     if @bike.errors.any? || flash[:error].present?
       edit_bike_url(@bike, edit_template: params[:edit_template])
     else
-      flash[:success] ||= translation_with_args(:bike_was_updated)
+      flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
       # Go directly to theft_details after reporting stolen
       next_template = params[:edit_template]
@@ -193,26 +192,26 @@ class BikesController < Bikes::BaseController
         if matching_notification.marked_remaining_at.blank?
           matching_notification.mark_remaining!(marked_remaining_by_id: current_user&.id)
         end
-        flash[:success] = translation_with_args(:marked_remaining, bike_type: @bike.type)
+        flash[:success] = translation(:marked_remaining, bike_type: @bike.type)
       else
-        flash[:error] = translation_with_args(:unable_to_find_graduated_notification)
+        flash[:error] = translation(:unable_to_find_graduated_notification)
       end
     else
       matching_notification = @bike.parking_notifications.where(retrieval_link_token: params[:token]).first
       if matching_notification.present?
         if matching_notification.active?
-          flash[:success] = translation_with_args(:marked_retrieved, bike_type: @bike.type)
+          flash[:success] = translation(:marked_retrieved, bike_type: @bike.type)
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
         elsif matching_notification.impounded? || matching_notification.impound_record_id.present?
-          flash[:error] = translation_with_args(:notification_impounded, bike_type: @bike.type, org_name: matching_notification.organization.short_name)
+          flash[:error] = translation(:notification_impounded, bike_type: @bike.type, org_name: matching_notification.organization.short_name)
         else
           # It's probably marked retrieved - but it could be something else (status: resolved_otherwise)
-          flash[:info] = translation_with_args(:notification_already_retrieved, bike_type: @bike.type)
+          flash[:info] = translation(:notification_already_retrieved, bike_type: @bike.type)
         end
       else
-        flash[:error] = translation_with_args(:unable_to_find_parking_notification)
+        flash[:error] = translation(:unable_to_find_parking_notification)
       end
     end
 

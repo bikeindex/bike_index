@@ -12,17 +12,17 @@
       = ownership.creator.name
     - else
       = EmailNormalizer.obfuscate(ownership&.creator.email)
-  = translate_with_args(".registered_your_bike_on_index", bike_type: bike.type)
+  = t(".registered_your_bike_on_index", bike_type: bike.type)
 
 
 %p
-  = translate_with_args(".public_resource_reunited_value_html", value: as_currency(Counts.recoveries_value))
+  = t(".public_resource_reunited_value_html", value: as_currency(Counts.recoveries_value))
 
 %p
-  = translate_with_args(".supercharge_if_your_bike_stolen", bike_type: bike.type)
+  = t(".supercharge_if_your_bike_stolen", bike_type: bike.type)
 
 - unless skip_to_see
   %p
-    - sign_up = translate_with_args(".sign_up")
-    = translate_with_args(".to_see_your_bike_sign_up_html", bike_type: bike.type, sign_up_link: link_to(sign_up, new_user_url))
+    - sign_up = t(".sign_up")
+    = t(".to_see_your_bike_sign_up_html", bike_type: bike.type, sign_up_link: link_to(sign_up, new_user_url))
 

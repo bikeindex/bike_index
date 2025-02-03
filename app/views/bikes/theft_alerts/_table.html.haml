@@ -5,17 +5,17 @@
   .form-wrap{ class: first_form_well ? "" : "secondary-form-wrap" }
     .form-well-form-header-always-visible
       %h3
-        = translate_with_args(".existing_theft_alerts")
+        = t(".existing_theft_alerts")
     .row
       .col-sm-12
         %table.table.table-bordered{ style: "background: #fff;" }
           %thead.small-header
             %tr
-              %th= translate_with_args(".created")
-              %th= translate_with_args(".plan")
-              %th= translate_with_args(".status")
-              %th= translate_with_args(".start")
-              %th= translate_with_args(".end")
+              %th= t(".created")
+              %th= t(".plan")
+              %th= t(".status")
+              %th= t(".start")
+              %th= t(".end")
               - if show_creator
                 %th.small=t(".creator")
 

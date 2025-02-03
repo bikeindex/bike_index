@@ -4,29 +4,29 @@
       %a{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) }
         = @bike_sticker.kind
         = @bike_sticker.pretty_code
-      = translate_with_args(".is_currently_linked")
+      = t(".is_currently_linked")
 
     %p
       - bike_link = link_to(@bike_sticker.bike&.title_string, bike_path(@bike_sticker.bike_id))
-      = translate_with_args(".connected_to_bike_html", bike_link: bike_link)
+      = t(".connected_to_bike_html", bike_link: bike_link)
   - else
     %h2
       %a{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) }
         = @bike_sticker.kind
         %strong= @bike_sticker.pretty_code
-      = translate_with_args(".isnt_linked_to_a_bike")
+      = t(".isnt_linked_to_a_bike")
   %p
-    = translate_with_args(".enter_url_of_the_bike_html", bike_sticker_kind: @bike_sticker.kind)
+    = t(".enter_url_of_the_bike_html", bike_sticker_kind: @bike_sticker.kind)
   = form_tag bike_sticker_path(id: @bike_sticker.code, organization_id: current_organization.to_param), method: "PUT", class: "row" do
     .col-sm-8.col-lg-10
       .form-group
         = text_field_tag :bike_id, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
     .col-sm-4.col-lg-2
-      = submit_tag translate_with_args(".update"), class: "btn btn-success"
+      = submit_tag t(".update"), class: "btn btn-success"
 
   %p.less-strong
     - org_name = current_organization.short_name
-    = translate_with_args(".search_org_bikes_html", org_name: org_name, bike_sticker_kind: @bike_sticker.kind)
+    = t(".search_org_bikes_html", org_name: org_name, bike_sticker_kind: @bike_sticker.kind)
 
   %hr.mt-4.mb-4.less-strong
 

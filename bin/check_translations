@@ -70,20 +70,7 @@ else
   fi
 
 
-  output "${YELLOW}" "Creating Update Pull Request"
+  output "${YELLOW}" "Create a new Pull Request"
 
-  if [[ "${TRANSLATION_BRANCH}" != "main" ]]; then
-    PR_URL="Related PR: ${CIRCLE_PULL_REQUEST}"
-  fi
-
-  git push -u origin "${BRANCH}"
-
-  hub pull-request \
-      -m "[i18n] Translation update: Build ${CIRCLE_BUILD_NUM}
-
-          Merge to unblock CI job ${CIRCLE_BUILD_NUM}: ${CIRCLE_BUILD_URL}
-          ${PR_URL}"
-
-  output "${GREEN}" "Translation update PR created."
   exit 1
 fi

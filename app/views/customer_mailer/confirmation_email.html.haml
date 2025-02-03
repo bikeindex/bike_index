@@ -1,13 +1,13 @@
 %h1.center-text{ style: "margin-top: 2rem;" }
-  = translate_with_args(".html.youre_almost_there")
+  = t(".html.youre_almost_there")
 
 
 %h3.center-text{ style: "margin: 2rem 0 3rem;" }
-  = translate_with_args(".html.please_confirm_your_email_address")
+  = t(".html.please_confirm_your_email_address")
 
 - tokenized_url = @email_preview ? @email_preview_tokenized_url : confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner)
-= link_to translate_with_args(".html.verify_email"), tokenized_url, "data-pm-no-track" => true, class: "binx-button"
+= link_to t(".html.verify_email"), tokenized_url, "data-pm-no-track" => true, class: "binx-button"
 
 - unless @partner
   %p.less-strong.center-text
-    = translate_with_args(".html.click_to_verify_html")
+    = t(".html.click_to_verify_html")

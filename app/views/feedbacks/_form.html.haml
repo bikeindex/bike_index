@@ -3,16 +3,16 @@
     .row.form-group
       - unless current_user.present?
         .col-sm-6
-          = f.email_field :email, placeholder: translate_with_args(".email_address"), value: current_user&.email.to_s, class: 'form-control'
+          = f.email_field :email, placeholder: t(".email_address"), value: current_user&.email.to_s, class: 'form-control'
       .col-sm-6
-        = f.text_field :name, placeholder: translate_with_args(".name"), value: current_user&.name.to_s, class: 'form-control'
+        = f.text_field :name, placeholder: t(".name"), value: current_user&.name.to_s, class: 'form-control'
 
   .row.form-group
     .col-sm-12
-      = f.text_field :title, placeholder: translate_with_args(".subject"), class: 'form-control'
+      = f.text_field :title, placeholder: t(".subject"), class: 'form-control'
   .row.form-group
     .col-sm-12
-      = f.text_area :body, placeholder: translate_with_args(".your_message"), rows: 7, class: 'form-control'
+      = f.text_area :body, placeholder: t(".your_message"), rows: 7, class: 'form-control'
   .row.form-group
     .col-sm-12
-      = f.submit translate_with_args(".send_it"), class: 'btn btn-primary'
+      = f.submit t(".send_it"), class: 'btn btn-primary'

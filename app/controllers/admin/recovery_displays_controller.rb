@@ -6,10 +6,9 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   helper_method :matching_recovery_displays
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @recovery_displays = matching_recovery_displays.page(page).per(@per_page)
-      .order(@time_range_column => sort_direction)
+    @pagy, @recovery_displays = pagy(matching_recovery_displays
+      .order(@time_range_column => sort_direction), limit: @per_page)
   end
 
   def new

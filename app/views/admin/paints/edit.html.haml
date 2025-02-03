@@ -64,7 +64,8 @@
   %p
     = number_with_delimiter(@bikes_count)
     Bikes with this paint
-  = paginate @bikes, views_prefix: "admin"
+
+  = render partial: "/shared/pagination", locals: {collection: @bikes}
 
   = render partial: "/admin/bikes/table"
 
