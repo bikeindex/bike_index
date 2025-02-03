@@ -152,7 +152,7 @@ group :development do
   gem "rerun" # restart sidekiq processes in development on app change
   gem "terminal-notifier"
   # Use community-maintained fork to support rails 8 - hopefully, eventually mainlined
-  gem "annotate", github: "msuliq/annotate_models", branch: "community-maintained" # Annotate models with schema info
+  gem "annotate", github: "bikeindex/annotate_models", branch: "develop" # Annotate models with schema info
 end
 
 group :development, :test do
