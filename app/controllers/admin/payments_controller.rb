@@ -5,11 +5,9 @@ class Admin::PaymentsController < Admin::BaseController
   before_action :find_payment, only: %i[edit update]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @payments = matching_payments.includes(:user, :organization, :invoice)
-      .order(sort_column + " " + sort_direction)
-      .page(page).per(@per_page)
+    @pagy, @payments = pagy(matching_payments.includes(:user, :organization, :invoice)
+      .order(sort_column + " " + sort_direction), limit: @per_page)
   end
 
   def new

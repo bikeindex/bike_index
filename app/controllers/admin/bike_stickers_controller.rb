@@ -3,7 +3,7 @@ class Admin::BikeStickersController < Admin::BaseController
   before_action :set_period, only: [:index]
 
   def index
-    @bike_stickers = scoped_bike_stickers(matching_bike_stickers)
+    @pagy, @bike_stickers = scoped_bike_stickers(matching_bike_stickers)
 
     @bike_sticker_batches = if @bike_sticker_batch.present?
       [@bike_sticker_batch]
@@ -39,7 +39,7 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def reassign
-    @bike_stickers = scoped_bike_stickers(selected_bike_stickers)
+    @pagy, @bike_stickers = scoped_bike_stickers(selected_bike_stickers)
     # Check that the selection matches our criteria
     @valid_selection = @bike_sticker1.present? &&
       selected_bike_stickers.count > 0 &&
@@ -136,12 +136,9 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def scoped_bike_stickers(stickers)
-    page = params[:page] || 1
     @per_page = params[:per_page] || 25
-    stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
-      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike)
-      .page(page)
-      .per(@per_page)
+    pagy(stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
+      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page)
   end
 
   def permitted_parameters

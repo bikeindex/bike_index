@@ -95,7 +95,7 @@
                         = link_to t(".ignore"), user_alert_path(id: alert.id, alert_action: "dismiss"), method: :patch, action: "update"
 
             .paginate-container.paginate-container-bottom
-              = paginate @bikes
+              = pagy_bootstrap_nav(@pagy).html_safe
           - else
             %h2= t(".you_have_no_registered_bikes")
         .tab-pane#locks_tab_content{ class: ('active' if @locks_active_tab) }

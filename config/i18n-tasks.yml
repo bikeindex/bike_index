@@ -150,7 +150,7 @@ ignore_unused:
   - "activerecord.select_options.*"
   - "activerecord.status_humanized.*"
   - "attributes.*"
-  - "{devise,kaminari,will_paginate,doorkeeper,gflash}.*"
+  - "{devise,doorkeeper,gflash}.*"
   - "simple_form.{yes,no}"
   - "simple_form.{placeholders,hints,labels}.*"
   - "simple_form.{error_notification,required}.:"

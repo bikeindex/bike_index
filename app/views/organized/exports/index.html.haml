@@ -10,7 +10,7 @@
   .full-screen-table.mt-4
     %p{ style: "margin-bottom: 0;" }
       %strong
-        = pluralize(number_with_delimiter(@exports.total_count), t(".export"))
+        = pluralize(number_with_delimiter(@pagy.count), t(".export"))
 
     - show_assigned_bike_codes = current_organization.enabled?("avery_export") || @exports.any? { |e| e.assign_bike_codes? }
 
@@ -55,4 +55,4 @@
                 method: :delete
 
   .paginate-container.paginate-container-bottom
-    = paginate @exports
+    = pagy_bootstrap_nav(@pagy).html_safe

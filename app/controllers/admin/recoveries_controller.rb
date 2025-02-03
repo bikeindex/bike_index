@@ -6,11 +6,9 @@ class Admin::RecoveriesController < Admin::BaseController
   helper_method :available_recoveries
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @recoveries = available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
-      .includes(:bike)
-      .page(page).per(@per_page)
+    @pagy, @recoveries = pagy(available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+      .includes(:bike), limit: @per_page)
   end
 
   def show

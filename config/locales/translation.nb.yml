@@ -1094,10 +1094,6 @@ nb:
       update: Oppdater %{model}
       submit: Lagre %{model}
     page_entries_info:
-      entry:
-        zero: innganger
-        one: inngang
-        other: innganger
       one_page:
         display_entries:
           zero: Ingen %{entry_name} funnet
@@ -1731,13 +1727,6 @@ nb:
       write_bikewise: Tillatelse til å *oppdatere* informasjon for Bikewise.org
       write_organizations: Tillatelse til å *opprette* organisasjoner på Bike Index
       write_user: Tillatelse til å *oppdatere* informasjon om deg
-  views:
-    pagination:
-      first: "«"
-      last: "»"
-      previous: "&lsaquo; Forrige"
-      next: Neste &rsaquo;
-      truncate: "&hellip;"
   bike_versions:
     index:
       primary_colors: Primærfarger

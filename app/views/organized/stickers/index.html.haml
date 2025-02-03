@@ -43,7 +43,7 @@
 
 .full-screen-table.mt-4
   %p{ style: "margin-bottom: 0;" }
-    %strong= pluralize(number_with_delimiter(@bike_stickers.total_count), t(".sticker"))
+    %strong= pluralize(number_with_delimiter(@pagy.count), t(".sticker"))
 
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.sortable
@@ -76,4 +76,4 @@
             %strong= bike_sticker.pretty_code
 
 .paginate-container.paginate-container-bottom
-  = paginate @bike_stickers
+  = pagy_bootstrap_nav(@pagy).html_safe

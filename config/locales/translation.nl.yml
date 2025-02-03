@@ -1095,10 +1095,6 @@ nl:
       update: "%{model} bijwerken"
       submit: "%{model} opslaan"
     page_entries_info:
-      entry:
-        zero: inzendingen
-        one: binnenkomst
-        other: inzendingen
       one_page:
         display_entries:
           zero: Geen %{entry_name} gevonden
@@ -1586,13 +1582,6 @@ nl:
     ZA: Zuid-Afrika
     ZM: Zambia
     ZW: Zimbabwe
-  views:
-    pagination:
-      first: "&laquo; Eerste"
-      last: Laatste &raquo;
-      previous: "&lsaquo; Vorige"
-      next: Volgende &rsaquo;
-      truncate: "&hellip;"
   doorkeeper:
     applications:
       confirmations:

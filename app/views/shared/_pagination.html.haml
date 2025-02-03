@@ -1,6 +1,6 @@
 -# Requires collection
 -# total_count is pagination method. Handle non-paginated collections, in case this is used to display count and time range
-- count ||= defined?(collection.total_count) ? collection.total_count : collection.count
+- count ||= defined?(@pagy.count) ? @pagy.count : collection.count
 
 - skip_total ||= false
 - skip_today ||= false
@@ -9,12 +9,12 @@
 - humanized_time_range_column_override ||= nil
 -# Currently only used in admin, but worth preparing for the future
 - views_prefix ||= controller_namespace == "admin" ? "admin" : nil
-- viewing ||= collection.table_name.humanize
+- viewing ||= (defined?(collection.table_name) ? collection.table_name.humanize : collection.first.class.table_name).humanize
 
 .row.mt-4.mb-4
   - unless skip_total
-    .col-md-5
-      %p.pagination-number
+    .col-md-5.mb-2
+      %p.pagination-number.mb-0
         %strong= number_with_delimiter(count)
         Matching #{viewing.pluralize(count)}
 
@@ -30,11 +30,12 @@
         - elsif !skip_total && defined?(collection.total_count)
           %em.less-strong
             (#{number_with_delimiter(collection.where("#{collection.table_name}.#{@time_range_column || "created_at"} >= ?", Time.current.beginning_of_day).total_count)} today)
-  - unless skip_pagination
+  - unless skip_pagination || !defined?(@pagy)
     .pagination-flex.justify-content-md-end{class: (skip_total ? "col-12" : "col-md-7")}
-      = paginate collection, views_prefix: views_prefix
+      -#= paginate collection, views_prefix: views_prefix
+      = pagy_bootstrap_nav(@pagy).html_safe
 
       - if views_prefix == "admin" && count > @per_page.to_i
         - per_pages = [10, 25, 50, 100, @per_page.to_i].uniq.sort
         -# Add -skiptotal onto id so that the JS can select it correctly for updating on change (otherwise there are two elements with the same ID)
-        = select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {id: "per_page_select#{skip_total ? '-skiptotal' : ''}", class: "form-control per-page-select"}
+        = select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {id: "per_page_select#{skip_total ? '-skiptotal' : ''}", class: "form-control per-page-select ml-2"}

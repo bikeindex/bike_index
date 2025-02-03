@@ -25,10 +25,9 @@ class WelcomeController < ApplicationController
   end
 
   def recovery_stories
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
 
-    @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
+    @pagy, @recovery_displays = pagy(RecoveryDisplay, limit: @per_page)
     @slice1, @slice2 = list_halves(@recovery_displays)
 
     flash[:notice] = translation(:no_stories_to_display) if @recovery_displays.empty?
