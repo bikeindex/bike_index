@@ -654,11 +654,8 @@ nl:
       payment:
         amount_cents: Bedrag centen
         email: E-mailadres
-        is_current: Is momenteel
         is_payment: Is betaling
-        is_recurring: Komt terug
         kind: Soort
-        last_payment_date: Laatste betalingsdatum
         paid_at: Eerste betalingsdatum
       public_image:
         external_image_url: Externe afbeeldings-URL

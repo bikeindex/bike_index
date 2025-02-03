@@ -675,11 +675,8 @@ nb:
       payment:
         amount_cents: Beløp cent
         email: E-post
-        is_current: Er aktuell
         is_payment: Er betaling
-        is_recurring: Er tilbakevendende
         kind: Snill
-        last_payment_date: Siste betalingsdato
         paid_at: Første betalingsdato
       public_image:
         external_image_url: Ekstern bildenettadresse

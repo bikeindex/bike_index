@@ -664,11 +664,8 @@ es:
       payment:
         amount_cents:
         email: Email
-        is_current:
         is_payment:
-        is_recurring:
         kind:
-        last_payment_date:
         paid_at:
       public_image:
         external_image_url:

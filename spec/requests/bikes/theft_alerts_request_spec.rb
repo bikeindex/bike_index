@@ -101,7 +101,6 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(payment.currency).to eq "USD"
       expect(payment.amount_cents).to eq theft_alert_plan.amount_cents
       expect(payment.paid_at).to be_blank # Ensure this gets set
-      expect(payment.last_payment_date).to be_blank
       expect(payment.paid?).to be_falsey
     end
 

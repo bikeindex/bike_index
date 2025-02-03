@@ -502,11 +502,8 @@ en:
         amount_cents: Amount cents
         email: Email
         invoice: :activerecord.models.invoice
-        is_current: Is current
         is_payment: Is payment
-        is_recurring: Is recurring
         kind: Kind
-        last_payment_date: Last payment date
         organization: :activerecord.models.organization
         paid_at: First payment date
         theft_alert: :activerecord.models.theft_alert

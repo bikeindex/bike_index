@@ -668,11 +668,8 @@ it:
       payment:
         amount_cents: Importo in centesimi
         email: Email
-        is_current: È attuale
         is_payment: È pagamento
-        is_recurring: È ricorrente
         kind: Tipo
-        last_payment_date: Data dell'ultimo pagamento
         paid_at: Prima data di pagamento
       public_image:
         external_image_url: URL dell'immagine esterna
