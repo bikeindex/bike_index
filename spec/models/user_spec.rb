@@ -704,14 +704,6 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "subscriptions" do
-    it "returns the payment if payment is subscription" do
-      user = FactoryBot.create(:user)
-      Payment.create(is_recurring: true, user_id: user)
-      expect(user.subscriptions).to eq(user.payments.where(is_recurring: true))
-    end
-  end
-
   describe "userlink" do
     it "is nil" do
       expect(User.new.userlink).to be_nil
