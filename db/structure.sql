@@ -2663,7 +2663,6 @@ CREATE TABLE public.payments (
     invoice_id integer,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
-    stripe_kind integer,
     referral_source text
 );
 

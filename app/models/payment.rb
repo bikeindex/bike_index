@@ -10,7 +10,6 @@
 #  paid_at         :datetime
 #  payment_method  :integer          default("stripe")
 #  referral_source :text
-#  stripe_kind     :integer
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  invoice_id      :integer
@@ -22,7 +21,6 @@ class Payment < ApplicationRecord
   include Amountable
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
-  STRIPE_KIND_ENUM = {stripe_charge: 0, stripe_session: 1}
 
   scope :organizations, -> { where.not(organization_id: nil) }
   scope :non_donation, -> { where.not(kind: "donation") }
@@ -31,7 +29,6 @@ class Payment < ApplicationRecord
 
   enum :payment_method, PAYMENT_METHOD_ENUM
   enum :kind, KIND_ENUM
-  enum :stripe_kind, STRIPE_KIND_ENUM
 
   belongs_to :user
   belongs_to :organization
@@ -187,7 +184,7 @@ class Payment < ApplicationRecord
   def update_associations
     return if skip_update
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
-    if payment_method == "stripe" && paid? && email.present? && !theft_alert?
+    if stripe? && paid? && email.present? && !theft_alert?
       EmailReceiptWorker.perform_async(id)
     end
     return true unless invoice.present?

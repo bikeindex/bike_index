@@ -134,7 +134,6 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.user_id).to be_blank
         expect(payment.stripe_id).to be_present
         expect(payment.kind).to eq "payment"
-        expect(payment.stripe_kind).to eq "stripe_session"
         expect(payment.currency).to eq "USD"
         expect(payment.amount_cents).to eq 4000
         expect(payment.paid_at).to be_blank # Ensure this gets set

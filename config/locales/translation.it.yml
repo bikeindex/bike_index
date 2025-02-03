@@ -668,12 +668,12 @@ it:
       payment:
         amount_cents: Importo in centesimi
         email: Email
-        first_payment_date: Prima data di pagamento
         is_current: È attuale
         is_payment: È pagamento
         is_recurring: È ricorrente
         kind: Tipo
         last_payment_date: Data dell'ultimo pagamento
+        paid_at: Prima data di pagamento
       public_image:
         external_image_url: URL dell'immagine esterna
         image: Immagine
@@ -2530,7 +2530,6 @@ it:
         donation_will_help:
         payment_received:
         thank_you_so_much:
-        thanks_for_signing_up:
         we_really_appreciate_your_support:
       subject:
     magic_login_link_email:

@@ -2006,9 +2006,6 @@ en:
           more bikes.
         payment_received: Your payment of %{amount} has been received.
         thank_you_so_much: Thank you so much!
-        thanks_for_signing_up: >-
-          Thank you for signing up to be a member of Bike Index. We'll send you invoices
-          every month to this email address
         we_really_appreciate_your_support: We really appreciate your support of Bike
           Index!
       subject: Thank you for supporting Bike Index!

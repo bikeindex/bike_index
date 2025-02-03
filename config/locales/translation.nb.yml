@@ -675,12 +675,12 @@ nb:
       payment:
         amount_cents: Beløp cent
         email: E-post
-        first_payment_date: Første betalingsdato
         is_current: Er aktuell
         is_payment: Er betaling
         is_recurring: Er tilbakevendende
         kind: Snill
         last_payment_date: Siste betalingsdato
+        paid_at: Første betalingsdato
       public_image:
         external_image_url: Ekstern bildenettadresse
         image: Bilde
@@ -2699,8 +2699,6 @@ nb:
           å redde flere sykler.
         payment_received: Din betaling på %{amount} er mottatt.
         thank_you_so_much: Tusen takk!
-        thanks_for_signing_up: Takk for at du registrerte deg som medlem av Bike Index.
-          Vi sender deg fakturaer hver måned til denne e-postadressen
         we_really_appreciate_your_support: Vi setter stor pris på din støtte til Bike
           Index!
       subject: Takk for at du støtter Bike Index!

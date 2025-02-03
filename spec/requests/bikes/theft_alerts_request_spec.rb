@@ -98,7 +98,6 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(payment.user_id).to eq current_user.id
       expect(payment.stripe_id).to be_present
       expect(payment.kind).to eq "theft_alert"
-      expect(payment.stripe_kind).to eq "stripe_session"
       expect(payment.currency).to eq "USD"
       expect(payment.amount_cents).to eq theft_alert_plan.amount_cents
       expect(payment.paid_at).to be_blank # Ensure this gets set
@@ -164,7 +163,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
   describe "show" do
     let(:stripe_id) { "cs_test_a11HYkpTmOUEdKM02Xx8zlX7pqUFhXW1P6CBRVhm09l3BCiFs0MxBs7NIY" }
     let(:theft_alert) { FactoryBot.create(:theft_alert, theft_alert_plan: theft_alert_plan, stolen_record: bike.current_stolen_record) }
-    let(:payment) { Payment.create(stripe_id: stripe_id, user: current_user, payment_method: "stripe", amount: nil, kind: "theft_alert", theft_alert: theft_alert) }
+    let(:payment) { Payment.create(stripe_id: stripe_id, user: current_user, payment_method: "stripe_session", amount: nil, kind: "theft_alert", theft_alert: theft_alert) }
     it "marks as paid" do
       expect(payment.reload.paid?).to be_falsey
       expect(payment.amount_cents).to eq 0

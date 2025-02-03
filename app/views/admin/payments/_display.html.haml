@@ -6,7 +6,7 @@
       %tr
         %td Method
         %td
-          %span.less-strong= payment.payment_method
+          %span.less-strong= payment.stripe_or_check
       %tr
         %td Amount
         %td= payment.amount_formatted
@@ -18,7 +18,7 @@
             - if display_dev_info?
               %small.less-strong.only-dev-visible
                 Kind:
-                %code= payment.stripe_kind
+                %code= payment.payment_method
       %tr
         %td For
         %td
