@@ -4,7 +4,7 @@ class Admin::ImpoundRecordsController < Admin::BaseController
   before_action :find_impound_record, except: [:index]
 
   def index
-    page = params[:page] || 1
+    params[:page] || 1
     @per_page = params[:per_page] || 50
     @pagy, @impound_records = pagy(matching_impound_records.includes(:user, :organization, :bike, :impound_claims)
       .order("impound_records.#{sort_column}" + " " + sort_direction), limit: @per_page)

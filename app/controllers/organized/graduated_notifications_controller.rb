@@ -6,7 +6,6 @@ module Organized
     before_action :find_graduated_notification, except: [:index]
 
     def index
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)

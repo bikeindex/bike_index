@@ -4,31 +4,27 @@
 # Customize only what you really need and notice that the core Pagy works also without any of the following lines.
 # Should you just cherry pick part of this file, please maintain the require-order of the extras
 
-
 # Pagy Variables
 # See https://ddnexus.github.io/pagy/docs/api/pagy#variables
 # You can set any pagy variable as a Pagy::DEFAULT. They can also be overridden per instance by just passing them to
 # Pagy.new|Pagy::Countless.new|Pagy::Calendar::*.new or any of the #pagy* controller methods
 # Here are the few that make more sense as DEFAULTs:
-Pagy::DEFAULT[:limit]       = 25                    # default
+Pagy::DEFAULT[:limit] = 25                    # default
 Pagy::DEFAULT[:max_per_page] = 100
 # Pagy::DEFAULT[:size]        = 7                     # default
 # Pagy::DEFAULT[:ends]        = true                  # default
 # Pagy::DEFAULT[:page_param]  = :page                 # default
 # Pagy::DEFAULT[:count_args]  = []                    # example for non AR ORMs
-Pagy::DEFAULT[:max_pages]   = 5000                  # example
-
+Pagy::DEFAULT[:max_pages] = 5000                  # example
 
 # Extras
 # See https://ddnexus.github.io/pagy/categories/extra
-
 
 # Legacy Compatibility Extras
 
 # Size extra: Enable the Array type for the `:size` variable (e.g. `size: [1,4,4,1]`)
 # See https://ddnexus.github.io/pagy/docs/extras/size
 # require 'pagy/extras/size'   # must be required before the other extras
-
 
 # Backend Extras
 
@@ -112,12 +108,11 @@ Pagy::DEFAULT[:max_pages]   = 5000                  # example
 # uncomment if you are going to use Searchkick.pagy_search
 # Searchkick.extend Pagy::Searchkick
 
-
 # Frontend Extras
 
 # Bootstrap extra: Add nav, nav_js and combo_nav_js helpers and templates for Bootstrap pagination
 # See https://ddnexus.github.io/pagy/docs/extras/bootstrap
-require 'pagy/extras/bootstrap'
+require "pagy/extras/bootstrap"
 
 # Bulma extra: Add nav, nav_js and combo_nav_js helpers and templates for Bulma pagination
 # See https://ddnexus.github.io/pagy/docs/extras/bulma
@@ -131,7 +126,6 @@ require 'pagy/extras/bootstrap'
 # Multi size var used by the *_nav_js helpers
 # See https://ddnexus.github.io/pagy/docs/extras/pagy#steps
 # Pagy::DEFAULT[:steps] = { 0 => 5, 540 => 7, 720 => 9 }   # example
-
 
 # Feature Extras
 
@@ -152,7 +146,7 @@ require 'pagy/extras/bootstrap'
 
 # Overflow extra: Allow for easy handling of overflowing pages
 # See https://ddnexus.github.io/pagy/docs/extras/overflow
-require 'pagy/extras/overflow'
+require "pagy/extras/overflow"
 Pagy::DEFAULT[:overflow] = :last_page    # default  (other options: :last_page and :exception)
 
 # Trim extra: Remove the page=1 param from links
@@ -210,12 +204,10 @@ Pagy::DEFAULT[:overflow] = :last_page    # default  (other options: :last_page a
 #                   filepath: 'path/to/pagy-xyz.yml',
 #                   pluralize: lambda{ |count| ... } )
 
-
 # I18n extra: uses the standard i18n gem which is ~18x slower using ~10x more memory
 # than the default pagy internal i18n (see above)
 # See https://ddnexus.github.io/pagy/docs/extras/i18n
 # require 'pagy/extras/i18n'
-
 
 # When you are done setting your own default freeze it, so it will not get changed accidentally
 Pagy::DEFAULT.freeze

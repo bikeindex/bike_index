@@ -9,11 +9,11 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
 
     @ambassador_task_assignments =
       matching_assignments
-      # There aren't many task assignments, so just ignore pagination
-      # Kaminari
-      #   .paginate_array(matching_assignments)
-      #   .page(params.fetch(:page, 1))
-      #   .per(params.fetch(:per_page, 25))
+    # There aren't many task assignments, so just ignore pagination
+    # Kaminari
+    #   .paginate_array(matching_assignments)
+    #   .page(params.fetch(:page, 1))
+    #   .per(params.fetch(:per_page, 25))
   end
 
   private

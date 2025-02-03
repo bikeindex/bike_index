@@ -8,7 +8,7 @@ module Organized
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
-      per_page = params[:per_page] || 25
+      params[:per_page] || 25
       @pagy, @bulk_imports = pagy(available_bulk_imports.includes(:ownerships)
         .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1

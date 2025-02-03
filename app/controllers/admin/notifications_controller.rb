@@ -3,7 +3,7 @@ class Admin::NotificationsController < Admin::BaseController
   before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
+    params[:page] || 1
     @per_page = params[:per_page] || 50
     @pagy, @notifications = pagy(matching_notifications.reorder("notifications.#{sort_column} #{sort_direction}")
       .includes(:bike, :notifiable, :user), limit: @per_page)

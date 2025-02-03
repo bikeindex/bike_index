@@ -7,7 +7,8 @@ class Admin::MembershipsController < Admin::BaseController
     @per_page = params[:per_page] || 50
     @pagy, @memberships = pagy(
       matching_memberships.includes(:user, :sender, :organization).reorder("memberships.#{sort_column} #{sort_direction}"),
-      limit: @per_page)
+      limit: @per_page
+    )
   end
 
   def show

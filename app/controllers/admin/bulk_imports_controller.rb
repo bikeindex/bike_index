@@ -4,7 +4,7 @@ class Admin::BulkImportsController < Admin::BaseController
   before_action :find_bulk_import, only: [:show, :update]
 
   def index
-    page = params[:page] || 1
+    params[:page] || 1
     @per_page = params[:per_page] || 10
     @org_count = InputNormalizer.boolean(params[:search_org_count])
     @pagy, @bulk_imports = pagy(matching_bulk_imports.includes(:organization, :user, :ownerships)

@@ -5,7 +5,6 @@ module Organized
     before_action :find_impound_claim, except: [:index]
 
     def index
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
 
       @pagy, @impound_claims = pagy(available_impound_claims.reorder("impound_claims.#{sort_column} #{sort_direction}")

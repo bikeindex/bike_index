@@ -15,7 +15,8 @@ class Admin::BikesController < Admin::BaseController
     @per_page = params[:per_page] || 100
     @pagy, @bikes = pagy(
       missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
-      limit: @per_page)
+      limit: @per_page
+    )
   end
 
   def update_manufacturers

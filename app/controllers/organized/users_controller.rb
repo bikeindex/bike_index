@@ -5,13 +5,14 @@ module Organized
     before_action :reject_self_updates, only: [:update, :destroy]
 
     def index
-      page = params[:page] || 1
+      params[:page] || 1
       per_page = params[:per_page] || 25
       @show_user_search = params[:query].present? || current_organization.memberships.count > per_page
       @show_matching_count = @show_user_search && params[:query].present?
       @pagy, @memberships = pagy(
         matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}"),
-        limit: @per_page)
+        limit: @per_page
+      )
     end
 
     def edit

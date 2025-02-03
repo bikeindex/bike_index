@@ -3,7 +3,7 @@ class Admin::FeedbacksController < Admin::BaseController
   before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
+    params[:page] || 1
     @per_page = params[:per_page] || 50
     @pagy, @feedbacks = pagy(available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}"),
       limit: @per_page)
