@@ -664,12 +664,9 @@ es:
       payment:
         amount_cents:
         email: Email
-        first_payment_date:
-        is_current:
         is_payment:
-        is_recurring:
         kind:
-        last_payment_date:
+        paid_at:
       public_image:
         external_image_url:
         image:
@@ -2513,7 +2510,6 @@ es:
         donation_will_help:
         payment_received:
         thank_you_so_much:
-        thanks_for_signing_up:
         we_really_appreciate_your_support:
       subject:
     magic_login_link_email:

@@ -501,14 +501,11 @@ en:
       payment:
         amount_cents: Amount cents
         email: Email
-        first_payment_date: First payment date
         invoice: :activerecord.models.invoice
-        is_current: Is current
         is_payment: Is payment
-        is_recurring: Is recurring
         kind: Kind
-        last_payment_date: Last payment date
         organization: :activerecord.models.organization
+        paid_at: First payment date
         theft_alert: :activerecord.models.theft_alert
         user: :activerecord.models.user
       public_image:
@@ -2006,9 +2003,6 @@ en:
           more bikes.
         payment_received: Your payment of %{amount} has been received.
         thank_you_so_much: Thank you so much!
-        thanks_for_signing_up: >-
-          Thank you for signing up to be a member of Bike Index. We'll send you invoices
-          every month to this email address
         we_really_appreciate_your_support: We really appreciate your support of Bike
           Index!
       subject: Thank you for supporting Bike Index!

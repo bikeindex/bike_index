@@ -654,12 +654,9 @@ nl:
       payment:
         amount_cents: Bedrag centen
         email: E-mailadres
-        first_payment_date: Eerste betalingsdatum
-        is_current: Is momenteel
         is_payment: Is betaling
-        is_recurring: Komt terug
         kind: Soort
-        last_payment_date: Laatste betalingsdatum
+        paid_at: Eerste betalingsdatum
       public_image:
         external_image_url: Externe afbeeldings-URL
         image: afbeelding
@@ -2483,8 +2480,6 @@ nl:
           te redden.
         payment_received: Uw betaling van %{amount} is ontvangen.
         thank_you_so_much: Heel erg bedankt!
-        thanks_for_signing_up: Bedankt voor het aanmelden als lid van Bike Index.
-          We sturen u elke maand facturen naar dit e-mailadres
         we_really_appreciate_your_support: We stellen uw steun aan Bike Index zeer
           op prijs!
       subject: Bedankt voor het ondersteunen van Bike Index!

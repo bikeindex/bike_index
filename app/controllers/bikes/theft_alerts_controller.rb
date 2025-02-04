@@ -54,7 +54,6 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     {
       kind: "theft_alert",
       payment_method: "stripe",
-      stripe_kind: "stripe_session",
       theft_alert: theft_alert,
       amount_cents: theft_alert.amount_cents,
       user_id: current_user.id,

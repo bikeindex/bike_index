@@ -2652,11 +2652,8 @@ ALTER SEQUENCE public.parking_notifications_id_seq OWNED BY public.parking_notif
 CREATE TABLE public.payments (
     id integer NOT NULL,
     user_id integer,
-    is_current boolean DEFAULT true,
-    is_recurring boolean DEFAULT false NOT NULL,
     stripe_id character varying(255),
-    last_payment_date timestamp without time zone,
-    first_payment_date timestamp without time zone,
+    paid_at timestamp without time zone,
     amount_cents integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2666,7 +2663,6 @@ CREATE TABLE public.payments (
     invoice_id integer,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
-    stripe_kind integer,
     referral_source text
 );
 
@@ -6209,6 +6205,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250203011709'),
 ('20250130185756'),
 ('20250127224140'),
 ('20250127223414'),

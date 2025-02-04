@@ -56,7 +56,7 @@ class TheftAlert < ApplicationRecord
   before_validation :set_calculated_attributes
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
-  scope :paid, -> { joins(:payment).where.not(payments: {first_payment_date: nil}) }
+  scope :paid, -> { joins(:payment).where.not(payments: {paid_at: nil}) }
   scope :admin, -> { where(admin: true) }
   scope :paid_or_admin, -> { paid.or(admin) }
   scope :posted, -> { where.not(start_at: nil) }
@@ -180,7 +180,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def paid_at
-    payment&.first_payment_date
+    payment&.paid_at
   end
 
   def address_string
