@@ -15,8 +15,7 @@ class BikesController < Bikes::BaseController
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
-    @page = (params[:page] || 1).to_i
-    @page = MAX_INDEX_PAGE if @page > MAX_INDEX_PAGE # web search isn't meant for paging through everything. So block it
+    @page = permitted_page(params[:page])
     @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
@@ -219,6 +218,17 @@ class BikesController < Bikes::BaseController
   end
 
   protected
+
+  def permitted_page(page_param)
+    page = (page_param.presence || 1).to_i
+    if page > MAX_INDEX_PAGE # web search isn't meant for paging through everything. So block it
+      MAX_INDEX_PAGE
+    elsif page < 1
+      1
+    else
+      page
+    end
+  end
 
   def render_ad
     @ad = true
