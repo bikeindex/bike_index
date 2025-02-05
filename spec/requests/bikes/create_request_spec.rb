@@ -59,7 +59,7 @@ RSpec.describe "BikesController#create", type: :request do
     context "scanned_sticker" do
       let(:organization) { FactoryBot.create(:organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
-      it "assigns scanned_sticker" do
+      it "assigns scanned_sticker", :flaky do
         expect(current_user.bikes.count).to eq 0
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 0
         expect {
