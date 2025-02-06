@@ -151,7 +151,7 @@ group :development do
   gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
   gem "terminal-notifier"
-  gem 'annotate_rb', github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
+  gem "annotate_rb", github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
 end
 
 group :development, :test do

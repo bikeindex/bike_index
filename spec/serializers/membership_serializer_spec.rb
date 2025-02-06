@@ -10,7 +10,7 @@ RSpec.describe MembershipSerializer do
     {
       base_url: "/organizations/#{organization.slug}",
       is_admin: false,
-      locations: [{id: nil,  name: organization.name}],
+      locations: [{id: nil, name: organization.name}],
       organization_id: organization.id,
       organization_name: organization.name,
       short_name: organization.short_name,

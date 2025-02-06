@@ -221,13 +221,7 @@ class BikesController < Bikes::BaseController
 
   def permitted_page(page_param)
     page = (page_param.presence || 1).to_i
-    if page > MAX_INDEX_PAGE # web search isn't meant for paging through everything. So block it
-      MAX_INDEX_PAGE
-    elsif page < 1
-      1
-    else
-      page
-    end
+    page.clamp(1, MAX_INDEX_PAGE)
   end
 
   def render_ad
