@@ -19,14 +19,14 @@ module API
             current_user.bike_ids
           end
 
-          def organization_organization_roles
-            return [] unless current_user.organization_roles.any?
-            current_user.organization_roles.map { |membership|
+          def organization_memberships
+            return [] unless current_user.memberships.any?
+            current_user.organization_roles.map { |organization_role|
               {
-                organization_name: membership.organization.name,
-                organization_slug: membership.organization.slug,
-                organization_access_token: membership.organization.access_token,
-                user_is_organization_admin: membership.role == "admin"
+                organization_name: organization_role.organization.name,
+                organization_slug: organization_role.organization.slug,
+                organization_access_token: organization_role.organization.access_token,
+                user_is_organization_admin: organization_role.role == "admin"
               }
             }
           end
@@ -49,7 +49,7 @@ module API
           }
           result[:user] = user_info if current_scopes.include?("read_user")
           result[:bike_ids] = bike_ids if current_scopes.include?("read_bikes")
-          result[:organization_roles] = organization_organization_roles if current_scopes.include?("read_organization_membership")
+          result[:memberships] = organization_memberships if current_scopes.include?("read_organization_membership")
           result
         end
 

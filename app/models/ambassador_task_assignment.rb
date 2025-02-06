@@ -45,7 +45,7 @@ class AmbassadorTaskAssignment < ApplicationRecord
 
   # Find completed assignments, filtering and sorting by columns on associated
   # models. The inner join is necessary because our data model permits multiple
-  # ambassador organization organization_roles for the same user (the most recent being
+  # ambassador organization_roles for the same user (the most recent being
   # the active ambassadorship). The intent is to eventually refactor to
   # enforcing single membership.
   #
