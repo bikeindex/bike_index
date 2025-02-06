@@ -1986,47 +1986,6 @@ ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 
 
 --
--- Name: memberships; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.memberships (
-    id integer NOT NULL,
-    organization_id integer NOT NULL,
-    user_id integer,
-    invited_email character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone,
-    sender_id integer,
-    claimed_at timestamp without time zone,
-    email_invitation_sent_at timestamp without time zone,
-    created_by_magic_link boolean DEFAULT false,
-    receive_hot_sheet boolean DEFAULT false,
-    hot_sheet_notification integer DEFAULT 0,
-    role integer
-);
-
-
---
--- Name: memberships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.memberships_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: memberships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.memberships_id_seq OWNED BY public.memberships.id;
-
-
---
 -- Name: model_attestations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2390,6 +2349,47 @@ CREATE SEQUENCE public.organization_model_audits_id_seq
 --
 
 ALTER SEQUENCE public.organization_model_audits_id_seq OWNED BY public.organization_model_audits.id;
+
+
+--
+-- Name: organization_roles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_roles (
+    id integer NOT NULL,
+    organization_id integer NOT NULL,
+    user_id integer,
+    invited_email character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    deleted_at timestamp without time zone,
+    sender_id integer,
+    claimed_at timestamp without time zone,
+    email_invitation_sent_at timestamp without time zone,
+    created_by_magic_link boolean DEFAULT false,
+    receive_hot_sheet boolean DEFAULT false,
+    hot_sheet_notification integer DEFAULT 0,
+    role integer
+);
+
+
+--
+-- Name: organization_roles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_roles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_roles_id_seq OWNED BY public.organization_roles.id;
 
 
 --
@@ -3886,13 +3886,6 @@ ALTER TABLE ONLY public.manufacturers ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.memberships_id_seq'::regclass);
-
-
---
 -- Name: model_attestations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3960,6 +3953,13 @@ ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT n
 --
 
 ALTER TABLE ONLY public.organization_model_audits ALTER COLUMN id SET DEFAULT nextval('public.organization_model_audits_id_seq'::regclass);
+
+
+--
+-- Name: organization_roles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_roles ALTER COLUMN id SET DEFAULT nextval('public.organization_roles_id_seq'::regclass);
 
 
 --
@@ -4545,14 +4545,6 @@ ALTER TABLE ONLY public.manufacturers
 
 
 --
--- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.memberships
-    ADD CONSTRAINT memberships_pkey PRIMARY KEY (id);
-
-
---
 -- Name: model_attestations model_attestations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4630,6 +4622,14 @@ ALTER TABLE ONLY public.organization_manufacturers
 
 ALTER TABLE ONLY public.organization_model_audits
     ADD CONSTRAINT organization_model_audits_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_roles organization_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_roles
+    ADD CONSTRAINT organization_roles_pkey PRIMARY KEY (id);
 
 
 --
@@ -5541,27 +5541,6 @@ CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btre
 
 
 --
--- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_memberships_on_organization_id ON public.memberships USING btree (organization_id);
-
-
---
--- Name: index_memberships_on_sender_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_memberships_on_sender_id ON public.memberships USING btree (sender_id);
-
-
---
--- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_memberships_on_user_id ON public.memberships USING btree (user_id);
-
-
---
 -- Name: index_model_attestations_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5692,6 +5671,27 @@ CREATE INDEX index_organization_model_audits_on_model_audit_id ON public.organiz
 --
 
 CREATE INDEX index_organization_model_audits_on_organization_id ON public.organization_model_audits USING btree (organization_id);
+
+
+--
+-- Name: index_organization_roles_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_roles_on_organization_id ON public.organization_roles USING btree (organization_id);
+
+
+--
+-- Name: index_organization_roles_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_roles_on_sender_id ON public.organization_roles USING btree (sender_id);
+
+
+--
+-- Name: index_organization_roles_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_roles_on_user_id ON public.organization_roles USING btree (user_id);
 
 
 --
@@ -6205,6 +6205,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250205135704'),
 ('20250203011709'),
 ('20250130185756'),
 ('20250127224140'),
