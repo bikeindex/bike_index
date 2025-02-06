@@ -253,7 +253,7 @@
   = render partial: "/admin/payments/table", locals: {payments: payments.limit(5), skip_user: true}
 
 %h4.mt-4
-  Memberships
+  OrganizationRoles
   %small.less-strong.mr-3= admin_number_display(@user.memberships.count)
   %small.d-inline-block.less-strong
     - reg_orgs_count = @user.user_registration_organizations.count

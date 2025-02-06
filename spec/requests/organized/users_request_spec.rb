@@ -122,7 +122,7 @@ RSpec.describe Organized::UsersController, type: :request do
           count = current_organization.remaining_invitation_count
           expect {
             delete "#{base_url}/#{membership.id}"
-          }.to change(Membership, :count).by(-1)
+          }.to change(OrganizationRole, :count).by(-1)
           expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
           expect(flash[:success]).to be_present
           current_organization.reload
@@ -137,7 +137,7 @@ RSpec.describe Organized::UsersController, type: :request do
             count = current_organization.remaining_invitation_count
             expect {
               delete "#{base_url}/#{membership.id}"
-            }.to change(Membership, :count).by(-1)
+            }.to change(OrganizationRole, :count).by(-1)
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:success]).to be_present
             current_organization.reload
@@ -150,7 +150,7 @@ RSpec.describe Organized::UsersController, type: :request do
             count = current_organization.remaining_invitation_count
             expect {
               delete "#{base_url}/#{membership.id}"
-            }.to change(Membership, :count).by(0)
+            }.to change(OrganizationRole, :count).by(0)
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
             current_organization.reload
@@ -172,7 +172,7 @@ RSpec.describe Organized::UsersController, type: :request do
         it "fails" do
           expect {
             post base_url, params: {membership: membership_params.merge(invited_email: " ")}
-          }.to change(Membership, :count).by(0)
+          }.to change(OrganizationRole, :count).by(0)
           expect(assigns(:membership).errors.full_messages).to be_present
         end
       end
@@ -184,12 +184,12 @@ RSpec.describe Organized::UsersController, type: :request do
             expect(User.count).to eq 2
             expect {
               post base_url, params: {membership: membership_params}
-            }.to change(Membership, :count).by(1)
+            }.to change(OrganizationRole, :count).by(1)
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
             expect(flash[:success]).to be_present
             current_organization.reload
             expect(current_organization.remaining_invitation_count).to eq 3
-            membership = Membership.last
+            membership = OrganizationRole.last
             expect(membership.role).to eq "member"
             expect(membership.sender).to eq current_user
             expect(membership.invited_email).to eq "bike_email@bike_shop.com"
@@ -206,7 +206,7 @@ RSpec.describe Organized::UsersController, type: :request do
         it "does not create a new membership" do
           expect {
             post base_url, params: {membership: membership_params}
-          }.to change(Membership, :count).by(0)
+          }.to change(OrganizationRole, :count).by(0)
           expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
           expect(flash[:error]).to be_present
         end
@@ -220,7 +220,7 @@ RSpec.describe Organized::UsersController, type: :request do
             expect(current_organization.restrict_invitations?).to be_falsey
             expect {
               post base_url, params: {membership: membership_params}
-            }.to change(Membership, :count).by 1
+            }.to change(OrganizationRole, :count).by 1
             expect(ActionMailer::Base.deliveries.count).to eq 0 # Because passwordless users
           end
         end
@@ -237,7 +237,7 @@ RSpec.describe Organized::UsersController, type: :request do
                 membership: membership_params,
                 multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
               }
-            }.to change(Membership, :count).by 4
+            }.to change(OrganizationRole, :count).by 4
             expect(current_organization.remaining_invitation_count).to eq 0
             expect(current_organization.sent_invitation_count).to eq 5
             expect(current_organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
@@ -255,7 +255,7 @@ RSpec.describe Organized::UsersController, type: :request do
                   membership: membership_params,
                   multiple_emails_invited: multiple_emails_invited.join("\n")
                 }
-              }.to_not change(Membership, :count)
+              }.to_not change(OrganizationRole, :count)
               expect(ActionMailer::Base.deliveries.count).to eq 0
             end
           end
@@ -270,7 +270,7 @@ RSpec.describe Organized::UsersController, type: :request do
                     membership: membership_params,
                     multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
                   }
-                }.to change(Membership, :count).by 4
+                }.to change(OrganizationRole, :count).by 4
                 expect(current_organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
                 expect(current_organization.users.count).to eq 5
                 expect(ActionMailer::Base.deliveries.empty?).to be_truthy
@@ -298,7 +298,7 @@ RSpec.describe Organized::UsersController, type: :request do
                   membership: membership_params,
                   multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
                 }
-              }.to change(Membership, :count).by 4
+              }.to change(OrganizationRole, :count).by 4
 
               expect(current_organization.remaining_invitation_count).to eq 0
               expect(current_organization.sent_invitation_count).to eq 5

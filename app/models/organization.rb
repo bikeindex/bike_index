@@ -85,7 +85,7 @@ class Organization < ApplicationRecord
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
 
-  has_many :admin_memberships, -> { admin }, class_name: "Membership"
+  has_many :admin_memberships, -> { admin }, class_name: "OrganizationRole"
   has_many :admins, through: :admin_memberships, source: :user
 
   has_many :ownerships
@@ -566,7 +566,7 @@ class Organization < ApplicationRecord
       u = User.fuzzy_email_find(embedable_user_email)
       self.auto_user_id = u.id if u&.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
-        Membership.create(user_id: u.id, organization_id: id, role: "member")
+        OrganizationRole.create(user_id: u.id, organization_id: id, role: "member")
         self.auto_user_id = u.id
       end
     elsif auto_user_id.blank?

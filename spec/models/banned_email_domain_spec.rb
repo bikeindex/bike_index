@@ -83,7 +83,7 @@ RSpec.describe BannedEmailDomain, type: :model do
           before { organization.update(approved: false) }
 
           it "is truthy" do
-            expect(Membership.count).to eq 1
+            expect(OrganizationRole.count).to eq 1
             expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
             expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
             expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy

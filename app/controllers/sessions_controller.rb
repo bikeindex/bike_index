@@ -28,7 +28,7 @@ class SessionsController < ApplicationController
     if user.blank?
       matching_organization = Organization.passwordless_email_matching(params[:email])
       if matching_organization.present?
-        membership = Membership.create_passwordless(invited_email: params[:email],
+        membership = OrganizationRole.create_passwordless(invited_email: params[:email],
           created_by_magic_link: true,
           organization_id: matching_organization.id)
         user = membership.user

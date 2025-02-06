@@ -377,7 +377,7 @@
       = number_with_delimiter(memberships.count)
       - if @deleted_memberships
         %span.text-danger Deleted
-      = "Membership".pluralize(memberships.count)
+      = "OrganizationRole".pluralize(memberships.count)
       %small
         - if @deleted_memberships
           %small

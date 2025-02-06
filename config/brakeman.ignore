@@ -637,7 +637,7 @@
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Admin::MembershipsController",
+        "class": "Admin::OrganizationRolesController",
         "method": "permitted_parameters"
       },
       "user_input": ":role",

@@ -35,7 +35,7 @@ class BannedEmailDomain < ApplicationRecord
     end
 
     def no_valid_memberships?(domain)
-      org_ids = Membership.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
+      org_ids = OrganizationRole.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
       Organization.approved.where(id: org_ids).none?
     end
 

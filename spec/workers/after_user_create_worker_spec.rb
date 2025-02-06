@@ -243,7 +243,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           ActionMailer::Base.deliveries = []
           expect {
             Sidekiq::Testing.inline! { user.confirm(user.confirmation_token) }
-          }.to_not change(Membership, :count)
+          }.to_not change(OrganizationRole, :count)
           expect(ActionMailer::Base.deliveries.count).to eq 0
           user.reload
           expect(user.confirmed?).to be_truthy

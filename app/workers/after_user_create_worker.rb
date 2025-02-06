@@ -69,16 +69,16 @@ class AfterUserCreateWorker < ApplicationWorker
   end
 
   def associate_membership_invites(user, email, skip_confirm: false)
-    memberships = Membership.unclaimed.where(invited_email: email)
+    memberships = OrganizationRole.unclaimed.where(invited_email: email)
     return false unless memberships.any?
 
     first, *rest = memberships.pluck(:id)
-    ProcessMembershipWorker.new.perform(first, user.id)
+    ProcessOrganizationRoleWorker.new.perform(first, user.id)
 
     # We want to do the first one inline so we can redirect
     # the user to the org page
     rest.each do |membership_id|
-      ProcessMembershipWorker.perform_async(membership_id, user.id)
+      ProcessOrganizationRoleWorker.perform_async(membership_id, user.id)
     end
 
     user.confirm(user.confirmation_token) unless skip_confirm
@@ -108,7 +108,7 @@ class AfterUserCreateWorker < ApplicationWorker
     matching_organization = Organization.passwordless_email_matching(user.email)
     return false unless matching_organization.present?
     return false if user.memberships.pluck(:organization_id).include?(matching_organization.id)
-    Membership.create_passwordless(organization_id: matching_organization.id,
+    OrganizationRole.create_passwordless(organization_id: matching_organization.id,
       invited_email: user.email)
     user.reload
   end

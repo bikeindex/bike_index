@@ -1,8 +1,8 @@
 %h1
-  Editing Membership
+  Editing OrganizationRole
 - if @membership.deleted?
   %h2.text-danger.mb-4
-    Membership deleted
+    OrganizationRole deleted
     %span.convertTime.preciseTime
       = l @membership.deleted_at, format: :convert_time
 

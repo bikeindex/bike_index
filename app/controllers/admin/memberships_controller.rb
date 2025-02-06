@@ -1,4 +1,4 @@
-class Admin::MembershipsController < Admin::BaseController
+class Admin::OrganizationRolesController < Admin::BaseController
   include SortableTable
   before_action :find_membership, only: [:show, :edit, :update, :destroy]
   before_action :find_organizations
@@ -16,7 +16,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def new
-    @membership = Membership.new(organization_id: current_organization&.id)
+    @membership = OrganizationRole.new(organization_id: current_organization&.id)
   end
 
   def edit
@@ -24,7 +24,7 @@ class Admin::MembershipsController < Admin::BaseController
 
   def update
     if @membership.update(permitted_parameters)
-      flash[:success] = "Membership Saved!"
+      flash[:success] = "OrganizationRole Saved!"
       redirect_to admin_membership_url(@membership)
     else
       render action: :edit
@@ -32,9 +32,9 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def create
-    @membership = Membership.new(permitted_parameters.merge(sender: current_user))
+    @membership = OrganizationRole.new(permitted_parameters.merge(sender: current_user))
     if @membership.save
-      flash[:success] = "Membership Created!"
+      flash[:success] = "OrganizationRole Created!"
       redirect_to admin_membership_url(@membership)
     else
       render action: :new
@@ -58,7 +58,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def find_membership
-    @membership = Membership.unscoped.find(params[:id])
+    @membership = OrganizationRole.unscoped.find(params[:id])
   end
 
   def find_organizations
@@ -69,7 +69,7 @@ class Admin::MembershipsController < Admin::BaseController
     memberships = if current_organization.present?
       current_organization.memberships
     else
-      Membership.all
+      OrganizationRole.all
     end
     @deleted_memberships = current_organization&.deleted? || InputNormalizer.boolean(params[:search_deleted])
     @deleted_memberships ? memberships.deleted : memberships

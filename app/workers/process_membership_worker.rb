@@ -1,8 +1,8 @@
-class ProcessMembershipWorker < ApplicationWorker
+class ProcessOrganizationRoleWorker < ApplicationWorker
   sidekiq_options queue: "high_priority"
 
   def perform(membership_id, user_id = nil)
-    membership = Membership.find(membership_id)
+    membership = OrganizationRole.find(membership_id)
 
     assign_membership_user(membership, user_id) if membership.user.blank?
     return false if remove_duplicated_membership!(membership)

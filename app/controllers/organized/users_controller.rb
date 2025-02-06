@@ -31,7 +31,7 @@ module Organized
     end
 
     def new
-      @membership ||= Membership.new(organization_id: current_organization.id)
+      @membership ||= OrganizationRole.new(organization_id: current_organization.id)
       @page_errors = @membership.errors
     end
 
@@ -40,7 +40,7 @@ module Organized
         flash[:error] = translation(:no_remaining_user_invitations, org_name: current_organization.name)
         redirect_to(current_root_path) && return
       end
-      @membership = Membership.new(permitted_create_params)
+      @membership = OrganizationRole.new(permitted_create_params)
       if params[:multiple_emails_invited].present?
         if current_organization.restrict_invitations? && (multiple_emails_invited.count > current_organization.remaining_invitation_count)
           flash[:error] = translation(:insufficient_invitations,
@@ -53,7 +53,7 @@ module Organized
             invite_count: multiple_emails_invited.count,
             org_name: current_organization.name)
           multiple_emails_invited
-            .each { |email| Membership.create(permitted_create_params.merge(invited_email: email)) }
+            .each { |email| OrganizationRole.create(permitted_create_params.merge(invited_email: email)) }
 
           redirect_to(current_root_path) && return
         end

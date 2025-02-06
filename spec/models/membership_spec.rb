@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Membership, type: :model do
+RSpec.describe OrganizationRole, type: :model do
   describe "#ensure_ambassador_tasks_assigned!" do
     context "given an ambassador organization" do
       it "enqueues a job to assign ambassador tasks to the given user" do
@@ -13,7 +13,7 @@ RSpec.describe Membership, type: :model do
         Sidekiq::Worker.clear_all
         expect {
           FactoryBot.create(:membership_claimed, organization: org, user: user)
-        }.to change(ProcessMembershipWorker.jobs, :count).by 1
+        }.to change(ProcessOrganizationRoleWorker.jobs, :count).by 1
         Sidekiq::Worker.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(2)
@@ -39,7 +39,7 @@ RSpec.describe Membership, type: :model do
     it "returns all and only ambassador organizations" do
       FactoryBot.create(:membership_claimed)
       ambassador_orgs = FactoryBot.create_list(:membership_ambassador, 3)
-      found_orgs = Membership.ambassador_organizations
+      found_orgs = OrganizationRole.ambassador_organizations
       expect(found_orgs.order(:created_at)).to eq(ambassador_orgs.sort_by(&:created_at))
     end
   end
@@ -47,13 +47,13 @@ RSpec.describe Membership, type: :model do
   describe "admin?" do
     context "admin" do
       it "returns true" do
-        membership = Membership.new(role: "admin")
+        membership = OrganizationRole.new(role: "admin")
         expect(membership.admin?).to be_truthy
       end
     end
     context "member" do
       it "returns true" do
-        membership = Membership.new(role: "member")
+        membership = OrganizationRole.new(role: "member")
         expect(membership.admin?).to be_falsey
       end
     end

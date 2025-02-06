@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ProcessMembershipWorker, type: :job do
+RSpec.describe ProcessOrganizationRoleWorker, type: :job do
   let(:instance) { described_class.new }
   before { ActionMailer::Base.deliveries = [] }
 
@@ -50,7 +50,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         expect(user.confirmed?).to be_falsey
         expect {
           instance.perform(membership.id)
-        }.to change(Membership, :count).by(-1)
+        }.to change(OrganizationRole, :count).by(-1)
         existing_membership.reload
         expect(existing_membership).to be_present
       end
@@ -60,7 +60,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
           expect(user.confirmed?).to be_truthy
           expect {
             instance.perform(membership.id)
-          }.to change(Membership, :count).by(-1)
+          }.to change(OrganizationRole, :count).by(-1)
           existing_membership.reload
           expect(existing_membership).to be_present
         end
@@ -71,7 +71,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         it "deletes itself" do
           expect {
             instance.perform(membership.id)
-          }.to change(Membership, :count).by(-1)
+          }.to change(OrganizationRole, :count).by(-1)
           existing_membership.reload
           expect(existing_membership).to be_present
         end

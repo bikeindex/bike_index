@@ -77,7 +77,7 @@ class User < ApplicationRecord
   has_many :payments
   has_many :notifications
   has_many :memberships
-  has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
+  has_many :sent_memberships, class_name: "OrganizationRole", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships
@@ -113,7 +113,7 @@ class User < ApplicationRecord
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
-  scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
+  scope :ambassadors, -> { where(id: OrganizationRole.ambassador_organizations.select(:user_id)) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
 
   validates_uniqueness_of :username, case_sensitive: false
@@ -363,7 +363,7 @@ class User < ApplicationRecord
   end
 
   def role(organization)
-    m = Membership.where(user_id: id, organization_id: organization.id).first
+    m = OrganizationRole.where(user_id: id, organization_id: organization.id).first
     m&.role
   end
 
@@ -524,7 +524,7 @@ class User < ApplicationRecord
   private
 
   def claimed_memberships_for(organization_id)
-    Membership.claimed.where(user_id: id, organization_id: organization_id)
+    OrganizationRole.claimed.where(user_id: id, organization_id: organization_id)
   end
 
   def preferred_language_is_an_available_locale

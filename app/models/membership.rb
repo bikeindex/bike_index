@@ -17,7 +17,7 @@
 #  sender_id                :integer
 #  user_id                  :integer
 #
-class Membership < ApplicationRecord
+class OrganizationRole < ApplicationRecord
   MEMBERSHIP_TYPES = %w[admin member member_no_bike_edit].freeze
   HOT_SHEET_NOTIFICATION_ENUM = {notification_never: 0, notification_daily: 1}.freeze
 
@@ -50,13 +50,13 @@ class Membership < ApplicationRecord
     new_passwordless_attrs = {skip_processing: true, role: "member"}
     if create_attrs[:invited_email].present? # This should always be present...
       # We need to check for existing memberships because the AfterUserCreateWorker calls this
-      existing_membership = Membership.find_by_invited_email(create_attrs[:invited_email])
+      existing_membership = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
       return existing_membership if existing_membership.present?
     end
     membership = create!(new_passwordless_attrs.merge(create_attrs))
-    # ProcessMembershipWorker creates a user if the user doesn't exist, for passwordless organizations
+    # ProcessOrganizationRoleWorker creates a user if the user doesn't exist, for passwordless organizations
     # because of that, we want to process this inline
-    ProcessMembershipWorker.new.perform(membership.id)
+    ProcessOrganizationRoleWorker.new.perform(membership.id)
     membership.reload
     membership
   end
@@ -92,11 +92,11 @@ class Membership < ApplicationRecord
 
   def enqueue_processing_worker
     return true if skip_processing
-    # We manually update the user, because ProcessMembershipWorker won't find this membership
+    # We manually update the user, because ProcessOrganizationRoleWorker won't find this membership
     if deleted? && user_id.present?
       AfterUserChangeWorker.perform_async(user_id)
     else
-      ProcessMembershipWorker.perform_async(id)
+      ProcessOrganizationRoleWorker.perform_async(id)
     end
   end
 
