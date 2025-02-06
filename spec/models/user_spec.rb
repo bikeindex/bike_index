@@ -410,7 +410,7 @@ RSpec.describe User, type: :model do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
     let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
-    let!(:membership) { FactoryBot.create(:membership, user: user, organization: organization, hot_sheet_notification: :notification_daily) }
+    let!(:organization_user) { FactoryBot.create(:organization_user, user: user, organization: organization, hot_sheet_notification: :notification_daily) }
     it "updates and marks all notifications false" do
       expect(user.reload.notification_newsletters).to be_truthy
       expect(user.no_non_theft_notification).to be_falsey
@@ -827,7 +827,7 @@ RSpec.describe User, type: :model do
   describe "ambassador?" do
     it "returns true if the user has any ambassadorship" do
       user = FactoryBot.create(:ambassador)
-      user.organization_roles << FactoryBot.create(:membership_claimed, user: user)
+      user.organization_roles << FactoryBot.create(:organization_user_claimed, user: user)
       user.save
 
       expect(user).to be_ambassador

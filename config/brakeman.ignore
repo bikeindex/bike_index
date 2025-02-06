@@ -633,7 +633,7 @@
       "file": "app/controllers/admin/organization_roles_controller.rb",
       "line": 56,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:membership).permit(:organization_id, :user_id, :role, :invited_email)",
+      "code": "params.require(:organization_role).permit(:organization_id, :user_id, :role, :invited_email)",
       "render_path": null,
       "location": {
         "type": "method",

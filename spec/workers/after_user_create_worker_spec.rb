@@ -144,8 +144,8 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   describe "associate_membership_invites" do
     it "assigns any organization_roles that match the user email, and mark user confirmed if invited", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
-      membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
-      membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      membership1 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
+      membership2 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
       expect(membership1.claimed?).to be_falsey
 
       Sidekiq::Testing.inline! { user.save }
@@ -164,8 +164,8 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     # redirect users to the organization they belong to
     it "synchronously associates the first memberhsip", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
-      membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
-      membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      membership1 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
+      membership2 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
       expect(membership1).to_not be_claimed
       expect(membership2).to_not be_claimed
 
@@ -235,7 +235,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       context "membership exists" do
         it "does not create an additional membership" do
           expect(user.confirmed?).to be_falsey
-          membership = FactoryBot.create(:membership, user: user, sender: nil, organization: organization, role: "admin")
+          membership = FactoryBot.create(:organization_user, user: user, sender: nil, organization: organization, role: "admin")
           expect(membership.claimed?).to be_truthy
           user.reload
           expect(user.mailchimp_datum).to be_blank

@@ -412,7 +412,7 @@ RSpec.describe "Bikes API V3", type: :request do
         it "updates if the submitting org is the creation org" do
           bike = FactoryBot.create(:bike_organized)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-          FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization)
+          FactoryBot.create(:organization_user_claimed, user: user, organization: bike.creation_organization)
 
           bike_attrs = {
             serial: bike.serial_display,
@@ -432,7 +432,7 @@ RSpec.describe "Bikes API V3", type: :request do
         it "creates a new record if the submitting org isn't the creation org" do
           bike = FactoryBot.create(:bike_organized)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-          FactoryBot.create(:membership_claimed, user: user)
+          FactoryBot.create(:organization_user_claimed, user: user)
 
           bike_attrs = {
             serial: bike.serial_display,
@@ -454,7 +454,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:can_edit_claimed) { true }
         let(:bike) { FactoryBot.create(:bike_organized, can_edit_claimed: can_edit_claimed) }
         let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike) }
-        let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization) }
+        let!(:organization_user) { FactoryBot.create(:organization_user_claimed, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do
           {
             serial: bike.serial_display,
@@ -753,7 +753,7 @@ RSpec.describe "Bikes API V3", type: :request do
       let(:organization) { FactoryBot.create(:organization) }
       it "creates a stolen bike through an organization and uses the passed phone" do
         user.update_attribute :phone, "0987654321"
-        FactoryBot.create(:membership, user: user, organization: organization)
+        FactoryBot.create(:organization_user, user: user, organization: organization)
         FactoryBot.create(:country, iso: "US")
         FactoryBot.create(:state, abbreviation: "NY")
         date_stolen = 1357192800
@@ -829,7 +829,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "with membership" do
       before do
-        FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+        FactoryBot.create(:organization_user, user: user, organization: organization, role: "admin")
         organization.save
       end
 

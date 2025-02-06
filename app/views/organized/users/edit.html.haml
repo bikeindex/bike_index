@@ -4,7 +4,7 @@
 
 %p.text-right
   = link_to t(".remove_from_organization"),
-    organization_user_path(id: @membership.id, organization_id: current_organization.to_param),
+    organization_role_path(id: @membership.id, organization_id: current_organization.to_param),
     method: :delete,
     data: { confirm: t(".confirmation", user_name: @name, org_name: current_organization.name) },
     class: "btn btn-danger"
@@ -38,7 +38,7 @@
         - if @membership&.user&.last_login_ip&.present?
           %code= @membership.user.last_login_ip
 
-= form_for @membership, { as: :membership, url: organization_user_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
+= form_for @membership, { as: :organization_role, url: organization_role_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   .form-group.row
     %label.org-form-label= t(".email")
     .col-sm-4

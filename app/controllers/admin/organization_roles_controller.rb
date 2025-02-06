@@ -54,7 +54,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:membership).permit(:organization_id, :user_id, :role, :invited_email)
+    params.require(:organization_role).permit(:organization_id, :user_id, :role, :invited_email)
   end
 
   def find_membership

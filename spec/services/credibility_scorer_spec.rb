@@ -96,7 +96,7 @@ RSpec.describe CredibilityScorer do
       let(:created_at) { Time.current - 20.days }
       let(:auto_user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 3.years) }
       let!(:auto_user_membership) do
-        FactoryBot.create(:membership_claimed, user: auto_user, organization: organization)
+        FactoryBot.create(:organization_user_claimed, user: auto_user, organization: organization)
         organization.update(auto_user: auto_user)
       end
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
@@ -247,7 +247,7 @@ RSpec.describe CredibilityScorer do
     context "previous owner banned" do
       let(:user2) { FactoryBot.create(:user, created_at: Time.current - 5.years) }
       let(:ambassador) { FactoryBot.create(:user) }
-      let!(:membership) { FactoryBot.create(:membership_ambassador, user: ambassador, created_at: Time.current - 1.hour) }
+      let!(:organization_user) { FactoryBot.create(:organization_user_ambassador, user: ambassador, created_at: Time.current - 1.hour) }
       let!(:ownership2) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: Time.current - 4.years, creator: banned_user, user: user2) }
       let!(:ownership3) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: Time.current - 2.years, creator: user2, user: ambassador) }
       it "returns banned" do
@@ -269,7 +269,7 @@ RSpec.describe CredibilityScorer do
         expect(instance.badges).to eq([:long_time_registration, :current_ownership_claimed, :long_time_user])
       end
       context "veteran also ambassador" do
-        let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
+        let!(:organization_user) { FactoryBot.create(:organization_user_ambassador, user: user, created_at: Time.current - 1.hour) }
         it "returns ambassador" do
           expect(subject.bike_user_badges(bike)).to eq([:user_ambassador])
         end
@@ -295,7 +295,7 @@ RSpec.describe CredibilityScorer do
       end
       context "user is member of trusted organization, supporter" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
-        let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
+        let!(:organization_user) { FactoryBot.create(:organization_user_claimed, user: user, organization: organization) }
         let!(:payment) { FactoryBot.create(:payment, user: user) }
         it "returns just user_trusted_organization_role", :flaky do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
@@ -315,7 +315,7 @@ RSpec.describe CredibilityScorer do
           expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :user_verified_phone, :long_time_user, :user_connected_to_strava])
         end
         context "ambassador" do
-          let!(:membership) { FactoryBot.create(:membership_ambassador, user: user, created_at: Time.current - 1.hour) }
+          let!(:organization_user) { FactoryBot.create(:organization_user_ambassador, user: user, created_at: Time.current - 1.hour) }
           it "returns ambassador" do
             expect(subject.bike_user_badges(bike)).to eq([:user_ambassador])
           end

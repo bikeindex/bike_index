@@ -11,7 +11,7 @@
         = render partial: "/shared/errors", locals: { name: "OrganizationRole", obj: @membership }
       .form-group.fancy-select.unfancy
         = f.label :organization
-        = collection_select :membership, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
+        = collection_select :organization_role, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
 
       .form-group
         = f.label :invited_email

@@ -99,16 +99,16 @@ module Organized
     end
 
     def permitted_update_params
-      params.require(:membership).permit(:role).merge(organization_id: current_organization.id)
+      params.require(:organization_role).permit(:role).merge(organization_id: current_organization.id)
     end
 
     def permitted_create_params
-      params.require(:membership).permit(:role, :invited_email)
+      params.require(:organization_role).permit(:role, :invited_email)
         .merge(organization: current_organization, sender: current_user)
     end
 
     def update_membership_params
-      {role: params.dig(:membership, :role)}
+      {role: params.dig(:organization_role, :role)}
     end
   end
 end

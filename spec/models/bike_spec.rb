@@ -842,7 +842,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(u: member_no_bikes, org: organization)).to be_falsey
         expect(bike.authorized?(member_no_bikes)).to be_falsey
         # If the member has multiple organization_roles, it should only work for the correct organization
-        new_membership = FactoryBot.create(:membership_claimed, user: member)
+        new_membership = FactoryBot.create(:organization_user_claimed, user: member)
         expect(bike.authorized_by_organization?).to be_truthy
         expect(bike.authorized_by_organization?(u: member)).to be_truthy
         expect(bike.authorized_by_organization?(u: member, org: new_membership.organization)).to be_falsey
@@ -1004,7 +1004,7 @@ RSpec.describe Bike, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
     let!(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
-    let(:organization_usership2) { FactoryBot.create(:membership, user: organization_user) }
+    let(:organization_usership2) { FactoryBot.create(:organization_user, user: organization_user) }
     let!(:organization2) { organization_usership2.organization }
     let(:bike) { FactoryBot.create(:bike_organized, user: user, claimed: true, creation_organization: organization, can_edit_claimed: false) }
     let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, can_edit_claimed: true, organization: organization2) }
@@ -1058,7 +1058,7 @@ RSpec.describe Bike, type: :model do
       let(:user_unorganized) { User.new }
       let(:owner) { User.new }
       let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
-      let(:membership) { FactoryBot.create(:membership, user: user, organization: organization_unstolen) }
+      let(:organization_user) { FactoryBot.create(:organization_user, user: user, organization: organization_unstolen) }
       it "is truthy for the organization with unstolen" do
         allow(bike).to receive(:owner) { owner }
         expect(bike.contact_owner?).to be_falsey

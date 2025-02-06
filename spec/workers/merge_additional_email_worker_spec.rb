@@ -12,7 +12,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
     let(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
     let(:user_email) { FactoryBot.create(:user_email, email: email) }
     let(:user) { user_email.user }
-    let(:membership) { FactoryBot.create(:membership, invited_email: "#{email.upcase} ") }
+    let(:organization_user) { FactoryBot.create(:organization_user, invited_email: "#{email.upcase} ") }
 
     context "existing user account", flaky: true do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
@@ -22,12 +22,12 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:theft_alert) { FactoryBot.create(:theft_alert, user: old_user) }
 
       let(:organization) { membership.organization }
-      let(:membership) { FactoryBot.create(:membership_claimed, user: old_user) }
+      let(:organization_user) { FactoryBot.create(:organization_user_claimed, user: old_user) }
       let(:second_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:second_membership) { FactoryBot.create(:membership_claimed, user: old_user, organization: second_organization) }
+      let(:second_membership) { FactoryBot.create(:organization_user_claimed, user: old_user, organization: second_organization) }
       let(:third_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:old_membership) { FactoryBot.create(:membership_claimed, user: old_user, organization: third_organization) }
-      let(:new_membership) { FactoryBot.create(:membership_claimed, user: user, organization: third_organization) }
+      let(:old_membership) { FactoryBot.create(:organization_user_claimed, user: old_user, organization: third_organization) }
+      let(:new_membership) { FactoryBot.create(:organization_user_claimed, user: user, organization: third_organization) }
 
       let(:integration) { FactoryBot.create(:integration, user: old_user, information: {"info" => {"email" => email, :name => "blargh"}}) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }

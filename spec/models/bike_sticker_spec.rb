@@ -499,7 +499,7 @@ RSpec.describe BikeSticker, type: :model do
       let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
       let(:organization_other) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:organization_user, organization: organization_regional) }
-      before { FactoryBot.create(:membership_claimed, user: user, organization: organization_other) }
+      before { FactoryBot.create(:organization_user_claimed, user: user, organization: organization_other) }
       it "is truthy for regional org" do
         FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1, bike: bike1, kind: "failed_claim") # Ignored, because failed
         FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker2, bike: bike1, kind: "failed_claim") # Ignored, because failed

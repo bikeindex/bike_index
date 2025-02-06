@@ -8,7 +8,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
     context "ambassador" do
       context "given a non-ambassador" do
         it "does not create ambassador_task_assignments" do
-          membership = FactoryBot.create(:membership_claimed)
+          membership = FactoryBot.create(:organization_user_claimed)
           FactoryBot.create(:ambassador_task)
           expect {
             instance.perform(membership.id)
@@ -21,7 +21,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
         it "idempotently creates all assignments for the given ambassador" do
           task_ids = FactoryBot.create_list(:ambassador_task, 3).map(&:id)
           user = FactoryBot.create(:user_confirmed)
-          membership = FactoryBot.create(:membership_ambassador, user_id: user.id)
+          membership = FactoryBot.create(:organization_user_ambassador, user_id: user.id)
 
           expect {
             instance.perform(membership.id)
@@ -42,8 +42,8 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
 
     context "duplication" do
       let(:user) { FactoryBot.create(:user, email: "party@monster.com") }
-      let!(:existing_membership) { FactoryBot.create(:membership, user: user) }
-      let!(:membership) { FactoryBot.create(:membership, user: nil, invited_email: invitation_email, organization: existing_membership.organization) }
+      let!(:existing_membership) { FactoryBot.create(:organization_user, user: user) }
+      let!(:organization_user) { FactoryBot.create(:organization_user, user: nil, invited_email: invitation_email, organization: existing_membership.organization) }
       let(:invitation_email) { "party@monster.com" }
       it "deletes itself" do
         expect(membership.valid?).to be_truthy
@@ -81,7 +81,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
     context "organization passwordless_users" do
       let(:email) { "rock@hardplace.com" }
       let(:organization) { FactoryBot.create(:organization) }
-      let!(:membership) { FactoryBot.create(:membership, organization: organization, invited_email: email) }
+      let!(:organization_user) { FactoryBot.create(:organization_user, organization: organization, invited_email: email) }
       before { organization.update_attribute :enabled_feature_slugs, ["passwordless_users"] }
       it "creates a user, does not send an email" do
         Sidekiq::Worker.clear_all
@@ -112,7 +112,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
     end
 
     context "email not sent" do
-      let(:membership) { FactoryBot.create(:membership) }
+      let(:organization_user) { FactoryBot.create(:organization_user) }
       it "sends the email" do
         expect(membership.claimed?).to be_falsey
         expect(membership.email_invitation_sent_at).to be_blank

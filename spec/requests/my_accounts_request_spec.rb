@@ -377,7 +377,7 @@ RSpec.describe MyAccountsController, type: :request do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
       let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
       let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
-      let(:membership) { current_user.organization_roles.first }
+      let(:organization_user) { current_user.organization_roles.first }
       it "updates hotsheet" do
         expect(membership.notification_never?).to be_truthy
         # Doesn't include the parameter because when false, it doesn't include
@@ -394,7 +394,7 @@ RSpec.describe MyAccountsController, type: :request do
       context "with other parameters too" do
         let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
         let(:organization2) { hot_sheet_configuration2.organization }
-        let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
+        let!(:organization_user2) { FactoryBot.create(:organization_user_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
         it "updates all the parameters" do
           expect(membership.notification_never?).to be_truthy
           expect(membership2.notification_daily?).to be_truthy

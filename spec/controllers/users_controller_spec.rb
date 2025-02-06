@@ -140,7 +140,7 @@ RSpec.describe UsersController, type: :controller do
       end
       context "with membership and an example bike" do
         let(:email) { "test@stuff.com" }
-        let(:membership) { FactoryBot.create(:membership, invited_email: " #{email.upcase}", role: "member") }
+        let(:organization_user) { FactoryBot.create(:organization_user, invited_email: " #{email.upcase}", role: "member") }
         let!(:organization) { membership.organization }
         let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
@@ -176,7 +176,7 @@ RSpec.describe UsersController, type: :controller do
         end
       end
       context "with membership, partner param" do
-        let!(:membership) { FactoryBot.create(:membership, invited_email: "poo@pile.com") }
+        let!(:organization_user) { FactoryBot.create(:organization_user, invited_email: "poo@pile.com") }
         it "creates a confirmed user, log in, and send welcome, language header" do
           session[:passive_organization_id] = "0"
           request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"

@@ -22,8 +22,8 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "update" do
       context "membership" do
-        let(:membership) { FactoryBot.create(:membership, organization: current_organization, sender: current_user) }
-        let(:membership_params) do
+        let(:organization_user) { FactoryBot.create(:organization_user, organization: current_organization, sender: current_user) }
+        let(:organization_user_params) do
           {
             role: "admin",
             name: "something",
@@ -75,10 +75,10 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "edit" do
       context "membership" do
-        let(:membership) { FactoryBot.create(:membership_claimed, organization: current_organization) }
+        let(:organization_user) { FactoryBot.create(:organization_user_claimed, organization: current_organization) }
         it "renders the page" do
           get "#{base_url}/#{membership.id}/edit", params: {organization_id: current_organization.to_param}
-          expect(assigns(:membership)).to eq membership
+          expect(assigns(:organization_user)).to eq membership
           expect(response.code).to eq("200")
           expect(response).to render_template :edit
         end
@@ -88,8 +88,8 @@ RSpec.describe Organized::UsersController, type: :request do
     describe "update" do
       context "membership" do
         context "other valid membership" do
-          let(:membership) { FactoryBot.create(:membership_claimed, organization: current_organization, role: "member") }
-          let(:membership_params) { {role: "admin", user_id: 333} }
+          let(:organization_user) { FactoryBot.create(:organization_user_claimed, organization: current_organization, role: "member") }
+          let(:organization_user_params) { {role: "admin", user_id: 333} }
           it "updates the role" do
             og_user = membership.user
             put "#{base_url}/#{membership.id}", params: {membership: membership_params}
@@ -101,7 +101,7 @@ RSpec.describe Organized::UsersController, type: :request do
           end
         end
         context "marking self member" do
-          let(:membership) { current_user.organization_roles.first }
+          let(:organization_user) { current_user.organization_roles.first }
           it "does not update the membership" do
             put "#{base_url}/#{membership.id}", params: {organization_id: current_organization.to_param, membership: {role: "member"}}
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
@@ -116,7 +116,7 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "destroy" do
       context "membership unclaimed" do
-        let(:membership) { FactoryBot.create(:membership, organization: current_organization, sender: current_user) }
+        let(:organization_user) { FactoryBot.create(:organization_user, organization: current_organization, sender: current_user) }
         it "destroys" do
           expect(membership.claimed?).to be_falsey
           count = current_organization.remaining_invitation_count
@@ -131,7 +131,7 @@ RSpec.describe Organized::UsersController, type: :request do
       end
       context "membership" do
         context "other valid membership" do
-          let(:membership) { FactoryBot.create(:membership_claimed, organization: current_organization, role: "member") }
+          let(:organization_user) { FactoryBot.create(:organization_user_claimed, organization: current_organization, role: "member") }
           it "destroys the membership" do
             expect(membership.claimed?).to be_truthy
             count = current_organization.remaining_invitation_count
@@ -145,7 +145,7 @@ RSpec.describe Organized::UsersController, type: :request do
           end
         end
         context "marking self member" do
-          let(:membership) { current_user.organization_roles.first }
+          let(:organization_user) { current_user.organization_roles.first }
           it "does not destroy" do
             count = current_organization.remaining_invitation_count
             expect {
@@ -162,7 +162,7 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "create" do
       before { Sidekiq::Worker.clear_all }
-      let(:membership_params) do
+      let(:organization_user_params) do
         {
           role: "member",
           invited_email: "bike_email@bike_shop.com"
@@ -173,7 +173,7 @@ RSpec.describe Organized::UsersController, type: :request do
           expect {
             post base_url, params: {membership: membership_params.merge(invited_email: " ")}
           }.to change(OrganizationRole, :count).by(0)
-          expect(assigns(:membership).errors.full_messages).to be_present
+          expect(assigns(:organization_user).errors.full_messages).to be_present
         end
       end
       context "available invitations" do

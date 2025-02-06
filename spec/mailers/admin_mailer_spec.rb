@@ -56,7 +56,7 @@ RSpec.describe AdminMailer, type: :mailer do
     context "org email" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:user) }
-      let(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
+      let(:organization_user) { FactoryBot.create(:organization_user_claimed, user: user, organization: organization) }
       let(:feedback) { FactoryBot.create(:feedback, feedback_type: "organization_created", feedback_hash: {organization_id: organization.id}) }
       it "sends a new org email" do
         mail = AdminMailer.feedback_notification_email(feedback)

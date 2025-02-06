@@ -596,7 +596,7 @@ RSpec.describe Organization, type: :model do
       it "sets the embedable user" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed, email: "embed@org.com")
-        FactoryBot.create(:membership_claimed, organization: organization, user: user)
+        FactoryBot.create(:organization_user_claimed, organization: organization, user: user)
         organization.embedable_user_email = "embed@org.com"
         organization.save
         expect(organization.reload.auto_user_id).to eq(user.id)
@@ -618,7 +618,7 @@ RSpec.describe Organization, type: :model do
       it "sets the embedable user if it isn't set and the org has members" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed)
-        FactoryBot.create(:membership_claimed, user: user, organization: organization)
+        FactoryBot.create(:organization_user_claimed, user: user, organization: organization)
         organization.save
         expect(organization.reload.auto_user_id).not_to be_nil
       end

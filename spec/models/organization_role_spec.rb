@@ -12,7 +12,7 @@ RSpec.describe OrganizationRole, type: :model do
 
         Sidekiq::Worker.clear_all
         expect {
-          FactoryBot.create(:membership_claimed, organization: org, user: user)
+          FactoryBot.create(:organization_user_claimed, organization: org, user: user)
         }.to change(ProcessOrganizationRoleWorker.jobs, :count).by 1
         Sidekiq::Worker.drain_all
 
@@ -27,7 +27,7 @@ RSpec.describe OrganizationRole, type: :model do
         org = FactoryBot.create(:organization)
         expect(AmbassadorTaskAssignment.count).to eq(0)
 
-        FactoryBot.create(:membership_claimed, organization: org, user: user)
+        FactoryBot.create(:organization_user_claimed, organization: org, user: user)
         Sidekiq::Worker.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(0)
@@ -37,8 +37,8 @@ RSpec.describe OrganizationRole, type: :model do
 
   describe ".ambassador_organizations" do
     it "returns all and only ambassador organizations" do
-      FactoryBot.create(:membership_claimed)
-      ambassador_orgs = FactoryBot.create_list(:membership_ambassador, 3)
+      FactoryBot.create(:organization_user_claimed)
+      ambassador_orgs = FactoryBot.create_list(:organization_user_ambassador, 3)
       found_orgs = OrganizationRole.ambassador_organizations
       expect(found_orgs.order(:created_at)).to eq(ambassador_orgs.sort_by(&:created_at))
     end
@@ -63,7 +63,7 @@ RSpec.describe OrganizationRole, type: :model do
     let!(:organization) { FactoryBot.create(:organization_ambassador) }
     let!(:ambassador_task) { FactoryBot.create(:ambassador_task) }
     let(:email) { "new@ambassador.edu" }
-    let(:membership) { FactoryBot.build(:membership, organization: organization, invited_email: email) }
+    let(:organization_user) { FactoryBot.build(:organization_user, organization: organization, invited_email: email) }
     it "creates the tasks when it can create the tasks" do
       Sidekiq::Worker.clear_all
       membership.save

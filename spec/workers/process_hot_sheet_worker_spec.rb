@@ -44,8 +44,8 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
     end
 
     context "with recipients" do
-      let!(:membership) { FactoryBot.create(:membership_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
-      let!(:membership_unclaimed) { FactoryBot.create(:membership, organization: organization1, hot_sheet_notification: "notification_daily") }
+      let!(:organization_user) { FactoryBot.create(:organization_user_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
+      let!(:organization_user_unclaimed) { FactoryBot.create(:organization_user, organization: organization1, hot_sheet_notification: "notification_daily") }
       it "delivers the email" do
         expect {
           ProcessHotSheetWorker.drain
