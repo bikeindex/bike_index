@@ -35,7 +35,7 @@ en:
         locks: Locks
         longitude: Longitude
         magic_link_token: Magic link token
-        memberships: OrganizationRoles
+        memberships: Memberships
         my_bikes_hash: My bikes hash
         name: Name
         notification_newsletters: Notification newsletters
@@ -458,7 +458,7 @@ en:
         locations: Locations
         lock_show_on_map: Lock show on map
         mail_snippets: Mail snippets
-        memberships: OrganizationRoles
+        memberships: Memberships
         name: Name
         parent_organization: :activerecord.models.parent_organization
         payments: Payments
@@ -638,7 +638,7 @@ en:
         locks: Locks
         longitude: Longitude
         magic_link_token: Magic link token
-        memberships: OrganizationRoles
+        memberships: Memberships
         my_bikes_hash: My bikes hash
         name: Name
         notification_newsletters: Notification newsletters
@@ -863,7 +863,7 @@ en:
       lock_type: Lock type
       mail_snippet: Mail snippet
       manufacturer: Manufacturer
-      membership: OrganizationRole
+      membership: Membership
       normalized_serial_segment: Normalized serial segment
       organization: Organization
       organization_feature: Organization feature
@@ -4802,7 +4802,7 @@ en:
         member_no_bikes_access: Same access as Member, but can not edit organization
           bikes
         member_of_organization: Member of organization
-        membership_type: OrganizationRole type
+        membership_type: Membership type
       new:
         1_email_per_line: 1 email per line
         automatic_passwordless: >-
@@ -4812,7 +4812,7 @@ en:
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user
-        membership: OrganizationRole
+        membership: Membership
         multiple_emails: Multiple emails
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
