@@ -1053,7 +1053,7 @@ RSpec.describe "Bikes API V3", type: :request do
       end
       context "application creator is auto_user of organization" do
         let(:application_owner) { auto_user }
-        before { application_owner.memberships.first.update(role: "admin") }
+        before { application_owner.organization_roles.first.update(role: "admin") }
         it "creates" do
           expect(application_owner.reload.admin_of?(organization)).to be_truthy
           expect(client_credentials_token.application.owner.id).to eq auto_user.id

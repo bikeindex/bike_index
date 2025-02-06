@@ -366,7 +366,7 @@ RSpec.describe UsersController, type: :controller do
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           expect_confirmed_and_set_ip(user)
-          expect(user.memberships.count).to eq 0
+          expect(user.organization_roles.count).to eq 0
           expect(session[:passive_organization_id]).to eq "0"
         end
         context "domain matching" do
@@ -379,7 +379,7 @@ RSpec.describe UsersController, type: :controller do
             expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
             expect(session[:passive_organization_id]).to eq organization.id
             expect_confirmed_and_set_ip(user)
-            expect(user.memberships.count).to eq 1
+            expect(user.organization_roles.count).to eq 1
           end
         end
       end

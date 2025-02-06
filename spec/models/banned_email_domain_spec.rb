@@ -59,7 +59,7 @@ RSpec.describe BannedEmailDomain, type: :model do
       it "is truthy" do
         expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
         expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
-        expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
+        expect(BannedEmailDomain.no_valid_organization_roles?(domain)).to be_truthy
         expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
       end
 
@@ -86,7 +86,7 @@ RSpec.describe BannedEmailDomain, type: :model do
             expect(OrganizationRole.count).to eq 1
             expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
             expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
-            expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
+            expect(BannedEmailDomain.no_valid_organization_roles?(domain)).to be_truthy
             expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
           end
         end

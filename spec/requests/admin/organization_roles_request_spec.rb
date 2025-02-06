@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::OrganizationRolesController, type: :request do
-  base_url = "/admin/memberships/"
+  base_url = "/admin/organization_roles/"
 
   include_context :request_spec_logged_in_as_superuser
 
@@ -24,10 +24,10 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
   describe "create" do
     let!(:organization) { FactoryBot.create(:organization) }
     it "creates" do
-      expect(organization.memberships.count).to eq 0
+      expect(organization.organization_roles.count).to eq 0
       post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com"}}
       organization.reload
-      expect(organization.memberships.count).to eq 1
+      expect(organization.organization_roles.count).to eq 1
       membership = OrganizationRole.last
       expect(membership.invited_email).to eq "new_email@stuff.com"
       expect(membership.claimed?).to be_falsey
@@ -36,20 +36,20 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
     context "user present" do
       let!(:existing_user) { FactoryBot.create(:user_confirmed, email: "somebody@stuff.com") }
       it "associates and claims" do
-        expect(existing_user.memberships.count).to eq 0
+        expect(existing_user.organization_roles.count).to eq 0
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         expect {
           post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com"}}
         }.to change(OrganizationRole, :count).by 1
-        expect(organization.memberships.count).to eq 1
+        expect(organization.organization_roles.count).to eq 1
         existing_user.reload
         membership = OrganizationRole.last
         expect(ProcessOrganizationRoleWorker.jobs.count).to eq 1
         ProcessOrganizationRoleWorker.drain
         organization.reload
         membership.reload
-        expect(existing_user.memberships.count).to eq 1
+        expect(existing_user.organization_roles.count).to eq 1
         expect(membership.user).to eq existing_user
         expect(membership.sender).to eq current_user
       end

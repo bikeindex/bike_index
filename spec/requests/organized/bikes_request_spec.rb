@@ -37,7 +37,7 @@ RSpec.describe Organized::BikesController, type: :request do
     context "member_no_bike_edit" do
       let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization, role: "member_no_bike_edit") }
       it "allows viewing" do
-        expect(current_user.reload.memberships.first.role).to eq "member_no_bike_edit"
+        expect(current_user.reload.organization_roles.first.role).to eq "member_no_bike_edit"
         get base_url, params: query_params
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization

@@ -12,7 +12,7 @@
     %p
       = t(".we_believe_that_bicycle_registration")
 
-    - if current_user.present? && current_user.memberships.present?
+    - if current_user.present? && current_user.organization_roles.present?
       - link = link_to 'bikeindex.org/lightspeed_interface', lightspeed_interface_path(organization_id: passive_organization&.id)
       - security_link = link_to t(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"
       %p= t(".all_you_have_to_do_is_html", link: link, security_link: security_link)

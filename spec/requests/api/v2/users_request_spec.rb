@@ -22,7 +22,7 @@ RSpec.describe "Users API V2", type: :request do
         expect(result["id"]).to eq(user.id.to_s)
         expect(result["user"].is_a?(Hash)).to be_truthy
         expect(result["bike_ids"].is_a?(Array)).to be_truthy
-        expect(result["memberships"].is_a?(Array)).to be_truthy
+        expect(result["organization_roles"].is_a?(Array)).to be_truthy
         expect(result["user"].key?("secondary_emails")).to be_falsey
       end
     end
@@ -36,16 +36,16 @@ RSpec.describe "Users API V2", type: :request do
       expect(result["bike_ids"].present?).to be_falsey
     end
 
-    it "doesn't include memberships if no memberships scoped" do
+    it "doesn't include organization_roles if no organization_roles scoped" do
       expect(token.scopes.to_s.match("read_organization_membership").present?).to be_falsey
       get "/api/v2/users/current", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)
       expect(result["id"]).to eq(user.id.to_s)
-      expect(result["memberships"].present?).to be_falsey
+      expect(result["organization_roles"].present?).to be_falsey
     end
 
-    it "doesn't include memberships if no memberships scoped" do
+    it "doesn't include organization_roles if no organization_roles scoped" do
       get "/api/v2/users/current", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)

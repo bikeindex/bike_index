@@ -1,4 +1,4 @@
-- memberships ||= @memberships
+- organization_roles ||= @organization_roles
 - skip_organization ||= false
 - render_sortable ||= false
 - render_deleted ||= false
@@ -27,7 +27,7 @@
             = sortable "deleted_at", render_sortable: render_sortable
 
     %tbody
-      - memberships.each do |membership|
+      - organization_roles.each do |membership|
         %tr
           %td
             .less-strong-hold

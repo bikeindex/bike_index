@@ -61,9 +61,9 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(user_phone.user_id).to eq old_user.id
       end
 
-      def expect_merged_bikes_and_memberships(ownerships_count: 2)
+      def expect_merged_bikes_and_organization_roles(ownerships_count: 2)
         user.reload
-        expect(user.memberships.count).to eq 1
+        expect(user.organization_roles.count).to eq 1
         expect(user.ownerships.count).to eq 0
         MergeAdditionalEmailWorker.new.perform(user_email.id)
         user.reload
@@ -82,11 +82,11 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         new_membership.reload
         expect(user_email.old_user_id).to eq old_user.id
         expect(User.where(id: old_user.id)).to_not be_present # Deleted user
-        expect(OrganizationRole.where(id: old_membership.id)).to_not be_present # Deleted extra memberships
+        expect(OrganizationRole.where(id: old_membership.id)).to_not be_present # Deleted extra organization_roles
 
         expect(user_email.user).to eq user
         expect(user.ownerships.count).to eq ownerships_count
-        expect(user.memberships.count).to eq 3
+        expect(user.organization_roles.count).to eq 3
         expect(user.organizations.pluck(:id)).to match_array([organization.id, second_organization.id, third_organization.id])
         expect(membership.user).to eq user
         expect(new_membership.user).to eq user
@@ -106,13 +106,13 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(user_phone.reload.user_id).to eq user.id
       end
 
-      it "merges bikes and memberships and deletes user" do
-        expect_merged_bikes_and_memberships
+      it "merges bikes and organization_roles and deletes user" do
+        expect_merged_bikes_and_organization_roles
       end
       context "banned user" do
         let(:old_user) { FactoryBot.create(:user_confirmed, email: email, banned: true) }
         it "merges and marks banned" do
-          expect_merged_bikes_and_memberships
+          expect_merged_bikes_and_organization_roles
           expect(user.banned?).to be_truthy
         end
       end
@@ -126,7 +126,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
           bike_sticker.claim(user: old_user, bike: bike)
           expect(bike_sticker.reload.user_id).to eq old_user.id
           expect(bike_sticker.bike_sticker_updates.pluck(:user_id)).to eq([old_user.id]) # One update, from claiming
-          expect_merged_bikes_and_memberships(ownerships_count: 3)
+          expect_merged_bikes_and_organization_roles(ownerships_count: 3)
           expect(ParkingNotification.where(user_id: user.id).pluck(:id)).to eq([parking_notification.id])
           expect(GraduatedNotification.where(user_id: user.id).pluck(:id)).to eq([graduated_notification.id])
           expect(bike_sticker.reload.user_id).to eq user.id
@@ -136,7 +136,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
     end
 
     context "existing multi-user-account" do
-      it "merges all the accounts. It does not create multiple memberships for one org"
+      it "merges all the accounts. It does not create multiple organization_roles for one org"
       # It would be nice to test this... future todo
     end
 
@@ -149,7 +149,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
 
       it "runs the same things as user_create" do
         user.reload
-        expect(user.memberships.count).to eq 0
+        expect(user.organization_roles.count).to eq 0
         expect(user.ownerships.count).to eq 0
         MergeAdditionalEmailWorker.new.perform(user_email.id)
         user.reload
@@ -157,7 +157,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         ownership.reload
         expect(user_email.old_user_id).to be_nil
         expect(user.ownerships.count).to eq 1
-        expect(user.memberships.count).to eq 1
+        expect(user.organization_roles.count).to eq 1
         expect(ownership.user).to eq user
       end
     end

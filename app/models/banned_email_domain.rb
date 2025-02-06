@@ -35,10 +35,10 @@ class BannedEmailDomain < ApplicationRecord
       domain = str.strip
       return true unless /\./.match?(domain)
 
-      !too_few_emails?(domain) && !too_many_bikes?(domain) && no_valid_memberships?(domain)
+      !too_few_emails?(domain) && !too_many_bikes?(domain) && no_valid_organization_roles?(domain)
     end
 
-    def no_valid_memberships?(domain)
+    def no_valid_organization_roles?(domain)
       org_ids = OrganizationRole.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
       Organization.approved.where(id: org_ids).none?
     end

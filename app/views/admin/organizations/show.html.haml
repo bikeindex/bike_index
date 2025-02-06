@@ -370,42 +370,42 @@
     = link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param), class: "gray-link mt-3 d-inline-block"
 = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
-- memberships = @deleted_memberships ? @organization.memberships.deleted.reorder(deleted_at: :asc) : @organization.memberships.reorder(created_at: :asc)
+- organization_roles = @deleted_organization_roles ? @organization.organization_roles.deleted.reorder(deleted_at: :asc) : @organization.organization_roles.reorder(created_at: :asc)
 .row.mt-4
   .col-6
     %h4
-      = number_with_delimiter(memberships.count)
-      - if @deleted_memberships
+      = number_with_delimiter(organization_roles.count)
+      - if @deleted_organization_roles
         %span.text-danger Deleted
-      = "OrganizationRole".pluralize(memberships.count)
+      = "OrganizationRole".pluralize(organization_roles.count)
       %small
-        - if @deleted_memberships
+        - if @deleted_organization_roles
           %small
-            = number_with_delimiter(memberships.claimed.count)
+            = number_with_delimiter(organization_roles.claimed.count)
             claimed
           - unless @organization.deleted?
             \-
             %small.less-strong
-              = link_to admin_organization_path(@organization, deleted_memberships: false), class: "gray-link" do
-                = number_with_delimiter(@organization.memberships.count)
+              = link_to admin_organization_path(@organization, deleted_organization_roles: false), class: "gray-link" do
+                = number_with_delimiter(@organization.organization_roles.count)
                 %strong NOT
                 deleted membership
         - else
           %small
-            = number_with_delimiter(@organization.memberships.claimed.count)
+            = number_with_delimiter(@organization.organization_roles.claimed.count)
             claimed
           \-
           %small.less-strong
-            = link_to admin_organization_path(@organization, deleted_memberships: true), class: "gray-link" do
-              = number_with_delimiter(@organization.memberships.deleted.count)
+            = link_to admin_organization_path(@organization, deleted_organization_roles: true), class: "gray-link" do
+              = number_with_delimiter(@organization.organization_roles.deleted.count)
               deleted
           %small
             = link_to "new membership", new_admin_membership_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3"
   .col-6.text-right
-    = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
+    = link_to "View all organization_roles", admin_organization_roles_path(organization_id: @organization.to_param)
 
-- if memberships.count > 0
-  = render partial: "/admin/memberships/table", locals: { memberships: memberships.limit(25), skip_organization: true, render_deleted: @deleted_memberships}
+- if organization_roles.count > 0
+  = render partial: "/admin/organization_roles/table", locals: { organization_roles: organization_roles.limit(25), skip_organization: true, render_deleted: @deleted_organization_roles}
 
 %hr.mt-4
 %h4

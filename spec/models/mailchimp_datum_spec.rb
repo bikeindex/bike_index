@@ -185,7 +185,7 @@ RSpec.describe MailchimpDatum, type: :model do
         }
       end
       it "is as expected" do
-        expect(user.reload.memberships.first.organization_creator?).to be_truthy
+        expect(user.reload.organization_roles.first.organization_creator?).to be_truthy
         expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
         expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields.as_json
         expect(mailchimp_datum.lists).to eq(["organization"])
@@ -245,8 +245,8 @@ RSpec.describe MailchimpDatum, type: :model do
       context "not creator of organization" do
         let!(:organization_creator) { FactoryBot.create(:organization_admin, organization: organization) }
         it "is as expected" do
-          expect(organization_creator.reload.memberships.first.organization_creator?).to be_truthy
-          expect(user.reload.memberships.first.organization_creator?).to be_falsey
+          expect(organization_creator.reload.organization_roles.first.organization_creator?).to be_truthy
+          expect(user.reload.organization_roles.first.organization_creator?).to be_falsey
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in_bike_index not_org_creator]).as_json
         end
       end
@@ -287,7 +287,7 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:combined_merge_fields) { target_merge_fields.merge(most_recent_donation_at: payment_time.to_date.to_s, number_of_donations: 1) }
         it "is only organization list but includes the other interests" do
           payment.reload
-          expect(user.reload.memberships.first.organization_creator?).to be_truthy
+          expect(user.reload.organization_roles.first.organization_creator?).to be_truthy
           expect(mailchimp_datum.managed_merge_fields.as_json).to eq combined_merge_fields.as_json
           expect(mailchimp_datum.lists).to eq(["organization"])
           target_combined = target.merge(interests: %w[bike_shop donors],

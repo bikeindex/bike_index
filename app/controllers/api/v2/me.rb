@@ -31,9 +31,9 @@ module API
             }
           end
 
-          def organization_memberships
+          def organization_organization_roles
             return {} unless current_scopes.include?("read_organization_membership")
-            {memberships: current_user.memberships.map { |m| serialized_membership(m) }}
+            {organization_roles: current_user.organization_roles.map { |m| serialized_membership(m) }}
           end
         end
 
@@ -49,7 +49,7 @@ module API
           NOTE
         }
         get "/" do
-          {id: current_user.id.to_s}.merge(user_info).merge(bike_ids).merge(organization_memberships)
+          {id: current_user.id.to_s}.merge(user_info).merge(bike_ids).merge(organization_organization_roles)
         end
 
         desc "Current user's bikes<span class='accstr'>*</span>", {

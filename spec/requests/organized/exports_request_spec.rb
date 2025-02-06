@@ -47,7 +47,7 @@ RSpec.describe Organized::ExportsController, type: :request do
 
     describe "index" do
       it "renders" do
-        expect(current_user.memberships.first.role).to eq "member"
+        expect(current_user.organization_roles.first.role).to eq "member"
         expect(export).to be_present # So that we're actually rendering an export
         current_organization.reload
         expect(current_organization.enabled?("csv_exports")).to be_truthy

@@ -62,9 +62,9 @@
             %td
               = user.ownerships.count
             %td
-              - if user.memberships.present?
+              - if user.organization_roles.present?
                 - first_org_rendered = false # can't use each_with_index because sometimes org is ambassador org
-                - user.memberships.each do |membership|
+                - user.organization_roles.each do |membership|
                   - next if membership.organization.ambassador?
                   - if first_org_rendered
                     <small class="less-strong">|</small>

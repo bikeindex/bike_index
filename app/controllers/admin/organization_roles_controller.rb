@@ -5,8 +5,8 @@ class Admin::OrganizationRolesController < Admin::BaseController
 
   def index
     @per_page = params[:per_page] || 50
-    @pagy, @memberships = pagy(
-      matching_memberships.includes(:user, :sender, :organization).reorder("memberships.#{sort_column} #{sort_direction}"),
+    @pagy, @organization_roles = pagy(
+      matching_organization_roles.includes(:user, :sender, :organization).reorder("organization_roles.#{sort_column} #{sort_direction}"),
       limit: @per_page
     )
   end
@@ -44,7 +44,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
   def destroy
     @membership.destroy
     flash[:success] = "membership deleted successfully"
-    redirect_to admin_memberships_url
+    redirect_to admin_organization_roles_url
   end
 
   protected
@@ -65,13 +65,13 @@ class Admin::OrganizationRolesController < Admin::BaseController
     @organizations = Organization.all
   end
 
-  def matching_memberships
-    memberships = if current_organization.present?
-      current_organization.memberships
+  def matching_organization_roles
+    organization_roles = if current_organization.present?
+      current_organization.organization_roles
     else
       OrganizationRole.all
     end
-    @deleted_memberships = current_organization&.deleted? || InputNormalizer.boolean(params[:search_deleted])
-    @deleted_memberships ? memberships.deleted : memberships
+    @deleted_organization_roles = current_organization&.deleted? || InputNormalizer.boolean(params[:search_deleted])
+    @deleted_organization_roles ? organization_roles.deleted : organization_roles
   end
 end

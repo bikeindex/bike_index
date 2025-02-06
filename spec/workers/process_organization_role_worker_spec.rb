@@ -89,7 +89,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
           instance.perform(membership.id)
         }.to change(User, :count).by 1
         user = User.reorder(:created_at).last
-        expect(user.memberships).to eq([membership])
+        expect(user.organization_roles).to eq([membership])
         expect(user.email).to eq email
         expect(user.confirmed?).to be_truthy
         expect(EmailWelcomeWorker.jobs.count).to eq 0
@@ -127,7 +127,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
       context "user with email exists" do
         let!(:user) { FactoryBot.build(:user_confirmed, email: membership.invited_email) }
         it "does not send the email, claims, etc - happens automatically on save" do
-          expect(user.memberships.count).to eq 0
+          expect(user.organization_roles.count).to eq 0
           expect(membership.claimed?).to be_falsey
           expect(membership.email_invitation_sent_at).to be_blank
           user.save
@@ -138,7 +138,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
           expect(membership.claimed?).to be_truthy
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           user.reload
-          expect(user.memberships.count).to eq 1
+          expect(user.organization_roles.count).to eq 1
         end
       end
     end

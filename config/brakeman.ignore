@@ -509,7 +509,7 @@
       "file": "app/views/shared/_pagination.html.haml",
       "line": 32,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :memberships => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).where(\"#{AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :memberships => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "code": "AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).where(\"#{AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
       "render_path": [
         {
           "type": "controller",
@@ -630,7 +630,7 @@
       "fingerprint": "843e0b97c05d7b25ce5dc66ef0215dfcf907b68522225416e1ed7355ede83732",
       "check_name": "PermitAttributes",
       "message": "Potentially dangerous key allowed for mass assignment",
-      "file": "app/controllers/admin/memberships_controller.rb",
+      "file": "app/controllers/admin/organization_roles_controller.rb",
       "line": 56,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.require(:membership).permit(:organization_id, :user_id, :role, :invited_email)",

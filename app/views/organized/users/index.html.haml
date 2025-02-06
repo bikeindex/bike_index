@@ -57,7 +57,7 @@
         %small
           = sortable "sender_id", t(".sender")
     %tbody
-      - @memberships.each do |membership|
+      - @organization_roles.each do |membership|
         %tr
           %td
             %a.convertTime{ href: edit_organization_user_path(membership.id, organization_id: current_organization.to_param) }

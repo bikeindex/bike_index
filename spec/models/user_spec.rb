@@ -414,11 +414,11 @@ RSpec.describe User, type: :model do
     it "updates and marks all notifications false" do
       expect(user.reload.notification_newsletters).to be_truthy
       expect(user.no_non_theft_notification).to be_falsey
-      expect(user.memberships.first&.hot_sheet_notification).to eq "notification_daily"
+      expect(user.organization_roles.first&.hot_sheet_notification).to eq "notification_daily"
       user.update(no_non_theft_notification: true)
       expect(user.reload.notification_newsletters).to be_falsey
       expect(user.no_non_theft_notification).to be_truthy
-      expect(user.memberships.first&.hot_sheet_notification).to eq "notification_never"
+      expect(user.organization_roles.first&.hot_sheet_notification).to eq "notification_never"
     end
   end
 
@@ -827,7 +827,7 @@ RSpec.describe User, type: :model do
   describe "ambassador?" do
     it "returns true if the user has any ambassadorship" do
       user = FactoryBot.create(:ambassador)
-      user.memberships << FactoryBot.create(:membership_claimed, user: user)
+      user.organization_roles << FactoryBot.create(:membership_claimed, user: user)
       user.save
 
       expect(user).to be_ambassador

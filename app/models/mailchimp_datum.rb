@@ -79,14 +79,14 @@ class MailchimpDatum < ApplicationRecord
   # This finds the organization from the existing merge field, or uses the most recent organization
   def mailchimp_organization_membership
     return @mailchimp_organization_membership if defined?(@mailchimp_organization_membership)
-    memberships = user&.memberships&.admin&.reorder(created_at: :desc)&.reject { |m| m.organization.ambassador? }
-    return nil unless memberships.present? && memberships.any?
+    organization_roles = user&.organization_roles&.admin&.reorder(created_at: :desc)&.reject { |m| m.organization.ambassador? }
+    return nil unless organization_roles.present? && organization_roles.any?
     existing_name = data&.dig("merge_fields", "organization_name")
     existing_org = Organization.friendly_find(existing_name) if existing_name.present?
     if existing_org.present?
-      @mailchimp_organization_membership = memberships.find { |m| m.organization_id == existing_org.id }
+      @mailchimp_organization_membership = organization_roles.find { |m| m.organization_id == existing_org.id }
     end
-    @mailchimp_organization_membership ||= memberships.last
+    @mailchimp_organization_membership ||= organization_roles.last
   end
 
   def mailchimp_organization

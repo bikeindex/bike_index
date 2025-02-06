@@ -3,8 +3,8 @@
     .row.choose-registration-items
       .choose-links.col-sm-6
         %ul
-          - if current_user.memberships.any?
-            - current_user.memberships.each do |membership|
+          - if current_user.organization_roles.any?
+            - current_user.organization_roles.each do |membership|
               %li
                 %a.organization-choice.choose-type{data: {target: new_bike_url(organization_id: membership.organization.id)}}
                   %span.add-selected

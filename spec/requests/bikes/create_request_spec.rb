@@ -309,7 +309,7 @@ RSpec.describe "BikesController#create", type: :request do
         organization.reload
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
-        expect(current_user.memberships.pluck(:id)).to eq([]) # sanity check
+        expect(current_user.organization_roles.pluck(:id)).to eq([]) # sanity check
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           expect {

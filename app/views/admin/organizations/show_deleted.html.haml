@@ -35,7 +35,7 @@
           %td{ style: "width: 30%; word-break: break-all" }
             = organization.name
           %td
-            = organization.memberships.count
+            = organization.organization_roles.count
           %td
             = link_to "Recover", admin_recover_organization_path(id: organization.id), class: "btn btn-warning"
             -# = button_to "Restore", admin_recover__organization_path {remote: true, action: "recover"}, {id: organization.id, class: "btn btn-warning"}

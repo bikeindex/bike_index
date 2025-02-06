@@ -222,7 +222,7 @@ RSpec.describe BikesController, type: :controller do
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
           it "makes current_organization the organization" do
-            expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
+            expect(user.organization_roles&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_sticker2.organization).to eq organization
             get :scanned, params: {id: "D900", organization_id: "BikeIndex"}
             expect(assigns(:bike_sticker)).to eq bike_sticker2

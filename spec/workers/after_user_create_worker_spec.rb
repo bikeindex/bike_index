@@ -142,7 +142,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   end
 
   describe "associate_membership_invites" do
-    it "assigns any memberships that match the user email, and mark user confirmed if invited", :flaky do
+    it "assigns any organization_roles that match the user email, and mark user confirmed if invited", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
       membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
       membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
@@ -156,7 +156,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       expect(membership1.reload.claimed?).to be_truthy
       expect(membership2.reload.claimed?).to be_truthy
       expect(membership1.user).to eq user
-      expect(user.memberships.count).to eq 2
+      expect(user.organization_roles.count).to eq 2
       expect(user.organizations.count).to eq 2
     end
 
@@ -175,7 +175,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       expect(user).to be_confirmed
       expect(membership1).to be_claimed
       expect(membership1.user).to eq user
-      expect(user.memberships.count).to eq(1)
+      expect(user.organization_roles.count).to eq(1)
       expect(user.organizations.count).to eq(1)
     end
   end
@@ -209,7 +209,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       expect(ActionMailer::Base.deliveries.count).to eq 0
       user.reload
       expect(user.confirmed?).to be_truthy
-      expect(user.memberships.count).to eq 0
+      expect(user.organization_roles.count).to eq 0
     end
     context "matching domain" do
       let(:email) { "example@city.gov" }
@@ -221,9 +221,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         Sidekiq::Testing.inline! { user.confirm(user.confirmation_token) }
         user.reload
         expect(user.confirmed?).to be_truthy
-        expect(user.memberships.count).to eq 1
+        expect(user.organization_roles.count).to eq 1
         expect(user.mailchimp_datum).to be_blank
-        membership = user.memberships.first
+        membership = user.organization_roles.first
         expect(membership.claimed?).to be_truthy
         expect(membership.organization_id).to eq organization.id
         expect(membership.role).to eq "member"
@@ -247,7 +247,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           expect(ActionMailer::Base.deliveries.count).to eq 0
           user.reload
           expect(user.confirmed?).to be_truthy
-          expect(user.memberships.count).to eq 1
+          expect(user.organization_roles.count).to eq 1
           membership.reload
           expect(membership.organization_id).to eq organization.id
           expect(membership.role).to eq "admin"

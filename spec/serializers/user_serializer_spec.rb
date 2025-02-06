@@ -8,5 +8,5 @@ RSpec.describe UserSerializer do
 
   it { expect(subject.user_present).to be_truthy }
   it { expect(subject.is_superuser).to be_falsey }
-  xit { expect(subject.memberships.first).to eq(membership) }
+  xit { expect(subject.organization_roles.first).to eq(membership) }
 end

@@ -106,7 +106,7 @@ class Ambassador < User
 
   def current_ambassador_organization
     most_recent_ambassador_membership =
-      memberships
+      organization_roles
         .ambassador_organizations
         .reorder(created_at: :desc)
         .limit(1)

@@ -254,14 +254,14 @@
 
 %h4.mt-4
   OrganizationRoles
-  %small.less-strong.mr-3= admin_number_display(@user.memberships.count)
+  %small.less-strong.mr-3= admin_number_display(@user.organization_roles.count)
   %small.d-inline-block.less-strong
     - reg_orgs_count = @user.user_registration_organizations.count
     = link_to admin_user_registration_organizations_path(user_id: @user.id) do
       = admin_number_display(reg_orgs_count)
     = "registration org".pluralize(reg_orgs_count)
-- if @user.memberships.count > 0
-  = render partial: "/admin/memberships/table", locals: {memberships: @user.memberships}
+- if @user.organization_roles.count > 0
+  = render partial: "/admin/organization_roles/table", locals: {organization_roles: @user.organization_roles}
 
 - notifications = Notification.notifications_sent_or_received_by(@user).order(id: :desc)
 %h4.mt-4

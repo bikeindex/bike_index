@@ -32,7 +32,7 @@ class ProcessOrganizationRoleWorker < ApplicationWorker
 
   def remove_duplicated_membership!(membership)
     return false unless membership.user.present? &&
-      membership.user.memberships.where.not(id: membership.id)
+      membership.user.organization_roles.where.not(id: membership.id)
         .where(organization_id: membership.organization_id).any?
     membership.destroy
   end

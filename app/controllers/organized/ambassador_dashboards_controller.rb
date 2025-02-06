@@ -6,8 +6,8 @@ module Organized
     def show
       @ambassadors =
         Ambassador
-          .includes(:memberships)
-          .where(memberships: {organization: current_organization})
+          .includes(:organization_roles)
+          .where(organization_roles: {organization: current_organization})
           .includes(:ambassador_task_assignments)
           .sort_by { |ambassador| -ambassador.percent_complete }
 

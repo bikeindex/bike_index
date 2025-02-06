@@ -17,7 +17,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     @locations = @organization.locations
-    @deleted_memberships = @organization.deleted? || InputNormalizer.boolean(params[:deleted_memberships])
+    @deleted_organization_roles = @organization.deleted? || InputNormalizer.boolean(params[:deleted_organization_roles])
     bikes = @organization.bikes.reorder("created_at desc")
     @bikes_count = bikes.size
     @pagy, @bikes = pagy(bikes, limit: 10)

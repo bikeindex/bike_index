@@ -55,7 +55,7 @@ class OrganizationRole < ApplicationRecord
   def self.create_passwordless(**create_attrs)
     new_passwordless_attrs = {skip_processing: true, role: "member"}
     if create_attrs[:invited_email].present? # This should always be present...
-      # We need to check for existing memberships because the AfterUserCreateWorker calls this
+      # We need to check for existing organization_roles because the AfterUserCreateWorker calls this
       existing_membership = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
       return existing_membership if existing_membership.present?
     end
@@ -70,7 +70,7 @@ class OrganizationRole < ApplicationRecord
   def self.admin_text_search(str)
     q = "%#{str.to_s.strip}%"
     left_joins(:user)
-      .where("memberships.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
+      .where("organization_roles.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
       .references(:users)
   end
 
@@ -93,7 +93,7 @@ class OrganizationRole < ApplicationRecord
   end
 
   def organization_creator?
-    organization.memberships.minimum(:id) == id
+    organization.organization_roles.minimum(:id) == id
   end
 
   def enqueue_processing_worker

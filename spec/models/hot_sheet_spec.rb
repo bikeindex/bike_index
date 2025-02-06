@@ -61,7 +61,7 @@ RSpec.describe HotSheet, type: :model do
     let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization) }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
     it "finds the recipients" do
-      expect(organization.memberships.pluck(:id)).to match_array([membership.id, membership2.id])
+      expect(organization.organization_roles.pluck(:id)).to match_array([membership.id, membership2.id])
       expect(hot_sheet.recipient_ids).to be_nil
       expect(hot_sheet.fetch_recipients.pluck(:id)).to eq([membership.user_id])
       hot_sheet.reload

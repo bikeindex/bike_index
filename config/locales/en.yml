@@ -35,7 +35,7 @@ en:
         locks: Locks
         longitude: Longitude
         magic_link_token: Magic link token
-        memberships: Memberships
+        organization_roles: Memberships
         my_bikes_hash: My bikes hash
         name: Name
         notification_newsletters: Notification newsletters
@@ -52,7 +52,7 @@ en:
         phone: Phone
         preferred_language: Preferred language
         received_stolen_notifications: Received stolen notifications
-        sent_memberships: Sent memberships
+        sent_organization_roles: Sent organization_roles
         sent_stolen_notifications: Sent stolen notifications
         show_bikes: Show bikes
         show_phone: Show phone
@@ -458,7 +458,7 @@ en:
         locations: Locations
         lock_show_on_map: Lock show on map
         mail_snippets: Mail snippets
-        memberships: Memberships
+        organization_roles: Memberships
         name: Name
         parent_organization: :activerecord.models.parent_organization
         payments: Payments
@@ -638,7 +638,7 @@ en:
         locks: Locks
         longitude: Longitude
         magic_link_token: Magic link token
-        memberships: Memberships
+        organization_roles: Memberships
         my_bikes_hash: My bikes hash
         name: Name
         notification_newsletters: Notification newsletters
@@ -655,7 +655,7 @@ en:
         phone: Phone
         preferred_language: Preferred language
         received_stolen_notifications: Received stolen notifications
-        sent_memberships: Sent memberships
+        sent_organization_roles: Sent organization_roles
         sent_stolen_notifications: Sent stolen notifications
         show_bikes: Show bikes
         show_phone: Show phone

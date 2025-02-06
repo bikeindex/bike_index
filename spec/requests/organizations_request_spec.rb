@@ -41,8 +41,8 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.approved).to be_truthy
       expect(organization.api_access_approved).to be_falsey
       expect(organization.auto_user_id).to eq(current_user.id)
-      expect(organization.memberships.count).to eq(1)
-      expect(organization.memberships.first.user_id).to eq(current_user.id)
+      expect(organization.organization_roles.count).to eq(1)
+      expect(organization.organization_roles.first.user_id).to eq(current_user.id)
       expect(organization.kind).to eq "bike_shop"
       expect(organization.website).to eq "http://example.com"
 
@@ -62,8 +62,8 @@ RSpec.describe OrganizationsController, type: :request do
         expect(organization.approved).to be_truthy
         expect(organization.api_access_approved).to be_falsey
         expect(organization.auto_user_id).to eq(current_user.id)
-        expect(organization.memberships.count).to eq(1)
-        expect(organization.memberships.first.user_id).to eq(current_user.id)
+        expect(organization.organization_roles.count).to eq(1)
+        expect(organization.organization_roles.first.user_id).to eq(current_user.id)
         expect(organization.kind).to eq "property_management"
       end
     end

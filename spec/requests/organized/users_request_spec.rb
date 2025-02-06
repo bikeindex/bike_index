@@ -52,16 +52,16 @@ RSpec.describe Organized::UsersController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:memberships).pluck(:user_id)).to match_array([current_user.id, user2.id])
+        expect(assigns(:organization_roles).pluck(:user_id)).to match_array([current_user.id, user2.id])
         current_organization.reload
-        expect(current_organization.memberships.admin_text_search("jill").pluck(:user_id)).to eq([user2.id])
-        expect(current_organization.memberships.admin_text_search("monica").pluck(:user_id)).to eq([user2.id])
+        expect(current_organization.organization_roles.admin_text_search("jill").pluck(:user_id)).to eq([user2.id])
+        expect(current_organization.organization_roles.admin_text_search("monica").pluck(:user_id)).to eq([user2.id])
 
         get base_url, params: {query: "jill@"}
-        expect(assigns(:memberships).pluck(:user_id)).to match_array([user2.id])
+        expect(assigns(:organization_roles).pluck(:user_id)).to match_array([user2.id])
 
         get "#{base_url}?query=mo"
-        expect(assigns(:memberships).pluck(:user_id)).to match_array([user2.id])
+        expect(assigns(:organization_roles).pluck(:user_id)).to match_array([user2.id])
       end
     end
 
@@ -101,7 +101,7 @@ RSpec.describe Organized::UsersController, type: :request do
           end
         end
         context "marking self member" do
-          let(:membership) { current_user.memberships.first }
+          let(:membership) { current_user.organization_roles.first }
           it "does not update the membership" do
             put "#{base_url}/#{membership.id}", params: {organization_id: current_organization.to_param, membership: {role: "member"}}
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
@@ -145,7 +145,7 @@ RSpec.describe Organized::UsersController, type: :request do
           end
         end
         context "marking self member" do
-          let(:membership) { current_user.memberships.first }
+          let(:membership) { current_user.organization_roles.first }
           it "does not destroy" do
             count = current_organization.remaining_invitation_count
             expect {
@@ -240,7 +240,7 @@ RSpec.describe Organized::UsersController, type: :request do
             }.to change(OrganizationRole, :count).by 4
             expect(current_organization.remaining_invitation_count).to eq 0
             expect(current_organization.sent_invitation_count).to eq 5
-            expect(current_organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+            expect(current_organization.organization_roles.pluck(:invited_email)).to match_array(target_invited_emails)
             expect(current_organization.users.count).to eq 1
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
@@ -261,7 +261,7 @@ RSpec.describe Organized::UsersController, type: :request do
           end
           context "restrict_invitations? is false" do
             let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
-            it "creates memberships" do
+            it "creates organization_roles" do
               Sidekiq::Testing.inline! do
                 ActionMailer::Base.deliveries = []
                 expect(current_organization.remaining_invitation_count).to eq 0
@@ -271,7 +271,7 @@ RSpec.describe Organized::UsersController, type: :request do
                     multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
                   }
                 }.to change(OrganizationRole, :count).by 4
-                expect(current_organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+                expect(current_organization.organization_roles.pluck(:invited_email)).to match_array(target_invited_emails)
                 expect(current_organization.users.count).to eq 5
                 expect(ActionMailer::Base.deliveries.empty?).to be_truthy
               end
@@ -302,7 +302,7 @@ RSpec.describe Organized::UsersController, type: :request do
 
               expect(current_organization.remaining_invitation_count).to eq 0
               expect(current_organization.sent_invitation_count).to eq 5
-              expect(current_organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+              expect(current_organization.organization_roles.pluck(:invited_email)).to match_array(target_invited_emails)
 
               expect(current_organization.users.count).to eq 5
               expect(current_organization.users.confirmed.count).to eq 5

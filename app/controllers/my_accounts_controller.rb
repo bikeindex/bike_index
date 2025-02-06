@@ -88,7 +88,7 @@ class MyAccountsController < ApplicationController
     return false unless params[:hot_sheet_organization_ids].present?
     params[:hot_sheet_organization_ids].split(",").each do |org_id|
       notify = params.dig(:hot_sheet_notifications, org_id).present?
-      membership = @user.memberships.where(organization_id: org_id).first
+      membership = @user.organization_roles.where(organization_id: org_id).first
       next unless membership.present?
       membership.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
       flash[:success] ||= "Notification setting updated"

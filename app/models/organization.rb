@@ -89,11 +89,11 @@ class Organization < ApplicationRecord
   has_many :bikes_ever_registered, through: :bike_organizations_ever_registered, source: :bike
   has_many :recovered_records, through: :bikes_ever_registered
 
-  has_many :memberships, dependent: :destroy
-  has_many :users, through: :memberships
+  has_many :organization_roles, dependent: :destroy
+  has_many :users, through: :organization_roles
 
-  has_many :admin_memberships, -> { admin }, class_name: "OrganizationRole"
-  has_many :admins, through: :admin_memberships, source: :user
+  has_many :admin_organization_roles, -> { admin }, class_name: "OrganizationRole"
+  has_many :admins, through: :admin_organization_roles, source: :user
 
   has_many :ownerships
   has_many :created_bikes, through: :ownerships, source: :bike
@@ -282,7 +282,7 @@ class Organization < ApplicationRecord
   end
 
   def sent_invitation_count
-    memberships.count
+    organization_roles.count
   end
 
   def remaining_invitation_count

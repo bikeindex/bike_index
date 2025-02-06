@@ -37,7 +37,7 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
 
     describe "index" do
       it "renders" do
-        expect(current_user.memberships.first.role).to eq "member"
+        expect(current_user.organization_roles.first.role).to eq "member"
         current_organization.reload
         get base_url
         expect(response.code).to eq("200")

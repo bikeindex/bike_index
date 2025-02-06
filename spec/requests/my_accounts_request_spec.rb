@@ -377,7 +377,7 @@ RSpec.describe MyAccountsController, type: :request do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
       let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
       let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:membership) { current_user.memberships.first }
+      let(:membership) { current_user.organization_roles.first }
       it "updates hotsheet" do
         expect(membership.notification_never?).to be_truthy
         # Doesn't include the parameter because when false, it doesn't include

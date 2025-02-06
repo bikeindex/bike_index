@@ -46,7 +46,7 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def current_recipient_ids
-    organization.memberships.claimed.notification_daily.pluck(:user_id)
+    organization.organization_roles.claimed.notification_daily.pluck(:user_id)
   end
 
   def timezone

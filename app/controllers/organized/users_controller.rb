@@ -7,10 +7,10 @@ module Organized
     def index
       params[:page] || 1
       per_page = params[:per_page] || 25
-      @show_user_search = params[:query].present? || current_organization.memberships.count > per_page
+      @show_user_search = params[:query].present? || current_organization.organization_roles.count > per_page
       @show_matching_count = @show_user_search && params[:query].present?
-      @pagy, @memberships = pagy(
-        matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}"),
+      @pagy, @organization_roles = pagy(
+        matching_organization_roles.reorder("organization_roles.#{sort_column} #{sort_direction}"),
         limit: @per_page
       )
     end
@@ -73,10 +73,10 @@ module Organized
       %w[created_at invited_email sender_id claimed_at role]
     end
 
-    def matching_memberships
-      m_memberships = current_organization.memberships.includes(:user, :sender)
-      return m_memberships unless params[:query].present?
-      m_memberships.admin_text_search(params[:query])
+    def matching_organization_roles
+      m_organization_roles = current_organization.organization_roles.includes(:user, :sender)
+      return m_organization_roles unless params[:query].present?
+      m_organization_roles.admin_text_search(params[:query])
     end
 
     def current_root_path
@@ -84,7 +84,7 @@ module Organized
     end
 
     def find_membership
-      @membership = current_organization.memberships.find(params[:id])
+      @membership = current_organization.organization_roles.find(params[:id])
     end
 
     def reject_self_updates
