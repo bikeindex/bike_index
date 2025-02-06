@@ -12,6 +12,10 @@
 #  updated_at       :datetime         not null
 #  stolen_record_id :integer
 #
+# Indexes
+#
+#  index_recovery_displays_on_stolen_record_id  (stolen_record_id)
+#
 class RecoveryDisplay < ActiveRecord::Base
   validates_presence_of :quote, :recovered_at
   mount_uploader :image, CircularImageUploader

@@ -23,6 +23,14 @@
 #  theft_alert_plan_id         :integer
 #  user_id                     :integer
 #
+# Indexes
+#
+#  index_theft_alerts_on_bike_id              (bike_id)
+#  index_theft_alerts_on_payment_id           (payment_id)
+#  index_theft_alerts_on_stolen_record_id     (stolen_record_id)
+#  index_theft_alerts_on_theft_alert_plan_id  (theft_alert_plan_id)
+#  index_theft_alerts_on_user_id              (user_id)
+#
 # Foreign Keys
 #
 #  fk_rails_...  (payment_id => payments.id)

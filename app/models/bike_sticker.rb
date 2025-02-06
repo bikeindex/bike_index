@@ -20,6 +20,12 @@
 #  secondary_organization_id :bigint
 #  user_id                   :integer
 #
+# Indexes
+#
+#  index_bike_stickers_on_bike_id                    (bike_id)
+#  index_bike_stickers_on_bike_sticker_batch_id      (bike_sticker_batch_id)
+#  index_bike_stickers_on_secondary_organization_id  (secondary_organization_id)
+#
 class BikeSticker < ApplicationRecord
   KIND_ENUM = {sticker: 0, spokecard: 1}.freeze
   MAX_UNORGANIZED = 20

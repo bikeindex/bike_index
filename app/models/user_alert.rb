@@ -15,6 +15,14 @@
 #  user_id         :bigint
 #  user_phone_id   :bigint
 #
+# Indexes
+#
+#  index_user_alerts_on_bike_id          (bike_id)
+#  index_user_alerts_on_organization_id  (organization_id)
+#  index_user_alerts_on_theft_alert_id   (theft_alert_id)
+#  index_user_alerts_on_user_id          (user_id)
+#  index_user_alerts_on_user_phone_id    (user_phone_id)
+#
 class UserAlert < ApplicationRecord
   KIND_ENUM = {
     phone_waiting_confirmation: 0,

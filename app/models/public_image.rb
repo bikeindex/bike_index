@@ -14,6 +14,10 @@
 #  updated_at         :datetime         not null
 #  imageable_id       :integer
 #
+# Indexes
+#
+#  index_public_images_on_imageable_id_and_imageable_type  (imageable_id,imageable_type)
+#
 class PublicImage < ApplicationRecord
   KIND_ENUM = {
     photo_uncategorized: 0, # If editing these images, also update _public_image template

@@ -73,6 +73,26 @@
 #  tertiary_frame_color_id     :integer
 #  updator_id                  :integer
 #
+# Indexes
+#
+#  index_bikes_on_current_impound_record_id  (current_impound_record_id)
+#  index_bikes_on_current_ownership_id       (current_ownership_id)
+#  index_bikes_on_current_stolen_record_id   (current_stolen_record_id)
+#  index_bikes_on_deleted_at                 (deleted_at)
+#  index_bikes_on_example                    (example)
+#  index_bikes_on_latitude_and_longitude     (latitude,longitude)
+#  index_bikes_on_listing_order              (listing_order)
+#  index_bikes_on_manufacturer_id            (manufacturer_id)
+#  index_bikes_on_model_audit_id             (model_audit_id)
+#  index_bikes_on_organization_id            (creation_organization_id)
+#  index_bikes_on_paint_id                   (paint_id)
+#  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
+#  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id)
+#  index_bikes_on_state_id                   (state_id)
+#  index_bikes_on_status                     (status)
+#  index_bikes_on_tertiary_frame_color_id    (tertiary_frame_color_id)
+#  index_bikes_on_user_hidden                (user_hidden)
+#
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable

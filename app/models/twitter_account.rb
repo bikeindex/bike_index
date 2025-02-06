@@ -28,6 +28,13 @@
 #  country_id           :bigint
 #  state_id             :bigint
 #
+# Indexes
+#
+#  index_twitter_accounts_on_country_id              (country_id)
+#  index_twitter_accounts_on_latitude_and_longitude  (latitude,longitude)
+#  index_twitter_accounts_on_screen_name             (screen_name)
+#  index_twitter_accounts_on_state_id                (state_id)
+#
 class TwitterAccount < ApplicationRecord
   include Geocodeable
 

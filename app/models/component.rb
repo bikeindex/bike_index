@@ -20,6 +20,12 @@
 #  ctype_id           :integer
 #  manufacturer_id    :integer
 #
+# Indexes
+#
+#  index_components_on_bike_id          (bike_id)
+#  index_components_on_bike_version_id  (bike_version_id)
+#  index_components_on_manufacturer_id  (manufacturer_id)
+#
 class Component < ApplicationRecord
   include ActiveModel::Dirty
 

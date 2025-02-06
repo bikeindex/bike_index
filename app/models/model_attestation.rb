@@ -15,6 +15,12 @@
 #  organization_id    :bigint
 #  user_id            :bigint
 #
+# Indexes
+#
+#  index_model_attestations_on_model_audit_id   (model_audit_id)
+#  index_model_attestations_on_organization_id  (organization_id)
+#  index_model_attestations_on_user_id          (user_id)
+#
 class ModelAttestation < ApplicationRecord
   # NOTE: This hash is ordered by the importance of the kind
   CERTIFICATION_KIND_ENUM = {

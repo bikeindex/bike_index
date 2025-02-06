@@ -8,6 +8,10 @@
 #  updated_at       :datetime         not null
 #  stolen_record_id :integer          not null
 #
+# Indexes
+#
+#  index_alert_images_on_stolen_record_id  (stolen_record_id)
+#
 # Foreign Keys
 #
 #  fk_rails_...  (stolen_record_id => stolen_records.id)

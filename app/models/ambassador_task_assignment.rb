@@ -9,6 +9,11 @@
 #  ambassador_task_id :integer          not null
 #  user_id            :integer          not null
 #
+# Indexes
+#
+#  index_ambassador_task_assignments_on_ambassador_task_id  (ambassador_task_id)
+#  unique_assignment_to_ambassador                          (user_id,ambassador_task_id) UNIQUE
+#
 # Foreign Keys
 #
 #  fk_rails_...  (ambassador_task_id => ambassador_tasks.id) ON DELETE => cascade

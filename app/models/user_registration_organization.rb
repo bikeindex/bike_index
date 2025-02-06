@@ -12,6 +12,11 @@
 #  organization_id      :bigint
 #  user_id              :bigint
 #
+# Indexes
+#
+#  index_user_registration_organizations_on_organization_id  (organization_id)
+#  index_user_registration_organizations_on_user_id          (user_id)
+#
 class UserRegistrationOrganization < ApplicationRecord
   include RegistrationInfoable
 

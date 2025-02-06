@@ -12,6 +12,10 @@
 #  updated_at           :datetime         not null
 #  user_id              :bigint
 #
+# Indexes
+#
+#  index_mailchimp_data_on_user_id  (user_id)
+#
 class MailchimpDatum < ApplicationRecord
   STATUS_ENUM = {
     no_subscription_required: 0,

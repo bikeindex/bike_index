@@ -12,6 +12,10 @@
 #  updated_at              :datetime         not null
 #  app_id                  :string
 #
+# Indexes
+#
+#  index_external_registry_credentials_on_type  (type)
+#
 class ExternalRegistryCredential::StopHelingCredential < ExternalRegistryCredential
   validates :app_id, :access_token, presence: true
 

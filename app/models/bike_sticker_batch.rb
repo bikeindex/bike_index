@@ -11,6 +11,11 @@
 #  organization_id    :integer
 #  user_id            :integer
 #
+# Indexes
+#
+#  index_bike_sticker_batches_on_organization_id  (organization_id)
+#  index_bike_sticker_batches_on_user_id          (user_id)
+#
 class BikeStickerBatch < ApplicationRecord
   belongs_to :user # Creator of the batch
   belongs_to :organization
