@@ -11,6 +11,11 @@
 #  creator_id  :bigint
 #  user_id     :bigint
 #
+# Indexes
+#
+#  index_user_bans_on_creator_id  (creator_id)
+#  index_user_bans_on_user_id     (user_id)
+#
 class UserBan < ApplicationRecord
   REASON_ENUM = {
     abuse: 0,

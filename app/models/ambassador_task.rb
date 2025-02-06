@@ -8,6 +8,10 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #
+# Indexes
+#
+#  index_ambassador_tasks_on_title  (title) UNIQUE
+#
 class AmbassadorTask < ApplicationRecord
   has_many :ambassador_task_assignments
   has_many :ambassadors, through: :ambassador_task_assignments

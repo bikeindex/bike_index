@@ -14,6 +14,10 @@
 #  updated_at           :datetime         not null
 #  manufacturer_id      :bigint
 #
+# Indexes
+#
+#  index_model_audits_on_manufacturer_id  (manufacturer_id)
+#
 class ModelAudit < ApplicationRecord
   UNKNOWN_STRINGS = %w[na idk no none nomodel tbd unknown unkown].freeze
   ADDITIONAL_CYCLE_TYPES = %w[bicycle dirtbike trike three-wheeler 3-wheeler].freeze

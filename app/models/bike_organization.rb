@@ -10,6 +10,12 @@
 #  bike_id              :integer
 #  organization_id      :integer
 #
+# Indexes
+#
+#  index_bike_organizations_on_bike_id          (bike_id)
+#  index_bike_organizations_on_deleted_at       (deleted_at)
+#  index_bike_organizations_on_organization_id  (organization_id)
+#
 class BikeOrganization < ApplicationRecord
   acts_as_paranoid
 

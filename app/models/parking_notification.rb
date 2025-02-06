@@ -37,6 +37,17 @@
 #  state_id              :bigint
 #  user_id               :integer
 #
+# Indexes
+#
+#  index_parking_notifications_on_bike_id            (bike_id)
+#  index_parking_notifications_on_country_id         (country_id)
+#  index_parking_notifications_on_impound_record_id  (impound_record_id)
+#  index_parking_notifications_on_initial_record_id  (initial_record_id)
+#  index_parking_notifications_on_organization_id    (organization_id)
+#  index_parking_notifications_on_retrieved_by_id    (retrieved_by_id)
+#  index_parking_notifications_on_state_id           (state_id)
+#  index_parking_notifications_on_user_id            (user_id)
+#
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze

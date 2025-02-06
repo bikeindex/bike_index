@@ -17,6 +17,15 @@
 #  stolen_record_id   :bigint
 #  user_id            :bigint
 #
+# Indexes
+#
+#  index_impound_claims_on_bike_claimed_id     (bike_claimed_id)
+#  index_impound_claims_on_bike_submitting_id  (bike_submitting_id)
+#  index_impound_claims_on_impound_record_id   (impound_record_id)
+#  index_impound_claims_on_organization_id     (organization_id)
+#  index_impound_claims_on_stolen_record_id    (stolen_record_id)
+#  index_impound_claims_on_user_id             (user_id)
+#
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,

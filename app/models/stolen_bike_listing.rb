@@ -28,6 +28,15 @@
 #  secondary_frame_color_id :bigint
 #  tertiary_frame_color_id  :bigint
 #
+# Indexes
+#
+#  index_stolen_bike_listings_on_bike_id                   (bike_id)
+#  index_stolen_bike_listings_on_initial_listing_id        (initial_listing_id)
+#  index_stolen_bike_listings_on_manufacturer_id           (manufacturer_id)
+#  index_stolen_bike_listings_on_primary_frame_color_id    (primary_frame_color_id)
+#  index_stolen_bike_listings_on_secondary_frame_color_id  (secondary_frame_color_id)
+#  index_stolen_bike_listings_on_tertiary_frame_color_id   (tertiary_frame_color_id)
+#
 
 # Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
