@@ -4793,7 +4793,7 @@ en:
         user: user
         you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
-      membership_role_fields:
+      organization_role_fields:
         admin_access: Full organization access
         admin_of_organization: Admin of organization
         member_access: Organization access, but can not edit organization settings

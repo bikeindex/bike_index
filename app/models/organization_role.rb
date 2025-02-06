@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: memberships
+# Table name: organization_roles
 #
 #  id                       :integer          not null, primary key
 #  claimed_at               :datetime
@@ -16,6 +16,12 @@
 #  organization_id          :integer          not null
 #  sender_id                :integer
 #  user_id                  :integer
+#
+# Indexes
+#
+#  index_organization_roles_on_organization_id  (organization_id)
+#  index_organization_roles_on_sender_id        (sender_id)
+#  index_organization_roles_on_user_id          (user_id)
 #
 class OrganizationRole < ApplicationRecord
   MEMBERSHIP_TYPES = %w[admin member member_no_bike_edit].freeze
