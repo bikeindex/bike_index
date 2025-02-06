@@ -13,7 +13,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     context "stage: new" do
       let(:user) { User.new(id: 69, email: "owner@jess.com") }
       it "sends confirmation email" do
-        expect(instance).to receive(:associate_membership_invites).and_return(true)
+        expect(instance).to receive(:associate_organization_role_invites).and_return(true)
         expect {
           instance.perform(user.id, "new", user: user)
         }.to change(AfterUserCreateWorker.jobs, :count).by 1
@@ -46,7 +46,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     context "stage: merged" do
       it "associates" do
         expect(instance).to receive(:associate_ownerships)
-        expect(instance).to receive(:associate_membership_invites)
+        expect(instance).to receive(:associate_organization_role_invites)
         expect {
           instance.perform(user.id, "merged", user: user)
         }.to_not change(AfterUserCreateWorker.jobs, :count)
@@ -141,7 +141,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     end
   end
 
-  describe "associate_membership_invites" do
+  describe "associate_organization_role_invites" do
     it "assigns any organization_roles that match the user email, and mark user confirmed if invited", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
       membership1 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")

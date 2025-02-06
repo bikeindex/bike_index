@@ -400,7 +400,7 @@
               = number_with_delimiter(@organization.organization_roles.deleted.count)
               deleted
           %small
-            = link_to "new membership", new_admin_membership_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3"
+            = link_to "new membership", new_admin_organization_role_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3"
   .col-6.text-right
     = link_to "View all organization_roles", admin_organization_roles_path(organization_id: @organization.to_param)
 

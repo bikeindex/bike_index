@@ -4,8 +4,8 @@ class ProcessOrganizationRoleWorker < ApplicationWorker
   def perform(membership_id, user_id = nil)
     membership = OrganizationRole.find(membership_id)
 
-    assign_membership_user(membership, user_id) if membership.user.blank?
-    return false if remove_duplicated_membership!(membership)
+    assign_organization_role_user(membership, user_id) if membership.user.blank?
+    return false if remove_duplicated_organization_role!(membership)
     auto_generate_user_for_organization(membership)
     if membership.send_invitation_email?
       OrganizedMailer.organization_invitation(membership).deliver_now
@@ -22,7 +22,7 @@ class ProcessOrganizationRoleWorker < ApplicationWorker
     end
   end
 
-  def assign_membership_user(membership, user_id)
+  def assign_organization_role_user(membership, user_id)
     user_id ||= User.fuzzy_confirmed_or_unconfirmed_email_find(membership.invited_email)&.id
     return false unless user_id.present?
     membership.update(user_id: user_id)
@@ -30,7 +30,7 @@ class ProcessOrganizationRoleWorker < ApplicationWorker
     User.find_by_id(user_id)&.update(updated_at: Time.current)
   end
 
-  def remove_duplicated_membership!(membership)
+  def remove_duplicated_organization_role!(membership)
     return false unless membership.user.present? &&
       membership.user.organization_roles.where.not(id: membership.id)
         .where(organization_id: membership.organization_id).any?

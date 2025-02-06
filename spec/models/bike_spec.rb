@@ -562,14 +562,14 @@ RSpec.describe Bike, type: :model do
       end
 
       it "returns true if shops can see it and user has shop membership" do
-        allow(user).to receive(:has_shop_membership?).and_return(true)
+        allow(user).to receive(:has_shop_organization_role?).and_return(true)
         stolen_record.phone_for_shops = true
         expect(bike.phoneable_by?(user)).to be_truthy
         expect(bike.phoneable_by?(User.new)).to be_falsey
       end
 
       it "returns true if police can see it and user is police" do
-        allow(user).to receive(:has_police_membership?).and_return(true)
+        allow(user).to receive(:has_police_organization_role?).and_return(true)
         stolen_record.phone_for_police = true
         expect(bike.phoneable_by?(user)).to be_truthy
         expect(bike.phoneable_by?(User.new)).to be_falsey
@@ -842,10 +842,10 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(u: member_no_bikes, org: organization)).to be_falsey
         expect(bike.authorized?(member_no_bikes)).to be_falsey
         # If the member has multiple organization_roles, it should only work for the correct organization
-        new_membership = FactoryBot.create(:organization_role_claimed, user: member)
+        new_organization_role = FactoryBot.create(:organization_role_claimed, user: member)
         expect(bike.authorized_by_organization?).to be_truthy
         expect(bike.authorized_by_organization?(u: member)).to be_truthy
-        expect(bike.authorized_by_organization?(u: member, org: new_membership.organization)).to be_falsey
+        expect(bike.authorized_by_organization?(u: member, org: new_organization_role.organization)).to be_falsey
         # It should be authorized for the owner, but not be authorized_by_organization
         expect(bike.authorized?(owner)).to be_truthy
         expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Because this bike is authorized by owning it, not organization

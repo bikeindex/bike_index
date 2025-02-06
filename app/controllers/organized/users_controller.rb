@@ -1,7 +1,7 @@
 module Organized
   class UsersController < Organized::AdminController
     include SortableTable
-    before_action :find_membership, only: [:edit, :update, :destroy]
+    before_action :find_organization_role, only: [:edit, :update, :destroy]
     before_action :reject_self_updates, only: [:update, :destroy]
 
     def index
@@ -20,7 +20,7 @@ module Organized
 
     def update
       @organization_role.update(permitted_update_params)
-      flash[:success] = translation(:updated_membership, user_email: @organization_role.user&.email)
+      flash[:success] = translation(:updated_organization_role, user_email: @organization_role.user&.email)
       redirect_to current_root_path
     end
 
@@ -83,7 +83,7 @@ module Organized
       organization_users_path(organization_id: current_organization.to_param)
     end
 
-    def find_membership
+    def find_organization_role
       @organization_role = current_organization.organization_roles.find(params[:id])
     end
 
@@ -107,7 +107,7 @@ module Organized
         .merge(organization: current_organization, sender: current_user)
     end
 
-    def update_membership_params
+    def update_organization_role_params
       {role: params.dig(:organization_role, :role)}
     end
   end

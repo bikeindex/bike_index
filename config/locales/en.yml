@@ -863,7 +863,7 @@ en:
       lock_type: Lock type
       mail_snippet: Mail snippet
       manufacturer: Manufacturer
-      membership: Membership
+      organization_role: Organization Role
       normalized_serial_segment: Normalized serial segment
       organization: Organization
       organization_feature: Organization feature
@@ -1854,7 +1854,7 @@ en:
             Sorry, you can't remove yourself from the organization. Contact us at
             support@bikeindex.org if this is problematic.
         update:
-          updated_membership: Updated membership for %{user_email}.
+          updated_organization_role: Updated membership for %{user_email}.
     ownerships:
       show:
         no_longer_your_bike: >-
@@ -4758,7 +4758,7 @@ en:
         confirmation: >-
           Are you sure you want to remove %{user_name} from %{org_name}? (They will
           still be to use their personal account)
-        edit_membership_html: Edit membership for <em class="small">%{email}</em>
+        edit_organization_role_html: Edit membership for <em class="small">%{email}</em>
         email: Email
         has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
         invited: Invited
@@ -4812,7 +4812,7 @@ en:
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user
-        membership: Membership
+        organization_role: Organization Role
         multiple_emails: Multiple emails
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more

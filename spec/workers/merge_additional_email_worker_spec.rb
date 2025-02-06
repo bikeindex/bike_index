@@ -24,10 +24,10 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:organization) { membership.organization }
       let(:organization_user) { FactoryBot.create(:organization_role_claimed, user: old_user) }
       let(:second_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:second_membership) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: second_organization) }
+      let(:second_organization_role) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: second_organization) }
       let(:third_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:old_membership) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: third_organization) }
-      let(:new_membership) { FactoryBot.create(:organization_role_claimed, user: user, organization: third_organization) }
+      let(:old_organization_role) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: third_organization) }
+      let(:new_organization_role) { FactoryBot.create(:organization_role_claimed, user: user, organization: third_organization) }
 
       let(:integration) { FactoryBot.create(:integration, user: old_user, information: {"info" => {"email" => email, :name => "blargh"}}) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }
@@ -40,13 +40,13 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         old_user.reload
         expect(ownership).to be_present
         expect(membership).to be_present
-        expect(second_membership).to be_present
+        expect(second_organization_role).to be_present
         expect(user_email.confirmed?).to be_truthy
         old_user_ownership.mark_claimed
         expect(old_user.reload.ownerships.pluck(:id)).to eq([ownership.id, old_user_ownership.id])
         expect(membership.user).to eq old_user
-        expect(old_membership.user).to eq old_user
-        expect(new_membership.user).to eq user
+        expect(old_organization_role.user).to eq old_user
+        expect(new_organization_role.user).to eq user
         expect(old_user.organizations.include?(second_organization)).to be_truthy
         expect(old_user.organizations.include?(organization)).to be_truthy
         oauth_application.update_attribute :owner_id, old_user.id
@@ -79,17 +79,17 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         customer_contact.reload
         stolen_notification.reload
         bike.reload
-        new_membership.reload
+        new_organization_role.reload
         expect(user_email.old_user_id).to eq old_user.id
         expect(User.where(id: old_user.id)).to_not be_present # Deleted user
-        expect(OrganizationRole.where(id: old_membership.id)).to_not be_present # Deleted extra organization_roles
+        expect(OrganizationRole.where(id: old_organization_role.id)).to_not be_present # Deleted extra organization_roles
 
         expect(user_email.user).to eq user
         expect(user.ownerships.count).to eq ownerships_count
         expect(user.organization_roles.count).to eq 3
         expect(user.organizations.pluck(:id)).to match_array([organization.id, second_organization.id, third_organization.id])
         expect(membership.user).to eq user
-        expect(new_membership.user).to eq user
+        expect(new_organization_role.user).to eq user
         expect(second_organization.auto_user).to eq user
         expect(ownership.user).to eq user
         expect(old_user_ownership.user).to eq user

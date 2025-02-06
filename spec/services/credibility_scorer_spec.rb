@@ -95,7 +95,7 @@ RSpec.describe CredibilityScorer do
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: created_at, creator: auto_user) }
       let(:created_at) { Time.current - 20.days }
       let(:auto_user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 3.years) }
-      let!(:auto_user_membership) do
+      let!(:auto_user_organization_role) do
         FactoryBot.create(:organization_role_claimed, user: auto_user, organization: organization)
         organization.update(auto_user: auto_user)
       end

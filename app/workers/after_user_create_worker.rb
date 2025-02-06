@@ -21,7 +21,7 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_create_jobs(user, email)
     # This may confirm the user. We auto-confirm users that belong to orgs.
     # Auto confirming the user actually ends up running perform_confirmed_jobs.
-    associate_membership_invites(user, email)
+    associate_organization_role_invites(user, email)
     send_welcoming_email(user)
     AfterUserCreateWorker.perform_async(user.id, "async")
   end
@@ -29,7 +29,7 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_merged_jobs(user, email)
     # This is already performing in a background job, so we don't need to run async
     # Also, we we need to process with the previous email, not the user's current email
-    associate_membership_invites(user, email, skip_confirm: true)
+    associate_organization_role_invites(user, email, skip_confirm: true)
     associate_ownerships(user, email)
   end
 
@@ -68,7 +68,7 @@ class AfterUserCreateWorker < ApplicationWorker
       .update_all(user_id: user.id)
   end
 
-  def associate_membership_invites(user, email, skip_confirm: false)
+  def associate_organization_role_invites(user, email, skip_confirm: false)
     organization_roles = OrganizationRole.unclaimed.where(invited_email: email)
     return false unless organization_roles.any?
 

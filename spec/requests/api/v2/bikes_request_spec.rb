@@ -335,7 +335,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "fails to create a bike if the app owner isn't a member of the organization" do
-      expect(user.has_membership?).to be_falsey
+      expect(user.has_organization_role?).to be_falsey
       post tokenized_url, params: bike_attrs.to_json, headers: json_headers
       expect(response.code).to eq("403")
       expect(json_result["error"].is_a?(String)).to be_truthy

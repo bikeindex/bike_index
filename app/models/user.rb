@@ -73,7 +73,7 @@ class User < ApplicationRecord
   has_secure_password
 
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
-  # stripe_id, is_paid_member, paid_membership_info
+  # stripe_id, is_paid_member, paid_organization_role_info
 
   mount_uploader :avatar, AvatarUploader
 
@@ -390,15 +390,15 @@ class User < ApplicationRecord
     superuser? && !no_superuser_override
   end
 
-  def has_membership?
+  def has_organization_role?
     organization_roles.limit(1).any?
   end
 
-  def has_police_membership?
+  def has_police_organization_role?
     organizations.law_enforcement.limit(1).any?
   end
 
-  def has_shop_membership?
+  def has_shop_organization_role?
     organizations.bike_shop.limit(1).any?
   end
 
@@ -445,7 +445,7 @@ class User < ApplicationRecord
   end
 
   def render_donation_request
-    return nil unless has_police_membership? && !organizations.law_enforcement.paid.limit(1).any?
+    return nil unless has_police_organization_role? && !organizations.law_enforcement.paid.limit(1).any?
     "law_enforcement"
   end
 

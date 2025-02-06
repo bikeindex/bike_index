@@ -1,6 +1,6 @@
 class Admin::OrganizationRolesController < Admin::BaseController
   include SortableTable
-  before_action :find_membership, only: [:show, :edit, :update, :destroy]
+  before_action :find_organization_role, only: [:show, :edit, :update, :destroy]
   before_action :find_organizations
 
   def index
@@ -12,7 +12,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_membership_path
+    redirect_to edit_admin_organization_role_path
   end
 
   def new
@@ -25,7 +25,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
   def update
     if @organization_role.update(permitted_parameters)
       flash[:success] = "OrganizationRole Saved!"
-      redirect_to admin_membership_url(@organization_role)
+      redirect_to admin_organization_role_url(@organization_role)
     else
       render action: :edit
     end
@@ -35,7 +35,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
     @organization_role = OrganizationRole.new(permitted_parameters.merge(sender: current_user))
     if @organization_role.save
       flash[:success] = "OrganizationRole Created!"
-      redirect_to admin_membership_url(@organization_role)
+      redirect_to admin_organization_role_url(@organization_role)
     else
       render action: :new
     end
@@ -57,7 +57,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
     params.require(:organization_role).permit(:organization_id, :user_id, :role, :invited_email)
   end
 
-  def find_membership
+  def find_organization_role
     @organization_role = OrganizationRole.unscoped.find(params[:id])
   end
 

@@ -58,4 +58,4 @@
   .col-md-4
     = render partial: "form"
     .mt-4.text-right
-      = link_to "Delete membership", admin_membership_path(@organization_role), method: :delete, data: { confirm: "Are you sure you want to delete this membership?" }, class: "btn btn-danger"
+      = link_to "Delete membership", admin_organization_role_path(@organization_role), method: :delete, data: { confirm: "Are you sure you want to delete this membership?" }, class: "btn btn-danger"

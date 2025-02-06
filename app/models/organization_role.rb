@@ -24,7 +24,7 @@
 #  index_organization_roles_on_user_id          (user_id)
 #
 class OrganizationRole < ApplicationRecord
-  MEMBERSHIP_TYPES = %w[admin member member_no_bike_edit].freeze
+  ROLE_TYPES = %w[admin member member_no_bike_edit].freeze
   HOT_SHEET_NOTIFICATION_ENUM = {notification_never: 0, notification_daily: 1}.freeze
 
   acts_as_paranoid
@@ -33,7 +33,7 @@ class OrganizationRole < ApplicationRecord
   belongs_to :organization
   belongs_to :sender, class_name: "User"
 
-  enum :role, MEMBERSHIP_TYPES
+  enum :role, ROLE_TYPES
   enum :hot_sheet_notification, HOT_SHEET_NOTIFICATION_ENUM
 
   validates_presence_of :role, :organization_id, :invited_email
@@ -48,16 +48,16 @@ class OrganizationRole < ApplicationRecord
   scope :created_by_magic_link, -> { where(created_by_magic_link: true) }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 
-  def self.membership_types
-    MEMBERSHIP_TYPES
+  def self.role_types
+    ROLE_TYPES
   end
 
   def self.create_passwordless(**create_attrs)
     new_passwordless_attrs = {skip_processing: true, role: "member"}
     if create_attrs[:invited_email].present? # This should always be present...
       # We need to check for existing organization_roles because the AfterUserCreateWorker calls this
-      existing_membership = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
-      return existing_membership if existing_membership.present?
+      existing_organization_role = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
+      return existing_organization_role if existing_organization_role.present?
     end
     membership = create!(new_passwordless_attrs.merge(create_attrs))
     # ProcessOrganizationRoleWorker creates a user if the user doesn't exist, for passwordless organizations

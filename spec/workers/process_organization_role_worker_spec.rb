@@ -42,8 +42,8 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
 
     context "duplication" do
       let(:user) { FactoryBot.create(:user, email: "party@monster.com") }
-      let!(:existing_membership) { FactoryBot.create(:organization_user, user: user) }
-      let!(:organization_user) { FactoryBot.create(:organization_user, user: nil, invited_email: invitation_email, organization: existing_membership.organization) }
+      let!(:existing_organization_role) { FactoryBot.create(:organization_user, user: user) }
+      let!(:organization_user) { FactoryBot.create(:organization_user, user: nil, invited_email: invitation_email, organization: existing_organization_role.organization) }
       let(:invitation_email) { "party@monster.com" }
       it "deletes itself" do
         expect(membership.valid?).to be_truthy
@@ -51,8 +51,8 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
         expect {
           instance.perform(membership.id)
         }.to change(OrganizationRole, :count).by(-1)
-        existing_membership.reload
-        expect(existing_membership).to be_present
+        existing_organization_role.reload
+        expect(existing_organization_role).to be_present
       end
       context "confirmed user" do
         let(:user) { FactoryBot.create(:user_confirmed, email: "party@monster.com") }
@@ -61,8 +61,8 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
           expect {
             instance.perform(membership.id)
           }.to change(OrganizationRole, :count).by(-1)
-          existing_membership.reload
-          expect(existing_membership).to be_present
+          existing_organization_role.reload
+          expect(existing_organization_role).to be_present
         end
       end
       context "secondary email" do
@@ -72,8 +72,8 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
           expect {
             instance.perform(membership.id)
           }.to change(OrganizationRole, :count).by(-1)
-          existing_membership.reload
-          expect(existing_membership).to be_present
+          existing_organization_role.reload
+          expect(existing_organization_role).to be_present
         end
       end
     end
