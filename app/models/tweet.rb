@@ -16,6 +16,12 @@
 #  twitter_account_id :integer
 #  twitter_id         :string
 #
+# Indexes
+#
+#  index_tweets_on_original_tweet_id   (original_tweet_id)
+#  index_tweets_on_stolen_record_id    (stolen_record_id)
+#  index_tweets_on_twitter_account_id  (twitter_account_id)
+#
 class Tweet < ApplicationRecord
   KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze

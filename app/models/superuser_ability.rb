@@ -12,6 +12,10 @@
 #  updated_at      :datetime         not null
 #  user_id         :bigint
 #
+# Indexes
+#
+#  index_superuser_abilities_on_user_id  (user_id)
+#
 
 # TODO: make this the way that superuser is defined for everyone
 # e.g. if universal, update user to be superuser: true, remove superuser: true if deleted, etc

@@ -18,6 +18,10 @@
 #  creator_id      :integer
 #  organization_id :integer
 #
+# Indexes
+#
+#  index_b_params_on_organization_id  (organization_id)
+#
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord

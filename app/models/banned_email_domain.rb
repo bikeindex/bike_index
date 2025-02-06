@@ -11,6 +11,10 @@
 #  updated_at :datetime         not null
 #  creator_id :bigint
 #
+# Indexes
+#
+#  index_banned_email_domains_on_creator_id  (creator_id)
+#
 class BannedEmailDomain < ApplicationRecord
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 500

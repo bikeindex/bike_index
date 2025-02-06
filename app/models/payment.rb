@@ -17,6 +17,10 @@
 #  stripe_id       :string(255)
 #  user_id         :integer
 #
+# Indexes
+#
+#  index_payments_on_user_id  (user_id)
+#
 class Payment < ApplicationRecord
   include Amountable
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze

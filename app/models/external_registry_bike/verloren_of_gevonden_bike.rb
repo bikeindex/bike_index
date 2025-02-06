@@ -23,6 +23,13 @@
 #  country_id                :integer          not null
 #  external_id               :string           not null
 #
+# Indexes
+#
+#  index_external_registry_bikes_on_country_id         (country_id)
+#  index_external_registry_bikes_on_external_id        (external_id)
+#  index_external_registry_bikes_on_serial_normalized  (serial_normalized)
+#  index_external_registry_bikes_on_type               (type)
+#
 class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
   def registry_url
     "https://verlorenofgevonden.nl"

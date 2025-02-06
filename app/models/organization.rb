@@ -41,6 +41,13 @@
 #  manufacturer_id                 :bigint
 #  parent_organization_id          :integer
 #
+# Indexes
+#
+#  index_organizations_on_location_latitude_and_location_longitude  (location_latitude,location_longitude)
+#  index_organizations_on_manufacturer_id                           (manufacturer_id)
+#  index_organizations_on_parent_organization_id                    (parent_organization_id)
+#  index_organizations_on_slug                                      (slug) UNIQUE
+#
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
   include SearchRadiusMetricable

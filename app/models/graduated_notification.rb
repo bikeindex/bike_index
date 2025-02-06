@@ -20,6 +20,16 @@
 #  primary_notification_id     :bigint
 #  user_id                     :bigint
 #
+# Indexes
+#
+#  index_graduated_notifications_on_bike_id                  (bike_id)
+#  index_graduated_notifications_on_bike_organization_id     (bike_organization_id)
+#  index_graduated_notifications_on_marked_remaining_by_id   (marked_remaining_by_id)
+#  index_graduated_notifications_on_organization_id          (organization_id)
+#  index_graduated_notifications_on_primary_bike_id          (primary_bike_id)
+#  index_graduated_notifications_on_primary_notification_id  (primary_notification_id)
+#  index_graduated_notifications_on_user_id                  (user_id)
+#
 class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze

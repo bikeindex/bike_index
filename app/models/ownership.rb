@@ -29,6 +29,15 @@
 #  previous_ownership_id         :bigint
 #  user_id                       :integer
 #
+# Indexes
+#
+#  index_ownerships_on_bike_id            (bike_id)
+#  index_ownerships_on_bulk_import_id     (bulk_import_id)
+#  index_ownerships_on_creator_id         (creator_id)
+#  index_ownerships_on_impound_record_id  (impound_record_id)
+#  index_ownerships_on_organization_id    (organization_id)
+#  index_ownerships_on_user_id            (user_id)
+#
 class Ownership < ApplicationRecord
   include RegistrationInfoable
   ORIGIN_ENUM = {

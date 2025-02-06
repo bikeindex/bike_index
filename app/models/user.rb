@@ -33,7 +33,6 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
-#  token_for_password_reset           :text
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null
@@ -46,6 +45,7 @@
 #  terms_of_service                   :boolean          default(FALSE), not null
 #  time_single_format                 :boolean          default(FALSE)
 #  title                              :text
+#  token_for_password_reset           :text
 #  twitter                            :string(255)
 #  username                           :string(255)
 #  vendor_terms_of_service            :boolean
@@ -56,6 +56,11 @@
 #  country_id                         :integer
 #  state_id                           :integer
 #  stripe_id                          :string(255)
+#
+# Indexes
+#
+#  index_users_on_auth_token                (auth_token)
+#  index_users_on_token_for_password_reset  (token_for_password_reset)
 #
 class User < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper

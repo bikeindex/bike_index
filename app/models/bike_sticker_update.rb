@@ -17,6 +17,15 @@
 #  organization_id     :bigint
 #  user_id             :bigint
 #
+# Indexes
+#
+#  index_bike_sticker_updates_on_bike_id          (bike_id)
+#  index_bike_sticker_updates_on_bike_sticker_id  (bike_sticker_id)
+#  index_bike_sticker_updates_on_bulk_import_id   (bulk_import_id)
+#  index_bike_sticker_updates_on_export_id        (export_id)
+#  index_bike_sticker_updates_on_organization_id  (organization_id)
+#  index_bike_sticker_updates_on_user_id          (user_id)
+#
 class BikeStickerUpdate < ApplicationRecord
   KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
   CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_bike_creation: 3, creator_import: 4}.freeze

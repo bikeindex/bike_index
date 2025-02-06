@@ -11,6 +11,10 @@
 #  updated_at        :datetime         not null
 #  organization_id   :bigint
 #
+# Indexes
+#
+#  index_hot_sheets_on_organization_id  (organization_id)
+#
 class HotSheet < ApplicationRecord
   belongs_to :organization
 

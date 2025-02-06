@@ -11,6 +11,11 @@
 #  model_audit_id       :bigint
 #  organization_id      :bigint
 #
+# Indexes
+#
+#  index_organization_model_audits_on_model_audit_id   (model_audit_id)
+#  index_organization_model_audits_on_organization_id  (organization_id)
+#
 class OrganizationModelAudit < ApplicationRecord
   enum :certification_status, ModelAttestation::CERTIFICATION_KIND_ENUM
 
