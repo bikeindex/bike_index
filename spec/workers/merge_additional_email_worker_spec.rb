@@ -22,12 +22,12 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:theft_alert) { FactoryBot.create(:theft_alert, user: old_user) }
 
       let(:organization) { membership.organization }
-      let(:organization_user) { FactoryBot.create(:organization_user_claimed, user: old_user) }
+      let(:organization_user) { FactoryBot.create(:organization_role_claimed, user: old_user) }
       let(:second_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:second_membership) { FactoryBot.create(:organization_user_claimed, user: old_user, organization: second_organization) }
+      let(:second_membership) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: second_organization) }
       let(:third_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:old_membership) { FactoryBot.create(:organization_user_claimed, user: old_user, organization: third_organization) }
-      let(:new_membership) { FactoryBot.create(:organization_user_claimed, user: user, organization: third_organization) }
+      let(:old_membership) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: third_organization) }
+      let(:new_membership) { FactoryBot.create(:organization_role_claimed, user: user, organization: third_organization) }
 
       let(:integration) { FactoryBot.create(:integration, user: old_user, information: {"info" => {"email" => email, :name => "blargh"}}) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }

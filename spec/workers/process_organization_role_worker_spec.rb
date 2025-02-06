@@ -8,7 +8,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
     context "ambassador" do
       context "given a non-ambassador" do
         it "does not create ambassador_task_assignments" do
-          membership = FactoryBot.create(:organization_user_claimed)
+          membership = FactoryBot.create(:organization_role_claimed)
           FactoryBot.create(:ambassador_task)
           expect {
             instance.perform(membership.id)

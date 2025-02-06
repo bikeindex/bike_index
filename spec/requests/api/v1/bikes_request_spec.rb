@@ -39,7 +39,7 @@ RSpec.describe API::V1::BikesController, type: :request do
       stole2 = FactoryBot.create(:stolen_record, approved: true)
       organization = FactoryBot.create(:organization)
       user = FactoryBot.create(:user)
-      FactoryBot.create(:organization_user_claimed, user: user, organization: organization)
+      FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
       options = {stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
       get "#{base_url}/stolen_ids", params: options.as_json
       expect(response.code).to eq("200")
@@ -227,7 +227,7 @@ RSpec.describe API::V1::BikesController, type: :request do
       before :each do
         @organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user)
-        FactoryBot.create(:organization_user_claimed, user: user, organization: @organization)
+        FactoryBot.create(:organization_role_claimed, user: user, organization: @organization)
         @organization.save
       end
 
@@ -420,7 +420,7 @@ RSpec.describe API::V1::BikesController, type: :request do
       it "creates an example bike if the bike is from example, and include all the options" do
         org = Organization.example
         user = FactoryBot.create(:user)
-        FactoryBot.create(:organization_user_claimed, user: user, organization: org)
+        FactoryBot.create(:organization_role_claimed, user: user, organization: org)
         manufacturer = FactoryBot.create(:manufacturer)
         org.save
         bike_attrs = {

@@ -842,7 +842,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(u: member_no_bikes, org: organization)).to be_falsey
         expect(bike.authorized?(member_no_bikes)).to be_falsey
         # If the member has multiple organization_roles, it should only work for the correct organization
-        new_membership = FactoryBot.create(:organization_user_claimed, user: member)
+        new_membership = FactoryBot.create(:organization_role_claimed, user: member)
         expect(bike.authorized_by_organization?).to be_truthy
         expect(bike.authorized_by_organization?(u: member)).to be_truthy
         expect(bike.authorized_by_organization?(u: member, org: new_membership.organization)).to be_falsey

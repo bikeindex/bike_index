@@ -96,7 +96,7 @@ RSpec.describe CredibilityScorer do
       let(:created_at) { Time.current - 20.days }
       let(:auto_user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 3.years) }
       let!(:auto_user_membership) do
-        FactoryBot.create(:organization_user_claimed, user: auto_user, organization: organization)
+        FactoryBot.create(:organization_role_claimed, user: auto_user, organization: organization)
         organization.update(auto_user: auto_user)
       end
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
@@ -295,7 +295,7 @@ RSpec.describe CredibilityScorer do
       end
       context "user is member of trusted organization, supporter" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
-        let!(:organization_user) { FactoryBot.create(:organization_user_claimed, user: user, organization: organization) }
+        let!(:organization_user) { FactoryBot.create(:organization_role_claimed, user: user, organization: organization) }
         let!(:payment) { FactoryBot.create(:payment, user: user) }
         it "returns just user_trusted_organization_role", :flaky do
           expect(user.organizations.pluck(:id)).to eq([organization.id])

@@ -394,7 +394,7 @@ RSpec.describe MyAccountsController, type: :request do
       context "with other parameters too" do
         let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
         let(:organization2) { hot_sheet_configuration2.organization }
-        let!(:organization_user2) { FactoryBot.create(:organization_user_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
+        let!(:organization_user2) { FactoryBot.create(:organization_role_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
         it "updates all the parameters" do
           expect(membership.notification_never?).to be_truthy
           expect(membership2.notification_daily?).to be_truthy

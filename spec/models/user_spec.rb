@@ -827,7 +827,7 @@ RSpec.describe User, type: :model do
   describe "ambassador?" do
     it "returns true if the user has any ambassadorship" do
       user = FactoryBot.create(:ambassador)
-      user.organization_roles << FactoryBot.create(:organization_user_claimed, user: user)
+      user.organization_roles << FactoryBot.create(:organization_role_claimed, user: user)
       user.save
 
       expect(user).to be_ambassador

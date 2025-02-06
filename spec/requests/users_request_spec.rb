@@ -19,7 +19,7 @@ RSpec.describe UsersController, type: :request do
       it "updates the vendor terms of service and emailable" do
         expect(current_user.reload.notification_newsletters).to be_falsey
         organization = FactoryBot.create(:organization)
-        FactoryBot.create(:organization_user_claimed, organization: organization, user: current_user)
+        FactoryBot.create(:organization_role_claimed, organization: organization, user: current_user)
         current_user.reload
         expect(current_user.default_organization).to eq organization
         patch "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {vendor_terms_of_service: "1", notification_newsletters: true}}

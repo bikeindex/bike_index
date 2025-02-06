@@ -322,7 +322,7 @@ RSpec.describe AfterUserChangeWorker, type: :job do
       user.reload
       expect(user.alert_slugs).to eq(%w[stolen_bike_without_location theft_alert_without_photo])
 
-      membership = FactoryBot.create(:organization_user_claimed, user: user, role: "member")
+      membership = FactoryBot.create(:organization_role_claimed, user: user, role: "member")
       instance.perform(user.id)
       user.reload
       expect(user.alert_slugs).to eq(["theft_alert_without_photo"])

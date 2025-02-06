@@ -82,7 +82,7 @@ RSpec.describe BikeUpdator do
       end
       context "user is an organization member" do
         it "passes users organization" do
-          FactoryBot.create(:organization_user_claimed, user: user, organization: organization)
+          FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
           expect(bike.reload.current_ownership.organization).to be_present
           expect(user.reload.member_of?(organization)).to be_truthy
           expect(ownership.reload.organization_pre_registration?).to be_falsey

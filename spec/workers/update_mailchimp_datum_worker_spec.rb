@@ -17,7 +17,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       let(:organization_created_at) { Time.at(1552072143) }
       let(:target_merge_fields) { {"NAME" => "Seth Herr", "O_NAME" => "Hogwarts", "O_AT" => organization_created_at.to_date.to_s} }
       let(:organization) { FactoryBot.create(:organization, kind: "school", name: "Hogwarts", created_at: organization_created_at) }
-      let(:organization_user) { FactoryBot.create(:organization_user_claimed, organization: organization, user: user, role: "admin") }
+      let(:organization_user) { FactoryBot.create(:organization_role_claimed, organization: organization, user: user, role: "admin") }
       let(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
 
       context "organization creator, create user" do
@@ -122,7 +122,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
         context "organization and individual" do
           let(:target_tags) { ["In Bike Index", "in_bike_index", "Not org creator", "not_org_creator", "Paid", "weird other tag"] }
           it "updates mailchimp_datum" do
-            FactoryBot.create(:organization_user_claimed, organization: organization)
+            FactoryBot.create(:organization_role_claimed, organization: organization)
             organization.update(updated_at: Time.current)
             expect(organization.default_location&.id).to eq location.id
             expect(membership.reload.organization_creator?).to be_falsey
