@@ -151,8 +151,7 @@ group :development do
   gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
   gem "terminal-notifier"
-  # Use community-maintained fork to support rails 8 - hopefully, eventually mainlined
-  gem "annotate", github: "bikeindex/annotate_models", branch: "develop" # Annotate models with schema info
+  gem 'annotate_rb', github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
 end
 
 group :development, :test do

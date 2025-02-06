@@ -12,6 +12,10 @@
 #  updated_at              :datetime         not null
 #  organization_id         :bigint
 #
+# Indexes
+#
+#  index_organization_statuses_on_organization_id  (organization_id)
+#
 class OrganizationStatus < AnalyticsRecord
   belongs_to :organization
 

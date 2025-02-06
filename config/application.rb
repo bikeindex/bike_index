@@ -25,7 +25,7 @@ module Bikeindex
     config.redis_default_url = ENV["REDIS_URL"]
     config.redis_cache_url = ENV["REDIS_CACHE_URL"]
 
-    config.load_defaults 7.2
+    config.load_defaults 8.0
 
     # Use our custom error pages
     config.exceptions_app = routes
@@ -39,9 +39,6 @@ module Bikeindex
 
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
-
-    # Remove after Rails 8
-    config.active_support.to_time_preserves_timezone = :zone
 
     # Disable default implicit presence validation for belongs_to relations
     config.active_record.belongs_to_required_by_default = false

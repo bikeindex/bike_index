@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/bikeindex/annotate_models.git
-  revision: 8cf2eeaaeee39a00f6b9573485219910da77b9ff
-  branch: develop
-  specs:
-    annotate (3.2.0)
-      activerecord (>= 3.2)
-      rake (>= 10.4, < 14.0)
-
-GIT
   remote: https://github.com/bikeindex/carrierwave_backgrounder.git
   revision: 7b2b0e9bc43f2ec20f09db3fea7bbc5f167f52c7
   specs:
@@ -41,6 +32,13 @@ GIT
     MailchimpMarketing (3.0.48)
       excon (~> 0.76.0)
       json (~> 2.1, >= 2.1.0)
+
+GIT
+  remote: https://github.com/sethherr/annotate_rb.git
+  revision: a947916dff1eab2c1b570a8b57020fb24337c797
+  branch: rename-annotate_rb
+  specs:
+    annotate_rb (5.0.0)
 
 GEM
   remote: https://rails-assets.org/
@@ -841,7 +839,7 @@ PLATFORMS
 DEPENDENCIES
   MailchimpMarketing!
   active_model_serializers (~> 0.8.3)
-  annotate!
+  annotate_rb!
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt
