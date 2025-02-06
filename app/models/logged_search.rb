@@ -28,6 +28,14 @@
 #  state_id          :bigint
 #  user_id           :bigint
 #
+# Indexes
+#
+#  index_logged_searches_on_country_id       (country_id)
+#  index_logged_searches_on_organization_id  (organization_id)
+#  index_logged_searches_on_request_id       (request_id)
+#  index_logged_searches_on_state_id         (state_id)
+#  index_logged_searches_on_user_id          (user_id)
+#
 class LoggedSearch < AnalyticsRecord
   include Geocodeable
 
