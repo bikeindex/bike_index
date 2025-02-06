@@ -22,7 +22,7 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "update" do
       context "organization_role" do
-        let(:organization_user) { FactoryBot.create(:organization_user, organization: current_organization, sender: current_user) }
+        let(:organization_role) { FactoryBot.create(:organization_role, organization: current_organization, sender: current_user) }
         let(:organization_role_params) do
           {
             role: "admin",
@@ -75,10 +75,10 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "edit" do
       context "organization_role" do
-        let(:organization_user) { FactoryBot.create(:organization_role_claimed, organization: current_organization) }
+        let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: current_organization) }
         it "renders the page" do
           get "#{base_url}/#{organization_role.id}/edit", params: {organization_id: current_organization.to_param}
-          expect(assigns(:organization_user)).to eq organization_role
+          expect(assigns(:organization_role)).to eq organization_role
           expect(response.code).to eq("200")
           expect(response).to render_template :edit
         end
@@ -88,7 +88,7 @@ RSpec.describe Organized::UsersController, type: :request do
     describe "update" do
       context "organization_role" do
         context "other valid organization_role" do
-          let(:organization_user) { FactoryBot.create(:organization_role_claimed, organization: current_organization, role: "member") }
+          let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: current_organization, role: "member") }
           let(:organization_role_params) { {role: "admin", user_id: 333} }
           it "updates the role" do
             og_user = organization_role.user
@@ -101,7 +101,7 @@ RSpec.describe Organized::UsersController, type: :request do
           end
         end
         context "marking self member" do
-          let(:organization_user) { current_user.organization_roles.first }
+          let(:organization_role) { current_user.organization_roles.first }
           it "does not update the organization_role" do
             put "#{base_url}/#{organization_role.id}", params: {organization_id: current_organization.to_param, organization_role: {role: "member"}}
             expect(response).to redirect_to organization_users_path(organization_id: current_organization.to_param)
@@ -116,7 +116,7 @@ RSpec.describe Organized::UsersController, type: :request do
 
     describe "destroy" do
       context "organization_role unclaimed" do
-        let(:organization_user) { FactoryBot.create(:organization_user, organization: current_organization, sender: current_user) }
+        let(:organization_role) { FactoryBot.create(:organization_role, organization: current_organization, sender: current_user) }
         it "destroys" do
           expect(organization_role.claimed?).to be_falsey
           count = current_organization.remaining_invitation_count
@@ -131,7 +131,7 @@ RSpec.describe Organized::UsersController, type: :request do
       end
       context "organization_role" do
         context "other valid organization_role" do
-          let(:organization_user) { FactoryBot.create(:organization_role_claimed, organization: current_organization, role: "member") }
+          let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: current_organization, role: "member") }
           it "destroys the organization_role" do
             expect(organization_role.claimed?).to be_truthy
             count = current_organization.remaining_invitation_count
@@ -145,7 +145,7 @@ RSpec.describe Organized::UsersController, type: :request do
           end
         end
         context "marking self member" do
-          let(:organization_user) { current_user.organization_roles.first }
+          let(:organization_role) { current_user.organization_roles.first }
           it "does not destroy" do
             count = current_organization.remaining_invitation_count
             expect {
@@ -173,7 +173,7 @@ RSpec.describe Organized::UsersController, type: :request do
           expect {
             post base_url, params: {organization_role: organization_role_params.merge(invited_email: " ")}
           }.to change(OrganizationRole, :count).by(0)
-          expect(assigns(:organization_user).errors.full_messages).to be_present
+          expect(assigns(:organization_role).errors.full_messages).to be_present
         end
       end
       context "available invitations" do

@@ -18,7 +18,7 @@
         %br
         = t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
 
-= form_for @organization_role, { as: :organization_role, url: organization_roles_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
+= form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 
   - if @organization_role.errors.any?
     = render partial: "shared/errors", locals: { name: t(".organization_role"), obj: @organization_role }

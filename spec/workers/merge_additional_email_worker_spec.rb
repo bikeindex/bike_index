@@ -12,7 +12,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
     let(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
     let(:user_email) { FactoryBot.create(:user_email, email: email) }
     let(:user) { user_email.user }
-    let(:organization_user) { FactoryBot.create(:organization_user, invited_email: "#{email.upcase} ") }
+    let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "#{email.upcase} ") }
 
     context "existing user account", flaky: true do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
@@ -22,7 +22,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:theft_alert) { FactoryBot.create(:theft_alert, user: old_user) }
 
       let(:organization) { organization_role.organization }
-      let(:organization_user) { FactoryBot.create(:organization_role_claimed, user: old_user) }
+      let(:organization_role) { FactoryBot.create(:organization_role_claimed, user: old_user) }
       let(:second_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
       let(:second_organization_role) { FactoryBot.create(:organization_role_claimed, user: old_user, organization: second_organization) }
       let(:third_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }

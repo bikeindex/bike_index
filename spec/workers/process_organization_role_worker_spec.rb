@@ -42,8 +42,8 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
 
     context "duplication" do
       let(:user) { FactoryBot.create(:user, email: "party@monster.com") }
-      let!(:existing_organization_role) { FactoryBot.create(:organization_user, user: user) }
-      let!(:organization_user) { FactoryBot.create(:organization_user, user: nil, invited_email: invitation_email, organization: existing_organization_role.organization) }
+      let!(:existing_organization_role) { FactoryBot.create(:organization_role, user: user) }
+      let!(:organization_role) { FactoryBot.create(:organization_role, user: nil, invited_email: invitation_email, organization: existing_organization_role.organization) }
       let(:invitation_email) { "party@monster.com" }
       it "deletes itself" do
         expect(organization_role.valid?).to be_truthy
@@ -81,7 +81,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
     context "organization passwordless_users" do
       let(:email) { "rock@hardplace.com" }
       let(:organization) { FactoryBot.create(:organization) }
-      let!(:organization_user) { FactoryBot.create(:organization_user, organization: organization, invited_email: email) }
+      let!(:organization_role) { FactoryBot.create(:organization_role, organization: organization, invited_email: email) }
       before { organization.update_attribute :enabled_feature_slugs, ["passwordless_users"] }
       it "creates a user, does not send an email" do
         Sidekiq::Worker.clear_all
@@ -112,7 +112,7 @@ RSpec.describe ProcessOrganizationRoleWorker, type: :job do
     end
 
     context "email not sent" do
-      let(:organization_user) { FactoryBot.create(:organization_user) }
+      let(:organization_role) { FactoryBot.create(:organization_role) }
       it "sends the email" do
         expect(organization_role.claimed?).to be_falsey
         expect(organization_role.email_invitation_sent_at).to be_blank

@@ -6,7 +6,7 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
-    let(:organization_user) { FactoryBot.create(:organization_user) }
+    let(:organization_role) { FactoryBot.create(:organization_role) }
     it "renders" do
       expect(organization_role).to be_present
       get base_url
