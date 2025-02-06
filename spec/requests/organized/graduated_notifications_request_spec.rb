@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::GraduatedNotificationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/graduated_notifications" }
-  include_context :request_spec_logged_in_as_organization_member
+  include_context :request_spec_logged_in_as_organization_user
 
   let(:earliest_time) { Time.current - 2.years } # Have to set this for organization creation, or the org time_range is just the past year
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: 1.year.to_i, created_at: earliest_time) }

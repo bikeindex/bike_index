@@ -207,14 +207,14 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "unregistered_parking_notification email update" do
     let(:current_organization) { FactoryBot.create(:organization) }
-    let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:auto_user) { FactoryBot.create(:organization_user, organization: current_organization) }
     let(:parking_notification) do
       current_organization.update(auto_user: auto_user)
       FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_organization.auto_user)
     end
     let!(:bike) { parking_notification.bike }
     let(:ownership1) { bike.ownerships.first }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
     it "updates email and marks not user hidden" do
       bike.reload
       expect(bike.claimed?).to be_truthy

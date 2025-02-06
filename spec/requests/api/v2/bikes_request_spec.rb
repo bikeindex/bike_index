@@ -58,7 +58,7 @@ RSpec.describe "Bikes API V2", type: :request do
       let!(:color) { FactoryBot.create(:color, name: "White") }
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:bike_attrs) do
         {
           serial: "WTU171G0193G",
@@ -253,7 +253,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.code).to eq("401")
     end
     context "user is organization member" do
-      let(:user) { FactoryBot.create(:organization_member) }
+      let(:user) { FactoryBot.create(:organization_user) }
       let!(:organization) { user.organizations.first }
       it "returns success" do
         expect(token.resource_owner_id).to eq user.id

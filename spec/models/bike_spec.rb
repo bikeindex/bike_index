@@ -525,7 +525,7 @@ RSpec.describe Bike, type: :model do
       end
 
       context "non-ambassador org with unstolen_notifications" do
-        let(:user) { FactoryBot.create(:organization_member) }
+        let(:user) { FactoryBot.create(:organization_user) }
         let(:organization) { user.organizations.first }
         it "is phoneable_by" do
           organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"]
@@ -806,7 +806,7 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "creation organization" do
-      let(:owner) { FactoryBot.create(:organization_member) }
+      let(:owner) { FactoryBot.create(:organization_user) }
       let(:organization) { owner.organizations.first }
       let(:can_edit_claimed) { false }
       let(:claimed) { false }
@@ -817,9 +817,9 @@ RSpec.describe Bike, type: :model do
           can_edit_claimed: can_edit_claimed,
           claimed: claimed)
       end
-      let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:member) { FactoryBot.create(:organization_user, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
-      let(:member_no_bikes) { FactoryBot.create(:organization_member, organization: organization, role: :member_no_bike_edit) }
+      let(:member_no_bikes) { FactoryBot.create(:organization_user, organization: organization, role: :member_no_bike_edit) }
       it "returns correctly for all sorts of convoluted things" do
         bike.reload
         expect(bike.creation_organization).to eq organization
@@ -923,7 +923,7 @@ RSpec.describe Bike, type: :model do
     context "impound_record" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
       let(:impound_record) { FactoryBot.create(:impound_record, bike: bike, user: user) }
-      it "returns truthy if impound_record is current unless user is organization_member" do
+      it "returns truthy if impound_record is current unless user is organization_user" do
         expect(impound_record.bike_id).to eq bike.id
         expect(bike.reload.claimed?).to be_truthy
         expect(bike.impound_records.pluck(:id)).to eq([impound_record.id])
@@ -943,8 +943,8 @@ RSpec.describe Bike, type: :model do
       let(:claimed) { false }
       let(:impound_record) { FactoryBot.build(:impound_record_with_organization, bike: bike) }
       let(:organization) { impound_record.organization }
-      let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
-      it "returns falsey if impound record is current unless user is organization_member" do
+      let!(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
+      it "returns falsey if impound record is current unless user is organization_user" do
         expect(bike.reload.claimed?).to be_falsey
         expect(bike.owner).to eq creator
         expect(bike.claimable_by?(user)).to be_truthy
@@ -957,9 +957,9 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_display).to eq "Hidden"
           expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
-          expect(bike.authorized?(organization_member)).to be_truthy
+          expect(bike.authorized?(organization_user)).to be_truthy
           expect(bike.current_impound_record_id).to eq impound_record.id
-          impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_member)
+          impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_user)
         end
         impound_record.reload
         expect(impound_record.resolved?).to be_truthy
@@ -984,8 +984,8 @@ RSpec.describe Bike, type: :model do
             expect(bike.status).to eq "status_impounded"
             expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
             expect(bike.authorized?(user)).to be_falsey
-            expect(bike.authorized?(organization_member)).to be_truthy
-            impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_member)
+            expect(bike.authorized?(organization_user)).to be_truthy
+            impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_user)
           end
           impound_record.reload
           expect(impound_record.resolved?).to be_truthy
@@ -993,7 +993,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.editable_organizations.pluck(:id)).to eq([]) # No longer impounded by that org
           expect(bike.status).to eq "status_with_owner"
           expect(bike.authorized?(user)).to be_truthy
-          expect(bike.authorized?(organization_member)).to be_falsey # Because no organization membership
+          expect(bike.authorized?(organization_user)).to be_falsey # Because no organization membership
           expect(bike.authorized?(superuser)).to be_truthy
         end
       end
@@ -1003,9 +1003,9 @@ RSpec.describe Bike, type: :model do
   describe "authorized_by_organization?" do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
-    let(:organization_membership2) { FactoryBot.create(:membership, user: organization_member) }
-    let!(:organization2) { organization_membership2.organization }
+    let!(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
+    let(:organization_usership2) { FactoryBot.create(:membership, user: organization_user) }
+    let!(:organization2) { organization_usership2.organization }
     let(:bike) { FactoryBot.create(:bike_organized, user: user, claimed: true, creation_organization: organization, can_edit_claimed: false) }
     let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, can_edit_claimed: true, organization: organization2) }
     it "checks the passed organization" do
@@ -1014,11 +1014,11 @@ RSpec.describe Bike, type: :model do
       expect(bike.editable_organizations.pluck(:id)).to eq([organization2.id])
       expect(bike.authorized_by_organization?(u: user)).to be_falsey # Because the user is the owner
       expect(bike.authorized_by_organization?).to be_truthy
-      expect(bike.authorized_by_organization?(u: organization_member)).to be_truthy
+      expect(bike.authorized_by_organization?(u: organization_user)).to be_truthy
       expect(bike.authorized_by_organization?(org: organization)).to be_falsey
-      expect(bike.authorized_by_organization?(u: organization_member, org: organization)).to be_falsey
+      expect(bike.authorized_by_organization?(u: organization_user, org: organization)).to be_falsey
       expect(bike.authorized_by_organization?(org: organization2)).to be_truthy
-      expect(bike.authorized_by_organization?(u: organization_member, org: organization2)).to be_truthy
+      expect(bike.authorized_by_organization?(u: organization_user, org: organization2)).to be_truthy
       # Also, if passed a user, the user must be a member of the organization that was passed
       expect(bike.authorized_by_organization?(u: FactoryBot.create(:user), org: organization2)).to be_falsey
     end
@@ -1054,7 +1054,7 @@ RSpec.describe Bike, type: :model do
     end
     context "organizations" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:user_unorganized) { User.new }
       let(:owner) { User.new }
       let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }

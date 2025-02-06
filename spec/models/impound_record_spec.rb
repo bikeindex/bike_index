@@ -5,8 +5,8 @@ RSpec.describe ImpoundRecord, type: :model do
   let!(:bike) { FactoryBot.create(:bike, created_at: Time.current - 1.day) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:impound_configuration) { organization.fetch_impound_configuration }
-  let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-  let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+  let(:user) { FactoryBot.create(:organization_user, organization: organization) }
+  let(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
 
   describe "validations" do
     it "marks the bike impounded only once" do
@@ -53,7 +53,7 @@ RSpec.describe ImpoundRecord, type: :model do
     context "impound_record_update" do
       let!(:location) { FactoryBot.create(:location, organization: organization) }
       let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization, display_id: "v8xcv833") }
-      let!(:user2) { FactoryBot.create(:organization_member, organization: organization) }
+      let!(:user2) { FactoryBot.create(:organization_user, organization: organization) }
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
       let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied expired] }
       it "updates the record and the user" do
@@ -106,7 +106,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.status).to eq "current"
           expect(impound_record.to_coordinates).to eq parking_notification.to_coordinates
           expect(impound_record.authorized?(user)).to be_truthy
-          expect(impound_record.authorized?(organization_member)).to be_truthy
+          expect(impound_record.authorized?(organization_user)).to be_truthy
           # Doesn't include move update kind, because there is no location
           expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
           expect(impound_record.update_multi_kinds).to eq(impound_record.update_kinds - %w[current expired])

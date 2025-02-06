@@ -61,7 +61,7 @@ RSpec.describe Organization, type: :model do
 
   describe "bikes member and not_member" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:member) { FactoryBot.create(:organization_user, organization: organization) }
     let(:user) { FactoryBot.create(:user) }
     let!(:bike_not_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, creator: member) }
     let!(:bike_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, creator: member, user: member) }
@@ -628,7 +628,7 @@ RSpec.describe Organization, type: :model do
   describe "ensure_auto_user" do
     let(:organization) { FactoryBot.create(:organization) }
     context "existing members" do
-      let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:member) { FactoryBot.create(:organization_user, organization: organization) }
       before do
         expect(member).to be_present
       end

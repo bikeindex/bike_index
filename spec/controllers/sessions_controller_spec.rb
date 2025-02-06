@@ -378,7 +378,7 @@ RSpec.describe SessionsController, type: :controller do
 
       context "user is organization admin" do
         let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let(:organization_kind) { "bike_shop" }
         it "signs in" do
           expect(user).to receive(:authenticate).and_return(true)

@@ -36,7 +36,7 @@ RSpec.describe CreateGraduatedNotificationWorker, type: :lib do
         end
       end
       context "organization member bike" do
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let!(:ownership) { FactoryBot.create(:ownership_claimed, user: user, creator: user, bike: bike, organization: organization) }
         it "does not enqueue" do
           expect(bike.reload.current_ownership&.id).to eq ownership.id

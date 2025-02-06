@@ -34,9 +34,9 @@ module RequestSpecHelpers
     before { log_in(current_user) }
   end
 
-  RSpec.shared_context :request_spec_logged_in_as_organization_member do
+  RSpec.shared_context :request_spec_logged_in_as_organization_user do
     let(:current_organization) { FactoryBot.create(:organization) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
     before { log_in(current_user) }
   end
 

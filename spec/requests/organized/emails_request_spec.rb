@@ -10,8 +10,8 @@ RSpec.describe Organized::EmailsController, type: :request do
   end
   let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes organization_stolen_message] }
 
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "redirects to the organization root path" do

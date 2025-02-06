@@ -51,7 +51,7 @@ RSpec.describe MyAccountsController, type: :request do
         end
         context "with organization" do
           let(:organization) { FactoryBot.create(:organization) }
-          let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
           it "sets passive_organization_id" do
             expect(current_user.authorized?(organization)).to be_truthy
             get base_url
@@ -376,7 +376,7 @@ RSpec.describe MyAccountsController, type: :request do
     context "organization with hotsheet" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
       let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
-      let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:membership) { current_user.organization_roles.first }
       it "updates hotsheet" do
         expect(membership.notification_never?).to be_truthy

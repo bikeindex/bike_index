@@ -289,7 +289,7 @@ RSpec.describe BulkImportWorker, type: :job do
         let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
         let(:organization) { impound_configuration.organization }
         let!(:state) { FactoryBot.create(:state_california) }
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
         let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
         include_context :geocoder_real

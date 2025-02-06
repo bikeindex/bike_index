@@ -67,7 +67,7 @@ RSpec.describe Bikes::EditsController, type: :request do
   context "not-creator but member of creation_organization" do
     let(:bike) { FactoryBot.create(:bike_organized) }
     let(:organization) { bike.creation_organization }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
     it "renders" do
       expect(bike.user_id).to_not eq current_user.id
       expect(bike.creation_organization&.id).to eq current_user.organizations.first.id
@@ -261,7 +261,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       end
       context "organization member" do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization) }
+        let(:current_user) { FactoryBot.create(:organization_user, organization: impound_record.organization) }
         it "renders" do
           bike.reload
           expect(bike.claimed?).to be_truthy

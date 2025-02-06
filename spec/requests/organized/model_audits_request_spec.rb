@@ -33,7 +33,7 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
 
   context "organization with model_audits" do
     let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
 
     describe "index" do
       it "renders" do

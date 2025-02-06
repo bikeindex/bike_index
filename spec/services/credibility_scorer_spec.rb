@@ -47,8 +47,8 @@ RSpec.describe CredibilityScorer do
         expect(subject.badge_value(badge_array)).to eq(50)
       end
     end
-    context "with user_trusted_organization_member and creation_organization_trusted" do
-      let(:badge_array) { %i[user_trusted_organization_member creation_organization_trusted] }
+    context "with user_trusted_organization_role and creation_organization_trusted" do
+      let(:badge_array) { %i[user_trusted_organization_role creation_organization_trusted] }
       it "it returns just creation_organization_trusted" do
         expect(subject.permitted_badges_array(badge_array)).to eq([:creation_organization_trusted])
         expect(subject.permitted_badges_hash(badge_array)).to eq({creation_organization_trusted: 30})
@@ -131,7 +131,7 @@ RSpec.describe CredibilityScorer do
           # It doesn't return anything but created_at_point_of_sale
           ownership.update(pos_kind: "other_pos")
           expect(subject.creation_badges(ownership)).to eq([:created_at_point_of_sale])
-          expect(instance.badges).to eq(%i[created_at_point_of_sale user_trusted_organization_member long_time_user])
+          expect(instance.badges).to eq(%i[created_at_point_of_sale user_trusted_organization_role long_time_user])
           expect(instance.score).to eq 100
         end
       end
@@ -297,9 +297,9 @@ RSpec.describe CredibilityScorer do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
         let!(:payment) { FactoryBot.create(:payment, user: user) }
-        it "returns just user_trusted_organization_member", :flaky do
+        it "returns just user_trusted_organization_role", :flaky do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
-          expect(subject.bike_user_badges(bike)).to match_array(%i[user_trusted_organization_member user_supporter])
+          expect(subject.bike_user_badges(bike)).to match_array(%i[user_trusted_organization_role user_supporter])
         end
       end
       context "user_handle_suspicious, long_time_user & donation" do

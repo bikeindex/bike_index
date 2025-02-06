@@ -43,7 +43,7 @@ FactoryBot.define do
       end
     end
 
-    factory :organization_member, traits: [:with_organization]
+    factory :organization_user, traits: [:with_organization]
 
     factory :organization_auto_user, traits: [:with_organization] do
       after(:create) do |user, evaluator|

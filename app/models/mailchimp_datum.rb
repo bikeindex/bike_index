@@ -77,20 +77,20 @@ class MailchimpDatum < ApplicationRecord
   end
 
   # This finds the organization from the existing merge field, or uses the most recent organization
-  def mailchimp_organization_membership
-    return @mailchimp_organization_membership if defined?(@mailchimp_organization_membership)
+  def mailchimp_organization_usership
+    return @mailchimp_organization_usership if defined?(@mailchimp_organization_usership)
     organization_roles = user&.organization_roles&.admin&.reorder(created_at: :desc)&.reject { |m| m.organization.ambassador? }
     return nil unless organization_roles.present? && organization_roles.any?
     existing_name = data&.dig("merge_fields", "organization_name")
     existing_org = Organization.friendly_find(existing_name) if existing_name.present?
     if existing_org.present?
-      @mailchimp_organization_membership = organization_roles.find { |m| m.organization_id == existing_org.id }
+      @mailchimp_organization_usership = organization_roles.find { |m| m.organization_id == existing_org.id }
     end
-    @mailchimp_organization_membership ||= organization_roles.last
+    @mailchimp_organization_usership ||= organization_roles.last
   end
 
   def mailchimp_organization
-    mailchimp_organization_membership&.organization
+    mailchimp_organization_usership&.organization
   end
 
   def stolen_records_recovered
@@ -306,7 +306,7 @@ class MailchimpDatum < ApplicationRecord
     updated_tags = tags.dup
     updated_tags << "in_bike_index" if user.present?
     if mailchimp_organization.present?
-      unless mailchimp_organization_membership.organization_creator?
+      unless mailchimp_organization_usership.organization_creator?
         updated_tags << "not_org_creator"
       end
       if mailchimp_organization.pos?
@@ -344,7 +344,7 @@ class MailchimpDatum < ApplicationRecord
       c_list << "organization"
     elsif user_id.blank? # If no feedbacks or user, this is based on mailchimp data, so keep that
       return lists.dup
-    elsif mailchimp_organization_membership.present?
+    elsif mailchimp_organization_usership.present?
       c_list << "organization"
     end
     # users aren't added to the individual list if they're on the organization list

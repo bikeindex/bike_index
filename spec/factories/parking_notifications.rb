@@ -21,7 +21,7 @@ FactoryBot.define do
 
     factory :parking_notification_organized do
       organization { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
-      user { FactoryBot.create(:organization_member, organization: organization) }
+      user { FactoryBot.create(:organization_user, organization: organization) }
 
       factory :parking_notification_unregistered do
         bike do

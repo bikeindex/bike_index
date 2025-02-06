@@ -205,14 +205,14 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:organization_kind) { "ambassador" }
         it "is no_subscription_required" do
           expect(user).to be_present
-          expect(mailchimp_datum.mailchimp_organization_membership&.id).to be_blank
+          expect(mailchimp_datum.mailchimp_organization_usership&.id).to be_blank
           # Doesn't include does_not_need_pos tag
           expect(mailchimp_datum.status).to eq "no_subscription_required"
           expect(mailchimp_datum.id).to be_blank
           expect(mailchimp_datum).to_not be_valid
           # And because I initially added some ambassador orgs, make sure we don't just load from the name
           mailchimp_datum.data["merge_fields"] = {organization_name: organization.name}
-          expect(mailchimp_datum.mailchimp_organization_membership&.id).to be_blank
+          expect(mailchimp_datum.mailchimp_organization_usership&.id).to be_blank
         end
       end
       context "lightspeed" do
@@ -361,7 +361,7 @@ RSpec.describe MailchimpDatum, type: :model do
     end
   end
 
-  describe "mailchimp_organization_membership" do
+  describe "mailchimp_organization_usership" do
     let(:user) { FactoryBot.create(:organization_admin) }
     let(:organization1) { user.organizations.first }
     let(:membership2) { FactoryBot.create(:membership_claimed, user: user, role: "admin") }

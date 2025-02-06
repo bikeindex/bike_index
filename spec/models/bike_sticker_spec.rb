@@ -277,7 +277,7 @@ RSpec.describe BikeSticker, type: :model do
       let(:organization_no_match) { FactoryBot.create(:organization) }
       let!(:bike_sticker_initial) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization) }
       let(:bike_sticker_duplicate) { FactoryBot.create(:bike_sticker, code: "a0010", organization: organization_duplicate) }
-      let!(:user) { FactoryBot.create(:organization_member, organization: organization_duplicate) }
+      let!(:user) { FactoryBot.create(:organization_user, organization: organization_duplicate) }
       it "looks up, falling back to the orgs for the user, falling back to any org" do
         expect(bike_sticker_duplicate).to be_present # Ensure it's created after initial
         # It finds the first record in the database
@@ -460,7 +460,7 @@ RSpec.describe BikeSticker, type: :model do
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker) }
       let(:bike_sticker3) { FactoryBot.create(:bike_sticker) }
       let(:organization) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       it "is truthy if fewer than MAX_UNORGANIZED bike_sticker_updates" do
         expect(bike_sticker1.claimable_by?(user)).to be_truthy
         expect(bike_sticker1.claimable_by?(user, organization)).to be_truthy
@@ -498,7 +498,7 @@ RSpec.describe BikeSticker, type: :model do
       let(:organization_regional) { FactoryBot.create(:organization, :in_edmonton) }
       let(:organization) { FactoryBot.create(:organization_with_regional_bike_counts, :in_edmonton, regional_ids: [organization_regional.id]) }
       let(:organization_other) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization_regional) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization_regional) }
       before { FactoryBot.create(:membership_claimed, user: user, organization: organization_other) }
       it "is truthy for regional org" do
         FactoryBot.create(:bike_sticker_update, user: user, bike_sticker: bike_sticker1, bike: bike1, kind: "failed_claim") # Ignored, because failed
@@ -731,8 +731,8 @@ RSpec.describe BikeSticker, type: :model do
       let(:user) { FactoryBot.create(:user) }
       context "user not authorized for bike" do
         let(:bike) { FactoryBot.create(:bike) }
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        let(:user2) { FactoryBot.create(:organization_member, organization: organization_regional) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
+        let(:user2) { FactoryBot.create(:organization_user, organization: organization_regional) }
         it "does not add bike" do
           expect(user.authorized?(bike)).to be_falsey
           expect { bike_sticker1.claim_if_permitted(user: user, bike: bike, organization: organization) }.to change(BikeStickerUpdate, :count).by 1
@@ -791,7 +791,7 @@ RSpec.describe BikeSticker, type: :model do
         end
       end
       context "with secondary organization authorized" do
-        let(:user) { FactoryBot.create(:organization_member, organization: organization_regional) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization_regional) }
         let(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }
         it "adds only the organization_regional" do
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([])

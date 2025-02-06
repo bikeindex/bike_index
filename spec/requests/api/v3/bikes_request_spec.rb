@@ -78,7 +78,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["error"]).to match(/organization/i)
     end
     context "user is organization member" do
-      let(:user) { FactoryBot.create(:organization_member) }
+      let(:user) { FactoryBot.create(:organization_user) }
       let!(:organization) { user.organizations.first }
       let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "with_user", authorized_bike_id: nil} }
       let(:unmatched_result) { {registered: false, claimed: false, can_edit: false, state: "no_matching_bike", authorized_bike_id: nil} }
@@ -1272,10 +1272,10 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "organization bike" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:og_creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:og_creator) { FactoryBot.create(:organization_user, organization: organization) }
       let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creator: og_creator) }
       let(:ownership) { bike.ownerships.first }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:params) { {year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"]} }
       let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
       it "permits updating" do

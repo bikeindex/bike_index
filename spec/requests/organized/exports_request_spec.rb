@@ -43,7 +43,7 @@ RSpec.describe Organized::ExportsController, type: :request do
   context "organization with csv_exports" do
     let(:enabled_feature_slugs) { ["csv_exports"] }
     let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
 
     describe "index" do
       it "renders" do

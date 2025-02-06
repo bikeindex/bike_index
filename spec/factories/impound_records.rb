@@ -5,7 +5,7 @@ FactoryBot.define do
 
     trait :with_organization do
       organization { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
-      user { FactoryBot.create(:organization_member, organization: organization) }
+      user { FactoryBot.create(:organization_user, organization: organization) }
     end
 
     factory :impound_record_with_organization, traits: [:with_organization]

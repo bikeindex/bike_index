@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe Organized::UsersController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/users" }
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     describe "index" do
       it "redirects" do
         get base_url, params: {organization_id: current_organization.to_param}
@@ -46,7 +46,7 @@ RSpec.describe Organized::UsersController, type: :request do
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
     describe "index" do
-      let!(:user2) { FactoryBot.create(:organization_member, organization: current_organization, email: "jill@org.edu", name: "monica") }
+      let!(:user2) { FactoryBot.create(:organization_user, organization: current_organization, email: "jill@org.edu", name: "monica") }
       it "renders" do
         get base_url
         expect(response.status).to eq(200)

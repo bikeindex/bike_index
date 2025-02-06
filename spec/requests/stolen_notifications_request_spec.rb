@@ -50,7 +50,7 @@ RSpec.describe StolenNotificationsController, type: :request do
       context "unstolen notification direct" do
         let(:owner_email) { "example@bikeindex.org" }
         let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
-        let(:current_user) { FactoryBot.create(:organization_member, organization: organization_unstolen) }
+        let(:current_user) { FactoryBot.create(:organization_user, organization: organization_unstolen) }
         let(:organization) { FactoryBot.create(:organization, direct_unclaimed_notifications: true) }
         let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: owner_email) }
         it "creates and sends" do

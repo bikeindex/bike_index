@@ -26,7 +26,7 @@ RSpec.describe StolenNotification, type: :model do
     let(:bike) { FactoryBot.create(:bike, owner_email: owner_email, creator: creator) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, owner_email: owner_email, creator: creator) }
     let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
-    let(:sender) { FactoryBot.create(:organization_member, organization: organization_unstolen) }
+    let(:sender) { FactoryBot.create(:organization_user, organization: organization_unstolen) }
     let(:stolen_notification) { StolenNotification.new(subject: "special title", message: "party", reference_url: "https://example.com", bike_id: bike.id, sender: sender) }
 
     def expect_stolen_notification_to_send(stolen_notification, receiver)

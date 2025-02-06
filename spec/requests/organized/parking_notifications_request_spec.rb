@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::ParkingNotificationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/parking_notifications" }
-  include_context :request_spec_logged_in_as_organization_member
+  include_context :request_spec_logged_in_as_organization_user
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 3.hours) }
@@ -214,7 +214,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
         let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
         let(:parking_notification_and_photo_params) { parking_notification_params.merge(image: Rack::Test::UploadedFile.new(file)) }
-        let(:organization_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let(:organization_user) { FactoryBot.create(:organization_user, organization: current_organization) }
         it "creates and adds photo" do
           FactoryBot.create(:state_new_york)
           expect(current_organization.enabled?("parking_notifications")).to be_truthy

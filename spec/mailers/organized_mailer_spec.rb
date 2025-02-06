@@ -378,7 +378,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
   end
 
   describe "hot_sheet_notification" do
-    let(:recipient) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:recipient) { FactoryBot.create(:organization_user, organization: organization) }
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_bike_image) }
     let(:bike) { stolen_record.bike }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization, recipient_ids: [recipient.id, organization.auto_user.id], stolen_record_ids: [stolen_record.id]) }
