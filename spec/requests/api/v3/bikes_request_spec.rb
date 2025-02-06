@@ -454,7 +454,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:can_edit_claimed) { true }
         let(:bike) { FactoryBot.create(:bike_organized, can_edit_claimed: can_edit_claimed) }
         let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike) }
-        let!(:organization_user) { FactoryBot.create(:organization_role_claimed, user: user, organization: bike.creation_organization) }
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do
           {
             serial: bike.serial_display,
@@ -753,7 +753,7 @@ RSpec.describe "Bikes API V3", type: :request do
       let(:organization) { FactoryBot.create(:organization) }
       it "creates a stolen bike through an organization and uses the passed phone" do
         user.update_attribute :phone, "0987654321"
-        FactoryBot.create(:organization_user, user: user, organization: organization)
+        FactoryBot.create(:organization_role, user: user, organization: organization)
         FactoryBot.create(:country, iso: "US")
         FactoryBot.create(:state, abbreviation: "NY")
         date_stolen = 1357192800
@@ -829,7 +829,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "with membership" do
       before do
-        FactoryBot.create(:organization_user, user: user, organization: organization, role: "admin")
+        FactoryBot.create(:organization_role, user: user, organization: organization, role: "admin")
         organization.save
       end
 

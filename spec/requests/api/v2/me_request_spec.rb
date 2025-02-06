@@ -27,7 +27,7 @@ RSpec.describe "Me API V2", type: :request do
       expect(result["id"]).to eq(user.id.to_s)
       expect(result["user"].is_a?(Hash)).to be_truthy
       expect(result["bike_ids"].is_a?(Array)).to be_truthy
-      expect(result["organization_roles"].is_a?(Array)).to be_truthy
+      expect(result["memberships"].is_a?(Array)).to be_truthy
       expect(response.response_code).to eq(200)
     end
 
@@ -40,7 +40,7 @@ RSpec.describe "Me API V2", type: :request do
       expect(result["id"]).to eq(user.id.to_s)
       expect(result["user"].is_a?(Hash)).to be_truthy
       expect(result["bike_ids"].is_a?(Array)).to be_truthy
-      expect(result["organization_roles"].is_a?(Array)).to be_truthy
+      expect(result["memberships"].is_a?(Array)).to be_truthy
     end
 
     it "doesn't include bikes if no bikes scoped" do
@@ -52,16 +52,16 @@ RSpec.describe "Me API V2", type: :request do
       expect(result["bike_ids"].present?).to be_falsey
     end
 
-    it "doesn't include organization_roles if no organization_roles scoped" do
+    it "doesn't include memberships if no memberships scoped" do
       expect(token.scopes.to_s.match("read_organization_membership").present?).to be_falsey
       get "#{base_url}/me", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)
       expect(result["id"]).to eq(user.id.to_s)
-      expect(result["organization_roles"].present?).to be_falsey
+      expect(result["memberships"].present?).to be_falsey
     end
 
-    it "doesn't include organization_roles if no organization_roles scoped" do
+    it "doesn't include memberships if no memberships scoped" do
       get "#{base_url}/me", params: {access_token: token.token, format: :json}
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)

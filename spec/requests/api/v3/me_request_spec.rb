@@ -20,13 +20,13 @@ RSpec.describe "Me API V3", type: :request do
     context "fully scoped token" do
       let(:scopes) { all_scopes }
       let!(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "d@f.co") }
-      let!(:organization_user) { FactoryBot.create(:organization_role_claimed, user: user) }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user) }
       let(:target_membership) do
         {
-          organization_name: membership.organization.name,
-          organization_slug: membership.organization.slug,
-          organization_id: membership.organization_id,
-          organization_access_token: membership.organization.access_token,
+          organization_name: organization_role.organization.name,
+          organization_slug: organization_role.organization.slug,
+          organization_id: organization_role.organization_id,
+          organization_access_token: organization_role.organization.access_token,
           user_is_organization_admin: false
         }
       end
@@ -40,8 +40,8 @@ RSpec.describe "Me API V3", type: :request do
         expect(json_result["id"]).to eq(user.id.to_s)
         expect(json_result["user"].is_a?(Hash)).to be_truthy
         expect(json_result["bike_ids"].is_a?(Array)).to be_truthy
-        expect(json_result["organization_roles"].is_a?(Array)).to be_truthy
-        expect(json_result["organization_roles"]).to eq([target_membership.as_json])
+        expect(json_result["memberships"].is_a?(Array)).to be_truthy
+        expect(json_result["memberships"]).to eq([target_membership.as_json])
         expect(response.response_code).to eq(200)
       end
     end
@@ -69,7 +69,7 @@ RSpec.describe "Me API V3", type: :request do
           expect(Time.at(json_result[:user][:created_at])).to be_within(1.second).of time
           expect(json_result[:user].is_a?(Hash)).to be_truthy
           expect(json_result.key?("bike_ids")).to be_falsey
-          expect(json_result.key?("organization_roles")).to be_falsey
+          expect(json_result.key?("memberships")).to be_falsey
           expect(response.response_code).to eq(200)
         end
         context "user not present" do
@@ -95,19 +95,19 @@ RSpec.describe "Me API V3", type: :request do
     end
 
     context "no membership scoped" do
-      it "doesn't include organization_roles if no organization_roles scoped" do
+      it "doesn't include memberships if no memberships scoped" do
         expect(token.scopes.to_s.match("read_organization_membership").present?).to be_falsey
         get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
         expect(response.response_code).to eq(200)
         result = JSON.parse(response.body)
         expect(result["id"]).to eq(user.id.to_s)
-        expect(result["organization_roles"].present?).to be_falsey
+        expect(result["memberships"].present?).to be_falsey
       end
     end
 
     context "Default scope" do
       let(:scopes) { "" }
-      it "doesn't include organization_roles" do
+      it "doesn't include memberships" do
         get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
         expect(response.response_code).to eq(200)
         result = JSON.parse(response.body)
