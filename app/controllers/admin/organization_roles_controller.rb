@@ -16,33 +16,33 @@ class Admin::OrganizationRolesController < Admin::BaseController
   end
 
   def new
-    @membership = OrganizationRole.new(organization_id: current_organization&.id)
+    @organization_role = OrganizationRole.new(organization_id: current_organization&.id)
   end
 
   def edit
   end
 
   def update
-    if @membership.update(permitted_parameters)
+    if @organization_role.update(permitted_parameters)
       flash[:success] = "OrganizationRole Saved!"
-      redirect_to admin_membership_url(@membership)
+      redirect_to admin_membership_url(@organization_role)
     else
       render action: :edit
     end
   end
 
   def create
-    @membership = OrganizationRole.new(permitted_parameters.merge(sender: current_user))
-    if @membership.save
+    @organization_role = OrganizationRole.new(permitted_parameters.merge(sender: current_user))
+    if @organization_role.save
       flash[:success] = "OrganizationRole Created!"
-      redirect_to admin_membership_url(@membership)
+      redirect_to admin_membership_url(@organization_role)
     else
       render action: :new
     end
   end
 
   def destroy
-    @membership.destroy
+    @organization_role.destroy
     flash[:success] = "membership deleted successfully"
     redirect_to admin_organization_roles_url
   end
@@ -58,7 +58,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
   end
 
   def find_membership
-    @membership = OrganizationRole.unscoped.find(params[:id])
+    @organization_role = OrganizationRole.unscoped.find(params[:id])
   end
 
   def find_organizations

@@ -19,20 +19,20 @@ module Organized
     end
 
     def update
-      @membership.update(permitted_update_params)
-      flash[:success] = translation(:updated_membership, user_email: @membership.user&.email)
+      @organization_role.update(permitted_update_params)
+      flash[:success] = translation(:updated_membership, user_email: @organization_role.user&.email)
       redirect_to current_root_path
     end
 
     def destroy
-      @membership.destroy
+      @organization_role.destroy
       flash[:success] = translation(:deleted_user)
       redirect_to current_root_path
     end
 
     def new
-      @membership ||= OrganizationRole.new(organization_id: current_organization.id)
-      @page_errors = @membership.errors
+      @organization_role ||= OrganizationRole.new(organization_id: current_organization.id)
+      @page_errors = @organization_role.errors
     end
 
     def create
@@ -40,7 +40,7 @@ module Organized
         flash[:error] = translation(:no_remaining_user_invitations, org_name: current_organization.name)
         redirect_to(current_root_path) && return
       end
-      @membership = OrganizationRole.new(permitted_create_params)
+      @organization_role = OrganizationRole.new(permitted_create_params)
       if params[:multiple_emails_invited].present?
         if current_organization.restrict_invitations? && (multiple_emails_invited.count > current_organization.remaining_invitation_count)
           flash[:error] = translation(:insufficient_invitations,
@@ -57,9 +57,9 @@ module Organized
 
           redirect_to(current_root_path) && return
         end
-      elsif @membership.save
+      elsif @organization_role.save
         flash[:success] = translation(:user_was_invited,
-          invited_email: @membership.invited_email,
+          invited_email: @organization_role.invited_email,
           org_name: current_organization.name)
         redirect_to current_root_path
       else
@@ -84,11 +84,11 @@ module Organized
     end
 
     def find_membership
-      @membership = current_organization.organization_roles.find(params[:id])
+      @organization_role = current_organization.organization_roles.find(params[:id])
     end
 
     def reject_self_updates
-      if @membership && @membership.user == current_user
+      if @organization_role && @organization_role.user == current_user
         flash[:error] = translation(:cannot_remove_yourself)
         redirect_to(organization_users_path(organization_id: current_organization)) && return
       end
