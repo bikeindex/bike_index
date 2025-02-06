@@ -47,8 +47,8 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  def organization_invitation(membership)
-    @organization_role = membership
+  def organization_invitation(organization_role)
+    @organization_role = organization_role
     @organization = @organization_role.organization
     @sender = @organization_role.sender
     @vars = {email: @organization_role.invited_email}

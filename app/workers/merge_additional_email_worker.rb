@@ -42,11 +42,11 @@ class MergeAdditionalEmailWorker < ApplicationWorker
   def merge_user_organization_roles(user_email, old_user)
     Organization.where(auto_user_id: old_user.id).each { |i| i.update_attribute :auto_user_id, user_email.user_id }
     OrganizationRole.where(sender_id: old_user.id).each { |i| i.update_attribute :sender_id, user_email.user_id }
-    old_user.organization_roles.each do |membership|
-      if user_email.user.organizations.include?(membership.organization)
-        membership.delete
+    old_user.organization_roles.each do |organization_role|
+      if user_email.user.organizations.include?(organization_role.organization)
+        organization_role.delete
       else
-        membership.update_attribute :user_id, user_email.user_id
+        organization_role.update_attribute :user_id, user_email.user_id
       end
     end
   end

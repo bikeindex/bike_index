@@ -77,8 +77,8 @@ class AfterUserCreateWorker < ApplicationWorker
 
     # We want to do the first one inline so we can redirect
     # the user to the org page
-    rest.each do |membership_id|
-      ProcessOrganizationRoleWorker.perform_async(membership_id, user.id)
+    rest.each do |organization_role_id|
+      ProcessOrganizationRoleWorker.perform_async(organization_role_id, user.id)
     end
 
     user.confirm(user.confirmation_token) unless skip_confirm

@@ -4,14 +4,14 @@
       .choose-links.col-sm-6
         %ul
           - if current_user.organization_roles.any?
-            - current_user.organization_roles.each do |membership|
+            - current_user.organization_roles.each do |organization_role|
               %li
-                %a.organization-choice.choose-type{data: {target: new_bike_url(organization_id: membership.organization.id)}}
+                %a.organization-choice.choose-type{data: {target: new_bike_url(organization_id: organization_role.organization.id)}}
                   %span.add-selected
                     &#10004
                   = t(".add_a_bike_through")
                   %em
-                    = membership.organization.name
+                    = organization_role.organization.name
           %li
             %a.purchase-choice.choose-type{data: {target: new_bike_url}}
               %span.add-selected

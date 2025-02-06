@@ -57,8 +57,8 @@
                 %ul.primary-submenu{ 'aria-labelledby' => '#setting_submenu' }
                   - organization_roles = current_user_or_unconfirmed_user.organization_roles.includes(:organization)
                   - if organization_roles.any?
-                    - organization_roles.each do |membership|
-                      - organization = membership.organization
+                    - organization_roles.each do |organization_role|
+                      - organization = organization_role.organization
                       - next unless organization.present?
                       %li
                         %a.nav-link{ href: organization_root_path(organization_id: organization.to_param) }

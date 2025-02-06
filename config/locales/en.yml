@@ -35,7 +35,7 @@ en:
         locks: Locks
         longitude: Longitude
         magic_link_token: Magic link token
-        organization_roles: Memberships
+        organization_roles: Organization roles
         my_bikes_hash: My bikes hash
         name: Name
         notification_newsletters: Notification newsletters
@@ -422,7 +422,7 @@ en:
         slug: Slug
         total_years_active: Total years active
         website: Website
-      membership:
+      organization_role:
         claimed_at: Claimed at
         deleted_at: Deleted at
         email_invitation_sent_at: Email invitation sent at
@@ -4802,7 +4802,7 @@ en:
         member_no_bikes_access: Same access as Member, but can not edit organization
           bikes
         member_of_organization: Member of organization
-        membership_type: Membership type
+        role_type: Role type
       new:
         1_email_per_line: 1 email per line
         automatic_passwordless: >-
