@@ -379,7 +379,7 @@ RSpec.describe MyAccountsController, type: :request do
       let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:organization_user) { current_user.organization_roles.first }
       it "updates hotsheet" do
-        expect(membership.notification_never?).to be_truthy
+        expect(organization_role.notification_never?).to be_truthy
         # Doesn't include the parameter because when false, it doesn't include
         patch base_url, params: {
           id: current_user.username,
@@ -388,16 +388,16 @@ RSpec.describe MyAccountsController, type: :request do
         }, headers: {"HTTP_REFERER" => organization_hot_sheet_path(organization_id: organization.to_param)}
         expect(flash[:success]).to be_present
         expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
-        membership.reload
-        expect(membership.notification_daily?).to be_truthy
+        organization_role.reload
+        expect(organization_role.notification_daily?).to be_truthy
       end
       context "with other parameters too" do
         let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
         let(:organization2) { hot_sheet_configuration2.organization }
         let!(:organization_user2) { FactoryBot.create(:organization_role_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
         it "updates all the parameters" do
-          expect(membership.notification_never?).to be_truthy
-          expect(membership2.notification_daily?).to be_truthy
+          expect(organization_role.notification_never?).to be_truthy
+          expect(organization_role2.notification_daily?).to be_truthy
           put base_url, params: {
             id: current_user.username,
             hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
@@ -409,10 +409,10 @@ RSpec.describe MyAccountsController, type: :request do
           }
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url(edit_template: "root")
-          membership.reload
-          membership2.reload
-          expect(membership.notification_daily?).to be_truthy
-          expect(membership2.notification_daily?).to be_falsey
+          organization_role.reload
+          organization_role2.reload
+          expect(organization_role.notification_daily?).to be_truthy
+          expect(organization_role2.notification_daily?).to be_falsey
 
           current_user.reload
           expect(current_user.notification_newsletters).to be_truthy

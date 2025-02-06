@@ -561,7 +561,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.phoneable_by?(user)).to be_truthy
       end
 
-      it "returns true if shops can see it and user has shop membership" do
+      it "returns true if shops can see it and user has shop organization_role" do
         allow(user).to receive(:has_shop_organization_role?).and_return(true)
         stolen_record.phone_for_shops = true
         expect(bike.phoneable_by?(user)).to be_truthy
@@ -993,7 +993,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.editable_organizations.pluck(:id)).to eq([]) # No longer impounded by that org
           expect(bike.status).to eq "status_with_owner"
           expect(bike.authorized?(user)).to be_truthy
-          expect(bike.authorized?(organization_user)).to be_falsey # Because no organization membership
+          expect(bike.authorized?(organization_user)).to be_falsey # Because no organization organization_role
           expect(bike.authorized?(superuser)).to be_truthy
         end
       end
@@ -1004,8 +1004,8 @@ RSpec.describe Bike, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
     let!(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
-    let(:organization_usership2) { FactoryBot.create(:organization_user, user: organization_user) }
-    let!(:organization2) { organization_usership2.organization }
+    let(:organization_role2) { FactoryBot.create(:organization_role, user: organization_user) }
+    let!(:organization2) { organization_role2.organization }
     let(:bike) { FactoryBot.create(:bike_organized, user: user, claimed: true, creation_organization: organization, can_edit_claimed: false) }
     let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, can_edit_claimed: true, organization: organization2) }
     it "checks the passed organization" do
@@ -1058,7 +1058,7 @@ RSpec.describe Bike, type: :model do
       let(:user_unorganized) { User.new }
       let(:owner) { User.new }
       let(:organization_unstolen) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
-      let(:organization_user) { FactoryBot.create(:organization_user, user: user, organization: organization_unstolen) }
+      let(:organization_role) { FactoryBot.create(:organization_role, user: user, organization: organization_unstolen) }
       it "is truthy for the organization with unstolen" do
         allow(bike).to receive(:owner) { owner }
         expect(bike.contact_owner?).to be_falsey
@@ -1067,7 +1067,7 @@ RSpec.describe Bike, type: :model do
         expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
 
         # Add user to the unstolen org
-        expect(membership.reload).to be_present
+        expect(organization_role.reload).to be_present
         user.reload
         expect(bike.contact_owner?(user)).to be_truthy
         expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
@@ -1100,7 +1100,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.current_ownership.organization_direct_unclaimed_notifications?).to be false
           expect(bike.contact_owner_user?(admin, organization)).to be true
           # Add user to the unstolen org
-          expect(membership.reload).to be_present
+          expect(organization_role.reload).to be_present
           user.reload
           expect(bike.contact_owner?(user)).to be true
           expect(bike.contact_owner?(user, organization_unstolen)).to be true

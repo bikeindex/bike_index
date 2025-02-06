@@ -38,7 +38,7 @@ RSpec.describe OrganizationRole, type: :model do
   describe ".ambassador_organizations" do
     it "returns all and only ambassador organizations" do
       FactoryBot.create(:organization_role_claimed)
-      ambassador_orgs = FactoryBot.create_list(:organization_user_ambassador, 3)
+      ambassador_orgs = FactoryBot.create_list(:organization_role_ambassador, 3)
       found_orgs = OrganizationRole.ambassador_organizations
       expect(found_orgs.order(:created_at)).to eq(ambassador_orgs.sort_by(&:created_at))
     end
@@ -47,27 +47,27 @@ RSpec.describe OrganizationRole, type: :model do
   describe "admin?" do
     context "admin" do
       it "returns true" do
-        membership = OrganizationRole.new(role: "admin")
-        expect(membership.admin?).to be_truthy
+        organization_role = OrganizationRole.new(role: "admin")
+        expect(organization_role.admin?).to be_truthy
       end
     end
     context "member" do
       it "returns true" do
-        membership = OrganizationRole.new(role: "member")
-        expect(membership.admin?).to be_falsey
+        organization_role = OrganizationRole.new(role: "member")
+        expect(organization_role.admin?).to be_falsey
       end
     end
   end
 
-  describe "ambassador membership without user" do
+  describe "ambassador organization_role without user" do
     let!(:organization) { FactoryBot.create(:organization_ambassador) }
     let!(:ambassador_task) { FactoryBot.create(:ambassador_task) }
     let(:email) { "new@ambassador.edu" }
-    let(:organization_user) { FactoryBot.build(:organization_user, organization: organization, invited_email: email) }
+    let(:organization_role) { FactoryBot.build(:organization_role, organization: organization, invited_email: email) }
     it "creates the tasks when it can create the tasks" do
       Sidekiq::Worker.clear_all
-      membership.save
-      expect(membership.ambassador?).to be_truthy
+      organization_role.save
+      expect(organization_role.ambassador?).to be_truthy
       Sidekiq::Worker.drain_all
       user = FactoryBot.create(:user, email: email)
       Sidekiq::Worker.drain_all

@@ -137,7 +137,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
 
     context "geolocated" do
-      context "user without organization membership" do
+      context "user without organization organization_role" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "does not create" do
           expect(current_organization.enabled?("parking_notifications")).to be_truthy

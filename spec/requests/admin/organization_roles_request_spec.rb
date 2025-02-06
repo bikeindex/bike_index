@@ -8,7 +8,7 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
   describe "index" do
     let(:organization_user) { FactoryBot.create(:organization_user) }
     it "renders" do
-      expect(membership).to be_present
+      expect(organization_role).to be_present
       get base_url
       expect(response).to render_template :index
     end
@@ -25,13 +25,13 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
     let!(:organization) { FactoryBot.create(:organization) }
     it "creates" do
       expect(organization.organization_roles.count).to eq 0
-      post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com"}}
+      post base_url, params: {organization_role: {role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com"}}
       organization.reload
       expect(organization.organization_roles.count).to eq 1
-      membership = OrganizationRole.last
-      expect(membership.invited_email).to eq "new_email@stuff.com"
-      expect(membership.claimed?).to be_falsey
-      expect(membership.sender).to eq current_user
+      organization_role = OrganizationRole.last
+      expect(organization_role.invited_email).to eq "new_email@stuff.com"
+      expect(organization_role.claimed?).to be_falsey
+      expect(organization_role.sender).to eq current_user
     end
     context "user present" do
       let!(:existing_user) { FactoryBot.create(:user_confirmed, email: "somebody@stuff.com") }
@@ -40,18 +40,18 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         expect {
-          post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com"}}
+          post base_url, params: {organization_role: {role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com"}}
         }.to change(OrganizationRole, :count).by 1
         expect(organization.organization_roles.count).to eq 1
         existing_user.reload
-        membership = OrganizationRole.last
+        organization_role = OrganizationRole.last
         expect(ProcessOrganizationRoleWorker.jobs.count).to eq 1
         ProcessOrganizationRoleWorker.drain
         organization.reload
-        membership.reload
+        organization_role.reload
         expect(existing_user.organization_roles.count).to eq 1
-        expect(membership.user).to eq existing_user
-        expect(membership.sender).to eq current_user
+        expect(organization_role.user).to eq existing_user
+        expect(organization_role.sender).to eq current_user
       end
     end
   end

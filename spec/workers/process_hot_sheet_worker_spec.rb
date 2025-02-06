@@ -44,7 +44,7 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
     end
 
     context "with recipients" do
-      let!(:organization_user) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
       let!(:organization_user_unclaimed) { FactoryBot.create(:organization_user, organization: organization1, hot_sheet_notification: "notification_daily") }
       it "delivers the email" do
         expect {
@@ -55,11 +55,11 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
         expect(hot_sheet.organization_id).to eq organization1.id
         # And it's delivered the email
         expect(hot_sheet.email_success?).to be_truthy
-        expect(hot_sheet.recipient_ids).to eq([membership.user_id])
+        expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
         expect(ActionMailer::Base.deliveries.count).to eq 1
         email = ActionMailer::Base.deliveries.last
         expect(email.subject).to eq hot_sheet.subject
-        expect(email.to).to eq([membership.user.email])
+        expect(email.to).to eq([organization_role.user.email])
         expect(email.bcc).to eq([])
       end
       context "with more than 50 recipients" do
@@ -75,7 +75,7 @@ RSpec.describe ProcessHotSheetWorker, type: :lib do
           expect(hot_sheet.organization_id).to eq organization1.id
           # And it's delivered the email
           expect(hot_sheet.email_success?).to be_truthy
-          expect(hot_sheet.recipient_ids).to eq([membership.user_id])
+          expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
           expect(ActionMailer::Base.deliveries.count).to eq 3
 
           ActionMailer::Base.deliveries.each do |email|

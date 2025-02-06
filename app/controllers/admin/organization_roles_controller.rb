@@ -24,7 +24,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
 
   def update
     if @organization_role.update(permitted_parameters)
-      flash[:success] = "OrganizationRole Saved!"
+      flash[:success] = "Organization Role Saved!"
       redirect_to admin_organization_role_url(@organization_role)
     else
       render action: :edit
@@ -34,7 +34,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
   def create
     @organization_role = OrganizationRole.new(permitted_parameters.merge(sender: current_user))
     if @organization_role.save
-      flash[:success] = "OrganizationRole Created!"
+      flash[:success] = "Organization Role Created!"
       redirect_to admin_organization_role_url(@organization_role)
     else
       render action: :new
@@ -43,7 +43,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
 
   def destroy
     @organization_role.destroy
-    flash[:success] = "membership deleted successfully"
+    flash[:success] = "Organization Role deleted successfully"
     redirect_to admin_organization_roles_url
   end
 

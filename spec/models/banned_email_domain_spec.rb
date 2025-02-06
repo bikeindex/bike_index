@@ -72,7 +72,7 @@ RSpec.describe BannedEmailDomain, type: :model do
         end
       end
 
-      context "with a membership in the domain" do
+      context "with a organization_role in the domain" do
         let(:organization) { FactoryBot.create(:organization, approved: true) }
         let!(:organization_user) { FactoryBot.create(:organization_user, organization:, user:) }
         it "is falsey" do

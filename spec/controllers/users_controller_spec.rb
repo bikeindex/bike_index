@@ -138,10 +138,10 @@ RSpec.describe UsersController, type: :controller do
           expect(mail.from).to eq(["contact@bikeindex.org"])
         end
       end
-      context "with membership and an example bike" do
+      context "with organization_role and an example bike" do
         let(:email) { "test@stuff.com" }
         let(:organization_user) { FactoryBot.create(:organization_user, invited_email: " #{email.upcase}", role: "member") }
-        let!(:organization) { membership.organization }
+        let!(:organization) { organization_role.organization }
         let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
         let(:user_attributes) { {email: email, name: "SAMPLE", password: "pleaseplease12", terms_of_service: "1", notification_newsletters: "0"} }
@@ -175,7 +175,7 @@ RSpec.describe UsersController, type: :controller do
           }.to change(EmailWelcomeWorker.jobs, :count)
         end
       end
-      context "with membership, partner param" do
+      context "with organization_role, partner param" do
         let!(:organization_user) { FactoryBot.create(:organization_user, invited_email: "poo@pile.com") }
         it "creates a confirmed user, log in, and send welcome, language header" do
           session[:passive_organization_id] = "0"
@@ -193,7 +193,7 @@ RSpec.describe UsersController, type: :controller do
           expect(User.from_auth(cookies.signed[:auth])).to eq user
           expect(user.last_login_at).to be_within(2.seconds).of Time.current
           expect(user.preferred_language).to eq "nl"
-          expect(session[:passive_organization_id]).to eq membership.organization_id
+          expect(session[:passive_organization_id]).to eq organization_role.organization_id
         end
       end
       context "with partner session" do
@@ -217,7 +217,7 @@ RSpec.describe UsersController, type: :controller do
       context "with auto passwordless users" do
         let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
         let(:email) { "example@ladot.online" }
-        it "Does not create a membership or automatically confirm the user" do
+        it "Does not create a organization_role or automatically confirm the user" do
           expect(session[:passive_organization_id]).to be_blank
           ActionMailer::Base.deliveries = []
           Sidekiq::Worker.clear_all

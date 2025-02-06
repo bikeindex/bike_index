@@ -13,7 +13,7 @@ RSpec.describe Ambassador, type: :model do
   describe "#ambassador_organizations" do
     it "returns any associated ambassador organizations" do
       ambassador = FactoryBot.create(:ambassador)
-      FactoryBot.create_list(:organization_user_ambassador, 3, user: ambassador)
+      FactoryBot.create_list(:organization_role_ambassador, 3, user: ambassador)
       FactoryBot.create_list(:organization_role_claimed, 2, user: ambassador)
 
       expect(ambassador.ambassador_organizations.count).to eq(4)
@@ -26,8 +26,8 @@ RSpec.describe Ambassador, type: :model do
       ambassador = FactoryBot.create(:ambassador)
       org1 = FactoryBot.create(:organization_ambassador)
       org2 = FactoryBot.create(:organization_ambassador)
-      FactoryBot.create(:organization_user_ambassador, user: ambassador, organization: org2)
-      new_ambassadorship = FactoryBot.create(:organization_user_ambassador, user: ambassador, organization: org1)
+      FactoryBot.create(:organization_role_ambassador, user: ambassador, organization: org2)
+      new_ambassadorship = FactoryBot.create(:organization_role_ambassador, user: ambassador, organization: org1)
       FactoryBot.create(:organization_role_claimed, user: ambassador)
 
       current_org = ambassador.current_ambassador_organization

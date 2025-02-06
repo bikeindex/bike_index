@@ -32,7 +32,7 @@ RSpec.describe OrganizationsController, type: :request do
         locations_attributes: {"0" => location_attrs}
       }
     end
-    it "creates org, membership, filters approved attrs & redirect to org with current_user" do
+    it "creates org, organization_role, filters approved attrs & redirect to org with current_user" do
       expect(Organization.count).to eq(0)
       post base_url, params: {organization: org_attrs}
       expect(Organization.count).to eq(1)
@@ -50,7 +50,7 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.locations.first).to match_hash_indifferently location_attrs
     end
 
-    it "creates org, membership, filters approved attrs & redirect to org with current_user and mails" do
+    it "creates org, organization_role, filters approved attrs & redirect to org with current_user and mails" do
       Sidekiq::Testing.inline! do
         expect(Organization.count).to eq(0)
         ActionMailer::Base.deliveries = []

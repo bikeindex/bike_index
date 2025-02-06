@@ -49,11 +49,11 @@ RSpec.describe SessionsController, type: :request do
           expect(user.confirmed?).to be_truthy
           expect(user.email).to eq "somethingcool@party.edu"
           expect(user.magic_link_token).to be_present
-          membership = user.organization_roles.first
-          expect(membership.organization).to eq current_organization
-          expect(membership.created_by_magic_link).to be_truthy
-          expect(membership.sender_id).to be_blank
-          expect(membership.role).to eq "member"
+          organization_role = user.organization_roles.first
+          expect(organization_role.organization).to eq current_organization
+          expect(organization_role.created_by_magic_link).to be_truthy
+          expect(organization_role.sender_id).to be_blank
+          expect(organization_role.role).to eq "member"
         end
       end
     end

@@ -47,14 +47,14 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.status).to eq "archived"
           expect(mailchimp_datum.user_id).to be_present
         end
-        context "membership removed" do
+        context "organization_role removed" do
           it "is archived" do
             mailchimp_datum = MailchimpDatum.find_or_create_for(user)
             expect(mailchimp_datum.lists).to eq(["organization"])
             expect(mailchimp_datum.subscribed?).to be_truthy
             expect(mailchimp_datum.on_mailchimp?).to be_falsey
             Sidekiq::Worker.clear_all
-            membership.destroy
+            organization_role.destroy
             expect(AfterUserChangeWorker.jobs.count).to eq 1
             id = mailchimp_datum.id
             mailchimp_datum = MailchimpDatum.find(id) # Unmemoize
@@ -94,7 +94,7 @@ RSpec.describe MailchimpDatum, type: :model do
             mailchimp_datum.update(updated_at: Time.current)
           }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
 
-          # And test that creating a membership doesn't result in update mailchimp datum
+          # And test that creating a organization_role doesn't result in update mailchimp datum
           FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
           expect {
             mailchimp_datum.update(updated_at: Time.current)
@@ -205,14 +205,14 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:organization_kind) { "ambassador" }
         it "is no_subscription_required" do
           expect(user).to be_present
-          expect(mailchimp_datum.mailchimp_organization_usership&.id).to be_blank
+          expect(mailchimp_datum.mailchimp_organization_role&.id).to be_blank
           # Doesn't include does_not_need_pos tag
           expect(mailchimp_datum.status).to eq "no_subscription_required"
           expect(mailchimp_datum.id).to be_blank
           expect(mailchimp_datum).to_not be_valid
           # And because I initially added some ambassador orgs, make sure we don't just load from the name
           mailchimp_datum.data["merge_fields"] = {organization_name: organization.name}
-          expect(mailchimp_datum.mailchimp_organization_usership&.id).to be_blank
+          expect(mailchimp_datum.mailchimp_organization_role&.id).to be_blank
         end
       end
       context "lightspeed" do
@@ -361,18 +361,18 @@ RSpec.describe MailchimpDatum, type: :model do
     end
   end
 
-  describe "mailchimp_organization_usership" do
+  describe "mailchimp_organization_role" do
     let(:user) { FactoryBot.create(:organization_admin) }
     let(:organization1) { user.organizations.first }
     let(:organization_user2) { FactoryBot.create(:organization_role_claimed, user: user, role: "admin") }
-    let(:organization2) { membership2.organization }
+    let(:organization2) { organization_role2.organization }
     let!(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
     it "uses the existing organization" do
       expect(mailchimp_datum).to be_valid
       expect(mailchimp_datum.mailchimp_organization&.id).to eq organization1.id
       mailchimp_datum.data["merge_fields"] = mailchimp_datum.managed_merge_fields
       mailchimp_datum.update(updated_at: Time.current)
-      expect(membership2).to be_valid
+      expect(organization_role2).to be_valid
       user.reload
       id = mailchimp_datum.id
       mailchimp_datum = MailchimpDatum.find(id) # Unmemoize

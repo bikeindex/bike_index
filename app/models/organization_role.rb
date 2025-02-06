@@ -59,12 +59,12 @@ class OrganizationRole < ApplicationRecord
       existing_organization_role = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
       return existing_organization_role if existing_organization_role.present?
     end
-    membership = create!(new_passwordless_attrs.merge(create_attrs))
+    organization_role = create!(new_passwordless_attrs.merge(create_attrs))
     # ProcessOrganizationRoleWorker creates a user if the user doesn't exist, for passwordless organizations
     # because of that, we want to process this inline
-    ProcessOrganizationRoleWorker.new.perform(membership.id)
-    membership.reload
-    membership
+    ProcessOrganizationRoleWorker.new.perform(organization_role.id)
+    organization_role.reload
+    organization_role
   end
 
   def self.admin_text_search(str)
@@ -98,7 +98,7 @@ class OrganizationRole < ApplicationRecord
 
   def enqueue_processing_worker
     return true if skip_processing
-    # We manually update the user, because ProcessOrganizationRoleWorker won't find this membership
+    # We manually update the user, because ProcessOrganizationRoleWorker won't find this organization_role
     if deleted? && user_id.present?
       AfterUserChangeWorker.perform_async(user_id)
     else

@@ -61,17 +61,17 @@ RSpec.describe HotSheet, type: :model do
     let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization) }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
     it "finds the recipients" do
-      expect(organization.organization_roles.pluck(:id)).to match_array([membership.id, membership2.id])
+      expect(organization.organization_roles.pluck(:id)).to match_array([organization_role.id, organization_role2.id])
       expect(hot_sheet.recipient_ids).to be_nil
-      expect(hot_sheet.fetch_recipients.pluck(:id)).to eq([membership.user_id])
+      expect(hot_sheet.fetch_recipients.pluck(:id)).to eq([organization_role.user_id])
       hot_sheet.reload
-      expect(hot_sheet.recipient_ids).to eq([membership.user_id])
+      expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
     end
     context "with recipient_ids set" do
-      let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization, recipient_ids: [membership.user_id, membership2.user_id]) }
+      let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization, recipient_ids: [organization_role.user_id, organization_role2.user_id]) }
       it "returns the set recipients" do
         hot_sheet.reload
-        expect(hot_sheet.fetch_recipients.pluck(:id)).to match_array([membership.user_id, membership2.user_id])
+        expect(hot_sheet.fetch_recipients.pluck(:id)).to match_array([organization_role.user_id, organization_role2.user_id])
       end
     end
   end

@@ -144,18 +144,18 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   describe "associate_organization_role_invites" do
     it "assigns any organization_roles that match the user email, and mark user confirmed if invited", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
-      membership1 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
-      membership2 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
-      expect(membership1.claimed?).to be_falsey
+      organization_role1 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
+      organization_role2 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
+      expect(organization_role1.claimed?).to be_falsey
 
       Sidekiq::Testing.inline! { user.save }
 
-      expect(membership1.created_at < user.created_at).to be_truthy
+      expect(organization_role1.created_at < user.created_at).to be_truthy
       # This is called on create, so we just test that things happen correctly here
       expect(user.confirmed?).to be_truthy
-      expect(membership1.reload.claimed?).to be_truthy
-      expect(membership2.reload.claimed?).to be_truthy
-      expect(membership1.user).to eq user
+      expect(organization_role1.reload.claimed?).to be_truthy
+      expect(organization_role2.reload.claimed?).to be_truthy
+      expect(organization_role1.user).to eq user
       expect(user.organization_roles.count).to eq 2
       expect(user.organizations.count).to eq 2
     end
@@ -164,17 +164,17 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     # redirect users to the organization they belong to
     it "synchronously associates the first memberhsip", :flaky do
       user = FactoryBot.build(:user, email: "owner1@B.COM")
-      membership1 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
-      membership2 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
-      expect(membership1).to_not be_claimed
-      expect(membership2).to_not be_claimed
+      organization_role1 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
+      organization_role2 = FactoryBot.create(:organization_user, invited_email: " #{user.email.upcase}")
+      expect(organization_role1).to_not be_claimed
+      expect(organization_role2).to_not be_claimed
 
       user.save
 
-      expect(membership1.reload.created_at).to be < user.created_at
+      expect(organization_role1.reload.created_at).to be < user.created_at
       expect(user).to be_confirmed
-      expect(membership1).to be_claimed
-      expect(membership1.user).to eq user
+      expect(organization_role1).to be_claimed
+      expect(organization_role1.user).to eq user
       expect(user.organization_roles.count).to eq(1)
       expect(user.organizations.count).to eq(1)
     end
@@ -213,7 +213,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     end
     context "matching domain" do
       let(:email) { "example@city.gov" }
-      it "creates the membership on confirm" do
+      it "creates the organization_role on confirm" do
         user.reload
         expect(user.confirmed?).to be_falsey
         Sidekiq::Worker.clear_all
@@ -223,20 +223,20 @@ RSpec.describe AfterUserCreateWorker, type: :job do
         expect(user.confirmed?).to be_truthy
         expect(user.organization_roles.count).to eq 1
         expect(user.mailchimp_datum).to be_blank
-        membership = user.organization_roles.first
-        expect(membership.claimed?).to be_truthy
-        expect(membership.organization_id).to eq organization.id
-        expect(membership.role).to eq "member"
+        organization_role = user.organization_roles.first
+        expect(organization_role.claimed?).to be_truthy
+        expect(organization_role.organization_id).to eq organization.id
+        expect(organization_role.role).to eq "member"
 
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to match(/join.*#{organization.name}/i)
       end
-      context "membership exists" do
-        it "does not create an additional membership" do
+      context "organization_role exists" do
+        it "does not create an additional organization_role" do
           expect(user.confirmed?).to be_falsey
-          membership = FactoryBot.create(:organization_user, user: user, sender: nil, organization: organization, role: "admin")
-          expect(membership.claimed?).to be_truthy
+          organization_role = FactoryBot.create(:organization_user, user: user, sender: nil, organization: organization, role: "admin")
+          expect(organization_role.claimed?).to be_truthy
           user.reload
           expect(user.mailchimp_datum).to be_blank
           Sidekiq::Worker.clear_all
@@ -248,9 +248,9 @@ RSpec.describe AfterUserCreateWorker, type: :job do
           user.reload
           expect(user.confirmed?).to be_truthy
           expect(user.organization_roles.count).to eq 1
-          membership.reload
-          expect(membership.organization_id).to eq organization.id
-          expect(membership.role).to eq "admin"
+          organization_role.reload
+          expect(organization_role.organization_id).to eq organization.id
+          expect(organization_role.role).to eq "admin"
           expect(user.mailchimp_datum).to be_present
         end
       end

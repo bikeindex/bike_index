@@ -6,7 +6,7 @@ RSpec.describe UserSerializer do
   let(:organization) { organization_role.organization }
   subject { UserSerializer.new(user.reload) }
 
-  let(:target_membership) do
+  let(:target_organization_role) do
     {
       base_url: "/organizations/#{organization.slug}",
       is_admin: false,
@@ -22,7 +22,7 @@ RSpec.describe UserSerializer do
       user_present: true,
       is_content_admin: false,
       is_superuser: nil,
-      memberships: [target_membership]
+      organization_roles: [target_organization_role]
     }
   end
   it "renders" do

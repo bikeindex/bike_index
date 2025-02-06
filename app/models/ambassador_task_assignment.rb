@@ -47,7 +47,7 @@ class AmbassadorTaskAssignment < ApplicationRecord
   # models. The inner join is necessary because our data model permits multiple
   # ambassador organization_roles for the same user (the most recent being
   # the active ambassadorship). The intent is to eventually refactor to
-  # enforcing single membership.
+  # enforcing single user role.
   #
   # filters: :organization_id, :ambassador_task_id, :ambassador_id (multiple permitted)
   # sort: :organization_name, :ambassador_task_title, :ambassador_name

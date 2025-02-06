@@ -608,7 +608,7 @@ RSpec.describe Organization, type: :model do
         organization.save
         expect(organization.reload.auto_user_id).to be_nil
       end
-      it "Makes a membership if the user is auto user" do
+      it "Makes a organization_role if the user is auto user" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed, email: ENV["AUTO_ORG_MEMBER"])
         organization.embedable_user_email = ENV["AUTO_ORG_MEMBER"]
