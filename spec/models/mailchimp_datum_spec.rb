@@ -20,7 +20,7 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(UpdateMailchimpDatumWorker.jobs.count).to eq 0
       end
       context "organization admin" do
-        let!(:organization_user) { FactoryBot.create(:organization_role_claimed, role: "admin", user: user, organization: organization) }
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, role: "admin", user: user, organization: organization) }
         it "creates and then finds for the user" do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
           mailchimp_datum = MailchimpDatum.find_or_create_for(user)
@@ -65,8 +65,8 @@ RSpec.describe MailchimpDatum, type: :model do
           end
         end
       end
-      context "organization member" do
-        let!(:organization_user) { FactoryBot.create(:organization_role_claimed, role: "member", user: user, organization: organization) }
+      context "organization role" do
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, role: "member", user: user, organization: organization) }
         it "does not create" do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
           mailchimp_datum = MailchimpDatum.find_or_create_for(user)
@@ -364,7 +364,7 @@ RSpec.describe MailchimpDatum, type: :model do
   describe "mailchimp_organization_role" do
     let(:user) { FactoryBot.create(:organization_admin) }
     let(:organization1) { user.organizations.first }
-    let(:organization_user2) { FactoryBot.create(:organization_role_claimed, user: user, role: "admin") }
+    let(:organization_role2) { FactoryBot.create(:organization_role_claimed, user: user, role: "admin") }
     let(:organization2) { organization_role2.organization }
     let!(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
     it "uses the existing organization" do

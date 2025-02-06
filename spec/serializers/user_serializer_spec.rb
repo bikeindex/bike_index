@@ -22,7 +22,7 @@ RSpec.describe UserSerializer do
       user_present: true,
       is_content_admin: false,
       is_superuser: nil,
-      organization_roles: [target_organization_role]
+      memberships: [target_organization_role]
     }
   end
   it "renders" do
