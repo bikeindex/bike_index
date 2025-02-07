@@ -3,6 +3,7 @@
 # Table name: notifications
 #
 #  id                     :bigint           not null, primary key
+#  delivery_errors        :text
 #  delivery_status        :integer
 #  delivery_status_str    :string
 #  kind                   :integer
@@ -30,8 +31,8 @@ class Notification < ApplicationRecord
   # so put that list in a YAML file for increased legibility
   KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
-  MESSAGE_CHANNEL_ENUM = { email: 0, text: 1 }.freeze
-  DELIVERY_STATUS_ENUM = { delivery_pending: 0, delivery_success: 1, delivery_failure: 2 }.freeze
+  MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
 
   belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
@@ -229,6 +230,13 @@ class Notification < ApplicationRecord
   def calculated_message_channel_target
     return calculated_phone if message_channel == "text" || phone_verification?
     calculated_email
+  end
+
+  # This method takes a block
+  def track_email_delivery
+    yield
+
+    update(delivery_status_str: "email_success")
   end
 
   private

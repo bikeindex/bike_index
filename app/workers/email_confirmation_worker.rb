@@ -18,8 +18,10 @@ class EmailConfirmationWorker < ApplicationWorker
     # If we just sent it, don't send again
     return false if notifications.email_success.any?
     notification = notifications.last || Notification.create(user_id: user.id, kind: "confirmation_email")
-    CustomerMailer.confirmation_email(user).deliver_now
-    notification.update(delivery_status_str: "email_success") # I'm not sure how to make this more representative
+
+    notification.track_email_delivery do
+      CustomerMailer.confirmation_email(user).deliver_now
+    end
   end
 
   def duplicate_user?(user)

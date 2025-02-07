@@ -2112,7 +2112,8 @@ CREATE TABLE public.notifications (
     twilio_sid text,
     bike_id bigint,
     message_channel_target character varying,
-    delivery_status integer
+    delivery_status integer,
+    delivery_errors text
 );
 
 

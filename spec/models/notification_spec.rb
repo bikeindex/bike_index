@@ -146,4 +146,16 @@ RSpec.describe Notification, type: :model do
       end
     end
   end
+
+  describe "track_email_delivery" do
+    let(:notification) { FactoryBot.create(:notification, kind: :confirmation_email) }
+
+    it "adds email success" do
+      expect(notification.reload.delivery_status).to eq "delivery_pending"
+      notification.track_email_delivery do
+        CustomerMailer.confirmation_email(notification.user).deliver_now
+      end
+      expect(notification.reload.delivery_status).to eq "delivery_success"
+    end
+  end
 end
