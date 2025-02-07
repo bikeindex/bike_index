@@ -14,7 +14,7 @@ class EmailImpoundClaimWorker < ApplicationWorker
     else
       OrganizedMailer.impound_claim_approved_or_denied(impound_claim).deliver_now
     end
-    notification.update(delivery_status: "email_success", message_channel: "email")
+    notification.update(delivery_status_str: "email_success", message_channel: "email")
     AfterUserChangeWorker.perform_async(impound_claim.user_id)
   end
 

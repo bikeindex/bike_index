@@ -17,6 +17,6 @@ class EmailStolenNotificationWorker < ApplicationWorker
       notification.kind = "stolen_notification_blocked"
       AdminMailer.blocked_stolen_notification_email(stolen_notification).deliver_now
     end
-    notification.update(delivery_status: "email_success") if notification.kind.present?
+    notification.update(delivery_status_str: "email_success") if notification.kind.present?
   end
 end

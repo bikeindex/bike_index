@@ -15,7 +15,7 @@ class CreateUserAlertNotificationWorker < ScheduledWorker
 
     CustomerMailer.user_alert_email(user_alert).deliver_now
 
-    notification.update(delivery_status: "email_success")
+    notification.update(delivery_status_str: "email_success")
   end
 
   def enqueue_workers

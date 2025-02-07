@@ -26,12 +26,12 @@ class Integrations::Twilio
   def send_notification(notification, to:, body:)
     if notification.twilio_sid.present?
       result = get_message(notification.twilio_sid)
-      notification.update(delivery_status: result.status)
+      notification.update(delivery_status_str: result.status)
     else
       result = send_message(to: to, body: body)
       notification.update(message_channel_target: to,
         twilio_sid: result.sid,
-        delivery_status: result.status)
+        delivery_status_str: result.status)
     end
     result
   end

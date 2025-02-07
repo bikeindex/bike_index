@@ -13,7 +13,7 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     return if !force_send && no_survey?(bike)
     notification = Notification.create(kind: :theft_survey_2023, bike: bike, user: bike.user)
     CustomerMailer.theft_survey(notification).deliver_now
-    notification.update(delivery_status: "email_success", message_channel: "email")
+    notification.update(delivery_status_str: "email_success", message_channel: "email")
   end
 
   def send_survey?(bike = nil)

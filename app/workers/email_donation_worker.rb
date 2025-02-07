@@ -13,7 +13,7 @@ class EmailDonationWorker < ApplicationWorker
       bike: bike_for_notification(payment, notification_kind))
 
     DonationMailer.donation_email(notification_kind, payment).deliver_now
-    notification.update(delivery_status: "email_success", message_channel: "email")
+    notification.update(delivery_status_str: "email_success", message_channel: "email")
   end
 
   def calculated_notification_kind(payment)

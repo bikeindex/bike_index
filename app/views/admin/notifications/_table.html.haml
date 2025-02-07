@@ -50,7 +50,7 @@
                   = notification.message_channel_target
                   %small.less-strong no user
             %td.text-center
-              = notification_delivery_display(notification.delivery_status)
+              = notification_delivery_display(notification.delivery_status_str)
             - unless skip_bike
               %td
                 - if notification.bike_id.present?

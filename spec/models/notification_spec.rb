@@ -34,6 +34,7 @@ RSpec.describe Notification, type: :model do
       expect(notification.reload.message_channel_target).to be_nil
       expect(notification.send(:calculated_email)).to eq "stuff@party.eu"
       expect(notification.send(:calculated_message_channel_target)).to eq "stuff@party.eu"
+      expect(notification.delivery_status).to eq "delivery_pending"
       user.destroy
       expect(notification.reload.send(:calculated_email)).to be_nil
       expect(notification.message_channel_target).to be_nil
@@ -50,9 +51,10 @@ RSpec.describe Notification, type: :model do
       end
     end
     context "email delivered" do
-      before { notification.update(delivery_status: "email_success", message_channel: "email") }
+      before { notification.update(delivery_status_str: "email_success", message_channel: "email") }
       it "returns email" do
         expect(notification.reload.delivered?).to be_truthy
+        expect(notification.delivery_status).to eq "delivery_success"
         expect(notification.send(:calculated_email)).to eq "stuff@party.eu"
         expect(notification.message_channel_target).to eq "stuff@party.eu"
       end
@@ -65,7 +67,7 @@ RSpec.describe Notification, type: :model do
         expect(notification.send(:calculated_message_channel_target)).to eq user_phone.phone
         expect(notification.message_channel_target).to be_nil
 
-        notification.update(delivery_status: "text_success", message_channel: "email")
+        notification.update(delivery_status_str: "text_success", message_channel: "email")
         expect(notification.reload.delivered?).to be_truthy
         expect(notification.send(:calculated_message_channel_target)).to eq user_phone.phone
         expect(notification.message_channel_target).to eq user_phone.phone
@@ -75,8 +77,8 @@ RSpec.describe Notification, type: :model do
 
   describe "kind sanity checks" do
     it "doesn't have duplicates" do
-      expect(Notification::KIND_ENUM.values.count).to eq Notification::KIND_ENUM.values.uniq.count
-      expect(Notification::KIND_ENUM.keys.count).to eq Notification::KIND_ENUM.keys.uniq.count
+      expect(Notification::KIND_ENUM.values.sort).to eq Notification::KIND_ENUM.values.uniq.sort
+      expect(Notification::KIND_ENUM.keys.sort).to eq Notification::KIND_ENUM.keys.uniq.sort
     end
   end
 
