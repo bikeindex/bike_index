@@ -19,7 +19,8 @@ class InvalidExtensionForAscendImportWorker < ApplicationWorker
 
     return true if notification.email_success?
 
-    AdminMailer.invalid_extension_for_ascend_import(notification).deliver_now
-    notification.update!(delivery_status_str: "email_success")
+    notification.track_email_delivery do
+      AdminMailer.invalid_extension_for_ascend_import(notification).deliver_now
+    end
   end
 end

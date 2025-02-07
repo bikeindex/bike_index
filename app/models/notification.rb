@@ -234,6 +234,8 @@ class Notification < ApplicationRecord
 
   # This method takes a block
   def track_email_delivery
+    return if delivery_success?
+
     yield
 
     update(delivery_status_str: "email_success")

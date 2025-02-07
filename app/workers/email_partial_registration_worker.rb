@@ -11,8 +11,9 @@ class EmailPartialRegistrationWorker < ApplicationWorker
         message_channel: "email",
         notifiable: b_param)
 
-      OrganizedMailer.partial_registration(b_param).deliver_now
-      notification.update(delivery_status_str: "email_success")
+      notification.track_email_delivery do
+        OrganizedMailer.partial_registration(b_param).deliver_now
+      end
     end
   end
 end

@@ -10,14 +10,14 @@ class EmailTheftAlertNotificationWorker < ApplicationWorker
       message_channel: "email",
       notifiable: theft_alert,
       bike: theft_alert.bike)
-    return true if notification.delivered?
 
-    if kind == "theft_alert_recovered"
-      AdminMailer.theft_alert_notification(theft_alert, notification_type: kind)
-        .deliver_now
-    else
-      CustomerMailer.theft_alert_email(theft_alert, notification).deliver_now
+    notification.track_email_delivery do
+      if kind == "theft_alert_recovered"
+        AdminMailer.theft_alert_notification(theft_alert, notification_type: kind)
+          .deliver_now
+      else
+        CustomerMailer.theft_alert_email(theft_alert, notification).deliver_now
+      end
     end
-    notification.update(delivery_status_str: "email_success")
   end
 end

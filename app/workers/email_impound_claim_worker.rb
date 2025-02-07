@@ -9,12 +9,15 @@ class EmailImpoundClaimWorker < ApplicationWorker
     notification = Notification.create(kind: "impound_claim_#{email_to_send}",
       notifiable: impound_claim,
       bike_id: impound_claim.bike_claimed_id)
-    if email_to_send == "submitting"
-      OrganizedMailer.impound_claim_submitted(impound_claim).deliver_now
-    else
-      OrganizedMailer.impound_claim_approved_or_denied(impound_claim).deliver_now
+
+    notification.track_email_delivery do
+      if email_to_send == "submitting"
+        OrganizedMailer.impound_claim_submitted(impound_claim).deliver_now
+      else
+        OrganizedMailer.impound_claim_approved_or_denied(impound_claim).deliver_now
+      end
     end
-    notification.update(delivery_status_str: "email_success", message_channel: "email")
+
     AfterUserChangeWorker.perform_async(impound_claim.user_id)
   end
 

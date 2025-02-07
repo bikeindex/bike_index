@@ -9,14 +9,20 @@ class EmailStolenNotificationWorker < ApplicationWorker
       Notification.find_or_create_by(notifiable: stolen_notification)
     end
 
-    return true if notification.delivered?
-    if force_send || stolen_notification.permitted_send?
-      notification.kind = "stolen_notification_sent"
-      CustomerMailer.stolen_notification_email(stolen_notification).deliver_now
+    notification.kind = if force_send || stolen_notification.permitted_send?
+      "stolen_notification_sent"
     elsif stolen_notification.bike.present?
-      notification.kind = "stolen_notification_blocked"
-      AdminMailer.blocked_stolen_notification_email(stolen_notification).deliver_now
+      "stolen_notification_blocked"
+    else
+      return # Bike is deleted or something
     end
-    notification.update(delivery_status_str: "email_success") if notification.kind.present?
+
+    notification.track_email_delivery do
+      if notification.kind == "stolen_notification_sent"
+        CustomerMailer.stolen_notification_email(stolen_notification).deliver_now
+      else
+        AdminMailer.blocked_stolen_notification_email(stolen_notification).deliver_now
+      end
+    end
   end
 end

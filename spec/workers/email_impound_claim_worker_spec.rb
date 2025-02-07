@@ -28,6 +28,7 @@ RSpec.describe EmailImpoundClaimWorker, type: :job do
 
       expect(notification.bike_id).to eq impound_claim.bike_claimed_id
       expect(notification.kind).to eq "impound_claim_submitting"
+      expect(notification.message_channel).to eq "email"
       expect(notification.sender&.id).to eq impound_claim.user_id
       expect(notification.sender_display_name).to eq impound_claim.user.display_name
 

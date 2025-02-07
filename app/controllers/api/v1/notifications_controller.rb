@@ -16,7 +16,6 @@ module API
               creator_email: "bryan@bikeindex.org",
               info_hash: params[:notification_hash])
             if customer_contact.save
-              EmailStolenBikeAlertWorker.perform_async(customer_contact.id)
               render(json: {success: true}) && return
             else
               msg = customer_contact.errors.full_messages.to_sentence

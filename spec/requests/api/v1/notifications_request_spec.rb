@@ -30,7 +30,8 @@ RSpec.describe API::V1::NotificationsController, type: :request do
       }
       expect {
         post base_url, params: options
-      }.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
+        CustomerContactNotificationCreateWorker.drain
+      }.to change(ActionMailer::Base.deliveries, :count).by(1)
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)
       customer_contact = CustomerContact.first

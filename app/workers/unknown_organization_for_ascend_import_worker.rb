@@ -13,9 +13,8 @@ class UnknownOrganizationForAscendImportWorker < ApplicationWorker
       kind: :unknown_organization_for_ascend,
       user_id: InvalidExtensionForAscendImportWorker::NOTIFICATION_USER_ID)
 
-    return true if notification.email_success?
-
-    AdminMailer.unknown_organization_for_ascend_import(notification).deliver_now
-    notification.update!(delivery_status_str: "email_success")
+    notification.track_email_delivery do
+      AdminMailer.unknown_organization_for_ascend_import(notification).deliver_now
+    end
   end
 end

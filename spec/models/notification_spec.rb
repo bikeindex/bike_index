@@ -159,6 +159,23 @@ RSpec.describe Notification, type: :model do
       expect(notification.delivery_error).to be_nil
     end
 
+    context "sent a second time" do
+      it "only delivers once" do
+        expect(notification.reload.delivery_status).to eq "delivery_pending"
+        notification.track_email_delivery do
+          CustomerMailer.confirmation_email(notification.user).deliver_now
+        end
+        expect(notification.reload.delivery_status).to eq "delivery_success"
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+
+        notification.track_email_delivery do
+          CustomerMailer.confirmation_email(notification.user).deliver_now
+        end
+        expect(notification.reload.delivery_status).to eq "delivery_success"
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+      end
+    end
+
     context "when email delivery fails" do
       let(:error_message) do
         "You tried to send to recipient(s) that have been marked as inactive. Found inactive addresses: example@bikeindex.org. " \
