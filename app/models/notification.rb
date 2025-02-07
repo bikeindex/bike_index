@@ -22,41 +22,12 @@
 #  index_notifications_on_user_id                            (user_id)
 #
 
-# TODO: create notifications for each other notification model:
-# - graduated_notifications
-# - parking_notifications
-# - feedbacks
-# We're creating notifications for other notification models (e.g. StolenNotification),
-# with the long term goal of moving all the notification/emailing logic here and removing it from other models
 class Notification < ApplicationRecord
-  KIND_ENUM = {
-    confirmation_email: 0,
-    finished_registration: 6,
-    partial_registration: 7,
-    receipt: 1,
-    stolen_notification_sent: 3,
-    stolen_notification_blocked: 4,
-    phone_verification: 5,
-    donation_standard: 11,
-    donation_second: 12,
-    donation_stolen: 13,
-    donation_recovered: 14,
-    donation_theft_alert: 15,
-    impound_claim_submitting: 16,
-    impound_claim_approved: 17,
-    impound_claim_denied: 18,
-    theft_alert_recovered: 19,
-    theft_alert_posted: 20,
-    stolen_contact: 21,
-    stolen_twitter_alerter: 2,
-    bike_possibly_found: 23,
-    user_alert_theft_alert_without_photo: 24,
-    user_alert_stolen_bike_without_location: 25,
-    theft_survey_4_2022: 26,
-    theft_survey_2023: 27,
-    invalid_extension_for_ascend_import: 28,
-    unknown_organization_for_ascend: 29
-  }.freeze
+  # TODO: create notifications for every email we send (including other models, e.g. Feedback)
+  #
+  # Every single notification that we send has a separate enum key - which is a lot!
+  # so put that list in a YAML file for increased legibility
+  KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
   MESSAGE_CHANNEL_ENUM = {
     email: 0,
