@@ -20,6 +20,12 @@
 #  secondary_organization_id :bigint
 #  user_id                   :integer
 #
+# Indexes
+#
+#  index_bike_stickers_on_bike_id                    (bike_id)
+#  index_bike_stickers_on_bike_sticker_batch_id      (bike_sticker_batch_id)
+#  index_bike_stickers_on_secondary_organization_id  (secondary_organization_id)
+#
 class BikeSticker < ApplicationRecord
   KIND_ENUM = {sticker: 0, spokecard: 1}.freeze
   MAX_UNORGANIZED = 20
@@ -97,7 +103,7 @@ class BikeSticker < ApplicationRecord
     matching_codes = code_integer_and_prefix_search(str)
     bike_sticker ||= matching_codes.organization_search(organization_id).first
     return bike_sticker if bike_sticker.present?
-    user_organization_ids = user&.memberships&.pluck(:organization_id) || []
+    user_organization_ids = user&.organization_roles&.pluck(:organization_id) || []
     if user_organization_ids.any?
       bike_sticker ||= matching_codes.where(organization_id: user_organization_ids).first
     end

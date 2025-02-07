@@ -259,7 +259,7 @@ RSpec.describe BikeCreator do
       let(:manufacturer_name) { "Surly" }
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:auto_user) { organization.auto_user }
-      let!(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let!(:creator) { FactoryBot.create(:organization_user, organization: organization) }
       let!(:state) { FactoryBot.create(:state_new_york) }
       let(:attrs) do
         {

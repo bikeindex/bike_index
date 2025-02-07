@@ -40,6 +40,6 @@ class PaymentsController < ApplicationController
   def permitted_create_parameters
     params.require(:payment)
       .permit(:kind, :amount_cents, :email, :currency, :referral_source)
-      .merge(user_id: current_user&.id, stripe_kind: "stripe_session")
+      .merge(user_id: current_user&.id)
   end
 end

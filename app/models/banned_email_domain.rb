@@ -11,6 +11,10 @@
 #  updated_at :datetime         not null
 #  creator_id :bigint
 #
+# Indexes
+#
+#  index_banned_email_domains_on_creator_id  (creator_id)
+#
 class BannedEmailDomain < ApplicationRecord
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 500
@@ -31,11 +35,11 @@ class BannedEmailDomain < ApplicationRecord
       domain = str.strip
       return true unless /\./.match?(domain)
 
-      !too_few_emails?(domain) && !too_many_bikes?(domain) && no_valid_memberships?(domain)
+      !too_few_emails?(domain) && !too_many_bikes?(domain) && no_valid_organization_roles?(domain)
     end
 
-    def no_valid_memberships?(domain)
-      org_ids = Membership.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
+    def no_valid_organization_roles?(domain)
+      org_ids = OrganizationRole.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
       Organization.approved.where(id: org_ids).none?
     end
 

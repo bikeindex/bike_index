@@ -34,13 +34,11 @@ GIT
       json (~> 2.1, >= 2.1.0)
 
 GIT
-  remote: https://github.com/msuliq/annotate_models.git
-  revision: 5d96dffe8d057743a2478fabbf00e41179b19099
-  branch: community-maintained
+  remote: https://github.com/sethherr/annotate_rb.git
+  revision: a947916dff1eab2c1b570a8b57020fb24337c797
+  branch: rename-annotate_rb
   specs:
-    annotate (3.2.0)
-      activerecord (>= 3.2)
-      rake (>= 10.4, < 14.0)
+    annotate_rb (5.0.0)
 
 GEM
   remote: https://rails-assets.org/
@@ -143,9 +141,6 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    annotate (2.6.5)
-      activerecord (>= 2.3.0)
-      rake (>= 0.8.7)
     api-pagination (6.0.0)
     ast (2.4.2)
     autoprefixer-rails (9.7.3)
@@ -459,7 +454,7 @@ GEM
     matrix (0.4.2)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
-    memory_profiler (0.9.14)
+    memory_profiler (1.1.0)
     method_source (1.1.0)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
@@ -565,7 +560,7 @@ GEM
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.1.9)
-    rack-mini-profiler (2.3.1)
+    rack-mini-profiler (3.3.1)
       rack (>= 1.2.0)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
@@ -751,7 +746,7 @@ GEM
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
     ssrf_filter (1.1.2)
-    stackprof (0.2.14)
+    stackprof (0.2.27)
     standard (1.44.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -844,7 +839,7 @@ PLATFORMS
 DEPENDENCIES
   MailchimpMarketing!
   active_model_serializers (~> 0.8.3)
-  annotate!
+  annotate_rb!
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt

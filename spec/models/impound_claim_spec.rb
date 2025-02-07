@@ -76,7 +76,7 @@ RSpec.describe ImpoundClaim, type: :model do
     end
     context "organization" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization, email: "example@stuff.com") }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization, email: "example@stuff.com") }
       let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, user: user, organization: organization) }
       it "returns user email" do
         organization.fetch_impound_configuration

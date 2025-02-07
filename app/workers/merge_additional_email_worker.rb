@@ -11,7 +11,7 @@ class MergeAdditionalEmailWorker < ApplicationWorker
 
   def merge_old_user(user_email, old_user)
     user_email.update_attribute :old_user_id, old_user.id
-    merge_user_memberships(user_email, old_user)
+    merge_user_organization_roles(user_email, old_user)
     old_user.ownerships.each { |i| i.update_attribute :user_id, user_email.user_id }
     old_user.created_ownerships.each { |i| i.update_attribute :creator_id, user_email.user_id }
     old_user.created_bikes.each { |i| i.update_attribute :creator_id, user_email.user_id }
@@ -39,14 +39,14 @@ class MergeAdditionalEmailWorker < ApplicationWorker
     old_user.destroy
   end
 
-  def merge_user_memberships(user_email, old_user)
+  def merge_user_organization_roles(user_email, old_user)
     Organization.where(auto_user_id: old_user.id).each { |i| i.update_attribute :auto_user_id, user_email.user_id }
-    Membership.where(sender_id: old_user.id).each { |i| i.update_attribute :sender_id, user_email.user_id }
-    old_user.memberships.each do |membership|
-      if user_email.user.organizations.include?(membership.organization)
-        membership.delete
+    OrganizationRole.where(sender_id: old_user.id).each { |i| i.update_attribute :sender_id, user_email.user_id }
+    old_user.organization_roles.each do |organization_role|
+      if user_email.user.organizations.include?(organization_role.organization)
+        organization_role.delete
       else
-        membership.update_attribute :user_id, user_email.user_id
+        organization_role.update_attribute :user_id, user_email.user_id
       end
     end
   end

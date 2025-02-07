@@ -297,7 +297,6 @@ nl:
         locks: Sloten
         longitude: Lengte
         magic_link_token: Magisch linktoken
-        memberships: lidmaatschappen
         my_bikes_hash: Mijn fietsen hash
         name: Naam
         notification_newsletters: Meldingsnieuwsbrieven
@@ -314,7 +313,6 @@ nl:
         phone: Telefoon
         preferred_language: Voorkeurstaal
         received_stolen_notifications: Gestolen meldingen ontvangen
-        sent_memberships: Verzonden lidmaatschappen
         sent_stolen_notifications: Verzonden gestolen meldingen
         show_bikes: Toon fietsen
         show_phone: Toon telefoon
@@ -333,6 +331,8 @@ nl:
         when_vendor_terms_of_service: Wanneer servicevoorwaarden van de verkoper
         zipcode: Postcode
         token_for_password_reset: Wachtwoord reset token
+        organization_roles: Organisatierollen
+        sent_organization_roles: Verzonden organisatie_rollen
       ambassador_task:
         ambassador_task_assignments: Taken van ambassadeurs
         ambassadors: Ambassadors
@@ -598,12 +598,6 @@ nl:
         slug: Naaktslak
         total_years_active: Totaal aantal jaren actief
         website: Website
-      membership:
-        claimed_at: Geclaimd op
-        deleted_at: Verwijderd om
-        email_invitation_sent_at: E-mailuitnodiging verzonden om
-        invited_email: E-mail uitgenodigd
-        role: Rol
       normalized_serial_segment:
         segment: Segment
       organization:
@@ -626,7 +620,6 @@ nl:
         locations: Locaties
         lock_show_on_map: Show op kaart vergrendelen
         mail_snippets: E-mailfragmenten
-        memberships: lidmaatschappen
         name: Naam
         payments: Betalingen
         pos_kind: Pos soort
@@ -641,6 +634,7 @@ nl:
         website: Website
         bike_stickers: Fietscodes
         enabled_feature_slugs: Ingeschakelde functie naaktslakken
+        organization_roles: lidmaatschappen
       ownership:
         claimed: beweerde
         current: Stroom
@@ -654,12 +648,9 @@ nl:
       payment:
         amount_cents: Bedrag centen
         email: E-mailadres
-        first_payment_date: Eerste betalingsdatum
-        is_current: Is momenteel
         is_payment: Is betaling
-        is_recurring: Komt terug
         kind: Soort
-        last_payment_date: Laatste betalingsdatum
+        paid_at: Eerste betalingsdatum
       public_image:
         external_image_url: Externe afbeeldings-URL
         image: afbeelding
@@ -772,7 +763,6 @@ nl:
         locks: sloten
         longitude: Lengte
         magic_link_token: Magisch linktoken
-        memberships: lidmaatschappen
         my_bikes_hash: Mijn fietsen hash
         name: Naam
         notification_newsletters: Meldingsnieuwsbrieven
@@ -789,7 +779,6 @@ nl:
         phone: Telefoon
         preferred_language: Voorkeurstaal
         received_stolen_notifications: Gestolen meldingen ontvangen
-        sent_memberships: Verzonden lidmaatschappen
         sent_stolen_notifications: Verzonden gestolen meldingen
         show_bikes: Toon fietsen
         show_phone: Toon telefoon
@@ -808,6 +797,8 @@ nl:
         when_vendor_terms_of_service: Wanneer servicevoorwaarden van de verkoper
         zipcode: Postcode
         token_for_password_reset: Wachtwoord reset token
+        organization_roles: lidmaatschappen
+        sent_organization_roles: Verzonden organisatie_rollen
       user_email:
         confirmation_token: Bevestigingstoken
         email: E-mailadres
@@ -836,6 +827,12 @@ nl:
         invoices: Facturen
         kind: Soort
         name: Naam
+      organization_role:
+        claimed_at: Geclaimd op
+        deleted_at: Verwijderd om
+        email_invitation_sent_at: E-mailuitnodiging verzonden om
+        invited_email: E-mail uitgenodigd
+        role: Rol
     enums:
       cycle_type:
         bike: Fiets
@@ -917,7 +914,6 @@ nl:
       lock_type: Slottype
       mail_snippet: E-mailfragment
       manufacturer: Fabrikant
-      membership: Lidmaatschap
       normalized_serial_segment: Genormaliseerd serieel segment
       organization: Organisatie
       organization_message: Organisatie bericht
@@ -941,6 +937,7 @@ nl:
       bike_sticker_batch: Fietssticker batch
       invoice_organization_feature: Factuur organisatiefunctie
       organization_feature: Organisatiefunctie
+      organization_role: Organisatie Rol
     select_options:
       color:
         black: Zwart
@@ -2416,7 +2413,7 @@ nl:
             Neem contact met ons op via support@bikeindex.org als dit problematisch
             is.
         update:
-          updated_membership: Bijgewerkt lidmaatschap voor %{user_email}.
+          updated_organization_role: Bijgewerkt lidmaatschap voor %{user_email}.
       parking_notifications:
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
@@ -2483,8 +2480,6 @@ nl:
           te redden.
         payment_received: Uw betaling van %{amount} is ontvangen.
         thank_you_so_much: Heel erg bedankt!
-        thanks_for_signing_up: Bedankt voor het aanmelden als lid van Bike Index.
-          We sturen u elke maand facturen naar dit e-mailadres
         we_really_appreciate_your_support: We stellen uw steun aan Bike Index zeer
           op prijs!
       subject: Bedankt voor het ondersteunen van Bike Index!
@@ -4478,7 +4473,6 @@ nl:
       edit:
         confirmation: Weet je zeker dat je %{user_name} wilt verwijderen uit %{org_name}?
           (Ze zullen nog steeds hun persoonlijke account gebruiken)
-        edit_membership_html: Lidmaatschap bewerken voor <em class="small">%{email}</em>
         email: E-mailadres
         has_not_signed_up_html: "%{name} <strong>heeft zich nog steeds niet aangemeld</strong>"
         invited: Uitgenodigd
@@ -4487,6 +4481,7 @@ nl:
         update: Bijwerken
         last_login: Laatste login
         last_login_ip: Laatste login ip
+        edit_organization_role_html: Lidmaatschap bewerken voor <em class="small">%{email}</em>
       index:
         claimed: beweerde
         created: Gemaakt
@@ -4522,7 +4517,6 @@ nl:
         email_youre_inviting: E-mail die u uitnodigt
         invite_multiple_emails: Nodig meerdere e-mails uit
         invite_user: Nodig gebruiker uit
-        membership: Lidmaatschap
         multiple_emails: Meerdere e-mails
         remaining_invites_html: U kunt <strong>%{invitations_count}</strong> meer
           toevoegen
@@ -4533,16 +4527,17 @@ nl:
           per e-mail" met een adres dat eindigt op <code>%{email_suffix}</code> wordt
           u automatisch lid van %{org_name}.
         you_have_a_permitted_domain: Je hebt een toegestaan domein
-      membership_role_fields:
-        member_of_organization: Lid van organisatie
-        member_no_bikes: Lid zonder fietsbewerking
-        membership_type: Soort lidmaatschap
-        admin_of_organization: Beheerder van organisatie
+        organization_role: Organisatie Rol
+      organization_role_fields:
         admin_access: Volledige toegang tot de organisatie
+        admin_of_organization: Beheerder van organisatie
         member_access: Organisatietoegang, maar kan geen organisatie-instellingen
           bewerken of nieuwe gebruikers uitnodigen
+        member_no_bikes: Lid zonder fietsbewerking
         member_no_bikes_access: Dezelfde toegang als Member, maar kan organisatiefietsen
           niet bewerken
+        member_of_organization: Lid van organisatie
+        role_type: Roltype
     parking_notifications:
       index:
         parking_notifications: Verlaten records

@@ -68,7 +68,7 @@ RSpec.describe BikeStickersController, type: :request do
         end
         context "organized" do
           let(:organization) { FactoryBot.create(:organization) }
-          let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
           let(:bike_sticker) { FactoryBot.create(:bike_sticker, bike_id: bike.id, organization: organization) }
           it "succeeds" do
             expect {

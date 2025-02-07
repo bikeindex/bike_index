@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Membership, type: :model do
+RSpec.describe OrganizationRole, type: :model do
   describe "#ensure_ambassador_tasks_assigned!" do
     context "given an ambassador organization" do
       it "enqueues a job to assign ambassador tasks to the given user" do
@@ -12,8 +12,8 @@ RSpec.describe Membership, type: :model do
 
         Sidekiq::Worker.clear_all
         expect {
-          FactoryBot.create(:membership_claimed, organization: org, user: user)
-        }.to change(ProcessMembershipWorker.jobs, :count).by 1
+          FactoryBot.create(:organization_role_claimed, organization: org, user: user)
+        }.to change(ProcessOrganizationRoleWorker.jobs, :count).by 1
         Sidekiq::Worker.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(2)
@@ -27,7 +27,7 @@ RSpec.describe Membership, type: :model do
         org = FactoryBot.create(:organization)
         expect(AmbassadorTaskAssignment.count).to eq(0)
 
-        FactoryBot.create(:membership_claimed, organization: org, user: user)
+        FactoryBot.create(:organization_role_claimed, organization: org, user: user)
         Sidekiq::Worker.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(0)
@@ -37,9 +37,9 @@ RSpec.describe Membership, type: :model do
 
   describe ".ambassador_organizations" do
     it "returns all and only ambassador organizations" do
-      FactoryBot.create(:membership_claimed)
-      ambassador_orgs = FactoryBot.create_list(:membership_ambassador, 3)
-      found_orgs = Membership.ambassador_organizations
+      FactoryBot.create(:organization_role_claimed)
+      ambassador_orgs = FactoryBot.create_list(:organization_role_ambassador, 3)
+      found_orgs = OrganizationRole.ambassador_organizations
       expect(found_orgs.order(:created_at)).to eq(ambassador_orgs.sort_by(&:created_at))
     end
   end
@@ -47,27 +47,27 @@ RSpec.describe Membership, type: :model do
   describe "admin?" do
     context "admin" do
       it "returns true" do
-        membership = Membership.new(role: "admin")
-        expect(membership.admin?).to be_truthy
+        organization_role = OrganizationRole.new(role: "admin")
+        expect(organization_role.admin?).to be_truthy
       end
     end
     context "member" do
       it "returns true" do
-        membership = Membership.new(role: "member")
-        expect(membership.admin?).to be_falsey
+        organization_role = OrganizationRole.new(role: "member")
+        expect(organization_role.admin?).to be_falsey
       end
     end
   end
 
-  describe "ambassador membership without user" do
+  describe "ambassador organization_role without user" do
     let!(:organization) { FactoryBot.create(:organization_ambassador) }
     let!(:ambassador_task) { FactoryBot.create(:ambassador_task) }
     let(:email) { "new@ambassador.edu" }
-    let(:membership) { FactoryBot.build(:membership, organization: organization, invited_email: email) }
+    let(:organization_role) { FactoryBot.build(:organization_role, organization: organization, invited_email: email) }
     it "creates the tasks when it can create the tasks" do
       Sidekiq::Worker.clear_all
-      membership.save
-      expect(membership.ambassador?).to be_truthy
+      organization_role.save
+      expect(organization_role.ambassador?).to be_truthy
       Sidekiq::Worker.drain_all
       user = FactoryBot.create(:user, email: email)
       Sidekiq::Worker.drain_all

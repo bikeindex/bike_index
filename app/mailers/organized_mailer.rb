@@ -47,11 +47,11 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  def organization_invitation(membership)
-    @membership = membership
-    @organization = @membership.organization
-    @sender = @membership.sender
-    @vars = {email: @membership.invited_email}
+  def organization_invitation(organization_role)
+    @organization_role = organization_role
+    @organization = @organization_role.organization
+    @sender = @organization_role.sender
+    @vars = {email: @organization_role.invited_email}
     @new_user = User.fuzzy_email_find(@vars[:email]).present?
 
     I18n.with_locale(@sender&.preferred_language) do

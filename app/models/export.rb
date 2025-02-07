@@ -14,6 +14,11 @@
 #  organization_id :integer
 #  user_id         :integer
 #
+# Indexes
+#
+#  index_exports_on_organization_id  (organization_id)
+#  index_exports_on_user_id          (user_id)
+#
 class Export < ApplicationRecord
   PROGRESS_ENUM = {
     pending: 0,

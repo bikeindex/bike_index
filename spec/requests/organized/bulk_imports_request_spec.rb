@@ -72,7 +72,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
     let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: ["show_bulk_import"]) }
 
     context "logged in as organization member" do
-      let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
       describe "index" do
         it "redirects" do
           expect(current_user.authorized?(current_organization)).to be_truthy

@@ -19,12 +19,12 @@ task seed_test_users_and_bikes: :environment do
 
   org = Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
   org.save
-  membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("member@example.com").id, role: "admin")
-  membership.save
+  organization_role = OrganizationRole.create(organization_id: org.id, user_id: User.find_by_email("member@example.com").id, role: "admin")
+  organization_role.save
   org = Organization.example
   org.save
-  membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("example_user@bikeindex.org").id, role: "member")
-  membership.save
+  organization_role = OrganizationRole.create(organization_id: org.id, user_id: User.find_by_email("example_user@bikeindex.org").id, role: "member")
+  organization_role.save
   org.save
   puts "Users added successfully\n"
   @user = User.find_by_email("user@example.com")

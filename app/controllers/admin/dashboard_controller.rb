@@ -9,7 +9,7 @@ class Admin::DashboardController < Admin::BaseController
       .includes(:creation_organization, :paint, :recovered_records)
     bikes = bikes.not_spam unless current_user.su_option?(:no_hide_spam)
     @bikes = bikes.order(id: :desc).limit(10)
-    @users = User.includes(memberships: [:organization]).limit(5).order(id: :desc)
+    @users = User.includes(organization_roles: [:organization]).limit(5).order(id: :desc)
   end
 
   def maintenance

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::ImpoundClaimsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/impound_claims" }
-  include_context :request_spec_logged_in_as_organization_member
+  include_context :request_spec_logged_in_as_organization_user
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:user_email) { "someemail@things.com" }

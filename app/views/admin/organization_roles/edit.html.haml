@@ -1,10 +1,10 @@
 %h1
-  Editing Membership
-- if @membership.deleted?
+  Editing OrganizationRole
+- if @organization_role.deleted?
   %h2.text-danger.mb-4
-    Membership deleted
+    OrganizationRole deleted
     %span.convertTime.preciseTime
-      = l @membership.deleted_at, format: :convert_time
+      = l @organization_role.deleted_at, format: :convert_time
 
 
 .row
@@ -15,7 +15,7 @@
           %td
             Sender
           %td
-            - sender = @membership.sender
+            - sender = @organization_role.sender
             - if sender.present?
               = link_to sender.display_name, admin_user_path(sender)
             - else
@@ -25,7 +25,7 @@
           %td
             Receiver
           %td
-            - user = @membership.user
+            - user = @organization_role.user
             - if user.present?
               = link_to user.display_name, admin_user_path(user)
         %tr
@@ -33,29 +33,29 @@
             Created
           %td
             %span.convertTime.preciseTime
-              = l @membership.created_at, format: :convert_time
+              = l @organization_role.created_at, format: :convert_time
         %tr
           %td
             Updated
           %td
             %span.convertTime.preciseTime
-              = l @membership.updated_at, format: :convert_time
+              = l @organization_role.updated_at, format: :convert_time
         %tr
           %td
             Claimed
           %td
-            - if @membership.claimed_at.present?
+            - if @organization_role.claimed_at.present?
               %span.convertTime.preciseTime
-                = l @membership.claimed_at, format: :convert_time
+                = l @organization_role.claimed_at, format: :convert_time
         %tr
           %td
             Emailed
           %td
-            - if @membership.email_invitation_sent_at.present?
+            - if @organization_role.email_invitation_sent_at.present?
               %span.convertTime.preciseTime
-                = l @membership.email_invitation_sent_at, format: :convert_time
+                = l @organization_role.email_invitation_sent_at, format: :convert_time
 
   .col-md-4
     = render partial: "form"
     .mt-4.text-right
-      = link_to "Delete membership", admin_membership_path(@membership), method: :delete, data: { confirm: "Are you sure you want to delete this membership?" }, class: "btn btn-danger"
+      = link_to "Delete organization_role", admin_organization_role_path(@organization_role), method: :delete, data: { confirm: "Are you sure you want to delete this organization_role?" }, class: "btn btn-danger"

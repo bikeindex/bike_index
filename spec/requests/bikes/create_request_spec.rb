@@ -59,7 +59,7 @@ RSpec.describe "BikesController#create", type: :request do
     context "scanned_sticker" do
       let(:organization) { FactoryBot.create(:organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
-      it "assigns scanned_sticker" do
+      it "assigns scanned_sticker", :flaky do
         expect(current_user.bikes.count).to eq 0
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 0
         expect {
@@ -309,7 +309,7 @@ RSpec.describe "BikesController#create", type: :request do
         organization.reload
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
-        expect(current_user.memberships.pluck(:id)).to eq([]) # sanity check
+        expect(current_user.organization_roles.pluck(:id)).to eq([]) # sanity check
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
           expect {

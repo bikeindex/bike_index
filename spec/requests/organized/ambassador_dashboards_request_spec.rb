@@ -15,7 +15,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
   context "given an authenticated non-ambassador" do
     include_context :request_spec_logged_in_as_user
     let(:current_organization) { FactoryBot.create(:organization) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
     describe "index" do
       it "redirects to organization root path" do
         current_user.reload

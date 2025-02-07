@@ -154,7 +154,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
           expect(payment.payment_method).to eq "check"
           expect(payment.created_at).to be_within(1.minute).of create_time
           expect(payment.paid?).to be_truthy
-          expect(payment.first_payment_date).to be_within(1.minute).of create_time
+          expect(payment.paid_at).to be_within(1.minute).of create_time
         end
       end
     end

@@ -231,7 +231,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
     context "special headers" do
       let(:enabled_feature_slugs) { ["csv_exports"] }
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let(:registration_info) do
         {street: "717 Market St",

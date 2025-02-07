@@ -11,6 +11,10 @@
 #  updated_at                 :datetime         not null
 #  organization_id            :bigint
 #
+# Indexes
+#
+#  index_hot_sheet_configurations_on_organization_id  (organization_id)
+#
 class HotSheetConfiguration < ApplicationRecord
   include SearchRadiusMetricable
 
@@ -42,7 +46,7 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def current_recipient_ids
-    organization.memberships.claimed.notification_daily.pluck(:user_id)
+    organization.organization_roles.claimed.notification_daily.pluck(:user_id)
   end
 
   def timezone

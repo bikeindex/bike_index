@@ -61,7 +61,7 @@ RSpec.describe Organization, type: :model do
 
   describe "bikes member and not_member" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:member) { FactoryBot.create(:organization_user, organization: organization) }
     let(:user) { FactoryBot.create(:user) }
     let!(:bike_not_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, creator: member) }
     let!(:bike_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, creator: member, user: member) }
@@ -596,7 +596,7 @@ RSpec.describe Organization, type: :model do
       it "sets the embedable user" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed, email: "embed@org.com")
-        FactoryBot.create(:membership_claimed, organization: organization, user: user)
+        FactoryBot.create(:organization_role_claimed, organization: organization, user: user)
         organization.embedable_user_email = "embed@org.com"
         organization.save
         expect(organization.reload.auto_user_id).to eq(user.id)
@@ -608,7 +608,7 @@ RSpec.describe Organization, type: :model do
         organization.save
         expect(organization.reload.auto_user_id).to be_nil
       end
-      it "Makes a membership if the user is auto user" do
+      it "Makes a organization_role if the user is auto user" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed, email: ENV["AUTO_ORG_MEMBER"])
         organization.embedable_user_email = ENV["AUTO_ORG_MEMBER"]
@@ -618,7 +618,7 @@ RSpec.describe Organization, type: :model do
       it "sets the embedable user if it isn't set and the org has members" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed)
-        FactoryBot.create(:membership_claimed, user: user, organization: organization)
+        FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
         organization.save
         expect(organization.reload.auto_user_id).not_to be_nil
       end
@@ -628,7 +628,7 @@ RSpec.describe Organization, type: :model do
   describe "ensure_auto_user" do
     let(:organization) { FactoryBot.create(:organization) }
     context "existing members" do
-      let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:member) { FactoryBot.create(:organization_user, organization: organization) }
       before do
         expect(member).to be_present
       end

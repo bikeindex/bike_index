@@ -11,7 +11,7 @@
         = sortable "created_at", render_sortable: render_sortable
       - unless skip_paid_at
         %th.small
-          = sortable "first_payment_date", "Paid", render_sortable: render_sortable
+          = sortable "paid_at", "Paid", render_sortable: render_sortable
       - unless skip_user
         %th= sortable "user_id", render_sortable: render_sortable
       %th= sortable "referral_source", render_sortable: render_sortable
@@ -36,9 +36,9 @@
               = l payment.created_at, format: :convert_time
           - unless skip_paid_at
             %td
-              - if payment.first_payment_date.present?
+              - if payment.paid_at.present?
                 %small.convertTime
-                  = l payment.first_payment_date, format: :convert_time
+                  = l payment.paid_at, format: :convert_time
           - unless skip_user
             %td
               = render partial: "/shared/admin_user_cell", locals: {email: payment.email, user: payment.user, render_search: render_sortable, cache: true}

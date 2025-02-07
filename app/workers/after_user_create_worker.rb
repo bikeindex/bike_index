@@ -21,7 +21,7 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_create_jobs(user, email)
     # This may confirm the user. We auto-confirm users that belong to orgs.
     # Auto confirming the user actually ends up running perform_confirmed_jobs.
-    associate_membership_invites(user, email)
+    associate_organization_role_invites(user, email)
     send_welcoming_email(user)
     AfterUserCreateWorker.perform_async(user.id, "async")
   end
@@ -29,13 +29,13 @@ class AfterUserCreateWorker < ApplicationWorker
   def perform_merged_jobs(user, email)
     # This is already performing in a background job, so we don't need to run async
     # Also, we we need to process with the previous email, not the user's current email
-    associate_membership_invites(user, email, skip_confirm: true)
+    associate_organization_role_invites(user, email, skip_confirm: true)
     associate_ownerships(user, email)
   end
 
   def perform_confirmed_jobs(user, email)
     UserEmail.create_confirmed_primary_email(user)
-    create_passwordless_domain_memberships(user)
+    create_passwordless_domain_organization_roles(user)
     AfterUserCreateWorker.perform_async(user.id, "async")
   end
 
@@ -68,17 +68,17 @@ class AfterUserCreateWorker < ApplicationWorker
       .update_all(user_id: user.id)
   end
 
-  def associate_membership_invites(user, email, skip_confirm: false)
-    memberships = Membership.unclaimed.where(invited_email: email)
-    return false unless memberships.any?
+  def associate_organization_role_invites(user, email, skip_confirm: false)
+    organization_roles = OrganizationRole.unclaimed.where(invited_email: email)
+    return false unless organization_roles.any?
 
-    first, *rest = memberships.pluck(:id)
-    ProcessMembershipWorker.new.perform(first, user.id)
+    first, *rest = organization_roles.pluck(:id)
+    ProcessOrganizationRoleWorker.new.perform(first, user.id)
 
     # We want to do the first one inline so we can redirect
     # the user to the org page
-    rest.each do |membership_id|
-      ProcessMembershipWorker.perform_async(membership_id, user.id)
+    rest.each do |organization_role_id|
+      ProcessOrganizationRoleWorker.perform_async(organization_role_id, user.id)
     end
 
     user.confirm(user.confirmation_token) unless skip_confirm
@@ -104,11 +104,11 @@ class AfterUserCreateWorker < ApplicationWorker
       .map { |id| Bike.unscoped.where(id: id).first }.compact
   end
 
-  def create_passwordless_domain_memberships(user)
+  def create_passwordless_domain_organization_roles(user)
     matching_organization = Organization.passwordless_email_matching(user.email)
     return false unless matching_organization.present?
-    return false if user.memberships.pluck(:organization_id).include?(matching_organization.id)
-    Membership.create_passwordless(organization_id: matching_organization.id,
+    return false if user.organization_roles.pluck(:organization_id).include?(matching_organization.id)
+    OrganizationRole.create_passwordless(organization_id: matching_organization.id,
       invited_email: user.email)
     user.reload
   end

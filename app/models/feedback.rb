@@ -15,6 +15,11 @@
 #  mailchimp_datum_id :bigint
 #  user_id            :integer
 #
+# Indexes
+#
+#  index_feedbacks_on_mailchimp_datum_id  (mailchimp_datum_id)
+#  index_feedbacks_on_user_id             (user_id)
+#
 class Feedback < ApplicationRecord
   KIND_ENUM = {
     message: 0,

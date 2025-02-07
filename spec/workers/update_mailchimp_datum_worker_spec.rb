@@ -17,7 +17,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       let(:organization_created_at) { Time.at(1552072143) }
       let(:target_merge_fields) { {"NAME" => "Seth Herr", "O_NAME" => "Hogwarts", "O_AT" => organization_created_at.to_date.to_s} }
       let(:organization) { FactoryBot.create(:organization, kind: "school", name: "Hogwarts", created_at: organization_created_at) }
-      let(:membership) { FactoryBot.create(:membership_claimed, organization: organization, user: user, role: "admin") }
+      let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: organization, user: user, role: "admin") }
       let(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
 
       context "organization creator, create user" do
@@ -33,7 +33,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
         end
         let(:target_tags) { %w[in_bike_index paid] }
         it "updates mailchimp_datum" do
-          expect(membership.organization_creator?).to be_truthy
+          expect(organization_role.organization_creator?).to be_truthy
           organization.update(updated_at: Time.current)
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
@@ -122,10 +122,10 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
         context "organization and individual" do
           let(:target_tags) { ["In Bike Index", "in_bike_index", "Not org creator", "not_org_creator", "Paid", "weird other tag"] }
           it "updates mailchimp_datum" do
-            FactoryBot.create(:membership_claimed, organization: organization)
+            FactoryBot.create(:organization_role_claimed, organization: organization)
             organization.update(updated_at: Time.current)
             expect(organization.default_location&.id).to eq location.id
-            expect(membership.reload.organization_creator?).to be_falsey
+            expect(organization_role.reload.organization_creator?).to be_falsey
             expect(organization.reload.paid?).to be_falsey
             mailchimp_datum.data["tags"] += ["weird other tag"]
             mailchimp_datum.update(updated_at: Time.current, mailchimp_updated_at: Time.current)
@@ -166,7 +166,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       context "mailchimp_datum archived" do
         let(:email_address) { "seth+archived@bikeindex.org" }
         it "updates mailchimp_datum" do
-          expect(membership.organization_creator?).to be_truthy
+          expect(organization_role.organization_creator?).to be_truthy
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
           expect(MailchimpDatum.count).to eq 1
@@ -197,7 +197,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       context "archived on mailchimp" do
         let(:email_address) { "seth+archived@bikeindex.org" }
         it "marks as archived" do
-          expect(membership.organization_creator?).to be_truthy
+          expect(organization_role.organization_creator?).to be_truthy
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
           expect(MailchimpDatum.count).to eq 1
@@ -213,7 +213,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       context "unsubscribed" do
         let(:email_address) { "seth+unsubscribed@bikeindex.org" }
         it "updates mailchimp_datum" do
-          expect(membership.organization_creator?).to be_truthy
+          expect(organization_role.organization_creator?).to be_truthy
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
           expect(MailchimpDatum.count).to eq 1
@@ -231,7 +231,7 @@ RSpec.describe UpdateMailchimpDatumWorker, type: :job do
       context "suspiscious email" do
         let(:email_address) { "asdf891234123@sneakemail.com" }
         it "updates mailchimp_datum" do
-          expect(membership.organization_creator?).to be_truthy
+          expect(organization_role.organization_creator?).to be_truthy
           expect(mailchimp_datum).to be_valid
           mailchimp_datum.reload
           expect(MailchimpDatum.count).to eq 1

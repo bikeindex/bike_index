@@ -298,7 +298,6 @@ nb:
         locks: Låser
         longitude: Lengdegrad
         magic_link_token: Magisk lenketoken
-        memberships: Medlemskap
         my_bikes_hash: Syklene mine hash
         name: Navn
         notification_newsletters: Varslingsnyhetsbrev
@@ -315,7 +314,6 @@ nb:
         phone: Telefon
         preferred_language: Foretrukket Språk
         received_stolen_notifications: Mottatt stjålne varsler
-        sent_memberships: Sendte medlemskap
         sent_stolen_notifications: Sendte stjålne varsler
         show_bikes: Vis sykler
         show_phone: Vis telefonen
@@ -334,6 +332,8 @@ nb:
         when_vendor_terms_of_service: Når leverandørens vilkår for bruk
         zipcode: postnummer
         token_for_password_reset: Token for tilbakestilling av passord
+        organization_roles: Organisasjonsroller
+        sent_organization_roles: Sendte organisasjonsroller
       ambassador_task:
         ambassador_task_assignments: Ambassadøroppgaver
         ambassadors: Ambassadører
@@ -610,12 +610,6 @@ nb:
         slug: Mordersnegle
         total_years_active: Totalt aktive år
         website: Nettsted
-      membership:
-        claimed_at: Hevdes kl
-        deleted_at: Slettet kl
-        email_invitation_sent_at: E-postinvitasjon sendt kl
-        invited_email: Invitert e-post
-        role: Rolle
       normalized_serial_segment:
         segment: Segmentet
       organization:
@@ -640,7 +634,6 @@ nb:
         locations: Steder
         lock_show_on_map: Lås vis på kartet
         mail_snippets: E-postutdrag
-        memberships: Medlemskap
         name: Navn
         payments: Betalinger
         pos_kind: Pos snill
@@ -653,6 +646,7 @@ nb:
         slug: Mordersnegle
         users: Brukere
         website: Nettsted
+        organization_roles: Medlemskap
       organization_feature:
         amount_cents: Beløp cent
         description: Beskrivelse
@@ -675,12 +669,9 @@ nb:
       payment:
         amount_cents: Beløp cent
         email: E-post
-        first_payment_date: Første betalingsdato
-        is_current: Er aktuell
         is_payment: Er betaling
-        is_recurring: Er tilbakevendende
         kind: Snill
-        last_payment_date: Siste betalingsdato
+        paid_at: Første betalingsdato
       public_image:
         external_image_url: Ekstern bildenettadresse
         image: Bilde
@@ -793,7 +784,6 @@ nb:
         locks: Låser
         longitude: Lengdegrad
         magic_link_token: Magisk lenketoken
-        memberships: Medlemskap
         my_bikes_hash: Syklene mine hash
         name: Navn
         notification_newsletters: Varslingsnyhetsbrev
@@ -810,7 +800,6 @@ nb:
         phone: Telefon
         preferred_language: Foretrukket Språk
         received_stolen_notifications: Mottatt stjålne varsler
-        sent_memberships: Sendte medlemskap
         sent_stolen_notifications: Sendte stjålne varsler
         show_bikes: Vis sykler
         show_phone: Vis telefonen
@@ -829,6 +818,8 @@ nb:
         when_vendor_terms_of_service: Når leverandørens vilkår for bruk
         zipcode: Postnummer
         token_for_password_reset: Token for tilbakestilling av passord
+        organization_roles: Medlemskap
+        sent_organization_roles: Sendte organisasjonsroller
       user_email:
         confirmation_token: Bekreftelseskode
         email: E-post
@@ -838,6 +829,12 @@ nb:
         iso_bsd: Iso bsd
         name: Navn
         priority: Prioritet
+      organization_role:
+        claimed_at: Hevdes kl
+        deleted_at: Slettet kl
+        email_invitation_sent_at: E-postinvitasjon sendt kl
+        invited_email: Invitert e-post
+        role: Rolle
     enums:
       cycle_type:
         bike: Sykkel
@@ -920,7 +917,6 @@ nb:
       lock_type: Lås type
       mail_snippet: E-postutdrag
       manufacturer: Produsent
-      membership: Medlemskap
       normalized_serial_segment: Normalisert seriesegment
       organization: Organisasjon
       organization_feature: Organisasjonsfunksjon
@@ -941,6 +937,7 @@ nb:
       user: Brukerkonto
       user_email: Brukerens e-post
       wheel_size: Hjulstørrelse
+      organization_role: Organisasjonsrolle
     select_options:
       color:
         black: Svart
@@ -2552,7 +2549,7 @@ nb:
           cannot_remove_yourself: Beklager, du kan ikke fjerne deg selv fra organisasjonen.
             Kontakt oss på support@bikeindex.org hvis dette er problematisk.
         update:
-          updated_membership: Oppdatert medlemskap for %{user_email}.
+          updated_organization_role: Oppdatert medlemskap for %{user_email}.
     ownerships:
       show:
         no_longer_your_bike: Det pleide å være din %{bike_type}, men er det ikke lenger!
@@ -2699,8 +2696,6 @@ nb:
           å redde flere sykler.
         payment_received: Din betaling på %{amount} er mottatt.
         thank_you_so_much: Tusen takk!
-        thanks_for_signing_up: Takk for at du registrerte deg som medlem av Bike Index.
-          Vi sender deg fakturaer hver måned til denne e-postadressen
         we_really_appreciate_your_support: Vi setter stor pris på din støtte til Bike
           Index!
       subject: Takk for at du støtter Bike Index!
@@ -5047,7 +5042,6 @@ nb:
       edit:
         confirmation: Er du sikker på at du vil fjerne %{user_name} fra %{org_name}?
           (De vil fortsatt bruke sin personlige konto)
-        edit_membership_html: Rediger medlemskap for <em class="small">%{email}</em>
         email: E-post
         has_not_signed_up_html: "%{name} <strong>har fortsatt ikke registrert seg</strong>"
         invited: Invitert
@@ -5056,6 +5050,7 @@ nb:
         remove_from_organization: fjern fra organisasjonen
         signed_up: Meldt seg
         update: Oppdater
+        edit_organization_role_html: Rediger medlemskap for <em class="small">%{email}</em>
       index:
         claimed: Hevdet
         created: Opprettet
@@ -5091,7 +5086,6 @@ nb:
         email_youre_inviting: E-post du inviterer
         invite_multiple_emails: Inviter flere e-poster
         invite_user: Inviter bruker
-        membership: Medlemskap
         multiple_emails: Flere e-poster
         remaining_invites_html: Du kan legge til <strong>%{invitations_count}</strong>
           mer
@@ -5102,15 +5096,16 @@ nb:
         user: bruker
         you_have_a_permitted_domain: Du har et tillatt domene
         you_have_invited_html: 'Du har invitert: <strong>%{users_count}</strong>'
-      membership_role_fields:
-        member_of_organization: Medlem av organisasjonen
-        member_no_bikes: Medlem uten sykkelredigering
-        membership_type: Medlemskapstype
-        admin_of_organization: Administrator for organisasjonen
+        organization_role: Organisasjonsrolle
+      organization_role_fields:
         admin_access: Full organisasjonstilgang
+        admin_of_organization: Administrator for organisasjonen
         member_access: Organisasjonstilgang, men kan ikke redigere organisasjonsinnstillinger
           eller invitere nye brukere
+        member_no_bikes: Medlem uten sykkelredigering
         member_no_bikes_access: Samme tilgang som medlem, men kan ikke redigere organisasjonssykler
+        member_of_organization: Medlem av organisasjonen
+        role_type: Rolletype
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"

@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: memberships
+# Table name: organization_roles
 #
 #  id                       :integer          not null, primary key
 #  claimed_at               :datetime
@@ -17,8 +17,14 @@
 #  sender_id                :integer
 #  user_id                  :integer
 #
-class Membership < ApplicationRecord
-  MEMBERSHIP_TYPES = %w[admin member member_no_bike_edit].freeze
+# Indexes
+#
+#  index_organization_roles_on_organization_id  (organization_id)
+#  index_organization_roles_on_sender_id        (sender_id)
+#  index_organization_roles_on_user_id          (user_id)
+#
+class OrganizationRole < ApplicationRecord
+  ROLE_TYPES = %w[admin member member_no_bike_edit].freeze
   HOT_SHEET_NOTIFICATION_ENUM = {notification_never: 0, notification_daily: 1}.freeze
 
   acts_as_paranoid
@@ -27,7 +33,7 @@ class Membership < ApplicationRecord
   belongs_to :organization
   belongs_to :sender, class_name: "User"
 
-  enum :role, MEMBERSHIP_TYPES
+  enum :role, ROLE_TYPES
   enum :hot_sheet_notification, HOT_SHEET_NOTIFICATION_ENUM
 
   validates_presence_of :role, :organization_id, :invited_email
@@ -42,29 +48,29 @@ class Membership < ApplicationRecord
   scope :created_by_magic_link, -> { where(created_by_magic_link: true) }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 
-  def self.membership_types
-    MEMBERSHIP_TYPES
+  def self.role_types
+    ROLE_TYPES
   end
 
   def self.create_passwordless(**create_attrs)
     new_passwordless_attrs = {skip_processing: true, role: "member"}
     if create_attrs[:invited_email].present? # This should always be present...
-      # We need to check for existing memberships because the AfterUserCreateWorker calls this
-      existing_membership = Membership.find_by_invited_email(create_attrs[:invited_email])
-      return existing_membership if existing_membership.present?
+      # We need to check for existing organization_roles because the AfterUserCreateWorker calls this
+      existing_organization_role = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
+      return existing_organization_role if existing_organization_role.present?
     end
-    membership = create!(new_passwordless_attrs.merge(create_attrs))
-    # ProcessMembershipWorker creates a user if the user doesn't exist, for passwordless organizations
+    organization_role = create!(new_passwordless_attrs.merge(create_attrs))
+    # ProcessOrganizationRoleWorker creates a user if the user doesn't exist, for passwordless organizations
     # because of that, we want to process this inline
-    ProcessMembershipWorker.new.perform(membership.id)
-    membership.reload
-    membership
+    ProcessOrganizationRoleWorker.new.perform(organization_role.id)
+    organization_role.reload
+    organization_role
   end
 
   def self.admin_text_search(str)
     q = "%#{str.to_s.strip}%"
     left_joins(:user)
-      .where("memberships.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
+      .where("organization_roles.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
       .references(:users)
   end
 
@@ -87,16 +93,16 @@ class Membership < ApplicationRecord
   end
 
   def organization_creator?
-    organization.memberships.minimum(:id) == id
+    organization.organization_roles.minimum(:id) == id
   end
 
   def enqueue_processing_worker
     return true if skip_processing
-    # We manually update the user, because ProcessMembershipWorker won't find this membership
+    # We manually update the user, because ProcessOrganizationRoleWorker won't find this organization_role
     if deleted? && user_id.present?
       AfterUserChangeWorker.perform_async(user_id)
     else
-      ProcessMembershipWorker.perform_async(id)
+      ProcessOrganizationRoleWorker.perform_async(id)
     end
   end
 

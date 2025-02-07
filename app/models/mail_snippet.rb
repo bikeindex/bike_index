@@ -21,6 +21,12 @@
 #  organization_id       :integer
 #  state_id              :bigint
 #
+# Indexes
+#
+#  index_mail_snippets_on_country_id       (country_id)
+#  index_mail_snippets_on_organization_id  (organization_id)
+#  index_mail_snippets_on_state_id         (state_id)
+#
 class MailSnippet < ApplicationRecord
   include Geocodeable
 

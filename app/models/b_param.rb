@@ -18,6 +18,10 @@
 #  creator_id      :integer
 #  organization_id :integer
 #
+# Indexes
+#
+#  index_b_params_on_organization_id  (organization_id)
+#
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
@@ -96,7 +100,7 @@ class BParam < ApplicationRecord
     end
     # Assign the correct user if user is part of the org (for embed submissions)
     if b.creation_organization_id.present? && b.creator_id != user_id
-      if Membership.where(user_id: user_id, organization_id: b.creation_organization_id).present?
+      if OrganizationRole.where(user_id: user_id, organization_id: b.creation_organization_id).present?
         b.update_attribute :creator_id, user_id
       end
     end

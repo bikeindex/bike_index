@@ -10,6 +10,10 @@
 #  old_user_id        :integer
 #  user_id            :integer
 #
+# Indexes
+#
+#  index_user_emails_on_user_id  (user_id)
+#
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: "User", touch: true

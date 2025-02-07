@@ -67,15 +67,21 @@ RSpec.describe "BikesController#index", type: :request do
           expect(assigns(:bikes).map(&:id)).to eq([])
         end
       end
-      context "over MAX_PAGE" do
+      context "invalid page params" do
         it "renders page 1" do
           get base_url, params: {page: 100}
           expect(response.status).to eq 200
           expect(assigns(:page)).to eq 100
           expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
+          # over MAX_PAGE
           get base_url, params: {page: 101}
           expect(response.status).to eq 200
           expect(assigns(:page)).to eq 100
+          expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
+          # blank
+          get base_url, params: {page: ""}
+          expect(response.status).to eq 200
+          expect(assigns(:page)).to eq 1
           expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
         end
       end

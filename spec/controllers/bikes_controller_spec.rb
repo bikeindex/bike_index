@@ -65,7 +65,7 @@ RSpec.describe BikesController, type: :controller do
     end
     context "Admin with manually set current_organization" do
       include_context :logged_in_as_superuser
-      let(:user) { FactoryBot.create(:organization_member, superuser: true) }
+      let(:user) { FactoryBot.create(:organization_user, superuser: true) }
       it "renders, sets passive_organization_id to be passed organization" do
         expect(user.default_organization).to be_present
         expect(user.default_organization).to_not eq organization
@@ -110,7 +110,7 @@ RSpec.describe BikesController, type: :controller do
     end
     # Because we're doing some special stuff with organization bike viewing
     context "organized user viewing bike" do
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       before { set_current_user(user) }
       it "renders" do
         expect(bike.editable_organizations.pluck(:id)).to eq([])
@@ -212,7 +212,7 @@ RSpec.describe BikesController, type: :controller do
         expect(session[:passive_organization_id]).to eq "0"
       end
       context "user part of organization" do
-        let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let!(:user) { FactoryBot.create(:organization_user, organization: organization) }
         it "makes current_organization the organization" do
           get :scanned, params: {id: "D0900", organization_id: organization.to_param}
           expect(assigns(:bike_sticker)).to eq bike_sticker2
@@ -222,7 +222,7 @@ RSpec.describe BikesController, type: :controller do
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
           it "makes current_organization the organization" do
-            expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
+            expect(user.organization_roles&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_sticker2.organization).to eq organization
             get :scanned, params: {id: "D900", organization_id: "BikeIndex"}
             expect(assigns(:bike_sticker)).to eq bike_sticker2
@@ -292,7 +292,7 @@ RSpec.describe BikesController, type: :controller do
         end
       end
       context "with organization member" do
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         it "renders and assigns creation_organization" do
           get :new
           expect(response.code).to eq("200")
@@ -591,7 +591,7 @@ RSpec.describe BikesController, type: :controller do
         end
       end
       context "with organization bike code and signed in member" do
-        let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let!(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "aaa", kind: "sticker") }
         let!(:wrong_bike_sticker) { FactoryBot.create(:bike_sticker, code: "aaa", kind: "sticker") }
         it "registers a bike under signed in user and redirects with persist_email" do
@@ -1141,7 +1141,7 @@ RSpec.describe BikesController, type: :controller do
       let(:can_edit_claimed) { false }
       let(:claimed) { false }
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       before { set_current_user(user) }
       it "updates the bike" do
         bike.reload

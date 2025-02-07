@@ -15,10 +15,7 @@
           %td Stripe ID
           %td
             = link_to payment.stripe_id, "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
-            - if display_dev_info?
-              %small.less-strong.only-dev-visible
-                Kind:
-                %code= payment.stripe_kind
+
       %tr
         %td For
         %td
@@ -38,7 +35,7 @@
         %td
           - if payment.paid?
             %span.convertTime.preciseTime
-              = l payment.first_payment_date, format: :convert_time
+              = l payment.paid_at, format: :convert_time
           - else
             %span.text-danger Incomplete!
       %tr

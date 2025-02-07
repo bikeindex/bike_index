@@ -1,4 +1,4 @@
-- memberships ||= @memberships
+- organization_roles ||= @organization_roles
 - skip_organization ||= false
 - render_sortable ||= false
 - render_deleted ||= false
@@ -27,35 +27,35 @@
             = sortable "deleted_at", render_sortable: render_sortable
 
     %tbody
-      - memberships.each do |membership|
+      - organization_roles.each do |organization_role|
         %tr
           %td
             .less-strong-hold
-              %a.convertTime{ href: admin_membership_url(membership) }
-                = l membership.created_at, format: :convert_time
+              %a.convertTime{ href: admin_organization_role_url(organization_role) }
+                = l organization_role.created_at, format: :convert_time
               %span.less-strong-right.d-none.d-md-block
-                = membership.id
+                = organization_role.id
           %td
-            - if membership.user.present?
-              = render partial: "/shared/admin_user_cell", locals: {user: membership.user, render_search: false, cache: true}
+            - if organization_role.user.present?
+              = render partial: "/shared/admin_user_cell", locals: {user: organization_role.user, render_search: false, cache: true}
             - else
-              = membership.invited_email
+              = organization_role.invited_email
           - unless skip_organization
             %td
-              = link_to membership.organization&.name, admin_organization_path(membership.organization_id)
+              = link_to organization_role.organization&.name, admin_organization_path(organization_role.organization_id)
           %td
-            - if membership.claimed_at.present?
+            - if organization_role.claimed_at.present?
               %span.convertTime
-                = l membership.claimed_at, format: :convert_time
+                = l organization_role.claimed_at, format: :convert_time
           %td
-            - if membership.sender.present?
-              = render partial: "/shared/admin_user_cell", locals: {user: membership.sender, render_search: false, cache: true}
+            - if organization_role.sender.present?
+              = render partial: "/shared/admin_user_cell", locals: {user: organization_role.sender, render_search: false, cache: true}
             - else
-              = membership.sender_id
+              = organization_role.sender_id
           %td
-            = check_mark if membership.admin?
+            = check_mark if organization_role.admin?
           - if render_deleted
             %td
-              - if membership.deleted_at.present?
+              - if organization_role.deleted_at.present?
                 %small.convertTime
-                  = l membership.deleted_at, format: :convert_time
+                  = l organization_role.deleted_at, format: :convert_time

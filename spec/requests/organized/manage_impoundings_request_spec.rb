@@ -12,8 +12,8 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
     end
   end
 
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     describe "index" do
       it "redirects to the organization root path" do
         get base_url

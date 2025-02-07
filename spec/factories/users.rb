@@ -37,13 +37,13 @@ FactoryBot.define do
       accepted_vendor_terms_of_service { true } # Necessary so everyone doesn't redirect back accept_vendor_terms
 
       after(:create) do |user, evaluator|
-        FactoryBot.create(:membership_claimed, user: user,
+        FactoryBot.create(:organization_role_claimed, user: user,
           organization: evaluator.organization,
           role: evaluator.role)
       end
     end
 
-    factory :organization_member, traits: [:with_organization]
+    factory :organization_user, traits: [:with_organization]
 
     factory :organization_auto_user, traits: [:with_organization] do
       after(:create) do |user, evaluator|

@@ -59,7 +59,7 @@ RSpec.describe BannedEmailDomain, type: :model do
       it "is truthy" do
         expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
         expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
-        expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
+        expect(BannedEmailDomain.no_valid_organization_roles?(domain)).to be_truthy
         expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
       end
 
@@ -72,9 +72,9 @@ RSpec.describe BannedEmailDomain, type: :model do
         end
       end
 
-      context "with a membership in the domain" do
+      context "with a organization_role in the domain" do
         let(:organization) { FactoryBot.create(:organization, approved: true) }
-        let!(:membership) { FactoryBot.create(:membership, organization:, user:) }
+        let!(:organization_role) { FactoryBot.create(:organization_role, organization:, user:) }
         it "is falsey" do
           expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
         end
@@ -83,10 +83,10 @@ RSpec.describe BannedEmailDomain, type: :model do
           before { organization.update(approved: false) }
 
           it "is truthy" do
-            expect(Membership.count).to eq 1
+            expect(OrganizationRole.count).to eq 1
             expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
             expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
-            expect(BannedEmailDomain.no_valid_memberships?(domain)).to be_truthy
+            expect(BannedEmailDomain.no_valid_organization_roles?(domain)).to be_truthy
             expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
           end
         end

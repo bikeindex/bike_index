@@ -11,6 +11,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_exchange_rates_on_from_and_to  (from,to) UNIQUE
+#
 class ExchangeRate < ApplicationRecord
   validates :from, :to, :rate, presence: true
   validates :from, :to, format: {with: /\A[A-Z]{3}\z/, message: "must be a valid ISO currency code"}

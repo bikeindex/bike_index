@@ -13,7 +13,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
   end
 
   context "organization not enabled" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     let(:current_organization) { FactoryBot.create(:organization) }
     it "redirects" do
       get base_url
@@ -22,8 +22,8 @@ RSpec.describe Organized::HotSheetsController, type: :request do
     end
   end
 
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
 
     describe "show" do

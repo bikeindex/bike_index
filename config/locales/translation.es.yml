@@ -288,7 +288,6 @@ es:
         locks:
         longitude:
         magic_link_token:
-        memberships:
         my_bikes_hash:
         name: Nombre
         notification_newsletters:
@@ -305,7 +304,6 @@ es:
         phone:
         preferred_language:
         received_stolen_notifications:
-        sent_memberships:
         sent_stolen_notifications:
         show_bikes:
         show_phone:
@@ -324,6 +322,8 @@ es:
         when_vendor_terms_of_service:
         zipcode:
         token_for_password_reset:
+        organization_roles:
+        sent_organization_roles:
       ambassador_task:
         ambassador_task_assignments:
         ambassadors:
@@ -599,12 +599,6 @@ es:
         slug:
         total_years_active:
         website:
-      membership:
-        claimed_at:
-        deleted_at:
-        email_invitation_sent_at:
-        invited_email:
-        role:
       normalized_serial_segment:
         segment:
       organization:
@@ -629,7 +623,6 @@ es:
         locations:
         lock_show_on_map:
         mail_snippets:
-        memberships:
         name: Nombre
         payments:
         pos_kind:
@@ -642,6 +635,7 @@ es:
         slug:
         users:
         website:
+        organization_roles:
       organization_feature:
         amount_cents:
         description:
@@ -664,12 +658,9 @@ es:
       payment:
         amount_cents:
         email: Email
-        first_payment_date:
-        is_current:
         is_payment:
-        is_recurring:
         kind:
-        last_payment_date:
+        paid_at:
       public_image:
         external_image_url:
         image:
@@ -782,7 +773,6 @@ es:
         locks:
         longitude:
         magic_link_token:
-        memberships:
         my_bikes_hash:
         name: Nombre
         notification_newsletters:
@@ -799,7 +789,6 @@ es:
         phone:
         preferred_language:
         received_stolen_notifications:
-        sent_memberships:
         sent_stolen_notifications:
         show_bikes:
         show_phone:
@@ -818,6 +807,8 @@ es:
         when_vendor_terms_of_service:
         zipcode:
         token_for_password_reset:
+        organization_roles:
+        sent_organization_roles:
       user_email:
         confirmation_token: Código de confirmación
         email: Email
@@ -827,6 +818,12 @@ es:
         iso_bsd:
         name: Nombre
         priority:
+      organization_role:
+        claimed_at:
+        deleted_at:
+        email_invitation_sent_at:
+        invited_email:
+        role:
     enums:
       cycle_type:
         bike:
@@ -909,7 +906,6 @@ es:
       lock_type:
       mail_snippet:
       manufacturer:
-      membership:
       normalized_serial_segment:
       organization:
       organization_feature:
@@ -930,6 +926,7 @@ es:
       user:
       user_email:
       wheel_size:
+      organization_role:
     select_options:
       color:
         black:
@@ -2398,7 +2395,7 @@ es:
         reject_self_updates:
           cannot_remove_yourself:
         update:
-          updated_membership:
+          updated_organization_role:
     ownerships:
       show:
         no_longer_your_bike:
@@ -2513,7 +2510,6 @@ es:
         donation_will_help:
         payment_received:
         thank_you_so_much:
-        thanks_for_signing_up:
         we_really_appreciate_your_support:
       subject:
     magic_login_link_email:
@@ -3943,7 +3939,6 @@ es:
     users:
       edit:
         confirmation:
-        edit_membership_html:
         email: Email
         has_not_signed_up_html:
         invited:
@@ -3952,6 +3947,7 @@ es:
         remove_from_organization:
         signed_up:
         update:
+        edit_organization_role_html:
       index:
         claimed:
         created:
@@ -3981,7 +3977,6 @@ es:
         email_youre_inviting:
         invite_multiple_emails:
         invite_user:
-        membership:
         multiple_emails:
         remaining_invites_html:
         send_invitation:
@@ -3989,14 +3984,15 @@ es:
         user:
         you_have_a_permitted_domain:
         you_have_invited_html:
-      membership_role_fields:
-        member_of_organization:
-        member_no_bikes:
-        membership_type:
-        admin_of_organization:
+        organization_role:
+      organization_role_fields:
         admin_access:
+        admin_of_organization:
         member_access:
+        member_no_bikes:
         member_no_bikes_access:
+        member_of_organization:
+        role_type:
   organized_mailer:
     custom_message:
       subject:

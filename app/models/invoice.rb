@@ -20,6 +20,11 @@
 #  first_invoice_id            :integer
 #  organization_id             :integer
 #
+# Indexes
+#
+#  index_invoices_on_first_invoice_id  (first_invoice_id)
+#  index_invoices_on_organization_id   (organization_id)
+#
 
 # daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ApplicationRecord
