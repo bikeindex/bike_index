@@ -89,11 +89,11 @@ class Organization < ApplicationRecord
   has_many :bikes_ever_registered, through: :bike_organizations_ever_registered, source: :bike
   has_many :recovered_records, through: :bikes_ever_registered
 
-  has_many :memberships, dependent: :destroy
-  has_many :users, through: :memberships
+  has_many :organization_roles, dependent: :destroy
+  has_many :users, through: :organization_roles
 
-  has_many :admin_memberships, -> { admin }, class_name: "Membership"
-  has_many :admins, through: :admin_memberships, source: :user
+  has_many :admin_organization_roles, -> { admin }, class_name: "OrganizationRole"
+  has_many :admins, through: :admin_organization_roles, source: :user
 
   has_many :ownerships
   has_many :created_bikes, through: :ownerships, source: :bike
@@ -282,7 +282,7 @@ class Organization < ApplicationRecord
   end
 
   def sent_invitation_count
-    memberships.count
+    organization_roles.count
   end
 
   def remaining_invitation_count
@@ -573,7 +573,7 @@ class Organization < ApplicationRecord
       u = User.fuzzy_email_find(embedable_user_email)
       self.auto_user_id = u.id if u&.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
-        Membership.create(user_id: u.id, organization_id: id, role: "member")
+        OrganizationRole.create(user_id: u.id, organization_id: id, role: "member")
         self.auto_user_id = u.id
       end
     elsif auto_user_id.blank?

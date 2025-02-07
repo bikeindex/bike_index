@@ -45,9 +45,9 @@ class AmbassadorTaskAssignment < ApplicationRecord
 
   # Find completed assignments, filtering and sorting by columns on associated
   # models. The inner join is necessary because our data model permits multiple
-  # ambassador organization memberships for the same user (the most recent being
+  # ambassador organization_roles for the same user (the most recent being
   # the active ambassadorship). The intent is to eventually refactor to
-  # enforcing single membership.
+  # enforcing single user role.
   #
   # filters: :organization_id, :ambassador_task_id, :ambassador_id (multiple permitted)
   # sort: :organization_name, :ambassador_task_title, :ambassador_name
@@ -75,7 +75,7 @@ class AmbassadorTaskAssignment < ApplicationRecord
         ON users.id = ambassador_task_assignments.user_id
         JOIN (
             SELECT m.user_id, MAX(m.created_at) AS created_at
-            FROM memberships AS m
+            FROM organization_roles AS m
             JOIN organizations AS o
             ON m.organization_id = o.id
             WHERE o.kind = #{Organization.kinds.index("ambassador")}
@@ -83,10 +83,10 @@ class AmbassadorTaskAssignment < ApplicationRecord
             GROUP BY m.user_id
         ) current_ambassadorships
         ON current_ambassadorships.user_id = users.id
-        JOIN memberships
-        ON memberships.created_at = current_ambassadorships.created_at
+        JOIN organization_roles
+        ON organization_roles.created_at = current_ambassadorships.created_at
         JOIN organizations
-        ON memberships.organization_id = organizations.id
+        ON organization_roles.organization_id = organizations.id
         WHERE ambassador_task_assignments.completed_at IS NOT NULL
       SQL
 

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organized::BaseController, type: :request do
   describe "#root" do
     context "not an ambassador organization" do
-      include_context :request_spec_logged_in_as_organization_member
+      include_context :request_spec_logged_in_as_organization_user
 
       it "redirects to the bikes page" do
         get "/o/#{current_organization.to_param}"
@@ -25,7 +25,7 @@ RSpec.describe Organized::BaseController, type: :request do
     end
 
     context "law enforcement organization" do
-      include_context :request_spec_logged_in_as_organization_member
+      include_context :request_spec_logged_in_as_organization_user
       let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
 
       it "redirects to the ambassador dashboard" do
@@ -40,7 +40,7 @@ RSpec.describe Organized::BaseController, type: :request do
   end
 
   describe "/dashboard" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: current_organization, created_at: Time.current - 2.days) }
     # Test the different organizations that have overview_dashboard? truthy
     context "organization with regional_bike_counts" do

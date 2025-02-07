@@ -41,7 +41,7 @@ module AdminHelper
       {title: "Parking Notifications", path: admin_parking_notifications_path, match_controller: true},
       {title: "Recoveries", path: admin_recoveries_path, match_controller: true},
       {title: "Recovery Displays", path: admin_recovery_displays_path, match_controller: true},
-      {title: "Memberships", path: admin_memberships_path, match_controller: true},
+      {title: "Organization Roles", path: admin_organization_roles_path, match_controller: true},
       {title: "Manufacturers", path: admin_manufacturers_path, match_controller: true},
       {title: "Config: TSV Exports", path: admin_tsvs_path, match_controller: false},
       {title: "Credibility badges", path: admin_credibility_badges_path, match_controller: false},
@@ -129,7 +129,7 @@ module AdminHelper
     icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
     org = user.organization_prioritized
     if org.present?
-      icon_hash[:tags] += [:organization_member]
+      icon_hash[:tags] += [:organization_role]
       icon_hash[:organization] = {kind: org.kind.to_sym, paid: org.paid?}
     end
     icon_hash
@@ -144,7 +144,7 @@ module AdminHelper
         concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
         concat(content_tag(:span, "onor", class: "less-strong")) if full_text
       end
-      if icon_hash[:tags].include?(:organization_member)
+      if icon_hash[:tags].include?(:organization_role)
         org_full_text = [
           icon_hash[:organization][:paid] ? "Paid" : nil,
           "organization member -",

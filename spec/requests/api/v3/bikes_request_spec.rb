@@ -78,7 +78,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result["error"]).to match(/organization/i)
     end
     context "user is organization member" do
-      let(:user) { FactoryBot.create(:organization_member) }
+      let(:user) { FactoryBot.create(:organization_user) }
       let!(:organization) { user.organizations.first }
       let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "with_user", authorized_bike_id: nil} }
       let(:unmatched_result) { {registered: false, claimed: false, can_edit: false, state: "no_matching_bike", authorized_bike_id: nil} }
@@ -412,7 +412,7 @@ RSpec.describe "Bikes API V3", type: :request do
         it "updates if the submitting org is the creation org" do
           bike = FactoryBot.create(:bike_organized)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-          FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization)
+          FactoryBot.create(:organization_role_claimed, user: user, organization: bike.creation_organization)
 
           bike_attrs = {
             serial: bike.serial_display,
@@ -432,7 +432,7 @@ RSpec.describe "Bikes API V3", type: :request do
         it "creates a new record if the submitting org isn't the creation org" do
           bike = FactoryBot.create(:bike_organized)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-          FactoryBot.create(:membership_claimed, user: user)
+          FactoryBot.create(:organization_role_claimed, user: user)
 
           bike_attrs = {
             serial: bike.serial_display,
@@ -454,7 +454,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:can_edit_claimed) { true }
         let(:bike) { FactoryBot.create(:bike_organized, can_edit_claimed: can_edit_claimed) }
         let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike) }
-        let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization) }
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do
           {
             serial: bike.serial_display,
@@ -753,7 +753,7 @@ RSpec.describe "Bikes API V3", type: :request do
       let(:organization) { FactoryBot.create(:organization) }
       it "creates a stolen bike through an organization and uses the passed phone" do
         user.update_attribute :phone, "0987654321"
-        FactoryBot.create(:membership, user: user, organization: organization)
+        FactoryBot.create(:organization_role, user: user, organization: organization)
         FactoryBot.create(:country, iso: "US")
         FactoryBot.create(:state, abbreviation: "NY")
         date_stolen = 1357192800
@@ -829,7 +829,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "with membership" do
       before do
-        FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+        FactoryBot.create(:organization_role, user: user, organization: organization, role: "admin")
         organization.save
       end
 
@@ -984,7 +984,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "fails to create a bike if the app owner isn't a member of the organization" do
-      expect(user.has_membership?).to be_falsey
+      expect(user.has_organization_role?).to be_falsey
       post tokenized_url, params: bike_attrs.to_json, headers: json_headers
       expect(response.code).to eq("403")
       expect(json_result["error"].is_a?(String)).to be_truthy
@@ -1053,7 +1053,7 @@ RSpec.describe "Bikes API V3", type: :request do
       end
       context "application creator is auto_user of organization" do
         let(:application_owner) { auto_user }
-        before { application_owner.memberships.first.update(role: "admin") }
+        before { application_owner.organization_roles.first.update(role: "admin") }
         it "creates" do
           expect(application_owner.reload.admin_of?(organization)).to be_truthy
           expect(client_credentials_token.application.owner.id).to eq auto_user.id
@@ -1272,10 +1272,10 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "organization bike" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:og_creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:og_creator) { FactoryBot.create(:organization_user, organization: organization) }
       let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creator: og_creator) }
       let(:ownership) { bike.ownerships.first }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:params) { {year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"]} }
       let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
       it "permits updating" do

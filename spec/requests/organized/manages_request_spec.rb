@@ -15,8 +15,8 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
   end
 
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     describe "index" do
       it "redirects to the organization root path" do
         get base_url
@@ -94,7 +94,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             is_paid: false
           }
         end
-        let(:user2) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let(:user2) { FactoryBot.create(:organization_user, organization: current_organization) }
         let(:update) do
           {
             direct_unclaimed_notifications: true,

@@ -2,11 +2,30 @@ require "rails_helper"
 
 RSpec.describe UserSerializer do
   let(:user) { FactoryBot.create(:user) }
-  let(:organization) { FactoryBot.create(:organization) }
-  let(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
-  subject { UserSerializer.new(user) }
+  let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user) }
+  let(:organization) { organization_role.organization }
+  subject { UserSerializer.new(user.reload) }
 
-  it { expect(subject.user_present).to be_truthy }
-  it { expect(subject.is_superuser).to be_falsey }
-  xit { expect(subject.memberships.first).to eq(membership) }
+  let(:target_organization_role) do
+    {
+      base_url: "/organizations/#{organization.slug}",
+      is_admin: false,
+      locations: [{id: nil, name: organization.name}],
+      organization_id: organization.id,
+      organization_name: organization.name,
+      short_name: organization.short_name,
+      slug: organization.slug
+    }
+  end
+  let(:target) do
+    {
+      user_present: true,
+      is_content_admin: false,
+      is_superuser: nil,
+      memberships: [target_organization_role]
+    }
+  end
+  it "renders" do
+    expect(subject.as_json(root: false)).to eq target
+  end
 end

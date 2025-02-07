@@ -169,7 +169,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
 
         # ambassador for group "B" joins group "X"
         org4 = FactoryBot.create(:organization_ambassador, name: "X Ambassadors")
-        FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
+        FactoryBot.create(:organization_role_ambassador, user: Ambassador.second, organization: org4)
 
         result = described_class.completed_assignments(sort: {organization_name: :asc})
 
@@ -188,7 +188,7 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
 
         # ambassador for group "Y" joins group "B"
         org4 = FactoryBot.create(:organization_ambassador, name: "B Ambassadors")
-        FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
+        FactoryBot.create(:organization_role_ambassador, user: Ambassador.second, organization: org4)
 
         result = described_class.completed_assignments(sort: {organization_name: :desc})
 

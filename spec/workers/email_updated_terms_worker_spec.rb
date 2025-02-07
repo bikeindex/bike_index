@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe EmailUpdatedTermsWorker, type: :job do
-  let(:user) { FactoryBot.create(:organization_member) }
+  let(:user) { FactoryBot.create(:organization_user) }
   let(:subject) { EmailUpdatedTermsWorker.new }
   before do
     subject.redis.expire(subject.enqueued_emails_key, 0)

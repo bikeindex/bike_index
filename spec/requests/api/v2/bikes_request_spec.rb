@@ -58,7 +58,7 @@ RSpec.describe "Bikes API V2", type: :request do
       let!(:color) { FactoryBot.create(:color, name: "White") }
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:bike_attrs) do
         {
           serial: "WTU171G0193G",
@@ -189,7 +189,7 @@ RSpec.describe "Bikes API V2", type: :request do
     it "creates a stolen bike through an organization and uses the passed phone" do
       organization = FactoryBot.create(:organization)
       user.update_attribute :phone, "0987654321"
-      FactoryBot.create(:membership_claimed, user: user, organization: organization)
+      FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
       FactoryBot.create(:country, iso: "US")
       FactoryBot.create(:state, abbreviation: "NY")
       organization.save
@@ -253,7 +253,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.code).to eq("401")
     end
     context "user is organization member" do
-      let(:user) { FactoryBot.create(:organization_member) }
+      let(:user) { FactoryBot.create(:organization_user) }
       let!(:organization) { user.organizations.first }
       it "returns success" do
         expect(token.resource_owner_id).to eq user.id
@@ -287,7 +287,7 @@ RSpec.describe "Bikes API V2", type: :request do
     before { FactoryBot.create(:wheel_size, iso_bsd: 559) }
 
     it "also sets front wheel bsd" do
-      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:organization_role_claimed, user: user, organization: organization, role: "admin")
       organization.save
       wheel_size_2 = FactoryBot.create(:wheel_size, iso_bsd: 622)
       additional_attrs = {
@@ -307,7 +307,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "creates a bike for organization with v2_accessor" do
-      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:organization_role_claimed, user: user, organization: organization, role: "admin")
       organization.save
       post tokenized_url, params: bike_attrs.to_json, headers: json_headers
       result = json_result["bike"]
@@ -326,7 +326,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "doesn't create a bike without an organization with v2_accessor" do
-      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:organization_role_claimed, user: user, organization: organization, role: "admin")
       organization.save
       bike_attrs.delete(:organization_slug)
       post tokenized_url, params: bike_attrs.to_json, headers: json_headers
@@ -335,7 +335,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "fails to create a bike if the app owner isn't a member of the organization" do
-      expect(user.has_membership?).to be_falsey
+      expect(user.has_organization_role?).to be_falsey
       post tokenized_url, params: bike_attrs.to_json, headers: json_headers
       expect(response.code).to eq("403")
       expect(json_result["error"].is_a?(String)).to be_truthy

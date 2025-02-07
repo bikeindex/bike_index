@@ -112,10 +112,10 @@ RSpec.describe AdminHelper, type: :helper do
     end
     context "organization" do
       let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       it "returns paid_org" do
         expect(user.paid_org?).to be_falsey
-        expect(user_icon_hash(user)).to eq({tags: %i[organization_member], organization: {kind: :bike_shop, paid: false}})
+        expect(user_icon_hash(user)).to eq({tags: %i[organization_role], organization: {kind: :bike_shop, paid: false}})
       end
       context "paid_org" do
         let(:organization) { FactoryBot.create(:organization, :organization_features, kind: "law_enforcement") }
@@ -123,7 +123,7 @@ RSpec.describe AdminHelper, type: :helper do
         let(:target_full_text) { "<span><span class=\"org-member-icon user-icon ml-1\" title=\"Paid organization member - Law Enforcement\">$O P</span><span class=\"ml-1 less-strong\">Paid organization member - Law Enforcement</span></span>" }
         it "returns paid_org" do
           expect(user.paid_org?).to be_truthy
-          expect(user_icon_hash(user)).to eq({tags: %i[organization_member], organization: {kind: :law_enforcement, paid: true}})
+          expect(user_icon_hash(user)).to eq({tags: %i[organization_role], organization: {kind: :law_enforcement, paid: true}})
           expect(user_icon(user)).to eq target
           expect(user_icon(user, full_text: true)).to eq target_full_text
         end

@@ -122,8 +122,8 @@ class UsersController < ApplicationController
       elsif params.dig(:user, :vendor_terms_of_service).present?
         if InputNormalizer.boolean(params.dig(:user, :vendor_terms_of_service))
           @user.update(accepted_vendor_terms_of_service: true)
-          flash[:success] = if @user.memberships.any?
-            translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
+          flash[:success] = if @user.organization_roles.any?
+            translation(:you_can_use_bike_index_as_org, org_name: @user.organization_roles.first.organization.name)
           else
             translation(:thanks_for_accepting_tos)
           end

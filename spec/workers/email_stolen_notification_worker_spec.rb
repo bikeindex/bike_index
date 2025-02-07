@@ -102,7 +102,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       end
     end
     context "user belongs to organization with unstolen_notifications" do
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       it "sends customer an email" do
         notification = Notification.find_or_create_by(notifiable: stolen_notification,
           kind: "stolen_notification_sent")
@@ -142,7 +142,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       end
     end
     context "user belongs to organization with unstolen_notifications" do
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       before do
         user.reload
         expect(user.enabled?("unstolen_notifications")).to be_truthy

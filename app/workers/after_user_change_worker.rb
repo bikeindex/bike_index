@@ -68,7 +68,7 @@ class AfterUserChangeWorker < ApplicationWorker
     end
 
     # Ignore alerts below for org members, otherwise they might get a lot of useless ones
-    if user.memberships.any?
+    if user.organization_roles.any?
       user.user_alerts.active.ignored_member.each { |user_alert| user_alert.resolve! }
       return
     end

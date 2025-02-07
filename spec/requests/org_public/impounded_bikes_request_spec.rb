@@ -10,7 +10,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   end
 
   context "Logged in as organization (not enabled)" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     it "redirects" do
       expect(current_organization.enabled?("impound_bikes")).to be_falsey
       expect(current_organization.public_impound_bikes?).to be_falsey

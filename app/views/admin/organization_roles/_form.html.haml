@@ -1,17 +1,17 @@
 .card
   .card-body
-    - if @membership.id.present?
+    - if @organization_role.id.present?
       %h4.text-danger.mb-4
         DANGER! Don't edit
         %em
           %br
           It would be better to delete and re-add
-    = form_for [:admin, @membership] do |f|
-      - if @membership.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
+    = form_for [:admin, @organization_role] do |f|
+      - if @organization_role.errors.any?
+        = render partial: "/shared/errors", locals: { name: "OrganizationRole", obj: @organization_role }
       .form-group.fancy-select.unfancy
         = f.label :organization
-        = collection_select :membership, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
+        = collection_select :organization_role, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
 
       .form-group
         = f.label :invited_email

@@ -446,7 +446,7 @@ RSpec.describe Ownership, type: :model do
     end
     context "organization registration" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
-      let(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:creator) { FactoryBot.create(:organization_user, organization: organization) }
       let(:owner_email) { creator.email }
       let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creator: creator, owner_email: owner_email) }
       let(:ownership) { bike.ownerships.first }
@@ -472,7 +472,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.send(:calculated_organization_pre_registration?)).to be_truthy
         end
         context "not self made" do
-          let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:member) { FactoryBot.create(:organization_user, organization: organization) }
           let(:owner_email) { member.email }
           it "is falsey" do
             ownership.reload

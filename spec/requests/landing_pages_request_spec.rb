@@ -39,7 +39,7 @@ RSpec.describe LandingPagesController, type: :request do
   end
 
   describe "welcome#index" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     it "renders" do
       get "/"
       expect(response.status).to eq(200)

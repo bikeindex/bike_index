@@ -100,7 +100,7 @@ class BParam < ApplicationRecord
     end
     # Assign the correct user if user is part of the org (for embed submissions)
     if b.creation_organization_id.present? && b.creator_id != user_id
-      if Membership.where(user_id: user_id, organization_id: b.creation_organization_id).present?
+      if OrganizationRole.where(user_id: user_id, organization_id: b.creation_organization_id).present?
         b.update_attribute :creator_id, user_id
       end
     end

@@ -33,7 +33,7 @@ class CredibilityScorer
       user_has_bike_recovered: 10,
       user_sent_in_bike_tip: 10,
       user_supporter: 20,
-      user_trusted_organization_member: 30
+      user_trusted_organization_role: 30
     },
 
     bike: {
@@ -54,8 +54,8 @@ class CredibilityScorer
     if (badges_array & %i[user_ambassador creation_organization_trusted]).count == 2
       badges_array -= [:creation_organization_trusted]
     end
-    if (badges_array & %i[user_trusted_organization_member creation_organization_trusted]).count == 2
-      badges_array -= [:user_trusted_organization_member]
+    if (badges_array & %i[user_trusted_organization_role creation_organization_trusted]).count == 2
+      badges_array -= [:user_trusted_organization_role]
     end
     badges_array
   end
@@ -120,7 +120,7 @@ class CredibilityScorer
     return [:user_banned] if user.banned
     return [:user_ambassador] if user.ambassador?
     badges = []
-    badges += [:user_trusted_organization_member] if user.organizations.any? { |o| organization_trusted?(o) }
+    badges += [:user_trusted_organization_role] if user.organizations.any? { |o| organization_trusted?(o) }
     badges += [:user_has_bike_recovered] if user.recovered_records.limit(1).present?
     badges += [:user_sent_in_bike_tip] if Feedback.where(user_id: user.id).stolen_tip.any?
     badges += [:user_supporter] if user.payments.any?
@@ -128,7 +128,7 @@ class CredibilityScorer
     badges += [:user_connected_to_strava] if user.integrations.strava.any?
     badges += [:user_verified_phone] if user.phone_confirmed?
     # Don't mark suspicious if we trust them
-    unless (badges & %i[user_trusted_organization_member]).any?
+    unless (badges & %i[user_trusted_organization_role]).any?
       badges += [:user_handle_suspicious] if [user.name, user.username, user.email].any? { |str| suspiscious_handle?(str) }
     end
     badges

@@ -600,8 +600,8 @@ class Bike < ApplicationRecord
     end
     return true if current_stolen_record.phone_for_everyone
     return false if passed_user.blank?
-    return true if current_stolen_record.phone_for_shops && passed_user.has_shop_membership?
-    return true if current_stolen_record.phone_for_police && passed_user.has_police_membership?
+    return true if current_stolen_record.phone_for_shops && passed_user.has_shop_organization_role?
+    return true if current_stolen_record.phone_for_police && passed_user.has_police_organization_role?
     current_stolen_record.phone_for_users
   end
 

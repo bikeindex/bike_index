@@ -159,7 +159,7 @@ RSpec.describe User, type: :model do
   describe "authorized?" do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
-    let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
     let(:admin) { User.new(superuser: true) }
     it "returns expected values" do
@@ -168,12 +168,12 @@ RSpec.describe User, type: :model do
       expect(admin.authorized?(bike)).to be_truthy
       expect(admin.authorized?(organization)).to be_truthy
       expect(bike.ownerships.first.creator.authorized?(bike)).to be_truthy
-      expect(organization_member.authorized?(bike)).to be_truthy
-      expect(organization_member.authorized?(organization)).to be_truthy
+      expect(organization_user.authorized?(bike)).to be_truthy
+      expect(organization_user.authorized?(organization)).to be_truthy
     end
     context "bike_sticker" do
       let(:organization2) { FactoryBot.create(:organization) }
-      let(:organization2_member) { FactoryBot.create(:organization_member, organization: organization2) }
+      let(:organization2_member) { FactoryBot.create(:organization_user, organization: organization2) }
       let(:owner) { bike.creator }
       let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization2, can_edit_claimed: true) }
       let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike) }
@@ -181,17 +181,17 @@ RSpec.describe User, type: :model do
         # Sanity check bike authorization
         expect(bike.authorized?(user)).to be_falsey
         expect(bike.authorized?(owner)).to be_truthy
-        expect(bike.authorized?(organization_member)).to be_truthy
+        expect(bike.authorized?(organization_user)).to be_truthy
         expect(bike.authorized?(admin)).to be_truthy
         # Check user authorization
         expect(user.authorized?(bike)).to be_falsey
         expect(owner.authorized?(bike)).to be_truthy
-        expect(organization_member.authorized?(bike)).to be_truthy
+        expect(organization_user.authorized?(bike)).to be_truthy
         expect(admin.authorized?(bike)).to be_truthy
         # Check bike code authorization
         expect(user.authorized?(bike_sticker)).to be_falsey
         expect(owner.authorized?(bike_sticker)).to be_truthy
-        expect(organization_member.authorized?(bike_sticker)).to be_truthy
+        expect(organization_user.authorized?(bike_sticker)).to be_truthy
         expect(admin.authorized?(bike_sticker)).to be_truthy
       end
     end
@@ -410,15 +410,15 @@ RSpec.describe User, type: :model do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
     let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
-    let!(:membership) { FactoryBot.create(:membership, user: user, organization: organization, hot_sheet_notification: :notification_daily) }
+    let!(:organization_role) { FactoryBot.create(:organization_role, user: user, organization: organization, hot_sheet_notification: :notification_daily) }
     it "updates and marks all notifications false" do
       expect(user.reload.notification_newsletters).to be_truthy
       expect(user.no_non_theft_notification).to be_falsey
-      expect(user.memberships.first&.hot_sheet_notification).to eq "notification_daily"
+      expect(user.organization_roles.first&.hot_sheet_notification).to eq "notification_daily"
       user.update(no_non_theft_notification: true)
       expect(user.reload.notification_newsletters).to be_falsey
       expect(user.no_non_theft_notification).to be_truthy
-      expect(user.memberships.first&.hot_sheet_notification).to eq "notification_never"
+      expect(user.organization_roles.first&.hot_sheet_notification).to eq "notification_never"
     end
   end
 
@@ -646,7 +646,7 @@ RSpec.describe User, type: :model do
     end
 
     context "organization" do
-      let(:user) { FactoryBot.create(:organization_member) }
+      let(:user) { FactoryBot.create(:organization_user) }
       let(:organization) { user.organizations.first }
       let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
       let!(:organization_feature) { FactoryBot.create(:organization_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
@@ -666,7 +666,7 @@ RSpec.describe User, type: :model do
 
   describe "render_donation_request" do
     let(:organization) { FactoryBot.create(:organization, kind: "bike_advocacy") }
-    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:user) { FactoryBot.create(:organization_user, organization: organization) }
     it "is nil" do
       expect(User.new.render_donation_request).to be_nil
     end
@@ -781,9 +781,9 @@ RSpec.describe User, type: :model do
       end
     end
     context "member of organization" do
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:organization_child) { FactoryBot.create(:organization, parent_organization: organization) }
-      let!(:user_child) { FactoryBot.create(:organization_member, organization: organization_child) }
+      let!(:user_child) { FactoryBot.create(:organization_user, organization: organization_child) }
       it "returns true" do
         organization.save
         expect(organization.child_organizations).to eq([organization_child])
@@ -827,14 +827,14 @@ RSpec.describe User, type: :model do
   describe "ambassador?" do
     it "returns true if the user has any ambassadorship" do
       user = FactoryBot.create(:ambassador)
-      user.memberships << FactoryBot.create(:membership_claimed, user: user)
+      user.organization_roles << FactoryBot.create(:organization_role_claimed, user: user)
       user.save
 
       expect(user).to be_ambassador
     end
 
     it "returns false if the user has no ambassadorships" do
-      user = FactoryBot.create(:organization_member)
+      user = FactoryBot.create(:organization_user)
       expect(user).to_not be_ambassador
     end
   end
@@ -848,7 +848,7 @@ RSpec.describe User, type: :model do
       end
     end
     context "member of organization" do
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       it "returns true" do
         expect(user.admin_of?(organization)).to be_falsey
       end

@@ -50,7 +50,7 @@ RSpec.describe API::V1::UsersController, type: :request do
       end
       context "bike is authorized by user" do
         let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
         it "actually sends the email" do

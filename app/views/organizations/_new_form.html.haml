@@ -22,7 +22,7 @@
       .card-block
         %h3.card-title
           = t(".new_organization")
-        - if current_user.memberships.count > 0
+        - if current_user.organization_roles.count > 0
           .alert.alert-info.mt-4.mb-4
             - org = current_user.organizations.first
             %h3.padded.header-font-alt.text-center

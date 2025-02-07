@@ -114,7 +114,7 @@ RSpec.describe "BikesController#show", type: :request do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, can_edit_claimed: false) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
     let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: organization2) }
     it "includes passive organization, even when redirected from sticker from other org" do
       current_user.reload
@@ -236,7 +236,7 @@ RSpec.describe "BikesController#show", type: :request do
           user: FactoryBot.create(:user))
       end
       let(:organization) { FactoryBot.create(:organization) }
-      let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
       it "404s" do
         expect(bike.user).to_not eq current_user
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
@@ -263,7 +263,7 @@ RSpec.describe "BikesController#show", type: :request do
   end
   context "unregistered_parking_notification (also user hidden)" do
     let(:current_organization) { FactoryBot.create(:organization) }
-    let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:auto_user) { FactoryBot.create(:organization_user, organization: current_organization) }
     let(:parking_notification) do
       current_organization.update(auto_user: auto_user)
       FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_organization.auto_user)
@@ -275,7 +275,7 @@ RSpec.describe "BikesController#show", type: :request do
       expect(response.status).to eq 404
     end
     context "with org member" do
-      include_context :request_spec_logged_in_as_organization_member
+      include_context :request_spec_logged_in_as_organization_user
       it "renders, even though user hidden" do
         expect(bike.reload.user_hidden).to be_truthy
         expect(bike.owner).to_not eq current_user

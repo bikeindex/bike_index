@@ -105,15 +105,15 @@ class Ambassador < User
   end
 
   def current_ambassador_organization
-    most_recent_ambassador_membership =
-      memberships
+    most_recent_ambassador_organization_role =
+      organization_roles
         .ambassador_organizations
         .reorder(created_at: :desc)
         .limit(1)
 
     organizations
       .ambassador
-      .where(id: most_recent_ambassador_membership.select(:organization_id))
+      .where(id: most_recent_ambassador_organization_role.select(:organization_id))
       .first
   end
 end

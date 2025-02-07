@@ -73,7 +73,7 @@ class User < ApplicationRecord
   has_secure_password
 
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
-  # stripe_id, is_paid_member, paid_membership_info
+  # stripe_id, is_paid_member, paid_organization_role_info
 
   mount_uploader :avatar, AvatarUploader
 
@@ -81,10 +81,10 @@ class User < ApplicationRecord
   has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :payments
   has_many :notifications
-  has_many :memberships
-  has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
+  has_many :organization_roles
+  has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
-  has_many :organizations, through: :memberships
+  has_many :organizations, through: :organization_roles
   has_many :ownerships
   has_many :bike_sticker_updates
   has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
@@ -118,7 +118,7 @@ class User < ApplicationRecord
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
-  scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
+  scope :ambassadors, -> { where(id: OrganizationRole.ambassador_organizations.select(:user_id)) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
 
   validates_uniqueness_of :username, case_sensitive: false
@@ -255,7 +255,7 @@ class User < ApplicationRecord
   end
 
   def ambassador?
-    memberships.ambassador_organizations.limit(1).any?
+    organization_roles.ambassador_organizations.limit(1).any?
   end
 
   def to_param
@@ -283,7 +283,7 @@ class User < ApplicationRecord
   end
 
   def organization_prioritized
-    return nil if memberships.limit(1).none?
+    return nil if organization_roles.limit(1).none?
     orgs = organizations.reorder(:created_at)
     # Prioritization of organizations
     orgs.ambassador.limit(1).first ||
@@ -368,47 +368,47 @@ class User < ApplicationRecord
   end
 
   def role(organization)
-    m = Membership.where(user_id: id, organization_id: organization.id).first
+    m = OrganizationRole.where(user_id: id, organization_id: organization.id).first
     m&.role
   end
 
   def member_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if claimed_memberships_for(organization.id).limit(1).any?
+    return true if claimed_organization_roles_for(organization.id).limit(1).any?
     superuser? && !no_superuser_override
   end
 
   def member_bike_edit_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if claimed_memberships_for(organization.id).not_member_no_bike_edit.limit(1).any?
+    return true if claimed_organization_roles_for(organization.id).not_member_no_bike_edit.limit(1).any?
     superuser? && !no_superuser_override
   end
 
   def admin_of?(organization, no_superuser_override: false)
     return false unless organization.present?
-    return true if claimed_memberships_for(organization.id).admin.limit(1).any?
+    return true if claimed_organization_roles_for(organization.id).admin.limit(1).any?
     superuser? && !no_superuser_override
   end
 
-  def has_membership?
-    memberships.limit(1).any?
+  def has_organization_role?
+    organization_roles.limit(1).any?
   end
 
-  def has_police_membership?
+  def has_police_organization_role?
     organizations.law_enforcement.limit(1).any?
   end
 
-  def has_shop_membership?
+  def has_shop_organization_role?
     organizations.bike_shop.limit(1).any?
   end
 
   def deletable?
-    !superuser? && memberships.admin.limit(1).none?
+    !superuser? && organization_roles.admin.limit(1).none?
   end
 
   def default_organization
     return @default_organization if defined?(@default_organization) # Memoize, permit nil
-    @default_organization = organizations&.first # Maybe at some point use memberships to get the most recent, for now, speed
+    @default_organization = organizations&.first # Maybe at some point use organization_roles to get the most recent, for now, speed
   end
 
   def partner_sign_up
@@ -445,7 +445,7 @@ class User < ApplicationRecord
   end
 
   def render_donation_request
-    return nil unless has_police_membership? && !organizations.law_enforcement.paid.limit(1).any?
+    return nil unless has_police_organization_role? && !organizations.law_enforcement.paid.limit(1).any?
     "law_enforcement"
   end
 
@@ -473,7 +473,7 @@ class User < ApplicationRecord
     self.title = InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification
       self.notification_newsletters = false
-      memberships.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }
+      organization_roles.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }
     end
     if my_bikes_link_target.present? || my_bikes_link_title.present?
       mbh = my_bikes_hash || {}
@@ -528,8 +528,8 @@ class User < ApplicationRecord
 
   private
 
-  def claimed_memberships_for(organization_id)
-    Membership.claimed.where(user_id: id, organization_id: organization_id)
+  def claimed_organization_roles_for(organization_id)
+    OrganizationRole.claimed.where(user_id: id, organization_id: organization_id)
   end
 
   def preferred_language_is_an_available_locale

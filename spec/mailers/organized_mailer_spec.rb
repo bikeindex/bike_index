@@ -302,8 +302,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
   end
 
   describe "organization_invitation" do
-    let(:membership) { FactoryBot.create(:membership, organization: organization) }
-    let(:mail) { OrganizedMailer.organization_invitation(membership) }
+    let(:organization_role) { FactoryBot.create(:organization_role, organization: organization) }
+    let(:mail) { OrganizedMailer.organization_invitation(organization_role) }
     before { expect(header_mail_snippet).to be_present }
     it "renders email" do
       expect(mail.body.encoded).to match header_mail_snippet.body
@@ -378,7 +378,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
   end
 
   describe "hot_sheet_notification" do
-    let(:recipient) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:recipient) { FactoryBot.create(:organization_user, organization: organization) }
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_bike_image) }
     let(:bike) { stolen_record.bike }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization, recipient_ids: [recipient.id, organization.auto_user.id], stolen_record_ids: [stolen_record.id]) }
