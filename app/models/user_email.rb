@@ -59,7 +59,7 @@ class UserEmail < ActiveRecord::Base
     end
   end
 
-  def update_last_email_status!(email_errored:)
+  def update_last_email_errored!(email_errored:)
     return if last_email_errored == email_errored
 
     update(last_email_errored: email_errored)

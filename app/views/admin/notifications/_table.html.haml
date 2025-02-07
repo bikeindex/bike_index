@@ -76,4 +76,10 @@
                 %span{class: (sender_display_name == "auto" ? "less-strong" : "")}
                   = sender_display_name
             %td.error-cell
-              = notification.delivery_error
+              - if notification.delivery_error == "Postmark::InactiveRecipientError"
+                An Email sent to this address was marked as spam
+              - elsif notification.delivery_error == "Postmark::InvalidEmailAddressError"
+                Invalid email address
+              - else
+                = notification.delivery_error
+

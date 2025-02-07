@@ -29,7 +29,7 @@ module ApplicationHelper
     elsif status == "delivery_pending"
       "..."
     else
-      status
+      "failure"
     end
     content_tag(:span, text, title: status&.titleize, style: "cursor:default;")
   end

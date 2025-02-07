@@ -168,7 +168,7 @@ class Notification < ApplicationRecord
   def user_email
     return nil unless email?
 
-    user&.user_emails.friendly_find(message_channel_target)
+    user&.user_emails&.friendly_find(message_channel_target)
   end
 
   def notifiable_display_name
@@ -223,10 +223,10 @@ class Notification < ApplicationRecord
     yield
 
     update(delivery_status: "delivery_success")
-    user_email&.update_last_email_status!(email_errored: false)
+    user_email&.update_last_email_errored!(email_errored: false)
   rescue => e
     update(delivery_status: "delivery_failure", delivery_error: e.class)
-    user_email&.update_last_email_status!(email_errored: true)
+    user_email&.update_last_email_errored!(email_errored: true)
 
     raise e unless UNDELIVERABLE_ERRORS.include?(delivery_error)
   end
