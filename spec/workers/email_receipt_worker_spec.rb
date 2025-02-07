@@ -17,7 +17,7 @@ RSpec.describe EmailReceiptWorker, type: :job do
     expect(notification.user_id).to eq payment.user_id
     expect(notification.message_channel).to eq "email"
     expect(notification.notifiable).to eq payment
-    expect(notification.email_success?).to be_truthy
+    expect(notification.delivery_success?).to be_truthy
     expect(notification.message_channel_target).to eq payment.email
   end
   context "donation, existing notification" do
@@ -26,7 +26,7 @@ RSpec.describe EmailReceiptWorker, type: :job do
     it "enqueues EmailDonationWorker" do
       expect(payment.notifications.count).to eq 1
       expect(payment.kind).to eq "donation"
-      expect(notification.delivered?).to be_falsey
+      expect(notification.delivery_success?).to be_falsey
       ActionMailer::Base.deliveries = []
       expect {
         EmailReceiptWorker.new.perform(payment.id)
@@ -38,23 +38,23 @@ RSpec.describe EmailReceiptWorker, type: :job do
       expect(notification.kind).to eq "receipt"
       expect(notification.user_id).to eq payment.user_id
       expect(notification.message_channel).to eq "email"
-      expect(notification.email_success?).to be_truthy
+      expect(notification.delivery_success?).to be_truthy
       # Ensure that it actually would send
       EmailDonationWorker.drain
       expect(ActionMailer::Base.deliveries.count).to eq 2
       expect(payment.notifications.count).to eq 2
     end
     context "notification delivered" do
-      let!(:notification) { Notification.create(notifiable: payment, kind: "receipt", delivery_status_str: "email_success") }
+      let!(:notification) { Notification.create(notifiable: payment, kind: "receipt", delivery_status: "delivery_success") }
       it "does not email" do
-        expect(payment.notifications.count).to eq 1
+        EmailDonationWorker.new.perform(payment.id)
+        expect(payment.reload.notifications.count).to eq 2
         ActionMailer::Base.deliveries = []
-        expect {
-          EmailReceiptWorker.new.perform(payment.id)
-        }.to change(EmailDonationWorker.jobs, :count).by 0
+
+        EmailReceiptWorker.new.perform(payment.id)
+        EmailDonationWorker.drain
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
-        payment.reload
-        expect(payment.notifications.count).to eq 1
+        expect(payment.reload.notifications.count).to eq 2
       end
     end
   end

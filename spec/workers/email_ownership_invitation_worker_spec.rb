@@ -16,14 +16,14 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
     expect(ownership.reload.notifications.count).to eq 1
     notification = Notification.last
     expect(notification.kind).to eq "finished_registration"
-    expect(notification.delivery_status_str).to eq "email_success"
+    expect(notification.delivery_status).to eq "delivery_success"
     expect(notification.notifiable).to eq ownership
     expect(notification.bike_id).to eq bike.id
     expect(notification.user_id).to be_blank
   end
   context "notification already exists" do
-    let!(:notification) { FactoryBot.create(:notification, notifiable: ownership, kind: "finished_registration", delivery_status_str: delivery_status_str) }
-    let(:delivery_status_str) { "email_success" }
+    let!(:notification) { FactoryBot.create(:notification, notifiable: ownership, kind: "finished_registration", delivery_status:) }
+    let(:delivery_status) { "delivery_success" }
     it "does not send an email" do
       expect(ownership.reload.notifications.count).to eq 1
       ActionMailer::Base.deliveries = []
@@ -34,8 +34,8 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
       expect(ActionMailer::Base.deliveries.count).to eq 0
       expect(ownership.reload.notifications.pluck(:id)).to eq([notification.id])
     end
-    context "delivery_status_str nil" do
-      let(:delivery_status_str) { nil }
+    context "delivery_status pending" do
+      let(:delivery_status) { "delivery_pending" }
       it "sends an email" do
         expect(ownership.reload.notifications.count).to eq 1
         ActionMailer::Base.deliveries = []
@@ -45,7 +45,7 @@ RSpec.describe EmailOwnershipInvitationWorker, type: :job do
         }.to change(Notification, :count).by(0)
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(ownership.reload.notifications.pluck(:id)).to eq([notification.id])
-        expect(notification.reload.delivery_status_str).to eq "email_success"
+        expect(notification.reload.delivery_status).to eq "delivery_success"
       end
     end
   end

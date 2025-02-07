@@ -56,7 +56,7 @@
                 = notification.message_channel_target
                 %small.less-strong no user
             %td.text-center
-              = notification_delivery_display(notification.delivery_status_str)
+              = notification_delivery_display(notification.delivery_status)
             %td.bike-cell
               - if notification.bike_id.present?
                 %code= link_to "#{notification.bike_id}", admin_bike_path(notification.bike_id), class: "less-strong"

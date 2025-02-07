@@ -23,7 +23,7 @@ RSpec.describe CreateUserAlertNotificationWorker, type: :job do
         }.to change(Notification, :count).by 1
         notification = Notification.last
         expect(user_alert.reload.notification&.id).to eq notification.id
-        expect(notification.delivered?).to be_truthy
+        expect(notification.delivery_success?).to be_truthy
         expect(UserAlert.with_notification.pluck(:id)).to eq([user_alert.id])
 
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -59,7 +59,7 @@ RSpec.describe CreateUserAlertNotificationWorker, type: :job do
         }.to change(Notification, :count).by 1 # NOTE: Doesn't create an alert for both missing location and photo
         notification = Notification.last
         expect(user_alert.reload.notification&.id).to eq notification.id
-        expect(notification.delivered?).to be_truthy
+        expect(notification.delivery_success?).to be_truthy
         expect(notification.notifiable_id).to eq user_alert.id
 
         expect(ActionMailer::Base.deliveries.count).to eq 1

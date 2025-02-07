@@ -2103,7 +2103,6 @@ CREATE TABLE public.notifications (
     id bigint NOT NULL,
     user_id bigint,
     kind integer,
-    delivery_status_str character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     notifiable_type character varying,
@@ -6207,6 +6206,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250207221053'),
 ('20250207193640'),
 ('20250205135704'),
 ('20250203011709'),

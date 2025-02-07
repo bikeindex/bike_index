@@ -47,7 +47,7 @@ RSpec.describe EmailImpoundClaimWorker, type: :job do
       notification = Notification.last
       expect(impound_claim.reload.notifications.pluck(:id)).to eq([notification.id])
       expect(notification.kind).to eq "impound_claim_approved"
-      expect(notification.delivery_status_str).to eq "email_success"
+      expect(notification.delivery_status).to eq "delivery_success"
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
   end

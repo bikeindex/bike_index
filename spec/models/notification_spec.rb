@@ -51,9 +51,8 @@ RSpec.describe Notification, type: :model do
       end
     end
     context "email delivered" do
-      before { notification.update(delivery_status_str: "email_success", message_channel: "email") }
+      before { notification.update(delivery_status: "delivery_success", message_channel: "email") }
       it "returns email" do
-        expect(notification.reload.delivered?).to be_truthy
         expect(notification.delivery_status).to eq "delivery_success"
         expect(notification.send(:calculated_email)).to eq "stuff@party.eu"
         expect(notification.message_channel_target).to eq "stuff@party.eu"
@@ -67,8 +66,7 @@ RSpec.describe Notification, type: :model do
         expect(notification.send(:calculated_message_channel_target)).to eq user_phone.phone
         expect(notification.message_channel_target).to be_nil
 
-        notification.update(delivery_status_str: "text_success", message_channel: "email")
-        expect(notification.reload.delivered?).to be_truthy
+        notification.update(delivery_status: "delivery_success", message_channel: "email")
         expect(notification.send(:calculated_message_channel_target)).to eq user_phone.phone
         expect(notification.message_channel_target).to eq user_phone.phone
       end

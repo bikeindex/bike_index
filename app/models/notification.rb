@@ -44,9 +44,6 @@ class Notification < ApplicationRecord
   enum :message_channel, MESSAGE_CHANNEL_ENUM
   enum :delivery_status, DELIVERY_STATUS_ENUM
 
-  scope :email_success, -> { where(delivery_status_str: "email_success") }
-  scope :delivered, -> { where(delivery_status_str: "email_success").or(where(delivery_status_str: "text_success")) }
-  scope :undelivered, -> { where(delivery_status_str: nil) }
   scope :with_bike, -> { where.not(bike_id: nil) }
   scope :without_bike, -> { where(bike_id: nil) }
   scope :donation, -> { where(kind: donation_kinds) }
@@ -128,25 +125,6 @@ class Notification < ApplicationRecord
         .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
         .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
     end
-
-    def delivery_status_from_str(delivery_status_str)
-      if delivery_status_str.blank?
-        :delivery_pending
-      elsif delivery_status_str.match?("_success")
-        :delivery_success
-      else
-        :delivery_failure
-      end
-    end
-  end
-
-  # TODO: update with twilio delivery status, update scope too
-  def delivered?
-    email_success? || delivery_status_str == "text_success"
-  end
-
-  def email_success?
-    delivery_status_str == "email_success"
   end
 
   def theft_alert?
@@ -211,9 +189,8 @@ class Notification < ApplicationRecord
   def set_calculated_attributes
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
-    self.delivery_status_str = nil if delivery_status_str.blank?
-    self.delivery_status = self.class.delivery_status_from_str(delivery_status_str)
-    self.message_channel_target ||= calculated_message_channel_target if delivery_status_str.present?
+    self.delivery_status ||= "delivery_pending"
+    self.message_channel_target ||= calculated_message_channel_target unless delivery_pending?
   end
 
   def survey_id
@@ -238,9 +215,9 @@ class Notification < ApplicationRecord
 
     yield
 
-    update(delivery_status_str: "email_success")
+    update(delivery_status: "delivery_success")
   rescue => e
-    update(delivery_status_str: "email_failure", delivery_error: e.class)
+    update(delivery_status: "delivery_failure", delivery_error: e.class)
     raise e
   end
 

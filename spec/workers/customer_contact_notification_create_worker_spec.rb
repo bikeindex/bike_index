@@ -18,7 +18,7 @@ RSpec.describe CustomerContactNotificationCreateWorker, type: :job do
       notification = customer_contact.notification
       expect(notification.user_id).to be_blank
       expect(notification.kind).to eq customer_contact.kind
-      expect(notification.delivered?).to be_truthy
+      expect(notification.delivery_success?).to be_truthy
       expect(notification.bike_id).to eq customer_contact.bike_id
       expect(notification.message_channel_target).to eq customer_contact.user_email
       expect(notification.sender).to eq customer_contact.creator
@@ -45,7 +45,7 @@ RSpec.describe CustomerContactNotificationCreateWorker, type: :job do
         instance.perform(customer_contact.id)
       end.to change(Notification, :count).by 1
       expect(ActionMailer::Base.deliveries).not_to be_empty
-      expect(Notification.last.delivery_status).to eq :delivery_success
+      expect(Notification.last.delivery_status).to eq "delivery_success"
     end
 
     context "stolen bike has receive_notifications false" do

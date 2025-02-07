@@ -114,7 +114,7 @@ RSpec.describe UsersController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
         expect(current_user.notifications.count).to eq 1
-        expect(current_user.notifications.last.email_success?).to be_truthy
+        expect(current_user.notifications.last.delivery_success?).to be_truthy
         expect(current_user.notifications.last.confirmation_email?).to be_truthy
       end
     end
@@ -136,7 +136,7 @@ RSpec.describe UsersController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
         expect(user_subject.notifications.count).to eq 1
-        expect(user_subject.notifications.last.email_success?).to be_truthy
+        expect(user_subject.notifications.last.delivery_success?).to be_truthy
         expect(user_subject.notifications.last.confirmation_email?).to be_truthy
       end
       context "user confirmed" do

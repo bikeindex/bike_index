@@ -29,13 +29,13 @@ RSpec.describe Integrations::Twilio do
         notification.reload
         expect(notification.twilio_sid).to be_present
         notification.twilio_sid
-        expect(notification.delivery_status_str).to eq "queued"
+        expect(notification.delivery_status).to eq "delivery_pending"
         expect(notification.message_channel_target).to eq "05102224444"
         # test credentials don't have access to fetch, too lazy to stub
         # instance.send_notification(notification, to: "5102224444", body: "This is a test message")
         # notification.reload
         # expect(notification.twilio_sid).to eq original sid
-        # expect(notification.delivery_status_str).to eq "delivered"
+        # expect(notification.delivery_status).to eq "delivery_success"
       end
     end
   end
