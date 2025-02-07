@@ -20,7 +20,7 @@ module API
           end
 
           def organization_memberships
-            return [] unless current_user.memberships.any?
+            return [] unless current_user.organization_roles.any?
             current_user.organization_roles.map { |organization_role|
               {
                 organization_name: organization_role.organization.name,
