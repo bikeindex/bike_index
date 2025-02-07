@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :notification do
     user { FactoryBot.create(:user) }
-    kind { Notification.kinds.first }
+    kind { :confirmation_email }
   end
 end

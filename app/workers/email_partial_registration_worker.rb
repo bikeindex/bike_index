@@ -12,7 +12,7 @@ class EmailPartialRegistrationWorker < ApplicationWorker
         notifiable: b_param)
 
       OrganizedMailer.partial_registration(b_param).deliver_now
-      notification.update(delivery_status: "email_success")
+      notification.update(delivery_status_str: "email_success")
     end
   end
 end

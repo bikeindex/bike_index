@@ -3,7 +3,9 @@
 # Table name: notifications
 #
 #  id                     :bigint           not null, primary key
-#  delivery_status        :string
+#  delivery_error         :string
+#  delivery_status        :integer
+#  delivery_status_str    :string
 #  kind                   :integer
 #  message_channel        :integer          default("email")
 #  message_channel_target :string
@@ -22,46 +24,15 @@
 #  index_notifications_on_user_id                            (user_id)
 #
 
-# TODO: create notifications for each other notification model:
-# - graduated_notifications
-# - parking_notifications
-# - feedbacks
-# We're creating notifications for other notification models (e.g. StolenNotification),
-# with the long term goal of moving all the notification/emailing logic here and removing it from other models
 class Notification < ApplicationRecord
-  KIND_ENUM = {
-    confirmation_email: 0,
-    finished_registration: 6,
-    partial_registration: 7,
-    receipt: 1,
-    stolen_notification_sent: 3,
-    stolen_notification_blocked: 4,
-    phone_verification: 5,
-    donation_standard: 11,
-    donation_second: 12,
-    donation_stolen: 13,
-    donation_recovered: 14,
-    donation_theft_alert: 15,
-    impound_claim_submitting: 16,
-    impound_claim_approved: 17,
-    impound_claim_denied: 18,
-    theft_alert_recovered: 19,
-    theft_alert_posted: 20,
-    stolen_contact: 21,
-    stolen_twitter_alerter: 2,
-    bike_possibly_found: 23,
-    user_alert_theft_alert_without_photo: 24,
-    user_alert_stolen_bike_without_location: 25,
-    theft_survey_4_2022: 26,
-    theft_survey_2023: 27,
-    invalid_extension_for_ascend_import: 28,
-    unknown_organization_for_ascend: 29
-  }.freeze
+  # TODO: create notifications for every email we send (including other models, e.g. Feedback)
+  #
+  # Every single notification that we send has a separate enum key - which is a lot!
+  # so put that list in a YAML file for increased legibility
+  KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
-  MESSAGE_CHANNEL_ENUM = {
-    email: 0,
-    text: 1
-  }.freeze
+  MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
 
   belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
@@ -71,10 +42,11 @@ class Notification < ApplicationRecord
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
+  enum :delivery_status, DELIVERY_STATUS_ENUM
 
-  scope :email_success, -> { where(delivery_status: "email_success") }
-  scope :delivered, -> { where(delivery_status: "email_success").or(where(delivery_status: "text_success")) }
-  scope :undelivered, -> { where(delivery_status: nil) }
+  scope :email_success, -> { where(delivery_status_str: "email_success") }
+  scope :delivered, -> { where(delivery_status_str: "email_success").or(where(delivery_status_str: "text_success")) }
+  scope :undelivered, -> { where(delivery_status_str: nil) }
   scope :with_bike, -> { where.not(bike_id: nil) }
   scope :without_bike, -> { where(bike_id: nil) }
   scope :donation, -> { where(kind: donation_kinds) }
@@ -84,85 +56,97 @@ class Notification < ApplicationRecord
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
 
-  def self.kind_humanized(str)
-    return "" unless str.present?
-    str.tr("_", " ")
-  end
+    def kind_humanized(str)
+      return "" unless str.present?
+      str.tr("_", " ")
+    end
 
-  def self.donation_kinds
-    kinds.select { |k| k.start_with?("donation_") }.freeze
-  end
+    def donation_kinds
+      kinds.select { |k| k.start_with?("donation_") }.freeze
+    end
 
-  def self.theft_alert_kinds
-    kinds.select { |k| k.start_with?("theft_alert_") }.freeze
-  end
+    def theft_alert_kinds
+      kinds.select { |k| k.start_with?("theft_alert_") }.freeze
+    end
 
-  def self.impound_claim_kinds
-    kinds.select { |k| k.start_with?("impound_claim_") }.freeze
-  end
+    def impound_claim_kinds
+      kinds.select { |k| k.start_with?("impound_claim_") }.freeze
+    end
 
-  def self.stolen_notification_kinds
-    kinds.select { |k| k.start_with?("stolen_notification_") }.freeze
-  end
+    def stolen_notification_kinds
+      kinds.select { |k| k.start_with?("stolen_notification_") }.freeze
+    end
 
-  def self.user_alert_kinds
-    kinds.select { |k| k.start_with?("user_alert_") }.freeze
-  end
+    def user_alert_kinds
+      kinds.select { |k| k.start_with?("user_alert_") }.freeze
+    end
 
-  def self.theft_survey_kinds
-    %w[theft_survey_4_2022 theft_survey_2023].freeze
-  end
+    def theft_survey_kinds
+      %w[theft_survey_4_2022 theft_survey_2023].freeze
+    end
 
-  def self.b_param_kinds
-    %w[partial_registration].freeze
-  end
+    def b_param_kinds
+      %w[partial_registration].freeze
+    end
 
-  def self.customer_contact_kinds
-    %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
-  end
+    def customer_contact_kinds
+      %w[stolen_contact stolen_twitter_alerter bike_possibly_found].freeze
+    end
 
-  def self.pos_integration_broken_kinds
-    # TODO: Send Lightspeed notifications from here
-    %w[invalid_extension_for_ascend_import].freeze
-  end
+    def pos_integration_broken_kinds
+      # TODO: Send Lightspeed notifications from here
+      %w[invalid_extension_for_ascend_import].freeze
+    end
 
-  def self.admin_kinds
-    %w[stolen_notification_blocked unknown_organization_for_ascend].freeze +
-      pos_integration_broken_kinds
-  end
+    def admin_kinds
+      %w[stolen_notification_blocked unknown_organization_for_ascend].freeze +
+        pos_integration_broken_kinds
+    end
 
-  def self.sender_auto_kinds
-    donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
-      %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend]
-  end
+    def sender_auto_kinds
+      donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
+        %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend]
+    end
 
-  def self.search_message_channel_target(str)
-    return none unless str.present?
-    where("message_channel_target ILIKE ?", "%#{str.strip.downcase}%")
-  end
+    def search_message_channel_target(str)
+      return none unless str.present?
+      where("message_channel_target ILIKE ?", "%#{str.strip.downcase}%")
+    end
 
-  def self.notifications_sent_or_received_by(user_or_id)
-    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
-    # TODO: THIS IS SHITTY
-    customer_contact_ids = CustomerContact.where(creator_id: user_id).pluck(:id)
-    stolen_notification_ids = StolenNotification.where(sender: user_id).pluck(:id)
+    def notifications_sent_or_received_by(user_or_id)
+      user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
+      # TODO: THIS IS SHITTY
+      customer_contact_ids = CustomerContact.where(creator_id: user_id).pluck(:id)
+      stolen_notification_ids = StolenNotification.where(sender: user_id).pluck(:id)
 
-    where(user_id: user_id)
-      .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
-      .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
+      where(user_id: user_id)
+        .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
+        .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
+    end
+
+    def delivery_status_from_str(delivery_status_str)
+      if delivery_status_str.blank?
+        :delivery_pending
+      elsif delivery_status_str.match?("_success")
+        :delivery_success
+      else
+        :delivery_failure
+      end
+    end
   end
 
   # TODO: update with twilio delivery status, update scope too
   def delivered?
-    email_success? || delivery_status == "text_success"
+    email_success? || delivery_status_str == "text_success"
   end
 
   def email_success?
-    delivery_status == "email_success"
+    delivery_status_str == "email_success"
   end
 
   def theft_alert?
@@ -227,8 +211,9 @@ class Notification < ApplicationRecord
   def set_calculated_attributes
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
-    self.delivery_status = nil if delivery_status.blank?
-    self.message_channel_target ||= calculated_message_channel_target if delivery_status.present?
+    self.delivery_status_str = nil if delivery_status_str.blank?
+    self.delivery_status = self.class.delivery_status_from_str(delivery_status_str)
+    self.message_channel_target ||= calculated_message_channel_target if delivery_status_str.present?
   end
 
   def survey_id
@@ -245,6 +230,16 @@ class Notification < ApplicationRecord
   def calculated_message_channel_target
     return calculated_phone if message_channel == "text" || phone_verification?
     calculated_email
+  end
+
+  # This method takes a block
+  def track_email_delivery
+    yield
+
+    update(delivery_status_str: "email_success")
+  rescue => e
+    update(delivery_status_str: "email_failure", delivery_error: e.class)
+    raise e
   end
 
   private

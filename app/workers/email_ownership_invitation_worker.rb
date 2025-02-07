@@ -21,7 +21,7 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
       kind: "finished_registration")
     unless notification.delivered?
       OrganizedMailer.finished_registration(ownership).deliver_now
-      notification.update(delivery_status: "email_success") # This could be made more representative
+      notification.update(delivery_status_str: "email_success") # This could be made more representative
     end
   end
 end

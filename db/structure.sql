@@ -2103,7 +2103,7 @@ CREATE TABLE public.notifications (
     id bigint NOT NULL,
     user_id bigint,
     kind integer,
-    delivery_status character varying,
+    delivery_status_str character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     notifiable_type character varying,
@@ -2111,7 +2111,9 @@ CREATE TABLE public.notifications (
     message_channel integer DEFAULT 0,
     twilio_sid text,
     bike_id bigint,
-    message_channel_target character varying
+    message_channel_target character varying,
+    delivery_status integer,
+    delivery_error character varying
 );
 
 
@@ -6205,6 +6207,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250207193640'),
 ('20250205135704'),
 ('20250203011709'),
 ('20250130185756'),

@@ -1,9 +1,13 @@
+- show_error_column = InputNormalizer.boolean(params[:search_show_error])
+
 .admin-subnav
   .col-md-5
     %h1
       Notifications
   .col-md-7
     %ul
+      %li.nav-item
+        = link_to "show errors", url_for(sortable_search_params.merge(search_show_error: !show_error_column)), class: "nav-link #{show_error_column ? 'active' : ''}"
       %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "")}
           #{@kind.titleize} #{(special_kind_scopes + ["all"]).include?(@kind) ? "kinds" : ""}
@@ -88,6 +92,6 @@
 
 = render partial: "/shared/pagination", locals: {collection: @notifications, count: matching_notifications.count}
 
-= render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true}
+= render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true, skip_error: !show_error_column}
 
 = render partial: "/shared/pagination", locals: {collection: @notifications, count: matching_notifications.count, skip_total: true}
