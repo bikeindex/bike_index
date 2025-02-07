@@ -106,7 +106,7 @@ RSpec.describe EmailStolenNotificationWorker, type: :job do
       it "sends customer an email" do
         notification = Notification.find_or_create_by(notifiable: stolen_notification,
           kind: "stolen_notification_sent")
-        expect(notification.reload.delivery_status).to be_blank
+        expect(notification.reload.delivery_status).to eq "delivery_pending"
         expect(notification.bike_id).to eq bike.id
         expect(notification.user_id).to eq ownership.user_id
         user.reload
