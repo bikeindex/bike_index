@@ -2113,7 +2113,7 @@ CREATE TABLE public.notifications (
     bike_id bigint,
     message_channel_target character varying,
     delivery_status integer,
-    delivery_errors text
+    delivery_error character varying
 );
 
 

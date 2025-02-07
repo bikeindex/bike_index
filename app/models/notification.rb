@@ -3,7 +3,7 @@
 # Table name: notifications
 #
 #  id                     :bigint           not null, primary key
-#  delivery_errors        :text
+#  delivery_error         :string
 #  delivery_status        :integer
 #  delivery_status_str    :string
 #  kind                   :integer
@@ -238,7 +238,7 @@ class Notification < ApplicationRecord
 
     update(delivery_status_str: "email_success")
   rescue => e
-    update(delivery_status_str: "email_failure", delivery_errors: e.message)
+    update(delivery_status_str: "email_failure", delivery_error: e.class)
     raise e
   end
 

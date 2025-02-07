@@ -156,7 +156,7 @@ RSpec.describe Notification, type: :model do
         CustomerMailer.confirmation_email(notification.user).deliver_now
       end
       expect(notification.reload.delivery_status).to eq "delivery_success"
-      expect(notification.delivery_errors).to be_nil
+      expect(notification.delivery_error).to be_nil
     end
 
     context "when email delivery fails" do
@@ -173,7 +173,7 @@ RSpec.describe Notification, type: :model do
         end.to raise_error(Postmark::InactiveRecipientError)
 
         expect(notification.reload.delivery_status).to eq "delivery_failure"
-        expect(notification.delivery_errors).to eq error_message
+        expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
       end
     end
   end
