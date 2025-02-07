@@ -156,6 +156,25 @@ RSpec.describe Notification, type: :model do
         CustomerMailer.confirmation_email(notification.user).deliver_now
       end
       expect(notification.reload.delivery_status).to eq "delivery_success"
+      expect(notification.delivery_errors).to be_nil
+    end
+
+    context "when email delivery fails" do
+      let(:error_message) do
+        "You tried to send to recipient(s) that have been marked as inactive. Found inactive addresses: example@bikeindex.org. " \
+        "Inactive recipients are ones that have generated a hard bounce, a spam complaint, or a manual suppression."
+      end
+      it "adds the error message to the notification" do
+        expect(notification.reload.delivery_status).to eq "delivery_pending"
+        expect do
+          notification.track_email_delivery do
+            raise Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
+          end
+        end.to raise_error(Postmark::InactiveRecipientError)
+
+        expect(notification.reload.delivery_status).to eq "delivery_failure"
+        expect(notification.delivery_errors).to eq error_message
+      end
     end
   end
 end

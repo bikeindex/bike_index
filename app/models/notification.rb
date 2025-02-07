@@ -237,6 +237,9 @@ class Notification < ApplicationRecord
     yield
 
     update(delivery_status_str: "email_success")
+  rescue => e
+    update(delivery_status_str: "email_failure", delivery_errors: e.message)
+    raise e
   end
 
   private
