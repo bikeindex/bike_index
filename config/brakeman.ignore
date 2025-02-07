@@ -75,7 +75,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/organized/impound_claims_controller.rb",
-      "line": 73,
+      "line": 72,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "impound_claims.public_send((params[:search_status] or available_statuses.first))",
       "render_path": null,
@@ -121,7 +121,7 @@
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
-      "line": 62,
+      "line": 61,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\", \"wb\")",
       "render_path": null,
@@ -336,7 +336,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/stolen_record.rb",
-      "line": 110,
+      "line": 117,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'\")",
       "render_path": null,
@@ -501,50 +501,6 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "500b4287397d732b3b8b3782fefe554bd988b9659a2548f254811b8a59b7c3c0",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/views/shared/_pagination.html.haml",
-      "line": 32,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).where(\"#{AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::AmbassadorTaskAssignmentsController",
-          "method": "index",
-          "line": 11,
-          "file": "app/controllers/admin/ambassador_task_assignments_controller.rb",
-          "rendered": {
-            "name": "admin/ambassador_task_assignments/index",
-            "file": "app/views/admin/ambassador_task_assignments/index.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "admin/ambassador_task_assignments/index",
-          "line": 38,
-          "file": "app/views/admin/ambassador_task_assignments/index.html.haml",
-          "rendered": {
-            "name": "shared/_pagination",
-            "file": "app/views/shared/_pagination.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "shared/_pagination"
-      },
-      "user_input": "@time_range_column",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "512e4e329b58c9c5a4916c68462284a0aa87450fd4e3bdac0b0799c3121929d7",
@@ -627,11 +583,11 @@
     {
       "warning_type": "Mass Assignment",
       "warning_code": 105,
-      "fingerprint": "843e0b97c05d7b25ce5dc66ef0215dfcf907b68522225416e1ed7355ede83732",
+      "fingerprint": "88168bb140c33d2c34eff43e8ffcd057017040c5bcd9babe9826063a3dc200f8",
       "check_name": "PermitAttributes",
       "message": "Potentially dangerous key allowed for mass assignment",
       "file": "app/controllers/admin/organization_roles_controller.rb",
-      "line": 56,
+      "line": 57,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.require(:organization_role).permit(:organization_id, :user_id, :role, :invited_email)",
       "render_path": null,
@@ -797,7 +753,7 @@
           "type": "controller",
           "class": "Organized::ImpoundClaimsController",
           "method": "show",
-          "line": 16,
+          "line": 15,
           "file": "app/controllers/organized/impound_claims_controller.rb",
           "rendered": {
             "name": "organized/impound_claims/show",
@@ -841,7 +797,7 @@
           "type": "controller",
           "class": "Organized::ImpoundClaimsController",
           "method": "show",
-          "line": 16,
+          "line": 15,
           "file": "app/controllers/organized/impound_claims_controller.rb",
           "rendered": {
             "name": "organized/impound_claims/show",
@@ -867,6 +823,50 @@
       "confidence": "Weak",
       "cwe_id": [
         79
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "a3c445b9a9aeef55aeb441f75fe658bec1ae6e998f9d46306a23d7e2b90b708f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/views/shared/_pagination.html.haml",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).where(\"#{AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::AmbassadorTaskAssignmentsController",
+          "method": "index",
+          "line": 11,
+          "file": "app/controllers/admin/ambassador_task_assignments_controller.rb",
+          "rendered": {
+            "name": "admin/ambassador_task_assignments/index",
+            "file": "app/views/admin/ambassador_task_assignments/index.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "admin/ambassador_task_assignments/index",
+          "line": 38,
+          "file": "app/views/admin/ambassador_task_assignments/index.html.haml",
+          "rendered": {
+            "name": "shared/_pagination",
+            "file": "app/views/shared/_pagination.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/_pagination"
+      },
+      "user_input": "@time_range_column",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -1048,7 +1048,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/organized/graduated_notifications_controller.rb",
-      "line": 53,
+      "line": 52,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "graduated_notifications.public_send((params[:search_status] or \"current\"))",
       "render_path": null,
@@ -1071,7 +1071,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/models/export.rb",
-      "line": 251,
+      "line": 256,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`wc -l \"#{tmp_file.path}\"`",
       "render_path": null,
@@ -1239,7 +1239,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/impound_claims_controller.rb",
-      "line": 43,
+      "line": 44,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "ImpoundClaim.public_send((params[:search_status] or available_statuses.first))",
       "render_path": null,
@@ -1353,7 +1353,7 @@
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
-      "line": 66,
+      "line": 65,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\")",
       "render_path": null,
