@@ -33,7 +33,7 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
 
-  UNDELIVERABLE_ERRORS = %w[Postmark::InactiveRecipientError Postmark::InvalidEmailAddressError]
+  UNDELIVERABLE_ERRORS = %w[Postmark::InactiveRecipientError Postmark::InvalidEmailAddressError].freeze
 
   belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
