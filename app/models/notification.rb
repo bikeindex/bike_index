@@ -5,7 +5,6 @@
 #  id                     :bigint           not null, primary key
 #  delivery_error         :string
 #  delivery_status        :integer
-#  delivery_status_str    :string
 #  kind                   :integer
 #  message_channel        :integer          default("email")
 #  message_channel_target :string
@@ -33,6 +32,8 @@ class Notification < ApplicationRecord
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
+
+  UNDELIVERABLE_ERRORS = %w[Postmark::InactiveRecipientError Postmark::InvalidEmailAddressError]
 
   belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
@@ -164,6 +165,12 @@ class Notification < ApplicationRecord
     Integrations::Twilio.new.get_message(twilio_sid)
   end
 
+  def user_email
+    return nil unless email?
+
+    user&.user_emails.friendly_find(message_channel_target)
+  end
+
   def notifiable_display_name
     return nil if notifiable.blank?
     "#{notifiable.class.to_s.titleize} ##{notifiable_id}"
@@ -190,7 +197,7 @@ class Notification < ApplicationRecord
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
     self.delivery_status ||= "delivery_pending"
-    self.message_channel_target ||= calculated_message_channel_target unless delivery_pending?
+    self.message_channel_target ||= calculated_message_channel_target
   end
 
   def survey_id
@@ -216,9 +223,12 @@ class Notification < ApplicationRecord
     yield
 
     update(delivery_status: "delivery_success")
+    user_email&.update_last_email_status!(email_errored: false)
   rescue => e
     update(delivery_status: "delivery_failure", delivery_error: e.class)
-    raise e
+    user_email&.update_last_email_status!(email_errored: true)
+
+    raise e unless UNDELIVERABLE_ERRORS.include?(delivery_error)
   end
 
   private

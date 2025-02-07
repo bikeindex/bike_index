@@ -24,6 +24,7 @@ class Integrations::Twilio
   end
 
   def send_notification(notification, to:, body:)
+    notification.message_channel_target = "text"
     if notification.twilio_sid.present?
       result = get_message(notification.twilio_sid)
       notification.update(delivery_status: result.status)

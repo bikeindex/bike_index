@@ -3334,7 +3334,8 @@ CREATE TABLE public.user_emails (
     old_user_id integer,
     confirmation_token text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    last_email_errored boolean DEFAULT false
 );
 
 
