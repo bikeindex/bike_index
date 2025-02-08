@@ -13,9 +13,9 @@ class CreateUserAlertNotificationWorker < ScheduledWorker
     notification = Notification.find_or_create_by(notifiable: user_alert,
       kind: "user_alert_#{user_alert.kind}")
 
-    CustomerMailer.user_alert_email(user_alert).deliver_now
-
-    notification.update(delivery_status_str: "email_success")
+    notification.track_email_delivery do
+      CustomerMailer.user_alert_email(user_alert).deliver_now
+    end
   end
 
   def enqueue_workers

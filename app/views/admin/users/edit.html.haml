@@ -1,4 +1,5 @@
-- if @user.banned? || @user.deleted?
+- last_email_errored = @user.user_emails&.last_email_errored || UserEmail.none
+- if @user.banned? || @user.deleted? || last_email_errored.any?
   .row.mb-4
     - if @user.deleted?
       .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
@@ -32,6 +33,11 @@
             %tr
               %td Notes
               %td= user_ban&.description
+    - if last_email_errored.any?
+      .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
+        .alert.alert-danger.mb-4
+          %h4.text-danger Last email to user errored!
+          Check the notifications "Delivery Errors" (below)
 .row
   .col-md-6
     %h1

@@ -56,7 +56,7 @@
                 = notification.message_channel_target
                 %small.less-strong no user
             %td.text-center
-              = notification_delivery_display(notification.delivery_status_str)
+              = notification_delivery_display(notification.delivery_status)
             %td.bike-cell
               - if notification.bike_id.present?
                 %code= link_to "#{notification.bike_id}", admin_bike_path(notification.bike_id), class: "less-strong"
@@ -76,4 +76,10 @@
                 %span{class: (sender_display_name == "auto" ? "less-strong" : "")}
                   = sender_display_name
             %td.error-cell
-              = notification.delivery_errors
+              - if notification.delivery_error == "Postmark::InactiveRecipientError"
+                An Email sent to this address was marked as spam
+              - elsif notification.delivery_error == "Postmark::InvalidEmailAddressError"
+                Invalid email address
+              - else
+                = notification.delivery_error
+

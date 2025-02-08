@@ -3,20 +3,26 @@ class EmailStolenNotificationWorker < ApplicationWorker
 
   def perform(stolen_notification_id, force_send = false)
     stolen_notification = StolenNotification.find(stolen_notification_id)
-    notification = if force_send
-      Notification.create(notifiable: stolen_notification)
+    return if stolen_notification.bike.blank?
+
+    kind = if force_send || stolen_notification.permitted_send?
+      "stolen_notification_sent"
     else
-      Notification.find_or_create_by(notifiable: stolen_notification)
+      "stolen_notification_blocked"
     end
 
-    return true if notification.delivered?
-    if force_send || stolen_notification.permitted_send?
-      notification.kind = "stolen_notification_sent"
-      CustomerMailer.stolen_notification_email(stolen_notification).deliver_now
-    elsif stolen_notification.bike.present?
-      notification.kind = "stolen_notification_blocked"
-      AdminMailer.blocked_stolen_notification_email(stolen_notification).deliver_now
+    notification = if force_send
+      Notification.create(notifiable: stolen_notification, kind:)
+    else
+      Notification.find_or_create_by(notifiable: stolen_notification, kind:)
     end
-    notification.update(delivery_status_str: "email_success") if notification.kind.present?
+
+    notification.track_email_delivery do
+      if notification.kind == "stolen_notification_sent"
+        CustomerMailer.stolen_notification_email(stolen_notification).deliver_now
+      else
+        AdminMailer.blocked_stolen_notification_email(stolen_notification).deliver_now
+      end
+    end
   end
 end

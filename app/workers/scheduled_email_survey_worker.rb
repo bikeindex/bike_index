@@ -12,8 +12,9 @@ class ScheduledEmailSurveyWorker < ScheduledWorker
     bike = Bike.unscoped.find(bike_id)
     return if !force_send && no_survey?(bike)
     notification = Notification.create(kind: :theft_survey_2023, bike: bike, user: bike.user)
-    CustomerMailer.theft_survey(notification).deliver_now
-    notification.update(delivery_status_str: "email_success", message_channel: "email")
+    notification.track_email_delivery do
+      CustomerMailer.theft_survey(notification).deliver_now
+    end
   end
 
   def send_survey?(bike = nil)

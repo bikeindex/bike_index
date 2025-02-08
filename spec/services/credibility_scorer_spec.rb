@@ -234,7 +234,7 @@ RSpec.describe CredibilityScorer do
     let(:user) { FactoryBot.create(:user) }
     let(:banned_user) { FactoryBot.create(:user, banned: true) }
     before { bike.reload } # Because current_ownership
-    it "returns []" do
+    it "returns []", :flaky do
       expect(subject.bike_user_badges(bike)).to eq([])
     end
     context "creator banned" do

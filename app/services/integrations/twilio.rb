@@ -24,14 +24,20 @@ class Integrations::Twilio
   end
 
   def send_notification(notification, to:, body:)
+    notification.message_channel_target = "text"
     if notification.twilio_sid.present?
       result = get_message(notification.twilio_sid)
-      notification.update(delivery_status_str: result.status)
+      notification.update(delivery_status: result.status)
     else
       result = send_message(to: to, body: body)
+      delivery_status = if result.status == "queued"
+        "delivery_pending"
+      else
+        result.status
+      end
       notification.update(message_channel_target: to,
         twilio_sid: result.sid,
-        delivery_status_str: result.status)
+        delivery_status:)
     end
     result
   end

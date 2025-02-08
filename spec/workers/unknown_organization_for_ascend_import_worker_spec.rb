@@ -18,7 +18,7 @@ RSpec.describe UnknownOrganizationForAscendImportWorker, type: :job do
     expect(Notification.count).to eq 1
     notification = Notification.last
     expect(notification.kind).to eq "unknown_organization_for_ascend"
-    expect(notification.email_success?).to be_truthy
+    expect(notification.delivery_success?).to be_truthy
     expect(notification.notifiable).to eq bulk_import
   end
 end

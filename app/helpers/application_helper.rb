@@ -24,12 +24,12 @@ module ApplicationHelper
   end
 
   def notification_delivery_display(status)
-    text = if status == "email_success"
+    text = if status == "delivery_success"
       check_mark
-    elsif status.nil?
+    elsif status == "delivery_pending"
       "..."
     else
-      status
+      "failure"
     end
     content_tag(:span, text, title: status&.titleize, style: "cursor:default;")
   end

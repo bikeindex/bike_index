@@ -19,9 +19,9 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
 
     notification = Notification.find_or_create_by(notifiable: ownership,
       kind: "finished_registration")
-    unless notification.delivered?
+
+    notification.track_email_delivery do
       OrganizedMailer.finished_registration(ownership).deliver_now
-      notification.update(delivery_status_str: "email_success") # This could be made more representative
     end
   end
 end

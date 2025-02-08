@@ -18,7 +18,7 @@ RSpec.describe EmailTheftAlertNotificationWorker, type: :job do
       expect(theft_alert.notifications.count).to eq 1
       notification = theft_alert.notifications.last
       expect(notification.kind).to eq "theft_alert_recovered"
-      expect(notification.delivered?).to be_truthy
+      expect(notification.delivery_success?).to be_truthy
       expect(notification.bike_id).to eq theft_alert.stolen_record.bike_id
       expect(notification.theft_alert?).to be_truthy
       expect(notification.sender&.id).to be_blank
@@ -40,7 +40,7 @@ RSpec.describe EmailTheftAlertNotificationWorker, type: :job do
         theft_alert.reload
         notification = theft_alert.notifications.last
         expect(notification.kind).to eq "theft_alert_posted"
-        expect(notification.delivered?).to be_truthy
+        expect(notification.delivery_success?).to be_truthy
 
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last

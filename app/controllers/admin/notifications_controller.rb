@@ -44,7 +44,7 @@ class Admin::NotificationsController < Admin::BaseController
     end
     if InputNormalizer.boolean(params[:search_undelivered])
       @undelivered = true
-      notifications = notifications.undelivered
+      notifications = notifications.not_delivery_success
     end
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])

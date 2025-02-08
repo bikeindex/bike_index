@@ -7,13 +7,12 @@ class EmailDonationWorker < ApplicationWorker
     @user = payment.user
     notification_kind = calculated_notification_kind(payment)
     notification = payment.notifications.where(kind: notification_kind).first
-    # If already delivered, skip out!
-    return true if notification&.delivered?
     notification ||= Notification.create(kind: notification_kind, notifiable: payment,
       bike: bike_for_notification(payment, notification_kind))
 
-    DonationMailer.donation_email(notification_kind, payment).deliver_now
-    notification.update(delivery_status_str: "email_success", message_channel: "email")
+    notification.track_email_delivery do
+      DonationMailer.donation_email(notification_kind, payment).deliver_now
+    end
   end
 
   def calculated_notification_kind(payment)

@@ -33,7 +33,7 @@ RSpec.describe InvalidExtensionForAscendImportWorker, type: :job do
 
     expect(notification.kind).to eq "invalid_extension_for_ascend_import"
     expect(notification.user_id).to eq user.id
-    expect(notification.email_success?).to be_truthy
+    expect(notification.delivery_success?).to be_truthy
 
     expect(ActionMailer::Base.deliveries.count).to eq 1
   end

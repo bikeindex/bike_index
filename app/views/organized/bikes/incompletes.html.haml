@@ -65,7 +65,7 @@
             %small.less-strong{ style: "display: block; line-height: 1;" }
               = t(".through_org", org_name: b_param.organization.short_name)
         %td
-          - resend_notifications = b_param.partial_notification_resends.pluck(:created_at, :delivery_status_str)
+          - resend_notifications = b_param.partial_notification_resends.pluck(:created_at, :delivery_status)
           .less-strong-hold{style: "min-width:2rem;"}
             - resend_notifications.each do |resend|
               %span.d-block{style: "line-height:1.2;"}

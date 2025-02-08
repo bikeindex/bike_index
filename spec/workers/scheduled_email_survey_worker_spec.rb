@@ -31,7 +31,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
     let(:bike_theft_survey_4_2022) { FactoryBot.create(:stolen_bike, :with_ownership, date_stolen: stolen_at) }
     let!(:theft_survey_4_2022) do
       Notification.create(kind: "theft_survey_4_2022", bike_id: bike_theft_survey_4_2022.id,
-        notifiable: bike_theft_survey_4_2022.current_stolen_record, delivery_status_str: "email_success",
+        notifiable: bike_theft_survey_4_2022.current_stolen_record, delivery_status: "delivery_success",
         message_channel: :email)
     end
     let!(:bike_outside_us) do
@@ -70,7 +70,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       notification = Notification.create(kind: "theft_survey_2023",
         user: user,
         bike: bike1,
-        delivery_status_str: "email_success",
+        delivery_status: "delivery_success",
         message_channel: :email)
       expect(notification).to be_valid
       expect(notification.message_channel_target).to eq user.email
@@ -102,7 +102,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
       expect(notification.user_id).to eq user.id
       expect(notification.bike_id).to eq bike1.id
       expect(notification.notifiable).to be_blank
-      expect(notification.delivered?).to be_truthy
+      expect(notification.delivery_success?).to be_truthy
       expect(notification.message_channel_target).to eq user.email
       expect(ActionMailer::Base.deliveries.count).to eq 1
 
@@ -138,7 +138,7 @@ RSpec.describe ScheduledEmailSurveyWorker, type: :job do
         expect(notification.user_id).to be_blank
         expect(notification.bike_id).to eq bike_unclaimed.id
         expect(notification.notifiable).to be_blank
-        expect(notification.delivered?).to be_truthy
+        expect(notification.delivery_success?).to be_truthy
         expect(notification.message_channel_target).to eq user.email
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
