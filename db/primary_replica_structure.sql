@@ -1363,6 +1363,7 @@ CREATE TABLE public.hot_sheets (
     organization_id bigint,
     stolen_record_ids jsonb,
     recipient_ids jsonb,
+    delivery_status character varying,
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -6206,7 +6207,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20250208040953'),
 ('20250207221053'),
 ('20250207193640'),
 ('20250205135704'),
