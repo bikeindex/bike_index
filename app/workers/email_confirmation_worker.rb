@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmailConfirmationWorker < ApplicationWorker
   sidekiq_options queue: "notify", retry: 3
 
