@@ -70,8 +70,8 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def send_today_now?
-    return false if off? ||
-      hot_sheets.where(sheet_date: current_date).email_success.any?
+    return false if off? || hot_sheets.where(sheet_date: current_date).any?
+
     time_in_zone > send_today_at
   end
 

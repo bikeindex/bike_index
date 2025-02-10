@@ -3,7 +3,6 @@
 # Table name: hot_sheets
 #
 #  id                :bigint           not null, primary key
-#  delivery_status   :string
 #  recipient_ids     :jsonb
 #  sheet_date        :date
 #  stolen_record_ids :jsonb
@@ -19,10 +18,9 @@ class HotSheet < ApplicationRecord
   belongs_to :organization
 
   has_one :hot_sheet_configuration, through: :organization
+  has_many :notifications, as: :notifiable
 
   validates_presence_of :organization_id, :sheet_date
-
-  scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.for(organization_or_id, date = nil)
     org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
@@ -40,7 +38,7 @@ class HotSheet < ApplicationRecord
   end
 
   def email_success?
-    delivery_status == "email_success"
+    notifications.delivery_success.any? && notifications.not_delivery_success.none?
   end
 
   def subject
@@ -84,17 +82,6 @@ class HotSheet < ApplicationRecord
       update(recipient_ids: hot_sheet_configuration.current_recipient_ids)
     end
     organization.users.where(id: recipient_ids)
-  end
-
-  def deliver_email
-    if recipient_emails.any?
-      # Postmark only allows 50 emails per sent email, so abide by that
-      recipient_emails.each_slice(48).map do |permitted_recipient_emails|
-        # This is called from process_hot_sheet_worker, so it can be delivered inline
-        OrganizedMailer.hot_sheet(self, permitted_recipient_emails).deliver_now
-      end
-    end
-    update(delivery_status: "email_success")
   end
 
   private
