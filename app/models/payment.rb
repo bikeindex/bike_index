@@ -2,45 +2,48 @@
 #
 # Table name: payments
 #
-#  id              :integer          not null, primary key
-#  amount_cents    :integer
-#  currency        :string           default("USD"), not null
-#  email           :string(255)
-#  kind            :integer
-#  paid_at         :datetime
-#  payment_method  :integer          default("stripe")
-#  referral_source :text
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  invoice_id      :integer
-#  organization_id :integer
-#  stripe_id       :string(255)
-#  user_id         :integer
+#  id                     :integer          not null, primary key
+#  amount_cents           :integer
+#  currency               :string           default("USD"), not null
+#  email                  :string(255)
+#  kind                   :integer
+#  paid_at                :datetime
+#  payment_method         :integer          default("stripe")
+#  referral_source        :text
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  invoice_id             :integer
+#  organization_id        :integer
+#  stripe_id              :string(255)
+#  stripe_subscription_id :bigint
+#  user_id                :integer
 #
 # Indexes
 #
-#  index_payments_on_user_id  (user_id)
+#  index_payments_on_stripe_subscription_id  (stripe_subscription_id)
+#  index_payments_on_user_id                 (user_id)
 #
 class Payment < ApplicationRecord
   include Amountable
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
 
-  scope :organizations, -> { where.not(organization_id: nil) }
-  scope :non_donation, -> { where.not(kind: "donation") }
-  scope :incomplete, -> { where(paid_at: nil) }
-  scope :paid, -> { where.not(paid_at: nil) }
-
-  enum :payment_method, PAYMENT_METHOD_ENUM
-  enum :kind, KIND_ENUM
-
   belongs_to :user
   belongs_to :organization
   belongs_to :invoice
+  belongs_to :stripe_subscription
 
   has_one :theft_alert
 
   has_many :notifications, as: :notifiable
+
+  enum :payment_method, PAYMENT_METHOD_ENUM
+  enum :kind, KIND_ENUM
+
+  scope :organizations, -> { where.not(organization_id: nil) }
+  scope :non_donation, -> { where.not(kind: "donation") }
+  scope :incomplete, -> { where(paid_at: nil) }
+  scope :paid, -> { where.not(paid_at: nil) }
 
   validate :email_or_organization_present
   validates :currency, presence: true
