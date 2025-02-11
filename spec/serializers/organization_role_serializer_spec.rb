@@ -1,10 +1,10 @@
 require "rails_helper"
 
-RSpec.describe MembershipSerializer do
+RSpec.describe OrganizationRoleSerializer do
   let(:organization) { FactoryBot.create(:organization) }
   let(:user) { FactoryBot.create(:user) }
   let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization_id: organization.id, user_id: user.id, role: "member") }
-  subject { MembershipSerializer.new(organization_role) }
+  subject { described_class.new(organization_role) }
 
   let(:target) do
     {
