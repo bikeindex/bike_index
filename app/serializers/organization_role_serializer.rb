@@ -1,7 +1,4 @@
-# NOTE: this is a serializer for OrganizationRole
-# (which used to be called membership)
-
-class MembershipSerializer < ApplicationSerializer
+class OrganizationRoleSerializer < ApplicationSerializer
   attributes :organization_name,
     :organization_id,
     :short_name,
