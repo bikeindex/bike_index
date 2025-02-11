@@ -1995,6 +1995,7 @@ CREATE TABLE public.memberships (
     kind integer,
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
+    active boolean DEFAULT false,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -3110,6 +3111,8 @@ CREATE TABLE public.stripe_prices (
     membership_kind integer,
     "interval" integer,
     stripe_id character varying,
+    currency character varying,
+    amount_cents integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -3143,6 +3146,8 @@ CREATE TABLE public.stripe_subscriptions (
     membership_id bigint,
     stripe_price_id bigint,
     end_at timestamp(6) without time zone,
+    start_at timestamp(6) without time zone,
+    active boolean DEFAULT false,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -6418,14 +6423,6 @@ ALTER TABLE ONLY public.theft_alerts
 
 ALTER TABLE ONLY public.alert_images
     ADD CONSTRAINT fk_rails_95dc479c85 FOREIGN KEY (stolen_record_id) REFERENCES public.stolen_records(id);
-
-
---
--- Name: memberships fk_rails_99326fb65d; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.memberships
-    ADD CONSTRAINT fk_rails_99326fb65d FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

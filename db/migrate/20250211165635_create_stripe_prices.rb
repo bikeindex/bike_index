@@ -4,6 +4,8 @@ class CreateStripePrices < ActiveRecord::Migration[8.0]
       t.integer :membership_kind
       t.integer :interval
       t.string :stripe_id
+      t.string :currency
+      t.integer :amount_cents
 
       t.timestamps
     end

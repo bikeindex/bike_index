@@ -5,6 +5,7 @@ class CreateMemberships < ActiveRecord::Migration[8.0]
       t.integer :kind
       t.datetime :start_at
       t.datetime :end_at
+      t.boolean :active, default: false
 
       t.timestamps
     end
