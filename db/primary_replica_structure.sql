@@ -1996,6 +1996,7 @@ CREATE TABLE public.memberships (
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
     active boolean DEFAULT false,
+    creator_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -3144,6 +3145,7 @@ ALTER SEQUENCE public.stripe_prices_id_seq OWNED BY public.stripe_prices.id;
 CREATE TABLE public.stripe_subscriptions (
     id bigint NOT NULL,
     membership_id bigint,
+    user_id bigint,
     stripe_price_id bigint,
     end_at timestamp(6) without time zone,
     start_at timestamp(6) without time zone,
@@ -5741,6 +5743,13 @@ CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btre
 
 
 --
+-- Name: index_memberships_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_memberships_on_creator_id ON public.memberships USING btree (creator_id);
+
+
+--
 -- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6179,6 +6188,13 @@ CREATE INDEX index_stripe_subscriptions_on_membership_id ON public.stripe_subscr
 --
 
 CREATE INDEX index_stripe_subscriptions_on_stripe_price_id ON public.stripe_subscriptions USING btree (stripe_price_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_user_id ON public.stripe_subscriptions USING btree (user_id);
 
 
 --

@@ -1,8 +1,7 @@
 FactoryBot.define do
   factory :membership do
-    user { nil }
-    kind { 1 }
-    start_at { "2025-02-11 08:48:27" }
-    end_at { "2025-02-11 08:48:27" }
+    user { FactoryBot.create(:user_confirmed) }
+    kind { "basic" }
+    start_at { Time.current - 1.hour }
   end
 end
