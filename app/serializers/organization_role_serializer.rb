@@ -1,4 +1,4 @@
-class MembershipSerializer < ApplicationSerializer
+class OrganizationRoleSerializer < ApplicationSerializer
   attributes :organization_name,
     :organization_id,
     :short_name,
