@@ -3147,6 +3147,7 @@ CREATE TABLE public.stripe_subscriptions (
     membership_id bigint,
     user_id bigint,
     stripe_price_id bigint,
+    stripe_id character varying,
     end_at timestamp(6) without time zone,
     start_at timestamp(6) without time zone,
     active boolean DEFAULT false,

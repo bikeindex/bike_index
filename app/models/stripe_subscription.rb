@@ -9,6 +9,7 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  membership_id   :bigint
+#  stripe_id       :string
 #  stripe_price_id :bigint
 #  user_id         :bigint
 #
@@ -25,7 +26,7 @@ class StripeSubscription < ApplicationRecord
   belongs_to :user
   belongs_to :stripe_price
 
-  def update_membership
+  def update_membership!
     if active?
       if user_current_membership.admin_managed?
         # end the membership, start a new membership here
