@@ -113,6 +113,16 @@ RSpec.describe OrganizationsController, type: :request do
         end
       end
     end
+
+    context "no current_user" do
+      let(:current_user) { false }
+      it "doesn't create" do
+        expect {
+          post base_url, params: {organization: org_attrs}
+        }.to_not change(Organization, :count)
+        expect(flash[:error]).to match "an account"
+      end
+    end
   end
 
   describe "legacy embeds" do

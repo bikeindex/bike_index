@@ -1754,6 +1754,8 @@ en:
     organizations:
       create:
         organization_created: Organization Created successfully!
+        must_create_an_account_first: >-
+          You have to sign up for an account on Bike Index before you can create an organziation
       find_organization:
         not_found: >-
           We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org

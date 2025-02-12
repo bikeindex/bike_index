@@ -24,6 +24,10 @@ class OrganizationsController < ApplicationController
   end
 
   def create
+    if current_user.blank?
+      flash[:error] = translation(:must_create_an_account_first)
+      redirect_to(new_user_path) && return
+    end
     @organization = Organization.new(permitted_create_params)
     if @organization.save
       OrganizationRole.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
