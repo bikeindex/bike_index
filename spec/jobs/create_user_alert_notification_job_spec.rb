@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe CreateUserAlertNotificationJob, type: :job do
   let(:instance) { described_class.new }
-  include_context :scheduled_worker
-  include_examples :scheduled_worker_tests
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
 
   describe "perform" do
     before do

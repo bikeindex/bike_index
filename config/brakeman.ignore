@@ -871,29 +871,6 @@
       "note": ""
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "a434fb9e854f608ed5dc1c4e1750bb35561f5fbdbd315e95e6581113638b074a",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/workers/listicle_image_size_worker.rb",
-      "line": 8,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`identify -format \"%wx%h\" #{Listicle.find(id).image_url}`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ListicleImageSizeJob",
-        "method": "perform"
-      },
-      "user_input": "Listicle.find(id).image_url",
-      "confidence": "High",
-      "cwe_id": [
-        77
-      ],
-      "note": "@sethherr: All seem like false positives to me"
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "a743bd471cdf4bb187bd3b07f9be19b8aca52624fee37000482ee30b9be07d55",
@@ -1275,6 +1252,29 @@
       "confidence": "Medium",
       "cwe_id": [
         915
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "e700bff883273d677c0bdbb09250662a7878d4f5b41a4578975f07ffa325f4d0",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/jobs/listicle_image_size_job.rb",
+      "line": 8,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`identify -format \"%wx%h\" #{Listicle.find(id).image_url}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ListicleImageSizeJob",
+        "method": "perform"
+      },
+      "user_input": "Listicle.find(id).image_url",
+      "confidence": "High",
+      "cwe_id": [
+        77
       ],
       "note": ""
     },

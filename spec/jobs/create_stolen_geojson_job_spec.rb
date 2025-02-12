@@ -5,8 +5,8 @@ RSpec.describe CreateStolenGeojsonJob, type: :job do
   # Have to do this here so that the scheduled worker test don't make requests
   before { allow_any_instance_of(Integrations::Cloudflare).to receive(:expire_cache) { true } }
 
-  include_context :scheduled_worker
-  include_examples :scheduled_worker_tests
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
 
   describe "perform" do
     let!(:bike) { FactoryBot.create(:stolen_bike) }

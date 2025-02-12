@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe ScheduledEmailSurveyJob, type: :job do
   let(:instance) { described_class.new }
-  include_context :scheduled_worker
-  include_examples :scheduled_worker_tests
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
 
   let(:stolen_at) { Time.current - 2.weeks } # time in stolen_survey_period
   let(:organization) { FactoryBot.create(:organization, opted_into_theft_survey_2023: true) }

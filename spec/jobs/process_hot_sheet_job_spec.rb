@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe ProcessHotSheetJob, type: :lib do
   let(:instance) { described_class.new }
-  include_context :scheduled_worker
-  include_examples :scheduled_worker_tests
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority" # overrides default

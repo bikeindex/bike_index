@@ -12,7 +12,7 @@ class ScheduledJobRunner < ScheduledJob
   end
 
   def self.worker_from_string(worker_string)
-    scheduled_workers.detect { |j| j.to_s == worker_string.to_s }
+    scheduled_jobs.detect { |j| j.to_s == worker_string.to_s }
   end
 
   def self.valid_history_records
@@ -32,7 +32,7 @@ class ScheduledJobRunner < ScheduledJob
     RedisPool.conn { |r| r.hset(HISTORY_KEY, record_key(worker_string, record), value.to_s) }
   end
 
-  def self.scheduled_workers
+  def self.scheduled_jobs
     [
       CleanBParamsJob,
       CleanBulkImportJob,
@@ -64,7 +64,7 @@ class ScheduledJobRunner < ScheduledJob
   end
 
   def self.scheduled_non_scheduler_workers
-    scheduled_workers.reject { |j| j == ScheduledJobRunner }
+    scheduled_jobs.reject { |j| j == ScheduledJobRunner }
   end
 
   def perform

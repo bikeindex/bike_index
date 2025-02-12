@@ -1,4 +1,4 @@
-RSpec.shared_context :scheduled_worker do
+RSpec.shared_context :scheduled_job do
   let(:redis) { Redis.new }
 
   def clear_scheduled_history
@@ -7,7 +7,7 @@ RSpec.shared_context :scheduled_worker do
 
   before { Sidekiq::Job.clear_all }
 
-  shared_examples_for :scheduled_worker_tests do
+  shared_examples_for :scheduled_job_tests do
     describe "scheduling" do
       it "does not need to run immediately after running" do
         clear_scheduled_history
@@ -19,7 +19,7 @@ RSpec.shared_context :scheduled_worker do
 
     describe "runnering" do
       it "is specified in the runner" do
-        expect(ScheduledJobRunner.scheduled_workers).to include(described_class)
+        expect(ScheduledJobRunner.scheduled_jobs).to include(described_class)
       end
     end
   end

@@ -10,8 +10,8 @@ end
 
 RSpec.describe UpdateTheftAlertFacebookJob, type: :job do
   let(:instance) { described_class.new }
-  include_context :scheduled_worker
-  include_examples :scheduled_worker_tests
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
 
   describe "perform" do
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 3999) }

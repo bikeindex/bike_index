@@ -7,8 +7,8 @@ RSpec.describe ScheduledAutocompleteCheckJob, type: :job do
     before do
       allow_any_instance_of(described_class).to receive(:too_few_autocomplete_manufacturers?) { false }
     end
-    include_context :scheduled_worker
-    include_examples :scheduled_worker_tests
+    include_context :scheduled_job
+    include_examples :scheduled_job_tests
   end
 
   describe "perform" do
