@@ -262,7 +262,7 @@ class Ownership < ApplicationRecord
     end
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
-    EmailOwnershipInvitationWorker.perform_in(2.seconds, id)
+    EmailOwnershipInvitationJob.perform_in(2.seconds, id)
   end
 
   def create_user_registration_for_phone_registration!(user)

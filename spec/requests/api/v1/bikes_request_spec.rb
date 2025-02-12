@@ -100,7 +100,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect([black, red, manufacturer].size).to eq 3
         expect(bike_hash).to be_present # make sure the things are created before we clear the queues
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
       end
 
       def expect_matching_created_bike(created_bike)
@@ -138,7 +138,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(bike.current_ownership).to eq og_ownership
         expect(bike.ownerships.count).to eq 1
 
-        Sidekiq::Worker.drain_all # Not wrapping both in drain_all, because
+        Sidekiq::Job.drain_all # Not wrapping both in drain_all, because
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
       end
@@ -163,7 +163,7 @@ RSpec.describe API::V1::BikesController, type: :request do
             post base_url, params: bike_hash
           }.to change(Ownership, :count).by 0
 
-          Sidekiq::Worker.drain_all
+          Sidekiq::Job.drain_all
           expect(ActionMailer::Base.deliveries.count).to eq 1
           expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
         end
@@ -177,7 +177,7 @@ RSpec.describe API::V1::BikesController, type: :request do
             bike = Bike.where(serial_number: "SSOMESERIAL").first
             expect_matching_created_bike(bike)
 
-            Sidekiq::Worker.drain_all
+            Sidekiq::Job.drain_all
             expect(ActionMailer::Base.deliveries.count).to eq 0
           end
         end
@@ -201,7 +201,7 @@ RSpec.describe API::V1::BikesController, type: :request do
             expect_matching_created_bike(bike)
             expect(bike.phone).to eq "CELL8887776666"
 
-            Sidekiq::Worker.drain_all
+            Sidekiq::Job.drain_all
             expect(ActionMailer::Base.deliveries.count).to eq 1
             expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
 
@@ -295,7 +295,7 @@ RSpec.describe API::V1::BikesController, type: :request do
           "http://i.imgur.com/3BGQeJh.jpg"
         ]
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         VCR.use_cassette("v1_bikes_create-images", match_requests_on: [:path], re_record_interval: 1.month) do
           Sidekiq::Testing.inline! do
             expect {
@@ -396,7 +396,7 @@ RSpec.describe API::V1::BikesController, type: :request do
             lock_defeat_description: "broken in some crazy way"
           }
           ActionMailer::Base.deliveries = []
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             post base_url, params: {bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token}
           }.to change(Ownership, :count).by(1)
@@ -437,11 +437,11 @@ RSpec.describe API::V1::BikesController, type: :request do
           owner_email: "fun_times@examples.com"
         }
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           post base_url, params: {bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token}
         }.to change(Ownership, :count).by(1)
-        EmailOwnershipInvitationWorker.drain
+        EmailOwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 example bikez").first
@@ -471,11 +471,11 @@ RSpec.describe API::V1::BikesController, type: :request do
         }
         options = {bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token}
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           post base_url, params: options
         }.to change(Ownership, :count).by(1)
-        EmailOwnershipInvitationWorker.drain
+        EmailOwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first
@@ -497,11 +497,11 @@ RSpec.describe API::V1::BikesController, type: :request do
         }
         options = {bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token}
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           post base_url, params: options
         }.to change(Ownership, :count).by(1)
-        EmailOwnershipInvitationWorker.drain
+        EmailOwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq(0)
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first

@@ -18,7 +18,7 @@ class BikeVersionsController < ApplicationController
     bike = Bike.unscoped.find(params[:bike_id])
     if bike&.authorized?(current_user)
       # Do it inline because it's blocking
-      bike_version = BikeVersionCreatorWorker.new.perform(bike.id)
+      bike_version = BikeVersionCreatorJob.new.perform(bike.id)
       flash[:success] = "Bike Version created!"
       redirect_to edit_bike_version_path(bike_version.id)
     else

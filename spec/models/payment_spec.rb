@@ -39,7 +39,7 @@ RSpec.describe Payment, type: :model do
       it "enqueues an email job, associates the user" do
         expect {
           payment
-        }.to change(EmailReceiptWorker.jobs, :size).by(1)
+        }.to change(EmailReceiptJob.jobs, :size).by(1)
         payment.reload
         expect(payment.id).to be_present
         expect(payment.user_id).to eq user.id
@@ -50,7 +50,7 @@ RSpec.describe Payment, type: :model do
         it "does not send an extra email" do
           expect {
             payment
-          }.to change(EmailReceiptWorker.jobs, :size).by 0
+          }.to change(EmailReceiptJob.jobs, :size).by 0
           payment.reload
           expect(payment.id).to be_present
           expect(payment.user_id).to eq user.id
@@ -63,7 +63,7 @@ RSpec.describe Payment, type: :model do
       it "does not enqueue an email" do
         expect {
           payment # it is created here
-        }.to_not change(EmailReceiptWorker.jobs, :size)
+        }.to_not change(EmailReceiptJob.jobs, :size)
         expect(payment.valid?).to be_truthy
         payment.reload
         expect(payment.id).to be_present
@@ -128,8 +128,8 @@ RSpec.describe Payment, type: :model do
     it "creates a mailchimp_datum" do
       user.reload
       expect(user.mailchimp_datum).to be_blank
-      expect(UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP).to be_falsey
-      Sidekiq::Worker.clear_all
+      expect(UpdateMailchimpDatumJob::UPDATE_MAILCHIMP).to be_falsey
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         payment.reload
       end

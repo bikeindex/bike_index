@@ -26,14 +26,14 @@ RSpec.describe StolenNotificationsController, type: :request do
       it "creates a Stolen Notification record" do
         expect(bike.reload.current_ownership.user_id).to eq user2.id
         expect(bike.contact_owner?(current_user)).to be_truthy
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect {
           expect {
             post base_url, params: {stolen_notification: stolen_notification_attributes}
             expect(flash[:success]).to be_present
           }.to change(StolenNotification, :count).by(1)
-        }.to change(EmailStolenNotificationWorker.jobs, :count).by(1)
+        }.to change(EmailStolenNotificationJob.jobs, :count).by(1)
         stolen_notification = StolenNotification.last
         expect(stolen_notification.bike).to eq bike
         expect(stolen_notification.sender_id).to eq current_user.id
@@ -42,7 +42,7 @@ RSpec.describe StolenNotificationsController, type: :request do
         expect(stolen_notification.reference_url).to eq stolen_notification_attributes[:reference_url]
         expect(stolen_notification.kind).to eq "stolen_permitted"
 
-        EmailStolenNotificationWorker.drain
+        EmailStolenNotificationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq("Stolen bike contact")
@@ -60,14 +60,14 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(bike.contact_owner?).to be false
           expect(bike.contact_owner?(current_user)).to be_truthy
           expect(bike.contact_owner?(current_user)).to be_truthy
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           expect {
             expect {
               post base_url, params: {stolen_notification: stolen_notification_attributes}
               expect(flash[:success]).to be_present
             }.to change(StolenNotification, :count).by(1)
-          }.to change(EmailStolenNotificationWorker.jobs, :count).by(1)
+          }.to change(EmailStolenNotificationJob.jobs, :count).by(1)
           stolen_notification = StolenNotification.last
           expect(stolen_notification.bike).to eq bike
           expect(stolen_notification.sender_id).to eq current_user.id
@@ -76,7 +76,7 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(stolen_notification.reference_url).to eq stolen_notification_attributes[:reference_url]
           expect(stolen_notification.kind).to eq "unstolen_unclaimed_permitted_direct"
 
-          EmailStolenNotificationWorker.drain
+          EmailStolenNotificationJob.drain
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Stolen bike contact")
@@ -87,7 +87,7 @@ RSpec.describe StolenNotificationsController, type: :request do
         let(:bike) { FactoryBot.create(:bike) }
         it "fails to create if the user isn't permitted to send a stolen_notification" do
           expect(bike.contact_owner?(current_user)).to be_falsey
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           expect {
             post base_url, params: {stolen_notification: stolen_notification_attributes}

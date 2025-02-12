@@ -199,6 +199,6 @@ RSpec.describe BikeUpdator do
     expect(update_bike).to receive(:update_ownership).and_return(true)
     expect {
       update_bike.update_available_attributes
-    }.to change(AfterBikeSaveWorker.jobs, :size).by(1)
+    }.to change(AfterBikeSaveJob.jobs, :size).by(1)
   end
 end

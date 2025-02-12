@@ -363,13 +363,13 @@ RSpec.describe User, type: :model do
     context "with phone_verification" do
       before { Flipper.enable(:phone_verification) }
       it "adds user phone, if blank" do
-        UserPhoneConfirmationWorker.new # Instantiate for stubbing
-        stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+        UserPhoneConfirmationJob.new # Instantiate for stubbing
+        stub_const("UserPhoneConfirmationJob::UPDATE_TWILIO", true)
         user.reload
         user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
         expect(user.user_phones.count).to eq 0
         expect(user.phone).to be_blank
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             user.update(phone: "6669996666")
@@ -542,7 +542,7 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       expect {
         expect(user.send_password_reset_email).to be_truthy
-      }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      }.to change(EmailResetPasswordJob.jobs, :size).by(1)
       expect(user.reload.token_for_password_reset).not_to be_nil
     end
 
@@ -554,7 +554,7 @@ RSpec.describe User, type: :model do
       expect {
         expect(user.send_password_reset_email).to be_falsey
         expect(user.send_password_reset_email).to be_falsey
-      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(EmailResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.token_for_password_reset).to eq current_token
     end
@@ -566,7 +566,7 @@ RSpec.describe User, type: :model do
       expect(user.magic_link_token).to be_nil
       expect {
         user.send_magic_link_email
-      }.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
+      }.to change(EmailMagicLoginLinkJob.jobs, :size).by(1)
       expect(user.reload.magic_link_token).not_to be_nil
     end
 
@@ -577,7 +577,7 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       expect {
         user.send_magic_link_email
-      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(EmailResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
     end

@@ -200,7 +200,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(bulk_import.organization_id).to eq current_organization.id
             expect(bulk_import.kind).to eq "organization_import" # Because this isn't a permitted kind
             expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-            expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+            expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
           end
           context "impound" do
             let!(:current_organization) { impound_organization }
@@ -208,7 +208,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             let!(:color_purple) { FactoryBot.create(:color, name: "Purple") }
             let!(:color_pink) { FactoryBot.create(:color, name: "Pink") }
             it "imports impounded bikes" do
-              Sidekiq::Worker.clear_all
+              Sidekiq::Job.clear_all
               expect {
                 post base_url, params: {bulk_import: {file: file, kind: "impounded"}}
               }.to change(BulkImport, :count).by 1
@@ -219,9 +219,9 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.progress).to eq "pending"
               expect(bulk_import.organization).to eq current_organization
               expect(bulk_import.kind).to eq "impounded"
-              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
 
-              expect { BulkImportWorker.drain }.to change(Bike, :count).by 2
+              expect { BulkImportJob.drain }.to change(Bike, :count).by 2
 
               bike1 = bulk_import.bikes.reorder(:created_at).first
               expect(bike1.mnfg_name).to eq "Salsa"
@@ -268,7 +268,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             let!(:color_green) { FactoryBot.create(:color, name: "Green") }
             let!(:color_white) { FactoryBot.create(:color, name: "White") }
             it "creates with stolen attributes" do
-              Sidekiq::Worker.clear_all
+              Sidekiq::Job.clear_all
               expect {
                 post base_url, params: {
                   bulk_import: {file: file, kind: "stolen"},
@@ -283,9 +283,9 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.kind).to eq "stolen"
               expect(bulk_import.no_notify).to be_truthy
               expect(bulk_import.data["stolen_record"]).to match_hash_indifferently stolen_record_params.except(:bad_attribute)
-              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
 
-              expect { BulkImportWorker.drain }.to change(Bike, :count).by 2
+              expect { BulkImportJob.drain }.to change(Bike, :count).by 2
 
               bike1 = bulk_import.bikes.reorder(:created_at).first
               expect(bike1.mnfg_name).to eq "Trek"
@@ -345,7 +345,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(bulk_import.progress).to eq "pending"
             expect(bulk_import.organization_id).to eq current_organization.id
             expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-            expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+            expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
           end
         end
         context "ascend token" do
@@ -374,8 +374,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.progress).to eq "pending"
               expect(bulk_import.organization).to be_blank
               expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
-              BulkImportWorker.drain
+              expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
+              BulkImportJob.drain
               expect(bulk_import.reload.ascend_errors).to be_present
               expect(bulk_import.import_errors?).to be_truthy
               expect(bulk_import.blocking_error?).to be_truthy
@@ -387,7 +387,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "powered-by-bike-index.png"))) }
             let!(:current_organization) { FactoryBot.create(:organization, ascend_name: "powered-by-bike-index") }
             it "creates but adds an error" do
-              Sidekiq::Worker.clear_all
+              Sidekiq::Job.clear_all
               expect {
                 post "/o/ascend/bulk_imports", params: {file: file}, headers: {"Authorization" => "XXXZZZ"}
               }.to change(BulkImport, :count).by 1
@@ -405,18 +405,18 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.progress).to eq "finished"
               expect(bulk_import.ascend_name).to eq "powered-by-bike-index"
               expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
               # Make sure that the worker doesn't explode
-              BulkImportWorker.drain
+              BulkImportJob.drain
               expect(bulk_import.reload.file_errors.join).to match(/file extension/)
               expect(bulk_import.organization_for_ascend_name&.id).to eq current_organization.id
               expect(bulk_import.organization_id).to eq current_organization.id
-              expect(UnknownOrganizationForAscendImportWorker.jobs.count).to eq 0 # have_enqueued_sidekiq_job(bulk_import.id)
-              expect(InvalidExtensionForAscendImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              expect(UnknownOrganizationForAscendImportJob.jobs.count).to eq 0 # have_enqueued_sidekiq_job(bulk_import.id)
+              expect(InvalidExtensionForAscendImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
               expect(ActionMailer::Base.deliveries.empty?).to be_truthy
               # Test errors are processed correctly
-              UnknownOrganizationForAscendImportWorker.drain
-              InvalidExtensionForAscendImportWorker.drain
+              UnknownOrganizationForAscendImportJob.drain
+              InvalidExtensionForAscendImportJob.drain
               expect(bulk_import.reload.file_errors).to be_an_instance_of(Array)
               expect(bulk_import.import_errors.keys).to match_array(%w[file file_lines bikes])
               expect(bulk_import.file_errors.join).to match(/file extension/)
@@ -424,7 +424,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.progress).to eq "finished"
               expect(bulk_import.blocking_error?).to be_truthy
 
-              UpdateOrganizationPosKindWorker.new.perform(current_organization.id)
+              UpdateOrganizationPosKindJob.new.perform(current_organization.id)
               expect(current_organization.reload.pos_kind).to eq "broken_ascend_pos"
             end
           end

@@ -134,7 +134,7 @@ RSpec.describe "Bikes API V2", type: :request do
       post "/api/v2/bikes?access_token=#{token.token}",
         params: bike_attrs.to_json,
         headers: json_headers
-      EmailOwnershipInvitationWorker.drain
+      EmailOwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
       expect(response.code).to eq("201")
       result = json_result["bike"]
@@ -163,7 +163,7 @@ RSpec.describe "Bikes API V2", type: :request do
       post "/api/v2/bikes?access_token=#{token.token}",
         params: bike_attrs.merge(no_notify: true).to_json,
         headers: json_headers
-      EmailOwnershipInvitationWorker.drain
+      EmailOwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries).to eq([])
       expect(response.code).to eq("201")
     end
@@ -173,7 +173,7 @@ RSpec.describe "Bikes API V2", type: :request do
       post "/api/v2/bikes?access_token=#{token.token}",
         params: bike_attrs.merge(test: true).to_json,
         headers: json_headers
-      EmailOwnershipInvitationWorker.drain
+      EmailOwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 0
       expect(response.code).to eq("201")
       result = json_result["bike"]
@@ -213,7 +213,7 @@ RSpec.describe "Bikes API V2", type: :request do
         post "/api/v2/bikes?access_token=#{token.token}",
           params: bike_attrs.to_json,
           headers: json_headers
-      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      }.to change(EmailOwnershipInvitationJob.jobs, :size).by(1)
       result = json_result
       expect(result).to include("bike")
       expect(result["bike"]["serial"]).to eq(bike_attrs[:serial].upcase)
@@ -549,7 +549,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.reload.status).to eq "status_stolen"
       expect {
         post url, params: params.to_json, headers: json_headers
-      }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+      }.to change(EmailStolenNotificationJob.jobs, :size).by(1)
       expect(response.code).to eq("201")
     end
   end

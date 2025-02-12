@@ -66,11 +66,11 @@ class PublicImage < ApplicationRecord
 
   def enqueue_after_commit_jobs
     if external_image_url.present? && image.blank?
-      return ExternalImageUrlStoreWorker.perform_async(id)
+      return ExternalImageUrlStoreJob.perform_async(id)
     end
     imageable&.update(updated_at: Time.current)
     return true unless bike?
-    AfterBikeSaveWorker.perform_async(imageable_id, false, true)
+    AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 
   # Because the way we load the file is different if it's remote or local

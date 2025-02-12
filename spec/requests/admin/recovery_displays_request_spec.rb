@@ -64,7 +64,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
         expect do
           post base_url, params: {recovery_display: valid_attrs}
         end.to change(RecoveryDisplay, :count).by 1
-        Sidekiq::Worker.drain_all # Process the backgrounded image upload
+        Sidekiq::Job.drain_all # Process the backgrounded image upload
 
         recovery_display = RecoveryDisplay.last
         expect(recovery_display.quote).to eq valid_attrs[:quote]

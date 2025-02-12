@@ -46,7 +46,7 @@ class StolenNotification < ApplicationRecord
   enum :kind, KIND_ENUM
 
   def notify_receiver
-    EmailStolenNotificationWorker.perform_async(id)
+    EmailStolenNotificationJob.perform_async(id)
   end
 
   def permitted_send?

@@ -584,7 +584,7 @@ class Organization < ApplicationRecord
 
   def update_associations
     return true if skip_update
-    UpdateOrganizationAssociationsWorker.perform_async(id)
+    UpdateOrganizationAssociationsJob.perform_async(id)
   end
 
   private

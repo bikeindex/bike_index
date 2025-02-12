@@ -115,7 +115,7 @@ class BulkImport < ApplicationRecord
     update_attribute :import_errors, (import_errors || {}).merge(updated_file_error_data)
   end
 
-  # If the bulk import failed on a line, start after that line, otherwise it's 1. See BulkImportWorker
+  # If the bulk import failed on a line, start after that line, otherwise it's 1. See BulkImportJob
   def starting_line
     error_line = file_import_error_lines&.compact&.last
     error_line.present? ? error_line + 1 : 1
@@ -161,12 +161,12 @@ class BulkImport < ApplicationRecord
       save if organization_id.present?
     end
     if organization_id.present? && invalid_extension?
-      InvalidExtensionForAscendImportWorker.perform_async(id)
+      InvalidExtensionForAscendImportJob.perform_async(id)
     end
     return true if organization_id.present?
     add_ascend_import_error!
-    UnknownOrganizationForAscendImportWorker.perform_async(id)
-    false # must return false, otherwise BulkImportWorker enqueues processing
+    UnknownOrganizationForAscendImportJob.perform_async(id)
+    false # must return false, otherwise BulkImportJob enqueues processing
   end
 
   def organization_for_ascend_name

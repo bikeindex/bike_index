@@ -230,11 +230,11 @@ class User < ApplicationRecord
 
   # Performed inline
   def perform_create_jobs
-    AfterUserCreateWorker.new.perform(id, "new", user: self)
+    AfterUserCreateJob.new.perform(id, "new", user: self)
   end
 
   def perform_user_update_jobs
-    AfterUserChangeWorker.perform_async(id) if id.present? && !skip_update
+    AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
   end
 
   def superuser?(controller_name: nil, action_name: nil)
@@ -340,7 +340,7 @@ class User < ApplicationRecord
     return false if auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailResetPasswordWorker.perform_async(id)
+    EmailResetPasswordJob.perform_async(id)
     true
   end
 
@@ -349,7 +349,7 @@ class User < ApplicationRecord
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailMagicLoginLinkWorker.perform_async(id)
+    EmailMagicLoginLinkJob.perform_async(id)
   end
 
   def update_last_login(ip_address)
@@ -363,7 +363,7 @@ class User < ApplicationRecord
     self.confirmed = true
     save
     reload
-    AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
+    AfterUserCreateJob.new.perform(id, "confirmed", user: self)
     true
   end
 

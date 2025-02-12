@@ -67,7 +67,7 @@ RSpec.describe Organized::BikesController, type: :request do
       end
       context "directly create export", :flaky do
         it "directly creates" do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
           }.to change(Export, :count).by 1
@@ -78,7 +78,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(export.custom_bike_ids).to match_array([bike.id, bike2.id])
           expect(export.user_id).to eq current_user.id
           expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
-          expect(OrganizationExportWorker.jobs.count).to eq 1
+          expect(OrganizationExportJob.jobs.count).to eq 1
         end
       end
     end
@@ -211,7 +211,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(current_organization.auto_user).to eq current_user
         expect(current_organization.public_impound_bikes?).to be_falsey
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
@@ -221,7 +221,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end
         # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-        ImageAssociatorWorker.new.perform
+        ImageAssociatorJob.new.perform
 
         b_param.reload
         expect(b_param.creation_organization).to eq current_organization

@@ -53,7 +53,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.kind).to eq "donation"
         expect(payment.amount_cents).to eq 0
         VCR.use_cassette("payments_controller-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           expect(Notification.count).to eq 0
           Sidekiq::Testing.inline! do
@@ -86,7 +86,7 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.paid?).to be_falsey
           expect(payment.amount_cents).to eq 0
           VCR.use_cassette("payments_controller-success-customer", match_requests_on: [:method], re_record_interval: re_record_interval) do
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             ActionMailer::Base.deliveries = []
             expect(Notification.count).to eq 0
             Sidekiq::Testing.inline! do
@@ -114,7 +114,7 @@ RSpec.describe PaymentsController, type: :request do
   describe "create" do
     it "makes a onetime payment" do
       VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:method], re_record_interval: re_record_interval) do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(Notification.count).to eq 0
         Sidekiq::Testing.inline! do

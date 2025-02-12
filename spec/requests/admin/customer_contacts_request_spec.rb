@@ -18,7 +18,7 @@ RSpec.describe Admin::CustomerContactsController, type: :request do
       }
       expect {
         post base_url, params: {customer_contact: customer_contact}
-      }.to change(EmailAdminContactStolenWorker.jobs, :size).by(1)
+      }.to change(EmailAdminContactStolenJob.jobs, :size).by(1)
       expect(response).to redirect_to edit_admin_stolen_bike_url(stolen_record.bike.id)
     end
   end

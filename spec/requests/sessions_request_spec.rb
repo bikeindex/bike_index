@@ -6,7 +6,7 @@ RSpec.describe SessionsController, type: :request do
     it "sends the magic link" do
       expect(current_user.magic_link_token).to be_nil
       ActionMailer::Base.deliveries = []
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         post "/session/create_magic_link", params: {email: " #{current_user.email} "}
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -19,7 +19,7 @@ RSpec.describe SessionsController, type: :request do
     context "unknown email" do
       it "redirects to login" do
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           post "/session/create_magic_link", params: {email: "something@stuff.bike"}
           expect(flash[:error]).to be_present
@@ -32,7 +32,7 @@ RSpec.describe SessionsController, type: :request do
       let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "party.edu", available_invitation_count: 1) }
       it "autogenerates" do
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           # Just throw this in here because we don't have anywhere else that tests signup with passwordless_user_domain present...
           expect { post "/session/create_magic_link", params: {email: "somethingcool@ party.edu"} }.to_not change(User, :count)

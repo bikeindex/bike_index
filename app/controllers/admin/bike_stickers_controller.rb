@@ -29,7 +29,7 @@ class Admin::BikeStickersController < Admin::BaseController
     create_batch_if_valid!
     if @bike_sticker_batch.id.present?
       flash[:success] = "Batch ##{@bike_sticker_batch.id} created. Please wait a few minutes for the stickers to finish creating"
-      CreateBikeStickerCodesWorker.perform_async(@bike_sticker_batch.id,
+      CreateBikeStickerCodesJob.perform_async(@bike_sticker_batch.id,
         @bike_sticker_batch.stickers_to_create_count, @bike_sticker_batch.initial_code_integer)
       redirect_to admin_bike_stickers_path(search_bike_sticker_batch_id: @bike_sticker_batch.id)
     else
@@ -48,7 +48,7 @@ class Admin::BikeStickersController < Admin::BaseController
       params[:search_bike_sticker_batch_id].present?
     # update if possible
     if @valid_selection && InputNormalizer.boolean(params[:reassign_now])
-      AdminReassignBikeStickerCodesWorker.perform_async(current_user.id,
+      AdminReassignBikeStickerCodesJob.perform_async(current_user.id,
         current_organization.id,
         @bike_sticker_batch.id,
         @bike_sticker1&.id,
