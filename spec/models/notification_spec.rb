@@ -16,8 +16,8 @@ RSpec.describe Notification, type: :model do
     let!(:notification1) { FactoryBot.create(:notification, user: user) }
     it "gets from and by" do
       expect {
-        EmailStolenNotificationWorker.new.perform(stolen_notification.id)
-        EmailStolenNotificationWorker.new.perform(stolen_notification.id, true)
+        EmailStolenNotificationJob.new.perform(stolen_notification.id)
+        EmailStolenNotificationJob.new.perform(stolen_notification.id, true)
       }.to change(Notification, :count).by 2
 
       expect(Notification.pluck(:kind)).to match_array(%w[confirmation_email stolen_notification_sent stolen_notification_blocked])

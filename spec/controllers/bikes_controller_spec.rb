@@ -389,11 +389,11 @@ RSpec.describe BikesController, type: :controller do
         include_context :test_csrf_token
         it "permits" do
           expect(user).to be_present
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             post :create, params: {bike: bike_params}
           }.to change(Ownership, :count).by 1
-          Sidekiq::Worker.drain_all
+          Sidekiq::Job.drain_all
           expect(ActionMailer::Base.deliveries.count).to eq 1
           bike = Bike.reorder(:created_at).last
           expect(bike.country.name).to eq("United States")
@@ -557,7 +557,7 @@ RSpec.describe BikesController, type: :controller do
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-            ImageAssociatorWorker.new.perform
+            ImageAssociatorJob.new.perform
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.current_ownership.origin).to eq "embed_extended"
@@ -842,7 +842,7 @@ RSpec.describe BikesController, type: :controller do
           before do
             bike.reload
             ActionMailer::Base.deliveries = []
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             Sidekiq::Testing.inline!
           end
           after { Sidekiq::Testing.fake! }

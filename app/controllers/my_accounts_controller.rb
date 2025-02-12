@@ -46,7 +46,7 @@ class MyAccountsController < ApplicationController
 
   def destroy
     if current_user.deletable?
-      UserDeleteWorker.new.perform(current_user.id, user: current_user)
+      UserDeleteJob.new.perform(current_user.id, user: current_user)
       remove_session
       redirect_to goodbye_url, notice: "Account deleted!"
     else
@@ -107,7 +107,7 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeWorker
+    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeJob
     @user
   end
 

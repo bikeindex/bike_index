@@ -28,7 +28,7 @@ class Admin::BikesController < Admin::BaseController
       end
       # Needs to happen after the manufacturer has been assigned
       Bike.unscoped.where(id: bike_ids).distinct.pluck(:model_audit_id)
-        .each { |i| UpdateModelAuditWorker.perform_async(i) }
+        .each { |i| UpdateModelAuditJob.perform_async(i) }
       flash[:success] = "Success. #{bike_ids.count} Bikes updated"
     else
       flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
@@ -65,7 +65,7 @@ class Admin::BikesController < Admin::BaseController
       if bike_ids.any?
         bike_ids.each do |id|
           Bike.unscoped.find(id).destroy!
-          AfterBikeSaveWorker.perform_async(id)
+          AfterBikeSaveJob.perform_async(id)
         end
         # Lazy pluralize hack
         flash[:success] = "#{bike_ids.count} #{(bike_ids.count == 1) ? "bike" : "bikes"} deleted!"
@@ -140,7 +140,7 @@ class Admin::BikesController < Admin::BaseController
   def destroy_bike
     find_bike
     @bike.destroy
-    AfterBikeSaveWorker.perform_async(@bike.id)
+    AfterBikeSaveJob.perform_async(@bike.id)
     flash[:success] = "Bike deleted!"
     redirect_to admin_bikes_url
   end

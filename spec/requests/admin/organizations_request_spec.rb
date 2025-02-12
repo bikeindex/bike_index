@@ -135,12 +135,12 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
     it "updates the organization" do
       expect(location1).to be_present
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         put "#{base_url}/#{organization.to_param}", params: {organization_id: organization.to_param, organization: update}
       }.to change(Location, :count).by 1
-      expect(UpdateOrganizationPosKindWorker.jobs.count).to eq 1
-      UpdateOrganizationPosKindWorker.drain # Run the jobs in the queue
+      expect(UpdateOrganizationPosKindJob.jobs.count).to eq 1
+      UpdateOrganizationPosKindJob.drain # Run the jobs in the queue
       organization.reload
       expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update[:name]
@@ -168,7 +168,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "updates the organization" do
         expect {
           put "#{base_url}/#{organization.to_param}", params: {organization: {manual_pos_kind: "not_set", lightspeed_register_with_phone: "0"}}
-        }.to change(UpdateOrganizationPosKindWorker.jobs, :count).by 1
+        }.to change(UpdateOrganizationPosKindJob.jobs, :count).by 1
         organization.reload
         expect(organization.manual_pos_kind).to be_blank
         expect(organization.lightspeed_register_with_phone).to be_falsey
@@ -281,7 +281,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "updates and doesn't enqueue worker" do
         expect {
           put "#{base_url}/#{organization.to_param}", params: {organization: {name: "new name", short_name: "something else"}}
-        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         organization.reload
         expect(organization.name).to eq "new name"
         expect(organization.short_name).to eq "something else"

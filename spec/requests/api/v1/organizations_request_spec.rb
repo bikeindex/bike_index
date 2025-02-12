@@ -82,7 +82,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
     it "updates the manual POS kind for the organization" do
       expect {
         put "#{base_url}/#{organization.to_param}", params: update_params.to_json, headers: json_headers
-      }.to change(UpdateOrganizationPosKindWorker.jobs, :count).by(1)
+      }.to change(UpdateOrganizationPosKindJob.jobs, :count).by(1)
       expect(response.code).to eq("200")
       expect(json_result).to eq target.as_json
       organization.reload
@@ -97,7 +97,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
         expect(organization.updated_at).to be_within(1).of updated_at
         expect {
           put "#{base_url}/#{organization.to_param}", params: update_params.to_json, headers: json_headers
-        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         expect(response.code).to eq("200")
         expect(json_result).to eq target.as_json
         organization.reload
@@ -107,7 +107,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
     context "broken pos" do
       include_context :test_csrf_token
       it "updates" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect(organization).to be_present
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "broken_lightspeed_pos").to_json,
@@ -130,7 +130,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
         expect {
           put "#{base_url}/#{organization.id}", params: update_params.merge(organization_id: organization.id, manual_pos_kind: "no_pos").to_json,
             headers: json_headers
-        }.to change(UpdateOrganizationPosKindWorker.jobs, :count).by(1)
+        }.to change(UpdateOrganizationPosKindJob.jobs, :count).by(1)
         expect(response.code).to eq("200")
         expect(json_result).to eq target_with_no_pos.as_json
         organization.reload
@@ -141,7 +141,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
       it "406s" do
         expect {
           put "#{base_url}/#{organization.to_param}", params: update_params.merge(manual_pos_kind: "party").to_json, headers: json_headers
-        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         expect(response.code).to eq("406")
         organization.reload
         expect(organization.manual_pos_kind).to be_blank
@@ -151,7 +151,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
       it "404s" do
         expect {
           put "#{base_url}/32891838283", params: {manual_pos_kind: "lightspeed_pos", access_token: "xxxxx"}.to_json, headers: json_headers
-        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         redirect_to(api_v1_not_found_url)
       end
     end
@@ -159,7 +159,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
       it "401s" do
         expect {
           put "#{base_url}/#{organization.to_param}", params: update_params.merge(access_token: "vvvvvvvvv").to_json, headers: json_headers
-        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         expect(response.code).to eq("401")
         organization.reload
         expect(organization.manual_pos_kind).to be_blank

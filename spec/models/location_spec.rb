@@ -59,11 +59,11 @@ RSpec.describe Location, type: :model do
       expect(location.not_publicly_visible).to be_falsey
       expect(location.destroy_forbidden?).to be_falsey
       organization.reload
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         organization.update(approved: true, skip_update: false)
-      }.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
-      UpdateOrganizationAssociationsWorker.drain
+      }.to change(UpdateOrganizationAssociationsJob.jobs, :count).by 1
+      UpdateOrganizationAssociationsJob.drain
       location.reload
       expect(location.shown).to be_truthy
       location.update(publicly_visible: false)
@@ -79,11 +79,11 @@ RSpec.describe Location, type: :model do
     it "sets the impound_bikes_locations on organization setting" do
       expect(organization.default_impound_location).to be_blank
       expect(organization.enabled_feature_slugs).to eq(["impound_bikes"])
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         location.update(impound_location: true)
-      }.to change(UpdateOrganizationAssociationsWorker.jobs, :count).by 1
-      UpdateOrganizationAssociationsWorker.drain
+      }.to change(UpdateOrganizationAssociationsJob.jobs, :count).by 1
+      UpdateOrganizationAssociationsJob.drain
       location.reload
       expect(location.default_impound_location).to be_truthy
       organization.reload

@@ -68,7 +68,7 @@ class BikeCreator
     bike
   end
 
-  # Called from ImageAssociatorWorker, so can't be private
+  # Called from ImageAssociatorJob, so can't be private
   def attach_photo(b_param, bike)
     return true unless b_param.image.present?
     public_image = PublicImage.new(image: b_param.image)
@@ -144,11 +144,11 @@ class BikeCreator
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)
     return bike unless bike.present? && bike.id.present?
-    # NOTE: spaminess is recalculated in EmailOwnershipInvitationWorker as a failsafe
+    # NOTE: spaminess is recalculated in EmailOwnershipInvitationJob as a failsafe
     if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
       bike.update(likely_spam: true)
     end
-    AfterBikeSaveWorker.perform_async(bike.id)
+    AfterBikeSaveJob.perform_async(bike.id)
     if b_param.bike_sticker_code.present? && bike.creation_organization.present?
       bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,

@@ -105,7 +105,7 @@ class Bike < ApplicationRecord
   acts_as_paranoid without_default_scope: true
 
   mount_uploader :pdf, PdfUploader
-  process_in_background :pdf, CarrierWaveProcessWorker
+  process_in_background :pdf, CarrierWaveProcessJob
 
   STATUS_ENUM = {
     status_with_owner: 0,
@@ -891,7 +891,7 @@ class Bike < ApplicationRecord
   end
 
   def enqueue_duplicate_bike_finder_worker
-    DuplicateBikeFinderWorker.perform_async(id)
+    DuplicateBikeFinderJob.perform_async(id)
   end
 
   private

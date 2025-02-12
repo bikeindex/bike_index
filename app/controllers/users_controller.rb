@@ -35,7 +35,7 @@ class UsersController < ApplicationController
     user_subject = unconfirmed_current_user
     user_subject ||= User.unconfirmed.fuzzy_unconfirmed_primary_email_find(params[:email])
     if user_subject.present?
-      EmailConfirmationWorker.new.perform(user_subject.id)
+      EmailConfirmationJob.new.perform(user_subject.id)
       flash[:success] = translation(:resending_email)
     else
       flash[:error] = translation(:please_sign_in)

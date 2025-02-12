@@ -34,7 +34,7 @@ module Organized
       return unless ensure_can_create_import!
       @bulk_import = BulkImport.new(permitted_parameters)
       if @bulk_import.save
-        BulkImportWorker.perform_async(@bulk_import.id)
+        BulkImportJob.perform_async(@bulk_import.id)
         if @is_api
           render json: {success: translation(:file_imported)}, status: 201
         else

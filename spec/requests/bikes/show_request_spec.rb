@@ -150,16 +150,16 @@ RSpec.describe "BikesController#show", type: :request do
       stolen_record.update_attribute :recovery_link_token, nil
       expect(stolen_record.reload.alert_image).to be_blank
       expect(stolen_record.recovery_link_token).to be_blank
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         get "#{base_url}/#{bike.id}"
         expect(assigns(:bike).id).to eq bike.id
         expect(response).to render_template(:show)
-      }.to change(AfterStolenRecordSaveWorker.jobs, :count).by 1
+      }.to change(AfterStolenRecordSaveJob.jobs, :count).by 1
       expect(stolen_record.reload.alert_image).to be_blank
       expect {
-        AfterStolenRecordSaveWorker.new.perform(stolen_record.id)
-      }.to change(AfterStolenRecordSaveWorker.jobs, :count).by 0
+        AfterStolenRecordSaveJob.new.perform(stolen_record.id)
+      }.to change(AfterStolenRecordSaveJob.jobs, :count).by 0
       expect(stolen_record.reload.alert_image).to be_present
       expect(stolen_record.recovery_link_token).to be_present
     end
@@ -453,7 +453,7 @@ RSpec.describe "BikesController#show", type: :request do
     context "abandoned as well" do
       let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
       it "renders" do
-        ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+        ProcessParkingNotificationJob.new.perform(parking_notification_abandoned.id)
         expect(parking_notification.reload.status).to eq "replaced"
         expect(parking_notification.active?).to be_truthy
         expect(parking_notification.resolved?).to be_falsey
@@ -464,7 +464,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(assigns(:token)).to eq parking_notification.retrieval_link_token
         expect(assigns(:matching_notification)&.id).to eq parking_notification.id
         # And then resolve that token, to test it works as well
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
           expect(flash[:success]).to be_present
@@ -481,7 +481,7 @@ RSpec.describe "BikesController#show", type: :request do
     context "impound notification" do
       let!(:parking_notification_impounded) { parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification", user: creator) }
       it "renders" do
-        ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
+        ProcessParkingNotificationJob.new.perform(parking_notification_impounded.id)
         parking_notification.reload
         expect(parking_notification.current?).to be_falsey
         expect(parking_notification.resolved?).to be_truthy

@@ -67,7 +67,7 @@ RSpec.describe FileCacheMaintainer do
     it "deletes the file" do
       FactoryBot.create(:stolen_bike)
       FileCacheMaintainer.reset_file_info("1456863086_all_stolen_cache.json", 1456863086)
-      FileCacheMaintenanceWorker.new.perform
+      FileCacheMaintenanceJob.new.perform
       files_count = FileCacheMaintainer.files.count
       cached_all_stolen = FileCacheMaintainer.cached_all_stolen
       expect(Dir["spec/fixtures/tsv_creation/*"].join).to match(cached_all_stolen["filename"])

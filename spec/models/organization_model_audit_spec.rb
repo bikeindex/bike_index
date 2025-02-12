@@ -34,11 +34,11 @@ RSpec.describe OrganizationModelAudit, type: :model do
         expect(organization_model_attestation.replaced).to be_falsey
         expect(model_audit.reload.send(:calculated_certification_status)).to eq "uncertified_by_trusted_org"
         # And replace it
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           FactoryBot.create(:model_attestation, model_audit: model_audit, kind: :certified_by_trusted_org, organization: organization)
-        }.to change(UpdateModelAuditWorker.jobs, :count).by 1
-        UpdateModelAuditWorker.drain
+        }.to change(UpdateModelAuditJob.jobs, :count).by 1
+        UpdateModelAuditJob.drain
         expect(organization_model_audit.reload.certification_status).to eq "certified_by_your_org"
         expect(model_audit.reload.certification_status).to eq "certified_by_trusted_org"
         expect(organization_model_attestation.reload.replaced).to be_truthy

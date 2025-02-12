@@ -150,7 +150,7 @@ RSpec.describe "BikesController#create", type: :request do
           # This is also where we're testing bikebook assignment
           expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             Sidekiq::Testing.inline! do
               # Test that we can still pass show_address - because API backward compatibility
@@ -310,7 +310,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
         expect(current_user.organization_roles.pluck(:id)).to eq([]) # sanity check
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {
@@ -362,7 +362,7 @@ RSpec.describe "BikesController#create", type: :request do
     end
     context "no address passed" do
       it "does not have address, has association" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {bike: bike_params.merge(cycle_type: "non-e-scooter")}
