@@ -26,18 +26,23 @@ class StripeSubscription < ApplicationRecord
   belongs_to :user
   belongs_to :stripe_price
 
+  delegate :membership_kind, to: :stripe_price, allow_nil: true
+
   def update_membership!
-    if active?
-      if user_current_membership.admin_managed?
-        # end the membership, start a new membership here
-      end
-    else
-    end
+    return unless active?
+
+    end_active_user_admin_membership! if active? && user.membership_active&.admin_managed?
+
+    membership ||= user.membership_active || Membership.new(user_id:)
+    membership.update!(start_at:, end_at:, kind: membership_kind)
+    update(membership_id: membership.id) if membership_id != membership.id
+    membership
   end
 
   private
 
-  def fetch_membership
-
+  def end_active_user_admin_membership!
+    user.membership_active.update(end_at: start_at || Time.current)
+    user.reload
   end
 end
