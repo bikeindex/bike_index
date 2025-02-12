@@ -203,7 +203,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification.organization).to eq current_organization
         expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
         expect(parking_notification.location_from_address).to be_falsey
-        expect(ProcessParkingNotificationWorker.jobs.count).to eq 1
+        expect(ProcessParkingNotificationJob.jobs.count).to eq 1
 
         bike.reload
         expect(bike.status).to eq "status_abandoned"
@@ -220,7 +220,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(current_organization.enabled?("parking_notifications")).to be_truthy
           bike.reload
           expect(bike.status).to eq "status_with_owner"
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             expect {
@@ -276,7 +276,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
         include_context :geocoder_real
         it "creates", vcr: true do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           bike.reload
           expect(bike.status).to eq "status_with_owner"
           ActionMailer::Base.deliveries = []
@@ -339,7 +339,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       expect(parking_notification_initial.current?).to be_truthy
       expect(parking_notification_initial.user).to_not eq current_user
       expect(ParkingNotification.count).to eq 1
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
         post base_url, params: {
@@ -380,7 +380,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification_initial.current?).to be_truthy
         expect(parking_notification_initial.user).to_not eq current_user
         expect(ParkingNotification.count).to eq 1
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           post base_url, params: {
@@ -407,7 +407,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       context "multiple parking notifications" do
         let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization, delivery_status: "email_success") }
         it "marks both retrieved" do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post base_url, params: {
@@ -461,7 +461,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           kind: "parked_incorrectly_notification")
       end
 
-      before { ProcessParkingNotificationWorker.new.perform(parking_notification2.id) }
+      before { ProcessParkingNotificationJob.new.perform(parking_notification2.id) }
 
       def expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
         expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([])
@@ -497,7 +497,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         bike.reload
         expect(bike.status).to eq "status_with_owner"
         expect(ParkingNotification.count).to eq 2
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           post base_url, params: {
@@ -516,7 +516,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           parking_notification2.reload
           parking_notification_initial.reload
           expect(parking_notification2.current?).to be_truthy
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post base_url, params: {
@@ -542,7 +542,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification2.current?).to be_truthy
         expect(parking_notification2.user).to_not eq current_user
         expect(current_organization.parking_notifications.active.pluck(:id)).to match_array([parking_notification_initial.id, parking_notification2.id])
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect {
           post base_url, params: {
@@ -550,8 +550,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             kind: "impound_notification",
             ids: "#{parking_notification_initial.id}, #{parking_notification2.id}"
           }
-        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 2
-        ProcessParkingNotificationWorker.drain
+        }.to change(ProcessParkingNotificationJob.jobs, :count).by 2
+        ProcessParkingNotificationJob.drain
         expect(ParkingNotification.count).to eq 4
         expect(ActionMailer::Base.deliveries.count).to eq 2
 

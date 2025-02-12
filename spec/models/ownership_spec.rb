@@ -57,11 +57,11 @@ RSpec.describe Ownership, type: :model do
     let!(:ownership2) { FactoryBot.create(:ownership, bike: bike) }
     it "marks existing ownerships as not current" do
       ownership2.reload
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         bike.ownerships.create(creator: ownership2.creator,
           owner_email: "s@s.com")
-      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      }.to change(EmailOwnershipInvitationJob.jobs, :size).by(1)
       expect(bike.ownerships.count).to eq 3
       expect(bike.reload.send(:calculated_current_ownership)&.id).to be > ownership2.id
       expect(ownership1.reload.current).to be_falsey
@@ -210,10 +210,10 @@ RSpec.describe Ownership, type: :model do
         expect(ownership2.origin).to eq "transferred_ownership"
         expect(ownership2.claim_message).to eq "transferred_registration"
 
-        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         expect(bike.reload.status).to eq "status_impounded"
         FactoryBot.create(:impound_record_update, impound_record: impound_record, kind: "transferred_to_new_owner", transfer_email: new_email)
-        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         ownership3 = impound_record.reload.ownership
         expect(ownership3.previous_ownership_id).to eq ownership2.id
         expect(ownership3.origin).to eq "impound_process"

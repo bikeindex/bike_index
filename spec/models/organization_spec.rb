@@ -105,7 +105,7 @@ RSpec.describe Organization, type: :model do
       VCR.use_cassette("organizations-nearby_organizations", match_requests_on: [:path]) do
         invoice.update(organization_feature_ids: [organization_feature.id], child_enabled_feature_slugs_string: "regional_bike_counts, child_organizations")
         expect([location_parent, location_child1, location_child2, location_child3, location_shop].size).to eq 5
-        UpdateOrganizationAssociationsWorker.new.perform(organization_ids)
+        UpdateOrganizationAssociationsJob.new.perform(organization_ids)
         organization_parent.reload && organization_child1.reload && organization_child2.reload && organization_child3.reload && organization_shop.reload
 
         expect(organization_child1.enabled_feature_slugs).to match_array(%w[child_organizations regional_bike_counts])
@@ -355,7 +355,7 @@ RSpec.describe Organization, type: :model do
       invoice.update(child_enabled_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(%w[child_organizations csv_exports])
 
-      expect { organization.save }.to change { UpdateOrganizationAssociationsWorker.jobs.count }.by(1)
+      expect { organization.save }.to change { UpdateOrganizationAssociationsJob.jobs.count }.by(1)
 
       expect(organization.is_paid).to be_truthy
       expect(organization.enabled_feature_slugs).to eq(["child_organizations", "csv_exports"])

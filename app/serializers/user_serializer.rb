@@ -3,7 +3,7 @@ class UserSerializer < ApplicationSerializer
 
   def memberships
     ActiveModel::ArraySerializer.new(object.organization_roles,
-      each_serializer: MembershipSerializer,
+      each_serializer: OrganizationRoleSerializer,
       root: false).as_json
   end
 

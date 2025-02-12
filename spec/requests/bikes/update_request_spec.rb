@@ -52,7 +52,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.address_set_manually).to be_falsey
       expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
       VCR.use_cassette("bike_request-set_manual_address") do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           patch base_url, params: {bike: update}
         end
@@ -77,7 +77,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.to_coordinates).to eq([nil, nil])
 
         VCR.use_cassette("bike_request-set_manual_address") do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             patch base_url, params: {bike: update}
           end
@@ -99,9 +99,9 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.status_stolen?).to be_falsey
       expect(bike.claimed?).to be_falsey
       expect(bike.authorized?(current_user)).to be_truthy
-      AfterUserChangeWorker.new.perform(current_user.id)
+      AfterUserChangeJob.new.perform(current_user.id)
       expect(current_user.reload.alert_slugs).to eq([])
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         patch base_url, params: {
           edit_template: "report_stolen", bike: {date_stolen: Time.current.to_i}
@@ -165,7 +165,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.status_stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
         expect(bike.user&.id).to eq current_user.id
-        AfterUserChangeWorker.new.perform(current_user.id)
+        AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq([])
         expect(current_user.address).to eq "278 Broadway, New York, 10007, US"
         expect(current_user.address_set_manually).to be_truthy
@@ -173,7 +173,7 @@ RSpec.describe "BikesController#update", type: :request do
         # Someone surprising, but I think I'm happy with the outcome - it should be set by user
         bike.reload.update(updated_at: Time.current)
         expect(bike.reload.address_set_manually).to be_falsey
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           # get edit because it should claim the bike
           get "#{base_url}/edit"
@@ -231,14 +231,14 @@ RSpec.describe "BikesController#update", type: :request do
       expect(ownership1.organization_pre_registration).to be_truthy
       expect(ownership1.status).to eq "unregistered_parking_notification"
       expect(ownership1.origin).to eq "creator_unregistered_parking_notification"
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         patch base_url, params: {
           bike: {owner_email: "newuser@example.com"}
         }
         expect(flash[:success]).to be_present
       }.to change(Ownership, :count).by 1
-      Sidekiq::Worker.drain_all
+      Sidekiq::Job.drain_all
       expect(bike.reload.ownerships.count).to eq 2
       expect(ownership1.reload.user_hidden).to be_falsey # Meh, maybe not ideal? But convenient
       expect(ownership1.current).to be_falsey
@@ -281,7 +281,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.user_hidden).to be_truthy
         expect(bike.ownerships.count).to eq 1
         expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           patch base_url, params: {bike: {description: "sooo cool and stuff"}}
           expect(flash[:success]).to be_present
@@ -350,10 +350,10 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_users).to be_truthy
         expect(stolen_record.phone_for_shops).to be_truthy
         expect(stolen_record.phone_for_police).to be_truthy
-        AfterUserChangeWorker.new.perform(current_user.id)
+        AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
         current_user.update_column :updated_at, Time.current - 5.minutes
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           patch base_url, params: {
             bike: {stolen: "true", stolen_records_attributes: {"0" => stolen_params}}

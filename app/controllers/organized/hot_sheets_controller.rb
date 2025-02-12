@@ -18,7 +18,7 @@ module Organized
       if @hot_sheet_configuration.update(permitted_parameters)
         flash[:success] = "Hot Sheet configuration updated"
         if @hot_sheet_configuration.send_today_now?
-          ProcessHotSheetWorker.perform_async(current_organization.id)
+          ProcessHotSheetJob.perform_async(current_organization.id)
         end
         redirect_back(fallback_location: organization_root_url)
       else

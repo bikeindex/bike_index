@@ -15,12 +15,12 @@ RSpec.describe Admin::MailchimpValuesController, type: :request do
 
   describe "create" do
     it "updates all of them" do
-      Sidekiq::Worker.clear_all
-      expect(UpdateMailchimpValuesWorker.jobs.count).to eq 0
+      Sidekiq::Job.clear_all
+      expect(UpdateMailchimpValuesJob.jobs.count).to eq 0
       post base_url
       expect(response).to redirect_to admin_mailchimp_values_path
       expect(flash[:success]).to be_present
-      expect(UpdateMailchimpValuesWorker.jobs.count).to eq 1
+      expect(UpdateMailchimpValuesJob.jobs.count).to eq 1
     end
   end
 end

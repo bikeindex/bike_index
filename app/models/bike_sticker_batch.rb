@@ -33,7 +33,7 @@ class BikeStickerBatch < ApplicationRecord
     bike_stickers.maximum(:code_integer) || 0
   end
 
-  # Should be called through CreateBikeStickerCodesWorker generally
+  # Should be called through CreateBikeStickerCodesJob generally
   def create_codes(number_to_create, initial_code_integer: nil, kind: "sticker")
     raise "Prefix required to create sequential codes!" unless prefix.present?
     initial_code_integer ||= max_code_integer

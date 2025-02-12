@@ -113,6 +113,6 @@ class CustomerContact < ApplicationRecord
   end
 
   def create_notification
-    CustomerContactNotificationCreateWorker.perform_async(id)
+    CustomerContactNotificationCreateJob.perform_async(id)
   end
 end

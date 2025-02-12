@@ -313,13 +313,13 @@ RSpec.describe BikesController, type: :request do
       context "abandoned as well" do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "recovers both" do
-          ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+          ProcessParkingNotificationJob.new.perform(parking_notification_abandoned.id)
           expect(parking_notification_abandoned.reload.status).to eq "current"
           parking_notification.reload
           expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
             expect(response).to redirect_to(bike_path(bike.id))
@@ -343,12 +343,12 @@ RSpec.describe BikesController, type: :request do
       context "impound notification" do
         let!(:parking_notification_impounded) { parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification", user: creator) }
         it "refuses" do
-          ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
+          ProcessParkingNotificationJob.new.perform(parking_notification_impounded.id)
           parking_notification.reload
           expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.active?).to be_falsey
           expect(bike.reload.status).to eq "status_impounded"
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
             expect(response).to redirect_to(bike_path(bike.id))

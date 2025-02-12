@@ -90,9 +90,9 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         it "enqueues the activate_theft_alert job" do
           expect(theft_alert.reload.activating_at).to be_blank
           expect(theft_alert.activating?).to be_falsey
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           patch "/admin/theft_alerts/#{theft_alert.id}", params: {activate_theft_alert: 1}
-          expect(ActivateTheftAlertWorker.jobs.count).to eq 1
+          expect(ActivateTheftAlertJob.jobs.count).to eq 1
           expect(theft_alert.reload.activating_at).to be_present
           expect(theft_alert.activating?).to be_truthy
         end
@@ -100,9 +100,9 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       context "update_theft_alert" do
         it "enqueues the job" do
           expect(theft_alert.reload.activating_at).to be_blank
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           patch "/admin/theft_alerts/#{theft_alert.id}", params: {update_theft_alert: true}
-          # expect(UpdateTheftAlertFacebookWorker.jobs.count).to eq 1
+          # expect(UpdateTheftAlertFacebookJob.jobs.count).to eq 1
           expect(theft_alert.reload.activating_at).to be_blank
         end
       end
@@ -125,7 +125,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
     describe "create" do
       let!(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }
       it "creates and activates" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect do
           post "/admin/theft_alerts",
             params: {
@@ -148,12 +148,12 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(theft_alert.notes).to eq "Some notes"
         expect(theft_alert.status).to eq "pending"
         expect(theft_alert.activateable?).to be_truthy
-        expect(ActivateTheftAlertWorker.jobs.count).to eq 1
+        expect(ActivateTheftAlertJob.jobs.count).to eq 1
       end
       context "not activateable" do
         let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver) }
         it "does not activate" do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect(stolen_record.reload.approved?).to be_falsey
           expect do
             post "/admin/theft_alerts",
@@ -178,7 +178,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           expect(theft_alert.status).to eq "pending"
           expect(theft_alert.activateable?).to be_falsey
           expect(theft_alert.activating?).to be_falsey
-          expect(ActivateTheftAlertWorker.jobs.count).to eq 0
+          expect(ActivateTheftAlertJob.jobs.count).to eq 0
         end
       end
     end
