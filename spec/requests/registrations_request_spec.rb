@@ -189,7 +189,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(b_param.partial_registration?).to be_truthy
           expect(b_param.motorized?).to be_falsey
           expect(b_param.params["propulsion_type_motorized"]).to be_blank
-          expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+          expect(EmailPartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
           expect(assigns(:simple_header)).to be_truthy
         end
       end
@@ -213,7 +213,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(attrs).to match_hash_indifferently b_param
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.motorized?).to be_truthy
-          expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+          expect(EmailPartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
           expect(b_param.partial_registration?).to be_truthy
         end
 
@@ -228,7 +228,7 @@ RSpec.describe RegistrationsController, type: :request do
             expect(b_param.origin).to eq "embed_partial"
             expect(b_param.cycle_type).to eq "bike"
             expect(b_param.motorized?).to be_truthy
-            expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+            expect(EmailPartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
             expect(b_param.partial_registration?).to be_truthy
           end
         end

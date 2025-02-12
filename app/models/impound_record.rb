@@ -232,9 +232,9 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_associations
-    # We call this job inline in ProcessParkingNotificationWorker
+    # We call this job inline in ProcessParkingNotificationJob
     return true if skip_update || !persisted?
-    ProcessImpoundUpdatesWorker.perform_async(id)
+    ProcessImpoundUpdatesJob.perform_async(id)
   end
 
   def set_calculated_attributes

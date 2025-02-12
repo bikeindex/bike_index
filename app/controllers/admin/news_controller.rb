@@ -31,7 +31,7 @@ class Admin::NewsController < Admin::BaseController
       @blog.reload
 
       if @blog.listicles.present?
-        @blog.listicles.pluck(:id).each { |id| ListicleImageSizeWorker.perform_in(1.minutes, id) }
+        @blog.listicles.pluck(:id).each { |id| ListicleImageSizeJob.perform_in(1.minutes, id) }
       end
 
       flash[:success] = "#{@blog.info? ? "Info post" : "Blog"} saved!"

@@ -133,7 +133,7 @@ RSpec.describe API::V1::UsersController, type: :request do
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         expect {
           post "#{base_url}/send_request", params: serial_request
-        }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+        }.to change(EmailFeedbackNotificationJob.jobs, :size).by(0)
         expect(response.code).to eq("200")
         expect(bike.reload.serial_number).to eq("some new serial")
       end
@@ -220,7 +220,7 @@ RSpec.describe API::V1::UsersController, type: :request do
           bike.reload
           expect(bike.current_stolen_record).to eq stolen_record
 
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post "#{base_url}/send_request", params: recovery_request.as_json

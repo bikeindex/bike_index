@@ -108,7 +108,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(bike.current_stolen_record_id).to be_present
       expect(Payment.count).to eq 0
       expect(TheftAlert.count).to eq 0
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       ActionMailer::Base.deliveries = []
       expect(Notification.count).to eq 0
       Sidekiq::Testing.inline! do
@@ -134,7 +134,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
         expect(Payment.count).to eq 0
         expect(TheftAlert.count).to eq 0
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(Notification.count).to eq 0
 

@@ -305,7 +305,7 @@ RSpec.describe Organized::EmailsController, type: :request do
         end
         it "updates" do
           expect(current_organization.kind).to eq "bike_shop"
-          # exists because UpdateOrganizationAssociationsWorker, destroy to test a weird state
+          # exists because UpdateOrganizationAssociationsJob, destroy to test a weird state
           expect(organization_stolen_message).to be_present
           get "#{base_url}/organization_stolen_message/edit"
           expect(response.status).to eq(200)

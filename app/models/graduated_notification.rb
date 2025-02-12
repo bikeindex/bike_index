@@ -267,9 +267,9 @@ class GraduatedNotification < ApplicationRecord
 
   def mark_remaining!(marked_remaining_by_id: nil, skip_async: false)
     unless skip_async
-      MarkGraduatedNotificationRemainingWorker.perform_in(5, id, marked_remaining_by_id)
+      MarkGraduatedNotificationRemainingJob.perform_in(5, id, marked_remaining_by_id)
     end
-    MarkGraduatedNotificationRemainingWorker.new.perform(id, marked_remaining_by_id)
+    MarkGraduatedNotificationRemainingJob.new.perform(id, marked_remaining_by_id)
   end
 
   def set_calculated_attributes
@@ -298,7 +298,7 @@ class GraduatedNotification < ApplicationRecord
     if primary_notification? && associated_bike_ids_missing_notifications.any?
       # We haven't created all the relevant graduated notifications, create them before processing
       associated_bike_ids_missing_notifications.each do |b_id|
-        CreateGraduatedNotificationWorker.perform_async(organization_id, b_id)
+        CreateGraduatedNotificationJob.perform_async(organization_id, b_id)
       end
       return false
     end

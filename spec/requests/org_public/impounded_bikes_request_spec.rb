@@ -51,7 +51,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
     let!(:bike) { parking_notification.bike }
     it "renders, shows impounded bike" do
       expect(current_organization.public_impound_bikes?).to be_truthy
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         i = parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification")
         expect(i).to be_valid

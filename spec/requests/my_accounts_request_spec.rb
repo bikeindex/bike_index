@@ -88,25 +88,25 @@ RSpec.describe MyAccountsController, type: :request do
         context "with user_phone" do
           before { current_user.update_column :alert_slugs, ["phone_waiting_confirmation"] }
           it "renders with show_general_alert" do
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             expect {
               get base_url
               expect(response).to be_ok
               expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template("show")
-            }.to change(AfterUserChangeWorker.jobs, :count).by 0
+            }.to change(AfterUserChangeJob.jobs, :count).by 0
           end
           context "with phone_verification enabled" do
             before { Flipper.enable(:phone_verification) }
             it "renders with show_general_alert" do
-              Sidekiq::Worker.clear_all
+              Sidekiq::Job.clear_all
               expect {
                 get base_url
                 expect(response).to be_ok
                 expect(assigns(:show_general_alert)).to be_truthy
                 expect(response).to render_template("show")
-              }.to change(AfterUserChangeWorker.jobs, :count).by 1
-              AfterUserChangeWorker.drain
+              }.to change(AfterUserChangeJob.jobs, :count).by 1
+              AfterUserChangeJob.drain
               expect(current_user.reload.alert_slugs).to eq([])
             end
           end
@@ -182,7 +182,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.username).to eq "something"
         expect {
           patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
-        }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+        }.to change(AfterUserChangeJob.jobs, :size).by(1)
         expect(assigns(:edit_template)).to eq("sharing")
         current_user.reload
         expect(current_user.username).to eq("something")
@@ -193,7 +193,7 @@ RSpec.describe MyAccountsController, type: :request do
       expect(current_user.notification_unstolen).to be_truthy # Because it's set to true by default
       expect {
         patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
-      }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+      }.to change(AfterUserChangeJob.jobs, :size).by(1)
       expect(response).to redirect_to edit_my_account_url(edit_template: "root")
       current_user.reload
       expect(current_user.notification_newsletters).to be_truthy
@@ -293,7 +293,7 @@ RSpec.describe MyAccountsController, type: :request do
         current_user.reload
         expect(current_user.phone).to be_blank
         expect(current_user.user_phones.count).to eq 0
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
           Sidekiq::Testing.inline! {
             put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
@@ -318,7 +318,7 @@ RSpec.describe MyAccountsController, type: :request do
           current_user.reload
           expect(current_user.phone).to be_blank
           expect(current_user.user_phones.count).to eq 0
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
             Sidekiq::Testing.inline! {
               put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
@@ -453,10 +453,10 @@ RSpec.describe MyAccountsController, type: :request do
       it "updates" do
         expect_bike1_initiated
 
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         put base_url, params: update_params
-        expect(AfterUserChangeWorker.jobs.count).to eq 1
-        expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+        expect(AfterUserChangeJob.jobs.count).to eq 1
+        expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
         expect(flash[:success]).to be_present
         expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
         expect(user_registration_organization1.reload.all_bikes?).to be_truthy
@@ -464,7 +464,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_registration_organization1.registration_info).to eq target_info
 
         Sidekiq::Testing.inline! {
-          AfterUserChangeWorker.drain
+          AfterUserChangeJob.drain
         }
         expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
         expect(bike1.registration_info).to eq target_info
@@ -480,7 +480,7 @@ RSpec.describe MyAccountsController, type: :request do
           expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
           expect(bike2.registration_info).to be_blank
 
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           put base_url, params: {
             :edit_template => "registration_organizations",
             :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
@@ -488,8 +488,8 @@ RSpec.describe MyAccountsController, type: :request do
             "reg_field-organization_affiliation_#{organization1.id}" => "student",
             "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
           }
-          expect(AfterUserChangeWorker.jobs.count).to eq 1
-          expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+          expect(AfterUserChangeJob.jobs.count).to eq 1
+          expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
           expect(user_registration_organization1.reload.all_bikes?).to be_truthy
@@ -497,7 +497,7 @@ RSpec.describe MyAccountsController, type: :request do
           expect(user_registration_organization1.registration_info).to eq target_info
 
           Sidekiq::Testing.inline! {
-            AfterUserChangeWorker.drain
+            AfterUserChangeJob.drain
           }
           expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
           expect(bike1.registration_info).to eq target_info
@@ -537,7 +537,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(bike3.reload.registration_info).to eq(bike3_information)
             expect(bike3.address_hash).to eq default_location_registration_address.as_json
 
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             put base_url, params: {
               :edit_template => "registration_organizations",
               :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
@@ -546,8 +546,8 @@ RSpec.describe MyAccountsController, type: :request do
               "reg_field-student_id_#{organization1.id}" => "XXX777YYY",
               "reg_field-organization_affiliation_#{organization2.id}" => "employee"
             }
-            expect(AfterUserChangeWorker.jobs.count).to eq 1
-            expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+            expect(AfterUserChangeJob.jobs.count).to eq 1
+            expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
             expect(flash[:success]).to be_present
             expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
             expect(user_registration_organization1.reload.all_bikes?).to be_truthy
@@ -559,7 +559,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(user_registration_organization2.registration_info).to eq target_extra_info
 
             Sidekiq::Testing.inline! {
-              AfterUserChangeWorker.drain
+              AfterUserChangeJob.drain
             }
             deleted_bike_organization = BikeOrganization.unscoped.where(id: bike1_organization2.id).first
             expect(deleted_bike_organization.deleted?).to be_truthy

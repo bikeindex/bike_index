@@ -59,7 +59,7 @@ class Admin::OrganizationsController < Admin::BaseController
     if @organization.update(permitted_parameters)
       update_organization_stolen_message
       flash[:success] = "Organization Saved!"
-      UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
+      UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)
     else
       render action: :edit

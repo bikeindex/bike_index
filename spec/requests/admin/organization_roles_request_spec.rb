@@ -38,15 +38,15 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
       it "associates and claims" do
         expect(existing_user.organization_roles.count).to eq 0
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           post base_url, params: {organization_role: {role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com"}}
         }.to change(OrganizationRole, :count).by 1
         expect(organization.organization_roles.count).to eq 1
         existing_user.reload
         organization_role = OrganizationRole.last
-        expect(ProcessOrganizationRoleWorker.jobs.count).to eq 1
-        ProcessOrganizationRoleWorker.drain
+        expect(ProcessOrganizationRoleJob.jobs.count).to eq 1
+        ProcessOrganizationRoleJob.drain
         organization.reload
         organization_role.reload
         expect(existing_user.organization_roles.count).to eq 1

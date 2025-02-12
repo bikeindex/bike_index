@@ -47,7 +47,7 @@ RSpec.describe Admin::UsersController, type: :request do
         og_auth_token = user_subject.auth_token
         expect(user_subject.banned?).to be_falsey
         current_user.reload
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         put "#{base_url}/#{user_subject.id}", params: {
           user: {
             name: "New Name",
@@ -78,8 +78,8 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_ban.description).to eq "something here"
         # Bump the auth token, because we want to sign out the user
         expect(user_subject.auth_token).to_not eq og_auth_token
-        expect(AfterUserChangeWorker.jobs.count).to be > 0
-        AfterUserChangeWorker.new.perform(user_subject.id)
+        expect(AfterUserChangeJob.jobs.count).to be > 0
+        AfterUserChangeJob.new.perform(user_subject.id)
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
       end

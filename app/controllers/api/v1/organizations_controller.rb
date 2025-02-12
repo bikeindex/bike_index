@@ -18,7 +18,7 @@ module API
             # We really only want to update orgs when there is a change, otherwise it breaks where
             unless @organization.manual_pos_kind == m_kind
               @organization.update(manual_pos_kind: m_kind)
-              UpdateOrganizationPosKindWorker.perform_async(@organization.id)
+              UpdateOrganizationPosKindJob.perform_async(@organization.id)
             end
             render json: organization_serialized(@organization)
           else

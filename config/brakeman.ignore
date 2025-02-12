@@ -883,7 +883,7 @@
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "ListicleImageSizeWorker",
+        "class": "ListicleImageSizeJob",
         "method": "perform"
       },
       "user_input": "Listicle.find(id).image_url",

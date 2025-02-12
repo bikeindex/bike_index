@@ -44,7 +44,7 @@ RSpec.describe Admin::PaintsController, type: :request do
       expect(paint.color).to be_blank
       expect(paint.secondary_color).to be_blank
       expect(paint.tertiary_color).to be_blank
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! {
         put "#{base_url}/#{paint.to_param}", params: {paint: paint_attributes}
       }

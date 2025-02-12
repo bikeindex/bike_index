@@ -324,7 +324,7 @@ class ParkingNotification < ActiveRecord::Base
     return true if skip_update
     # Update the bike immediately, inline
     bike&.update(updated_at: Time.current)
-    ProcessParkingNotificationWorker.perform_async(id)
+    ProcessParkingNotificationJob.perform_async(id)
   end
 
   # new_attrs needs to include kind and user_id. It can include additional attrs if they matter

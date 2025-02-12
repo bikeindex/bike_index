@@ -239,7 +239,7 @@ class MailchimpDatum < ApplicationRecord
     end
     return true unless should_update?(@previous_status)
     return true if data == @previous_data && status == @previous_status
-    UpdateMailchimpDatumWorker.perform_async(id)
+    UpdateMailchimpDatumJob.perform_async(id)
   end
 
   def ensure_subscription_required
