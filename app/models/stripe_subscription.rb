@@ -26,6 +26,8 @@ class StripeSubscription < ApplicationRecord
   belongs_to :user
   belongs_to :stripe_price
 
+  has_many :payments
+
   delegate :membership_kind, to: :stripe_price, allow_nil: true
 
   def update_membership!

@@ -1,0 +1,23 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Manage Memberships
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "Active", url_for(sortable_search_params.merge(search_activeness: "active")), class: "nav-link #{(@activeness == 'active') ? 'active' : ''}"
+      %li.nav-item
+        = link_to "Inactive", url_for(sortable_search_params.merge(search_activeness: "inactive")), class: "nav-link #{(@activeness == 'inactive') ? 'active' : ''}"
+      %li.nav-item
+        = link_to "New Membership", new_admin_membership_url, class: "nav-link"
+
+
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Membership"}
+
+= render partial: "/shared/period_select"
+
+= render partial: "/shared/pagination", locals: {collection: @memberships}
+
+= render partial: "/admin/memberships/table", locals: {memberships: @memberships, render_sortable: true}
+
+= render partial: "/shared/pagination", locals: {collection: @memberships, skip_total: true}

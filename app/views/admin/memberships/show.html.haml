@@ -1,0 +1,87 @@
+%h1
+  Editing Membership
+  %small.less-strong
+    - if @membership.admin_managed?
+      admin managed
+    - else
+      stripe managed
+
+.row
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            User
+          %td
+            = render partial: "/shared/admin_user_cell", locals: {user: @membership.user, user_id: @membership.user_id}
+        %tr.small
+          %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @membership.created_at, format: :convert_time
+        %tr.small
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @membership.updated_at, format: :convert_time
+        %tr
+          %td
+            Kind
+          %td
+            = @membership.kind_humanized
+
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Active?
+          %td
+            - if @membership.active?
+              %strong Active
+            - else
+              %span.less-strong inactive
+
+        %tr
+          %td
+            Start
+          %td
+            %span.convertTime.preciseTime
+              = l @membership.start_at, format: :convert_time
+        %tr
+          %td
+            End
+          %td
+            - if @membership.end_at.present?
+              %span.convertTime.preciseTime
+                = l @membership.end_at, format: :convert_time
+        %tr
+          %td
+            Creator
+          %td
+            - if @membership.creator_id.present?
+              %em Admin:
+              = render partial: "/shared/admin_user_cell", locals: {user: @membership.creator, user_id: @membership.creator_id}
+            - else
+              %em Stripe
+              = link_to "manage on stripe", @membership.stripe_admin_url
+
+.row.mt-5
+  - if @membership.admin_managed? && @membership.active?
+    .col-md-4
+      = render partial: "form"
+  - elsif @membership.stripe_managed?
+    %em.small edit this membership on stripe
+
+    %h4.mt-4
+      payments
+      %small
+        = link_to admin_number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
+        - if @payments.count > 25
+          %em (only first 25 shown)
+    - if @payments.any?
+      = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true}
+

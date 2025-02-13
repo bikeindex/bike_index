@@ -1,7 +1,7 @@
 class Admin::UsersController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
-  before_action :find_user, only: [:show, :edit, :update, :destroy]
+  before_action :set_period, only: %i[index]
+  before_action :find_user, only: %i[show edit update destroy]
 
   def index
     @per_page = params[:per_page] || 25
@@ -11,13 +11,14 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_user_url(@user&.id)
+    redirect_to edit_admin_user_url(params[:id])
   end
 
   def edit
     # urls with user IDs rather than usernames are more helpful in superadmin
     if params[:id] == @user.username
       redirect_to edit_admin_user_path(@user.id)
+      return
     end
     calculate_user_bikes
   end

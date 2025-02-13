@@ -1,21 +1,21 @@
 .admin-subnav
   .col-md-5
     %h1
-      Manage OrganizationRoles
+      Manage Organization Roles
   .col-md-7
     %ul
       - if current_organization.present?
         %li.nav-item
           = link_to "Organization view", organization_users_path(organization_id: current_organization.id), class: "nav-link less-strong"
       %li.nav-item
-        = link_to "Deleted OrganizationRoles", url_for(sortable_search_params.merge(search_deleted: true)), class: "nav-link #{@deleted_organization_roles ? 'active' : ''}"
+        = link_to "Deleted Roles", url_for(sortable_search_params.merge(search_deleted: true)), class: "nav-link #{@deleted_organization_roles ? 'active' : ''}"
       %li.nav-item
-        = link_to "New OrganizationRole", new_admin_organization_role_url(organization_id: current_organization&.to_param), class: "nav-link"
+        = link_to "New Role", new_admin_organization_role_url(organization_id: current_organization&.to_param), class: "nav-link"
 
 
-  = render partial: "/shared/admin_current_header", locals: {viewing: "OrganizationRole"}
+  = render partial: "/shared/admin_current_header", locals: {viewing: "Role"}
 
-= render partial: "/shared/pagination", locals: {collection: @organization_roles}
+= render partial: "/shared/pagination", locals: {collection: @organization_roles, viewing: "Role"}
 
 = render partial: "/admin/organization_roles/table", locals: {organization_roles: @organization_roles, render_sortable: true, render_deleted: @deleted_organization_roles}
 

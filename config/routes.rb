@@ -60,7 +60,10 @@ Rails.application.routes.draw do
   get "logout", to: "sessions#destroy"
 
   resources :payments, only: %i[new create] do
-    collection { get :success }
+    collection do
+      get :success
+      get :success_subscription
+    end
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
   resources :documentation, only: [:index] do
@@ -198,6 +201,7 @@ Rails.application.routes.draw do
       :mail_snippets,
       :mailchimp_data,
       :mailchimp_values,
+      :memberships,
       :organization_roles,
       :model_attestations,
       :model_audits,

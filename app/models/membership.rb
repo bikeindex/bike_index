@@ -31,11 +31,22 @@ class Membership < ApplicationRecord
 
   enum :kind, KIND_ENUM
 
-  validate :no_active_stripe_subscription_admin_managed, on: :create
+  validates :user_id, presence: true
+  validate :no_active_stripe_subscription_admin_managed
   before_validation :set_calculated_attributes
 
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
+
+  attr_accessor :user_email
+
+  def self.kind_humanized(str)
+    str&.humanize
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
+  end
 
   def admin_managed?
     creator_id.present?
@@ -45,15 +56,30 @@ class Membership < ApplicationRecord
     !admin_managed?
   end
 
+  def set_calculated_attributes
+    self.kind ||= "basic"
+    self.start_at ||= Time.current
+
+    if user_email.present?
+      self.user_id ||= User.fuzzy_email_find(user_email)&.id
+    end
+  end
+
+  def stripe_admin_url
+    "Stripe URL"
+  end
+
+  private
+
   def no_active_stripe_subscription_admin_managed
-    return if stripe_managed? || user.membership_active.blank?
+    return if stripe_managed? || !calculated_active? || user.blank?
+
+    active_membership_id = user.memberships.active.order(:id).limit(1).pluck(:id).first
+    return if [id, nil].include?(active_membership_id)
 
     # Currently, the app is not handling cancelling or extending stripe subscriptions
     # So you either have an admin created (and managed) membership, or a stripe subscription
-    errors.add(:base, "can't create because there is already an active membership")
-  end
-
-  def set_calculated_attributes
-    self.kind ||= "basic"
+    errors.add(:base, "there is a prior active membership")
   end
 end
+
