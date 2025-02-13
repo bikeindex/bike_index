@@ -1,6 +1,50 @@
 {
   "ignored_warnings": [
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "0158e322561a2b6aad2521eed811672937122085db5ccdbebe999b48aa644b6e",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/views/shared/admin/_pagination.html.haml",
+      "line": 31,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).where(\"#{AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::AmbassadorTaskAssignmentsController",
+          "method": "index",
+          "line": 11,
+          "file": "app/controllers/admin/ambassador_task_assignments_controller.rb",
+          "rendered": {
+            "name": "admin/ambassador_task_assignments/index",
+            "file": "app/views/admin/ambassador_task_assignments/index.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "admin/ambassador_task_assignments/index",
+          "line": 38,
+          "file": "app/views/admin/ambassador_task_assignments/index.html.haml",
+          "rendered": {
+            "name": "shared/admin/_pagination",
+            "file": "app/views/shared/admin/_pagination.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/admin/_pagination"
+      },
+      "user_input": "@time_range_column",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "077c5f6dca08a24f14c7748a921fbc405d6c5c2a7efeb00cef88db55b1e1d02f",
@@ -587,7 +631,7 @@
       "check_name": "PermitAttributes",
       "message": "Potentially dangerous key allowed for mass assignment",
       "file": "app/controllers/admin/organization_roles_controller.rb",
-      "line": 57,
+      "line": 60,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.require(:organization_role).permit(:organization_id, :user_id, :role, :invited_email)",
       "render_path": null,
@@ -823,50 +867,6 @@
       "confidence": "Weak",
       "cwe_id": [
         79
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "a3c445b9a9aeef55aeb441f75fe658bec1ae6e998f9d46306a23d7e2b90b708f",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/views/shared/_pagination.html.haml",
-      "line": 32,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).where(\"#{AmbassadorTaskAssignment.includes(:ambassador_task, :ambassador => ({ :organization_roles => :organization })).completed_assignments(:filters => filter_params, :sort => ({ sort_column => sort_direction })).table_name}.#{(@time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::AmbassadorTaskAssignmentsController",
-          "method": "index",
-          "line": 11,
-          "file": "app/controllers/admin/ambassador_task_assignments_controller.rb",
-          "rendered": {
-            "name": "admin/ambassador_task_assignments/index",
-            "file": "app/views/admin/ambassador_task_assignments/index.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "admin/ambassador_task_assignments/index",
-          "line": 38,
-          "file": "app/views/admin/ambassador_task_assignments/index.html.haml",
-          "rendered": {
-            "name": "shared/_pagination",
-            "file": "app/views/shared/_pagination.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "shared/_pagination"
-      },
-      "user_input": "@time_range_column",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
       ],
       "note": ""
     },
