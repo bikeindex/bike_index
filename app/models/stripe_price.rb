@@ -3,9 +3,11 @@
 # Table name: stripe_prices
 #
 #  id              :bigint           not null, primary key
+#  active          :boolean          default(TRUE)
 #  amount_cents    :integer
 #  currency        :string
 #  interval        :integer
+#  live_mode       :boolean          default(FALSE)
 #  membership_kind :integer
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
@@ -29,9 +31,5 @@ class StripePrice < ApplicationRecord
 
   def test?
     !live?
-  end
-
-  def live?
-    live_mode?
   end
 end

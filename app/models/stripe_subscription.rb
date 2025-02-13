@@ -2,22 +2,22 @@
 #
 # Table name: stripe_subscriptions
 #
-#  id              :bigint           not null, primary key
-#  active          :boolean          default(FALSE)
-#  end_at          :datetime
-#  start_at        :datetime
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  membership_id   :bigint
-#  stripe_id       :string
-#  stripe_price_id :bigint
-#  user_id         :bigint
+#  id                     :bigint           not null, primary key
+#  active                 :boolean          default(FALSE)
+#  end_at                 :datetime
+#  start_at               :datetime
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  membership_id          :bigint
+#  stripe_id              :string
+#  stripe_price_stripe_id :string
+#  user_id                :bigint
 #
 # Indexes
 #
-#  index_stripe_subscriptions_on_membership_id    (membership_id)
-#  index_stripe_subscriptions_on_stripe_price_id  (stripe_price_id)
-#  index_stripe_subscriptions_on_user_id          (user_id)
+#  index_stripe_subscriptions_on_membership_id           (membership_id)
+#  index_stripe_subscriptions_on_stripe_price_stripe_id  (stripe_price_stripe_id)
+#  index_stripe_subscriptions_on_user_id                 (user_id)
 #
 class StripeSubscription < ApplicationRecord
   include ActivePeriodable

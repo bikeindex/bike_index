@@ -3114,7 +3114,8 @@ CREATE TABLE public.stripe_prices (
     stripe_id character varying,
     currency character varying,
     amount_cents integer,
-    live_mode boolean DEFAULT false,
+    live boolean DEFAULT false,
+    active boolean DEFAULT true,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
