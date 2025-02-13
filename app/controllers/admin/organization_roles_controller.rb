@@ -48,6 +48,8 @@ class Admin::OrganizationRolesController < Admin::BaseController
     redirect_to admin_organization_roles_url
   end
 
+  helper_method :matching_organization_roles
+
   protected
 
   def sortable_columns
@@ -73,6 +75,10 @@ class Admin::OrganizationRolesController < Admin::BaseController
       OrganizationRole.all
     end
     @deleted_organization_roles = current_organization&.deleted? || InputNormalizer.boolean(params[:search_deleted])
-    @deleted_organization_roles ? organization_roles.deleted : organization_roles
+    organization_roles = organization_roles.deleted if @deleted_organization_roles
+
+    @time_range_column = sort_column if %w[claimed_at deleted_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    organization_roles.where(@time_range_column => @time_range)
   end
 end

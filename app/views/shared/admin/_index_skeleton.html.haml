@@ -20,8 +20,7 @@
   = render partial: "/shared/admin/current_header", locals: {viewing:}
 
 - if @render_chart
-  -# NOTE: if you want to render_chart, you must include locals: chart_collection
-  -#       (required because collection is paginated)
+  -# NOTE: if you want to render_chart, you must include the local: chart_collection
   = column_chart time_range_counts(collection: chart_collection, column: time_range_column), stacked: true, thousands: ","
 
 .mt-2.mb-4
