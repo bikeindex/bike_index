@@ -1,6 +1,5 @@
 class Admin::BikeStickersController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
     @pagy, @bike_stickers = scoped_bike_stickers(matching_bike_stickers)

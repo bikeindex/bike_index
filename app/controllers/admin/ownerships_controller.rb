@@ -1,6 +1,6 @@
 class Admin::OwnershipsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_ownership, except: [:index]
 
   def index

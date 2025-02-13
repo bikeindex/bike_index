@@ -1,6 +1,6 @@
 class Admin::SuperuserAbilitiesController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_superuser_ability, except: [:index]
 
   def index

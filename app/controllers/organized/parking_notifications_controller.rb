@@ -4,7 +4,7 @@ module Organized
     include SortableTable
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
-    before_action :set_period, only: [:index]
+
     before_action :set_failed_and_repeated_ivars
 
     def index
