@@ -261,8 +261,8 @@ Rails.application.routes.draw do
     resources :banned_email_domains, only: %i[index new create destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-      constraints: AdminRestriction,
-      as: :feature_flags
+      :constraints => AdminRestriction,
+      :as => :feature_flags
   end
 
   namespace :api, defaults: {format: "json"} do
