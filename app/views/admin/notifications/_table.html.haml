@@ -51,7 +51,7 @@
               %small.less-strong= notification.message_channel
             %td.user-cell
               - if notification.user_id.present?
-                = render partial: "/shared/admin_user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
+                = render partial: "/shared/admin/user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
               - else
                 = notification.message_channel_target
                 %small.less-strong no user

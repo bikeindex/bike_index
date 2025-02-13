@@ -37,7 +37,7 @@
                 = organization_role.id
           %td
             - if organization_role.user.present?
-              = render partial: "/shared/admin_user_cell", locals: {user: organization_role.user, render_search: false, cache: true}
+              = render partial: "/shared/admin/user_cell", locals: {user: organization_role.user, render_search: false, cache: true}
             - else
               = organization_role.invited_email
           - unless skip_organization
@@ -49,7 +49,7 @@
                 = l organization_role.claimed_at, format: :convert_time
           %td
             - if organization_role.sender.present?
-              = render partial: "/shared/admin_user_cell", locals: {user: organization_role.sender, render_search: false, cache: true}
+              = render partial: "/shared/admin/user_cell", locals: {user: organization_role.sender, render_search: false, cache: true}
             - else
               = organization_role.sender_id
           %td

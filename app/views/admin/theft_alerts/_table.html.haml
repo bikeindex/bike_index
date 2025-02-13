@@ -63,7 +63,7 @@
               - if theft_alert.bike.present?
                 = link_to theft_alert.bike.title_string, edit_admin_bike_path(theft_alert.bike)
           %td
-            = render partial: "/shared/admin_user_cell", locals: {user: theft_alert.user, render_search: true, cache: true, user_id: theft_alert.user_id}
+            = render partial: "/shared/admin/user_cell", locals: {user: theft_alert.user, render_search: true, cache: true, user_id: theft_alert.user_id}
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
             %small

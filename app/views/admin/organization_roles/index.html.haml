@@ -13,7 +13,7 @@
         = link_to "New OrganizationRole", new_admin_organization_role_url(organization_id: current_organization&.to_param), class: "nav-link"
 
 
-  = render partial: "/shared/admin_current_header", locals: {viewing: "OrganizationRole"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "OrganizationRole"}
 
 = render partial: "/shared/pagination", locals: {collection: @organization_roles}
 

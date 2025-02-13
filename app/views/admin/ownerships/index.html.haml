@@ -20,7 +20,7 @@
             = link_to Ownership.origin_humanized(origin).titleize, url_for(sortable_search_params.merge(search_origin: origin)), class: "dropdown-item #{@search_origin == origin ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Ownerships"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "Ownerships"}
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_ownerships, column: @time_range_column), stacked: true, thousands: ","

@@ -17,7 +17,7 @@
           Emails that end in these domains are deleted right after sign up and aren't sent a confirmation (but they still are shown the page that says they need to confirm their email, just like a normal user).
 
 
-= render partial: "/shared/admin_current_header"
+= render partial: "/shared/admin/current_header"
 
 = render partial: "/shared/pagination", locals: {collection: @banned_email_domains}
 
@@ -42,7 +42,7 @@
               %code.small.only-dev-visible= banned_email_domain.id
           %td= banned_email_domain.domain
           %td
-            = render partial: "/shared/admin_user_cell", locals: {user: banned_email_domain.creator, user_id: banned_email_domain.creator_id, cache: false}
+            = render partial: "/shared/admin/user_cell", locals: {user: banned_email_domain.creator, user_id: banned_email_domain.creator_id, cache: false}
           - if params[:matching_users].present?
             %td
               = number_with_delimiter(User.matching_domain(banned_email_domain.domain).count)

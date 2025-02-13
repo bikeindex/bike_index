@@ -22,7 +22,7 @@
               .dropdown-divider
       %li.nav-item
         = link_to "graph", admin_mail_snippets_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Mail Snippet"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "Mail Snippet"}
 
 
 - if @render_chart

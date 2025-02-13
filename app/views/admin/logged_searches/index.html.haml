@@ -30,7 +30,7 @@
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Logged Searches"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "Logged Searches"}
 
 - if @render_chart
   - if @endpoint.present?
@@ -129,7 +129,7 @@
               = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id)), class: "display-sortable-link small"
           %td
             - if logged_search.user_id.present?
-              = render partial: "/shared/admin_user_cell", locals: {user: logged_search.user, render_search: true, cache: true, user_id: logged_search.user_id}
+              = render partial: "/shared/admin/user_cell", locals: {user: logged_search.user, render_search: true, cache: true, user_id: logged_search.user_id}
 
           %td
             - unless logged_search.stolenness_all?

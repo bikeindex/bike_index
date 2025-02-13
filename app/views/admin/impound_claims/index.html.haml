@@ -27,7 +27,7 @@
               .dropdown-divider
       %li.nav-item
         = link_to "graph", admin_impound_claims_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: { viewing: "Impound Claims" }
+  = render partial: "/shared/admin/current_header", locals: { viewing: "Impound Claims" }
 
 .row.mt-4.mb-4
   .col-sm-6

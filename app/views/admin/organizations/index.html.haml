@@ -40,7 +40,7 @@
       %li.nav-item
         = link_to 'New Organization', new_admin_organization_url, class: "nav-link"
 
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Organizations"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "Organizations"}
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_organizations, column: @time_range_column), stacked: true, thousands: ","
