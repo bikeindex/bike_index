@@ -1,6 +1,6 @@
 class Admin::FeedbacksController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+  
 
   def index
     params[:page] || 1

@@ -1,6 +1,6 @@
 class Admin::UsersController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+  
   before_action :find_user, only: [:show, :edit, :update, :destroy]
 
   def index

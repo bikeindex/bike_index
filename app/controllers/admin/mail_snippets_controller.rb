@@ -1,6 +1,6 @@
 class Admin::MailSnippetsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+  
 
   before_action :find_snippet, except: [:index, :new, :create]
 

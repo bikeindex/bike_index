@@ -2,7 +2,7 @@ module Organized
   class GraduatedNotificationsController < Organized::BaseController
     include SortableTable
     before_action :ensure_access_to_graduated_notifications!
-    before_action :set_period, only: [:index]
+    
     before_action :find_graduated_notification, except: [:index]
 
     def index

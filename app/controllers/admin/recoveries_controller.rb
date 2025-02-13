@@ -1,7 +1,7 @@
 class Admin::RecoveriesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
+  
 
   helper_method :available_recoveries
 
