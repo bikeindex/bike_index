@@ -12,7 +12,7 @@ RSpec.describe EmailResetPasswordJob, type: :job do
     user.reload
     expect(user.token_for_password_reset).to eq token
     expect(Notification.count).to eq 1
-    expect(Notification.last).to have_attributes(message_channel: "email",  kind: "password_reset",
+    expect(Notification.last).to have_attributes(message_channel: "email", kind: "password_reset",
       delivery_status: "delivery_success", message_channel_target: user.email)
     # It doesn't send again
     expect do
@@ -47,7 +47,7 @@ RSpec.describe EmailResetPasswordJob, type: :job do
         EmailResetPasswordJob.new.perform(user.id)
       end.to change(Notification, :count).by 1
       expect(ActionMailer::Base.deliveries.empty?).to be_falsey
-      expect(Notification.last).to have_attributes(message_channel: "email",  kind: "password_reset",
+      expect(Notification.last).to have_attributes(message_channel: "email", kind: "password_reset",
         delivery_status: "delivery_success", message_channel_target: user.email)
     end
   end
