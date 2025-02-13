@@ -6,6 +6,7 @@ class CreateStripePrices < ActiveRecord::Migration[8.0]
       t.string :stripe_id
       t.string :currency
       t.integer :amount_cents
+      t.boolean :live_mode, default: false
 
       t.timestamps
     end

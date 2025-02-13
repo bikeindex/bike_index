@@ -28,10 +28,10 @@ class StripePrice < ApplicationRecord
   validates :interval, presence: true
 
   def test?
-    false
+    !live?
   end
 
   def live?
-    !test?
+    live_mode?
   end
 end
