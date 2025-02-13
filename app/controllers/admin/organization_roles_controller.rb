@@ -2,10 +2,11 @@ class Admin::OrganizationRolesController < Admin::BaseController
   include SortableTable
   before_action :set_period, only: %i[index]
   before_action :find_organization_role, only: %i[show edit update destroy]
+  before_action :find_organizations, except: %i[index destroy]
 
   def index
     @per_page = params[:per_page] || 50
-    @pagy, @organization_roles = pagy(
+    @pagy, @collection = pagy(
       matching_organization_roles.includes(:user, :sender, :organization).reorder("organization_roles.#{sort_column} #{sort_direction}"),
       limit: @per_page
     )
@@ -59,6 +60,10 @@ class Admin::OrganizationRolesController < Admin::BaseController
 
   def find_organization_role
     @organization_role = OrganizationRole.unscoped.find(params[:id])
+  end
+
+  def find_organizations
+    @organizations = Organization.all
   end
 
   def matching_organization_roles

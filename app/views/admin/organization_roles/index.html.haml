@@ -7,9 +7,9 @@
   %li.nav-item
     = link_to "New Role", new_admin_organization_role_url(organization_id: current_organization&.to_param), class: "nav-link"
 
-- table_view = render partial: "/admin/organization_roles/table", locals: {organization_roles: @organization_roles, render_sortable: true, render_deleted: @deleted_organization_roles}
+- table_view = render partial: "/admin/organization_roles/table", locals: {organization_roles: @collection, render_sortable: true, render_deleted: @deleted_organization_roles}
 
-= render partial: "/shared/admin/index_skeleton", locals: {collection: @organization_roles, nav_header_list_items:, |
-  table_view: render(partial: "/admin/organization_roles/table", locals: {organization_roles: @organization_roles, render_sortable: true, render_deleted: @deleted_organization_roles})}
+= render partial: "/shared/admin/index_skeleton", locals: {nav_header_list_items:,
+  table_view:}
 
 
