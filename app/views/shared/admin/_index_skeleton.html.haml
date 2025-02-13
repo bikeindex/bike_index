@@ -1,6 +1,8 @@
 - collection ||= @collection
 - viewing ||= controller_name.humanize
 - nav_header_list_items ||= ""
+
+-# time_range_column is only used for graphing
 - time_range_column ||= @time_range_column || "created_at"
 
 .admin-subnav
@@ -18,7 +20,9 @@
   = render partial: "/shared/admin/current_header", locals: {viewing:}
 
 - if @render_chart
-  = column_chart time_range_counts(collection:, column: time_range_column), stacked: true, thousands: ","
+  -# NOTE: if you want to render_chart, you must include locals: chart_collection
+  -#       (required because collection is paginated)
+  = column_chart time_range_counts(collection: chart_collection, column: time_range_column), stacked: true, thousands: ","
 
 .mt-2.mb-4
   = render partial: "/shared/period_select"
