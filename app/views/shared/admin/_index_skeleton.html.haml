@@ -1,0 +1,30 @@
+- collection ||= @collection
+- viewing ||= controller_name.humanize
+- nav_header_list_items ||= ""
+
+.admin-subnav
+  .col-md-5
+    %h1
+      Manage #{viewing}
+  .col-md-7
+    %ul
+      = nav_header_list_items
+
+      %li.nav-item
+        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+
+  = render partial: "/shared/admin/current_header", locals: {viewing:}
+
+- if @render_chart
+  = column_chart time_range_counts(collection:), stacked: true, thousands: ","
+
+.mt-2.mb-4
+  = render partial: "/shared/period_select"
+
+= render partial: "/shared/pagination", locals: {collection:, viewing:}
+
+= table_view
+
+
+= render partial: "/shared/pagination", locals: {collection:, skip_total: true}
