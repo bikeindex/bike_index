@@ -1,7 +1,7 @@
 module Organized
   class ImpoundClaimsController < Organized::BaseController
     include SortableTable
-    
+
     before_action :find_impound_claim, except: [:index]
 
     def index

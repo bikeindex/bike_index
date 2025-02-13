@@ -1,7 +1,6 @@
 class Admin::TheftAlertsController < Admin::BaseController
   include SortableTable
 
-  
   before_action :find_theft_alert, only: [:edit, :update]
 
   def index

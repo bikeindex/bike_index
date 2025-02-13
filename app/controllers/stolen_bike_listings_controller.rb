@@ -1,6 +1,5 @@
 class StolenBikeListingsController < ApplicationController
   include SortableTable
-  
 
   def index
     @render_info = calculated_render_info

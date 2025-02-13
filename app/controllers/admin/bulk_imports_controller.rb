@@ -1,6 +1,6 @@
 class Admin::BulkImportsController < Admin::BaseController
   include SortableTable
-  
+
   before_action :find_bulk_import, only: [:show, :update]
 
   def index

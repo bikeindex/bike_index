@@ -1,8 +1,6 @@
 class Admin::RecoveriesController < Admin::BaseController
   include SortableTable
 
-  
-
   helper_method :available_recoveries
 
   def index

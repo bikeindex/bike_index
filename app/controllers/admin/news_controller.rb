@@ -1,6 +1,6 @@
 class Admin::NewsController < Admin::BaseController
   include SortableTable
-  
+
   before_action :find_blog, only: [:show, :edit, :update, :destroy]
   before_action :set_dignified_name
 

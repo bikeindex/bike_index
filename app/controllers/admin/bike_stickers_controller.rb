@@ -1,6 +1,5 @@
 class Admin::BikeStickersController < Admin::BaseController
   include SortableTable
-  
 
   def index
     @pagy, @bike_stickers = scoped_bike_stickers(matching_bike_stickers)

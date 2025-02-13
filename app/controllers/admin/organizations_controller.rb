@@ -1,6 +1,6 @@
 class Admin::OrganizationsController < Admin::BaseController
   include SortableTable
-  
+
   before_action :find_organization, only: [:show, :edit, :update, :destroy]
 
   def index

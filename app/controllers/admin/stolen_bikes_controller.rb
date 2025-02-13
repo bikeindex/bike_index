@@ -1,7 +1,6 @@
 class Admin::StolenBikesController < Admin::BaseController
   include SortableTable
   before_action :find_bike, only: %i[edit update]
-  before_action :set_period, only: %i[index]
   helper_method :available_stolen_records
 
   def index

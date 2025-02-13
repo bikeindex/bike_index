@@ -1,7 +1,7 @@
 module Organized
   class DashboardController < Organized::BaseController
     before_action :set_fallback_period
-    
+
     helper_method :bikes_for_graph
     skip_before_action :ensure_not_ambassador_organization!, only: [:root]
 

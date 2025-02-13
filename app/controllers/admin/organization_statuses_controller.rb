@@ -1,8 +1,6 @@
 class Admin::OrganizationStatusesController < Admin::BaseController
   include SortableTable
 
-  
-
   def index
     @per_page = params[:per_page] || 10
     @pagy, @organization_statuses =

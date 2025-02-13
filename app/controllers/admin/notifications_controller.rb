@@ -1,6 +1,5 @@
 class Admin::NotificationsController < Admin::BaseController
   include SortableTable
-  
 
   def index
     params[:page] || 1

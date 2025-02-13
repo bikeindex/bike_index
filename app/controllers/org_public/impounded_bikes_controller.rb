@@ -2,7 +2,6 @@ module OrgPublic
   class ImpoundedBikesController < OrgPublic::BaseController
     include SortableTable
     before_action :ensure_public_impound_bikes!
-    
 
     def index
       @per_page = params[:per_page] || 25

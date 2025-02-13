@@ -1,6 +1,6 @@
 class Admin::ImpoundRecordsController < Admin::BaseController
   include SortableTable
-  
+
   before_action :find_impound_record, except: [:index]
 
   def index

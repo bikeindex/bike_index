@@ -1,6 +1,6 @@
 class Admin::TweetsController < Admin::BaseController
   include SortableTable
-  
+
   before_action :find_tweet, except: [:new, :create, :index]
 
   def index

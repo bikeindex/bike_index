@@ -1,7 +1,6 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
 
-  
   before_action :find_payment, only: %i[edit update]
 
   def index

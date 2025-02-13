@@ -1,6 +1,6 @@
 class Admin::PaintsController < Admin::BaseController
   include SortableTable
-  
+
   before_action :find_paint, only: [:show, :edit, :update, :destroy]
 
   def index

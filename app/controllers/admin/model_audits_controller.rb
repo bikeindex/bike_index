@@ -1,6 +1,5 @@
 class Admin::ModelAuditsController < Admin::BaseController
   include SortableTable
-  
 
   def index
     @per_page = params[:per_page] || 50

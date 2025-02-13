@@ -1,6 +1,6 @@
 class Admin::OwnershipsController < Admin::BaseController
   include SortableTable
-  
+
   before_action :find_ownership, except: [:index]
 
   def index

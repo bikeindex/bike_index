@@ -1,8 +1,6 @@
 class Admin::MailchimpDataController < Admin::BaseController
   include SortableTable
 
-  
-
   def index
     @per_page = params[:per_page] || 50
     @pagy, @mailchimp_data = pagy(matching_mailchimp_data.includes(:user, :feedbacks)
