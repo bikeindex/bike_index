@@ -64,8 +64,8 @@
     .mt-2.mr-2
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
-= render partial: "/shared/pagination", locals: {collection: @organizations}
+= render partial: "/shared/admin/pagination", locals: {collection: @organizations}
 
 = render partial: "/admin/organizations/table", locals: { render_sortable: true }
 
-= render partial: "/shared/pagination", locals: {collection: @organizations, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @organizations, skip_total: true}

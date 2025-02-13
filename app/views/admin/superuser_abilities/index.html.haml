@@ -17,8 +17,8 @@
 
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @superuser_abilities, count: searched_superuser_abilities.count}
+= render partial: "/shared/admin/pagination", locals: {collection: @superuser_abilities, count: searched_superuser_abilities.count}
 
 = render partial: "/admin/superuser_abilities/table", locals: {superuser_abilities: @superuser_abilities, render_sortable: true, render_deleted: @deleted}
 
-= render partial: "/shared/pagination", locals: {collection: @superuser_abilities, count: searched_superuser_abilities.count}
+= render partial: "/shared/admin/pagination", locals: {collection: @superuser_abilities, count: searched_superuser_abilities.count}

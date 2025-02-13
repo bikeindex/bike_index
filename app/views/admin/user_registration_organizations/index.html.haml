@@ -35,7 +35,7 @@
   = column_chart time_range_counts(collection: matching_user_registration_organizations, column: @time_range_column), stacked: true, thousands: ","
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @user_registration_organizations, count: matching_user_registration_organizations.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @user_registration_organizations, count: matching_user_registration_organizations.size}
 
 - render_sortable ||= true
 .full-screen-table

@@ -54,6 +54,6 @@
         = text_field_tag :query, params[:query], placeholder: "Search tweets", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/pagination", locals: {collection: @tweets, count: matching_tweets.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @tweets, count: matching_tweets.size}
 
 = render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_total: true}

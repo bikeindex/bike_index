@@ -14,7 +14,7 @@
 
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count}
+= render partial: "/shared/admin/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count}
 
 - skip_sortable = false
 
@@ -59,4 +59,4 @@
             - else
               = stolen_notification.send_dates_parsed.count
 
-= render partial: "/shared/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count, skip_total: true}

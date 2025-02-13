@@ -100,6 +100,6 @@
 %p.less-strong
   Go to individual organizations to create new invoices
 
-= render partial: "/shared/pagination", locals: {collection: @invoices}
+= render partial: "/shared/admin/pagination", locals: {collection: @invoices}
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }

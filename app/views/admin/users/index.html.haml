@@ -60,9 +60,9 @@
   %strong
     = number_with_delimiter(matching_users.unconfirmed.size)
   unconfirmed users
-= render partial: "/shared/pagination", locals: {collection: @users, viewing: "User", count: matching_users.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @users, viewing: "User", count: matching_users.size}
 = render partial: "/admin/users/table", locals: {render_sortable: true, render_deleted: @search_deleted}
-= render partial: "/shared/pagination", locals: {collection: @users, viewing: "User", skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @users, viewing: "User", skip_total: true}
 
 - unless @users.present?
   %h1.mt-4

@@ -169,8 +169,8 @@
                 %td.small= admin_number_display(recovered_count_total)
 
 
-= render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert"}
+= render partial: "/shared/admin/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert"}
 
 = render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: @bike.present?}
 
-= render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert", skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert", skip_total: true}

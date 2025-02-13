@@ -131,7 +131,7 @@
       = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)}
 
 
-= render partial: "/shared/pagination", locals: {collection: @bike_sticker_updates, viewing: "Sticker Update", count: matching_bike_sticker_updates.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @bike_sticker_updates, viewing: "Sticker Update", count: matching_bike_sticker_updates.size}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border

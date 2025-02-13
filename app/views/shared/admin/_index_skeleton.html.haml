@@ -26,9 +26,9 @@
 .mt-2.mb-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection:, viewing:}
+= render partial: "/shared/admin/pagination", locals: {collection:, viewing:}
 
 = table_view
 
 
-= render partial: "/shared/pagination", locals: {collection:, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection:, skip_total: true}

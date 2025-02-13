@@ -61,7 +61,7 @@
 .mt-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @bulk_imports, count: matching_bulk_imports.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @bulk_imports, count: matching_bulk_imports.size}
 
 .full-screen-table.pt-2
   %table.table.table-striped.table-bordered.sortable.table-sm

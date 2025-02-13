@@ -76,7 +76,7 @@
 
 .mt-4
 
-= render partial: "/shared/pagination", locals: {collection: @organization_statuses}
+= render partial: "/shared/admin/pagination", locals: {collection: @organization_statuses}
 
 - org_ids = @organization_statuses.distinct.map(&:organization_id)
 - org_names_hash = Organization.unscoped.where(id: org_ids).pluck(:id, :short_name).to_h
@@ -138,4 +138,4 @@
 
 
 
-= render partial: "/shared/pagination", locals: {collection: @organization_statuses, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @organization_statuses, skip_total: true}

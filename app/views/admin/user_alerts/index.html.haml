@@ -70,6 +70,6 @@
 
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @user_alerts, count: matching_user_alerts.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @user_alerts, count: matching_user_alerts.size}
 
 = render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user.present?}

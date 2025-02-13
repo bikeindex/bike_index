@@ -61,8 +61,8 @@
 
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/pagination", locals: {collection: @bikes}
+= render partial: "/shared/admin/pagination", locals: {collection: @bikes}
 
 = render partial: "table", locals: {render_sortable: true}
 
-= render partial: "/shared/pagination", locals: {collection: @bikes, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @bikes, skip_total: true}

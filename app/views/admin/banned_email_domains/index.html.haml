@@ -19,7 +19,7 @@
 
 = render partial: "/shared/admin/current_header"
 
-= render partial: "/shared/pagination", locals: {collection: @banned_email_domains}
+= render partial: "/shared/admin/pagination", locals: {collection: @banned_email_domains}
 
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -49,4 +49,4 @@
           %td
             %small.float-right= link_to "remove block", admin_banned_email_domain_path(banned_email_domain), method: :delete
 
-= render partial: "/shared/pagination", locals: {collection: @banned_email_domains, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @banned_email_domains, skip_total: true}

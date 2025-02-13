@@ -62,7 +62,7 @@
     %code= params[:search_ip_address]
     = link_to "view from any ip address", url_for(sortable_search_params.merge(search_ip_address: nil)), class: "gray-link small"
 
-= render partial: "/shared/pagination", locals: {collection: @logged_searches, count: matching_logged_searches.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @logged_searches, count: matching_logged_searches.size}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -146,4 +146,4 @@
                 = admin_number_display((logged_search.duration_ms * 0.001).round(2))
 
 
-= render partial: "/shared/pagination", locals: {collection: @logged_searches, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @logged_searches, skip_total: true}

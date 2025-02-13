@@ -32,7 +32,7 @@
 .mt-2.mb-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @graduated_notifications}
+= render partial: "/shared/admin/pagination", locals: {collection: @graduated_notifications}
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down

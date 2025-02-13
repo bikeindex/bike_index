@@ -65,6 +65,6 @@
 .mt-4.mb-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @impound_records, count: matching_impound_records.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @impound_records, count: matching_impound_records.size}
 
 = render partial: "table", locals: {impound_records: @impound_records, render_sortable: true, skip_organization: current_organization.present?}

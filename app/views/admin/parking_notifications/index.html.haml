@@ -42,6 +42,6 @@
 .mt-4.mb-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @parking_notifications}
+= render partial: "/shared/admin/pagination", locals: {collection: @parking_notifications}
 
 = render partial: "/admin/parking_notifications/table", locals: {parking_notifications: @parking_notifications, render_sortable: true}
