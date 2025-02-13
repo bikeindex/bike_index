@@ -2,11 +2,10 @@ class Admin::MembershipsController < Admin::BaseController
   include SortableTable
 
   before_action :find_membership, only: %i[show update]
-  before_action :set_period, only: %i[index]
 
   def index
     @per_page = params[:per_page] || 50
-    @pagy, @memberships = pagy(
+    @pagy, @collection = pagy(
       matching_memberships.includes(:user, :creator, :stripe_subscriptions).reorder("memberships.#{sort_column} #{sort_direction}"),
       limit: @per_page
     )
@@ -49,6 +48,8 @@ class Admin::MembershipsController < Admin::BaseController
       render action: :edit
     end
   end
+
+  helper_method :matching_memberships
 
   protected
 
