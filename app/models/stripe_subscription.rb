@@ -27,6 +27,7 @@ class StripeSubscription < ApplicationRecord
   belongs_to :stripe_price, foreign_key: 'stripe_price_stripe_id', primary_key: 'stripe_id'
 
   has_many :payments
+  has_many :stripe_events, foreign_key: 'stripe_subscription_stripe_id', primary_key: 'stripe_id'
 
   delegate :membership_kind, to: :stripe_price, allow_nil: true
 

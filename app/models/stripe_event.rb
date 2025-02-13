@@ -13,5 +13,13 @@
 #  index_stripe_events_on_stripe_subscription_stripe_id  (stripe_subscription_stripe_id)
 #
 class StripeEvent < ApplicationRecord
-  belongs_to :stripe_subscription
+  belongs_to :stripe_subscription, foreign_key: 'stripe_subscription_stripe_id', primary_key: 'stripe_id'
+
+  def test?
+    false
+  end
+
+  def live?
+    !test?
+  end
 end
