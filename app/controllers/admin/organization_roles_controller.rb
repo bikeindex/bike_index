@@ -3,7 +3,6 @@
 class Admin::OrganizationRolesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: %i[index]
   before_action :find_organization_role, only: %i[show edit update destroy]
   before_action :find_organizations, except: %i[index destroy]
 
