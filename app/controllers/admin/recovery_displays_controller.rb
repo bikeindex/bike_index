@@ -1,6 +1,6 @@
 class Admin::RecoveryDisplaysController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_recovery_displays, only: [:edit, :update, :destroy]
 
   helper_method :matching_recovery_displays

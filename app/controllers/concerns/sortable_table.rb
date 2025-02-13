@@ -2,6 +2,8 @@ module SortableTable
   extend ActiveSupport::Concern
 
   included do
+    before_action :set_period, only: %i[index]
+
     helper_method :sort_column, :sort_direction
   end
 

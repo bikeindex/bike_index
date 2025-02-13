@@ -1,76 +1,66 @@
-.admin-subnav
-  .col-md-5
-    %h1
-      Mail Snippets
-  .col-md-7
-    %ul
-      %li.nav-item
-        = link_to "new snippet", new_admin_mail_snippet_path, class: "nav-link"
-      %li.nav-item
-        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == "all" ? "" : "active") }
-          - if @search_kind == "all"
-            All kinds
-          - else
-            = MailSnippet.kind_humanized(@search_kind)
-        .dropdown-menu
-          - (["all"] + MailSnippet.kinds).each do |kind|
-            - kind_active = @search_kind == kind
-            - kind_link_params = sortable_search_params.merge(search_kind: (kind_active ? nil : kind))
-            - kind_humanized = kind == "all" ? "All kinds" : MailSnippet.kind_humanized(kind)
-            = link_to kind_humanized, admin_mail_snippets_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
-            - if kind == "all" # Add a divider after all
-              .dropdown-divider
-      %li.nav-item
-        = link_to "graph", admin_mail_snippets_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Mail Snippet"}
 
+- nav_header_list_items = capture_haml do
+  %li.nav-item
+    = link_to "new snippet", new_admin_mail_snippet_path, class: "nav-link"
+  %li.nav-item
+    %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_kind == "all" ? "" : "active") }
+      - if @search_kind == "all"
+        All kinds
+      - else
+        = MailSnippet.kind_humanized(@search_kind)
+    .dropdown-menu
+      - (["all"] + MailSnippet.kinds).each do |kind|
+        - kind_active = @search_kind == kind
+        - kind_link_params = sortable_search_params.merge(search_kind: (kind_active ? nil : kind))
+        - kind_humanized = kind == "all" ? "All kinds" : MailSnippet.kind_humanized(kind)
+        = link_to kind_humanized, admin_mail_snippets_path(kind_link_params), class: "dropdown-item #{kind_active ? 'active' : ''}"
+        - if kind == "all" # Add a divider after all
+          .dropdown-divider
 
-- if @render_chart
-  = column_chart time_range_counts(collection: matching_mail_snippets), stacked: true, thousands: ","
-
-.mt-2.mb-4
-  = render partial: "/shared/period_select"
-
-= render partial: "/shared/pagination", locals: {collection: @mail_snippets}
-
-
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border
-  %thead.small-header.hidden-md-down
-    %th= sortable "created_at"
-    %th
-      %small= sortable "updated_at"
-    - unless current_organization.present?
+- table_view = capture_haml do
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header.hidden-md-down
+      %th= sortable "created_at"
       %th
-        = sortable "organization_id"
-    %th= sortable "kind"
-    %th Subject, Body
-    %th
-      %small Enabled
-    %th
-      %small Geo
+        %small= sortable "updated_at"
+      - unless current_organization.present?
+        %th
+          = sortable "organization_id"
+      %th= sortable "kind"
+      %th Subject, Body
+      %th
+        %small Enabled
+      %th
+        %small Geo
 
-    %tbody
-      - @mail_snippets.each do |mail_snippet|
-        %tr
-          %td
-            %a.convertTime{ href: edit_mail_snippet_path_for(mail_snippet) }
-              = l mail_snippet.created_at, format: :convert_time
-            - if display_dev_info?
-              %code.small.only-dev-visible= mail_snippet.id
-          %td
-            %small.convertTime
-              = l mail_snippet.updated_at, format: :convert_time
-          - unless current_organization.present?
+      %tbody
+        - @mail_snippets.each do |mail_snippet|
+          %tr
             %td
-              - if mail_snippet.organization.present?
-                = link_to mail_snippet.organization&.short_name, admin_mail_snippets_path(sortable_search_params.merge(organization_id: mail_snippet.organization_id))
-          %td
-            = mail_snippet.kind_humanized
-          %td
-            .d-block= mail_snippet.subject
-            %small
-              = truncate(mail_snippet.body, length: 100)
-          %td.table-cell-check
-            = check_mark if mail_snippet.is_enabled
-          %td.table-cell-check
-            = check_mark if mail_snippet.with_location?
+              %a.convertTime{ href: edit_mail_snippet_path_for(mail_snippet) }
+                = l mail_snippet.created_at, format: :convert_time
+              - if display_dev_info?
+                %code.small.only-dev-visible= mail_snippet.id
+            %td
+              %small.convertTime
+                = l mail_snippet.updated_at, format: :convert_time
+            - unless current_organization.present?
+              %td
+                - if mail_snippet.organization.present?
+                  = link_to mail_snippet.organization&.short_name, admin_mail_snippets_path(sortable_search_params.merge(organization_id: mail_snippet.organization_id))
+            %td
+              = mail_snippet.kind_humanized
+            %td
+              .d-block= mail_snippet.subject
+              %small
+                = truncate(mail_snippet.body, length: 100)
+            %td.table-cell-check
+              = check_mark if mail_snippet.is_enabled
+            %td.table-cell-check
+              = check_mark if mail_snippet.with_location?
+
+
+
+= render partial: "/shared/admin/index_skeleton", locals: {collection: @mail_snippets, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_mail_snippets}
+
+

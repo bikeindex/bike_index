@@ -41,7 +41,7 @@
         %td User
         %td
           - search_url = payment.user_id.present? ? admin_payments_path(user_id: payment.user_id) : admin_payments_path(search_email: payment.email)
-          = render partial: "/shared/admin_user_cell", locals: {user: payment.user, email: payment.email, search_url: search_url}
+          = render partial: "/shared/admin/user_cell", locals: {user: payment.user, email: payment.email, search_url: search_url}
       %tr
         %td Referral source
         %td

@@ -2,7 +2,7 @@ module Organized
   class BulkImportsController < Organized::BaseController
     include SortableTable
     skip_before_action :ensure_member!
-    before_action :set_period, only: [:index]
+
     skip_before_action :ensure_current_organization!, only: [:create]
     skip_before_action :verify_authenticity_token, only: [:create]
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin

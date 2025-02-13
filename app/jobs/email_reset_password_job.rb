@@ -3,7 +3,7 @@
 class EmailResetPasswordJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
-  NOTIFICATION_KIND = "password_reset".freeze
+  NOTIFICATION_KIND = "password_reset"
 
   def perform(user_id)
     user = User.find(user_id)

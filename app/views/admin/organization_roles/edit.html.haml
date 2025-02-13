@@ -1,5 +1,5 @@
 %h1
-  Editing OrganizationRole
+  Editing Organization Role
 - if @organization_role.deleted?
   %h2.text-danger.mb-4
     OrganizationRole deleted
@@ -15,9 +15,8 @@
           %td
             Sender
           %td
-            - sender = @organization_role.sender
-            - if sender.present?
-              = link_to sender.display_name, admin_user_path(sender)
+            - if @organization_role.sender_id.present?
+              = render partial: "/shared/admin/user_cell", locals: {user: @organization_role.sender, user_id: @organization_role.user_id}
             - else
               %small.less-strong
                 self created
@@ -25,9 +24,7 @@
           %td
             Receiver
           %td
-            - user = @organization_role.user
-            - if user.present?
-              = link_to user.display_name, admin_user_path(user)
+            = render partial: "/shared/admin/user_cell", locals: {user: @organization_role.user, user_id: @organization_role.user_id}
         %tr
           %td
             Created

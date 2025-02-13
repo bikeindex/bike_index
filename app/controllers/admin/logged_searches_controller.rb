@@ -1,8 +1,6 @@
 class Admin::LoggedSearchesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
-
   def index
     @per_page = params[:per_page] || 10
     @pagy, @logged_searches =

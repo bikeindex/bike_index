@@ -1,6 +1,5 @@
 class StolenBikeListingsController < ApplicationController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
     @render_info = calculated_render_info

@@ -104,7 +104,7 @@
                       - if bike.creator.blank?
                         %small.text-danger Creator missing
                       - else
-                        = render partial: "/shared/admin_user_cell", locals: {user: bike.creator, search_url: admin_bikes_path(user_id: bike.creator_id)}
+                        = render partial: "/shared/admin/user_cell", locals: {user: bike.creator, search_url: admin_bikes_path(user_id: bike.creator_id)}
                     - else
                       %small.less-strong self reg
                   - if bike.creation_description.present?
@@ -163,7 +163,7 @@
                 Owner
               %td
                 - if bike.user.present?
-                  = render partial: "/shared/admin_user_cell", locals: {user: bike.user}
+                  = render partial: "/shared/admin/user_cell", locals: {user: bike.user}
                 - else
                   Unclaimed
             %tr
