@@ -3,6 +3,8 @@
 class Admin::BannedEmailDomainsController < Admin::BaseController
   include SortableTable
 
+  before_action :set_period, only: %i[index]
+
   def index
     @per_page = params[:per_page] || 25
     @pagy, @banned_email_domains = pagy(BannedEmailDomain.order(sort_column => sort_direction)
