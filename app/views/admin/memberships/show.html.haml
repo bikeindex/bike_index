@@ -14,7 +14,7 @@
           %td
             User
           %td
-            = render partial: "/shared/admin_user_cell", locals: {user: @membership.user, user_id: @membership.user_id}
+            = render partial: "/shared/admin/user_cell", locals: {user: @membership.user, user_id: @membership.user_id}
         %tr.small
           %td
             Created
@@ -64,7 +64,7 @@
           %td
             - if @membership.creator_id.present?
               %em Admin:
-              = render partial: "/shared/admin_user_cell", locals: {user: @membership.creator, user_id: @membership.creator_id}
+              = render partial: "/shared/admin/user_cell", locals: {user: @membership.creator, user_id: @membership.creator_id}
             - else
               %em Stripe
               = link_to "manage on stripe", @membership.stripe_admin_url

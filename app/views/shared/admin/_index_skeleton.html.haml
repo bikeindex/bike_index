@@ -2,6 +2,9 @@
 - viewing ||= controller_name.humanize
 - nav_header_list_items ||= ""
 - skip_charting ||= false
+- render_sortable ||= true
+
+- table_view ||= render(partial: "table", locals: {collection:, render_sortable:})
 
 -# time_range_column is only used for graphing
 - time_range_column ||= @time_range_column || "created_at"

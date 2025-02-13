@@ -4,6 +4,7 @@ module AdminHelper
     [
       # Impound claims index is currently busted, so ignoring for now
       {title: "Dev: Impound Claims", path: admin_impound_claims_path, match_controller: true},
+      {title: "Dev: Stripe Prices", path: admin_stripe_prices_path, match_controller: true},
       {title: "Dev: Feature Flags", path: admin_feature_flags_path, match_controller: false},
       {title: "Dev: Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
       {title: "Dev: Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
