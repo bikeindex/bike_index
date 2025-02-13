@@ -10,9 +10,9 @@ class Stripe::UpdatePricesJob < ApplicationJob
         interval: "#{price.recurring["interval"]}ly",
         active: true
       }
-      if new_attributes[:membership_kind].blank?
-        pp new_attributes
-      else
+
+      # Only create if we know the membership kind
+      if new_attributes[:membership_kind].present?
         stripe_price.update!(new_attributes)
       end
     end

@@ -4,7 +4,7 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
   let(:instance) { described_class.new }
 
   describe "perform" do
-    let(:target_basic) { {live?: false, stripe_id: "xxxx"} }
+    let(:target_basic) { {live?: false, stripe_id: "price_0Qs5p2m0T0GBfX0vhLrGLAAi"} }
 
     it "creates the prices once" do
       VCR.use_cassette("stripe-update_prices_job", match_requests_on: [:path]) do
