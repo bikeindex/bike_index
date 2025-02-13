@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Membership, type: :model do
   it_behaves_like "active_periodable"
@@ -7,13 +7,21 @@ RSpec.describe Membership, type: :model do
     let(:membership) { FactoryBot.create(:membership) }
     it "is valid" do
       expect(membership).to be_valid
+      expect(membership.stripe_managed?).to be_falsey
+    end
+    context "stripe_managed" do
+      let(:membership) { FactoryBot.create(:membership_stripe_managed) }
+      it "is valid" do
+        expect(membership).to be_valid
+        expect(membership.stripe_managed?).to be_truthy
+      end
     end
   end
 
   describe "user_email" do
-    let(:user) { FactoryBot.create(:user) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     it "finds the user" do
-      expect(user.reload.confirmed?).to be_falsey
+      expect(user.reload.confirmed?).to be_truthy
       membership = Membership.new(user_email: user.email)
       expect(membership.save).to be_truthy
       expect(membership.reload.user_id).to eq user.id

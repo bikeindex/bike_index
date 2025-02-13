@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe StripeSubscription, type: :model do
   it_behaves_like "active_periodable"
@@ -21,7 +21,7 @@ RSpec.describe StripeSubscription, type: :model do
 
     context "with existing admin_managed membership" do
       let!(:membership_existing) do
-        FactoryBot.create(:membership, user:,  start_at: start_at_existing, end_at: end_at_existing,
+        FactoryBot.create(:membership, user:, start_at: start_at_existing, end_at: end_at_existing,
           creator: FactoryBot.create(:admin))
       end
       let(:start_at_existing) { Time.current - 1.year }

@@ -43,7 +43,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
   end
 
   describe "update" do
-    let(:membership) { FactoryBot.create(:membership_admin_managed) }
+    let(:membership) { FactoryBot.create(:membership) }
     let(:start_at) { "2025-02-05T23:00:00" }
     let(:end_at) { "2026-02-05T23:00:00" }
     it "updates" do

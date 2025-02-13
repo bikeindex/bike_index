@@ -3077,7 +3077,7 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 CREATE TABLE public.stripe_events (
     id bigint NOT NULL,
-    stripe_subscription_id bigint,
+    stripe_subscription_stripe_id character varying,
     name character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -3146,7 +3146,7 @@ CREATE TABLE public.stripe_subscriptions (
     id bigint NOT NULL,
     membership_id bigint,
     user_id bigint,
-    stripe_price_id bigint,
+    stripe_price_stripe_id character varying,
     stripe_id character varying,
     end_at timestamp(6) without time zone,
     start_at timestamp(6) without time zone,
@@ -6171,10 +6171,10 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
--- Name: index_stripe_events_on_stripe_subscription_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_stripe_events_on_stripe_subscription_stripe_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_stripe_events_on_stripe_subscription_id ON public.stripe_events USING btree (stripe_subscription_id);
+CREATE INDEX index_stripe_events_on_stripe_subscription_stripe_id ON public.stripe_events USING btree (stripe_subscription_stripe_id);
 
 
 --
@@ -6185,10 +6185,10 @@ CREATE INDEX index_stripe_subscriptions_on_membership_id ON public.stripe_subscr
 
 
 --
--- Name: index_stripe_subscriptions_on_stripe_price_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_stripe_subscriptions_on_stripe_price_stripe_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_stripe_subscriptions_on_stripe_price_id ON public.stripe_subscriptions USING btree (stripe_price_id);
+CREATE INDEX index_stripe_subscriptions_on_stripe_price_stripe_id ON public.stripe_subscriptions USING btree (stripe_price_stripe_id);
 
 
 --

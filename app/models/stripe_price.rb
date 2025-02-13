@@ -16,7 +16,7 @@ class StripePrice < ApplicationRecord
 
   INTERVAL_ENUM = {monthly: 0, yearly: 1}
 
-  has_many :stripe_subscriptions
+  has_many :stripe_subscriptions, foreign_key: 'stripe_price_stripe_id', primary_key: 'stripe_id'
 
   enum :membership_kind, Membership::KIND_ENUM
   enum :interval, INTERVAL_ENUM
@@ -26,4 +26,12 @@ class StripePrice < ApplicationRecord
   validates :membership_kind, presence: true
   validates :amount_cents, presence: true
   validates :interval, presence: true
+
+  def test?
+    false
+  end
+
+  def live?
+    !test?
+  end
 end

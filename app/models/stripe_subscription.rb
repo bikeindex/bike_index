@@ -24,7 +24,7 @@ class StripeSubscription < ApplicationRecord
 
   belongs_to :membership
   belongs_to :user
-  belongs_to :stripe_price
+  belongs_to :stripe_price, foreign_key: 'stripe_price_stripe_id', primary_key: 'stripe_id'
 
   has_many :payments
 

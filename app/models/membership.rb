@@ -82,4 +82,3 @@ class Membership < ApplicationRecord
     errors.add(:base, "there is a prior active membership")
   end
 end
-
