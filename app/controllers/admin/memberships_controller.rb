@@ -1,3 +1,6 @@
+
+# frozen_string_literal: true
+
 class Admin::MembershipsController < Admin::BaseController
   include SortableTable
 

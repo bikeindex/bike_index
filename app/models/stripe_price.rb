@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: stripe_prices
@@ -7,7 +9,7 @@
 #  amount_cents    :integer
 #  currency        :string
 #  interval        :integer
-#  live_mode       :boolean          default(FALSE)
+#  live            :boolean          default(FALSE)
 #  membership_kind :integer
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
@@ -16,7 +18,7 @@
 class StripePrice < ApplicationRecord
   include Amountable
 
-  INTERVAL_ENUM = {monthly: 0, yearly: 1}
+  INTERVAL_ENUM = {monthly: 0, yearly: 1}.freeze
 
   has_many :stripe_subscriptions, foreign_key: "stripe_price_stripe_id", primary_key: "stripe_id"
 
