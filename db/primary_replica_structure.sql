@@ -3112,7 +3112,7 @@ CREATE TABLE public.stripe_prices (
     membership_kind integer,
     "interval" integer,
     stripe_id character varying,
-    currency character varying,
+    currency_enum integer,
     amount_cents integer,
     live boolean DEFAULT false,
     active boolean DEFAULT true,

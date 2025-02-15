@@ -7,7 +7,7 @@
 #  id              :bigint           not null, primary key
 #  active          :boolean          default(TRUE)
 #  amount_cents    :integer
-#  currency        :string
+#  currency_enum   :integer
 #  interval        :integer
 #  live            :boolean          default(FALSE)
 #  membership_kind :integer
@@ -24,9 +24,10 @@ class StripePrice < ApplicationRecord
 
   enum :membership_kind, Membership::KIND_ENUM
   enum :interval, INTERVAL_ENUM
+  # enum :handlebar_type, Currency::SLUGS
 
   validates :stripe_id, presence: true, uniqueness: true
-  validates :currency, presence: true
+  validates :currency_enum, presence: true
   validates :membership_kind, presence: true
   validates :amount_cents, presence: true
   validates :interval, presence: true

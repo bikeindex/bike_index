@@ -4,7 +4,7 @@ class CreateStripePrices < ActiveRecord::Migration[8.0]
       t.integer :membership_kind
       t.integer :interval
       t.string :stripe_id
-      t.string :currency
+      t.integer :currency_enum
       t.integer :amount_cents
       t.boolean :live, default: false
       t.boolean :active, default: true
