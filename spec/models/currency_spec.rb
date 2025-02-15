@@ -1,0 +1,50 @@
+require "rails_helper"
+
+RSpec.describe Currency, type: :model do
+  describe "USD" do
+    let(:slug) { :usd }
+    let(:target) { {name: "USD", symbol: "$", slug:} }
+    it "creates with slug" do
+      expect(Currency.new(slug)).to have_attributes(target)
+    end
+    it "creates with name" do
+      expect(Currency.new("USD")).to have_attributes(target)
+    end
+    it "creates from default" do
+      expect(Currency.default).to have_attributes(target)
+    end
+    it "creates from symbol" do
+      expect(Currency.new("$")).to have_attributes(target)
+    end
+  end
+
+  describe "CAD" do
+    let(:slug) { :cad }
+    let(:target) { {name: "CAD", symbol: "$", slug:} }
+
+    it "creates with slug" do
+      expect(Currency.new(slug)).to have_attributes(target)
+    end
+
+    it "creates with name" do
+      expect(Currency.new("CAD")).to have_attributes(target)
+    end
+  end
+
+  describe "EUR" do
+    let(:slug) { :eur }
+    let(:target) { {name: "EUR", symbol: "€", slug:} }
+
+    it "creates with slug" do
+      expect(Currency.new(slug)).to have_attributes(target)
+    end
+
+    it "creates with name" do
+      expect(Currency.new("EUR")).to have_attributes(target)
+    end
+
+    it "creates with symbol" do
+      expect(Currency.new("€")).to have_attributes(target)
+    end
+  end
+end
