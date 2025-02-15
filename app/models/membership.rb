@@ -44,6 +44,10 @@ class Membership < ApplicationRecord
     str&.humanize
   end
 
+  def self.kinds_ordered
+    kinds.keys.map { kind_humanized(_1) }
+  end
+
   def kind_humanized
     self.class.kind_humanized(kind)
   end

@@ -1,0 +1,5 @@
+---
+es:
+  components:
+    choose_membership:
+      currency: Currency
