@@ -66,6 +66,8 @@ Rails.application.routes.draw do
     end
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
+  resource :membership
+
   resources :documentation, only: [:index] do
     collection do
       get :api_v1
