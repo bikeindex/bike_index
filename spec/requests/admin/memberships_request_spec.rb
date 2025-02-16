@@ -32,13 +32,28 @@ RSpec.describe Admin::MembershipsController, type: :request do
   describe "create" do
     let!(:user) { FactoryBot.create(:user_confirmed) }
     let(:target_attrs) do
-      {user_id: user.id, start_at: Time.current, kind: "plus", end_at: nil, creator: current_user}
+      {user_id: user.id, start_at: nil, kind: "plus", end_at: nil, creator: current_user,
+       status: "pending_status"}
     end
     it "creates" do
       expect do
         post base_url, params: {membership: {kind: "plus", user_email: " #{user.email.upcase} "}}
       end.to change(Membership, :count).by 1
       expect(Membership.last).to match_hash_indifferently(target_attrs)
+    end
+    context "with a start_at" do
+      it "creates" do
+        expect do
+          post base_url, params: {
+            membership: {
+              kind: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601
+            }
+          }
+        end.to change(Membership, :count).by 1
+        membership = Membership.last
+        expect(membership).to match_hash_indifferently(target_attrs.except(:start_at).merge(status: "active_status"))
+        expect(membership.start_at).to be_within(1).of Time.current
+      end
     end
   end
 

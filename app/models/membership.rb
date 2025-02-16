@@ -7,6 +7,7 @@
 #  end_at     :datetime
 #  kind       :integer
 #  start_at   :datetime
+#  status     :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  creator_id :bigint
@@ -21,6 +22,7 @@ class Membership < ApplicationRecord
   include ActivePeriodable
 
   KIND_ENUM = {basic: 0, plus: 1, patron: 2}
+  STATUS_ENUM = {pending_status: 0, active_status: 1, ended_status: 2}
 
   belongs_to :user
   belongs_to :creator, class_name: "User"
@@ -30,6 +32,7 @@ class Membership < ApplicationRecord
   has_many :payments, through: :stripe_subscriptions
 
   enum :kind, KIND_ENUM
+  enum :status, STATUS_ENUM
 
   validates :user_id, presence: true
   validate :no_active_stripe_subscription_admin_managed
@@ -62,7 +65,7 @@ class Membership < ApplicationRecord
 
   def set_calculated_attributes
     self.kind ||= "basic"
-    self.start_at ||= Time.current
+    self.status = calculated_status
 
     if user_email.present?
       self.user_id ||= User.fuzzy_email_find(user_email)&.id
@@ -74,6 +77,16 @@ class Membership < ApplicationRecord
   end
 
   private
+
+  def calculated_status
+    if start_at.blank? || start_at > Time.current + 1.minute
+      "pending_status"
+    elsif end_at.present? && end_at < Time.current
+      "ended_status"
+    else
+      "active_status"
+    end
+  end
 
   def no_active_stripe_subscription_admin_managed
     return if stripe_managed? || !calculated_active? || user.blank?

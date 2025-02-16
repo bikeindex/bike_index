@@ -8,6 +8,8 @@ RSpec.describe Membership, type: :model do
     it "is valid" do
       expect(membership).to be_valid
       expect(membership.stripe_managed?).to be_falsey
+      expect(membership.active?).to be_truthy
+      expect(membership.status).to eq "active_status"
     end
     context "stripe_managed" do
       let(:membership) { FactoryBot.create(:membership_stripe_managed) }

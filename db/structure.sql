@@ -1993,6 +1993,7 @@ CREATE TABLE public.memberships (
     id bigint NOT NULL,
     user_id bigint,
     kind integer,
+    status integer,
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
     active boolean DEFAULT false,
@@ -2700,8 +2701,8 @@ CREATE TABLE public.payments (
     invoice_id integer,
     kind integer,
     referral_source text,
-    currency_enum integer,
-    stripe_subscription_id bigint
+    stripe_subscription_id bigint,
+    currency_enum integer
 );
 
 

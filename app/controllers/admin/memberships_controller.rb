@@ -61,7 +61,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def permitted_create_parameters
-    params.require(:membership).permit(:user_email, :kind, :end_at)
+    params.require(:membership).permit(:user_email, :kind, :start_at, :end_at)
   end
 
   def permitted_update_parameters
