@@ -17,13 +17,12 @@
 #  updated_at            :datetime         not null
 #
 class TheftAlertPlan < ApplicationRecord
-  include Amountable
   include Currencyable
+  include Amountable
   include Translatable
 
   validates :name,
     :amount_cents,
-    :currency,
     :views,
     :duration_days,
     presence: true
@@ -36,11 +35,6 @@ class TheftAlertPlan < ApplicationRecord
   scope :active, -> { where(active: true) }
   scope :price_ordered_desc, -> { order(amount_cents: :desc) }
   scope :price_ordered_asc, -> { order(amount_cents: :asc) }
-
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
-  end
 
   def description_html
     Kramdown::Document.new(description).to_html

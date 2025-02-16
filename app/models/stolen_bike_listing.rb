@@ -41,8 +41,8 @@
 # Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model
-  include Amountable
   include Currencyable
+  include Amountable
   include BikeSearchable
 
   GROUP_ENUM = {constru: 0}

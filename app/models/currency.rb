@@ -4,19 +4,22 @@ class Currency
   SLUGS = {
     usd: 0,
     cad: 1,
-    eur: 2
+    eur: 2,
+    mxn: 3
   }.freeze
 
   NAMES = {
     usd: "USD",
     cad: "CAD",
-    eur: "EUR"
+    eur: "EUR",
+    mxn: "MXN"
   }.freeze
 
   SYMBOLS = {
     usd: "$",
     cad: "$",
-    eur: "€"
+    eur: "€",
+    mxn: "$"
   }.freeze
 
   def self.default

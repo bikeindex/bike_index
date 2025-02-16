@@ -22,8 +22,8 @@
 #  index_payments_on_user_id  (user_id)
 #
 class Payment < ApplicationRecord
-  include Amountable
   include Currencyable
+  include Amountable
 
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
@@ -45,7 +45,6 @@ class Payment < ApplicationRecord
   has_many :notifications, as: :notifiable
 
   validate :email_or_organization_present
-  validates :currency, presence: true
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
@@ -82,11 +81,6 @@ class Payment < ApplicationRecord
       return all if str.blank?
       where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
     end
-  end
-
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
   end
 
   def paid?
