@@ -6,7 +6,7 @@ module Currencyable
   included do
     enum :currency_enum, Currency::SLUGS
 
-    before_save :set_currency_fallback
+    before_validation :set_currency_fallback
   end
 
   def currency=(val)
@@ -14,7 +14,7 @@ module Currencyable
   end
 
   def currency_obj
-    Currency.new(currency_enum)
+    Currency.new(currency_enum || Currency.default.slug)
   end
 
   def currency_symbol
