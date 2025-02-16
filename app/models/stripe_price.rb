@@ -17,6 +17,7 @@
 #
 class StripePrice < ApplicationRecord
   include Amountable
+  include Currencyable
 
   INTERVAL_ENUM = {monthly: 0, yearly: 1}.freeze
 
@@ -24,7 +25,6 @@ class StripePrice < ApplicationRecord
 
   enum :membership_kind, Membership::KIND_ENUM
   enum :interval, INTERVAL_ENUM
-  # enum :handlebar_type, Currency::SLUGS
 
   validates :stripe_id, presence: true, uniqueness: true
   validates :currency_enum, presence: true
