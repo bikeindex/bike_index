@@ -38,7 +38,7 @@ class Invoice < ApplicationRecord
   has_many :organization_features, through: :invoice_organization_features
   has_many :payments
 
-  validates :organization, :currency, presence: true
+  validates :organization, presence: true
 
   before_save :set_calculated_attributes
   after_commit :update_organization
@@ -220,15 +220,15 @@ class Invoice < ApplicationRecord
   end
 
   def amount_due_formatted
-    MoneyFormater.money_format(amount_due_cents, currency)
+    MoneyFormater.money_format(amount_due_cents, currency_name)
   end
 
   def amount_paid_formatted
-    MoneyFormater.money_format(amount_paid_cents, currency)
+    MoneyFormater.money_format(amount_paid_cents, currency_name)
   end
 
   def discount_formatted
-    MoneyFormater.money_format(-(discount_cents || 0), currency)
+    MoneyFormater.money_format(-(discount_cents || 0), currency_name)
   end
 
   def previous_invoice
