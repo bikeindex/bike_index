@@ -107,7 +107,7 @@ class Payment < ApplicationRecord
       line_items: [{
         price_data: {
           unit_amount: amount_cents,
-          currency: currency,
+          currency: currency_name,
           product_data: {
             name: item_name,
             images: session_images
