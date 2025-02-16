@@ -8,7 +8,6 @@
 #  amount_due_cents            :integer
 #  amount_paid_cents           :integer
 #  child_enabled_feature_slugs :jsonb
-#  currency                    :string           default("USD"), not null
 #  currency_enum               :integer
 #  force_active                :boolean          default(FALSE), not null
 #  is_active                   :boolean          default(FALSE), not null
@@ -30,6 +29,8 @@
 # daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ApplicationRecord
   include Amountable # included for formatting stuff
+  include Currencyable
+
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
@@ -65,11 +66,6 @@ class Invoice < ApplicationRecord
 
   def self.feature_slugs
     includes(:organization_features).pluck(:feature_slugs).flatten.uniq
-  end
-
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
   end
 
   def law_enforcement_functionality_invoice?

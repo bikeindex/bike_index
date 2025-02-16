@@ -6,7 +6,6 @@
 #
 #  id                       :bigint           not null, primary key
 #  amount_cents             :integer
-#  currency                 :string
 #  currency_enum            :integer
 #  data                     :jsonb
 #  frame_model              :text
@@ -43,6 +42,7 @@
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model
   include Amountable
+  include Currencyable
   include BikeSearchable
 
   GROUP_ENUM = {constru: 0}
@@ -77,11 +77,6 @@ class StolenBikeListing < ActiveRecord::Base
 
   def self.find_by_folder(str)
     find { |l| l.updated_photo_folder == str }
-  end
-
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
   end
 
   def photo_urls

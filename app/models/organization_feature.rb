@@ -6,7 +6,6 @@
 #
 #  id            :integer          not null, primary key
 #  amount_cents  :integer
-#  currency      :string           default("USD"), not null
 #  currency_enum :integer
 #  description   :text
 #  details_link  :string
@@ -19,6 +18,8 @@
 
 class OrganizationFeature < ApplicationRecord
   include Amountable
+  include Currencyable
+
   KIND_ENUM = {standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3}.freeze
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array

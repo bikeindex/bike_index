@@ -4,7 +4,6 @@
 #
 #  id                     :integer          not null, primary key
 #  amount_cents           :integer
-#  currency               :string           default("USD"), not null
 #  currency_enum          :integer
 #  email                  :string(255)
 #  kind                   :integer
@@ -26,6 +25,8 @@
 #
 class Payment < ApplicationRecord
   include Amountable
+  include Currencyable
+
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
 
