@@ -2,24 +2,27 @@
 #
 # Table name: payments
 #
-#  id              :integer          not null, primary key
-#  amount_cents    :integer
-#  currency        :string           default("USD"), not null
-#  email           :string(255)
-#  kind            :integer
-#  paid_at         :datetime
-#  payment_method  :integer          default("stripe")
-#  referral_source :text
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  invoice_id      :integer
-#  organization_id :integer
-#  stripe_id       :string(255)
-#  user_id         :integer
+#  id                     :integer          not null, primary key
+#  amount_cents           :integer
+#  currency               :string           default("USD"), not null
+#  currency_enum          :integer
+#  email                  :string(255)
+#  kind                   :integer
+#  paid_at                :datetime
+#  payment_method         :integer          default("stripe")
+#  referral_source        :text
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  invoice_id             :integer
+#  organization_id        :integer
+#  stripe_id              :string(255)
+#  stripe_subscription_id :bigint
+#  user_id                :integer
 #
 # Indexes
 #
-#  index_payments_on_user_id  (user_id)
+#  index_payments_on_stripe_subscription_id  (stripe_subscription_id)
+#  index_payments_on_user_id                 (user_id)
 #
 class Payment < ApplicationRecord
   include Amountable
@@ -50,34 +53,41 @@ class Payment < ApplicationRecord
 
   attr_accessor :skip_update
 
-  def self.payment_methods
-    PAYMENT_METHOD_ENUM.keys.map(&:to_s)
+  class << self
+    def payment_methods
+      PAYMENT_METHOD_ENUM.keys.map(&:to_s)
+    end
+
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
+
+    def admin_creatable_payment_methods
+      ["check"]
+    end
+
+    def kind_humanized(kind)
+      return "NO KIND!" unless kind.present?
+      return "Promoted alert" if kind == "theft_alert"
+      kind&.humanize
+    end
+
+    def normalize_referral_source(str)
+      return nil if str.blank?
+      str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").gsub(/\/|_/, "-")
+      Slugifyer.slugify(str)
+    end
+
+    # NOTE: Currently only searches by referral_source - in the future it might do other stuff
+    def admin_search(str)
+      return all if str.blank?
+      where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
+    end
   end
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
-
-  def self.admin_creatable_payment_methods
-    ["check"]
-  end
-
-  def self.kind_humanized(kind)
-    return "NO KIND!" unless kind.present?
-    return "Promoted alert" if kind == "theft_alert"
-    kind&.humanize
-  end
-
-  def self.normalize_referral_source(str)
-    return nil if str.blank?
-    str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").gsub(/\/|_/, "-")
-    Slugifyer.slugify(str)
-  end
-
-  # NOTE: Currently only searches by referral_source - in the future it might do other stuff
-  def self.admin_search(str)
-    return all if str.blank?
-    where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
+  # TODO: migrate currency to currency_str then currency_enum
+  def currency_name
+    currency
   end
 
   def paid?

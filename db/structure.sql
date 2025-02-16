@@ -1363,10 +1363,10 @@ CREATE TABLE public.hot_sheets (
     organization_id bigint,
     stolen_record_ids jsonb,
     recipient_ids jsonb,
-    delivery_status character varying,
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    delivery_status character varying
 );
 
 
@@ -1640,7 +1640,8 @@ CREATE TABLE public.invoices (
     notes text,
     child_enabled_feature_slugs jsonb,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
-    is_endless boolean DEFAULT false
+    is_endless boolean DEFAULT false,
+    currency_enum integer
 );
 
 
@@ -2261,7 +2262,8 @@ CREATE TABLE public.organization_features (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     feature_slugs text[] DEFAULT '{}'::text[],
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
+    currency character varying DEFAULT 'USD'::character varying NOT NULL,
+    currency_enum integer
 );
 
 
@@ -2664,7 +2666,8 @@ CREATE TABLE public.payments (
     invoice_id integer,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
-    referral_source text
+    referral_source text,
+    currency_enum integer
 );
 
 
@@ -2900,7 +2903,8 @@ CREATE TABLE public.stolen_bike_listings (
     line integer,
     "group" integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    currency_enum integer
 );
 
 
@@ -3087,7 +3091,8 @@ CREATE TABLE public.theft_alert_plans (
     language integer DEFAULT 0 NOT NULL,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
     amount_cents_facebook integer,
-    ad_radius_miles integer
+    ad_radius_miles integer,
+    currency_enum integer
 );
 
 
@@ -6207,6 +6212,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250216183834'),
 ('20250207221053'),
 ('20250207193640'),
 ('20250205135704'),

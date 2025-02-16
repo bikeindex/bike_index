@@ -9,6 +9,7 @@
 #  amount_paid_cents           :integer
 #  child_enabled_feature_slugs :jsonb
 #  currency                    :string           default("USD"), not null
+#  currency_enum               :integer
 #  force_active                :boolean          default(FALSE), not null
 #  is_active                   :boolean          default(FALSE), not null
 #  is_endless                  :boolean          default(FALSE)
@@ -64,6 +65,11 @@ class Invoice < ApplicationRecord
 
   def self.feature_slugs
     includes(:organization_features).pluck(:feature_slugs).flatten.uniq
+  end
+
+  # TODO: migrate currency to currency_str then currency_enum
+  def currency_name
+    currency
   end
 
   def law_enforcement_functionality_invoice?

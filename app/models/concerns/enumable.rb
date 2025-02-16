@@ -39,6 +39,7 @@ module Enumable
 
     def find_sym(str)
       return if str.blank?
+      return str.slug if str.instance_of?(self)
       return str if str.is_a?(Symbol) && self::SLUGS.key?(str)
       str = str.to_s.downcase.strip if str.is_a?(String) || str.is_a?(Symbol)
       if str.is_a?(Integer) || str.match?(/\A\d+\z/)
