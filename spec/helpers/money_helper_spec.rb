@@ -59,7 +59,7 @@ RSpec.describe MoneyHelper, type: :helper do
         currency = money_usd(1.00, exchange_to: :EUR)
         expect(currency).to be_an_instance_of(Money)
         expect(currency.fractional).to eq(conversion_rate * 100)
-        expect(currency.currency_name).to eq(:EUR)
+        expect(currency.currency).to eq(:EUR)
       end
     end
 
@@ -82,7 +82,7 @@ RSpec.describe MoneyHelper, type: :helper do
         currency = money_usd(1.00)
         expect(currency).to be_an_instance_of(Money)
         expect(currency.fractional).to eq(100)
-        expect(currency.currency_name).to eq(:USD)
+        expect(currency.currency).to eq(:USD)
       end
     end
   end
@@ -126,14 +126,6 @@ RSpec.describe MoneyHelper, type: :helper do
       it "returns a Money object converting to the default currency" do
         expect(as_currency(100)).to eq("$100")
       end
-    end
-  end
-
-  describe "#currency_symbols" do
-    let(:target) { ["$ (USD)", "€ (EUR)"] }
-
-    it "returns the available currencies" do
-      expect(currency_symbols).to eq target
     end
   end
 end

@@ -141,7 +141,7 @@ class Admin::PaymentsController < Admin::BaseController
   def permitted_create_parameters
     params
       .require(:payment)
-      .permit(:payment_method, :amount, :email, :currency, :created_at, :referral_source)
+      .permit(:payment_method, :amount, :email, :currency_enum, :created_at, :referral_source)
       .merge(invoice_parameters)
   end
 

@@ -9,7 +9,13 @@
           %span.less-strong= payment.payment_method
       %tr
         %td Amount
-        %td= payment.amount_formatted
+        %td
+          = payment.amount_formatted
+      %tr
+        %td Currency
+        %td
+          %span{class: (payment.currency_enum == Currency.default.slug ? "less-strong" : "text-info")}
+            = payment.currency_name
       - if payment.stripe_id.present?
         %tr
           %td Stripe ID

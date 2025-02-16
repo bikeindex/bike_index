@@ -47,7 +47,7 @@ class Admin::OrganizationFeaturesController < Admin::BaseController
   end
 
   def permitted_update_parameters
-    permitted_parameters = params.require(:organization_feature).permit(:amount, :description, :details_link, :kind, :name, :currency)
+    permitted_parameters = params.require(:organization_feature).permit(:amount, :description, :details_link, :kind, :name, :currency_enum)
     if current_user.developer?
       permitted_parameters.merge(params.require(:organization_feature).permit(:feature_slugs_string))
     elsif @organization_feature&.id&.present? && @organization_feature.locked?

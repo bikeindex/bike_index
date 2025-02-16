@@ -30,6 +30,10 @@ class Currency
     super || self::SYMBOLS.detect { |k, v| str == v }&.first
   end
 
+  def self.select_options
+    slugs.map { |slug| ["#{SYMBOLS[slug.to_sym]} (#{slug_translation(slug)})", slug] }
+  end
+
   def initialize(slug)
     @slug = self.class.find_sym(slug)
     @id = SLUGS[@slug]

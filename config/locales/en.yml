@@ -687,6 +687,11 @@ en:
         name: Name
         priority: Priority
     enums:
+      currency: 
+        usd: USD
+        cad: CAD
+        eur: EUR
+        mxn: MXN
       cycle_type:
         bike: Bike
         cargo: Cargo Bike (front storage)
@@ -3869,6 +3874,7 @@ en:
     en: English
     nb: Norwegian (Bokmål)
     nl: Nederlands (Dutch)
+    es: Spanish
   locks:
     edit:
       are_you_sure: Are you sure?
