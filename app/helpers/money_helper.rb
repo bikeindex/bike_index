@@ -18,17 +18,6 @@ module MoneyHelper
     ExchangeRate.required_targets
   end
 
-  # Return a list of currency symbols and abbreviations for all available locales:
-  # ["$ (USD)", "€ (EUR)"]
-  def currency_symbols
-    I18n.available_locales.map do |locale|
-      [
-        I18n.with_locale(locale) { number_to_currency(1, format: "%u") },
-        "(#{t(locale, scope: [:money, :currencies])})"
-      ].join(" ")
-    end.uniq
-  end
-
   def money_usd(dollars, exchange_to: default_currency)
     Money.new(dollars * 100, :USD).exchange_to(exchange_to)
   end

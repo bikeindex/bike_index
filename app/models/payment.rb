@@ -2,30 +2,29 @@
 #
 # Table name: payments
 #
-#  id                     :integer          not null, primary key
-#  amount_cents           :integer
-#  currency               :string           default("USD"), not null
-#  currency_enum          :integer
-#  email                  :string(255)
-#  kind                   :integer
-#  paid_at                :datetime
-#  payment_method         :integer          default("stripe")
-#  referral_source        :text
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  invoice_id             :integer
-#  organization_id        :integer
-#  stripe_id              :string(255)
-#  stripe_subscription_id :bigint
-#  user_id                :integer
+#  id              :integer          not null, primary key
+#  amount_cents    :integer
+#  currency_enum   :integer
+#  email           :string(255)
+#  kind            :integer
+#  paid_at         :datetime
+#  payment_method  :integer          default("stripe")
+#  referral_source :text
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  invoice_id      :integer
+#  organization_id :integer
+#  stripe_id       :string(255)
+#  user_id         :integer
 #
 # Indexes
 #
-#  index_payments_on_stripe_subscription_id  (stripe_subscription_id)
-#  index_payments_on_user_id                 (user_id)
+#  index_payments_on_user_id  (user_id)
 #
 class Payment < ApplicationRecord
+  include Currencyable
   include Amountable
+
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
 
@@ -46,7 +45,6 @@ class Payment < ApplicationRecord
   has_many :notifications, as: :notifiable
 
   validate :email_or_organization_present
-  validates :currency, presence: true
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
@@ -85,11 +83,6 @@ class Payment < ApplicationRecord
     end
   end
 
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
-  end
-
   def paid?
     paid_at.present?
   end
@@ -114,7 +107,7 @@ class Payment < ApplicationRecord
       line_items: [{
         price_data: {
           unit_amount: amount_cents,
-          currency: currency,
+          currency: currency_name,
           product_data: {
             name: item_name,
             images: session_images

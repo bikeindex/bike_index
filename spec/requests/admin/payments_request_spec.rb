@@ -119,7 +119,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
     end
     context "check payment" do
       it "creates" do
-        payment_attrs = params.merge(payment_method: "check")
+        payment_attrs = params.merge(payment_method: "check", currency_enum: "mxn")
 
         expect {
           post base_url, params: {payment: payment_attrs}
@@ -133,6 +133,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
         expect(payment.amount_cents).to eq 22_222
         expect(payment.payment_method).to eq "check"
         expect(payment.created_at).to be_within(1.minute).of create_time
+        expect(payment.currency_name).to eq "MXN"
         expect(payment.paid?).to be_truthy
       end
       context "no organization" do

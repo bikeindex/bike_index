@@ -6,7 +6,6 @@
 #
 #  id                       :bigint           not null, primary key
 #  amount_cents             :integer
-#  currency                 :string
 #  currency_enum            :integer
 #  data                     :jsonb
 #  frame_model              :text
@@ -42,6 +41,7 @@
 # Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model
+  include Currencyable
   include Amountable
   include BikeSearchable
 
@@ -79,11 +79,6 @@ class StolenBikeListing < ActiveRecord::Base
     find { |l| l.updated_photo_folder == str }
   end
 
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
-  end
-
   def photo_urls
     (data["photo_urls"] || []).sort
   end
@@ -103,7 +98,7 @@ class StolenBikeListing < ActiveRecord::Base
 
   def calculated_amount_cents_usd
     return 0 unless amount_cents.present?
-    Money.new(amount_cents, currency).exchange_to(:USD).cents
+    Money.new(amount_cents, currency_name).exchange_to(:USD).cents
   end
 
   def updated_photo_folder

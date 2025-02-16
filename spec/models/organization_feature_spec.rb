@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe OrganizationFeature, type: :model do
   it_behaves_like "amountable"
+  it_behaves_like "currencyable"
 
   describe "constant ordering" do
     it "is ordered" do

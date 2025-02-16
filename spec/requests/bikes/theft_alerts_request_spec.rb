@@ -98,7 +98,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(payment.user_id).to eq current_user.id
       expect(payment.stripe_id).to be_present
       expect(payment.kind).to eq "theft_alert"
-      expect(payment.currency).to eq "USD"
+      expect(payment.currency_name).to eq "USD"
       expect(payment.amount_cents).to eq theft_alert_plan.amount_cents
       expect(payment.paid_at).to be_blank # Ensure this gets set
       expect(payment.paid?).to be_falsey

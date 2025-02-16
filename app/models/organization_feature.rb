@@ -6,7 +6,6 @@
 #
 #  id            :integer          not null, primary key
 #  amount_cents  :integer
-#  currency      :string           default("USD"), not null
 #  currency_enum :integer
 #  description   :text
 #  details_link  :string
@@ -18,7 +17,9 @@
 #
 
 class OrganizationFeature < ApplicationRecord
+  include Currencyable
   include Amountable
+
   KIND_ENUM = {standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3}.freeze
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
@@ -76,7 +77,6 @@ class OrganizationFeature < ApplicationRecord
   has_many :invoices, through: :invoice_organization_features
 
   validates_uniqueness_of :name
-  validates :currency, presence: true
 
   enum :kind, KIND_ENUM
 
@@ -125,11 +125,6 @@ class OrganizationFeature < ApplicationRecord
     def feature_slugs
       pluck(:feature_slugs).flatten.uniq
     end
-  end
-
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
   end
 
   def has_feature_slugs?

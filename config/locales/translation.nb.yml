@@ -880,6 +880,11 @@ nb:
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedalassistent og gass
         throttle: Gasspedal
+      currency:
+        cad: CAD
+        eur: EUR
+        mxn: MXN
+        usd: USD
     models:
       ad: Annonse
       ambassador: Ambassadør
@@ -4238,6 +4243,7 @@ nb:
     en: Engelsk
     nb: norsk (bokmål)
     nl: Nederlands (nederlandsk)
+    es: spansk
   locks:
     edit:
       are_you_sure: Er du sikker?

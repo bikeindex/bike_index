@@ -38,7 +38,7 @@ RSpec.describe ImportStolenBikeListingJob, type: :lib do
       expect(stolen_bike_listing.primary_frame_color_id).to eq Color.black.id
       expect(stolen_bike_listing.manufacturer_id).to eq manufacturer.id
       expect(stolen_bike_listing.amount).to eq 203.33
-      expect(stolen_bike_listing.currency).to eq "MXN"
+      expect(stolen_bike_listing.currency_name).to eq "MXN"
       expect(stolen_bike_listing.amount_formatted).to eq "$203.33"
       expect(stolen_bike_listing.frame_model).to eq "whatever"
       expect(stolen_bike_listing.listing_text).to eq "something something All City 26\""

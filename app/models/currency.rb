@@ -4,19 +4,22 @@ class Currency
   SLUGS = {
     usd: 0,
     cad: 1,
-    eur: 2
+    eur: 2,
+    mxn: 3
   }.freeze
 
   NAMES = {
     usd: "USD",
     cad: "CAD",
-    eur: "EUR"
+    eur: "EUR",
+    mxn: "MXN"
   }.freeze
 
   SYMBOLS = {
     usd: "$",
     cad: "$",
-    eur: "€"
+    eur: "€",
+    mxn: "$"
   }.freeze
 
   def self.default
@@ -25,6 +28,10 @@ class Currency
 
   def self.find_sym(str)
     super || self::SYMBOLS.detect { |k, v| str == v }&.first
+  end
+
+  def self.select_options
+    slugs.map { |slug| ["#{SYMBOLS[slug.to_sym]} (#{slug_translation(slug)})", slug] }
   end
 
   def initialize(slug)

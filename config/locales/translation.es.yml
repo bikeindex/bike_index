@@ -869,6 +869,11 @@ es:
         pedal_assist:
         pedal_assist_and_throttle:
         throttle:
+      currency:
+        cad:
+        eur:
+        mxn:
+        usd:
     models:
       ad:
       ambassador:
@@ -3263,6 +3268,7 @@ es:
     en: Inglés
     nb: Noruego (Bokmål)
     nl: Nederlands (neerlandés)
+    es:
   locks:
     edit:
       are_you_sure: "¿Estás seguro?"
