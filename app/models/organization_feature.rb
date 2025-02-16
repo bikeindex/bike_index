@@ -7,6 +7,7 @@
 #  id            :integer          not null, primary key
 #  amount_cents  :integer
 #  currency      :string           default("USD"), not null
+#  currency_enum :integer
 #  description   :text
 #  details_link  :string
 #  feature_slugs :text             default([]), is an Array

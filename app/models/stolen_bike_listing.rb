@@ -7,6 +7,7 @@
 #  id                       :bigint           not null, primary key
 #  amount_cents             :integer
 #  currency                 :string
+#  currency_enum            :integer
 #  data                     :jsonb
 #  frame_model              :text
 #  frame_size               :string

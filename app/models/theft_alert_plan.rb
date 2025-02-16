@@ -8,6 +8,7 @@
 #  amount_cents          :integer          not null
 #  amount_cents_facebook :integer
 #  currency              :string           default("USD"), not null
+#  currency_enum         :integer
 #  description           :string           default(""), not null
 #  duration_days         :integer          not null
 #  language              :integer          default("en"), not null

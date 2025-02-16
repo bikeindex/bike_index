@@ -1363,10 +1363,10 @@ CREATE TABLE public.hot_sheets (
     organization_id bigint,
     stolen_record_ids jsonb,
     recipient_ids jsonb,
-    delivery_status character varying,
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    delivery_status character varying
 );
 
 
@@ -1640,7 +1640,8 @@ CREATE TABLE public.invoices (
     notes text,
     child_enabled_feature_slugs jsonb,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
-    is_endless boolean DEFAULT false
+    is_endless boolean DEFAULT false,
+    currency_enum integer
 );
 
 
@@ -1986,6 +1987,42 @@ ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 
 
 --
+-- Name: memberships; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.memberships (
+    id bigint NOT NULL,
+    user_id bigint,
+    kind integer,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    active boolean DEFAULT false,
+    creator_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: memberships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.memberships_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: memberships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.memberships_id_seq OWNED BY public.memberships.id;
+
+
+--
 -- Name: model_attestations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2261,7 +2298,8 @@ CREATE TABLE public.organization_features (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     feature_slugs text[] DEFAULT '{}'::text[],
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
+    currency character varying DEFAULT 'USD'::character varying NOT NULL,
+    currency_enum integer
 );
 
 
@@ -2664,7 +2702,9 @@ CREATE TABLE public.payments (
     invoice_id integer,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
-    referral_source text
+    referral_source text,
+    stripe_subscription_id bigint,
+    currency_enum integer
 );
 
 
@@ -2900,7 +2940,8 @@ CREATE TABLE public.stolen_bike_listings (
     line integer,
     "group" integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    currency_enum integer
 );
 
 
@@ -3035,6 +3076,112 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
+-- Name: stripe_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_events (
+    id bigint NOT NULL,
+    stripe_subscription_stripe_id character varying,
+    name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_events_id_seq OWNED BY public.stripe_events.id;
+
+
+--
+-- Name: stripe_prices; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_prices (
+    id bigint NOT NULL,
+    membership_kind integer,
+    "interval" integer,
+    stripe_id character varying,
+    currency_enum integer,
+    amount_cents integer,
+    live boolean DEFAULT false,
+    active boolean DEFAULT true,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_prices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_prices_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_prices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_prices_id_seq OWNED BY public.stripe_prices.id;
+
+
+--
+-- Name: stripe_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_subscriptions (
+    id bigint NOT NULL,
+    membership_id bigint,
+    user_id bigint,
+    stripe_price_stripe_id character varying,
+    stripe_id character varying,
+    end_at timestamp(6) without time zone,
+    start_at timestamp(6) without time zone,
+    active boolean DEFAULT false,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_subscriptions_id_seq OWNED BY public.stripe_subscriptions.id;
+
+
+--
 -- Name: superuser_abilities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3087,7 +3234,8 @@ CREATE TABLE public.theft_alert_plans (
     language integer DEFAULT 0 NOT NULL,
     currency character varying DEFAULT 'USD'::character varying NOT NULL,
     amount_cents_facebook integer,
-    ad_radius_miles integer
+    ad_radius_miles integer,
+    currency_enum integer
 );
 
 
@@ -3888,6 +4036,13 @@ ALTER TABLE ONLY public.manufacturers ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.memberships_id_seq'::regclass);
+
+
+--
 -- Name: model_attestations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4060,6 +4215,27 @@ ALTER TABLE ONLY public.stolen_notifications ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('public.stolen_records_id_seq'::regclass);
+
+
+--
+-- Name: stripe_events id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_events ALTER COLUMN id SET DEFAULT nextval('public.stripe_events_id_seq'::regclass);
+
+
+--
+-- Name: stripe_prices id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_prices ALTER COLUMN id SET DEFAULT nextval('public.stripe_prices_id_seq'::regclass);
+
+
+--
+-- Name: stripe_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.stripe_subscriptions_id_seq'::regclass);
 
 
 --
@@ -4547,6 +4723,14 @@ ALTER TABLE ONLY public.manufacturers
 
 
 --
+-- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.memberships
+    ADD CONSTRAINT memberships_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: model_attestations model_attestations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4744,6 +4928,30 @@ ALTER TABLE ONLY public.stolen_bike_listings
 
 ALTER TABLE ONLY public.stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_events stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_events
+    ADD CONSTRAINT stripe_events_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_prices stripe_prices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_prices
+    ADD CONSTRAINT stripe_prices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_subscriptions stripe_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_subscriptions
+    ADD CONSTRAINT stripe_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -5543,6 +5751,20 @@ CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btre
 
 
 --
+-- Name: index_memberships_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_memberships_on_creator_id ON public.memberships USING btree (creator_id);
+
+
+--
+-- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_memberships_on_user_id ON public.memberships USING btree (user_id);
+
+
+--
 -- Name: index_model_attestations_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5837,6 +6059,13 @@ CREATE INDEX index_parking_notifications_on_user_id ON public.parking_notificati
 
 
 --
+-- Name: index_payments_on_stripe_subscription_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_payments_on_stripe_subscription_id ON public.payments USING btree (stripe_subscription_id);
+
+
+--
 -- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5946,6 +6175,34 @@ CREATE INDEX index_stolen_records_on_organization_stolen_message_id ON public.st
 --
 
 CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records USING btree (recovering_user_id);
+
+
+--
+-- Name: index_stripe_events_on_stripe_subscription_stripe_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_events_on_stripe_subscription_stripe_id ON public.stripe_events USING btree (stripe_subscription_stripe_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_membership_id ON public.stripe_subscriptions USING btree (membership_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_stripe_price_stripe_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_stripe_price_stripe_id ON public.stripe_subscriptions USING btree (stripe_price_stripe_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_user_id ON public.stripe_subscriptions USING btree (user_id);
 
 
 --
@@ -6207,6 +6464,11 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250216183834'),
+('20250211165635'),
+('20250211164846'),
+('20250211164840'),
+('20250211164827'),
 ('20250207221053'),
 ('20250207193640'),
 ('20250205135704'),

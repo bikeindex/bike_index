@@ -9,6 +9,7 @@
 #  amount_paid_cents           :integer
 #  child_enabled_feature_slugs :jsonb
 #  currency                    :string           default("USD"), not null
+#  currency_enum               :integer
 #  force_active                :boolean          default(FALSE), not null
 #  is_active                   :boolean          default(FALSE), not null
 #  is_endless                  :boolean          default(FALSE)
