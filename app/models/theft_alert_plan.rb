@@ -36,6 +36,11 @@ class TheftAlertPlan < ApplicationRecord
   scope :price_ordered_desc, -> { order(amount_cents: :desc) }
   scope :price_ordered_asc, -> { order(amount_cents: :asc) }
 
+  # TODO: migrate currency to currency_str then currency_enum
+  def currency_name
+    currency
+  end
+
   def description_html
     Kramdown::Document.new(description).to_html
   end

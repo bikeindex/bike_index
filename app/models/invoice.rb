@@ -66,6 +66,11 @@ class Invoice < ApplicationRecord
     includes(:organization_features).pluck(:feature_slugs).flatten.uniq
   end
 
+  # TODO: migrate currency to currency_str then currency_enum
+  def currency_name
+    currency
+  end
+
   def law_enforcement_functionality_invoice?
     organization_features.pluck(:name).any? { |n| n.match?(/law enforcement/i) }
   end

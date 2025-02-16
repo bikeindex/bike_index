@@ -78,6 +78,11 @@ class StolenBikeListing < ActiveRecord::Base
     find { |l| l.updated_photo_folder == str }
   end
 
+  # TODO: migrate currency to currency_str then currency_enum
+  def currency_name
+    currency
+  end
+
   def photo_urls
     (data["photo_urls"] || []).sort
   end
