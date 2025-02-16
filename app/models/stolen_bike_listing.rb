@@ -98,7 +98,7 @@ class StolenBikeListing < ActiveRecord::Base
 
   def calculated_amount_cents_usd
     return 0 unless amount_cents.present?
-    Money.new(amount_cents, currency).exchange_to(:USD).cents
+    Money.new(amount_cents, currency_name).exchange_to(:USD).cents
   end
 
   def updated_photo_folder
