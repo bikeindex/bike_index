@@ -20,6 +20,15 @@ RSpec.describe Payment, type: :model do
     end
   end
 
+  describe "stripe_session_hash" do
+    let(:payment) { Payment.new(amount_cents: 2500, kind: "donation")}
+    it "renders" do
+      expect(payment.stripe_session_hash[:submit_type]).to eq "donate"
+      expect(payment.stripe_session_hash[:success_url]).to be_present
+      expect(payment.stripe_session_hash[:cancel_url]).to be_present
+    end
+  end
+
   describe "admin_search" do
     let!(:payment1) { FactoryBot.create(:payment, referral_source: "something%20special") }
     let!(:payment2) { FactoryBot.create(:payment, referral_source: "something/else/special", email: "sTUFF@things.com ", user: nil) }
