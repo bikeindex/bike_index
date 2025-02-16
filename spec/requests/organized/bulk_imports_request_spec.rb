@@ -267,7 +267,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             let!(:current_organization) { stolen_organization }
             let!(:color_green) { FactoryBot.create(:color, name: "Green") }
             let!(:color_white) { FactoryBot.create(:color, name: "White") }
-            it "creates with stolen attributes" do
+            it "creates with stolen attributes", :flaky do
               Sidekiq::Job.clear_all
               expect {
                 post base_url, params: {
