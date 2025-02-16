@@ -13,7 +13,6 @@
   = f.hidden_field :amount_cents
   = f.hidden_field :referral_source, value: params[:source]
   = f.hidden_field :kind, value: (is_payment ? "payment" : "donation")
-  = f.hidden_field :currency, value: "USD"
   / -# If this is rendering from cache, don't include email because caching
   - email = is_cached ? nil : current_user&.email
   = f.hidden_field :email, value: email
