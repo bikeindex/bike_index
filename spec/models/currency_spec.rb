@@ -29,6 +29,11 @@ RSpec.describe Currency, type: :model do
     it "creates with name" do
       expect(Currency.new("CAD")).to have_attributes(target)
     end
+
+    it "creates from instance" do
+      instance = Currency.new(slug)
+      expect(Currency.new(instance)).to have_attributes(target)
+    end
   end
 
   describe "EUR" do

@@ -13,6 +13,6 @@ module Amountable
   end
 
   def amount_formatted
-    MoneyFormater.money_format(amount_cents, currency)
+    MoneyFormater.money_format(amount_cents, currency_name)
   end
 end

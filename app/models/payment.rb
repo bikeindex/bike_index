@@ -5,6 +5,7 @@
 #  id                     :integer          not null, primary key
 #  amount_cents           :integer
 #  currency               :string           default("USD"), not null
+#  currency_enum          :integer
 #  email                  :string(255)
 #  kind                   :integer
 #  paid_at                :datetime
@@ -53,34 +54,41 @@ class Payment < ApplicationRecord
 
   attr_accessor :skip_update
 
-  def self.payment_methods
-    PAYMENT_METHOD_ENUM.keys.map(&:to_s)
+  class << self
+    def payment_methods
+      PAYMENT_METHOD_ENUM.keys.map(&:to_s)
+    end
+
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
+
+    def admin_creatable_payment_methods
+      ["check"]
+    end
+
+    def kind_humanized(kind)
+      return "NO KIND!" unless kind.present?
+      return "Promoted alert" if kind == "theft_alert"
+      kind&.humanize
+    end
+
+    def normalize_referral_source(str)
+      return nil if str.blank?
+      str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").gsub(/\/|_/, "-")
+      Slugifyer.slugify(str)
+    end
+
+    # NOTE: Currently only searches by referral_source - in the future it might do other stuff
+    def admin_search(str)
+      return all if str.blank?
+      where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
+    end
   end
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
-
-  def self.admin_creatable_payment_methods
-    ["check"]
-  end
-
-  def self.kind_humanized(kind)
-    return "NO KIND!" unless kind.present?
-    return "Promoted alert" if kind == "theft_alert"
-    kind&.humanize
-  end
-
-  def self.normalize_referral_source(str)
-    return nil if str.blank?
-    str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").gsub(/\/|_/, "-")
-    Slugifyer.slugify(str)
-  end
-
-  # NOTE: Currently only searches by referral_source - in the future it might do other stuff
-  def self.admin_search(str)
-    return all if str.blank?
-    where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
+  # TODO: migrate currency to currency_str then currency_enum
+  def currency_name
+    currency
   end
 
   def paid?
