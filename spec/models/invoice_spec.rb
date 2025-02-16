@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Invoice, type: :model do
+  it_behaves_like "currencyable"
+
   let(:organization) { invoice.organization }
 
   describe "friendly_find" do

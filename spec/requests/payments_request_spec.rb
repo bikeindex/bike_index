@@ -134,7 +134,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.user_id).to be_blank
         expect(payment.stripe_id).to be_present
         expect(payment.kind).to eq "payment"
-        expect(payment.currency).to eq "USD"
+        expect(payment.currency_name).to eq "USD"
         expect(payment.amount_cents).to eq 4000
         expect(payment.paid_at).to be_blank # Ensure this gets set
         expect(payment.paid?).to be_falsey
@@ -189,7 +189,7 @@ RSpec.describe PaymentsController, type: :request do
               is_arbitrary: false,
               payment: {
                 amount_cents: "4000",
-                currency: "USD",
+                currency: "MXN",
                 kind: "donation"
               }
             }
@@ -198,7 +198,7 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.user_id).to eq current_user.id
           expect(payment.stripe_id).to be_present
           expect(payment.kind).to eq "donation"
-          expect(payment.currency).to eq "USD"
+          expect(payment.currency_name).to eq "MXN"
           expect(payment.amount_cents).to eq 4000
           expect(payment.paid_at).to be_blank # Ensure this gets set
           expect(payment.paid?).to be_falsey
@@ -225,7 +225,7 @@ RSpec.describe PaymentsController, type: :request do
             expect(payment.user_id).to eq current_user.id
             expect(payment.stripe_id).to be_present
             expect(payment.kind).to eq "donation"
-            expect(payment.currency).to eq "USD"
+            expect(payment.currency_name).to eq "USD"
             expect(payment.amount_cents).to eq 7500
             expect(payment.paid_at).to be_blank # Ensure this gets set
             expect(payment.paid?).to be_falsey

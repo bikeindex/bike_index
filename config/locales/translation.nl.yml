@@ -879,6 +879,11 @@ nl:
         throttle: Elektrisch gaspedaal
         pedal_assist_and_throttle: Trapondersteuning en gaspedaal
         human_not_pedal: Menselijk aangedreven (niet door pedalen)
+      currency:
+        cad: CAD
+        eur: EUR
+        mxn: MXN
+        usd: USD
     models:
       ad: Advertentie
       ambassador: Ambassadeur
@@ -5206,6 +5211,7 @@ nl:
     en: English (Engels)
     nl: Nederlands
     nb: Noors (Bokmål)
+    es: Spaans
   money:
     currencies:
       en: USD

@@ -874,6 +874,11 @@ it:
         pedal_assist: Pedalata assisita
         pedal_assist_and_throttle: Pedalata assistita e acceleratore
         throttle: Acceleratore elettrico
+      currency:
+        cad:
+        eur: EUR
+        mxn:
+        usd: USD
     models:
       ad: Annuncio
       ambassador: Ambasciatore
@@ -3279,6 +3284,7 @@ it:
     en:
     nb:
     nl:
+    es:
   locks:
     edit:
       are_you_sure: Sei sicuro?

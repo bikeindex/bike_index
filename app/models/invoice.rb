@@ -8,7 +8,6 @@
 #  amount_due_cents            :integer
 #  amount_paid_cents           :integer
 #  child_enabled_feature_slugs :jsonb
-#  currency                    :string           default("USD"), not null
 #  currency_enum               :integer
 #  force_active                :boolean          default(FALSE), not null
 #  is_active                   :boolean          default(FALSE), not null
@@ -29,7 +28,9 @@
 
 # daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ApplicationRecord
+  include Currencyable
   include Amountable # included for formatting stuff
+
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
@@ -37,7 +38,7 @@ class Invoice < ApplicationRecord
   has_many :organization_features, through: :invoice_organization_features
   has_many :payments
 
-  validates :organization, :currency, presence: true
+  validates :organization, presence: true
 
   before_save :set_calculated_attributes
   after_commit :update_organization
@@ -65,11 +66,6 @@ class Invoice < ApplicationRecord
 
   def self.feature_slugs
     includes(:organization_features).pluck(:feature_slugs).flatten.uniq
-  end
-
-  # TODO: migrate currency to currency_str then currency_enum
-  def currency_name
-    currency
   end
 
   def law_enforcement_functionality_invoice?
@@ -224,15 +220,15 @@ class Invoice < ApplicationRecord
   end
 
   def amount_due_formatted
-    MoneyFormater.money_format(amount_due_cents, currency)
+    MoneyFormater.money_format(amount_due_cents, currency_name)
   end
 
   def amount_paid_formatted
-    MoneyFormater.money_format(amount_paid_cents, currency)
+    MoneyFormater.money_format(amount_paid_cents, currency_name)
   end
 
   def discount_formatted
-    MoneyFormater.money_format(-(discount_cents || 0), currency)
+    MoneyFormater.money_format(-(discount_cents || 0), currency_name)
   end
 
   def previous_invoice

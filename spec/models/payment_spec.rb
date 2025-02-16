@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Payment, type: :model do
   it_behaves_like "amountable"
+  it_behaves_like "currencyable"
 
   describe "normalize_referral_source" do
     it "is nil" do

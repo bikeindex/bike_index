@@ -1639,7 +1639,6 @@ CREATE TABLE public.invoices (
     updated_at timestamp without time zone NOT NULL,
     notes text,
     child_enabled_feature_slugs jsonb,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     is_endless boolean DEFAULT false,
     currency_enum integer
 );
@@ -2298,7 +2297,6 @@ CREATE TABLE public.organization_features (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     feature_slugs text[] DEFAULT '{}'::text[],
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     currency_enum integer
 );
 
@@ -2700,7 +2698,6 @@ CREATE TABLE public.payments (
     payment_method integer DEFAULT 0,
     organization_id integer,
     invoice_id integer,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
     referral_source text,
     currency_enum integer,
@@ -2934,7 +2931,6 @@ CREATE TABLE public.stolen_bike_listings (
     frame_size_number double precision,
     listed_at timestamp without time zone,
     amount_cents integer,
-    currency character varying,
     listing_text text,
     data jsonb,
     line integer,
@@ -3232,7 +3228,6 @@ CREATE TABLE public.theft_alert_plans (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     language integer DEFAULT 0 NOT NULL,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     amount_cents_facebook integer,
     ad_radius_miles integer,
     currency_enum integer
@@ -6464,6 +6459,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250216191639'),
 ('20250216183834'),
 ('20250211165635'),
 ('20250211164846'),

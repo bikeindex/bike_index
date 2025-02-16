@@ -5,6 +5,8 @@ module Currencyable
 
   included do
     enum :currency_enum, Currency::SLUGS
+
+    before_save :set_currency_fallback
   end
 
   def currency=(val)
@@ -21,5 +23,11 @@ module Currencyable
 
   def currency_name
     currency_obj&.name
+  end
+
+  private
+
+  def set_currency_fallback
+    self.currency_enum ||= Currency.default.slug
   end
 end
