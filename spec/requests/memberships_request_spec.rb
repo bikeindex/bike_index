@@ -1,6 +1,6 @@
 require "rails_helper"
 
-base_url = "/memberships"
+base_url = "/membership"
 RSpec.describe MembershipsController, type: :request do
   let(:re_record_interval) { 30.days }
 
@@ -21,6 +21,12 @@ RSpec.describe MembershipsController, type: :request do
         expect(response).to render_template("new")
         expect(flash).to_not be_present
       end
+    end
+  end
+
+  describe "create" do
+    it "creates a pending membership" do
+
     end
   end
 end

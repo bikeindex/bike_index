@@ -1998,6 +1998,7 @@ CREATE TABLE public.memberships (
     end_at timestamp(6) without time zone,
     active boolean DEFAULT false,
     creator_id bigint,
+    notes text,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -2701,8 +2702,8 @@ CREATE TABLE public.payments (
     invoice_id integer,
     kind integer,
     referral_source text,
-    stripe_subscription_id bigint,
-    currency_enum integer
+    currency_enum integer,
+    stripe_subscription_id bigint
 );
 
 
@@ -6460,12 +6461,12 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250217173339'),
+('20250217173338'),
+('20250217173337'),
+('20250217173308'),
 ('20250216191639'),
 ('20250216183834'),
-('20250211165635'),
-('20250211164846'),
-('20250211164840'),
-('20250211164827'),
 ('20250207221053'),
 ('20250207193640'),
 ('20250205135704'),

@@ -32,25 +32,29 @@
             Kind
           %td
             = @membership.kind_humanized
+        %tr
+          %td
+            Status
+          %td
+            = @membership.status_display
+
 
   .col-md-6
     %table.table-list
       %tbody
         %tr
           %td
-            Active?
+            Notes
           %td
-            - if @membership.active?
-              %strong Active
-            - else
-              %span.less-strong inactive
+            = @membership.notes
 
         %tr
           %td
             Start
           %td
-            %span.convertTime.preciseTime
-              = l @membership.start_at, format: :convert_time
+            - if @membership.start_at.present?
+              %span.convertTime.preciseTime
+                = l @membership.start_at, format: :convert_time
         %tr
           %td
             End

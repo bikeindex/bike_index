@@ -62,7 +62,6 @@ Rails.application.routes.draw do
   resources :payments, only: %i[new create] do
     collection do
       get :success
-      get :success_subscription
     end
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"

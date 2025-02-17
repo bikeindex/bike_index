@@ -7,12 +7,12 @@
       - if @membership.id.blank?
         .form-group
           = f.label :user_email
-          = f.text_field :user_email, required: true, class: "form-control"
+          = f.email_field :user_email, required: true, class: "form-control"
 
       .form-group
         = f.label :start_at
         = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-        = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
+        = f.datetime_local_field :start_at, step: 60, class: "form-control"
 
       .form-group
         = f.label :end_at
@@ -31,3 +31,9 @@
 
       .form-group.mt-4
         = f.submit 'Save', class: 'btn btn-success'
+
+      .form-group.mt-4
+        = f.label :notes do
+          Admin notes
+          %small.less-strong not shown to user
+        = f.text_area :notes, class: "form-control"

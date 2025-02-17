@@ -1,5 +1,5 @@
 class MembershipsController < ApplicationController
-  before_action :authenticate_user_for_my_accounts_controller
+  # before_action :authenticate_user_for_my_accounts_controller
 
   layout "payments_layout"
 

@@ -6,6 +6,7 @@
 #  active     :boolean          default(FALSE)
 #  end_at     :datetime
 #  kind       :integer
+#  notes      :text
 #  start_at   :datetime
 #  status     :integer
 #  created_at :datetime         not null
@@ -43,16 +44,26 @@ class Membership < ApplicationRecord
 
   attr_accessor :user_email
 
-  def self.kind_humanized(str)
-    str&.humanize
-  end
+  class << self
+    def kind_humanized(str)
+      str&.humanize
+    end
 
-  def self.kinds_ordered
-    kinds.keys.map { kind_humanized(_1) }
+    def status_display(str)
+      str&.humanize&.gsub("status", "")
+    end
+
+    def kinds_ordered
+      kinds.keys.map { kind_humanized(_1) }
+    end
   end
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  def status_display
+    self.class.status_display(status)
   end
 
   def admin_managed?

@@ -33,11 +33,13 @@ RSpec.describe Admin::MembershipsController, type: :request do
     let!(:user) { FactoryBot.create(:user_confirmed) }
     let(:target_attrs) do
       {user_id: user.id, start_at: nil, kind: "plus", end_at: nil, creator: current_user,
-       status: "pending_status"}
+       status: "pending_status", notes: "A note"}
     end
     it "creates" do
       expect do
-        post base_url, params: {membership: {kind: "plus", user_email: " #{user.email.upcase} "}}
+        post base_url, params: {
+          membership: {kind: "plus", user_email: " #{user.email.upcase} ", notes: "A note"}
+        }
       end.to change(Membership, :count).by 1
       expect(Membership.last).to match_hash_indifferently(target_attrs)
     end
@@ -46,7 +48,8 @@ RSpec.describe Admin::MembershipsController, type: :request do
         expect do
           post base_url, params: {
             membership: {
-              kind: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601
+              kind: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601,
+              notes: "A note"
             }
           }
         end.to change(Membership, :count).by 1
@@ -61,18 +64,26 @@ RSpec.describe Admin::MembershipsController, type: :request do
     let(:membership) { FactoryBot.create(:membership) }
     let(:start_at) { "2025-02-05T23:00:00" }
     let(:end_at) { "2026-02-05T23:00:00" }
+    let(:update_params) do
+      {kind: "plus", user_email: "ffff", start_at:, end_at:, notes: "something something something"}
+    end
     it "updates" do
       expect(membership.kind).to eq "basic"
       og_user_id = membership.user_id
       expect(membership.end_at).to be_blank
       patch "#{base_url}/#{membership.id}", params: {
-        membership: {kind: "plus", user_email: "ffff", start_at:, end_at:}
+        membership: update_params
       }
       expect(flash[:success]).to be_present
       expect(membership.reload.user_id).to eq og_user_id
       expect(membership.kind).to eq "plus"
       expect(membership.start_at).to match_time TimeParser.parse(start_at)
       expect(membership.end_at).to match_time TimeParser.parse(end_at)
+      expect(membership.notes).to eq update_params[:notes]
+    end
+    context "stripe membership" do
+      xit "only updates the note" do
+      end
     end
   end
 end
