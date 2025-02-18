@@ -6,10 +6,10 @@ module.exports = {
     './public/*.html',
     './app/helpers/**/*.rb',
     './app/javascript/**/*.js',
-    './app/views/**/*.{erb,haml,html,slim}',
+    './app/views/**/*.{erb,haml,html}',
     './app/components/**/*.{erb,haml,html,rb}'
   ],
-  darkMode: 'class',
+  darkMode: ['class', '[class="dark"]'],
   theme: {
     extend: {
       colors: {

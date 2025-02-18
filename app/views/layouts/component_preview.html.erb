@@ -5,6 +5,7 @@
     <%= stylesheet_link_tag 'tailwind' %>
     <%= javascript_importmap_tags %>
   </head>
+  <%# NOTE: This sets the theme %>
   <body class="<%= params.dig(:lookbook, :display, :theme) %>">
     <div class="tw-w-full tw-h-full">
       <%= yield %>

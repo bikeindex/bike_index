@@ -29,13 +29,12 @@ class Membership < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   has_many :stripe_subscriptions
-  # has_one :active_stripe_subscription, stripe_subscriptions.active
+  has_one :active_stripe_subscription, -> { active }, class_name: "StripeSubscription"
   has_many :payments, through: :stripe_subscriptions
 
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
 
-  validates :user_id, presence: true
   validate :no_active_stripe_subscription_admin_managed
   before_validation :set_calculated_attributes
 
@@ -81,6 +80,10 @@ class Membership < ApplicationRecord
     if user_email.present?
       self.user_id ||= User.fuzzy_email_find(user_email)&.id
     end
+  end
+
+  def interval
+    active_stripe_subscription&.interval
   end
 
   def stripe_admin_url

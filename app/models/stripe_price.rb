@@ -32,6 +32,10 @@ class StripePrice < ApplicationRecord
   validates :amount_cents, presence: true
   validates :interval, presence: true
 
+  def self.interval_default
+    "monthly"
+  end
+
   def test?
     !live?
   end

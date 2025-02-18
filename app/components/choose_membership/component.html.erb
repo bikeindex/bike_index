@@ -1,5 +1,35 @@
-<div>
-  <% membership_kinds |kind| %>
-    <%= link_to kind %>
+<div class="tw-block tw-max-w-2xl tw-p-4 tw-mx-auto tw-my-2 tw-bg-white tw-border tw-border-gray-200 tw-rounded-lg tw-shadow-sm dark:tw-bg-gray-800 dark:tw-border-gray-700" data-controller="choose-membership--component">
+  <h1 class="tw-mb-5 tw-text-xl tw-font-medium tw-text-gray-900 dark:tw-text-gray-100">
+    Become a Bike Index member
+  </h1>
+  <%= form_for @membership, builder: BikeIndexFormBuilder, url: membership_path, method: :post do |f| %>
+    <ul class="tw-grid tw-w-full tw-gap-6 md:tw-grid-cols-3 tw-mt-6 tw-mb-8">
+      <li class="tw-inline-flex tw-items-center tw-justify-between ">
+        <label class="tw-w-full tw-p-5 tw-shadow-sm tw-rounded tw-text-center tw-border tw-cursor-pointer tw-border-gray-200 dark:tw-border-gray-700 hover:tw-bg-gray-100 dark:hover:tw-bg-gray-700 focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-offset-2 focus-visible:tw-outline-gray-200 focus-visible:dark:tw-outline-gray-600 has-checked:tw-bg-gray-100 has-checked:dark:tw-bg-gray-700">
+          <%= f.radio_button :kind, :basic, class: "tw-hidden updateOnChange" %>
+          <h3>$4.99</h3>
+          <h3>Basic</h3>
+        </label>
+      </li>
+      <li class="tw-inline-flex tw-items-center tw-justify-between ">
+        <label class="tw-w-full tw-p-5 tw-shadow-sm tw-rounded tw-text-center tw-border tw-cursor-pointer tw-border-gray-200 dark:tw-border-gray-700 hover:tw-bg-gray-100 dark:hover:tw-bg-gray-700 focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-offset-2 focus-visible:tw-outline-gray-200 focus-visible:dark:tw-outline-gray-600 has-checked:tw-bg-gray-100 has-checked:dark:tw-bg-gray-700">
+          <%= f.radio_button :kind, :plus, class: "tw-hidden updateOnChange" %>
+          <h3>$9.99</h3>
+          <h3>Plus</h3>
+        </label>
+      </li>
+      <li class="tw-inline-flex tw-items-center tw-justify-between ">
+        <label class="tw-w-full tw-p-5 tw-shadow-sm tw-rounded tw-text-center tw-border tw-cursor-pointer tw-border-gray-200 dark:tw-border-gray-700 hover:tw-bg-gray-100 dark:hover:tw-bg-gray-700 focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-offset-2 focus-visible:tw-outline-gray-200 focus-visible:dark:tw-outline-gray-600 has-checked:tw-bg-gray-100 has-checked:dark:tw-bg-gray-700">
+          <%= f.radio_button :kind, :plus, class: "tw-hidden updateOnChange" %>
+          <h3>$49.99</h3>
+          <h3>Patron</h3>
+        </label>
+      </li>
+    </ul>
+    <%= f.submit "Next >", class: "tw-btn-blue" %>
+    <%#= link_to "Next >", "#", class: "tw-btn-blue" %>
   <% end %>
 </div>
+
+@interval_selected = interval_selected || StripePrice.interval_default
+      @kind_selected = kind_selected
