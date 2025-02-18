@@ -486,8 +486,6 @@ GEM
       mustermann (>= 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
-    net-http (0.3.2)
-      uri
     net-imap (0.5.5)
       date
       net-protocol
@@ -574,6 +572,8 @@ GEM
     rack-throttle (0.7.0)
       bundler (>= 1.0.0)
       rack (>= 1.0.0)
+    rack-utf8_sanitizer (1.10.1)
+      rack (>= 1.0, < 4.0)
     rackup (2.2.1)
       rack (>= 3)
     rails (8.0.1)
@@ -892,7 +892,6 @@ DEPENDENCIES
   mini_magick
   money-rails (~> 1.11)
   multi_json
-  net-http
   observer
   oj
   pagy
@@ -909,6 +908,7 @@ DEPENDENCIES
   puma
   rack-mini-profiler
   rack-throttle
+  rack-utf8_sanitizer
   rails
   rails-assets-Stickyfill (~> 1.1.3)!
   rails-assets-jquery (~> 3.4.1)!

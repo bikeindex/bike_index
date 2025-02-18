@@ -9,10 +9,10 @@ module Amountable
   end
 
   def amount=(val)
-    self.amount_cents = MoneyFormater.convert_to_cents(val)
+    self.amount_cents = MoneyFormatter.convert_to_cents(val)
   end
 
   def amount_formatted
-    MoneyFormater.money_format(amount_cents, currency_name)
+    MoneyFormatter.money_format(amount_cents, currency_name)
   end
 end

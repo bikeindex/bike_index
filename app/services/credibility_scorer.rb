@@ -1,6 +1,7 @@
 class CredibilityScorer
   BASE_SCORE = 50
   MAX_SCORE = 100
+  CHECK_SUSPISCIOUS_NUMBERS = true # Causes flaky specs, so enable stubbing
 
   BADGES = {
     overrides: {
@@ -162,7 +163,8 @@ class CredibilityScorer
     str = str.downcase.strip
     return true if str.match?("thief")
     return false if str.match?(/@.*\.edu/)
-    return true if str.match?("5150") || str.match?("shady")
+    return true if str.match?("5150") && CHECK_SUSPISCIOUS_NUMBERS
+    return true if str.match?("shady")
     return true if BadWordCleaner.clean(str).count("*") > str.count("*")
     str.length < 4
   end
