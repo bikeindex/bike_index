@@ -6,27 +6,26 @@
     <ul class="tw:grid tw:w-full tw:gap-6 tw:md:grid-cols-3 tw:mt-6 tw:mb-8">
       <li class="tw:inline-flex tw:items-center tw:justify-between ">
         <label class="tw:w-full tw:p-5 tw:shadow-sm tw:rounded tw:text-center tw:border tw:cursor-pointer tw:border-gray-200 tw:dark:border-gray-700 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-gray-200 tw:focus-visible:dark:outline-gray-600 tw:has-checked:bg-gray-100 tw:has-checked:dark:bg-gray-700">
-          <%= f.radio_button :kind, :basic, class: "tw:hidden updateOnChange" %>
-          <h3>$4.99</h3>
-          <h3>Basic</h3>
+          <%= f.radio_button :kind, :basic, required: true, class: "tw:hidden updateOnChange" %>
+          <%= price_display(499, "month") %>
+          <h3 class="tw:mt-3 tw:font-semibold tw:text-xl">Basic</h3>
         </label>
       </li>
       <li class="tw:inline-flex tw:items-center tw:justify-between ">
         <label class="tw:w-full tw:p-5 tw:shadow-sm tw:rounded tw:text-center tw:border tw:cursor-pointer tw:border-gray-200 tw:dark:border-gray-700 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-gray-200 tw:focus-visible:dark:outline-gray-600 tw:has-checked:bg-gray-100 tw:has-checked:dark:bg-gray-700">
-          <%= f.radio_button :kind, :plus, class: "tw:hidden updateOnChange" %>
-          <h3>$9.99</h3>
-          <h3>Plus</h3>
+          <%= f.radio_button :kind, :plus, required: true, class: "tw:hidden updateOnChange" %>
+          <%= price_display(999, "month") %>
+          <h3 class="tw:mt-3 tw:font-semibold tw:text-xl">Plus</h3>
         </label>
       </li>
       <li class="tw:inline-flex tw:items-center tw:justify-between ">
         <label class="tw:w-full tw:p-5 tw:shadow-sm tw:rounded tw:text-center tw:border tw:cursor-pointer tw:border-gray-200 tw:dark:border-gray-700 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-gray-200 tw:focus-visible:dark:outline-gray-600 tw:has-checked:bg-gray-100 tw:has-checked:dark:bg-gray-700">
-          <%= f.radio_button :kind, :plus, class: "tw:hidden updateOnChange" %>
-          <h3>$49.99</h3>
-          <h3>Patron</h3>
+          <%= f.radio_button :kind, :plus, required: true, class: "tw:hidden updateOnChange" %>
+          <%= price_display(4999, "month") %>
+          <h3 class="tw:mt-3 tw:font-semibold tw:text-xl">Patron</h3>
         </label>
       </li>
     </ul>
     <%= f.submit "Next >", class: "tw:btn-blue" %>
-    <%#= link_to "Next >", "#", class: "tw:btn-blue" %>
   <% end %>
 </div>

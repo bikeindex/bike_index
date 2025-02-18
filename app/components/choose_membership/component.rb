@@ -6,14 +6,25 @@ module ChooseMembership
       @currency = currency
       @membership = membership || Membership.new
       @interval ||= @membership.interval || interval || StripePrice.interval_default
-      @membership.kind ||= kind
+      @membership.kind ||= kind || :basic
     end
 
     private
 
-    def kind_li_classes
-      "tw-inline-flex tw-items-center tw-justify-between tw-shadow-sm tw-rounded tw-text-center tw-border tw-border-gray-200 dark:tw-border-gray-700 hover:tw-bg-gray-100 dark:hover:tw-bg-gray-800 focus-visible:tw-outline focus-visible:tw-outline-2 focus-visible:tw-outline-offset-2 focus-visible:tw-outline-gray-800"
+    def price_display(amount_cents, interval)
+      tag.h3(class: "tw:inline-flex tw:items-stretch") do
+        safe_join([
+          tag.span(MoneyFormatter.money_format(amount_cents, @currency), class: "tw:text-2xl tw:font-semibold"),
+          tag.span(class: "tw:ml-1 tw:text-xs tw:flex tw:flex-col tw:justify-center tw:leading-none tw:text-left") do
+            safe_join([
+              tag.span("per"),
+              tag.span(interval)
+            ])
+          end
+        ])
+      end
     end
+
 
     def membership_kinds
       Membership.kinds_ordered

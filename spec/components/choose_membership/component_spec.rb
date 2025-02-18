@@ -1,9 +1,10 @@
+
 # frozen_string_literal: true
 
 require "rails_helper"
 
 RSpec.describe ChooseMembership::Component, type: :component do
-  let(:options) { {} }
+  let(:options) { {currency: Currency.default} }
   let(:component) { render_inline(described_class.new(**options)) }
 
   it "renders" do
