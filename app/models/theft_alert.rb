@@ -215,11 +215,11 @@ class TheftAlert < ApplicationRecord
   end
 
   def amount_facebook
-    MoneyFormater.money_format(amount_cents_facebook)
+    MoneyFormatter.money_format(amount_cents_facebook)
   end
 
   def amount_facebook_spent
-    MoneyFormater.money_format(amount_cents_facebook_spent)
+    MoneyFormatter.money_format(amount_cents_facebook_spent)
   end
 
   def activating_at
