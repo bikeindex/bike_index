@@ -20,8 +20,11 @@ gem "puma" # App server
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
-gem "paranoia"
+gem "paranoia" # soft delete
 gem "pg_search"
+gem "lograge" # Structure log data, put it in single lines to improve the functionality
+gem "logstash-event" # Use logstash format for logging data
+gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 
 # Speed
 gem "fast_blank", "~> 1.0"
@@ -80,6 +83,7 @@ gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
 gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
+gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 
 # Secure things
 gem "rack-throttle" # Rate limiting
@@ -113,7 +117,6 @@ gem "pghero" # PG Info
 
 gem "responders"
 gem "thor"
-gem "net-http" # Required to remove error printouts, PR#2408
 
 source "https://rails-assets.org" do # JS land is crazy, so lock everything
   gem "rails-assets-jquery", "~> 3.4.1"
@@ -131,10 +134,6 @@ source "https://rails-assets.org" do # JS land is crazy, so lock everything
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
-
-gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
-gem "lograge" # Structure log data, put it in single lines to improve the functionality
-gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
