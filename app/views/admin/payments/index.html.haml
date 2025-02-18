@@ -61,7 +61,7 @@
       data: time_range_counts(collection: payments_of_kind),
       data_money: time_range_amounts(collection: payments_of_kind, convert_to_dollars: true),
       count: payments_of_kind.count,
-      money: MoneyFormater.money_format(payments_of_kind.sum(:amount_cents)),
+      money: MoneyFormatter.money_format(payments_of_kind.sum(:amount_cents)),
     }
   end.compact
   payments_counts_nozero = payments_counts.reject { |c| c[:count] < 1 }
@@ -79,7 +79,7 @@
   .col-sm
     %p.mt-2
       A total of
-      = MoneyFormater.money_format(matching_payments.sum(:amount_cents))
+      = MoneyFormatter.money_format(matching_payments.sum(:amount_cents))
   - if payments_counts.present?
     .col-sm
       .full-screen-table

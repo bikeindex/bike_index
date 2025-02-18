@@ -58,7 +58,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       amount_cents: theft_alert.amount_cents,
       user_id: current_user.id,
       email: current_user.email,
-      currency: params[:currency] || MoneyFormater.default_currency # TODO: handle this better
+      currency: params[:currency] || Currency.default.name # TODO: handle this better
     }
   end
 

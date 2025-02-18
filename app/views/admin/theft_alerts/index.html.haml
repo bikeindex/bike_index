@@ -137,7 +137,7 @@
                 %tr
                   %td
                     = theft_alert_plan.name
-                    %small= MoneyFormater.money_format(theft_alert_plan.amount_cents_facebook)
+                    %small= MoneyFormatter.money_format(theft_alert_plan.amount_cents_facebook)
                   %td
                     - alert_count = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).count
                     - alert_count_total += alert_count
@@ -149,11 +149,11 @@
                   %td
                     - fbook_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).sum(:amount_cents_facebook_spent)
                     - fbook_cents_total += fbook_cents
-                    = MoneyFormater.money_format(fbook_cents)
+                    = MoneyFormatter.money_format(fbook_cents)
                   %td.small
                     - revenue_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).paid_cents
                     - revenue_cents_total += revenue_cents
-                    = MoneyFormater.money_format(revenue_cents)
+                    = MoneyFormatter.money_format(revenue_cents)
                   %td.small
                     - recovered_count = stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count
                     - recovered_count_total += recovered_count
@@ -163,9 +163,9 @@
                   %strong Total
                 %td= admin_number_display(alert_count_total)
                 %td= admin_number_display(fbook_reach_total)
-                %td= MoneyFormater.money_format(fbook_cents_total)
+                %td= MoneyFormatter.money_format(fbook_cents_total)
                 %td
-                  %small= MoneyFormater.money_format(revenue_cents_total)
+                  %small= MoneyFormatter.money_format(revenue_cents_total)
                 %td.small= admin_number_display(recovered_count_total)
 
 
