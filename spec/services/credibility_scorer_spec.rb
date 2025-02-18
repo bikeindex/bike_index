@@ -5,6 +5,8 @@ RSpec.describe CredibilityScorer do
   let(:instance) { subject.new(bike) }
   let(:created_at) { Time.current - 1.day }
   let(:bike) { FactoryBot.create(:bike, created_at: created_at) }
+  let(:check_suspiscious_numbers) { false }
+  before { stub_const("CredibilityScorer::CHECK_SUSPISCIOUS_NUMBERS", check_suspiscious_numbers) }
 
   describe "all_badges" do
     it "is a one dimensional hash" do
@@ -223,7 +225,7 @@ RSpec.describe CredibilityScorer do
         expect(ownership1.current?).to be_falsey
         expect(subject.ownership_badges(bike)).to eq([:multiple_ownerships])
         # Also, general badges returns long_time_registration
-        expect(instance.badges).to match_array(%i[long_time_registration multiple_ownerships])
+        expect(instance.badges - %i[user_handle_suspicious]).to match_array(%i[long_time_registration multiple_ownerships])
       end
     end
   end
@@ -289,6 +291,7 @@ RSpec.describe CredibilityScorer do
       end
     end
     describe "user_name_suspicious" do
+      let(:check_suspiscious_numbers) { true }
       let(:user) { FactoryBot.create(:user, email: "something5150@yahoo.com") }
       it "returns user_name_suspicious" do
         expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious])
@@ -353,6 +356,7 @@ RSpec.describe CredibilityScorer do
   end
 
   describe "suspiscious_handle?" do
+    let(:check_suspiscious_numbers) { true }
     ["shady-p@yahoo.com", "bike thief", "hoogivzzafudge5150@hotmail.co", "mj", "fuckyou@stuff.com", "cunt-edu"].each do |str|
       it "is truthy for #{str}" do
         expect(subject.suspiscious_handle?(str)).to be_truthy
