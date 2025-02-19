@@ -42,10 +42,7 @@
               = organization_role.invited_email
           - unless skip_organization
             %td
-              = link_to organization_role.organization&.name, admin_organization_path(organization_role.organization_id)
-
-              - if params[:organization_id].blank?
-                = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: organization_role.organization_id)), class: "display-sortable-link small"
+              = render partial: "/shared/admin/organization_cell", locals: {organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?}
           %td
             - if organization_role.claimed_at.present?
               %span.convertTime

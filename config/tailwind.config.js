@@ -1,15 +1,12 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
-
 module.exports = {
-  prefix: 'tw-',
   content: [
     './public/*.html',
     './app/helpers/**/*.rb',
     './app/javascript/**/*.js',
-    './app/views/**/*.{erb,haml,html,slim}',
+    './app/views/**/*.{erb,haml,html}',
     './app/components/**/*.{erb,haml,html,rb}'
   ],
-  darkMode: 'class',
+  darkMode: 'selector',
   theme: {
     extend: {
       colors: {
@@ -65,16 +62,15 @@ module.exports = {
           900: '#2c3e50', // OG Bike Index blue-dark
           950: '#1d2834'
         }
-      },
-      fontFamily: {
-        sans: ['Inter var', ...defaultTheme.fontFamily.sans]
       }
+      // fontFamily: {
+      //   sans: ['Inter var', ...defaultTheme.fontFamily.sans]
+      // }
     }
-  },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'),
-    require('@tailwindcss/container-queries')
-    // require('flowbite/plugin') // not sure this is necessary after copying!
-  ]
+  }
+  // plugins: [
+  //   require('@tailwindcss/forms'),
+  //   require('@tailwindcss/typography'),
+  //   // require('flowbite/plugin') // not sure this is necessary after copying!
+  // ]
 }

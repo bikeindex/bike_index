@@ -60,9 +60,12 @@ Rails.application.routes.draw do
   get "logout", to: "sessions#destroy"
 
   resources :payments, only: %i[new create] do
-    collection { get :success }
+    collection do
+      get :success
+    end
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
+
   resources :documentation, only: [:index] do
     collection do
       get :api_v1
@@ -186,37 +189,31 @@ Rails.application.routes.draw do
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     resources :ads,
-      :bike_sticker_updates,
       :bulk_imports,
       :content_tags,
       :ctypes,
-      :exports,
-      :graduated_notifications,
       :impound_claims,
       :impound_records,
-      :logged_searches,
       :mail_snippets,
-      :mailchimp_data,
       :mailchimp_values,
       :organization_roles,
-      :model_attestations,
-      :model_audits,
-      :notifications,
       :organization_features,
-      :organization_statuses,
       :paints,
-      :parking_notifications,
       :payments,
       :recovery_displays,
       :superuser_abilities,
-      :theft_alerts,
-      :user_alerts,
-      :user_registration_organizations
+      :theft_alerts
+
+    %i[
+      bike_sticker_updates exports graduated_notifications invoices logged_searches mailchimp_data
+      model_attestations model_audits notifications organization_statuses parking_notifications
+      stripe_prices user_alerts user_registration_organizations
+    ].each { resources _1, only: %i[index] }
 
     resources :bike_stickers do
       collection { get :reassign }
     end
-    resources :invoices, only: [:index]
+
     resources :theft_alert_plans, only: %i[index edit update new create]
 
     resources :organizations do
