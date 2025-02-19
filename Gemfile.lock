@@ -60,7 +60,6 @@ GEM
       rails-assets-microplugin (~> 0.0.0)
       rails-assets-sifter (~> 0.5.0)
     rails-assets-sifter (0.5.3)
-    rails-assets-tether (1.1.1)
     rails-assets-waypoints (3.1.1)
 
 GEM
@@ -143,8 +142,6 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     api-pagination (6.0.0)
     ast (2.4.2)
-    autoprefixer-rails (9.7.3)
-      execjs
     axlsx (3.0.0.pre)
       htmlentities (~> 4.3, >= 4.3.4)
       mimemagic (~> 0.3)
@@ -156,9 +153,6 @@ GEM
     bigdecimal (3.1.9)
     bootsnap (1.18.4)
       msgpack (~> 1.2)
-    bootstrap (4.0.0.alpha4)
-      autoprefixer-rails (>= 6.0.3)
-      sass (>= 3.4.19)
     brakeman (7.0.0)
       racc
     buftok (0.2.0)
@@ -692,11 +686,6 @@ GEM
     sanitize (6.1.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    sass (3.7.4)
-      sass-listen (~> 4.0.0)
-    sass-listen (4.0.0)
-      rb-fsevent (~> 0.9, >= 0.9.4)
-      rb-inotify (~> 0.9, >= 0.9.7)
     secure_headers (2.5.3)
       user_agent_parser
     securerandom (0.4.1)
@@ -834,7 +823,6 @@ DEPENDENCIES
   axlsx (~> 3.0.0.pre)
   bcrypt
   bootsnap
-  bootstrap (= 4.0.0.alpha4)
   brakeman
   bullet
   capybara
@@ -910,7 +898,6 @@ DEPENDENCIES
   rails-assets-mustache (~> 2.2.1)!
   rails-assets-select2 (~> 4.0.3)!
   rails-assets-selectize (~> 0.12.1)!
-  rails-assets-tether (~> 1.1.0)!
   rails-assets-waypoints (~> 3.1.1)!
   rails-controller-testing
   rails-i18n
