@@ -16,7 +16,7 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "show" do
     it "links to edit" do
       get "#{base_url}/#{user_subject.username}"
-      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.username))
     end
   end
 

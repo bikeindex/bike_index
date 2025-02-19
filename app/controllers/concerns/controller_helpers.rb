@@ -56,6 +56,12 @@ module ControllerHelpers
     end
   end
 
+  # This alone doesn't enable importmaps (and tailwind)
+  # Make sure the layout has 'if @include_importmaps'
+  def enable_importmaps
+    @include_importmaps = true
+  end
+
   def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
     translation_key ||= :you_have_to_log_in
 
