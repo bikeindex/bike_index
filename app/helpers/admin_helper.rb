@@ -127,6 +127,7 @@ module AdminHelper
       return icon_hash
     end
     icon_hash[:tags] += [:donor] if user.donor?
+    icon_hash[:tags] += [:member] if user.membership_active.present?
     icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
     icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
     org = user.organization_prioritized
@@ -145,6 +146,10 @@ module AdminHelper
       if icon_hash[:tags].include?(:donor)
         concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
         concat(content_tag(:span, "onor", class: "less-strong")) if full_text
+      end
+      if icon_hash[:tags].include?(:member)
+        concat(content_tag(:span, "M", class: "donor-icon user-icon ml-1", title: "Member"))
+        concat(content_tag(:span, "ember", class: "less-strong")) if full_text
       end
       if icon_hash[:tags].include?(:organization_role)
         org_full_text = [
