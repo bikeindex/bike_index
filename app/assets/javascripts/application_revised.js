@@ -1,11 +1,8 @@
-// Using bootstrap 4.0 - it's a gem, so it isn't through rails-assets.
-//
 // require self
 //= require jquery2
 //= require jquery_ujs
 //= require lodash
-//= require tether
-//= require bootstrap
+//= require external_scripts/bootstrap
 //= require jquery.dirtyforms
 //= require jquery.dirtyforms/plugins/jquery.dirtyforms.dialogs.bootstrap.min.js
 //= require mustache

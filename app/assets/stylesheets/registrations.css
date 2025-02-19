@@ -1,0 +1,4659 @@
+@charset "UTF-8";
+/**
+ * selectize.bootstrap3.css (v0.12.6) - Bootstrap 3 Theme
+ * Copyright (c) 2013–2015 Brian Reavis & contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License. You may obtain a copy of the License at:
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ * ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ *
+ * @author Brian Reavis <brian@thirdroute.com>
+ */
+/* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-drag_drop.multi > .selectize-input > div.ui-sortable-placeholder {
+  visibility: visible !important;
+  background: #f2f2f2 !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+  border: 0 none !important;
+  box-shadow: inset 0 0 12px 4px #fff;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-drag_drop .ui-sortable-placeholder::after {
+  content: '!';
+  visibility: hidden;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-drag_drop .ui-sortable-helper {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* line 32, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header {
+  position: relative;
+  padding: 3px 12px;
+  border-bottom: 1px solid #d0d0d0;
+  background: #f8f8f8;
+  border-radius: 4px 4px 0 0;
+}
+
+/* line 41, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header-close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  color: #333333;
+  opacity: 0.4;
+  margin-top: -12px;
+  line-height: 20px;
+  font-size: 20px !important;
+}
+
+/* line 51, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header-close:hover {
+  color: #000000;
+}
+
+/* line 54, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup {
+  border-right: 1px solid #f2f2f2;
+  border-top: 0 none;
+  float: left;
+  box-sizing: border-box;
+}
+
+/* line 62, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup:last-child {
+  border-right: 0 none;
+}
+
+/* line 65, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup:before {
+  display: none;
+}
+
+/* line 68, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup-header {
+  border-top: 0 none;
+}
+
+/* line 71, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button [data-value] {
+  position: relative;
+  padding-right: 24px !important;
+}
+
+/* line 75, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button [data-value] .remove {
+  z-index: 1;
+  /* fixes ie bug (see #392) */
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 17px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+  color: inherit;
+  text-decoration: none;
+  vertical-align: middle;
+  display: inline-block;
+  padding: 1px 0 0 0;
+  border-left: 1px solid rgba(0, 0, 0, 0);
+  border-radius: 0 2px 2px 0;
+  box-sizing: border-box;
+}
+
+/* line 99, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button [data-value] .remove:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* line 102, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .active[data-value] .remove {
+  border-left-color: rgba(0, 0, 0, 0);
+}
+
+/* line 105, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .disabled [data-value] .remove:hover {
+  background: none;
+}
+
+/* line 108, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .disabled [data-value] .remove {
+  border-left-color: rgba(77, 77, 77, 0);
+}
+
+/* line 111, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .remove-single {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 23px;
+}
+
+/* line 117, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control {
+  position: relative;
+}
+
+/* line 120, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown,
+.selectize-input,
+.selectize-input input {
+  color: #333333;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 20px;
+  -webkit-font-smoothing: inherit;
+}
+
+/* line 129, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input,
+.selectize-control.single .selectize-input.input-active {
+  background: #fff;
+  cursor: text;
+  display: inline-block;
+}
+
+/* line 135, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input {
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  box-shadow: none;
+  border-radius: 4px;
+}
+
+/* line 152, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input.has-items {
+  padding: 5px 12px 2px;
+}
+
+/* line 155, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.full {
+  background-color: #fff;
+}
+
+/* line 158, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.disabled,
+.selectize-input.disabled * {
+  cursor: default !important;
+}
+
+/* line 162, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.focus {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* line 166, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active {
+  border-radius: 4px 4px 0 0;
+}
+
+/* line 171, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > * {
+  vertical-align: baseline;
+  display: -moz-inline-stack;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+
+/* line 178, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input > div {
+  cursor: pointer;
+  margin: 0 3px 3px 0;
+  padding: 1px 3px;
+  background: #efefef;
+  color: #333333;
+  border: 0 solid rgba(0, 0, 0, 0);
+}
+
+/* line 186, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input > div.active {
+  background: #428bca;
+  color: #fff;
+  border: 0 solid rgba(0, 0, 0, 0);
+}
+
+/* line 191, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input.disabled > div,
+.selectize-control.multi .selectize-input.disabled > div.active {
+  color: #808080;
+  background: #ffffff;
+  border: 0 solid rgba(77, 77, 77, 0);
+}
+
+/* line 197, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > input {
+  display: inline-block !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  text-indent: 0 !important;
+  border: 0 none !important;
+  background: none !important;
+  line-height: inherit !important;
+  -webkit-user-select: auto !important;
+  box-shadow: none !important;
+}
+
+/* line 212, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > input::-ms-clear {
+  display: none;
+}
+
+/* line 215, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > input:focus {
+  outline: none !important;
+}
+
+/* line 218, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input::after {
+  content: ' ';
+  display: block;
+  clear: left;
+}
+
+/* line 223, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active::before {
+  content: ' ';
+  display: block;
+  position: absolute;
+  background: #ffffff;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* line 233, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown {
+  position: absolute;
+  z-index: 10;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  margin: -1px 0 0 0;
+  border-top: 0 none;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 4px 4px;
+}
+
+/* line 249, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown [data-selectable] {
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* line 253, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown [data-selectable] .highlight {
+  background: rgba(255, 237, 40, 0.4);
+  border-radius: 1px;
+}
+
+/* line 259, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .option,
+.selectize-dropdown .optgroup-header {
+  padding: 3px 12px;
+}
+
+/* line 263, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .option,
+.selectize-dropdown [data-disabled],
+.selectize-dropdown [data-disabled] .option[data-selectable] {
+  cursor: inherit;
+  opacity: 0.5;
+}
+
+/* line 269, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .option[data-selectable] {
+  opacity: 1;
+}
+
+/* line 272, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup:first-child .optgroup-header {
+  border-top: 0 none;
+}
+
+/* line 275, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup-header {
+  color: #777777;
+  background: #fff;
+  cursor: default;
+}
+
+/* line 280, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .active {
+  background-color: #f5f5f5;
+  color: #262626;
+}
+
+/* line 284, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .active.create {
+  color: #262626;
+}
+
+/* line 287, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .create {
+  color: rgba(51, 51, 51, 0.5);
+}
+
+/* line 290, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 200px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* line 296, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input,
+.selectize-control.single .selectize-input input {
+  cursor: pointer;
+}
+
+/* line 300, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input.input-active,
+.selectize-control.single .selectize-input.input-active input {
+  cursor: text;
+}
+
+/* line 304, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input:after {
+  content: ' ';
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 17px;
+  margin-top: -3px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 5px 0 5px;
+  border-color: #333333 transparent transparent transparent;
+}
+
+/* line 317, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input.dropdown-active:after {
+  margin-top: -4px;
+  border-width: 0 5px 5px 5px;
+  border-color: transparent transparent #333333 transparent;
+}
+
+/* line 322, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.rtl.single .selectize-input:after {
+  left: 17px;
+  right: auto;
+}
+
+/* line 326, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.rtl .selectize-input > input {
+  margin: 0 4px 0 -2px !important;
+}
+
+/* line 329, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control .selectize-input.disabled {
+  opacity: 0.5;
+  background-color: #fff;
+}
+
+/* line 333, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown,
+.selectize-dropdown.form-control {
+  height: auto;
+  padding: 0;
+  margin: 2px 0 0 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+
+/* line 348, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup-header {
+  font-size: 12px;
+  line-height: 1.42857143;
+}
+
+/* line 352, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup:first-child:before {
+  display: none;
+}
+
+/* line 355, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup:before {
+  content: ' ';
+  display: block;
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+/* line 365, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-content {
+  padding: 5px 0;
+}
+
+/* line 368, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header {
+  padding: 6px 12px;
+}
+
+/* line 371, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input {
+  min-height: 34px;
+}
+
+/* line 374, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active {
+  border-radius: 4px;
+}
+
+/* line 379, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active::before {
+  display: none;
+}
+
+/* line 382, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.focus {
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+/* line 388, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.has-error .selectize-input {
+  border-color: #a94442;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+/* line 393, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.has-error .selectize-input:focus {
+  border-color: #843534;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
+}
+
+/* line 398, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input.has-items {
+  padding-left: 9px;
+  padding-right: 9px;
+}
+
+/* line 402, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input > div {
+  border-radius: 3px;
+}
+
+/* line 407, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.form-control.selectize-control {
+  padding: 0;
+  height: auto;
+  border: none;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+/*
+ * Revised manifest file things from rails-assets
+
+ */
+/*!
+ * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ */
+/* line 43, app/assets/stylesheets/revised/mixins/_colors.scss */
+.stolen-color {
+  color: #e74c3c;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_colors.scss */
+.found-color {
+  color: #2ecc71;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_colors.scss */
+.impounded-color {
+  color: #e74c3c;
+}
+
+/* line 58, app/assets/stylesheets/revised/mixins/_colors.scss */
+.unregistered-color {
+  color: #f0ad4e;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_colors.scss */
+.text-dark {
+  color: #666666 !important;
+}
+
+/*! normalize.css v4.0.0 | MIT License | github.com/necolas/normalize.css */
+/* line 8, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+body {
+  margin: 0;
+}
+
+/* line 31, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+
+/* line 50, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+}
+
+/* line 61, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+/* line 70, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+progress {
+  vertical-align: baseline;
+}
+
+/* line 79, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+template,
+[hidden] {
+  display: none;
+}
+
+/* line 91, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+a {
+  background-color: transparent;
+}
+
+/* line 100, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+a:active,
+a:hover {
+  outline-width: 0;
+}
+
+/* line 113, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+abbr[title] {
+  border-bottom: none;
+  text-decoration: underline;
+  -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted;
+}
+
+/* line 123, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+b,
+strong {
+  font-weight: inherit;
+}
+
+/* line 132, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+b,
+strong {
+  font-weight: bolder;
+}
+
+/* line 141, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+dfn {
+  font-style: italic;
+}
+
+/* line 150, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+/* line 159, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+mark {
+  background-color: #ff0;
+  color: #000;
+}
+
+/* line 168, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+small, .below-input-help {
+  font-size: 80%;
+}
+
+/* line 177, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+/* line 185, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+sub {
+  bottom: -0.25em;
+}
+
+/* line 189, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+sup {
+  top: -0.5em;
+}
+
+/* line 200, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+img {
+  border-style: none;
+}
+
+/* line 208, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+svg:not(:root) {
+  overflow: hidden;
+}
+
+/* line 220, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+/* line 232, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+figure {
+  margin: 1em 40px;
+}
+
+/* line 241, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+hr {
+  box-sizing: content-box;
+  height: 0;
+  overflow: visible;
+}
+
+/* line 254, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* line 265, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+optgroup {
+  font-weight: bold;
+}
+
+/* line 275, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button,
+input,
+select {
+  overflow: visible;
+}
+
+/* line 286, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button,
+input,
+select,
+textarea {
+  margin: 0;
+}
+
+/* line 298, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button,
+select {
+  text-transform: none;
+}
+
+/* line 307, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  cursor: pointer;
+}
+
+/* line 318, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+[disabled] {
+  cursor: default;
+}
+
+/* line 328, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button,
+html [type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+}
+
+/* line 339, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* line 349, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+button:-moz-focusring,
+input:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+/* line 358, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+
+/* line 371, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+legend {
+  box-sizing: border-box;
+  color: inherit;
+  display: table;
+  max-width: 100%;
+  padding: 0;
+  white-space: normal;
+}
+
+/* line 384, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+textarea {
+  overflow: auto;
+}
+
+/* line 393, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* line 403, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/* line 412, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+[type="search"] {
+  -webkit-appearance: textfield;
+}
+
+/* line 421, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_normalize.scss */
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/* line 22, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+html {
+  box-sizing: border-box;
+}
+
+/* line 26, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+@-ms-viewport {
+  width: device-width;
+}
+
+/* line 57, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+html {
+  font-size: 16px;
+  -ms-overflow-style: scrollbar;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* line 71, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #373a3c;
+  background-color: #fff;
+}
+
+/* line 87, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+[tabindex="-1"]:focus {
+  outline: none !important;
+}
+
+/* line 100, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: .5rem;
+}
+
+/* line 109, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* line 115, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+abbr[title],
+abbr[data-original-title] {
+  cursor: help;
+  border-bottom: 1px dotted #818a91;
+}
+
+/* line 122, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+address {
+  margin-bottom: 1rem;
+  font-style: normal;
+  line-height: inherit;
+}
+
+/* line 128, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+ol,
+ul,
+dl {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* line 135, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+ol ol,
+ul ul,
+ol ul,
+ul ol {
+  margin-bottom: 0;
+}
+
+/* line 142, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+dt {
+  font-weight: bold;
+}
+
+/* line 146, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+dd {
+  margin-bottom: .5rem;
+  margin-left: 0;
+}
+
+/* line 151, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+blockquote {
+  margin: 0 0 1rem;
+}
+
+/* line 160, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a:focus, a:hover {
+  color: #014c8c;
+  text-decoration: underline;
+}
+
+/* line 169, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+a:focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+/* line 180, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+a:not([href]):not([tabindex]) {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a:not([href]):not([tabindex]):focus, a:not([href]):not([tabindex]):hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* line 189, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+a:not([href]):not([tabindex]):focus {
+  outline: none;
+}
+
+/* line 199, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+pre {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  overflow: auto;
+}
+
+/* line 213, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+figure {
+  margin: 0 0 1rem;
+}
+
+/* line 224, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+img {
+  vertical-align: middle;
+}
+
+/* line 239, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+[role="button"] {
+  cursor: pointer;
+}
+
+/* line 254, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+a,
+area,
+button,
+[role="button"],
+input,
+label,
+select,
+summary,
+textarea {
+  touch-action: manipulation;
+}
+
+/* line 271, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+table {
+  border-collapse: collapse;
+  background-color: transparent;
+}
+
+/* line 278, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+caption {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  color: #818a91;
+  text-align: left;
+  caption-side: bottom;
+}
+
+/* line 286, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+th {
+  text-align: left;
+}
+
+/* line 296, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+label {
+  display: inline-block;
+  margin-bottom: .5rem;
+}
+
+/* line 306, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+button:focus {
+  outline: 1px dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+}
+
+/* line 311, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+input,
+button,
+select,
+textarea {
+  margin: 0;
+  line-height: inherit;
+  border-radius: 0;
+}
+
+/* line 330, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+input[type="radio"]:disabled,
+input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+
+/* line 336, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"] {
+  -webkit-appearance: listbox;
+}
+
+/* line 348, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+textarea {
+  resize: vertical;
+}
+
+/* line 353, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+/* line 364, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: .5rem;
+  font-size: 1.5rem;
+  line-height: inherit;
+}
+
+/* line 374, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+input[type="search"] {
+  -webkit-appearance: none;
+}
+
+/* line 383, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+output {
+  display: inline-block;
+}
+
+/* line 391, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_reboot.scss */
+[hidden] {
+  display: none !important;
+}
+
+/* line 7, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.25;
+  color: #55595c;
+  background-color: #fff;
+  background-image: none;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+}
+
+/* line 27, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control::-ms-expand {
+  background-color: transparent;
+  border: 0;
+}
+
+/* line 52, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.form-control:focus {
+  color: #55595c;
+  background-color: #fff;
+  border-color: #66afe9;
+  outline: none;
+}
+
+/* line 36, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control::-webkit-input-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.form-control::-moz-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.form-control:-ms-input-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.form-control::-ms-input-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.form-control::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* line 47, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control:disabled, .form-control[readonly] {
+  background-color: #eceeef;
+  opacity: 1;
+}
+
+/* line 54, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control:disabled {
+  cursor: not-allowed;
+}
+
+/* line 60, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+select.form-control:not([size]):not([multiple]) {
+  height: 2.5rem;
+}
+
+/* line 64, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+select.form-control:focus::-ms-value {
+  color: #55595c;
+  background-color: #fff;
+}
+
+/* line 76, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control-file,
+.form-control-range {
+  display: block;
+}
+
+/* line 88, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.col-form-label {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* line 94, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.col-form-label-lg {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 1.25rem;
+}
+
+/* line 100, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.col-form-label-sm {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* line 113, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.col-form-legend {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+/* line 126, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control-static {
+  min-height: 2.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* line 134, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control-static.form-control-sm, .input-group-sm > .form-control-static.form-control,
+.input-group-sm > .form-control-static.input-group-addon,
+.input-group-sm > .input-group-btn > .form-control-static.btn, .form-control-static.form-control-lg, .input-group-lg > .form-control-static.form-control,
+.input-group-lg > .form-control-static.input-group-addon,
+.input-group-lg > .input-group-btn > .form-control-static.btn {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/* line 150, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control-sm, .input-group-sm > .form-control,
+.input-group-sm > .input-group-addon,
+.input-group-sm > .input-group-btn > .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+}
+
+/* line 157, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+select.form-control-sm:not([size]):not([multiple]), .input-group-sm > select.form-control:not([size]):not([multiple]),
+.input-group-sm > select.input-group-addon:not([size]):not([multiple]),
+.input-group-sm > .input-group-btn > select.btn:not([size]):not([multiple]) {
+  height: 1.8125rem;
+}
+
+/* line 162, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control-lg, .input-group-lg > .form-control,
+.input-group-lg > .input-group-addon,
+.input-group-lg > .input-group-btn > .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  border-radius: 0.3rem;
+}
+
+/* line 169, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.form-control:not([size]):not([multiple]),
+.input-group-lg > select.input-group-addon:not([size]):not([multiple]),
+.input-group-lg > .input-group-btn > select.btn:not([size]):not([multiple]) {
+  height: 3.1666666667rem;
+}
+
+/* line 180, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+/* line 184, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-text {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* line 194, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check {
+  position: relative;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* line 200, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check + .form-check {
+  margin-top: -.25rem;
+}
+
+/* line 205, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check.disabled .form-check-label {
+  color: #818a91;
+  cursor: not-allowed;
+}
+
+/* line 212, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check-label {
+  padding-left: 1.25rem;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+/* line 218, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check-input {
+  position: absolute;
+  margin-top: .25rem;
+  margin-left: -1.25rem;
+}
+
+/* line 223, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check-input:only-child {
+  position: static;
+}
+
+/* line 229, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check-inline {
+  position: relative;
+  display: inline-block;
+  padding-left: 1.25rem;
+  margin-bottom: 0;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* line 237, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check-inline + .form-check-inline {
+  margin-left: .75rem;
+}
+
+/* line 241, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-check-inline.disabled {
+  cursor: not-allowed;
+}
+
+/* line 251, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control-feedback, #email_check_message {
+  margin-top: 0.25rem;
+}
+
+/* line 255, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.form-control-success,
+.form-control-warning,
+.form-control-danger {
+  padding-right: 2.25rem;
+  background-repeat: no-repeat;
+  background-position: center right 0.625rem;
+  background-size: 1.25rem 1.25rem;
+}
+
+/* line 8, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-success .form-control-feedback, .has-success #email_check_message,
+.has-success .form-control-label,
+.has-success .form-check-label,
+.has-success .form-check-inline,
+.has-success .custom-control {
+  color: #5cb85c;
+}
+
+/* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-success .form-control {
+  border-color: #5cb85c;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-success .input-group-addon {
+  color: #5cb85c;
+  border-color: #5cb85c;
+  background-color: #eaf6ea;
+}
+
+/* line 34, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-success .form-control-feedback, .has-success #email_check_message {
+  color: #5cb85c;
+}
+
+/* line 268, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.has-success .form-control-success {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%235cb85c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E");
+}
+
+/* line 8, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-warning .form-control-feedback, .has-warning #email_check_message,
+.has-warning .form-control-label,
+.has-warning .form-check-label,
+.has-warning .form-check-inline,
+.has-warning .custom-control {
+  color: #f0ad4e;
+}
+
+/* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-warning .form-control {
+  border-color: #f0ad4e;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-warning .input-group-addon {
+  color: #f0ad4e;
+  border-color: #f0ad4e;
+  background-color: white;
+}
+
+/* line 34, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-warning .form-control-feedback, .has-warning #email_check_message {
+  color: #f0ad4e;
+}
+
+/* line 276, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.has-warning .form-control-warning {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23f0ad4e' d='M4.4 5.324h-.8v-2.46h.8zm0 1.42h-.8V5.89h.8zM3.76.63L.04 7.075c-.115.2.016.425.26.426h7.397c.242 0 .372-.226.258-.426C6.726 4.924 5.47 2.79 4.253.63c-.113-.174-.39-.174-.494 0z'/%3E%3C/svg%3E");
+}
+
+/* line 8, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-danger .form-control-feedback, .has-danger #email_check_message,
+.has-danger .form-control-label,
+.has-danger .form-check-label,
+.has-danger .form-check-inline,
+.has-danger .custom-control {
+  color: #d9534f;
+}
+
+/* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-danger .form-control {
+  border-color: #d9534f;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-danger .input-group-addon {
+  color: #d9534f;
+  border-color: #d9534f;
+  background-color: #fdf7f7;
+}
+
+/* line 34, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_forms.scss */
+.has-danger .form-control-feedback, .has-danger #email_check_message {
+  color: #d9534f;
+}
+
+/* line 284, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+.has-danger .form-control-danger {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23d9534f' viewBox='-2 -2 7 7'%3E%3Cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3E%3Ccircle r='.5'/%3E%3Ccircle cx='3' r='.5'/%3E%3Ccircle cy='3' r='.5'/%3E%3Ccircle cx='3' cy='3' r='.5'/%3E%3C/svg%3E");
+}
+
+@media (min-width: 544px) {
+  /* line 304, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  /* line 311, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+  }
+  /* line 318, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .form-control-static {
+    display: inline-block;
+  }
+  /* line 322, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .input-group {
+    display: inline-table;
+    vertical-align: middle;
+  }
+  /* line 326, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .input-group .input-group-addon,
+.form-inline .input-group .input-group-btn,
+.form-inline .input-group .form-control {
+    width: auto;
+  }
+  /* line 334, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .input-group > .form-control {
+    width: 100%;
+  }
+  /* line 338, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .form-control-label {
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  /* line 345, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .form-check {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  /* line 351, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .form-check-label {
+    padding-left: 0;
+  }
+  /* line 354, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .form-check-input {
+    position: relative;
+    margin-left: 0;
+  }
+  /* line 360, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_forms.scss */
+  .form-inline .has-feedback .form-control-feedback, .form-inline .has-feedback #email_check_message {
+    top: 0;
+  }
+}
+
+/* line 5, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group {
+  position: relative;
+  width: 100%;
+  display: table;
+  border-collapse: separate;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group .form-control {
+  position: relative;
+  z-index: 2;
+  float: left;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* line 54, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.input-group .form-control:focus, .input-group .form-control:active, .input-group .form-control:hover {
+  z-index: 3;
+}
+
+/* line 40, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon,
+.input-group-btn,
+.input-group .form-control {
+  display: table-cell;
+}
+
+/* line 47, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon:not(:first-child):not(:last-child),
+.input-group-btn:not(:first-child):not(:last-child),
+.input-group .form-control:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+
+/* line 52, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon,
+.input-group-btn {
+  width: 1%;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* line 83, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0;
+  font-size: 1rem;
+  font-weight: normal;
+  line-height: 1.25;
+  color: #55595c;
+  text-align: center;
+  background-color: #eceeef;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+}
+
+/* line 96, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon.form-control-sm,
+.input-group-sm > .input-group-addon,
+.input-group-sm > .input-group-btn > .input-group-addon.btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+}
+
+/* line 101, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon.form-control-lg,
+.input-group-lg > .input-group-addon,
+.input-group-lg > .input-group-btn > .input-group-addon.btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  border-radius: 0.3rem;
+}
+
+/* line 109, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon input[type="radio"],
+.input-group-addon input[type="checkbox"] {
+  margin-top: 0;
+}
+
+/* line 121, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group .form-control:not(:last-child),
+.input-group-addon:not(:last-child),
+.input-group-btn:not(:last-child) > .btn,
+.input-group-btn:not(:last-child) > .btn-group > .btn,
+.input-group-btn:not(:last-child) > .dropdown-toggle,
+.input-group-btn:not(:first-child) > .btn:not(:last-child):not(.dropdown-toggle),
+.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > .btn {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* line 130, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-addon:not(:last-child) {
+  border-right: 0;
+}
+
+/* line 133, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group .form-control:not(:first-child),
+.input-group-addon:not(:first-child),
+.input-group-btn:not(:first-child) > .btn,
+.input-group-btn:not(:first-child) > .btn-group > .btn,
+.input-group-btn:not(:first-child) > .dropdown-toggle,
+.input-group-btn:not(:last-child) > .btn:not(:first-child),
+.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+/* line 142, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.form-control + .input-group-addon:not(:first-child) {
+  border-left: 0;
+}
+
+/* line 150, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-btn {
+  position: relative;
+  font-size: 0;
+  white-space: nowrap;
+}
+
+/* line 159, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-btn > .btn {
+  position: relative;
+}
+
+/* line 161, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-btn > .btn + .btn {
+  margin-left: -1px;
+}
+
+/* line 54, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.input-group-btn > .btn:focus, .input-group-btn > .btn:active, .input-group-btn > .btn:hover {
+  z-index: 3;
+}
+
+/* line 172, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-btn:not(:last-child) > .btn,
+.input-group-btn:not(:last-child) > .btn-group {
+  margin-right: -1px;
+}
+
+/* line 178, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_input-group.scss */
+.input-group-btn:not(:first-child) > .btn,
+.input-group-btn:not(:first-child) > .btn-group {
+  z-index: 2;
+  margin-left: -1px;
+}
+
+/* line 54, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.input-group-btn:not(:first-child) > .btn:focus, .input-group-btn:not(:first-child) > .btn:active, .input-group-btn:not(:first-child) > .btn:hover,
+.input-group-btn:not(:first-child) > .btn-group:focus,
+.input-group-btn:not(:first-child) > .btn-group:active,
+.input-group-btn:not(:first-child) > .btn-group:hover {
+  z-index: 3;
+}
+
+/* line 12, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control {
+  position: relative;
+  display: inline;
+  padding-left: 1.5rem;
+  cursor: pointer;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control + .custom-control {
+  margin-left: 1rem;
+}
+
+/* line 23, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control-input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control-input:checked ~ .custom-control-indicator {
+  color: #fff;
+  background-color: #0074d9;
+}
+
+/* line 34, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control-input:focus ~ .custom-control-indicator {
+  box-shadow: 0 0 0 0.075rem #fff, 0 0 0 0.2rem #0074d9;
+}
+
+/* line 39, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control-input:active ~ .custom-control-indicator {
+  color: #fff;
+  background-color: #84c6ff;
+}
+
+/* line 46, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control-input:disabled ~ .custom-control-indicator {
+  cursor: not-allowed;
+  background-color: #eee;
+}
+
+/* line 51, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control-input:disabled ~ .custom-control-description {
+  color: #767676;
+  cursor: not-allowed;
+}
+
+/* line 62, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-control-indicator {
+  position: absolute;
+  top: .0625rem;
+  left: 0;
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-color: #ddd;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 50% 50%;
+}
+
+/* line 83, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-checkbox .custom-control-indicator {
+  border-radius: 0.25rem;
+}
+
+/* line 87, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-checkbox .custom-control-input:checked ~ .custom-control-indicator {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E");
+}
+
+/* line 91, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-checkbox .custom-control-input:indeterminate ~ .custom-control-indicator {
+  background-color: #0074d9;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath stroke='%23fff' d='M0 2h4'/%3E%3C/svg%3E");
+}
+
+/* line 103, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-radio .custom-control-indicator {
+  border-radius: 50%;
+}
+
+/* line 107, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-radio .custom-control-input:checked ~ .custom-control-indicator {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='%23fff'/%3E%3C/svg%3E");
+}
+
+/* line 119, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-controls-stacked .custom-control {
+  display: inline;
+}
+
+/* line 122, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-controls-stacked .custom-control::after {
+  display: block;
+  margin-bottom: 0.25rem;
+  content: "";
+}
+
+/* line 128, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-controls-stacked .custom-control + .custom-control {
+  margin-left: 0;
+}
+
+/* line 142, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-select {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+  padding-right: 0.75rem \9;
+  color: #55595c;
+  vertical-align: middle;
+  background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+  background-image: none \9;
+  background-size: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+
+/* line 158, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-select:focus {
+  border-color: #51a7e8;
+  outline: none;
+}
+
+/* line 163, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-select:focus::-ms-value {
+  color: #55595c;
+  background-color: #fff;
+}
+
+/* line 174, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-select:disabled {
+  color: #818a91;
+  cursor: not-allowed;
+  background-color: #eceeef;
+}
+
+/* line 181, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-select::-ms-expand {
+  opacity: 0;
+}
+
+/* line 186, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-select-sm {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  font-size: 75%;
+}
+
+/* line 202, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-file {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  height: 2.5rem;
+  cursor: pointer;
+}
+
+/* line 210, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-file-input {
+  min-width: 14rem;
+  max-width: 100%;
+  margin: 0;
+  filter: alpha(opacity=0);
+  opacity: 0;
+}
+
+/* line 222, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-file-control {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 5;
+  height: 2.5rem;
+  padding: 0.5rem 1rem;
+  line-height: 1.5;
+  color: #555;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+}
+
+/* line 239, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-file-control:lang(en)::after {
+  content: "Choose file...";
+}
+
+/* line 244, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-file-control::before {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  z-index: 6;
+  display: block;
+  height: 2.5rem;
+  padding: 0.5rem 1rem;
+  line-height: 1.5;
+  color: #555;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+/* line 261, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_custom-forms.scss */
+.custom-file-control:lang(en)::before {
+  content: "Browse";
+}
+
+/* line 3, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_responsive-embed.scss */
+.embed-responsive {
+  position: relative;
+  display: block;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* line 10, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_responsive-embed.scss */
+.embed-responsive .embed-responsive-item,
+.embed-responsive iframe,
+.embed-responsive embed,
+.embed-responsive object,
+.embed-responsive video {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* line 25, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_responsive-embed.scss */
+.embed-responsive-21by9 {
+  padding-bottom: 42.8571428571%;
+}
+
+/* line 29, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_responsive-embed.scss */
+.embed-responsive-16by9 {
+  padding-bottom: 56.25%;
+}
+
+/* line 33, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_responsive-embed.scss */
+.embed-responsive-4by3 {
+  padding-bottom: 75%;
+}
+
+/* line 37, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_responsive-embed.scss */
+.embed-responsive-1by1 {
+  padding-bottom: 100%;
+}
+
+/* line 1, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_close.scss */
+.close {
+  float: right;
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: .2;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.close:focus, .close:hover {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: .5;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/_close.scss */
+button.close {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
+/* line 5, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_background.scss */
+.bg-faded {
+  background-color: #f7f7f9;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_background-variant.scss */
+.bg-primary {
+  color: #fff !important;
+  background-color: #0275d8 !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.bg-primary:focus, a.bg-primary:hover {
+  background-color: #025aa5 !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_background-variant.scss */
+.bg-success {
+  color: #fff !important;
+  background-color: #5cb85c !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.bg-success:focus, a.bg-success:hover {
+  background-color: #449d44 !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_background-variant.scss */
+.bg-info {
+  color: #fff !important;
+  background-color: #5bc0de !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.bg-info:focus, a.bg-info:hover {
+  background-color: #31b0d5 !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_background-variant.scss */
+.bg-warning {
+  color: #fff !important;
+  background-color: #f0ad4e !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.bg-warning:focus, a.bg-warning:hover {
+  background-color: #ec971f !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_background-variant.scss */
+.bg-danger {
+  color: #fff !important;
+  background-color: #d9534f !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.bg-danger:focus, a.bg-danger:hover {
+  background-color: #c9302c !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_background-variant.scss */
+.bg-inverse {
+  color: #fff !important;
+  background-color: #373a3c !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.bg-inverse:focus, a.bg-inverse:hover {
+  background-color: #1f2021 !important;
+}
+
+/* line 2, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_clearfix.scss */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* line 5, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_display.scss */
+.d-block {
+  display: block !important;
+}
+
+/* line 8, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_display.scss */
+.d-inline-block {
+  display: inline-block !important;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_display.scss */
+.d-inline {
+  display: inline !important;
+}
+
+/* line 3, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+.pull-xs-left {
+  float: left !important;
+}
+
+/* line 6, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+.pull-xs-right {
+  float: right !important;
+}
+
+/* line 9, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+.pull-xs-none {
+  float: none !important;
+}
+
+@media (min-width: 544px) {
+  /* line 3, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-sm-left {
+    float: left !important;
+  }
+  /* line 6, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-sm-right {
+    float: right !important;
+  }
+  /* line 9, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-sm-none {
+    float: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  /* line 3, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-md-left {
+    float: left !important;
+  }
+  /* line 6, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-md-right {
+    float: right !important;
+  }
+  /* line 9, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-md-none {
+    float: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  /* line 3, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-lg-left {
+    float: left !important;
+  }
+  /* line 6, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-lg-right {
+    float: right !important;
+  }
+  /* line 9, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-lg-none {
+    float: none !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* line 3, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-xl-left {
+    float: left !important;
+  }
+  /* line 6, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-xl-right {
+    float: right !important;
+  }
+  /* line 9, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_pulls.scss */
+  .pull-xl-none {
+    float: none !important;
+  }
+}
+
+/* line 5, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_screenreaders.scss */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* line 23, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_screen-reader.scss */
+.sr-only-focusable:active, .sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+}
+
+/* line 3, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.w-100 {
+  width: 100% !important;
+}
+
+/* line 7, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-x-auto {
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-a-0 {
+  margin: 0 0 !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-t-0 {
+  margin-top: 0 !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-r-0 {
+  margin-right: 0 !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-b-0 {
+  margin-bottom: 0 !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-l-0 {
+  margin-left: 0 !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-x-0 {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-y-0 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-a-1 {
+  margin: 1rem 1rem !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-t-1 {
+  margin-top: 1rem !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-r-1 {
+  margin-right: 1rem !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-b-1 {
+  margin-bottom: 1rem !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-l-1 {
+  margin-left: 1rem !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-x-1 {
+  margin-right: 1rem !important;
+  margin-left: 1rem !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-y-1 {
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-a-2 {
+  margin: 1.5rem 1.5rem !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-t-2 {
+  margin-top: 1.5rem !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-r-2 {
+  margin-right: 1.5rem !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-b-2 {
+  margin-bottom: 1.5rem !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-l-2 {
+  margin-left: 1.5rem !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-x-2 {
+  margin-right: 1.5rem !important;
+  margin-left: 1.5rem !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-y-2 {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-a-3 {
+  margin: 3rem 3rem !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-t-3 {
+  margin-top: 3rem !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-r-3 {
+  margin-right: 3rem !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-b-3 {
+  margin-bottom: 3rem !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-l-3 {
+  margin-left: 3rem !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-x-3 {
+  margin-right: 3rem !important;
+  margin-left: 3rem !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.m-y-3 {
+  margin-top: 3rem !important;
+  margin-bottom: 3rem !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-a-0 {
+  padding: 0 0 !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-t-0 {
+  padding-top: 0 !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-r-0 {
+  padding-right: 0 !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-b-0 {
+  padding-bottom: 0 !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-l-0 {
+  padding-left: 0 !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-x-0 {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-y-0 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-a-1 {
+  padding: 1rem 1rem !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-t-1 {
+  padding-top: 1rem !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-r-1 {
+  padding-right: 1rem !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-b-1 {
+  padding-bottom: 1rem !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-l-1 {
+  padding-left: 1rem !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-x-1 {
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-y-1 {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-a-2 {
+  padding: 1.5rem 1.5rem !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-t-2 {
+  padding-top: 1.5rem !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-r-2 {
+  padding-right: 1.5rem !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-b-2 {
+  padding-bottom: 1.5rem !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-l-2 {
+  padding-left: 1.5rem !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-x-2 {
+  padding-right: 1.5rem !important;
+  padding-left: 1.5rem !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-y-2 {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-a-3 {
+  padding: 3rem 3rem !important;
+}
+
+/* line 18, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-t-3 {
+  padding-top: 3rem !important;
+}
+
+/* line 19, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-r-3 {
+  padding-right: 3rem !important;
+}
+
+/* line 20, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-b-3 {
+  padding-bottom: 3rem !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-l-3 {
+  padding-left: 3rem !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-x-3 {
+  padding-right: 3rem !important;
+  padding-left: 3rem !important;
+}
+
+/* line 28, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.p-y-3 {
+  padding-top: 3rem !important;
+  padding-bottom: 3rem !important;
+}
+
+/* line 37, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_spacing.scss */
+.pos-f-t {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+}
+
+/* line 7, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-justify {
+  text-align: justify !important;
+}
+
+/* line 8, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-nowrap {
+  white-space: nowrap !important;
+}
+
+/* line 9, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* line 15, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-xs-left {
+  text-align: left !important;
+}
+
+/* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-xs-right {
+  text-align: right !important;
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-xs-center {
+  text-align: center !important;
+}
+
+@media (min-width: 544px) {
+  /* line 15, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-sm-left {
+    text-align: left !important;
+  }
+  /* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-sm-right {
+    text-align: right !important;
+  }
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-sm-center {
+    text-align: center !important;
+  }
+}
+
+@media (min-width: 768px) {
+  /* line 15, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-md-left {
+    text-align: left !important;
+  }
+  /* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-md-right {
+    text-align: right !important;
+  }
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-md-center {
+    text-align: center !important;
+  }
+}
+
+@media (min-width: 992px) {
+  /* line 15, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-lg-left {
+    text-align: left !important;
+  }
+  /* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-lg-right {
+    text-align: right !important;
+  }
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-lg-center {
+    text-align: center !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* line 15, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-xl-left {
+    text-align: left !important;
+  }
+  /* line 16, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-xl-right {
+    text-align: right !important;
+  }
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+  .text-xl-center {
+    text-align: center !important;
+  }
+}
+
+/* line 23, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-lowercase {
+  text-transform: lowercase !important;
+}
+
+/* line 24, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-uppercase {
+  text-transform: uppercase !important;
+}
+
+/* line 25, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-capitalize {
+  text-transform: capitalize !important;
+}
+
+/* line 29, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.font-weight-normal {
+  font-weight: normal;
+}
+
+/* line 30, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.font-weight-bold {
+  font-weight: bold;
+}
+
+/* line 31, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.font-italic {
+  font-style: italic;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_text-emphasis.scss */
+.text-muted {
+  color: #818a91 !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.text-muted:focus, a.text-muted:hover {
+  color: #687077 !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_text-emphasis.scss */
+.text-primary {
+  color: #0275d8 !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.text-primary:focus, a.text-primary:hover {
+  color: #025aa5 !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_text-emphasis.scss */
+.text-success {
+  color: #5cb85c !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.text-success:focus, a.text-success:hover {
+  color: #449d44 !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_text-emphasis.scss */
+.text-info {
+  color: #5bc0de !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.text-info:focus, a.text-info:hover {
+  color: #31b0d5 !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_text-emphasis.scss */
+.text-warning {
+  color: #f0ad4e !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.text-warning:focus, a.text-warning:hover {
+  color: #ec971f !important;
+}
+
+/* line 4, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_text-emphasis.scss */
+.text-danger {
+  color: #d9534f !important;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+a.text-danger:focus, a.text-danger:hover {
+  color: #c9302c !important;
+}
+
+/* line 49, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_text.scss */
+.text-hide {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+/* line 5, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+.invisible {
+  visibility: hidden !important;
+}
+
+/* line 12, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+.hidden-xs-up {
+  display: none !important;
+}
+
+@media (max-width: 543px) {
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-xs-down {
+    display: none !important;
+  }
+}
+
+@media (min-width: 544px) {
+  /* line 12, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-sm-up {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-sm-down {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  /* line 12, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-md-up {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991px) {
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-md-down {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  /* line 12, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-lg-up {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1199px) {
+  /* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-lg-down {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* line 12, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-xl-up {
+    display: none !important;
+  }
+}
+
+/* line 17, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+.hidden-xl-down {
+  display: none !important;
+}
+
+/* line 29, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+.visible-print-block {
+  display: none !important;
+}
+
+@media print {
+  /* line 29, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .visible-print-block {
+    display: block !important;
+  }
+}
+
+/* line 36, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+.visible-print-inline {
+  display: none !important;
+}
+
+@media print {
+  /* line 36, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .visible-print-inline {
+    display: inline !important;
+  }
+}
+
+/* line 43, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+.visible-print-inline-block {
+  display: none !important;
+}
+
+@media print {
+  /* line 43, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .visible-print-inline-block {
+    display: inline-block !important;
+  }
+}
+
+@media print {
+  /* line 51, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/utilities/_visibility.scss */
+  .hidden-print {
+    display: none !important;
+  }
+}
+
+/*!
+ * Bike Index styles
+ * for revised style in 2016
+ */
+/* line 18, app/assets/stylesheets/revised/fonts.scss */
+.body-font, .pullquote, h5, p, body {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 15px;
+  line-height: 2em;
+  color: #666666;
+  text-transform: none;
+}
+
+/* line 27, app/assets/stylesheets/revised/fonts.scss */
+.body-font em, .pullquote em, h5 em, p em, body em {
+  font-style: italic;
+}
+
+/* line 31, app/assets/stylesheets/revised/fonts.scss */
+.body-font strong, .pullquote strong, h5 strong, p strong, body strong {
+  font-weight: 700;
+}
+
+/* line 35, app/assets/stylesheets/revised/fonts.scss */
+.body-font a, .pullquote a, h5 a, p a, body a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+/* line 39, app/assets/stylesheets/revised/fonts.scss */
+.body-font a:hover, .pullquote a:hover, h5 a:hover, p a:hover, body a:hover, .body-font a:active, .pullquote a:active, h5 a:active, p a:active, body a:active, .body-font a.active, .pullquote a.active, h5 a.active, p a.active, body a.active {
+  text-decoration: underline;
+  color: #3498db;
+}
+
+/* line 48, app/assets/stylesheets/revised/fonts.scss */
+.light-italic {
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* line 52, app/assets/stylesheets/revised/fonts.scss */
+.light-italic strong {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* line 62, app/assets/stylesheets/revised/fonts.scss */
+p {
+  margin: 0 0 24px;
+}
+
+/* line 69, app/assets/stylesheets/revised/fonts.scss */
+h5 {
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 1.5em;
+}
+
+/* line 77, app/assets/stylesheets/revised/fonts.scss */
+.pullquote {
+  font-weight: 300;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.3em;
+}
+
+/* line 86, app/assets/stylesheets/revised/fonts.scss */
+.text-normal-weight {
+  font-weight: 400;
+}
+
+/* line 90, app/assets/stylesheets/revised/fonts.scss */
+.header-font, h4, h3, h2, h1, .header-font-uncap, .header-font-alt {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-transform: uppercase;
+  color: #0f466b;
+}
+
+/* line 97, app/assets/stylesheets/revised/fonts.scss */
+.header-font strong, h4 strong, h3 strong, h2 strong, h1 strong, .header-font-uncap strong, .header-font-alt strong {
+  font-weight: 700;
+}
+
+/* line 101, app/assets/stylesheets/revised/fonts.scss */
+.header-font a, h4 a, h3 a, h2 a, h1 a, .header-font-uncap a, .header-font-alt a {
+  color: #3498db;
+}
+
+/* line 104, app/assets/stylesheets/revised/fonts.scss */
+.header-font a:hover, h4 a:hover, h3 a:hover, h2 a:hover, h1 a:hover, .header-font-uncap a:hover, .header-font-alt a:hover, .header-font a:active, h4 a:active, h3 a:active, h2 a:active, h1 a:active, .header-font-uncap a:active, .header-font-alt a:active, .header-font a.active, h4 a.active, h3 a.active, h2 a.active, h1 a.active, .header-font-uncap a.active, .header-font-alt a.active {
+  text-decoration: underline;
+  color: #3498db;
+}
+
+/* line 113, app/assets/stylesheets/revised/fonts.scss */
+.uncap, .header-font-uncap, .header-font-alt {
+  text-transform: none !important;
+}
+
+/* line 117, app/assets/stylesheets/revised/fonts.scss */
+.uppercase {
+  text-transform: uppercase !important;
+}
+
+/* line 121, app/assets/stylesheets/revised/fonts.scss */
+.less-line-height {
+  line-height: 1.5;
+}
+
+/* line 130, app/assets/stylesheets/revised/fonts.scss */
+.header-font-alt {
+  font-family: "Open Sans", sans-serif;
+  color: #666666;
+}
+
+/* line 137, app/assets/stylesheets/revised/fonts.scss */
+h1 {
+  margin: 0 0 24px;
+  letter-spacing: -1px;
+  font-size: 36px;
+  line-height: 1.12em;
+}
+
+@media (max-width: 991px) {
+  /* line 137, app/assets/stylesheets/revised/fonts.scss */
+  h1 {
+    font-size: 30px;
+  }
+}
+
+/* line 150, app/assets/stylesheets/revised/fonts.scss */
+h2 {
+  margin: 0 0 24px;
+  font-size: 30px;
+  line-height: 1em;
+}
+
+@media (max-width: 991px) {
+  /* line 150, app/assets/stylesheets/revised/fonts.scss */
+  h2 {
+    font-size: 28px;
+  }
+}
+
+/* line 162, app/assets/stylesheets/revised/fonts.scss */
+h3 {
+  margin: 0 0 24px;
+  font-size: 24px;
+  line-height: 1em;
+}
+
+/* line 171, app/assets/stylesheets/revised/fonts.scss */
+h4 {
+  margin: 0 0 24px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* line 182, app/assets/stylesheets/revised/fonts.scss */
+.form-control::-webkit-input-placeholder {
+  color: #a4a4a4;
+  font-style: italic;
+}
+.form-control::-moz-placeholder {
+  color: #a4a4a4;
+  font-style: italic;
+}
+.form-control:-ms-input-placeholder {
+  color: #a4a4a4;
+  font-style: italic;
+}
+.form-control::-ms-input-placeholder {
+  color: #a4a4a4;
+  font-style: italic;
+}
+.form-control::placeholder {
+  color: #a4a4a4;
+  font-style: italic;
+}
+
+/* line 232, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-transform: uppercase;
+  display: inline-block;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  font-size: 15px;
+  border-radius: 1px;
+}
+
+/* line 258, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn:focus, .btn.focus, .btn:active:focus, .btn.focus:active, .btn.active:focus, .btn.active.focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn:focus, .btn:hover {
+  text-decoration: none;
+}
+
+/* line 268, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn.focus {
+  text-decoration: none;
+}
+
+/* line 272, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn:active, .btn.active {
+  background-image: none;
+  outline: 0;
+}
+
+/* line 280, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn.disabled, .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* line 290, app/assets/stylesheets/revised/mixins/_buttons.scss */
+a.btn.disabled,
+fieldset[disabled] a.btn {
+  pointer-events: none;
+}
+
+/* line 299, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary {
+  color: #fff;
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+/* line 19, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-primary:hover {
+  color: #fff;
+  background-color: #217dbb;
+  border-color: #2077b2;
+}
+
+/* line 28, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 36, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:focus, .btn-primary.focus {
+  color: #fff;
+  background-color: #217dbb;
+  border-color: #2077b2;
+}
+
+/* line 40, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:focus:not([href]):not([tabindex]), .btn-primary.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:active, .btn-primary.active, .open > .btn-primary.dropdown-toggle {
+  color: #fff;
+  background-color: #217dbb;
+  border-color: #2077b2;
+  background-image: none;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:active:not([href]):not([tabindex]), .btn-primary.active:not([href]):not([tabindex]), .open > .btn-primary.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 65, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:active:hover, .btn-primary:active:focus, .btn-primary.focus:active, .btn-primary.active:hover, .btn-primary.active:focus, .btn-primary.active.focus, .open > .btn-primary.dropdown-toggle:hover, .open > .btn-primary.dropdown-toggle:focus, .open > .btn-primary.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #1c699d;
+  border-color: #16527a;
+}
+
+/* line 70, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary:active:hover:not([href]):not([tabindex]), .btn-primary:active:focus:not([href]):not([tabindex]), .btn-primary.focus:active:not([href]):not([tabindex]), .btn-primary.active:hover:not([href]):not([tabindex]), .btn-primary.active:focus:not([href]):not([tabindex]), .btn-primary.active.focus:not([href]):not([tabindex]), .open > .btn-primary.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-primary.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-primary.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary.disabled:focus, .btn-primary.disabled.focus, .btn-primary:disabled:focus, .btn-primary.focus:disabled {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-primary.disabled:hover, .btn-primary:disabled:hover {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+/* line 307, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset {
+  color: #fff;
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+/* line 19, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-primary-offset:hover {
+  color: #fff;
+  background-color: #20638f;
+  border-color: #1e5d87;
+}
+
+/* line 28, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 36, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:focus, .btn-primary-offset.focus {
+  color: #fff;
+  background-color: #20638f;
+  border-color: #1e5d87;
+}
+
+/* line 40, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:focus:not([href]):not([tabindex]), .btn-primary-offset.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:active, .btn-primary-offset.active, .open > .btn-primary-offset.dropdown-toggle {
+  color: #fff;
+  background-color: #20638f;
+  border-color: #1e5d87;
+  background-image: none;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:active:not([href]):not([tabindex]), .btn-primary-offset.active:not([href]):not([tabindex]), .open > .btn-primary-offset.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 65, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:active:hover, .btn-primary-offset:active:focus, .btn-primary-offset.focus:active, .btn-primary-offset.active:hover, .btn-primary-offset.active:focus, .btn-primary-offset.active.focus, .open > .btn-primary-offset.dropdown-toggle:hover, .open > .btn-primary-offset.dropdown-toggle:focus, .open > .btn-primary-offset.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #194f72;
+  border-color: #123851;
+}
+
+/* line 70, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset:active:hover:not([href]):not([tabindex]), .btn-primary-offset:active:focus:not([href]):not([tabindex]), .btn-primary-offset.focus:active:not([href]):not([tabindex]), .btn-primary-offset.active:hover:not([href]):not([tabindex]), .btn-primary-offset.active:focus:not([href]):not([tabindex]), .btn-primary-offset.active.focus:not([href]):not([tabindex]), .open > .btn-primary-offset.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-primary-offset.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-primary-offset.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-primary-offset.disabled:focus, .btn-primary-offset.disabled.focus, .btn-primary-offset:disabled:focus, .btn-primary-offset.focus:disabled {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-primary-offset.disabled:hover, .btn-primary-offset:disabled:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+/* line 311, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary {
+  color: #373a3c;
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+/* line 19, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:not([href]):not([tabindex]) {
+  color: #373a3c;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-secondary:hover {
+  color: #373a3c;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+
+/* line 28, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:hover:not([href]):not([tabindex]) {
+  color: #373a3c;
+}
+
+/* line 36, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:focus, .btn-secondary.focus {
+  color: #373a3c;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+
+/* line 40, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:focus:not([href]):not([tabindex]), .btn-secondary.focus:not([href]):not([tabindex]) {
+  color: #373a3c;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:active, .btn-secondary.active, .open > .btn-secondary.dropdown-toggle {
+  color: #373a3c;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+  background-image: none;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:active:not([href]):not([tabindex]), .btn-secondary.active:not([href]):not([tabindex]), .open > .btn-secondary.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #373a3c;
+}
+
+/* line 65, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:active:hover, .btn-secondary:active:focus, .btn-secondary.focus:active, .btn-secondary.active:hover, .btn-secondary.active:focus, .btn-secondary.active.focus, .open > .btn-secondary.dropdown-toggle:hover, .open > .btn-secondary.dropdown-toggle:focus, .open > .btn-secondary.dropdown-toggle.focus {
+  color: #373a3c;
+  background-color: #d4d4d4;
+  border-color: #8c8c8c;
+}
+
+/* line 70, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary:active:hover:not([href]):not([tabindex]), .btn-secondary:active:focus:not([href]):not([tabindex]), .btn-secondary.focus:active:not([href]):not([tabindex]), .btn-secondary.active:hover:not([href]):not([tabindex]), .btn-secondary.active:focus:not([href]):not([tabindex]), .btn-secondary.active.focus:not([href]):not([tabindex]), .open > .btn-secondary.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-secondary.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-secondary.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #373a3c;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-secondary.disabled:focus, .btn-secondary.disabled.focus, .btn-secondary:disabled:focus, .btn-secondary.focus:disabled {
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-secondary.disabled:hover, .btn-secondary:disabled:hover {
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+/* line 319, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #5bc0de;
+}
+
+/* line 19, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-info:hover {
+  color: #fff;
+  background-color: #31b0d5;
+  border-color: #2aabd2;
+}
+
+/* line 28, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 36, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:focus, .btn-info.focus {
+  color: #fff;
+  background-color: #31b0d5;
+  border-color: #2aabd2;
+}
+
+/* line 40, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:focus:not([href]):not([tabindex]), .btn-info.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:active, .btn-info.active, .open > .btn-info.dropdown-toggle {
+  color: #fff;
+  background-color: #31b0d5;
+  border-color: #2aabd2;
+  background-image: none;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:active:not([href]):not([tabindex]), .btn-info.active:not([href]):not([tabindex]), .open > .btn-info.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 65, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:active:hover, .btn-info:active:focus, .btn-info.focus:active, .btn-info.active:hover, .btn-info.active:focus, .btn-info.active.focus, .open > .btn-info.dropdown-toggle:hover, .open > .btn-info.dropdown-toggle:focus, .open > .btn-info.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #269abc;
+  border-color: #1f7e9a;
+}
+
+/* line 70, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info:active:hover:not([href]):not([tabindex]), .btn-info:active:focus:not([href]):not([tabindex]), .btn-info.focus:active:not([href]):not([tabindex]), .btn-info.active:hover:not([href]):not([tabindex]), .btn-info.active:focus:not([href]):not([tabindex]), .btn-info.active.focus:not([href]):not([tabindex]), .open > .btn-info.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-info.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-info.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-info.disabled:focus, .btn-info.disabled.focus, .btn-info:disabled:focus, .btn-info.focus:disabled {
+  background-color: #5bc0de;
+  border-color: #5bc0de;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-info.disabled:hover, .btn-info:disabled:hover {
+  background-color: #5bc0de;
+  border-color: #5bc0de;
+}
+
+/* line 323, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #5cb85c;
+}
+
+/* line 19, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-success:hover {
+  color: #fff;
+  background-color: #449d44;
+  border-color: #419641;
+}
+
+/* line 28, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 36, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:focus, .btn-success.focus {
+  color: #fff;
+  background-color: #449d44;
+  border-color: #419641;
+}
+
+/* line 40, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:focus:not([href]):not([tabindex]), .btn-success.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:active, .btn-success.active, .open > .btn-success.dropdown-toggle {
+  color: #fff;
+  background-color: #449d44;
+  border-color: #419641;
+  background-image: none;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:active:not([href]):not([tabindex]), .btn-success.active:not([href]):not([tabindex]), .open > .btn-success.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 65, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:active:hover, .btn-success:active:focus, .btn-success.focus:active, .btn-success.active:hover, .btn-success.active:focus, .btn-success.active.focus, .open > .btn-success.dropdown-toggle:hover, .open > .btn-success.dropdown-toggle:focus, .open > .btn-success.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #398439;
+  border-color: #2d672d;
+}
+
+/* line 70, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success:active:hover:not([href]):not([tabindex]), .btn-success:active:focus:not([href]):not([tabindex]), .btn-success.focus:active:not([href]):not([tabindex]), .btn-success.active:hover:not([href]):not([tabindex]), .btn-success.active:focus:not([href]):not([tabindex]), .btn-success.active.focus:not([href]):not([tabindex]), .open > .btn-success.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-success.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-success.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-success.disabled:focus, .btn-success.disabled.focus, .btn-success:disabled:focus, .btn-success.focus:disabled {
+  background-color: #5cb85c;
+  border-color: #5cb85c;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-success.disabled:hover, .btn-success:disabled:hover {
+  background-color: #5cb85c;
+  border-color: #5cb85c;
+}
+
+/* line 331, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #f0ad4e;
+}
+
+/* line 19, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-warning:hover {
+  color: #fff;
+  background-color: #ec971f;
+  border-color: #eb9316;
+}
+
+/* line 28, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 36, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:focus, .btn-warning.focus {
+  color: #fff;
+  background-color: #ec971f;
+  border-color: #eb9316;
+}
+
+/* line 40, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:focus:not([href]):not([tabindex]), .btn-warning.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:active, .btn-warning.active, .open > .btn-warning.dropdown-toggle {
+  color: #fff;
+  background-color: #ec971f;
+  border-color: #eb9316;
+  background-image: none;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:active:not([href]):not([tabindex]), .btn-warning.active:not([href]):not([tabindex]), .open > .btn-warning.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 65, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:active:hover, .btn-warning:active:focus, .btn-warning.focus:active, .btn-warning.active:hover, .btn-warning.active:focus, .btn-warning.active.focus, .open > .btn-warning.dropdown-toggle:hover, .open > .btn-warning.dropdown-toggle:focus, .open > .btn-warning.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #d58512;
+  border-color: #b06d0f;
+}
+
+/* line 70, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning:active:hover:not([href]):not([tabindex]), .btn-warning:active:focus:not([href]):not([tabindex]), .btn-warning.focus:active:not([href]):not([tabindex]), .btn-warning.active:hover:not([href]):not([tabindex]), .btn-warning.active:focus:not([href]):not([tabindex]), .btn-warning.active.focus:not([href]):not([tabindex]), .open > .btn-warning.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-warning.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-warning.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-warning.disabled:focus, .btn-warning.disabled.focus, .btn-warning:disabled:focus, .btn-warning.focus:disabled {
+  background-color: #f0ad4e;
+  border-color: #f0ad4e;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-warning.disabled:hover, .btn-warning:disabled:hover {
+  background-color: #f0ad4e;
+  border-color: #f0ad4e;
+}
+
+/* line 339, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+/* line 19, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-danger:hover {
+  color: #fff;
+  background-color: #c9302c;
+  border-color: #c12e2a;
+}
+
+/* line 28, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 36, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:focus, .btn-danger.focus {
+  color: #fff;
+  background-color: #c9302c;
+  border-color: #c12e2a;
+}
+
+/* line 40, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:focus:not([href]):not([tabindex]), .btn-danger.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:active, .btn-danger.active, .open > .btn-danger.dropdown-toggle {
+  color: #fff;
+  background-color: #c9302c;
+  border-color: #c12e2a;
+  background-image: none;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:active:not([href]):not([tabindex]), .btn-danger.active:not([href]):not([tabindex]), .open > .btn-danger.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 65, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:active:hover, .btn-danger:active:focus, .btn-danger.focus:active, .btn-danger.active:hover, .btn-danger.active:focus, .btn-danger.active.focus, .open > .btn-danger.dropdown-toggle:hover, .open > .btn-danger.dropdown-toggle:focus, .open > .btn-danger.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #ac2925;
+  border-color: #8b211e;
+}
+
+/* line 70, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger:active:hover:not([href]):not([tabindex]), .btn-danger:active:focus:not([href]):not([tabindex]), .btn-danger.focus:active:not([href]):not([tabindex]), .btn-danger.active:hover:not([href]):not([tabindex]), .btn-danger.active:focus:not([href]):not([tabindex]), .btn-danger.active.focus:not([href]):not([tabindex]), .open > .btn-danger.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-danger.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-danger.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-danger.disabled:focus, .btn-danger.disabled.focus, .btn-danger:disabled:focus, .btn-danger.focus:disabled {
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-danger.disabled:hover, .btn-danger:disabled:hover {
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+/* line 348, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary {
+  color: #3498db;
+  background-image: none;
+  background-color: transparent;
+  border-color: #3498db;
+}
+
+/* line 100, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:not([href]):not([tabindex]) {
+  color: #3498db;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+/* line 108, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 116, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:focus, .btn-outline-primary.focus {
+  color: #fff;
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+/* line 120, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:focus:not([href]):not([tabindex]), .btn-outline-primary.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 128, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:active, .btn-outline-primary.active, .open > .btn-outline-primary.dropdown-toggle {
+  color: #fff;
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+/* line 133, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:active:not([href]):not([tabindex]), .btn-outline-primary.active:not([href]):not([tabindex]), .open > .btn-outline-primary.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 140, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:active:hover, .btn-outline-primary:active:focus, .btn-outline-primary.focus:active, .btn-outline-primary.active:hover, .btn-outline-primary.active:focus, .btn-outline-primary.active.focus, .open > .btn-outline-primary.dropdown-toggle:hover, .open > .btn-outline-primary.dropdown-toggle:focus, .open > .btn-outline-primary.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #1c699d;
+  border-color: #16527a;
+}
+
+/* line 145, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary:active:hover:not([href]):not([tabindex]), .btn-outline-primary:active:focus:not([href]):not([tabindex]), .btn-outline-primary.focus:active:not([href]):not([tabindex]), .btn-outline-primary.active:hover:not([href]):not([tabindex]), .btn-outline-primary.active:focus:not([href]):not([tabindex]), .btn-outline-primary.active.focus:not([href]):not([tabindex]), .open > .btn-outline-primary.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-outline-primary.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-outline-primary.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 156, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-primary.disabled:focus, .btn-outline-primary.disabled.focus, .btn-outline-primary:disabled:focus, .btn-outline-primary.focus:disabled {
+  border-color: #8bc4ea;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-primary.disabled:hover, .btn-outline-primary:disabled:hover {
+  border-color: #8bc4ea;
+}
+
+/* line 352, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary {
+  color: #ccc;
+  background-image: none;
+  background-color: transparent;
+  border-color: #ccc;
+}
+
+/* line 100, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:not([href]):not([tabindex]) {
+  color: #ccc;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-secondary:hover {
+  color: #fff;
+  background-color: #ccc;
+  border-color: #ccc;
+}
+
+/* line 108, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 116, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:focus, .btn-outline-secondary.focus {
+  color: #fff;
+  background-color: #ccc;
+  border-color: #ccc;
+}
+
+/* line 120, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:focus:not([href]):not([tabindex]), .btn-outline-secondary.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 128, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:active, .btn-outline-secondary.active, .open > .btn-outline-secondary.dropdown-toggle {
+  color: #fff;
+  background-color: #ccc;
+  border-color: #ccc;
+}
+
+/* line 133, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:active:not([href]):not([tabindex]), .btn-outline-secondary.active:not([href]):not([tabindex]), .open > .btn-outline-secondary.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 140, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:active:hover, .btn-outline-secondary:active:focus, .btn-outline-secondary.focus:active, .btn-outline-secondary.active:hover, .btn-outline-secondary.active:focus, .btn-outline-secondary.active.focus, .open > .btn-outline-secondary.dropdown-toggle:hover, .open > .btn-outline-secondary.dropdown-toggle:focus, .open > .btn-outline-secondary.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #a1a1a1;
+  border-color: #8c8c8c;
+}
+
+/* line 145, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary:active:hover:not([href]):not([tabindex]), .btn-outline-secondary:active:focus:not([href]):not([tabindex]), .btn-outline-secondary.focus:active:not([href]):not([tabindex]), .btn-outline-secondary.active:hover:not([href]):not([tabindex]), .btn-outline-secondary.active:focus:not([href]):not([tabindex]), .btn-outline-secondary.active.focus:not([href]):not([tabindex]), .open > .btn-outline-secondary.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-outline-secondary.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-outline-secondary.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 156, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-secondary.disabled:focus, .btn-outline-secondary.disabled.focus, .btn-outline-secondary:disabled:focus, .btn-outline-secondary.focus:disabled {
+  border-color: white;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-secondary.disabled:hover, .btn-outline-secondary:disabled:hover {
+  border-color: white;
+}
+
+/* line 356, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info {
+  color: #5bc0de;
+  background-image: none;
+  background-color: transparent;
+  border-color: #5bc0de;
+}
+
+/* line 100, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:not([href]):not([tabindex]) {
+  color: #5bc0de;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-info:hover {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #5bc0de;
+}
+
+/* line 108, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 116, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:focus, .btn-outline-info.focus {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #5bc0de;
+}
+
+/* line 120, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:focus:not([href]):not([tabindex]), .btn-outline-info.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 128, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:active, .btn-outline-info.active, .open > .btn-outline-info.dropdown-toggle {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #5bc0de;
+}
+
+/* line 133, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:active:not([href]):not([tabindex]), .btn-outline-info.active:not([href]):not([tabindex]), .open > .btn-outline-info.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 140, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:active:hover, .btn-outline-info:active:focus, .btn-outline-info.focus:active, .btn-outline-info.active:hover, .btn-outline-info.active:focus, .btn-outline-info.active.focus, .open > .btn-outline-info.dropdown-toggle:hover, .open > .btn-outline-info.dropdown-toggle:focus, .open > .btn-outline-info.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #269abc;
+  border-color: #1f7e9a;
+}
+
+/* line 145, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info:active:hover:not([href]):not([tabindex]), .btn-outline-info:active:focus:not([href]):not([tabindex]), .btn-outline-info.focus:active:not([href]):not([tabindex]), .btn-outline-info.active:hover:not([href]):not([tabindex]), .btn-outline-info.active:focus:not([href]):not([tabindex]), .btn-outline-info.active.focus:not([href]):not([tabindex]), .open > .btn-outline-info.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-outline-info.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-outline-info.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 156, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-info.disabled:focus, .btn-outline-info.disabled.focus, .btn-outline-info:disabled:focus, .btn-outline-info.focus:disabled {
+  border-color: #b0e1ef;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-info.disabled:hover, .btn-outline-info:disabled:hover {
+  border-color: #b0e1ef;
+}
+
+/* line 360, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success {
+  color: #5cb85c;
+  background-image: none;
+  background-color: transparent;
+  border-color: #5cb85c;
+}
+
+/* line 100, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:not([href]):not([tabindex]) {
+  color: #5cb85c;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-success:hover {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #5cb85c;
+}
+
+/* line 108, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 116, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:focus, .btn-outline-success.focus {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #5cb85c;
+}
+
+/* line 120, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:focus:not([href]):not([tabindex]), .btn-outline-success.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 128, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:active, .btn-outline-success.active, .open > .btn-outline-success.dropdown-toggle {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #5cb85c;
+}
+
+/* line 133, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:active:not([href]):not([tabindex]), .btn-outline-success.active:not([href]):not([tabindex]), .open > .btn-outline-success.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 140, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:active:hover, .btn-outline-success:active:focus, .btn-outline-success.focus:active, .btn-outline-success.active:hover, .btn-outline-success.active:focus, .btn-outline-success.active.focus, .open > .btn-outline-success.dropdown-toggle:hover, .open > .btn-outline-success.dropdown-toggle:focus, .open > .btn-outline-success.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #398439;
+  border-color: #2d672d;
+}
+
+/* line 145, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success:active:hover:not([href]):not([tabindex]), .btn-outline-success:active:focus:not([href]):not([tabindex]), .btn-outline-success.focus:active:not([href]):not([tabindex]), .btn-outline-success.active:hover:not([href]):not([tabindex]), .btn-outline-success.active:focus:not([href]):not([tabindex]), .btn-outline-success.active.focus:not([href]):not([tabindex]), .open > .btn-outline-success.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-outline-success.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-outline-success.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 156, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-success.disabled:focus, .btn-outline-success.disabled.focus, .btn-outline-success:disabled:focus, .btn-outline-success.focus:disabled {
+  border-color: #a3d7a3;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-success.disabled:hover, .btn-outline-success:disabled:hover {
+  border-color: #a3d7a3;
+}
+
+/* line 364, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning {
+  color: #f0ad4e;
+  background-image: none;
+  background-color: transparent;
+  border-color: #f0ad4e;
+}
+
+/* line 100, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:not([href]):not([tabindex]) {
+  color: #f0ad4e;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-warning:hover {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #f0ad4e;
+}
+
+/* line 108, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 116, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:focus, .btn-outline-warning.focus {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #f0ad4e;
+}
+
+/* line 120, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:focus:not([href]):not([tabindex]), .btn-outline-warning.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 128, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:active, .btn-outline-warning.active, .open > .btn-outline-warning.dropdown-toggle {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #f0ad4e;
+}
+
+/* line 133, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:active:not([href]):not([tabindex]), .btn-outline-warning.active:not([href]):not([tabindex]), .open > .btn-outline-warning.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 140, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:active:hover, .btn-outline-warning:active:focus, .btn-outline-warning.focus:active, .btn-outline-warning.active:hover, .btn-outline-warning.active:focus, .btn-outline-warning.active.focus, .open > .btn-outline-warning.dropdown-toggle:hover, .open > .btn-outline-warning.dropdown-toggle:focus, .open > .btn-outline-warning.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #d58512;
+  border-color: #b06d0f;
+}
+
+/* line 145, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning:active:hover:not([href]):not([tabindex]), .btn-outline-warning:active:focus:not([href]):not([tabindex]), .btn-outline-warning.focus:active:not([href]):not([tabindex]), .btn-outline-warning.active:hover:not([href]):not([tabindex]), .btn-outline-warning.active:focus:not([href]):not([tabindex]), .btn-outline-warning.active.focus:not([href]):not([tabindex]), .open > .btn-outline-warning.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-outline-warning.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-outline-warning.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 156, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-warning.disabled:focus, .btn-outline-warning.disabled.focus, .btn-outline-warning:disabled:focus, .btn-outline-warning.focus:disabled {
+  border-color: #f8d9ac;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-warning.disabled:hover, .btn-outline-warning:disabled:hover {
+  border-color: #f8d9ac;
+}
+
+/* line 368, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger {
+  color: #d9534f;
+  background-image: none;
+  background-color: transparent;
+  border-color: #d9534f;
+}
+
+/* line 100, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:not([href]):not([tabindex]) {
+  color: #d9534f;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-danger:hover {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+/* line 108, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:hover:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 116, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:focus, .btn-outline-danger.focus {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+/* line 120, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:focus:not([href]):not([tabindex]), .btn-outline-danger.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 128, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:active, .btn-outline-danger.active, .open > .btn-outline-danger.dropdown-toggle {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+/* line 133, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:active:not([href]):not([tabindex]), .btn-outline-danger.active:not([href]):not([tabindex]), .open > .btn-outline-danger.dropdown-toggle:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 140, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:active:hover, .btn-outline-danger:active:focus, .btn-outline-danger.focus:active, .btn-outline-danger.active:hover, .btn-outline-danger.active:focus, .btn-outline-danger.active.focus, .open > .btn-outline-danger.dropdown-toggle:hover, .open > .btn-outline-danger.dropdown-toggle:focus, .open > .btn-outline-danger.dropdown-toggle.focus {
+  color: #fff;
+  background-color: #ac2925;
+  border-color: #8b211e;
+}
+
+/* line 145, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger:active:hover:not([href]):not([tabindex]), .btn-outline-danger:active:focus:not([href]):not([tabindex]), .btn-outline-danger.focus:active:not([href]):not([tabindex]), .btn-outline-danger.active:hover:not([href]):not([tabindex]), .btn-outline-danger.active:focus:not([href]):not([tabindex]), .btn-outline-danger.active.focus:not([href]):not([tabindex]), .open > .btn-outline-danger.dropdown-toggle:hover:not([href]):not([tabindex]), .open > .btn-outline-danger.dropdown-toggle:focus:not([href]):not([tabindex]), .open > .btn-outline-danger.dropdown-toggle.focus:not([href]):not([tabindex]) {
+  color: #fff;
+}
+
+/* line 156, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-outline-danger.disabled:focus, .btn-outline-danger.disabled.focus, .btn-outline-danger:disabled:focus, .btn-outline-danger.focus:disabled {
+  border-color: #eba5a3;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-outline-danger.disabled:hover, .btn-outline-danger:disabled:hover {
+  border-color: #eba5a3;
+}
+
+/* line 377, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-link {
+  font-weight: normal;
+  color: #3498db;
+  border-radius: 0;
+}
+
+/* line 382, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-link, .btn-link:active, .btn-link.active, .btn-link:disabled {
+  background-color: transparent;
+}
+
+/* line 391, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-link, .btn-link:focus, .btn-link:active {
+  border-color: transparent;
+}
+
+/* line 11, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-link:hover {
+  border-color: transparent;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-link:focus, .btn-link:hover {
+  color: #014c8c;
+  text-decoration: underline;
+  background-color: transparent;
+}
+
+/* line 21, ../../../../.asdf/installs/ruby/3.3.7/lib/ruby/gems/3.3.0/gems/bootstrap-4.0.0.alpha4/assets/stylesheets/bootstrap/mixins/_hover.scss */
+.btn-link:disabled:focus, .btn-link:disabled:hover {
+  color: #818a91;
+  text-decoration: none;
+}
+
+/* line 419, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 15px;
+  border-radius: 1px;
+}
+
+/* line 429, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 15px;
+  border-radius: 1px;
+}
+
+/* line 443, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+/* line 449, app/assets/stylesheets/revised/mixins/_buttons.scss */
+.btn-block + .btn-block {
+  margin-top: 0.5rem;
+}
+
+/* line 457, app/assets/stylesheets/revised/mixins/_buttons.scss */
+input.btn-block[type="submit"],
+input.btn-block[type="reset"],
+input.btn-block[type="button"] {
+  width: 100%;
+}
+
+/* line 5, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert {
+  padding: 12px 1em;
+  margin-bottom: 12px;
+  border-radius: 1px;
+  background: #fff;
+}
+
+/* line 13, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-heading {
+  color: inherit;
+}
+
+/* line 19, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-link {
+  font-weight: bold;
+}
+
+/* line 27, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-dismissible {
+  padding-right: 2.25rem;
+}
+
+/* line 33, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-dismissible .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  color: inherit;
+}
+
+/* line 44, app/assets/stylesheets/revised/sections/alerts.scss */
+.primary-alert-block {
+  position: fixed;
+  z-index: 1040;
+  padding-right: 0.9375rem;
+  padding-left: 0.9375rem;
+}
+
+/* line 50, app/assets/stylesheets/revised/sections/alerts.scss */
+.primary-alert-block .alert {
+  width: 100%;
+  clear: both;
+}
+
+/* line 55, app/assets/stylesheets/revised/sections/alerts.scss */
+.primary-alert-block.faded {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* line 61, app/assets/stylesheets/revised/sections/alerts.scss */
+  .primary-alert-block {
+    width: 83.33333%;
+    top: 90px;
+    right: 0;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  /* line 69, app/assets/stylesheets/revised/sections/alerts.scss */
+  .primary-alert-block {
+    width: 66.66667%;
+    top: 150px;
+    right: 8.3333%;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* line 77, app/assets/stylesheets/revised/sections/alerts.scss */
+  .primary-alert-block {
+    width: 600px;
+    top: 150px;
+    left: 50%;
+  }
+}
+
+/* line 86, app/assets/stylesheets/revised/sections/alerts.scss */
+.modal-alert-wrapper .alert {
+  margin: 0;
+}
+
+/* line 129, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-success {
+  border: 1px solid #2ecc71;
+  color: #2ecc71;
+}
+
+/* line 99, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-success p,
+.alert-success h1,
+.alert-success h2,
+.alert-success h3,
+.alert-success h4 {
+  color: #2ecc71;
+}
+
+/* line 106, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-success p a,
+.alert-success h1 a,
+.alert-success h2 a,
+.alert-success h3 a,
+.alert-success h4 a {
+  color: #25a25a;
+}
+
+/* line 111, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-success p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* line 115, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-success hr {
+  border-top-color: #29b765;
+}
+
+/* line 119, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-success .close {
+  color: #2ecc71;
+  opacity: 0.8;
+}
+
+/* line 123, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-success .close:hover {
+  opacity: 1;
+}
+
+/* line 133, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-info,
+.alert-notice {
+  border: 1px solid #3498db;
+  color: #3498db;
+}
+
+/* line 99, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-info p,
+.alert-info h1,
+.alert-info h2,
+.alert-info h3,
+.alert-info h4,
+.alert-notice p,
+.alert-notice h1,
+.alert-notice h2,
+.alert-notice h3,
+.alert-notice h4 {
+  color: #3498db;
+}
+
+/* line 106, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-info p a,
+.alert-info h1 a,
+.alert-info h2 a,
+.alert-info h3 a,
+.alert-info h4 a,
+.alert-notice p a,
+.alert-notice h1 a,
+.alert-notice h2 a,
+.alert-notice h3 a,
+.alert-notice h4 a {
+  color: #217dbb;
+}
+
+/* line 111, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-info p:last-of-type,
+.alert-notice p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* line 115, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-info hr,
+.alert-notice hr {
+  border-top-color: #258cd1;
+}
+
+/* line 119, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-info .close,
+.alert-notice .close {
+  color: #3498db;
+  opacity: 0.8;
+}
+
+/* line 123, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-info .close:hover,
+.alert-notice .close:hover {
+  opacity: 1;
+}
+
+/* line 138, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-warning {
+  border: 1px solid orange;
+  color: orange;
+}
+
+/* line 99, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-warning p,
+.alert-warning h1,
+.alert-warning h2,
+.alert-warning h3,
+.alert-warning h4 {
+  color: orange;
+}
+
+/* line 106, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-warning p a,
+.alert-warning h1 a,
+.alert-warning h2 a,
+.alert-warning h3 a,
+.alert-warning h4 a {
+  color: #cc8400;
+}
+
+/* line 111, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-warning p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* line 115, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-warning hr {
+  border-top-color: #e69500;
+}
+
+/* line 119, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-warning .close {
+  color: orange;
+  opacity: 0.8;
+}
+
+/* line 123, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-warning .close:hover {
+  opacity: 1;
+}
+
+/* line 142, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-danger,
+.alert-error {
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+}
+
+/* line 99, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-danger p,
+.alert-danger h1,
+.alert-danger h2,
+.alert-danger h3,
+.alert-danger h4,
+.alert-error p,
+.alert-error h1,
+.alert-error h2,
+.alert-error h3,
+.alert-error h4 {
+  color: #e74c3c;
+}
+
+/* line 106, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-danger p a,
+.alert-danger h1 a,
+.alert-danger h2 a,
+.alert-danger h3 a,
+.alert-danger h4 a,
+.alert-error p a,
+.alert-error h1 a,
+.alert-error h2 a,
+.alert-error h3 a,
+.alert-error h4 a {
+  color: #d62c1a;
+}
+
+/* line 111, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-danger p:last-of-type,
+.alert-error p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* line 115, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-danger hr,
+.alert-error hr {
+  border-top-color: #e43725;
+}
+
+/* line 119, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-danger .close,
+.alert-error .close {
+  color: #e74c3c;
+  opacity: 0.8;
+}
+
+/* line 123, app/assets/stylesheets/revised/sections/alerts.scss */
+.alert-danger .close:hover,
+.alert-error .close:hover {
+  opacity: 1;
+}
+
+/* line 1, app/assets/stylesheets/revised/sections/forms.scss */
+input[type="checkbox"], input[type="radio"] {
+  cursor: pointer;
+}
+
+/* line 8, app/assets/stylesheets/revised/sections/forms.scss */
+.hide-selectize-dropdown-arrow .selectize-control.single .selectize-input:after {
+  display: none;
+}
+
+/* line 13, app/assets/stylesheets/revised/sections/forms.scss */
+.form-circle-item, .context-display-help {
+  padding: 0.5em 0.25em;
+  border-radius: 1em;
+  line-height: 0;
+  cursor: pointer;
+  color: #666666;
+  font-size: 125%;
+  text-decoration: none;
+}
+
+/* line 24, app/assets/stylesheets/revised/sections/forms.scss */
+.below-input-help {
+  display: block;
+  line-height: 1.5em;
+  padding-bottom: 0.5em;
+  color: #767676;
+}
+
+/* line 33, app/assets/stylesheets/revised/sections/forms.scss */
+a.optional-form-block {
+  cursor: pointer;
+  color: #666666;
+}
+
+/* line 37, app/assets/stylesheets/revised/sections/forms.scss */
+a.optional-form-block:hover {
+  color: #3498db;
+  text-decoration: none;
+}
+
+/* line 41, app/assets/stylesheets/revised/sections/forms.scss */
+a.optional-form-block:hover .context-display-help {
+  color: #3498db;
+}
+
+/* line 47, app/assets/stylesheets/revised/sections/forms.scss */
+.context-display-help {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #e4e4e4;
+}
+
+/* line 55, app/assets/stylesheets/revised/sections/forms.scss */
+.hidden-other {
+  margin-top: 0;
+  display: none;
+}
+
+/* line 59, app/assets/stylesheets/revised/sections/forms.scss */
+.hidden-other.unhidden {
+  margin-bottom: 1.5rem;
+  display: -webkit-box !important;
+  display: flex !important;
+  flex-wrap: wrap;
+}
+
+/* line 66, app/assets/stylesheets/revised/sections/forms.scss */
+#email_check_message {
+  cursor: pointer;
+  display: none;
+  padding: 0 0.75rem;
+}
+
+/* line 82, app/assets/stylesheets/revised/sections/forms.scss */
+.avatar-upload-wrapper img,
+.file-upload-wrapper img {
+  padding-bottom: 12px;
+}
+
+/* line 86, app/assets/stylesheets/revised/sections/forms.scss */
+.avatar-upload-wrapper label.file,
+.file-upload-wrapper label.file {
+  display: block;
+}
+
+/* line 91, app/assets/stylesheets/revised/sections/forms.scss */
+.avatar-upload-wrapper .file-custom .file-upload-text,
+.file-upload-wrapper .file-custom .file-upload-text {
+  color: #767676;
+}
+
+/* line 95, app/assets/stylesheets/revised/sections/forms.scss */
+.avatar-upload-wrapper .file-custom::after,
+.file-upload-wrapper .file-custom::after {
+  content: "";
+}
+
+/* line 99, app/assets/stylesheets/revised/sections/forms.scss */
+.avatar-upload-wrapper .file-custom::before,
+.file-upload-wrapper .file-custom::before {
+  content: "Upload Photo";
+  font-size: 15px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-transform: uppercase;
+  color: white;
+  background: #2ecc71;
+  border-color: #2ecc71;
+}
+
+/* line 113, app/assets/stylesheets/revised/sections/forms.scss */
+.avatar-upload-wrapper.file-upload-wrapper .file-custom::before,
+.file-upload-wrapper.file-upload-wrapper .file-custom::before {
+  content: "Upload file";
+}
+
+/* line 121, app/assets/stylesheets/revised/sections/forms.scss */
+.file {
+  position: relative;
+  display: inline-block;
+  height: 2.5rem;
+  cursor: pointer;
+}
+
+/* line 128, app/assets/stylesheets/revised/sections/forms.scss */
+.file input {
+  width: 100%;
+  margin: 0;
+  filter: alpha(opacity=0);
+  opacity: 0;
+}
+
+/* line 135, app/assets/stylesheets/revised/sections/forms.scss */
+.file-custom {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 5;
+  height: 2.5rem;
+  padding: 0.5rem 1rem;
+  line-height: 1.5;
+  color: #555;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+}
+
+/* line 153, app/assets/stylesheets/revised/sections/forms.scss */
+.file-custom::after {
+  content: "Choose file...";
+}
+
+/* line 157, app/assets/stylesheets/revised/sections/forms.scss */
+.file-custom::before {
+  position: absolute;
+  top: -0.075rem;
+  right: -0.075rem;
+  bottom: -0.075rem;
+  z-index: 6;
+  display: block;
+  height: 2.5rem;
+  padding: 0.5rem 1rem;
+  line-height: 1.5;
+  color: #555;
+  content: "Browse";
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+/* line 193, app/assets/stylesheets/registrations.scss */
+img {
+  max-width: 100%;
+}
+
+/* line 205, app/assets/stylesheets/registrations.scss */
+.selectize-dropdown [data-selectable] .highlight {
+  background: rgba(52, 152, 219, 0.2);
+}
+
+/* line 209, app/assets/stylesheets/registrations.scss */
+.selectize-dropdown .active {
+  background-color: #d8d8d8;
+}
+
+/* line 214, app/assets/stylesheets/registrations.scss */
+.form-group .selectize-control .selectize-input {
+  padding: 0.475rem 0.75rem;
+}
+
+/* line 219, app/assets/stylesheets/registrations.scss */
+.registration-widget .selectize-input.not-full > input {
+  font-style: italic;
+}
+
+/* line 223, app/assets/stylesheets/registrations.scss */
+.registration-widget .selectize-input.not-full.input-active > input {
+  font-style: normal;
+}
+
+/* line 240, app/assets/stylesheets/registrations.scss */
+.cusor-pointer {
+  cursor: pointer;
+}
+
+/* line 243, app/assets/stylesheets/registrations.scss */
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
+/* line 250, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget {
+  margin: 0 auto;
+  position: relative;
+  border-radius: 1px;
+  width: 100%;
+  border: 1px solid #e4e4e4;
+  background: #f2f2f2;
+}
+
+/* line 260, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget h2 {
+  font-size: 30px;
+  margin: 12px 0 18px;
+}
+
+/* line 265, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget p,
+#binx_registration_widget h2 {
+  text-align: center;
+}
+
+/* line 270, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget header {
+  border-radius: 1px 1px 0 0;
+  display: block;
+  background: #222222;
+  position: relative;
+  padding: 12px;
+}
+
+/* line 277, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget header h3 {
+  color: #fff;
+  margin: 0;
+  text-align: center;
+  font-size: 21px;
+}
+
+/* line 285, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget header.reg-header {
+  background: url(/assets/revised/spokebg-0149f76f8582fdc9d08038776f41153a17f93b77be6f686f173419d7a2e2ac03.png);
+  background-size: cover;
+  background-position: center center;
+  padding: 12px 0;
+}
+
+/* line 291, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget header.reg-header .reg-header-logo {
+  display: block;
+  width: 15%;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* line 298, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget header.reg-header h2 {
+  color: #dbdbdb;
+  margin: 12px 0;
+}
+
+/* line 303, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget header.reg-header p {
+  margin: 0;
+  color: #fff;
+}
+
+/* line 307, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget header.reg-header p em {
+  color: #3498db;
+}
+
+/* line 313, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget .registration-widget-body {
+  padding: 22px 24px 21px;
+}
+
+/* line 316, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget .registration-widget-body p {
+  padding: 0 10%;
+}
+
+/* line 321, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget .registration-widget-body > form {
+  margin: 0 auto;
+}
+
+/* line 325, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget input[type='email'],
+#binx_registration_widget select,
+#binx_registration_widget .form-control {
+  width: 100%;
+}
+
+/* line 331, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget .below-input-help {
+  padding: 0 6px;
+}
+
+/* line 335, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget .fancy-select .selectize-control {
+  width: 100%;
+}
+
+/* line 340, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget .short-fancy-select .selectize-dropdown-content {
+  max-height: 120px;
+}
+
+/* line 344, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget label {
+  line-height: 1.2em;
+}
+
+/* line 348, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget .submit-wrapper .btn {
+  display: block;
+  margin: 0;
+  width: 100%;
+  border: none;
+}
+
+/* line 356, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.umd .submit-wrapper .btn {
+  background: #e03a3e;
+}
+
+/* line 359, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.uw .submit-wrapper .btn {
+  background: #4b2e83;
+}
+
+/* line 362, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.upitt .submit-wrapper .btn {
+  background: #102f59;
+}
+
+/* line 365, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.psu .submit-wrapper .btn {
+  background: #074378;
+}
+
+/* line 368, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.lapd .submit-wrapper .btn {
+  background: #4062a8;
+}
+
+/* line 371, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.princeton .submit-wrapper .btn {
+  background: #EE7F2D;
+}
+
+/* line 374, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.msu .submit-wrapper .btn {
+  background: #18453B;
+}
+
+/* line 377, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.uc-davis .submit-wrapper .btn, #binx_registration_widget.uc-davis-health .submit-wrapper .btn {
+  background: #022851;
+}
+
+/* line 381, app/assets/stylesheets/registrations.scss */
+#binx_registration_widget.uiowa .submit-wrapper .btn, #binx_registration_widget.university-of-iowa .submit-wrapper .btn {
+  background: #ffcd00;
+}

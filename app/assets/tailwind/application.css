@@ -1,6 +1,11 @@
 @import "tailwindcss" prefix(tw);
 @config "../../../config/tailwind.config.js";
 
+@theme {
+  --font-sans: 'Open Sans', sans-serif;
+  --font-header: 'Montserrat', sans-serif;
+}
+
 @layer components {
   .twbtn, .twbtn-blue, .twbtn-green {
     @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3
@@ -27,10 +32,8 @@
   }
 }
 
-@layer theme, base, components, utilities;
-
 body {
-  @apply tw:antialiased tw:text-gray-900;
+  @apply tw:antialiased tw:text-gray-900 tw:font-sans;
 }
 /*
   'dark:' syntax isn't working for the body element, unclear why - hacking with this for now
