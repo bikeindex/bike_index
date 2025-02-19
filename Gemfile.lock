@@ -7,13 +7,6 @@ GIT
       rails
 
 GIT
-  remote: https://github.com/bikeindex/swagger-ui_rails.git
-  revision: 0377d8ecd0714901351a6bfc68491d255ad86093
-  branch: bike_index_0.1.7
-  specs:
-    swagger-ui_rails (0.1.7)
-
-GIT
   remote: https://github.com/facebook/facebook-ruby-business-sdk.git
   revision: c64b51f862c2359d289a9aea6d317cf1218595aa
   branch: main
@@ -923,7 +916,6 @@ DEPENDENCIES
   standard
   stimulus-rails
   stripe
-  swagger-ui_rails!
   tailwindcss-rails
   terminal-notifier
   thor

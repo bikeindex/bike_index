@@ -82,7 +82,6 @@ gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
-gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 
 # Secure things
