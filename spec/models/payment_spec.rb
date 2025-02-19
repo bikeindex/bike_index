@@ -132,6 +132,19 @@ RSpec.describe Payment, type: :model do
     end
   end
 
+  describe "can_assign_to_membership?" do
+    let(:payment) { Payment.new }
+    it "is truthy" do
+      expect(payment.can_assign_to_membership?).to be_truthy
+    end
+    context "with membership_id" do
+      let(:payment) { Payment.new(membership_id: 22) }
+      it "is truthy" do
+        expect(payment.can_assign_to_membership?).to be_falsey
+      end
+    end
+  end
+
   describe "after_commit" do
     let(:user) { FactoryBot.create(:user) }
     let(:payment) { FactoryBot.create(:payment, kind: "donation", user: user) }

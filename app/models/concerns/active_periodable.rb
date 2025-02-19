@@ -6,6 +6,7 @@ module ActivePeriodable
   included do
     scope :active, -> { where(active: true) }
     scope :inactive, -> { where(active: false) }
+    scope :time_ordered, -> { reorder(:start_at) }
 
     before_save :set_active
   end

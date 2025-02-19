@@ -1363,10 +1363,10 @@ CREATE TABLE public.hot_sheets (
     organization_id bigint,
     stolen_record_ids jsonb,
     recipient_ids jsonb,
+    delivery_status character varying,
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    delivery_status character varying
+    updated_at timestamp without time zone NOT NULL
 );
 
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Stripe::UpdatePricesJob < ApplicationJob
   def perform
     Stripe::Price.list({active: true, limit: 100}).each do |price|

@@ -1,7 +1,4 @@
-// const defaultTheme = require('tailwindcss/defaultTheme')
-
 module.exports = {
-  // prefix: 'tw-',
   content: [
     './public/*.html',
     './app/helpers/**/*.rb',
@@ -74,7 +71,6 @@ module.exports = {
   // plugins: [
   //   require('@tailwindcss/forms'),
   //   require('@tailwindcss/typography'),
-  //   require('@tailwindcss/container-queries')
   //   // require('flowbite/plugin') // not sure this is necessary after copying!
   // ]
 }

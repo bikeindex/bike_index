@@ -30,13 +30,13 @@ class Payment < ApplicationRecord
   include Amountable
 
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
-  KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3}
+  KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3, membership_donation: 4}
 
   belongs_to :user
   belongs_to :organization
   belongs_to :invoice
   belongs_to :stripe_subscription
-  belongs_to :payment
+  belongs_to :membership
 
   has_one :theft_alert
 
@@ -73,7 +73,7 @@ class Payment < ApplicationRecord
     def kind_humanized(kind)
       return "NO KIND!" unless kind.present?
       return "Promoted alert" if kind == "theft_alert"
-      kind&.humanize
+      kind&.humanize&.gsub("payment", "")&.strip
     end
 
     def normalize_referral_source(str)
@@ -204,12 +204,22 @@ class Payment < ApplicationRecord
     invoice.update(updated_at: Time.current) # Manually trigger invoice update
   end
 
+  def can_assign_to_membership?
+    membership_id.blank? && invoice_id.blank? && theft_alert.blank?
+  end
+
   private
 
   def calculated_kind
-    return "invoice_payment" if invoice_id.present?
-    return "theft_alert" if theft_alert.present?
-    kind || "donation" # Use the current kind, if it exists
+    if invoice_id.present?
+      "invoice_payment"
+    elsif theft_alert.present?
+      "theft_alert"
+    elsif kind.present?
+      kind
+    else
+      membership_id.present? ? "membership_donation" : "donation"
+    end
   end
 
   def user_stripe_session_hash

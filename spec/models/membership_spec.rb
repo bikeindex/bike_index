@@ -18,6 +18,19 @@ RSpec.describe Membership, type: :model do
         expect(membership.stripe_managed?).to be_truthy
       end
     end
+    context "with_payment" do
+      let(:membership) { FactoryBot.create(:membership, :with_payment) }
+      let(:payment) { membership.payments.first }
+      it "is valid" do
+        expect(membership).to be_valid
+        expect(membership.reload.user_id).to eq payment.user_id
+        expect(membership.payments.count).to eq 1
+        expect(membership.stripe_managed?).to be_falsey
+        expect(membership.status).to eq "active_status"
+
+        expect(payment.reload.kind).to eq "membership_donation"
+      end
+    end
   end
 
   describe "user_email" do

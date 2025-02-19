@@ -18,7 +18,7 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
 
         expect(StripePrice.monthly.basic.count).to eq 3
 
-        expect(StripePrice.monthly.basic.where(currency: "usd").first)
+        expect(StripePrice.monthly.basic.usd.first)
           .to match_hash_indifferently target_basic
       end
     end
