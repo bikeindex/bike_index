@@ -97,7 +97,6 @@ gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
-gem "sass-rails"
 gem "sprockets-rails"
 
 # new frontend
