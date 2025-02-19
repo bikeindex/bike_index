@@ -1,0 +1,3185 @@
+/* line 43, app/assets/stylesheets/revised/mixins/_colors.scss */
+.stolen-color {
+  color: #e74c3c;
+}
+
+/* line 48, app/assets/stylesheets/revised/mixins/_colors.scss */
+.found-color {
+  color: #2ecc71;
+}
+
+/* line 53, app/assets/stylesheets/revised/mixins/_colors.scss */
+.impounded-color {
+  color: #e74c3c;
+}
+
+/* line 58, app/assets/stylesheets/revised/mixins/_colors.scss */
+.unregistered-color {
+  color: #f0ad4e;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_colors.scss */
+.text-dark {
+  color: #666666 !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-none {
+  display: none !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-inline {
+  display: inline !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-inline-block {
+  display: inline-block !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-block {
+  display: block !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-table {
+  display: table !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-table-row {
+  display: table-row !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-table-cell {
+  display: table-cell !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-flex {
+  display: -webkit-box !important;
+  display: flex !important;
+}
+
+/* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.d-inline-flex {
+  display: -webkit-inline-box !important;
+  display: inline-flex !important;
+}
+
+@media (min-width: 544px) {
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-none {
+    display: none !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-inline {
+    display: inline !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-inline-block {
+    display: inline-block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-block {
+    display: block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-table {
+    display: table !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-table-row {
+    display: table-row !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-table-cell {
+    display: table-cell !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-flex {
+    display: -webkit-box !important;
+    display: flex !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-sm-inline-flex {
+    display: -webkit-inline-box !important;
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 768px) {
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-none {
+    display: none !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-inline {
+    display: inline !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-inline-block {
+    display: inline-block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-block {
+    display: block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-table {
+    display: table !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-table-row {
+    display: table-row !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-table-cell {
+    display: table-cell !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-flex {
+    display: -webkit-box !important;
+    display: flex !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-md-inline-flex {
+    display: -webkit-inline-box !important;
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 992px) {
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-none {
+    display: none !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-inline {
+    display: inline !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-inline-block {
+    display: inline-block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-block {
+    display: block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-table {
+    display: table !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-table-row {
+    display: table-row !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-table-cell {
+    display: table-cell !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-flex {
+    display: -webkit-box !important;
+    display: flex !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-lg-inline-flex {
+    display: -webkit-inline-box !important;
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-none {
+    display: none !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-inline {
+    display: inline !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-inline-block {
+    display: inline-block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-block {
+    display: block !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-table {
+    display: table !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-table-row {
+    display: table-row !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-table-cell {
+    display: table-cell !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-flex {
+    display: -webkit-box !important;
+    display: flex !important;
+  }
+  /* line 17, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .d-xl-inline-flex {
+    display: -webkit-inline-box !important;
+    display: inline-flex !important;
+  }
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-0 {
+  margin: 0 !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-0,
+.my-0 {
+  margin-top: 0 !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-0,
+.mx-0 {
+  margin-right: 0 !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-0,
+.my-0 {
+  margin-bottom: 0 !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-0,
+.mx-0 {
+  margin-left: 0 !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-1 {
+  margin: 0.25rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-1,
+.my-1 {
+  margin-top: 0.25rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-1,
+.mx-1 {
+  margin-right: 0.25rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-1,
+.my-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-1,
+.mx-1 {
+  margin-left: 0.25rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-2 {
+  margin: 0.5rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-2,
+.my-2 {
+  margin-top: 0.5rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-2,
+.mx-2 {
+  margin-right: 0.5rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-2,
+.my-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-2,
+.mx-2 {
+  margin-left: 0.5rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-3 {
+  margin: 1rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-3,
+.my-3 {
+  margin-top: 1rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-3,
+.mx-3 {
+  margin-right: 1rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-3,
+.my-3 {
+  margin-bottom: 1rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-3,
+.mx-3 {
+  margin-left: 1rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-4 {
+  margin: 1.5rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-4,
+.my-4 {
+  margin-top: 1.5rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-4,
+.mx-4 {
+  margin-right: 1.5rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-4,
+.my-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-4,
+.mx-4 {
+  margin-left: 1.5rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-5 {
+  margin: 3rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-5,
+.my-5 {
+  margin-top: 3rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-5,
+.mx-5 {
+  margin-right: 3rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-5,
+.my-5 {
+  margin-bottom: 3rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-5,
+.mx-5 {
+  margin-left: 3rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.p-0 {
+  padding: 0 !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pt-0,
+.py-0 {
+  padding-top: 0 !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pr-0,
+.px-0 {
+  padding-right: 0 !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pb-0,
+.py-0 {
+  padding-bottom: 0 !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pl-0,
+.px-0 {
+  padding-left: 0 !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.p-1 {
+  padding: 0.25rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pt-1,
+.py-1 {
+  padding-top: 0.25rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pr-1,
+.px-1 {
+  padding-right: 0.25rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pb-1,
+.py-1 {
+  padding-bottom: 0.25rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pl-1,
+.px-1 {
+  padding-left: 0.25rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.p-2 {
+  padding: 0.5rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pt-2,
+.py-2 {
+  padding-top: 0.5rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pr-2,
+.px-2 {
+  padding-right: 0.5rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pb-2,
+.py-2 {
+  padding-bottom: 0.5rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pl-2,
+.px-2 {
+  padding-left: 0.5rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.p-3 {
+  padding: 1rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pt-3,
+.py-3 {
+  padding-top: 1rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pr-3,
+.px-3 {
+  padding-right: 1rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pb-3,
+.py-3 {
+  padding-bottom: 1rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pl-3,
+.px-3 {
+  padding-left: 1rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.p-4 {
+  padding: 1.5rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pt-4,
+.py-4 {
+  padding-top: 1.5rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pr-4,
+.px-4 {
+  padding-right: 1.5rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pb-4,
+.py-4 {
+  padding-bottom: 1.5rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pl-4,
+.px-4 {
+  padding-left: 1.5rem !important;
+}
+
+/* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.p-5 {
+  padding: 3rem !important;
+}
+
+/* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pt-5,
+.py-5 {
+  padding-top: 3rem !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pr-5,
+.px-5 {
+  padding-right: 3rem !important;
+}
+
+/* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pb-5,
+.py-5 {
+  padding-bottom: 3rem !important;
+}
+
+/* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.pl-5,
+.px-5 {
+  padding-left: 3rem !important;
+}
+
+/* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-n1 {
+  margin: -0.25rem !important;
+}
+
+/* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-n1,
+.my-n1 {
+  margin-top: -0.25rem !important;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-n1,
+.mx-n1 {
+  margin-right: -0.25rem !important;
+}
+
+/* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-n1,
+.my-n1 {
+  margin-bottom: -0.25rem !important;
+}
+
+/* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-n1,
+.mx-n1 {
+  margin-left: -0.25rem !important;
+}
+
+/* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-n2 {
+  margin: -0.5rem !important;
+}
+
+/* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-n2,
+.my-n2 {
+  margin-top: -0.5rem !important;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-n2,
+.mx-n2 {
+  margin-right: -0.5rem !important;
+}
+
+/* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-n2,
+.my-n2 {
+  margin-bottom: -0.5rem !important;
+}
+
+/* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-n2,
+.mx-n2 {
+  margin-left: -0.5rem !important;
+}
+
+/* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-n3 {
+  margin: -1rem !important;
+}
+
+/* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-n3,
+.my-n3 {
+  margin-top: -1rem !important;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-n3,
+.mx-n3 {
+  margin-right: -1rem !important;
+}
+
+/* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-n3,
+.my-n3 {
+  margin-bottom: -1rem !important;
+}
+
+/* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-n3,
+.mx-n3 {
+  margin-left: -1rem !important;
+}
+
+/* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-n4 {
+  margin: -1.5rem !important;
+}
+
+/* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-n4,
+.my-n4 {
+  margin-top: -1.5rem !important;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-n4,
+.mx-n4 {
+  margin-right: -1.5rem !important;
+}
+
+/* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-n4,
+.my-n4 {
+  margin-bottom: -1.5rem !important;
+}
+
+/* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-n4,
+.mx-n4 {
+  margin-left: -1.5rem !important;
+}
+
+/* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-n5 {
+  margin: -3rem !important;
+}
+
+/* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-n5,
+.my-n5 {
+  margin-top: -3rem !important;
+}
+
+/* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-n5,
+.mx-n5 {
+  margin-right: -3rem !important;
+}
+
+/* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-n5,
+.my-n5 {
+  margin-bottom: -3rem !important;
+}
+
+/* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-n5,
+.mx-n5 {
+  margin-left: -3rem !important;
+}
+
+/* line 94, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.m-auto {
+  margin: auto !important;
+}
+
+/* line 97, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mt-auto,
+.my-auto {
+  margin-top: auto !important;
+}
+
+/* line 100, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mr-auto,
+.mx-auto {
+  margin-right: auto !important;
+}
+
+/* line 103, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.mb-auto,
+.my-auto {
+  margin-bottom: auto !important;
+}
+
+/* line 106, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+.ml-auto,
+.mx-auto {
+  margin-left: auto !important;
+}
+
+@media (min-width: 544px) {
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-0 {
+    margin: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-0,
+.my-sm-0 {
+    margin-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-0,
+.mx-sm-0 {
+    margin-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-0,
+.my-sm-0 {
+    margin-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-0,
+.mx-sm-0 {
+    margin-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-1 {
+    margin: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-1,
+.my-sm-1 {
+    margin-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-1,
+.mx-sm-1 {
+    margin-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-1,
+.my-sm-1 {
+    margin-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-1,
+.mx-sm-1 {
+    margin-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-2 {
+    margin: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-2,
+.my-sm-2 {
+    margin-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-2,
+.mx-sm-2 {
+    margin-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-2,
+.my-sm-2 {
+    margin-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-2,
+.mx-sm-2 {
+    margin-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-3 {
+    margin: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-3,
+.my-sm-3 {
+    margin-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-3,
+.mx-sm-3 {
+    margin-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-3,
+.my-sm-3 {
+    margin-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-3,
+.mx-sm-3 {
+    margin-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-4 {
+    margin: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-4,
+.my-sm-4 {
+    margin-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-4,
+.mx-sm-4 {
+    margin-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-4,
+.my-sm-4 {
+    margin-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-4,
+.mx-sm-4 {
+    margin-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-5 {
+    margin: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-5,
+.my-sm-5 {
+    margin-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-5,
+.mx-sm-5 {
+    margin-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-5,
+.my-sm-5 {
+    margin-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-5,
+.mx-sm-5 {
+    margin-left: 3rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-sm-0 {
+    padding: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-sm-0,
+.py-sm-0 {
+    padding-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-sm-0,
+.px-sm-0 {
+    padding-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-sm-0,
+.py-sm-0 {
+    padding-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-sm-0,
+.px-sm-0 {
+    padding-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-sm-1 {
+    padding: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-sm-1,
+.py-sm-1 {
+    padding-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-sm-1,
+.px-sm-1 {
+    padding-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-sm-1,
+.py-sm-1 {
+    padding-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-sm-1,
+.px-sm-1 {
+    padding-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-sm-2 {
+    padding: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-sm-2,
+.py-sm-2 {
+    padding-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-sm-2,
+.px-sm-2 {
+    padding-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-sm-2,
+.py-sm-2 {
+    padding-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-sm-2,
+.px-sm-2 {
+    padding-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-sm-3 {
+    padding: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-sm-3,
+.py-sm-3 {
+    padding-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-sm-3,
+.px-sm-3 {
+    padding-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-sm-3,
+.py-sm-3 {
+    padding-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-sm-3,
+.px-sm-3 {
+    padding-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-sm-4 {
+    padding: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-sm-4,
+.py-sm-4 {
+    padding-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-sm-4,
+.px-sm-4 {
+    padding-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-sm-4,
+.py-sm-4 {
+    padding-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-sm-4,
+.px-sm-4 {
+    padding-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-sm-5 {
+    padding: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-sm-5,
+.py-sm-5 {
+    padding-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-sm-5,
+.px-sm-5 {
+    padding-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-sm-5,
+.py-sm-5 {
+    padding-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-sm-5,
+.px-sm-5 {
+    padding-left: 3rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-n1 {
+    margin: -0.25rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-n1,
+.my-sm-n1 {
+    margin-top: -0.25rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-n1,
+.mx-sm-n1 {
+    margin-right: -0.25rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-n1,
+.my-sm-n1 {
+    margin-bottom: -0.25rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-n1,
+.mx-sm-n1 {
+    margin-left: -0.25rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-n2 {
+    margin: -0.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-n2,
+.my-sm-n2 {
+    margin-top: -0.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-n2,
+.mx-sm-n2 {
+    margin-right: -0.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-n2,
+.my-sm-n2 {
+    margin-bottom: -0.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-n2,
+.mx-sm-n2 {
+    margin-left: -0.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-n3 {
+    margin: -1rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-n3,
+.my-sm-n3 {
+    margin-top: -1rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-n3,
+.mx-sm-n3 {
+    margin-right: -1rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-n3,
+.my-sm-n3 {
+    margin-bottom: -1rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-n3,
+.mx-sm-n3 {
+    margin-left: -1rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-n4 {
+    margin: -1.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-n4,
+.my-sm-n4 {
+    margin-top: -1.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-n4,
+.mx-sm-n4 {
+    margin-right: -1.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-n4,
+.my-sm-n4 {
+    margin-bottom: -1.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-n4,
+.mx-sm-n4 {
+    margin-left: -1.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-n5 {
+    margin: -3rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-n5,
+.my-sm-n5 {
+    margin-top: -3rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-n5,
+.mx-sm-n5 {
+    margin-right: -3rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-n5,
+.my-sm-n5 {
+    margin-bottom: -3rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-n5,
+.mx-sm-n5 {
+    margin-left: -3rem !important;
+  }
+  /* line 94, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-sm-auto {
+    margin: auto !important;
+  }
+  /* line 97, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-sm-auto,
+.my-sm-auto {
+    margin-top: auto !important;
+  }
+  /* line 100, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-sm-auto,
+.mx-sm-auto {
+    margin-right: auto !important;
+  }
+  /* line 103, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-sm-auto,
+.my-sm-auto {
+    margin-bottom: auto !important;
+  }
+  /* line 106, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-sm-auto,
+.mx-sm-auto {
+    margin-left: auto !important;
+  }
+}
+
+@media (min-width: 768px) {
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-0 {
+    margin: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-0,
+.my-md-0 {
+    margin-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-0,
+.mx-md-0 {
+    margin-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-0,
+.my-md-0 {
+    margin-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-0,
+.mx-md-0 {
+    margin-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-1 {
+    margin: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-1,
+.my-md-1 {
+    margin-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-1,
+.mx-md-1 {
+    margin-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-1,
+.my-md-1 {
+    margin-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-1,
+.mx-md-1 {
+    margin-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-2 {
+    margin: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-2,
+.my-md-2 {
+    margin-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-2,
+.mx-md-2 {
+    margin-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-2,
+.my-md-2 {
+    margin-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-2,
+.mx-md-2 {
+    margin-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-3 {
+    margin: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-3,
+.my-md-3 {
+    margin-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-3,
+.mx-md-3 {
+    margin-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-3,
+.my-md-3 {
+    margin-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-3,
+.mx-md-3 {
+    margin-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-4 {
+    margin: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-4,
+.my-md-4 {
+    margin-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-4,
+.mx-md-4 {
+    margin-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-4,
+.my-md-4 {
+    margin-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-4,
+.mx-md-4 {
+    margin-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-5 {
+    margin: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-5,
+.my-md-5 {
+    margin-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-5,
+.mx-md-5 {
+    margin-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-5,
+.my-md-5 {
+    margin-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-5,
+.mx-md-5 {
+    margin-left: 3rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-md-0 {
+    padding: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-md-0,
+.py-md-0 {
+    padding-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-md-0,
+.px-md-0 {
+    padding-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-md-0,
+.py-md-0 {
+    padding-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-md-0,
+.px-md-0 {
+    padding-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-md-1 {
+    padding: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-md-1,
+.py-md-1 {
+    padding-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-md-1,
+.px-md-1 {
+    padding-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-md-1,
+.py-md-1 {
+    padding-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-md-1,
+.px-md-1 {
+    padding-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-md-2 {
+    padding: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-md-2,
+.py-md-2 {
+    padding-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-md-2,
+.px-md-2 {
+    padding-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-md-2,
+.py-md-2 {
+    padding-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-md-2,
+.px-md-2 {
+    padding-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-md-3 {
+    padding: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-md-3,
+.py-md-3 {
+    padding-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-md-3,
+.px-md-3 {
+    padding-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-md-3,
+.py-md-3 {
+    padding-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-md-3,
+.px-md-3 {
+    padding-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-md-4 {
+    padding: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-md-4,
+.py-md-4 {
+    padding-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-md-4,
+.px-md-4 {
+    padding-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-md-4,
+.py-md-4 {
+    padding-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-md-4,
+.px-md-4 {
+    padding-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-md-5 {
+    padding: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-md-5,
+.py-md-5 {
+    padding-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-md-5,
+.px-md-5 {
+    padding-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-md-5,
+.py-md-5 {
+    padding-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-md-5,
+.px-md-5 {
+    padding-left: 3rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-n1 {
+    margin: -0.25rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-n1,
+.my-md-n1 {
+    margin-top: -0.25rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-n1,
+.mx-md-n1 {
+    margin-right: -0.25rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-n1,
+.my-md-n1 {
+    margin-bottom: -0.25rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-n1,
+.mx-md-n1 {
+    margin-left: -0.25rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-n2 {
+    margin: -0.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-n2,
+.my-md-n2 {
+    margin-top: -0.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-n2,
+.mx-md-n2 {
+    margin-right: -0.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-n2,
+.my-md-n2 {
+    margin-bottom: -0.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-n2,
+.mx-md-n2 {
+    margin-left: -0.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-n3 {
+    margin: -1rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-n3,
+.my-md-n3 {
+    margin-top: -1rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-n3,
+.mx-md-n3 {
+    margin-right: -1rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-n3,
+.my-md-n3 {
+    margin-bottom: -1rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-n3,
+.mx-md-n3 {
+    margin-left: -1rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-n4 {
+    margin: -1.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-n4,
+.my-md-n4 {
+    margin-top: -1.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-n4,
+.mx-md-n4 {
+    margin-right: -1.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-n4,
+.my-md-n4 {
+    margin-bottom: -1.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-n4,
+.mx-md-n4 {
+    margin-left: -1.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-n5 {
+    margin: -3rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-n5,
+.my-md-n5 {
+    margin-top: -3rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-n5,
+.mx-md-n5 {
+    margin-right: -3rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-n5,
+.my-md-n5 {
+    margin-bottom: -3rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-n5,
+.mx-md-n5 {
+    margin-left: -3rem !important;
+  }
+  /* line 94, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-md-auto {
+    margin: auto !important;
+  }
+  /* line 97, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-md-auto,
+.my-md-auto {
+    margin-top: auto !important;
+  }
+  /* line 100, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-md-auto,
+.mx-md-auto {
+    margin-right: auto !important;
+  }
+  /* line 103, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-md-auto,
+.my-md-auto {
+    margin-bottom: auto !important;
+  }
+  /* line 106, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-md-auto,
+.mx-md-auto {
+    margin-left: auto !important;
+  }
+}
+
+@media (min-width: 992px) {
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-0 {
+    margin: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-0,
+.my-lg-0 {
+    margin-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-0,
+.mx-lg-0 {
+    margin-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-0,
+.my-lg-0 {
+    margin-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-0,
+.mx-lg-0 {
+    margin-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-1 {
+    margin: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-1,
+.my-lg-1 {
+    margin-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-1,
+.mx-lg-1 {
+    margin-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-1,
+.my-lg-1 {
+    margin-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-1,
+.mx-lg-1 {
+    margin-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-2 {
+    margin: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-2,
+.my-lg-2 {
+    margin-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-2,
+.mx-lg-2 {
+    margin-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-2,
+.my-lg-2 {
+    margin-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-2,
+.mx-lg-2 {
+    margin-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-3 {
+    margin: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-3,
+.my-lg-3 {
+    margin-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-3,
+.mx-lg-3 {
+    margin-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-3,
+.my-lg-3 {
+    margin-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-3,
+.mx-lg-3 {
+    margin-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-4 {
+    margin: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-4,
+.my-lg-4 {
+    margin-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-4,
+.mx-lg-4 {
+    margin-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-4,
+.my-lg-4 {
+    margin-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-4,
+.mx-lg-4 {
+    margin-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-5 {
+    margin: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-5,
+.my-lg-5 {
+    margin-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-5,
+.mx-lg-5 {
+    margin-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-5,
+.my-lg-5 {
+    margin-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-5,
+.mx-lg-5 {
+    margin-left: 3rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-lg-0 {
+    padding: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-lg-0,
+.py-lg-0 {
+    padding-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-lg-0,
+.px-lg-0 {
+    padding-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-lg-0,
+.py-lg-0 {
+    padding-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-lg-0,
+.px-lg-0 {
+    padding-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-lg-1 {
+    padding: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-lg-1,
+.py-lg-1 {
+    padding-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-lg-1,
+.px-lg-1 {
+    padding-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-lg-1,
+.py-lg-1 {
+    padding-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-lg-1,
+.px-lg-1 {
+    padding-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-lg-2 {
+    padding: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-lg-2,
+.py-lg-2 {
+    padding-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-lg-2,
+.px-lg-2 {
+    padding-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-lg-2,
+.py-lg-2 {
+    padding-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-lg-2,
+.px-lg-2 {
+    padding-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-lg-3 {
+    padding: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-lg-3,
+.py-lg-3 {
+    padding-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-lg-3,
+.px-lg-3 {
+    padding-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-lg-3,
+.py-lg-3 {
+    padding-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-lg-3,
+.px-lg-3 {
+    padding-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-lg-4 {
+    padding: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-lg-4,
+.py-lg-4 {
+    padding-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-lg-4,
+.px-lg-4 {
+    padding-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-lg-4,
+.py-lg-4 {
+    padding-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-lg-4,
+.px-lg-4 {
+    padding-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-lg-5 {
+    padding: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-lg-5,
+.py-lg-5 {
+    padding-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-lg-5,
+.px-lg-5 {
+    padding-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-lg-5,
+.py-lg-5 {
+    padding-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-lg-5,
+.px-lg-5 {
+    padding-left: 3rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-n1 {
+    margin: -0.25rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-n1,
+.my-lg-n1 {
+    margin-top: -0.25rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-n1,
+.mx-lg-n1 {
+    margin-right: -0.25rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-n1,
+.my-lg-n1 {
+    margin-bottom: -0.25rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-n1,
+.mx-lg-n1 {
+    margin-left: -0.25rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-n2 {
+    margin: -0.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-n2,
+.my-lg-n2 {
+    margin-top: -0.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-n2,
+.mx-lg-n2 {
+    margin-right: -0.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-n2,
+.my-lg-n2 {
+    margin-bottom: -0.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-n2,
+.mx-lg-n2 {
+    margin-left: -0.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-n3 {
+    margin: -1rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-n3,
+.my-lg-n3 {
+    margin-top: -1rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-n3,
+.mx-lg-n3 {
+    margin-right: -1rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-n3,
+.my-lg-n3 {
+    margin-bottom: -1rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-n3,
+.mx-lg-n3 {
+    margin-left: -1rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-n4 {
+    margin: -1.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-n4,
+.my-lg-n4 {
+    margin-top: -1.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-n4,
+.mx-lg-n4 {
+    margin-right: -1.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-n4,
+.my-lg-n4 {
+    margin-bottom: -1.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-n4,
+.mx-lg-n4 {
+    margin-left: -1.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-n5 {
+    margin: -3rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-n5,
+.my-lg-n5 {
+    margin-top: -3rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-n5,
+.mx-lg-n5 {
+    margin-right: -3rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-n5,
+.my-lg-n5 {
+    margin-bottom: -3rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-n5,
+.mx-lg-n5 {
+    margin-left: -3rem !important;
+  }
+  /* line 94, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-lg-auto {
+    margin: auto !important;
+  }
+  /* line 97, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-lg-auto,
+.my-lg-auto {
+    margin-top: auto !important;
+  }
+  /* line 100, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-lg-auto,
+.mx-lg-auto {
+    margin-right: auto !important;
+  }
+  /* line 103, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-lg-auto,
+.my-lg-auto {
+    margin-bottom: auto !important;
+  }
+  /* line 106, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-lg-auto,
+.mx-lg-auto {
+    margin-left: auto !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-0 {
+    margin: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-0,
+.my-xl-0 {
+    margin-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-0,
+.mx-xl-0 {
+    margin-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-0,
+.my-xl-0 {
+    margin-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-0,
+.mx-xl-0 {
+    margin-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-1 {
+    margin: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-1,
+.my-xl-1 {
+    margin-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-1,
+.mx-xl-1 {
+    margin-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-1,
+.my-xl-1 {
+    margin-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-1,
+.mx-xl-1 {
+    margin-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-2 {
+    margin: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-2,
+.my-xl-2 {
+    margin-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-2,
+.mx-xl-2 {
+    margin-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-2,
+.my-xl-2 {
+    margin-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-2,
+.mx-xl-2 {
+    margin-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-3 {
+    margin: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-3,
+.my-xl-3 {
+    margin-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-3,
+.mx-xl-3 {
+    margin-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-3,
+.my-xl-3 {
+    margin-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-3,
+.mx-xl-3 {
+    margin-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-4 {
+    margin: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-4,
+.my-xl-4 {
+    margin-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-4,
+.mx-xl-4 {
+    margin-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-4,
+.my-xl-4 {
+    margin-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-4,
+.mx-xl-4 {
+    margin-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-5 {
+    margin: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-5,
+.my-xl-5 {
+    margin-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-5,
+.mx-xl-5 {
+    margin-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-5,
+.my-xl-5 {
+    margin-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-5,
+.mx-xl-5 {
+    margin-left: 3rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-xl-0 {
+    padding: 0 !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-xl-0,
+.py-xl-0 {
+    padding-top: 0 !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-xl-0,
+.px-xl-0 {
+    padding-right: 0 !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-xl-0,
+.py-xl-0 {
+    padding-bottom: 0 !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-xl-0,
+.px-xl-0 {
+    padding-left: 0 !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-xl-1 {
+    padding: 0.25rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-xl-1,
+.py-xl-1 {
+    padding-top: 0.25rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-xl-1,
+.px-xl-1 {
+    padding-right: 0.25rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-xl-1,
+.py-xl-1 {
+    padding-bottom: 0.25rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-xl-1,
+.px-xl-1 {
+    padding-left: 0.25rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-xl-2 {
+    padding: 0.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-xl-2,
+.py-xl-2 {
+    padding-top: 0.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-xl-2,
+.px-xl-2 {
+    padding-right: 0.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-xl-2,
+.py-xl-2 {
+    padding-bottom: 0.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-xl-2,
+.px-xl-2 {
+    padding-left: 0.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-xl-3 {
+    padding: 1rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-xl-3,
+.py-xl-3 {
+    padding-top: 1rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-xl-3,
+.px-xl-3 {
+    padding-right: 1rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-xl-3,
+.py-xl-3 {
+    padding-bottom: 1rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-xl-3,
+.px-xl-3 {
+    padding-left: 1rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-xl-4 {
+    padding: 1.5rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-xl-4,
+.py-xl-4 {
+    padding-top: 1.5rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-xl-4,
+.px-xl-4 {
+    padding-right: 1.5rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-xl-4,
+.py-xl-4 {
+    padding-bottom: 1.5rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-xl-4,
+.px-xl-4 {
+    padding-left: 1.5rem !important;
+  }
+  /* line 54, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .p-xl-5 {
+    padding: 3rem !important;
+  }
+  /* line 57, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pt-xl-5,
+.py-xl-5 {
+    padding-top: 3rem !important;
+  }
+  /* line 60, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pr-xl-5,
+.px-xl-5 {
+    padding-right: 3rem !important;
+  }
+  /* line 63, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pb-xl-5,
+.py-xl-5 {
+    padding-bottom: 3rem !important;
+  }
+  /* line 66, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .pl-xl-5,
+.px-xl-5 {
+    padding-left: 3rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-n1 {
+    margin: -0.25rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-n1,
+.my-xl-n1 {
+    margin-top: -0.25rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-n1,
+.mx-xl-n1 {
+    margin-right: -0.25rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-n1,
+.my-xl-n1 {
+    margin-bottom: -0.25rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-n1,
+.mx-xl-n1 {
+    margin-left: -0.25rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-n2 {
+    margin: -0.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-n2,
+.my-xl-n2 {
+    margin-top: -0.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-n2,
+.mx-xl-n2 {
+    margin-right: -0.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-n2,
+.my-xl-n2 {
+    margin-bottom: -0.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-n2,
+.mx-xl-n2 {
+    margin-left: -0.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-n3 {
+    margin: -1rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-n3,
+.my-xl-n3 {
+    margin-top: -1rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-n3,
+.mx-xl-n3 {
+    margin-right: -1rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-n3,
+.my-xl-n3 {
+    margin-bottom: -1rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-n3,
+.mx-xl-n3 {
+    margin-left: -1rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-n4 {
+    margin: -1.5rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-n4,
+.my-xl-n4 {
+    margin-top: -1.5rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-n4,
+.mx-xl-n4 {
+    margin-right: -1.5rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-n4,
+.my-xl-n4 {
+    margin-bottom: -1.5rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-n4,
+.mx-xl-n4 {
+    margin-left: -1.5rem !important;
+  }
+  /* line 75, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-n5 {
+    margin: -3rem !important;
+  }
+  /* line 78, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-n5,
+.my-xl-n5 {
+    margin-top: -3rem !important;
+  }
+  /* line 81, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-n5,
+.mx-xl-n5 {
+    margin-right: -3rem !important;
+  }
+  /* line 84, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-n5,
+.my-xl-n5 {
+    margin-bottom: -3rem !important;
+  }
+  /* line 87, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-n5,
+.mx-xl-n5 {
+    margin-left: -3rem !important;
+  }
+  /* line 94, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .m-xl-auto {
+    margin: auto !important;
+  }
+  /* line 97, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mt-xl-auto,
+.my-xl-auto {
+    margin-top: auto !important;
+  }
+  /* line 100, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mr-xl-auto,
+.mx-xl-auto {
+    margin-right: auto !important;
+  }
+  /* line 103, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .mb-xl-auto,
+.my-xl-auto {
+    margin-bottom: auto !important;
+  }
+  /* line 106, app/assets/stylesheets/revised/mixins/_bootstrap_utilities.scss */
+  .ml-xl-auto,
+.mx-xl-auto {
+    margin-left: auto !important;
+  }
+}
+
+/* line 16, app/assets/stylesheets/email.scss */
+.table-list {
+  margin-bottom: 0;
+  border: 1px solid #eceeef;
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  background-color: transparent;
+  display: table;
+  box-sizing: border-box;
+  border-spacing: 2px;
+}
+
+/* line 27, app/assets/stylesheets/email.scss */
+.table-list tr:nth-of-type(even) {
+  background-color: #dddddd;
+}
+
+/* line 30, app/assets/stylesheets/email.scss */
+.table-list tr:first-child td {
+  border-top: none;
+}
+
+/* line 33, app/assets/stylesheets/email.scss */
+.table-list tr td {
+  line-height: 1.5;
+  border: 1px solid #eceeef;
+  padding: 4px 4px 4px 4px;
+}
+
+/* line 37, app/assets/stylesheets/email.scss */
+.table-list tr td:first-child {
+  font-size: 75%;
+  font-style: italic;
+  text-align: right;
+  padding: 9px 4px 4px;
+  line-height: 1.25;
+}
+
+/* line 44, app/assets/stylesheets/email.scss */
+.table-list tr td.full-width-data:first-child {
+  font-size: 100%;
+  font-style: normal;
+  text-align: left;
+}
+
+/* line 50, app/assets/stylesheets/email.scss */
+.table-list tr td:last-child {
+  width: 85%;
+}
+
+/* line 1, app/assets/stylesheets/revised/emails/email_body.scss */
+#outlook a {
+  padding: 0;
+}
+
+/* Force Outlook to provide a "view in browser" button. */
+/* line 7, app/assets/stylesheets/revised/emails/email_body.scss */
+body {
+  width: 100% !important;
+  /* Force Hotmail to display emails at full width */
+  -webkit-text-size-adjust: none;
+  /* Prevent Webkit platforms from changing default text sizes. */
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  font-family: sans-serif;
+  color: #666666;
+  font-size: 16px;
+  line-height: 2em;
+}
+
+/* line 22, app/assets/stylesheets/revised/emails/email_body.scss */
+body a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+/* line 26, app/assets/stylesheets/revised/emails/email_body.scss */
+body a:hover, body a:active, body a.active {
+  text-decoration: underline;
+  color: #3498db;
+}
+
+/* line 35, app/assets/stylesheets/revised/emails/email_body.scss */
+h1,
+h2,
+h3,
+h4,
+h5 {
+  line-height: 1.2em;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+/* line 45, app/assets/stylesheets/revised/emails/email_body.scss */
+h1,
+h2,
+h3 {
+  color: #333333;
+  text-transform: uppercase;
+}
+
+/* line 52, app/assets/stylesheets/revised/emails/email_body.scss */
+h1 {
+  font-weight: 200;
+}
+
+/* line 56, app/assets/stylesheets/revised/emails/email_body.scss */
+.uncap {
+  text-transform: none !important;
+}
+
+/* line 60, app/assets/stylesheets/revised/emails/email_body.scss */
+hr {
+  display: block;
+  margin: 24px 0;
+  border: none;
+  border-top: 1px inset #a4a4a4;
+}
+
+/* line 67, app/assets/stylesheets/revised/emails/email_body.scss */
+.center-text {
+  text-align: center;
+}
+
+/* line 71, app/assets/stylesheets/revised/emails/email_body.scss */
+.less-strong {
+  color: #767676;
+}
+
+/* line 1, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-wrapper {
+  width: 100%;
+  position: relative;
+  max-width: 700px;
+  margin: 20px auto 0;
+}
+
+/* line 8, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-body,
+.binx-pstscpt {
+  padding: 24px;
+}
+
+/* line 13, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header {
+  background-color: #333333;
+}
+
+/* line 16, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header {
+  width: 100%;
+  background-color: #333333;
+  border: 0;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+/* line 22, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header tr,
+.binx-header td {
+  padding: 0;
+  border-spacing: 0;
+}
+
+/* line 27, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header td {
+  height: 82px;
+  background-color: #333333;
+}
+
+/* line 32, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header img {
+  display: block;
+  margin: 3.6px 18px 2.4px 0;
+  float: right;
+  height: 70px;
+  max-height: 70px;
+  width: auto;
+}
+
+/* line 45, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header .partner-header {
+  height: 84px;
+}
+
+/* line 47, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header .partner-header .bike-index-logo {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+/* line 53, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header .partner-logo-wrapper {
+  display: block;
+  float: left;
+  background-color: #ffffff;
+  height: 84px;
+}
+
+/* line 59, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-header .partner-logo-wrapper .partner-header-logo {
+  float: left;
+  margin-top: 21px;
+  margin-right: 0;
+  height: 45px;
+}
+
+/* line 71, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-pstscpt h4 {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.2em;
+}
+
+/* line 77, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-pstscpt span {
+  font-family: Verdana, sans-serif;
+  font-size: 30px;
+}
+
+/* line 81, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-pstscpt span:nth-of-type(1) {
+  color: #f46767;
+}
+
+/* line 85, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-pstscpt span:nth-of-type(2) {
+  color: #ffed40;
+}
+
+/* line 89, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-pstscpt span:nth-of-type(3) {
+  color: #c7e775;
+}
+
+/* line 93, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-pstscpt span:nth-of-type(4) {
+  color: #3498db;
+}
+
+/* line 97, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-pstscpt span:nth-of-type(5) {
+  color: #cea9f7;
+}
+
+/* line 105, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-footer {
+  background-color: #333333;
+  padding: 33px;
+}
+
+/* line 109, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-footer h5,
+.binx-footer p {
+  color: #767676;
+  font-size: 16px;
+  text-align: center;
+  line-height: 1.2em;
+  width: 100%;
+}
+
+/* line 118, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-footer h5 {
+  font-weight: 600;
+}
+
+/* line 122, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-footer p {
+  margin: 1.5rem 0 0;
+  font-style: italic;
+}
+
+/* line 125, app/assets/stylesheets/revised/emails/email_sections.scss */
+.binx-footer p a {
+  color: #3a78a8;
+}
+
+/* line 1, app/assets/stylesheets/revised/emails/email_components.scss */
+.binx-button {
+  margin: 12px auto;
+  color: #fff;
+  background: #3498db;
+  text-transform: uppercase;
+  font-size: 20px;
+  padding: 12px 0;
+  width: 300px;
+  display: block;
+  text-align: center;
+  max-width: 100%;
+  border-radius: 2px;
+}
+
+/* line 13, app/assets/stylesheets/revised/emails/email_components.scss */
+.binx-button:hover {
+  color: #fff;
+  text-decoration: none;
+  background: #3498db;
+}
+
+/* line 20, app/assets/stylesheets/revised/emails/email_components.scss */
+.donate-message {
+  padding: 12px 0;
+  border-top: 1px solid #e74c3c;
+  border-bottom: 1px solid #e74c3c;
+  margin: 0 0 30px;
+}
+
+/* line 21, app/assets/stylesheets/revised/emails/email_components.scss */
+.donate-message h5,
+.donate-message p {
+  text-align: center;
+}
+
+/* line 26, app/assets/stylesheets/revised/emails/email_components.scss */
+.donate-message h5 {
+  font-size: 16px;
+}
+
+/* line 30, app/assets/stylesheets/revised/emails/email_components.scss */
+.donate-message p {
+  line-height: 1.5em;
+  margin: 8px 0 0;
+  opacity: 0.8;
+  font-size: 15px;
+  font-style: italic;
+}
+
+/* line 44, app/assets/stylesheets/revised/emails/email_components.scss */
+.locking-demonstration {
+  border: solid 12px #dddddd;
+  width: 100%;
+  margin: 24px 0 0;
+  position: relative;
+}
+
+/* line 50, app/assets/stylesheets/revised/emails/email_components.scss */
+.locking-demonstration img {
+  display: block;
+  width: 80%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* line 58, app/assets/stylesheets/revised/emails/email_components.scss */
+.binx-bulleted-list {
+  display: block;
+  list-style-type: disc;
+  margin: 1em 0;
+  padding: 0 0 0 40px;
+}
+
+/* line 64, app/assets/stylesheets/revised/emails/email_components.scss */
+.binx-bulleted-list li {
+  line-height: 1.5em;
+  margin-top: 6px;
+}
+
+/* line 70, app/assets/stylesheets/revised/emails/email_components.scss */
+.clearstuffdiv {
+  width: 100%;
+  clear: both;
+  float: none;
+}
+
+/* line 77, app/assets/stylesheets/revised/emails/email_components.scss */
+.mark-retrieved-box {
+  background: #ffe7a0;
+  width: 100%;
+  border: 1px solid #ffc107;
+  border-radius: 2px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+/* line 84, app/assets/stylesheets/revised/emails/email_components.scss */
+.mark-retrieved-box a {
+  margin-top: 20px;
+}
+
+/* line 87, app/assets/stylesheets/revised/emails/email_components.scss */
+.mark-retrieved-box p {
+  padding: 10px;
+  margin: 10px 0 0 0;
+}
+
+/* line 93, app/assets/stylesheets/revised/emails/email_components.scss */
+.organization-stolen-message-alert {
+  margin: 24px 0;
+  padding: 12px;
+  border: 2px solid #ffc107;
+  line-height: 1.5;
+}
+
+/* line 1, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display {
+  position: relative;
+  width: 100%;
+  margin: 12px auto 24px;
+  padding: 12px;
+  border: 1px solid #a4a4a4;
+  border-spacing: unset;
+  border-collapse: collapse;
+}
+
+/* line 9, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display td.bike-display-wrapper-cell {
+  border: none;
+  padding: 4px;
+}
+
+/* line 13, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .image-holder {
+  margin: 0;
+  width: 33%;
+}
+
+/* line 17, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .image-holder a {
+  display: block;
+  position: relative;
+}
+
+/* line 22, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .image-holder img {
+  width: 300px;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  height: auto;
+}
+
+/* line 30, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .image-holder.placeholder {
+  background-color: #dddddd;
+}
+
+/* line 33, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .image-holder.placeholder a {
+  padding: 12px 0;
+}
+
+/* line 37, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .image-holder.placeholder img {
+  width: 70%;
+}
+
+/* line 43, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .info-holder {
+  margin: 0;
+  width: 66%;
+  vertical-align: top;
+}
+
+/* line 47, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .info-holder ul {
+  list-style-type: none;
+  display: block;
+  margin: 0;
+  padding: 8px 8px 8px 32px;
+}
+
+/* line 53, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .info-holder li {
+  margin: 6px 0 0 0;
+  padding: 0 0 0 0;
+  text-indent: -16px;
+  display: block;
+  list-style: none;
+  line-height: 1.5em;
+}
+
+/* line 61, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .info-holder li:first-of-type {
+  margin-top: 0;
+}
+
+/* line 69, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.bike-display .serial-display {
+  font-family: 'Courier';
+}
+
+/* line 74, app/assets/stylesheets/revised/emails/email_bike_display.scss */
+.claim-message-org-avatar {
+  display: block;
+  float: left;
+  margin: 0 0.5em 0 0;
+  width: 75px;
+  height: auto;
+}
+
+/* line 1, app/assets/stylesheets/revised/emails/email_stolen_checklist.scss */
+ul.stolen-checklist {
+  margin: 0;
+  padding: 0;
+  display: block;
+  list-style-type: none;
+}
+
+/* line 6, app/assets/stylesheets/revised/emails/email_stolen_checklist.scss */
+ul.stolen-checklist li {
+  line-height: 2;
+  font-size: 16px;
+  display: block;
+  padding: 0 0 0 2rem;
+  margin: 0 0 0.25rem;
+  position: relative;
+}
+
+/* line 14, app/assets/stylesheets/revised/emails/email_stolen_checklist.scss */
+ul.stolen-checklist li .checklist-checkbox {
+  display: block;
+  position: absolute;
+  background: #fff;
+  left: 0.25em;
+  top: 0.25em;
+  border: 2px solid #919197;
+  border-radius: 50%;
+  min-width: 1em;
+  min-height: 1em;
+  vertical-align: middle;
+  line-height: 1;
+  padding: 0;
+}
+
+/* line 29, app/assets/stylesheets/revised/emails/email_stolen_checklist.scss */
+ul.stolen-checklist li.completed-item {
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+/* line 32, app/assets/stylesheets/revised/emails/email_stolen_checklist.scss */
+ul.stolen-checklist li.completed-item .checklist-checkbox {
+  color: #919197;
+  font-family: "zp-icons";
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+}
+
+/* line 1, app/assets/stylesheets/revised/emails/email_admins.scss */
+.bike-index-administration-links {
+  margin-top: 30px;
+  padding-top: 1rem;
+  border-top: #a4a4a4 1px solid;
+  opacity: 0.8;
+}
+
+/* line 1, app/assets/stylesheets/revised/emails/email_partners.scss */
+.organized-partnership-header {
+  text-align: center;
+}
+
+/* line 4, app/assets/stylesheets/revised/emails/email_partners.scss */
+.organized-partnership-header p {
+  color: #000;
+  font-style: italic;
+  margin: 0;
+}
+
+/* line 10, app/assets/stylesheets/revised/emails/email_partners.scss */
+.organized-partnership-header img {
+  display: inline-block;
+  margin-left: 24px;
+  max-width: 60%;
+  vertical-align: middle;
+}
+
+/* line 18, app/assets/stylesheets/revised/emails/email_partners.scss */
+.organized-partnership-main {
+  padding: 24px 12px;
+  border: 1px solid #666666;
+  margin: 24px 0;
+}
+
+/* line 3, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.email-hot-sheet-link-footer {
+  margin-top: 34px;
+  border-top: 1px solid #dddddd;
+}
+
+/* line 6, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.email-hot-sheet-link-footer p {
+  text-align: center;
+}
+
+/* line 9, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.email-hot-sheet-link-footer .hot-sheet-notification-change {
+  clear: both;
+  margin-top: 2rem;
+}
+
+/* line 15, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.clear-org-buttons {
+  padding: 16px 0;
+  display: block;
+  position: relative;
+  text-align: center;
+}
+
+/* line 20, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.clear-org-buttons .org-button {
+  display: inline-block;
+  padding: 12px 16px;
+  border: 1px solid #9d9d9d;
+  background-color: #aaaaaa;
+  font-weight: bold;
+  border-radius: 3px;
+  max-width: 100%;
+  color: #ffffff;
+  text-decoration: none;
+  line-height: 1;
+}
+
+/* line 34, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display {
+  padding-top: 2px;
+}
+
+/* line 37, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .bike-display {
+  border: none;
+  background-color: #ffffff;
+}
+
+/* line 41, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .bike-display td.bike-display-wrapper-cell {
+  border: none;
+  padding: 0;
+}
+
+/* line 45, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .bike-display .info-holder {
+  padding-top: 8px;
+  vertical-align: top;
+}
+
+/* line 50, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .table-list {
+  margin-top: 0;
+  border: 1px solid #d0d0d0;
+}
+
+/* line 53, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .table-list tr td {
+  line-height: 1.5;
+  border-color: #d0d0d0;
+}
+
+/* line 57, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .table-list tr:nth-of-type(odd) {
+  background-color: #eeeeee;
+}
+
+/* line 60, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .table-list .bike-title td {
+  text-align: left;
+  text-decoration: none;
+  font-size: 100%;
+  font-style: normal;
+}
+
+/* line 65, app/assets/stylesheets/revised/emails/email_hot_sheet.scss */
+.hot-sheet-bike-display .table-list .bike-title td a {
+  display: block;
+  font-size: 17px;
+}
+
+/* line 68, app/assets/stylesheets/email.scss */
+.stolen-notification-from {
+  background-color: #f2f2f2;
+  border: 1px solid #e4e4e4;
+  padding: 0 1em;
+  text-align: center;
+  font-style: italic;
+}
+
+/* line 76, app/assets/stylesheets/email.scss */
+.geolocated-message-map {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+}
