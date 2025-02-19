@@ -679,6 +679,16 @@ GEM
     sanitize (6.1.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    sass-rails (6.0.0)
+      sassc-rails (~> 2.1, >= 2.1.1)
+    sassc (2.4.0)
+      ffi (~> 1.9)
+    sassc-rails (2.1.2)
+      railties (>= 4.0.0)
+      sassc (>= 2.0)
+      sprockets (> 3.0)
+      sprockets-rails
+      tilt
     secure_headers (2.5.3)
       user_agent_parser
     securerandom (0.4.1)
@@ -904,6 +914,7 @@ DEPENDENCIES
   rspec-retry
   rspec-sidekiq
   rspec_junit_formatter
+  sass-rails
   secure_headers (~> 2.5.0)
   selenium-webdriver
   sidekiq
