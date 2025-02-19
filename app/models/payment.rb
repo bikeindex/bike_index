@@ -13,6 +13,7 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  invoice_id             :integer
+#  membership_id          :bigint
 #  organization_id        :integer
 #  stripe_id              :string(255)
 #  stripe_subscription_id :bigint
@@ -20,6 +21,7 @@
 #
 # Indexes
 #
+#  index_payments_on_membership_id           (membership_id)
 #  index_payments_on_stripe_subscription_id  (stripe_subscription_id)
 #  index_payments_on_user_id                 (user_id)
 #
@@ -34,6 +36,7 @@ class Payment < ApplicationRecord
   belongs_to :organization
   belongs_to :invoice
   belongs_to :stripe_subscription
+  belongs_to :payment
 
   has_one :theft_alert
 

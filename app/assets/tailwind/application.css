@@ -2,13 +2,32 @@
 @config "../../../config/tailwind.config.js";
 
 @layer components {
-  .twbtn {
+  .twbtn, .twbtn-blue, .twbtn-green {
     @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3
     tw:cursor-pointer tw:active:outline tw:focus-visible:outline-offset-2
     tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2
     tw:active:outline-none tw:active:opacity-95;
   }
+  .twbtn-green {
+    @apply tw:text-white tw:bg-green-600
+      tw:hover:bg-green-500 tw:focus-visible:outline-green-600;
+  }
+
+  .twbtn-blue {
+    @apply tw:text-white tw:bg-blue-600
+      tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600;
+  }
 }
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  input:where([type=button],[type=reset],[type=submit]):not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer theme, base, components, utilities;
 
 body {
   @apply tw:antialiased tw:text-gray-900;
@@ -19,21 +38,3 @@ body {
 body.dark {
   @apply tw:bg-gray-900 tw:text-gray-400;
 }
-
-
-/*.twbtn {
-  @apply tw:w-full tw:rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold
-   hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
-}*/
-
-.twbtn-green {
-  @apply tw:text-white tw:bg-green-600
-    tw:hover:bg-green-500 tw:focus-visible:outline-green-600;
-}
-
-.twbtn-blue {
-  @apply tw:text-white tw:bg-blue-600
-    tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600
-}
-
-

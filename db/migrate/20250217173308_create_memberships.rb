@@ -8,9 +8,10 @@ class CreateMemberships < ActiveRecord::Migration[8.0]
       t.datetime :end_at
       t.boolean :active, default: false
       t.references :creator, index: true
-      t.text :notes
 
       t.timestamps
     end
+
+    add_reference :payments, :membership, index: true
   end
 end

@@ -1998,7 +1998,6 @@ CREATE TABLE public.memberships (
     end_at timestamp(6) without time zone,
     active boolean DEFAULT false,
     creator_id bigint,
-    notes text,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -2703,6 +2702,7 @@ CREATE TABLE public.payments (
     kind integer,
     referral_source text,
     currency_enum integer,
+    membership_id bigint,
     stripe_subscription_id bigint
 );
 
@@ -6053,6 +6053,13 @@ CREATE INDEX index_parking_notifications_on_state_id ON public.parking_notificat
 --
 
 CREATE INDEX index_parking_notifications_on_user_id ON public.parking_notifications USING btree (user_id);
+
+
+--
+-- Name: index_payments_on_membership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_payments_on_membership_id ON public.payments USING btree (membership_id);
 
 
 --

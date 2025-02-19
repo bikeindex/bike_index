@@ -31,9 +31,3 @@
 
       .form-group.mt-4
         = f.submit 'Save', class: 'btn btn-success'
-
-      .form-group.mt-4
-        = f.label :notes do
-          Admin notes
-          %small.less-strong not shown to user
-        = f.text_area :notes, class: "form-control"

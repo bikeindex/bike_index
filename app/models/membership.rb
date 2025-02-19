@@ -6,7 +6,6 @@
 #  active     :boolean          default(FALSE)
 #  end_at     :datetime
 #  kind       :integer
-#  notes      :text
 #  start_at   :datetime
 #  status     :integer
 #  created_at :datetime         not null
@@ -30,7 +29,7 @@ class Membership < ApplicationRecord
 
   has_many :stripe_subscriptions
   has_one :active_stripe_subscription, -> { active }, class_name: "StripeSubscription"
-  has_many :payments, through: :stripe_subscriptions
+  has_many :payments
 
   enum :kind, KIND_ENUM
   enum :status, STATUS_ENUM
@@ -41,7 +40,7 @@ class Membership < ApplicationRecord
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
 
-  attr_accessor :user_email
+  attr_accessor :user_email, :set_interval
 
   class << self
     def kind_humanized(str)
