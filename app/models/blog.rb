@@ -89,6 +89,10 @@ class Blog < ApplicationRecord
     "how-to-get-your-stolen-bike-back" # Also hard coded in routes
   end
 
+  def self.why_membership_slug
+    "bike-index-membership"
+  end
+
   # matches ALL content tag ids
   def self.with_tag_ids(content_tag_ids)
     content_tag_ids = Array(content_tag_ids)

@@ -7,6 +7,10 @@
 }
 
 @layer components {
+  .twlink {
+    @apply tw:text-blue-500 tw:underline;
+  }
+
   .twbtn, .twbtn-blue, .twbtn-green {
     @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3
     tw:cursor-pointer tw:active:outline tw:focus-visible:outline-offset-2
