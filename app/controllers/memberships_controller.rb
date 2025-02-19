@@ -1,9 +1,12 @@
 class MembershipsController < ApplicationController
-  # before_action :authenticate_user_for_my_accounts_controller
+  before_action :enable_importmaps
 
   layout "payments_layout"
 
   def new
+  end
+
+  def create
   end
 
   # def success
