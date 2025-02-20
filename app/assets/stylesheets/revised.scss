@@ -32,11 +32,11 @@ $border-radius-sm: 1px;
 @import 'bootstrap/mixins';
 
 // Reset and dependencies
-@import 'bootstrap/normalize';
+@import 'legacy_includes/bootstrap_normalize';
 @import 'bootstrap/print';
 
-// Core CSS
-@import 'bootstrap/reboot';
+// Core CSS - overridden to prevent overrides
+@import 'legacy_includes/bootstrap_reboot';
 
 // @import "bootstrap/type";
 @import 'bootstrap/images';

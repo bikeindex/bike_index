@@ -55,25 +55,6 @@ $btn-font-size: 15px;
   }
 }
 
-body {
-  @extend .body-font;
-}
-
-p {
-  @extend .body-font;
-
-  margin: 0 0 (2 * $vertical-height);
-}
-
-// p.intro on typecast
-h5 {
-  @extend .body-font;
-
-  font-size: $h5-font-size;
-  font-weight: normal;
-  line-height: 1.5em;
-}
-
 .pullquote {
   @extend .body-font;
 
@@ -93,6 +74,8 @@ h5 {
   font-style: normal;
   text-transform: uppercase;
   color: $header-font-color;
+  margin-top: 0;
+  margin-bottom: .5rem;
 
   strong {
     font-weight: $strong-font-weight;
@@ -134,46 +117,77 @@ h5 {
   color: $body-font-color;
 }
 
-h1 {
-  @extend .header-font;
-
-  margin: 0 0 (2 * $vertical-height);
-  letter-spacing: -1px;
-  font-size: $h1-font-size;
-  line-height: 1.12em;
-
-  @include media-breakpoint-down(md) {
-    font-size: $h1-font-size-md;
-  }
-}
-
-h2 {
-  @extend .header-font;
-
-  margin: 0 0 (2 * $vertical-height);
-  font-size: $h2-font-size;
-  line-height: 1em;
-
-  @include media-breakpoint-down(md) {
-    font-size: $h2-font-size-md;
-  }
-}
-
-h3 {
-  @extend .header-font;
-
-  margin: 0 0 (2 * $vertical-height);
-  font-size: $h3-font-size;
-  line-height: 1em;
-}
-
-// Primary menu header height
-h4 {
+.h4 {
   @extend .header-font;
 
   margin: 0 0 (2 * $vertical-height);
   font-size: $h4-font-size;
   line-height: 18px;
+}
+
+.h5 {
+  @extend .body-font;
+
+  font-size: $h5-font-size;
+  font-weight: normal;
+  line-height: 1.5em;
+}
+
+// Updated to only apply styles to bootstrap wrapped classes
+.container, .container-fluid, .bootstrapstyle {
+  @extend .body-font;
+
+  p {
+    margin: 0 0 (2 * $vertical-height);
+  }
+
+  h1 {
+    @extend .header-font;
+
+    margin: 0 0 (2 * $vertical-height);
+    letter-spacing: -1px;
+    font-size: $h1-font-size;
+    line-height: 1.12em;
+
+    @include media-breakpoint-down(md) {
+      font-size: $h1-font-size-md;
+    }
+  }
+
+  h2 {
+    @extend .header-font;
+
+    margin: 0 0 (2 * $vertical-height);
+    font-size: $h2-font-size;
+    line-height: 1em;
+
+    @include media-breakpoint-down(md) {
+      font-size: $h2-font-size-md;
+    }
+  }
+
+  h3 {
+    @extend .header-font;
+
+    margin: 0 0 (2 * $vertical-height);
+    font-size: $h3-font-size;
+    line-height: 1em;
+  }
+
+  // Primary menu header height
+  h4 {
+    @extend .h4;
+  }
+  h5 {
+    @extend .h5;
+  }
+
+  // Updated to maintain consistency
+  .nav-link {
+    &:hover, &:focus {
+      text-decoration: none;
+    }
+  }
 }
 
 // Stop fucking prefixing. - textarea[placeholder], input[placeholder]
