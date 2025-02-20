@@ -25,7 +25,16 @@ RSpec.describe MembershipsController, type: :request do
   end
 
   describe "create" do
+    let(:create_params) do
+      {
+
+      }
+    end
     it "creates a pending membership" do
+      expect {
+        post base_url, params: create_params
+      }.to change(Membership, :count).by 1
+      membership = Membership.last
 
     end
   end

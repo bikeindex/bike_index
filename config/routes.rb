@@ -65,7 +65,9 @@ Rails.application.routes.draw do
     end
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
-  resource :membership
+  resource :membership, only: %i[new create] do
+
+  end
 
   resources :documentation, only: %i[index] do
     collection do

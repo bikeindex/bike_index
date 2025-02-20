@@ -7,6 +7,7 @@ class MembershipsController < ApplicationController
   end
 
   def create
+    pp permitted_create_parameters
   end
 
   # def success
@@ -40,7 +41,7 @@ class MembershipsController < ApplicationController
 
   def permitted_create_parameters
     params.require(:membership)
-      .permit(:kind, :currency_enum, :interval)
+      .permit(:kind, :interval)
       .merge(user_id: current_user&.id)
   end
 end
