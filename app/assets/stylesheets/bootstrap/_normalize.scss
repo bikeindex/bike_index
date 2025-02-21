@@ -245,28 +245,6 @@ body {
     overflow: visible; // 2
   }
 
-  // Forms
-  // ==========================================================================
-
-  //
-  // Change font properties to `inherit` in all browsers (opinionated).
-  //
-
-  button,
-  input,
-  select,
-  textarea {
-    font: inherit;
-  }
-
-  //
-  // Restore the font weight unset by the previous rule.
-  //
-
-  optgroup {
-    font-weight: bold;
-  }
-
   //
   // Show the overflow in IE.
   // 1. Show the overflow in Edge.
