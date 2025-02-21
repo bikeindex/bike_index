@@ -38,7 +38,7 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
   - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
   - Gives user@example.com 50 bikes
 
-- `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile_development](Procfile_development) and [.env](.env)
+- `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile.dev). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile.dev](Procfile.dev) and [.env](.env)
 
 - Go to [localhost:3042](http://localhost:3042)
 
