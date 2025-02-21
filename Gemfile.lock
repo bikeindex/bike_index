@@ -60,7 +60,6 @@ GEM
       rails-assets-microplugin (~> 0.0.0)
       rails-assets-sifter (~> 0.5.0)
     rails-assets-sifter (0.5.3)
-    rails-assets-tether (1.1.1)
     rails-assets-waypoints (3.1.1)
 
 GEM
@@ -920,7 +919,6 @@ DEPENDENCIES
   rails-assets-mustache (~> 2.2.1)!
   rails-assets-select2 (~> 4.0.3)!
   rails-assets-selectize (~> 0.12.1)!
-  rails-assets-tether (~> 1.1.0)!
   rails-assets-waypoints (~> 3.1.1)!
   rails-controller-testing
   rails-i18n

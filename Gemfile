@@ -129,7 +129,6 @@ source "https://rails-assets.org" do # JS land is crazy, so lock everything
   gem "rails-assets-select2", "~> 4.0.3" # Use select2 for a few things, it's a bit better sometimes
   gem "rails-assets-selectize", "~> 0.12.1" # Manually configured scss
   gem "rails-assets-Stickyfill", "~> 1.1.3" # Affix bike edit menu
-  gem "rails-assets-tether", "~> 1.1.0" # Required by bootstrap 4, but not included :(
   gem "rails-assets-waypoints", "~> 3.1.1" # For documentation pages
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
