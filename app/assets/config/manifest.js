@@ -1,6 +1,5 @@
 //= link_tree ../images
 
-//= link jquery2.js
 //= link embed.js
 //= link embed_user.js
 //= link application_revised.js
