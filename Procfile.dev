@@ -2,3 +2,4 @@ web: bundle exec puma -C config/puma.rb -e development -p 3042
 log: tail -f log/development.log
 hard_worker: bundle exec rerun --background --dir app,db,lib --pattern '{**/*.rb}' --no-notify -- bundle exec sidekiq
 css: bin/rails tailwindcss:watch
+scss: bin/rails dartsass:watch
