@@ -1,0 +1,102 @@
+$initial-about-social-color: $less-strong-font-color;
+$hover-about-social-color: lighten($gray-light, 15%);
+
+#info_about {
+  .about-social {
+    @include clearfix;
+
+    margin: 24px 0 60px;
+
+    ul {
+      @include list-unstyled;
+
+      margin: 0;
+      text-align: center;
+    }
+
+    li {
+      display: block;
+      float: left;
+      width: 8 * $vertical-height;
+    }
+
+    .social-link-text {
+      color: $initial-about-social-color;
+      display: block;
+      fill: $initial-about-social-color;
+      margin-top: -0.5em;
+      transition: all 0.05s linear;
+    }
+
+    a {
+      display: block;
+      position: relative;
+      color: inherit;
+
+      &:hover,
+      &:active {
+        text-decoration: none;
+        color: $hover-about-social-color;
+      }
+    }
+  }
+
+  .about-people {
+    @include list-unstyled;
+
+    list-style-type: none;
+    margin-left: 0;
+
+    li {
+      @include clearfix;
+
+      padding-top: 1em;
+    }
+
+    img {
+      max-width: 25%;
+      float: left;
+      margin-right: 2%;
+    }
+  }
+
+  .about-list {
+    @include clearfix;
+
+    @include list-unstyled;
+
+    width: 100%;
+    position: relative;
+
+    // max-width: $max-content-width;
+    list-style-type: none;
+    margin: 20px 0 0 0;
+
+    li {
+      width: 32%;
+      float: left;
+      margin: 0 0 0 2%;
+      position: relative;
+
+      img {
+        display: block;
+        width: 100%;
+      }
+    }
+
+    &.final-list {
+      li:first-of-type {
+        margin-left: 16%;
+      }
+    }
+  }
+
+  .about-alumni-list {
+    list-style-position: outside;
+
+    li {
+      margin: 0;
+      margin-right: 5px;
+    }
+  }
+}

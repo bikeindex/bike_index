@@ -1,0 +1,133 @@
+.organized-form {
+  .checkbox input {
+    margin-top: 0.6em;
+  }
+
+  .form-well-input {
+    @include media-breakpoint-down(xs) {
+      @include make-col-ready;
+
+      @include make-col(12);
+    }
+  }
+
+  .org-form-label {
+    @extend .col-sm-4;
+
+    @include media-breakpoint-up(sm) {
+      text-align: right;
+      margin-top: 0.25rem;
+    }
+  }
+
+  // Because of increasing the margin to align text-box labels,
+  // make the margin larger on non-text box fields
+  .static-form-control,
+  .row .checkbox,
+  .row .radio {
+    &:first-of-type {
+      @include media-breakpoint-up(sm) {
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  .form-submit-button {
+    @include make-col-ready;
+
+    @include media-breakpoint-up(sm) {
+      @include make-col(8);
+
+      @include make-col-offset(4);
+    }
+  }
+
+  .export-included-columns-label {
+    @extend .less-strong;
+
+    margin-bottom: 0;
+
+    @include media-breakpoint-up(lg) {
+      text-align: right;
+      margin-top: 0.25rem;
+    }
+  }
+
+  .locations-where-and-add {
+    padding-bottom: $vertical-height;
+
+    .btn {
+      margin-top: -6px;
+    }
+  }
+
+  // Text heavy organization forms (e.g. manage_impounding/edit) look weird with line-height: 2
+  // So provide a way to reduce the line height
+  // This class should be added to .form-group.row
+  .small-line-height {
+    line-height: 1.5;
+    // To make the labels line up, we have to remove the top margin
+    .org-form-label {
+      margin-top: 0;
+    }
+  }
+
+  .locations-fieldset-wrapper {
+    @extend .row;
+    .card-block {
+      width: 100%;
+    }
+
+    fieldset {
+      display: flex;
+    }
+    // For some reason, after uncollapsing, the checkbox margin gets messed up
+    .checkbox label {
+      margin-left: 0.25rem;
+    }
+  }
+
+  .remove-control {
+    input {
+      display: none;
+    }
+
+    label {
+      display: block;
+      text-align: right;
+      float: right;
+      width: auto;
+      color: $link-color;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.address-group {
+  label {
+    margin-bottom: 0;
+  }
+
+  .selectize-control,
+  input {
+    margin-top: 0.5em;
+  }
+}
+
+.countrystatezip {
+  @include media-breakpoint-up(sm) {
+    // Sometimes displaying just fields two on a row, in that case only remove padding on the right one
+    .col-sm-6:first-of-type,
+    .col-sm-4:first-of-type {
+      padding-right: 0;
+    }
+
+    .col-sm-4:last-of-type {
+      padding-left: 0;
+    }
+  }
+}

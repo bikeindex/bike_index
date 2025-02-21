@@ -8,6 +8,7 @@
 coverage/*
 public/uploads/*
 public/caches
+.sass-cache
 public/partner
 .vagrant
 ubuntu-xenial-16.04-cloudimg-console.log

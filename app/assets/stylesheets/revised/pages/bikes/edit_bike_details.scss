@@ -1,0 +1,100 @@
+#edit-bike-skeleton {
+  .nav-group-header {
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .nav-group-header:first-of-type {
+    margin-top: 0;
+  }
+}
+
+.edit-bike-page-bike_details {
+  .frame-sizes {
+    .btn {
+      transition: all 0.1s linear;
+      padding-left: 0;
+      padding-right: 0;
+      width: 3em;
+
+      &.active,
+      &:active {
+        background: $green;
+        color: white;
+      }
+    }
+
+    .ordinal-sizes .btn {
+      max-width: 20%;
+    }
+
+    // Ensure buttons never overflow onto a second line
+    .frame-size-units {
+      min-width: 6.5em;
+      position: absolute;
+      top: 0;
+      transition: top 0.1s linear;
+    }
+
+    .right-input-help {
+      line-height: 2;
+      margin-top: 0;
+    }
+  }
+  .toggle-version-date {
+    display: inline-block;
+    &.currently-hidden {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: $grid-breakpoint-md - 1px) {
+  #edit-bike-skeleton {
+    .nav-group-header {
+      display: none;
+    }
+  }
+
+  .edit-bike-page-bike_details {
+    .frame-sizes {
+      .right-input-help {
+        flex: 0 0 66.6667%;
+        margin-top: -0.5em;
+      }
+
+      .frame-size-units {
+        top: 15px;
+        right: 0.9375rem;
+      }
+
+      &.unexpanded-unit-size {
+        padding-bottom: 6 * $vertical-height;
+      }
+    }
+
+    .frame-size-other .form-well-input {
+      @include make-col(5);
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .edit-bike-page-bike_details {
+    .frame-sizes .frame-size-units {
+      right: 0.6rem;
+    }
+    .frame-size-other .form-well-input {
+      max-width: 5rem;
+    }
+  }
+}
+
+@media (min-width: $grid-breakpoint-md) {
+  .edit-bike-page-bike_details {
+    .frame-sizes {
+      .right-input-help {
+        position: relative;
+      }
+    }
+  }
+}

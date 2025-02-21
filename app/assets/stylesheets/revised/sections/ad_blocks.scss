@@ -1,0 +1,50 @@
+.ad-col {
+  .ad-block img {
+    margin-bottom: $vertical-height;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.ad-block {
+  width: 100%;
+
+  &.rendered-ad {
+    margin-top: $vertical-height;
+    a,
+    img {
+      display: block;
+      width: 100%;
+      margin: 0 auto;
+    }
+  }
+
+  &.ad468x60 {
+    height: 60px;
+    max-width: 468px;
+  }
+
+  &.ad300x600 {
+    height: 600px;
+    // Because otherwise it looks weird since it's so wide
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  &.adFullWidth {
+    max-height: 500px;
+    min-height: 100px; // So that it shows up as visible
+  }
+
+  h3 {
+    font-size: 21px;
+    margin: 0 0 (0.5 * $vertical-height);
+
+    &,
+    a {
+      color: $gray-light;
+    }
+  }
+}

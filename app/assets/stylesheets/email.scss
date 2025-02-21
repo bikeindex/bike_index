@@ -1,0 +1,81 @@
+@import "revised/mixins/colors";
+@import "revised/vars";
+
+// variables and mixins required for bootstrap utilities (e.g. mt-2)
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+// Backport of future bootstrap utilities
+@import "revised/mixins/bootstrap_utilities";
+
+$font-size: 16px;
+$header-height: 82px;
+$email-light-bg: #dddddd;
+
+$table-list-offset-color: $email-light-bg;
+
+.table-list {
+  margin-bottom: 0;
+  border: 1px solid #eceeef;
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  background-color: transparent;
+  display: table;
+  box-sizing: border-box;
+  border-spacing: 2px;
+
+  tr:nth-of-type(even) {
+    background-color: $table-list-offset-color;
+  }
+  tr:first-child td {
+    border-top: none;
+  }
+  tr td {
+    line-height: 1.5;
+    border: 1px solid #eceeef;
+    padding: 4px 4px 4px 4px;
+    &:first-child {
+      font-size: 75%;
+      font-style: italic;
+      text-align: right;
+      padding: 9px 4px 4px;
+      line-height: 1.25;
+    }
+    &:first-child.full-width-data {
+      font-size: 100%;
+      font-style: normal;
+      text-align: left;
+    }
+    // use last, rather than first, to enable full width single rows
+    &:last-child {
+      width: 85%; // This is effectively min-width for tables
+    }
+  }
+}
+
+//
+// Email specific styles
+//
+@import "revised/emails/email_body";
+@import "revised/emails/email_sections";
+@import "revised/emails/email_components";
+@import "revised/emails/email_bike_display";
+@import "revised/emails/email_stolen_checklist";
+@import "revised/emails/email_admins";
+@import "revised/emails/email_partners";
+@import "revised/emails/email_hot_sheet";
+
+.stolen-notification-from {
+  background-color: $gray-lighter;
+  border: 1px solid $gray-lightish;
+  padding: 0 1em;
+  text-align: center;
+  font-style: italic;
+}
+
+.geolocated-message-map {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+}
