@@ -91,7 +91,6 @@ gem "secure_headers", "~> 2.5.0"
 
 # Frontend
 gem "jquery-rails" # Javascript framework?
-gem "bootstrap", "4.0.0.alpha4" # Bootstrap 4 - used for revised stylesheets (locked to current version)
 gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
 gem "coffee-rails"
