@@ -7,7 +7,7 @@ class CreateStripePrices < ActiveRecord::Migration[8.0]
       t.integer :currency_enum
       t.integer :amount_cents
       t.boolean :live, default: false
-      t.boolean :active, default: true
+      t.boolean :active, default: false
 
       t.timestamps
     end

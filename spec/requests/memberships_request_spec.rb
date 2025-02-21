@@ -25,17 +25,47 @@ RSpec.describe MembershipsController, type: :request do
   end
 
   describe "create" do
+    let!(:stripe_price) { FactoryBot.create(:stripe_price_basic) }
     let(:create_params) do
       {
-
+        set_interval: "monthly",
+        currency_enum: "usd",
+        kind: "basic"
       }
     end
-    it "creates a pending membership" do
-      expect {
-        post base_url, params: create_params
-      }.to change(Membership, :count).by 1
-      membership = Membership.last
+    # let(:target_membership) do
+    #   {
+    #     user_id: nil,
+    #     status: "status_pending",
+    #     kind: "basic",
+    #     start_at: nil
+    #   }
+    # end
+    let(:target_stripe_subscription) do
+      {
+        stripe_price_stripe_id: stripe_price.stripe_id,
+        active: false,
+        currency_enum: "usd",
+        membership_kind: "basic",
+        interval: "monthly",
+        start_at: nil,
+        end_at: nil,
+        active: false,
+        user_id: nil
+      }
+    end
 
+    context "logged in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "creates a pending membership" do
+        expect {
+          post base_url, params: create_params
+        }.to change(StripeSubscription, :count).by 1
+        expect(Membership.count).to eq 0
+        stripe_subscription = StripeSubscription.last
+        expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
+      end
     end
   end
 end

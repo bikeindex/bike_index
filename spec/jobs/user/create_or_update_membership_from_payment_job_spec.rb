@@ -10,7 +10,7 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
 
   let(:new_attrs) do
     { user_id: user.id, start_at: Time.current, end_at: Time.current + 3.month,
-      creator_id:, kind: "basic", status: "active_status" }
+      creator_id:, kind: "basic", status: "status_active" }
   end
   it "creates a membership" do
     expect(payment.reload.membership_id).to be_blank
@@ -57,11 +57,11 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
     let(:new_end_at) { end_at + 3.months }
     let(:updated_attrs) do
       { user_id: user.id, start_at:, end_at: end_at + 3.months,
-        creator_id: membership.creator_id, kind: "plus", status: "active_status" }
+        creator_id: membership.creator_id, kind: "plus", status: "status_active" }
     end
     it "extends the membership" do
       expect(membership.reload.creator_id).to_not eq creator_id
-      expect(membership.status).to eq "active_status"
+      expect(membership.status).to eq "status_active"
       expect(payment.reload.membership_id).to be_blank
       expect(payment.kind).to eq "donation"
       expect {
@@ -77,7 +77,7 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
       let(:end_at) { Time.current - 1.day }
       it "creates a new membership from today" do
         expect(membership.reload.creator_id).to_not eq creator_id
-        expect(membership.status).to eq "ended_status"
+        expect(membership.status).to eq "status_ended"
         expect {
           instance.perform(payment.id, creator_id)
         }.to change(Membership, :count).by(1)

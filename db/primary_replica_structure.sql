@@ -3117,7 +3117,7 @@ CREATE TABLE public.stripe_prices (
     currency_enum integer,
     amount_cents integer,
     live boolean DEFAULT false,
-    active boolean DEFAULT true,
+    active boolean DEFAULT false,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

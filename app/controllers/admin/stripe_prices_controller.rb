@@ -14,7 +14,7 @@ class Admin::StripePricesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at membership_kind amount_cents currency interval]
+    %w[created_at membership_kind amount_cents currency_enum interval]
   end
 
   def matching_stripe_prices

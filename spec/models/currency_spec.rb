@@ -52,4 +52,13 @@ RSpec.describe Currency, type: :model do
       expect(Currency.new("€")).to have_attributes(target)
     end
   end
+
+  describe "select_option" do
+    let(:instance) { Currency.new(:cad) }
+    let(:target) { "$ (CAD)" }
+    it "returns target" do
+      expect(instance.select_option).to eq target
+      expect(described_class.select_options).to include([target, instance.slug.to_s])
+    end
+  end
 end

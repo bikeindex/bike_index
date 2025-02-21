@@ -5,7 +5,7 @@
 # Table name: stripe_prices
 #
 #  id              :bigint           not null, primary key
-#  active          :boolean          default(TRUE)
+#  active          :boolean          default(FALSE)
 #  amount_cents    :integer
 #  currency_enum   :integer
 #  interval        :integer

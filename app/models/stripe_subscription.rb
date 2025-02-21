@@ -29,14 +29,14 @@ class StripeSubscription < ApplicationRecord
   has_many :payments
   has_many :stripe_events, foreign_key: "stripe_subscription_stripe_id", primary_key: "stripe_id"
 
-  delegate :membership_kind, to: :stripe_price, allow_nil: true
+  delegate :membership_kind, :currency_enum, to: :stripe_price, allow_nil: true
 
   def update_membership!
     return unless active?
 
-    end_active_user_admin_membership! if active? && user.membership_active&.admin_managed?
+    end_active_user_admin_membership! if active? && user&.membership_active&.admin_managed?
 
-    membership ||= user.membership_active || Membership.new(user_id:)
+    membership ||= user&.membership_active || Membership.new(user_id:)
     membership.update!(start_at:, end_at:, kind: membership_kind)
     update(membership_id: membership.id) if membership_id != membership.id
     membership

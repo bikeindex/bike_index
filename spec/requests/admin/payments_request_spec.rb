@@ -65,7 +65,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
         expect(invoice.reload.updated_at).to be_within(1.second).of Time.current
       end
       context "assign_to_membership" do
-        let(:target_attrs) { {creator_id: current_user.id, status: "active_status"} }
+        let(:target_attrs) { {creator_id: current_user.id, status: "status_active"} }
         it "assigns to membership" do
           expect(subject.reload.can_assign_to_membership?).to be_truthy
           expect do

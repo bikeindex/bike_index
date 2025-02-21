@@ -22,7 +22,7 @@ class Membership < ApplicationRecord
   include ActivePeriodable
 
   KIND_ENUM = {basic: 0, plus: 1, patron: 2}
-  STATUS_ENUM = {pending_status: 0, active_status: 1, ended_status: 2}
+  STATUS_ENUM = {status_pending: 0, status_active: 1, status_ended: 2}
 
   belongs_to :user
   belongs_to :creator, class_name: "User"
@@ -93,11 +93,11 @@ class Membership < ApplicationRecord
 
   def calculated_status
     if start_at.blank? || start_at > Time.current + 1.minute
-      "pending_status"
+      "status_pending"
     elsif end_at.present? && end_at < Time.current
-      "ended_status"
+      "status_ended"
     else
-      "active_status"
+      "status_active"
     end
   end
 

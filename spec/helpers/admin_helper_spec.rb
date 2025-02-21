@@ -108,7 +108,7 @@ RSpec.describe AdminHelper, type: :helper do
       let(:target) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Member\">M</span></span>" }
       let(:target_full_text) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Member\">M</span><span class=\"less-strong\">ember</span></span>" }
       it "returns member" do
-        expect(membership.reload.status).to eq "active_status"
+        expect(membership.reload.status).to eq "status_active"
         expect(user.donor?).to be_falsey
         expect(user_icon_hash(user)).to eq({tags: %i[member]})
         expect(user_icon(user)).to eq target
@@ -117,7 +117,7 @@ RSpec.describe AdminHelper, type: :helper do
       context "membership ended" do
         let(:end_at) { Time.current - 1.hour }
         it "doesn't return member" do
-          expect(membership.reload.status).to eq "ended_status"
+          expect(membership.reload.status).to eq "status_ended"
           expect(user_icon_hash(user)).to eq({tags: []})
           expect(user_icon(user)).to be_blank
         end

@@ -9,7 +9,7 @@ RSpec.describe Membership, type: :model do
       expect(membership).to be_valid
       expect(membership.stripe_managed?).to be_falsey
       expect(membership.active?).to be_truthy
-      expect(membership.status).to eq "active_status"
+      expect(membership.status).to eq "status_active"
     end
     context "stripe_managed" do
       let(:membership) { FactoryBot.create(:membership_stripe_managed) }
@@ -26,7 +26,7 @@ RSpec.describe Membership, type: :model do
         expect(membership.reload.user_id).to eq payment.user_id
         expect(membership.payments.count).to eq 1
         expect(membership.stripe_managed?).to be_falsey
-        expect(membership.status).to eq "active_status"
+        expect(membership.status).to eq "status_active"
 
         expect(payment.reload.kind).to eq "membership_donation"
       end

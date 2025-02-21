@@ -8,11 +8,13 @@
       %th
         = sortable "amount_cents", "Amount", render_sortable: render_sortable
       %th
-        = sortable "currency", render_sortable: render_sortable
+        = sortable "currency_enum", "Currency", render_sortable: render_sortable
       %th
         = sortable "interval", render_sortable: render_sortable
       %th Test?
       %th Active?
+      %th
+        %small Stripe ID
     %tbody
       - collection.each do |stripe_price|
         %tr
@@ -27,10 +29,12 @@
           %td
             = stripe_price.amount_formatted
           %td
-            = stripe_price.currency
+            = stripe_price.currency_name
           %td
             = stripe_price.interval
           %td
             = check_mark if stripe_price.test?
           %td
             = check_mark if stripe_price.active?
+          %td
+            %code.small= stripe_price.stripe_id
