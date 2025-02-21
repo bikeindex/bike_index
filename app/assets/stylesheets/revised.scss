@@ -1,9 +1,5 @@
-/*
- * Revised manifest file
- * things from rails-assets
- *= require select2
- *= require selectize/selectize.bootstrap3
- */
+@import 'legacy_includes/select2';
+@import 'legacy_includes/selectize.bootstrap3';
 
 /*!
  * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
