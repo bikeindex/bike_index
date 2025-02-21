@@ -82,7 +82,6 @@ gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
-gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 
 # Secure things
@@ -90,7 +89,6 @@ gem "rack-throttle" # Rate limiting
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
-gem "jquery-rails" # Javascript framework?
 gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
 gem "coffee-rails"
@@ -116,22 +114,6 @@ gem "pghero" # PG Info
 
 gem "responders"
 gem "thor"
-
-source "https://rails-assets.org" do # JS land is crazy, so lock everything
-  gem "rails-assets-jquery", "~> 3.4.1"
-  gem "rails-assets-jquery.dirtyforms", "~> 2.0.0" # Alert on attempts to leave with dirt on forms
-  gem "rails-assets-lodash", "~> 4.9.0"
-  gem "rails-assets-mailcheck", "~> 1.1.2" # Check for common email errors
-  gem "rails-assets-moment", "~> 2.18.1" # Javascript Time - localizing :)
-  gem "rails-assets-moment-timezone", "~> 0.5.13" # Timezones for moment
-  gem "rails-assets-mustache", "~> 2.2.1"
-  gem "rails-assets-select2", "~> 4.0.3" # Use select2 for a few things, it's a bit better sometimes
-  gem "rails-assets-selectize", "~> 0.12.1" # Manually configured scss
-  gem "rails-assets-Stickyfill", "~> 1.1.3" # Affix bike edit menu
-  gem "rails-assets-waypoints", "~> 3.1.1" # For documentation pages
-  # Sortable breaks assets:precompile, so it's included manually
-  # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
-end
 
 group :production do
   gem "skylight" # Performance monitoring

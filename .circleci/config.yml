@@ -148,7 +148,6 @@ jobs:
           name: "Assets: cache save"
           key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-            - .sass-cache
             - public/assets
             - public/packs
             - public/packs-test
