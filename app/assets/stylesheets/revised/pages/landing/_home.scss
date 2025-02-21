@@ -121,35 +121,35 @@
 }
 
 .bg-image-bike-hero {
-  background-image: image-url("landing_pages/header_bg_root-full.jpg");
+  background-image: url("landing_pages/header_bg_root-full.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-shops {
-  background-image: image-url("landing_pages/bike-shop.jpg");
+  background-image: url("landing_pages/bike-shop.jpg");
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-cities {
-  background-image: image-url("landing_pages/cities.jpg");
+  background-image: url("landing_pages/cities.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-schools {
-  background-image: image-url("landing_pages/schools.jpg");
+  background-image: url("landing_pages/schools.jpg");
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-groups {
-  background-image: image-url("landing_pages/groups.jpg");
+  background-image: url("landing_pages/groups.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -180,13 +180,13 @@
 // TODO: Optimize images
 @media screen and (min-device-width: 1000px) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/header_bg_root-full.jpg");
+    background-image: url("landing_pages/header_bg_root-full.jpg");
   }
 }
 
 @media screen and (min-device-width: 1000px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/header_bg_root-full.jpg");
+    background-image: url("landing_pages/header_bg_root-full.jpg");
   }
 }
 
@@ -533,7 +533,7 @@
 }
 
 .root-by-the-numbers {
-  background-image: image-url("landing_pages/bike_pattern_bg.png");
+  background-image: url("landing_pages/bike_pattern_bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
