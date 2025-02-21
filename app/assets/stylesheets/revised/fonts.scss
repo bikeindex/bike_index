@@ -188,6 +188,14 @@ $btn-font-size: 15px;
       text-decoration: none;
     }
   }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: $body-font-family;
+    font-weight: $normal-font-weight;
+  }
 }
 
 // Stop fucking prefixing. - textarea[placeholder], input[placeholder]
