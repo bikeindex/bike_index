@@ -1,0 +1,181 @@
+.parking-notification-email-preview {
+  width: 100%;
+  max-width: 700px;
+  margin: 30px auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #e6e6e6;
+  iframe {
+    min-height: 800px;
+    width: 100%;
+    border: none;
+  }
+}
+
+.parking-notification-show-image {
+  width: 100%;
+  position: relative;
+  a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  img {
+    display: block;
+    height: auto;
+    width: auto;
+    max-height: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+.organized-records {
+  #map {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 12px;
+  }
+
+  // table rows are rendered when you click on a point on the map too - only show the map link when on the table
+  .map-cell {
+    display: none;
+  }
+
+  .parking-notifications-table {
+    .map-cell {
+      display: table-cell;
+      padding: 0;
+      text-align: center;
+
+      a {
+        color: $gray-light;
+        cursor: pointer;
+        display: block;
+        padding: 0.3rem;
+
+        &:hover,
+        &:active {
+          color: $link-color;
+        }
+      }
+    }
+  }
+
+  #placeSearch {
+    max-width: 60%;
+    display: none;
+    position: absolute;
+
+    &.searchOnMap {
+      display: block;
+    }
+
+    @include media-breakpoint-down(md) {
+      max-width: 50%;
+    }
+
+    box-shadow: 0 0 4px rgba(black, 0.1);
+    margin: 9px 9px 0 0;
+    border-radius: 1px;
+    padding: 0.6rem;
+  }
+}
+
+// Wherever this table is, it has multiple lines and looks stupid with line-height 2
+.parking-notifications-table td {
+  line-height: 1.5em;
+}
+
+#parking-notification-nav-links {
+  li {
+    display: inline-block;
+  }
+  // the status dropdown has big phrases in it - manage it
+  // This is probably something broken in bootstrap 4alpha - but it overflows the screen
+  // Fix it here
+  @include media-breakpoint-down(md) {
+    .parking-notification-status-li {
+      position: relative;
+      width: 100%;
+      .dropdown-toggle {
+        display: block;
+        small {
+          display: block; // break line for small screens
+        }
+      }
+      .dropdown-menu a {
+        width: 98%;
+        white-space: normal;
+        line-height: 1;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}
+
+// We don't want to display extended-col-info except on the main table, when the screen is small
+.extended-col-info {
+  &,
+  &.d-block {
+    display: none !important;
+  }
+}
+// For small tables, we want to just have two cells, so that it isn't too wide for the page
+// This is outside of the above scope because it is also shown on non-organized pages
+@include media-breakpoint-down(md) {
+  // For small tables, we want to make the line-height not stupid for the expanded cell
+  .parking-notifications-table td {
+    line-height: 1.25;
+  }
+
+  .extended-col-info {
+    display: inline !important;
+    &.d-block {
+      display: block !important;
+    }
+    &.d-inline-block {
+      display: inline-block !important;
+    }
+  }
+
+  .msgbikelink {
+    display: block !important;
+  }
+
+  .hidden-sm-cells {
+    display: none !important;
+  }
+}
+
+.new-unregistered-btn-wrap {
+  text-align: right;
+  margin-bottom: 24px;
+  .btn {
+    max-width: 100%;
+    white-space: break-spaces;
+  }
+}
+
+.map-wrapper {
+  position: relative;
+
+  #redo-search-in-map {
+    border-top-right-radius: 4px;
+    background: rgba(black, 0.7);
+    line-height: 1;
+    padding: 0.3rem 0.4rem 0.3rem;
+    box-shadow: 0 0 2px rgba(black, 0.1);
+    color: #fff;
+    position: absolute;
+    bottom: 0rem;
+    left: 0rem;
+    transition-duration: 0.3s;
+    &:hover {
+      background: rgba(black, 0.95);
+    }
+  }
+}

@@ -1,0 +1,187 @@
+$payments-page-breakpoint: "sm";
+
+.payments-layout-body {
+  height: 100%;
+
+  // set in coffeescript to ensure no black bar
+  @include media-breakpoint-up($payments-page-breakpoint) {
+    background: url("revised/donate_bg.jpg");
+    background-size: cover;
+    background-position: center center;
+    padding-top: 36px;
+  }
+
+  @include media-breakpoint-down($payments-page-breakpoint) {
+    padding-top: 0;
+    background: none;
+
+    .payments-top-container {
+      padding-top: 2 * $vertical-height;
+      background: url("revised/donate_bg.jpg");
+      background-size: cover;
+      background-position: center center;
+    }
+  }
+
+  @include media-breakpoint-up("md") {
+    padding-bottom: $primary-footer-top-margin;
+  }
+
+  .payments-top-container {
+    padding-bottom: 3 * $vertical-height;
+  }
+
+  .payments-logo-line {
+    width: 100%;
+
+    a {
+      display: block;
+      width: 6 * $vertical-height;
+
+      @include media-breakpoint-up($payments-page-breakpoint) {
+        margin: 0 auto;
+      }
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  header.payments-header {
+    color: white;
+    text-align: center;
+
+    h1,
+    p {
+      color: inherit;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin: 27px 0 0;
+      line-height: 1;
+
+      @include media-breakpoint-down(sm) {
+        font-size: 36px;
+      }
+
+      @include media-breakpoint-down(xs) {
+        font-size: 28px;
+      }
+    }
+
+    p {
+      font-size: 24px;
+      line-height: 1.25;
+      margin: 8px 0 0;
+
+      span {
+        @include media-breakpoint-down("xs") {
+          display: block;
+        }
+      }
+    }
+  }
+}
+.donate-block {
+  background: $gray-darker;
+  text-align: center;
+  padding-bottom: 2 * $vertical-height;
+
+  // Force at least a little padding on the bottom
+  h3 {
+    font-size: 25px;
+    color: white;
+    margin: 0;
+    padding: (2 * $vertical-height) $half-gutter;
+  }
+
+  .select-amount {
+    background: #efefef;
+    width: 100%;
+    padding: $vertical-height $half-gutter (2 * $vertical-height);
+
+    @include media-breakpoint-down($payments-page-breakpoint) {
+      border-radius: 1px;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .amount-list {
+    @include list-unstyled;
+
+    li {
+      margin-top: 2 * $vertical-height;
+      // There is too much padding on xs screens, so remove it
+      @include media-breakpoint-down("sm") {
+        padding-left: 7.5px;
+        padding-right: 7.5px;
+      }
+    }
+
+    a,
+    .btn {
+      font-family: $header-font-family;
+      font-size: 18px;
+      display: block;
+      width: 100%;
+      border-radius: 0.25rem;
+    }
+
+    .active {
+      border-color: $blue;
+    }
+  }
+  .next-steps {
+    margin-top: 2 * $vertical-height;
+    .btn {
+      display: inline-block;
+      width: auto;
+    }
+  }
+
+  .nfp-info {
+    margin-bottom: -12px;
+    color: $less-strong-font-color;
+
+    a {
+      color: $less-strong-font-color;
+      text-decoration: underline;
+    }
+  }
+
+  @include media-breakpoint-down($payments-page-breakpoint) {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  @include media-breakpoint-up("md") {
+    padding-bottom: 0;
+    max-width: 525px;
+    border-radius: 1px;
+    margin: 0 auto;
+  }
+
+  // This is a modal popup donation form - it has slightly different styles
+  &.modal-content {
+    background: none;
+    padding: 0 !important;
+    border: 6px solid #3498db;
+
+    .modal-title-logo {
+      display: block;
+      margin: 0 auto;
+      width: 4rem;
+      height: auto;
+    }
+    .btn {
+      border-radius: 0.25rem;
+    }
+  }
+}

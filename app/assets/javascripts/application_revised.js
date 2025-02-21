@@ -1,26 +1,11 @@
 // require self
-//= require jquery2
-//= require jquery_ujs
-//= require lodash
-//= require external_scripts/bootstrap
-//= require jquery.dirtyforms
-//= require jquery.dirtyforms/plugins/jquery.dirtyforms.dialogs.bootstrap.min.js
-//= require mustache
-//= require Stickyfill
-//= require select2/select2.full.js
-//= require selectize/standalone/selectize.js
+//= require external_scripts/application_revised_dependencies.js
+//= require external_scripts/bootstrap.js
 //= require external_scripts/selectize_placeholder_plugin.js
-//= require external_scripts/headroom
-//= require external_scripts/jQuery.headroom
-//= require mailcheck
-//= require moment
-//= require moment-timezone
-//= require external_scripts/zoom.js
-//= require chartkick
-//= require Chart.bundle
+//= require external_scripts/headroom.js
+//= require external_scripts/jQuery.headroom.js
 
 // Legacy carousel. Used on homepage.
-// Can use if we need a carousel, though would be nice to use rails-assets version instead
 //= require external_scripts/slick.js
 
 // Translations
@@ -35,5 +20,5 @@
 //= require external_scripts/time_parser-coffeeimport.js
 
 // Our actual scripts:
-//= require init
+//= require revised/init
 //= require_tree ./revised

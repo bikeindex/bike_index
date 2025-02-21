@@ -1,0 +1,528 @@
+// Padding to deal with header nav.
+// Also set in the landing/organizations scss
+body,
+.organized-left-menu {
+  padding-top: 8 * $vertical-height;
+}
+
+@media (min-width: $grid-breakpoint-lg) {
+  body,
+  .organized-left-menu {
+    padding-top: 12 * $vertical-height;
+  }
+}
+
+$primary-logo-fullsize-height: 84px;
+$primary-logo-padding: 0.5 * $vertical-height;
+$primary-logo-padding-mobile: $vertical-height;
+$mainmenu-transform-speed: 200ms;
+$mainmenu-width: 80%;
+$mainmenu-open-zindex: 10;
+
+// Header nav
+.primary-header-nav {
+  background: $primary-nav-background;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: $zindex-navbar-fixed;
+  ul {
+    list-style-type: none;
+  }
+
+  .primary-logo {
+    position: relative;
+    float: left;
+    padding: $primary-logo-padding 0;
+
+    img {
+      display: block;
+      height: 44px;
+      width: auto;
+    }
+  }
+
+  .primary-main-menu {
+    @include list-unstyled;
+
+    margin: 0;
+    display: block;
+  }
+
+  .primary-nav-item {
+    display: block;
+    margin: 0;
+
+    a {
+      @extend h4;
+
+      margin: 0;
+      cursor: pointer;
+      color: $primary-nav-text-color;
+      display: block;
+      transition: color 0.05s linear;
+
+      &:hover,
+      &:active,
+      &.active {
+        color: #fff;
+      }
+    }
+  }
+
+  .divider-nav-item,
+  .nonprofit-subtitle {
+    display: none;
+  }
+
+  .primary-submenu .divider-nav-item,
+  .current-organization-submenu .divider-nav-item {
+    display: block;
+    width: 94%;
+    margin: 6px auto;
+    border-top: 1px solid #666;
+  }
+
+  .hamburgler {
+    font-family: courier;
+  }
+
+  .primary-nav-item .settings-link {
+    display: none;
+  }
+
+  // Current org nav and dropdown
+  .current-organization-nav-item {
+    float: left;
+    display: block;
+    margin: 0 0 0 16px;
+    padding: $vertical-height 24px 0;
+    transition: padding $mainmenu-transform-speed linear;
+
+    a {
+      @extend .header-font;
+
+      color: #fff;
+      font-size: 12px;
+      line-height: 18px;
+      cursor: pointer;
+      display: block;
+      padding: 8px 15px;
+
+      &:hover,
+      &:active,
+      &.active {
+        color: #fff;
+
+        .caret-down {
+          color: #fff;
+        }
+      }
+    }
+
+    .caret-down {
+      color: darken($primary-nav-text-color, 10%);
+      display: inline-block;
+      font-size: 90%;
+      font-weight: 800;
+      margin-left: 0.2rem;
+    }
+  }
+
+  &.headroom--pinned .current-organization-nav-item,
+  &.headroom--unpinned .current-organization-nav-item {
+    padding: $vertical-height 24px 0;
+
+    a.active::after {
+      bottom: 0;
+    }
+  }
+
+  .open > .current-organization-submenu {
+    display: block;
+    z-index: 10000; // Override to fix issues with safari not opening links
+  }
+
+  .current-organization-submenu {
+    position: absolute;
+    top: 100%;
+    display: none;
+    min-width: 400px;
+    padding: 5px 0;
+    margin: 0;
+    font-size: 1rem;
+    text-align: left;
+    background-color: #222222;
+    background-clip: padding-box;
+    border: 1px solid rgba($gray, 0.3);
+    border-radius: $border-radius;
+    z-index: 1;
+
+    li {
+      font-size: 80%;
+    }
+    .nav-link.secondary-item {
+      padding-left: 30px;
+      &:before {
+        content: "-";
+        display: block;
+        height: 0;
+        width: 15px;
+        left: 15px;
+        position: absolute;
+      }
+    }
+  }
+
+  // If it overflows, hide the extra text. Explicit width is set in coffeescript
+  #passive_organization_submenu {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .current-organization-submenu a,
+  .primary-submenu a {
+    font-family: $body-font-family;
+    color: $primary-nav-text-color;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 15px;
+    text-transform: none;
+
+    &:hover,
+    &:active,
+    &.active {
+      color: #fff;
+      text-decoration: none;
+    }
+  }
+}
+
+//
+// Small Screen Styles
+@media (max-width: $grid-breakpoint-lg - 1px) {
+  .primary-header-nav {
+    transition: transform $mainmenu-transform-speed linear;
+
+    &.headroom--pinned {
+      transform: translate(0, 0%);
+    }
+
+    &.headroom--unpinned {
+      transform: translate(0, -100%);
+    }
+
+    .primary-logo {
+      padding: $primary-logo-padding-mobile 0;
+    }
+
+    .hamburgler {
+      float: right;
+      position: relative;
+      transition: padding $mainmenu-transform-speed linear;
+      padding: (1.5 * $vertical-height) 0;
+      z-index: $mainmenu-open-zindex + 3;
+      background-color: $black-off;
+
+      a {
+        font-size: 36px;
+        display: block;
+        cursor: pointer;
+        color: $gray;
+        background: $primary-nav-background;
+        transition: transform 100ms linear;
+
+        &:hover {
+          color: #fff;
+          text-decoration: none;
+        }
+
+        &:active {
+        }
+
+        &:active,
+        &.active {
+          color: #fff;
+          text-decoration: none;
+        }
+
+        &:active,
+        &.active:active {
+          transform: rotate(45deg);
+        }
+
+        &.active {
+          transform: rotate(90deg);
+        }
+      }
+    }
+
+    .primary-main-menu {
+      display: none;
+      background: $primary-nav-background;
+      position: fixed;
+      right: 0;
+      top: 4 * $vertical-height;
+      transform: translate(100%, 0);
+      width: $mainmenu-width;
+      height: 100%;
+      transition: transform $mainmenu-transform-speed linear;
+      z-index: $mainmenu-open-zindex;
+      overflow-y: auto;
+      padding: (2 * $vertical-height) 0 100px;
+    }
+
+    .primary-nav-item {
+      a.primary-nav-link-with-submenu {
+        // headers of lists aren't links on small screens
+        cursor: default;
+
+        &:hover,
+        &:active {
+          background: $primary-nav-background;
+          color: $primary-nav-text-color;
+        }
+      }
+
+      a {
+        padding: $vertical-height (2 * $vertical-height);
+
+        &:active,
+        &.active {
+          background: $gray-light;
+          text-decoration: none;
+        }
+      }
+    }
+
+    .divider-nav-item {
+      display: block;
+      width: 94%;
+      margin: 6px auto;
+      border-top: 1px solid #666;
+    }
+
+    .primary-submenu {
+      padding-left: 0;
+    }
+
+    #menu-opened-backdrop {
+      display: none;
+      position: fixed;
+      top: 5 * $vertical-height;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: none;
+      z-index: $mainmenu-open-zindex - 1;
+    }
+  }
+
+  // So that mobile browsers don't show it all the time, like assholes
+  .primary-header-nav.enabled .primary-main-menu {
+    display: block;
+  }
+
+  //
+  // Mobile menu visible
+  body.menu-in {
+    overflow: hidden;
+
+    .current-organization-nav-item {
+      display: none;
+    }
+  }
+
+  .current-organization-nav-item {
+    // Somehow, makes things lineup more
+    padding-top: (2px + $vertical-height) !important;
+  }
+
+  .primary-header-nav.menu-in {
+    #menu-opened-backdrop {
+      display: block;
+    }
+
+    .hamburgler {
+      padding-right: $mainmenu-width - 5%;
+      padding-left: 10%; // Ensure we cover the links when scrolling
+    }
+
+    .primary-main-menu {
+      transform: translate(0%, 0);
+    }
+  }
+}
+
+@media (max-width: $grid-breakpoint-sm) {
+  .primary-header-nav.menu-in .hamburgler {
+    padding-right: 50%; // Don't break line on small screens
+  }
+}
+
+//
+// Large screen styles
+@media (min-width: $grid-breakpoint-lg) {
+  .primary-header-nav {
+    &.headroom--pinned,
+    &.headroom--unpinned {
+      .primary-logo img {
+        height: 48px;
+      }
+
+      .primary-nav-item {
+        padding: $vertical-height 0 0;
+
+        a.active::after {
+          bottom: 0;
+        }
+      }
+    }
+
+    .primary-logo img {
+      transition: height $mainmenu-transform-speed linear;
+    }
+
+    .hamburgler {
+      display: none;
+    }
+
+    .primary-nav-item {
+      float: right;
+      position: relative;
+      transition: padding $mainmenu-transform-speed linear;
+
+      a {
+        padding: 8px (0.5 * $grid-gutter-width);
+
+        &.active,
+        &:active {
+          text-decoration: none;
+        }
+      }
+
+      // Only apply to primary nav items, not submenus
+      & > a.active::after {
+        transition: bottom $mainmenu-transform-speed linear;
+        content: "";
+        position: absolute;
+        left: 50%;
+        height: 2px;
+        width: 24%;
+        margin-left: -12%;
+        background: $blue;
+      }
+
+      // On large screens, the signup link is a button
+      .signup-link {
+        border-radius: 4px;
+        border: 1px solid $link-color;
+        color: white;
+        transition: background 0.05s linear;
+
+        &:hover {
+          background: rgba(white, 0.1);
+          color: $primary-nav-text-color;
+        }
+
+        &.active::after {
+          display: none;
+        }
+      }
+
+      .settings-link {
+        display: block;
+        padding-top: 0.5 * $vertical-height;
+        padding-bottom: 0.5 * $vertical-height;
+
+        svg {
+          display: block;
+          height: 2 * $vertical-height;
+          width: auto;
+        }
+      }
+    }
+  }
+
+  .open > .primary-submenu {
+    display: block;
+    z-index: 10000; // Override to fix issues with safari not opening links
+  }
+
+  .primary-submenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    float: left;
+    min-width: 400px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    font-size: 1rem;
+    text-align: left;
+    background-color: $primary-nav-background;
+    background-clip: padding-box;
+    border: 1px solid rgba($gray, 0.3);
+    border-radius: $border-radius;
+    z-index: 1;
+
+    li {
+      font-size: 80%;
+    }
+  }
+
+  // To prevent flashing on initial load, before JS arrives
+  .primary-header-nav,
+  .primary-header-nav.headroom--top,
+  .primary-header-nav.headroom--top.headroom--pinned {
+    .primary-logo img {
+      height: $primary-logo-fullsize-height - 2 * $primary-logo-padding;
+    }
+
+    .current-organization-nav-item,
+    .primary-nav-item {
+      // nav-items are 34px tall.
+      padding: (0.5 * ($primary-logo-fullsize-height - 34px)) 0
+        (2 * $vertical-height);
+
+      a.active::after {
+        bottom: 2 * $vertical-height;
+      }
+    }
+  }
+}
+
+// Only display nonprofit subtitle on xtra large screens
+@media (min-width: $grid-breakpoint-xl) {
+  .primary-header-nav {
+    .nonprofit-subtitle {
+      display: block;
+      float: left;
+      padding: 0 6px;
+      border-left: 1px solid #3498db;
+      color: #d8d8d8;
+      line-height: 1.15;
+      font-size: 12px;
+      font-family: "Open Sans";
+      font-style: italic;
+      text-decoration: none;
+      margin: 11px $vertical-height 0 $vertical-height;
+      transition: margin $mainmenu-transform-speed linear;
+      width: 100px;
+    }
+
+    &.headroom--pinned .nonprofit-subtitle,
+    &.headroom--unpinned .nonprofit-subtitle {
+      margin-top: 11px;
+    }
+
+    // To prevent moving on initial load, before JS arrives
+    .nonprofit-subtitle,
+    &.headroom--top.headroom--pinned .nonprofit-subtitle,
+    &.headroom--top .nonprofit-subtitle {
+      margin-top: 18px;
+    }
+  }
+}
