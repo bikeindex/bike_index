@@ -7,7 +7,9 @@ class MembershipsController < ApplicationController
   end
 
   def create
-    pp permitted_create_parameters
+    pp stripe_price_parameters
+    stripe_price = StripePrice.where(stripe_price_parameters).first
+    pp stripe_price, "----"
   end
 
   # def success
@@ -39,9 +41,14 @@ class MembershipsController < ApplicationController
     !amount_cents.to_i.between?(1, 99_999_999)
   end
 
-  def permitted_create_parameters
-    params.require(:membership)
-      .permit(:kind, :interval)
-      .merge(user_id: current_user&.id)
+  def stripe_price_parameters
+    mem_params = params.require(:membership).permit(:kind, :set_interval)
+    currency_enum = (Currency.new(params.permit(:currency)[:currency]) || Currency.default).slug
+
+    {
+      membership_kind: mem_params[:kind],
+      interval: mem_params[:set_interval],
+      currency_enum:
+    }
   end
 end

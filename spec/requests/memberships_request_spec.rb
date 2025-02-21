@@ -21,6 +21,9 @@ RSpec.describe MembershipsController, type: :request do
         expect(response).to render_template("new")
         expect(flash).to_not be_present
       end
+      context "user has an active membership" do
+        it "redirects to edit"
+      end
     end
   end
 
@@ -28,9 +31,8 @@ RSpec.describe MembershipsController, type: :request do
     let!(:stripe_price) { FactoryBot.create(:stripe_price_basic) }
     let(:create_params) do
       {
-        set_interval: "monthly",
-        currency_enum: "usd",
-        kind: "basic"
+        currency: "usd",
+        membership: {set_interval: "monthly",kind: "basic"}
       }
     end
     # let(:target_membership) do
@@ -50,7 +52,6 @@ RSpec.describe MembershipsController, type: :request do
         interval: "monthly",
         start_at: nil,
         end_at: nil,
-        active: false,
         user_id: nil
       }
     end
@@ -58,13 +59,21 @@ RSpec.describe MembershipsController, type: :request do
     context "logged in" do
       include_context :request_spec_logged_in_as_user
 
-      it "creates a pending membership" do
+      it "creates a stripe_subscription" do
         expect {
           post base_url, params: create_params
+          expect(response).to redirect_to "xxxx"
         }.to change(StripeSubscription, :count).by 1
         expect(Membership.count).to eq 0
         stripe_subscription = StripeSubscription.last
         expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
+      end
+
+      context "with invalid currency" do
+        let(:modified_params) { create_params.merge(currency: "xxx") }
+
+        it "creates a stripe_subscription" do
+        end
       end
     end
   end

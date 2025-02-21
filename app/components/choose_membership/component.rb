@@ -28,7 +28,7 @@ module ChooseMembership
       end
     end
 
-
+    # TODO: Actually use membership kinds
     def membership_kinds
       Membership.kinds_ordered
     end
