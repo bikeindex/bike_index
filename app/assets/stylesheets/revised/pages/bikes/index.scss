@@ -1,0 +1,29 @@
+#bikes_index {
+  .no-exact-results {
+    color: $gray;
+    padding: (2 * $vertical-height) 0;
+  }
+
+  .no-exact-results,
+  .secondary-matches {
+    margin-top: 2rem;
+    text-align: center;
+  }
+}
+
+.bikes-searched {
+  margin-top: 2rem;
+}
+
+// Create a seperation between the containing and the rest
+.bikes-searched-search_serials_containing {
+  border: 2px solid #c2c2c2;
+}
+
+.bikes-searched .js-paginate {
+  text-align: center;
+  width: 100%;
+  a {
+    margin-left: 0.5rem;
+  }
+}

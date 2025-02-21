@@ -1,0 +1,178 @@
+.edit-bike-page-photos {
+  .edit-photo-display-list {
+    @include list-unstyled;
+
+    .edit-photo-display-wrap {
+      padding: (0.5 * $vertical-height) (0.5 * $vertical-height) 0;
+      min-height: 100px;
+      background: white;
+      border: 1px solid $form-well-border-color;
+
+      img,
+      .missing-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        min-height: 100px;
+        position: relative;
+        background: white;
+        z-index: 2;
+      }
+      .missing-image {
+        background: $gray-lighter;
+        text-align: center;
+        padding: 2rem 2px;
+        color: $gray-light;
+      }
+    }
+
+    .kind-select-wrap {
+      margin: 0 0 (0.5 * $vertical-height);
+      select {
+        padding: 0.5 * $vertical-height;
+        font-size: 90%;
+        height: auto;
+      }
+    }
+
+    .processing {
+      position: absolute;
+      left: 0;
+      top: 25%;
+      width: 100%;
+      text-align: center;
+      color: $gray-light;
+      z-index: 1;
+    }
+
+    .bottom-photo-edit-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+    }
+
+    label.keep-private {
+      display: flex;
+      -webkit-box-flex: 0;
+      flex: 0 0 75%;
+      min-width: 110px; // prevent breaking line
+      margin-bottom: 0;
+      padding-top: 0.75rem;
+
+      line-height: 1.25;
+      font-size: 11px;
+      color: $gray-light;
+      input {
+        margin-right: 0.2rem;
+      }
+    }
+
+    .remove-wrapper {
+      display: flex;
+      -webkit-box-flex: 0;
+      flex: 0 0 25%;
+      align-self: right;
+    }
+
+    .photo-remove {
+      display: block;
+      position: relative;
+      width: 100%;
+      text-align: center;
+      margin: 0.5 * $vertical-height (0.5 * $vertical-height) 0;
+
+      // make sure zindex sets it above the "processing" text - so you can click it
+      z-index: 100;
+
+      // Hovering anywhere on the link colors the trash-can-icon
+      &:hover,
+      &:active,
+      &.active {
+        .hover-colorize {
+          background-color: $link-color;
+        }
+      }
+    }
+    .trash-can-icon {
+      @include trash-can-icon(
+        $gray-light,
+        $link-color,
+        white,
+        2 * $vertical-height
+      );
+
+      display: inline-block;
+    }
+  }
+
+  .edit-photo-upload {
+    padding-top: 2 * $vertical-height;
+
+    label.file {
+      float: right;
+    }
+
+    .file-custom {
+      &::before {
+        content: "Upload Photos";
+        font-size: $btn-font-size;
+        font-family: $header-font-family;
+        font-weight: 400;
+        font-style: normal;
+        text-transform: uppercase;
+        color: white;
+        background: $green;
+        border-color: $green;
+      }
+    }
+  }
+
+  .edit-photo-display-list-item {
+    margin-top: $vertical-height;
+    position: relative;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: move;
+  }
+
+  // This class is unique to html5sortable for
+  // the placeholder that's shown while in motion
+  .placeholder {
+    @extend .edit-photo-display-list-item;
+
+    height: 280px;
+    border: 3px dashed #ccc;
+  }
+
+  // Actual item that is in the air, being dragged by you
+  .dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+    transform: rotate(-15deg);
+  }
+
+  .upload {
+    border: 1px solid $form-well-border-color;
+    border-radius: $border-radius;
+    background: white;
+    width: 80%;
+    margin: 10px 10% 0;
+    padding: $vertical-height (0.5 * $vertical-height);
+
+    .progress,
+    .alert-success {
+      margin-bottom: 0;
+    }
+
+    p {
+      @include textoverflow;
+
+      margin-bottom: 0.5 * $vertical-height;
+    }
+  }
+}

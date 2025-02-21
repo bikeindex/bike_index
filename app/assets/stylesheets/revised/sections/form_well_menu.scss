@@ -1,0 +1,183 @@
+$active-bike-edit-border-width: 2px;
+
+.primary-edit-form-well-menu {
+  z-index: 1;
+
+  ul {
+    display: none;
+
+    @include list-unstyled;
+
+    margin: 0;
+
+    li {
+      display: block;
+
+      &.edit-menu-alert {
+        a h4 {
+          color: $red;
+          font-weight: 700;
+        }
+      }
+
+      &.edit-menu-accessories {
+        border-bottom: 1px solid $gray-light;
+      }
+      &.edit-menu-stolen {
+        a h4 {
+          color: $red;
+        }
+        a:hover,
+        a:active,
+        a.active {
+          h4 {
+            color: darken($red, 15%);
+          }
+        }
+      }
+    }
+
+    a {
+      padding: $vertical-height 0;
+      display: block;
+      width: 100%;
+
+      h4 {
+        padding-left: 0.25em;
+        margin: 0;
+        border-left: $active-bike-edit-border-width solid transparent;
+      }
+
+      &:hover,
+      &:active,
+      &.active,
+      h4 {
+        text-decoration: none;
+      }
+
+      &:hover h4 {
+        color: $link-color;
+      }
+
+      &:active,
+      &.active {
+        h4 {
+          border-left: $active-bike-edit-border-width solid $blue;
+          font-weight: $strong-font-weight;
+          color: $header-font-nocolor;
+        }
+      }
+    }
+  }
+
+  .edit-form-well-submit-wrapper {
+    .btn {
+      font-size: 15px;
+      width: 100%;
+    }
+  }
+
+  .form-well-edit-page-select {
+    float: left;
+    width: 50%;
+
+    select {
+      width: 100%;
+      font-family: $header-font-family;
+      font-weight: $strong-font-weight;
+      color: $header-font-nocolor;
+      -webkit-appearance: none;
+      border-radius: 0;
+      border: none;
+      font-size: 15px;
+      line-height: 1em;
+      padding: 0.75em 1.75rem 0.55em 0.75em;
+    }
+  }
+
+  &.no-save-button {
+    .form-well-edit-page-select {
+      float: left;
+      width: 100%;
+    }
+    .edit-form-well-submit-wrapper {
+      display: none;
+    }
+  }
+}
+.mobile-nonfloating-menu {
+  display: none;
+  line-height: 1.5;
+  margin-top: 90px; // oof. Lots of top padding on the form well
+  a.active {
+    color: $body-font-color;
+  }
+}
+//
+// Small screen styles
+@media (max-width: $grid-breakpoint-md - 1px) {
+  .mobile-nonfloating-menu { display: block; }
+  // Menu fixed to bottom of the screen
+  .primary-edit-form-well-menu {
+    z-index: $zindex-navbar-fixed + 1;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 -1px 2px rgba(black, 0.2);
+    background: white;
+
+    .form-well-edit-page-select {
+      display: block;
+    }
+
+    .edit-form-well-submit-wrapper {
+      width: 50%;
+      float: left;
+
+      .btn {
+        border-radius: 0;
+        border: none;
+      }
+    }
+  }
+}
+
+//
+// Medium and up screen styles
+@media (min-width: $grid-breakpoint-md) {
+  .primary-edit-form-well-menu {
+    display: block;
+    float: left;
+    width: 33.33333%;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 8 * $vertical-height;
+
+    // Same as the padding top for body in primary_header_nav
+    ul {
+      display: block;
+    }
+
+    .edit-form-well-submit-wrapper {
+      padding-top: 1em;
+    }
+  }
+
+  // Hide with media query so as not to override selectize
+  .form-well-edit-page-select {
+    display: none;
+  }
+}
+
+// XL screens - smaller menu, offset it
+@media (min-width: $grid-breakpoint-xl) {
+  .primary-edit-form-well-menu {
+    // because we have to use floats instead of flex with sticky (affixing)
+    width: 25%;
+    margin-right: 8.3333%;
+
+    // 1 col margin - Manually set the offset via margin
+  }
+}

@@ -1,0 +1,142 @@
+.hot-sheet-recipient-emails {
+  padding: 0 !important;
+  ul {
+    max-height: 250px;
+    overflow-x: scroll;
+    margin-bottom: 0;
+    li:first-of-type {
+      margin-top: 0.5rem;
+    }
+    li:last-of-type {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.hot-sheet-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  li {
+    width: 100%;
+    margin: 2rem 0 0;
+  }
+  .bike-display {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+  }
+  .bike-image {
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%;
+    img {
+      width: 100%;
+      display: block;
+      margin: 0 auto;
+      height: auto;
+    }
+    &.placeholder {
+      background: #ddd;
+
+      a {
+        padding: $vertical-height 0;
+      }
+
+      img {
+        width: 70%;
+      }
+    }
+  }
+  .bike-info {
+    flex: 0 0 66.6666666666%;
+    max-width: 66.6666666666%;
+    padding: 0;
+  }
+  tr.bike-main-info td {
+    font-size: 100%;
+    text-align: left;
+    font-style: normal;
+  }
+}
+
+.recovered-alert {
+  background: $btn-success-bg;
+  padding: 0.5rem;
+  margin: 0 0 0.5rem;
+  h3 {
+    color: #fff;
+    margin: 0;
+    line-height: 1;
+    font-weight: bold;
+  }
+}
+
+.hot-sheet-current-title {
+  @extend .uncap;
+  font-size: 20px;
+  margin: 24px 0;
+  position: relative;
+
+  .sheet-day-text {
+    padding: 0 3rem;
+  }
+  .hot-sheet-day-link {
+    padding: 0.25rem;
+    font-size: 125%;
+    line-height: 1;
+    opacity: 0.8;
+    display: block;
+    position: absolute;
+    top: -0.5rem;
+    &:hover,
+    &:active,
+    &:focus,
+    &.active {
+      opacity: 1;
+    }
+    &.hot-sheet-day-next {
+      left: 0;
+    }
+    &.hot-sheet-day-previous {
+      right: 0;
+    }
+  }
+}
+
+// Basically like alert, but the text isn't colored by default
+.hot-sheet-notification-panel,
+.hot-sheet-notification-panel-warning {
+  @extend .alert;
+  margin-top: 30px;
+  h3,
+  h4 {
+    margin: 0 0 1rem;
+  }
+  h4 {
+    font-size: 16px;
+  }
+  form {
+    label {
+      margin-bottom: 0;
+      font-size: 14px;
+    }
+    .btn {
+      margin-left: 1rem;
+      font-size: 14px;
+    }
+  }
+}
+.hot-sheet-notification-panel {
+  border: 1px solid $brand-info;
+  h3,
+  h4 {
+    color: $brand-info;
+  }
+}
+.hot-sheet-notification-panel-warning {
+  border: 1px solid $brand-warning;
+  h3,
+  h4 {
+    color: $brand-warning;
+  }
+}
