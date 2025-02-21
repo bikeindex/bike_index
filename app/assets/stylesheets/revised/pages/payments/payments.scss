@@ -5,7 +5,7 @@ $payments-page-breakpoint: "sm";
 
   // set in coffeescript to ensure no black bar
   @include media-breakpoint-up($payments-page-breakpoint) {
-    background: image-url("revised/donate_bg.jpg");
+    background: url("revised/donate_bg.jpg");
     background-size: cover;
     background-position: center center;
     padding-top: 36px;
@@ -17,7 +17,7 @@ $payments-page-breakpoint: "sm";
 
     .payments-top-container {
       padding-top: 2 * $vertical-height;
-      background: image-url("revised/donate_bg.jpg");
+      background: url("revised/donate_bg.jpg");
       background-size: cover;
       background-position: center center;
     }

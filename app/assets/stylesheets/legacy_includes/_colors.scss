@@ -107,8 +107,8 @@ $btnDangerBorder: darken($red, 10%);
 //
 //________________________
 
-$searchBackground: image-url("/background-granite.jpg") repeat repeat;
-$searchBackgroundLight: image-url("/background-granite-light.jpg") repeat repeat;
+$searchBackground: url("/background-granite.jpg") repeat repeat;
+$searchBackgroundLight: url("/background-granite-light.jpg") repeat repeat;
 $searchBorder: darken(rgb(234, 234, 234), 5%);
 $searchBorderLight: #ebebeb;
 
@@ -117,6 +117,6 @@ $footerBackground: rgb(249, 249, 249);
 
 // $bodyBackground: url("/background-paper.jpg") repeat repeat;
 $bodyBackground: #fff;
-$stolenBackground: image-url("/background-stolen.jpg") repeat repeat;
+$stolenBackground: url("/background-stolen.jpg") repeat repeat;
 
 // Tint on about who page: #f0f5fa
