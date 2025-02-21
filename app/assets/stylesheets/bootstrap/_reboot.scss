@@ -312,20 +312,6 @@ address {
     outline: 5px auto -webkit-focus-ring-color;
   }
 
-  input,
-  button,
-  select,
-  textarea {
-    // Remove all `margin`s so our classes don't have to do it themselves.
-    margin: 0;
-    // Normalize includes `font: inherit;`, so `font-family`. `font-size`, etc are
-    // properly inherited. However, `line-height` isn't addressed there. Using this
-    // ensures we don't need to unnecessarily redeclare the global font stack.
-    line-height: inherit;
-    // iOS adds rounded borders by default
-    border-radius: 0;
-  }
-
   input[type="radio"],
   input[type="checkbox"] {
     // Apply a disabled cursor for radios and checkboxes.
