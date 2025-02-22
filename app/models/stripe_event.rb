@@ -16,6 +16,7 @@ class StripeEvent < ApplicationRecord
 
   def self.create_from(event)
     data = event['data']
+
     stripe_event = create(name: event['type'], stripe_id: data["object"]["id"])
     stripe_event.data = data
     stripe_event
@@ -30,26 +31,35 @@ class StripeEvent < ApplicationRecord
   end
 
   def data_object
-    data["object"] || {}
+    data["object"]
   end
 
   def known_event?
     KNOWN_EVENTS.include?(name)
   end
 
-  def checkout_id?
+  def checkout?
     name.match(/checkout/)
   end
 
-  def subscription_id?
+  def subscription?
     name.match(/subscription/)
   end
 
-  def stripe_subscription
-    if checkout_id?
-      StripeSubscription.find_or_create_from_stripe(stripe_checkout: data_object)
-    elsif subscription_id?
-      # StripeSubscription.find_or_create_from_stripe(stripe_subscription_obj: data_object)
+  def update_bike_index_record
+    # Currently, only handle on creation, when the data object is assigned.
+    raise "Stripe Data not assigned, unable to handle" unless @data.present?
+
+    if checkout?
+      if data_object.subscription.present?
+        update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
+      end
     end
+  end
+
+  private
+
+  def update_stripe_subscription(stripe_subscription_obj, stripe_checkout_session = nil)
+    StripeSubscription.find_or_create_from_stripe(stripe_subscription_obj:, stripe_checkout_session:)
   end
 end

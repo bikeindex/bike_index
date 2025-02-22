@@ -142,21 +142,24 @@ class Payment < ApplicationRecord
     self.referral_source = self.class.normalize_referral_source(referral_source)
   end
 
-  # Right now, this method is only good for updating unpaid payments to be paid, when stripe says they are paid
-  def update_from_stripe_checkout_session
-    return unless incomplete? && stripe_checkout_session.payment_status == "paid"
-    update(paid_at: Time.current, amount_cents: stripe_checkout_session.amount_total)
-    # Update email if we can
-    return unless stripe_customer.present?
-    update(email: stripe_customer.email)
-    if user.present? && user.stripe_id.blank?
-      user.update(stripe_id: stripe_customer.id)
+  def update_from_stripe_checkout_session!(stripe_obj = nil)
+    stripe_obj ||= stripe_checkout_session
+
+    self.amount_cents = stripe_obj.amount_total
+    # There isn't a paid_at timestamp in the stripe object
+    self.paid_at = Time.current if paid_at.blank? && stripe_obj.payment_status == "paid"
+    self.email ||= stripe_obj.customer_email if user.blank?
+    save!
+
+    if user.present? && user.stripe_id != stripe_obj.customer
+      user.update(stripe_id: stripe_obj.customer)
     end
-    true
+    self
   end
 
   def stripe_customer
     return nil unless stripe_checkout_session.present?
+
     @stripe_customer ||= stripe_checkout_session.customer.present? ? Stripe::Customer.retrieve(stripe_checkout_session.customer) : nil
   end
 
@@ -260,8 +263,6 @@ class Payment < ApplicationRecord
     end
   end
 
-
-  # TODO: check first if either of these is instantiated
   def stripe_email
     if @stripe_checkout_session.present?
       return @stripe_checkout_session.email

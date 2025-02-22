@@ -41,18 +41,11 @@ class StripeSubscription < ApplicationRecord
       stripe_subscription
     end
 
-    # Called from the webhook. But don't rely on data from webhook, in case it's stale. re-request it
-    def find_or_create_from_stripe(stripe_checkout: nil, stripe_subscription_obj: nil)
-      if stripe_subscription_obj.blank? && stripe_checkout.subscription.present?
-        stripe_subscription_obj = Stripe::Subscription.retrieve(stripe_checkout.subscription)
-      end
-      if stripe_subscription_obj.present?
-        stripe_subscription = find_by(stripe_id: stripe_subscription_obj.id) || new(stripe_id: stripe_subscription_obj.id)
-        stripe_subscription.update_from_stripe!(stripe_subscription_obj:)
-      end
-      # TODO: make stripe_checkout work too
-      if stripe_subscription.present? && stripe_checkout.present?
-        stripe_subscription.find_or_create_payment(stripe_checkout.id, email: stripe_checkout.customer_email)
+    def find_or_create_from_stripe(stripe_subscription_obj:, stripe_checkout_session: nil)
+      stripe_subscription = find_by(stripe_id: stripe_subscription_obj.id) || new(stripe_id: stripe_subscription_obj.id)
+      stripe_subscription.update_from_stripe_subscription!(stripe_subscription_obj)
+      if stripe_checkout_session.present?
+        stripe_subscription.find_or_create_payment(stripe_checkout_session)
       end
       stripe_subscription
     end
@@ -73,21 +66,26 @@ class StripeSubscription < ApplicationRecord
     membership
   end
 
-  def update_from_stripe!(stripe_subscription_obj: nil)
-    stripe_subscription_obj ||= fetch_stripe_subscription_obj
-    new_stripe_price_stripe_id = stripe_subscription_obj.plan&.id
+  def update_from_stripe_subscription!(stripe_obj = nil)
+    stripe_obj ||= fetch_stripe_subscription_obj
+    raise "Unable to find subscription" unless stripe_obj.present?
+
+    self.stripe_status = stripe_obj.status
+
+    new_stripe_price_stripe_id = stripe_obj.plan&.id
     self.stripe_price_stripe_id = new_stripe_price_stripe_id if new_stripe_price_stripe_id.present?
-    start_at_t = stripe_subscription_obj.start_date
+
+    start_at_t = stripe_obj.start_date
     self.start_at = Time.at(start_at_t) if start_at_t.present?
+
     # TODO: Verify this is what we want (not cancel_at, etc)
-    end_at_t = stripe_subscription_obj.ended_at
+    end_at_t = stripe_obj.ended_at
     self.end_at = Time.at(end_at_t) if end_at_t.present?
     save!
   end
 
-  # Might be pulling this from stripe sometime...
   def email
-    user&.email || payments.first.email
+    user&.email || payments.first&.email
   end
 
   def stripe_checkout_session_url
@@ -103,16 +101,19 @@ class StripeSubscription < ApplicationRecord
     @stripe_checkout_session_url = payment.stripe_checkout_session.url
   end
 
-  def find_or_create_payment(stripe_checkout_id, email:)
-    payments.find_by(stripe_id: stripe_checkout_id) ||
-      payments.create(payment_method: :stripe, currency_enum:, user_id:,
-        stripe_id: stripe_checkout_id, email:)
+  def find_or_create_payment(stripe_checkout_session)
+    payment = payments.find_by(stripe_id: stripe_checkout_session.id) ||
+      payments.build(payment_method: :stripe, currency_enum:, user_id:, stripe_id: stripe_checkout_session.id)
+
+    payment.update_from_stripe_checkout_session!(stripe_checkout_session)
   end
 
   private
 
   def fetch_stripe_subscription_obj
-    Stripe::Subscription.retrieve(stripe_id) if stripe_id.present?
+    return nil if stripe_id.blank?
+
+    @stripe_subscription_obj ||= Stripe::Subscription.retrieve(stripe_id)
   end
 
   def set_calculated_attributes

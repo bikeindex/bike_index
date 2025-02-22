@@ -18,14 +18,20 @@ FactoryBot.define do
     end
 
     factory :stripe_price_basic_yearly, traits: [:test_stripe_id] do
+      interval { "yearly" }
+      amount_cents { 4999 }
       stripe_id { "price_0Qs5rim0T0GBfX0vE7Q7cyoG" }
     end
 
     factory :stripe_price_plus, traits: [:test_stripe_id] do
+      membership_kind { "plus" }
+      amount_cents { 999 }
       stripe_id { "price_0Qs5s1m0T0GBfX0visCJi4lq" }
     end
 
     factory :stripe_price_patron, traits: [:test_stripe_id] do
+      membership_kind { "patron" }
+      amount_cents { 4999 }
       stripe_id { "price_0Qs5t7m0T0GBfX0vnALQrD8t" }
     end
   end

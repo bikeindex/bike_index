@@ -42,7 +42,7 @@ RSpec.describe MembershipsController, type: :request do
         membership_kind: "basic",
         interval: "monthly",
         start_at: nil,
-        stripe_status: "open",
+        stripe_status: nil,
         stripe_id: nil,
         end_at: nil,
         user_id: nil
@@ -60,7 +60,7 @@ RSpec.describe MembershipsController, type: :request do
           expect(Membership.count).to eq 0
           stripe_subscription = StripeSubscription.last
           expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
-          expect(stripe_subscription.stripe_subscription_id).to be_present
+          expect(stripe_subscription.payments.count).to eq 1
           expect(response).to redirect_to(/https:..checkout.stripe.com/)
         end
       end
@@ -71,6 +71,18 @@ RSpec.describe MembershipsController, type: :request do
         it "creates a stripe_subscription" do
         end
       end
+    end
+  end
+
+  describe "success" do
+    it "renders" do
+      get "#{base_url}/success"
+      expect(response.code).to eq("200")
+      expect(response).to render_template("success")
+      expect(flash).to_not be_present
+    end
+    context "with checkout id" do
+      it "updates the checkout"
     end
   end
 end

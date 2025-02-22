@@ -25,14 +25,13 @@ RSpec.describe WebhooksController, type: :request do
       )
     end
 
-    context "with checkout session completed" do
+    context "with subscription checkout session completed" do
       let(:target_stripe_subscription) do
         {
           user_id: nil,
           stripe_status: "active",
-          start_at: Time.current, # has to be updated when cass
-          end_at: nil,
-          email: "seth@bikeindex.org"
+          email: "seth@bikeindex.org",
+          end_at: nil
         }
       end
       it "processes the webhook successfully" do
@@ -49,11 +48,17 @@ RSpec.describe WebhooksController, type: :request do
           expect(stripe_event.name).to eq "checkout.session.completed"
           expect(stripe_event.stripe_id).to be_present
           stripe_subscription = StripeSubscription.last
+          expect(stripe_subscription.start_at).to be_within(1).of Time.at(1740173835) # has to be updated when cassette is updated
           expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription
           expect(stripe_subscription.stripe_id).to be_present
           expect(stripe_subscription.membership_id).to be_blank
+          expect(stripe_subscription.payments.count)
         end
       end
+    end
+
+    context "with a checkout session completed - not subscription" do
+      it "processes the webhook successfully"
     end
 
     context "with invalid signature" do
