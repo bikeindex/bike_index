@@ -4,26 +4,22 @@ module ActivePeriodable
   extend ActiveSupport::Concern
 
   included do
-    scope :active, -> { where(active: true) }
-    scope :inactive, -> { where(active: false) }
+    scope :period_started, -> { where("start_at < ?", Time.current) }
+    scope :period_active, -> {
+      period_started.where(end_at: nil).or(period_started.where("end_at > ?", Time.current))
+    }
+    scope :period_not_started, -> { where(start_at: nil).or(where("start_at > ?", Time.current)) }
+    scope :period_inactive, -> { period_not_started.or(where("end_at < ?", Time.current)) }
     scope :time_ordered, -> { reorder(:start_at) }
-
-    before_save :set_active
   end
 
-  def inactive?
-    !active?
-  end
-
-  def set_active
-    self.active = calculated_active?
-  end
-
-  private
-
-  def calculated_active?
-    return false if start_at.blank? || start_at > Time.current
+  def period_active?
+    return false unless start_at.present? && start_at < Time.current
 
     end_at.blank? || end_at > Time.current
+  end
+
+  def period_inactive?
+    !period_active?
   end
 end

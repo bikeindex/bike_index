@@ -72,14 +72,15 @@
     .col-md-4
       = render partial: "form"
   - elsif @membership.stripe_managed?
-    %em.small edit this membership on stripe
+    .col-md-4
+      %em.small edit this membership on stripe
 
-    %h4.mt-4
-      payments
-      %small
-        = link_to admin_number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
-        - if @payments.count > 25
-          %em (only first 25 shown)
+      %h4.mt-4
+        payments
+        %small
+          = link_to admin_number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
+          - if @payments.count > 25
+            %em (only first 25 shown)
     - if @payments.any?
       = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true}
 

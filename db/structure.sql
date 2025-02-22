@@ -1996,7 +1996,6 @@ CREATE TABLE public.memberships (
     status integer,
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
-    active boolean DEFAULT false,
     creator_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL

@@ -85,7 +85,7 @@ RSpec.describe StripeEvent, type: :model do
       context "with user matching email" do
         let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
         let(:target_membership) do
-          {kind: "plus", status: "status_active", user_id: user.id, end_at: nil, active: true}
+          {kind: "plus", status: "active", user_id: user.id, end_at: nil}
         end
 
         it "assigns things to the user and creates a membership" do
@@ -102,6 +102,7 @@ RSpec.describe StripeEvent, type: :model do
           expect(stripe_subscription.user_id).to eq user.id
           expect(stripe_subscription.membership_id).to be_present
           expect(payment.user_id).to eq user.id
+          expect(payment.membership_id).to eq stripe_subscription.membership_id
 
           membership = stripe_subscription.membership
           expect(membership).to match_hash_indifferently target_membership

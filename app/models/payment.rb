@@ -139,6 +139,7 @@ class Payment < ApplicationRecord
     end
     self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
     self.organization_id ||= invoice&.organization_id
+    self.membership_id ||= stripe_subscription&.membership_id
     self.referral_source = self.class.normalize_referral_source(referral_source)
   end
 

@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe StripeSubscription, type: :model do
+  it_behaves_like "active_periodable"
+
   let(:re_record_interval) { 30.days }
 
   describe "factory" do
@@ -48,9 +50,9 @@ RSpec.describe StripeSubscription, type: :model do
     let(:end_at) { nil }
     let(:membership_id) { nil }
     let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:stripe_status) { "active" }
 
     context "with existing admin_managed membership" do
-      let(:stripe_status) { "active" }
       let!(:membership_existing) do
         FactoryBot.create(:membership, user:, start_at: start_at_existing, end_at: end_at_existing,
           creator: FactoryBot.create(:admin))
@@ -86,7 +88,39 @@ RSpec.describe StripeSubscription, type: :model do
           stripe_subscription.update_membership!
           expect(membership_existing.reload.active?).to be_truthy
           expect(stripe_subscription.reload.active?).to be_falsey
-          expect(stripe_subscription.membership_id).to be_blank
+          expect(stripe_subscription.membership_id).to be_present
+          expect(stripe_subscription.membership_id).to_not eq membership_existing.id
+        end
+      end
+    end
+
+    context "ended" do
+      let(:start_at) { Time.current - 1.year }
+      let(:end_at) { Time.current - 1.minute }
+      let(:stripe_status) { "canceled" }
+      let(:target_attrs) { {start_at:, end_at:, kind: "basic", status: "ended"} }
+
+      it "creates a membership and ends it" do
+        expect(stripe_subscription.reload.active?).to be_falsey
+        expect(stripe_subscription.membership).to be_blank
+        stripe_subscription.update_membership!
+        expect(stripe_subscription.reload.active?).to be_falsey
+        expect(stripe_subscription.membership_id).to be_present
+        expect(stripe_subscription.membership).to match_hash_indifferently target_attrs
+      end
+
+      context "with existing membership" do
+        let(:membership) { FactoryBot.create(:membership, user:, start_at: start_at, end_at: nil) }
+        let(:membership_id) { membership.id }
+
+        it "ends the membership" do
+          expect(stripe_subscription.reload.active?).to be_falsey
+          expect(stripe_subscription.membership_id).to eq membership.id
+          expect(membership.reload.active?).to be_truthy
+          stripe_subscription.update_membership!
+          expect(stripe_subscription.reload.active?).to be_falsey
+          expect(stripe_subscription.membership_id).to eq membership.id
+          expect(membership.reload).to match_hash_indifferently target_attrs
         end
       end
     end

@@ -20,6 +20,8 @@
 #  index_stripe_subscriptions_on_user_id                 (user_id)
 #
 class StripeSubscription < ApplicationRecord
+  include ActivePeriodable
+
   belongs_to :membership
   belongs_to :user
   belongs_to :stripe_price, foreign_key: "stripe_price_stripe_id", primary_key: "stripe_id"
@@ -63,12 +65,16 @@ class StripeSubscription < ApplicationRecord
     if active?
       end_active_user_admin_membership!
 
-      membership ||= user&.membership_active || Membership.new(user_id:)
-      membership.kind = membership_kind
+      self.membership ||= user&.membership_active
+      self.membership&.kind = membership_kind
     end
-    membership&.update!(start_at:, end_at:)
+    self.membership ||= Membership.new(user_id:, kind: membership_kind)
+    self.membership&.update!(start_at:, end_at:)
 
-    update(membership_id: membership.id) if membership&.id&.present? && membership_id != membership.id
+    if membership&.id&.present? && membership_id != membership.id
+      update(membership_id: membership.id)
+      payments.where(membership_id: nil).each { |payment| payment.update(membership_id:) }
+    end
     membership
   end
 

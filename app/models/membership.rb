@@ -3,7 +3,6 @@
 # Table name: memberships
 #
 #  id         :bigint           not null, primary key
-#  active     :boolean          default(FALSE)
 #  end_at     :datetime
 #  kind       :integer
 #  start_at   :datetime
@@ -22,7 +21,7 @@ class Membership < ApplicationRecord
   include ActivePeriodable
 
   KIND_ENUM = {basic: 0, plus: 1, patron: 2}
-  STATUS_ENUM = {status_pending: 0, status_active: 1, status_ended: 2}
+  STATUS_ENUM = {pending: 0, active: 1, ended: 2}
 
   belongs_to :user
   belongs_to :creator, class_name: "User"
@@ -48,7 +47,7 @@ class Membership < ApplicationRecord
     end
 
     def status_display(str)
-      str&.humanize&.gsub("status", "")
+      str&.humanize
     end
 
     def kinds_ordered
@@ -93,16 +92,16 @@ class Membership < ApplicationRecord
 
   def calculated_status
     if start_at.blank? || start_at > Time.current + 1.minute
-      "status_pending"
-    elsif end_at.present? && end_at < Time.current
-      "status_ended"
+      "pending"
+    elsif period_active?
+      "active"
     else
-      "status_active"
+      "ended"
     end
   end
 
   def no_active_stripe_subscription_admin_managed
-    return if stripe_managed? || !calculated_active? || user.blank?
+    return if stripe_managed? || period_inactive? || user.blank?
 
     active_membership_id = user.memberships.active.order(:id).limit(1).pluck(:id).first
     return if [id, nil].include?(active_membership_id)

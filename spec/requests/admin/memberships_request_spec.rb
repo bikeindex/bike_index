@@ -33,7 +33,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
     let!(:user) { FactoryBot.create(:user_confirmed) }
     let(:target_attrs) do
       {user_id: user.id, start_at: nil, kind: "plus", end_at: nil, creator: current_user,
-       status: "status_pending"}
+       status: "pending"}
     end
     it "creates" do
       expect do
@@ -53,7 +53,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
           }
         end.to change(Membership, :count).by 1
         membership = Membership.last
-        expect(membership).to match_hash_indifferently(target_attrs.except(:start_at).merge(status: "status_active"))
+        expect(membership).to match_hash_indifferently(target_attrs.except(:start_at).merge(status: "active"))
         expect(membership.start_at).to be_within(1).of Time.current
       end
     end
