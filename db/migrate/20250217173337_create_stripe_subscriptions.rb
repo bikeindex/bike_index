@@ -5,9 +5,10 @@ class CreateStripeSubscriptions < ActiveRecord::Migration[8.0]
       t.references :user, index: true
       t.string :stripe_price_stripe_id
       t.string :stripe_id
+      t.string :stripe_checkout_id
       t.datetime :end_at
       t.datetime :start_at
-      t.boolean :active, default: false
+      t.string :stripe_status
 
       t.timestamps
     end

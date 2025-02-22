@@ -9,8 +9,8 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
   let(:creator_id) { FactoryBot.create(:admin).id }
 
   let(:new_attrs) do
-    { user_id: user.id, start_at: Time.current, end_at: Time.current + 3.month,
-      creator_id:, kind: "basic", status: "status_active" }
+    {user_id: user.id, start_at: Time.current, end_at: Time.current + 3.month,
+     creator_id:, kind: "basic", status: "status_active"}
   end
   it "creates a membership" do
     expect(payment.reload.membership_id).to be_blank
@@ -56,8 +56,8 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
     let(:end_at) { Time.current + 2.months }
     let(:new_end_at) { end_at + 3.months }
     let(:updated_attrs) do
-      { user_id: user.id, start_at:, end_at: end_at + 3.months,
-        creator_id: membership.creator_id, kind: "plus", status: "status_active" }
+      {user_id: user.id, start_at:, end_at: end_at + 3.months,
+       creator_id: membership.creator_id, kind: "plus", status: "status_active"}
     end
     it "extends the membership" do
       expect(membership.reload.creator_id).to_not eq creator_id

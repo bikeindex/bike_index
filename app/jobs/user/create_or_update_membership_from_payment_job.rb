@@ -21,7 +21,7 @@ class User::CreateOrUpdateMembershipFromPaymentJob < ApplicationJob
 
   # for simplicity, just do basic and patron - plus is just for extra gifts
   def kind_from_amount(amount_cents)
-    amount_cents < 5000 ? "basic" : "patron"
+    (amount_cents < 5000) ? "basic" : "patron"
   end
 
   def period_from_amount(amount_cents, start_at: nil, end_at: nil)
@@ -38,6 +38,6 @@ class User::CreateOrUpdateMembershipFromPaymentJob < ApplicationJob
       1.year
     end
 
-    { start_at:, end_at: end_at + extension }
+    {start_at:, end_at: end_at + extension}
   end
 end

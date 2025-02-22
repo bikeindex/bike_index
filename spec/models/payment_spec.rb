@@ -21,7 +21,7 @@ RSpec.describe Payment, type: :model do
   end
 
   describe "stripe_session_hash" do
-    let(:payment) { Payment.new(amount_cents: 2500, kind: "donation")}
+    let(:payment) { Payment.new(amount_cents: 2500, kind: "donation") }
     it "renders" do
       expect(payment.stripe_session_hash[:submit_type]).to eq "donate"
       expect(payment.stripe_session_hash[:success_url]).to be_present

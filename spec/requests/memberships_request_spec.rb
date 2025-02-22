@@ -35,22 +35,15 @@ RSpec.describe MembershipsController, type: :request do
         membership: {set_interval: "monthly",kind: "basic"}
       }
     end
-    # let(:target_membership) do
-    #   {
-    #     user_id: nil,
-    #     status: "status_pending",
-    #     kind: "basic",
-    #     start_at: nil
-    #   }
-    # end
     let(:target_stripe_subscription) do
       {
         stripe_price_stripe_id: stripe_price.stripe_id,
-        active: false,
         currency_enum: "usd",
         membership_kind: "basic",
         interval: "monthly",
         start_at: nil,
+        stripe_status: "open",
+        stripe_id: nil,
         end_at: nil,
         user_id: nil
       }
@@ -60,13 +53,16 @@ RSpec.describe MembershipsController, type: :request do
       include_context :request_spec_logged_in_as_user
 
       it "creates a stripe_subscription" do
-        expect {
-          post base_url, params: create_params
-          expect(response).to redirect_to "xxxx"
-        }.to change(StripeSubscription, :count).by 1
-        expect(Membership.count).to eq 0
-        stripe_subscription = StripeSubscription.last
-        expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
+        VCR.use_cassette("MembershipsController-create-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          expect {
+            post base_url, params: create_params
+          }.to change(StripeSubscription, :count).by 1
+          expect(Membership.count).to eq 0
+          stripe_subscription = StripeSubscription.last
+          expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
+          expect(stripe_subscription.stripe_subscription_id).to be_present
+          expect(response).to redirect_to(/https:..checkout.stripe.com/)
+        end
       end
 
       context "with invalid currency" do

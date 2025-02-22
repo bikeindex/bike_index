@@ -60,13 +60,15 @@ Rails.application.routes.draw do
   get "logout", to: "sessions#destroy"
 
   resources :payments, only: %i[new create] do
-    collection do
-      get :success
-    end
+    collection { get :success }
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
   resource :membership, only: %i[new create] do
+    collection { get :success }
+  end
 
+  resources :webhooks, only: [] do
+    collection { post :stripe }
   end
 
   resources :documentation, only: %i[index] do

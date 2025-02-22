@@ -48,7 +48,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
         expect do
           post base_url, params: {
             membership: {
-              kind: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601,
+              kind: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601
             }
           }
         end.to change(Membership, :count).by 1

@@ -7,39 +7,22 @@ class MembershipsController < ApplicationController
   end
 
   def create
-    pp stripe_price_parameters
     stripe_price = StripePrice.where(stripe_price_parameters).first
-    pp stripe_price, "----"
+    stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user)
+    redirect_to(stripe_subscription.stripe_checkout_session.url, allow_other_host: true)
   end
 
-  # def success
-  #   @payment = if params[:session_id].present?
-  #     Payment.where(stripe_id: params[:session_id]).first
-  #   end
+  def success
+    # @payment = if params[:session_id].present?
+    #   Payment.where(stripe_id: params[:session_id]).first
+    # end
 
-  #   @payment&.user_id ||= current_user&.id # Stupid, only happens in testing, but whateves
-  #   @payment&.update_from_stripe_session
-  # end
-
-  # def create
-  #   if invalid_amount_cents?(permitted_create_parameters[:amount_cents])
-  #     flash[:notice] = "Please enter a valid amount"
-  #     redirect_back(fallback_location: new_payment_path) && return
-  #   end
-  #   @payment = Payment.new(permitted_create_parameters)
-  #   stripe_session = Stripe::Checkout::Session.create(@payment.stripe_session_hash)
-
-  #   @payment.update(stripe_id: stripe_session.id)
-  #   redirect_to stripe_session.url, allow_other_host: true
-  # end
+    # @payment&.user_id ||= current_user&.id # Stupid, only happens in testing, but whateves
+    # @payment&.update_from_stripe_session
+    render layout: "application"
+  end
 
   private
-
-  def invalid_amount_cents?(amount_cents)
-    return true if amount_cents.blank?
-
-    !amount_cents.to_i.between?(1, 99_999_999)
-  end
 
   def stripe_price_parameters
     mem_params = params.require(:membership).permit(:kind, :set_interval)

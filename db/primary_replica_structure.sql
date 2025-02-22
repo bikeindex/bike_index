@@ -3079,7 +3079,7 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 CREATE TABLE public.stripe_events (
     id bigint NOT NULL,
-    stripe_subscription_stripe_id character varying,
+    stripe_id character varying,
     name character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -3152,9 +3152,10 @@ CREATE TABLE public.stripe_subscriptions (
     user_id bigint,
     stripe_price_stripe_id character varying,
     stripe_id character varying,
+    stripe_checkout_id character varying,
     end_at timestamp(6) without time zone,
     start_at timestamp(6) without time zone,
-    active boolean DEFAULT false,
+    stripe_status character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -6179,13 +6180,6 @@ CREATE INDEX index_stolen_records_on_organization_stolen_message_id ON public.st
 --
 
 CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records USING btree (recovering_user_id);
-
-
---
--- Name: index_stripe_events_on_stripe_subscription_stripe_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_stripe_events_on_stripe_subscription_stripe_id ON public.stripe_events USING btree (stripe_subscription_stripe_id);
 
 
 --
