@@ -8,7 +8,11 @@
 
 @layer components {
   .twlink {
-    @apply tw:text-blue-500 tw:underline;
+    @apply tw:text-blue-500 tw:underline ;
+  }
+
+  .twless-strong {
+    @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
   }
 
   .twbtn, .twbtn-blue, .twbtn-green {
@@ -17,6 +21,7 @@
     tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2
     tw:active:outline-none tw:active:opacity-95;
   }
+
   .twbtn-green {
     @apply tw:text-white tw:bg-green-600
       tw:hover:bg-green-500 tw:focus-visible:outline-green-600;
