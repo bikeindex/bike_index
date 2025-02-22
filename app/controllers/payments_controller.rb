@@ -10,7 +10,7 @@ class PaymentsController < ApplicationController
 
   def success
     @payment = if params[:session_id].present?
-      Payment.where(stripe_id: params[:session_id]).first
+      Payment.find_by(stripe_id: params[:session_id])
     end
 
     @payment&.user_id ||= current_user&.id # Stupid, only happens in testing, but whateves

@@ -148,19 +148,13 @@ class Payment < ApplicationRecord
     self.amount_cents = stripe_obj.amount_total
     # There isn't a paid_at timestamp in the stripe object
     self.paid_at = Time.current if paid_at.blank? && stripe_obj.payment_status == "paid"
-    self.email ||= stripe_obj.customer_email if user.blank?
+    self.email ||= stripe_email(stripe_obj) if user.blank?
     save!
 
     if user.present? && user.stripe_id != stripe_obj.customer
       user.update(stripe_id: stripe_obj.customer)
     end
     self
-  end
-
-  def stripe_customer
-    return nil unless stripe_checkout_session.present?
-
-    @stripe_customer ||= stripe_checkout_session.customer.present? ? Stripe::Customer.retrieve(stripe_checkout_session.customer) : nil
   end
 
   def email_or_organization_or_stripe_present
@@ -180,7 +174,17 @@ class Payment < ApplicationRecord
   end
 
   def can_assign_to_membership?
-    membership_id.blank? && invoice_id.blank? && theft_alert.blank?
+    user_id.present? && membership_id.blank? && invoice_id.blank? && theft_alert.blank?
+  end
+
+  def stripe_email(stripe_obj = nil)
+    stripe_obj ||= stripe_checkout_session
+    return nil unless stripe_obj.present?
+    return stripe_obj.customer_email if stripe_obj.customer_email.present?
+
+    # Sometimes email isn't in the stripe_checkout_session, and needs to be retrieved
+    stripe_customer = Stripe::Customer.retrieve(stripe_obj.customer) if stripe_obj.customer.present?
+    stripe_customer&.email
   end
 
   private
@@ -260,13 +264,6 @@ class Payment < ApplicationRecord
     else
       "#{ENV["BASE_URL"]}/payments/new"
     end
-  end
-
-  def stripe_email
-    if @stripe_checkout_session.present?
-      return @stripe_checkout_session.email
-    end
-    stripe_subscription&.email || stripe_checkout_session&.email
   end
 
   def user_stripe_checkout_session_hash

@@ -97,7 +97,7 @@ RSpec.describe PaymentsController, type: :request do
             expect(flash).to_not be_present
             expect(assigns(:payment)&.id).to eq payment.id
             payment.reload
-            expect(payment.reload.email).to eq "testly@bikeindex.org"
+            expect(payment.reload.email).to eq current_user.email
             expect(payment.paid?).to be_truthy
             expect(payment.amount_cents).to eq 500000
           end

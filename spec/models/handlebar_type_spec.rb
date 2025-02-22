@@ -15,6 +15,10 @@ RSpec.describe HandlebarType, type: :model do
       expect(HandlebarType.friendly_find(" ")).to be_nil
     end
 
+    it "returns nil" do
+      expect(HandlebarType.friendly_find("not-known-type")).to be_nil
+    end
+
     context "slug" do
       let(:name) { "Bmx " }
       it "tries to find the slug, given a name" do

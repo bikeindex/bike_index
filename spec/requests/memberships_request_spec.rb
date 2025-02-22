@@ -22,7 +22,9 @@ RSpec.describe MembershipsController, type: :request do
         expect(flash).to_not be_present
       end
       context "user has an active membership" do
-        it "redirects to edit"
+        # it "redirects to edit" do
+        #   fail
+        # end
       end
     end
   end
@@ -49,6 +51,19 @@ RSpec.describe MembershipsController, type: :request do
       }
     end
 
+    it "creates a stripe_subscription" do
+      VCR.use_cassette("MembershipsController-create-no_user", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        expect {
+          post base_url, params: create_params
+        }.to change(StripeSubscription, :count).by 1
+        expect(Membership.count).to eq 0
+        stripe_subscription = StripeSubscription.last
+        expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription
+        expect(stripe_subscription.payments.count).to eq 1
+        expect(response).to redirect_to(/https:..checkout.stripe.com/)
+      end
+    end
+
     context "logged in" do
       include_context :request_spec_logged_in_as_user
 
@@ -69,6 +84,16 @@ RSpec.describe MembershipsController, type: :request do
         let(:modified_params) { create_params.merge(currency: "xxx") }
 
         it "creates a stripe_subscription" do
+          VCR.use_cassette("MembershipsController-create-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+            expect {
+              post base_url, params: modified_params
+            }.to change(StripeSubscription, :count).by 1
+            expect(Membership.count).to eq 0
+            stripe_subscription = StripeSubscription.last
+            expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
+            expect(stripe_subscription.payments.count).to eq 1
+            expect(response).to redirect_to(/https:..checkout.stripe.com/)
+          end
         end
       end
     end

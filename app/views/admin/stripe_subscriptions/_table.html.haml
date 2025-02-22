@@ -1,0 +1,50 @@
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        = sortable "stripe_price_stripe_id", "Stripe Price", render_sortable: render_sortable
+      %th
+        = sortable "start_at", render_sortable: render_sortable
+      %th
+        = sortable "end_at", render_sortable: render_sortable
+      %th
+        = sortable "user_id", render_sortable: render_sortable
+      %th
+        = sortable "stripe_status", render_sortable: render_sortable
+      %th
+        Payments
+    %tbody
+      - collection.each do |stripe_subscription|
+        %tr
+          %td
+            .less-strong-hold
+              %span.convertTime
+                = l stripe_subscription.created_at, format: :convert_time
+              %span.less-strong-right.d-none.d-md-block
+                = stripe_subscription.id
+          %td
+            - if stripe_subscription.stripe_price.present?
+              - stripe_price = stripe_subscription.stripe_price
+              #{stripe_price.membership_kind}
+              - unless stripe_price.interval == "monthly"
+                %em= stripe_price.interval
+              - unless stripe_price.currency_enum == "usd"
+                %strong= stripe_price.currency_name
+          %td
+            - if stripe_subscription.start_at.present?
+              %span.convertTime
+                = l stripe_subscription.start_at, format: :convert_time
+          %td
+            - if stripe_subscription.end_at.present?
+              %span.convertTime
+                = l stripe_subscription.end_at, format: :convert_time
+          %td
+            - if stripe_subscription.user_id.present?
+              = render partial: "/shared/admin/user_cell", locals: {user: stripe_subscription.user, render_search: true, cache: true}
+          %td
+            = stripe_subscription.stripe_status
+          %td
+            - stripe_subscription.payments.pluck(:id).each_with_index do |id, inx|
+              = link_to inx + 1, admin_payment_path(id)

@@ -54,6 +54,8 @@ class StripeEvent < ApplicationRecord
       if data_object.subscription.present?
         update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
       end
+    elsif subscription?
+      update_stripe_subscription(data_object)
     end
   end
 

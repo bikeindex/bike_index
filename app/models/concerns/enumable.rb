@@ -60,7 +60,7 @@ module Enumable
 
     def friendly_find(str)
       matching_sym = find_sym(str)
-      str.present? ? new(matching_sym) : nil
+      matching_sym.present? ? new(matching_sym) : nil
     end
   end
 

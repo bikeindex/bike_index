@@ -47,7 +47,6 @@ RSpec.describe StripeEvent, type: :model do
         expect(payment.paid_at).to be_present
       end
 
-
       it "creates a payment and a stripe subscription" do
         expect(stripe_event).to be_valid
         expect(stripe_event.checkout?).to be_truthy
@@ -67,8 +66,20 @@ RSpec.describe StripeEvent, type: :model do
         expect(payment.user_id).to be_blank
       end
 
-      context "calling it twice doesn't do anything different" do
+      context "called twice" do
+        it "only creates the things once" do
+          expect do
+            VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+              stripe_event.update_bike_index_record
+            end
+            VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+              stripe_event.update_bike_index_record
+            end
+          end.to change(StripeSubscription, :count).by(1)
+            .and change(Payment, :count).by 1
 
+          expect_stripe_subscription_and_payment_to_match_targets(StripeSubscription.last, Payment.last)
+        end
       end
 
       context "with user matching email" do

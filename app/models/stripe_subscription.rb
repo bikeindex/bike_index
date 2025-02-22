@@ -102,14 +102,14 @@ class StripeSubscription < ApplicationRecord
     return @stripe_checkout_session_url if @stripe_checkout_session_url.present?
 
     payment = payments.order(:id).first ||
-      payments.create(payment_method: :stripe, currency_enum:, user_id:)
+      payments.create(payment_attrs)
 
     @stripe_checkout_session_url = payment.stripe_checkout_session.url
   end
 
   def find_or_create_payment(stripe_checkout_session)
     payment = payments.find_by(stripe_id: stripe_checkout_session.id) ||
-      payments.build(payment_method: :stripe, currency_enum:, user_id:, stripe_id: stripe_checkout_session.id)
+      payments.build(payment_attrs.merge(stripe_id: stripe_checkout_session.id))
 
     payment.update_from_stripe_checkout_session!(stripe_checkout_session)
     update(user_id: payment.user_id) if user_id.blank? && payment.user_id.present?
@@ -118,6 +118,10 @@ class StripeSubscription < ApplicationRecord
   end
 
   private
+
+  def payment_attrs
+    {user_id:, payment_method: "stripe", currency_enum:, amount_cents: stripe_price&.amount_cents}
+  end
 
   def fetch_stripe_subscription_obj
     return nil if stripe_id.blank?

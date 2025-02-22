@@ -1,6 +1,13 @@
 require "rails_helper"
 
 RSpec.describe Currency, type: :model do
+  describe "friendly_find" do
+    it "returns nil for not found" do
+      expect(Currency.friendly_find(" ")).to be_nil
+      expect(Currency.friendly_find("xxx")).to be_nil
+    end
+  end
+
   describe "USD" do
     let(:slug) { :usd }
     let(:target) { {name: "USD", symbol: "$", slug:} }
