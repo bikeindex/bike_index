@@ -46,7 +46,7 @@ class StripeEvent < ApplicationRecord
     name.match(/subscription/)
   end
 
-  def update_bike_index_record
+  def update_bike_index_record!
     # Currently, only handle on creation, when the data object is assigned.
     raise "Stripe Data not assigned, unable to handle" unless @data.present?
 

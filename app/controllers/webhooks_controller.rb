@@ -23,7 +23,7 @@ class WebhooksController < ApplicationController
 
     stripe_event = StripeEvent.create_from(event)
     if stripe_event.known_event?
-      stripe_event.update_bike_index_record
+      stripe_event.update_bike_index_record!
 
       render json: {success: true}
     else

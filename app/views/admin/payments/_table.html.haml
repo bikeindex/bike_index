@@ -61,7 +61,7 @@
               - if render_sortable && current_organization.blank?
                 %small= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: payment.organization_id))
           %td
-            = render partial: "payment_invoice_cell", locals: {payment:}
+            = render partial: "/admin/payments/payment_invoice_cell", locals: {payment:}
           - if render_method
             %td
               %small

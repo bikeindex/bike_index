@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe StripeEvent, type: :model do
   let(:re_record_interval) { 30.days }
 
-  describe "update_bike_index_record" do
+  describe "update_bike_index_record!" do
     let(:event_mock) do
       # Just uses openstruct, not stripe, but good enough for now
       object = OpenStruct.new(webhook_payload.dig("data", "object"))
@@ -53,7 +53,7 @@ RSpec.describe StripeEvent, type: :model do
 
         VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect do
-            stripe_event.update_bike_index_record
+            stripe_event.update_bike_index_record!
           end.to change(StripeSubscription, :count).by 1
         end
 
@@ -70,10 +70,10 @@ RSpec.describe StripeEvent, type: :model do
         it "only creates the things once" do
           expect do
             VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
-              stripe_event.update_bike_index_record
+              stripe_event.update_bike_index_record!
             end
             VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
-              stripe_event.update_bike_index_record
+              stripe_event.update_bike_index_record!
             end
           end.to change(StripeSubscription, :count).by(1)
             .and change(Payment, :count).by 1
@@ -91,7 +91,7 @@ RSpec.describe StripeEvent, type: :model do
         it "assigns things to the user and creates a membership" do
           VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
             expect do
-              stripe_event.update_bike_index_record
+              stripe_event.update_bike_index_record!
             end.to change(StripeSubscription, :count).by 1
           end
 

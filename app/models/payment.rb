@@ -174,6 +174,8 @@ class Payment < ApplicationRecord
   end
 
   def can_assign_to_membership?
+    return false if stripe_subscription?
+
     user_id.present? && membership_id.blank? && invoice_id.blank? && theft_alert.blank?
   end
 
