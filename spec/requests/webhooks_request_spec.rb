@@ -1,6 +1,4 @@
 require "rails_helper"
-
-base_url = "/webhooks"
 RSpec.describe WebhooksController, type: :request do
   let(:re_record_interval) { 30.days }
 
@@ -12,9 +10,9 @@ RSpec.describe WebhooksController, type: :request do
     # Helper method to generate a valid Stripe signature for testing
     def generate_stripe_signature(payload)
       timestamp = Time.now.to_i
-      secret = ENV['STRIPE_WEBHOOK_SECRET'] || 'whsec_test_secret'
+      secret = ENV["STRIPE_WEBHOOK_SECRET"] || "whsec_test_secret"
       signed_payload = "#{timestamp}.#{payload}"
-      signature = OpenSSL::HMAC.hexdigest('SHA256', secret, signed_payload)
+      signature = OpenSSL::HMAC.hexdigest("SHA256", secret, signed_payload)
       "t=#{timestamp},v1=#{signature}"
     end
 
@@ -38,9 +36,9 @@ RSpec.describe WebhooksController, type: :request do
         VCR.use_cassette("WebhooksController-checkout_session-completed", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect do
             post webhook_url,
-                 params: payload,
-                 headers: { 'CONTENT_TYPE' => 'application/json', 'HTTP_STRIPE_SIGNATURE' => stripe_signature }
-           end.to change(StripeEvent, :count).by 1
+              params: payload,
+              headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
+          end.to change(StripeEvent, :count).by 1
 
           expect(response).to have_http_status(:ok)
           expect(json_result).to eq({"success" => true})
@@ -63,11 +61,11 @@ RSpec.describe WebhooksController, type: :request do
 
     context "with invalid signature" do
       it "returns a 400 bad request status" do
-        allow(Stripe::Webhook).to receive(:construct_event).and_raise(Stripe::SignatureVerificationError.new('', ''))
+        allow(Stripe::Webhook).to receive(:construct_event).and_raise(Stripe::SignatureVerificationError.new("", ""))
 
         post webhook_url,
-             params: payload,
-             headers: { 'CONTENT_TYPE' => 'application/json', 'HTTP_STRIPE_SIGNATURE' => "invalid_signature" }
+          params: payload,
+          headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => "invalid_signature"}
 
         expect(response).to have_http_status(:bad_request)
       end

@@ -8,7 +8,7 @@ RSpec.describe StripeEvent, type: :model do
       # Just uses openstruct, not stripe, but good enough for now
       object = OpenStruct.new(webhook_payload.dig("data", "object"))
 
-      OpenStruct.new(type: webhook_payload["type"], "data" => {"object" => object})
+      OpenStruct.new(:type => webhook_payload["type"], "data" => {"object" => object})
     end
     let(:stripe_event) { StripeEvent.create_from(event_mock) }
 
@@ -33,7 +33,8 @@ RSpec.describe StripeEvent, type: :model do
           payment_method: "stripe",
           stripe_subscription?: true,
           amount_cents: 999,
-          currency_enum: "usd"}
+          currency_enum: "usd"
+        }
       end
 
       it "creates a payment and a stripe subscription" do

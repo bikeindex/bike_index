@@ -15,9 +15,9 @@ class StripeEvent < ApplicationRecord
   attr_accessor :data
 
   def self.create_from(event)
-    data = event['data']
+    data = event["data"]
 
-    stripe_event = create(name: event['type'], stripe_id: data["object"]["id"])
+    stripe_event = create(name: event["type"], stripe_id: data["object"]["id"])
     stripe_event.data = data
     stripe_event
   end

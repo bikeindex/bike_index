@@ -187,7 +187,6 @@ class Payment < ApplicationRecord
 
   def create_stripe_checkout_session(item_name: nil)
     Stripe::Checkout::Session.create(stripe_checkout_session_hash(item_name:))
-
   rescue Stripe::InvalidRequestError => e
     raise e unless e.message.match?(/no such customer/i)
 
@@ -239,7 +238,7 @@ class Payment < ApplicationRecord
     elsif membership_id.present? || stripe_subscription_id.present?
       "membership_donation"
     else
-     "donation"
+      "donation"
     end
   end
 

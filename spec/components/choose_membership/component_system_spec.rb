@@ -11,7 +11,7 @@ RSpec.describe ChooseMembership::Component, :js, type: :system do
     expect(page).to have_content(/\$4.99\s+per\s+month/)
 
     # Click yearly toggle
-    choose 'Yearly'
+    choose "Yearly"
 
     # Verify yearly price is displayed
     expect(page).to have_content(/\$49.99\s+per\s+year/)

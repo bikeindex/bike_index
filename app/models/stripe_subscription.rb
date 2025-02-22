@@ -96,7 +96,7 @@ class StripeSubscription < ApplicationRecord
     return @stripe_checkout_session_url if @stripe_checkout_session_url.present?
 
     payment = payments.order(:id).first ||
-     payments.create(payment_method: :stripe, currency_enum:, user_id:)
+      payments.create(payment_method: :stripe, currency_enum:, user_id:)
 
     @stripe_checkout_session_url = payment.stripe_checkout_session.url
   end

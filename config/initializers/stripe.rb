@@ -4,4 +4,4 @@ Rails.configuration.stripe = {
 }
 
 Stripe.api_key = ENV["STRIPE_SECRET_KEY"]
-STRIPE_LIVE_MODE = Stripe.api_key.start_with?('sk_live_')
+STRIPE_LIVE_MODE = Stripe.api_key.start_with?("sk_live_")
