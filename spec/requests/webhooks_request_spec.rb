@@ -36,20 +36,23 @@ RSpec.describe WebhooksController, type: :request do
         }
       end
       it "processes the webhook successfully" do
-        expect do
-          post webhook_url,
-               params: payload,
-               headers: { 'CONTENT_TYPE' => 'application/json', 'HTTP_STRIPE_SIGNATURE' => stripe_signature }
-         end.to change(StripeEvent, :count).by 1
+        VCR.use_cassette("WebhooksController-checkout_session-completed", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          expect do
+            post webhook_url,
+                 params: payload,
+                 headers: { 'CONTENT_TYPE' => 'application/json', 'HTTP_STRIPE_SIGNATURE' => stripe_signature }
+           end.to change(StripeEvent, :count).by 1
 
-        expect(response).to have_http_status(:ok)
-        expect(json_result).to eq({"success" => true})
-        stripe_event = StripeEvent.last
-        expect(stripe_event.name).to eq "checkout.session.completed"
-        expect(stripe_event.stripe_id).to be_present
-        expect(stripe_event.stripe_subscription).to match_hash_indifferently target_stripe_subscription
-        expect(stripe_event.stripe_subscription.stripe_id).to be_present
-        expect(stripe_event.stripe_subscription.membership_id).to be_blank
+          expect(response).to have_http_status(:ok)
+          expect(json_result).to eq({"success" => true})
+          stripe_event = StripeEvent.last
+          expect(stripe_event.name).to eq "checkout.session.completed"
+          expect(stripe_event.stripe_id).to be_present
+          stripe_subscription = StripeSubscription.last
+          expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription
+          expect(stripe_subscription.stripe_id).to be_present
+          expect(stripe_subscription.membership_id).to be_blank
+        end
       end
     end
 

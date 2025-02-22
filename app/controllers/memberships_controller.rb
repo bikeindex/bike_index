@@ -9,16 +9,10 @@ class MembershipsController < ApplicationController
   def create
     stripe_price = StripePrice.where(stripe_price_parameters).first
     stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user)
-    redirect_to(stripe_subscription.stripe_checkout_session.url, allow_other_host: true)
+    redirect_to(stripe_subscription.stripe_checkout_session_url, allow_other_host: true)
   end
 
   def success
-    # @payment = if params[:session_id].present?
-    #   Payment.where(stripe_id: params[:session_id]).first
-    # end
-
-    # @payment&.user_id ||= current_user&.id # Stupid, only happens in testing, but whateves
-    # @payment&.update_from_stripe_session
     render layout: "application"
   end
 

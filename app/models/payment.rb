@@ -111,6 +111,7 @@ class Payment < ApplicationRecord
 
   def stripe_checkout_session(item_name: nil)
     return nil unless stripe?
+
     @stripe_checkout_session ||= if stripe_id.blank?
       checkout_session = create_stripe_checkout_session(item_name:)
       update(stripe_id: checkout_session.id)
@@ -144,8 +145,7 @@ class Payment < ApplicationRecord
   # Right now, this method is only good for updating unpaid payments to be paid, when stripe says they are paid
   def update_from_stripe_checkout_session
     return unless incomplete? && stripe_checkout_session.payment_status == "paid"
-    update(paid_at: Time.current,
-      amount_cents: stripe_checkout_session.amount_total)
+    update(paid_at: Time.current, amount_cents: stripe_checkout_session.amount_total)
     # Update email if we can
     return unless stripe_customer.present?
     update(email: stripe_customer.email)

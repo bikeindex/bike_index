@@ -17,7 +17,7 @@ RSpec.describe StripeSubscription, type: :model do
     let(:user) { FactoryBot.create(:user_confirmed) }
 
     it "creates a stripe_subscription" do
-      VCR.use_cassette("stripe_subscription-create_for-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+      VCR.use_cassette("StripeSubscription-create_for-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
         stripe_subscription = StripeSubscription.create_for(stripe_price:, user:)
         expect(stripe_subscription).to be_valid
         expect(stripe_subscription.stripe_checkout_session_url).to be_present
@@ -32,11 +32,31 @@ RSpec.describe StripeSubscription, type: :model do
     context "user has an invalid stripe_id" do
       let(:user) { FactoryBot.create(:user_confirmed, stripe_id: "cus_xxxx") }
       it "creates a stripe_subscription" do
-        VCR.use_cassette("stripe_subscription-create_for-invalid_user_id", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        VCR.use_cassette("StripeSubscription-create_for-invalid_user_id", match_requests_on: [:method], re_record_interval: re_record_interval) do
           stripe_subscription = StripeSubscription.create_for(stripe_price:, user:)
           expect(stripe_subscription).to be_valid
           expect(stripe_subscription.stripe_checkout_session_url).to be_present
           expect(stripe_subscription.payments.count).to eq 1
+        end
+      end
+    end
+  end
+
+  describe "find_or_create_from_stripe" do
+    context "mocked stripe_checkout" do
+      let!(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
+      let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-checkout.session.completed.json"))) }
+      let(:stripe_checkout) { OpenStruct.new(webhook_payload.dig("data", "object")) }
+      let(:stripe_subscription) { StripeSubscription.find_or_create_from_stripe(stripe_checkout:) }
+
+      # NOTE: This is an open struct mock - but it gets us there
+      it "creates a payment and a stripe subscription" do
+        VCR.use_cassette("StripeSubscription-find_or_create_from_stripe-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          expect(stripe_subscription).to be_valid
+          expect(stripe_subscription.stripe_price&.id).to eq stripe_price.id
+          expect(stripe_subscription.user_id).to be_blank
+          expect(stripe_subscription.payments.count).to eq 1
+          expect(stripe_subscription.payments.first.email).to eq "seth@bikeindex.org"
         end
       end
     end
