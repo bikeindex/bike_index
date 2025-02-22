@@ -32,6 +32,9 @@
             = link_to "Membership", admin_membership_path(payment.membership_id)
           %small.less-strong
             (#{payment.kind_humanized})
+
+          - if payment.stripe? && payment.membership_id.present?
+            = link_to "membership's payments", admin_payments_path(search_membership_id: payment.membership_id), class: "small less-strong ml-1"
   .col-md-6
     %table.table-list
       %tr

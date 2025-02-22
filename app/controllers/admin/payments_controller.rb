@@ -107,6 +107,9 @@ class Admin::PaymentsController < Admin::BaseController
     else
       @payment_method = "all"
     end
+    if params[:search_membership_id].present?
+      matching_payments = matching_payments.where(membership_id: params[:search_membership_id])
+    end
     matching_payments = matching_payments.admin_search(params[:query]) if params[:query].present?
     if params[:search_email].present?
       matching_payments = matching_payments.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%")

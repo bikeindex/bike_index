@@ -28,10 +28,9 @@
             - if stripe_subscription.stripe_price.present?
               - stripe_price = stripe_subscription.stripe_price
               #{stripe_price.membership_kind}
-              - unless stripe_price.interval == "monthly"
-                %em= stripe_price.interval
+              %span.less-strong= stripe_price.interval
               - unless stripe_price.currency_enum == "usd"
-                %strong= stripe_price.currency_name
+                %small= stripe_price.currency_name
           %td
             - if stripe_subscription.start_at.present?
               %span.convertTime
@@ -46,5 +45,6 @@
           %td
             = stripe_subscription.stripe_status
           %td
-            - stripe_subscription.payments.pluck(:id).each_with_index do |id, inx|
-              = link_to inx + 1, admin_payment_path(id)
+            %small= admin_number_display(stripe_subscription.payments.count)
+            - stripe_subscription.payments.order(id: :desc).limit(1).pluck(:id).each do |id|
+              = link_to "view last", admin_payment_path(id), class: "small"

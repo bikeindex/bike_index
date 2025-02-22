@@ -31,9 +31,11 @@ class StripeSubscription < ApplicationRecord
 
   validates_uniqueness_of :stripe_id, allow_nil: true
 
-  delegate :membership_kind, :currency_enum, :interval, :test?, to: :stripe_price, allow_nil: true
-
   before_validation :set_calculated_attributes
+
+  scope :active, -> { where(stripe_status: "active") }
+
+  delegate :membership_kind, :currency_enum, :interval, :test?, to: :stripe_price, allow_nil: true
 
   class << self
     def create_for(stripe_price:, user:)

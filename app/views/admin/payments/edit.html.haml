@@ -5,6 +5,8 @@
 
 = render partial: "/admin/payments/display", locals: {payment: @payment}
 
+.pb-4
+
 - if @payment.can_assign_to_membership?
   .card.ml-auto.mr-auto.mb-5.mt-4.col-6
     .card-body
