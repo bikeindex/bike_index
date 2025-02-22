@@ -9,7 +9,6 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  membership_id          :bigint
-#  stripe_checkout_id     :string
 #  stripe_id              :string
 #  stripe_price_stripe_id :string
 #  user_id                :bigint
@@ -28,7 +27,6 @@ class StripeSubscription < ApplicationRecord
   has_many :payments
   has_many :stripe_events, foreign_key: "stripe_subscription_stripe_id", primary_key: "stripe_id"
 
-  validates_uniqueness_of :stripe_checkout_id, allow_nil: true
   validates_uniqueness_of :stripe_id, allow_nil: true
 
   delegate :membership_kind, :currency_enum, :interval, :test?, to: :stripe_price, allow_nil: true
@@ -36,10 +34,10 @@ class StripeSubscription < ApplicationRecord
   before_validation :set_calculated_attributes
 
   class << self
-    def create_for(stripe_price:, user:, email: nil, stripe_checkout_id: nil)
+    def create_for(stripe_price:, user:)
       # TODO: check if one exists first
-      stripe_subscription = new(stripe_price:, user:)
-      stripe_subscription.stripe_checkout_session # triggers creating the stripe_checkout_session
+      stripe_subscription = create(stripe_price:, user:)
+      stripe_subscription.fetch_stripe_checkout_session_url # triggers creating the stripe_checkout_session
       stripe_subscription
     end
 
@@ -80,24 +78,26 @@ class StripeSubscription < ApplicationRecord
     user&.email || stripe_email
   end
 
-  def success_url
-    "#{ENV["BASE_URL"]}/membership/success?session_id={CHECKOUT_SESSION_ID}"
+  def stripe_checkout_session_url
+    @stripe_checkout_session_url
   end
 
-  def cancel_url
-    "#{ENV["BASE_URL"]}/membership/new"
-  end
+  def fetch_stripe_checkout_session_url
+    return @stripe_checkout_session_url if @stripe_checkout_session_url.present?
 
-  def stripe_checkout_session
-    return @stripe_checkout_session if @stripe_checkout_session.present?
+    payment = payments.order(:id).first ||
+     payments.create(payment_method: :stripe, currency_enum:, user_id:)
 
-    if stripe_checkout_id.blank?
-      @stripe_checkout_session = create_stripe_checkout_session
-      update(stripe_checkout_id: @stripe_checkout_session.id)
-      @stripe_checkout_session
-    else
-      @stripe_checkout_session = Stripe::Checkout::Session.retrieve(stripe_checkout_id)
-    end
+    @stripe_checkout_session_url = payment.stripe_checkout_session.url
+    # return @stripe_checkout_session if @stripe_checkout_session.present?
+
+    # if stripe_checkout_id.blank?
+    #   @stripe_checkout_session = create_stripe_checkout_session
+    #   update(stripe_checkout_id: @stripe_checkout_session.id)
+    #   @stripe_checkout_session
+    # else
+    #   @stripe_checkout_session = Stripe::Checkout::Session.retrieve(stripe_checkout_id)
+    # end
   end
 
   private
@@ -109,42 +109,14 @@ class StripeSubscription < ApplicationRecord
     end
   end
 
-  # TODO: check first if either of these is instantiated
-  def stripe_email
-    if @stripe_checkout_session.present?
-      return @stripe_checkout_session.email
-    end
-    stripe_subscription&.email || stripe_checkout_session&.email
-  end
-
   def end_active_user_admin_membership!
     user.membership_active.update(end_at: start_at || Time.current)
     user.reload
   end
 
-  def create_stripe_checkout_session
-    Stripe::Checkout::Session.create(stripe_checkout_session_hash)
+  # def user_stripe_session_hash
+  #   return {} unless email.present?
 
-  rescue Stripe::InvalidRequestError => e
-    raise e unless e.message.match?(/no such customer/i)
-
-    # If no such customer, try again without the customer id
-    Stripe::Checkout::Session.create(stripe_checkout_session_hash({customer_email: user&.email}))
-  end
-
-  def stripe_checkout_session_hash(user_stripe_hash = nil)
-    user_stripe_hash ||= user_stripe_session_hash
-    {
-      success_url:,
-      cancel_url:,
-      mode: "subscription",
-      line_items: [{quantity: 1, price: stripe_price_stripe_id}]
-    }.merge(user_stripe_hash)
-  end
-
-  def user_stripe_session_hash
-    return {} unless email.present?
-
-    user&.stripe_id.present? ? {customer: user.stripe_id} : {customer_email: user.email}
-  end
+  #   user&.stripe_id.present? ? {customer: user.stripe_id} : {customer_email: user.email}
+  # end
 end

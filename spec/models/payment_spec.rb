@@ -20,12 +20,12 @@ RSpec.describe Payment, type: :model do
     end
   end
 
-  describe "stripe_session_hash" do
+  describe "stripe_checkout_session_hash" do
     let(:payment) { Payment.new(amount_cents: 2500, kind: "donation") }
     it "renders" do
-      expect(payment.stripe_session_hash[:submit_type]).to eq "donate"
-      expect(payment.stripe_session_hash[:success_url]).to be_present
-      expect(payment.stripe_session_hash[:cancel_url]).to be_present
+      expect(payment.send(:stripe_checkout_session_hash)[:submit_type]).to eq "donate"
+      expect(payment.send(:stripe_checkout_session_hash)[:success_url]).to be_present
+      expect(payment.send(:stripe_checkout_session_hash)[:cancel_url]).to be_present
     end
   end
 
@@ -112,13 +112,13 @@ RSpec.describe Payment, type: :model do
     end
   end
 
-  describe "stripe_success_url, stripe_cancel_url" do
+  describe "success_url, cancel_url" do
     let(:target_success) { "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}" }
     let(:target_cancel) { "http://test.host/payments/new" }
     let(:payment) { Payment.new }
     it "is expected" do
-      expect(payment.stripe_success_url).to eq target_success
-      expect(payment.stripe_cancel_url).to eq target_cancel
+      expect(payment.send(:success_url)).to eq target_success
+      expect(payment.send(:cancel_url)).to eq target_cancel
     end
     context "theft_alert" do
       let(:theft_alert) { FactoryBot.create(:theft_alert) }
@@ -126,8 +126,8 @@ RSpec.describe Payment, type: :model do
       let(:target_success) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}" }
       let(:target_cancel) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert/new" }
       it "returns expected" do
-        expect(payment.stripe_success_url).to eq target_success
-        expect(payment.stripe_cancel_url).to eq target_cancel
+        expect(payment.send(:success_url)).to eq target_success
+        expect(payment.send(:cancel_url)).to eq target_cancel
       end
     end
   end

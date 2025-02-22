@@ -20,9 +20,12 @@ RSpec.describe StripeSubscription, type: :model do
       VCR.use_cassette("stripe_subscription-create_for-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
         stripe_subscription = StripeSubscription.create_for(stripe_price:, user:)
         expect(stripe_subscription).to be_valid
-        expect(stripe_subscription.stripe_checkout_session.url).to be_present
-        expect(stripe_subscription.reload.stripe_checkout_id).to be_present
-        expect(stripe_subscription.stripe_status).to eq "open"
+        expect(stripe_subscription.stripe_checkout_session_url).to be_present
+        expect(stripe_subscription.payments.count).to eq 1
+        expect(stripe_subscription.stripe_status).to be_blank
+
+        # Calling fetch_stripe_checkout_session_url doesn't create again
+        stripe_subscription.reload.fetch_stripe_checkout_session_url
       end
     end
 
@@ -32,8 +35,8 @@ RSpec.describe StripeSubscription, type: :model do
         VCR.use_cassette("stripe_subscription-create_for-invalid_user_id", match_requests_on: [:method], re_record_interval: re_record_interval) do
           stripe_subscription = StripeSubscription.create_for(stripe_price:, user:)
           expect(stripe_subscription).to be_valid
-          expect(stripe_subscription.stripe_checkout_session.url).to be_present
-          expect(stripe_subscription.reload.stripe_checkout_id).to be_present
+          expect(stripe_subscription.stripe_checkout_session_url).to be_present
+          expect(stripe_subscription.payments.count).to eq 1
         end
       end
     end
