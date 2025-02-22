@@ -102,7 +102,6 @@ class Membership < ApplicationRecord
 
   def no_active_stripe_subscription_admin_managed
     return if stripe_managed? || period_inactive? || user.blank?
-
     active_membership_id = user.memberships.active.order(:id).limit(1).pluck(:id).first
     return if [id, nil].include?(active_membership_id)
 

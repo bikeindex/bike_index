@@ -69,17 +69,19 @@ RSpec.describe Membership, type: :model do
       end
 
       context "when invalid date is set" do
-        # it "blocks updating the earlier created one" do
-        #   membership_new.save!
-        #   membership_existing.update_columns(end_at: nil)
-        #   expect(membership_new.reload.period_active?).to be_truthy
-        #   expect(membership_existing.reload.save).to be_truthy
-        #   membership_existing.update(end_at: Time.current + 1.minute)
-        #   expect(membership_existing.reload.end_at).to be_within(1).of Time.current + 1.minute
+        it "blocks updating the earlier created one" do
+          membership_new.save!
+          membership_existing.update_columns(end_at: nil, status: "active")
+          expect(membership_new.reload.period_active?).to be_truthy
+          expect(membership_new.id).to be > membership_existing.id
+          membership_existing.reload.save
+          expect(membership_existing.reload.save).to be_truthy
+          membership_existing.update(end_at: Time.current + 1.minute)
+          expect(membership_existing.reload.end_at).to be_within(1).of Time.current + 1.minute
 
-        #   # Nothing has happened here
-        #   expect(membership_new.reload.end_at).to be_nil
-        # end
+          # Nothing has happened here
+          expect(membership_new.reload.end_at).to be_nil
+        end
       end
     end
   end
