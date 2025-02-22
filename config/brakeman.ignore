@@ -319,6 +319,29 @@
     {
       "warning_type": "Redirect",
       "warning_code": 18,
+      "fingerprint": "2843118e7bef96258449dfb2f745e07476f8a3193835936f63af1254bdf24a9c",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/bikes/theft_alerts_controller.rb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Bikes::TheftAlertsController",
+        "method": "create"
+      },
+      "user_input": "Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
       "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
@@ -517,7 +540,7 @@
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/memberships/show.html.haml",
-      "line": 70,
+      "line": 68,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
       "code": "link_to(\"manage on stripe\", Membership.find(params[:id]).stripe_admin_url)",
       "render_path": [
@@ -525,7 +548,7 @@
           "type": "controller",
           "class": "Admin::MembershipsController",
           "method": "show",
-          "line": 36,
+          "line": 38,
           "file": "app/controllers/admin/memberships_controller.rb",
           "rendered": {
             "name": "admin/memberships/show",
@@ -901,6 +924,29 @@
       "confidence": "Weak",
       "cwe_id": [
         79
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "a023e0858b0d5962b53a5b762dcf22efd6883df12310d60199cf26de6fb91a3c",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/memberships_controller.rb",
+      "line": 12,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(StripeSubscription.create_for(:stripe_price => StripePrice.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "MembershipsController",
+        "method": "create"
+      },
+      "user_input": "StripeSubscription.create_for(:stripe_price => StripePrice.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
       ],
       "note": ""
     },
@@ -1286,6 +1332,29 @@
       "confidence": "Medium",
       "cwe_id": [
         915
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "e39c2e5eefb85eabd4bdd7df34edfb6bc4e5a1f22994c51addd3c201bd206a33",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/payments_controller.rb",
+      "line": 28,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Payment.create(permitted_create_parameters).stripe_checkout_session.url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PaymentsController",
+        "method": "create"
+      },
+      "user_input": "Payment.create(permitted_create_parameters).stripe_checkout_session.url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
       ],
       "note": ""
     },
