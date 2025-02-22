@@ -60,6 +60,6 @@ class StripeEvent < ApplicationRecord
   private
 
   def update_stripe_subscription(stripe_subscription_obj, stripe_checkout_session = nil)
-    StripeSubscription.find_or_create_from_stripe(stripe_subscription_obj:, stripe_checkout_session:)
+    StripeSubscription.create_or_update_from_stripe!(stripe_subscription_obj:, stripe_checkout_session:)
   end
 end

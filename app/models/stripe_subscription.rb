@@ -41,12 +41,14 @@ class StripeSubscription < ApplicationRecord
       stripe_subscription
     end
 
-    def find_or_create_from_stripe(stripe_subscription_obj:, stripe_checkout_session: nil)
+    def create_or_update_from_stripe!(stripe_subscription_obj:, stripe_checkout_session: nil)
       stripe_subscription = find_by(stripe_id: stripe_subscription_obj.id) || new(stripe_id: stripe_subscription_obj.id)
       stripe_subscription.update_from_stripe_subscription!(stripe_subscription_obj)
       if stripe_checkout_session.present?
         stripe_subscription.find_or_create_payment(stripe_checkout_session)
       end
+      stripe_subscription.update_membership! if stripe_subscription.user_id.present?
+
       stripe_subscription
     end
   end
@@ -56,13 +58,17 @@ class StripeSubscription < ApplicationRecord
   end
 
   def update_membership!
-    return unless active? && user_id.present?
+    return unless user_id.present?
 
-    end_active_user_admin_membership! if active? && user&.membership_active&.admin_managed?
+    if active?
+      end_active_user_admin_membership!
 
-    membership ||= user&.membership_active || Membership.new(user_id:)
-    membership.update!(start_at:, end_at:, kind: membership_kind)
-    update(membership_id: membership.id) if membership_id != membership.id
+      membership ||= user&.membership_active || Membership.new(user_id:)
+      membership.kind = membership_kind
+    end
+    membership&.update!(start_at:, end_at:)
+
+    update(membership_id: membership.id) if membership&.id&.present? && membership_id != membership.id
     membership
   end
 
@@ -106,6 +112,9 @@ class StripeSubscription < ApplicationRecord
       payments.build(payment_method: :stripe, currency_enum:, user_id:, stripe_id: stripe_checkout_session.id)
 
     payment.update_from_stripe_checkout_session!(stripe_checkout_session)
+    update(user_id: payment.user_id) if user_id.blank? && payment.user_id.present?
+
+    payment
   end
 
   private
@@ -124,6 +133,8 @@ class StripeSubscription < ApplicationRecord
   end
 
   def end_active_user_admin_membership!
+    return unless user.membership_active&.admin_managed?
+
     user.membership_active.update(end_at: start_at || Time.current)
     user.reload
   end
