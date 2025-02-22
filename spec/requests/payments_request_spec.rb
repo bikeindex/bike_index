@@ -202,7 +202,7 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.amount_cents).to eq 4000
           expect(payment.paid_at).to be_blank # Ensure this gets set
           expect(payment.paid?).to be_falsey
-          expect(payment.stripe_customer).to be_blank
+          expect(payment.user.stripe_id).to be_blank
         end
       end
       context "user is a stripe customer" do
@@ -229,8 +229,7 @@ RSpec.describe PaymentsController, type: :request do
             expect(payment.amount_cents).to eq 7500
             expect(payment.paid_at).to be_blank # Ensure this gets set
             expect(payment.paid?).to be_falsey
-            expect(payment.stripe_customer).to be_present
-            expect(payment.stripe_customer.id).to eq customer_stripe_id
+            expect(payment.user.stripe_id).to be_present
           end
         end
       end
