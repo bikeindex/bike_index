@@ -108,6 +108,31 @@ RSpec.describe StripeEvent, type: :model do
           expect(membership).to match_hash_indifferently target_membership
           expect(membership.start_at).to be_within(1).of start_at
         end
+
+        context "with a matching payment" do
+          let(:stripe_subscription) { StripeSubscription.create(user:) }
+          let(:checkout_id) { "cs_test_a14VdEixSrpFjwqkENSaSEdr8THKAu5Q6wCe8tE1qJaeBB6NEAsjpYvgg4" }
+          let!(:payment) do
+            stripe_subscription.payments.create(
+              stripe_subscription.send(:payment_attrs).merge(stripe_id: checkout_id)
+            )
+          end
+          it "uses the existing subscription" do
+            Sidekiq::Job.drain_all
+            ActionMailer::Base.deliveries = []
+
+            VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+              expect do
+                stripe_event.update_bike_index_record!
+              end.to change(StripeSubscription, :count).by 0
+            end
+
+            expect_stripe_subscription_and_payment_to_match_targets(stripe_subscription.reload, payment.reload)
+
+            Sidekiq::Job.drain_all
+            expect(ActionMailer::Base.deliveries.count).to eq 1 # Should be 2 someday
+          end
+        end
       end
     end
 

@@ -4,6 +4,13 @@ base_url = "/membership"
 RSpec.describe MembershipsController, type: :request do
   let(:re_record_interval) { 30.days }
 
+  describe "show" do
+    it "redirects to blog" do
+      get base_url
+      expect(response).to redirect_to "/news/bike-index-membership"
+    end
+  end
+
   describe "new" do
     context "user not logged in" do
       it "renders" do
@@ -83,6 +90,8 @@ RSpec.describe MembershipsController, type: :request do
       include_context :request_spec_logged_in_as_user
 
       it "creates a stripe_subscription" do
+        Sidekiq::Job.drain_all
+        ActionMailer::Base.deliveries = []
         VCR.use_cassette("MembershipsController-create-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect {
             post base_url, params: create_params
@@ -92,6 +101,9 @@ RSpec.describe MembershipsController, type: :request do
           expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
           expect(stripe_subscription.payments.count).to eq 1
           expect(response).to redirect_to(/https:..checkout.stripe.com/)
+          # Verify that no emails are created
+          Sidekiq::Job.drain_all
+          expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         end
       end
 

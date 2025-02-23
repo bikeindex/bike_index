@@ -3,6 +3,8 @@
 class WebhooksController < ApplicationController
   STRIPE_WEBHOOK_SECRET = ENV["STRIPE_WEBHOOK_SECRET"].freeze
 
+  skip_before_action :verify_authenticity_token
+
   def stripe
     payload = request.body.read
     # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.

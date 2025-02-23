@@ -46,7 +46,13 @@ class StripeSubscription < ApplicationRecord
     end
 
     def create_or_update_from_stripe!(stripe_subscription_obj:, stripe_checkout_session: nil)
-      stripe_subscription = find_by(stripe_id: stripe_subscription_obj.id) || new(stripe_id: stripe_subscription_obj.id)
+      stripe_subscription = find_by(stripe_id: stripe_subscription_obj.id)
+      # Get the subscription by looking up the payment
+      if stripe_subscription.blank? && stripe_checkout_session.present?
+        stripe_subscription = Payment.find_by(stripe_id: stripe_checkout_session.id)&.stripe_subscription
+      end
+      stripe_subscription ||= new(stripe_id: stripe_subscription_obj.id)
+
       stripe_subscription.update_from_stripe_subscription!(stripe_subscription_obj)
       if stripe_checkout_session.present?
         stripe_subscription.find_or_create_payment(stripe_checkout_session)
@@ -84,6 +90,7 @@ class StripeSubscription < ApplicationRecord
     stripe_obj ||= fetch_stripe_subscription_obj
     raise "Unable to find subscription" unless stripe_obj.present?
 
+    self.stripe_id ||= stripe_obj.id
     self.user_id ||= User.find_by(stripe_id: stripe_obj.customer)&.id
     self.stripe_status = stripe_obj.status
 

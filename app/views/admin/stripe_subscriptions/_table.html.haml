@@ -14,6 +14,8 @@
       %th
         = sortable "stripe_status", render_sortable: render_sortable
       %th
+        Stripe
+      %th
         Payments
     %tbody
       - collection.each do |stripe_subscription|
@@ -44,6 +46,9 @@
               = render partial: "/shared/admin/user_cell", locals: {user: stripe_subscription.user, render_search: true, cache: true}
           %td
             = stripe_subscription.stripe_status
+          %td
+            - if stripe_subscription.stripe_id.present?
+              = link_to stripe_subscription.stripe_id.truncate(20), "https://dashboard.stripe.com/subscriptions/#{stripe_subscription.stripe_id}", title: stripe_subscription.stripe_id
           %td
             %small= admin_number_display(stripe_subscription.payments.count)
             - stripe_subscription.payments.order(id: :desc).limit(1).pluck(:id).each do |id|
