@@ -73,7 +73,7 @@ class Admin::MembershipsController < Admin::BaseController
 
   def matching_memberships
     memberships = Membership.all
-    @activeness = %w[active inactive].include?(params[:search_activeness]) ? params[:search_activeness] : nil
+    @activeness = %w[active not_active].include?(params[:search_activeness]) ? params[:search_activeness] : nil
     memberships = memberships.send(@activeness) if @activeness.present?
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])

@@ -87,7 +87,7 @@ class StripeSubscription < ApplicationRecord
     self.user_id ||= User.find_by(stripe_id: stripe_obj.customer)&.id
     self.stripe_status = stripe_obj.status
 
-    new_stripe_price_stripe_id = stripe_obj.plan&.id
+    new_stripe_price_stripe_id = stripe_obj.plan["id"]
     self.stripe_price_stripe_id = new_stripe_price_stripe_id if new_stripe_price_stripe_id.present?
 
     start_at_t = stripe_obj.start_date
@@ -129,7 +129,7 @@ class StripeSubscription < ApplicationRecord
   def stripe_portal_session
     Stripe::BillingPortal::Session.create({
       customer: user&.stripe_id,
-      return_url: "#{ENV["BASE_URL"]}/my_account",
+      return_url: "#{ENV["BASE_URL"]}/my_account"
     })
   end
 

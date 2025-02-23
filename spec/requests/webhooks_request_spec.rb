@@ -48,10 +48,6 @@ RSpec.describe WebhooksController, type: :request do
       end
     end
 
-    context "with a checkout session completed - not subscription" do
-      it "processes the webhook successfully"
-    end
-
     context "with a stripe subscription created event" do
       let(:payload) { File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.created.json")) }
       let(:target_stripe_subscription) do
