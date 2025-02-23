@@ -14,7 +14,7 @@ module ActivePeriodable
   end
 
   def period_active?
-    return false unless start_at.present? && start_at < Time.current
+    return false unless start_at.present? && start_at <= Time.current
 
     end_at.blank? || end_at > Time.current
   end

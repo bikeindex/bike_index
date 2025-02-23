@@ -2452,6 +2452,7 @@ nb:
         sharing: Deling + personlig side
         user_settings: Brukerinstillinger
         delete_account: Slett konto
+        membership: Medlemskap
       update:
         current_password_doesnt_match: Gjeldende passord stemmer ikke, det er nødvendig
           for å oppdatere passordet ditt.
@@ -2658,6 +2659,12 @@ nb:
     welcome:
       recovery_stories:
         no_stories_to_display: Ingen gjenopprettingshistorier å vise
+    memberships:
+      edit:
+        free_membership: Bike Index har gitt deg et gratis medlemskap. Send en e-post
+          til support@bikeindex.org hvis du har spørsmål.
+        no_active_membership: Du har ikke et aktivt medlemskap, du må registrere deg
+          for et nytt.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5832,3 +5839,10 @@ nb:
       location: plassering
       primary_colors: Primærfarger
       serial: Seriell
+  memberships:
+    success:
+      bike_index_team: Bike Index team
+      glad_to_have_you_on_board: Vi er så glade for å ha deg som medlem. Vi gir deg
+        beskjed når vi har oppdateringer om medlemsfordelene og alt annet kult å dele.
+      thank_you_for_supporting_bike_index: Takk for at du støtter Bike Index!
+      xoxo: XOXO,

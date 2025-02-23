@@ -84,6 +84,7 @@ class StripeSubscription < ApplicationRecord
     stripe_obj ||= fetch_stripe_subscription_obj
     raise "Unable to find subscription" unless stripe_obj.present?
 
+    self.user_id ||= User.find_by(stripe_id: stripe_obj.customer)&.id
     self.stripe_status = stripe_obj.status
 
     new_stripe_price_stripe_id = stripe_obj.plan&.id
@@ -93,7 +94,7 @@ class StripeSubscription < ApplicationRecord
     self.start_at = Time.at(start_at_t) if start_at_t.present?
 
     # TODO: Verify this is what we want (not cancel_at, etc)
-    end_at_t = stripe_obj.ended_at
+    end_at_t = stripe_obj.ended_at || stripe_obj.cancel_at
     self.end_at = Time.at(end_at_t) if end_at_t.present?
     save!
   end
@@ -123,6 +124,13 @@ class StripeSubscription < ApplicationRecord
     update(user_id: payment.user_id) if user_id.blank? && payment.user_id.present?
 
     payment
+  end
+
+  def stripe_portal_session
+    Stripe::BillingPortal::Session.create({
+      customer: user&.stripe_id,
+      return_url: "#{ENV["BASE_URL"]}/my_account",
+    })
   end
 
   private

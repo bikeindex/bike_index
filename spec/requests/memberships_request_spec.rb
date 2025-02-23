@@ -22,9 +22,24 @@ RSpec.describe MembershipsController, type: :request do
         expect(flash).to_not be_present
       end
       context "user has an active membership" do
-        # it "redirects to edit" do
-        #   fail
-        # end
+        let!(:membership) { FactoryBot.create(:membership, user: current_user) }
+        it "redirects to edit" do
+          expect(current_user.reload.membership_active).to be_present
+
+          get "#{base_url}/new"
+          expect(response).to redirect_to "/membership/edit"
+        end
+      end
+      context "user has an inactive membership" do
+        let!(:membership) { FactoryBot.create(:membership, user: current_user, start_at: 1.year.ago, end_at: 1.month.ago) }
+        it "redirects to edit" do
+          expect(current_user.reload.membership_active).to be_blank
+
+          get "#{base_url}/new"
+          expect(response.code).to eq("200")
+          expect(response).to render_template("new")
+          expect(flash).to_not be_present
+        end
       end
     end
   end
@@ -106,8 +121,49 @@ RSpec.describe MembershipsController, type: :request do
       expect(response).to render_template("success")
       expect(flash).to_not be_present
     end
-    context "with checkout id" do
-      it "updates the checkout"
+  end
+
+  describe "edit" do
+    it "sets return to, redirects to log in" do
+      get "#{base_url}/edit"
+      expect(response).to redirect_to new_session_path
+      expect(flash[:error]).to be_present
+      expect(session[:return_to]).to match(/membership\/edit/)
+    end
+
+    context "logged in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "redirects to new membership" do
+        get "#{base_url}/edit"
+        expect(response).to redirect_to new_membership_path
+        expect(flash[:notice]).to match(/active/)
+      end
+
+      context "with admin managed active membership" do
+        let!(:membership) { FactoryBot.create(:membership, user: current_user) }
+        it "redirects to my_account" do
+          expect(current_user.reload.membership_active.admin_managed?).to be_truthy
+
+          get "#{base_url}/edit"
+          expect(response).to redirect_to my_account_path
+          expect(flash[:notice]).to match(/free membership/i)
+        end
+      end
+
+      context "with stripe membership" do
+        let!(:stripe_subscription) { FactoryBot.create(:stripe_subscription_active, user: current_user) }
+
+        it "redirects to my_account" do
+          current_user.update(stripe_id: "cus_RohIc4uZhMPzxN")
+          expect(current_user.reload.membership_active.admin_managed?).to be_falsey
+
+          VCR.use_cassette("MembershipsController-edit-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+            get "#{base_url}/edit"
+            expect(response).to redirect_to(/https:\/\/billing.stripe.com\/p\/session/)
+          end
+        end
+      end
     end
   end
 end

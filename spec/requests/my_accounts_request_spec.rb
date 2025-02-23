@@ -122,7 +122,8 @@ RSpec.describe MyAccountsController, type: :request do
         delete_account: "Delete account",
         root: "User Settings",
         password: "Password",
-        sharing: "Sharing + Personal Page"
+        sharing: "Sharing + Personal Page",
+        membership: "Membership"
       }
     end
     context "no page given" do

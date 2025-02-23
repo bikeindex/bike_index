@@ -11,9 +11,9 @@ RSpec.describe StripeEvent, type: :model do
       OpenStruct.new(:type => webhook_payload["type"], "data" => {"object" => object})
     end
     let(:stripe_event) { StripeEvent.create_from(event_mock) }
+    let!(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
 
     context "subscription stripe_checkout completed" do
-      let!(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
       let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-checkout.session.completed.json"))) }
       let(:start_at) { Time.at(1740173835) } # has to be updated when fixture is updated
       let(:target_subscription) do

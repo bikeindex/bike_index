@@ -39,7 +39,7 @@ class Membership < ApplicationRecord
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
 
-  delegate :stripe_id, to: :active_stripe_subscription, allow_nil: true
+  delegate :stripe_id, :stripe_portal_session, to: :active_stripe_subscription, allow_nil: true
 
   attr_accessor :user_email, :set_interval
 

@@ -10,6 +10,7 @@ RSpec.describe StripeSubscription, type: :model do
     it "is valid" do
       expect(stripe_subscription).to be_valid
       expect(stripe_subscription.membership.user_id).to eq stripe_subscription.user_id
+      expect(stripe_subscription.membership.admin_managed?).to be_falsey
       expect(stripe_subscription.user.reload.membership_active&.id).to eq stripe_subscription.membership.id
     end
   end

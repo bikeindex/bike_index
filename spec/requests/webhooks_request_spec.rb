@@ -16,13 +16,6 @@ RSpec.describe WebhooksController, type: :request do
       "t=#{timestamp},v1=#{signature}"
     end
 
-    before do
-      # Stub the Stripe Webhook.construct_event method
-      allow(Stripe::Webhook).to receive(:construct_event).and_return(
-        Stripe::Event.construct_from(JSON.parse(payload))
-      )
-    end
-
     context "with subscription checkout session completed" do
       let(:target_stripe_subscription) do
         {
@@ -92,6 +85,39 @@ RSpec.describe WebhooksController, type: :request do
       end
     end
 
+    context "subscription canceled" do
+      let(:payload) { File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.updated-canceled.json")) }
+      let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org", stripe_id: "cus_RohIc4uZhMPzxN") }
+
+      it "updates the subscription" do
+        VCR.use_cassette("WebhooksController-subscription-cancel", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          expect do
+            post webhook_url,
+              params: payload,
+              headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
+
+            expect(response).to have_http_status(:ok)
+            expect(json_result).to eq({"success" => true})
+          end.to change(StripeEvent, :count).by 1
+        end
+
+        stripe_subscription = StripeSubscription.last
+        expect(stripe_subscription.user_id).to eq user.id
+        expect(stripe_subscription.stripe_status).to eq "active"
+        expect(stripe_subscription.start_at).to be_within(1).of Time.at(1740173835)
+        expect(stripe_subscription.end_at).to be_within(1).of Time.at(1742593035)
+
+        expect(stripe_subscription.payments.count).to eq 0 # no data to create from
+        expect(stripe_subscription.membership_id).to be_present
+
+        membership = stripe_subscription.membership
+        expect(membership.user_id).to eq user.id
+        expect(membership.start_at).to be_within(1).of stripe_subscription.start_at
+        expect(membership.end_at).to be_within(1).of stripe_subscription.end_at
+        expect(membership.status).to eq "active"
+      end
+    end
+
     context "with invalid signature" do
       it "returns a 400 bad request status" do
         allow(Stripe::Webhook).to receive(:construct_event).and_raise(Stripe::SignatureVerificationError.new("", ""))
@@ -107,16 +133,5 @@ RSpec.describe WebhooksController, type: :request do
     context "unknown event type" do
       it "returns 400"
     end
-
-    # Seems like a low value test
-    # context "with invalid JSON payload" do
-    #   it "returns a 400 bad request status" do
-    #     post webhook_url,
-    #          params: "invalid json",
-    #          headers: { 'CONTENT_TYPE' => 'application/json', 'HTTP_STRIPE_SIGNATURE' => stripe_signature }
-
-    #     expect(response).to have_http_status(:bad_request)
-    #   end
-    # end
   end
 end
