@@ -86,6 +86,7 @@ class User < ApplicationRecord
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :organization_roles
   has_many :memberships
+  has_many :stripe_subscriptions
   has_many :ownerships
   has_many :bike_sticker_updates
   has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
