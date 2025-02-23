@@ -5,7 +5,6 @@ class MoneyFormatter
     include MoneyRails::ActionViewExtension
 
     def money_format(amnt, currency = nil)
-
       Money.new(amnt || 0, currency_name_for(currency)).format
     end
 

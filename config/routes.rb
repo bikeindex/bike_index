@@ -60,13 +60,18 @@ Rails.application.routes.draw do
   get "logout", to: "sessions#destroy"
 
   resources :payments, only: %i[new create] do
-    collection do
-      get :success
-    end
+    collection { get :success }
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
+  resource :membership, only: %i[new create edit show] do
+    collection { get :success }
+  end
 
-  resources :documentation, only: [:index] do
+  resources :webhooks, only: [] do
+    collection { post :stripe }
+  end
+
+  resources :documentation, only: %i[index] do
     collection do
       get :api_v1
       get :api_v2
@@ -76,7 +81,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :ownerships, only: [:show]
+  resources :ownerships, only: %i[show]
 
   resources :stolen_notifications, only: %i[create new]
 
@@ -196,6 +201,7 @@ Rails.application.routes.draw do
       :impound_records,
       :mail_snippets,
       :mailchimp_values,
+      :memberships,
       :organization_roles,
       :organization_features,
       :paints,
@@ -207,7 +213,7 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates exports graduated_notifications invoices logged_searches mailchimp_data
       model_attestations model_audits notifications organization_statuses parking_notifications
-      stripe_prices user_alerts user_registration_organizations
+      stripe_prices stripe_subscriptions user_alerts user_registration_organizations
     ].each { resources _1, only: %i[index] }
 
     resources :bike_stickers do
@@ -275,15 +281,15 @@ Rails.application.routes.draw do
         end
       end
       resources :stolen_locking_response_suggestions, only: [:index]
-      resources :cycle_types, only: [:index]
-      resources :wheel_sizes, only: [:index]
-      resources :component_types, only: [:index]
-      resources :colors, only: [:index]
-      resources :handlebar_types, only: [:index]
-      resources :frame_materials, only: [:index]
+      resources :cycle_types, only: %i[index]
+      resources :wheel_sizes, only: %i[index]
+      resources :component_types, only: %i[index]
+      resources :colors, only: %i[index]
+      resources :handlebar_types, only: %i[index]
+      resources :frame_materials, only: %i[index]
       resources :manufacturers, only: %i[index show]
-      resources :notifications, only: [:create]
-      resources :organizations, only: [:show, :update]
+      resources :notifications, only: %i[create]
+      resources :organizations, only: %i[show update]
       resources :users do
         collection do
           get :current
@@ -294,25 +300,25 @@ Rails.application.routes.draw do
       get "not_found", to: "api_v1#not_found"
       get "*a", to: "api_v1#not_found"
     end
-    resources :autocomplete, only: [:index]
+    resources :autocomplete, only: %i[index]
   end
   mount API::Base => "/api"
 
-  resources :stolen, only: [:index, :show] do
+  resources :stolen, only: %i[index show] do
     collection do
       get "current_tsv"
       get "current_tsv_rapid"
     end
   end
 
-  resources :manufacturers, only: [:index] do
+  resources :manufacturers, only: %i[index] do
     collection { get "tsv" }
   end
   get "manufacturers_tsv", to: "manufacturers#tsv"
 
   get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   get "theft-ring", to: redirect("theft-rings")
-  resources :stolen_bike_listings, only: [:index]
+  resources :stolen_bike_listings, only: %i[index]
 
   get "/auth/failure", to: "integrations#integrations_controller_creation_error"
 
@@ -325,7 +331,7 @@ Rails.application.routes.draw do
   get "why_donate", to: redirect("/why-donate")
   get "lightspeed_integration", to: redirect("/lightspeed")
   get "/info/how-to-get-your-stolen-bike-back", controller: "info", action: "show", id: "how-to-get-your-stolen-bike-back", as: :get_your_stolen_bike_back
-  resources :info, only: [:show]
+  resources :info, only: %i[show]
 
   %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
 
@@ -342,7 +348,7 @@ Rails.application.routes.draw do
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: "o", module: "organized" do
     get "/", to: "dashboard#root", as: :root
-    resources :dashboard, only: [:index]
+    resources :dashboard, only: %i[index]
     get "landing", to: "manages#landing", as: :landing
     resources :bikes, only: %i[index new create show update] do
       collection do
@@ -354,7 +360,7 @@ Rails.application.routes.draw do
       member { post :resend_incomplete_email }
     end
     resources :model_audits, only: %i[index create show]
-    resources :exports, except: [:edit]
+    resources :exports, except: %i[edit]
     resources :bulk_imports, only: %i[index show new create]
     resources :emails, only: %i[index show edit update]
     resources :parking_notifications
@@ -378,7 +384,7 @@ Rails.application.routes.draw do
       end
     end
     resource :manage_impounding
-    resources :users, except: [:show]
+    resources :users, except: %i[show]
   end
 
   # This is the public organizations section

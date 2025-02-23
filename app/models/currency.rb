@@ -31,7 +31,7 @@ class Currency
   end
 
   def self.select_options
-    slugs.map { |slug| ["#{SYMBOLS[slug.to_sym]} (#{slug_translation(slug)})", slug] }
+    slugs.map { |slug| [new(slug).select_option, slug] }
   end
 
   def initialize(slug)
@@ -41,4 +41,8 @@ class Currency
   end
 
   attr_reader :slug, :id, :symbol
+
+  def select_option
+    "#{SYMBOLS[slug.to_sym]} (#{self.class.slug_translation(slug)})"
+  end
 end

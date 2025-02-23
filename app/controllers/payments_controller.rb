@@ -10,11 +10,11 @@ class PaymentsController < ApplicationController
 
   def success
     @payment = if params[:session_id].present?
-      Payment.where(stripe_id: params[:session_id]).first
+      Payment.find_by(stripe_id: params[:session_id])
     end
 
     @payment&.user_id ||= current_user&.id # Stupid, only happens in testing, but whateves
-    @payment&.update_from_stripe_session
+    @payment&.update_from_stripe_checkout_session!
   end
 
   def create
@@ -22,11 +22,10 @@ class PaymentsController < ApplicationController
       flash[:notice] = "Please enter a valid amount"
       redirect_back(fallback_location: new_payment_path) && return
     end
-    @payment = Payment.new(permitted_create_parameters)
-    stripe_session = Stripe::Checkout::Session.create(@payment.stripe_session_hash)
+    @payment = Payment.create(permitted_create_parameters)
+    @payment.stripe_checkout_session
 
-    @payment.update(stripe_id: stripe_session.id)
-    redirect_to stripe_session.url, allow_other_host: true
+    redirect_to @payment.stripe_checkout_session.url, allow_other_host: true
   end
 
   private

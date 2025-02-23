@@ -1,0 +1,49 @@
+- memberships ||= @memberships
+- skip_user ||= false
+- render_sortable ||= false
+- render_deleted ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      - unless skip_user
+        %th
+          = sortable "user_id", render_sortable: render_sortable
+      %th
+        = sortable "start_at", render_sortable: render_sortable
+      %th
+        = sortable "end_at", render_sortable: render_sortable
+      %th
+        = sortable "kind", render_sortable: render_sortable
+      %th
+        = sortable "creator", render_sortable: render_sortable
+
+    %tbody
+      - memberships.each do |membership|
+        %tr
+          %td
+            .less-strong-hold
+              %a.convertTime{ href: admin_membership_url(membership) }
+                = l membership.created_at, format: :convert_time
+              %span.less-strong-right.d-none.d-md-block
+                = membership.id
+          - unless skip_user
+            %td
+              = render partial: "/shared/admin/user_cell", locals: {user: membership.user, user_id: membership.user_id, render_search: false, cache: true}
+          %td
+            %span.convertTime
+              = l membership.start_at, format: :convert_time
+          %td
+            - if membership.end_at.present?
+              %span.convertTime
+                = l membership.end_at, format: :convert_time
+          %td
+            = membership.kind_humanized
+          %td
+            - if membership.stripe_managed?
+              = link_to "Stripe", membership.stripe_admin_url
+            - else
+              .less-strong
+                = render partial: "/shared/admin/user_cell", locals: {user: membership.creator, user_id: membership.creator_id, render_search: false, cache: true}

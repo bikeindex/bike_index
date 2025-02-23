@@ -71,7 +71,8 @@ class MyAccountsController < ApplicationController
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
       password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
       sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
-      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit]),
+      membership: translation(:membership, scope: [:controllers, :my_accounts, :edit])
     }.merge(registration_organization_template).as_json
   end
 

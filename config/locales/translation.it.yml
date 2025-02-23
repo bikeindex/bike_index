@@ -2333,6 +2333,7 @@ it:
         registration_organizations:
         sharing:
         user_settings:
+        membership:
       update:
         current_password_doesnt_match:
         successfully_updated:
@@ -2497,6 +2498,10 @@ it:
     welcome:
       recovery_stories:
         no_stories_to_display:
+    memberships:
+      edit:
+        free_membership:
+        no_active_membership:
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4587,3 +4592,9 @@ it:
       location: Luogo
       primary_colors: Colori primari
       serial: Seriale
+  memberships:
+    success:
+      bike_index_team:
+      glad_to_have_you_on_board:
+      thank_you_for_supporting_bike_index:
+      xoxo:

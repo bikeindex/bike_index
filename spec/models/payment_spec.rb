@@ -20,12 +20,12 @@ RSpec.describe Payment, type: :model do
     end
   end
 
-  describe "stripe_session_hash" do
-    let(:payment) { Payment.new(amount_cents: 2500, kind: "donation")}
+  describe "stripe_checkout_session_hash" do
+    let(:payment) { Payment.new(amount_cents: 2500, kind: "donation") }
     it "renders" do
-      expect(payment.stripe_session_hash[:submit_type]).to eq "donate"
-      expect(payment.stripe_session_hash[:success_url]).to be_present
-      expect(payment.stripe_session_hash[:cancel_url]).to be_present
+      expect(payment.send(:stripe_checkout_session_hash)[:submit_type]).to eq "donate"
+      expect(payment.send(:stripe_checkout_session_hash)[:success_url]).to be_present
+      expect(payment.send(:stripe_checkout_session_hash)[:cancel_url]).to be_present
     end
   end
 
@@ -112,13 +112,13 @@ RSpec.describe Payment, type: :model do
     end
   end
 
-  describe "stripe_success_url, stripe_cancel_url" do
+  describe "success_url, cancel_url" do
     let(:target_success) { "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}" }
     let(:target_cancel) { "http://test.host/payments/new" }
     let(:payment) { Payment.new }
     it "is expected" do
-      expect(payment.stripe_success_url).to eq target_success
-      expect(payment.stripe_cancel_url).to eq target_cancel
+      expect(payment.send(:success_url)).to eq target_success
+      expect(payment.send(:cancel_url)).to eq target_cancel
     end
     context "theft_alert" do
       let(:theft_alert) { FactoryBot.create(:theft_alert) }
@@ -126,8 +126,27 @@ RSpec.describe Payment, type: :model do
       let(:target_success) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}" }
       let(:target_cancel) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert/new" }
       it "returns expected" do
-        expect(payment.stripe_success_url).to eq target_success
-        expect(payment.stripe_cancel_url).to eq target_cancel
+        expect(payment.send(:success_url)).to eq target_success
+        expect(payment.send(:cancel_url)).to eq target_cancel
+      end
+    end
+  end
+
+  describe "can_assign_to_membership?" do
+    let(:payment) { Payment.new(user_id: 12) }
+    it "is truthy" do
+      expect(payment.can_assign_to_membership?).to be_truthy
+    end
+    context "without user_id" do
+      let(:payment) { Payment.new }
+      it "is falsey" do
+        expect(payment.can_assign_to_membership?).to be_falsey
+      end
+    end
+    context "with membership_id" do
+      let(:payment) { Payment.new(user_id: 12, membership_id: 22) }
+      it "is truthy" do
+        expect(payment.can_assign_to_membership?).to be_falsey
       end
     end
   end
@@ -146,6 +165,28 @@ RSpec.describe Payment, type: :model do
       user.reload
       expect(user.mailchimp_datum).to be_present
       expect(user.mailchimp_datum.interests).to eq(["donors"])
+    end
+  end
+
+  describe "update_from_stripe_checkout_session" do
+    let(:payment) { Payment.create(stripe_id: "cs_test_a1CtKMVSPmXNJnR683KqoOTff69gPvcdhJA545USuUfYVFwmykgV6KWsQp") }
+    let(:target_attrs) do
+      {
+        amount_cents: 499,
+        payment_method: "stripe",
+        kind: "donation",
+        email: "seth+test@bikeindex.org", # This isn't through stripe_checkout_session.customer_email
+        currency_enum: "usd",
+        stripe_subscription_id: nil # NOTE: doesn't assign, even though this is a subscription payment
+      }
+    end
+    it "updates and assigns" do
+      VCR.use_cassette("Payment-update_from_stripe_checkout_session", match_requests_on: [:method]) do
+        payment.update_from_stripe_checkout_session!
+      end
+      expect(payment.reload).to match_hash_indifferently target_attrs
+      expect(payment.paid_at).to be_present
+      expect(payment.user_id).to be_blank
     end
   end
 end

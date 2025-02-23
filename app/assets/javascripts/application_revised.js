@@ -5,6 +5,10 @@
 //= require external_scripts/headroom.js
 //= require external_scripts/jQuery.headroom.js
 
+// This is the only external dependency from a gem:
+//= require chartkick
+//= require Chart.bundle
+
 // Legacy carousel. Used on homepage.
 //= require external_scripts/slick.js
 

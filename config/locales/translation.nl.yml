@@ -2451,10 +2451,17 @@ nl:
         user_settings: Gebruikersinstellingen
         registration_organizations: Registratie Organisaties
         delete_account: Account verwijderen
+        membership: Lidmaatschap
       update:
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
         successfully_updated: Uw gegevens zijn succesvol bijgewerkt.
+    memberships:
+      edit:
+        free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
+          een e-mail naar support@bikeindex.org als u vragen hebt.
+        no_active_membership: Als u nog geen actief lidmaatschap heeft, moet u zich
+          aanmelden voor een nieuw lidmaatschap.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5985,3 +5992,12 @@ nl:
       location: Plaats
       primary_colors: Primaire kleuren
       serial: Serie
+  memberships:
+    success:
+      bike_index_team: Bike Index Team
+      glad_to_have_you_on_board: We zijn zo blij dat je lid bent. We laten je weten
+        wanneer we updates hebben over de lidmaatschapsvoordelen en andere leuke dingen
+        om te delen.
+      thank_you_for_supporting_bike_index: Bedankt voor het ondersteunen van Bike
+        Index!
+      xoxo: XOXO,
