@@ -14,7 +14,7 @@ class ActivateTheftAlertJob < ApplicationJob
     Facebook::AdsIntegration.new.create_for(theft_alert)
     theft_alert.reload
     # And mark the theft alert active
-    theft_alert.update(start_at: theft_alert.calculated_start_at,
+    theft_alert.update(start_at: theft_alert.start_at_with_fallback,
       end_at: theft_alert.calculated_end_at,
       status: "active")
     # Generally, there is information that didn't get saved when the ad was created, so enqueue update

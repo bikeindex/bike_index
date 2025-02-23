@@ -136,7 +136,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
     if available_statuses.include?(params[:search_status])
       @status = params[:search_status]
-      theft_alerts = if TheftAlert.available_statuses.include?(@status)
+      theft_alerts = if TheftAlert.statuses.include?(@status)
         theft_alerts.where(status: @status)
       else # It must be one of the special statuses - which must be valid to send!
         theft_alerts.send(@status)
