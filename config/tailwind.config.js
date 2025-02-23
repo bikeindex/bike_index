@@ -63,14 +63,10 @@ module.exports = {
           950: '#1d2834'
         }
       }
-      // fontFamily: {
-      //   sans: ['Inter var', ...defaultTheme.fontFamily.sans]
-      // }
     }
   }
   // plugins: [
   //   require('@tailwindcss/forms'),
-  //   require('@tailwindcss/typography'),
   //   // require('flowbite/plugin') // not sure this is necessary after copying!
   // ]
 }
