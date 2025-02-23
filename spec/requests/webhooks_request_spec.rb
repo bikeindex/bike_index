@@ -58,6 +58,7 @@ RSpec.describe WebhooksController, type: :request do
           end_at: nil
         }
       end
+      include_context :test_csrf_token
       it "processes the webhook successfully" do
         VCR.use_cassette("WebhooksController-subscription-created", match_requests_on: [:method], re_record_interval: re_record_interval) do
           expect do
