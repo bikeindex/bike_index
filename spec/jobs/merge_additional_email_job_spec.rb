@@ -10,13 +10,14 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
   context "confirmed" do
     let(:email) { "FOO@barexample.com" }
     let(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
-    let(:user_email) { FactoryBot.create(:user_email, email: email) }
-    let(:user) { user_email.user }
+    let(:user) { FactoryBot.create(:user_confirmed, stripe_id:) }
+    let(:user_email) { FactoryBot.create(:user_email, email:, user:) }
     let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "#{email.upcase} ") }
+    let(:stripe_id) { nil }
 
     context "existing user account", flaky: true do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
-      let(:old_user) { FactoryBot.create(:user_confirmed, email: email) }
+      let(:old_user) { FactoryBot.create(:user_confirmed, email: email, stripe_id: "xxxyyy") }
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryBot.create(:ownership, owner_email: email) }
       let(:theft_alert) { FactoryBot.create(:theft_alert, user: old_user) }
@@ -104,10 +105,12 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
         expect(bike.creator).to eq user
         expect(pre_created_ownership.creator_id).to eq user.id
         expect(user_phone.reload.user_id).to eq user.id
+        expect(payment.reload.user_id).to eq user.id
       end
 
       it "merges bikes and organization_roles and deletes user" do
         expect_merged_bikes_and_organization_roles
+        expect(user.stripe_id).to eq "xxxyyy"
       end
       context "banned user" do
         let(:old_user) { FactoryBot.create(:user_confirmed, email: email, banned: true) }
@@ -116,7 +119,7 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
           expect(user.banned?).to be_truthy
         end
       end
-      context "graduated_notifications, parking_notifications, stickers" do
+      context "graduated_notifications, parking_notifications, stickers, payment" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification, :with_user, user: old_user) }
         let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, user: old_user) }
         let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
@@ -132,6 +135,24 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
           expect(bike_sticker.reload.user_id).to eq user.id
           expect(bike_sticker.bike_sticker_updates.pluck(:user_id)).to eq([user.id]) # One update, from claiming
         end
+      end
+    end
+
+    context "membership" do
+      let!(:stripe_subscription) { FactoryBot.create(:stripe_subscription_active, user: old_user) }
+      let(:membership) { stripe_subscription.membership }
+      let(:stripe_id) { "new_stripe_id" }
+      let(:old_user) { FactoryBot.create(:user_confirmed, email: email, stripe_id: "xxxyyy") }
+
+      it "merges" do
+        stripe_subscription.reload
+        old_user.reload
+        user.reload
+
+        MergeAdditionalEmailJob.new.perform(user_email.id)
+
+        expect(stripe_subscription.reload.user_id).to eq user.id
+        expect(stripe_subscription.membership.user_id).to eq user.id
       end
     end
 

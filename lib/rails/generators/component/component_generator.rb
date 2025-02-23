@@ -74,7 +74,7 @@ class ComponentGenerator < Rails::Generators::NamedBase
   end
 
   def preview_path
-    "/rails/view_components/#{component_dir}/component/default"
+    "/rails/view_components#{component_dir}/component/default"
   end
 
   def create_locale_file(locale)

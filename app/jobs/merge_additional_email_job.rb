@@ -19,6 +19,8 @@ class MergeAdditionalEmailJob < ApplicationJob
     old_user.user_phones.update_all(user_id: user_email.user_id)
     old_user.locks.update_all(user_id: user_email.user_id)
     old_user.payments.update_all(user_id: user_email.user_id)
+    old_user.stripe_subscriptions.update_all(user_id: user_email.user_id)
+    old_user.memberships.update_all(user_id: user_email.user_id)
     old_user.integrations.update_all(user_id: user_email.user_id)
     old_user.sent_stolen_notifications.update_all(sender_id: user_email.user_id)
     old_user.received_stolen_notifications.update_all(receiver_id: user_email.user_id)
@@ -33,6 +35,9 @@ class MergeAdditionalEmailJob < ApplicationJob
     CustomerContact.where(user_id: old_user.id).each { |i| i.update_attribute :user_id, user_email.user_id }
     CustomerContact.where(creator_id: old_user.id).each { |i| i.update_attribute :creator_id, user_email.user_id }
 
+    if user_email.user.stripe_id.blank? && old_user.stripe_id.present?
+      user_email.user.update(stripe_id: old_user.stripe_id)
+    end
     user_email.user.update(banned: true) if old_user.banned?
 
     old_user.reload # so we don't trigger dependent destroys

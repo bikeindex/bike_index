@@ -1741,9 +1741,17 @@ en:
         lock_created: Lock created successfully!
       find_lock:
         not_your_lock: Whoops, that's not your lock!
+    memberships:
+      edit:
+        free_membership: >-
+          Bike Index has given you a free membership. Please email support@bikeindex.org
+          if you have questions.
+        no_active_membership: You don't have an active membership, you'll have to
+          sign up for a new one.
     my_accounts:
       edit:
         delete_account: Delete account
+        membership: Membership
         password: Password
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
@@ -3924,6 +3932,14 @@ en:
       oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
       only_makes_components: Only makes components
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
+  memberships:
+    success:
+      bike_index_team: The Bike Index team
+      glad_to_have_you_on_board: >-
+        We're so glad to have you as a member. We'll let you know when we have updates
+        on the membership benefits and anything else cool to share.
+      thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
+      xoxo: XOXO,
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
@@ -4912,7 +4928,7 @@ en:
       donation_header: Help support our efforts!
       pay_bike_index: Pay Bike Index
     success:
-      bike_index_team: Bike Index team
+      bike_index_team: The Bike Index team
       thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
       we_received_your_payment_of: We received your payment of %{amount}
       xoxo: XOXO,

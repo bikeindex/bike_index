@@ -48,6 +48,7 @@ RSpec.describe EmailReceiptJob, type: :job do
       let!(:notification) { Notification.create(notifiable: payment, kind: "receipt", delivery_status: "delivery_success") }
       it "does not email" do
         EmailDonationJob.new.perform(payment.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(payment.reload.notifications.count).to eq 2
         ActionMailer::Base.deliveries = []
 

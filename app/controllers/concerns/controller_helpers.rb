@@ -62,6 +62,13 @@ module ControllerHelpers
     @include_importmaps = true
   end
 
+  def store_return_and_authenticate_user(flash_type: :error)
+    return if current_user&.confirmed?
+
+    store_return_to
+    authenticate_user(flash_type:) && return
+  end
+
   def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
     translation_key ||= :you_have_to_log_in
 

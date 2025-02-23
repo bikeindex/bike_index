@@ -93,7 +93,7 @@
           "type": "controller",
           "class": "StolenBikeListingsController",
           "method": "index",
-          "line": 16,
+          "line": 15,
           "file": "app/controllers/stolen_bike_listings_controller.rb",
           "rendered": {
             "name": "stolen_bike_listings/index",
@@ -319,6 +319,29 @@
     {
       "warning_type": "Redirect",
       "warning_code": 18,
+      "fingerprint": "2843118e7bef96258449dfb2f745e07476f8a3193835936f63af1254bdf24a9c",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/bikes/theft_alerts_controller.rb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Bikes::TheftAlertsController",
+        "method": "create"
+      },
+      "user_input": "Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
       "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
@@ -403,7 +426,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/notifications_controller.rb",
-      "line": 37,
+      "line": 36,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "Notification.public_send(params[:search_kind])",
       "render_path": null,
@@ -512,6 +535,40 @@
     },
     {
       "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "4b22877587bddcd02107e977eced9d582540249cca162af37c1a2fc4a5c610df",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/memberships/show.html.haml",
+      "line": 68,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(\"manage on stripe\", Membership.find(params[:id]).stripe_admin_url)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::MembershipsController",
+          "method": "show",
+          "line": 38,
+          "file": "app/controllers/admin/memberships_controller.rb",
+          "rendered": {
+            "name": "admin/memberships/show",
+            "file": "app/views/admin/memberships/show.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/memberships/show"
+      },
+      "user_input": "Membership.find(params[:id]).stripe_admin_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "4bf92dd97cc7d2637f63a334523e1379acaacb4a59d1be98bed00db0950c13bf",
       "check_name": "CrossSiteScripting",
@@ -574,7 +631,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/feedbacks_controller.rb",
-      "line": 36,
+      "line": 35,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "Feedback.public_send(params[:search_kind])",
       "render_path": null,
@@ -631,7 +688,7 @@
       "check_name": "PermitAttributes",
       "message": "Potentially dangerous key allowed for mass assignment",
       "file": "app/controllers/admin/organization_roles_controller.rb",
-      "line": 60,
+      "line": 62,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.require(:organization_role).permit(:organization_id, :user_id, :role, :invited_email)",
       "render_path": null,
@@ -654,7 +711,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/organization_statuses_controller.rb",
-      "line": 68,
+      "line": 66,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "OrganizationStatus.all.where(:organization_id => current_organization.id).current.ended.deleted.public_send(params[:search_pos_kind]).public_send(params[:search_kind])",
       "render_path": null,
@@ -677,7 +734,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/theft_alerts_controller.rb",
-      "line": 129,
+      "line": 128,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  TheftAlert.where(:stolen_record_id => StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  TheftAlert\nend).public_send((params[:search_paid_admin] or nil))",
       "render_path": null,
@@ -871,6 +928,29 @@
       "note": ""
     },
     {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "a023e0858b0d5962b53a5b762dcf22efd6883df12310d60199cf26de6fb91a3c",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/memberships_controller.rb",
+      "line": 12,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(StripeSubscription.create_for(:stripe_price => StripePrice.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "MembershipsController",
+        "method": "create"
+      },
+      "user_input": "StripeSubscription.create_for(:stripe_price => StripePrice.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "a743bd471cdf4bb187bd3b07f9be19b8aca52624fee37000482ee30b9be07d55",
@@ -908,7 +988,7 @@
           "type": "controller",
           "class": "Organized::ModelAuditsController",
           "method": "show",
-          "line": 24,
+          "line": 23,
           "file": "app/controllers/organized/model_audits_controller.rb",
           "rendered": {
             "name": "organized/model_audits/show",
@@ -999,7 +1079,7 @@
           "type": "controller",
           "class": "Admin::TheftAlertsController",
           "method": "edit",
-          "line": 21,
+          "line": 20,
           "file": "app/controllers/admin/theft_alerts_controller.rb",
           "rendered": {
             "name": "admin/theft_alerts/edit",
@@ -1193,7 +1273,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/organization_statuses_controller.rb",
-      "line": 61,
+      "line": 59,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "OrganizationStatus.all.where(:organization_id => current_organization.id).current.ended.deleted.public_send(params[:search_pos_kind])",
       "render_path": null,
@@ -1252,6 +1332,29 @@
       "confidence": "Medium",
       "cwe_id": [
         915
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "e39c2e5eefb85eabd4bdd7df34edfb6bc4e5a1f22994c51addd3c201bd206a33",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/payments_controller.rb",
+      "line": 28,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Payment.create(permitted_create_parameters).stripe_checkout_session.url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PaymentsController",
+        "method": "create"
+      },
+      "user_input": "Payment.create(permitted_create_parameters).stripe_checkout_session.url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
       ],
       "note": ""
     },

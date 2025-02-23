@@ -1,0 +1,171 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.stripe.com/v1/checkout/sessions
+    body:
+      encoding: UTF-8
+      string: success_url=http%3A%2F%2Ftest.host%2Fmembership%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fmembership%2Fnew&mode=subscription&line_items[0][quantity]=1&line_items[0][price]=price_0Qs5p2m0T0GBfX0vhLrGLAAi
+    headers:
+      User-Agent:
+      - Stripe/v1 RubyBindings/13.4.1
+      Idempotency-Key:
+      - 7969495c-5e3a-446c-b828-8b6ec822157d
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Sat, 22 Feb 2025 19:32:07 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2417'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Methods:
+      - GET, HEAD, PUT, PATCH, POST, DELETE
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
+        X-Stripe-Privileged-Session-Required
+      Access-Control-Max-Age:
+      - '300'
+      Cache-Control:
+      - no-cache, no-store
+      Content-Security-Policy:
+      - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=upoR4e7Yv2pll3K2Xa4XsvBuEvNNIQFb0W6w8emd4Tlt47P2dFe3jfatbF9Rstvm1BMmu0kIEjCwtVnz
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to="coop"
+      Idempotency-Key:
+      - 7969495c-5e3a-446c-b828-8b6ec822157d
+      Original-Request:
+      - req_qxmnzoTf4LrrAn
+      Report-To:
+      - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
+      Reporting-Endpoints:
+      - coop="https://q.stripe.com/coop-report"
+      Request-Id:
+      - req_qxmnzoTf4LrrAn
+      Stripe-Should-Retry:
+      - 'false'
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Vary:
+      - Origin
+      X-Stripe-Priority-Routing-Enabled:
+      - 'true'
+      X-Stripe-Routing-Context-Priority-Tier:
+      - api-testmode
+      X-Wc:
+      - AB
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "id": "cs_test_a1I8HQYrVLDVPG8zbJ8VwUkctFx5pV4AX8SxELEH4WfDpKjo0o3WzuOBF1",
+          "object": "checkout.session",
+          "adaptive_pricing": null,
+          "after_expiration": null,
+          "allow_promotion_codes": null,
+          "amount_subtotal": 499,
+          "amount_total": 499,
+          "automatic_tax": {
+            "enabled": false,
+            "liability": null,
+            "status": null
+          },
+          "billing_address_collection": null,
+          "cancel_url": "http://test.host/membership/new",
+          "client_reference_id": null,
+          "client_secret": null,
+          "collected_information": null,
+          "consent": null,
+          "consent_collection": null,
+          "created": 1740252727,
+          "currency": "usd",
+          "currency_conversion": null,
+          "custom_fields": [],
+          "custom_text": {
+            "after_submit": null,
+            "shipping_address": null,
+            "submit": null,
+            "terms_of_service_acceptance": null
+          },
+          "customer": null,
+          "customer_creation": "always",
+          "customer_details": null,
+          "customer_email": null,
+          "discounts": [],
+          "expires_at": 1740339127,
+          "invoice": null,
+          "invoice_creation": null,
+          "livemode": false,
+          "locale": null,
+          "metadata": {},
+          "mode": "subscription",
+          "payment_intent": null,
+          "payment_link": null,
+          "payment_method_collection": "always",
+          "payment_method_configuration_details": {
+            "id": "pmc_0P68HJm0T0GBfX0vuIr5fXd9",
+            "parent": null
+          },
+          "payment_method_options": {
+            "card": {
+              "request_three_d_secure": "automatic"
+            }
+          },
+          "payment_method_types": [
+            "card",
+            "cashapp"
+          ],
+          "payment_status": "unpaid",
+          "phone_number_collection": {
+            "enabled": false
+          },
+          "recovered_from": null,
+          "saved_payment_method_options": {
+            "allow_redisplay_filters": [
+              "always"
+            ],
+            "payment_method_remove": null,
+            "payment_method_save": null
+          },
+          "setup_intent": null,
+          "shipping_address_collection": null,
+          "shipping_cost": null,
+          "shipping_details": null,
+          "shipping_options": [],
+          "status": "open",
+          "submit_type": null,
+          "subscription": null,
+          "success_url": "http://test.host/membership/success?session_id={CHECKOUT_SESSION_ID}",
+          "total_details": {
+            "amount_discount": 0,
+            "amount_shipping": 0,
+            "amount_tax": 0
+          },
+          "ui_mode": "hosted",
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1I8HQYrVLDVPG8zbJ8VwUkctFx5pV4AX8SxELEH4WfDpKjo0o3WzuOBF1#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+        }
+  recorded_at: Sat, 22 Feb 2025 19:32:07 GMT
+recorded_with: VCR 6.3.1

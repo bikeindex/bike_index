@@ -239,6 +239,14 @@
 - if @bikescount > 0
   = render partial: "admin/bikes/table", locals: {bikes: @bikes, skip_user: true}
 
+
+- memberships = Membership.where(user_id: @user.id).order(id: :desc)
+%h4.mt-4
+  Memberships
+  %small= link_to admin_number_display(memberships.count), admin_memberships_path(user_id: @user.id)
+- if memberships.count > 0
+  = render partial: "/admin/memberships/table", locals: {memberships: memberships, skip_user: true}
+
 - user_alerts = @user.user_alerts.order(created_at: :desc)
 %h4.mt-4
   = "Active Alert".pluralize(user_alerts.active.count)
@@ -254,7 +262,7 @@
   %small
     = link_to admin_number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all")
     - if payments.count > 5
-      %em (only first 5 shown)
+      %em (only most recent 5 shown)
 - if payments.any?
   = render partial: "/admin/payments/table", locals: {payments: payments.limit(5), skip_user: true}
 

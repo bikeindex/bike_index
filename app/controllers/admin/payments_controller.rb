@@ -21,7 +21,15 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def update
-    if valid_invoice_parameters?
+    if assign_to_membership_param?
+      if @payment.can_assign_to_membership?
+        User::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
+        flash[:success] = "Payment updated"
+      else
+        flash[:error] = "This payment can't be assigned to a membership - maybe it already has been?"
+      end
+      redirect_back(fallback_location: edit_admin_payment_url(@payment))
+    elsif valid_invoice_parameters?
       @payment.update(invoice_parameters) # invoice params are the only params permitted for update ;)
       flash[:success] = "Payment updated"
       redirect_to admin_payments_path
@@ -99,6 +107,9 @@ class Admin::PaymentsController < Admin::BaseController
     else
       @payment_method = "all"
     end
+    if params[:search_membership_id].present?
+      matching_payments = matching_payments.where(membership_id: params[:search_membership_id])
+    end
     matching_payments = matching_payments.admin_search(params[:query]) if params[:query].present?
     if params[:search_email].present?
       matching_payments = matching_payments.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%")
@@ -117,6 +128,10 @@ class Admin::PaymentsController < Admin::BaseController
 
   def default_period
     "year"
+  end
+
+  def assign_to_membership_param?
+    InputNormalizer.boolean(params[:assign_to_membership])
   end
 
   def valid_invoice_parameters?

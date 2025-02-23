@@ -2316,6 +2316,7 @@ es:
         sharing:
         user_settings:
         delete_account:
+        membership:
       update:
         current_password_doesnt_match:
         successfully_updated:
@@ -2480,6 +2481,10 @@ es:
     welcome:
       recovery_stories:
         no_stories_to_display:
+    memberships:
+      edit:
+        free_membership:
+        no_active_membership:
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4580,3 +4585,9 @@ es:
       location:
       primary_colors:
       serial:
+  memberships:
+    success:
+      bike_index_team:
+      glad_to_have_you_on_board:
+      thank_you_for_supporting_bike_index:
+      xoxo:

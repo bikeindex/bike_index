@@ -4,6 +4,8 @@ module AdminHelper
     [
       # Impound claims index is currently busted, so ignoring for now
       {title: "Dev: Impound Claims", path: admin_impound_claims_path, match_controller: true},
+      {title: "Dev: Stripe Subscriptions", path: admin_stripe_subscriptions_path, match_controller: true},
+      {title: "Dev: Stripe Prices", path: admin_stripe_prices_path, match_controller: true},
       {title: "Dev: Feature Flags", path: admin_feature_flags_path, match_controller: false},
       {title: "Dev: Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
       {title: "Dev: Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
@@ -34,6 +36,7 @@ module AdminHelper
       {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path, match_controller: true},
       {title: "Promoted Alerts", path: admin_theft_alerts_path, match_controller: true},
       {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path, match_controller: true},
+      {title: "Memberships", path: admin_memberships_path, match_controller: true},
       {title: "Payments", path: admin_payments_path, match_controller: true},
       {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
       {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true},
@@ -125,6 +128,7 @@ module AdminHelper
       return icon_hash
     end
     icon_hash[:tags] += [:donor] if user.donor?
+    icon_hash[:tags] += [:member] if user.membership_active.present?
     icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
     icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
     org = user.organization_prioritized
@@ -143,6 +147,10 @@ module AdminHelper
       if icon_hash[:tags].include?(:donor)
         concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
         concat(content_tag(:span, "onor", class: "less-strong")) if full_text
+      end
+      if icon_hash[:tags].include?(:member)
+        concat(content_tag(:span, "M", class: "donor-icon user-icon ml-1", title: "Member"))
+        concat(content_tag(:span, "ember", class: "less-strong")) if full_text
       end
       if icon_hash[:tags].include?(:organization_role)
         org_full_text = [

@@ -85,6 +85,8 @@ class User < ApplicationRecord
   has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :organization_roles
+  has_many :memberships
+  has_many :stripe_subscriptions
   has_many :ownerships
   has_many :bike_sticker_updates
   has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
@@ -110,6 +112,7 @@ class User < ApplicationRecord
   has_many :theft_alerts
   has_many :feedbacks
 
+  has_one :membership_active, -> { active }, class_name: "Membership"
   has_one :mailchimp_datum
   has_one :user_ban
   accepts_nested_attributes_for :user_ban
