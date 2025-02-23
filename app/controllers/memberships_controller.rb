@@ -7,7 +7,6 @@ class MembershipsController < ApplicationController
   def new
     if current_user&.membership_active.present?
       redirect_to edit_membership_path
-      nil
     end
   end
 

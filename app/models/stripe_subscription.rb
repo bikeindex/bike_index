@@ -93,7 +93,6 @@ class StripeSubscription < ApplicationRecord
     start_at_t = stripe_obj.start_date
     self.start_at = Time.at(start_at_t) if start_at_t.present?
 
-    # TODO: Verify this is what we want (not cancel_at, etc)
     end_at_t = stripe_obj.ended_at || stripe_obj.cancel_at
     self.end_at = Time.at(end_at_t) if end_at_t.present?
     save!
