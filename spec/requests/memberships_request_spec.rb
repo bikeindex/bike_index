@@ -4,6 +4,13 @@ base_url = "/membership"
 RSpec.describe MembershipsController, type: :request do
   let(:re_record_interval) { 30.days }
 
+  describe "show" do
+    it "redirects to blog" do
+      get base_url
+      expect(response).to redirect_to "/news/bike-index-membership"
+    end
+  end
+
   describe "new" do
     context "user not logged in" do
       it "renders" do
