@@ -21,14 +21,11 @@
               = link_to "#{status.humanize} alerts", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : '' }"
         %li.nav-item.dropdown
           %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_paid_admin.present? ? "active" : "") }
-            - if @search_paid_admin.present?
-              = @search_paid_admin.humanize
-            - else
-              Any paid/admin
+            = @search_paid_admin.humanize
           .dropdown-menu
-            = link_to "Any paid/admin", url_for(sortable_search_params.merge(search_paid_admin: nil)), class: "dropdown-item #{@search_paid_admin == 'all' ? 'active' : '' }"
-            .dropdown-divider
             - available_paid_admin.each do |paid_admin|
+              - if paid_admin == "paid_and_unpaid"
+                .dropdown-divider
               = link_to paid_admin.humanize, url_for(sortable_search_params.merge(search_paid_admin: paid_admin)), class: "dropdown-item #{@search_paid_admin == paid_admin ? 'active' : '' }"
         %li.nav-item
           = link_to "fbook data", url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), class: "nav-link #{@search_facebook_data ? 'active' : ''}"

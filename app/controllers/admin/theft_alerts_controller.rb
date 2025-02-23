@@ -112,7 +112,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def available_paid_admin
-    %w[paid admin paid_or_admin]
+    %w[paid_or_admin paid admin unpaid paid_and_unpaid]
   end
 
   def searched_theft_alerts
@@ -124,8 +124,13 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
-    @search_paid_admin = available_paid_admin.include?(params[:search_paid_admin]) ? params[:search_paid_admin] : nil
-    theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin.present?
+    @search_paid_admin = if available_paid_admin.include?(params[:search_paid_admin])
+      params[:search_paid_admin]
+    else
+      available_paid_admin.first
+    end
+    # paid_and_unpaid is "all"
+    theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin != "paid_and_unpaid"
 
     @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data

@@ -64,8 +64,10 @@ class TheftAlert < ApplicationRecord
   before_validation :set_calculated_attributes
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
-  scope :paid, -> { joins(:payment).where.not(payments: {paid_at: nil}) }
+  scope :paid, -> { joins(:payment).merge(Payment.paid) }
   scope :admin, -> { where(admin: true) }
+  scope :not_admin, -> { where(admin: false) }
+  scope :unpaid, -> { not_admin.joins(:payment).merge(Payment.incomplete) }
   scope :paid_or_admin, -> { paid.or(admin) }
   scope :posted, -> { where.not(start_at: nil) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
