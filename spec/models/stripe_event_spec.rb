@@ -118,6 +118,9 @@ RSpec.describe StripeEvent, type: :model do
             )
           end
           it "uses the existing subscription" do
+            Sidekiq::Job.drain_all
+            ActionMailer::Base.deliveries = []
+
             VCR.use_cassette("StripeEvent-update_bike_index-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
               expect do
                 stripe_event.update_bike_index_record!
@@ -125,6 +128,9 @@ RSpec.describe StripeEvent, type: :model do
             end
 
             expect_stripe_subscription_and_payment_to_match_targets(stripe_subscription.reload, payment.reload)
+
+            Sidekiq::Job.drain_all
+            expect(ActionMailer::Base.deliveries.count).to eq 1 # Should be 2 someday
           end
         end
       end

@@ -5,7 +5,7 @@
   = t(".html.we_really_appreciate_your_support")
 
 %p
-  - if @payment.donation?
+  - if @payment.donation? || @payment.membership_donation?
     = t(".html.donation_will_help", amount: @payment.amount_formatted)
   - else
     = t(".html.payment_received", amount: @payment.amount_formatted)
