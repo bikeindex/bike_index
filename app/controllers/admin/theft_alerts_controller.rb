@@ -23,11 +23,11 @@ class Admin::TheftAlertsController < Admin::BaseController
     if InputNormalizer.boolean(params[:activate_theft_alert])
       new_data = @theft_alert.facebook_data || {}
       @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
-      ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
+      StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
     elsif InputNormalizer.boolean(params[:update_theft_alert])
-      UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
+      StolenBike::UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
     elsif @theft_alert.update(permitted_update_params)
@@ -64,7 +64,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   def create
     @theft_alert = TheftAlert.new(permitted_create_params)
     if @theft_alert.save
-      ActivateTheftAlertJob.perform_async(@theft_alert.id) if @theft_alert.activateable?
+      StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id) if @theft_alert.activateable?
       flash[:success] = "Promoted alert created!"
       redirect_to edit_admin_theft_alert_path(@theft_alert)
     else

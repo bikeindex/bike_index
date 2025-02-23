@@ -7,7 +7,7 @@ rescue
 end
 
 if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
-  RSpec.describe ActivateTheftAlertJob, type: :job do
+  RSpec.describe StolenBike::ActivateTheftAlertJob, type: :job do
     let(:instance) { described_class.new }
 
     describe "perform" do
@@ -46,7 +46,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       #     # Somehow this doesn't show up, in requests after the first request
       #     # expect(theft_alert.facebook_post_url).to be_present
       #   end
-      #   expect(UpdateTheftAlertFacebookJob.jobs.count).to eq 1
+      #   expect(StolenBike::UpdateTheftAlertFacebookJob.jobs.count).to eq 1
       # end
     end
   end

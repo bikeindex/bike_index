@@ -39,7 +39,7 @@ class ScheduledJobRunner < ScheduledJob
       CreateGraduatedNotificationJob,
       CreateStolenGeojsonJob,
       CreateUserAlertNotificationJob,
-      DeactivateExpiredTheftAlertJob,
+      StolenBike::DeactivateExpiredTheftAlertJob,
       FetchProject529BikesJob,
       FileCacheMaintenanceJob,
       ImpoundExpirationJob,
@@ -58,7 +58,7 @@ class ScheduledJobRunner < ScheduledJob
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
-      UpdateTheftAlertFacebookJob,
+      StolenBike::UpdateTheftAlertFacebookJob,
       self
     ].freeze
   end

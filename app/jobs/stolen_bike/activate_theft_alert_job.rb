@@ -1,5 +1,5 @@
-class ActivateTheftAlertJob < ApplicationJob
-  sidekiq_options retry: 4 # It will retry because of UpdateTheftAlertFacebookJob
+class StolenBike::ActivateTheftAlertJob < ApplicationJob
+  sidekiq_options retry: 4 # It will retry because of StolenBike::UpdateTheftAlertFacebookJob
 
   def perform(theft_alert_id, force_activate = false)
     theft_alert = TheftAlert.find(theft_alert_id)
@@ -18,6 +18,6 @@ class ActivateTheftAlertJob < ApplicationJob
       end_at: theft_alert.calculated_end_at,
       status: "active")
     # Generally, there is information that didn't get saved when the ad was created, so enqueue update
-    UpdateTheftAlertFacebookJob.perform_in(15.seconds, theft_alert.id)
+    StolenBike::UpdateTheftAlertFacebookJob.perform_in(15.seconds, theft_alert.id)
   end
 end

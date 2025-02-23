@@ -8,7 +8,7 @@ class FakeIntegrationClass
   end
 end
 
-RSpec.describe UpdateTheftAlertFacebookJob, type: :job do
+RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
   let(:instance) { described_class.new }
   include_context :scheduled_job
   include_examples :scheduled_job_tests
@@ -101,7 +101,7 @@ RSpec.describe UpdateTheftAlertFacebookJob, type: :job do
         expect(theft_alert.status).to eq "pending"
         expect {
           instance.perform(theft_alert.id)
-        }.to change(ActivateTheftAlertJob.jobs, :count).by 1
+        }.to change(StolenBike::ActivateTheftAlertJob.jobs, :count).by 1
       end
     end
     context "receive_notifications? false" do
