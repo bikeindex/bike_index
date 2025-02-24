@@ -160,7 +160,7 @@ class TheftAlert < ApplicationRecord
   def should_update_facebook?
     return false unless facebook_updateable?
     return false if end_at < self.class.update_end_buffer
-    facebook_updated_at.blank? || facebook_updated_at < Time.current - 6.hours
+    facebook_updated_at.blank? || facebook_updated_at < Time.current - 3.hours
   end
 
   # literally CAN NOT activate
