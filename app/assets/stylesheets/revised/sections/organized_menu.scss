@@ -34,10 +34,10 @@ $organized-menu-bg: $gray-lighter;
     }
 
     img {
-      width: 70%;
-      max-width: 150px;
+      width: 100%;
+      max-width: 200px;
       height: auto;
-      margin: 0 auto $vertical-height;
+      margin: 0 0 $vertical-height;
       display: block;
     }
   }
@@ -83,8 +83,8 @@ $organized-menu-bg: $gray-lighter;
       .nav-link {
         color: $header-font-nocolor;
         &:hover {
-          text-decoration: none;
-          font-weight: $strong-font-weight;
+          text-decoration: underline;
+          // font-weight: $strong-font-weight;
           padding-right: 0;
           // Because otherwise the shift to bold can break line
         }
@@ -111,6 +111,7 @@ $organized-menu-bg: $gray-lighter;
         color: $blue;
         position: relative;
         font-weight: bold;
+        text-decoration: underline;
 
         &:after {
           content: "";
