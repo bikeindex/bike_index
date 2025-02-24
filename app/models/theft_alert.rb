@@ -73,12 +73,6 @@ class TheftAlert < ApplicationRecord
   scope :posted, -> { where.not(start_at: nil) }
   scope :activating, -> { pending.where(start_at: nil).where("(facebook_data -> 'activating_at') IS NOT NULL") }
   scope :failed_to_activate, -> { activating.where("(facebook_data -> 'activating_at')::integer < ?", Time.current.to_i - FAILED_DELAY) }
-
-  # return false unless activating?
-  #   activating_at < Time.current - 5.minutes
-  #   t = facebook_data&.dig("activating_at")
-  #   t.present? ? TimeParser.parse(t) : nil
-
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }

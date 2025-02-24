@@ -14,7 +14,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, amount_cents_facebook: 3999) }
       let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
       let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike, approved: true) }
       let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, theft_alert_plan: theft_alert_plan, stolen_record: stolen_record) }
       before do
         allow_any_instance_of(TheftAlert).to receive(:facebook_name) { "Test Theft Alert (worker)" }
@@ -48,6 +48,27 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       #   end
       #   expect(StolenBike::UpdateTheftAlertFacebookJob.jobs.count).to eq 1
       # end
+
+      describe "failed to activate" do
+        let(:timestamp) { (Time.current - 10.minutes).to_i }
+
+        it "doesn't update the activating_at time" do
+          stolen_record.reload
+          theft_alert.reload.update(facebook_data: {activating_at: timestamp})
+          expect(theft_alert.reload.failed_to_activate?).to be_truthy
+          expect(theft_alert.activateable_except_approval?).to be_truthy
+          expect(theft_alert.activateable?).to be_truthy
+
+          allow_any_instance_of(Facebook::AdsIntegration).to receive(:create_for).and_raise(StandardError)
+
+          expect {
+            instance.perform(theft_alert.id)
+          }.to raise_error(StandardError)
+
+          expect(theft_alert.reload.failed_to_activate?).to be_truthy
+          expect(theft_alert.facebook_data["activating_at"]).to be_within(1).of timestamp
+        end
+      end
     end
   end
 end

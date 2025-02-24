@@ -1,9 +1,9 @@
 class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
   prepend ScheduledJobRecorder
-  sidekiq_options queue: "low_priority", retry: 4 # It will retry because of scheduling
+  sidekiq_options queue: "low_priority", retry: 3 # It will retry because of scheduling
 
   def self.frequency
-    62.minutes
+    34.minutes
   end
 
   def perform(theft_alert_id = nil)
@@ -24,9 +24,14 @@ class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
 
   def enqueue_workers
     TheftAlert.should_update_facebook.where(facebook_updated_at: nil).pluck(:id)
-      .each { |i| StolenBike::UpdateTheftAlertFacebookJob.perform_async(i) }
+      .each { |i| self.class.perform_async(i) }
+
     # Try to avoid overrunning our rate limits
-    TheftAlert.should_update_facebook.where.not(facebook_updated_at: nil).order(:facebook_updated_at).limit(10).pluck(:id)
-      .each { |i| StolenBike::UpdateTheftAlertFacebookJob.perform_async(i) }
+    TheftAlert.failed_to_activate.pluck(:id)
+      .each { |i| self.class.perform_in(2.minutes, i) }
+
+    TheftAlert.should_update_facebook.where.not(facebook_updated_at: nil)
+      .order(:facebook_updated_at).limit(20).pluck(:id)
+      .each_with_index { |i, inx| self.class.perform_async(3.minutes + inx.minutes, i) }
   end
 end
