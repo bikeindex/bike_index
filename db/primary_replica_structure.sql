@@ -2761,6 +2761,53 @@ ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_sta
 
 
 --
+-- Name: promoted_alerts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.promoted_alerts (
+    id integer NOT NULL,
+    stolen_record_id integer,
+    theft_alert_plan_id integer,
+    payment_id integer,
+    user_id integer,
+    status integer DEFAULT 0 NOT NULL,
+    start_at timestamp without time zone,
+    end_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    notes text,
+    facebook_data jsonb,
+    latitude double precision,
+    longitude double precision,
+    reach integer,
+    bike_id bigint,
+    facebook_updated_at timestamp without time zone,
+    amount_cents_facebook_spent integer,
+    admin boolean DEFAULT false,
+    ad_radius_miles integer
+);
+
+
+--
+-- Name: promoted_alerts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.promoted_alerts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: promoted_alerts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.promoted_alerts_id_seq OWNED BY public.promoted_alerts.id;
+
+
+--
 -- Name: public_images; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3252,53 +3299,6 @@ CREATE SEQUENCE public.theft_alert_plans_id_seq
 --
 
 ALTER SEQUENCE public.theft_alert_plans_id_seq OWNED BY public.theft_alert_plans.id;
-
-
---
--- Name: theft_alerts; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.theft_alerts (
-    id integer NOT NULL,
-    stolen_record_id integer,
-    theft_alert_plan_id integer,
-    payment_id integer,
-    user_id integer,
-    status integer DEFAULT 0 NOT NULL,
-    start_at timestamp without time zone,
-    end_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    notes text,
-    facebook_data jsonb,
-    latitude double precision,
-    longitude double precision,
-    reach integer,
-    bike_id bigint,
-    facebook_updated_at timestamp without time zone,
-    amount_cents_facebook_spent integer,
-    admin boolean DEFAULT false,
-    ad_radius_miles integer
-);
-
-
---
--- Name: theft_alerts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.theft_alerts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: theft_alerts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.theft_alerts_id_seq OWNED BY public.theft_alerts.id;
 
 
 --
@@ -4165,6 +4165,13 @@ ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: promoted_alerts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.promoted_alerts ALTER COLUMN id SET DEFAULT nextval('public.promoted_alerts_id_seq'::regclass);
+
+
+--
 -- Name: public_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4246,13 +4253,6 @@ ALTER TABLE ONLY public.superuser_abilities ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY public.theft_alert_plans ALTER COLUMN id SET DEFAULT nextval('public.theft_alert_plans_id_seq'::regclass);
-
-
---
--- Name: theft_alerts id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.theft_alerts ALTER COLUMN id SET DEFAULT nextval('public.theft_alerts_id_seq'::regclass);
 
 
 --
@@ -4871,6 +4871,14 @@ ALTER TABLE ONLY public.pghero_query_stats
 
 
 --
+-- Name: promoted_alerts promoted_alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.promoted_alerts
+    ADD CONSTRAINT promoted_alerts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: public_images public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4964,14 +4972,6 @@ ALTER TABLE ONLY public.superuser_abilities
 
 ALTER TABLE ONLY public.theft_alert_plans
     ADD CONSTRAINT theft_alert_plans_pkey PRIMARY KEY (id);
-
-
---
--- Name: theft_alerts theft_alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.theft_alerts
-    ADD CONSTRAINT theft_alerts_pkey PRIMARY KEY (id);
 
 
 --
@@ -6083,6 +6083,41 @@ CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghe
 
 
 --
+-- Name: index_promoted_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_promoted_alerts_on_bike_id ON public.promoted_alerts USING btree (bike_id);
+
+
+--
+-- Name: index_promoted_alerts_on_payment_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_promoted_alerts_on_payment_id ON public.promoted_alerts USING btree (payment_id);
+
+
+--
+-- Name: index_promoted_alerts_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_promoted_alerts_on_stolen_record_id ON public.promoted_alerts USING btree (stolen_record_id);
+
+
+--
+-- Name: index_promoted_alerts_on_theft_alert_plan_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_promoted_alerts_on_theft_alert_plan_id ON public.promoted_alerts USING btree (theft_alert_plan_id);
+
+
+--
+-- Name: index_promoted_alerts_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_promoted_alerts_on_user_id ON public.promoted_alerts USING btree (user_id);
+
+
+--
 -- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6206,41 +6241,6 @@ CREATE INDEX index_stripe_subscriptions_on_user_id ON public.stripe_subscription
 --
 
 CREATE INDEX index_superuser_abilities_on_user_id ON public.superuser_abilities USING btree (user_id);
-
-
---
--- Name: index_theft_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_theft_alerts_on_bike_id ON public.theft_alerts USING btree (bike_id);
-
-
---
--- Name: index_theft_alerts_on_payment_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_theft_alerts_on_payment_id ON public.theft_alerts USING btree (payment_id);
-
-
---
--- Name: index_theft_alerts_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_theft_alerts_on_stolen_record_id ON public.theft_alerts USING btree (stolen_record_id);
-
-
---
--- Name: index_theft_alerts_on_theft_alert_plan_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_theft_alerts_on_theft_alert_plan_id ON public.theft_alerts USING btree (theft_alert_plan_id);
-
-
---
--- Name: index_theft_alerts_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (user_id);
 
 
 --
@@ -6398,26 +6398,26 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
--- Name: theft_alerts fk_rails_3c23dcdc45; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: promoted_alerts fk_rails_3c23dcdc45; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.theft_alerts
+ALTER TABLE ONLY public.promoted_alerts
     ADD CONSTRAINT fk_rails_3c23dcdc45 FOREIGN KEY (stolen_record_id) REFERENCES public.stolen_records(id) ON DELETE CASCADE;
 
 
 --
--- Name: theft_alerts fk_rails_4d1dc73022; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: promoted_alerts fk_rails_4d1dc73022; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.theft_alerts
+ALTER TABLE ONLY public.promoted_alerts
     ADD CONSTRAINT fk_rails_4d1dc73022 FOREIGN KEY (theft_alert_plan_id) REFERENCES public.theft_alert_plans(id) ON DELETE CASCADE;
 
 
 --
--- Name: theft_alerts fk_rails_58c070cc66; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: promoted_alerts fk_rails_58c070cc66; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.theft_alerts
+ALTER TABLE ONLY public.promoted_alerts
     ADD CONSTRAINT fk_rails_58c070cc66 FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
@@ -6430,10 +6430,10 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 
 --
--- Name: theft_alerts fk_rails_6dac5d87d9; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: promoted_alerts fk_rails_6dac5d87d9; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.theft_alerts
+ALTER TABLE ONLY public.promoted_alerts
     ADD CONSTRAINT fk_rails_6dac5d87d9 FOREIGN KEY (payment_id) REFERENCES public.payments(id);
 
 
@@ -6460,6 +6460,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250224234749'),
 ('20250217173339'),
 ('20250217173338'),
 ('20250217173337'),
