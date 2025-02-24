@@ -92,7 +92,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           expect(theft_alert.activating?).to be_falsey
           Sidekiq::Job.clear_all
           patch "/admin/theft_alerts/#{theft_alert.id}", params: {activate_theft_alert: 1}
-          expect(ActivateTheftAlertJob.jobs.count).to eq 1
+          expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
           expect(theft_alert.reload.activating_at).to be_present
           expect(theft_alert.activating?).to be_truthy
         end
@@ -102,7 +102,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           expect(theft_alert.reload.activating_at).to be_blank
           Sidekiq::Job.clear_all
           patch "/admin/theft_alerts/#{theft_alert.id}", params: {update_theft_alert: true}
-          # expect(UpdateTheftAlertFacebookJob.jobs.count).to eq 1
+          # expect(StolenBike::UpdateTheftAlertFacebookJob.jobs.count).to eq 1
           expect(theft_alert.reload.activating_at).to be_blank
         end
       end
@@ -148,7 +148,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(theft_alert.notes).to eq "Some notes"
         expect(theft_alert.status).to eq "pending"
         expect(theft_alert.activateable?).to be_truthy
-        expect(ActivateTheftAlertJob.jobs.count).to eq 1
+        expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
       end
       context "not activateable" do
         let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver) }
@@ -178,7 +178,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           expect(theft_alert.status).to eq "pending"
           expect(theft_alert.activateable?).to be_falsey
           expect(theft_alert.activating?).to be_falsey
-          expect(ActivateTheftAlertJob.jobs.count).to eq 0
+          expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 0
         end
       end
     end

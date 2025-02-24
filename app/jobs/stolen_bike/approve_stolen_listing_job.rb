@@ -1,4 +1,4 @@
-class ApproveStolenListingJob < ApplicationJob
+class StolenBike::ApproveStolenListingJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 1
 
   TWEETING_DISABLED = ENV["TWITTER_IS_FUCKED"].present?

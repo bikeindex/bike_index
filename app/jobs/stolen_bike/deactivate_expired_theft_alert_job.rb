@@ -1,4 +1,4 @@
-class DeactivateExpiredTheftAlertJob < ScheduledJob
+class StolenBike::DeactivateExpiredTheftAlertJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   def self.frequency

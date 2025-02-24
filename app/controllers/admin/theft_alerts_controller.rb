@@ -23,11 +23,11 @@ class Admin::TheftAlertsController < Admin::BaseController
     if InputNormalizer.boolean(params[:activate_theft_alert])
       new_data = @theft_alert.facebook_data || {}
       @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
-      ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
+      StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
     elsif InputNormalizer.boolean(params[:update_theft_alert])
-      UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
+      StolenBike::UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
     elsif @theft_alert.update(permitted_update_params)
@@ -64,7 +64,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   def create
     @theft_alert = TheftAlert.new(permitted_create_params)
     if @theft_alert.save
-      ActivateTheftAlertJob.perform_async(@theft_alert.id) if @theft_alert.activateable?
+      StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id) if @theft_alert.activateable?
       flash[:success] = "Promoted alert created!"
       redirect_to edit_admin_theft_alert_path(@theft_alert)
     else
@@ -108,11 +108,11 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def available_statuses
-    TheftAlert.statuses + ["posted"]
+    TheftAlert.statuses + %w[posted failed_to_activate]
   end
 
   def available_paid_admin
-    %w[paid admin paid_or_admin]
+    %w[paid_or_admin paid admin unpaid paid_and_unpaid]
   end
 
   def searched_theft_alerts
@@ -124,17 +124,22 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
-    @search_paid_admin = available_paid_admin.include?(params[:search_paid_admin]) ? params[:search_paid_admin] : nil
-    theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin.present?
+    @search_paid_admin = if available_paid_admin.include?(params[:search_paid_admin])
+      params[:search_paid_admin]
+    else
+      available_paid_admin.first
+    end
+    # paid_and_unpaid is "all"
+    theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin != "paid_and_unpaid"
 
     @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
     if available_statuses.include?(params[:search_status])
       @status = params[:search_status]
-      theft_alerts = if @status == "posted"
-        theft_alerts.posted
-      else
+      theft_alerts = if TheftAlert.statuses.include?(@status)
         theft_alerts.where(status: @status)
+      else # It must be one of the special statuses - which must be valid to send!
+        theft_alerts.send(@status)
       end
     else
       @status = "all"

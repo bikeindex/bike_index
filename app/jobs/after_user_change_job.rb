@@ -36,7 +36,7 @@ class AfterUserChangeJob < ApplicationJob
     # Activate activateable theft alerts!
     user.theft_alerts.paid.where(start_at: nil).each do |theft_alert|
       next unless theft_alert.activateable?
-      ActivateTheftAlertJob.perform_async(theft_alert.id)
+      StolenBike::ActivateTheftAlertJob.perform_async(theft_alert.id)
     end
 
     process_user_registration_organizations(user)
