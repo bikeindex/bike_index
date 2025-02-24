@@ -32,6 +32,6 @@ class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
 
     TheftAlert.should_update_facebook.where.not(facebook_updated_at: nil)
       .order(:facebook_updated_at).limit(20).pluck(:id)
-      .each_with_index { |i, inx| self.class.perform_async(3.minutes + inx.minutes, i) }
+      .each_with_index { |i, inx| self.class.perform_in(3.minutes + inx.minutes, i) }
   end
 end

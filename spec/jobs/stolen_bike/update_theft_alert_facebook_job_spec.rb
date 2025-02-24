@@ -34,7 +34,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
     it "updates the theft_alert and sends a message" do
       stolen_record.reload
       expect(stolen_record).to be_valid
-      expect(theft_alert.stolen_record_id).to eq stolen_record.id
+      expect(theft_alert.reload.stolen_record_id).to eq stolen_record.id
       expect(theft_alert.paid?).to be_truthy
       expect(theft_alert.live?).to be_falsey
       expect(theft_alert.missing_location?).to be_falsey
@@ -46,6 +46,12 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
       expect(theft_alert.end_at).to be_present
       expect(theft_alert.facebook_post_url).to be_blank
       expect(theft_alert.facebook_updated_at).to be_blank
+      expect(theft_alert.should_update_facebook?).to be_truthy
+
+      # It's enqueued
+      expect {
+        instance.perform
+      }.to change(StolenBike::UpdateTheftAlertFacebookJob.jobs, :count).by 1
 
       ActionMailer::Base.deliveries = []
       expect {
@@ -66,6 +72,19 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
         instance.perform(theft_alert.id)
       }.to_not change(Notification, :count)
     end
+    context "with facebook_update_at set" do
+      it "also enqueues" do
+        theft_alert.update(facebook_updated_at: Time.current - 6.hours)
+        expect(TheftAlert.facebook_updateable.pluck(:id)).to eq([theft_alert.id])
+        expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
+        expect(theft_alert.reload.should_update_facebook?).to be_truthy
+
+        # It's enqueued
+        expect {
+          instance.perform
+        }.to change(StolenBike::UpdateTheftAlertFacebookJob.jobs, :count).by 1
+      end
+    end
     context "no_notify" do
       it "does not notify" do
         theft_alert.update(facebook_data: facebook_data.merge(no_notify: true))
@@ -83,6 +102,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
         expect(theft_alert.end_at).to be_present
         expect(theft_alert.facebook_post_url).to be_blank
         expect(theft_alert.facebook_updated_at).to be_blank
+        expect(theft_alert.should_update_facebook?).to be_truthy
 
         ActionMailer::Base.deliveries = []
         expect {
