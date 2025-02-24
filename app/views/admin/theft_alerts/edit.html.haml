@@ -12,7 +12,7 @@
       Facebook Activation failed
     %small
       this alert has be marked inactive, but it never ran.
-      %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2024-2-23.
+      %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
 %h4
   - if @theft_alert.facebook_updateable?
     = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
