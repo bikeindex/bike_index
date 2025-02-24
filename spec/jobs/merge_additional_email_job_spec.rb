@@ -20,7 +20,7 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
       let(:old_user) { FactoryBot.create(:user_confirmed, email: email, stripe_id: "xxxyyy") }
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryBot.create(:ownership, owner_email: email) }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, user: old_user) }
+      let(:promoted_alert) { FactoryBot.create(:promoted_alert, user: old_user) }
 
       let(:organization) { organization_role.organization }
       let(:organization_role) { FactoryBot.create(:organization_role_claimed, user: old_user) }
@@ -58,7 +58,7 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
         expect(payment).to be_present
         expect(customer_contact).to be_present
         expect(stolen_notification).to be_present
-        expect(theft_alert).to be_present
+        expect(promoted_alert).to be_present
         expect(user_phone.user_id).to eq old_user.id
       end
 

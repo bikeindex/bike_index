@@ -56,14 +56,14 @@ class AdminMailer < ApplicationMailer
       subject: "API Notification sent!")
   end
 
-  def theft_alert_notification(theft_alert, notification_type: nil)
-    @theft_alert = theft_alert
-    @theft_alert_plan = theft_alert.theft_alert_plan
-    @user = theft_alert.user
-    @bike = theft_alert.bike
-    if notification_type == "theft_alert_recovered"
+  def promoted_alert_notification(promoted_alert, notification_type: nil)
+    @promoted_alert = promoted_alert
+    @promoted_alert_plan = promoted_alert.promoted_alert_plan
+    @user = promoted_alert.user
+    @bike = promoted_alert.bike
+    if notification_type == "promoted_alert_recovered"
       @recovered = true
-      msg_subject = "RECOVERED Promoted Alert: #{@theft_alert.id}"
+      msg_subject = "RECOVERED Promoted Alert: #{@promoted_alert.id}"
     end
     @message = "#{notification_type.upcase} - a Promoted Alert bike was just #{notification_type}"
 

@@ -109,14 +109,14 @@ RSpec.describe AdminMailer, type: :mailer do
     end
   end
 
-  describe "#theft_alert_notification" do
+  describe "#promoted_alert_notification" do
     context "given notify_of_recovered true" do
       it "renders email with recovered notification" do
-        theft_alert = FactoryBot.create(:theft_alert_paid)
-        mail = described_class.theft_alert_notification(theft_alert, notification_type: "theft_alert_recovered")
+        promoted_alert = FactoryBot.create(:promoted_alert_paid)
+        mail = described_class.promoted_alert_notification(promoted_alert, notification_type: "promoted_alert_recovered")
 
         expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
-        expect(mail.subject).to match("RECOVERED Promoted Alert: #{theft_alert.id}")
+        expect(mail.subject).to match("RECOVERED Promoted Alert: #{promoted_alert.id}")
         expect(mail.body.encoded).to include("RECOVERED")
         expect(mail.tag).to eq("admin")
       end

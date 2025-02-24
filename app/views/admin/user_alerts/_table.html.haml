@@ -48,10 +48,10 @@
             - if user_alert.user_phone.present?
               %span.d-block
                 %small user_phone: #{user_alert.user_phone_id}
-            - if user_alert.theft_alert.present?
+            - if user_alert.promoted_alert.present?
               %span.d-block
-                %small theft_alert:
-                = link_to user_alert.theft_alert_id, admin_theft_alert_path(user_alert.theft_alert_id)
+                %small promoted_alert:
+                = link_to user_alert.promoted_alert_id, admin_promoted_alert_path(user_alert.promoted_alert_id)
             - if user_alert.organization.present?
               %span.d-block
                 %small organization:

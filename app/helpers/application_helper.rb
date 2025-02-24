@@ -72,7 +72,7 @@ module ApplicationHelper
     case controller_name
     when "bikes"
       "edit_bike_skeleton" if %w[update].include?(action_name)
-    when "edits", "theft_alerts", "recovery"
+    when "edits", "promoted_alerts", "recovery"
       "edit_bike_skeleton"
     when "info"
       "content_skeleton" unless %w[terms security vendor_terms privacy support_the_index].include?(action_name)

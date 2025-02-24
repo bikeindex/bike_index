@@ -1,4 +1,4 @@
-class StolenBike::DeactivateExpiredTheftAlertJob < ScheduledJob
+class StolenBike::DeactivateExpiredPromotedAlertJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   def self.frequency
@@ -6,7 +6,7 @@ class StolenBike::DeactivateExpiredTheftAlertJob < ScheduledJob
   end
 
   def perform
-    TheftAlert
+    PromotedAlert
       .should_expire
       .update_all(status: "inactive")
   end

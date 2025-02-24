@@ -214,9 +214,9 @@ RSpec.describe API::V1::UsersController, type: :request do
         expect(stolen_record.can_share_recovery).to be_truthy
       end
       context "with a promoted alert" do
-        let!(:theft_alert) { FactoryBot.create(:theft_alert_ended, stolen_record: stolen_record, user: user) }
+        let!(:promoted_alert) { FactoryBot.create(:promoted_alert_ended, stolen_record: stolen_record, user: user) }
         it "sends an email to admins" do
-          expect(theft_alert.active?).to be_falsey
+          expect(promoted_alert.active?).to be_falsey
           bike.reload
           expect(bike.current_stolen_record).to eq stolen_record
 
@@ -240,7 +240,7 @@ RSpec.describe API::V1::UsersController, type: :request do
           expect(stolen_record.can_share_recovery).to be_truthy
           expect(ActionMailer::Base.deliveries.count).to eq 2
           mail_subjects = ActionMailer::Base.deliveries.map(&:subject)
-          expect(mail_subjects).to match_array(["Bike Recovery", "RECOVERED Promoted Alert: #{theft_alert.id}"])
+          expect(mail_subjects).to match_array(["Bike Recovery", "RECOVERED Promoted Alert: #{promoted_alert.id}"])
         end
       end
     end

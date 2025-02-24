@@ -20,9 +20,9 @@ module BikeEditable
     elsif edits_controller_name_for(template) == "edits"
       edit_bike_url(bike.id, edit_template: template)
     elsif template.to_s == "alert"
-      new_bike_theft_alert_path(bike_id: bike.id)
+      new_bike_promoted_alert_path(bike_id: bike.id)
     else
-      bike_theft_alert_path(bike_id: bike.id)
+      bike_promoted_alert_path(bike_id: bike.id)
     end
   end
 
@@ -94,6 +94,6 @@ module BikeEditable
   end
 
   def edits_controller_name_for(requested_page)
-    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alerts" : "edits"
+    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "promoted_alerts" : "edits"
   end
 end

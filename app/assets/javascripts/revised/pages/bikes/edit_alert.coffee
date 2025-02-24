@@ -36,4 +36,4 @@ class BikeIndex.BikesEditAlert extends BikeIndex
       $target = $target.parents(".js-plan-container")
 
     $target.addClass("selected")
-    @$alertForm.find("#theft_alert_plan_id").val($target.attr("data-id"))
+    @$alertForm.find("#promoted_alert_plan_id").val($target.attr("data-id"))

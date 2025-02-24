@@ -1,5 +1,5 @@
 # Add to a model that can be localized independent of the locale but with the
-# same set of languages (e.g. News, TheftAlertPlan models).
+# same set of languages (e.g. News, PromotedAlertPlan models).
 #
 # Expects a `language` column defined on the corresponding table.
 module Translatable

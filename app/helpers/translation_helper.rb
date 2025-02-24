@@ -1,15 +1,15 @@
 module TranslationHelper
-  def theft_alert_plan_title(plan)
+  def promoted_alert_plan_title(plan)
     duration = [
       plan.duration_days,
-      t(:days, scope: [:theft_alert_plans, :theft_alert_plan]).downcase
+      t(:days, scope: [:promoted_alert_plans, :promoted_alert_plan]).downcase
     ].join(" ")
 
     "#{plan.name} (#{duration})"
   end
 
   # Language choices available for request locale and localized models (Blog,
-  # TheftAlertPlan).
+  # PromotedAlertPlan).
   #
   # Return an array of tuples, each with the following strings:
   #

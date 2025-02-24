@@ -83,7 +83,7 @@ RSpec.describe AdminHelper, type: :helper do
         expect(user_icon(user, full_text: true)).to eq target_full_text
       end
       context "theft alert" do
-        let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user: user) }
+        let!(:promoted_alert) { FactoryBot.create(:promoted_alert_paid, user: user) }
         let(:target) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span><span class=\"theft-alert-icon user-icon ml-1\" title=\"Promoted alert purchaser\">P</span></span>" }
         let(:target_full_text) do
           "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span><span class=\"less-strong\">onor</span>" \
@@ -92,8 +92,8 @@ RSpec.describe AdminHelper, type: :helper do
         end
         it "returns donor and theft alert" do
           expect(user.donor?).to be_truthy
-          expect(user.theft_alert_purchaser?).to be_truthy
-          expect(user_icon_hash(user)).to eq({tags: %i[donor theft_alert]})
+          expect(user.promoted_alert_purchaser?).to be_truthy
+          expect(user_icon_hash(user)).to eq({tags: %i[donor promoted_alert]})
           expect(user_icon(user)).to eq target
           expect(user_icon(user, full_text: true)).to eq target_full_text
           user.superuser = true
@@ -157,9 +157,9 @@ RSpec.describe AdminHelper, type: :helper do
     it "returns blank" do
       expect(admin_path_for_object).to be_blank
     end
-    context "theft_alert" do
+    context "promoted_alert" do
       it "returns" do
-        expect(admin_path_for_object(TheftAlert.new(id: 69))).to eq admin_theft_alert_path(69)
+        expect(admin_path_for_object(PromotedAlert.new(id: 69))).to eq admin_promoted_alert_path(69)
       end
     end
     context "user_phone" do

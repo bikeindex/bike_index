@@ -244,7 +244,7 @@ nb:
         recovery_display:
           quote_too_long: Det sitatet er for langt. Vennligst forkort den til å være
             mindre enn 300 tegn
-        theft_alert:
+        promoted_alert:
           must_be_later_than_start_time: må være senere enn starttidspunktet
           must_be_present: må være tilstede
         user:
@@ -734,24 +734,24 @@ nb:
         recovery_tweet: Recovery tweet
         secondary_phone: Sekundær telefon
         street: gate
-        theft_alerts: Tyverivarsler
+        promoted_alerts: Tyverivarsler
         theft_description: Tyveribeskrivelse
         time: Tid
         tsved_at: Tsved kl
         zipcode: Postnummer
-      theft_alert:
+      promoted_alert:
         end_at: Slutt kl
         notes: Notater
         start_at: Start ved
         status: Status
-      theft_alert_plan:
+      promoted_alert_plan:
         active: Aktiv
         amount_cents: Beløp cent
         description: Beskrivelse
         duration_days: Varighet dager
         name: Navn
         stolen_records: Stjålet poster
-        theft_alerts: Tyverivarsler
+        promoted_alerts: Tyverivarsler
         views: Visninger
       tweet:
         alignment: Justering
@@ -936,8 +936,8 @@ nb:
       state: Stat
       stolen_notification: Stjålet varsel
       stolen_record: Stjålet rekord
-      theft_alert: Tyverivarsel
-      theft_alert_plan: Tyverivarslingsplan
+      promoted_alert: Tyverivarsel
+      promoted_alert_plan: Tyverivarslingsplan
       tweet: kvitring
       user: Brukerkonto
       user_email: Brukerens e-post
@@ -2066,7 +2066,7 @@ nb:
       share_widely_on_your_personal_social: Del mye på dine personlige sosiale medier
       supercharge_sharing_on_facebook: Supercharge deling på Facebook med Bike Index
       your_police_report: ditt politianmeldelsesnummer
-    theft_alerts:
+    promoted_alerts:
       new:
         best_value: Beste verdi
         bike_index_can_help: Bike Index kan hjelpe ved å kjøpe målrettede annonser
@@ -2094,7 +2094,7 @@ nb:
         created: Opprettet
         creator: Skaper
         end: Slutt
-        existing_theft_alerts: Eksisterende promoterte varsler
+        existing_promoted_alerts: Eksisterende promoterte varsler
         plan: Plan
         start: Start
         status: Status
@@ -2287,10 +2287,10 @@ nb:
       do_these_things_for_the_best_chance: Gjør disse tingene for best sjanse for
         å bli frisk!
       here: her
-      promoted_theft_alert_service_description: Bike Indexs nye Promoted Theft Alert-tjeneste
+      promoted_promoted_alert_service_description: Bike Indexs nye Promoted Theft Alert-tjeneste
         får øynene opp for sykkelen din av folk i sykkelmiljøet i nabolaget der sykkelen
         sist ble sett.
-      promoted_theft_alerts: Markedsførte tyverivarsler
+      promoted_promoted_alerts: Markedsførte tyverivarsler
       try_one_now: Prøv en nå!
       we_can_create_fb_ads_for_you: Visste du at vi kan lage målrettede Facebook-annonser
         for å spre ordet om din stjålne sykkel for deg?
@@ -2588,13 +2588,13 @@ nb:
         thanks: Takk for at du ser ut!
         unauthorized: Du har ikke tillatelse til å sende det varselet! Ta kontakt
           med support@bikeindex.org
-    theft_alerts:
+    promoted_alerts:
       create:
         order_is_pending: Bestillingen din venter, men vi kunne ikke fullføre betalingen.
           Ta kontakt med brukerstøtten for å fullføre kjøpet.
         unable_to_process_order: Vi kunne ikke behandle bestillingen din. Vennligst
           kontakt support.
-      ensure_user_allowed_to_create_theft_alert:
+      ensure_user_allowed_to_create_promoted_alert:
         unauthorized: Du har ikke tillatelse til å gjøre det. Vennligst kontakt support.
     user_emails:
       confirm:
@@ -5708,8 +5708,8 @@ nb:
       your_local_police_department_will_do_what: Din lokale politiavdeling vil gjøre
         det den gjør for å hjelpe med å gjenopprette sykkelen din. Hold deg i kommunikasjon
         med dem.
-  theft_alert_plans:
-    theft_alert_plan:
+  promoted_alert_plans:
+    promoted_alert_plan:
       days: Dager
   user_embeds:
     show:

@@ -98,9 +98,9 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.alert_image).to eq(result)
         stolen_record.skip_update = false # Make sure we aren't blocking
         expect(AlertImage.count).to eq(1)
-        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
-        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
-        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+        expect(stolen_record.promoted_alert_missing_photo?).to be_falsey
+        FactoryBot.create(:promoted_alert, stolen_record: stolen_record, status: :active)
+        expect(stolen_record.promoted_alert_missing_photo?).to be_falsey
 
         image.destroy
         expect(stolen_record.bike.public_images.count).to eq 0
@@ -160,7 +160,7 @@ RSpec.describe StolenRecord, type: :model do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
     expect(stolen_record.display_checklist?).to be_falsey
-    expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+    expect(stolen_record.promoted_alert_missing_photo?).to be_falsey
   end
 
   describe "find_or_create_recovery_link_token" do
@@ -627,17 +627,17 @@ RSpec.describe StolenRecord, type: :model do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do
         stolen_record = FactoryBot.create(:stolen_record, :in_chicago)
-        theft_alert = FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+        promoted_alert = FactoryBot.create(:promoted_alert, stolen_record: stolen_record, status: :active)
         stolen_record.reload
-        expect(stolen_record.theft_alert_missing_photo?).to be_truthy
-        expect(theft_alert.missing_location?).to be_falsey
-        og_updated_at = theft_alert.updated_at
+        expect(stolen_record.promoted_alert_missing_photo?).to be_truthy
+        expect(promoted_alert.missing_location?).to be_falsey
+        og_updated_at = promoted_alert.updated_at
 
         Sidekiq::Testing.inline! do
           expect { stolen_record.add_recovery_information }.to change { ActionMailer::Base.deliveries.length }.by(1)
         end
-        theft_alert.reload
-        expect(theft_alert.updated_at).to be > og_updated_at
+        promoted_alert.reload
+        expect(promoted_alert.updated_at).to be > og_updated_at
       end
     end
   end

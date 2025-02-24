@@ -103,10 +103,10 @@
         = link_to t(".share_widely_on_your_personal_social"), edit_bike_url(id: @bike.to_param, edit_template: "publicize")
         = t(".facebook_instagram_etc")
 
-    - theft_alert_purchased = stolen_record.theft_alerts.any?
-    %li{ class: theft_alert_purchased ? "completed-item" : "" }
+    - promoted_alert_purchased = stolen_record.promoted_alerts.any?
+    %li{ class: promoted_alert_purchased ? "completed-item" : "" }
       %span.checklist-checkbox
-        = "&#10003;".html_safe if theft_alert_purchased
+        = "&#10003;".html_safe if promoted_alert_purchased
       %span.checklist-text
         = t(".supercharge_sharing_on_facebook")
         = link_to t(".promoted_stolen_bike_alerts"), edit_bike_url(id: @bike.to_param, edit_template: "alert")

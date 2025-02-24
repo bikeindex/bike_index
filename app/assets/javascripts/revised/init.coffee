@@ -43,7 +43,7 @@ class BikeIndex.Init extends BikeIndex
     # If this is a landing page
     if body_id.match 'landing_pages_'
       return window.pageScript = new BikeIndex.LandingPage
-    if body_id.match 'bikes_theft_alerts'
+    if body_id.match 'bikes_promoted_alerts'
       return window.pageScript = new BikeIndex.BikesEdit
 
     # When save fails, it can render create or update (eg bikes_create) - but really, it's bikes_new

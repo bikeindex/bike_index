@@ -24,7 +24,7 @@ class MergeAdditionalEmailJob < ApplicationJob
     old_user.integrations.update_all(user_id: user_email.user_id)
     old_user.sent_stolen_notifications.update_all(sender_id: user_email.user_id)
     old_user.received_stolen_notifications.update_all(receiver_id: user_email.user_id)
-    old_user.theft_alerts.update_all(user_id: user_email.user_id)
+    old_user.promoted_alerts.update_all(user_id: user_email.user_id)
     old_user.bike_sticker_updates.update_all(user_id: user_email.user_id)
 
     BikeSticker.where(user_id: old_user.id).update_all(user_id: user_email.user_id)

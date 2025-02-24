@@ -1,11 +1,11 @@
 - first_form_well ||= false
 
-- if theft_alerts.present?
-  - show_creator = theft_alerts.pluck(:user_id).uniq != [current_user.id]
+- if promoted_alerts.present?
+  - show_creator = promoted_alerts.pluck(:user_id).uniq != [current_user.id]
   .form-wrap{ class: first_form_well ? "" : "secondary-form-wrap" }
     .form-well-form-header-always-visible
       %h3
-        = t(".existing_theft_alerts")
+        = t(".existing_promoted_alerts")
     .row
       .col-sm-12
         %table.table.table-bordered{ style: "background: #fff;" }
@@ -20,19 +20,19 @@
                 %th.small=t(".creator")
 
           %tbody
-            - theft_alerts.each do |theft_alert|
+            - promoted_alerts.each do |promoted_alert|
               %tr
                 %td
                   %span.convertTime
-                    = l(theft_alert.created_at, format: :convert_time)
-                %td= theft_alert.theft_alert_plan.name
-                %td= theft_alert.status
+                    = l(promoted_alert.created_at, format: :convert_time)
+                %td= promoted_alert.promoted_alert_plan.name
+                %td= promoted_alert.status
                 %td
-                  - if theft_alert.start_at.present?
-                    %span.convertTime= l(theft_alert.start_at, format: :convert_time)
+                  - if promoted_alert.start_at.present?
+                    %span.convertTime= l(promoted_alert.start_at, format: :convert_time)
                 %td
-                  - if theft_alert.end_at.present?
-                    .convertTime= l(theft_alert.end_at, format: :convert_time)
+                  - if promoted_alert.end_at.present?
+                    .convertTime= l(promoted_alert.end_at, format: :convert_time)
                 - if show_creator
                   %td
-                    %small= theft_alert.user&.display_name
+                    %small= promoted_alert.user&.display_name

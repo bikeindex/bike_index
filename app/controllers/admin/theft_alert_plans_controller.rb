@@ -1,43 +1,43 @@
-class Admin::TheftAlertPlansController < Admin::BaseController
+class Admin::PromotedAlertPlansController < Admin::BaseController
   def index
-    @theft_alert_plans = TheftAlertPlan.order(:amount_cents)
+    @promoted_alert_plans = PromotedAlertPlan.order(:amount_cents)
   end
 
   def new
-    @theft_alert_plan = TheftAlertPlan.new
+    @promoted_alert_plan = PromotedAlertPlan.new
   end
 
   def create
-    @theft_alert_plan = TheftAlertPlan.new(theft_alert_plan_params)
+    @promoted_alert_plan = PromotedAlertPlan.new(promoted_alert_plan_params)
 
-    if @theft_alert_plan.save
-      redirect_to(edit_admin_theft_alert_plan_path(@theft_alert_plan))
+    if @promoted_alert_plan.save
+      redirect_to(edit_admin_promoted_alert_plan_path(@promoted_alert_plan))
     else
-      flash[:errors] = @theft_alert_plan.errors.full_messages
+      flash[:errors] = @promoted_alert_plan.errors.full_messages
       render :new
     end
   end
 
   def edit
-    @theft_alert_plan = TheftAlertPlan.find(params[:id])
+    @promoted_alert_plan = PromotedAlertPlan.find(params[:id])
   end
 
   def update
-    @theft_alert_plan = TheftAlertPlan.find(params[:id])
+    @promoted_alert_plan = PromotedAlertPlan.find(params[:id])
 
-    if @theft_alert_plan.update(theft_alert_plan_params)
-      redirect_to(admin_theft_alert_plans_path)
+    if @promoted_alert_plan.update(promoted_alert_plan_params)
+      redirect_to(admin_promoted_alert_plans_path)
     else
-      flash[:errors] = @theft_alert_plan.errors.full_messages
+      flash[:errors] = @promoted_alert_plan.errors.full_messages
       render :edit
     end
   end
 
   private
 
-  def theft_alert_plan_params
+  def promoted_alert_plan_params
     params
-      .require(:theft_alert_plan)
+      .require(:promoted_alert_plan)
       .permit(:name, :amount_cents, :views, :duration_days, :description, :active, :language,
         :currency_enum, :amount_cents_facebook, :ad_radius_miles)
   end

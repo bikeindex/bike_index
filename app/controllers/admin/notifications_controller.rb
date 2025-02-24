@@ -22,7 +22,7 @@ class Admin::NotificationsController < Admin::BaseController
   end
 
   def special_kind_scopes
-    %w[donation theft_alert impound_claim customer_contact admin]
+    %w[donation promoted_alert impound_claim customer_contact admin]
   end
 
   def permitted_scopes

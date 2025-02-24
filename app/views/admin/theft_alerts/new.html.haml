@@ -1,15 +1,15 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", display_recovery: true}
+= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "promoted_alerts", display_recovery: true}
 
 %h1.mt-5.mb-4
   New Promoted Alert
 
-- if @theft_alerts.any?
+- if @promoted_alerts.any?
   %h4 Existing alerts
-  = render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true}
+  = render partial: "/admin/promoted_alerts/table", locals: {render_sortable: true, promoted_alerts: @promoted_alerts, skip_bike: true}
 
 .row.mt-5.mb-4
   .offset-md-2.col-md-8
-    - if @theft_alert.activateable?
+    - if @promoted_alert.activateable?
       .alert.alert-success
         %h4
           This alert will activate as soon as you create it.
@@ -19,26 +19,26 @@
           This alert won't activate,
           %small it's missing required stuff:
         %ul
-          - if @theft_alert.missing_photo?
+          - if @promoted_alert.missing_photo?
             %li.text-danger It doesn't have a photo
-          - if @theft_alert.missing_location?
-            %li.text-danger It doesn't have a location - "#{@theft_alert.latitude}"
-          - unless @theft_alert.stolen_record_approved?
+          - if @promoted_alert.missing_location?
+            %li.text-danger It doesn't have a location - "#{@promoted_alert.latitude}"
+          - unless @promoted_alert.stolen_record_approved?
             %li.text-danger Stolen record isn't approved
 
-= form_for @theft_alert, url: admin_theft_alerts_path, method: :post, html: {class: "m-0"} do |f|
+= form_for @promoted_alert, url: admin_promoted_alerts_path, method: :post, html: {class: "m-0"} do |f|
   = f.hidden_field :stolen_record_id
   .row
     .col-md-6
       .form-group
-        - plan_options = @theft_alert_plans.map { |e| ["#{theft_alert_plan_title(e)} - #{e.amount_formatted}", e.id] }
-        = f.label :theft_alert_plan_id
-        = f.select :theft_alert_plan_id,
-          options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
+        - plan_options = @promoted_alert_plans.map { |e| ["#{promoted_alert_plan_title(e)} - #{e.amount_formatted}", e.id] }
+        = f.label :promoted_alert_plan_id
+        = f.select :promoted_alert_plan_id,
+          options_for_select(plan_options, @promoted_alert.promoted_alert_plan.id),
           {},
           class: "form-control"
 
-    - @theft_alert.ad_radius_miles ||= @theft_alert.theft_alert_plan.ad_radius_miles
+    - @promoted_alert.ad_radius_miles ||= @promoted_alert.promoted_alert_plan.ad_radius_miles
     .col-md-6
       .form-group
         = f.label :ad_radius_miles
@@ -46,7 +46,7 @@
 
   .form-group
     = label_tag :location
-    = text_field_tag :location, @theft_alert.address_string, disabled: true, class: "form-control"
+    = text_field_tag :location, @promoted_alert.address_string, disabled: true, class: "form-control"
 
   .form-group
     = f.label :notes

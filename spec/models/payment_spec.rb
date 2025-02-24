@@ -55,8 +55,8 @@ RSpec.describe Payment, type: :model do
         expect(payment.user_id).to eq user.id
         expect(payment.referral_source).to be_nil
       end
-      context "theft_alert" do
-        let(:payment) { FactoryBot.create(:payment, user: nil, kind: "theft_alert", email: user.email) }
+      context "promoted_alert" do
+        let(:payment) { FactoryBot.create(:payment, user: nil, kind: "promoted_alert", email: user.email) }
         it "does not send an extra email" do
           expect {
             payment
@@ -88,11 +88,11 @@ RSpec.describe Payment, type: :model do
       payment.set_calculated_attributes
       expect(payment.kind).to eq "donation"
     end
-    context "theft_alert" do
-      let(:payment) { Payment.new(kind: "theft_alert") }
-      it "does not change from theft_alert" do
+    context "promoted_alert" do
+      let(:payment) { Payment.new(kind: "promoted_alert") }
+      it "does not change from promoted_alert" do
         payment.set_calculated_attributes
-        expect(payment.kind).to eq "theft_alert"
+        expect(payment.kind).to eq "promoted_alert"
       end
     end
     context "payment" do
@@ -120,11 +120,11 @@ RSpec.describe Payment, type: :model do
       expect(payment.send(:success_url)).to eq target_success
       expect(payment.send(:cancel_url)).to eq target_cancel
     end
-    context "theft_alert" do
-      let(:theft_alert) { FactoryBot.create(:theft_alert) }
-      let(:payment) { Payment.new(kind: "theft_alert", theft_alert: theft_alert) }
-      let(:target_success) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}" }
-      let(:target_cancel) { "http://test.host/bikes/#{theft_alert.bike_id}/theft_alert/new" }
+    context "promoted_alert" do
+      let(:promoted_alert) { FactoryBot.create(:promoted_alert) }
+      let(:payment) { Payment.new(kind: "promoted_alert", promoted_alert: promoted_alert) }
+      let(:target_success) { "http://test.host/bikes/#{promoted_alert.bike_id}/promoted_alert?session_id={CHECKOUT_SESSION_ID}" }
+      let(:target_cancel) { "http://test.host/bikes/#{promoted_alert.bike_id}/promoted_alert/new" }
       it "returns expected" do
         expect(payment.send(:success_url)).to eq target_success
         expect(payment.send(:cancel_url)).to eq target_cancel

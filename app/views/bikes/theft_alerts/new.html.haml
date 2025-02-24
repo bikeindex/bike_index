@@ -1,6 +1,6 @@
-= form_tag bike_theft_alert_path, method: :post, class: "primary-edit-bike-form", id: "alert-form" do |f|
+= form_tag bike_promoted_alert_path, method: :post, class: "primary-edit-bike-form", id: "alert-form" do |f|
   = hidden_field_tag :edit_template, :alert_purchase
-  = hidden_field_tag :theft_alert_plan_id, @selected_theft_alert_plan&.id
+  = hidden_field_tag :promoted_alert_plan_id, @selected_promoted_alert_plan&.id
   = hidden_field_tag :bike_id, @bike.id
   = hidden_field_tag :selected_bike_image_id
   = hidden_field_tag :currency, default_currency
@@ -21,27 +21,27 @@
               %p= t(".bike_index_can_help", bike_type: @bike.type)
 
           .row
-            - preferred_plan = @theft_alert_plans.max_by(&:amount_cents)
-            - @theft_alert_plans.each do |theft_alert_plan|
-              - is_selected = (theft_alert_plan == @selected_theft_alert_plan)
-              - is_preferred = (theft_alert_plan == preferred_plan) if preferred_plan.present?
+            - preferred_plan = @promoted_alert_plans.max_by(&:amount_cents)
+            - @promoted_alert_plans.each do |promoted_alert_plan|
+              - is_selected = (promoted_alert_plan == @selected_promoted_alert_plan)
+              - is_preferred = (promoted_alert_plan == preferred_plan) if preferred_plan.present?
               .col-md-12.col-lg-4
-                .detail-card-container.js-plan-container{class: (is_selected ? "selected" : ""), "data-id" => theft_alert_plan.id}
+                .detail-card-container.js-plan-container{class: (is_selected ? "selected" : ""), "data-id" => promoted_alert_plan.id}
                   .detail-card-title
-                    = theft_alert_plan.name
+                    = promoted_alert_plan.name
                     - if is_preferred
                       .preferred-tag= t(".best_value")
                   .detail-card
                     .detail-card-subtitle
-                      %strong= number_with_delimiter(theft_alert_plan.views)
+                      %strong= number_with_delimiter(promoted_alert_plan.views)
                       = t(".views")
                     .detail-card-subtitle
-                      %strong= theft_alert_plan.duration_days
+                      %strong= promoted_alert_plan.duration_days
                       = t(".days")
                     .detail-card-subtitle.detail-card-price
-                      = number_to_currency(theft_alert_plan.amount_cents / 100.0)
+                      = number_to_currency(promoted_alert_plan.amount_cents / 100.0)
                   .detail-card-content-main
-                    = theft_alert_plan.description_html.html_safe
+                    = promoted_alert_plan.description_html.html_safe
                   .detail-card-subtitle.detail-card-footer.js-plan-select
 
           -# Select an image
@@ -78,4 +78,4 @@
 
       .col-md-8.form-well
         .mt-4
-          = render partial: "table", locals: { theft_alerts: @theft_alerts, first_form_well: true }
+          = render partial: "table", locals: { promoted_alerts: @promoted_alerts, first_form_well: true }

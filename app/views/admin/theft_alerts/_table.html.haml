@@ -13,7 +13,7 @@
           %th Bike
         %th User
         %th
-          = sortable "theft_alert_plan_id", "Plan", render_sortable: render_sortable
+          = sortable "promoted_alert_plan_id", "Plan", render_sortable: render_sortable
         %th
           = sortable "amount_cents_facebook_spent", "Fbook spent", render_sortable: render_sortable
         %th
@@ -28,75 +28,75 @@
         %th City
         %th Notes
     %tbody
-      - theft_alerts.each do |theft_alert|
+      - promoted_alerts.each do |promoted_alert|
         %tr
           %td
-            = link_to l(theft_alert.created_at, format: :convert_time), edit_admin_theft_alert_path(theft_alert), class: "convertTime"
+            = link_to l(promoted_alert.created_at, format: :convert_time), edit_admin_promoted_alert_path(promoted_alert), class: "convertTime"
             %small.less-strong
-              = theft_alert.id
+              = promoted_alert.id
           %td
-            - if theft_alert.recovered?
-              = link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success"
-            - if theft_alert.failed_to_activate?
+            - if promoted_alert.recovered?
+              = link_to "recovered!", admin_recovery_path(promoted_alert.stolen_record), class: "text-success"
+            - if promoted_alert.failed_to_activate?
               %span.text-danger Failed activation!
-            - elsif theft_alert.activating?
+            - elsif promoted_alert.activating?
               %span.text-success activating!
             - else
-              - unless theft_alert.recovered? && theft_alert.inactive?
-                %span{class: theft_alert_status_class(theft_alert)}
-                  = theft_alert.status
-              - if theft_alert.pending?
-                - if theft_alert.activateable?
+              - unless promoted_alert.recovered? && promoted_alert.inactive?
+                %span{class: promoted_alert_status_class(promoted_alert)}
+                  = promoted_alert.status
+              - if promoted_alert.pending?
+                - if promoted_alert.activateable?
                   %em.small.text-success activateable
                 - else
                   %em.small.d-block
                     %span.text-danger missing:
                     - missing = []
-                    - missing << "photo" if theft_alert.missing_photo?
-                    - missing << "location" if theft_alert.missing_location?
-                    - missing << "payment" unless theft_alert.paid?
-                    - missing << "approval" unless theft_alert.stolen_record_approved?
+                    - missing << "photo" if promoted_alert.missing_photo?
+                    - missing << "location" if promoted_alert.missing_location?
+                    - missing << "payment" unless promoted_alert.paid?
+                    - missing << "approval" unless promoted_alert.stolen_record_approved?
                     = missing.join(", ")
 
           - unless skip_bike
             %td
-              - if theft_alert.bike.present?
-                = link_to theft_alert.bike.title_string, edit_admin_bike_path(theft_alert.bike)
+              - if promoted_alert.bike.present?
+                = link_to promoted_alert.bike.title_string, edit_admin_bike_path(promoted_alert.bike)
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: theft_alert.user, render_search: true, cache: true, user_id: theft_alert.user_id}
+            = render partial: "/shared/admin/user_cell", locals: {user: promoted_alert.user, render_search: true, cache: true, user_id: promoted_alert.user_id}
           %td
-            - theft_alert_plan = theft_alert.theft_alert_plan
+            - promoted_alert_plan = promoted_alert.promoted_alert_plan
             %small
-              = theft_alert.amount_facebook
-              %span.less-strong= theft_alert_plan.name
+              = promoted_alert.amount_facebook
+              %span.less-strong= promoted_alert_plan.name
           %td
-            - if theft_alert.amount_cents_facebook_spent.to_i > 0
-              = theft_alert.amount_facebook_spent
+            - if promoted_alert.amount_cents_facebook_spent.to_i > 0
+              = promoted_alert.amount_facebook_spent
           %td
-            %small.convertTime= l(theft_alert.start_at, format: :convert_time) if theft_alert.start_at.present?
+            %small.convertTime= l(promoted_alert.start_at, format: :convert_time) if promoted_alert.start_at.present?
           %td
-            - if theft_alert.end_at.present?
-              %small.convertTime= l(theft_alert.end_at, format: :convert_time)
+            - if promoted_alert.end_at.present?
+              %small.convertTime= l(promoted_alert.end_at, format: :convert_time)
 
           - if display_dev_info?
             %td
-              - if theft_alert.facebook_updated_at.present?
-                %small.convertTime= l theft_alert.facebook_updated_at, format: :convert_time
+              - if promoted_alert.facebook_updated_at.present?
+                %small.convertTime= l promoted_alert.facebook_updated_at, format: :convert_time
           %td
-            = admin_number_display(theft_alert.reach)
+            = admin_number_display(promoted_alert.reach)
           %td
-            %small= admin_number_display(theft_alert.engagement&.dig("unique_clicks"))
+            %small= admin_number_display(promoted_alert.engagement&.dig("unique_clicks"))
           %td
-            = theft_alert.city
-            - if theft_alert.state.present?
+            = promoted_alert.city
+            - if promoted_alert.state.present?
               %small.less-strong
-                = theft_alert.state.abbreviation
-            - elsif theft_alert.country.present? && theft_alert.country != Country.united_states
+                = promoted_alert.state.abbreviation
+            - elsif promoted_alert.country.present? && promoted_alert.country != Country.united_states
               %small.less-strong
-                = theft_alert.country.name
+                = promoted_alert.country.name
 
           %td
             %small
-              = theft_alert.notes
-              - if theft_alert.facebook_post_url.present?
-                %small.d-block= link_to "facebook", theft_alert.facebook_post_url
+              = promoted_alert.notes
+              - if promoted_alert.facebook_post_url.present?
+                %small.d-block= link_to "facebook", promoted_alert.facebook_post_url

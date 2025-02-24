@@ -1,24 +1,24 @@
-class StolenBike::ActivateTheftAlertJob < ApplicationJob
-  sidekiq_options retry: 4 # It will retry because of StolenBike::UpdateTheftAlertFacebookJob
+class StolenBike::ActivatePromotedAlertJob < ApplicationJob
+  sidekiq_options retry: 4 # It will retry because of StolenBike::UpdatePromotedAlertFacebookJob
 
-  def perform(theft_alert_id, force_activate = false)
-    theft_alert = TheftAlert.find(theft_alert_id)
-    return false unless theft_alert.pending?
-    return false unless theft_alert.activateable? || force_activate
+  def perform(promoted_alert_id, force_activate = false)
+    promoted_alert = PromotedAlert.find(promoted_alert_id)
+    return false unless promoted_alert.pending?
+    return false unless promoted_alert.activateable? || force_activate
 
-    if theft_alert.activating_at.blank?
-      new_data = theft_alert.facebook_data || {}
-      theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
+    if promoted_alert.activating_at.blank?
+      new_data = promoted_alert.facebook_data || {}
+      promoted_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
     end
 
-    Facebook::AdsIntegration.new.create_for(theft_alert)
+    Facebook::AdsIntegration.new.create_for(promoted_alert)
 
-    theft_alert.reload
+    promoted_alert.reload
     # And mark the theft alert active
-    theft_alert.update(start_at: theft_alert.start_at_with_fallback,
-      end_at: theft_alert.calculated_end_at,
+    promoted_alert.update(start_at: promoted_alert.start_at_with_fallback,
+      end_at: promoted_alert.calculated_end_at,
       status: "active")
     # Generally, there is information that didn't get saved when the ad was created, so enqueue update
-    StolenBike::UpdateTheftAlertFacebookJob.perform_in(15.seconds, theft_alert.id)
+    StolenBike::UpdatePromotedAlertFacebookJob.perform_in(15.seconds, promoted_alert.id)
   end
 end

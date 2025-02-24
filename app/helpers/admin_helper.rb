@@ -34,8 +34,8 @@ module AdminHelper
       {title: "POS Integration", path: lightspeed_interface_path, match_controller: false},
       {title: "Ambassador Activities", path: admin_ambassador_tasks_path, match_controller: true},
       {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path, match_controller: true},
-      {title: "Promoted Alerts", path: admin_theft_alerts_path, match_controller: true},
-      {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path, match_controller: true},
+      {title: "Promoted Alerts", path: admin_promoted_alerts_path, match_controller: true},
+      {title: "Promoted Alert Plans", path: admin_promoted_alert_plans_path, match_controller: true},
       {title: "Memberships", path: admin_memberships_path, match_controller: true},
       {title: "Payments", path: admin_payments_path, match_controller: true},
       {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
@@ -130,7 +130,7 @@ module AdminHelper
     icon_hash[:tags] += [:donor] if user.donor?
     icon_hash[:tags] += [:member] if user.membership_active.present?
     icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
-    icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
+    icon_hash[:tags] += [:promoted_alert] if user.promoted_alert_purchaser?
     org = user.organization_prioritized
     if org.present?
       icon_hash[:tags] += [:organization_role]
@@ -170,7 +170,7 @@ module AdminHelper
         concat(content_tag(:span, "S", class: "superuser-icon user-icon ml-1", title: "Superuser"))
         concat(content_tag(:span, "uperuser", class: "less-strong")) if full_text
       end
-      if icon_hash[:tags].include?(:theft_alert)
+      if icon_hash[:tags].include?(:promoted_alert)
         concat(content_tag(:span, "P", class: "theft-alert-icon user-icon ml-1", title: "Promoted alert purchaser"))
         concat(content_tag(:span, "romoted alert", class: "less-strong")) if full_text
       end
@@ -192,15 +192,15 @@ module AdminHelper
     end
   end
 
-  def theft_alert_status_class(theft_alert)
-    text_class = if theft_alert.active?
+  def promoted_alert_status_class(promoted_alert)
+    text_class = if promoted_alert.active?
       "text-info"
-    elsif theft_alert.pending?
+    elsif promoted_alert.pending?
       "text-warning"
-    elsif theft_alert.inactive?
+    elsif promoted_alert.inactive?
       "less-strong small"
     end
-    theft_alert.recovered? ? text_class + " small" : text_class
+    promoted_alert.recovered? ? text_class + " small" : text_class
   end
 
   private

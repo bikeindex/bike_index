@@ -28,10 +28,10 @@
 -# Only show if there is a stolen_record_id, the session_key hasn't been stored, and there isn't a paid alert
 
 - stolen_record_id = @bike&.current_stolen_record&.id
-- session_key = "promoted_theft_alert_modal_#{stolen_record_id}_seen"
-- if stolen_record_id.present? && session[session_key].blank? && TheftAlert.paid.where(stolen_record_id: stolen_record_id).none?
+- session_key = "promoted_promoted_alert_modal_#{stolen_record_id}_seen"
+- if stolen_record_id.present? && session[session_key].blank? && PromotedAlert.paid.where(stolen_record_id: stolen_record_id).none?
   - session[session_key] = true
-  - modal_title = t(".promoted_theft_alerts")
+  - modal_title = t(".promoted_promoted_alerts")
   - modal_body = capture_haml do
     .modal-body
       %p
@@ -43,7 +43,7 @@
           class: "m-auto mw-100"
 
       %p
-        = t(".promoted_theft_alert_service_description")
+        = t(".promoted_promoted_alert_service_description")
 
       %p
         - blog_post_link = link_to t(".here"),

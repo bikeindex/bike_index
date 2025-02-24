@@ -317,15 +317,15 @@ RSpec.describe AfterUserChangeJob, type: :job do
       user.reload
       expect(user.alert_slugs).to eq(["stolen_bike_without_location"])
 
-      FactoryBot.create(:theft_alert, stolen_record: stolen_record, user: user)
+      FactoryBot.create(:promoted_alert, stolen_record: stolen_record, user: user)
       instance.perform(user.id)
       user.reload
-      expect(user.alert_slugs).to eq(%w[stolen_bike_without_location theft_alert_without_photo])
+      expect(user.alert_slugs).to eq(%w[stolen_bike_without_location promoted_alert_without_photo])
 
       organization_role = FactoryBot.create(:organization_role_claimed, user: user, role: "member")
       instance.perform(user.id)
       user.reload
-      expect(user.alert_slugs).to eq(["theft_alert_without_photo"])
+      expect(user.alert_slugs).to eq(["promoted_alert_without_photo"])
 
       organization_role.destroy
       user.update(superuser: true)

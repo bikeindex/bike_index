@@ -9,7 +9,7 @@ class OrganizationNameValidator < ActiveModel::Validator
     my_account news o oauth organizations ownerships pages payments privacy protect_your_bike
     public_images rails recovery_stories registrations resources serials session shop sidekiq stickers
     stolen stolen_notifications store donate why_donate support_bike_index support_the_bike_index support_the_index terms
-    theft_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where
+    promoted_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where
     none false].freeze
 
   def self.valid?(str)

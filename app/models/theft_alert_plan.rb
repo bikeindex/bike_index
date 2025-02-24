@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: theft_alert_plans
+# Table name: promoted_alert_plans
 #
 #  id                    :integer          not null, primary key
 #  active                :boolean          default(TRUE), not null
@@ -16,7 +16,7 @@
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #
-class TheftAlertPlan < ApplicationRecord
+class PromotedAlertPlan < ApplicationRecord
   include Currencyable
   include Amountable
   include Translatable
@@ -29,8 +29,8 @@ class TheftAlertPlan < ApplicationRecord
 
   validates :amount_cents, :duration_days, :views, numericality: {greater_than: 0}
 
-  has_many :theft_alerts, dependent: :destroy
-  has_many :stolen_records, through: :theft_alerts
+  has_many :promoted_alerts, dependent: :destroy
+  has_many :stolen_records, through: :promoted_alerts
 
   scope :active, -> { where(active: true) }
   scope :price_ordered_desc, -> { order(amount_cents: :desc) }

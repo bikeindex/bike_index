@@ -10,7 +10,7 @@ class StolenBike::AfterStolenRecordSaveJob < ApplicationJob
       stolen_record.alert_image&.destroy
     end
 
-    stolen_record.theft_alerts.each { |t| t.update(updated_at: Time.current) }
+    stolen_record.promoted_alerts.each { |t| t.update(updated_at: Time.current) }
     if stolen_record.current
       StolenRecord.unscoped.where(bike_id: stolen_record.bike_id).where.not(id: stolen_record.id)
         .each { |s| s.update(current: false, skip_update: true) }

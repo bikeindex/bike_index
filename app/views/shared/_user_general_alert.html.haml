@@ -47,9 +47,9 @@
 
     = render partial: "shared/modal", locals: { title: t(".stolen_missing_location_title"), modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true }
 
-- elsif current_user.alert_slugs.include?("theft_alert_without_photo")
+- elsif current_user.alert_slugs.include?("promoted_alert_without_photo")
   -# TODO: use existing user_alert to select correct theft alert
-  - missing_photo_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.theft_alert_missing_photo? }
+  - missing_photo_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.promoted_alert_missing_photo? }
   - if missing_photo_bikes.present?
 
     - modal_body = capture_haml do

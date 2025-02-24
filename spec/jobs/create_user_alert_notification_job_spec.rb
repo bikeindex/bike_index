@@ -37,15 +37,15 @@ RSpec.describe CreateUserAlertNotificationJob, type: :job do
       end
     end
 
-    context "theft_alert_without_photo" do
+    context "promoted_alert_without_photo" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, latitude: nil, longitude: nil) }
-      let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user: bike.user, stolen_record: bike.current_stolen_record) }
-      let!(:user_alert) { FactoryBot.create(:user_alert, user: bike.user, bike: bike, kind: "theft_alert_without_photo") }
+      let!(:promoted_alert) { FactoryBot.create(:promoted_alert_paid, user: bike.user, stolen_record: bike.current_stolen_record) }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user: bike.user, bike: bike, kind: "promoted_alert_without_photo") }
       let!(:user_alert2) { FactoryBot.create(:user_alert, user: bike.user, bike: bike, kind: "stolen_bike_without_location") }
       it "creates and sends notifications" do
         expect(bike.current_stolen_record).to be_present
-        expect(theft_alert.reload.missing_photo?).to be_truthy
-        expect(theft_alert.missing_location?).to be_truthy
+        expect(promoted_alert.reload.missing_photo?).to be_truthy
+        expect(promoted_alert.missing_location?).to be_truthy
         expect(user_alert.reload.create_notification?).to be_truthy
         expect(bike.reload.user.email).to eq bike.owner_email
         expect(UserAlert.where(bike_id: bike.id, user_id: bike.user_id).pluck(:id)).to match_array([user_alert.id, user_alert2.id])

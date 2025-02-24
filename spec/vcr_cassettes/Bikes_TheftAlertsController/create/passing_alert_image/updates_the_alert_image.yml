@@ -5,7 +5,7 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=pay&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=100&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=theft_alert&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fbikes%2F21146%2Ftheft_alerts%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fbikes%2F21146%2Ftheft_alerts%2Fnew&customer_email=user1s%40bikeiasdndex.org
+      string: submit_type=pay&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=100&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=promoted_alert&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fbikes%2F21146%2Fpromoted_alerts%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fbikes%2F21146%2Fpromoted_alerts%2Fnew&customer_email=user1s%40bikeiasdndex.org
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/5.35.0
@@ -64,7 +64,7 @@ http_interactions:
             "status": null
           },
           "billing_address_collection": null,
-          "cancel_url": "http://test.host/bikes/21146/theft_alerts/new",
+          "cancel_url": "http://test.host/bikes/21146/promoted_alerts/new",
           "client_reference_id": null,
           "currency": "usd",
           "customer": null,
@@ -87,7 +87,7 @@ http_interactions:
           "shipping_address_collection": null,
           "submit_type": "pay",
           "subscription": null,
-          "success_url": "http://test.host/bikes/21146/theft_alerts?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://test.host/bikes/21146/promoted_alerts?session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,

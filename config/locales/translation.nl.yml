@@ -238,7 +238,7 @@ nl:
           requires_email_or_org: Vereist een e-mailadres of organisatie
         recovery_display:
           quote_too_long: Dat citaat is te lang. Kort deze in tot minder dan 300 tekens
-        theft_alert:
+        promoted_alert:
           must_be_later_than_start_time: moet later zijn dan de starttijd
           must_be_present: Moet aanwezig zijn
         user:
@@ -712,25 +712,25 @@ nl:
         recovery_tweet: Hersteltweet
         secondary_phone: Secundaire telefoon
         street: straat
-        theft_alerts: Diefstalwaarschuwingen
+        promoted_alerts: Diefstalwaarschuwingen
         theft_description: Diefstal beschrijving
         time: tijd
         tsved_at: Tsved om
         zipcode: Postcode
         recovered_at: Datum hersteld
-      theft_alert:
+      promoted_alert:
         end_at: Eindig op
         notes: Notes
         status: Toestand
         start_at: Begin bij
-      theft_alert_plan:
+      promoted_alert_plan:
         active: Actief
         amount_cents: Bedrag centen
         description: Beschrijving
         duration_days: Duur dagen
         name: Naam
         stolen_records: Gestolen records
-        theft_alerts: Diefstalwaarschuwingen
+        promoted_alerts: Diefstalwaarschuwingen
         views: Weergaven
       tweet:
         alignment: opstelling
@@ -932,8 +932,8 @@ nl:
       state: Staat
       stolen_notification: Gestolen melding
       stolen_record: Gestolen record
-      theft_alert: Diefstalalarm
-      theft_alert_plan: Diefstalalarmplan
+      promoted_alert: Diefstalalarm
+      promoted_alert_plan: Diefstalalarmplan
       tweet: Gekwetter
       user: Gebruiker
       user_email: gebruikers e-mail
@@ -2044,7 +2044,7 @@ nl:
       nl_phone_report: bel 0900-8844. Meestal krijgt u later een telefoongesprekafspraak,
         waarna u de informatie aan de politie doorgeeft
       nl_website_link_text: op deze plitie.nl webpagina
-    theft_alerts:
+    promoted_alerts:
       new:
         best_value: Beste aanbieding
         bike_index_can_help: Bike Index kan helpen door gerichte advertenties op Facebook
@@ -2071,7 +2071,7 @@ nl:
       table:
         created: Gemaakt
         end: Einde
-        existing_theft_alerts: Bestaande gesponsorde waarschuwingen
+        existing_promoted_alerts: Bestaande gesponsorde waarschuwingen
         plan: Plan
         start: Begin
         status: Toestand
@@ -2236,13 +2236,13 @@ nl:
         thanks: Bedankt voor het kijken!
         unauthorized: U hebt geen toestemming om die melding te verzenden! Neem contact
           op met support@bikeindex.org
-    theft_alerts:
+    promoted_alerts:
       create:
         order_is_pending: Uw bestelling is in behandeling, maar we konden de betaling
           niet voltooien. Neem contact op met ondersteuning om uw aankoop te voltooien.
         unable_to_process_order: We konden uw bestelling niet verwerken. Neem contact
           op met ondersteuning.
-      ensure_user_allowed_to_create_theft_alert:
+      ensure_user_allowed_to_create_promoted_alert:
         unauthorized: Je hebt geen toestemming om dat te doen. Neem contact op met
           ondersteuning.
     welcome:
@@ -5516,8 +5516,8 @@ nl:
       your_email_address: Uw e-mailadres
       your_local_police_department_will_do_what: Jouw lokale politie-afdeling zal
         doen wat het moet doet om de fiets terug te vinden. Blijf in contact met hen.
-  theft_alert_plans:
-    theft_alert_plan:
+  promoted_alert_plans:
+    promoted_alert_plan:
       days: dagen
   user_embeds:
     show:
@@ -5938,10 +5938,10 @@ nl:
         dan één dag hebben hersteld.
       do_these_things_for_the_best_chance: Doe deze dingen voor de beste kans op herstel!
       here: hier
-      promoted_theft_alert_service_description: De nieuwe Promoted Theft Alert-service
+      promoted_promoted_alert_service_description: De nieuwe Promoted Theft Alert-service
         van Bike Index krijgt uw fiets in de gaten van mensen in de fietsgemeenschap
         in de buurt waar uw fiets voor het laatst werd gezien.
-      promoted_theft_alerts: Gepromoveerde diefstalmeldingen
+      promoted_promoted_alerts: Gepromoveerde diefstalmeldingen
       try_one_now: Probeer er nu een!
       we_can_create_fb_ads_for_you: Wist je dat we gerichte Facebook-advertenties
         kunnen maken om het woord over je gestolen fiets voor jou te verspreiden?

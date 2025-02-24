@@ -1,22 +1,22 @@
-class EmailTheftAlertNotificationJob < ApplicationJob
+class EmailPromotedAlertNotificationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
-  def perform(theft_alert_id, kind, theft_alert = nil)
-    theft_alert ||= TheftAlert.find(theft_alert_id)
+  def perform(promoted_alert_id, kind, promoted_alert = nil)
+    promoted_alert ||= PromotedAlert.find(promoted_alert_id)
 
-    notification = theft_alert.notifications.where(kind: kind).first
-    notification ||= Notification.create(user: theft_alert.user,
+    notification = promoted_alert.notifications.where(kind: kind).first
+    notification ||= Notification.create(user: promoted_alert.user,
       kind: kind,
       message_channel: "email",
-      notifiable: theft_alert,
-      bike: theft_alert.bike)
+      notifiable: promoted_alert,
+      bike: promoted_alert.bike)
 
     notification.track_email_delivery do
-      if kind == "theft_alert_recovered"
-        AdminMailer.theft_alert_notification(theft_alert, notification_type: kind)
+      if kind == "promoted_alert_recovered"
+        AdminMailer.promoted_alert_notification(promoted_alert, notification_type: kind)
           .deliver_now
       else
-        CustomerMailer.theft_alert_email(theft_alert, notification).deliver_now
+        CustomerMailer.promoted_alert_email(promoted_alert, notification).deliver_now
       end
     end
   end

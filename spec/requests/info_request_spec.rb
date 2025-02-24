@@ -114,7 +114,7 @@ RSpec.describe InfoController, type: :request do
   describe "user with stolen info" do
     include_context :request_spec_logged_in_as_user
     before do
-      current_user.update_column :alert_slugs, ["theft_alert_without_photo"]
+      current_user.update_column :alert_slugs, ["promoted_alert_without_photo"]
     end
     it "renders with show alert" do
       get "/lightspeed"

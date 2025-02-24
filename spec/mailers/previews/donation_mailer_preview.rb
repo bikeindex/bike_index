@@ -20,8 +20,8 @@ class DonationMailerPreview < ActionMailer::Preview
     DonationMailer.donation_email("donation_recovered", payment)
   end
 
-  def donation_theft_alert
+  def donation_promoted_alert
     payment = Payment.donation.last
-    DonationMailer.donation_email("donation_theft_alert", payment)
+    DonationMailer.donation_email("donation_promoted_alert", payment)
   end
 end

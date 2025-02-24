@@ -48,7 +48,7 @@ class Notification < ApplicationRecord
   scope :with_bike, -> { where.not(bike_id: nil) }
   scope :without_bike, -> { where(bike_id: nil) }
   scope :donation, -> { where(kind: donation_kinds) }
-  scope :theft_alert, -> { where(kind: theft_alert_kinds) }
+  scope :promoted_alert, -> { where(kind: promoted_alert_kinds) }
   scope :impound_claim, -> { where(kind: impound_claim_kinds) }
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
@@ -68,8 +68,8 @@ class Notification < ApplicationRecord
       kinds.select { |k| k.start_with?("donation_") }.freeze
     end
 
-    def theft_alert_kinds
-      kinds.select { |k| k.start_with?("theft_alert_") }.freeze
+    def promoted_alert_kinds
+      kinds.select { |k| k.start_with?("promoted_alert_") }.freeze
     end
 
     def impound_claim_kinds
@@ -107,7 +107,7 @@ class Notification < ApplicationRecord
     end
 
     def sender_auto_kinds
-      donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
+      donation_kinds + promoted_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
         %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend]
     end
 
@@ -128,8 +128,8 @@ class Notification < ApplicationRecord
     end
   end
 
-  def theft_alert?
-    self.class.theft_alert_kinds.include?(kind)
+  def promoted_alert?
+    self.class.promoted_alert_kinds.include?(kind)
   end
 
   def b_param?

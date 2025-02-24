@@ -4,7 +4,7 @@
   .col-md-8
     %ul
       %li.nav-item
-        = link_to "New Promoted Alert Plan", new_admin_theft_alert_plan_path
+        = link_to "New Promoted Alert Plan", new_admin_promoted_alert_plan_path
 
 .full-screen-table
   %table.table.table-striped.table-bordered.ambassador-tasks-table
@@ -18,9 +18,9 @@
         %th Language
         %th Active?
     %tbody
-      - @theft_alert_plans.each do |plan|
+      - @promoted_alert_plans.each do |plan|
         %tr
-          %td= link_to plan.name , edit_admin_theft_alert_plan_path(plan)
+          %td= link_to plan.name , edit_admin_promoted_alert_plan_path(plan)
           %td= plan.amount_formatted
           %td= number_with_delimiter(plan.views)
           %td= plan.duration_days

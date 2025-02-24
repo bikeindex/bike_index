@@ -141,9 +141,9 @@ RSpec.describe "BikesController#show", type: :request do
       expect(response).to render_template("_organized_access_panel")
     end
   end
-  context "theft_alert and recovery_link_token" do
-    let(:theft_alert) { FactoryBot.create(:theft_alert_ended) }
-    let(:stolen_record) { theft_alert.stolen_record }
+  context "promoted_alert and recovery_link_token" do
+    let(:promoted_alert) { FactoryBot.create(:promoted_alert_ended) }
+    let(:stolen_record) { promoted_alert.stolen_record }
     let(:bike) { stolen_record.bike }
     let!(:image1) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
     it "renders" do

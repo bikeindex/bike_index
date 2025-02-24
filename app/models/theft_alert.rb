@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: theft_alerts
+# Table name: promoted_alerts
 #
 #  id                          :integer          not null, primary key
 #  ad_radius_miles             :integer
@@ -20,26 +20,26 @@
 #  bike_id                     :bigint
 #  payment_id                  :integer
 #  stolen_record_id            :integer
-#  theft_alert_plan_id         :integer
+#  promoted_alert_plan_id         :integer
 #  user_id                     :integer
 #
 # Indexes
 #
-#  index_theft_alerts_on_bike_id              (bike_id)
-#  index_theft_alerts_on_payment_id           (payment_id)
-#  index_theft_alerts_on_stolen_record_id     (stolen_record_id)
-#  index_theft_alerts_on_theft_alert_plan_id  (theft_alert_plan_id)
-#  index_theft_alerts_on_user_id              (user_id)
+#  index_promoted_alerts_on_bike_id              (bike_id)
+#  index_promoted_alerts_on_payment_id           (payment_id)
+#  index_promoted_alerts_on_stolen_record_id     (stolen_record_id)
+#  index_promoted_alerts_on_promoted_alert_plan_id  (promoted_alert_plan_id)
+#  index_promoted_alerts_on_user_id              (user_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (payment_id => payments.id)
 #  fk_rails_...  (stolen_record_id => stolen_records.id) ON DELETE => cascade
-#  fk_rails_...  (theft_alert_plan_id => theft_alert_plans.id) ON DELETE => cascade
+#  fk_rails_...  (promoted_alert_plan_id => promoted_alert_plans.id) ON DELETE => cascade
 #  fk_rails_...  (user_id => users.id)
 #
-class TheftAlert < ApplicationRecord
-  # NOTE: TheftAlert is called "Promoted alert" on the frontend
+class PromotedAlert < ApplicationRecord
+  # NOTE: PromotedAlert is called "Promoted alert" on the frontend
 
   FAILED_DELAY = 5.minutes.to_i.freeze
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
@@ -48,7 +48,7 @@ class TheftAlert < ApplicationRecord
 
   enum :status, STATUS_ENUM
 
-  validates :theft_alert_plan,
+  validates :promoted_alert_plan,
     :status,
     :user_id,
     presence: true
@@ -56,7 +56,7 @@ class TheftAlert < ApplicationRecord
   validate :alert_cannot_begin_in_past_or_after_ends
 
   belongs_to :stolen_record
-  belongs_to :theft_alert_plan
+  belongs_to :promoted_alert_plan
   belongs_to :payment
   belongs_to :user
 
@@ -64,7 +64,7 @@ class TheftAlert < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
+  scope :should_expire, -> { active.where('"promoted_alerts"."end_at" <= ?', Time.current) }
   scope :paid, -> { joins(:payment).merge(Payment.paid) }
   scope :admin, -> { where(admin: true) }
   scope :not_admin, -> { where(admin: false) }
@@ -75,9 +75,9 @@ class TheftAlert < ApplicationRecord
   scope :failed_to_activate, -> { activating.where("(facebook_data -> 'activating_at')::integer < ?", Time.current.to_i - FAILED_DELAY) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
-  scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
+  scope :should_update_facebook, -> { facebook_updateable.where("promoted_alerts.end_at > ?", update_end_buffer) }
 
-  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
+  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :promoted_alert_plan
   delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   geocoded_by nil
@@ -221,7 +221,7 @@ class TheftAlert < ApplicationRecord
 
   def amount_cents_facebook
     return facebook_data["amount_cents"] if facebook_data&.dig("amount_cents").present?
-    theft_alert_plan&.amount_cents_facebook
+    promoted_alert_plan&.amount_cents_facebook
   end
 
   def amount_facebook
@@ -287,7 +287,7 @@ class TheftAlert < ApplicationRecord
       self.longitude = stolen_record.longitude
     end
     self.bike_id = stolen_record&.bike_id
-    self.ad_radius_miles = theft_alert_plan&.ad_radius_miles unless admin
+    self.ad_radius_miles = promoted_alert_plan&.ad_radius_miles unless admin
     self.amount_cents_facebook_spent = calculated_cents_facebook_spent
   end
 

@@ -1,6 +1,6 @@
 - @bike = @user_alert.bike
 
-- if @user_alert.kind == "theft_alert_without_photo"
+- if @user_alert.kind == "promoted_alert_without_photo"
   %h2
     Your stolen #{@bike.type} doesn't have a photo
 
@@ -25,7 +25,7 @@
 
   %p
     %strong
-      - if @bike.theft_alerts.paid.any?
+      - if @bike.promoted_alerts.paid.any?
         We can't turn on your promoted alert
       - else
         We can't alert anyone about your bike being stolen

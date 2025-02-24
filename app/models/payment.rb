@@ -30,7 +30,7 @@ class Payment < ApplicationRecord
   include Amountable
 
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
-  KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3, membership_donation: 4}
+  KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, promoted_alert: 3, membership_donation: 4}
 
   belongs_to :user
   belongs_to :organization
@@ -38,7 +38,7 @@ class Payment < ApplicationRecord
   belongs_to :stripe_subscription
   belongs_to :membership
 
-  has_one :theft_alert
+  has_one :promoted_alert
 
   has_many :notifications, as: :notifiable
 
@@ -72,7 +72,7 @@ class Payment < ApplicationRecord
 
     def kind_humanized(kind)
       return "NO KIND!" unless kind.present?
-      return "Promoted alert" if kind == "theft_alert"
+      return "Promoted alert" if kind == "promoted_alert"
       kind&.humanize&.gsub("payment", "")&.strip
     end
 
@@ -122,7 +122,7 @@ class Payment < ApplicationRecord
   end
 
   def session_images
-    if %w[donation theft_alert].include?(kind)
+    if %w[donation promoted_alert].include?(kind)
       ["https://files.bikeindex.org/uploads/Pu/151203/reg_hance.jpg"]
     else # payment, invoice_payment
       []
@@ -137,7 +137,7 @@ class Payment < ApplicationRecord
       self.email = EmailNormalizer.normalize(email)
       self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email) if email.present?
     end
-    self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
+    self.amount_cents ||= promoted_alert&.amount_cents if promoted_alert?
     self.organization_id ||= invoice&.organization_id
     self.membership_id ||= stripe_subscription&.membership_id
     self.referral_source = self.class.normalize_referral_source(referral_source)
@@ -167,7 +167,7 @@ class Payment < ApplicationRecord
   def update_associations
     return if skip_update
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
-    if stripe? && paid? && email.present? && !theft_alert?
+    if stripe? && paid? && email.present? && !promoted_alert?
       EmailReceiptJob.perform_async(id)
     end
     return true unless invoice.present?
@@ -177,7 +177,7 @@ class Payment < ApplicationRecord
   def can_assign_to_membership?
     return false if stripe_subscription?
 
-    user_id.present? && membership_id.blank? && invoice_id.blank? && theft_alert.blank?
+    user_id.present? && membership_id.blank? && invoice_id.blank? && promoted_alert.blank?
   end
 
   def stripe_email(stripe_obj = nil)
@@ -238,8 +238,8 @@ class Payment < ApplicationRecord
   def calculated_kind
     if invoice_id.present?
       "invoice_payment"
-    elsif theft_alert.present?
-      "theft_alert"
+    elsif promoted_alert.present?
+      "promoted_alert"
     elsif kind.present?
       kind
     elsif membership_id.present? || stripe_subscription_id.present?
@@ -250,8 +250,8 @@ class Payment < ApplicationRecord
   end
 
   def success_url
-    if theft_alert?
-      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}"
+    if promoted_alert?
+      "#{ENV["BASE_URL"]}/bikes/#{promoted_alert&.bike_id}/promoted_alert?session_id={CHECKOUT_SESSION_ID}"
     elsif stripe_subscription?
       "#{ENV["BASE_URL"]}/membership/success?session_id={CHECKOUT_SESSION_ID}"
     else
@@ -260,8 +260,8 @@ class Payment < ApplicationRecord
   end
 
   def cancel_url
-    if theft_alert?
-      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/theft_alert/new"
+    if promoted_alert?
+      "#{ENV["BASE_URL"]}/bikes/#{promoted_alert&.bike_id}/promoted_alert/new"
     elsif stripe_subscription?
       "#{ENV["BASE_URL"]}/membership/new"
     else

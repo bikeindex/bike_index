@@ -1,12 +1,12 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", stolen_record: @stolen_record}
+= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "promoted_alerts", stolen_record: @stolen_record}
 
 %h2.mt-4
   Facebook data
   %small.ml-1
     alert status:
-    %span{class: theft_alert_status_class(@theft_alert)}
-      = @theft_alert.status
-- if @theft_alert.inactive? && @theft_alert.failed_to_activate_data?
+    %span{class: promoted_alert_status_class(@promoted_alert)}
+      = @promoted_alert.status
+- if @promoted_alert.inactive? && @promoted_alert.failed_to_activate_data?
   %p.pt-2.pb-2
     %span.text-danger
       Facebook Activation failed
@@ -14,64 +14,64 @@
       this alert has be marked inactive, but it never ran.
       %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
 %h4
-  - if @theft_alert.facebook_updateable?
-    = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
+  - if @promoted_alert.facebook_updateable?
+    = link_to "Update Facebook data", admin_promoted_alert_path(@promoted_alert.id, update_promoted_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
   - else
     %em
       %span.text-warning Can't update Facebook:
-    - if @theft_alert.before_automation?
+    - if @promoted_alert.before_automation?
       %span.less-strong This alert was created before automation
-    - elsif !@theft_alert.activateable?
+    - elsif !@promoted_alert.activateable?
       %span.less-strong This alert is missing required stuff
     - else
       %span.text-danger NOT SURE WHY!
       %strong Tell Seth
 
-  - if @theft_alert.failed_to_activate?
+  - if @promoted_alert.failed_to_activate?
     %span.text-danger Something Broke!
     %strong Tell Seth
 
-- if @theft_alert.pending?
+- if @promoted_alert.pending?
   .row.mt-4.mb-4
     .col-xl-4.offset-xl-4.col-md-6.offset-md-3
       .card
         .card-body
-          - if @theft_alert.activateable_except_approval?
+          - if @promoted_alert.activateable_except_approval?
             %h4.text-center
-              - if @theft_alert.activateable?
+              - if @promoted_alert.activateable?
                 Theft alert can be activated!
               - else
                 %span.text-warning This stolen record is NOT approved
                 %em.small.d-block.mt-2
                   You can still activate if you're sure you want to
 
-            - if @theft_alert.activating?
+            - if @promoted_alert.activating?
               %h2.mt-3.text-center
                 %span.text-warning Activation in process
 
               %p
                 Activation started at:
-                %span.convertTime= l( @theft_alert.activating_at, format: :convert_time)
+                %span.convertTime= l( @promoted_alert.activating_at, format: :convert_time)
 
               %p
                 %strong Don't activate again
                 unless activation started a while ago
 
             .text-center.mt-4
-              = link_to "Activate!", admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, action: "update", class: "btn btn-lg btn-success"
+              = link_to "Activate!", admin_promoted_alert_path(@promoted_alert.id, activate_promoted_alert: true), method: :patch, action: "update", class: "btn btn-lg btn-success"
           - else
             %h4.text-center
               Theft alert
               %span.text-danger can not
               be activated
             %ul.mt-4
-              - unless @theft_alert.stolen_record_approved?
+              - unless @promoted_alert.stolen_record_approved?
                 %li Stolen Record is not approved
-              - unless @theft_alert.paid?
+              - unless @promoted_alert.paid?
                 %li Alert is not paid
-              - if @theft_alert.missing_photo?
+              - if @promoted_alert.missing_photo?
                 %li Alert is missing photo
-              - if @theft_alert.missing_location?
+              - if @promoted_alert.missing_location?
                 %li Alert is missing location
 
 .row.mt-4
@@ -81,40 +81,40 @@
         %tr
           %td Link
           %td
-            - if @theft_alert.facebook_post_url.present?
+            - if @promoted_alert.facebook_post_url.present?
               %strong
-                = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank"
+                = link_to "Facebook post", @promoted_alert.facebook_post_url, target: "_blank"
         %tr
           %td Activation began
           %td
-            - if @theft_alert.activating_at.present?
+            - if @promoted_alert.activating_at.present?
               %span.convertTime
-                = l @theft_alert.activating_at, format: :convert_time
-              - if @theft_alert.paid_at.present?
+                = l @promoted_alert.activating_at, format: :convert_time
+              - if @promoted_alert.paid_at.present?
                 %small.ml-2.less-strong
-                  = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
+                  = distance_of_time_in_words(@promoted_alert.paid_at, @promoted_alert.activating_at)
                   after payment
         %tr
           %td last FB update
           %td
-            - if @theft_alert.facebook_updated_at.present?
+            - if @promoted_alert.facebook_updated_at.present?
               %span.convertTime
-                = l @theft_alert.facebook_updated_at, format: :convert_time
+                = l @promoted_alert.facebook_updated_at, format: :convert_time
               %small.ml-2.less-strong
-                = @theft_alert.live? ? "alert ends" : "alert ended"
+                = @promoted_alert.live? ? "alert ends" : "alert ended"
                 %span.convertTime
-                  = l @theft_alert.end_at, format: :convert_time
+                  = l @promoted_alert.end_at, format: :convert_time
         %tr
           %td Notify?
           %td
-            = @theft_alert.notify? ? "✅" : "❌"
-            - if @theft_alert.admin
+            = @promoted_alert.notify? ? "✅" : "❌"
+            - if @promoted_alert.admin
               %small.text-info (admin)
-            - elsif @theft_alert.facebook_data&.dig("no_notify").present?
+            - elsif @promoted_alert.facebook_data&.dig("no_notify").present?
               %em.less-strong manually disabled
-            - elsif @theft_alert.stolen_record.present?
+            - elsif @promoted_alert.stolen_record.present?
               Stolen record
-              - if @theft_alert.stolen_record.receive_notifications?
+              - if @promoted_alert.stolen_record.receive_notifications?
                 %span.text-info receives notifications
               - else
                 %span.text-warning DOESN'T receive notifications
@@ -123,38 +123,38 @@
         %tr
           %td Creator
           %td
-            - if @theft_alert.admin
+            - if @promoted_alert.admin
               %small.text-info admin:
-            = link_to @theft_alert.user.display_name, edit_admin_user_path(@theft_alert.user.to_param)
+            = link_to @promoted_alert.user.display_name, edit_admin_user_path(@promoted_alert.user.to_param)
         %tr
           %td
             Campaign
             %small Objective
           %td
-            %code= @theft_alert.objective_campaign
+            %code= @promoted_alert.objective_campaign
         %tr
           %td
             Adset
             %small Objective
           %td
-            %code= @theft_alert.objective_adset
+            %code= @promoted_alert.objective_adset
 
   .col-sm-6
     %table.table-list
       %tbody
         %tr
           %td Target Spend
-          %td= @theft_alert.amount_facebook
+          %td= @promoted_alert.amount_facebook
         %tr
           %td Actual Fbook Spend
           %td
-            = @theft_alert.amount_facebook_spent
+            = @promoted_alert.amount_facebook_spent
             %span.text-warning
-              = @theft_alert.live? ? "so far" : "total"
+              = @promoted_alert.live? ? "so far" : "total"
         %tr
           %td Reach
-          %td= @theft_alert.reach
-        - @theft_alert.engagement.each do |k, v|
+          %td= @promoted_alert.reach
+        - @promoted_alert.engagement.each do |k, v|
           %tr
             %td= k.titleize
             %td= v
@@ -162,48 +162,48 @@
 %h2.mt-4
   Payment
   %small
-    - if @theft_alert.payment.present?
-      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
+    - if @promoted_alert.payment.present?
+      = link_to "view payment", edit_admin_payment_path(@promoted_alert.payment_id)
 
-- if @theft_alert.payment.present?
-  = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
-- elsif @theft_alert.admin
+- if @promoted_alert.payment.present?
+  = render partial: "/admin/payments/display", locals: { payment: @promoted_alert.payment }
+- elsif @promoted_alert.admin
   %h4 Admin
 - else
   No payment present!
 
 .mt-3
-= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
+= render partial: "/admin/bikes/promoted_alert_images", locals: { bike: @bike }
 
 
-- if @theft_alert.notifications.any?
+- if @promoted_alert.notifications.any?
   %h3 Notifications
-  = render partial: "/admin/notifications/table", locals: {notifications: @theft_alert.notifications.reorder(created_at: :desc), skip_user: true}
+  = render partial: "/admin/notifications/table", locals: {notifications: @promoted_alert.notifications.reorder(created_at: :desc), skip_user: true}
 .admin-subnav.midpage-subnav
   .col-12
     %h1 Edit Promoted Alert
 
-= form_for @theft_alert,
-  url: admin_theft_alert_path(@theft_alert),
+= form_for @promoted_alert,
+  url: admin_promoted_alert_path(@promoted_alert),
   method: :patch,
   html: { class: "m-0" } do |f|
 
-  -# Can't edit many things here! They're set via the theft_alert_plan
-  -# - unless @theft_alert.pending?
+  -# Can't edit many things here! They're set via the promoted_alert_plan
+  -# - unless @promoted_alert.pending?
   .row
     .col-sm-4
       .form-group
         = f.label :status
         = f.select :status,
-          options_for_select(TheftAlert.statuses, @theft_alert.status),
+          options_for_select(PromotedAlert.statuses, @promoted_alert.status),
           {},
           {disabled: true, class: "form-control"}
     .col-sm-4
       .form-group
-        - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
-        = f.label :theft_alert_plan_id
-        = f.select :theft_alert_plan_id,
-          options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
+        - plan_options = PromotedAlertPlan.active.map { |e| [promoted_alert_plan_title(e), e.id] }
+        = f.label :promoted_alert_plan_id
+        = f.select :promoted_alert_plan_id,
+          options_for_select(plan_options, @promoted_alert.promoted_alert_plan.id),
           {},
           {disabled: true, class: "form-control"}
     .col-sm-4
@@ -230,4 +230,4 @@
 - if display_dev_info?
   .mt-5.mb-1.only-dev-visible
     %h2 Raw facebook data
-  = pretty_print_json(@theft_alert.facebook_data)
+  = pretty_print_json(@promoted_alert.facebook_data)

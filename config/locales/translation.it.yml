@@ -237,7 +237,7 @@ it:
         recovery_display:
           quote_too_long: Quella citazione è troppo lunga. La preghiamo di accorciarla
             in modo che sia inferiore a 300 caratteri
-        theft_alert:
+        promoted_alert:
           must_be_later_than_start_time: deve essere successivo all'orario di inizio
           must_be_present: deve essere presente
         user:
@@ -727,24 +727,24 @@ it:
         recovery_tweet: Tweet recupero
         secondary_phone: Telefono secondario
         street: Via
-        theft_alerts:
+        promoted_alerts:
         theft_description:
         time: Ora
         tsved_at:
         zipcode: Codice postale
-      theft_alert:
+      promoted_alert:
         end_at: Finisce il
         notes: Note
         start_at: Inizia il
         status: Stato
-      theft_alert_plan:
+      promoted_alert_plan:
         active: Attivo
         amount_cents: Importo in centesimi
         description: Descrizione
         duration_days: Giorni di durata
         name: Nome
         stolen_records: Record rubati
-        theft_alerts: Avvisi di furto
+        promoted_alerts: Avvisi di furto
         views:
       tweet:
         alignment: Allineamento
@@ -930,8 +930,8 @@ it:
       state: Stato
       stolen_notification: Notifica di furto
       stolen_record: Record rubato
-      theft_alert: Avvisi di furto
-      theft_alert_plan:
+      promoted_alert: Avvisi di furto
+      promoted_alert_plan:
       tweet: Tweet
       user: Utente
       user_email: Email dell'utente
@@ -2001,7 +2001,7 @@ it:
       share_widely_on_your_personal_social:
       supercharge_sharing_on_facebook:
       your_police_report:
-    theft_alerts:
+    promoted_alerts:
       new:
         best_value:
         bike_index_can_help:
@@ -2024,7 +2024,7 @@ it:
         created:
         creator:
         end:
-        existing_theft_alerts:
+        existing_promoted_alerts:
         plan:
         start:
         status:
@@ -2189,8 +2189,8 @@ it:
       click_to_see_promoted_alert_blog_post_html:
       do_these_things_for_the_best_chance:
       here:
-      promoted_theft_alert_service_description:
-      promoted_theft_alerts:
+      promoted_promoted_alert_service_description:
+      promoted_promoted_alerts:
       try_one_now:
       we_can_create_fb_ads_for_you:
     theft_details_partial:
@@ -2445,11 +2445,11 @@ it:
         failure:
         thanks:
         unauthorized:
-    theft_alerts:
+    promoted_alerts:
       create:
         order_is_pending:
         unable_to_process_order:
-      ensure_user_allowed_to_create_theft_alert:
+      ensure_user_allowed_to_create_promoted_alert:
         unauthorized:
     user_emails:
       confirm:
@@ -4479,8 +4479,8 @@ it:
       where_is_this_happening:
       your_email_address:
       your_local_police_department_will_do_what:
-  theft_alert_plans:
-    theft_alert_plan:
+  promoted_alert_plans:
+    promoted_alert_plan:
       days:
   user_embeds:
     show:

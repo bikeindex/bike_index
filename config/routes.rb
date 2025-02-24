@@ -148,7 +148,7 @@ Rails.application.routes.draw do
       put :resolve_token
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
-    resource :theft_alert, only: %i[new create show], controller: "bikes/theft_alerts"
+    resource :promoted_alert, only: %i[new create show], controller: "bikes/promoted_alerts"
   end
   get "bikes/:id/edit(/:edit_template)", to: "bikes/edits#show", as: :edit_bike
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
@@ -208,7 +208,7 @@ Rails.application.routes.draw do
       :payments,
       :recovery_displays,
       :superuser_abilities,
-      :theft_alerts
+      :promoted_alerts
 
     %i[
       bike_sticker_updates exports graduated_notifications invoices logged_searches mailchimp_data
@@ -220,7 +220,7 @@ Rails.application.routes.draw do
       collection { get :reassign }
     end
 
-    resources :theft_alert_plans, only: %i[index edit update new create]
+    resources :promoted_alert_plans, only: %i[index edit update new create]
 
     resources :organizations do
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"

@@ -2761,6 +2761,46 @@ ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_sta
 
 
 --
+-- Name: promoted_alert_plans; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.promoted_alert_plans (
+    id integer NOT NULL,
+    name character varying DEFAULT ''::character varying NOT NULL,
+    amount_cents integer NOT NULL,
+    views integer NOT NULL,
+    duration_days integer NOT NULL,
+    description character varying DEFAULT ''::character varying NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    language integer DEFAULT 0 NOT NULL,
+    amount_cents_facebook integer,
+    ad_radius_miles integer,
+    currency_enum integer
+);
+
+
+--
+-- Name: promoted_alert_plans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.promoted_alert_plans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: promoted_alert_plans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.promoted_alert_plans_id_seq OWNED BY public.promoted_alert_plans.id;
+
+
+--
 -- Name: promoted_alerts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3259,46 +3299,6 @@ CREATE SEQUENCE public.superuser_abilities_id_seq
 --
 
 ALTER SEQUENCE public.superuser_abilities_id_seq OWNED BY public.superuser_abilities.id;
-
-
---
--- Name: theft_alert_plans; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.theft_alert_plans (
-    id integer NOT NULL,
-    name character varying DEFAULT ''::character varying NOT NULL,
-    amount_cents integer NOT NULL,
-    views integer NOT NULL,
-    duration_days integer NOT NULL,
-    description character varying DEFAULT ''::character varying NOT NULL,
-    active boolean DEFAULT true NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    language integer DEFAULT 0 NOT NULL,
-    amount_cents_facebook integer,
-    ad_radius_miles integer,
-    currency_enum integer
-);
-
-
---
--- Name: theft_alert_plans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.theft_alert_plans_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: theft_alert_plans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.theft_alert_plans_id_seq OWNED BY public.theft_alert_plans.id;
 
 
 --
@@ -4165,6 +4165,13 @@ ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: promoted_alert_plans id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.promoted_alert_plans ALTER COLUMN id SET DEFAULT nextval('public.promoted_alert_plans_id_seq'::regclass);
+
+
+--
 -- Name: promoted_alerts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4246,13 +4253,6 @@ ALTER TABLE ONLY public.stripe_subscriptions ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.superuser_abilities ALTER COLUMN id SET DEFAULT nextval('public.superuser_abilities_id_seq'::regclass);
-
-
---
--- Name: theft_alert_plans id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.theft_alert_plans ALTER COLUMN id SET DEFAULT nextval('public.theft_alert_plans_id_seq'::regclass);
 
 
 --
@@ -4871,6 +4871,14 @@ ALTER TABLE ONLY public.pghero_query_stats
 
 
 --
+-- Name: promoted_alert_plans promoted_alert_plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.promoted_alert_plans
+    ADD CONSTRAINT promoted_alert_plans_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: promoted_alerts promoted_alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4964,14 +4972,6 @@ ALTER TABLE ONLY public.stripe_subscriptions
 
 ALTER TABLE ONLY public.superuser_abilities
     ADD CONSTRAINT superuser_abilities_pkey PRIMARY KEY (id);
-
-
---
--- Name: theft_alert_plans theft_alert_plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.theft_alert_plans
-    ADD CONSTRAINT theft_alert_plans_pkey PRIMARY KEY (id);
 
 
 --
@@ -6410,7 +6410,7 @@ ALTER TABLE ONLY public.promoted_alerts
 --
 
 ALTER TABLE ONLY public.promoted_alerts
-    ADD CONSTRAINT fk_rails_4d1dc73022 FOREIGN KEY (theft_alert_plan_id) REFERENCES public.theft_alert_plans(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_rails_4d1dc73022 FOREIGN KEY (theft_alert_plan_id) REFERENCES public.promoted_alert_plans(id) ON DELETE CASCADE;
 
 
 --

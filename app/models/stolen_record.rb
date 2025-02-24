@@ -93,7 +93,7 @@ class StolenRecord < ApplicationRecord
 
   has_many :impound_claims
   has_many :tweets
-  has_many :theft_alerts
+  has_many :promoted_alerts
   has_many :notifications, as: :notifiable
   has_many :theft_surveys, -> { theft_survey }, as: :notifiable, class_name: "Notification"
   has_one :alert_image
@@ -119,7 +119,7 @@ class StolenRecord < ApplicationRecord
 
   scope :recovered, -> { unscoped.where(current: false) }
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
-  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}) }
+  scope :with_promoted_alerts, -> { includes(:promoted_alerts).where.not(promoted_alerts: {id: nil}) }
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
@@ -347,8 +347,8 @@ class StolenRecord < ApplicationRecord
   end
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
-  def theft_alert_missing_photo?
-    current_alert_image.blank? && theft_alerts.any?
+  def promoted_alert_missing_photo?
+    current_alert_image.blank? && promoted_alerts.any?
   end
 
   # The associated bike's first public image, if available. Else nil.
@@ -416,10 +416,10 @@ class StolenRecord < ApplicationRecord
   end
 
   def notify_of_promoted_alert_recovery
-    return unless recovered? && theft_alerts.any?
+    return unless recovered? && promoted_alerts.any?
 
-    EmailTheftAlertNotificationJob
-      .perform_async(theft_alerts.last.id, "theft_alert_recovered")
+    EmailPromotedAlertNotificationJob
+      .perform_async(promoted_alerts.last.id, "promoted_alert_recovered")
   end
 
   def all_location_attributes_present?

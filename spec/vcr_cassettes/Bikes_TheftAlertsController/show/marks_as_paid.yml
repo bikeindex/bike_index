@@ -64,7 +64,7 @@ http_interactions:
             "status": null
           },
           "billing_address_collection": null,
-          "cancel_url": "http://localhost:3001/bikes/1110519/theft_alerts/new",
+          "cancel_url": "http://localhost:3001/bikes/1110519/promoted_alerts/new",
           "client_reference_id": null,
           "currency": "usd",
           "customer": "cus_JyocxxIgSrW7Xx",
@@ -93,7 +93,7 @@ http_interactions:
           "shipping_address_collection": null,
           "submit_type": "pay",
           "subscription": null,
-          "success_url": "http://localhost:3001/bikes/1110519/theft_alerts?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://localhost:3001/bikes/1110519/promoted_alerts?session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,

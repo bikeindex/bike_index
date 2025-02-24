@@ -109,7 +109,7 @@ class User < ApplicationRecord
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
-  has_many :theft_alerts
+  has_many :promoted_alerts
   has_many :feedbacks
 
   has_one :membership_active, -> { active }, class_name: "Membership"
@@ -281,8 +281,8 @@ class User < ApplicationRecord
     donations > 900
   end
 
-  def theft_alert_purchaser?
-    theft_alerts.paid.limit(1).any?
+  def promoted_alert_purchaser?
+    promoted_alerts.paid.limit(1).any?
   end
 
   def organization_prioritized

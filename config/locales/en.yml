@@ -506,7 +506,7 @@ en:
         kind: Kind
         organization: :activerecord.models.organization
         paid_at: First payment date
-        theft_alert: :activerecord.models.theft_alert
+        promoted_alert: :activerecord.models.promoted_alert
         user: :activerecord.models.user
       public_image:
         external_image_url: External image url
@@ -583,12 +583,12 @@ en:
         secondary_phone: Secondary phone
         state: :activerecord.models.state
         street: Street
-        theft_alerts: Theft alerts
+        promoted_alerts: Theft alerts
         theft_description: Theft description
         time: Time
         tsved_at: Tsved at
         zipcode: Postal code
-      theft_alert:
+      promoted_alert:
         creator: :activerecord.models.creator
         end_at: End at
         notes: Notes
@@ -596,15 +596,15 @@ en:
         start_at: Start at
         status: Status
         stolen_record: :activerecord.models.stolen_record
-        theft_alert_plan: :activerecord.models.theft_alert_plan
-      theft_alert_plan:
+        promoted_alert_plan: :activerecord.models.promoted_alert_plan
+      promoted_alert_plan:
         active: Active
         amount_cents: Amount cents
         description: Description
         duration_days: Duration days
         name: Name
         stolen_records: Stolen records
-        theft_alerts: Theft alerts
+        promoted_alerts: Theft alerts
         views: Views
       tweet:
         alignment: Alignment
@@ -821,7 +821,7 @@ en:
         recovery_display:
           quote_too_long: That quote is too long. Please shorten it to be less than
             300 characters
-        theft_alert:
+        promoted_alert:
           must_be_later_than_start_time: must be later than start time
           must_be_present: must be present
         user:
@@ -883,8 +883,8 @@ en:
       state: State
       stolen_notification: Stolen notification
       stolen_record: Stolen record
-      theft_alert: Theft alert
-      theft_alert_plan: Theft alert plan
+      promoted_alert: Theft alert
+      promoted_alert_plan: Theft alert plan
       tweet: Tweet
       user: User
       user_email: User email
@@ -1340,7 +1340,7 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
-    theft_alerts:
+    promoted_alerts:
       new:
         best_value: Best value
         bike_index_can_help: >-
@@ -1372,7 +1372,7 @@ en:
         created: Created
         creator: Creator
         end: End
-        existing_theft_alerts: Existing Promoted Alerts
+        existing_promoted_alerts: Existing Promoted Alerts
         plan: Plan
         start: Start
         status: Status
@@ -1571,10 +1571,10 @@ en:
       do_these_things_for_the_best_chance: Do these things for the best chance of
         recovery!
       here: here
-      promoted_theft_alert_service_description: >-
+      promoted_promoted_alert_service_description: >-
         Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
         in the cycling community in the neighborhood where your bike was last seen.
-      promoted_theft_alerts: Promoted Theft Alerts
+      promoted_promoted_alerts: Promoted Theft Alerts
       try_one_now: Try one now!
       we_can_create_fb_ads_for_you: >-
         Did you know we can create targeted Facebook ads to spread the word about
@@ -1900,14 +1900,14 @@ en:
         thanks: Thanks for looking out!
         unauthorized: >-
           You don't have permission to send that notification! Please contact support@bikeindex.org
-    theft_alerts:
+    promoted_alerts:
       create:
         order_is_pending: >-
           Your order is pending, but we were unable to complete payment. Please contact
           support to complete your purchase.
         unable_to_process_order: We were unable to process your order. Please contact
           support.
-      ensure_user_allowed_to_create_theft_alert:
+      ensure_user_allowed_to_create_promoted_alert:
         unauthorized: You don't have permission to do that. Please contact support.
     user_emails:
       confirm:
@@ -5467,8 +5467,8 @@ en:
       last_word_connector: ", and "
       two_words_connector: " and "
       words_connector: ", "
-  theft_alert_plans:
-    theft_alert_plan:
+  promoted_alert_plans:
+    promoted_alert_plan:
       days: Days
   time:
     formats:

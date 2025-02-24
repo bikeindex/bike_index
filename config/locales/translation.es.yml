@@ -235,7 +235,7 @@ es:
           requires_email_or_org:
         recovery_display:
           quote_too_long:
-        theft_alert:
+        promoted_alert:
           must_be_later_than_start_time:
           must_be_present:
         user:
@@ -723,24 +723,24 @@ es:
         recovery_tweet:
         secondary_phone:
         street:
-        theft_alerts:
+        promoted_alerts:
         theft_description:
         time:
         tsved_at:
         zipcode:
-      theft_alert:
+      promoted_alert:
         end_at:
         notes:
         start_at:
         status:
-      theft_alert_plan:
+      promoted_alert_plan:
         active:
         amount_cents:
         description:
         duration_days:
         name: Nombre
         stolen_records:
-        theft_alerts:
+        promoted_alerts:
         views:
       tweet:
         alignment:
@@ -925,8 +925,8 @@ es:
       state:
       stolen_notification:
       stolen_record:
-      theft_alert:
-      theft_alert_plan:
+      promoted_alert:
+      promoted_alert_plan:
       tweet:
       user:
       user_email:
@@ -1984,7 +1984,7 @@ es:
       share_widely_on_your_personal_social:
       supercharge_sharing_on_facebook:
       your_police_report:
-    theft_alerts:
+    promoted_alerts:
       new:
         best_value:
         bike_index_can_help:
@@ -2007,7 +2007,7 @@ es:
         created:
         creator:
         end:
-        existing_theft_alerts:
+        existing_promoted_alerts:
         plan:
         start:
         status:
@@ -2172,8 +2172,8 @@ es:
       click_to_see_promoted_alert_blog_post_html:
       do_these_things_for_the_best_chance:
       here:
-      promoted_theft_alert_service_description:
-      promoted_theft_alerts:
+      promoted_promoted_alert_service_description:
+      promoted_promoted_alerts:
       try_one_now:
       we_can_create_fb_ads_for_you:
     theft_details_partial:
@@ -2428,11 +2428,11 @@ es:
         failure:
         thanks:
         unauthorized:
-    theft_alerts:
+    promoted_alerts:
       create:
         order_is_pending:
         unable_to_process_order:
-      ensure_user_allowed_to_create_theft_alert:
+      ensure_user_allowed_to_create_promoted_alert:
         unauthorized:
     user_emails:
       confirm:
@@ -4466,8 +4466,8 @@ es:
       where_is_this_happening:
       your_email_address:
       your_local_police_department_will_do_what:
-  theft_alert_plans:
-    theft_alert_plan:
+  promoted_alert_plans:
+    promoted_alert_plan:
       days:
   user_embeds:
     show:

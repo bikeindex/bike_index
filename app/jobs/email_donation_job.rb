@@ -19,14 +19,14 @@ class EmailDonationJob < ApplicationJob
     user = payment.user
     return "donation_standard" if user.blank?
 
-    # Return recovered if there's a relevant recovery - higher priority than theft_alert
+    # Return recovered if there's a relevant recovery - higher priority than promoted_alert
     if matching_recovered_bikes(payment).any?
       return "donation_recovered"
     end
 
-    # theft_alert is higher priority than anything else
-    if user.theft_alerts.paid.where(created_at: relevant_period(payment)).any?
-      return "donation_theft_alert"
+    # promoted_alert is higher priority than anything else
+    if user.promoted_alerts.paid.where(created_at: relevant_period(payment)).any?
+      return "donation_promoted_alert"
     end
 
     if matching_stolen_bikes(payment).any?
@@ -48,8 +48,8 @@ class EmailDonationJob < ApplicationJob
       matching_recovered_bikes(payment).last
     elsif notification_kind == "donation_stolen"
       matching_stolen_bikes(payment).last
-    elsif notification_kind == "donation_theft_alert"
-      matching_theft_alert_bikes(payment).last
+    elsif notification_kind == "donation_promoted_alert"
+      matching_promoted_alert_bikes(payment).last
     end
   end
 
@@ -71,9 +71,9 @@ class EmailDonationJob < ApplicationJob
       .map(&:bike)
   end
 
-  def matching_theft_alert_bikes(payment)
+  def matching_promoted_alert_bikes(payment)
     return [] if payment.user.blank?
-    payment.user.theft_alerts.paid.where(created_at: relevant_period(payment)).order(:created_at)
+    payment.user.promoted_alerts.paid.where(created_at: relevant_period(payment)).order(:created_at)
       .map(&:bike)
   end
 end

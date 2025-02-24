@@ -34,9 +34,9 @@ class AfterUserChangeJob < ApplicationJob
     end
 
     # Activate activateable theft alerts!
-    user.theft_alerts.paid.where(start_at: nil).each do |theft_alert|
-      next unless theft_alert.activateable?
-      StolenBike::ActivateTheftAlertJob.perform_async(theft_alert.id)
+    user.promoted_alerts.paid.where(start_at: nil).each do |promoted_alert|
+      next unless promoted_alert.activateable?
+      StolenBike::ActivatePromotedAlertJob.perform_async(promoted_alert.id)
     end
 
     process_user_registration_organizations(user)
@@ -63,8 +63,8 @@ class AfterUserChangeJob < ApplicationJob
       return
     end
 
-    user.theft_alerts.each do |theft_alert|
-      UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)
+    user.promoted_alerts.each do |promoted_alert|
+      UserAlert.update_promoted_alert_without_photo(user: user, promoted_alert: promoted_alert)
     end
 
     # Ignore alerts below for org members, otherwise they might get a lot of useless ones

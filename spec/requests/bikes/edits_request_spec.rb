@@ -134,10 +134,10 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
       expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
-      # It redirects "alert" to new_bike_theft_alert, for backward compatibility
+      # It redirects "alert" to new_bike_promoted_alert, for backward compatibility
       # Maybe sometime after merging #2041, stop redirecting?
       get "#{base_url}?edit_template=alert"
-      expect(response).to redirect_to(new_bike_theft_alert_path(bike_id: bike.id))
+      expect(response).to redirect_to(new_bike_promoted_alert_path(bike_id: bike.id))
       expect(flash).to be_blank
     end
     context "recovered bike" do
@@ -189,14 +189,14 @@ RSpec.describe Bikes::EditsController, type: :request do
         bc.edit_templates.keys - %w[alert alert_purchase_confirmation]
       end
       let(:no_global_alert_templates) { %w[theft_details photos report_recovered remove] }
-      before { FactoryBot.create_list(:theft_alert_plan, 3) }
+      before { FactoryBot.create_list(:promoted_alert_plan, 3) }
       it "renders the template" do
         # Ensure stolen bike is set up correctly
         stolen_record.reload
         bike.reload
         expect(bike.current_stolen_record).to eq stolen_record
         expect(bike.current_stolen_record.without_location?).to be_truthy
-        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
+        expect(stolen_record.promoted_alert_missing_photo?).to be_falsey
         templates.each do |template|
           get base_url, params: {id: bike.id, edit_template: template}
 
@@ -204,7 +204,7 @@ RSpec.describe Bikes::EditsController, type: :request do
           expect(response).to render_template(template)
           expect(assigns(:edit_template)).to eq(template)
           expect(assigns(:private_images)).to eq([]) if template == "photos"
-          expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
+          expect(assigns(:promoted_alerts)).to eq([]) if template == "alert"
 
           should_show_general_alert = no_global_alert_templates.exclude?(template)
           pp template unless assigns(:show_general_alert) == should_show_general_alert

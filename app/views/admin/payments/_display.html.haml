@@ -24,8 +24,8 @@
       %tr
         %td For
         %td
-          - if payment.theft_alert.present?
-            = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+          - if payment.promoted_alert.present?
+            = link_to "Promoted alert", edit_admin_promoted_alert_path(payment.promoted_alert)
           - elsif payment.invoice_id.present?
             = render partial: "payment_invoice_cell", locals: {payment:}
           - elsif payment.membership_id.present?

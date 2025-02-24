@@ -11,7 +11,7 @@
 #  updated_at      :datetime         not null
 #  bike_id         :bigint
 #  organization_id :bigint
-#  theft_alert_id  :bigint
+#  promoted_alert_id  :bigint
 #  user_id         :bigint
 #  user_phone_id   :bigint
 #
@@ -19,14 +19,14 @@
 #
 #  index_user_alerts_on_bike_id          (bike_id)
 #  index_user_alerts_on_organization_id  (organization_id)
-#  index_user_alerts_on_theft_alert_id   (theft_alert_id)
+#  index_user_alerts_on_promoted_alert_id   (promoted_alert_id)
 #  index_user_alerts_on_user_id          (user_id)
 #  index_user_alerts_on_user_phone_id    (user_phone_id)
 #
 class UserAlert < ApplicationRecord
   KIND_ENUM = {
     phone_waiting_confirmation: 0,
-    theft_alert_without_photo: 1,
+    promoted_alert_without_photo: 1,
     stolen_bike_without_location: 2,
     unassigned_bike_org: 3
   }.freeze
@@ -34,7 +34,7 @@ class UserAlert < ApplicationRecord
   belongs_to :user
   belongs_to :bike
   belongs_to :user_phone
-  belongs_to :theft_alert
+  belongs_to :promoted_alert
   belongs_to :organization
 
   has_one :notification, as: :notifiable
@@ -70,7 +70,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.ignored_kinds_superuser
-    ignored_kinds_member + %w[theft_alert_without_photo unassigned_bike_org]
+    ignored_kinds_member + %w[promoted_alert_without_photo unassigned_bike_org]
   end
 
   def self.ignored_kinds_member
@@ -82,7 +82,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.general_kinds
-    %w[phone_waiting_confirmation theft_alert_without_photo stolen_bike_without_location]
+    %w[phone_waiting_confirmation promoted_alert_without_photo stolen_bike_without_location]
   end
 
   def self.account_kinds
@@ -90,7 +90,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.notification_kinds
-    %w[theft_alert_without_photo stolen_bike_without_location]
+    %w[promoted_alert_without_photo stolen_bike_without_location]
   end
 
   def self.notify_period
@@ -105,12 +105,12 @@ class UserAlert < ApplicationRecord
     where(attrs).first || new(attrs)
   end
 
-  def self.update_theft_alert_without_photo(user:, theft_alert:)
+  def self.update_promoted_alert_without_photo(user:, promoted_alert:)
     # scope to just active, to alert if the theft alert once again has no image
-    user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
-      user_id: user.id, theft_alert_id: theft_alert.id)
-    if theft_alert.missing_photo?
-      user_alert.bike_id = theft_alert.bike&.id
+    user_alert = UserAlert.active.find_or_build_by(kind: "promoted_alert_without_photo",
+      user_id: user.id, promoted_alert_id: promoted_alert.id)
+    if promoted_alert.missing_photo?
+      user_alert.bike_id = promoted_alert.bike&.id
       user_alert.save
     else # Don't create just to resolve
       user_alert.id.blank? ? true : user_alert.resolve!
@@ -200,7 +200,7 @@ class UserAlert < ApplicationRecord
       !self.class.notify_period.cover?(updated_at) ||
       self.class.notification_kinds.exclude?(kind)
     # Check if the relevant object is updated since
-    if theft_alert_without_photo? || stolen_bike_without_location?
+    if promoted_alert_without_photo? || stolen_bike_without_location?
       return false if bike.blank? || !self.class.notify_period.cover?(bike.updated_at) ||
         !bike.current_stolen_record&.receive_notifications
     end
@@ -209,7 +209,7 @@ class UserAlert < ApplicationRecord
   end
 
   def email_subject
-    if kind == "theft_alert_without_photo"
+    if kind == "promoted_alert_without_photo"
       "Your stolen #{bike.cycle_type} needs a photo"
     elsif kind == "stolen_bike_without_location"
       "Your stolen #{bike.cycle_type} is missing its location"

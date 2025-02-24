@@ -382,10 +382,10 @@
                 %span{ class: (stolen_record.approved? ? "text-success" : "text-danger")}
                   = stolen_record.approved? ? "✅" : "❌"
           .nav-item
-            = link_to admin_theft_alerts_path(search_bike_id: bike.id), class: "nav-link theft_alerts" do
+            = link_to admin_promoted_alerts_path(search_bike_id: bike.id), class: "nav-link promoted_alerts" do
               P<span class="d-none d-md-inline">romoted alerts</span>
               %small
-                (#{admin_number_display(bike.theft_alerts.count)})
+                (#{admin_number_display(bike.promoted_alerts.count)})
           .nav-item
             = link_to admin_bike_path(bike, active_tab: "recoveries"), class: "nav-link bikes-recoveries" do
               R<span class="d-none d-md-inline">ecoveries</span>

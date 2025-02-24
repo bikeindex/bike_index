@@ -209,8 +209,8 @@ RSpec.describe ApplicationHelper, type: :helper do
           expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
         end
       end
-      context "theft_alerts" do
-        before { allow(view).to receive(:controller_name) { "theft_alerts" } }
+      context "promoted_alerts" do
+        before { allow(view).to receive(:controller_name) { "promoted_alerts" } }
         it "new returns edit_bike_skeleton" do
           allow(view).to receive(:action_name) { "new" }
           expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"

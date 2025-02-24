@@ -60,14 +60,14 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(StolenBike::ApproveStolenListingJob.jobs.count).to eq 1
         expect(StolenBike::ApproveStolenListingJob.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
       end
-      context "with a theft_alert" do
+      context "with a promoted_alert" do
         let!(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record: stolen_record) }
-        let(:theft_alert) { FactoryBot.create(:theft_alert_paid, stolen_record: stolen_record, user: bike.user) }
+        let(:promoted_alert) { FactoryBot.create(:promoted_alert_paid, stolen_record: stolen_record, user: bike.user) }
         it "updates the bike and stolen_record and enqueues the jobs" do
-          expect(theft_alert.reload.bike_id).to eq bike.id
-          expect(theft_alert.activateable?).to be_falsey
-          expect(theft_alert.activateable_except_approval?).to be_truthy
-          expect(theft_alert.start_at).to be_blank
+          expect(promoted_alert.reload.bike_id).to eq bike.id
+          expect(promoted_alert.activateable?).to be_falsey
+          expect(promoted_alert.activateable_except_approval?).to be_truthy
+          expect(promoted_alert.start_at).to be_blank
           bike.reload
           stolen_record.reload
           expect(stolen_record.approved).to be_falsey
@@ -84,8 +84,8 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(AfterUserChangeJob.jobs.count).to eq 1
           AfterUserChangeJob.drain
 
-          expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
-          expect(StolenBike::ActivateTheftAlertJob.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
+          expect(StolenBike::ActivatePromotedAlertJob.jobs.count).to eq 1
+          expect(StolenBike::ActivatePromotedAlertJob.jobs.map { |j| j["args"] }.last.flatten).to eq([promoted_alert.id])
         end
       end
       context "multi_approve" do

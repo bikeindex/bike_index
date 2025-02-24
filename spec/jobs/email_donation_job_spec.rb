@@ -53,10 +53,10 @@ RSpec.describe EmailDonationJob, type: :job do
   end
 
   context "donation_stolen" do
-    let!(:theft_alert) { FactoryBot.create(:theft_alert_unpaid, user: user, stolen_record: stolen_record1) }
+    let!(:promoted_alert) { FactoryBot.create(:promoted_alert_unpaid, user: user, stolen_record: stolen_record1) }
     it "sends a donation_stolen message" do
       user.reload
-      expect(user.theft_alerts.count).to eq 1
+      expect(user.promoted_alerts.count).to eq 1
       expect(instance.bike_for_notification(payment, "donation_stolen")&.id).to eq bike1.id
       expect(instance.calculated_notification_kind(payment)).to eq "donation_stolen"
       expect(payment.notifications.count).to eq 0
@@ -73,7 +73,7 @@ RSpec.describe EmailDonationJob, type: :job do
       let(:stolen_record2) { FactoryBot.create(:stolen_record, bike: bike2, date_stolen: Time.current - 2.weeks) }
       it "is the more recent stolen_record" do
         user.reload
-        expect(user.theft_alerts.count).to eq 1
+        expect(user.promoted_alerts.count).to eq 1
         expect(stolen_record2.date_stolen).to be < stolen_record1.date_stolen
         expect(instance.bike_for_notification(payment, "donation_stolen")&.id).to eq bike1.id
         expect(instance.calculated_notification_kind(payment)).to eq "donation_stolen"
@@ -90,13 +90,13 @@ RSpec.describe EmailDonationJob, type: :job do
     end
   end
 
-  context "donation_theft_alert" do
+  context "donation_promoted_alert" do
     let!(:payment_second) { FactoryBot.create(:payment, kind: "donation", user: user) }
-    let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user: user, stolen_record: stolen_record1) }
-    it "sends a donation_theft_alert message" do
+    let!(:promoted_alert) { FactoryBot.create(:promoted_alert_paid, user: user, stolen_record: stolen_record1) }
+    it "sends a donation_promoted_alert message" do
       payment_second.reload
       user.reload
-      expect(instance.calculated_notification_kind(payment_second)).to eq "donation_theft_alert"
+      expect(instance.calculated_notification_kind(payment_second)).to eq "donation_promoted_alert"
       expect(payment_second.notifications.count).to eq 0
       ActionMailer::Base.deliveries = []
       instance.perform(payment_second.id)
@@ -104,10 +104,10 @@ RSpec.describe EmailDonationJob, type: :job do
       payment_second.reload
       expect(payment_second.notifications.count).to eq 1
       notification = payment_second.notifications.first
-      expect(notification.kind).to eq "donation_theft_alert"
+      expect(notification.kind).to eq "donation_promoted_alert"
       expect(notification.bike_id).to be_present
-      expect(notification.bike_id).to eq theft_alert.bike&.id
-      expect(notification.theft_alert?).to be_falsey
+      expect(notification.bike_id).to eq promoted_alert.bike&.id
+      expect(notification.promoted_alert?).to be_falsey
       expect(notification.donation?).to be_truthy
     end
   end
@@ -130,7 +130,7 @@ RSpec.describe EmailDonationJob, type: :job do
       expect(payment.notifications.first.bike_id).to eq stolen_record1.bike&.id
     end
     context "with active theft alert" do
-      let!(:theft_alert) { FactoryBot.create(:theft_alert_begun, user: user) }
+      let!(:promoted_alert) { FactoryBot.create(:promoted_alert_begun, user: user) }
       let!(:recovery2) { FactoryBot.create(:stolen_record_recovered, bike: bike2, recovered_at: Time.current - 1.week) }
       it "sends a donation_recovered message" do
         expect(stolen_record1).to be_present

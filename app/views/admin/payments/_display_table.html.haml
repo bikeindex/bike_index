@@ -19,8 +19,8 @@
       %tr
         %td For
         %td
-          - if payment.theft_alert.present?
-            = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+          - if payment.promoted_alert.present?
+            = link_to "Promoted alert", edit_admin_promoted_alert_path(payment.promoted_alert)
           - else
             = payment.kind_humanized
   .col-md-6

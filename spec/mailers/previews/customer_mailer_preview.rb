@@ -52,15 +52,15 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.user_alert_email(user_alert)
   end
 
-  def theft_alert_posted
-    theft_alert = TheftAlert.reorder(:created_at).last
-    notification = theft_alert.notifications.where(kind: "theft_alert_posted").first
-    notification ||= Notification.new(user: theft_alert.user,
-      kind: "theft_alert_posted",
+  def promoted_alert_posted
+    promoted_alert = PromotedAlert.reorder(:created_at).last
+    notification = promoted_alert.notifications.where(kind: "promoted_alert_posted").first
+    notification ||= Notification.new(user: promoted_alert.user,
+      kind: "promoted_alert_posted",
       message_channel: "email",
-      notifiable: theft_alert)
+      notifiable: promoted_alert)
 
-    CustomerMailer.theft_alert_email(theft_alert, notification)
+    CustomerMailer.promoted_alert_email(promoted_alert, notification)
   end
 
   def admin_contact_stolen_email

@@ -148,7 +148,7 @@ class Bike < ApplicationRecord
   has_many :graduated_notifications
   has_many :notifications
   has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
-  has_many :theft_alerts
+  has_many :promoted_alerts
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records

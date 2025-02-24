@@ -25,13 +25,13 @@ class AdminMailerPreview < ActionMailer::Preview
     AdminMailer.unknown_organization_for_ascend_import(bulk_import)
   end
 
-  def theft_alert_notification
-    theft_alert = TheftAlert.last
-    AdminMailer.theft_alert_notification(theft_alert)
+  def promoted_alert_notification
+    promoted_alert = PromotedAlert.last
+    AdminMailer.promoted_alert_notification(promoted_alert)
   end
 
-  def theft_alert_recovery
-    theft_alert = TheftAlert.last
-    AdminMailer.theft_alert_notification(theft_alert, notification_type: :recovered)
+  def promoted_alert_recovery
+    promoted_alert = PromotedAlert.last
+    AdminMailer.promoted_alert_notification(promoted_alert, notification_type: :recovered)
   end
 end
