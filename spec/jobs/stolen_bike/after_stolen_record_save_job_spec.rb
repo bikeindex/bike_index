@@ -1,7 +1,7 @@
 require "rails_helper"
 
-RSpec.describe AfterStolenRecordSaveJob, type: :job do
-  let(:subject) { AfterStolenRecordSaveJob }
+RSpec.describe StolenBike::AfterStolenRecordSaveJob, type: :job do
+  let(:subject) { StolenBike::AfterStolenRecordSaveJob }
   let(:instance) { subject.new }
   before { Sidekiq::Job.clear_all }
 

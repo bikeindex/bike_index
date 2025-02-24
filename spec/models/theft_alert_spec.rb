@@ -60,11 +60,43 @@ RSpec.describe TheftAlert, type: :model do
         expect(theft_alert.paid?).to be_truthy
         expect(theft_alert.activateable?).to be_truthy
         expect(theft_alert.posted?).to be_falsey
+        expect(theft_alert.failed_to_activate?).to be_falsey
+        expect(TheftAlert.activating.pluck(:id)).to eq([])
+        expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
         # Also, test notify? in here too
         expect(theft_alert.notify?).to be_truthy
         stolen_record.update(receive_notifications: false)
         theft_alert.reload
         expect(theft_alert.notify?).to be_falsey
+      end
+    end
+  end
+
+  describe "failed_to_activate?" do
+    let(:theft_alert) do
+      FactoryBot.create(:theft_alert, status: "pending", facebook_data: {activating_at:})
+    end
+    let(:activating_at) { (Time.current - 6.minutes).to_i }
+    let(:start_at) { nil }
+    it "is falsey" do
+      expect(theft_alert.reload.start_at).to be_nil
+      expect(theft_alert.failed_to_activate?).to be_truthy
+      expect(TheftAlert.activating.pluck(:id)).to eq([theft_alert.id])
+      expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([theft_alert.id])
+
+      theft_alert.update(start_at: Time.current, end_at: Time.current + 1.day, status: "active")
+      expect(theft_alert.reload.start_at).to be_present
+      expect(theft_alert.failed_to_activate?).to be_falsey
+      expect(TheftAlert.activating.pluck(:id)).to eq([])
+      expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
+    end
+    context "start_at more recently" do
+      let(:activating_at) { (Time.current - 2.minutes).to_i }
+
+      it "is falsey" do
+        expect(theft_alert.reload.failed_to_activate?).to be_falsey
+        expect(TheftAlert.activating.pluck(:id)).to eq([theft_alert.id])
+        expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
       end
     end
   end

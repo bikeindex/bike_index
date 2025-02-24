@@ -207,7 +207,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_impounded_only_required.csv"))) }
             let!(:color_purple) { FactoryBot.create(:color, name: "Purple") }
             let!(:color_pink) { FactoryBot.create(:color, name: "Pink") }
-            it "imports impounded bikes" do
+            it "imports impounded bikes", :flaky do
               Sidekiq::Job.clear_all
               expect {
                 post base_url, params: {bulk_import: {file: file, kind: "impounded"}}

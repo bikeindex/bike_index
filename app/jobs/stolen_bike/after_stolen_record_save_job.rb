@@ -1,4 +1,4 @@
-class AfterStolenRecordSaveJob < ApplicationJob
+class StolenBike::AfterStolenRecordSaveJob < ApplicationJob
   sidekiq_options retry: false
 
   def perform(stolen_record_id, remove_alert_image = false)

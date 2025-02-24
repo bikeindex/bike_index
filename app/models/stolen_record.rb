@@ -404,7 +404,7 @@ class StolenRecord < ApplicationRecord
     if current || bike&.current_stolen_record_id == id
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
-    AfterStolenRecordSaveJob.perform_async(id, @alert_location_changed)
+    StolenBike::AfterStolenRecordSaveJob.perform_async(id, @alert_location_changed)
     AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
@@ -412,7 +412,7 @@ class StolenRecord < ApplicationRecord
 
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
   def enqueue_worker
-    AfterStolenRecordSaveJob.perform_async(id)
+    StolenBike::AfterStolenRecordSaveJob.perform_async(id)
   end
 
   def notify_of_promoted_alert_recovery

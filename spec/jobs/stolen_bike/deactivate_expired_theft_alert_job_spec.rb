@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe DeactivateExpiredTheftAlertJob, type: :job do
+RSpec.describe StolenBike::DeactivateExpiredTheftAlertJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
 

@@ -41,6 +41,7 @@
 class TheftAlert < ApplicationRecord
   # NOTE: TheftAlert is called "Promoted alert" on the frontend
 
+  FAILED_DELAY = 5.minutes.to_i.freeze
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
   # Timestamp 1s before first alert was automated
   AUTOMATION_START = 1625586988 # 2021-7-6
@@ -64,10 +65,14 @@ class TheftAlert < ApplicationRecord
   before_validation :set_calculated_attributes
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
-  scope :paid, -> { joins(:payment).where.not(payments: {paid_at: nil}) }
+  scope :paid, -> { joins(:payment).merge(Payment.paid) }
   scope :admin, -> { where(admin: true) }
+  scope :not_admin, -> { where(admin: false) }
+  scope :unpaid, -> { not_admin.joins(:payment).merge(Payment.incomplete) }
   scope :paid_or_admin, -> { paid.or(admin) }
   scope :posted, -> { where.not(start_at: nil) }
+  scope :activating, -> { pending.where(start_at: nil).where("(facebook_data -> 'activating_at') IS NOT NULL") }
+  scope :failed_to_activate, -> { activating.where("(facebook_data -> 'activating_at')::integer < ?", Time.current.to_i - FAILED_DELAY) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
@@ -155,7 +160,7 @@ class TheftAlert < ApplicationRecord
   def should_update_facebook?
     return false unless facebook_updateable?
     return false if end_at < self.class.update_end_buffer
-    facebook_updated_at.blank? || facebook_updated_at < Time.current - 6.hours
+    facebook_updated_at.blank? || facebook_updated_at < Time.current - 3.hours
   end
 
   # literally CAN NOT activate
@@ -176,7 +181,12 @@ class TheftAlert < ApplicationRecord
   # Simplistic, can be improved
   def failed_to_activate?
     return false unless activating?
-    activating_at < Time.current - 5.minutes
+    failed_to_activate_data?
+  end
+
+  # Separate so that we can manually set alerts to be inactive, but still show that they failed to activate
+  def failed_to_activate_data?
+    activating_at < Time.current - FAILED_DELAY
   end
 
   def recovered?
@@ -262,13 +272,13 @@ class TheftAlert < ApplicationRecord
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
 
-  def calculated_start_at
+  def start_at_with_fallback
     start_at.present? ? start_at : Time.current
   end
 
   # Default to 3 days, because something
   def calculated_end_at
-    calculated_start_at + (duration_days_facebook || 3).days
+    start_at_with_fallback + (duration_days_facebook || 3).days
   end
 
   def set_calculated_attributes
