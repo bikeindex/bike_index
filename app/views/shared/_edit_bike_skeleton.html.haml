@@ -37,7 +37,7 @@
           = link_to t(".view_bike", bike_type: @bike.type_titleize), bike_path(@bike), class: "gray-link"
   = yield
 
-  .mobile-nonfloating-menu.pl-1.pr-1.text-center
+  .mobile-nonfloating-menu.pl-1.pr-1.text-center.bootstrapstyle
     %strong.d-inline-block
       = t(".edit_pages", bike_type: @bike.type)
     - menu_link_count = @edit_templates.keys.count
