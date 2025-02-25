@@ -5,7 +5,7 @@ RSpec.describe StolenBike::DeactivateExpiredPromotedAlertJob, type: :job do
   include_examples :scheduled_job_tests
 
   describe "#perform" do
-    it "deactivates expired theft alerts" do
+    it "deactivates expired promoted alerts" do
       active = FactoryBot.create_list(:promoted_alert_begun, 2)
       expired = FactoryBot.create_list(:promoted_alert_begun, 2,
         start_at: Time.current - 2.days,

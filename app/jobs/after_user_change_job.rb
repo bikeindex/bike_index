@@ -33,7 +33,7 @@ class AfterUserChangeJob < ApplicationJob
       user.update(alert_slugs: current_alerts, skip_update: true)
     end
 
-    # Activate activateable theft alerts!
+    # Activate activateable promoted alerts!
     user.promoted_alerts.paid.where(start_at: nil).each do |promoted_alert|
       next unless promoted_alert.activateable?
       StolenBike::ActivatePromotedAlertJob.perform_async(promoted_alert.id)

@@ -94,7 +94,7 @@ class Admin::PromotedAlertsController < Admin::BaseController
       .merge(user: current_user, admin: true)
   end
 
-  # Override, set one week before earliest created theft alert
+  # Override, set one week before earliest created promoted alert
   def earliest_period_date
     if @search_facebook_data
       Time.at(1624982189)

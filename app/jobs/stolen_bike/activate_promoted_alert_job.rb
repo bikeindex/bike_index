@@ -14,7 +14,7 @@ class StolenBike::ActivatePromotedAlertJob < ApplicationJob
     Facebook::AdsIntegration.new.create_for(promoted_alert)
 
     promoted_alert.reload
-    # And mark the theft alert active
+    # And mark the promoted alert active
     promoted_alert.update(start_at: promoted_alert.start_at_with_fallback,
       end_at: promoted_alert.calculated_end_at,
       status: "active")

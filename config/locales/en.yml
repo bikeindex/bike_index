@@ -583,7 +583,7 @@ en:
         secondary_phone: Secondary phone
         state: :activerecord.models.state
         street: Street
-        promoted_alerts: Theft alerts
+        promoted_alerts: Promoted alerts
         theft_description: Theft description
         time: Time
         tsved_at: Tsved at
@@ -604,7 +604,7 @@ en:
         duration_days: Duration days
         name: Name
         stolen_records: Stolen records
-        promoted_alerts: Theft alerts
+        promoted_alerts: Promoted alerts
         views: Views
       tweet:
         alignment: Alignment
@@ -883,8 +883,8 @@ en:
       state: State
       stolen_notification: Stolen notification
       stolen_record: Stolen record
-      promoted_alert: Theft alert
-      promoted_alert_plan: Theft alert plan
+      promoted_alert: Promoted alert
+      promoted_alert_plan: Promoted alert plan
       tweet: Tweet
       user: User
       user_email: User email

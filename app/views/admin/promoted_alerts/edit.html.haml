@@ -39,7 +39,7 @@
           - if @promoted_alert.activateable_except_approval?
             %h4.text-center
               - if @promoted_alert.activateable?
-                Theft alert can be activated!
+                Promoted alert can be activated!
               - else
                 %span.text-warning This stolen record is NOT approved
                 %em.small.d-block.mt-2
@@ -61,7 +61,7 @@
               = link_to "Activate!", admin_promoted_alert_path(@promoted_alert.id, activate_promoted_alert: true), method: :patch, action: "update", class: "btn btn-lg btn-success"
           - else
             %h4.text-center
-              Theft alert
+              Promoted alert
               %span.text-danger can not
               be activated
             %ul.mt-4

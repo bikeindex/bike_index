@@ -129,7 +129,7 @@ RSpec.describe EmailDonationJob, type: :job do
       expect(payment.notifications.first.bike_id).to be_present
       expect(payment.notifications.first.bike_id).to eq stolen_record1.bike&.id
     end
-    context "with active theft alert" do
+    context "with active promoted alert" do
       let!(:promoted_alert) { FactoryBot.create(:promoted_alert_begun, user: user) }
       let!(:recovery2) { FactoryBot.create(:stolen_record_recovered, bike: bike2, recovered_at: Time.current - 1.week) }
       it "sends a donation_recovered message" do

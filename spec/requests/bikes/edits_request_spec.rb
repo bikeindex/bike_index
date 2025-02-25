@@ -185,7 +185,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         # can't use the let block
         bc = Bikes::EditsController.new
         bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
-        # Don't test alert templates, they're in theft alerts controller
+        # Don't test alert templates, they're in promoted alerts controller
         bc.edit_templates.keys - %w[alert alert_purchase_confirmation]
       end
       let(:no_global_alert_templates) { %w[theft_details photos report_recovered remove] }

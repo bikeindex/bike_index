@@ -82,7 +82,7 @@ RSpec.describe AdminHelper, type: :helper do
         expect(user_icon(user)).to eq target
         expect(user_icon(user, full_text: true)).to eq target_full_text
       end
-      context "theft alert" do
+      context "promoted alert" do
         let!(:promoted_alert) { FactoryBot.create(:promoted_alert_paid, user: user) }
         let(:target) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span><span class=\"theft-alert-icon user-icon ml-1\" title=\"Promoted alert purchaser\">P</span></span>" }
         let(:target_full_text) do
@@ -90,7 +90,7 @@ RSpec.describe AdminHelper, type: :helper do
             "<span class=\"theft-alert-icon user-icon ml-1\" title=\"Promoted alert purchaser\">P</span><span class=\"less-strong\">romoted alert</span>" \
             "</span>"
         end
-        it "returns donor and theft alert" do
+        it "returns donor and promoted alert" do
           expect(user.donor?).to be_truthy
           expect(user.promoted_alert_purchaser?).to be_truthy
           expect(user_icon_hash(user)).to eq({tags: %i[donor promoted_alert]})

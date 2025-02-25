@@ -21,7 +21,7 @@ RSpec.describe Bikes::PromotedAlertsController, type: :request, vcr: true, match
       expect(assigns(:selected_promoted_alert_plan)&.id).to eq promoted_alert_plan2.id
       expect(assigns(:promoted_alerts).pluck(:id)).to eq([])
     end
-    context "existing theft alert" do
+    context "existing promoted alert" do
       let!(:promoted_alert_paid) do
         FactoryBot.create(:promoted_alert, :paid, :ended,
           user: promoted_alert_user,
@@ -29,7 +29,7 @@ RSpec.describe Bikes::PromotedAlertsController, type: :request, vcr: true, match
           stolen_record: stolen_record)
       end
       let(:promoted_alert_user) { current_user }
-      it "renders theft alert" do
+      it "renders promoted alert" do
         expect(stolen_record.reload.promoted_alerts.pluck(:id)).to eq([promoted_alert_paid.id])
         expect(stolen_record.promoted_alerts.active.pluck(:id)).to eq([])
         get "#{base_url}/new"

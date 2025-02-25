@@ -346,7 +346,7 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
+  # If there isn't any image and there is a promoted alert, we want to tell the user to upload an image
   def promoted_alert_missing_photo?
     current_alert_image.blank? && promoted_alerts.any?
   end

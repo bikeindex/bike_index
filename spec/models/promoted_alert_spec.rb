@@ -105,7 +105,7 @@ RSpec.describe PromotedAlert, type: :model do
     let(:promoted_alert_plan) { PromotedAlertPlan.new(amount_cents_facebook: 1999) }
     let(:promoted_alert) { PromotedAlert.new(id: 12, promoted_alert_plan: promoted_alert_plan) }
     let(:facebook_name) { "Theft Alert 12 - $19.99" }
-    it "returns the theft alert plan" do
+    it "returns the promoted alert plan" do
       expect(promoted_alert.facebook_name("campaign")).to eq facebook_name
       expect(promoted_alert.facebook_name("adset")).to eq "#{facebook_name} - adset"
       expect(promoted_alert.facebook_name("ad")).to eq "#{facebook_name} - ad"
