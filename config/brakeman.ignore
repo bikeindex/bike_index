@@ -317,52 +317,6 @@
       "note": ""
     },
     {
-      "warning_type": "Dangerous Send",
-      "warning_code": 23,
-      "fingerprint": "27893a57cea7b1d22ce67ff0eb87c14ee97190f330ff3c7fbe4c632842b6056c",
-      "check_name": "Send",
-      "message": "User controlled method execution",
-      "file": "app/controllers/admin/promoted_alerts_controller.rb",
-      "line": 133,
-      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
-      "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  PromotedAlert.where(:stolen_record_id => StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  PromotedAlert\nend).public_send((params[:search_paid_admin] or available_paid_admin.first))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Admin::PromotedAlertsController",
-        "method": "searched_promoted_alerts"
-      },
-      "user_input": "params[:search_paid_admin]",
-      "confidence": "High",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "2843118e7bef96258449dfb2f745e07476f8a3193835936f63af1254bdf24a9c",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/bikes/promoted_alerts_controller.rb",
-      "line": 40,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(Payment.new(create_parameters(PromotedAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :promoted_alert_plan => PromotedAlertPlan.find(params[:promoted_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Bikes::PromotedAlertsController",
-        "method": "create"
-      },
-      "user_input": "Payment.new(create_parameters(PromotedAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :promoted_alert_plan => PromotedAlertPlan.find(params[:promoted_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
-      "confidence": "Weak",
-      "cwe_id": [
-        601
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
@@ -464,29 +418,6 @@
         77
       ],
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
-    },
-    {
-      "warning_type": "Dangerous Send",
-      "warning_code": 23,
-      "fingerprint": "4042ee974c4be89e69767715766963cb9e215f86867d62a579ceaf391602c24e",
-      "check_name": "Send",
-      "message": "User controlled method execution",
-      "file": "app/controllers/admin/promoted_alerts_controller.rb",
-      "line": 142,
-      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
-      "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  PromotedAlert.where(:stolen_record_id => StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  PromotedAlert\nend).public_send((params[:search_paid_admin] or available_paid_admin.first)).facebook_updateable.send(params[:search_status])",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Admin::PromotedAlertsController",
-        "method": "searched_promoted_alerts"
-      },
-      "user_input": "params[:search_status]",
-      "confidence": "High",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -639,6 +570,29 @@
     {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
+      "fingerprint": "51a134f5ba73abb978b2c69007019a28e31f65c3d93f8b8e5bdcbcc8b8db90b3",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/admin/promoted_alerts_controller.rb",
+      "line": 142,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  PromotedAlert.where(:stolen_record_id => StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  PromotedAlert\nend).public_send((params[:search_paid_admin] or available_paid_admin.first)).facebook_updateable.send(params[:search_status])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::PromotedAlertsController",
+        "method": "searched_promoted_alerts"
+      },
+      "user_input": "params[:search_status]",
+      "confidence": "High",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
       "fingerprint": "5dfde37acf6b644d93e5a1d2b7a4e1b7c9f30ad7a7bf51701770975c5ea5dbb9",
       "check_name": "Send",
       "message": "User controlled method execution",
@@ -694,6 +648,40 @@
       "note": ""
     },
     {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "75f9cb8021b7adf75ffc3cc164a4328d602ba9f02820712d23db7241eb39bf1b",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/promoted_alerts/edit.html.haml",
+      "line": 86,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(\"Facebook post\", PromotedAlert.find(params[:id]).facebook_post_url, :target => \"_blank\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::PromotedAlertsController",
+          "method": "edit",
+          "line": 20,
+          "file": "app/controllers/admin/promoted_alerts_controller.rb",
+          "rendered": {
+            "name": "admin/promoted_alerts/edit",
+            "file": "app/views/admin/promoted_alerts/edit.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/promoted_alerts/edit"
+      },
+      "user_input": "PromotedAlert.find(params[:id]).facebook_post_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 105,
       "fingerprint": "88168bb140c33d2c34eff43e8ffcd057017040c5bcd9babe9826063a3dc200f8",
@@ -738,6 +726,29 @@
         77
       ],
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "92175cce8687f023dc634ec5bd8f85cc977b0704acc80f7b59045bf598a129f3",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/admin/promoted_alerts_controller.rb",
+      "line": 133,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  PromotedAlert.where(:stolen_record_id => StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  PromotedAlert\nend).public_send((params[:search_paid_admin] or available_paid_admin.first))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::PromotedAlertsController",
+        "method": "searched_promoted_alerts"
+      },
+      "user_input": "params[:search_paid_admin]",
+      "confidence": "High",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
     },
     {
       "warning_type": "Command Injection",
@@ -940,6 +951,29 @@
       "note": ""
     },
     {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "a61a2d1b7d92684707b4ea4ab66d69c0ec9e1399c52766d279eefe1306843349",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/bikes/promoted_alerts_controller.rb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Payment.new(create_parameters(PromotedAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :promoted_alert_plan => PromotedAlertPlan.find(params[:promoted_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Bikes::PromotedAlertsController",
+        "method": "create"
+      },
+      "user_input": "Payment.new(create_parameters(PromotedAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :promoted_alert_plan => PromotedAlertPlan.find(params[:promoted_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "a743bd471cdf4bb187bd3b07f9be19b8aca52624fee37000482ee30b9be07d55",
@@ -1047,40 +1081,6 @@
         "template": "admin/bulk_imports/show"
       },
       "user_input": "BulkImport.find(params[:id]).file_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "be2ce00918c2c3877cf571e2ab007fca6ad86fc744198b859c0c646bdcffb2c7",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/admin/promoted_alerts/edit.html.haml",
-      "line": 79,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(\"Facebook post\", PromotedAlert.find(params[:id]).facebook_post_url, :target => \"_blank\")",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::PromotedAlertsController",
-          "method": "edit",
-          "line": 20,
-          "file": "app/controllers/admin/promoted_alerts_controller.rb",
-          "rendered": {
-            "name": "admin/promoted_alerts/edit",
-            "file": "app/views/admin/promoted_alerts/edit.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/promoted_alerts/edit"
-      },
-      "user_input": "PromotedAlert.find(params[:id]).facebook_post_url",
       "confidence": "Weak",
       "cwe_id": [
         79
