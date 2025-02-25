@@ -2807,7 +2807,7 @@ ALTER SEQUENCE public.promoted_alert_plans_id_seq OWNED BY public.promoted_alert
 CREATE TABLE public.promoted_alerts (
     id integer NOT NULL,
     stolen_record_id integer,
-    theft_alert_plan_id integer,
+    promoted_alert_plan_id integer,
     payment_id integer,
     user_id integer,
     status integer DEFAULT 0 NOT NULL,
@@ -3402,7 +3402,7 @@ CREATE TABLE public.user_alerts (
     user_id bigint,
     user_phone_id bigint,
     bike_id bigint,
-    theft_alert_id bigint,
+    promoted_alert_id bigint,
     organization_id bigint,
     message text,
     kind integer,
@@ -6097,17 +6097,17 @@ CREATE INDEX index_promoted_alerts_on_payment_id ON public.promoted_alerts USING
 
 
 --
+-- Name: index_promoted_alerts_on_promoted_alert_plan_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_promoted_alerts_on_promoted_alert_plan_id ON public.promoted_alerts USING btree (promoted_alert_plan_id);
+
+
+--
 -- Name: index_promoted_alerts_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_promoted_alerts_on_stolen_record_id ON public.promoted_alerts USING btree (stolen_record_id);
-
-
---
--- Name: index_promoted_alerts_on_theft_alert_plan_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_promoted_alerts_on_theft_alert_plan_id ON public.promoted_alerts USING btree (theft_alert_plan_id);
 
 
 --
@@ -6307,10 +6307,10 @@ CREATE INDEX index_user_alerts_on_organization_id ON public.user_alerts USING bt
 
 
 --
--- Name: index_user_alerts_on_theft_alert_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_user_alerts_on_promoted_alert_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_user_alerts_on_theft_alert_id ON public.user_alerts USING btree (theft_alert_id);
+CREATE INDEX index_user_alerts_on_promoted_alert_id ON public.user_alerts USING btree (promoted_alert_id);
 
 
 --
@@ -6410,7 +6410,7 @@ ALTER TABLE ONLY public.promoted_alerts
 --
 
 ALTER TABLE ONLY public.promoted_alerts
-    ADD CONSTRAINT fk_rails_4d1dc73022 FOREIGN KEY (theft_alert_plan_id) REFERENCES public.promoted_alert_plans(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_rails_4d1dc73022 FOREIGN KEY (promoted_alert_plan_id) REFERENCES public.promoted_alert_plans(id) ON DELETE CASCADE;
 
 
 --

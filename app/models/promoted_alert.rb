@@ -19,23 +19,23 @@
 #  updated_at                  :datetime         not null
 #  bike_id                     :bigint
 #  payment_id                  :integer
+#  promoted_alert_plan_id      :integer
 #  stolen_record_id            :integer
-#  promoted_alert_plan_id         :integer
 #  user_id                     :integer
 #
 # Indexes
 #
-#  index_promoted_alerts_on_bike_id              (bike_id)
-#  index_promoted_alerts_on_payment_id           (payment_id)
-#  index_promoted_alerts_on_stolen_record_id     (stolen_record_id)
+#  index_promoted_alerts_on_bike_id                 (bike_id)
+#  index_promoted_alerts_on_payment_id              (payment_id)
 #  index_promoted_alerts_on_promoted_alert_plan_id  (promoted_alert_plan_id)
-#  index_promoted_alerts_on_user_id              (user_id)
+#  index_promoted_alerts_on_stolen_record_id        (stolen_record_id)
+#  index_promoted_alerts_on_user_id                 (user_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (payment_id => payments.id)
-#  fk_rails_...  (stolen_record_id => stolen_records.id) ON DELETE => cascade
 #  fk_rails_...  (promoted_alert_plan_id => promoted_alert_plans.id) ON DELETE => cascade
+#  fk_rails_...  (stolen_record_id => stolen_records.id) ON DELETE => cascade
 #  fk_rails_...  (user_id => users.id)
 #
 class PromotedAlert < ApplicationRecord
