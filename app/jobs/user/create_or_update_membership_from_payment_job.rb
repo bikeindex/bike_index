@@ -12,7 +12,7 @@ class User::CreateOrUpdateMembershipFromPaymentJob < ApplicationJob
         end_at: membership.end_at))
     else
       membership = Membership.new(user_id: payment.user_id, creator_id: admin_id)
-      membership.kind = kind_from_amount(payment.amount_cents)
+      membership.level = level_from_amount(payment.amount_cents)
       membership.update!(period_from_amount(payment.amount_cents))
     end
     payment.update!(membership_id: membership.id)
@@ -21,7 +21,7 @@ class User::CreateOrUpdateMembershipFromPaymentJob < ApplicationJob
   private
 
   # for simplicity, just do basic and patron - plus is just for extra gifts
-  def kind_from_amount(amount_cents)
+  def level_from_amount(amount_cents)
     (amount_cents < 5000) ? "basic" : "patron"
   end
 

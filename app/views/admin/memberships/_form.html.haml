@@ -26,7 +26,7 @@
         - Membership.levels.keys.each do |level|
           .form-check
             %label
-              = f.radio_button :level, kind, class: "form-check-input"
+              = f.radio_button :level, level, class: "form-check-input"
               = Membership.level_humanized(level)
 
       .form-group.mt-4
