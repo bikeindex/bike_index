@@ -22,7 +22,7 @@ RSpec.describe StripeEvent, type: :model do
           stripe_status: "active",
           stripe_price_stripe_id: stripe_price.stripe_id,
           end_at: nil,
-          membership_kind: "plus",
+          membership_level: "plus",
           interval: "monthly",
           test?: true
         }
@@ -85,7 +85,7 @@ RSpec.describe StripeEvent, type: :model do
       context "with user matching email" do
         let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
         let(:target_membership) do
-          {kind: "plus", status: "active", user_id: user.id, end_at: nil}
+          {level: "plus", status: "active", user_id: user.id, end_at: nil}
         end
 
         it "assigns things to the user and creates a membership" do
@@ -170,7 +170,7 @@ RSpec.describe StripeEvent, type: :model do
             user_id: user.id,
             stripe_status: "active",
             stripe_price_stripe_id: stripe_price.stripe_id,
-            membership_kind: "plus",
+            membership_level: "plus",
             interval: "monthly",
             test?: true,
             stripe_id: # sanity check. Manually set, needs to be pulled from the cassette

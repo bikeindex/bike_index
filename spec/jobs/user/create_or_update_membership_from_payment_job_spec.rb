@@ -10,7 +10,7 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
 
   let(:new_attrs) do
     {user_id: user.id, start_at: Time.current, end_at: Time.current + 3.month,
-     creator_id:, kind: "basic", status: "active"}
+     creator_id:, level: "basic", status: "active"}
   end
   it "creates a membership" do
     expect(payment.reload.membership_id).to be_blank
@@ -46,18 +46,18 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
       expect(payment.reload.membership_id).to be_present
       expect(payment.kind).to eq "donation" # Doesn't update payment kind
 
-      expect(payment.membership).to match_hash_indifferently new_attrs.merge(kind: "patron", end_at: Time.current + 1.year)
+      expect(payment.membership).to match_hash_indifferently new_attrs.merge(level: "patron", end_at: Time.current + 1.year)
     end
   end
 
   context "when user already has a membership" do
-    let!(:membership) { FactoryBot.create(:membership, start_at:, end_at:, kind: "plus", user_id: user.id) }
+    let!(:membership) { FactoryBot.create(:membership, start_at:, end_at:, level: "plus", user_id: user.id) }
     let(:start_at) { Time.current - 1.month }
     let(:end_at) { Time.current + 2.months }
     let(:new_end_at) { end_at + 3.months }
     let(:updated_attrs) do
       {user_id: user.id, start_at:, end_at: end_at + 3.months,
-       creator_id: membership.creator_id, kind: "plus", status: "active"}
+       creator_id: membership.creator_id, level: "plus", status: "active"}
     end
     it "extends the membership" do
       expect(membership.reload.creator_id).to_not eq creator_id

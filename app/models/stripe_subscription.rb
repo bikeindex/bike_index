@@ -35,7 +35,7 @@ class StripeSubscription < ApplicationRecord
 
   scope :active, -> { where(stripe_status: "active") }
 
-  delegate :membership_kind, :currency_enum, :interval, :test?, to: :stripe_price, allow_nil: true
+  delegate :membership_level, :currency_enum, :interval, :test?, to: :stripe_price, allow_nil: true
 
   class << self
     def create_for(stripe_price:, user:)
@@ -74,9 +74,9 @@ class StripeSubscription < ApplicationRecord
       end_active_user_admin_membership!
 
       self.membership ||= user&.membership_active
-      self.membership&.kind = membership_kind
+      self.membership&.level = membership_level
     end
-    self.membership ||= Membership.new(user_id:, kind: membership_kind)
+    self.membership ||= Membership.new(user_id:, level: membership_level)
     self.membership&.update!(start_at:, end_at:)
 
     if membership&.id&.present? && membership_id != membership.id
@@ -107,6 +107,10 @@ class StripeSubscription < ApplicationRecord
 
   def email
     user&.email || payments.first&.email
+  end
+
+  def stripe_admin_url
+    "https://dashboard.stripe.com/subscriptions/#{stripe_id}"
   end
 
   def stripe_checkout_session_url

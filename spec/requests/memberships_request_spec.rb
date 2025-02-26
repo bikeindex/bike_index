@@ -56,14 +56,14 @@ RSpec.describe MembershipsController, type: :request do
     let(:create_params) do
       {
         currency: "usd",
-        membership: {set_interval: "monthly", kind: "basic"}
+        membership: {set_interval: "monthly", level: "basic"}
       }
     end
     let(:target_stripe_subscription) do
       {
         stripe_price_stripe_id: stripe_price.stripe_id,
         currency_enum: "usd",
-        membership_kind: "basic",
+        membership_level: "basic",
         interval: "monthly",
         start_at: nil,
         stripe_status: nil,

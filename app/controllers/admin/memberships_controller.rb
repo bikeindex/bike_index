@@ -15,7 +15,7 @@ class Admin::MembershipsController < Admin::BaseController
 
   def new
     @membership = Membership.new
-    @membership.set_calculated_attributes # Sets start_at and kind
+    @membership.set_calculated_attributes # Sets start_at and level
 
     if params[:user_id].present?
       user = User.find_by(id: params[:user_id])
@@ -51,20 +51,32 @@ class Admin::MembershipsController < Admin::BaseController
     end
   end
 
-  helper_method :matching_memberships
+  helper_method :matching_memberships, :searchable_levels, :searchable_statuses, :searchable_managers
+
+  def searchable_statuses
+    Membership.statuses.keys
+  end
+
+  def searchable_levels
+    Membership.levels.keys
+  end
+
+  def searchable_managers
+    %w[stripe_managed admin_managed].freeze
+  end
 
   protected
 
   def sortable_columns
-    %w[created_at start_at end_at updated_at kind user_id]
+    %w[created_at start_at end_at updated_at level user_id].freeze
   end
 
   def permitted_create_parameters
-    params.require(:membership).permit(:user_email, :kind, :start_at, :end_at)
+    params.require(:membership).permit(:user_email, :level, :start_at, :end_at)
   end
 
   def permitted_update_parameters
-    params.require(:membership).permit(:kind, :start_at, :end_at)
+    params.require(:membership).permit(:level, :start_at, :end_at)
   end
 
   def find_membership
@@ -73,8 +85,15 @@ class Admin::MembershipsController < Admin::BaseController
 
   def matching_memberships
     memberships = Membership.all
-    @activeness = %w[active not_active].include?(params[:search_activeness]) ? params[:search_activeness] : nil
-    memberships = memberships.send(@activeness) if @activeness.present?
+    @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
+    memberships = memberships.where(status: @status) if @status.present?
+
+    @level = searchable_levels.include?(params[:search_level]) ? params[:search_level] : nil
+    memberships = memberships.where(level: @level) if @level.present?
+
+    @manager = searchable_managers.include?(params[:search_manager]) ? params[:search_manager] : nil
+    memberships = memberships.send(@manager) if @manager.present?
+
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])
       memberships = memberships.where(user_id: @user.id) if @user.present?

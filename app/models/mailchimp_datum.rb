@@ -26,7 +26,8 @@ class MailchimpDatum < ApplicationRecord
     archived: 5 # Not a mailchimp status, but tracking it as well
   }.freeze
 
-  MANAGED_TAGS = %w[in_bike_index not_org_creator paid paid_previously pos_approved lightspeed ascend].freeze
+  MANAGED_TAGS = %w[ascend in_bike_index lightspeed member not_org_creator paid paid_previously
+    pos_approved].freeze
 
   belongs_to :user
   has_many :feedbacks
@@ -304,7 +305,10 @@ class MailchimpDatum < ApplicationRecord
   # or else it won't update mailchimp
   def calculated_tags
     updated_tags = tags.dup
-    updated_tags << "in_bike_index" if user.present?
+    if user.present?
+      updated_tags << "in_bike_index"
+      updated_tags << "member" if user.member?
+    end
     if mailchimp_organization.present?
       unless mailchimp_organization_role.organization_creator?
         updated_tags << "not_org_creator"
@@ -350,8 +354,8 @@ class MailchimpDatum < ApplicationRecord
     # users aren't added to the individual list if they're on the organization list
     unless c_list.include?("organization")
       if user&.present?
-        c_list << "individual" if user.payments.donation.any?
-        c_list << "individual" if stolen_records_recovered.any?
+        c_list << "individual" if user.member? || user.payments.donation.any? ||
+          stolen_records_recovered.any?
       end
     end
     c_list.uniq.sort

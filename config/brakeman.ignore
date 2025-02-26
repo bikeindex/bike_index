@@ -363,6 +363,29 @@
       "note": ""
     },
     {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "291665b6116d5f36cbc91110dfeb3dce1ba903b78f74b8f0fa455fd99ca49570",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/admin/memberships_controller.rb",
+      "line": 95,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "Membership.all.where(:status => ((params[:search_status] or nil))).where(:level => ((params[:search_level] or nil))).send((params[:search_manager] or nil))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::MembershipsController",
+        "method": "matching_memberships"
+      },
+      "user_input": "params[:search_manager]",
+      "confidence": "High",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "38cbf9d0ba136acb8502affdc8f703e52fc0c068b5eda8c048b1b21d21cbc772",
@@ -658,6 +681,50 @@
         77
       ],
       "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "651809dafcd743c22afeb1dd2c7cca62a326b3211f77053f8b4994a2e341f1e9",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/payments/_display.html.haml",
+      "line": 23,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Payment.find(params[:id]).stripe_id.truncate(20), Payment.find(params[:id]).stripe_admin_url, :title => Payment.find(params[:id]).stripe_id)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::PaymentsController",
+          "method": "edit",
+          "line": 21,
+          "file": "app/controllers/admin/payments_controller.rb",
+          "rendered": {
+            "name": "admin/payments/edit",
+            "file": "app/views/admin/payments/edit.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "admin/payments/edit",
+          "line": 6,
+          "file": "app/views/admin/payments/edit.html.haml",
+          "rendered": {
+            "name": "admin/payments/_display",
+            "file": "app/views/admin/payments/_display.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/payments/_display"
+      },
+      "user_input": "Payment.find(params[:id]).stripe_admin_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1060,7 +1127,7 @@
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/theft_alerts/edit.html.haml",
-      "line": 79,
+      "line": 86,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
       "code": "link_to(\"Facebook post\", TheftAlert.find(params[:id]).facebook_post_url, :target => \"_blank\")",
       "render_path": [
@@ -1249,6 +1316,40 @@
         "template": "review_impound_claims/_display"
       },
       "user_input": "(Unresolved Model).new.image_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "cfcf6efef605caaaf1b33b383c0629079cb7029fbd478c1a45ccd80308d5075f",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/memberships/show.html.haml",
+      "line": 68,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Membership.find(params[:id]).stripe_id.truncate(20), Membership.find(params[:id]).stripe_admin_url, :title => Membership.find(params[:id]).stripe_id)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::MembershipsController",
+          "method": "show",
+          "line": 38,
+          "file": "app/controllers/admin/memberships_controller.rb",
+          "rendered": {
+            "name": "admin/memberships/show",
+            "file": "app/views/admin/memberships/show.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/memberships/show"
+      },
+      "user_input": "Membership.find(params[:id]).stripe_admin_url",
       "confidence": "Weak",
       "cwe_id": [
         79

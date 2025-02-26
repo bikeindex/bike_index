@@ -2,11 +2,11 @@
 
 module ChooseMembership
   class Component < ApplicationComponent
-    def initialize(currency:, interval: nil, kind: nil, membership: nil)
+    def initialize(currency:, interval: nil, level: nil, membership: nil)
       @currency = currency
       @membership = membership || Membership.new
       @membership.set_interval = @membership.interval || interval || StripePrice.interval_default
-      @membership.kind ||= kind || :basic
+      @membership.level ||= level || :basic
     end
 
     private
@@ -28,9 +28,9 @@ module ChooseMembership
       end
     end
 
-    # TODO: Actually use membership kinds
-    def membership_kinds
-      Membership.kinds_ordered
+    # TODO: Actually use membership levels
+    def membership_levels
+      Membership.levels_ordered
     end
   end
 end

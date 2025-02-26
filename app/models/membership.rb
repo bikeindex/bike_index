@@ -4,7 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  end_at     :datetime
-#  kind       :integer
+#  level      :integer
 #  start_at   :datetime
 #  status     :integer
 #  created_at :datetime         not null
@@ -20,7 +20,7 @@
 class Membership < ApplicationRecord
   include ActivePeriodable
 
-  KIND_ENUM = {basic: 0, plus: 1, patron: 2}
+  LEVEL_ENUM = {basic: 0, plus: 1, patron: 2}
   STATUS_ENUM = {pending: 0, active: 1, ended: 2}
 
   belongs_to :user
@@ -30,7 +30,7 @@ class Membership < ApplicationRecord
   has_one :active_stripe_subscription, -> { active }, class_name: "StripeSubscription"
   has_many :payments
 
-  enum :kind, KIND_ENUM
+  enum :level, LEVEL_ENUM
   enum :status, STATUS_ENUM
 
   validate :no_active_stripe_subscription_admin_managed
@@ -39,12 +39,13 @@ class Membership < ApplicationRecord
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
 
-  delegate :stripe_id, :stripe_portal_session, to: :active_stripe_subscription, allow_nil: true
+  delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
+    to: :active_stripe_subscription, allow_nil: true
 
   attr_accessor :user_email, :set_interval
 
   class << self
-    def kind_humanized(str)
+    def level_humanized(str)
       str&.humanize
     end
 
@@ -52,13 +53,13 @@ class Membership < ApplicationRecord
       str&.humanize
     end
 
-    def kinds_ordered
-      kinds.keys.map { kind_humanized(_1) }
+    def levels_ordered
+      levels.keys.map { level_humanized(_1) }
     end
   end
 
-  def kind_humanized
-    self.class.kind_humanized(kind)
+  def level_humanized
+    self.class.level_humanized(level)
   end
 
   def status_display
@@ -74,7 +75,7 @@ class Membership < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.kind ||= "basic"
+    self.level ||= "basic"
     self.status = calculated_status
 
     if user_email.present?
@@ -84,10 +85,6 @@ class Membership < ApplicationRecord
 
   def interval
     active_stripe_subscription&.interval
-  end
-
-  def stripe_admin_url
-    "Stripe URL"
   end
 
   private

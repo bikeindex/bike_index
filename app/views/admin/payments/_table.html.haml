@@ -66,7 +66,7 @@
             %td
               %small
                 - if payment.stripe?
-                  = link_to "stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+                  = link_to "stripe", payment.stripe_admin_url
                 - else
                   = payment.payment_method.humanize.downcase
                 %small= link_to search_emoji, url_for(sortable_search_params.merge(search_payment_method: payment.payment_method))

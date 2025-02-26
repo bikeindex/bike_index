@@ -20,7 +20,7 @@
         %tr
           %td Stripe ID
           %td
-            = link_to payment.stripe_id.truncate(20), "https://dashboard.stripe.com/payments/#{payment.stripe_id}", title: payment.stripe_id
+            = link_to payment.stripe_id.truncate(20), payment.stripe_admin_url, title: payment.stripe_id
       %tr
         %td For
         %td

@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :membership do
     user { FactoryBot.create(:user_confirmed) }
-    kind { "basic" }
+    level { "basic" }
     start_at { Time.current - 1.hour }
     creator { FactoryBot.create(:admin) }
 

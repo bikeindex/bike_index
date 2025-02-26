@@ -109,6 +109,10 @@ class Payment < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
+  def stripe_admin_url
+    "https://dashboard.stripe.com/payments/#{stripe_id}"
+  end
+
   def stripe_checkout_session(item_name: nil)
     return nil unless stripe?
 
@@ -175,9 +179,15 @@ class Payment < ApplicationRecord
   end
 
   def can_assign_to_membership?
-    return false if stripe_subscription?
+    return false if stripe_subscription? || theft_alert?
 
-    user_id.present? && membership_id.blank? && invoice_id.blank? && theft_alert.blank?
+    user_id.present? && membership_id.blank? && invoice_id.blank? && organization_id.blank?
+  end
+
+  def can_assign_to_invoice?
+    return false if stripe_subscription? || theft_alert?
+
+    membership_id.blank?
   end
 
   def stripe_email(stripe_obj = nil)

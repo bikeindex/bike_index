@@ -180,13 +180,12 @@ class TheftAlert < ApplicationRecord
 
   # Simplistic, can be improved
   def failed_to_activate?
-    return false unless activating?
-    failed_to_activate_data?
+    activating? && failed_to_activate_data?
   end
 
-  # Separate so that we can manually set alerts to be inactive, but still show that they failed to activate
-  def failed_to_activate_data?
-    activating_at < Time.current - FAILED_DELAY
+  # Some alerts have been manually overridden to be inactive - make it possible to show this state
+  def failed_to_activate_inactive?
+    inactive? && failed_to_activate_data? && start_at.blank?
   end
 
   def recovered?
@@ -292,6 +291,10 @@ class TheftAlert < ApplicationRecord
   end
 
   private
+
+  def failed_to_activate_data?
+    activating_at < Time.current - FAILED_DELAY
+  end
 
   def alert_cannot_begin_in_past_or_after_ends
     return if start_at.blank? && end_at.blank?

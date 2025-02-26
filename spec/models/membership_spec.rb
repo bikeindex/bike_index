@@ -85,4 +85,30 @@ RSpec.describe Membership, type: :model do
       end
     end
   end
+
+  describe "user member and scope" do
+    let(:membership) { FactoryBot.create(:membership) }
+    let(:user) { membership.user }
+    it "is member" do
+      expect(membership.reload.status).to eq "active"
+      expect(user.reload.member?).to be_truthy
+      expect(User.member.pluck(:id)).to eq([user.id])
+    end
+    context "membership pending" do
+      let(:membership) { FactoryBot.create(:membership, start_at: Time.current + 1.week) }
+      it "is not member" do
+        expect(membership.reload.status).to eq "pending"
+        expect(user.reload.member?).to be_falsey
+        expect(User.member.pluck(:id)).to eq([])
+      end
+    end
+    context "membership ended" do
+      let(:membership) { FactoryBot.create(:membership, end_at: Time.current - 1) }
+      it "is not member" do
+        expect(membership.reload.status).to eq "ended"
+        expect(user.reload.member?).to be_falsey
+        expect(User.member.pluck(:id)).to eq([])
+      end
+    end
+  end
 end

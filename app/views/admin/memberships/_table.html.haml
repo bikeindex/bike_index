@@ -16,7 +16,7 @@
       %th
         = sortable "end_at", render_sortable: render_sortable
       %th
-        = sortable "kind", render_sortable: render_sortable
+        = sortable "level", render_sortable: render_sortable
       %th
         = sortable "creator", render_sortable: render_sortable
 
@@ -40,7 +40,7 @@
               %span.convertTime
                 = l membership.end_at, format: :convert_time
           %td
-            = membership.kind_humanized
+            = membership.level_humanized
           %td
             - if membership.stripe_managed?
               = link_to "Stripe", membership.stripe_admin_url

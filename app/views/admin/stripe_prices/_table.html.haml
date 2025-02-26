@@ -4,7 +4,7 @@
       %th
         = sortable "created_at", render_sortable: render_sortable
       %th
-        = sortable "membership_kind", "Kind", render_sortable: render_sortable
+        = sortable "membership_level", "Kind", render_sortable: render_sortable
       %th
         = sortable "amount_cents", "Amount", render_sortable: render_sortable
       %th
@@ -25,7 +25,7 @@
               %span.less-strong-right.d-none.d-md-block
                 = stripe_price.id
           %td
-            = Membership.kind_humanized(stripe_price.membership_kind)
+            = Membership.kind_humanized(stripe_price.membership_level)
           %td
             = stripe_price.amount_formatted
           %td

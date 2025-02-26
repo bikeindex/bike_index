@@ -29,7 +29,7 @@
           %td
             - if stripe_subscription.stripe_price.present?
               - stripe_price = stripe_subscription.stripe_price
-              #{stripe_price.membership_kind}
+              #{stripe_price.membership_level}
               %span.less-strong= stripe_price.interval
               - unless stripe_price.currency_enum == "usd"
                 %small= stripe_price.currency_name
@@ -48,7 +48,7 @@
             = stripe_subscription.stripe_status
           %td
             - if stripe_subscription.stripe_id.present?
-              = link_to stripe_subscription.stripe_id.truncate(20), "https://dashboard.stripe.com/subscriptions/#{stripe_subscription.stripe_id}", title: stripe_subscription.stripe_id
+              = link_to stripe_subscription.stripe_id.truncate(20), stripe_subscription.stripe_admin_url, title: stripe_subscription.stripe_id
           %td
             %small= admin_number_display(stripe_subscription.payments.count)
             - stripe_subscription.payments.order(id: :desc).limit(1).pluck(:id).each do |id|

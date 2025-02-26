@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :stripe_price do
-    membership_kind { "basic" }
+    membership_level { "basic" }
     interval { "monthly" }
     currency { Currency.default }
     amount_cents { 499 }
@@ -24,13 +24,13 @@ FactoryBot.define do
     end
 
     factory :stripe_price_plus, traits: [:test_stripe_id] do
-      membership_kind { "plus" }
+      membership_level { "plus" }
       amount_cents { 999 }
       stripe_id { "price_0Qs5s1m0T0GBfX0visCJi4lq" }
     end
 
     factory :stripe_price_patron, traits: [:test_stripe_id] do
-      membership_kind { "patron" }
+      membership_level { "patron" }
       amount_cents { 4999 }
       stripe_id { "price_0Qs5t7m0T0GBfX0vnALQrD8t" }
     end

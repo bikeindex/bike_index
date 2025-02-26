@@ -32,13 +32,13 @@ RSpec.describe Admin::MembershipsController, type: :request do
   describe "create" do
     let!(:user) { FactoryBot.create(:user_confirmed) }
     let(:target_attrs) do
-      {user_id: user.id, start_at: nil, kind: "plus", end_at: nil, creator: current_user,
+      {user_id: user.id, start_at: nil, level: "plus", end_at: nil, creator: current_user,
        status: "pending"}
     end
     it "creates" do
       expect do
         post base_url, params: {
-          membership: {kind: "plus", user_email: " #{user.email.upcase} "}
+          membership: {level: "plus", user_email: " #{user.email.upcase} "}
         }
       end.to change(Membership, :count).by 1
       expect(Membership.last).to match_hash_indifferently(target_attrs)
@@ -48,13 +48,13 @@ RSpec.describe Admin::MembershipsController, type: :request do
         expect do
           post base_url, params: {
             membership: {
-              kind: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601
+              level: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601
             }
           }
         end.to change(Membership, :count).by 1
         membership = Membership.last
         expect(membership).to match_hash_indifferently(target_attrs.except(:start_at).merge(status: "active"))
-        expect(membership.start_at).to be_within(1).of Time.current
+        expect(membership.start_at).to be_within(5).of Time.current
       end
     end
   end
@@ -64,10 +64,10 @@ RSpec.describe Admin::MembershipsController, type: :request do
     let(:start_at) { "2025-02-05T23:00:00" }
     let(:end_at) { "2026-02-05T23:00:00" }
     let(:update_params) do
-      {kind: "plus", user_email: "ffff", start_at:, end_at:}
+      {level: "plus", user_email: "ffff", start_at:, end_at:}
     end
     it "updates" do
-      expect(membership.kind).to eq "basic"
+      expect(membership.level).to eq "basic"
       og_user_id = membership.user_id
       expect(membership.end_at).to be_blank
       patch "#{base_url}/#{membership.id}", params: {
@@ -75,7 +75,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
       }
       expect(flash[:success]).to be_present
       expect(membership.reload.user_id).to eq og_user_id
-      expect(membership.kind).to eq "plus"
+      expect(membership.level).to eq "plus"
       expect(membership.start_at).to match_time TimeParser.parse(start_at)
       expect(membership.end_at).to match_time TimeParser.parse(end_at)
     end

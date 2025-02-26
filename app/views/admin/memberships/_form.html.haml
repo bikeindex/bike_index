@@ -12,22 +12,22 @@
       .form-group
         = f.label :start_at
         = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-        = f.datetime_local_field :start_at, step: 60, class: "form-control"
+        = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
 
       .form-group
         = f.label :end_at
         = f.datetime_local_field :end_at, step: 60, class: "form-control"
         %small.below-input-help
-          %em leave blank if there shouldn't be an explicit end
+          %em leave blank if you want to give a membership for forever. In general, set an end at
 
       .form-group
         %label
-          Membership Kind
-        - Membership.kinds.keys.each do |kind|
+          Membership Level
+        - Membership.levels.keys.each do |level|
           .form-check
             %label
-              = f.radio_button :kind, kind, class: "form-check-input"
-              = kind.humanize
+              = f.radio_button :level, level, class: "form-check-input"
+              = Membership.level_humanized(level)
 
       .form-group.mt-4
         = f.submit 'Save', class: 'btn btn-success'

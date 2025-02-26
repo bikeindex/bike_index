@@ -61,7 +61,7 @@ RSpec.describe StripeSubscription, type: :model do
       let(:start_at_existing) { Time.current - 1.year }
       let(:end_at_existing) { nil }
       let(:target_attrs) do
-        {start_at:, end_at:, user_id: user.id, kind: "basic", stripe_managed?: true}
+        {start_at:, end_at:, user_id: user.id, level: "basic", stripe_managed?: true}
       end
 
       it "ends the membership and creates a new one" do
@@ -99,7 +99,7 @@ RSpec.describe StripeSubscription, type: :model do
       let(:start_at) { Time.current - 1.year }
       let(:end_at) { Time.current - 1.minute }
       let(:stripe_status) { "canceled" }
-      let(:target_attrs) { {start_at:, end_at:, kind: "basic", status: "ended"} }
+      let(:target_attrs) { {start_at:, end_at:, level: "basic", status: "ended"} }
 
       it "creates a membership and ends it" do
         expect(stripe_subscription.reload.active?).to be_falsey
