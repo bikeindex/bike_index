@@ -14,7 +14,7 @@
         %tr
           %td Stripe ID
           %td
-            = link_to payment.stripe_id, "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+            = link_to payment.stripe_id, payment.stripe_admin_url
 
       %tr
         %td For

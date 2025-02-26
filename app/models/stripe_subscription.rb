@@ -109,6 +109,10 @@ class StripeSubscription < ApplicationRecord
     user&.email || payments.first&.email
   end
 
+  def stripe_admin_url
+    "https://dashboard.stripe.com/subscriptions/#{stripe_id}"
+  end
+
   def stripe_checkout_session_url
     @stripe_checkout_session_url || fetch_stripe_checkout_session_url
   end

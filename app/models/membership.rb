@@ -39,7 +39,8 @@ class Membership < ApplicationRecord
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
 
-  delegate :stripe_id, :stripe_portal_session, to: :active_stripe_subscription, allow_nil: true
+  delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
+    to: :active_stripe_subscription, allow_nil: true
 
   attr_accessor :user_email, :set_interval
 
@@ -84,10 +85,6 @@ class Membership < ApplicationRecord
 
   def interval
     active_stripe_subscription&.interval
-  end
-
-  def stripe_admin_url
-    "Stripe URL"
   end
 
   private
