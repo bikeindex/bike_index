@@ -16,21 +16,22 @@
         \- which will give this user a membership if they don't have one, or extend their current membership if they do.
       = button_to "assign to membership", admin_payment_path(id: @payment.id, assign_to_membership: true), method: :patch, class: "btn btn-primary"
 
-.row
-  .col-md-8.offset-md-2
-    = form_for [:admin, @payment] do |f|
-      - if @payment.errors.any?
-        = render partial: "/shared/errors", locals: {name: "Payment", obj: @payment}
+- if @payment.can_assign_to_invoice?
+  .row
+    .col-md-8.offset-md-2
+      = form_for [:admin, @payment] do |f|
+        - if @payment.errors.any?
+          = render partial: "/shared/errors", locals: {name: "Payment", obj: @payment}
 
-      .row
-        .col-lg-6
-          .form-group.fancy-select.unfancy
-            = f.label :organization_id
-            = collection_select(:payment, :organization_id, Organization.approved, :id, :name, prompt: "Choose organization")
-        .col-lg-6
-          .form-group
-            = f.label :invoice_id, "Invoice #"
-            = f.text_field :invoice_id, class: "form-control"
+        .row
+          .col-lg-6
+            .form-group.fancy-select.unfancy
+              = f.label :organization_id
+              = collection_select(:payment, :organization_id, Organization.approved, :id, :name, prompt: "Choose organization")
+          .col-lg-6
+            .form-group
+              = f.label :invoice_id, "Invoice #"
+              = f.text_field :invoice_id, class: "form-control"
 
-      = f.submit "Submit", class: 'btn btn-success float-right'
+        = f.submit "Submit", class: 'btn btn-success float-right'
 

@@ -29,7 +29,7 @@
           %td
             - if stripe_subscription.stripe_price.present?
               - stripe_price = stripe_subscription.stripe_price
-              #{stripe_price.membership_kind}
+              #{stripe_price.membership_level}
               %span.less-strong= stripe_price.interval
               - unless stripe_price.currency_enum == "usd"
                 %small= stripe_price.currency_name

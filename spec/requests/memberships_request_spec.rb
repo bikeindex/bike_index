@@ -63,7 +63,7 @@ RSpec.describe MembershipsController, type: :request do
       {
         stripe_price_stripe_id: stripe_price.stripe_id,
         currency_enum: "usd",
-        membership_kind: "basic",
+        membership_level: "basic",
         interval: "monthly",
         start_at: nil,
         stripe_status: nil,

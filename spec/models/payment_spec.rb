@@ -93,6 +93,7 @@ RSpec.describe Payment, type: :model do
       it "does not change from theft_alert" do
         payment.set_calculated_attributes
         expect(payment.kind).to eq "theft_alert"
+        expect(payment.kind_humanized).to eq "Promoted alert"
       end
     end
     context "payment" do
@@ -100,6 +101,7 @@ RSpec.describe Payment, type: :model do
       it "stays payment" do
         payment.set_calculated_attributes
         expect(payment.kind).to eq "payment"
+        expect(payment.kind_humanized).to eq "Payment"
       end
       context "with invoice" do
         let(:invoice) { Invoice.new }

@@ -24,7 +24,7 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
     end
   end
 
-  describe "product_membership_kind" do
+  describe "product_membership_level" do
     let(:target) do
       {
         "prod_Rld50xInuW3d5A" => :basic,
@@ -35,7 +35,7 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
     it "returns the products with membership kinds" do
       # Use the same cassette as above because it is included in the above call
       VCR.use_cassette("stripe-update_prices_job", match_requests_on: [:path]) do
-        expect(instance.send(:product_membership_kind)).to eq target
+        expect(instance.send(:product_membership_level)).to eq target
       end
     end
   end

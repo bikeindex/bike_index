@@ -29,7 +29,7 @@ module ChooseMembership
     end
 
     # TODO: Actually use membership kinds
-    def membership_kinds
+    def membership_levels
       Membership.kinds_ordered
     end
   end

@@ -1992,7 +1992,7 @@ ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 CREATE TABLE public.memberships (
     id bigint NOT NULL,
     user_id bigint,
-    kind integer,
+    level integer,
     status integer,
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
@@ -3110,7 +3110,7 @@ ALTER SEQUENCE public.stripe_events_id_seq OWNED BY public.stripe_events.id;
 
 CREATE TABLE public.stripe_prices (
     id bigint NOT NULL,
-    membership_kind integer,
+    membership_level integer,
     "interval" integer,
     stripe_id character varying,
     currency_enum integer,
@@ -6460,6 +6460,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250226182610'),
 ('20250217173339'),
 ('20250217173338'),
 ('20250217173337'),

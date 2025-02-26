@@ -29,9 +29,9 @@
               = l @membership.updated_at, format: :convert_time
         %tr
           %td
-            Kind
+            level
           %td
-            = @membership.kind_humanized
+            = @membership.level_humanized
 
   .col-md-6
     %table.table-list
@@ -72,14 +72,14 @@
   .row.mt-5
     .col-md-4
       = render partial: "form"
-- elsif @membership.stripe_managed?
-  .container
-    %h4.pt-4.pb-2
-      Payments
-      %small
-        = link_to admin_number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
-        - if @payments.count > 25
-          %em (only first 25 shown)
-  - if @payments.any?
-    = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true, render_method: true}
+
+.container
+  %h4.pt-4.pb-2
+    Payments
+    %small
+      = link_to admin_number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
+      - if @payments.count > 25
+        %em (only first 25 shown)
+- if @payments.any?
+  = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true, render_method: true}
 

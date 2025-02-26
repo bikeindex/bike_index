@@ -45,7 +45,7 @@ class MembershipsController < ApplicationController
     currency_enum = (currency_from_params || Currency.default).slug
 
     {
-      membership_kind: mem_params[:kind],
+      membership_level: mem_params[:kind],
       interval: mem_params[:set_interval],
       currency_enum:
     }

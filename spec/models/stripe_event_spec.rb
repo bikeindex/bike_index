@@ -22,7 +22,7 @@ RSpec.describe StripeEvent, type: :model do
           stripe_status: "active",
           stripe_price_stripe_id: stripe_price.stripe_id,
           end_at: nil,
-          membership_kind: "plus",
+          membership_level: "plus",
           interval: "monthly",
           test?: true
         }
@@ -170,7 +170,7 @@ RSpec.describe StripeEvent, type: :model do
             user_id: user.id,
             stripe_status: "active",
             stripe_price_stripe_id: stripe_price.stripe_id,
-            membership_kind: "plus",
+            membership_level: "plus",
             interval: "monthly",
             test?: true,
             stripe_id: # sanity check. Manually set, needs to be pulled from the cassette
