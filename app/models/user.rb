@@ -123,6 +123,7 @@ class User < ApplicationRecord
   scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
   scope :ambassadors, -> { where(id: OrganizationRole.ambassador_organizations.select(:user_id)) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
+  scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   validates_uniqueness_of :username, case_sensitive: false
 
@@ -221,6 +222,10 @@ class User < ApplicationRecord
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
     return true if id.present? # Because existing users shouldn't see this error
     errors.add(:email, :email_already_exists)
+  end
+
+  def member?
+    membership_active.present?
   end
 
   def confirmed?

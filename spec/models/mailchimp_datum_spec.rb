@@ -19,6 +19,49 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(mailchimp_datum.subscriber_hash).to eq "4108acb6069e48c2eec39cb7ecc002fe"
         expect(UpdateMailchimpDatumJob.jobs.count).to eq 0
       end
+      context "member" do
+        let!(:member) { FactoryBot.create(:membership, user:, level: "plus", start_at: Time.current - 1.year, end_at:) }
+        let(:end_at) { Time.current + 2.weeks }
+        it "creates and then finds for the user" do
+          expect(user.reload.member?).to be_truthy
+          mailchimp_datum = MailchimpDatum.find_or_create_for(user)
+          expect(mailchimp_datum.lists).to eq(["individual"])
+          expect(mailchimp_datum.subscribed?).to be_truthy
+          expect(mailchimp_datum.on_mailchimp?).to be_falsey
+          expect(mailchimp_datum.id).to be_present
+          expect(mailchimp_datum.user_id).to eq user.id
+          expect(user.reload.mailchimp_datum&.id).to eq mailchimp_datum.id
+          expect(UpdateMailchimpDatumJob.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
+          expect {
+            mailchimp_datum.update(updated_at: Time.current)
+          }.to_not change(UpdateMailchimpDatumJob.jobs, :count)
+          expect(mailchimp_datum.should_update?).to be_truthy
+
+          # Destroying the user updates mailchimp
+          user.destroy
+          expect {
+            mailchimp_datum.reload
+            mailchimp_datum.update(updated_at: Time.current)
+          }.to change(UpdateMailchimpDatumJob.jobs, :count).by 1
+          mailchimp_datum.reload
+          expect(mailchimp_datum.user_deleted?).to be_truthy
+          expect(mailchimp_datum.status).to eq "archived"
+          expect(mailchimp_datum.user_id).to be_present
+        end
+        context "membership ended" do
+          let(:end_at) { Time.current - 1.week }
+          it "does not create if not otherwise required" do
+            expect(user.reload.member?).to be_falsey
+            mailchimp_datum = MailchimpDatum.find_or_create_for(user)
+            expect(mailchimp_datum.lists).to eq([])
+            expect(mailchimp_datum.no_subscription_required?).to be_truthy
+            expect(mailchimp_datum.id).to be_blank
+            expect(mailchimp_datum.data.except("merge_fields")).to eq empty_data.except(:merge_fields).merge(tags: ["in_bike_index"]).as_json
+            expect(mailchimp_datum.subscriber_hash).to eq "4108acb6069e48c2eec39cb7ecc002fe"
+            expect(UpdateMailchimpDatumJob.jobs.count).to eq 0
+          end
+        end
+      end
       context "organization admin" do
         let!(:organization_role) { FactoryBot.create(:organization_role_claimed, role: "admin", user: user, organization: organization) }
         it "creates and then finds for the user" do
