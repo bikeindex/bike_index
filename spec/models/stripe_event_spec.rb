@@ -85,7 +85,7 @@ RSpec.describe StripeEvent, type: :model do
       context "with user matching email" do
         let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
         let(:target_membership) do
-          {kind: "plus", status: "active", user_id: user.id, end_at: nil}
+          {level: "plus", status: "active", user_id: user.id, end_at: nil}
         end
 
         it "assigns things to the user and creates a membership" do
