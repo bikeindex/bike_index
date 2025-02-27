@@ -107,10 +107,14 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
               expect(theft_alert.adset_id).to be_present
               expect(theft_alert.ad_id).to be_present
               expect(theft_alert.facebook_data["objective_campaign"]).to eq "OUTCOME_AWARENESS"
+              expect(theft_alert.objective_campaign).to eq "OUTCOME_AWARENESS"
               expect(theft_alert.facebook_data["objective_adset"]).to eq "REACH"
+              expect(theft_alert.objective_adset).to eq "REACH"
               # This fails when it's freshly created - so ignoring
               # expect(theft_alert.facebook_post_url).to be_present
             end
+            expect(TheftAlert.matching_adset_objective("OUTCOME_AWARENESS").pluck(:id)).to eq([theft_alert.id])
+            expect(TheftAlert.matching_adset_objective("REACH").pluck(:id)).to eq([theft_alert.id])
           end
         end
 

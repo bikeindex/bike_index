@@ -110,7 +110,7 @@
     = render partial: 'shared/modal', locals: { title: modal_title, id: 'initial-open-modal', modal_body: modal_body }
 
 - if bike_edit_overlay_possible && @bike.authorized?(current_user, no_superuser_override: true) && !@bike.authorized_by_organization?(u: current_user)
-  .bike-overlay-wrapper
+  .bike-overlay-wrapper.bootstrapstyle
     .bike-edit-overlay
       %p
         -# If the bike user is actually the current bike owner, do this

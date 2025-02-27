@@ -82,37 +82,44 @@ class TheftAlert < ApplicationRecord
 
   geocoded_by nil
 
-  def self.statuses
-    STATUS_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def statuses
+      STATUS_ENUM.keys.map(&:to_s)
+    end
 
-  def self.update_end_buffer
-    Time.current - 2.days
-  end
+    def update_end_buffer
+      Time.current - 2.days
+    end
 
-  def self.flatten_city(counted)
-    @countries ||= Country.pluck(:id, :name).to_h
-    @states ||= State.pluck(:id, :name).to_h
+    def flatten_city(counted)
+      @countries ||= Country.pluck(:id, :name).to_h
+      @states ||= State.pluck(:id, :name).to_h
 
-    [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
-  end
+      [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
+    end
 
-  def self.cities_count
-    joins(:stolen_record)
-      .group("stolen_records.country_id", "stolen_records.city", "stolen_records.state_id")
-      .count
-      .map { |c| flatten_city(c) }
-      .sort_by { |c| -c[3] }
-  end
+    def cities_count
+      joins(:stolen_record)
+        .group("stolen_records.country_id", "stolen_records.city", "stolen_records.state_id")
+        .count
+        .map { |c| flatten_city(c) }
+        .sort_by { |c| -c[3] }
+    end
 
-  def self.paid_cents
-    paid.sum("payments.amount_cents")
-  end
+    def paid_cents
+      paid.sum("payments.amount_cents")
+    end
 
-  def self.facebook_integration
-    "Facebook::AdsIntegration".constantize
-  rescue
-    nil
+    def facebook_integration
+      "Facebook::AdsIntegration".constantize
+    rescue
+      nil
+    end
+
+    def matching_adset_objective(objective)
+      where("(facebook_data ->> 'objective_adset') = ?", objective)
+        .or(where("(facebook_data ->> 'objective_campaign') = ?", objective))
+    end
   end
 
   # Override because of recovered bikes not being in default scope
@@ -259,12 +266,12 @@ class TheftAlert < ApplicationRecord
 
   def objective_campaign
     return nil if campaign_id.blank?
-    facebook_data&.dig("objective_campaign") || default_objective("campaign")
+    facebook_data&.dig("objective_campaign")
   end
 
   def objective_adset
     return nil if campaign_id.blank?
-    facebook_data&.dig("objective_campaign") || default_objective("adset")
+    facebook_data&.dig("objective_adset")
   end
 
   def message
@@ -310,14 +317,5 @@ class TheftAlert < ApplicationRecord
 
   def calculated_cents_facebook_spent
     facebook_data&.dig("spend_cents")
-  end
-
-  def default_objective(target)
-    return nil if self.class.facebook_integration.blank?
-    if target == "campaign"
-      Facebook::AdsIntegration::OBJECTIVE_DEFAULT
-    else
-      Facebook::AdsIntegration::ADSET_OBJECTIVE_DEFAULT
-    end
   end
 end
