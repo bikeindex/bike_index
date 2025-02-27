@@ -26,7 +26,7 @@
 #
 class Blog < ApplicationRecord
   include ActionView::Helpers::TextHelper
-  include Localizable
+  include Translatable
   include PgSearch::Model
 
   KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
@@ -46,7 +46,7 @@ class Blog < ApplicationRecord
   before_save :set_calculated_attributes
   before_create :set_title_slug
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
 
@@ -87,6 +87,10 @@ class Blog < ApplicationRecord
 
   def self.get_your_stolen_bike_back_slug
     "how-to-get-your-stolen-bike-back" # Also hard coded in routes
+  end
+
+  def self.why_membership_slug
+    "bike-index-membership"
   end
 
   # matches ALL content tag ids
@@ -152,7 +156,7 @@ class Blog < ApplicationRecord
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
     unless listicle?
-      self.kind = !InputNormalizer.boolean(info_kind) ? "blog" : "info"
+      self.kind = (!InputNormalizer.boolean(info_kind)) ? "blog" : "info"
     end
     self.published_at = Time.current if info?
     update_title_save
@@ -208,7 +212,7 @@ class Blog < ApplicationRecord
         markdown = Kramdown::Document.new(body)
         body_html = markdown.to_html
       end
-      abbr = strip_tags(body_html)
+      abbr = InputNormalizer.sanitize(body_html)
       # strip tags, then remove extra spaces
       abbr = abbr.tr("\n", " ").gsub(/\s+/, " ").strip if abbr.present?
       self.body_abbr = truncate(abbr, length: 200)

@@ -13,6 +13,10 @@
 #  updated_at              :datetime         not null
 #  organization_id         :bigint
 #
+# Indexes
+#
+#  index_impound_configurations_on_organization_id  (organization_id)
+#
 class ImpoundConfiguration < ApplicationRecord
   belongs_to :organization
   has_many :impound_records, through: :organization
@@ -40,7 +44,7 @@ class ImpoundConfiguration < ApplicationRecord
 
   def calculated_display_id_next_integer
     # TODO: display_id_next_integer input needs to be validated
-    # currently, in ProcessImpoundUpdatesWorker it's removed if it's been used
+    # currently, in ProcessImpoundUpdatesJob it's removed if it's been used
     return display_id_next_integer if display_id_next_integer.present?
     last_display_id_integer + 1
   end

@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
+  include Pagy::Backend
   protect_from_forgery
 
   around_action :set_locale
@@ -84,13 +85,13 @@ class ApplicationController < ActionController::Base
   def set_locale(&action)
     # Parse the timezone params if they are passed (tested in admin#dashboard#index)
     if params[:timezone].present?
-      timezone = TimeParser.parse_timezone(params[:timezone])
+      timezone = TimeZoneParser.parse(params[:timezone])
       # If it's a valid timezone, save to session
       session[:timezone] = timezone&.name
     end
     # Set the timezone on a per request basis if we have a timezone saved
     if session[:timezone].present?
-      Time.zone = timezone || TimeParser.parse_timezone(session[:timezone])
+      Time.zone = timezone || TimeZoneParser.parse(session[:timezone])
     end
 
     # We aren't translating the superadmin section
@@ -99,13 +100,13 @@ class ApplicationController < ActionController::Base
     end
     I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
-    Time.zone = TimeParser::DEFAULT_TIMEZONE
+    Time.zone = TimeParser::DEFAULT_TIME_ZONE
   end
 
   # Handle localization / currency conversion exceptions by redirecting to the
   # root url with the default locale and a flash message.
   def localization_failure
-    locale = t(requested_locale, scope: [:locales])
+    locale = translation(requested_locale, scope: [:locales])
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url

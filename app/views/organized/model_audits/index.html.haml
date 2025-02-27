@@ -7,7 +7,7 @@
 = render partial: "/shared/period_select"
 
 .mt-4.mb-4
-  = pluralize(number_with_delimiter(@organization_model_audits.total_count), "matching models")
+  = pluralize(number_with_delimiter(@pagy.count), "matching models")
   %em
     = humanized_time_range(@time_range)
   - if params[:search_mnfg_name].present?
@@ -70,6 +70,6 @@
             update
 
 .paginate-container.paginate-container-bottom
-  = paginate @organization_model_audits
+  = pagy_bootstrap_nav(@pagy).html_safe
 
 = render partial: "/organized/model_audits/submit_model_attestation"

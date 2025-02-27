@@ -10,6 +10,10 @@
 #  updated_at    :datetime         not null
 #  user_id       :integer
 #
+# Indexes
+#
+#  index_integrations_on_user_id  (user_id)
+#
 class IntegrationAssociationError < StandardError
 end
 
@@ -17,7 +21,7 @@ class Integration < ApplicationRecord
   validates_presence_of :access_token
   validates_presence_of :information
 
-  serialize :information, JSON
+  serialize :information, coder: JSON
 
   belongs_to :user
 

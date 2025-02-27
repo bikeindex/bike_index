@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 class InfoController < ApplicationController
+  DONT_BUY_STOLEN_URL = "https://files.bikeindex.org/stored/dont_buy_stolen.pdf"
+
   def show
     @blog = Blog.friendly_find(params[:id])
     if @blog.blank?
@@ -74,7 +78,7 @@ class InfoController < ApplicationController
   end
 
   def how_not_to_buy_stolen
-    redirect_to "https://files.bikeindex.org/stored/dont_buy_stolen.pdf"
+    redirect_to(DONT_BUY_STOLEN_URL, allow_other_host: true)
   end
 
   private

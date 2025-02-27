@@ -5,13 +5,12 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization) }
 
   it "redirects" do
-    expect {
-      get "/some-unknown-organization/impounded_bikes"
-    }.to raise_error(ActiveRecord::RecordNotFound)
+    get "/some-unknown-organization/impounded_bikes"
+    expect(response.status).to eq 404
   end
 
   context "Logged in as organization (not enabled)" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     it "redirects" do
       expect(current_organization.enabled?("impound_bikes")).to be_falsey
       expect(current_organization.public_impound_bikes?).to be_falsey
@@ -52,7 +51,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
     let!(:bike) { parking_notification.bike }
     it "renders, shows impounded bike" do
       expect(current_organization.public_impound_bikes?).to be_truthy
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         i = parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification")
         expect(i).to be_valid

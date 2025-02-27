@@ -27,7 +27,7 @@ class CustomerContact < ApplicationRecord
     bike_possibly_found: 2
   }.freeze
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   validates \
     :bike,
@@ -113,6 +113,6 @@ class CustomerContact < ApplicationRecord
   end
 
   def create_notification
-    CustomerContactNotificationCreateWorker.perform_async(id)
+    CustomerContactNotificationCreateJob.perform_async(id)
   end
 end

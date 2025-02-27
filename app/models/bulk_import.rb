@@ -29,8 +29,8 @@ class BulkImport < ApplicationRecord
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
-  enum progress: PROGRESS_ENUM
-  enum kind: KIND_ENUM
+  enum :progress, PROGRESS_ENUM
+  enum :kind, KIND_ENUM
 
   scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
   scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }
@@ -56,7 +56,7 @@ class BulkImport < ApplicationRecord
   end
 
   def self.kind_humanized(str)
-    str == "organization_import" ? "standard" : str&.gsub("_", " ")
+    (str == "organization_import") ? "standard" : str&.tr("_", " ")
   end
 
   # NOTE: Headers were added in PR#1914 - 2021-3-11 - many bulk imports don't have them stored
@@ -115,7 +115,7 @@ class BulkImport < ApplicationRecord
     update_attribute :import_errors, (import_errors || {}).merge(updated_file_error_data)
   end
 
-  # If the bulk import failed on a line, start after that line, otherwise it's 1. See BulkImportWorker
+  # If the bulk import failed on a line, start after that line, otherwise it's 1. See BulkImportJob
   def starting_line
     error_line = file_import_error_lines&.compact&.last
     error_line.present? ? error_line + 1 : 1
@@ -161,12 +161,12 @@ class BulkImport < ApplicationRecord
       save if organization_id.present?
     end
     if organization_id.present? && invalid_extension?
-      InvalidExtensionForAscendImportWorker.perform_async(id)
+      InvalidExtensionForAscendImportJob.perform_async(id)
     end
     return true if organization_id.present?
     add_ascend_import_error!
-    UnknownOrganizationForAscendImportWorker.perform_async(id)
-    false # must return false, otherwise BulkImportWorker enqueues processing
+    UnknownOrganizationForAscendImportJob.perform_async(id)
+    false # must return false, otherwise BulkImportJob enqueues processing
   end
 
   def organization_for_ascend_name

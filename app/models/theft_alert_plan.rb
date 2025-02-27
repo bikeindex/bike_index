@@ -7,7 +7,7 @@
 #  ad_radius_miles       :integer
 #  amount_cents          :integer          not null
 #  amount_cents_facebook :integer
-#  currency              :string           default("USD"), not null
+#  currency_enum         :integer
 #  description           :string           default(""), not null
 #  duration_days         :integer          not null
 #  language              :integer          default("en"), not null
@@ -17,12 +17,12 @@
 #  updated_at            :datetime         not null
 #
 class TheftAlertPlan < ApplicationRecord
+  include Currencyable
   include Amountable
-  include Localizable
+  include Translatable
 
   validates :name,
     :amount_cents,
-    :currency,
     :views,
     :duration_days,
     presence: true

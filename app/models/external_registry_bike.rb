@@ -23,6 +23,13 @@
 #  country_id                :integer          not null
 #  external_id               :string           not null
 #
+# Indexes
+#
+#  index_external_registry_bikes_on_country_id         (country_id)
+#  index_external_registry_bikes_on_external_id        (external_id)
+#  index_external_registry_bikes_on_serial_normalized  (serial_normalized)
+#  index_external_registry_bikes_on_type               (type)
+#
 class ExternalRegistryBike < ApplicationRecord
   belongs_to :country, class_name: "Country"
 
@@ -37,7 +44,7 @@ class ExternalRegistryBike < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum status: Bike::STATUS_ENUM
+  enum :status, Bike::STATUS_ENUM
 
   class << self
     def registry_name(str)
@@ -97,7 +104,7 @@ class ExternalRegistryBike < ApplicationRecord
   def short_address
     return nil unless location_found.present?
     addy = location_found.split(",")
-    shorter_length = addy.length > 3 ? 3 : addy.length
+    shorter_length = (addy.length > 3) ? 3 : addy.length
     addy[-shorter_length..].reject(&:blank?).map(&:strip).join(", ")
   end
 

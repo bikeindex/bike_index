@@ -2,17 +2,14 @@ module OrgPublic
   class ImpoundedBikesController < OrgPublic::BaseController
     include SortableTable
     before_action :ensure_public_impound_bikes!
-    before_action :set_period, only: [:index]
 
     def index
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
 
-      @impound_records = available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-        .page(@page).per(@per_page)
-        .includes(:bike, :location)
+      @pagy, @impound_records = pagy(available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
+        .includes(:bike, :location), limit: @per_page)
     end
 
     private

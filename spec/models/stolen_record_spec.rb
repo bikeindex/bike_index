@@ -300,57 +300,59 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  describe "set_phone" do
-    let(:stolen_record) { StolenRecord.new(phone: "000/000/0000", secondary_phone: "+220000000000 extension: 000") }
-    it "it should set_phone" do
-      stolen_record.set_calculated_attributes
-      expect(stolen_record.phone).to eq("0000000000")
-      expect(stolen_record.secondary_phone).to eq("+22 0000000000 x000")
-    end
-  end
-
-  describe "titleize_city" do
-    it "it should titleize_city" do
-      stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
-      stolen_record.set_calculated_attributes
-      expect(stolen_record.city).to eq("Indianapolis")
-    end
-
-    it "it shouldn't remove other things" do
-      stolen_record = StolenRecord.new(city: "Georgian la")
-      stolen_record.set_calculated_attributes
-      expect(stolen_record.city).to eq("Georgian La")
-    end
-  end
-
   describe "set_calculated_attributes" do
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    it "has before_save_callback_method defined as before_save callback" do
-      expect(stolen_record._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:set_calculated_attributes)).to eq(true)
+    describe "set_phone" do
+      let(:stolen_record) { StolenRecord.new(phone: "000/000/0000", secondary_phone: "+220000000000 extension: 000") }
+      it "it should set_phone" do
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.phone).to eq("0000000000")
+        expect(stolen_record.secondary_phone).to eq("+22 0000000000 x000")
+      end
+    end
+
+    describe "titleize_city" do
+      it "it should titleize_city" do
+        stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.city).to eq("Indianapolis")
+      end
+
+      it "it shouldn't remove other things" do
+        stolen_record = StolenRecord.new(city: "Georgian la")
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.city).to eq("Georgian La")
+      end
+    end
+
+    describe "set_date" do
+      let(:date) { Date.strptime("07-22-0014", "%m-%d-%Y") }
+      let(:stolen_record) { StolenRecord.new(date_stolen: date) }
+      it "it should set the year to something not stupid" do
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.date_stolen.to_date.to_s).to eq("2014-07-22")
+      end
     end
   end
 
-  describe "fix_date" do
-    it "it should set the year to something not stupid" do
-      stolen_record = StolenRecord.new
-      stupid_year = Date.strptime("07-22-0014", "%m-%d-%Y")
-      stolen_record.date_stolen = stupid_year
-      stolen_record.send(:fix_date)
-      expect(stolen_record.date_stolen.year).to eq(2014)
+  describe "corrected_date_stolen" do
+    let(:result) { StolenRecord.corrected_date_stolen(date) }
+    context "year last century" do
+      let(:date) { Date.strptime("07-22-1913", "%m-%d-%Y") }
+      it "it sets the year to not last century" do
+        expect(result.to_date.to_s).to eq("2013-07-22")
+      end
     end
-    it "it should set the year to not last century" do
-      stolen_record = StolenRecord.new
-      wrong_century = Date.strptime("07-22-1913", "%m-%d-%Y")
-      stolen_record.date_stolen = wrong_century
-      stolen_record.send(:fix_date)
-      expect(stolen_record.date_stolen.year).to eq(2013)
+    context "date next year" do
+      let(:date) { Time.current + 2.months }
+      it "it sets the year to last year" do
+        expect(result.to_date).to eq((date - 1.year).to_date)
+      end
     end
-    it "it should set the year to the past year if the date hasn't happened yet" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      next_year = (Time.current + 2.months)
-      stolen_record.date_stolen = next_year
-      stolen_record.send(:fix_date)
-      expect(stolen_record.date_stolen.year).to eq(Time.current.year - 1)
+    context "timestamp" do
+      let(:date) { (Time.current - 1.hour).to_i }
+      it "it sets the year to last year" do
+        expect(result).to be_within(1).of(Time.current - 1.hour)
+      end
     end
   end
 

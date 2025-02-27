@@ -14,6 +14,11 @@
 #  organization_id :integer
 #  user_id         :integer
 #
+# Indexes
+#
+#  index_exports_on_organization_id  (organization_id)
+#  index_exports_on_user_id          (user_id)
+#
 class Export < ApplicationRecord
   PROGRESS_ENUM = {
     pending: 0,
@@ -53,9 +58,9 @@ class Export < ApplicationRecord
 
   belongs_to :organization
   belongs_to :user # Creator of export
-  enum progress: PROGRESS_ENUM
-  enum kind: VALID_KINDS
-  enum file_format: VALID_FILE_FORMATS
+  enum :progress, PROGRESS_ENUM
+  enum :kind, VALID_KINDS
+  enum :file_format, VALID_FILE_FORMATS
 
   before_validation :set_calculated_attributes
 
@@ -244,7 +249,7 @@ class Export < ApplicationRecord
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["#{kind == "organization" ? organization.slug : kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["#{(kind == "organization") ? organization.slug : kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows
@@ -292,7 +297,7 @@ class Export < ApplicationRecord
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
-    (created_at || Time.current) < Time.current - 10.minutes ? "errored" : progress
+    ((created_at || Time.current) < Time.current - 10.minutes) ? "errored" : progress
   end
 
   def validated_options(opts)

@@ -12,11 +12,15 @@
 #  updated_at              :datetime         not null
 #  organization_id         :bigint
 #
+# Indexes
+#
+#  index_organization_statuses_on_organization_id  (organization_id)
+#
 class OrganizationStatus < AnalyticsRecord
   belongs_to :organization
 
-  enum pos_kind: Organization::POS_KIND_ENUM
-  enum kind: Organization::KIND_ENUM
+  enum :pos_kind, Organization::POS_KIND_ENUM
+  enum :kind, Organization::KIND_ENUM
 
   has_one :notification, as: :notifiable
 

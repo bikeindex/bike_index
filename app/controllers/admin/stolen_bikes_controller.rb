@@ -1,14 +1,12 @@
 class Admin::StolenBikesController < Admin::BaseController
   include SortableTable
-  before_action :find_bike, only: [:edit, :destroy, :update, :regenerate_alert_image]
-  before_action :set_period, only: [:index]
+  before_action :find_bike, only: %i[edit update]
   helper_method :available_stolen_records
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @stolen_records = available_stolen_records.page(page).per(@per_page).includes(:bike)
-      .reorder("stolen_records.#{sort_column} #{sort_direction}")
+    @pagy, @stolen_records = pagy(available_stolen_records.includes(:bike)
+      .reorder("stolen_records.#{sort_column} #{sort_direction}"), limit: @per_page)
   end
 
   def approve
@@ -18,10 +16,10 @@ class Admin::StolenBikesController < Admin::BaseController
         stolen_record_ids.each do |id|
           stolen_record = StolenRecord.unscoped.find(id)
           stolen_record.update_attribute :approved, true
-          ApproveStolenListingWorker.perform_async(stolen_record.bike_id)
+          StolenBike::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
         end
         # Lazy pluralize hack
-        flash[:success] = "#{stolen_record_ids.count} stolen #{stolen_record_ids.count == 1 ? "bike" : "bikes"} approved!"
+        flash[:success] = "#{stolen_record_ids.count} stolen #{(stolen_record_ids.count == 1) ? "bike" : "bikes"} approved!"
       else
         flash[:error] = "No stolen records selected to approve!"
       end
@@ -29,7 +27,7 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       find_bike
       @bike.current_stolen_record.update_attribute :approved, true
-      ApproveStolenListingWorker.perform_async(@bike.id)
+      StolenBike::ApproveStolenListingJob.perform_async(@bike.id)
       flash[:success] = "Stolen Bike was approved"
       redirect_to edit_admin_stolen_bike_url(@bike)
     end
@@ -49,7 +47,7 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}).update_ownership
       if @bike.update(permitted_parameters)
-        SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
+        SerialNormalizer.new(serial: @bike.serial_number).save_segments(@bike.id)
         flash[:success] = "Bike was successfully updated."
       else
         flash[:error] = "Unable to update!"
@@ -120,7 +118,7 @@ class Admin::StolenBikesController < Admin::BaseController
 
     # We always render distance
     distance = params[:search_distance].to_i
-    @distance = distance.present? && distance > 0 ? distance : 50
+    @distance = (distance.present? && distance > 0) ? distance : 50
     if !@only_without_location && params[:search_location].present?
       bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       available_stolen_records = available_stolen_records.within_bounding_box(bounding_box)

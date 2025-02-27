@@ -72,7 +72,7 @@ RSpec.describe "Bikes API V2", type: :request do
 
     it "proximity square does not overwrite the proximity_radius" do
       opts = {proximity_square: 100, proximity_radius: "10"}
-      target = Hashie::Mash.new(opts.merge(proximity: "ip"))
+      target = opts.merge(proximity: "ip")
       expect_any_instance_of(BikeSearcher).to receive(:initialize).with(target)
       get "/api/v2/bikes_search/count", params: opts.merge(format: :json)
     end
@@ -82,7 +82,7 @@ RSpec.describe "Bikes API V2", type: :request do
     it "returns the cached file" do
       FactoryBot.create(:stolen_bike)
       t = Time.current.to_i
-      FileCacheMaintenanceWorker.new.perform
+      FileCacheMaintenanceJob.new.perform
       cached_all_stolen = FileCacheMaintainer.cached_all_stolen
       expect(cached_all_stolen["updated_at"].to_i).to be >= t
       get "/api/v2/bikes_search/all_stolen", params: {format: :json}

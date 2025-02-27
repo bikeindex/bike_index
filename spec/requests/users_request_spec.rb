@@ -19,7 +19,7 @@ RSpec.describe UsersController, type: :request do
       it "updates the vendor terms of service and emailable" do
         expect(current_user.reload.notification_newsletters).to be_falsey
         organization = FactoryBot.create(:organization)
-        FactoryBot.create(:membership_claimed, organization: organization, user: current_user)
+        FactoryBot.create(:organization_role_claimed, organization: organization, user: current_user)
         current_user.reload
         expect(current_user.default_organization).to eq organization
         patch "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {vendor_terms_of_service: "1", notification_newsletters: true}}
@@ -87,7 +87,7 @@ RSpec.describe UsersController, type: :request do
       ActionMailer::Base.deliveries = []
       expect {
         post "#{base_url}/resend_confirmation_email", params: {email: "stuff@stuff.com"}
-      }.to_not change(EmailConfirmationWorker, :jobs) # Because it's done inline
+      }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
       expect(response).to redirect_to please_confirm_email_users_path
       expect(flash[:error]).to be_present
       expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -103,7 +103,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "blah blah blah"}
-        }.to_not change(EmailConfirmationWorker, :jobs) # Because it's done inline
+        }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -114,7 +114,7 @@ RSpec.describe UsersController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
         expect(current_user.notifications.count).to eq 1
-        expect(current_user.notifications.last.email_success?).to be_truthy
+        expect(current_user.notifications.last.delivery_success?).to be_truthy
         expect(current_user.notifications.last.confirmation_email?).to be_truthy
       end
     end
@@ -126,7 +126,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-        }.to_not change(EmailConfirmationWorker, :jobs) # Because it's done inline
+        }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -136,7 +136,7 @@ RSpec.describe UsersController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
         expect(user_subject.notifications.count).to eq 1
-        expect(user_subject.notifications.last.email_success?).to be_truthy
+        expect(user_subject.notifications.last.delivery_success?).to be_truthy
         expect(user_subject.notifications.last.confirmation_email?).to be_truthy
       end
       context "user confirmed" do
@@ -146,7 +146,7 @@ RSpec.describe UsersController, type: :request do
           ActionMailer::Base.deliveries = []
           expect {
             post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-          }.to_not change(EmailConfirmationWorker, :jobs) # Because it's done inline
+          }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
           expect(response).to redirect_to please_confirm_email_users_path
           expect(flash[:error]).to be_present
           expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -167,9 +167,9 @@ RSpec.describe UsersController, type: :request do
   describe "send_password_reset_email" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     it "enqueues a password reset email job" do
-      expect(user.password_reset_token).to be_blank
+      expect(user.token_for_password_reset).to be_blank
       ActionMailer::Base.deliveries = []
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         post "#{base_url}/send_password_reset_email", params: {email: user.email}
         expect(response.code).to eq("200")
@@ -181,13 +181,13 @@ RSpec.describe UsersController, type: :request do
       expect(mail.subject).to eq("Instructions to reset your password")
 
       user.reload
-      expect(user.password_reset_token).to be_present
+      expect(user.token_for_password_reset).to be_present
     end
     context "unknown user" do
       it "redirects back and flash errors if unable to find user" do
         expect {
           post "#{base_url}/send_password_reset_email", params: {email: "some-crazy-email@stuff.com"}
-        }.to_not change(EmailResetPasswordWorker.jobs, :size)
+        }.to_not change(EmailResetPasswordJob.jobs, :size)
         expect(flash[:error]).to match(/email/)
         expect(response).to redirect_to request_password_reset_form_users_path
       end
@@ -200,10 +200,10 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
-        expect(EmailResetPasswordWorker).to have_enqueued_sidekiq_job(user.id)
+        }.to change(EmailResetPasswordJob.jobs, :size).by(1)
+        expect(EmailResetPasswordJob).to have_enqueued_sidekiq_job(user.id)
         user.reload
-        expect(user.password_reset_token).to be_present
+        expect(user.token_for_password_reset).to be_present
       end
     end
     context "unconfirmed user" do
@@ -215,38 +215,38 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+        }.to change(EmailResetPasswordJob.jobs, :size).by(1)
         user.reload
-        expect(user.password_reset_token).to be_present
+        expect(user.token_for_password_reset).to be_present
         expect(user.confirmed?).to be_falsey
       end
     end
     context "existing password reset token" do
       it "does not resend if just sent" do
         user.send_password_reset_email
-        og_token = user.password_reset_token
+        og_token = user.token_for_password_reset
         expect {
           post "#{base_url}/send_password_reset_email", params: {email: user.email}
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_present
-        }.to_not change(EmailResetPasswordWorker.jobs, :size)
+        }.to_not change(EmailResetPasswordJob.jobs, :size)
         user.reload
-        expect(user.password_reset_token).to eq og_token
+        expect(user.token_for_password_reset).to eq og_token
       end
       context "older token" do
         it "updates token and sends" do
-          user.update_auth_token("password_reset_token", Time.current - 5.minutes)
-          og_token = user.password_reset_token
+          user.update_auth_token("token_for_password_reset", Time.current - 5.minutes)
+          og_token = user.token_for_password_reset
           expect(og_token).to be_present
           expect {
             post "#{base_url}/send_password_reset_email", params: {email: user.email}
             expect(response.code).to eq("200")
             expect(response).to render_template(:send_password_reset_email)
             expect(flash).to be_blank
-          }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+          }.to change(EmailResetPasswordJob.jobs, :size).by(1)
           user.reload
-          expect(user.password_reset_token).to_not eq og_token
+          expect(user.token_for_password_reset).to_not eq og_token
         end
       end
     end
@@ -256,17 +256,17 @@ RSpec.describe UsersController, type: :request do
     let(:user) { FactoryBot.create(:user) }
     it "renders" do
       user.send_password_reset_email
-      og_token = user.password_reset_token
+      og_token = user.token_for_password_reset
       get "#{base_url}/update_password_form_with_reset_token?token=#{og_token}"
       expect(response.code).to eq("200")
       expect(response).to render_template(:update_password_form_with_reset_token)
       expect(flash).to be_blank
       user.reload
-      expect(user.password_reset_token).to eq og_token
+      expect(user.token_for_password_reset).to eq og_token
     end
     context "nil token" do
       it "redirects" do
-        expect(user.password_reset_token).to be_blank # technically, this matches the pasesd token
+        expect(user.token_for_password_reset).to be_blank # technically, this matches the pasesd token
         get "#{base_url}/update_password_form_with_reset_token", params: {token: ""}
         expect(response).to redirect_to request_password_reset_form_users_path
         expect(flash[:error]).to be_present
@@ -281,13 +281,13 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("password_reset_token", Time.current - 121.minutes)
-        og_token = user.password_reset_token
-        get "#{base_url}/update_password_form_with_reset_token", params: {token: user.password_reset_token}
+        user.update_auth_token("token_for_password_reset", Time.current - 121.minutes)
+        og_token = user.token_for_password_reset
+        get "#{base_url}/update_password_form_with_reset_token", params: {token: user.token_for_password_reset}
         expect(response).to redirect_to request_password_reset_form_users_path
         expect(flash[:error]).to match "expired"
         user.reload
-        expect(user.password_reset_token).to eq og_token
+        expect(user.token_for_password_reset).to eq og_token
       end
     end
   end
@@ -296,18 +296,18 @@ RSpec.describe UsersController, type: :request do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:valid_params) do
       {
-        token: user.password_reset_token,
+        token: user.token_for_password_reset,
         user: {password: "b79xzcvb9xcvbzaxcvvvcvqwerwe7823412/`!", password_confirmation: "b79xzcvb9xcvbzaxcvvvcvqwerwe7823412/`!"}
       }
     end
     it "updates user and signs in" do
       user.send_password_reset_email
       og_auth = user.auth_token
-      og_token = user.password_reset_token
+      og_token = user.token_for_password_reset
       post "#{base_url}/update_password_with_reset_token", params: valid_params
       expect(response).to redirect_to my_account_url
       user.reload
-      expect(user.password_reset_token).to_not eq og_token
+      expect(user.token_for_password_reset).to_not eq og_token
       expect(user.auth_token).to_not eq og_auth
       expect(user.authenticate(valid_params.dig(:user, :password))).to be_truthy
       jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
@@ -319,12 +319,12 @@ RSpec.describe UsersController, type: :request do
         user.send_password_reset_email
         user.reload
         og_auth = user.auth_token
-        og_token = user.password_reset_token
+        og_token = user.token_for_password_reset
         expect(user.confirmed?).to be_falsey
         post "#{base_url}/update_password_with_reset_token", params: valid_params
         expect(response).to redirect_to my_account_url
         user.reload
-        expect(user.password_reset_token).to_not eq og_token
+        expect(user.token_for_password_reset).to_not eq og_token
         expect(user.auth_token).to_not eq og_auth
         expect(user.authenticate(valid_params.dig(:user, :password))).to be_truthy
         jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
@@ -337,7 +337,7 @@ RSpec.describe UsersController, type: :request do
       it "redirects to terms" do
         user.send_password_reset_email
         user.reload
-        og_token = user.password_reset_token
+        og_token = user.token_for_password_reset
         expect(user.confirmed?).to be_truthy
         expect(user.terms_of_service).to be_falsey
         post "#{base_url}/update_password_with_reset_token", params: valid_params
@@ -346,7 +346,7 @@ RSpec.describe UsersController, type: :request do
         get "/my_account"
         expect(response).to redirect_to accept_terms_url
         user.reload
-        expect(user.password_reset_token).to_not eq og_token
+        expect(user.token_for_password_reset).to_not eq og_token
         expect(user.authenticate(valid_params.dig(:user, :password))).to be_truthy
         jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
         expect(jar.signed["auth"]).to eq([user.id, user.auth_token])
@@ -359,12 +359,12 @@ RSpec.describe UsersController, type: :request do
       it "redirects back, doesn't sign in" do
         user.send_password_reset_email
         og_auth = user.auth_token
-        og_token = user.password_reset_token
+        og_token = user.token_for_password_reset
         post "#{base_url}/update_password_with_reset_token", params: invalid_params
         expect(assigns(:page_errors)).to be_present
         expect(response).to render_template(:update_password_form_with_reset_token)
         user.reload
-        expect(user.password_reset_token).to eq og_token
+        expect(user.token_for_password_reset).to eq og_token
         expect(user.auth_token).to eq og_auth
         expect(user.authenticate(valid_params.dig(:user, :password))).to be_falsey
         expect(response.cookies[:auth]).to be_blank
@@ -374,12 +374,12 @@ RSpec.describe UsersController, type: :request do
       let(:invalid_params) { valid_params.merge(user: {password: "validvalidvalid", password_confirmation: "invalidvalidvalid"}) }
       it "redirects back, doesn't sign in" do
         user.send_password_reset_email
-        og_token = user.password_reset_token
+        og_token = user.token_for_password_reset
         post "#{base_url}/update_password_with_reset_token", params: invalid_params
         expect(assigns(:page_errors)).to be_present
         expect(response).to render_template(:update_password_form_with_reset_token)
         user.reload
-        expect(user.password_reset_token).to eq og_token
+        expect(user.token_for_password_reset).to eq og_token
         expect(user.authenticate(valid_params.dig(:user, :password))).to be_falsey
         expect(response.cookies[:auth]).to be_blank
       end
@@ -387,7 +387,7 @@ RSpec.describe UsersController, type: :request do
     context "nil token" do
       it "redirects" do
         user.reload
-        expect(user.password_reset_token).to be_blank
+        expect(user.token_for_password_reset).to be_blank
         post "#{base_url}/update_password_with_reset_token", params: valid_params.merge(token: "")
         expect(response).to redirect_to request_password_reset_form_users_path
         expect(flash[:error]).to be_present
@@ -406,14 +406,14 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("password_reset_token", Time.current - 3.hours)
+        user.update_auth_token("token_for_password_reset", Time.current - 3.hours)
         user.reload
-        og_token = user.password_reset_token
+        og_token = user.token_for_password_reset
         post "#{base_url}/update_password_with_reset_token", params: valid_params
         expect(response).to redirect_to request_password_reset_form_users_path
         expect(flash[:error]).to match "expired"
         user.reload
-        expect(user.password_reset_token).to eq og_token
+        expect(user.token_for_password_reset).to eq og_token
         expect(user.authenticate(valid_params.dig(:user, :password))).to be_falsey
         expect(response.cookies[:auth]).to be_blank
       end
@@ -423,9 +423,8 @@ RSpec.describe UsersController, type: :request do
   describe "show" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     it "404s if the user doesn't exist" do
-      expect {
-        get "#{base_url}/fake_user-extra-stuff"
-      }.to raise_error(ActionController::RoutingError)
+      get "#{base_url}/fake_user-extra-stuff"
+      expect(response.status).to eq 404
     end
 
     it "redirects to user home url if the user exists but doesn't want to show their page" do
@@ -441,7 +440,6 @@ RSpec.describe UsersController, type: :request do
       get "#{base_url}/#{user.username}?page=1&per_page=1"
       expect(response).to render_template :show
       expect(assigns(:per_page)).to eq "1"
-      expect(assigns(:page)).to eq "1"
     end
   end
 

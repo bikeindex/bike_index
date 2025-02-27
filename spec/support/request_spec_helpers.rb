@@ -8,6 +8,7 @@ module RequestSpecHelpers
   end
 
   def log_in(current_user = nil)
+    return if current_user == false # Allow skipping log in by setting current_user: false
     current_user ||= FactoryBot.create(:user_confirmed)
     allow(User).to receive(:from_auth) { current_user }
   end
@@ -33,9 +34,9 @@ module RequestSpecHelpers
     before { log_in(current_user) }
   end
 
-  RSpec.shared_context :request_spec_logged_in_as_organization_member do
+  RSpec.shared_context :request_spec_logged_in_as_organization_user do
     let(:current_organization) { FactoryBot.create(:organization) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
     before { log_in(current_user) }
   end
 

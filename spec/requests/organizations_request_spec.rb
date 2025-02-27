@@ -32,7 +32,7 @@ RSpec.describe OrganizationsController, type: :request do
         locations_attributes: {"0" => location_attrs}
       }
     end
-    it "creates org, membership, filters approved attrs & redirect to org with current_user" do
+    it "creates org, organization_role, filters approved attrs & redirect to org with current_user" do
       expect(Organization.count).to eq(0)
       post base_url, params: {organization: org_attrs}
       expect(Organization.count).to eq(1)
@@ -41,16 +41,16 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.approved).to be_truthy
       expect(organization.api_access_approved).to be_falsey
       expect(organization.auto_user_id).to eq(current_user.id)
-      expect(organization.memberships.count).to eq(1)
-      expect(organization.memberships.first.user_id).to eq(current_user.id)
+      expect(organization.organization_roles.count).to eq(1)
+      expect(organization.organization_roles.first.user_id).to eq(current_user.id)
       expect(organization.kind).to eq "bike_shop"
       expect(organization.website).to eq "http://example.com"
 
       expect(organization.locations.count).to eq 1
-      expect_hashes_to_match(organization.locations.first, location_attrs)
+      expect(organization.locations.first).to match_hash_indifferently location_attrs
     end
 
-    it "creates org, membership, filters approved attrs & redirect to org with current_user and mails" do
+    it "creates org, organization_role, filters approved attrs & redirect to org with current_user and mails" do
       Sidekiq::Testing.inline! do
         expect(Organization.count).to eq(0)
         ActionMailer::Base.deliveries = []
@@ -62,8 +62,8 @@ RSpec.describe OrganizationsController, type: :request do
         expect(organization.approved).to be_truthy
         expect(organization.api_access_approved).to be_falsey
         expect(organization.auto_user_id).to eq(current_user.id)
-        expect(organization.memberships.count).to eq(1)
-        expect(organization.memberships.first.user_id).to eq(current_user.id)
+        expect(organization.organization_roles.count).to eq(1)
+        expect(organization.organization_roles.first.user_id).to eq(current_user.id)
         expect(organization.kind).to eq "property_management"
       end
     end

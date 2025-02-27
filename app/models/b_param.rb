@@ -18,15 +18,18 @@
 #  creator_id      :integer
 #  organization_id :integer
 #
+# Indexes
+#
+#  index_b_params_on_organization_id  (organization_id)
+#
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
   mount_uploader :image, ImageUploader
-  process_in_background :image, CarrierWaveStoreWorker
+  process_in_background :image, CarrierWaveStoreJob
   attr_writer :image_cache
 
-  # serialize :params
-  serialize :bike_errors
+  serialize :bike_errors, coder: YAML
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
@@ -97,7 +100,7 @@ class BParam < ApplicationRecord
     end
     # Assign the correct user if user is part of the org (for embed submissions)
     if b.creation_organization_id.present? && b.creator_id != user_id
-      if Membership.where(user_id: user_id, organization_id: b.creation_organization_id).present?
+      if OrganizationRole.where(user_id: user_id, organization_id: b.creation_organization_id).present?
         b.update_attribute :creator_id, user_id
       end
     end
@@ -545,7 +548,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_notification_pre_tracking?
-    (created_at || Time.current) < EmailPartialRegistrationWorker::NOTIFICATION_STARTED
+    (created_at || Time.current) < EmailPartialRegistrationJob::NOTIFICATION_STARTED
   end
 
   def partial_notification_resends
@@ -594,8 +597,8 @@ class BParam < ApplicationRecord
 
   def process_image_if_required
     return true if image_processed || image.blank?
-    ImageAssociatorWorker.perform_in(5.seconds)
-    ImageAssociatorWorker.perform_in(1.minutes)
+    ImageAssociatorJob.perform_in(5.seconds)
+    ImageAssociatorJob.perform_in(1.minutes)
   end
 
   def set_color_key(key = nil)

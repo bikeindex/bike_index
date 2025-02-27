@@ -15,21 +15,32 @@ if ENV["COVERAGE"]
   Rails.application.eager_load! if defined?(Rails)
 end
 
-require "spec_helper"
-
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"] = "true"
 
+require "spec_helper"
 require File.expand_path("../../config/environment", __FILE__)
-
 require "rspec/rails"
 
-require "database_cleaner"
-require "rspec-sidekiq"
-require "vcr"
-require "super_diff/rspec-rails"
+# Include capybara for view component system specs
+require "capybara/rails"
+require "capybara/rspec"
+Capybara.register_driver :chrome_headless do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument("--headless")
+  options.add_argument("--window-size=1920,1080")
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+# Configure Capybara
+Capybara.configure do |config|
+  config.default_driver = :chrome_headless
+  config.javascript_driver = :chrome_headless
+end
+
+require "view_component/test_helpers"
+require "view_component/system_test_helpers"
 
 ActiveRecord::Migration.maintain_test_schema!
 
@@ -55,8 +66,15 @@ RSpec.configure do |config|
 
   # Set default geocoder location
   config.include_context :geocoder_default_location
+
+  # View components
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include ViewComponent::SystemTestHelpers, type: :component
+  config.include Capybara::RSpecMatchers, type: :component
+  config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
 end
 
+require "vcr"
 VCR.configure do |config|
   config.cassette_library_dir = "spec/vcr_cassettes"
   config.allow_http_connections_when_no_cassette = false
@@ -67,6 +85,7 @@ VCR.configure do |config|
     record: :new_episodes,
     match_requests_on: [:method, :host, :path]
   }
+  config.ignore_hosts("127.0.0.1", "0.0.0.0") # for capybara selenium
 
   %w[GOOGLE_GEOCODER MAILCHIMP_KEY FACEBOOK_AD_TOKEN CLOUDFLARE_TOKEN MAXMIND_KEY].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
@@ -89,7 +108,7 @@ if ENV["RETRY_FLAKY"]
 
     config.around(:each) do |ex|
       if ex.metadata[:flaky]
-        ex.run_with_retry retry: 1
+        ex.run_with_retry retry: 2
       else
         ex.run
       end
@@ -97,19 +116,12 @@ if ENV["RETRY_FLAKY"]
   end
 end
 
+require "rspec-sidekiq"
 RSpec::Sidekiq.configure do |config|
   config.warn_when_jobs_not_processed_by_sidekiq = false
 end
 
-# Doesn't seem to be important
-# RSpec.configure do |config|
-#   config.before(:each) do
-#     # Reset feature-flipping between examples
-#     # (In test examples, stub Flipper as needed, passing specific args to #with)
-#     allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
-#   end
-# end
-
+require "database_cleaner"
 # DB Cleaner metadata tags
 # ========================
 #
@@ -153,7 +165,7 @@ end
 #
 class DirtyDatabaseError < RuntimeError
   def initialize(meta)
-    super "#{meta[:full_description]}\n\t#{meta[:location]}"
+    super("#{meta[:full_description]}\n\t#{meta[:location]}")
   end
 end
 

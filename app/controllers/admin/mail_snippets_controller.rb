@@ -1,15 +1,12 @@
 class Admin::MailSnippetsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   before_action :find_snippet, except: [:index, :new, :create]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 25
-    @mail_snippets = matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
-      .page(page).per(@per_page)
-      .includes(:organization)
+    @pagy, @mail_snippets = pagy(matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
+      .includes(:organization), limit: @per_page)
   end
 
   def show

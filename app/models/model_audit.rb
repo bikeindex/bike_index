@@ -14,6 +14,10 @@
 #  updated_at           :datetime         not null
 #  manufacturer_id      :bigint
 #
+# Indexes
+#
+#  index_model_audits_on_manufacturer_id  (manufacturer_id)
+#
 class ModelAudit < ApplicationRecord
   UNKNOWN_STRINGS = %w[na idk no none nomodel tbd unknown unkown].freeze
   ADDITIONAL_CYCLE_TYPES = %w[bicycle dirtbike trike three-wheeler 3-wheeler].freeze
@@ -25,9 +29,9 @@ class ModelAudit < ApplicationRecord
     long.?tail mid.?tail high.?step mid.?step step.?through step.?thru step.?in
   ].freeze
 
-  enum certification_status: ModelAttestation::CERTIFICATION_KIND_ENUM
-  enum propulsion_type: PropulsionType::SLUGS
-  enum cycle_type: CycleType::SLUGS
+  enum :certification_status, ModelAttestation::CERTIFICATION_KIND_ENUM
+  enum :propulsion_type, PropulsionType::SLUGS
+  enum :cycle_type, CycleType::SLUGS
 
   belongs_to :manufacturer
 

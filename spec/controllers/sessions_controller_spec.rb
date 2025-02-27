@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe SessionsController, type: :controller do
   describe "new" do
     it "renders and calls store_return_to" do
@@ -374,7 +378,7 @@ RSpec.describe SessionsController, type: :controller do
 
       context "user is organization admin" do
         let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let(:organization_kind) { "bike_shop" }
         it "signs in" do
           expect(user).to receive(:authenticate).and_return(true)

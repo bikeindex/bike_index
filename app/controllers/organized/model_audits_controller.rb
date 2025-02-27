@@ -2,16 +2,13 @@ module Organized
   class ModelAuditsController < Organized::BaseController
     include SortableTable
     before_action :ensure_access_to_model_audits!
-    before_action :set_period, only: [:index]
 
     def index
       @page_title = "E-Vehicle Audits"
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @model_attestation ||= ModelAttestation.new
-      @organization_model_audits = organization_model_audits
-        .reorder(sort_ordered)
-        .page(@page).per(@per_page)
+      @pagy, @organization_model_audits = pagy(organization_model_audits
+        .reorder(sort_ordered), limit: @per_page)
     end
 
     def show
@@ -19,10 +16,10 @@ module Organized
       @model_attestations = @model_audit.model_attestations
       @model_attestation ||= ModelAttestation.new
       @organization_model_audit = @model_audit.organization_model_audits.where(organization_id: current_organization.id).first
-      bikes = @organization_model_audit&.bikes&.reorder(created_at: :desc)
+      bikes = @organization_model_audit&.bikes&.reorder(created_at: :desc) || Bike.none
       @bikes_count = @organization_model_audit&.bikes_count || 0
       @per_page = 10
-      @bikes = bikes&.page(1)&.per(@per_page) || Bike.none
+      @pagy, @bikes = pagy(bikes, limit: @per_page)
     end
 
     # NOTE: This is really "create model_attestation"

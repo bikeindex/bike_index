@@ -17,6 +17,15 @@
 #  organization_id     :bigint
 #  user_id             :bigint
 #
+# Indexes
+#
+#  index_bike_sticker_updates_on_bike_id          (bike_id)
+#  index_bike_sticker_updates_on_bike_sticker_id  (bike_sticker_id)
+#  index_bike_sticker_updates_on_bulk_import_id   (bulk_import_id)
+#  index_bike_sticker_updates_on_export_id        (export_id)
+#  index_bike_sticker_updates_on_organization_id  (organization_id)
+#  index_bike_sticker_updates_on_user_id          (user_id)
+#
 class BikeStickerUpdate < ApplicationRecord
   KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
   CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_bike_creation: 3, creator_import: 4}.freeze
@@ -29,9 +38,9 @@ class BikeStickerUpdate < ApplicationRecord
   belongs_to :export
   belongs_to :bulk_import
 
-  enum kind: KIND_ENUM
-  enum creator_kind: CREATOR_KIND_ENUM
-  enum organization_kind: ORGANIZATION_KIND_ENUM
+  enum :kind, KIND_ENUM
+  enum :creator_kind, CREATOR_KIND_ENUM
+  enum :organization_kind, ORGANIZATION_KIND_ENUM
 
   scope :successful, -> { where(kind: successful_kinds) }
   scope :unauthorized_organization, -> { where(organization_kind: organization_kinds_unauthorized) }
@@ -102,7 +111,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def add_failed_claim_error(str_or_array)
     self.failed_claim_errors = [
-      (failed_claim_errors || nil),
+      failed_claim_errors || nil,
       Array(str_or_array)
     ].flatten.compact.join(", ")
   end

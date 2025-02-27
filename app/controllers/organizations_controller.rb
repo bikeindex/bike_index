@@ -10,7 +10,7 @@ class OrganizationsController < ApplicationController
 
   def lightspeed_interface
     if current_user&.organizations&.any?
-      redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}") && return
+      redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}", allow_other_host: true) && return
     end
 
     session[:return_to] = lightspeed_interface_path
@@ -26,7 +26,7 @@ class OrganizationsController < ApplicationController
   def create
     @organization = Organization.new(permitted_create_params)
     if @organization.save
-      Membership.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
+      OrganizationRole.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
       notify_admins("organization_created")
       flash[:success] = translation(:organization_created)
       if current_user.present?

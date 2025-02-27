@@ -8,6 +8,11 @@
 #  blog_id        :bigint
 #  content_tag_id :bigint
 #
+# Indexes
+#
+#  index_blog_content_tags_on_blog_id         (blog_id)
+#  index_blog_content_tags_on_content_tag_id  (content_tag_id)
+#
 class BlogContentTag < ApplicationRecord
   belongs_to :blog
   belongs_to :content_tag

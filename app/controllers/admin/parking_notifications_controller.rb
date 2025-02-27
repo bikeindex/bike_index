@@ -1,13 +1,10 @@
 class Admin::ParkingNotificationsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @parking_notifications = matching_parking_notifications.includes(:user, :organization, :bike)
-      .order(sort_column + " " + sort_direction)
-      .page(page).per(@per_page)
+    @pagy, @parking_notifications = pagy(matching_parking_notifications.includes(:user, :organization, :bike)
+      .order(sort_column + " " + sort_direction), limit: @per_page)
   end
 
   helper_method :matching_parking_notifications
@@ -31,7 +28,7 @@ class Admin::ParkingNotificationsController < Admin::BaseController
       parking_notifications = parking_notifications.where(status: @search_status)
     elsif %w[active resolved].include?(params[:search_status])
       @search_status = params[:search_status]
-      parking_notifications = @search_status == "active" ? parking_notifications.active : parking_notifications.resolved
+      parking_notifications = (@search_status == "active") ? parking_notifications.active : parking_notifications.resolved
     else
       @search_status = "all"
     end

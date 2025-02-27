@@ -17,19 +17,18 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of the following dependencies that Bike Index uses._
 
-- [Ruby 2.7](http://www.ruby-lang.org/en/)
+- [Ruby](http://www.ruby-lang.org/en/)
 
-- [Rails 5.2](http://rubyonrails.org/)
+- [Rails](http://rubyonrails.org/)
 
-- [Node 12.18](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/)
+- [Node](https://nodejs.org/en/)
 
-- PostgreSQL >= 9.6
+- PostgreSQL
 
 - Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
 
 - [Sidekiq](https://github.com/mperham/sidekiq), which requires [Redis](http://redis.io/).
 
-- Requires 1gb of ram (or at least more than 512mb)
 
 ## Running Bike Index locally
 
@@ -39,7 +38,7 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
   - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
   - Gives user@example.com 50 bikes
 
-- `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile_development](Procfile_development) and [.env](.env)
+- `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile.dev). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile.dev](Procfile.dev) and [.env](.env)
 
 - Go to [localhost:3042](http://localhost:3042)
 
@@ -107,9 +106,13 @@ See the [how do I run standard in my editor](standardrb-plugin) section of the S
 
 [standardrb-plugin]: https://github.com/testdouble/standard#how-do-i-run-standard-in-my-editor
 
-### ESLint
+### StandardJS
 
-ESlint is configured to run on project JavaScript. To run it, issue `yarn lint`.
+standard is configured to run on project JavaScript.
+
+Install it with `npm install`
+
+Run it with `npm run lint`.
 
 ## Bug tracker
 

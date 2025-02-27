@@ -73,6 +73,26 @@
 #  tertiary_frame_color_id     :integer
 #  updator_id                  :integer
 #
+# Indexes
+#
+#  index_bikes_on_current_impound_record_id  (current_impound_record_id)
+#  index_bikes_on_current_ownership_id       (current_ownership_id)
+#  index_bikes_on_current_stolen_record_id   (current_stolen_record_id)
+#  index_bikes_on_deleted_at                 (deleted_at)
+#  index_bikes_on_example                    (example)
+#  index_bikes_on_latitude_and_longitude     (latitude,longitude)
+#  index_bikes_on_listing_order              (listing_order)
+#  index_bikes_on_manufacturer_id            (manufacturer_id)
+#  index_bikes_on_model_audit_id             (model_audit_id)
+#  index_bikes_on_organization_id            (creation_organization_id)
+#  index_bikes_on_paint_id                   (paint_id)
+#  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
+#  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id)
+#  index_bikes_on_state_id                   (state_id)
+#  index_bikes_on_status                     (status)
+#  index_bikes_on_tertiary_frame_color_id    (tertiary_frame_color_id)
+#  index_bikes_on_user_hidden                (user_hidden)
+#
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
@@ -85,7 +105,7 @@ class Bike < ApplicationRecord
   acts_as_paranoid without_default_scope: true
 
   mount_uploader :pdf, PdfUploader
-  process_in_background :pdf, CarrierWaveProcessWorker
+  process_in_background :pdf, CarrierWaveProcessJob
 
   STATUS_ENUM = {
     status_with_owner: 0,
@@ -150,7 +170,7 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   delegate :bulk_import, :claimed?, :creation_description,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
@@ -209,7 +229,7 @@ class Bike < ApplicationRecord
 
     def status_humanized(str)
       status = str.to_s&.gsub("status_", "")&.tr("_", " ")
-      status == "unregistered parking notification" ? "unregistered" : status
+      (status == "unregistered parking notification") ? "unregistered" : status
     end
 
     def status_humanized_translated(str)
@@ -365,7 +385,7 @@ class Bike < ApplicationRecord
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
     t = (updated_by_user_fallback || Time.current).to_i / 10000
-    stock_photo_url.present? || public_images.limit(1).present? ? t : t / 100
+    (stock_photo_url.present? || public_images.limit(1).present?) ? t : t / 100
   end
 
   def credibility_scorer
@@ -438,9 +458,7 @@ class Bike < ApplicationRecord
   def serial_display(u = nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_organization?
-      return "Hidden" unless authorized?(u) ||
-        u&.id.present? && u.id == user&.id ||
-        current_impound_record.present? && current_impound_record.authorized?(u)
+      return "Hidden" unless can_see_hidden_serial?(u)
     end
     return serial_number.humanize if no_serial?
     serial_number&.upcase
@@ -582,8 +600,8 @@ class Bike < ApplicationRecord
     end
     return true if current_stolen_record.phone_for_everyone
     return false if passed_user.blank?
-    return true if current_stolen_record.phone_for_shops && passed_user.has_shop_membership?
-    return true if current_stolen_record.phone_for_police && passed_user.has_police_membership?
+    return true if current_stolen_record.phone_for_shops && passed_user.has_shop_organization_role?
+    return true if current_stolen_record.phone_for_police && passed_user.has_police_organization_role?
     current_stolen_record.phone_for_users
   end
 
@@ -873,7 +891,7 @@ class Bike < ApplicationRecord
   end
 
   def enqueue_duplicate_bike_finder_worker
-    DuplicateBikeFinderWorker.perform_async(id)
+    DuplicateBikeFinderJob.perform_async(id)
   end
 
   private
@@ -906,6 +924,12 @@ class Bike < ApplicationRecord
   def authorization_requires_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
+  end
+
+  def can_see_hidden_serial?(u = nil)
+    authorized?(u) ||
+      u&.id.present? && u.id == user&.id ||
+      current_impound_record.present? && current_impound_record.authorized?(u)
   end
 
   def calculated_current_ownership

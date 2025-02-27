@@ -20,13 +20,13 @@ RSpec.describe "Me API V3", type: :request do
     context "fully scoped token" do
       let(:scopes) { all_scopes }
       let!(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "d@f.co") }
-      let!(:membership) { FactoryBot.create(:membership_claimed, user: user) }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user) }
       let(:target_membership) do
         {
-          organization_name: membership.organization.name,
-          organization_slug: membership.organization.slug,
-          organization_id: membership.organization_id,
-          organization_access_token: membership.organization.access_token,
+          organization_name: organization_role.organization.name,
+          organization_slug: organization_role.organization.slug,
+          organization_id: organization_role.organization_id,
+          organization_access_token: organization_role.organization.access_token,
           user_is_organization_admin: false
         }
       end

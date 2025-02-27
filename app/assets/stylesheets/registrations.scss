@@ -1,7 +1,4 @@
-/*
- * Revised manifest file things from rails-assets
- *= require selectize/selectize.bootstrap3
- */
+@import 'legacy_includes/selectize.bootstrap3';
 
 // TODO: import a manifest for assets here.
 // import the same manifest in general stylesheet,
@@ -283,7 +280,7 @@ img {
   }
 
   header.reg-header {
-    background: image-url('revised/spokebg.png');
+    background: url('revised/spokebg.png');
     background-size: cover;
     background-position: center center;
     padding: $vertical-height 0;

@@ -14,6 +14,13 @@
 #  location_id       :bigint
 #  user_id           :bigint
 #
+# Indexes
+#
+#  index_impound_record_updates_on_impound_claim_id   (impound_claim_id)
+#  index_impound_record_updates_on_impound_record_id  (impound_record_id)
+#  index_impound_record_updates_on_location_id        (location_id)
+#  index_impound_record_updates_on_user_id            (user_id)
+#
 class ImpoundRecordUpdate < ApplicationRecord
   # These statuses are used by impound_records!
   KIND_ENUM = {
@@ -40,7 +47,7 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   after_commit :update_associations
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :active, -> { where(kind: active_kinds) }
   scope :resolved, -> { where(kind: resolved_kinds) }

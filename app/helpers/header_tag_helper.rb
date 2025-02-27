@@ -8,7 +8,7 @@ module HeaderTagHelper
   def header_tag_array
     return bikes_header_tags if %w[bikes bike_versions].include?(controller_namespace) # eg bikes_edit
     return default_header_tag_array unless page_with_custom_header_tags?
-    send("#{controller_name}_header_tags")
+    send(:"#{controller_name}_header_tags")
   end
 
   def page_with_custom_header_tags?
@@ -18,11 +18,11 @@ module HeaderTagHelper
   end
 
   def page_title=(val)
-    @page_title = strip_tags(val).strip.gsub("&amp;", "&")
+    @page_title = InputNormalizer.sanitize(val)
   end
 
   def page_description=(val)
-    @page_description = strip_tags(val).strip
+    @page_description = InputNormalizer.sanitize(val)
   end
 
   def page_title
@@ -61,7 +61,7 @@ module HeaderTagHelper
       "twitter:image" => twitter_image || page_image,
       "og:site_name" => "Bike Index",
       "fb:app_id" => "223376277803071",
-      "twitter:card" => (page_image == DEFAULT_IMAGE ? "summary" : "summary_large_image"),
+      "twitter:card" => ((page_image == DEFAULT_IMAGE) ? "summary" : "summary_large_image"),
       "twitter:creator" => "@bikeindex",
       "twitter:site" => "@bikeindex"
     }
@@ -224,12 +224,12 @@ module HeaderTagHelper
 
   def translation_title(location: nil, translation_args: default_translation_args)
     location ||= "meta_titles.#{page_id}"
-    t(location, translation_args)
+    t(location, **translation_args)
   end
 
   def translation_description(location: nil, translation_args: default_translation_args)
     location ||= "meta_descriptions.#{page_id}"
-    t(location, translation_args)
+    t(location, **translation_args)
   end
 
   def auto_controller_and_action_title

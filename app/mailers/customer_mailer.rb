@@ -1,4 +1,6 @@
 class CustomerMailer < ApplicationMailer
+  helper TranslationHelper
+
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
@@ -23,7 +25,7 @@ class CustomerMailer < ApplicationMailer
 
   def password_reset_email(user)
     @user = user
-    @url = update_password_form_with_reset_token_users_url(token: @user.password_reset_token)
+    @url = update_password_form_with_reset_token_users_url(token: @user.token_for_password_reset)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__)
@@ -60,14 +62,14 @@ class CustomerMailer < ApplicationMailer
   def theft_survey(notification)
     mail_snippet = MailSnippet.theft_survey_2023.first
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
-    mail_body = mail_snippet.body.gsub(/SURVEY_LINK_ID/, notification.survey_id.to_s)
+    mail_body = mail_snippet.body.gsub("SURVEY_LINK_ID", notification.survey_id.to_s)
     if notification.user.present?
       mail_body = mail_body.gsub(/Bike Index Registrant/i, notification.user.name)
     end
 
     # Also replace organization if it's present
     organization = notification.bike.creation_organization
-    mail_body = mail_body.gsub(/a Bike Shop/, organization.name) if organization.present?
+    mail_body = mail_body.gsub("a Bike Shop", organization.name) if organization.present?
 
     mail(to: notification.calculated_message_channel_target, from: "gavin@bikeindex.org",
       subject: mail_snippet.subject, body: mail_body + "\n\n\n\n", tag: notification.kind)

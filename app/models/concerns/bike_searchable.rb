@@ -169,30 +169,30 @@ module BikeSearchable
 
     def extracted_query_items_manufacturer_id(query_params)
       return query_params[:manufacturer] if query_params[:manufacturer].present?
-      manufacturer_id = query_params[:query_items]&.select { |i| i.start_with?(/m_/) }
+      manufacturer_id = query_params[:query_items]&.select { |i| i.start_with?("m_") }
       return nil unless manufacturer_id&.any?
-      manufacturer_id.map { |i| i.gsub(/m_/, "").to_i }
+      manufacturer_id.map { |i| i.gsub("m_", "").to_i }
     end
 
     def extracted_query_items_propulsion_type_id(query_params)
       return query_params[:propulsion_type] if query_params[:propulsion_type].present?
-      propulsion_type_id = query_params[:query_items]&.select { |i| i.start_with?(/p_/) }
+      propulsion_type_id = query_params[:query_items]&.select { |i| i.start_with?("p_") }
       return nil unless propulsion_type_id&.any?
-      propulsion_type_id.map { |i| i.gsub(/p_/, "").to_i }
+      propulsion_type_id.map { |i| i.gsub("p_", "").to_i }
     end
 
     def extracted_query_items_cycle_type_id(query_params)
       return query_params[:cycle_type] if query_params[:cycle_type].present?
-      cycle_type_id = query_params[:query_items]&.select { |i| i.start_with?(/v_/) }
+      cycle_type_id = query_params[:query_items]&.select { |i| i.start_with?("v_") }
       return nil unless cycle_type_id&.any?
-      cycle_type_id.map { |i| i.gsub(/v_/, "").to_i }
+      cycle_type_id.map { |i| i.gsub("v_", "").to_i }
     end
 
     def extracted_query_items_color_ids(query_params)
       return query_params[:colors] if query_params[:colors].present?
-      color_ids = query_params[:query_items]&.select { |i| i.start_with?(/c_/) }
+      color_ids = query_params[:query_items]&.select { |i| i.start_with?("c_") }
       return nil unless color_ids&.any?
-      color_ids.map { |i| i.gsub(/c_/, "").to_i }
+      color_ids.map { |i| i.gsub("c_", "").to_i }
     end
 
     def extracted_searchable_proximity_hash(query_params, ip_address)
@@ -213,7 +213,7 @@ module BikeSearchable
         bounding_box: bounding_box,
         stolenness: "proximity",
         location: location,
-        distance: distance && distance > 0 ? distance : 100
+        distance: (distance && distance > 0) ? distance : 100
       }
     end
 
@@ -232,7 +232,7 @@ module BikeSearchable
 
     def search_matching_propulsion_type(propulsion_type)
       return all unless propulsion_type.present?
-      where(propulsion_type: propulsion_type == :motorized ? PropulsionType::MOTORIZED : propulsion_type)
+      where(propulsion_type: (propulsion_type == :motorized) ? PropulsionType::MOTORIZED : propulsion_type)
     end
 
     def search_matching_query(query)

@@ -12,6 +12,10 @@
 #  updated_at      :datetime         not null
 #  user_id         :bigint
 #
+# Indexes
+#
+#  index_superuser_abilities_on_user_id  (user_id)
+#
 
 # TODO: make this the way that superuser is defined for everyone
 # e.g. if universal, update user to be superuser: true, remove superuser: true if deleted, etc
@@ -39,7 +43,7 @@ class SuperuserAbility < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :non_universal, -> { where.not(kind: "universal") }
 

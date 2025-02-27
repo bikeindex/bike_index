@@ -27,9 +27,8 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
       let(:impound_record) { FactoryBot.create(:impound_record) }
       it "raises" do
         expect(impound_record.reload.authorized?(current_user)).to be_falsey
-        expect {
-          get "#{base_url}/#{impound_claim.to_param}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{impound_claim.to_param}"
+        expect(response.status).to eq 404
         # unless user is a superuser
         current_user.update(superuser: true)
         get "#{base_url}/#{impound_claim.to_param}"
@@ -61,7 +60,7 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
           submit: "Retrieved",
           impound_claim: {response_message: ""}
         }
-      }.to_not change(EmailImpoundClaimWorker.jobs, :count)
+      }.to_not change(EmailImpoundClaimJob.jobs, :count)
       expect(flash[:error]).to be_present
       expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
       impound_record.reload
@@ -82,7 +81,7 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
             submit: "Approve",
             impound_claim: {response_message: " "}
           }
-        }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
+        }.to change(EmailImpoundClaimJob.jobs, :count).by(1)
         expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
@@ -102,7 +101,7 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
       context "inline sidekiq" do
         let(:response_message) { "RESponse=MESSAGE<alert>" }
         it "sends a message" do
-          EmailImpoundClaimWorker.new.perform(impound_claim.id)
+          EmailImpoundClaimJob.new.perform(impound_claim.id)
           # ensure that the message includes the response_message
           expect(impound_claim.reload.status).to eq "submitting"
           # Verify we sent created a notification already (or else it gets created when sidekiq inlined)
@@ -112,7 +111,7 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
           expect(impound_record.status).to eq "current"
           expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
           expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location expired])
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{impound_claim.to_param}", params: {
@@ -159,7 +158,7 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
             submit: "Deny",
             impound_claim: {response_message: "I recommend talking with us about all the things"}
           }
-        }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
+        }.to change(EmailImpoundClaimJob.jobs, :count).by(1)
         expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload

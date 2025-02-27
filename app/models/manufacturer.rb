@@ -138,7 +138,7 @@ class Manufacturer < ApplicationRecord
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
     self.description = nil if description.blank?
-    self.priority = calculated_priority # scheduled updates via UpdateManufacturerLogoAndPriorityWorker
+    self.priority = calculated_priority # scheduled updates via UpdateManufacturerLogoAndPriorityJob
     true
   end
 
@@ -172,12 +172,12 @@ class Manufacturer < ApplicationRecord
     name.gsub(/\s?\([^)]*\)/i, "")
   end
 
-  # Can't be private because it's called by UpdateManufacturerLogoAndPriorityWorker
+  # Can't be private because it's called by UpdateManufacturerLogoAndPriorityJob
   def calculated_priority
     return 100 if b_count > 999
     return 0 if (b_count + c_count) == 0
     pop = (2 * b_count + c_count) / 20 + 10
-    pop > 100 ? 100 : pop
+    (pop > 100) ? 100 : pop
   end
 
   private

@@ -1,16 +1,11 @@
 class Admin::BParamsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    page = params.fetch(:page, 1)
-    @per_page = params.fetch(:per_page, 25)
-
-    @b_params = matching_b_params
+    @per_page = params[:per_page] || 25
+    @pagy, @b_params = pagy(matching_b_params
       .includes(:creator, :organization)
-      .reorder("b_params.#{sort_column} #{sort_direction}")
-      .page(page)
-      .per(@per_page)
+      .reorder("b_params.#{sort_column} #{sort_direction}"), limit: @per_page)
   end
 
   def show

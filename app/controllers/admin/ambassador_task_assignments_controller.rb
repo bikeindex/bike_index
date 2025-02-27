@@ -4,14 +4,16 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   def index
     matching_assignments =
       AmbassadorTaskAssignment
-        .includes(:ambassador_task, ambassador: {memberships: :organization})
+        .includes(:ambassador_task, ambassador: {organization_roles: :organization})
         .completed_assignments(filters: filter_params, sort: {sort_column => sort_direction})
 
     @ambassador_task_assignments =
-      Kaminari
-        .paginate_array(matching_assignments)
-        .page(params.fetch(:page, 1))
-        .per(params.fetch(:per_page, 25))
+      matching_assignments
+    # There aren't many task assignments, so just ignore pagination
+    # Kaminari
+    #   .paginate_array(matching_assignments)
+    #   .page(params.fetch(:page, 1))
+    #   .per(params.fetch(:per_page, 25))
   end
 
   private

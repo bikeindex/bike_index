@@ -1,15 +1,13 @@
 module Organized
   class StickersController < Organized::BaseController
     include SortableTable
-    before_action :ensure_access_to_bike_stickers!, except: [:create] # Because this checks ensure_admin
-    before_action :find_bike_sticker, only: [:edit, :update]
+    before_action :ensure_access_to_bike_stickers! # Because this checks ensure_admin
+    before_action :find_bike_sticker, only: %i[edit update]
 
     def index
-      page = params[:page] || 1
-      per_page = params[:per_page] || 25
-      @bike_stickers = searched.includes(:bike)
-        .reorder("bike_stickers.#{sort_column} #{sort_direction}")
-        .page(page).per(per_page)
+      @per_page = params[:per_page] || 25
+      @pagy, @bike_stickers = pagy(searched.includes(:bike)
+        .reorder("bike_stickers.#{sort_column} #{sort_direction}"), limit: @per_page)
     end
 
     def show
@@ -63,7 +61,7 @@ module Organized
       if params[:search_bike].present?
         searched_codes = searched_codes.claimed.where(bike_id: Bike.friendly_find(params[:search_bike])&.id)
       elsif params[:search_claimedness] && params[:search_claimedness] != "all"
-        searched_codes = params[:search_claimedness] == "claimed" ? searched_codes.claimed : searched_codes.unclaimed
+        searched_codes = (params[:search_claimedness] == "claimed") ? searched_codes.claimed : searched_codes.unclaimed
       end
       searched_codes.sticker_code_search(params[:query])
     end

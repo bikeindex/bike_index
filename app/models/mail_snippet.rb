@@ -21,6 +21,12 @@
 #  organization_id       :integer
 #  state_id              :bigint
 #
+# Indexes
+#
+#  index_mail_snippets_on_country_id       (country_id)
+#  index_mail_snippets_on_organization_id  (organization_id)
+#  index_mail_snippets_on_state_id         (state_id)
+#
 class MailSnippet < ApplicationRecord
   include Geocodeable
 
@@ -50,7 +56,7 @@ class MailSnippet < ApplicationRecord
   scope :with_organizations, -> { where.not(organization_id: nil) }
   scope :without_organizations, -> { where(organization_id: nil) }
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   after_commit :update_associations
 

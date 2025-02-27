@@ -11,6 +11,10 @@
 #  updated_at        :datetime         not null
 #  user_id           :bigint
 #
+# Indexes
+#
+#  index_user_phones_on_user_id  (user_id)
+#
 class UserPhone < ApplicationRecord
   acts_as_paranoid
 
@@ -89,7 +93,7 @@ class UserPhone < ApplicationRecord
   def confirm!
     return true if confirmed?
     result = update(confirmed_at: Time.current)
-    AfterPhoneConfirmedWorker.perform_async(id)
+    AfterPhoneConfirmedJob.perform_async(id)
     result
   end
 
@@ -111,7 +115,7 @@ class UserPhone < ApplicationRecord
   end
 
   def send_confirmation_text
-    UserPhoneConfirmationWorker.perform_async(id) unless confirmed?
+    UserPhoneConfirmationJob.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation

@@ -10,7 +10,7 @@
         = link_to "Render organization counts", url_for(sortable_search_params.merge(search_org_counts: !@render_org_counts)), class: "nav-link #{@render_org_counts ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: { viewing: "User Registration Organizations" }
+  = render partial: "/shared/admin/current_header", locals: { viewing: "User Registration Organizations" }
 
 - if @render_org_counts
   .row.mt-4.mb-4
@@ -35,7 +35,7 @@
   = column_chart time_range_counts(collection: matching_user_registration_organizations, column: @time_range_column), stacked: true, thousands: ","
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @user_registration_organizations, count: matching_user_registration_organizations.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @user_registration_organizations, count: matching_user_registration_organizations.size}
 
 - render_sortable ||= true
 .full-screen-table

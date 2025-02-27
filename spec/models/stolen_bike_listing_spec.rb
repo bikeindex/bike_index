@@ -1,6 +1,9 @@
 require "rails_helper"
 
 RSpec.describe StolenBikeListing, type: :model do
+  it_behaves_like "amountable"
+  it_behaves_like "currencyable"
+
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
 

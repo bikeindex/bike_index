@@ -11,6 +11,11 @@
 #  organization_id    :integer
 #  user_id            :integer
 #
+# Indexes
+#
+#  index_bike_sticker_batches_on_organization_id  (organization_id)
+#  index_bike_sticker_batches_on_user_id          (user_id)
+#
 class BikeStickerBatch < ApplicationRecord
   belongs_to :user # Creator of the batch
   belongs_to :organization
@@ -28,7 +33,7 @@ class BikeStickerBatch < ApplicationRecord
     bike_stickers.maximum(:code_integer) || 0
   end
 
-  # Should be called through CreateBikeStickerCodesWorker generally
+  # Should be called through CreateBikeStickerCodesJob generally
   def create_codes(number_to_create, initial_code_integer: nil, kind: "sticker")
     raise "Prefix required to create sequential codes!" unless prefix.present?
     initial_code_integer ||= max_code_integer
@@ -50,7 +55,7 @@ class BikeStickerBatch < ApplicationRecord
     estimated_finish_integer = (initial_code_integer&.to_i || max_code_integer) + to_create_count
     estimated_code_length = estimated_finish_integer.to_s.length
     # minimum of 4. Return a larger number if there's a larger code in the batch
-    estimated_code_length > 4 ? estimated_code_length : 4
+    (estimated_code_length > 4) ? estimated_code_length : 4
   end
 
   # Shouldn't occur anymore, but included for legacy diagnostic purposes

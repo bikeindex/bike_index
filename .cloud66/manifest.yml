@@ -4,4 +4,4 @@ production:
       version: 16
   rails:
     configuration:
-      node_version: "16.20.2"
+      node_version: "20.18.2"

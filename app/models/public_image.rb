@@ -14,6 +14,10 @@
 #  updated_at         :datetime         not null
 #  imageable_id       :integer
 #
+# Indexes
+#
+#  index_public_images_on_imageable_id_and_imageable_type  (imageable_id,imageable_type)
+#
 class PublicImage < ApplicationRecord
   KIND_ENUM = {
     photo_uncategorized: 0, # If editing these images, also update _public_image template
@@ -33,7 +37,7 @@ class PublicImage < ApplicationRecord
   before_save :set_calculated_attributes
   after_commit :enqueue_after_commit_jobs
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   def default_name
     if bike?
@@ -62,11 +66,11 @@ class PublicImage < ApplicationRecord
 
   def enqueue_after_commit_jobs
     if external_image_url.present? && image.blank?
-      return ExternalImageUrlStoreWorker.perform_async(id)
+      return ExternalImageUrlStoreJob.perform_async(id)
     end
     imageable&.update(updated_at: Time.current)
     return true unless bike?
-    AfterBikeSaveWorker.perform_async(imageable_id, false, true)
+    AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 
   # Because the way we load the file is different if it's remote or local

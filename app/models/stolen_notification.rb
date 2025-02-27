@@ -16,6 +16,10 @@
 #  receiver_id          :integer
 #  sender_id            :integer
 #
+# Indexes
+#
+#  index_stolen_notifications_on_oauth_application_id  (oauth_application_id)
+#
 class StolenNotification < ApplicationRecord
   KIND_ENUM = {
     stolen_permitted: 0,
@@ -39,10 +43,10 @@ class StolenNotification < ApplicationRecord
 
   # Kind enum was added to track how often various types of messages were sent
   # in #2275 - it isn't currently used for logic, just data analysis
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   def notify_receiver
-    EmailStolenNotificationWorker.perform_async(id)
+    EmailStolenNotificationJob.perform_async(id)
   end
 
   def permitted_send?

@@ -1,17 +1,21 @@
 FactoryBot.define do
   factory :membership do
-    role { "member" }
-    organization { FactoryBot.create(:organization) }
-    sender { FactoryBot.create(:user_confirmed) }
-    sequence(:invited_email) { |n| user&.email || "someone-#{n}@test.com" }
+    user { FactoryBot.create(:user_confirmed) }
+    level { "basic" }
+    start_at { Time.current - 1.hour }
+    creator { FactoryBot.create(:admin) }
 
-    factory :membership_claimed do
-      user { FactoryBot.create(:user_confirmed) }
-      email_invitation_sent_at { Time.current }
-      claimed_at { Time.current }
+    trait :with_payment do
+      after(:create) do |membership|
+        FactoryBot.create(:payment, membership:, user: membership.user)
+      end
+    end
 
-      factory :membership_ambassador do
-        organization { FactoryBot.create(:organization_ambassador) }
+    factory :membership_stripe_managed do
+      creator { nil }
+
+      after(:create) do |membership|
+        FactoryBot.create(:stripe_subscription, membership:)
       end
     end
   end

@@ -26,6 +26,15 @@
 #  state_id              :bigint
 #  user_id               :integer
 #
+# Indexes
+#
+#  index_impound_records_on_bike_id          (bike_id)
+#  index_impound_records_on_country_id       (country_id)
+#  index_impound_records_on_location_id      (location_id)
+#  index_impound_records_on_organization_id  (organization_id)
+#  index_impound_records_on_state_id         (state_id)
+#  index_impound_records_on_user_id          (user_id)
+#
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
 
@@ -45,7 +54,7 @@ class ImpoundRecord < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  enum status: ImpoundRecordUpdate::KIND_ENUM
+  enum :status, ImpoundRecordUpdate::KIND_ENUM
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
@@ -136,7 +145,7 @@ class ImpoundRecord < ApplicationRecord
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     Geocodeable.address(
       self,
-      street: (force_show_address || show_address),
+      street: force_show_address || show_address,
       country: country
     ).presence
   end
@@ -223,9 +232,9 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_associations
-    # We call this job inline in ProcessParkingNotificationWorker
+    # We call this job inline in ProcessParkingNotificationJob
     return true if skip_update || !persisted?
-    ProcessImpoundUpdatesWorker.perform_async(id)
+    ProcessImpoundUpdatesJob.perform_async(id)
   end
 
   def set_calculated_attributes

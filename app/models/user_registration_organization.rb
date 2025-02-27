@@ -12,6 +12,11 @@
 #  organization_id      :bigint
 #  user_id              :bigint
 #
+# Indexes
+#
+#  index_user_registration_organizations_on_organization_id  (organization_id)
+#  index_user_registration_organizations_on_user_id          (user_id)
+#
 class UserRegistrationOrganization < ApplicationRecord
   include RegistrationInfoable
 
@@ -105,10 +110,10 @@ class UserRegistrationOrganization < ApplicationRecord
     return true if @skip_update_associations
     create_or_update_bike_organizations
     return true if skip_after_user_change_worker
-    AfterUserChangeWorker.perform_async(user_id)
+    AfterUserChangeJob.perform_async(user_id)
   end
 
-  # Manually called from AfterUserChangeWorker
+  # Manually called from AfterUserChangeJob
   def create_or_update_bike_organizations
     return true unless all_bikes # only overrides bike_organizations if all_bikes is checked
     bikes.each do |bike|

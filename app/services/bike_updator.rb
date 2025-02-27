@@ -17,7 +17,7 @@ class BikeUpdator
   end
 
   def update_ownership
-    # Because this is a mess, managed independently in ProcessImpoundUpdatesWorker
+    # Because this is a mess, managed independently in ProcessImpoundUpdatesJob
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
     return false if new_owner_email.blank? || @bike.owner_email == new_owner_email
 
@@ -86,7 +86,7 @@ class BikeUpdator
       update_stolen_record
       update_impound_record
     end
-    AfterBikeSaveWorker.perform_async(@bike.id) if @bike.present? # run immediately
+    AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately
     remove_blank_components
     @bike
   end

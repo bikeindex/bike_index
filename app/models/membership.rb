@@ -2,110 +2,110 @@
 #
 # Table name: memberships
 #
-#  id                       :integer          not null, primary key
-#  claimed_at               :datetime
-#  created_by_magic_link    :boolean          default(FALSE)
-#  deleted_at               :datetime
-#  email_invitation_sent_at :datetime
-#  hot_sheet_notification   :integer          default("notification_never")
-#  invited_email            :string(255)
-#  receive_hot_sheet        :boolean          default(FALSE)
-#  role                     :integer
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  organization_id          :integer          not null
-#  sender_id                :integer
-#  user_id                  :integer
+#  id         :bigint           not null, primary key
+#  end_at     :datetime
+#  level      :integer
+#  start_at   :datetime
+#  status     :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  creator_id :bigint
+#  user_id    :bigint
+#
+# Indexes
+#
+#  index_memberships_on_creator_id  (creator_id)
+#  index_memberships_on_user_id     (user_id)
 #
 class Membership < ApplicationRecord
-  MEMBERSHIP_TYPES = %w[admin member member_no_bike_edit].freeze
-  HOT_SHEET_NOTIFICATION_ENUM = {notification_never: 0, notification_daily: 1}.freeze
+  include ActivePeriodable
 
-  acts_as_paranoid
+  LEVEL_ENUM = {basic: 0, plus: 1, patron: 2}
+  STATUS_ENUM = {pending: 0, active: 1, ended: 2}
 
   belongs_to :user
-  belongs_to :organization
-  belongs_to :sender, class_name: "User"
+  belongs_to :creator, class_name: "User"
 
-  enum role: MEMBERSHIP_TYPES
-  enum hot_sheet_notification: HOT_SHEET_NOTIFICATION_ENUM
+  has_many :stripe_subscriptions
+  has_one :active_stripe_subscription, -> { active }, class_name: "StripeSubscription"
+  has_many :payments
 
-  validates_presence_of :role, :organization_id, :invited_email
+  enum :level, LEVEL_ENUM
+  enum :status, STATUS_ENUM
 
+  validate :no_active_stripe_subscription_admin_managed
   before_validation :set_calculated_attributes
-  after_commit :enqueue_processing_worker
 
-  attr_accessor :skip_processing
+  scope :admin_managed, -> { where.not(creator_id: nil) }
+  scope :stripe_managed, -> { where(creator_id: nil) }
 
-  scope :unclaimed, -> { where(claimed_at: nil) }
-  scope :claimed, -> { where.not(claimed_at: nil) }
-  scope :created_by_magic_link, -> { where(created_by_magic_link: true) }
-  scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
+  delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
+    to: :active_stripe_subscription, allow_nil: true
 
-  def self.membership_types
-    MEMBERSHIP_TYPES
-  end
+  attr_accessor :user_email, :set_interval
 
-  def self.create_passwordless(**create_attrs)
-    new_passwordless_attrs = {skip_processing: true, role: "member"}
-    if create_attrs[:invited_email].present? # This should always be present...
-      # We need to check for existing memberships because the AfterUserCreateWorker calls this
-      existing_membership = Membership.find_by_invited_email(create_attrs[:invited_email])
-      return existing_membership if existing_membership.present?
+  class << self
+    def level_humanized(str)
+      str&.humanize
     end
-    membership = create!(new_passwordless_attrs.merge(create_attrs))
-    # ProcessMembershipWorker creates a user if the user doesn't exist, for passwordless organizations
-    # because of that, we want to process this inline
-    ProcessMembershipWorker.new.perform(membership.id)
-    membership.reload
-    membership
-  end
 
-  def self.admin_text_search(str)
-    q = "%#{str.to_s.strip}%"
-    left_joins(:user)
-      .where("memberships.invited_email ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", q, q, q)
-      .references(:users)
-  end
-
-  def invited_display_name
-    user.present? ? user.display_name : invited_email
-  end
-
-  def send_invitation_email?
-    return false if created_by_magic_link # Don't send an email if they're already being emailed
-    return false if email_invitation_sent_at.present?
-    invited_email.present?
-  end
-
-  def claimed?
-    claimed_at.present?
-  end
-
-  def ambassador?
-    organization.ambassador?
-  end
-
-  def organization_creator?
-    organization.memberships.minimum(:id) == id
-  end
-
-  def enqueue_processing_worker
-    return true if skip_processing
-    # We manually update the user, because ProcessMembershipWorker won't find this membership
-    if deleted? && user_id.present?
-      AfterUserChangeWorker.perform_async(user_id)
-    else
-      ProcessMembershipWorker.perform_async(id)
+    def status_display(str)
+      str&.humanize
     end
+
+    def levels_ordered
+      levels.keys.map { level_humanized(_1) }
+    end
+  end
+
+  def level_humanized
+    self.class.level_humanized(level)
+  end
+
+  def status_display
+    self.class.status_display(status)
+  end
+
+  def admin_managed?
+    creator_id.present?
+  end
+
+  def stripe_managed?
+    !admin_managed?
   end
 
   def set_calculated_attributes
-    self.invited_email = if invited_email.present?
-      EmailNormalizer.normalize(invited_email)
-    else
-      user&.email # Basically, just for auto_user in orgs
+    self.level ||= "basic"
+    self.status = calculated_status
+
+    if user_email.present?
+      self.user_id ||= User.fuzzy_email_find(user_email)&.id
     end
-    self.claimed_at ||= Time.current if user_id.present?
+  end
+
+  def interval
+    active_stripe_subscription&.interval
+  end
+
+  private
+
+  def calculated_status
+    if start_at.blank? || start_at > Time.current + 1.minute
+      "pending"
+    elsif period_active?
+      "active"
+    else
+      "ended"
+    end
+  end
+
+  def no_active_stripe_subscription_admin_managed
+    return if stripe_managed? || period_inactive? || user.blank?
+    active_membership_id = user.memberships.active.order(:id).limit(1).pluck(:id).first
+    return if [id, nil].include?(active_membership_id)
+
+    # Currently, the app is not handling cancelling or extending stripe subscriptions
+    # So you either have an admin created (and managed) membership, or a stripe subscription
+    errors.add(:base, "there is a prior active membership")
   end
 end

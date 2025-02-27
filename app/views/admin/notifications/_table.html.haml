@@ -1,11 +1,20 @@
 - render_sortable ||= false
 - skip_user ||= false
 - skip_bike ||= false
-- skip_channel ||= false
 - skip_sender ||= false
+- skip_error ||= false
 
 - unless display_dev_info?
   <style>.only-dev-visible {display: none !important;} </style>
+
+- if skip_user
+  <style>.user-cell {display: none !important;} </style>
+- if skip_bike
+  <style>.bike-cell {display: none !important;} </style>
+- if skip_sender
+  <style>.sender-cell {display: none !important;} </style>
+- if skip_error
+  <style>.error-cell {display: none !important;} </style>
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -16,18 +25,16 @@
         = sortable "updated_at", render_sortable: render_sortable
       %th
         = sortable "kind", render_sortable: render_sortable
-      - unless skip_channel
-        %th.small Method
-      - unless skip_user
-        %th
-          = sortable "user_id", render_sortable: render_sortable
+      %th.small Method
+      %th.user-cell
+        = sortable "user_id", render_sortable: render_sortable
       %th.small Delivered?
-      - unless skip_bike
-        %th
-          = sortable "bike_id", render_sortable: render_sortable
+      %th.bike-cell
+        = sortable "bike_id", render_sortable: render_sortable
       %th Object
-      - unless skip_sender
-        %th Sender
+      %th.sender-cell Sender
+      %th.error-cell
+        Delivery Errors
     %tbody
       - notifications.each do |notification|
         - cache(["admin_notifications_table", notification]) do
@@ -42,33 +49,37 @@
             %td= notification.kind_humanized&.titleize
             %td
               %small.less-strong= notification.message_channel
-            - unless skip_user
-              %td
-                - if notification.user_id.present?
-                  = render partial: "/shared/admin_user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
-                - else
-                  = notification.message_channel_target
-                  %small.less-strong no user
+            %td.user-cell
+              - if notification.user_id.present?
+                = render partial: "/shared/admin/user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
+              - else
+                = notification.message_channel_target
+                %small.less-strong no user
             %td.text-center
               = notification_delivery_display(notification.delivery_status)
-            - unless skip_bike
-              %td
-                - if notification.bike_id.present?
-                  %code= link_to "#{notification.bike_id}", admin_bike_path(notification.bike_id), class: "less-strong"
-                  - if render_sortable && params[:search_bike_id].blank?
-                    %small
-                      = link_to search_emoji, admin_notifications_path(sortable_search_params.merge(search_bike_id: notification.bike_id)), class: "small"
+            %td.bike-cell
+              - if notification.bike_id.present?
+                %code= link_to "#{notification.bike_id}", admin_bike_path(notification.bike_id), class: "less-strong"
+                - if render_sortable && params[:search_bike_id].blank?
+                  %small
+                    = link_to search_emoji, admin_notifications_path(sortable_search_params.merge(search_bike_id: notification.bike_id)), class: "small"
             %td
               - if notification.notifiable.present?
                 = link_to admin_path_for_object(notification.notifiable) do
                   = notification.notifiable.class.to_s.titleize
                   %code.text-link.small= "##{notification.notifiable_id}"
-
-            %td
+            %td.sender-cell
               - sender_display_name = notification.sender_display_name
               - if notification.sender.is_a?(User)
                 = link_to sender_display_name, admin_user_path(notification.sender&.id)
               - else
                 %span{class: (sender_display_name == "auto" ? "less-strong" : "")}
                   = sender_display_name
+            %td.error-cell
+              - if notification.delivery_error == "Postmark::InactiveRecipientError"
+                An Email sent to this address was marked as spam
+              - elsif notification.delivery_error == "Postmark::InvalidEmailAddressError"
+                Invalid email address
+              - else
+                = notification.delivery_error
 

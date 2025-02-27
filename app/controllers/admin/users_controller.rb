@@ -1,23 +1,24 @@
 class Admin::UsersController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
-  before_action :find_user, only: [:show, :edit, :update, :destroy]
+
+  before_action :find_user, only: %i[show edit update destroy]
 
   def index
-    page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    @users = matching_users.reorder("users.#{sort_column} #{sort_direction}").page(page).per(per_page)
-      .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :memberships, :ambassador_tasks)
+    @per_page = params[:per_page] || 25
+    @pagy, @users = pagy(matching_users.reorder("users.#{sort_column} #{sort_direction}")
+      .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks),
+      limit: @per_page)
   end
 
   def show
-    redirect_to edit_admin_user_url(@user&.id)
+    redirect_to edit_admin_user_url(params[:id])
   end
 
   def edit
     # urls with user IDs rather than usernames are more helpful in superadmin
     if params[:id] == @user.username
       redirect_to edit_admin_user_path(@user.id)
+      return
     end
     calculate_user_bikes
   end
@@ -90,7 +91,7 @@ class Admin::UsersController < Admin::BaseController
       # Manually confirm the user
       user_email.update(confirmation_token: nil) if user_email&.unconfirmed?
       user_email ||= @user.user_emails.create(email: email)
-      if MergeAdditionalEmailWorker.new.perform(user_email.id)
+      if MergeAdditionalEmailJob.new.perform(user_email.id)
         flash[:success] = "User #{@user.display_name} merged with '#{email}'"
       else
         flash[:error] = "Unable to merge users!"
@@ -107,6 +108,8 @@ class Admin::UsersController < Admin::BaseController
     @search_superusers = InputNormalizer.boolean(params[:search_superusers])
     @search_deleted = InputNormalizer.boolean(params[:search_deleted])
     @updated_at = InputNormalizer.boolean(params[:search_updated_at])
+    @search_unconfirmed = InputNormalizer.boolean(params[:search_unconfirmed])
+    @search_confirmed = @search_unconfirmed ? false : InputNormalizer.boolean(params[:search_confirmed])
     users = if current_organization.present?
       current_organization.users
     else
@@ -116,9 +119,15 @@ class Admin::UsersController < Admin::BaseController
     users = users.ambassadors if @search_ambassadors
     users = users.superuser_abilities if @search_superusers
     users = users.banned if @search_banned
+    users = users.unconfirmed if @search_unconfirmed
+    users = users.confirmed if @search_confirmed
+
     users = users.admin_text_search(params[:query]) if params[:query].present?
     if params[:search_phone].present?
       users = users.search_phone(params[:search_phone])
+    end
+    if params[:search_domain].present?
+      users = users.matching_domain(params[:search_domain])
     end
 
     @time_range_column = sort_column if %w[updated_at deleted_at].include?(sort_column)

@@ -17,6 +17,15 @@
 #  stolen_record_id   :bigint
 #  user_id            :bigint
 #
+# Indexes
+#
+#  index_impound_claims_on_bike_claimed_id     (bike_claimed_id)
+#  index_impound_claims_on_bike_submitting_id  (bike_submitting_id)
+#  index_impound_claims_on_impound_record_id   (impound_record_id)
+#  index_impound_claims_on_organization_id     (organization_id)
+#  index_impound_claims_on_stolen_record_id    (stolen_record_id)
+#  index_impound_claims_on_user_id             (user_id)
+#
 class ImpoundClaim < ApplicationRecord
   STATUS_ENUM = {
     pending: 0,
@@ -43,7 +52,7 @@ class ImpoundClaim < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :send_triggered_notifications
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   scope :unsubmitted, -> { where(submitted_at: nil) }
   scope :submitted, -> { where.not(submitted_at: nil) }
@@ -75,7 +84,7 @@ class ImpoundClaim < ApplicationRecord
 
   def self.status_humanized(str)
     # It doesn't make sense to display "submitting"
-    str == "submitting" ? "submitted" : str&.to_s&.tr("_", " ")
+    (str == "submitting") ? "submitted" : str&.to_s&.tr("_", " ")
   end
 
   def self.involving_bike_id(bike_id)
@@ -166,7 +175,7 @@ class ImpoundClaim < ApplicationRecord
 
   def send_triggered_notifications
     return true if skip_update
-    EmailImpoundClaimWorker.perform_async(id)
+    EmailImpoundClaimJob.perform_async(id)
   end
 
   private

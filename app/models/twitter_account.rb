@@ -28,6 +28,13 @@
 #  country_id           :bigint
 #  state_id             :bigint
 #
+# Indexes
+#
+#  index_twitter_accounts_on_country_id              (country_id)
+#  index_twitter_accounts_on_latitude_and_longitude  (latitude,longitude)
+#  index_twitter_accounts_on_screen_name             (screen_name)
+#  index_twitter_accounts_on_state_id                (state_id)
+#
 class TwitterAccount < ApplicationRecord
   include Geocodeable
 
@@ -160,13 +167,15 @@ class TwitterAccount < ApplicationRecord
   end
 
   def tweet(text, photo = nil, **opts)
-    return unless text.present?
+    nil unless text.present?
 
-    if photo.present?
-      twitter_client.update_with_media(text, photo, opts)
-    else
-      twitter_client.update(text, opts)
-    end
+    # Commented out in #2618 - twitter is disabled
+    #
+    # if photo.present?
+    #   twitter_client.update_with_media(text, photo, opts)
+    # else
+    #   twitter_client.update(text, opts)
+    # end
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     nil

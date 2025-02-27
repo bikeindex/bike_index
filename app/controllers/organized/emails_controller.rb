@@ -131,14 +131,14 @@ module Organized
     end
 
     def build_finished_email
-      @bike = @kind == "organization_stolen_message" ? default_stolen_bike : default_bike
+      @bike = (@kind == "organization_stolen_message") ? default_stolen_bike : default_bike
       @ownership ||= @bike.current_ownership # Gross things to make default_bike work
       @user = @ownership.owner
       @vars = {
         new_bike: @ownership.new_registration?,
         email: @ownership.owner_email,
         new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-        registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
+        registered_by_owner: @ownership.user.present? && @bike.creator_id == @ownership.user_id
       }
     end
 
@@ -152,7 +152,7 @@ module Organized
     end
 
     def find_or_build_impound_claim(kind)
-      status = @kind == "impound_claim_approved" ? "approved" : "denied"
+      status = (@kind == "impound_claim_approved") ? "approved" : "denied"
       impound_claims = @organization.impound_claims
       @impound_claim = impound_claims.find(params[:impound_claim_id]) if params[:impound_claim_id].present?
       @impound_claim ||= impound_claims.where(status: status).last

@@ -5,7 +5,6 @@ module Organized
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
-      @page = params[:page] || 1
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
@@ -20,7 +19,7 @@ module Organized
             # ... but, this works
             flash[:info] = "Directly creating export - can't configure with over 1,000 bikes"
             export = Export.create(create_export_params)
-            OrganizationExportWorker.perform_async(export.id)
+            OrganizationExportJob.perform_async(export.id)
             redirect_to organization_export_path(export, organization_id: current_organization.id)
           else
             if @available_bikes.count > 300
@@ -36,14 +35,13 @@ module Organized
         else
           organization_bikes.where(created_at: @time_range)
         end
-        @bikes = @available_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
+        @pagy, @bikes = pagy(@available_bikes.order("bikes.created_at desc"), limit: @per_page)
       end
     end
 
     def recoveries
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
       set_period
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       # Default to showing regional recoveries
       @search_only_organization = InputNormalizer.boolean(params[:search_only_organization])
@@ -52,7 +50,7 @@ module Organized
       recovered_records = @search_only_organization ? current_organization.recovered_records : current_organization.nearby_recovered_records
 
       @matching_recoveries = recovered_records.where(recovered_at: @time_range)
-      @recoveries = @matching_recoveries.reorder(recovered_at: :desc).page(@page).per(@per_page)
+      @pagy, @recoveries = pagy(@matching_recoveries.reorder(recovered_at: :desc), limit: @per_page)
       # When selecting through the organization bikes, it fails. Lazy solution: Don't permit doing that ;)
       @render_chart = !@search_only_organization && InputNormalizer.boolean(params[:render_chart])
     end
@@ -60,20 +58,19 @@ module Organized
     def incompletes
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
       set_period
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
 
       @b_params_total = incompletes_sorted(b_params.where(created_at: @time_range))
-      @b_params = @b_params_total.page(@page).per(@per_page)
+      @pagy, @b_params = pagy(@b_params_total, limit: @per_page)
     end
 
     def resend_incomplete_email
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
       @b_param = current_organization.incomplete_b_params.find_by_id(params[:id])
       if @b_param.present?
-        EmailPartialRegistrationWorker.perform_async(@b_param.id)
+        EmailPartialRegistrationJob.perform_async(@b_param.id)
         flash[:success] = "Incomplete registration re-sent!"
       else
         flash[:error] = "Unable to find that incomplete bike"
@@ -206,8 +203,8 @@ module Organized
         bikes = Bike.search(@interpreted_params)
       end
       if params[:search_stickers].present?
-        @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
-        bikes = @search_stickers == "none" ? bikes.no_bike_sticker : bikes.bike_sticker
+        @search_stickers = (params[:search_stickers] == "none") ? "none" : "with"
+        bikes = (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
       else
         @search_stickers = false
       end
@@ -235,7 +232,7 @@ module Organized
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
-      @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
+      @pagy, @bikes = pagy(@available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end

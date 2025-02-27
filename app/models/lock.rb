@@ -16,6 +16,10 @@
 #  manufacturer_id    :integer
 #  user_id            :integer
 #
+# Indexes
+#
+#  index_locks_on_user_id  (user_id)
+#
 class Lock < ApplicationRecord
   belongs_to :manufacturer
   belongs_to :lock_type

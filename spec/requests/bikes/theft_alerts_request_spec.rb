@@ -98,11 +98,9 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(payment.user_id).to eq current_user.id
       expect(payment.stripe_id).to be_present
       expect(payment.kind).to eq "theft_alert"
-      expect(payment.stripe_kind).to eq "stripe_session"
-      expect(payment.currency).to eq "USD"
+      expect(payment.currency_name).to eq "USD"
       expect(payment.amount_cents).to eq theft_alert_plan.amount_cents
-      expect(payment.first_payment_date).to be_blank # Ensure this gets set
-      expect(payment.last_payment_date).to be_blank
+      expect(payment.paid_at).to be_blank # Ensure this gets set
       expect(payment.paid?).to be_falsey
     end
 
@@ -110,7 +108,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(bike.current_stolen_record_id).to be_present
       expect(Payment.count).to eq 0
       expect(TheftAlert.count).to eq 0
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       ActionMailer::Base.deliveries = []
       expect(Notification.count).to eq 0
       Sidekiq::Testing.inline! do
@@ -136,7 +134,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
         expect(Payment.count).to eq 0
         expect(TheftAlert.count).to eq 0
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(Notification.count).to eq 0
 

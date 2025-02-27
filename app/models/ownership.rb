@@ -29,6 +29,15 @@
 #  previous_ownership_id         :bigint
 #  user_id                       :integer
 #
+# Indexes
+#
+#  index_ownerships_on_bike_id            (bike_id)
+#  index_ownerships_on_bulk_import_id     (bulk_import_id)
+#  index_ownerships_on_creator_id         (creator_id)
+#  index_ownerships_on_impound_record_id  (impound_record_id)
+#  index_ownerships_on_organization_id    (organization_id)
+#  index_ownerships_on_user_id            (user_id)
+#
 class Ownership < ApplicationRecord
   include RegistrationInfoable
   ORIGIN_ENUM = {
@@ -65,9 +74,9 @@ class Ownership < ApplicationRecord
 
   has_many :notifications, as: :notifiable
 
-  enum status: Bike::STATUS_ENUM
-  enum pos_kind: Organization::POS_KIND_ENUM
-  enum origin: ORIGIN_ENUM
+  enum :status, Bike::STATUS_ENUM
+  enum :pos_kind, Organization::POS_KIND_ENUM
+  enum :origin, ORIGIN_ENUM
 
   default_scope { order(:id) }
   scope :current, -> { where(current: true) }
@@ -197,7 +206,7 @@ class Ownership < ApplicationRecord
     return false if skip_email || bike.blank? || phone_registration? || bike.example? || bike.likely_spam?
     return false if spam_risky_email? || user&.no_non_theft_notification
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
-    return true unless organization.present? && organization.enabled?("skip_ownership_email")
+    true unless organization.present? && organization.enabled?("skip_ownership_email")
   end
 
   # This got a little unwieldy in #2110 - TODO, maybe - clean up
@@ -253,7 +262,7 @@ class Ownership < ApplicationRecord
     end
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
-    EmailOwnershipInvitationWorker.perform_in(2.seconds, id)
+    EmailOwnershipInvitationJob.perform_in(2.seconds, id)
   end
 
   def create_user_registration_for_phone_registration!(user)

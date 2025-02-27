@@ -68,7 +68,7 @@ FactoryBot.define do
       transient { user { FactoryBot.create(:user_confirmed) } }
 
       after(:create) do |organization, evaluator|
-        FactoryBot.create(:membership_claimed, user: evaluator.user, organization: organization)
+        FactoryBot.create(:organization_role_claimed, user: evaluator.user, organization: organization)
         organization.update(auto_user: evaluator.user)
       end
     end

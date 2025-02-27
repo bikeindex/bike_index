@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -21,6 +22,20 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 --
 
 COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
+
+
+--
+-- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
 
 
 SET default_tablespace = '';
@@ -212,6 +227,39 @@ CREATE SEQUENCE public.b_params_id_seq
 --
 
 ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
+
+
+--
+-- Name: banned_email_domains; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.banned_email_domains (
+    id bigint NOT NULL,
+    domain character varying,
+    creator_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: banned_email_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.banned_email_domains_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: banned_email_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.banned_email_domains_id_seq OWNED BY public.banned_email_domains.id;
 
 
 --
@@ -1591,8 +1639,8 @@ CREATE TABLE public.invoices (
     updated_at timestamp without time zone NOT NULL,
     notes text,
     child_enabled_feature_slugs jsonb,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
-    is_endless boolean DEFAULT false
+    is_endless boolean DEFAULT false,
+    currency_enum integer
 );
 
 
@@ -1942,20 +1990,15 @@ ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 --
 
 CREATE TABLE public.memberships (
-    id integer NOT NULL,
-    organization_id integer NOT NULL,
-    user_id integer,
-    invited_email character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone,
-    sender_id integer,
-    claimed_at timestamp without time zone,
-    email_invitation_sent_at timestamp without time zone,
-    created_by_magic_link boolean DEFAULT false,
-    receive_hot_sheet boolean DEFAULT false,
-    hot_sheet_notification integer DEFAULT 0,
-    role integer
+    id bigint NOT NULL,
+    user_id bigint,
+    level integer,
+    status integer,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    creator_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -2096,7 +2139,6 @@ CREATE TABLE public.notifications (
     id bigint NOT NULL,
     user_id bigint,
     kind integer,
-    delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     notifiable_type character varying,
@@ -2104,7 +2146,9 @@ CREATE TABLE public.notifications (
     message_channel integer DEFAULT 0,
     twilio_sid text,
     bike_id bigint,
-    message_channel_target character varying
+    message_channel_target character varying,
+    delivery_status integer,
+    delivery_error character varying
 );
 
 
@@ -2253,7 +2297,7 @@ CREATE TABLE public.organization_features (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     feature_slugs text[] DEFAULT '{}'::text[],
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
+    currency_enum integer
 );
 
 
@@ -2342,6 +2386,47 @@ CREATE SEQUENCE public.organization_model_audits_id_seq
 --
 
 ALTER SEQUENCE public.organization_model_audits_id_seq OWNED BY public.organization_model_audits.id;
+
+
+--
+-- Name: organization_roles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_roles (
+    id integer NOT NULL,
+    organization_id integer NOT NULL,
+    user_id integer,
+    invited_email character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    deleted_at timestamp without time zone,
+    sender_id integer,
+    claimed_at timestamp without time zone,
+    email_invitation_sent_at timestamp without time zone,
+    created_by_magic_link boolean DEFAULT false,
+    receive_hot_sheet boolean DEFAULT false,
+    hot_sheet_notification integer DEFAULT 0,
+    role integer
+);
+
+
+--
+-- Name: organization_roles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_roles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_roles_id_seq OWNED BY public.organization_roles.id;
 
 
 --
@@ -2604,11 +2689,8 @@ ALTER SEQUENCE public.parking_notifications_id_seq OWNED BY public.parking_notif
 CREATE TABLE public.payments (
     id integer NOT NULL,
     user_id integer,
-    is_current boolean DEFAULT true,
-    is_recurring boolean DEFAULT false NOT NULL,
     stripe_id character varying(255),
-    last_payment_date timestamp without time zone,
-    first_payment_date timestamp without time zone,
+    paid_at timestamp without time zone,
     amount_cents integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2616,10 +2698,11 @@ CREATE TABLE public.payments (
     payment_method integer DEFAULT 0,
     organization_id integer,
     invoice_id integer,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
-    stripe_kind integer,
-    referral_source text
+    referral_source text,
+    currency_enum integer,
+    membership_id bigint,
+    stripe_subscription_id bigint
 );
 
 
@@ -2640,6 +2723,41 @@ CREATE SEQUENCE public.payments_id_seq
 --
 
 ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
+
+
+--
+-- Name: pghero_query_stats; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pghero_query_stats (
+    id bigint NOT NULL,
+    database text,
+    "user" text,
+    query text,
+    query_hash bigint,
+    total_time double precision,
+    calls bigint,
+    captured_at timestamp without time zone
+);
+
+
+--
+-- Name: pghero_query_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pghero_query_stats_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pghero_query_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_stats.id;
 
 
 --
@@ -2814,13 +2932,13 @@ CREATE TABLE public.stolen_bike_listings (
     frame_size_number double precision,
     listed_at timestamp without time zone,
     amount_cents integer,
-    currency character varying,
     listing_text text,
     data jsonb,
     line integer,
     "group" integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    currency_enum integer
 );
 
 
@@ -2955,6 +3073,112 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
+-- Name: stripe_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_events (
+    id bigint NOT NULL,
+    stripe_id character varying,
+    name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_events_id_seq OWNED BY public.stripe_events.id;
+
+
+--
+-- Name: stripe_prices; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_prices (
+    id bigint NOT NULL,
+    membership_level integer,
+    "interval" integer,
+    stripe_id character varying,
+    currency_enum integer,
+    amount_cents integer,
+    live boolean DEFAULT false,
+    active boolean DEFAULT false,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_prices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_prices_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_prices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_prices_id_seq OWNED BY public.stripe_prices.id;
+
+
+--
+-- Name: stripe_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_subscriptions (
+    id bigint NOT NULL,
+    membership_id bigint,
+    user_id bigint,
+    stripe_price_stripe_id character varying,
+    stripe_id character varying,
+    end_at timestamp(6) without time zone,
+    start_at timestamp(6) without time zone,
+    stripe_status character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_subscriptions_id_seq OWNED BY public.stripe_subscriptions.id;
+
+
+--
 -- Name: superuser_abilities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3005,9 +3229,9 @@ CREATE TABLE public.theft_alert_plans (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     language integer DEFAULT 0 NOT NULL,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     amount_cents_facebook integer,
-    ad_radius_miles integer
+    ad_radius_miles integer,
+    currency_enum integer
 );
 
 
@@ -3254,7 +3478,8 @@ CREATE TABLE public.user_emails (
     old_user_id integer,
     confirmation_token text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    last_email_errored boolean DEFAULT false
 );
 
 
@@ -3359,7 +3584,7 @@ CREATE TABLE public.users (
     password text,
     last_login_at timestamp without time zone,
     superuser boolean DEFAULT false NOT NULL,
-    password_reset_token text,
+    token_for_password_reset text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     password_digest character varying(255),
@@ -3496,6 +3721,13 @@ ALTER TABLE ONLY public.ambassador_tasks ALTER COLUMN id SET DEFAULT nextval('pu
 --
 
 ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_params_id_seq'::regclass);
+
+
+--
+-- Name: banned_email_domains id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.banned_email_domains ALTER COLUMN id SET DEFAULT nextval('public.banned_email_domains_id_seq'::regclass);
 
 
 --
@@ -3877,6 +4109,13 @@ ALTER TABLE ONLY public.organization_model_audits ALTER COLUMN id SET DEFAULT ne
 
 
 --
+-- Name: organization_roles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_roles ALTER COLUMN id SET DEFAULT nextval('public.organization_roles_id_seq'::regclass);
+
+
+--
 -- Name: organization_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3916,6 +4155,13 @@ ALTER TABLE ONLY public.parking_notifications ALTER COLUMN id SET DEFAULT nextva
 --
 
 ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.payments_id_seq'::regclass);
+
+
+--
+-- Name: pghero_query_stats id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('public.pghero_query_stats_id_seq'::regclass);
 
 
 --
@@ -3965,6 +4211,27 @@ ALTER TABLE ONLY public.stolen_notifications ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('public.stolen_records_id_seq'::regclass);
+
+
+--
+-- Name: stripe_events id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_events ALTER COLUMN id SET DEFAULT nextval('public.stripe_events_id_seq'::regclass);
+
+
+--
+-- Name: stripe_prices id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_prices ALTER COLUMN id SET DEFAULT nextval('public.stripe_prices_id_seq'::regclass);
+
+
+--
+-- Name: stripe_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.stripe_subscriptions_id_seq'::regclass);
 
 
 --
@@ -4097,6 +4364,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: banned_email_domains banned_email_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.banned_email_domains
+    ADD CONSTRAINT banned_email_domains_pkey PRIMARY KEY (id);
 
 
 --
@@ -4532,6 +4807,14 @@ ALTER TABLE ONLY public.organization_model_audits
 
 
 --
+-- Name: organization_roles organization_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_roles
+    ADD CONSTRAINT organization_roles_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organization_stolen_messages organization_stolen_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4577,6 +4860,14 @@ ALTER TABLE ONLY public.parking_notifications
 
 ALTER TABLE ONLY public.payments
     ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pghero_query_stats pghero_query_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_query_stats
+    ADD CONSTRAINT pghero_query_stats_pkey PRIMARY KEY (id);
 
 
 --
@@ -4633,6 +4924,30 @@ ALTER TABLE ONLY public.stolen_bike_listings
 
 ALTER TABLE ONLY public.stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_events stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_events
+    ADD CONSTRAINT stripe_events_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_prices stripe_prices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_prices
+    ADD CONSTRAINT stripe_prices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_subscriptions stripe_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_subscriptions
+    ADD CONSTRAINT stripe_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -4746,13 +5061,6 @@ CREATE INDEX index_ambassador_task_assignments_on_ambassador_task_id ON public.a
 
 
 --
--- Name: index_ambassador_task_assignments_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_ambassador_task_assignments_on_user_id ON public.ambassador_task_assignments USING btree (user_id);
-
-
---
 -- Name: index_ambassador_tasks_on_title; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4764,6 +5072,13 @@ CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks U
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
+
+
+--
+-- Name: index_banned_email_domains_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_banned_email_domains_on_creator_id ON public.banned_email_domains USING btree (creator_id);
 
 
 --
@@ -5432,17 +5747,10 @@ CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btre
 
 
 --
--- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_memberships_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_memberships_on_organization_id ON public.memberships USING btree (organization_id);
-
-
---
--- Name: index_memberships_on_sender_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_memberships_on_sender_id ON public.memberships USING btree (sender_id);
+CREATE INDEX index_memberships_on_creator_id ON public.memberships USING btree (creator_id);
 
 
 --
@@ -5586,6 +5894,27 @@ CREATE INDEX index_organization_model_audits_on_organization_id ON public.organi
 
 
 --
+-- Name: index_organization_roles_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_roles_on_organization_id ON public.organization_roles USING btree (organization_id);
+
+
+--
+-- Name: index_organization_roles_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_roles_on_sender_id ON public.organization_roles USING btree (sender_id);
+
+
+--
+-- Name: index_organization_roles_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_roles_on_user_id ON public.organization_roles USING btree (user_id);
+
+
+--
 -- Name: index_organization_stolen_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5726,10 +6055,31 @@ CREATE INDEX index_parking_notifications_on_user_id ON public.parking_notificati
 
 
 --
+-- Name: index_payments_on_membership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_payments_on_membership_id ON public.payments USING btree (membership_id);
+
+
+--
+-- Name: index_payments_on_stripe_subscription_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_payments_on_stripe_subscription_id ON public.payments USING btree (stripe_subscription_id);
+
+
+--
 -- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_payments_on_user_id ON public.payments USING btree (user_id);
+
+
+--
+-- Name: index_pghero_query_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghero_query_stats USING btree (database, captured_at);
 
 
 --
@@ -5828,6 +6178,27 @@ CREATE INDEX index_stolen_records_on_organization_stolen_message_id ON public.st
 --
 
 CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records USING btree (recovering_user_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_membership_id ON public.stripe_subscriptions USING btree (membership_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_stripe_price_stripe_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_stripe_price_stripe_id ON public.stripe_subscriptions USING btree (stripe_price_stripe_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_user_id ON public.stripe_subscriptions USING btree (user_id);
 
 
 --
@@ -6006,10 +6377,10 @@ CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
 
 
 --
--- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
+-- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_password_reset_token ON public.users USING btree (password_reset_token);
+CREATE INDEX index_users_on_token_for_password_reset ON public.users USING btree (token_for_password_reset);
 
 
 --
@@ -6089,572 +6460,587 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20120911182934'),
-('20120911183639'),
-('20120911184407'),
-('20120911185927'),
-('20120911230801'),
-('20120912003857'),
-('20120913164701'),
-('20120914193704'),
-('20120914194950'),
-('20120914214119'),
-('20120914221204'),
-('20121010120352'),
-('20121012140221'),
-('20121028230353'),
-('20121029020401'),
-('20121029232446'),
-('20121030004253'),
-('20121031232916'),
-('20121031234103'),
-('20121101002812'),
-('20121101002951'),
-('20121102144757'),
-('20121103160512'),
-('20121103201904'),
-('20121107230721'),
-('20121108220013'),
-('20121111190041'),
-('20121114221424'),
-('20121114223945'),
-('20121117213635'),
-('20121122183150'),
-('20121124163916'),
-('20121216155454'),
-('20121218161337'),
-('20121218163801'),
-('20121218165048'),
-('20121218175444'),
-('20121218232923'),
-('20121223151926'),
-('20121223152831'),
-('20121223160807'),
-('20121223175254'),
-('20130111143823'),
-('20130111161224'),
-('20130111165852'),
-('20130111230539'),
-('20130116160029'),
-('20130120201311'),
-('20130125155810'),
-('20130126000921'),
-('20130126010711'),
-('20130128182738'),
-('20130128183512'),
-('20130206030035'),
-('20130210182811'),
-('20130210183940'),
-('20130210184643'),
-('20130212215600'),
-('20130213230159'),
-('20130214204648'),
-('20130214211116'),
-('20130214231224'),
-('20130217161855'),
-('20130217161945'),
-('20130217170709'),
-('20130220010120'),
-('20130225180109'),
-('20130225202426'),
-('20130225215129'),
-('20130226165427'),
-('20130226170115'),
-('20130226171603'),
-('20130227022823'),
-('20130308162717'),
-('20130312214622'),
-('20130312234622'),
-('20130314000516'),
-('20130314202232'),
-('20130314214024'),
-('20130314235254'),
-('20130315022544'),
-('20130318004611'),
-('20130329212736'),
-('20130403012755'),
-('20130420195053'),
-('20130422133115'),
-('20130422162415'),
-('20130422162432'),
-('20130422170303'),
-('20130424134913'),
-('20130424155646'),
-('20130424161125'),
-('20130424225341'),
-('20130506191950'),
-('20130506194218'),
-('20130507033150'),
-('20130508162206'),
-('20130509213617'),
-('20130510144825'),
-('20130510154536'),
-('20130510161119'),
-('20130510191228'),
-('20130511175952'),
-('20130511181304'),
-('20130511182611'),
-('20130515014438'),
-('20130515140718'),
-('20130515202608'),
-('20130517154952'),
-('20130522165237'),
-('20130524164449'),
-('20130604205407'),
-('20130607162957'),
-('20130613144600'),
-('20130613153522'),
-('20130619234253'),
-('20130621012516'),
-('20130628161112'),
-('20130629152453'),
-('20130629152508'),
-('20130629162208'),
-('20130629165920'),
-('20130629165929'),
-('20130629171337'),
-('20130629183647'),
-('20130629183656'),
-('20130630190556'),
-('20130709160337'),
-('20130709215543'),
-('20130711200929'),
-('20130711201434'),
-('20130711230226'),
-('20130714155827'),
-('20130716213553'),
-('20130717195126'),
-('20130718175528'),
-('20130724145302'),
-('20130725191328'),
-('20130729190352'),
-('20130729190514'),
-('20130729195607'),
-('20130802145610'),
-('20130807173218'),
-('20130807215021'),
-('20130809155956'),
-('20130820145312'),
-('20130820150839'),
-('20130820173657'),
-('20130821134559'),
-('20130821135549'),
-('20130821230157'),
-('20130903142657'),
-('20130905215302'),
-('20131009140156'),
-('20131013171704'),
-('20131013172625'),
-('20131013233351'),
-('20131018221510'),
-('20131029004416'),
-('20131029144536'),
-('20131030132116'),
-('20131030161105'),
-('20131031222251'),
-('20131101002019'),
-('20131105010837'),
-('20131117232341'),
-('20131202181502'),
-('20131204230644'),
-('20131205145316'),
-('20131211163130'),
-('20131212161639'),
-('20131213185845'),
-('20131216154423'),
-('20131218201839'),
-('20131219182417'),
-('20131221193910'),
-('20131227132337'),
-('20131227133553'),
-('20131227135813'),
-('20131227151833'),
-('20131229194508'),
-('20140103144654'),
-('20140103161433'),
-('20140103222943'),
-('20140103235111'),
-('20140104011352'),
-('20140105181220'),
-('20140106031356'),
-('20140108195016'),
-('20140108202025'),
-('20140108203313'),
-('20140109001625'),
-('20140111142521'),
-('20140111183125'),
-('20140112004042'),
-('20140113181408'),
-('20140114230221'),
-('20140115041923'),
-('20140116214759'),
-('20140116222529'),
-('20140122181025'),
-('20140122181308'),
-('20140204162239'),
-('20140225203114'),
-('20140227225103'),
-('20140301174242'),
-('20140312191710'),
-('20140313002428'),
-('20140426211337'),
-('20140504234957'),
-('20140507023948'),
-('20140510155037'),
-('20140510163446'),
-('20140523122545'),
-('20140524183616'),
-('20140525163552'),
-('20140525173416'),
-('20140525183759'),
-('20140526141810'),
-('20140526161223'),
-('20140614190845'),
-('20140615230212'),
-('20140621013108'),
-('20140621171727'),
-('20140629144444'),
-('20140629162651'),
-('20140629170842'),
-('20140706170329'),
-('20140713182107'),
-('20140720175226'),
-('20140809102725'),
-('20140817160101'),
-('20140830152248'),
-('20140902230041'),
-('20140903191321'),
-('20140907144150'),
-('20140916141534'),
-('20140916185511'),
-('20141006184444'),
-('20141008160942'),
-('20141010145930'),
-('20141025185722'),
-('20141026172449'),
-('20141030140601'),
-('20141031152955'),
-('20141105172149'),
-('20141110174307'),
-('20141210002148'),
-('20141210031732'),
-('20141210233551'),
-('20141217191826'),
-('20141217200937'),
-('20141224165646'),
-('20141231170329'),
-('20150111193842'),
-('20150111211009'),
-('20150122195921'),
-('20150123233624'),
-('20150127220842'),
-('20150208001048'),
-('20150321233527'),
-('20150325145515'),
-('20150402051334'),
-('20150507222158'),
-('20150518192613'),
-('20150701151619'),
-('20150805160333'),
-('20150903194549'),
-('20150916133842'),
-('20151122175408'),
-('20160314144745'),
-('20160317183354'),
-('20160320154610'),
-('20160406202125'),
-('20160425185052'),
-('20160509110049'),
-('20160509120017'),
-('20160529093040'),
-('20160614112308'),
-('20160629152210'),
-('20160630161603'),
-('20160630175602'),
-('20160631175602'),
-('20160711183247'),
-('20160714182030'),
-('20160808133129'),
-('20160813191639'),
-('20160901175004'),
-('20160910174549'),
-('20160910184053'),
-('20160913155615'),
-('20160923180542'),
-('20160923215650'),
-('20161222154603'),
-('20170227012150'),
-('20170503024611'),
-('20170617222902'),
-('20170618205609'),
-('20170731023746'),
-('20180225205617'),
-('20180624192035'),
-('20180624211320'),
-('20180624211323'),
-('20180706162137'),
-('20180730013343'),
-('20180731194240'),
-('20180801010129'),
-('20180801011704'),
-('20180801025713'),
-('20180802235809'),
-('20180803003635'),
-('20180804170624'),
-('20180806172125'),
-('20180813004404'),
-('20180813020849'),
-('20180813023344'),
-('20180818194244'),
-('20180911215238'),
-('20180918220604'),
-('20181130200131'),
-('20181204215943'),
-('20181205180633'),
-('20181213224936'),
-('20190110210704'),
-('20190201193608'),
-('20190201214042'),
-('20190206044915'),
-('20190208195902'),
-('20190214192448'),
-('20190301020053'),
-('20190306223523'),
-('20190306232544'),
-('20190307232718'),
-('20190308235449'),
-('20190309021455'),
-('20190312185621'),
-('20190314182139'),
-('20190315183047'),
-('20190315213846'),
-('20190317191821'),
-('20190327164432'),
-('20190329233031'),
-('20190401233010'),
-('20190402230848'),
-('20190422221408'),
-('20190424001657'),
-('20190514155447'),
-('20190516222221'),
-('20190517161246'),
-('20190517200357'),
-('20190524191139'),
-('20190529024835'),
-('20190606214539'),
-('20190607174104'),
-('20190611203612'),
-('20190611223723'),
-('20190612183532'),
-('20190614223136'),
-('20190617174200'),
-('20190617193251'),
-('20190617193255'),
-('20190620203854'),
-('20190621183811'),
-('20190624171627'),
-('20190625151428'),
-('20190703194554'),
-('20190705230020'),
-('20190708181605'),
-('20190709011902'),
-('20190710203715'),
-('20190710230727'),
-('20190725141309'),
-('20190725172835'),
-('20190726160009'),
-('20190726183859'),
-('20190806155914'),
-('20190806170520'),
-('20190806214815'),
-('20190809200257'),
-('20190809214414'),
-('20190829221522'),
-('20190903145420'),
-('20190904161424'),
-('20190909190050'),
-('20190913132047'),
-('20190916190441'),
-('20190916190442'),
-('20190916191514'),
-('20190918121951'),
-('20190918143646'),
-('20190919145324'),
-('20190923181352'),
-('20191010182940'),
-('20191018140618'),
-('20191022123037'),
-('20191022143755'),
-('20191028130015'),
-('20191106210313'),
-('20191108195338'),
-('20191117123105'),
-('20191209160937'),
-('20191216054404'),
-('20200101211426'),
-('20200107234030'),
-('20200108232256'),
-('20200109005657'),
-('20200128144317'),
-('20200130220100'),
-('20200131175543'),
-('20200210225544'),
-('20200210234925'),
-('20200212000416'),
-('20200212022845'),
-('20200212203304'),
-('20200311160107'),
-('20200324221906'),
-('20200326192650'),
-('20200403234228'),
-('20200409201638'),
-('20200410043813'),
-('20200410183949'),
-('20200414055430'),
-('20200414055431'),
-('20200415161915'),
-('20200416202219'),
-('20200420181614'),
-('20200421191302'),
-('20200421230336'),
-('20200422161944'),
-('20200422171902'),
-('20200424222002'),
-('20200428203014'),
-('20200429004612'),
-('20200429174144'),
-('20200517001632'),
-('20200521143231'),
-('20200521144927'),
-('20200524214006'),
-('20200610194531'),
-('20200611040757'),
-('20200616144000'),
-('20200616144002'),
-('20200616144623'),
-('20200619141947'),
-('20200619234821'),
-('20200620170809'),
-('20200620171606'),
-('20200620172241'),
-('20200630200556'),
-('20200727213018'),
-('20200804172753'),
-('20200804180457'),
-('20200808175756'),
-('20200810163704'),
-('20200813154458'),
-('20200813221439'),
-('20200831194703'),
-('20200901165655'),
-('20200901181453'),
-('20200911230445'),
-('20200921165203'),
-('20200921203331'),
-('20200925175027'),
-('20201008202006'),
-('20201008204248'),
-('20201009210429'),
-('20201013204925'),
-('20201019200213'),
-('20201103001935'),
-('20201208002014'),
-('20210111220950'),
-('20210114030113'),
-('20210120162658'),
-('20210127173741'),
-('20210127191226'),
-('20210129214432'),
-('20210203164749'),
-('20210204184023'),
-('20210204191110'),
-('20210204223335'),
-('20210205191728'),
-('20210208203928'),
-('20210227162633'),
-('20210227163837'),
-('20210311160040'),
-('20210402214845'),
-('20210402214854'),
-('20210405200829'),
-('20210420161728'),
-('20210421174751'),
-('20210423200934'),
-('20210512162607'),
-('20210601175924'),
-('20210604191419'),
-('20210610185925'),
-('20210614175711'),
-('20210626220123'),
-('20210702204848'),
-('20210704190719'),
-('20210706220349'),
-('20210708151750'),
-('20210709164954'),
-('20210723222942'),
-('20210727011722'),
-('20210727021013'),
-('20210727212502'),
-('20210730172142'),
-('20210811141935'),
-('20210817204248'),
-('20210820220126'),
-('20210921181852'),
-('20211215163717'),
-('20211220183631'),
-('20211220193440'),
-('20211221010148'),
-('20211222230922'),
-('20211223213257'),
-('20211224053713'),
-('20211225005744'),
-('20220102153706'),
-('20220102160149'),
-('20220107041406'),
-('20220113194000'),
-('20220113194041'),
-('20220118221319'),
-('20220121230959'),
-('20220124192245'),
-('20220201213958'),
-('20220324004315'),
-('20220405173312'),
-('20220411165641'),
-('20220420145734'),
-('20220520180217'),
-('20220527162543'),
-('20220622004930'),
-('20220627165205'),
-('20220730171652'),
-('20220801162511'),
-('20220811174115'),
-('20220819205834'),
-('20220903183420'),
-('20220921170820'),
-('20221007123638'),
-('20230224234148'),
-('20230418192859'),
-('20230831222013'),
-('20230906000736'),
-('20230906180600'),
-('20230906200524'),
-('20230906203110'),
-('20231004171919'),
-('20231012212343'),
-('20231019173522'),
-('20231029220010'),
-('20231030150841'),
-('20231104191652'),
-('20231112013451'),
-('20231115201426'),
-('20231203021402'),
-('20231206022455'),
-('20231212023722'),
-('20231212025929'),
-('20240517161713'),
-('20240712181117'),
-('20240908151325'),
+('20250226182610'),
+('20250217173339'),
+('20250217173338'),
+('20250217173337'),
+('20250217173308'),
+('20250216191639'),
+('20250216183834'),
+('20250207221053'),
+('20250207193640'),
+('20250205135704'),
+('20250203011709'),
+('20250130185756'),
+('20250127224140'),
+('20250127223414'),
+('20250125023931'),
+('20250124230102'),
+('20241007164353'),
 ('20241003155715'),
-('20241007164353');
-
+('20240908151325'),
+('20240712181117'),
+('20240517161713'),
+('20231212025929'),
+('20231212023722'),
+('20231206022455'),
+('20231203021402'),
+('20231115201426'),
+('20231112013451'),
+('20231104191652'),
+('20231030150841'),
+('20231029220010'),
+('20231019173522'),
+('20231012212343'),
+('20231004171919'),
+('20230906203110'),
+('20230906200524'),
+('20230906180600'),
+('20230906000736'),
+('20230831222013'),
+('20230418192859'),
+('20230224234148'),
+('20221007123638'),
+('20220921170820'),
+('20220903183420'),
+('20220819205834'),
+('20220811174115'),
+('20220801162511'),
+('20220730171652'),
+('20220627165205'),
+('20220622004930'),
+('20220527162543'),
+('20220520180217'),
+('20220420145734'),
+('20220411165641'),
+('20220405173312'),
+('20220324004315'),
+('20220201213958'),
+('20220124192245'),
+('20220121230959'),
+('20220118221319'),
+('20220113194041'),
+('20220113194000'),
+('20220107041406'),
+('20220102160149'),
+('20220102153706'),
+('20211225005744'),
+('20211224053713'),
+('20211223213257'),
+('20211222230922'),
+('20211221010148'),
+('20211220193440'),
+('20211220183631'),
+('20211215163717'),
+('20210921181852'),
+('20210820220126'),
+('20210817204248'),
+('20210811141935'),
+('20210730172142'),
+('20210727212502'),
+('20210727021013'),
+('20210727011722'),
+('20210723222942'),
+('20210709164954'),
+('20210708151750'),
+('20210706220349'),
+('20210704190719'),
+('20210702204848'),
+('20210626220123'),
+('20210614175711'),
+('20210610185925'),
+('20210604191419'),
+('20210601175924'),
+('20210512162607'),
+('20210423200934'),
+('20210421174751'),
+('20210420161728'),
+('20210405200829'),
+('20210402214854'),
+('20210402214845'),
+('20210311160040'),
+('20210227163837'),
+('20210227162633'),
+('20210208203928'),
+('20210205191728'),
+('20210204223335'),
+('20210204191110'),
+('20210204184023'),
+('20210203164749'),
+('20210129214432'),
+('20210127191226'),
+('20210127173741'),
+('20210120162658'),
+('20210114030113'),
+('20210111220950'),
+('20201208002014'),
+('20201103001935'),
+('20201019200213'),
+('20201013204925'),
+('20201009210429'),
+('20201008204248'),
+('20201008202006'),
+('20200925175027'),
+('20200921203331'),
+('20200921165203'),
+('20200911230445'),
+('20200901181453'),
+('20200901165655'),
+('20200831194703'),
+('20200813221439'),
+('20200813154458'),
+('20200810163704'),
+('20200808175756'),
+('20200804180457'),
+('20200804172753'),
+('20200727213018'),
+('20200630200556'),
+('20200620172241'),
+('20200620171606'),
+('20200620170809'),
+('20200619234821'),
+('20200619141947'),
+('20200616144623'),
+('20200616144002'),
+('20200616144000'),
+('20200611040757'),
+('20200610194531'),
+('20200524214006'),
+('20200521144927'),
+('20200521143231'),
+('20200517001632'),
+('20200429174144'),
+('20200429004612'),
+('20200428203014'),
+('20200424222002'),
+('20200422171902'),
+('20200422161944'),
+('20200421230336'),
+('20200421191302'),
+('20200420181614'),
+('20200416202219'),
+('20200415161915'),
+('20200414055431'),
+('20200414055430'),
+('20200410183949'),
+('20200410043813'),
+('20200409201638'),
+('20200403234228'),
+('20200326192650'),
+('20200324221906'),
+('20200311160107'),
+('20200212203304'),
+('20200212022845'),
+('20200212000416'),
+('20200210234925'),
+('20200210225544'),
+('20200131175543'),
+('20200130220100'),
+('20200128144317'),
+('20200109005657'),
+('20200108232256'),
+('20200107234030'),
+('20200101211426'),
+('20191216054404'),
+('20191209160937'),
+('20191117123105'),
+('20191108195338'),
+('20191106210313'),
+('20191028130015'),
+('20191022143755'),
+('20191022123037'),
+('20191018140618'),
+('20191010182940'),
+('20190923181352'),
+('20190919145324'),
+('20190918143646'),
+('20190918121951'),
+('20190916191514'),
+('20190916190442'),
+('20190916190441'),
+('20190913132047'),
+('20190909190050'),
+('20190904161424'),
+('20190903145420'),
+('20190829221522'),
+('20190809214414'),
+('20190809200257'),
+('20190806214815'),
+('20190806170520'),
+('20190806155914'),
+('20190726183859'),
+('20190726160009'),
+('20190725172835'),
+('20190725141309'),
+('20190710230727'),
+('20190710203715'),
+('20190709011902'),
+('20190708181605'),
+('20190705230020'),
+('20190703194554'),
+('20190625151428'),
+('20190624171627'),
+('20190621183811'),
+('20190620203854'),
+('20190617193255'),
+('20190617193251'),
+('20190617174200'),
+('20190614223136'),
+('20190612183532'),
+('20190611223723'),
+('20190611203612'),
+('20190607174104'),
+('20190606214539'),
+('20190529024835'),
+('20190524191139'),
+('20190517200357'),
+('20190517161246'),
+('20190516222221'),
+('20190514155447'),
+('20190424001657'),
+('20190422221408'),
+('20190402230848'),
+('20190401233010'),
+('20190329233031'),
+('20190327164432'),
+('20190317191821'),
+('20190315213846'),
+('20190315183047'),
+('20190314182139'),
+('20190312185621'),
+('20190309021455'),
+('20190308235449'),
+('20190307232718'),
+('20190306232544'),
+('20190306223523'),
+('20190301020053'),
+('20190214192448'),
+('20190208195902'),
+('20190206044915'),
+('20190201214042'),
+('20190201193608'),
+('20190110210704'),
+('20181213224936'),
+('20181205180633'),
+('20181204215943'),
+('20181130200131'),
+('20180918220604'),
+('20180911215238'),
+('20180818194244'),
+('20180813023344'),
+('20180813020849'),
+('20180813004404'),
+('20180806172125'),
+('20180804170624'),
+('20180803003635'),
+('20180802235809'),
+('20180801025713'),
+('20180801011704'),
+('20180801010129'),
+('20180731194240'),
+('20180730013343'),
+('20180706162137'),
+('20180624211323'),
+('20180624211320'),
+('20180624192035'),
+('20180225205617'),
+('20170731023746'),
+('20170618205609'),
+('20170617222902'),
+('20170503024611'),
+('20170227012150'),
+('20161222154603'),
+('20160923215650'),
+('20160923180542'),
+('20160913155615'),
+('20160910184053'),
+('20160910174549'),
+('20160901175004'),
+('20160813191639'),
+('20160808133129'),
+('20160714182030'),
+('20160711183247'),
+('20160631175602'),
+('20160630175602'),
+('20160630161603'),
+('20160629152210'),
+('20160614112308'),
+('20160529093040'),
+('20160509120017'),
+('20160509110049'),
+('20160425185052'),
+('20160406202125'),
+('20160320154610'),
+('20160317183354'),
+('20160314144745'),
+('20151122175408'),
+('20150916133842'),
+('20150903194549'),
+('20150805160333'),
+('20150701151619'),
+('20150518192613'),
+('20150507222158'),
+('20150402051334'),
+('20150325145515'),
+('20150321233527'),
+('20150208001048'),
+('20150127220842'),
+('20150123233624'),
+('20150122195921'),
+('20150111211009'),
+('20150111193842'),
+('20141231170329'),
+('20141224165646'),
+('20141217200937'),
+('20141217191826'),
+('20141210233551'),
+('20141210031732'),
+('20141210002148'),
+('20141110174307'),
+('20141105172149'),
+('20141031152955'),
+('20141030140601'),
+('20141026172449'),
+('20141025185722'),
+('20141010145930'),
+('20141008160942'),
+('20141006184444'),
+('20140916185511'),
+('20140916141534'),
+('20140907144150'),
+('20140903191321'),
+('20140902230041'),
+('20140830152248'),
+('20140817160101'),
+('20140809102725'),
+('20140720175226'),
+('20140713182107'),
+('20140706170329'),
+('20140629170842'),
+('20140629162651'),
+('20140629144444'),
+('20140621171727'),
+('20140621013108'),
+('20140615230212'),
+('20140614190845'),
+('20140526161223'),
+('20140526141810'),
+('20140525183759'),
+('20140525173416'),
+('20140525163552'),
+('20140524183616'),
+('20140523122545'),
+('20140510163446'),
+('20140510155037'),
+('20140507023948'),
+('20140504234957'),
+('20140426211337'),
+('20140313002428'),
+('20140312191710'),
+('20140301174242'),
+('20140227225103'),
+('20140225203114'),
+('20140204162239'),
+('20140122181308'),
+('20140122181025'),
+('20140116222529'),
+('20140116214759'),
+('20140115041923'),
+('20140114230221'),
+('20140113181408'),
+('20140112004042'),
+('20140111183125'),
+('20140111142521'),
+('20140109001625'),
+('20140108203313'),
+('20140108202025'),
+('20140108195016'),
+('20140106031356'),
+('20140105181220'),
+('20140104011352'),
+('20140103235111'),
+('20140103222943'),
+('20140103161433'),
+('20140103144654'),
+('20131229194508'),
+('20131227151833'),
+('20131227135813'),
+('20131227133553'),
+('20131227132337'),
+('20131221193910'),
+('20131219182417'),
+('20131218201839'),
+('20131216154423'),
+('20131213185845'),
+('20131212161639'),
+('20131211163130'),
+('20131205145316'),
+('20131204230644'),
+('20131202181502'),
+('20131117232341'),
+('20131105010837'),
+('20131101002019'),
+('20131031222251'),
+('20131030161105'),
+('20131030132116'),
+('20131029144536'),
+('20131029004416'),
+('20131018221510'),
+('20131013233351'),
+('20131013172625'),
+('20131013171704'),
+('20131009140156'),
+('20130905215302'),
+('20130903142657'),
+('20130821230157'),
+('20130821135549'),
+('20130821134559'),
+('20130820173657'),
+('20130820150839'),
+('20130820145312'),
+('20130809155956'),
+('20130807215021'),
+('20130807173218'),
+('20130802145610'),
+('20130729195607'),
+('20130729190514'),
+('20130729190352'),
+('20130725191328'),
+('20130724145302'),
+('20130718175528'),
+('20130717195126'),
+('20130716213553'),
+('20130714155827'),
+('20130711230226'),
+('20130711201434'),
+('20130711200929'),
+('20130709215543'),
+('20130709160337'),
+('20130630190556'),
+('20130629183656'),
+('20130629183647'),
+('20130629171337'),
+('20130629165929'),
+('20130629165920'),
+('20130629162208'),
+('20130629152508'),
+('20130629152453'),
+('20130628161112'),
+('20130621012516'),
+('20130619234253'),
+('20130613153522'),
+('20130613144600'),
+('20130607162957'),
+('20130604205407'),
+('20130524164449'),
+('20130522165237'),
+('20130517154952'),
+('20130515202608'),
+('20130515140718'),
+('20130515014438'),
+('20130511182611'),
+('20130511181304'),
+('20130511175952'),
+('20130510191228'),
+('20130510161119'),
+('20130510154536'),
+('20130510144825'),
+('20130509213617'),
+('20130508162206'),
+('20130507033150'),
+('20130506194218'),
+('20130506191950'),
+('20130424225341'),
+('20130424161125'),
+('20130424155646'),
+('20130424134913'),
+('20130422170303'),
+('20130422162432'),
+('20130422162415'),
+('20130422133115'),
+('20130420195053'),
+('20130403012755'),
+('20130329212736'),
+('20130318004611'),
+('20130315022544'),
+('20130314235254'),
+('20130314214024'),
+('20130314202232'),
+('20130314000516'),
+('20130312234622'),
+('20130312214622'),
+('20130308162717'),
+('20130227022823'),
+('20130226171603'),
+('20130226170115'),
+('20130226165427'),
+('20130225215129'),
+('20130225202426'),
+('20130225180109'),
+('20130220010120'),
+('20130217170709'),
+('20130217161945'),
+('20130217161855'),
+('20130214231224'),
+('20130214211116'),
+('20130214204648'),
+('20130213230159'),
+('20130212215600'),
+('20130210184643'),
+('20130210183940'),
+('20130210182811'),
+('20130206030035'),
+('20130128183512'),
+('20130128182738'),
+('20130126010711'),
+('20130126000921'),
+('20130125155810'),
+('20130120201311'),
+('20130116160029'),
+('20130111230539'),
+('20130111165852'),
+('20130111161224'),
+('20130111143823'),
+('20121223175254'),
+('20121223160807'),
+('20121223152831'),
+('20121223151926'),
+('20121218232923'),
+('20121218175444'),
+('20121218165048'),
+('20121218163801'),
+('20121218161337'),
+('20121216155454'),
+('20121124163916'),
+('20121122183150'),
+('20121117213635'),
+('20121114223945'),
+('20121114221424'),
+('20121111190041'),
+('20121108220013'),
+('20121107230721'),
+('20121103201904'),
+('20121103160512'),
+('20121102144757'),
+('20121101002951'),
+('20121101002812'),
+('20121031234103'),
+('20121031232916'),
+('20121030004253'),
+('20121029232446'),
+('20121029020401'),
+('20121028230353'),
+('20121012140221'),
+('20121010120352'),
+('20120914221204'),
+('20120914214119'),
+('20120914194950'),
+('20120914193704'),
+('20120913164701'),
+('20120912003857'),
+('20120911230801'),
+('20120911185927'),
+('20120911184407'),
+('20120911183639'),
+('20120911182934');
 

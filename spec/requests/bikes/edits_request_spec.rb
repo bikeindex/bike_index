@@ -67,7 +67,7 @@ RSpec.describe Bikes::EditsController, type: :request do
   context "not-creator but member of creation_organization" do
     let(:bike) { FactoryBot.create(:bike_organized) }
     let(:organization) { bike.creation_organization }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
     it "renders" do
       expect(bike.user_id).to_not eq current_user.id
       expect(bike.creation_organization&.id).to eq current_user.organizations.first.id
@@ -83,7 +83,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     expect(flash).to be_blank
     expect(response).to render_template(:bike_details)
     expect(assigns(:bike).id).to eq bike.id
-    expect_hashes_to_match(assigns(:edit_templates), edit_templates)
+    expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates
     # Because user is bike#user
     expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     # If passed an unknown template, it renders default template
@@ -233,7 +233,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
     context "organized impound_record" do
       let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
-      before { ProcessImpoundUpdatesWorker.new.perform(impound_record.id) }
+      before { ProcessImpoundUpdatesJob.new.perform(impound_record.id) }
       it "redirects with flash error" do
         expect(bike.reload.status).to eq "status_impounded"
         get base_url
@@ -261,7 +261,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       end
       context "organization member" do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-        let(:current_user) { FactoryBot.create(:organization_member, organization: impound_record.organization) }
+        let(:current_user) { FactoryBot.create(:organization_user, organization: impound_record.organization) }
         it "renders" do
           bike.reload
           expect(bike.claimed?).to be_truthy
@@ -286,7 +286,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     let(:bike) { parking_notification.bike }
     let(:current_organization) { parking_notification.organization }
     let(:current_user) { parking_notification.user }
-    before { ProcessParkingNotificationWorker.new.perform(parking_notification.id) }
+    before { ProcessParkingNotificationJob.new.perform(parking_notification.id) }
     it "renders" do
       parking_notification.reload
       impound_record = parking_notification.impound_record

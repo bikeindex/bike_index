@@ -4,6 +4,8 @@ module AdminHelper
     [
       # Impound claims index is currently busted, so ignoring for now
       {title: "Dev: Impound Claims", path: admin_impound_claims_path, match_controller: true},
+      {title: "Dev: Stripe Subscriptions", path: admin_stripe_subscriptions_path, match_controller: true},
+      {title: "Dev: Stripe Prices", path: admin_stripe_prices_path, match_controller: true},
       {title: "Dev: Feature Flags", path: admin_feature_flags_path, match_controller: false},
       {title: "Dev: Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
       {title: "Dev: Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
@@ -34,6 +36,7 @@ module AdminHelper
       {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path, match_controller: true},
       {title: "Promoted Alerts", path: admin_theft_alerts_path, match_controller: true},
       {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path, match_controller: true},
+      {title: "Memberships", path: admin_memberships_path, match_controller: true},
       {title: "Payments", path: admin_payments_path, match_controller: true},
       {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
       {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true},
@@ -41,7 +44,7 @@ module AdminHelper
       {title: "Parking Notifications", path: admin_parking_notifications_path, match_controller: true},
       {title: "Recoveries", path: admin_recoveries_path, match_controller: true},
       {title: "Recovery Displays", path: admin_recovery_displays_path, match_controller: true},
-      {title: "Memberships", path: admin_memberships_path, match_controller: true},
+      {title: "Organization Roles", path: admin_organization_roles_path, match_controller: true},
       {title: "Manufacturers", path: admin_manufacturers_path, match_controller: true},
       {title: "Config: TSV Exports", path: admin_tsvs_path, match_controller: false},
       {title: "Credibility badges", path: admin_credibility_badges_path, match_controller: false},
@@ -61,6 +64,7 @@ module AdminHelper
       {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
       {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
+      {title: "Config: Banned Email Domains", path: admin_banned_email_domains_path, match_controller: true},
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
@@ -109,11 +113,11 @@ module AdminHelper
   end
 
   def credibility_scorer_color_table(score)
-    score < 31 ? credibility_scorer_color(score) : ""
+    (score < 31) ? credibility_scorer_color(score) : ""
   end
 
   def admin_number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: (number == 0 ? "less-less-strong" : ""))
+    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
   end
 
   def user_icon_hash(user = nil)
@@ -124,11 +128,12 @@ module AdminHelper
       return icon_hash
     end
     icon_hash[:tags] += [:donor] if user.donor?
+    icon_hash[:tags] += [:member] if user.membership_active.present?
     icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
     icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
     org = user.organization_prioritized
     if org.present?
-      icon_hash[:tags] += [:organization_member]
+      icon_hash[:tags] += [:organization_role]
       icon_hash[:organization] = {kind: org.kind.to_sym, paid: org.paid?}
     end
     icon_hash
@@ -143,13 +148,17 @@ module AdminHelper
         concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
         concat(content_tag(:span, "onor", class: "less-strong")) if full_text
       end
-      if icon_hash[:tags].include?(:organization_member)
+      if icon_hash[:tags].include?(:member)
+        concat(content_tag(:span, "M", class: "donor-icon user-icon ml-1", title: "Member"))
+        concat(content_tag(:span, "ember", class: "less-strong")) if full_text
+      end
+      if icon_hash[:tags].include?(:organization_role)
         org_full_text = [
           icon_hash[:organization][:paid] ? "Paid" : nil,
           "organization member -",
           Organization.kind_humanized(icon_hash[:organization][:kind])
         ].compact.join(" ")
-        concat(content_tag(:span, org_icon_text(icon_hash[:organization]), class: "org-member-icon user-icon ml-1", title: org_full_text))
+        concat(content_tag(:span, org_icon_text(**icon_hash[:organization]), class: "org-member-icon user-icon ml-1", title: org_full_text))
         concat(content_tag(:span, org_full_text, class: "ml-1 less-strong")) if full_text
       end
 

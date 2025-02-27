@@ -70,7 +70,7 @@ RSpec.describe Admin::BikesController, type: :request do
   describe "update" do
     it "updates the user email, without sending email" do
       expect(bike.current_ownership).to be_present
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
         expect {
@@ -91,7 +91,7 @@ RSpec.describe Admin::BikesController, type: :request do
         user.destroy
         bike.reload
         expect(bike.current_ownership).to be_present
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           expect {
@@ -112,7 +112,7 @@ RSpec.describe Admin::BikesController, type: :request do
       it "marks the bike recovered" do
         stolen_record.reload
         expect(stolen_record.recovered?).to be_falsey
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           patch "#{base_url}/#{bike.id}", params: {
@@ -215,7 +215,7 @@ RSpec.describe Admin::BikesController, type: :request do
       bike2 = FactoryBot.create(:bike, manufacturer_other: "69", model_audit_id: 11, likely_spam: true)
       bike3 = FactoryBot.create(:bike, manufacturer_other: "69", model_audit_id: 12)
       manufacturer = FactoryBot.create(:manufacturer)
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       post "#{base_url}/update_manufacturers", params: {
         manufacturer_id: manufacturer.id,
         bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
@@ -227,7 +227,7 @@ RSpec.describe Admin::BikesController, type: :request do
       end
       bike3.reload
       expect(bike3.manufacturer_other).to eq "69" # Sanity check
-      expect(UpdateModelAuditWorker.jobs.map { |j| j["args"] }.flatten).to match_array([11, 12])
+      expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to match_array([11, 12])
     end
   end
 
@@ -239,7 +239,7 @@ RSpec.describe Admin::BikesController, type: :request do
       }.to change(Bike, :count).by(-1)
       expect(response).to redirect_to(:admin_bikes)
       expect(flash[:success]).to match(/deleted/i)
-      expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+      expect(AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
     end
     context "get_destroy" do
       it "destroys" do
@@ -249,7 +249,7 @@ RSpec.describe Admin::BikesController, type: :request do
         }.to change(Bike, :count).by(-1)
         expect(response).to redirect_to(:admin_bikes)
         expect(flash[:success]).to match(/deleted/i)
-        expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+        expect(AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
       end
     end
     context "multi_destroy" do

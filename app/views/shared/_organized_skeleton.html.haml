@@ -1,6 +1,6 @@
 - show_overview_dashboard = current_organization.overview_dashboard?
 - show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link
-%nav.organized-left-menu
+%nav.organized-left-menu.bootstrapstyle
   .organized-menu-wrapper
     %header{ class: show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" }
       - if OrganizationDisplayer.avatar?(current_organization)
@@ -67,5 +67,5 @@
   :javascript
     window.passiveOrganizationId = "#{passive_organization&.slug}";
   -# Important that this is below yield, sometimes important page data is added to the dom in there
-  = javascript_pack_tag "application"
+  <script src="/vendored_assets/application.js"></script>
 

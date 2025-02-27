@@ -4,14 +4,13 @@ module Organized
     before_action :find_export, except: %i[index new create]
 
     def index
-      @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @exports = exports.order(created_at: :desc).page(@page).per(@per_page)
+      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page)
     end
 
     def show
       @avery_export_redirect = params[:avery_redirect].present?
-      redirect_to @export.avery_export_url if @avery_export_redirect && @export.avery_export_url.present?
+      redirect_to(@export.avery_export_url, allow_other_host: true) if @avery_export_redirect && @export.avery_export_url.present?
     end
 
     def new
@@ -26,7 +25,7 @@ module Organized
         @export.options[:partial_registrations] = partial_registration_params
       end
       if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
-        OrganizationExportWorker.perform_async(@export.id)
+        OrganizationExportJob.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
           flash[:success] = translation(:with_avery_redirect)
           redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)

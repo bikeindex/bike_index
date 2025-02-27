@@ -4,7 +4,7 @@ module Organized
     include SortableTable
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
-    before_action :set_period, only: [:index]
+
     before_action :set_failed_and_repeated_ivars
 
     def index
@@ -29,7 +29,7 @@ module Organized
         "all"
       end
       # If we're searching impound_notifications, you can't search current or replaced
-      @unpermitted_statuses = @search_kind == "impound_notification" ? %w[current replaced] : []
+      @unpermitted_statuses = (@search_kind == "impound_notification") ? %w[current replaced] : []
       permitted_statuses = ParkingNotification.statuses + %w[all resolved]
       @search_status = permitted_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
       @search_status = "all" if @unpermitted_statuses.include?(@search_status)
@@ -40,12 +40,10 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          @page = params[:page] || 1
-          records = matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record)
-            .page(@page).per(@per_page)
-          set_pagination_headers(records, @page, @per_page) # Can't use api-pagination, because it blocks overriding max_per_page
-
+          pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+            .includes(:user, :bike, :impound_record), limit: @per_page)
+          # This was already set up, so I left it when upgrading to pagy
+          set_pagination_headers(pagy, @per_page)
           render json: records,
             root: "parking_notifications",
             each_serializer: ParkingNotificationSerializer
@@ -222,9 +220,9 @@ module Organized
     end
 
     # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
-    def set_pagination_headers(collection, page, per_page)
+    def set_pagination_headers(pagy, per_page)
       url = request.base_url + request.path_info
-      pages = ApiPagination.pages_from(collection)
+      pages = ApiPagination.pages_from(pagy)
       links = []
 
       pages.each do |k, v|
@@ -232,10 +230,10 @@ module Organized
         links << %(<#{url}?#{new_params.to_param}>; rel="#{k}")
       end
 
-      headers["Page"] = page
+      headers["Page"] = pagy.page
       headers["Link"] = links.join(", ") unless links.empty?
       headers["Per-Page"] = per_page.to_s
-      headers["Total"] = collection.total_count.to_s
+      headers["Total"] = pagy.count.to_s
     end
   end
 end

@@ -81,7 +81,7 @@
         .col-md-6.text-right
           %p
             = [link_to(t(".privacy_policy"), privacy_url),
-              (current_user&.has_membership? ? link_to(t(".vendor_terms"), vendor_terms_url) : nil),
+              (current_user&.has_organization_role? ? link_to(t(".vendor_terms"), vendor_terms_url) : nil),
             link_to(t(".terms_and_conditions"), terms_url)].compact.to_sentence.html_safe
 
           %p

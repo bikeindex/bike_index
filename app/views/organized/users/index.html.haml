@@ -31,7 +31,7 @@
 .row.mb-4.mt-4
   .col-md-6
     .paginate-container.text-left
-      = paginate @memberships
+      = pagy_bootstrap_nav(@pagy).html_safe
   - if @show_user_search
     .col-md-6.text-right{ style: "margin-top: 0.25rem;" }
       = form_tag organization_users_path(organization_id: current_organization.to_param), method: :get, class: "form-inline" do
@@ -43,8 +43,8 @@
 - if @show_matching_count
   %p.mt-2.mb-2
     %strong
-      = number_with_delimiter(@memberships.total_count)
-    = t(".matching_user").pluralize(@memberships.total_count)
+      = number_with_delimiter(@pagy.count)
+    = t(".matching_user").pluralize(@pagy.count)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
@@ -57,28 +57,28 @@
         %small
           = sortable "sender_id", t(".sender")
     %tbody
-      - @memberships.each do |membership|
+      - @organization_roles.each do |organization_role|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_user_path(membership.id, organization_id: current_organization.to_param) }
-              = l(membership.created_at, format: :convert_time)
+            %a.convertTime{ href: edit_organization_user_path(organization_role.id, organization_id: current_organization.to_param) }
+              = l(organization_role.created_at, format: :convert_time)
           %td
-            = membership.invited_display_name
+            = organization_role.invited_display_name
             %small.less-strong.d-none.d-lg-inline-block
-              = membership.invited_email
+              = organization_role.invited_email
           %td
-            - if membership.claimed_at.present?
+            - if organization_role.claimed_at.present?
               %span.convertTime
-                = l(membership.created_at, format: :convert_time)
+                = l(organization_role.created_at, format: :convert_time)
           %td
-            - if membership.admin?
+            - if organization_role.admin?
               %span.text-info= t(".admin")
             - else
               %span.less-strong= t(".member")
-              - if membership.member_no_bike_edit?
+              - if organization_role.member_no_bike_edit?
                 %small= t(".no_bike_edit")
 
           %td
-            - if membership.sender.present?
+            - if organization_role.sender.present?
               %small
-                = membership.sender.display_name
+                = organization_role.sender.display_name

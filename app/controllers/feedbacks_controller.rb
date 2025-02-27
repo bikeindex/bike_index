@@ -18,7 +18,7 @@ class FeedbacksController < ApplicationController
         translation(:thanks_for_your_message)
       end
       if request.env["HTTP_REFERER"].present? && (request.env["HTTP_REFERER"] != request.env["REQUEST_URI"])
-        redirect_back(fallback_location: help_path)
+        redirect_back(fallback_location: help_path, allow_other_host: true)
       else
         redirect_to help_path
       end

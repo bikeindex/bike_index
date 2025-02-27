@@ -41,6 +41,13 @@
 #  manufacturer_id                 :bigint
 #  parent_organization_id          :integer
 #
+# Indexes
+#
+#  index_organizations_on_location_latitude_and_location_longitude  (location_latitude,location_longitude)
+#  index_organizations_on_manufacturer_id                           (manufacturer_id)
+#  index_organizations_on_parent_organization_id                    (parent_organization_id)
+#  index_organizations_on_slug                                      (slug) UNIQUE
+#
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
   include SearchRadiusMetricable
@@ -82,11 +89,11 @@ class Organization < ApplicationRecord
   has_many :bikes_ever_registered, through: :bike_organizations_ever_registered, source: :bike
   has_many :recovered_records, through: :bikes_ever_registered
 
-  has_many :memberships, dependent: :destroy
-  has_many :users, through: :memberships
+  has_many :organization_roles, dependent: :destroy
+  has_many :users, through: :organization_roles
 
-  has_many :admin_memberships, -> { admin }, class_name: "Membership"
-  has_many :admins, through: :admin_memberships, source: :user
+  has_many :admin_organization_roles, -> { admin }, class_name: "OrganizationRole"
+  has_many :admins, through: :admin_organization_roles, source: :user
 
   has_many :ownerships
   has_many :created_bikes, through: :ownerships, source: :bike
@@ -113,9 +120,9 @@ class Organization < ApplicationRecord
   accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  enum kind: KIND_ENUM
-  enum pos_kind: POS_KIND_ENUM
-  enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
+  enum :kind, KIND_ENUM
+  enum :pos_kind, POS_KIND_ENUM
+  enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
@@ -275,7 +282,7 @@ class Organization < ApplicationRecord
   end
 
   def sent_invitation_count
-    memberships.count
+    organization_roles.count
   end
 
   def remaining_invitation_count
@@ -566,7 +573,7 @@ class Organization < ApplicationRecord
       u = User.fuzzy_email_find(embedable_user_email)
       self.auto_user_id = u.id if u&.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
-        Membership.create(user_id: u.id, organization_id: id, role: "member")
+        OrganizationRole.create(user_id: u.id, organization_id: id, role: "member")
         self.auto_user_id = u.id
       end
     elsif auto_user_id.blank?
@@ -577,7 +584,7 @@ class Organization < ApplicationRecord
 
   def update_associations
     return true if skip_update
-    UpdateOrganizationAssociationsWorker.perform_async(id)
+    UpdateOrganizationAssociationsJob.perform_async(id)
   end
 
   private
@@ -589,7 +596,7 @@ class Organization < ApplicationRecord
   end
 
   def strip_name_tags(str)
-    strip_tags(name&.strip).gsub("&amp;", "&")
+    InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
   end
 
   def name_shortener(str)

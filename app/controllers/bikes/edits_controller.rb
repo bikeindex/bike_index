@@ -21,7 +21,7 @@ class Bikes::EditsController < Bikes::BaseController
       end
     end
 
-    render "/bikes_edit/#{@edit_template}".to_sym
+    render :"/bikes_edit/#{@edit_template}"
   end
 
   private

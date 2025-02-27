@@ -20,7 +20,7 @@ class Admin::ManufacturersController < Admin::BaseController
   def update
     if @manufacturer.update(permitted_parameters)
       flash[:success] = "Manufacturer Saved!"
-      AutocompleteLoaderWorker.perform_async
+      AutocompleteLoaderJob.perform_async
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :edit
@@ -31,7 +31,7 @@ class Admin::ManufacturersController < Admin::BaseController
     @manufacturer = Manufacturer.create(permitted_parameters)
     if @manufacturer.save
       flash[:success] = "Manufacturer Created!"
-      AutocompleteLoaderWorker.perform_async
+      AutocompleteLoaderJob.perform_async
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :new

@@ -6,7 +6,7 @@
 #
 #  id                       :bigint           not null, primary key
 #  amount_cents             :integer
-#  currency                 :string
+#  currency_enum            :integer
 #  data                     :jsonb
 #  frame_model              :text
 #  frame_size               :string
@@ -28,10 +28,20 @@
 #  secondary_frame_color_id :bigint
 #  tertiary_frame_color_id  :bigint
 #
+# Indexes
+#
+#  index_stolen_bike_listings_on_bike_id                   (bike_id)
+#  index_stolen_bike_listings_on_initial_listing_id        (initial_listing_id)
+#  index_stolen_bike_listings_on_manufacturer_id           (manufacturer_id)
+#  index_stolen_bike_listings_on_primary_frame_color_id    (primary_frame_color_id)
+#  index_stolen_bike_listings_on_secondary_frame_color_id  (secondary_frame_color_id)
+#  index_stolen_bike_listings_on_tertiary_frame_color_id   (tertiary_frame_color_id)
+#
 
 # Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model
+  include Currencyable
   include Amountable
   include BikeSearchable
 
@@ -48,7 +58,7 @@ class StolenBikeListing < ActiveRecord::Base
 
   before_save :set_calculated_attributes
 
-  enum group: GROUP_ENUM
+  enum :group, GROUP_ENUM
 
   scope :listing_ordered, -> { reorder(listing_order: :desc) }
   scope :initial, -> { where(initial_listing_id: nil) }
@@ -83,12 +93,12 @@ class StolenBikeListing < ActiveRecord::Base
 
   def amount_usd_formatted
     cents_usd = data["amount_cents_usd"] || calculated_amount_cents_usd
-    MoneyFormater.money_format_without_cents(cents_usd, :USD)
+    MoneyFormatter.money_format_without_cents(cents_usd, :USD)
   end
 
   def calculated_amount_cents_usd
     return 0 unless amount_cents.present?
-    Money.new(amount_cents, currency).exchange_to(:USD).cents
+    Money.new(amount_cents, currency_name).exchange_to(:USD).cents
   end
 
   def updated_photo_folder

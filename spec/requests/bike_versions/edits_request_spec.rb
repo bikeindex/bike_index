@@ -50,9 +50,8 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(response).to redirect_to(bike_version_path(bike_version))
       expect(flash[:error]).to be_present
       bike_version.update(visibility: "user_hidden")
-      expect {
-        get base_url
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      get base_url
+      expect(response.status).to eq 404
     end
   end
 end

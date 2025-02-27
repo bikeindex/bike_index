@@ -1,14 +1,11 @@
 class Admin::UserRegistrationOrganizationsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @user_registration_organizations = matching_user_registration_organizations
+    @pagy, @user_registration_organizations = pagy(matching_user_registration_organizations
       .reorder("user_registration_organizations.#{sort_column} #{sort_direction}")
-      .includes(:user, :organization)
-      .page(page).per(@per_page)
+      .includes(:user, :organization), limit: @per_page)
     @render_org_counts = InputNormalizer.boolean(params[:search_org_counts])
   end
 

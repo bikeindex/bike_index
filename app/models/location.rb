@@ -101,7 +101,7 @@ class Location < ApplicationRecord
 
   def display_name
     return "" if organization.blank?
-    name == organization.name ? name : "#{organization.name} - #{name}"
+    (name == organization.name) ? name : "#{organization.name} - #{name}"
   end
 
   # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally

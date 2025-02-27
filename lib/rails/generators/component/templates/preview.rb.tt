@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+module <%= class_name %>
+  class ComponentPreview < <%= preview_parent_class %>
+    def default
+      render(<%= component_class %>.new(<%= initialize_signature %>))
+    end
+  end
+end

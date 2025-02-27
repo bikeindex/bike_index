@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   include Sessionable
-  before_action :skip_if_signed_in, only: %i[new globalid]
-  before_action :find_user_from_password_reset_token!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
+  before_action :skip_if_signed_in, only: %i[new]
+  before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
 
   def new
     @user ||= User.new(email: params[:email])
@@ -28,14 +28,14 @@ class UsersController < ApplicationController
       redirect_to(new_session_path) && return unless unconfirmed_current_user.present?
     end
     @user = unconfirmed_current_user
-    render layout: sign_in_partner == "bikehub" ? "application_bikehub" : "application"
+    render layout: (sign_in_partner == "bikehub") ? "application_bikehub" : "application"
   end
 
   def resend_confirmation_email
     user_subject = unconfirmed_current_user
     user_subject ||= User.unconfirmed.fuzzy_unconfirmed_primary_email_find(params[:email])
     if user_subject.present?
-      EmailConfirmationWorker.new.perform(user_subject.id)
+      EmailConfirmationJob.new.perform(user_subject.id)
       flash[:success] = translation(:resending_email)
     else
       flash[:error] = translation(:please_sign_in)
@@ -51,7 +51,7 @@ class UsersController < ApplicationController
       if current_user.present? && sign_in_partner.present?
         session.delete(:partner) # Only removing once signed in, PR#1435
         session.delete(:company)
-        redirect_to(bikehub_url("account?reauthenticate_bike_index=true")) && return # Only partner rn is bikehub, hardcode it
+        redirect_to(bikehub_url("account?reauthenticate_bike_index=true"), allow_other_host: true) && return # Only partner rn is bikehub, hardcode it
       else
         render_partner_or_default_signin_layout(redirect_path: new_session_path)
       end
@@ -103,9 +103,8 @@ class UsersController < ApplicationController
     unless user == current_user || @user.show_bikes
       redirect_to(my_account_url, notice: translation(:user_not_sharing)) && return
     end
-    @page = params[:page] || 1
     @per_page = params[:per_page] || 15
-    @bikes = user.bikes(true).page(@page).per(@per_page)
+    @pagy, @bikes = pagy(user.bikes(true), limit: @per_page)
   end
 
   # this action should only be for terms of service (or vendor_terms_of_service)
@@ -123,8 +122,8 @@ class UsersController < ApplicationController
       elsif params.dig(:user, :vendor_terms_of_service).present?
         if InputNormalizer.boolean(params.dig(:user, :vendor_terms_of_service))
           @user.update(accepted_vendor_terms_of_service: true)
-          flash[:success] = if @user.memberships.any?
-            translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
+          flash[:success] = if @user.organization_roles.any?
+            translation(:you_can_use_bike_index_as_org, org_name: @user.organization_roles.first.organization.name)
           else
             translation(:thanks_for_accepting_tos)
           end
@@ -183,10 +182,10 @@ class UsersController < ApplicationController
     params.require(:user).permit(:password, :password_confirmation)
   end
 
-  def find_user_from_password_reset_token!
+  def find_user_from_token_for_password_reset!
     @token = params[:token]
-    @user = User.find_by_password_reset_token(@token) if @token.present?
-    return true if @user.present? && !@user.auth_token_expired?("password_reset_token")
+    @user = User.find_by_token_for_password_reset(@token) if @token.present?
+    return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
     remove_session
     flash[:error] = @user.blank? ? translation(:does_not_match_token) : translation(:token_expired)
     redirect_to(request_password_reset_form_users_path) && return

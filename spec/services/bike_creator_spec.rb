@@ -168,13 +168,13 @@ RSpec.describe BikeCreator do
           let!(:b_param) { BParam.create(creator: user, params: b_param_params) }
           let(:target_created_attrs) { b_param_params[:bike].merge(cycle_type: "bike", propulsion_type: "foot-pedal") }
           it "creates the bike_organization" do
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             ActionMailer::Base.deliveries = []
 
             expect {
               instance.create_bike(b_param)
             }.to change(BikeOrganization, :count).by 1
-            EmailOwnershipInvitationWorker.drain
+            EmailOwnershipInvitationJob.drain
             # CRITICAL - this needs to not deliver email, or else we're spamming people
             expect(ActionMailer::Base.deliveries.count).to eq 0
 
@@ -259,7 +259,7 @@ RSpec.describe BikeCreator do
       let(:manufacturer_name) { "Surly" }
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:auto_user) { organization.auto_user }
-      let!(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let!(:creator) { FactoryBot.create(:organization_user, organization: organization) }
       let!(:state) { FactoryBot.create(:state_new_york) }
       let(:attrs) do
         {
@@ -287,7 +287,7 @@ RSpec.describe BikeCreator do
       end
       let(:b_param) { BParam.create(attrs) }
       it "creates" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           ActionMailer::Base.deliveries = []
           expect(creator.id).to_not eq auto_user.id
@@ -359,7 +359,7 @@ RSpec.describe BikeCreator do
         end
         let(:b_param) { BParam.create(attrs.merge(params: attrs[:params].merge(parking_notification: updated_parking_notification_attrs))) }
         it "uses the address" do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
             expect(creator.id).to_not eq auto_user.id

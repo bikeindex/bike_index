@@ -1,17 +1,19 @@
 # To bump cache:
-# Increment & Replace: 'CACHE_V4' in this config
+# Increment & Replace: 'CACHE_V1' in this config
 
 # NB: It would be great to use Pipeline parameters instead of search and replacing the cache key
 # ... but that doesn't work with this config version, and workflows don't work with version 2.1
 # And circleci's documentation bounces between the two versions and everything is a pain.
 # See #2257
 
-version: 2
+version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@1.5.0
 
 jobs:
   brakeman_scan:
     docker:
-      - image: cimg/ruby:2.7.8-node
+      - image: cimg/ruby:3.3.7-node
     steps:
       - checkout
       - run:
@@ -28,7 +30,7 @@ jobs:
           path: brakeman-output.tabs
           destination: brakeman
 
-  build:
+  test:
     working_directory: ~/bikeindex/bike_index
     parallelism: 2
     shell: /bin/bash --login
@@ -43,12 +45,12 @@ jobs:
       RETRY_FLAKY: true
 
     docker:
-      - image: cimg/ruby:2.7.8-node
+      - image: cimg/ruby:3.3.7-browsers
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root
           PSQL_PAGER: ""
-      - image: cimg/postgres:13.5-postgis
+      - image: cimg/postgres:17.1-postgis
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test
@@ -80,17 +82,11 @@ jobs:
               postgresql-client \
               ripgrep
 
-      - run:
-          name: "Update Node.js and npm"
-          command: |
-            curl -sSL "https://nodejs.org/download/release/v16.20.2/node-v16.20.2-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v16.20.2-linux-x64/bin/node
-            # curl https://www.npmjs.com/install.sh | sudo bash
-
       - restore_cache:
           name: "Dockerize: cache restore"
           keys:
-            - CACHE_V4-dockerize-0.6.1
-            - CACHE_V4-dockerize-
+            - CACHE_V1-dockerize-0.6.1
+            - CACHE_V1-dockerize-
 
       - run:
           name: "Dockerize: install"
@@ -103,90 +99,11 @@ jobs:
             fi
             sudo tar -C /usr/local/bin -xzvf ${dockerize_tar}
 
-      - type: cache-save
-        name: "Dockerize: cache save"
-        key: CACHE_V4-dockerize-0.6.1
-        paths:
-          - ~/.cache/dockerize
-
-      # Updated all restore_cache to make things more functional when changing a single dependency, see PR#2366
-      - restore_cache:
-          name: "Git: cache restore"
-          keys:
-            - CACHE_V4-git-2.22.0
-            - CACHE_V4-git-
-
-      - run:
-          name: "Git: install"
-          environment:
-            GIT_VERSION: 2.22.0
-          command: |
-            set -x
-
-            git_binary=~/.cache/git/git-${GIT_VERSION}/git
-
-            if [[ ! -f $git_binary ]]; then
-              rm -rf ~/.cache/git
-              mkdir -p ~/.cache/git
-              cd ~/.cache/git
-
-              wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
-              tar -xzf git.tgz
-              cd git-${GIT_VERSION}
-
-              export DEFAULT_HELP_FORMAT="man"
-              autoconf
-              ./configure
-
-              sudo make man
-              sudo make install-man
-            fi
-
-            cd ~/.cache/git/git-${GIT_VERSION}
-            sudo make prefix=/usr/local all
-            sudo make install
-            sudo cp ${git_binary} /usr/local/bin/git
-
-      - type: cache-save
-        name: "Git: cache save"
-        key: CACHE_V4-git-2.22.0
-        paths:
-          - ~/.cache/git/git-2.22.0
-
-      - restore_cache:
-          name: "Hub: cache restore"
-          keys:
-            - CACHE_V4-hub-2.12.3
-            - CACHE_V4-hub-
-
-      - run:
-          name: "Hub: install"
-          environment:
-            HUB_VERSION: 2.12.3
-          command: |
-            set -x
-
-            hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
-
-            if [[ ! -f ${hub_binary} ]]; then
-              rm -rf ~/.cache/hub
-              mkdir -p ~/.cache/hub
-              cd ~/.cache/hub
-
-              wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-              tar -xzf hub.tgz
-            fi
-
-            sudo cp ${hub_binary} /usr/local/bin/hub
-
-      - restore_cache:
-          name: "Hub: cache save"
-          keys:
-            - CACHE_V4-hub-2.12.3
-            - CACHE_V4-hub-
+      - save_cache:
+          name: "Dockerize: cache save"
+          key: CACHE_V1-dockerize-0.6.1
           paths:
-            - ~/.cache/hub
-
+            - ~/.cache/dockerize
       - run:
           name: "Bundler: install"
           command: gem install bundler -v 2.4.22
@@ -194,8 +111,8 @@ jobs:
       - restore_cache:
           name: "Ruby dependencies: cache restore"
           keys:
-            - CACHE_V4-gems-{{ checksum "Gemfile.lock" }}
-            - CACHE_V4-gems-
+            - CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
+            - CACHE_V1-gems-
 
       - run:
           name: "Ruby dependencies: install"
@@ -204,65 +121,45 @@ jobs:
             bundle config set --local path '~/.cache/bundle'
             bundle install
 
-      - type: cache-save
-        name: "Ruby dependencies: cache save"
-        key: CACHE_V4-gems-{{ checksum "Gemfile.lock" }}
-        paths:
-          - ~/.cache/bundle
+      - save_cache:
+          name: "Ruby dependencies: cache save"
+          key: CACHE_V1-gems-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ~/.cache/bundle
 
       - run:
           name: Sync translations (only on main by default)
           command: bin/check_translations
 
       - restore_cache:
-          name: "Node dependencies: cache restore"
-          keys:
-            - CACHE_V4-yarn-{{ checksum "yarn.lock" }}
-            - CACHE_V4-yarn-
-
-      - run:
-          name: "Node dependencies: install"
-          command: |
-            set -x
-            [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
-            yarn install --cache-folder ~/.cache/yarn $use_local
-
-      - type: cache-save
-        name: "Node dependencies: cache save"
-        key: CACHE_V4-yarn-{{ checksum "yarn.lock" }}
-        paths:
-          - ~/.cache/yarn
-
-      - restore_cache:
           name: "Assets: cache restore"
           keys:
-            - CACHE_V4-assets-{{ .Environment.CIRCLE_SHA1 }}
-            - CACHE_V4-assets-
+            - CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
+            - CACHE_V1-assets-
 
       - run:
           name: "Assets: precompile"
           command: |
             set -x
             node --version
-            bin/webpack
             bundle exec rails assets:precompile assets:clean --trace
 
-      - type: cache-save
-        name: "Assets: cache save"
-        key: CACHE_V4-assets-{{ .Environment.CIRCLE_SHA1 }}
-        paths:
-          - .sass-cache
-          - public/assets
-          - public/packs
-          - public/packs-test
-          - tmp/cache/assets
-          - tmp/cache/webpacker
+      - save_cache:
+          name: "Assets: cache save"
+          key: CACHE_V1-assets-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - public/assets
+            - public/packs
+            - public/packs-test
+            - tmp/cache/assets
 
       - run:
           name: Install Code Climate Test Reporter
           command: |
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
+
+      - browser-tools/install-chromedriver
 
       - run:
           name: Wait for PostgreSQL to start
@@ -297,14 +194,6 @@ jobs:
           root: coverage
           paths:
             - codeclimate.*.json
-      - run:
-          name: "Jest: Tests"
-          command: |
-            mkdir -p /tmp/test-results/junit
-            yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
-          environment:
-            JEST_JUNIT_OUTPUT: "/tmp/test-results/junit/js-test-results.xml" # This is the env variable for the old version of jest-junit
-            JEST_JUNIT_OUTPUT_DIR: "/tmp/test-results/junit/"
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
@@ -312,7 +201,7 @@ jobs:
 
   upload-coverage:
     docker:
-      - image: cimg/ruby:2.7.8-node
+      - image: cimg/ruby:3.3.7-node
     environment:
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
     working_directory: ~/bikeindex/bike_index
@@ -346,17 +235,16 @@ jobs:
             curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
-  version: 2
   commit:
     jobs:
-      - build
+      - test
       - brakeman_scan
       - upload-coverage:
           requires:
-            - build
+            - test
       - deploy_production:
           requires:
-            - build
+            - test
           filters:
             branches:
               only: main

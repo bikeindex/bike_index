@@ -1,6 +1,5 @@
 class StolenBikeListingsController < ApplicationController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
     @render_info = calculated_render_info
@@ -8,11 +7,9 @@ class StolenBikeListingsController < ApplicationController
       @blog = Blog.friendly_find(Blog.theft_rings_id)
       per_page = 10
     end
-    page = params[:page] || 1
     per_page ||= params[:per_page] || 25
-    @stolen_bike_listings = matching_stolen_bike_listings
-      .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}")
-      .page(page).per(per_page)
+    @pagy, @stolen_bike_listings = pagy(matching_stolen_bike_listings
+      .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}"), limit: per_page)
 
     @selected_query_items_options = StolenBikeListing.selected_query_items_options(@interpreted_params)
   end
@@ -27,7 +24,7 @@ class StolenBikeListingsController < ApplicationController
 
   def calculated_render_info
     # Duplicates ApplicationHelper#sortable_search_params
-    sortable_search_params = params.permit(*params.keys.select { |k| k.to_s.start_with?(/search_/) }, # params starting with search_
+    sortable_search_params = params.permit(*params.keys.select { |k| k.to_s.start_with?("search_") }, # params starting with search_
       :direction, :sort, # sorting params
       :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
       :user_id, :organization_id, :query, # General search params

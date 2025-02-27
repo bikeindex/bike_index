@@ -15,6 +15,11 @@
 #  mailchimp_datum_id :bigint
 #  user_id            :integer
 #
+# Indexes
+#
+#  index_feedbacks_on_mailchimp_datum_id  (mailchimp_datum_id)
+#  index_feedbacks_on_user_id             (user_id)
+#
 class Feedback < ApplicationRecord
   KIND_ENUM = {
     message: 0,
@@ -39,7 +44,7 @@ class Feedback < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   attr_accessor :additional
 
@@ -86,7 +91,7 @@ class Feedback < ApplicationRecord
 
   def self.kind_humanized(str)
     return nil unless str.present?
-    return "#{str.gsub(/lead_for_/, "").strip.humanize} lead" if str.match?("lead")
+    return "#{str.gsub("lead_for_", "").strip.humanize} lead" if str.match?("lead")
     str.gsub("_request", "").strip.humanize
   end
 
@@ -108,7 +113,7 @@ class Feedback < ApplicationRecord
       end
     end
     return true if self.class.no_notification_kinds.include?(kind)
-    EmailFeedbackNotificationWorker.perform_async(id)
+    EmailFeedbackNotificationJob.perform_async(id)
   end
 
   def delete_request?
@@ -186,7 +191,7 @@ class Feedback < ApplicationRecord
     return nil unless lead?
     kind_str = feedback_type if feedback_type.present?
     kind_str ||= kind
-    kind_str.gsub(/lead_for_/, "").humanize
+    kind_str.gsub("lead_for_", "").humanize
   end
 
   private

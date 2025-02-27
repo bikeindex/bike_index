@@ -94,17 +94,17 @@ RSpec.describe BulkImport, type: :model do
 
   describe "check_ascend_import_processable!" do
     let!(:bulk_import) { FactoryBot.build(:bulk_import_ascend) }
-    before { Sidekiq::Worker.clear_all }
+    before { Sidekiq::Job.clear_all }
     it "adds an ascend error, sends email" do
       expect(bulk_import.created_at).to_not be_present # Bulk import is saved
       expect {
         expect(bulk_import.check_ascend_import_processable!).to be_falsey
-      }.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
+      }.to change(UnknownOrganizationForAscendImportJob.jobs, :count).by 1
       expect(bulk_import.created_at).to be_present # Bulk import is saved
       expect(bulk_import.kind).to eq "ascend"
       expect(bulk_import.import_errors.to_s).to match(/ascend/)
       expect(bulk_import.import_errors?).to be_truthy
-      expect(UnknownOrganizationForAscendImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
+      expect(UnknownOrganizationForAscendImportJob.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
     end
     context "organization_id already present" do
       let!(:bulk_import) { FactoryBot.build(:bulk_import_ascend, organization_id: 12, import_errors: {ascend: "unable to associate"}) }
@@ -113,7 +113,7 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.import_errors?).to be_truthy
         expect {
           expect(bulk_import.check_ascend_import_processable!).to be_truthy
-        }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
+        }.to_not change(UnknownOrganizationForAscendImportJob.jobs, :count)
         expect(bulk_import.import_errors?).to be_falsey
         expect(bulk_import.created_at).to_not be_present # Bulk import is not saved
       end
@@ -127,7 +127,7 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.organization_id).to_not be_present
         expect {
           expect(bulk_import.check_ascend_import_processable!).to be_truthy
-        }.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
+        }.to_not change(UnknownOrganizationForAscendImportJob.jobs, :count)
         expect(bulk_import.organization_id).to eq organization.id
         expect(bulk_import.creator).to eq organization.auto_user
         expect(bulk_import.reload.organization_id).to be_present

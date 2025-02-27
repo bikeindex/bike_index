@@ -2,15 +2,23 @@ require "rails_helper"
 
 RSpec.describe Admin::MembershipsController, type: :request do
   base_url = "/admin/memberships/"
+  let(:membership) { FactoryBot.create(:membership) }
 
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
-    let(:membership) { FactoryBot.create(:membership) }
     it "renders" do
       expect(membership).to be_present
       get base_url
       expect(response).to render_template :index
+    end
+  end
+
+  describe "show" do
+    it "renders" do
+      expect(membership).to be_present
+      get "#{base_url}/#{membership.id}"
+      expect(response).to render_template :show
     end
   end
 
@@ -22,37 +30,54 @@ RSpec.describe Admin::MembershipsController, type: :request do
   end
 
   describe "create" do
-    let!(:organization) { FactoryBot.create(:organization) }
-    it "creates" do
-      expect(organization.memberships.count).to eq 0
-      post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com"}}
-      organization.reload
-      expect(organization.memberships.count).to eq 1
-      membership = Membership.last
-      expect(membership.invited_email).to eq "new_email@stuff.com"
-      expect(membership.claimed?).to be_falsey
-      expect(membership.sender).to eq current_user
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+    let(:target_attrs) do
+      {user_id: user.id, start_at: nil, level: "plus", end_at: nil, creator: current_user,
+       status: "pending"}
     end
-    context "user present" do
-      let!(:existing_user) { FactoryBot.create(:user_confirmed, email: "somebody@stuff.com") }
-      it "associates and claims" do
-        expect(existing_user.memberships.count).to eq 0
-        ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
-        expect {
-          post base_url, params: {membership: {role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com"}}
-        }.to change(Membership, :count).by 1
-        expect(organization.memberships.count).to eq 1
-        existing_user.reload
+    it "creates" do
+      expect do
+        post base_url, params: {
+          membership: {level: "plus", user_email: " #{user.email.upcase} "}
+        }
+      end.to change(Membership, :count).by 1
+      expect(Membership.last).to match_hash_indifferently(target_attrs)
+    end
+    context "with a start_at" do
+      it "creates" do
+        expect do
+          post base_url, params: {
+            membership: {
+              level: "plus", user_email: " #{user.email.upcase} ", start_at: Time.current.iso8601
+            }
+          }
+        end.to change(Membership, :count).by 1
         membership = Membership.last
-        expect(ProcessMembershipWorker.jobs.count).to eq 1
-        ProcessMembershipWorker.drain
-        organization.reload
-        membership.reload
-        expect(existing_user.memberships.count).to eq 1
-        expect(membership.user).to eq existing_user
-        expect(membership.sender).to eq current_user
+        expect(membership).to match_hash_indifferently(target_attrs.except(:start_at).merge(status: "active"))
+        expect(membership.start_at).to be_within(5).of Time.current
       end
+    end
+  end
+
+  describe "update" do
+    let(:membership) { FactoryBot.create(:membership) }
+    let(:start_at) { "2025-02-05T23:00:00" }
+    let(:end_at) { "2026-02-05T23:00:00" }
+    let(:update_params) do
+      {level: "plus", user_email: "ffff", start_at:, end_at:}
+    end
+    it "updates" do
+      expect(membership.level).to eq "basic"
+      og_user_id = membership.user_id
+      expect(membership.end_at).to be_blank
+      patch "#{base_url}/#{membership.id}", params: {
+        membership: update_params
+      }
+      expect(flash[:success]).to be_present
+      expect(membership.reload.user_id).to eq og_user_id
+      expect(membership.level).to eq "plus"
+      expect(membership.start_at).to match_time TimeParser.parse(start_at)
+      expect(membership.end_at).to match_time TimeParser.parse(end_at)
     end
   end
 end

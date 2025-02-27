@@ -20,6 +20,16 @@
 #  primary_notification_id     :bigint
 #  user_id                     :bigint
 #
+# Indexes
+#
+#  index_graduated_notifications_on_bike_id                  (bike_id)
+#  index_graduated_notifications_on_bike_organization_id     (bike_organization_id)
+#  index_graduated_notifications_on_marked_remaining_by_id   (marked_remaining_by_id)
+#  index_graduated_notifications_on_organization_id          (organization_id)
+#  index_graduated_notifications_on_primary_bike_id          (primary_bike_id)
+#  index_graduated_notifications_on_primary_notification_id  (primary_notification_id)
+#  index_graduated_notifications_on_user_id                  (user_id)
+#
 class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
@@ -39,7 +49,7 @@ class GraduatedNotification < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associated_notifications, if: :persisted?
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   attr_accessor :skip_update
 
@@ -257,9 +267,9 @@ class GraduatedNotification < ApplicationRecord
 
   def mark_remaining!(marked_remaining_by_id: nil, skip_async: false)
     unless skip_async
-      MarkGraduatedNotificationRemainingWorker.perform_in(5, id, marked_remaining_by_id)
+      MarkGraduatedNotificationRemainingJob.perform_in(5, id, marked_remaining_by_id)
     end
-    MarkGraduatedNotificationRemainingWorker.new.perform(id, marked_remaining_by_id)
+    MarkGraduatedNotificationRemainingJob.new.perform(id, marked_remaining_by_id)
   end
 
   def set_calculated_attributes
@@ -284,11 +294,11 @@ class GraduatedNotification < ApplicationRecord
     return true if processed?
     return false unless organization.deliver_graduated_notifications?
     # The primary notification should be the first one to process, so skip processing if it isn't
-    return false unless primary_notification? || (primary_notification.present? && primary_notification.processed?)
+    return false unless primary_notification? || primary_notification&.presence&.processed?
     if primary_notification? && associated_bike_ids_missing_notifications.any?
       # We haven't created all the relevant graduated notifications, create them before processing
       associated_bike_ids_missing_notifications.each do |b_id|
-        CreateGraduatedNotificationWorker.perform_async(organization_id, b_id)
+        CreateGraduatedNotificationJob.perform_async(organization_id, b_id)
       end
       return false
     end
@@ -328,7 +338,7 @@ class GraduatedNotification < ApplicationRecord
     # Because prior to commit, the value for the current notification isn't set
     return "marked_remaining" if marked_remaining_at.present?
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
-    email_success? || primary_notification.present? && primary_notification.email_success? ? "bike_graduated" : "pending"
+    (email_success? || primary_notification.present? && primary_notification.email_success?) ? "bike_graduated" : "pending"
   end
 
   def calculated_email

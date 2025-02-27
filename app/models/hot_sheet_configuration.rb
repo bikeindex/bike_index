@@ -11,6 +11,10 @@
 #  updated_at                 :datetime         not null
 #  organization_id            :bigint
 #
+# Indexes
+#
+#  index_hot_sheet_configurations_on_organization_id  (organization_id)
+#
 class HotSheetConfiguration < ApplicationRecord
   include SearchRadiusMetricable
 
@@ -42,11 +46,11 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def current_recipient_ids
-    organization.memberships.claimed.notification_daily.pluck(:user_id)
+    organization.organization_roles.claimed.notification_daily.pluck(:user_id)
   end
 
   def timezone
-    TimeParser.parse_timezone(timezone_str)
+    TimeZoneParser.parse(timezone_str)
   end
 
   def time_in_zone
@@ -79,7 +83,7 @@ class HotSheetConfiguration < ApplicationRecord
 
   def set_calculated_attributes
     # Store a parsed value - needs to store name, because timeparser can't parse timezone.to_s
-    self.timezone_str = TimeParser.parse_timezone(timezone_str)&.name
+    self.timezone_str = TimeZoneParser.parse(timezone_str)&.name
     self.send_seconds_past_midnight ||= 21_600 # 6am
   end
 

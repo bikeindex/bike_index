@@ -13,7 +13,7 @@
     = render partial: "/shared/bike_search_form", locals: {include_hidden_search_fields: true, search_path: organization_impounded_bikes_path(organization_id: current_organization.to_param)}
 
   .mt-4.mb-4
-    = pluralize(number_with_delimiter(@impound_records.total_count), "matching impound record")
+    = pluralize(number_with_delimiter(@pagy.count), "matching impound record")
     %em
       = humanized_time_range(@time_range)
 
@@ -57,7 +57,7 @@
               = impound_record.address
 
   .paginate-container.paginate-container-bottom
-    = paginate @impound_records
+    = pagy_bootstrap_nav(@pagy).html_safe
 
 -# include javascript because of period select
-= javascript_pack_tag "application"
+<script src="/vendored_assets/application.js"></script>

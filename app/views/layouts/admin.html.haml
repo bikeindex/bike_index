@@ -4,14 +4,14 @@
     = header_tags
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    = javascript_pack_tag "application_standalone"
-    = stylesheet_pack_tag "application_css"
+    <link href="/vendored_assets/admin.css" rel='stylesheet' type='text/css'>
+    <script src="/vendored_assets/application_standalone.js"></script>
   -# manually override body_class in a few situations :/
   - admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - admin_body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  admin_body_class || body_class }
-    %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar
+    %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar.more
       %span.navbar-brand
         = link_to (image_tag("logo.svg")), user_root_url
       - if current_user.superuser?

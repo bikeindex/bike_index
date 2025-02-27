@@ -45,6 +45,20 @@
 #  secondary_frame_color_id  :bigint
 #  tertiary_frame_color_id   :bigint
 #
+# Indexes
+#
+#  index_bike_versions_on_bike_id                   (bike_id)
+#  index_bike_versions_on_front_gear_type_id        (front_gear_type_id)
+#  index_bike_versions_on_front_wheel_size_id       (front_wheel_size_id)
+#  index_bike_versions_on_manufacturer_id           (manufacturer_id)
+#  index_bike_versions_on_owner_id                  (owner_id)
+#  index_bike_versions_on_paint_id                  (paint_id)
+#  index_bike_versions_on_primary_frame_color_id    (primary_frame_color_id)
+#  index_bike_versions_on_rear_gear_type_id         (rear_gear_type_id)
+#  index_bike_versions_on_rear_wheel_size_id        (rear_wheel_size_id)
+#  index_bike_versions_on_secondary_frame_color_id  (secondary_frame_color_id)
+#  index_bike_versions_on_tertiary_frame_color_id   (tertiary_frame_color_id)
+#
 class BikeVersion < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
@@ -64,8 +78,8 @@ class BikeVersion < ApplicationRecord
 
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
-  enum visibility: VISIBILITY_ENUM
-  enum status: Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
+  enum :visibility, VISIBILITY_ENUM
+  enum :status, Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
 
   attr_accessor :timezone
   attr_writer :end_at_shown, :start_at_shown

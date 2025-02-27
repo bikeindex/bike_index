@@ -1,14 +1,12 @@
 class Admin::OwnershipsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_ownership, except: [:index]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @ownerships = matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
-      .includes(:bike, :organization, :creator, :user)
-      .page(page).per(@per_page)
+    @pagy, @ownerships = pagy(matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
+      .includes(:bike, :organization, :creator, :user), limit: @per_page)
   end
 
   def edit

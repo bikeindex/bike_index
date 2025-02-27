@@ -1,17 +1,12 @@
 class Admin::LoggedSearchesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
-
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 10
-    @logged_searches =
-      matching_logged_searches
+    @pagy, @logged_searches =
+      pagy(matching_logged_searches
         .reorder("logged_searches.#{sort_column} #{sort_direction}")
-        .includes(:organization, :user)
-        .page(page)
-        .per(@per_page)
+        .includes(:organization, :user), limit: @per_page)
   end
 
   helper_method :matching_logged_searches, :special_endpoints

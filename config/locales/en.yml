@@ -35,25 +35,24 @@ en:
         locks: Locks
         longitude: Longitude
         magic_link_token: Magic link token
-        memberships: Memberships
         my_bikes_hash: My bikes hash
         name: Name
         notification_newsletters: Notification newsletters
         notification_unstolen: Notification unstolen
         oauth_applications: Oauth applications
         organization_embeds: Organization embeds
+        organization_roles: Organization roles
         organizations: Organizations
         owned_bikes: Owned bikes
         ownerships: Ownerships
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        password_reset_token: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
         received_stolen_notifications: Received stolen notifications
-        sent_memberships: Sent memberships
+        sent_organization_roles: Sent organization_roles
         sent_stolen_notifications: Sent stolen notifications
         show_bikes: Show bikes
         show_phone: Show phone
@@ -65,6 +64,7 @@ en:
         superuser: Superuser
         terms_of_service: Terms of service
         title: Title
+        token_for_password_reset: Password reset token
         twitter: Twitter
         user_emails: User emails
         username: Username
@@ -290,8 +290,10 @@ en:
         authorized_tokens: Authorized tokens
         can_send_stolen_notifications: Can send stolen notifications
         is_internal: Is internal
+        name: Name
         owner: :activerecord.models.owner
         owner_type: Owner type
+        redirect_uri: Redirect URI
         scopes: Scopes
         secret: Secret
         uid: Uid
@@ -420,15 +422,6 @@ en:
         slug: Slug
         total_years_active: Total years active
         website: Website
-      membership:
-        claimed_at: Claimed at
-        deleted_at: Deleted at
-        email_invitation_sent_at: Email invitation sent at
-        invited_email: Invited email
-        organization: :activerecord.models.organization
-        role: Role
-        sender: :activerecord.models.sender
-        user: :activerecord.models.user
       normalized_serial_segment:
         bike: :activerecord.models.bike
         duplicate_bike_group: :activerecord.models.duplicate_bike_group
@@ -456,8 +449,8 @@ en:
         locations: Locations
         lock_show_on_map: Lock show on map
         mail_snippets: Mail snippets
-        memberships: Memberships
         name: Name
+        organization_roles: Memberships
         parent_organization: :activerecord.models.parent_organization
         payments: Payments
         pos_kind: Pos kind
@@ -479,6 +472,15 @@ en:
         invoices: Invoices
         kind: Kind
         name: Name
+      organization_role:
+        claimed_at: Claimed at
+        deleted_at: Deleted at
+        email_invitation_sent_at: Email invitation sent at
+        invited_email: Invited email
+        organization: :activerecord.models.organization
+        role: Role
+        sender: :activerecord.models.sender
+        user: :activerecord.models.user
       ownership:
         bike: :activerecord.models.bike
         claimed: Claimed
@@ -499,14 +501,11 @@ en:
       payment:
         amount_cents: Amount cents
         email: Email
-        first_payment_date: First payment date
         invoice: :activerecord.models.invoice
-        is_current: Is current
         is_payment: Is payment
-        is_recurring: Is recurring
         kind: Kind
-        last_payment_date: Last payment date
         organization: :activerecord.models.organization
+        paid_at: First payment date
         theft_alert: :activerecord.models.theft_alert
         user: :activerecord.models.user
       public_image:
@@ -639,25 +638,24 @@ en:
         locks: Locks
         longitude: Longitude
         magic_link_token: Magic link token
-        memberships: Memberships
         my_bikes_hash: My bikes hash
         name: Name
         notification_newsletters: Notification newsletters
         notification_unstolen: Notification unstolen
         oauth_applications: Oauth applications
         organization_embeds: Organization embeds
+        organization_roles: Memberships
         organizations: Organizations
         owned_bikes: Owned bikes
         ownerships: Ownerships
         partner_data: Partner data
         password: Password
         password_digest: Password digest
-        password_reset_token: Password reset token
         payments: Payments
         phone: Phone
         preferred_language: Preferred language
         received_stolen_notifications: Received stolen notifications
-        sent_memberships: Sent memberships
+        sent_organization_roles: Sent organization_roles
         sent_stolen_notifications: Sent stolen notifications
         show_bikes: Show bikes
         show_phone: Show phone
@@ -669,6 +667,7 @@ en:
         superuser: Superuser
         terms_of_service: Terms of service
         title: Title
+        token_for_password_reset: Password reset token
         twitter: Twitter
         user_emails: User emails
         username: Username
@@ -688,6 +687,11 @@ en:
         name: Name
         priority: Priority
     enums:
+      currency:
+        cad: CAD
+        eur: EUR
+        mxn: MXN
+        usd: USD
       cycle_type:
         bike: Bike
         cargo: Cargo Bike (front storage)
@@ -794,6 +798,13 @@ en:
         bike_sticker:
           not_found: not found
           unauthorized_to_claim: does not have permission to claim this
+        doorkeeper/application:
+          attributes:
+            redirect_uri:
+              fragment_present: cannot contain a fragment.
+              invalid_uri: must be a valid URI.
+              relative_uri: must be an absolute URI.
+              secured_uri: must be an HTTPS/SSL URI.
         export:
           required: required
         impound_record:
@@ -857,11 +868,11 @@ en:
       lock_type: Lock type
       mail_snippet: Mail snippet
       manufacturer: Manufacturer
-      membership: Membership
       normalized_serial_segment: Normalized serial segment
       organization: Organization
       organization_feature: Organization feature
       organization_message: Organization message
+      organization_role: Organization Role
       other_listing: Other listing
       ownership: Ownership
       paint: Paint
@@ -976,6 +987,11 @@ en:
         stolen: stolen
         unregistered: unregistered
         with_owner: with owner
+  attributes:
+    bikes:
+      location: Location
+      primary_colors: Primary colors
+      serial: Serial
   bike_versions:
     index:
       primary_colors: Primary colors
@@ -1725,9 +1741,17 @@ en:
         lock_created: Lock created successfully!
       find_lock:
         not_your_lock: Whoops, that's not your lock!
+    memberships:
+      edit:
+        free_membership: >-
+          Bike Index has given you a free membership. Please email support@bikeindex.org
+          if you have questions.
+        no_active_membership: You don't have an active membership, you'll have to
+          sign up for a new one.
     my_accounts:
       edit:
         delete_account: Delete account
+        membership: Membership
         password: Password
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
@@ -1843,7 +1867,7 @@ en:
             Sorry, you can't remove yourself from the organization. Contact us at
             support@bikeindex.org if this is problematic.
         update:
-          updated_membership: Updated membership for %{user_email}.
+          updated_organization_role: Updated membership for %{user_email}.
     ownerships:
       show:
         no_longer_your_bike: >-
@@ -1917,7 +1941,7 @@ en:
     users:
       confirm:
         already_confirmed: Your user account is already confirmed. Please log in.
-      find_user_from_password_reset_token!:
+      find_user_from_token_for_password_reset!:
         does_not_match_token: Doesn't match user's password reset token
         token_expired: Password reset token expired, try resetting password again.
       resend_confirmation_email:
@@ -1992,9 +2016,6 @@ en:
           more bikes.
         payment_received: Your payment of %{amount} has been received.
         thank_you_so_much: Thank you so much!
-        thanks_for_signing_up: >-
-          Thank you for signing up to be a member of Bike Index. We'll send you invoices
-          every month to this email address
         we_really_appreciate_your_support: We really appreciate your support of Bike
           Index!
       subject: Thank you for supporting Bike Index!
@@ -2323,6 +2344,13 @@ en:
       log_in_to_send_a_comment: Log in to send a comment!
       you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
         your message right here.
+  gflash:
+    titles:
+      error: Error
+      notice: Notice
+      progress: Progress
+      success: Success
+      warning: Warning
   helpers:
     bike_helper:
       hidden: hidden
@@ -3852,6 +3880,7 @@ en:
       please_fix_the_following: Please fix the following %{errors}
   locales:
     en: English
+    es: Spanish
     nb: Norwegian (Bokmål)
     nl: Nederlands (Dutch)
   locks:
@@ -3903,6 +3932,14 @@ en:
       oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
       only_makes_components: Only makes components
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
+  memberships:
+    success:
+      bike_index_team: The Bike Index team
+      glad_to_have_you_on_board: >-
+        We're so glad to have you as a member. We'll let you know when we have updates
+        on the membership benefits and anything else cool to share.
+      thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
+      xoxo: XOXO,
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
@@ -4743,7 +4780,7 @@ en:
         confirmation: >-
           Are you sure you want to remove %{user_name} from %{org_name}? (They will
           still be to use their personal account)
-        edit_membership_html: Edit membership for <em class="small">%{email}</em>
+        edit_organization_role_html: Edit membership for <em class="small">%{email}</em>
         email: Email
         has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
         invited: Invited
@@ -4778,16 +4815,6 @@ en:
         user: user
         you_can_also: You can also
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
-      membership_role_fields:
-        admin_access: Full organization access
-        admin_of_organization: Admin of organization
-        member_access: Organization access, but can not edit organization settings
-          or invite new users
-        member_no_bikes: Member without bike edit
-        member_no_bikes_access: Same access as Member, but can not edit organization
-          bikes
-        member_of_organization: Member of organization
-        membership_type: Membership type
       new:
         1_email_per_line: 1 email per line
         automatic_passwordless: >-
@@ -4797,8 +4824,8 @@ en:
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user
-        membership: Membership
         multiple_emails: Multiple emails
+        organization_role: Organization Role
         remaining_invites_html: You can add <strong>%{invitations_count}</strong>
           more
         send_invitation: Send invitation
@@ -4808,6 +4835,16 @@ en:
         user: user
         you_have_a_permitted_domain: You have a permitted domain
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+      organization_role_fields:
+        admin_access: Full organization access
+        admin_of_organization: Admin of organization
+        member_access: Organization access, but can not edit organization settings
+          or invite new users
+        member_no_bikes: Member without bike edit
+        member_no_bikes_access: Same access as Member, but can not edit organization
+          bikes
+        member_of_organization: Member of organization
+        role_type: Role type
   organized_mailer:
     custom_message:
       subject: "%{org_name} - the location of your %{mnfg_name}"
@@ -4891,7 +4928,7 @@ en:
       donation_header: Help support our efforts!
       pay_bike_index: Pay Bike Index
     success:
-      bike_index_team: Bike Index team
+      bike_index_team: The Bike Index team
       thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
       we_received_your_payment_of: We received your payment of %{amount}
       xoxo: XOXO,
@@ -5523,13 +5560,6 @@ en:
         %{better_password_link}.
       update_password: Update password
       update_your_password: Update your password
-  views:
-    pagination:
-      first: "&laquo;"
-      last: "&raquo;"
-      next: Next
-      previous: Prev
-      truncate: "&hellip;"
   welcome:
     choose_registration:
       add_a_bike_through: Add a bike through

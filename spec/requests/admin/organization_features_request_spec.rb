@@ -4,7 +4,16 @@ base_url = "/admin/organization_features"
 RSpec.describe Admin::OrganizationFeaturesController, type: :request do
   let(:subject) { FactoryBot.create(:organization_feature) }
   include_context :request_spec_logged_in_as_superuser
-  let(:passed_params) { {amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com", kind: "custom_one_time", name: "another name stuff"} }
+  let(:passed_params) do
+    {
+      amount: 222.22,
+      description: "Some really long description or wahtttt",
+      details_link: "https://example.com",
+      kind: "custom_one_time",
+      name: "another name stuff",
+      currency_enum: "eur"
+    }
+  end
 
   describe "index" do
     it "renders" do

@@ -96,7 +96,7 @@
                 %em.small.less-strong.only-dev-visible
                   = stolen_bike_listing.line
             %td
-              %span{ title: "#{stolen_bike_listing.amount_formatted} #{stolen_bike_listing.currency}"}
+              %span{ title: "#{stolen_bike_listing.amount_formatted} #{stolen_bike_listing.currency_name}"}
                 = stolen_bike_listing.amount_usd_formatted
             %td
               = stolen_bike_listing.mnfg_name
@@ -123,12 +123,12 @@
                 - else
                   %em.less-strong We haven't uploaded the photos for this bike yet
 
-  - if @stolen_bike_listings.total_count > @stolen_bike_listings.count
+  - if @pagy.count > @stolen_bike_listings.count
     .paginate-container.paginate-container-bottom.row
       .col-md-4.mt-4
         .ad-block.ad-binx.ad468x60
       .col-md-8.col-lg-4.mt-4
-        = paginate @stolen_bike_listings
+        = pagy_bootstrap_nav(@pagy).html_safe
 
 
   - unless @stolen_bike_listings.present?
@@ -140,6 +140,6 @@
       = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}
 
 -# include javascript pack for the time period select
-= javascript_pack_tag "application"
+<script src="/vendored_assets/application.js"></script>
 
 

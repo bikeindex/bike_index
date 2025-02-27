@@ -31,7 +31,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def organization_invitation
-    OrganizedMailer.organization_invitation(Membership.last)
+    OrganizedMailer.organization_invitation(OrganizationRole.last)
   end
 
   def parking_notification

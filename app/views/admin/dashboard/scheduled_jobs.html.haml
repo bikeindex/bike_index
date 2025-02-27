@@ -15,7 +15,7 @@
       %th Last finished
       %th Duration
     %tbody
-      - ScheduledWorkerRunner.scheduled_workers.sort_by { |klass| klass.name.downcase }.each do |klass|
+      - ScheduledJobRunner.scheduled_jobs.sort_by { |klass| klass.name.downcase }.each do |klass|
         - last_started = klass.last_started && Time.parse(klass.last_started)
         %tr
           - if display_dev_info?

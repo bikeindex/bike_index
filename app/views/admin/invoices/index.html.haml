@@ -40,7 +40,7 @@
           = link_to "Not Endless", admin_invoices_path(sortable_search_params.merge(search_endless: not_endless_active ? nil : "not_endless")), class: "dropdown-item #{not_endless_active ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", admin_invoices_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Invoices"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "Invoices"}
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_invoices, column: @time_range_column), stacked: true, thousands: ","
@@ -60,46 +60,46 @@
                 - payments = matching_invoices.first_invoice
                 %td First invoice
                 %td= admin_number_display(payments.count)
-                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
-                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 - payments = matching_invoices.renewal_invoice
                 %td Renewals
                 %td= admin_number_display(payments.count)
-                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
-                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 - payments = matching_invoices.free
                 %td Free invoices
                 %td= admin_number_display(payments.count)
-                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
-                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 - payments = matching_invoices.paid
                 %td Not free
                 %td= admin_number_display(payments.count)
-                %td= MoneyFormater.money_format(payments.sum(:amount_due_cents))
-                %td= MoneyFormater.money_format(payments.sum(:amount_paid_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
+                %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 %td
                   %strong All
                 %td
                   %strong= admin_number_display(matching_invoices.count)
                 %td
-                  %strong= MoneyFormater.money_format(matching_invoices.sum(:amount_due_cents))
+                  %strong= MoneyFormatter.money_format(matching_invoices.sum(:amount_due_cents))
                 %td
-                  %strong= MoneyFormater.money_format(matching_invoices.sum(:amount_paid_cents))
+                  %strong= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents))
 
 .mt-2
   = render partial: "/shared/period_select", locals: { include_future: true }
 
 %p
   Total paid:
-  %strong= MoneyFormater.money_format(matching_invoices.sum(:amount_paid_cents))
+  %strong= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents))
 
 %p.less-strong
   Go to individual organizations to create new invoices
 
-= render partial: "/shared/pagination", locals: {collection: @invoices}
+= render partial: "/shared/admin/pagination", locals: {collection: @invoices}
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }

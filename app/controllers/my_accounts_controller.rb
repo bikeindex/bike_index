@@ -5,10 +5,9 @@ class MyAccountsController < ApplicationController
   around_action :set_reading_role, only: %i[show]
 
   def show
-    page = params[:page] || 1
     @locks_active_tab = params[:active_tab] == "locks"
     @per_page = params[:per_page] || 20
-    @bikes = current_user.bikes.reorder(updated_at: :desc).page(page).per(@per_page)
+    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page)
     @locks = current_user.locks
   end
 
@@ -47,7 +46,7 @@ class MyAccountsController < ApplicationController
 
   def destroy
     if current_user.deletable?
-      UserDeleteWorker.new.perform(current_user.id, user: current_user)
+      UserDeleteJob.new.perform(current_user.id, user: current_user)
       remove_session
       redirect_to goodbye_url, notice: "Account deleted!"
     else
@@ -72,7 +71,8 @@ class MyAccountsController < ApplicationController
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
       password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
       sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
-      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit]),
+      membership: translation(:membership, scope: [:controllers, :my_accounts, :edit])
     }.merge(registration_organization_template).as_json
   end
 
@@ -89,9 +89,9 @@ class MyAccountsController < ApplicationController
     return false unless params[:hot_sheet_organization_ids].present?
     params[:hot_sheet_organization_ids].split(",").each do |org_id|
       notify = params.dig(:hot_sheet_notifications, org_id).present?
-      membership = @user.memberships.where(organization_id: org_id).first
-      next unless membership.present?
-      membership.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
+      organization_role = @user.organization_roles.where(organization_id: org_id).first
+      next unless organization_role.present?
+      organization_role.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
       flash[:success] ||= "Notification setting updated"
     end
     true
@@ -108,7 +108,7 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeWorker
+    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeJob
     @user
   end
 

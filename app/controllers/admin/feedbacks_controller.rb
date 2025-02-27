@@ -1,12 +1,11 @@
 class Admin::FeedbacksController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
+    params[:page] || 1
     @per_page = params[:per_page] || 50
-    @feedbacks = available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
-      .page(page).per(@per_page)
+    @pagy, @feedbacks = pagy(available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}"),
+      limit: @per_page)
     @render_kind_counts = InputNormalizer.boolean(params[:search_kind_counts])
   end
 

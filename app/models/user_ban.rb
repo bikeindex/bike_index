@@ -11,6 +11,11 @@
 #  creator_id  :bigint
 #  user_id     :bigint
 #
+# Indexes
+#
+#  index_user_bans_on_creator_id  (creator_id)
+#  index_user_bans_on_user_id     (user_id)
+#
 class UserBan < ApplicationRecord
   REASON_ENUM = {
     abuse: 0,
@@ -21,7 +26,7 @@ class UserBan < ApplicationRecord
 
   acts_as_paranoid
 
-  enum reason: REASON_ENUM
+  enum :reason, REASON_ENUM
 
   belongs_to :user
   belongs_to :creator, class_name: "User"

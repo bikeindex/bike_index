@@ -37,6 +37,17 @@
 #  state_id              :bigint
 #  user_id               :integer
 #
+# Indexes
+#
+#  index_parking_notifications_on_bike_id            (bike_id)
+#  index_parking_notifications_on_country_id         (country_id)
+#  index_parking_notifications_on_impound_record_id  (impound_record_id)
+#  index_parking_notifications_on_initial_record_id  (initial_record_id)
+#  index_parking_notifications_on_organization_id    (organization_id)
+#  index_parking_notifications_on_retrieved_by_id    (retrieved_by_id)
+#  index_parking_notifications_on_state_id           (state_id)
+#  index_parking_notifications_on_user_id            (user_id)
+#
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze
@@ -62,9 +73,9 @@ class ParkingNotification < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :process_notification
 
-  enum kind: KIND_ENUM
-  enum status: STATUS_ENUM
-  enum retrieved_kind: RETRIEVED_KIND_ENUM
+  enum :kind, KIND_ENUM
+  enum :status, STATUS_ENUM
+  enum :retrieved_kind, RETRIEVED_KIND_ENUM
 
   attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
 
@@ -260,7 +271,7 @@ class ParkingNotification < ActiveRecord::Base
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     Geocodeable.address(
       self,
-      street: (force_show_address || show_address),
+      street: force_show_address || show_address,
       country: country
     ).presence
   end
@@ -313,7 +324,7 @@ class ParkingNotification < ActiveRecord::Base
     return true if skip_update
     # Update the bike immediately, inline
     bike&.update(updated_at: Time.current)
-    ProcessParkingNotificationWorker.perform_async(id)
+    ProcessParkingNotificationJob.perform_async(id)
   end
 
   # new_attrs needs to include kind and user_id. It can include additional attrs if they matter

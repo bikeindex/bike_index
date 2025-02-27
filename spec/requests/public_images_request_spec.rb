@@ -13,10 +13,10 @@ RSpec.describe PublicImagesController, type: :request do
       context "valid owner" do
         it "creates an image" do
           bike.update_column :updated_at, Time.current - 1.hour
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
-          expect(AfterBikeSaveWorker.jobs.count).to eq 1
-          AfterBikeSaveWorker.drain
+          expect(AfterBikeSaveJob.jobs.count).to eq 1
+          AfterBikeSaveJob.drain
           expect(bike.reload.updated_at).to be_within(1).of Time.current
           expect(bike.public_images.first.name).to eq "cool name"
         end
@@ -26,10 +26,10 @@ RSpec.describe PublicImagesController, type: :request do
             bike.update_column :updated_at, Time.current - 1.hour
             expect(bike.reload.user_hidden).to be_truthy
             expect(bike.thumb_path).to be_blank
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
-            expect(AfterBikeSaveWorker.jobs.count).to eq 1
-            AfterBikeSaveWorker.drain
+            expect(AfterBikeSaveJob.jobs.count).to eq 1
+            AfterBikeSaveJob.drain
             expect(bike.reload.updated_at).to be_within(1).of Time.current
             expect(bike.public_images.first.name).to eq "cool name"
           end
@@ -37,19 +37,19 @@ RSpec.describe PublicImagesController, type: :request do
       end
       context "org authorized" do
         let(:current_organization) { FactoryBot.create(:organization) }
-        let!(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let!(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: current_organization) }
         it "creates an image" do
           bike.reload
           expect(bike.can_edit_claimed_organizations.pluck(:id)).to eq([current_organization.id])
           expect(bike.authorized?(current_user)).to be_truthy
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
           }.to change(PublicImage, :count).by 1
           bike.reload
           expect(bike.public_images.first.name).to eq "cool name"
-          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
+          expect(AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "no user" do
@@ -67,10 +67,10 @@ RSpec.describe PublicImagesController, type: :request do
       context "valid owner" do
         it "creates an image" do
           bike_version.update_column :updated_at, Time.current - 1.hour
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
                                   public_image: {name: "cool name"}, format: :js}
-          expect(AfterBikeSaveWorker.jobs.count).to eq 0
+          expect(AfterBikeSaveJob.jobs.count).to eq 0
           expect(bike_version.reload.updated_at).to be_within(1).of Time.current
           expect(bike_version.public_images.first.name).to eq "cool name"
         end
@@ -78,10 +78,10 @@ RSpec.describe PublicImagesController, type: :request do
           it "creates an image" do
             bike_version.update(visibility: "user_hidden")
             expect(bike_version.thumb_path).to be_blank
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
                                     public_image: {name: "cool name"}, format: :js}
-            expect(AfterBikeSaveWorker.jobs.count).to eq 0
+            expect(AfterBikeSaveJob.jobs.count).to eq 0
             expect(bike_version.reload.updated_at).to be_within(1).of Time.current
             expect(bike_version.public_images.first.name).to eq "cool name"
             expect(bike_version.public_images.first.is_private).to be_falsey
@@ -276,9 +276,8 @@ RSpec.describe PublicImagesController, type: :request do
     context "private" do
       let(:public_image) { FactoryBot.create(:public_image, is_private: true) }
       it "redirects" do
-        expect {
-          get "#{base_url}/#{public_image.id}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{public_image.id}"
+        expect(response.status).to eq 404
       end
     end
   end
@@ -311,7 +310,7 @@ RSpec.describe PublicImagesController, type: :request do
         expect(bike.reload.owner).to eq(current_user)
         expect {
           put "#{base_url}/#{public_image.id}", params: {public_image: {name: "Food"}}
-        }.to change(AfterBikeSaveWorker.jobs, :count).by(1)
+        }.to change(AfterBikeSaveJob.jobs, :count).by(1)
         expect(response).to redirect_to(edit_bike_url(bike))
         expect(public_image.reload.name).to eq("Food")
       end
@@ -322,7 +321,7 @@ RSpec.describe PublicImagesController, type: :request do
           expect(bike.authorized?(current_user)).to be_falsey
           expect {
             put "#{base_url}/#{public_image.id}", params: {public_image: {name: "Food"}}
-          }.to change(AfterBikeSaveWorker.jobs, :count).by(0)
+          }.to change(AfterBikeSaveJob.jobs, :count).by(0)
           expect(public_image.reload.name).to eq(og_name)
         end
       end
@@ -331,7 +330,7 @@ RSpec.describe PublicImagesController, type: :request do
           expect(public_image.kind).to eq "photo_uncategorized"
           expect {
             patch "#{base_url}/#{public_image.id}", params: {kind: "photo_of_user_with_bike"}
-          }.to change(AfterBikeSaveWorker.jobs, :count).by(1)
+          }.to change(AfterBikeSaveJob.jobs, :count).by(1)
           expect(public_image.reload.kind).to eq("photo_of_user_with_bike")
           # And changing from a non-default kind
           put "#{base_url}/#{public_image.id}", params: {kind: "photo_of_serial"}
@@ -346,22 +345,22 @@ RSpec.describe PublicImagesController, type: :request do
       context "is_private true" do
         it "marks image private" do
           expect(bike.reload.owner).to eq(current_user)
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           post "#{base_url}/#{public_image.id}/is_private", params: {is_private: "true"}
           public_image.reload
           expect(public_image.is_private).to be_truthy
-          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
+          expect(AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "is_private false" do
         let(:public_image) { FactoryBot.create(:public_image, imageable: bike, is_private: true) }
         it "marks bike not private" do
           expect(bike.reload.owner).to eq(current_user)
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           post "#{base_url}/#{public_image.id}/is_private", params: {is_private: false}
           public_image.reload
           expect(public_image.is_private).to be_falsey
-          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
+          expect(AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
         end
       end
       context "non owner" do
@@ -387,14 +386,14 @@ RSpec.describe PublicImagesController, type: :request do
         expect(public_image_2.listing_order).to eq 2
         expect(public_image_1.listing_order).to be < 2
         list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         post "#{base_url}/order", params: {list_of_photos: list_order.map(&:to_s)}
 
         expect(public_image_3.reload.listing_order).to eq 1
         expect(public_image_2.reload.listing_order).to eq 4
         expect(public_image_1.reload.listing_order).to eq 2
         expect(public_image_other.reload.listing_order).to eq 0
-        expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id, false, true)
+        expect(AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
       end
     end
   end

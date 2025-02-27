@@ -17,7 +17,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
         let(:controller_name) { controller_name }
         it "calls special_controller name" do
           expect(helper.page_with_custom_header_tags?).to be_truthy
-          expect(helper).to receive("#{controller_name}_header_tags".to_sym) { ["tags"] }
+          expect(helper).to receive(:"#{controller_name}_header_tags") { ["tags"] }
           expect(helper.header_tags).to eq "tags"
         end
       end

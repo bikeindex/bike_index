@@ -16,6 +16,12 @@
 #  twitter_account_id :integer
 #  twitter_id         :string
 #
+# Indexes
+#
+#  index_tweets_on_original_tweet_id   (original_tweet_id)
+#  index_tweets_on_stolen_record_id    (stolen_record_id)
+#  index_tweets_on_twitter_account_id  (twitter_account_id)
+#
 class Tweet < ApplicationRecord
   KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
@@ -35,7 +41,7 @@ class Tweet < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :retweet, -> { where.not(original_tweet: nil) }
   scope :not_retweet, -> { where(original_tweet: nil) }
@@ -48,7 +54,7 @@ class Tweet < ApplicationRecord
   def self.friendly_find(id)
     return nil if id.blank?
     id = id.to_s
-    query = id.length > 15 ? {twitter_id: id} : {id: id}
+    query = (id.length > 15) ? {twitter_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
   end
 

@@ -25,8 +25,8 @@ module ControllerSpecHelpers
     end
   end
 
-  RSpec.shared_context :logged_in_as_organization_member do
-    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+  RSpec.shared_context :logged_in_as_organization_user do
+    let(:user) { FactoryBot.create(:organization_user, organization: organization) }
     let(:organization) { FactoryBot.create(:organization) }
     before :each do
       set_current_user(user)

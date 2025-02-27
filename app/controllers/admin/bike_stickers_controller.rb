@@ -1,9 +1,8 @@
 class Admin::BikeStickersController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    @bike_stickers = scoped_bike_stickers(matching_bike_stickers)
+    @pagy, @bike_stickers = scoped_bike_stickers(matching_bike_stickers)
 
     @bike_sticker_batches = if @bike_sticker_batch.present?
       [@bike_sticker_batch]
@@ -29,7 +28,7 @@ class Admin::BikeStickersController < Admin::BaseController
     create_batch_if_valid!
     if @bike_sticker_batch.id.present?
       flash[:success] = "Batch ##{@bike_sticker_batch.id} created. Please wait a few minutes for the stickers to finish creating"
-      CreateBikeStickerCodesWorker.perform_async(@bike_sticker_batch.id,
+      CreateBikeStickerCodesJob.perform_async(@bike_sticker_batch.id,
         @bike_sticker_batch.stickers_to_create_count, @bike_sticker_batch.initial_code_integer)
       redirect_to admin_bike_stickers_path(search_bike_sticker_batch_id: @bike_sticker_batch.id)
     else
@@ -39,7 +38,7 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def reassign
-    @bike_stickers = scoped_bike_stickers(selected_bike_stickers)
+    @pagy, @bike_stickers = scoped_bike_stickers(selected_bike_stickers)
     # Check that the selection matches our criteria
     @valid_selection = @bike_sticker1.present? &&
       selected_bike_stickers.count > 0 &&
@@ -48,7 +47,7 @@ class Admin::BikeStickersController < Admin::BaseController
       params[:search_bike_sticker_batch_id].present?
     # update if possible
     if @valid_selection && InputNormalizer.boolean(params[:reassign_now])
-      AdminReassignBikeStickerCodesWorker.perform_async(current_user.id,
+      AdminReassignBikeStickerCodesJob.perform_async(current_user.id,
         current_organization.id,
         @bike_sticker_batch.id,
         @bike_sticker1&.id,
@@ -77,11 +76,11 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def default_column
-    action_name == "reassign" ? "code_integer" : sortable_columns.first
+    (action_name == "reassign") ? "code_integer" : sortable_columns.first
   end
 
   def default_direction
-    action_name == "reassign" ? "asc" : "desc"
+    (action_name == "reassign") ? "asc" : "desc"
   end
 
   def matching_bike_stickers
@@ -136,12 +135,9 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def scoped_bike_stickers(stickers)
-    page = params[:page] || 1
     @per_page = params[:per_page] || 25
-    stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
-      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike)
-      .page(page)
-      .per(@per_page)
+    pagy(stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
+      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page)
   end
 
   def permitted_parameters

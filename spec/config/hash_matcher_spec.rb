@@ -130,8 +130,8 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
         expect(RspecHashMatcher.send(:values_match?, 12.0, 12, options: options)).to be_truthy
       end
       it "is truthy for matching Float and BigDecimal" do
-        expect(RspecHashMatcher.send(:values_match?, 12.0, BigDecimal("12"), options: options)).to be_truthy
-        expect(RspecHashMatcher.send(:values_match?, BigDecimal("12"), 12, options: options)).to be_truthy
+        expect(RspecHashMatcher.send(:values_match?, 12.0, BigDecimal(12), options: options)).to be_truthy
+        expect(RspecHashMatcher.send(:values_match?, BigDecimal(12), 12, options: options)).to be_truthy
       end
       it "is truthy for matching Number and String" do
         expect(RspecHashMatcher.send(:values_match?, 12.0, "12", options: options)).to be_truthy
@@ -144,7 +144,7 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
       context "with match_number_types: true" do
         let(:options) { RspecHashMatcher::DEFAULT_OPTS.merge(match_number_types: true) }
         it "is falsey" do
-          expect(RspecHashMatcher.send(:values_match?, 12.0, BigDecimal("12"), options: options)).to be_truthy
+          expect(RspecHashMatcher.send(:values_match?, 12.0, BigDecimal(12), options: options)).to be_truthy
           expect(RspecHashMatcher.send(:values_match?, 12.0, 12, options: options)).to be_truthy
           expect(RspecHashMatcher.send(:values_match?, 12, 12.00, options: options)).to be_truthy
           expect(RspecHashMatcher.send(:values_match?, 12.0, 12.00, options: options)).to be_truthy

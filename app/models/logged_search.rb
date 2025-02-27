@@ -28,6 +28,14 @@
 #  state_id          :bigint
 #  user_id           :bigint
 #
+# Indexes
+#
+#  index_logged_searches_on_country_id       (country_id)
+#  index_logged_searches_on_organization_id  (organization_id)
+#  index_logged_searches_on_request_id       (request_id)
+#  index_logged_searches_on_state_id         (state_id)
+#  index_logged_searches_on_user_id          (user_id)
+#
 class LoggedSearch < AnalyticsRecord
   include Geocodeable
 
@@ -59,8 +67,8 @@ class LoggedSearch < AnalyticsRecord
   belongs_to :user
   belongs_to :organization
 
-  enum endpoint: ENDPOINT_ENUM
-  enum stolenness: STOLENNESS_ENUM, _prefix: :stolenness
+  enum :endpoint, ENDPOINT_ENUM
+  enum :stolenness, STOLENNESS_ENUM, prefix: :stolenness
 
   validates_presence_of :log_line, :request_at
   validates_uniqueness_of :request_id, allow_nil: false

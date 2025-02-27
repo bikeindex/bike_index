@@ -5,19 +5,18 @@ class Admin::BikesController < Admin::BaseController
   around_action :set_reading_role, only: %i[index show]
 
   def index
-    @page = params[:page] || 1
     @per_page = params[:per_page] || 100
 
-    @bikes = available_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .reorder("bikes.#{sort_column} #{sort_direction}")
-      .page(@page).per(@per_page)
+    @pagy, @bikes = pagy(available_bikes.includes(:creation_organization, :current_ownership, :paint)
+      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
   end
 
   def missing_manufacturer
-    @page = params[:page] || 1
     @per_page = params[:per_page] || 100
-    @bikes = missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .page(@page).per(@per_page)
+    @pagy, @bikes = pagy(
+      missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
+      limit: @per_page
+    )
   end
 
   def update_manufacturers
@@ -29,7 +28,7 @@ class Admin::BikesController < Admin::BaseController
       end
       # Needs to happen after the manufacturer has been assigned
       Bike.unscoped.where(id: bike_ids).distinct.pluck(:model_audit_id)
-        .each { |i| UpdateModelAuditWorker.perform_async(i) }
+        .each { |i| UpdateModelAuditJob.perform_async(i) }
       flash[:success] = "Success. #{bike_ids.count} Bikes updated"
     else
       flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
@@ -43,10 +42,9 @@ class Admin::BikesController < Admin::BaseController
     else
       DuplicateBikeGroup.unignored.order("created_at desc")
     end
-    @page = params[:page] || 1
     @per_page = params[:per_page] || 25
     @duplicate_groups_count = duplicate_groups.size
-    @duplicate_groups = duplicate_groups.page(@page).per(@per_page)
+    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page)
   end
 
   def ignore_duplicate_toggle
@@ -67,10 +65,10 @@ class Admin::BikesController < Admin::BaseController
       if bike_ids.any?
         bike_ids.each do |id|
           Bike.unscoped.find(id).destroy!
-          AfterBikeSaveWorker.perform_async(id)
+          AfterBikeSaveJob.perform_async(id)
         end
         # Lazy pluralize hack
-        flash[:success] = "#{bike_ids.count} #{bike_ids.count == 1 ? "bike" : "bikes"} deleted!"
+        flash[:success] = "#{bike_ids.count} #{(bike_ids.count == 1) ? "bike" : "bikes"} deleted!"
       else
         flash[:error] = "No bikes selected to delete!"
       end
@@ -142,7 +140,7 @@ class Admin::BikesController < Admin::BaseController
   def destroy_bike
     find_bike
     @bike.destroy
-    AfterBikeSaveWorker.perform_async(@bike.id)
+    AfterBikeSaveJob.perform_async(@bike.id)
     flash[:success] = "Bike deleted!"
     redirect_to admin_bikes_url
   end

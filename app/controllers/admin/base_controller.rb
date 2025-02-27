@@ -52,7 +52,7 @@ class Admin::BaseController < ApplicationController
   # Match the statuses with bike statuses
   def bike_search_statuses(searched_statuses)
     bike_statuses = searched_statuses.map do |k|
-      k == "unregistered_parking_notification" ? k : "status_#{k}"
+      (k == "unregistered_parking_notification") ? k : "status_#{k}"
     end
     statuses = bike_statuses & Bike.statuses
     # Return all bike statuses if there are no matches (e.g. searching for "deleted_only")

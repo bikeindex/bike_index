@@ -1,3 +1,5 @@
+- def template_url(template); template == "membership" ? edit_membership_path : edit_my_account_path(edit_template: template) end
+
 = form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
   .form-well-container.container
     .row
@@ -7,7 +9,7 @@
           - @edit_templates.each do |template, description|
             %li
               - classname = @edit_template == template ? 'active' : ''
-              %a{ href: edit_my_account_path(edit_template: template), class: classname }
+              %a{ href: template_url(template), class: classname }
                 %h4
                   = description
 
@@ -15,7 +17,7 @@
           // ignore this select in dirty forms
           %select.dirtyignore
             - @edit_templates.each do |template, description|
-              %option{ selected: (@edit_template == template), value: edit_my_account_path(edit_template: template) }
+              %option{ selected: (@edit_template == template), value: template_url(template) }
                 = description
         .edit-form-well-submit-wrapper
           = hidden_field_tag :edit_template, @edit_template
@@ -31,5 +33,5 @@
   - @edit_templates.each_with_index do |t_d, i|
     - template, description = t_d[0], t_d[1]
     - is_active = 'active' if @edit_template.match(/#{template}/)
-    %a.ml-1.mr-1.d-inline-block.text-underline{href: edit_my_account_path(edit_template: template), class: is_active}
+    %a.ml-1.mr-1.d-inline-block.text-underline{href: template_url(template), class: is_active}
       = description

@@ -22,7 +22,7 @@
 
   = render partial: "/shared/period_select"
 
-  = render partial: "/shared/pagination", locals: {collection: @recovery_displays}
+  = render partial: "/shared/admin/pagination", locals: {collection: @recovery_displays}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.padded.table-sm
@@ -57,4 +57,4 @@
           %td.large-screens.table-cell-check
             = check_mark if recovery_display.stolen_record_id.present?
 
-= render partial: "/shared/pagination", locals: {collection: @recovery_displays}
+= render partial: "/shared/admin/pagination", locals: {collection: @recovery_displays}

@@ -15,6 +15,10 @@ RSpec.describe HandlebarType, type: :model do
       expect(HandlebarType.friendly_find(" ")).to be_nil
     end
 
+    it "returns nil" do
+      expect(HandlebarType.friendly_find("not-known-type")).to be_nil
+    end
+
     context "slug" do
       let(:name) { "Bmx " }
       it "tries to find the slug, given a name" do
@@ -25,7 +29,7 @@ RSpec.describe HandlebarType, type: :model do
   end
 
   describe "names and translations" do
-    let(:en_yaml) { YAML.safe_load(File.read(Rails.root.join("config", "locales", "en.yml")), [Symbol]) }
+    let(:en_yaml) { YAML.safe_load_file(Rails.root.join("config", "locales", "en.yml"), permitted_classes: [Symbol]) }
     let(:enum_translations) do
       en_yaml.dig("en", "activerecord", "enums", "handlebar_type")
     end

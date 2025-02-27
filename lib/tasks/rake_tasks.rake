@@ -1,5 +1,5 @@
 task run_scheduler: :environment do
-  ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
+  ScheduledJobRunner.perform_async if ScheduledJobRunner.should_enqueue?
 end
 
 task read_logged_searches: :environment do
@@ -9,7 +9,7 @@ end
 
 desc "Reset Autocomplete"
 task reset_autocomplete: :environment do
-  AutocompleteLoaderWorker.new.perform(nil, true)
+  AutocompleteLoaderJob.new.perform(nil, true)
 end
 
 # TODO: Remove :processed attribute when processing finishes
@@ -19,12 +19,12 @@ task process_logged_searches: :environment do
   enqueue_limit = enqueue_limit.present? ? enqueue_limit.to_i : 1000
 
   LoggedSearch.unprocessed.limit(enqueue_limit).pluck(:id)
-    .each { |i| ProcessLoggedSearchWorker.perform_async(i) }
+    .each { |i| ProcessLoggedSearchJob.perform_async(i) }
 end
 
 desc "Load counts" # This is a rake task so it can be loaded from bin/update
 task load_counts: :environment do
-  UpdateCountsWorker.new.perform
+  UpdateCountsJob.new.perform
 end
 
 desc "Prepare translations for committing to main"

@@ -15,8 +15,8 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
   end
 
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     describe "index" do
       it "redirects to the organization root path" do
         get base_url
@@ -94,7 +94,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             is_paid: false
           }
         end
-        let(:user2) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let(:user2) { FactoryBot.create(:organization_user, organization: current_organization) }
         let(:update) do
           {
             direct_unclaimed_notifications: true,
@@ -127,7 +127,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect_hashes_to_match(current_organization, update.slice(:name, :direct_unclaimed_notifications))
+          expect(current_organization).to match_hash_indifferently update.slice(:name, :direct_unclaimed_notifications)
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")
@@ -207,7 +207,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             location1.reload
             expect(location1.organization).to eq current_organization
             skipped_location_attrs = %i[latitude longitude shown organization_id created_at _destroy publicly_visible impound_location default_impound_location]
-            expect_hashes_to_match(location1, update[:locations_attributes]["0"].except(*skipped_location_attrs))
+            expect(location1).to match_hash_indifferently update[:locations_attributes]["0"].except(*skipped_location_attrs)
             expect(location1.publicly_visible).to be_truthy
             expect(location1.impound_location).to be_falsey
             # ensure we are not permitting crazy assignment for first location
@@ -218,7 +218,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             # second location
             location2 = current_organization.locations.last
             key = update[:locations_attributes].keys.last
-            expect_hashes_to_match(location2, update[:locations_attributes][key].except(*skipped_location_attrs))
+            expect(location2).to match_hash_indifferently update[:locations_attributes][key].except(*skipped_location_attrs)
             expect(location2.publicly_visible).to be_falsey
             expect(location2.impound_location).to be_truthy
             expect(location2.default_impound_location).to be_falsey
@@ -285,7 +285,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 })
             end
             it "does not remove" do
-              UpdateOrganizationAssociationsWorker.new.perform(location1.organization_id)
+              UpdateOrganizationAssociationsJob.new.perform(location1.organization_id)
               location1.reload
               expect(location1.default_impound_location?).to be_truthy
               expect(location1.destroy_forbidden?).to be_truthy
@@ -331,8 +331,8 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.search_coordinates_set?).to be_falsey
 
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
-              Sidekiq::Worker.clear_all
-              # Need to inline to process UpdateOrganizationAssociationsWorker
+              Sidekiq::Job.clear_all
+              # Need to inline to process UpdateOrganizationAssociationsJob
               Sidekiq::Testing.inline! do
                 expect {
                   patch base_url,
@@ -349,7 +349,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.locations.count).to eq 1
             location = current_organization.locations.first
 
-            expect_hashes_to_match(location, update.except(:created_at, :organization_id))
+            expect(location).to match_hash_indifferently update.except(:created_at, :organization_id)
             expect(location.latitude).to be_within(0.1).of(41.8)
             expect(location.longitude).to be_within(0.1).of(-87.6)
 

@@ -114,7 +114,7 @@ RSpec.describe "BikesController#show", type: :request do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, can_edit_claimed: false) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
     let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike, organization: organization2) }
     it "includes passive organization, even when redirected from sticker from other org" do
       current_user.reload
@@ -150,16 +150,16 @@ RSpec.describe "BikesController#show", type: :request do
       stolen_record.update_attribute :recovery_link_token, nil
       expect(stolen_record.reload.alert_image).to be_blank
       expect(stolen_record.recovery_link_token).to be_blank
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         get "#{base_url}/#{bike.id}"
         expect(assigns(:bike).id).to eq bike.id
         expect(response).to render_template(:show)
-      }.to change(AfterStolenRecordSaveWorker.jobs, :count).by 1
+      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 1
       expect(stolen_record.reload.alert_image).to be_blank
       expect {
-        AfterStolenRecordSaveWorker.new.perform(stolen_record.id)
-      }.to change(AfterStolenRecordSaveWorker.jobs, :count).by 0
+        StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
+      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
       expect(stolen_record.reload.alert_image).to be_present
       expect(stolen_record.recovery_link_token).to be_present
     end
@@ -222,9 +222,8 @@ RSpec.describe "BikesController#show", type: :request do
     context "non-owner non-admin viewing" do
       let(:current_user) { FactoryBot.create(:user_confirmed) }
       it "404s" do
-        expect {
-          get "#{base_url}/#{bike.id}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
       end
     end
     context "organization viewing" do
@@ -237,14 +236,13 @@ RSpec.describe "BikesController#show", type: :request do
           user: FactoryBot.create(:user))
       end
       let(:organization) { FactoryBot.create(:organization) }
-      let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
       it "404s" do
         expect(bike.user).to_not eq current_user
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         expect(bike.visible_by?(current_user)).to be_falsey
-        expect {
-          get "#{base_url}/#{bike.id}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
       end
       context "bike organization editable" do
         let(:can_edit_claimed) { true }
@@ -265,7 +263,7 @@ RSpec.describe "BikesController#show", type: :request do
   end
   context "unregistered_parking_notification (also user hidden)" do
     let(:current_organization) { FactoryBot.create(:organization) }
-    let(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:auto_user) { FactoryBot.create(:organization_user, organization: current_organization) }
     let(:parking_notification) do
       current_organization.update(auto_user: auto_user)
       FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_organization.auto_user)
@@ -273,12 +271,11 @@ RSpec.describe "BikesController#show", type: :request do
     let!(:bike) { parking_notification.bike }
 
     it "404s" do
-      expect {
-        get "#{base_url}/#{bike.id}"
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq 404
     end
     context "with org member" do
-      include_context :request_spec_logged_in_as_organization_member
+      include_context :request_spec_logged_in_as_organization_user
       it "renders, even though user hidden" do
         expect(bike.reload.user_hidden).to be_truthy
         expect(bike.owner).to_not eq current_user
@@ -456,7 +453,7 @@ RSpec.describe "BikesController#show", type: :request do
     context "abandoned as well" do
       let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
       it "renders" do
-        ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+        ProcessParkingNotificationJob.new.perform(parking_notification_abandoned.id)
         expect(parking_notification.reload.status).to eq "replaced"
         expect(parking_notification.active?).to be_truthy
         expect(parking_notification.resolved?).to be_falsey
@@ -467,7 +464,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(assigns(:token)).to eq parking_notification.retrieval_link_token
         expect(assigns(:matching_notification)&.id).to eq parking_notification.id
         # And then resolve that token, to test it works as well
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
           expect(flash[:success]).to be_present
@@ -484,7 +481,7 @@ RSpec.describe "BikesController#show", type: :request do
     context "impound notification" do
       let!(:parking_notification_impounded) { parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification", user: creator) }
       it "renders" do
-        ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
+        ProcessParkingNotificationJob.new.perform(parking_notification_impounded.id)
         parking_notification.reload
         expect(parking_notification.current?).to be_falsey
         expect(parking_notification.resolved?).to be_truthy

@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe DiscourseAuthenticationController, type: :controller do
   describe "index" do
     let(:discourse_query_string) { "sso=bm9uY2U9MGViZDBjMWU2YmZjMDk2MmIxODQ2YzBiYWY4NjNmNDcmcmV0dXJu%0AX3Nzb191cmw9aHR0cCUzQSUyRiUyRmxvY2FsaG9zdCUzQTMwMDAlMkZzZXNz%0AaW9uJTJGc3NvX2xvZ2lu%0A&sig=b1cffd09e878825b0bcdbf2eedf7e7e6133e3ca5acac6854f096bee71786f125" }

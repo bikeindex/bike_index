@@ -1,12 +1,12 @@
 class BikeVersionsController < ApplicationController
   before_action :render_ad, only: %i[index show]
-  before_action :find_bike_version, except: %i[index new create]
-  before_action :ensure_user_allowed_to_edit_version, except: %i[index show new create]
+  before_action :find_bike_version, except: %i[index create]
+  before_action :ensure_user_allowed_to_edit_version, except: %i[index show create]
 
   def index
     @interpreted_params = BikeVersion.searchable_interpreted_params(permitted_search_params)
-
-    @bike_versions = BikeVersion.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10)
+    per_page = params[:per_page] || 10
+    @pagy, @bike_versions = pagy(BikeVersion.search(@interpreted_params), limit: per_page)
     @selected_query_items_options = BikeVersion.selected_query_items_options(@interpreted_params)
   end
 
@@ -18,7 +18,7 @@ class BikeVersionsController < ApplicationController
     bike = Bike.unscoped.find(params[:bike_id])
     if bike&.authorized?(current_user)
       # Do it inline because it's blocking
-      bike_version = BikeVersionCreatorWorker.new.perform(bike.id)
+      bike_version = BikeVersionCreatorJob.new.perform(bike.id)
       flash[:success] = "Bike Version created!"
       redirect_to edit_bike_version_path(bike_version.id)
     else

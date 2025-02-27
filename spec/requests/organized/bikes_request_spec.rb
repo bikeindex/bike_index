@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::BikesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/bikes" }
-  include_context :request_spec_logged_in_as_organization_member
+  include_context :request_spec_logged_in_as_organization_user
   let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
@@ -35,9 +35,9 @@ RSpec.describe Organized::BikesController, type: :request do
       }.to_not change(Export, :count)
     end
     context "member_no_bike_edit" do
-      let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization, role: "member_no_bike_edit") }
+      let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization, role: "member_no_bike_edit") }
       it "allows viewing" do
-        expect(current_user.reload.memberships.first.role).to eq "member_no_bike_edit"
+        expect(current_user.reload.organization_roles.first.role).to eq "member_no_bike_edit"
         get base_url, params: query_params
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
@@ -67,7 +67,7 @@ RSpec.describe Organized::BikesController, type: :request do
       end
       context "directly create export", :flaky do
         it "directly creates" do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
           }.to change(Export, :count).by 1
@@ -78,7 +78,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(export.custom_bike_ids).to match_array([bike.id, bike2.id])
           expect(export.user_id).to eq current_user.id
           expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
-          expect(OrganizationExportWorker.jobs.count).to eq 1
+          expect(OrganizationExportJob.jobs.count).to eq 1
         end
       end
     end
@@ -211,7 +211,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(current_organization.auto_user).to eq current_user
         expect(current_organization.public_impound_bikes?).to be_falsey
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
@@ -221,7 +221,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end
         # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-        ImageAssociatorWorker.new.perform
+        ImageAssociatorJob.new.perform
 
         b_param.reload
         expect(b_param.creation_organization).to eq current_organization
@@ -282,7 +282,7 @@ RSpec.describe Organized::BikesController, type: :request do
       end
 
       context "different auto_user, impound_notification" do
-        let!(:auto_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let!(:auto_user) { FactoryBot.create(:organization_user, organization: current_organization) }
         let!(:impound_configuration) { FactoryBot.create(:impound_configuration, organization_id: current_organization.id, public_view: true) }
         let(:parking_notification_abandoned) do
           parking_notification.merge(use_entered_address: "1",

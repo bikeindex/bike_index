@@ -10,8 +10,8 @@ RSpec.describe Organized::EmailsController, type: :request do
   end
   let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes organization_stolen_message] }
 
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs) }
     describe "index" do
       it "redirects to the organization root path" do
@@ -93,9 +93,8 @@ RSpec.describe Organized::EmailsController, type: :request do
         context "different org" do
           let!(:parking_notification) { FactoryBot.create(:parking_notification) }
           it "404s" do
-            expect {
-              get "#{base_url}/appears_abandoned_notification", params: {parking_notification_id: parking_notification.id}
-            }.to raise_error(ActiveRecord::RecordNotFound)
+            get "#{base_url}/appears_abandoned_notification", params: {parking_notification_id: parking_notification.id}
+            expect(response.status).to eq 404
           end
         end
       end
@@ -128,9 +127,8 @@ RSpec.describe Organized::EmailsController, type: :request do
         context "different org" do
           let!(:graduated_notification) { FactoryBot.create(:graduated_notification) }
           it "404s" do
-            expect {
-              get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
-            }.to raise_error(ActiveRecord::RecordNotFound)
+            get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
+            expect(response.status).to eq 404
           end
         end
       end
@@ -307,7 +305,7 @@ RSpec.describe Organized::EmailsController, type: :request do
         end
         it "updates" do
           expect(current_organization.kind).to eq "bike_shop"
-          # exists because UpdateOrganizationAssociationsWorker, destroy to test a weird state
+          # exists because UpdateOrganizationAssociationsJob, destroy to test a weird state
           expect(organization_stolen_message).to be_present
           get "#{base_url}/organization_stolen_message/edit"
           expect(response.status).to eq(200)

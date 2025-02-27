@@ -16,10 +16,10 @@ module BikeAttributable
 
     accepts_nested_attributes_for :components, allow_destroy: true
 
-    enum frame_material: FrameMaterial::SLUGS
-    enum handlebar_type: HandlebarType::SLUGS
-    enum cycle_type: CycleType::SLUGS
-    enum propulsion_type: PropulsionType::SLUGS
+    enum :frame_material, FrameMaterial::SLUGS
+    enum :handlebar_type, HandlebarType::SLUGS
+    enum :cycle_type, CycleType::SLUGS
+    enum :propulsion_type, PropulsionType::SLUGS
 
     scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   end
@@ -158,16 +158,16 @@ module BikeAttributable
   def cached_data_array
     [
       mnfg_name,
-      (propulsion_type_name == "Foot pedal" ? nil : propulsion_type_name),
+      ((propulsion_type_name == "Foot pedal") ? nil : propulsion_type_name),
       year,
       frame_colors,
-      (frame_material && frame_material_name),
+      frame_material && frame_material_name,
       frame_size,
       frame_model,
-      (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
-      (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
+      rear_wheel_size && "#{rear_wheel_size.name} wheel",
+      ((front_wheel_size && front_wheel_size != rear_wheel_size) ? "#{front_wheel_size.name} wheel" : nil),
       extra_registration_number,
-      (cycle_type == "bike" ? nil : type),
+      ((cycle_type == "bike") ? nil : type),
       components_cache_array
     ].flatten.reject(&:blank?).uniq
   end

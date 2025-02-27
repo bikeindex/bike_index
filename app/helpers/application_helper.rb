@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Pagy::Frontend
+
   # Override ActionView `cache` helper, adding the current locale to the cache
   # key.
   def cache(key = {}, options = {}, &block)
@@ -22,12 +24,12 @@ module ApplicationHelper
   end
 
   def notification_delivery_display(status)
-    text = if status == "email_success"
+    text = if status == "delivery_success"
       check_mark
-    elsif status.nil?
+    elsif status == "delivery_pending"
       "..."
     else
-      status
+      "failure"
     end
     content_tag(:span, text, title: status&.titleize, style: "cursor:default;")
   end
@@ -114,7 +116,7 @@ module ApplicationHelper
         class_name = "active"
       end
     else
-      class_name = controller_name == link_text.downcase.tr(" ", "_") ? "active" : ""
+      class_name = (controller_name == link_text.downcase.tr(" ", "_")) ? "active" : ""
     end
     (link_to link_text, link_path, class: class_name).html_safe
   end
@@ -164,10 +166,10 @@ module ApplicationHelper
     render_sortable = html_options.key?(:render_sortable) ? html_options[:render_sortable] : !html_options[:skip_sortable]
     return title unless render_sortable
     html_options[:class] = "#{html_options[:class]} sortable-link"
-    direction = column == sort_column && sort_direction == "desc" ? "asc" : "desc"
+    direction = (column == sort_column && sort_direction == "desc") ? "asc" : "desc"
     if column == sort_column
       html_options[:class] += " active"
-      span_content = direction == "asc" ? "\u2193" : "\u2191"
+      span_content = (direction == "asc") ? "\u2193" : "\u2191"
     end
     link_to(sortable_search_params.merge(sort: column, direction: direction), html_options) do
       concat(title.html_safe)
@@ -182,7 +184,7 @@ module ApplicationHelper
   end
 
   def sortable_search_params
-    @sortable_search_params ||= params.permit(*params.keys.select { |k| k.to_s.start_with?(/search_/) }, # params starting with search_
+    @sortable_search_params ||= params.permit(*params.keys.select { |k| k.to_s.start_with?("search_") }, # params starting with search_
       :direction, :sort, # sorting params
       :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
       :user_id, :organization_id, :query, # General search params

@@ -59,7 +59,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         it "errors" do
           # We require a scope parameter to be passed
           get authorization_url
-          expect(response.code).to eq("200")
+          expect(response.code).to eq("400")
           expect(response).to render_template(:error)
           expect(response.body).to match("Missing required parameter: scope")
         end
@@ -115,7 +115,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         # And then test that you can make an authorized request with the token
         get "/api/v3/me", params: {access_token: access_token.token}, headers: {format: :json}
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
-        expect_hashes_to_match(json_result, {id: current_user.id.to_s, bike_ids: []})
+        expect(json_result).to match_hash_indifferently({id: current_user.id.to_s, bike_ids: []})
         # Then, expire the token
         access_token.update(created_at: Time.current - 3700)
         expect(access_token.reload.expired?).to be_truthy

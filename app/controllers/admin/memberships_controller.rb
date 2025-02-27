@@ -1,37 +1,30 @@
+# frozen_string_literal: true
+
 class Admin::MembershipsController < Admin::BaseController
   include SortableTable
-  before_action :find_membership, only: [:show, :edit, :update, :destroy]
-  before_action :find_organizations
+
+  before_action :find_membership, only: %i[show update]
 
   def index
-    page = params[:page] || 1
     @per_page = params[:per_page] || 50
-    @memberships = matching_memberships.includes(:user, :sender, :organization).reorder("memberships.#{sort_column} #{sort_direction}")
-      .page(page).per(@per_page)
-  end
-
-  def show
-    redirect_to edit_admin_membership_path
+    @pagy, @collection = pagy(
+      matching_memberships.includes(:user, :creator, :stripe_subscriptions).reorder("memberships.#{sort_column} #{sort_direction}"),
+      limit: @per_page
+    )
   end
 
   def new
-    @membership = Membership.new(organization_id: current_organization&.id)
-  end
+    @membership = Membership.new
+    @membership.set_calculated_attributes # Sets start_at and level
 
-  def edit
-  end
-
-  def update
-    if @membership.update(permitted_parameters)
-      flash[:success] = "Membership Saved!"
-      redirect_to admin_membership_url(@membership)
-    else
-      render action: :edit
+    if params[:user_id].present?
+      user = User.find_by(id: params[:user_id])
+      @membership.user_email = user.email if user.present?
     end
   end
 
   def create
-    @membership = Membership.new(permitted_parameters.merge(sender: current_user))
+    @membership = Membership.new(permitted_create_parameters.merge(creator: current_user))
     if @membership.save
       flash[:success] = "Membership Created!"
       redirect_to admin_membership_url(@membership)
@@ -40,37 +33,74 @@ class Admin::MembershipsController < Admin::BaseController
     end
   end
 
-  def destroy
-    @membership.destroy
-    flash[:success] = "membership deleted successfully"
-    redirect_to admin_memberships_url
+  def show
+    @payments = @membership.payments
+  end
+
+  def update
+    if @membership.stripe_managed?
+      flash[:error] = "Stripe subscriptions must be edited on stripe"
+      redirect_back(fallback_location: admin_memberships_url) && return
+    end
+
+    if @membership.update(permitted_update_parameters)
+      flash[:success] = "Membership Saved!"
+      redirect_to admin_membership_url(@membership)
+    else
+      render action: :edit
+    end
+  end
+
+  helper_method :matching_memberships, :searchable_levels, :searchable_statuses, :searchable_managers
+
+  def searchable_statuses
+    Membership.statuses.keys
+  end
+
+  def searchable_levels
+    Membership.levels.keys
+  end
+
+  def searchable_managers
+    %w[stripe_managed admin_managed].freeze
   end
 
   protected
 
   def sortable_columns
-    %w[created_at invited_email sender_id claimed_at organization_id role deleted_at]
+    %w[created_at start_at end_at updated_at level user_id].freeze
   end
 
-  def permitted_parameters
-    params.require(:membership).permit(:organization_id, :user_id, :role, :invited_email)
+  def permitted_create_parameters
+    params.require(:membership).permit(:user_email, :level, :start_at, :end_at)
+  end
+
+  def permitted_update_parameters
+    params.require(:membership).permit(:level, :start_at, :end_at)
   end
 
   def find_membership
-    @membership = Membership.unscoped.find(params[:id])
-  end
-
-  def find_organizations
-    @organizations = Organization.all
+    @membership = Membership.find(params[:id])
   end
 
   def matching_memberships
-    memberships = if current_organization.present?
-      current_organization.memberships
-    else
-      Membership.all
+    memberships = Membership.all
+    @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
+    memberships = memberships.where(status: @status) if @status.present?
+
+    @level = searchable_levels.include?(params[:search_level]) ? params[:search_level] : nil
+    memberships = memberships.where(level: @level) if @level.present?
+
+    @manager = searchable_managers.include?(params[:search_manager]) ? params[:search_manager] : nil
+    memberships = memberships.send(@manager) if @manager.present?
+
+    if params[:user_id].present?
+      @user = User.unscoped.friendly_find(params[:user_id])
+      memberships = memberships.where(user_id: @user.id) if @user.present?
     end
-    @deleted_memberships = current_organization&.deleted? || InputNormalizer.boolean(params[:search_deleted])
-    @deleted_memberships ? memberships.deleted : memberships
+
+    @time_range_column = sort_column if %w[start_at end_at updated_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    memberships.where(@time_range_column => @time_range)
   end
 end
