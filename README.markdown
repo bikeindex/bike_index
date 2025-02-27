@@ -1,8 +1,6 @@
-# [![BIKE INDEX][bike-index-logo]][bike-index] [![CircleCI][circleci-badge]][circleci] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] [![View performance data on Skylight][skylight-badge]][skylight]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/bike_index.png?raw=true
-[circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/main
-[circleci-badge]: https://circleci.com/gh/bikeindex/bike_index/tree/main.svg?style=svg
 [skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
 [skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
 [bike-index]: https://www.bikeindex.org

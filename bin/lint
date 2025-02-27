@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+# To test linting, rather than automatically fix it, set LINT_TEST. Used for CI
+cli_args = ARGV
+lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?('--no-fix')
+
 require "fileutils"
 include FileUtils
 
@@ -10,7 +14,21 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
+def html_files
+  (Dir.glob("app/**/*.{html}{+*,}.erb") + Dir.glob(".static_dev/*.html"))
+    .map { |f| "'#{f}'" }.join(" ")
+end
+
 chdir APP_ROOT do
-  system!("bundle exec standardrb --fix")
-  system!("npm run lint")
+  if lint_test
+    puts "Testing lint (will not autofix)"
+    system!("bundle exec standardrb --no-fix")
+    # TEMPORARILY commented out, js not installed on CI
+    # system!("npm run lint")
+    # system!("bundle exec htmlbeautifier --keep-blank-lines 1 --lint-only #{html_files}")
+  else
+    system!("bundle exec standardrb --fix")
+    # system!("bundle exec htmlbeautifier --keep-blank-lines 1 #{html_files}")
+    system!("npm run lint")
+  end
 end
