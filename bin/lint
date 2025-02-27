@@ -23,7 +23,8 @@ chdir APP_ROOT do
   if lint_test
     puts "Testing lint (will not autofix)"
     system!("bundle exec standardrb --no-fix")
-    system!("npm run lint")
+    # TEMPORARILY commented out, js not installed on CI
+    # system!("npm run lint")
     # system!("bundle exec htmlbeautifier --keep-blank-lines 1 --lint-only #{html_files}")
   else
     system!("bundle exec standardrb --fix")
