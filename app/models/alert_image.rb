@@ -4,8 +4,10 @@
 #
 #  id               :integer          not null, primary key
 #  image            :string
+#  processed        :boolean          default(FALSE)
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  image_id         :bigint
 #  stolen_record_id :integer          not null
 #
 # Indexes

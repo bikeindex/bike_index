@@ -1,4 +1,5 @@
 require "rails_helper"
+require "chunky_png"
 
 RSpec.describe AlertImageGenerator do
   describe "#bike_url" do
@@ -46,6 +47,18 @@ RSpec.describe AlertImageGenerator do
         expect(stolen_record.to_coordinates).to eq([location_attrs[:latitude], location_attrs[:longitude]])
         expect(generator.stolen_record_location).to eq("Edmonton, Canada")
       end
+    end
+  end
+
+  describe "application variant processor" do
+    it "vips" do
+      expect(Bikeindex::Application.config.active_storage.variant_processor).to eq :vips
+    end
+  end
+
+  describe "image output" do
+      context "variant :facebook" do
+
     end
   end
 end
