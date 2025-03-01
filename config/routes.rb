@@ -3,6 +3,22 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
+  # Direct route for active storage, lipanski.com/posts/activestorage-cdn-rails-direct-route
+  direct :rails_public_blob do |blob|
+    # Preserve the behavior of `rails_blob_url` when using file storage
+    if Bikeindex::Application.config.active_storage.service == :local
+      route =
+        if blob.is_a?(ActiveStorage::Variant) || blob.is_a?(ActiveStorage::VariantWithRecord)
+          :rails_representation
+        else
+          :rails_blob
+        end
+      route_for(route, blob)
+    else
+      File.join(ENV.fetch("ACTIVE_STORAGE_HOST"), blob.key) # Use the CDN
+    end
+  end
+
   mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
   mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
 

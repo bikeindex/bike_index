@@ -1,0 +1,2 @@
+class Images::Processor
+end
