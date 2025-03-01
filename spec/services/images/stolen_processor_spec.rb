@@ -2,7 +2,7 @@ require "rails_helper"
 require "chunky_png" # For image comparison
 
 RSpec.describe Images::StolenProcessor do
-  let(:location_text) { "Nowhere, IL" }
+  let(:location_text) { "San Francisco, CA" }
 
   def expect_images_to_match(generated, target, tolerance: 0.001)
     actual = ChunkyPNG::Image.from_file(generated)
@@ -86,15 +86,14 @@ RSpec.describe Images::StolenProcessor do
   # end
 
   describe "caption_overlay" do
-    let(:target_image) do
+    let(:target_image) { Rails.root.join("spec", "fixtures", "alert_caption.png") }
 
-    end
-    let(:generated_image) { described_class.send(:caption_overlay, "K") }
+    let(:generated_image) { described_class.send(:caption_overlay, location_text) }
 
     it "makes a caption image" do
-      pp generated_image
+      output = generated_image.write_to_file("tmp/generated_alert_caption.png")
 
-      expect_images_to_match(generated_image, target_image)
+      expect_images_to_match("tmp/generated_alert_caption.png", target_image)
     end
   end
 end

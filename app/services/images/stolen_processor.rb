@@ -75,36 +75,26 @@ class Images::StolenProcessor
 
     private
 
-    def caption_overlay(text, font_size: 24)
-      bg_color = [0, 0, 0]
-      text_color = [255, 255, 255]
-
-      # Create a blank image with the background color
-      # image = Vips::Image.black(width, height, bands: 3, dpi: 100)
-      # image = image.new_from_image(bg_color).copy(interpretation: :srgb)
+    def caption_overlay(text)
       image = Vips::Image.new_from_file(LANDSCAPE_CAPTION.to_s)
-      width = 560 # image.width
-      height = 61 # image.height
+      # image {width: 560, height: 61}
 
-      # # Add the text to the image
+      # Add the text to the image
       text_overlay = Vips::Image.text(text,
-                                      width: width - 40,  # Add some padding
-                                      # font: caption_font,
-                                      # fontsize: font_size,
-                                      dpi: 24,
-                                      align: :high)
-      # Convert text mask to RGB
-      text_overlay = text_overlay.new_from_image(text_color).copy(interpretation: :srgb)
+                                      width: 600,  # Add some padding
+                                      font:,
+                                      dpi: 200,
+                                      align: :low)
 
-      # # Calculate position to center the text
-      left = (width - text_overlay.width) / 2
-      top = (height - text_overlay.height) / 2
+      bg_color = [26, 26, 26] # the color of LANDSCAPE_CAPTION
+      text_overlay = text_overlay.ifthenelse([255, 255, 255], bg_color, blend: true)
 
-      # # Composite the text over the background
-      image = image.composite(text_overlay, :over, x: left, y: top)
-      # image = image.composite(text_overlay, :over)
+      # Calculate position to center the text
+      left = (image.width - text_overlay.width) - 10 # left align, 20px padding
+      top = (image.height - text_overlay.height) / 2 # vertically center
 
-      image.write_to_file("text_image.png")
+      # Composite the text over the background
+      image.composite(text_overlay, :over, x: left, y: top)
     end
 
     def largest_dimension
@@ -113,7 +103,7 @@ class Images::StolenProcessor
 
     # The font to use in the caption. Set fallbacks since different environments
     # have different fonts available.
-    def caption_font
+    def font
       if system("mogrify -list font | grep --silent 'Font: Helvetica-Oblique$'")
         "Helvetica-Oblique"
       elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
