@@ -76,25 +76,15 @@ class Images::StolenProcessor
     private
 
     def caption_overlay(text)
-      image = Vips::Image.new_from_file(LANDSCAPE_CAPTION.to_s)
-      # image {width: 560, height: 61}
-
       # Add the text to the image
       text_overlay = Vips::Image.text(text,
-                                      width: 600,  # Add some padding
                                       font:,
-                                      dpi: 200,
-                                      align: :low)
+                                      dpi: 510)
 
       bg_color = [26, 26, 26] # the color of LANDSCAPE_CAPTION
       text_overlay = text_overlay.ifthenelse([255, 255, 255], bg_color, blend: true)
 
-      # Calculate position to center the text
-      left = (image.width - text_overlay.width) - 10 # left align, 20px padding
-      top = (image.height - text_overlay.height) / 2 # vertically center
-
-      # Composite the text over the background
-      image.composite(text_overlay, :over, x: left, y: top)
+      text_overlay
     end
 
     def largest_dimension
