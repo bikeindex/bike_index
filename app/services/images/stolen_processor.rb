@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "image_processing/vips"
+require "vips"
 
 class Images::StolenProcessor
   PROMOTED_ALERTS_PATH = "app/assets/images/promoted_alerts"
@@ -32,7 +33,7 @@ class Images::StolenProcessor
       processed
     end
 
-    def four_by_five(image, location_text, header_height: 200, padding: 100)
+    def four_by_five(image, location_text, header_height: 190, padding: 100)
       template_image = Vips::Image.new_from_file(SQUARE_TEMPLATE.to_s)
 
       bike_image = ImageProcessing::Vips.source(image).resize_to_fit!(
@@ -49,6 +50,7 @@ class Images::StolenProcessor
         ).call
 
       # if stolen_record_location.present?
+      #   # Preference
       #   caption_image = MiniMagick::Image.open(LANDSCAPE_CAPTION).tap do |caption|
       #     caption.combine_options do |i|
       #       i.font caption_font
@@ -72,6 +74,38 @@ class Images::StolenProcessor
 
 
     private
+
+    def caption_overlay(text, font_size: 24)
+      bg_color = [0, 0, 0]
+      text_color = [255, 255, 255]
+
+      # Create a blank image with the background color
+      # image = Vips::Image.black(width, height, bands: 3, dpi: 100)
+      # image = image.new_from_image(bg_color).copy(interpretation: :srgb)
+      image = Vips::Image.new_from_file(LANDSCAPE_CAPTION.to_s)
+      width = 560 # image.width
+      height = 61 # image.height
+
+      # # Add the text to the image
+      text_overlay = Vips::Image.text(text,
+                                      width: width - 40,  # Add some padding
+                                      # font: caption_font,
+                                      # fontsize: font_size,
+                                      dpi: 24,
+                                      align: :high)
+      # Convert text mask to RGB
+      text_overlay = text_overlay.new_from_image(text_color).copy(interpretation: :srgb)
+
+      # # Calculate position to center the text
+      left = (width - text_overlay.width) / 2
+      top = (height - text_overlay.height) / 2
+
+      # # Composite the text over the background
+      image = image.composite(text_overlay, :over, x: left, y: top)
+      # image = image.composite(text_overlay, :over)
+
+      image.write_to_file("text_image.png")
+    end
 
     def largest_dimension
       FOUR_BY_FIVE_DIMENSIONS.max

@@ -78,9 +78,6 @@
     = render partial: "impound_claim", locals: { impound_record: @bike.current_impound_record, impound_claim: @impound_claim, start_open: @contact_owner_open }
 
   .row
-    .col-12
-      =# image_tag rails_public_blob_url(@bike.current_stolen_record.stolen_image)
-  .row
     .col-md-8
       %h1.bike-title
         = bike_status_span(@bike)

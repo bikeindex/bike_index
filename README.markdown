@@ -27,8 +27,8 @@ _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby an
 
 - Redis
 
-- `libvips` for image manipulation
-  - For testing, `imagemagick`, `libjpeg-dev` and `libpng-dev` are required (by [phashion](https://github.com/westonplatter/phashion), for image comparison). Install all the required libraries with homebrew: `brew install libvips imagemagick libpng libjpeg`
+- `libvips` and `imagemagick` for image manipulation
+  - Eventually, `imagemagick` will only be required for testing (via [chunky_png](https://github.com/wvanbergen/chunky_png)), but we're not there yet
 
 - [Sidekiq](https://github.com/mperham/sidekiq)
 

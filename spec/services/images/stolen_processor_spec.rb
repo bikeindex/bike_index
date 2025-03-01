@@ -1,7 +1,26 @@
 require "rails_helper"
-require "chunky_png" # For image comparison with perceptual hashing
+require "chunky_png" # For image comparison
 
 RSpec.describe Images::StolenProcessor do
+  let(:location_text) { "Nowhere, IL" }
+
+  def expect_images_to_match(generated, target, tolerance: 0.001)
+    actual = ChunkyPNG::Image.from_file(generated)
+    expected = ChunkyPNG::Image.from_file(target)
+
+    # Calculate image difference score
+    diff = 0
+    actual.height.times do |y|
+      actual.width.times do |x|
+        diff += 1 unless actual[x, y] == expected[x, y]
+      end
+    end
+
+    # Allow a small tolerance (e.g., 0.1% of pixels can be different)
+    max_diff = (actual.width * actual.height) * tolerance
+    expect(diff).to be <= max_diff
+  end
+
   describe "application variant processor" do
     it "vips" do
       expect(Bikeindex::Application.config.active_storage.variant_processor).to eq :vips
@@ -55,27 +74,27 @@ RSpec.describe Images::StolenProcessor do
     end
   end
 
-  describe "four_by_five" do
-    let(:image) { Rails.root.join("spec", "fixtures", "tandem.jpeg") }
-    let(:target_image) { Rails.root.join("spec", "fixtures", "tandem-stolen-4x5.png") }
+  # describe "four_by_five" do
+  #   let(:image) { Rails.root.join("spec", "fixtures", "tandem.jpeg") }
+  #   let(:target_image) { Rails.root.join("spec", "fixtures", "tandem-stolen-4x5.png") }
 
-    it "generates an image matching target image" do
-      generated_image = described_class.four_by_five(image, "Nowhere, IL")
+  #   it "generates an image matching target image" do
+  #     generated_image = described_class.four_by_five(image, location_text)
 
-      actual = ChunkyPNG::Image.from_file(generated_image)
-      expected = ChunkyPNG::Image.from_file(target_image)
+  #     expect_generated_
+  #   end
+  # end
 
-      # Calculate image difference score
-      diff = 0
-      actual.height.times do |y|
-        actual.width.times do |x|
-          diff += 1 unless actual[x, y] == expected[x, y]
-        end
-      end
+  describe "caption_overlay" do
+    let(:target_image) do
 
-      # Allow a small tolerance (e.g., 0.1% of pixels can be different)
-      max_diff = (actual.width * actual.height) * 0.001
-      expect(diff).to be <= max_diff
+    end
+    let(:generated_image) { described_class.send(:caption_overlay, "K") }
+
+    it "makes a caption image" do
+      pp generated_image
+
+      expect_images_to_match(generated_image, target_image)
     end
   end
 end
