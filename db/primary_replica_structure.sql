@@ -186,9 +186,7 @@ CREATE TABLE public.alert_images (
     stolen_record_id integer NOT NULL,
     image character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    processed boolean DEFAULT false,
-    image_id bigint
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -6650,7 +6648,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20250227213304'),
 ('20250227195412'),
 ('20250226182610'),
 ('20250217173339'),
