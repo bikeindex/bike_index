@@ -71,15 +71,14 @@ RSpec.describe Images::StolenProcessor do
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:target_image) { Rails.root.join("spec", "fixtures", generated_fixture_name) }
     let(:generated_image) { described_class.generate_alert(template:, image:, location_text:) }
+    # If the image generation updates, use this to save the updated image:
+    # before { `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}` }
 
     context "with template: four_by_five" do
       let(:template) { :four_by_five }
       let(:generated_fixture_name) { "alert-4x5-landscape.png" }
 
       it "generates an image matching target" do
-        # If the target changes, use this to save the updated image:
-        # `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}`
-
         expect_images_to_match(generated_image, target_image)
       end
 
@@ -94,7 +93,21 @@ RSpec.describe Images::StolenProcessor do
     end
 
     context "with template: square" do
+      let(:template) { :square }
+      let(:generated_fixture_name) { "alert-square-landscape.png" }
+
       it "generates an image matching target" do
+        expect_images_to_match(generated_image, target_image)
+      end
+
+      context "with a portrait image" do
+        let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
+        let(:generated_fixture_name) { "alert-square-portrait.png" }
+
+        xit "generates an image matching target" do
+          # `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}`
+          expect_images_to_match(generated_image, target_image)
+        end
       end
     end
 
@@ -106,12 +119,14 @@ RSpec.describe Images::StolenProcessor do
   end
 
   describe "caption_overlay" do
-    let(:target_image) { Rails.root.join("spec/fixtures/alert_caption.png") }
-    let(:generated_image) { described_class.send(:caption_overlay, location_text) }
+    let(:target_image) { Rails.root.join("spec/fixtures/#{generated_fixture_name}") }
+    let(:generated_fixture_name) { "alert_caption.png" }
+    let!(:generated_image) { described_class.send(:caption_overlay, location_text).write_to_file(generated_filename) }
     let(:generated_filename) { "tmp/generated_alert_caption.png" }
 
     it "makes a caption image" do
-      generated_image.write_to_file(generated_filename)
+      # If the caption generation changes, use this to save the updated image:
+      # `mv #{generated_filename} spec/fixtures/#{generated_fixture_name}`
 
       expect_images_to_match(generated_filename, target_image)
     end

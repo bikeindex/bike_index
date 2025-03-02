@@ -58,7 +58,8 @@ class Images::StolenProcessor
 
       bike_image = ImageProcessing::Vips.source(image)
         .resize_to_limit(*bike_image_dimensions_for(config))
-        .call(save: false) # not saving enables calculating the dimensions
+        .call(save: false)
+      # call(save: false) enables calculating the dimensions & we don't need the intermediary images
 
       # Put bike image onto the alert template
       alert_image = ImageProcessing::Vips.source(template_path(template))
@@ -122,17 +123,17 @@ class Images::StolenProcessor
     end
 
     # enable passing in DPI because if the caption is too large, it should
-    def caption_overlay(text, dpi: 600)
+    def caption_overlay(text, dpi: 400, border_width: 20)
       # Add the text to the image
       text_overlay = Vips::Image.text(text, font:, dpi:)
 
       bg_color = [0, 0, 0] # topbar is 26, 26, 26
       text_with_bg = text_overlay.ifthenelse([255, 255, 255], bg_color, blend: true)
       bordered_text = text_with_bg.embed(
-        20,                           # Left margin
-        20,                           # Top margin
-        text_with_bg.width + 40,      # New width (original + left + right margin)
-        text_with_bg.height + 30,     # New height (original + top + bottom margin)
+        border_width,                           # Left margin
+        border_width,                           # Top margin
+        text_with_bg.width + 2*border_width,    # New width (original + left + right margin)
+        text_with_bg.height + 1.5*border_width, # New height (bottom border smaller because comma expands lower coverage)
         background: bg_color          # Border color
       ).copy(interpretation: :srgb)   # Convert to a colorspace that can combine with the other image
     end
