@@ -45,18 +45,24 @@ class Images::StolenProcessor
 
       bike_image = ImageProcessing::Vips.source(image)
         .resize_to_limit(*bike_image_dimensions_for(FOUR_BY_FIVE_DIMENSIONS))
-        .call
+        .call(save: false) # not saving enables calculating the dimensions
 
-      location_image = caption_overlay(location_text)
+      # for some reason, :centre and offset fails - so get the dimensions and manually center the image
+      left_offset = (template_image.width - bike_image.width)/2
+      top_offset = (template_image.height - bike_image.height)/2
+      # landscape images look better vertically centered in the template. If offset is < top-bar height,
+      # the image takes up the whole visible area - so use the top-bar min height. Otherwise, use the
+      # offset (which vertically centers the image).
+      top_offset = TOPBAR_MIN_HEIGHT if top_offset < TOPBAR_MIN_HEIGHT
 
-      # Compose bike image onto alert template
+      # Put bike image onto the alert template
       alert_image = ImageProcessing::Vips.source(template_image)
         .composite(bike_image,
           mode: :over,
-          gravity: "centre",
-          # offset: [0, TOPBAR_MIN_HEIGHT], # can't do centre and offset :/
+          offset: [left_offset, top_offset],
         ).call
 
+      # Add the topbar
       alert_image = ImageProcessing::Vips.source(alert_image)
         .composite(topbar_image,
           mode: :over,
@@ -64,11 +70,13 @@ class Images::StolenProcessor
           offset: [0, 0],
         ).call
 
+      # Add the location
+      location_image = caption_overlay(location_text)
       ImageProcessing::Vips.source(alert_image)
         .composite(location_image,
           mode: :over,
           gravity: "south-east",
-          offset: [0, 0],
+          offset: [0, 40],
         ).convert("png").call
     end
 

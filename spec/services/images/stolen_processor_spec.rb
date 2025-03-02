@@ -76,19 +76,26 @@ RSpec.describe Images::StolenProcessor do
 
   describe "4x5_template" do
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
-    let(:target_image) { Rails.root.join("spec/fixtures/alert-4x5-landscape.png") }
-    let(:generated_filename) { "tmp/generated_four_by_five.png" }
+    let(:target_image) { Rails.root.join("spec", "fixtures", generated_fixture_name) }
+    let(:generated_fixture_name) { "alert-4x5-landscape.png" }
+    let(:generated_image) { described_class.four_by_five(image, location_text) }
+
     it "generates an image matching target" do
-      generated_image = described_class.four_by_five(image, location_text)
-      # If generating a different image, use this:
-      # `mv #{generated_image.path} "spec/fixtures/tandem-stolen-4x5.png"`
+      # If the target changes, use this to save the updated image:
+      # `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}`
 
       expect_images_to_match(generated_image, target_image)
     end
 
     context "with a portrait image" do
-      # Verify that the image is centered correctly
-      it "generates an image matching target"
+      let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
+      let(:generated_fixture_name) { "alert-4x5-portrait.png" }
+
+      it "generates an image matching target" do
+        # `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}`
+
+        expect_images_to_match(generated_image, target_image)
+      end
     end
   end
 
