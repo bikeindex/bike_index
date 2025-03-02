@@ -27,13 +27,6 @@ RSpec.describe Images::StolenProcessor do
     end
   end
 
-  describe ".bike_url" do
-    let(:stolen_record) { StolenRecord.new(bike_id: 12) }
-    it "is the url" do
-      expect(described_class.send(:bike_url, stolen_record)).to eq "test.host/bikes/12"
-    end
-  end
-
   describe "#stolen_record_location" do
     let(:state) { FactoryBot.create(:state_california) }
     let(:location_attrs) { {state: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", zipcode: "90021", latitude: 34.05223, longitude: -118.24368} }
@@ -74,39 +67,41 @@ RSpec.describe Images::StolenProcessor do
     end
   end
 
-  describe "4x5_template" do
+  describe "generate_alert" do
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:target_image) { Rails.root.join("spec", "fixtures", generated_fixture_name) }
-    let(:generated_fixture_name) { "alert-4x5-landscape.png" }
-    let(:generated_image) { described_class.four_by_five(image, location_text) }
+    let(:generated_image) { described_class.generate_alert(template:, image:, location_text:) }
 
-    it "generates an image matching target" do
-      # If the target changes, use this to save the updated image:
-      # `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}`
-
-      expect_images_to_match(generated_image, target_image)
-    end
-
-    context "with a portrait image" do
-      let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
-      let(:generated_fixture_name) { "alert-4x5-portrait.png" }
+    context "with template: four_by_five" do
+      let(:template) { :four_by_five }
+      let(:generated_fixture_name) { "alert-4x5-landscape.png" }
 
       it "generates an image matching target" do
+        # If the target changes, use this to save the updated image:
         # `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}`
 
         expect_images_to_match(generated_image, target_image)
       end
+
+      context "with a portrait image" do
+        let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
+        let(:generated_fixture_name) { "alert-4x5-portrait.png" }
+
+        it "generates an image matching target" do
+          expect_images_to_match(generated_image, target_image)
+        end
+      end
     end
-  end
 
-  describe "square_template" do
-    it "generates an image matching target" do
+    context "with template: square" do
+      it "generates an image matching target" do
+      end
     end
-  end
 
-  describe "landscape_template" do
-    it "creates an image matching target" do
+    context "with template: landscape" do
+      it "creates an image matching target" do
 
+      end
     end
   end
 
