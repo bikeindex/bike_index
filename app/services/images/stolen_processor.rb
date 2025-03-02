@@ -8,24 +8,24 @@ class Images::StolenProcessor
   FACEBOOK_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "facebook-template.png")
   TWITTER_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "twitter-template.png")
   LANDSCAPE_CAPTION = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-caption.png")
-  SQUARE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "square-template.png")
-  FOUR_BY_FIVE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "4x5_template.png")
+
+  LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "template_landscape.png")
+  SQUARE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "template_square.png")
+  FOUR_BY_FIVE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "template_4x5.png")
 
   # topbar is 170px tall, right side is 120px tall
   TOPBAR_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
+  # topbar is 170px wide, right side is 106px wide
+  TOPBAR_LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
   TOPBAR_MIN_HEIGHT = 120
 
   BASE_URL = ENV.fetch("BASE_URL", "bikeindex.org").gsub(/https?:\/\//, "").freeze
   # recommended sizes per facebook ads guide 2025-2-27, facebook.com/business/ads-guide/update/image
-  # 4:5 aspect ratio, seems optimal for facebook
-  FOUR_BY_FIVE_DIMENSIONS = [1440, 1800].freeze
+  FOUR_BY_FIVE_DIMENSIONS = [1440, 1800].freeze # 4:5 aspect ratio, seems optimal for facebook
   SQUARE_DIMENSIONS = [1440, 1440].freeze
+  LANDSCAPE_DIMENSIONS = [1440, 1800].freeze
 
   class << self
-
-    # Should crop
-    # 4:5 > 1440 x 1800
-    # square > 1440 x 1440
     def attach_base_image(stolen_record, image: nil)
       # This relies on existing carrierewave methods, will need to be updated
       image ||= stolen_record.bike_main_image.open_file

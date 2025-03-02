@@ -61,6 +61,7 @@ gem "sitemap_generator", "~> 6"
 # Making other files
 gem "image_processing" # what it says
 gem "mini_magick" # Required for image processing
+gem "ruby-vips" # Faster image processing, should eventually replace mini_magick
 gem "carrierwave", "~> 2.2.6" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
@@ -161,5 +162,5 @@ group :test do
   gem "rspec-retry", require: false # Retry flaky test failures on CI
   gem "capybara" # For view components
   gem "selenium-webdriver" # For capybara
-  gem "chunky_png" # perceptual hashes of images, test duplication
+  gem "chunky_png" # used to test that generated images match their targets
 end

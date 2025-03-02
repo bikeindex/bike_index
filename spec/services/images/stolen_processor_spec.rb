@@ -64,7 +64,7 @@ RSpec.describe Images::StolenProcessor do
 
   describe "attach_base_image" do
     let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    let(:image) { Rails.root.join("spec", "fixtures", "tandem.jpeg") }
+    let(:image) { Rails.root.join("spec", "fixtures", "bike_photo-landscape.jpeg") }
     let(:target_metadata) { {identified: true, width: 1800, height: 1800, analyzed: true} }
     it "attaches the image" do
       expect(stolen_record.reload.image.attached?).to be_falsey
@@ -74,16 +74,32 @@ RSpec.describe Images::StolenProcessor do
     end
   end
 
-  describe "four_by_five" do
-    let(:image) { Rails.root.join("spec/fixtures/tandem.jpeg") }
-    let(:target_image) { Rails.root.join("spec/fixtures/tandem-stolen-4x5.png") }
+  describe "4x5_template" do
+    let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+    let(:target_image) { Rails.root.join("spec/fixtures/alert-4x5-landscape.png") }
     let(:generated_filename) { "tmp/generated_four_by_five.png" }
-    it "generates an image matching target image" do
+    it "generates an image matching target" do
       generated_image = described_class.four_by_five(image, location_text)
       # If generating a different image, use this:
       # `mv #{generated_image.path} "spec/fixtures/tandem-stolen-4x5.png"`
 
       expect_images_to_match(generated_image, target_image)
+    end
+
+    context "with a portrait image" do
+      # Verify that the image is centered correctly
+      it "generates an image matching target"
+    end
+  end
+
+  describe "square_template" do
+    it "generates an image matching target" do
+    end
+  end
+
+  describe "landscape_template" do
+    it "creates an image matching target" do
+
     end
   end
 
