@@ -74,26 +74,28 @@ RSpec.describe Images::StolenProcessor do
     end
   end
 
-  # describe "four_by_five" do
-  #   let(:image) { Rails.root.join("spec", "fixtures", "tandem.jpeg") }
-  #   let(:target_image) { Rails.root.join("spec", "fixtures", "tandem-stolen-4x5.png") }
+  describe "four_by_five" do
+    let(:image) { Rails.root.join("spec/fixtures/tandem.jpeg") }
+    let(:target_image) { Rails.root.join("spec/fixtures/tandem-stolen-4x5.png") }
+    let(:generated_filename) { "tmp/generated_four_by_five.png" }
+    it "generates an image matching target image" do
+      generated_image = described_class.four_by_five(image, location_text)
+      # If generating a different image, use this:
+      # `mv #{generated_image.path} "spec/fixtures/tandem-stolen-4x5.png"`
 
-  #   it "generates an image matching target image" do
-  #     generated_image = described_class.four_by_five(image, location_text)
-
-  #     expect_generated_
-  #   end
-  # end
+      expect_images_to_match(generated_image, target_image)
+    end
+  end
 
   describe "caption_overlay" do
-    let(:target_image) { Rails.root.join("spec", "fixtures", "alert_caption.png") }
-
+    let(:target_image) { Rails.root.join("spec/fixtures/alert_caption.png") }
     let(:generated_image) { described_class.send(:caption_overlay, location_text) }
+    let(:generated_filename) { "tmp/generated_alert_caption.png" }
 
     it "makes a caption image" do
-      output = generated_image.write_to_file("tmp/generated_alert_caption.png")
+      generated_image.write_to_file(generated_filename)
 
-      expect_images_to_match("tmp/generated_alert_caption.png", target_image)
+      expect_images_to_match(generated_filename, target_image)
     end
   end
 end

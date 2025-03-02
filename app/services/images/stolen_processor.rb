@@ -3,21 +3,27 @@ require "image_processing/vips"
 require "vips"
 
 class Images::StolenProcessor
+  # Background color red rgb(239,85,110) / #ef556e
   PROMOTED_ALERTS_PATH = "app/assets/images/promoted_alerts"
   FACEBOOK_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "facebook-template.png")
   TWITTER_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "twitter-template.png")
   LANDSCAPE_CAPTION = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-caption.png")
   SQUARE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "square-template.png")
+  FOUR_BY_FIVE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "4x5_template.png")
+
+  # topbar is 170px tall, right side is 120px tall
+  TOPBAR_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
+  TOPBAR_MIN_HEIGHT = 120
 
   BASE_URL = ENV.fetch("BASE_URL", "bikeindex.org").gsub(/https?:\/\//, "").freeze
   # recommended sizes per facebook ads guide 2025-2-27, facebook.com/business/ads-guide/update/image
+  # 4:5 aspect ratio, seems optimal for facebook
   FOUR_BY_FIVE_DIMENSIONS = [1440, 1800].freeze
   SQUARE_DIMENSIONS = [1440, 1440].freeze
 
   class << self
-    # version :four_five # 4:5 aspect ratio, seems optimal for facebook
+
     # Should crop
-    # recommended sizes per facebook ads guide 2025-2-27, facebook.com/business/ads-guide/update/image
     # 4:5 > 1440 x 1800
     # square > 1440 x 1440
     def attach_base_image(stolen_record, image: nil)
@@ -34,61 +40,64 @@ class Images::StolenProcessor
     end
 
     def four_by_five(image, location_text, header_height: 190, padding: 100)
-      template_image = Vips::Image.new_from_file(SQUARE_TEMPLATE.to_s)
+      template_image = Vips::Image.new_from_file(FOUR_BY_FIVE_TEMPLATE.to_s)
+      topbar_image = Vips::Image.new_from_file(TOPBAR_TEMPLATE.to_s)
 
-      bike_image = ImageProcessing::Vips.source(image).resize_to_fit!(
-        template_image.width - padding*2,
-        template_image.height - padding*2 - header_height
-      )
+      bike_image = ImageProcessing::Vips.source(image)
+        .resize_to_limit(*bike_image_dimensions_for(FOUR_BY_FIVE_DIMENSIONS))
+        .call
+
+      location_image = caption_overlay(location_text)
 
       # Compose bike image onto alert template
       alert_image = ImageProcessing::Vips.source(template_image)
         .composite(bike_image,
           mode: :over,
-          # gravity: :centre,
-          offset: [padding, padding + header_height],
+          gravity: "centre",
+          # offset: [0, TOPBAR_MIN_HEIGHT], # can't do centre and offset :/
         ).call
 
-      # if stolen_record_location.present?
-      #   # Preference
-      #   caption_image = MiniMagick::Image.open(LANDSCAPE_CAPTION).tap do |caption|
-      #     caption.combine_options do |i|
-      #       i.font caption_font
-      #       i.fill "#FFFFFF"
-      #       i.antialias
-      #       i.gravity "Center"
-      #       i.pointsize 50
-      #       i.size "#{caption.height}x#{caption.width}"
-      #       i.draw "text 0,0 '#{stolen_record_location}'"
-      #     end
-      #   end
+      alert_image = ImageProcessing::Vips.source(alert_image)
+        .composite(topbar_image,
+          mode: :over,
+          gravity: :north,
+          offset: [0, 0],
+        ).call
 
-      #   alert_image = alert_image.composite(caption_image) { |alert|
-      #     alert.gravity "Southeast"
-      #     alert.compose "Over"
-      #     alert.size "x100"
-      #     alert.geometry "+0+5"
-      #   }
-      # end
+      ImageProcessing::Vips.source(alert_image)
+        .composite(location_image,
+          mode: :over,
+          gravity: "south-east",
+          offset: [0, 0],
+        ).convert("png").call
     end
-
 
     private
 
-    def caption_overlay(text)
+    # enable passing in DPI because if the caption is too large, it should
+    def caption_overlay(text, dpi: 600)
       # Add the text to the image
-      text_overlay = Vips::Image.text(text,
-                                      font:,
-                                      dpi: 510)
+      text_overlay = Vips::Image.text(text, font:, dpi:)
 
-      bg_color = [26, 26, 26] # the color of LANDSCAPE_CAPTION
-      text_overlay = text_overlay.ifthenelse([255, 255, 255], bg_color, blend: true)
-
-      text_overlay
+      bg_color = [0, 0, 0] # topbar is 26, 26, 26
+      text_with_bg = text_overlay.ifthenelse([255, 255, 255], bg_color, blend: true)
+      bordered_text = text_with_bg.embed(
+        20,                           # Left margin
+        20,                           # Top margin
+        text_with_bg.width + 40,      # New width (original + left + right margin)
+        text_with_bg.height + 30,     # New height (original + top + bottom margin)
+        background: bg_color          # Border color
+      ).copy(interpretation: :srgb)   # Convert to a colorspace that can combine with the other image
     end
 
     def largest_dimension
       FOUR_BY_FIVE_DIMENSIONS.max
+    end
+
+    def bike_image_dimensions_for(dimensions)
+      # height - topbar right height (smallest part of the black bar)
+      [dimensions.first,
+       dimensions.last - TOPBAR_MIN_HEIGHT]
     end
 
     # The font to use in the caption. Set fallbacks since different environments
