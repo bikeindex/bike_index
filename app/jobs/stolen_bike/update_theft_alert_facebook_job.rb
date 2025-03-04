@@ -11,7 +11,7 @@ class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
 
     theft_alert = TheftAlert.find(theft_alert_id)
     # If the ad_id is blank, we need to activate the ad
-    if theft_alert.facebook_data&.dig("ad_id").blank?
+    if theft_alert.facebook_data&.dig("ad_id").blank? || theft_alert.failed_to_activate?
       return StolenBike::ActivateTheftAlertJob.perform_async(theft_alert_id)
     end
     Facebook::AdsIntegration.new.update_facebook_data(theft_alert)
