@@ -52,6 +52,8 @@ class Images::StolenProcessor
       processed
     end
 
+    private
+
     def generate_alert(template:, image:, location_text:)
       config = TEMPLATE_CONFIG[template]
       raise "Unknown template (#{template})!" unless config.present?
@@ -72,7 +74,6 @@ class Images::StolenProcessor
       alert_image = ImageProcessing::Vips.source(alert_image)
         .composite(topbar_path(config[:topbar]),
           mode: :over,
-          gravity: :north,
           offset: [0, 0],
         ).call(save: false)
 
@@ -83,10 +84,8 @@ class Images::StolenProcessor
           mode: :over,
           gravity: "south-east",
           offset: [0, 40],
-        ).convert("png").call
+        )
     end
-
-    private
 
     def template_path(template_sym)
       Rails.root.join(PROMOTED_ALERTS_PATH, "template-#{template_sym}.png").to_s
@@ -102,7 +101,8 @@ class Images::StolenProcessor
         [config[:dimensions].first,
          config[:dimensions].last - TOPBAR_HORIZONTAL_HEIGHT]
       else
-        []
+        [config[:dimensions].first - TOPBAR_VERTICAL_WIDTH,
+         config[:dimensions].last]
       end
     end
 
@@ -117,6 +117,7 @@ class Images::StolenProcessor
         top_offset = TOPBAR_HORIZONTAL_HEIGHT if top_offset < TOPBAR_HORIZONTAL_HEIGHT
       else
         # update the left offset
+        left_offset = TOPBAR_VERTICAL_WIDTH if left_offset < TOPBAR_VERTICAL_WIDTH
       end
 
       [left_offset, top_offset]

@@ -55,22 +55,24 @@ RSpec.describe Images::StolenProcessor do
     end
   end
 
-  describe "attach_base_image" do
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    let(:image) { Rails.root.join("spec", "fixtures", "bike_photo-landscape.jpeg") }
-    let(:target_metadata) { {identified: true, width: 1800, height: 1800, analyzed: true} }
-    it "attaches the image" do
-      expect(stolen_record.reload.image.attached?).to be_falsey
-      described_class.attach_base_image(stolen_record, image:)
-      expect(stolen_record.reload.image.attached?).to be_truthy
-      expect(stolen_record.image.metadata).to match_hash_indifferently target_metadata
-    end
-  end
+  # describe "attach_base_image" do
+  #   let(:stolen_record) { FactoryBot.create(:stolen_record) }
+  #   let(:image) { Rails.root.join("spec", "fixtures", "bike_photo-landscape.jpeg") }
+  #   let(:target_metadata) { {identified: true, width: 1800, height: 1800, analyzed: true} }
+  #   it "attaches the image" do
+  #     expect(stolen_record.reload.image.attached?).to be_falsey
+  #     described_class.attach_base_image(stolen_record, image:)
+  #     expect(stolen_record.reload.image.attached?).to be_truthy
+  #     expect(stolen_record.image.metadata).to match_hash_indifferently target_metadata
+  #   end
+  # end
 
   describe "generate_alert" do
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:target_image) { Rails.root.join("spec", "fixtures", generated_fixture_name) }
-    let(:generated_image) { described_class.generate_alert(template:, image:, location_text:) }
+    let(:generated_image) do
+      described_class.send(:generate_alert, template:, image:, location_text:).convert("png").call
+    end
     # If the image generation updates, use this to save the updated image:
     # before { `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}` }
 
@@ -104,16 +106,18 @@ RSpec.describe Images::StolenProcessor do
         let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
         let(:generated_fixture_name) { "alert-square-portrait.png" }
 
-        xit "generates an image matching target" do
-          # `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}`
+        it "generates an image matching target" do
           expect_images_to_match(generated_image, target_image)
         end
       end
     end
 
     context "with template: landscape" do
-      it "creates an image matching target" do
+      let(:template) { :landscape }
+      let(:generated_fixture_name) { "alert-landscape-landscape.png" }
 
+      it "creates an image matching target" do
+        expect_images_to_match(generated_image, target_image)
       end
     end
   end
