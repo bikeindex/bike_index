@@ -102,8 +102,9 @@
                 = l @theft_alert.facebook_updated_at, format: :convert_time
               %small.ml-2.less-strong
                 = @theft_alert.live? ? "alert ends" : "alert ended"
-                %span.convertTime
-                  = l @theft_alert.end_at, format: :convert_time
+                - if @theft_alert.end_at.present?
+                  %span.convertTime
+                    = l @theft_alert.end_at, format: :convert_time
         %tr
           %td Notify?
           %td
