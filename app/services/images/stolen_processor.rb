@@ -3,27 +3,7 @@ require "image_processing/vips"
 require "vips"
 
 class Images::StolenProcessor
-  # Background color red rgb(239,85,110) / #ef556e
   PROMOTED_ALERTS_PATH = "app/assets/images/promoted_alerts"
-  # FACEBOOK_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "facebook-template.png")
-  # TWITTER_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "twitter-template.png")
-  # LANDSCAPE_CAPTION = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-caption.png")
-
-  # LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "template_landscape.png")
-  # SQUARE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "template_square.png")
-  # FOUR_BY_FIVE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "template_4x5.png")
-
-  # topbar is 170px tall, right side is 120px tall (smallest height of the black bar)
-  TOPBAR_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
-  # topbar is 170px wide, right side is 106px wide (smallest width of the black bar)
-  TOPBAR_LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
-  # TOPBAR_MIN_HEIGHT = 120
-
-  BASE_URL = ENV.fetch("BASE_URL", "bikeindex.org").gsub(/https?:\/\//, "").freeze
-  FOUR_BY_FIVE_DIMENSIONS = [1440, 1800].freeze # 4:5 aspect ratio, seems optimal for facebook
-  SQUARE_DIMENSIONS = [1440, 1440].freeze
-  LANDSCAPE_DIMENSIONS = [1440, 1800].freeze
-
   # 4:5 and square are the recommended sizes per facebook ads guide 2025-2-27
   # facebook.com/business/ads-guide/update/image - 4:5 seems like the preferred
   TEMPLATE_CONFIG = {
@@ -32,36 +12,47 @@ class Images::StolenProcessor
     landscape: { topbar: :vertical, dimensions: [1600, 990] }
   }.freeze
 
+  TOPBAR_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
+  TOPBAR_LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
   # topbar is 170px tall, right side is 120px tall - so the minimum height is 120
   TOPBAR_HORIZONTAL_HEIGHT = 120
-  # topbar is 170px wide, right side is 106px wide
+  # topbar vertical is 170px wide, right side is 106px wide
   TOPBAR_VERTICAL_WIDTH = 106
 
   class << self
-    def attach_base_image(stolen_record, image: nil)
+    def attach_alert_images(stolen_record, image: nil)
       # This relies on existing carrierewave methods, will need to be updated
       image ||= stolen_record.bike_main_image.open_file
-      largest_dimension = FOUR_BY_FIVE_DIMENSIONS.max
-      processed = ImageProcessing::Vips.source(image).convert("jpg")
-        .resize_to_fill(largest_dimension, largest_dimension, crop: :centre)
-        .saver(strip: true).call
 
-      stolen_record.image.attach(io: processed, filename: "#{stolen_record.id}-stolen.jpg")
-      stolen_record.image.analyze
+      location_text = stolen_record_location(stolen_record)
 
-      processed
+      stolen_record.image_four_by_five
+        .attach(io: generate_alert(template: :four_by_five, image:, location_text:),
+          filename: "stolen-#{stolen.id}-four_by_five.jpeg")
+      stolen_record.image_four_by_five.analyze
+
+      stolen_record.image_square
+        .attach(io: generate_alert(template: :square, image:, location_text:),
+          filename: "stolen-#{stolen.id}-square.jpeg")
+      stolen_record.image_square.analyze
+
+      stolen_record.image_landscape
+        .attach(io: generate_alert(template: :landscape, image:, location_text:),
+          filename: "stolen-#{stolen.id}-landscape.jpeg")
+      stolen_record.image_landscape.analyze
+      stolen_record
     end
 
     private
 
-    def generate_alert(template:, image:, location_text:)
+    def generate_alert(template:, image:, location_text:, convert: "jpeg")
       config = TEMPLATE_CONFIG[template]
       raise "Unknown template (#{template})!" unless config.present?
 
       bike_image = ImageProcessing::Vips.source(image)
         .resize_to_limit(*bike_image_dimensions_for(config))
         .call(save: false)
-      # call(save: false) enables calculating the dimensions & we don't need the intermediary images
+      # using save: false enables calculating the dimensions & we don't need the intermediary images
 
       # Put bike image onto the alert template
       alert_image = ImageProcessing::Vips.source(template_path(template))
@@ -84,7 +75,7 @@ class Images::StolenProcessor
           mode: :over,
           gravity: "south-east",
           offset: [0, 40],
-        )
+        ).convert(convert).call
     end
 
     def template_path(template_sym)

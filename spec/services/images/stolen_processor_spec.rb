@@ -71,7 +71,7 @@ RSpec.describe Images::StolenProcessor do
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:target_image) { Rails.root.join("spec", "fixtures", generated_fixture_name) }
     let(:generated_image) do
-      described_class.send(:generate_alert, template:, image:, location_text:).convert("png").call
+      described_class.send(:generate_alert, template:, image:, location_text:, convert: "png")
     end
     # If the image generation updates, use this to save the updated image:
     # before { `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}` }
