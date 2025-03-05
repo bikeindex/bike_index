@@ -27,6 +27,27 @@ RSpec.describe Images::StolenProcessor do
     end
   end
 
+  describe "update_alert_images" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    let(:image) { Rails.root.join("spec", "fixtures", "bike_photo-landscape.jpeg") }
+
+    it "attaches the image" do
+      expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
+      described_class.update_alert_images(stolen_record, image:)
+
+      expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
+      expect(stolen_record.image_square.attached?).to be_truthy
+      expect(stolen_record.image_landscape.attached?).to be_truthy
+
+      # and calling it again removes the images (since the stolen record has no actual images)
+      described_class.update_alert_images(stolen_record)
+
+      expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
+      expect(stolen_record.image_square.attached?).to be_falsey
+      expect(stolen_record.image_landscape.attached?).to be_falsey
+    end
+  end
+
   describe "#stolen_record_location" do
     let(:state) { FactoryBot.create(:state_california) }
     let(:location_attrs) { {state: state, country: Country.united_states, street: "100 W 1st St", city: "Los Angeles", zipcode: "90021", latitude: 34.05223, longitude: -118.24368} }
@@ -54,18 +75,6 @@ RSpec.describe Images::StolenProcessor do
       end
     end
   end
-
-  # describe "attach_base_image" do
-  #   let(:stolen_record) { FactoryBot.create(:stolen_record) }
-  #   let(:image) { Rails.root.join("spec", "fixtures", "bike_photo-landscape.jpeg") }
-  #   let(:target_metadata) { {identified: true, width: 1800, height: 1800, analyzed: true} }
-  #   it "attaches the image" do
-  #     expect(stolen_record.reload.image.attached?).to be_falsey
-  #     described_class.attach_base_image(stolen_record, image:)
-  #     expect(stolen_record.reload.image.attached?).to be_truthy
-  #     expect(stolen_record.image.metadata).to match_hash_indifferently target_metadata
-  #   end
-  # end
 
   describe "generate_alert" do
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }

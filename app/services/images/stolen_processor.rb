@@ -20,25 +20,30 @@ class Images::StolenProcessor
   TOPBAR_VERTICAL_WIDTH = 106
 
   class << self
-    def attach_alert_images(stolen_record, image: nil)
+    def update_alert_images(stolen_record, image: nil)
       # This relies on existing carrierewave methods, will need to be updated
-      image ||= stolen_record.bike_main_image.open_file
+      image ||= stolen_record.bike_main_image&.open_file
+
+      stolen_record.image_four_by_five.purge
+      stolen_record.image_square.purge
+      stolen_record.image_landscape.purge
+      return if image.blank?
 
       location_text = stolen_record_location(stolen_record)
 
       stolen_record.image_four_by_five
         .attach(io: generate_alert(template: :four_by_five, image:, location_text:),
-          filename: "stolen-#{stolen.id}-four_by_five.jpeg")
+          filename: "stolen-#{stolen_record.id}-four_by_five.jpeg")
       stolen_record.image_four_by_five.analyze
 
       stolen_record.image_square
         .attach(io: generate_alert(template: :square, image:, location_text:),
-          filename: "stolen-#{stolen.id}-square.jpeg")
+          filename: "stolen-#{stolen_record.id}-square.jpeg")
       stolen_record.image_square.analyze
 
       stolen_record.image_landscape
         .attach(io: generate_alert(template: :landscape, image:, location_text:),
-          filename: "stolen-#{stolen.id}-landscape.jpeg")
+          filename: "stolen-#{stolen_record.id}-landscape.jpeg")
       stolen_record.image_landscape.analyze
       stolen_record
     end
@@ -66,11 +71,12 @@ class Images::StolenProcessor
         .composite(topbar_path(config[:topbar]),
           mode: :over,
           offset: [0, 0],
-        ).call(save: false)
+        )
+      return alert_image.convert(convert).call if location_text.blank?
 
       # Add the location
       location_image = caption_overlay(location_text)
-      ImageProcessing::Vips.source(alert_image)
+      ImageProcessing::Vips.source(alert_image.call(save: false))
         .composite(location_image,
           mode: :over,
           gravity: "south-east",

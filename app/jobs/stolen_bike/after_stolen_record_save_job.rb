@@ -24,5 +24,6 @@ class StolenBike::AfterStolenRecordSaveJob < ApplicationJob
     end
     stolen_record.current_alert_image # Generate alert image
     stolen_record.find_or_create_recovery_link_token
+    Images::StolenProcessor.update_alert_images(stolen_record)
   end
 end
