@@ -40,14 +40,13 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:17-alpine
+        image: postgres:16-alpine
         ports:
           - 5432:5432
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ""
+          POSTGRES_PASSWORD: password
           POSTGRES_DB: postgres
-          POSTGRES_HOST_AUTH_METHOD: trust # allow passwordless access
         # needed because the postgres container does not provide a healthcheck
         # tmpfs makes DB faster by using RAM
         options: >-
@@ -62,8 +61,11 @@ jobs:
         options: --entrypoint redis-server
     env:
       RAILS_ENV: test
-      PGHOST: localhost
-      PGUSER: postgres
+      PG_HOST: localhost
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: password
+      RAILS_ENV: test
       TZ: "America/Chicago"
       COVERAGE: true
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
