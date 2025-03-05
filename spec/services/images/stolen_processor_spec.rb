@@ -85,42 +85,6 @@ RSpec.describe Images::StolenProcessor do
     # If the image generation updates, use this to save the updated image:
     # before { `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}` }
 
-    context "with template: four_by_five" do
-      let(:template) { :four_by_five }
-      let(:generated_fixture_name) { "alert-4x5-landscape.png" }
-
-      it "generates an image matching target" do
-        expect_images_to_match(generated_image, target_image)
-      end
-
-      context "with a portrait image" do
-        let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
-        let(:generated_fixture_name) { "alert-4x5-portrait.png" }
-
-        it "generates an image matching target" do
-          expect_images_to_match(generated_image, target_image)
-        end
-      end
-    end
-
-    context "with template: square" do
-      let(:template) { :square }
-      let(:generated_fixture_name) { "alert-square-landscape.png" }
-
-      it "generates an image matching target" do
-        expect_images_to_match(generated_image, target_image)
-      end
-
-      context "with a portrait image" do
-        let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
-        let(:generated_fixture_name) { "alert-square-portrait.png" }
-
-        it "generates an image matching target" do
-          expect_images_to_match(generated_image, target_image)
-        end
-      end
-    end
-
     context "with template: landscape" do
       let(:template) { :landscape }
       let(:generated_fixture_name) { "alert-landscape-landscape.png" }
@@ -129,19 +93,63 @@ RSpec.describe Images::StolenProcessor do
         expect_images_to_match(generated_image, target_image)
       end
     end
+
+    # These tests take a substantial amount of resources and are largely the same
+    # - they were useful for building the functionality, and will be useful if it's ever changed -
+    # but they don't need to run every CI run
+    if !ENV["CI"]
+      context "with template: four_by_five" do
+        let(:template) { :four_by_five }
+        let(:generated_fixture_name) { "alert-4x5-landscape.png" }
+
+        it "generates an image matching target" do
+          expect_images_to_match(generated_image, target_image)
+        end
+
+        context "with a portrait image" do
+          let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
+          let(:generated_fixture_name) { "alert-4x5-portrait.png" }
+
+          it "generates an image matching target" do
+            expect_images_to_match(generated_image, target_image)
+          end
+        end
+      end
+
+      context "with template: square" do
+        let(:template) { :square }
+        let(:generated_fixture_name) { "alert-square-landscape.png" }
+
+        it "generates an image matching target" do
+          expect_images_to_match(generated_image, target_image)
+        end
+
+        context "with a portrait image" do
+          let(:image) { Rails.root.join("spec/fixtures/bike_photo-portrait.jpeg") }
+          let(:generated_fixture_name) { "alert-square-portrait.png" }
+
+          it "generates an image matching target" do
+            expect_images_to_match(generated_image, target_image)
+          end
+        end
+      end
+    end
   end
 
-  describe "caption_overlay" do
-    let(:target_image) { Rails.root.join("spec/fixtures/#{generated_fixture_name}") }
-    let(:generated_fixture_name) { "alert_caption.png" }
-    let!(:generated_image) { described_class.send(:caption_overlay, location_text).write_to_file(generated_filename) }
-    let(:generated_filename) { "tmp/generated_alert_caption.png" }
+  # Ditto the above - this was useful when creating the functionality, but doesn't need to run every CI run
+  if !ENV["CI"]
+    describe "caption_overlay" do
+      let(:target_image) { Rails.root.join("spec/fixtures/#{generated_fixture_name}") }
+      let(:generated_fixture_name) { "alert_caption.png" }
+      let!(:generated_image) { described_class.send(:caption_overlay, location_text).write_to_file(generated_filename) }
+      let(:generated_filename) { "tmp/generated_alert_caption.png" }
 
-    it "makes a caption image" do
-      # If the caption generation changes, use this to save the updated image:
-      # `mv #{generated_filename} spec/fixtures/#{generated_fixture_name}`
+      it "makes a caption image" do
+        # If the caption generation changes, use this to save the updated image:
+        # `mv #{generated_filename} spec/fixtures/#{generated_fixture_name}`
 
-      expect_images_to_match(generated_filename, target_image)
+        expect_images_to_match(generated_filename, target_image)
+      end
     end
   end
 end

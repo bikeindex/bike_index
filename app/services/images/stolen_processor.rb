@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "image_processing/vips"
 require "vips"
 
@@ -7,9 +8,9 @@ class Images::StolenProcessor
   # 4:5 and square are the recommended sizes per facebook ads guide 2025-2-27
   # facebook.com/business/ads-guide/update/image - 4:5 seems like the preferred
   TEMPLATE_CONFIG = {
-    four_by_five: { topbar: :horizontal, dimensions: [1440, 1800] },
-    square: { topbar: :horizontal, dimensions: [1440, 1440] },
-    landscape: { topbar: :vertical, dimensions: [1600, 990] }
+    four_by_five: {topbar: :horizontal, dimensions: [1440, 1800]},
+    square: {topbar: :horizontal, dimensions: [1440, 1440]},
+    landscape: {topbar: :vertical, dimensions: [1600, 990]}
   }.freeze
 
   TOPBAR_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
@@ -63,15 +64,13 @@ class Images::StolenProcessor
       alert_image = ImageProcessing::Vips.source(template_path(template))
         .composite(bike_image,
           mode: :over,
-          offset: bike_image_offset(config, bike_image.width, bike_image.height),
-        ).call(save: false)
+          offset: bike_image_offset(config, bike_image.width, bike_image.height)).call(save: false)
 
       # Add the topbar
       alert_image = ImageProcessing::Vips.source(alert_image)
         .composite(topbar_path(config[:topbar]),
           mode: :over,
-          offset: [0, 0],
-        )
+          offset: [0, 0])
       return alert_image.convert(convert).call if location_text.blank?
 
       # Add the location
@@ -80,8 +79,7 @@ class Images::StolenProcessor
         .composite(location_image,
           mode: :over,
           gravity: "south-east",
-          offset: [0, 40],
-        ).convert(convert).call
+          offset: [0, 40]).convert(convert).call
     end
 
     def template_path(template_sym)
@@ -89,33 +87,33 @@ class Images::StolenProcessor
     end
 
     def topbar_path(variety)
-      filename = variety == :horizontal ? "topbar" : "topbar-vertical"
+      filename = (variety == :horizontal) ? "topbar" : "topbar-vertical"
       Rails.root.join(PROMOTED_ALERTS_PATH, "#{filename}.png").to_s
     end
 
     def bike_image_dimensions_for(config)
       if config[:topbar] == :horizontal
         [config[:dimensions].first,
-         config[:dimensions].last - TOPBAR_HORIZONTAL_HEIGHT]
+          config[:dimensions].last - TOPBAR_HORIZONTAL_HEIGHT]
       else
         [config[:dimensions].first - TOPBAR_VERTICAL_WIDTH,
-         config[:dimensions].last]
+          config[:dimensions].last]
       end
     end
 
     def bike_image_offset(config, bike_image_width, bike_image_height)
       # for some reason, :centre and offset fails - so get the dimensions and manually center the image
-      left_offset = (config[:dimensions].first - bike_image_width)/2
-      top_offset = (config[:dimensions].last - bike_image_height)/2
+      left_offset = (config[:dimensions].first - bike_image_width) / 2
+      top_offset = (config[:dimensions].last - bike_image_height) / 2
       if config[:topbar] === :horizontal
         # landscape images look better vertically centered in the template. If offset is < top-bar height,
         # the image takes up the whole visible area - so use the top-bar min height. Otherwise, use the
         # offset (which vertically centers the image).
         top_offset = TOPBAR_HORIZONTAL_HEIGHT if top_offset < TOPBAR_HORIZONTAL_HEIGHT
-      else
-        # update the left offset
-        left_offset = TOPBAR_VERTICAL_WIDTH if left_offset < TOPBAR_VERTICAL_WIDTH
+      elsif left_offset < TOPBAR_VERTICAL_WIDTH
+        left_offset = TOPBAR_VERTICAL_WIDTH
       end
+      # update the left offset
 
       [left_offset, top_offset]
     end
@@ -127,11 +125,11 @@ class Images::StolenProcessor
 
       bg_color = [0, 0, 0] # topbar is 26, 26, 26
       text_with_bg = text_overlay.ifthenelse([255, 255, 255], bg_color, blend: true)
-      bordered_text = text_with_bg.embed(
+      text_with_bg.embed(
         border_width,                           # Left margin
         border_width,                           # Top margin
-        text_with_bg.width + 2*border_width,    # New width (original + left + right margin)
-        text_with_bg.height + 1.5*border_width, # New height (bottom border smaller because comma expands lower coverage)
+        text_with_bg.width + 2 * border_width,    # New width (original + left + right margin)
+        text_with_bg.height + 1.5 * border_width, # New height (bottom border smaller because comma expands lower coverage)
         background: bg_color          # Border color
       ).copy(interpretation: :srgb)   # Convert to a colorspace that can combine with the other image
     end
