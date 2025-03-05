@@ -18,6 +18,7 @@ cloudflare_dev:
   public: true
 
 cloudflare_production:
+  service: S3
   endpoint: <%= ENV["R2_ENDPOINT"] %>
   access_key_id: <%= ENV["R2_ACCESS_KEY"] %>
   secret_access_key: <%= ENV["R2_ACCESS_KEY_SECRET"] %>
