@@ -12,7 +12,7 @@ cloudflare_dev:
   service: S3
   endpoint: <%= ENV["R2_ENDPOINT"] %>
   access_key_id: <%= ENV["R2_ACCESS_KEY"] %>
-  secret_access_key: <%= ENV["R2_ACCESS_KEY_KEY"] %>
+  secret_access_key: <%= ENV["R2_ACCESS_KEY_SECRET"] %>
   bucket: bikeindex-dev
   region: auto
   public: true
@@ -20,7 +20,7 @@ cloudflare_dev:
 cloudflare_production:
   endpoint: <%= ENV["R2_ENDPOINT"] %>
   access_key_id: <%= ENV["R2_ACCESS_KEY"] %>
-  secret_access_key: <%= ENV["R2_ACCESS_KEY_KEY"] %>
+  secret_access_key: <%= ENV["R2_ACCESS_KEY_SECRET"] %>
   bucket: bikeindex
   region: auto
   public: true

@@ -75,6 +75,8 @@ gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
+gem "aws-sdk-s3", "1.170", require: false # Used by ActiveStorage for Cloudflare R2
+gem "aws-sdk-core", "3.211" # Required for S3 compatibility, see github.com/rails/rails/issues/54374
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
