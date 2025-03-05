@@ -42,11 +42,11 @@ jobs:
       postgres:
         image: postgres:16-alpine
         ports:
-          - "5432:5432"
+          - 5432:5432
         env:
-          POSTGRES_DB: bikeindex_test
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
       redis:
         image: redis
         ports:
@@ -59,13 +59,12 @@ jobs:
       TRANSLATION_BRANCH: main
       RETRY_FLAKY: true
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
       # install system dependencies
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get -y install \
+            google-chrome-stable \
             curl \
             gettext \
             imagemagick \
@@ -76,6 +75,8 @@ jobs:
             libz-dev \
             postgresql-client \
             ripgrep
+      - name: Checkout code
+        uses: actions/checkout@v4
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
@@ -83,7 +84,7 @@ jobs:
           bundler-cache: true
       - run: bundle install
       - name: Set up database schema
-        run: bin/rails db:schema:load --trace
+        run: bin/rails db:setup
       # Install JS dependencies
       - name: build assets
         run: bin/rails assets:precompile --trace
