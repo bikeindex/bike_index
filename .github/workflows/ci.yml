@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:17-alpine
         ports:
           - 5432:5432
         env:
@@ -54,7 +54,6 @@ jobs:
           --mount type=tmpfs,destination=/var/lib/postgresql/data
           --health-cmd pg_isready
           --health-interval 10s
-          --health-timeout 5s
           --health-retries 5
       redis:
         image: redis
@@ -95,8 +94,10 @@ jobs:
         with:
           bundler-cache: true
       - run: bundle install
-      - name: Set up database schema
+      - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
+      - name: Sync translations (only on main by default)
+        run: bin/check_translations
       # Install JS dependencies
       - name: build assets
         run: bin/rails assets:precompile --trace
