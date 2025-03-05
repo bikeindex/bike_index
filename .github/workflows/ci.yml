@@ -53,7 +53,7 @@ jobs:
           - "6379:6379"
     env:
       RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@localhost:5432/bikeindex_test"
+      DATABASE_URL: "postgres://rails:password@localhost:5432"
       COVERAGE: true
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
