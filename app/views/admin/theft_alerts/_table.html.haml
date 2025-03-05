@@ -22,6 +22,7 @@
           = sortable "end_at", render_sortable: render_sortable
         - if display_dev_info?
           %th.only-dev-visible.small FB updated
+          %th.only-dev-visible.small FB objective
         %th
           = sortable "reach", render_sortable: render_sortable
         %th.small Clicks
@@ -82,6 +83,10 @@
             %td
               - if theft_alert.facebook_updated_at.present?
                 %small.convertTime= l theft_alert.facebook_updated_at, format: :convert_time
+            %td
+              - if theft_alert.objective_adset.present?
+                %small{title: "Campaign: #{theft_alert.objective_campaign}\nAdset: #{theft_alert.objective_adset}\n"}
+                  = theft_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip
           %td
             = admin_number_display(theft_alert.reach)
           %td

@@ -3,6 +3,7 @@
 
 # Ignore all logfiles and tempfiles.
 /log/*.log*
+/storage/*
 /tmp
 .DS_Store
 coverage/*

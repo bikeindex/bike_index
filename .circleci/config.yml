@@ -75,6 +75,7 @@ jobs:
               curl \
               gettext \
               imagemagick \
+              libvips \
               libcurl4-gnutls-dev \
               libexpat1-dev \
               libssl-dev \

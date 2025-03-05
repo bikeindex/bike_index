@@ -78,4 +78,9 @@ class PublicImage < ApplicationRecord
   def local_file?
     image&._storage&.to_s == "CarrierWave::Storage::File"
   end
+
+  # To enable stream processing for both local and remote files
+  def open_file
+    local_file? ? File.open(image.path, "r") : URI.parse(image.url).open
+  end
 end

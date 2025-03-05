@@ -23,9 +23,12 @@ _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby an
 
 - PostgreSQL
 
-- Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
+- Redis
 
-- [Sidekiq](https://github.com/mperham/sidekiq), which requires [Redis](http://redis.io/).
+- `libvips` and `imagemagick` for image manipulation
+  - Eventually, `imagemagick` will only be required for testing (via [chunky_png](https://github.com/wvanbergen/chunky_png)), but we're not there yet
+
+- [Sidekiq](https://github.com/mperham/sidekiq)
 
 
 ## Running Bike Index locally
