@@ -32,7 +32,6 @@ module Bikeindex
 
     # Use our custom error pages
     config.exceptions_app = routes
-    routes.default_url_options = config.action_mailer.default_url_options
 
     config.time_zone = "Central Time (US & Canada)"
 
