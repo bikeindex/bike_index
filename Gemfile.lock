@@ -913,6 +913,7 @@ DEPENDENCIES
   sidekiq
   sidekiq-failures
   simplecov
+  simplecov_json_formatter
   sitemap_generator (~> 6)
   skylight
   sprockets-rails
