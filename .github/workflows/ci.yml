@@ -54,9 +54,28 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/bikeindex_test"
+      COVERAGE: true
+      CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
+      TRANSLATION_BRANCH: main
+      RETRY_FLAKY: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      # install system dependencies
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install \
+            curl \
+            gettext \
+            imagemagick \
+            libvips \
+            libcurl4-gnutls-dev \
+            libexpat1-dev \
+            libssl-dev \
+            libz-dev \
+            postgresql-client \
+            ripgrep
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1

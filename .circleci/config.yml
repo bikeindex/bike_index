@@ -235,17 +235,17 @@ jobs:
           command: |
             curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
-workflows:
-  commit:
-    jobs:
-      - test
-      - brakeman_scan
-      - upload-coverage:
-          requires:
-            - test
-      - deploy_production:
-          requires:
-            - test
-          filters:
-            branches:
-              only: main
+# workflows:
+#   commit:
+#     jobs:
+#       - test
+#       - brakeman_scan
+#       - upload-coverage:
+#           requires:
+#             - test
+#       - deploy_production:
+#           requires:
+#             - test
+#           filters:
+#             branches:
+#               only: main
