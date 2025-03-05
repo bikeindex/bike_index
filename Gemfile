@@ -59,7 +59,9 @@ gem "money-rails", "~> 1.11"
 gem "sitemap_generator", "~> 6"
 
 # Making other files
+gem "image_processing" # what it says
 gem "mini_magick" # Required for image processing
+gem "ruby-vips" # Faster image processing, should eventually replace mini_magick
 gem "carrierwave", "~> 2.2.6" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
@@ -73,6 +75,8 @@ gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
+gem "aws-sdk-s3", "1.170", require: false # Used by ActiveStorage for Cloudflare R2
+gem "aws-sdk-core", "3.211" # Required for S3 compatibility, see github.com/rails/rails/issues/54374
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
@@ -160,4 +164,5 @@ group :test do
   gem "rspec-retry", require: false # Retry flaky test failures on CI
   gem "capybara" # For view components
   gem "selenium-webdriver" # For capybara
+  gem "chunky_png" # used to test that generated images match their targets
 end

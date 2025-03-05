@@ -27,6 +27,9 @@ module Bikeindex
 
     config.load_defaults 8.0
 
+    # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
+    config.active_job.queue_adapter = :sidekiq
+
     # Use our custom error pages
     config.exceptions_app = routes
 
