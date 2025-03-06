@@ -193,6 +193,7 @@ class StolenRecord < ApplicationRecord
   end
 
   def purge_images!
+    alert_image&.destroy
     image_four_by_five.purge
     image_square.purge
     image_landscape.purge
