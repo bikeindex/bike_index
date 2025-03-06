@@ -1,0 +1,68 @@
+<title><%= @page_title %></title>
+
+<meta charset="utf-8">
+<meta content="ie=edge" http-equiv="x-ua-compatible">
+<meta name="handheldfriendly" content="true">
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="<%= @page_description %>">
+
+<meta property="og:site_name" content="Bike Index">
+<meta property="og:title" content="<%= @page_title %>">
+<meta property="og:description" content="<%= @page_description %>">
+<meta property="og:image" content="<%= @page_image %>">
+<meta property="og:url" content="<%= url_page %>">
+<meta content="223376277803071" property="fb:app_id">
+<% if date_published.present? %><meta property="og:published_time" content="<%= date_published %>"><% end %>
+<% if date_modified.present? %><meta property="og:modified_time" content="<%= date_modified %>"><% end %>
+
+<meta name="twitter:title" content="<% @page_title %>">
+<meta name="twitter:description" content="<%= @page_description %>">
+<meta name="twitter:image" content="<% @page_image %>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@bikeindex">
+<meta name="twitter:site" content="@bikeindex">
+<meta name="twitter:image:alt" content="<% @page_description %>">
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Bike Index",
+    "description": "<%= bike_index_description %>",
+    "url": "https://bikeindex.org",
+    "image": "https://bikeindex.org/opengraph.png"
+  }
+</script>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Bike Index",
+    "url": "https://bikeindex.org"
+  }
+</script>
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "<%= json_ld_type %>",
+    "image": "<%= @page_image %>",
+    "url": "<%= url_page %>",
+    "headline": "<%= @page_title %>",
+    "alternativeHeadline": "<%= @page_description %>",
+    <% if date_published.present? %>"datePublished": "<%= date_published %>",<% end %>
+    <% if date_modified.present? %>"dateModified": "<%= date_modified %>"<% end %>
+  }
+</script>
+
+<link rel="canonical" href="<%= url_cannonical %>">
+
+<%# favicons %>
+<% if Rails.env.development? %>
+  <%# don't include an svg version in development, we only want to show the dev icon %>
+  <link rel="icon" href="/favicon_dev.ico">
+<% else %>
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+<% end %>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
