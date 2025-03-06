@@ -6,63 +6,63 @@
 <meta name="viewport" content="width=device-width">
 <meta name="description" content="<%= @page_description %>">
 
-"og:published_time" => @blog.published_at.utc,
-"og:modified_time" => @blog.updated_at.utc
-
 <meta property="og:site_name" content="Bike Index">
-<meta property="og:title" content="<% @page_title %>">
+<meta property="og:title" content="<%= @page_title %>">
 <meta property="og:description" content="<%= @page_description %>">
-<meta property="og:image" content="https://dev.37signals.com/assets/images/opengraph/pure-storage-monitoring.png">
-<meta property="og:url" content="https://dev.37signals.com/pure-storage-monitoring/">
-<meta property="og:type" content="website">
+<meta property="og:image" content="<%= @page_image %>">
+<meta property="og:url" content="<%= url_page %>">
+<meta content="223376277803071" property="fb:app_id">
+<% if date_published.present? %><meta property="og:published_time" content="<%= date_published %>"><% end %>
+<% if date_modified.present? %><meta property="og:modified_time" content="<%= date_modified %>"><% end %>
 
 <meta name="twitter:title" content="<% @page_title %>">
 <meta name="twitter:description" content="<%= @page_description %>">
-<meta name="twitter:image" content="https://dev.37signals.com/assets/images/opengraph/pure-storage-monitoring.png">
+<meta name="twitter:image" content="<% @page_image %>">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:creator" content="@37signals">
-<meta name="twitter:site" content="@37signals">
-<meta name="twitter:image:alt" content="37signals Dev">
+<meta name="twitter:creator" content="@bikeindex">
+<meta name="twitter:site" content="@bikeindex">
+<meta name="twitter:image:alt" content="<% @page_description %>">
 
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "37signals Dev",
-    "description": "The 37signals Dev blog is brought to you by the people who build Basecamp, HEY, and ONCE ✌️❤️",
-    "url": "https://dev.37signals.com",
-    "image": "https://dev.37signals.com/assets/images/global/opengraph.png"
+    "name": "Bike Index",
+    "description": "<%= bike_index_description %>",
+    "url": "https://bikeindex.org",
+    "image": "https://bikeindex.org/opengraph.png"
   }
 </script>
-
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "37signals Dev",
-    "url": "https://dev.37signals.com"
+    "name": "Bike Index",
+    "url": "https://bikeindex.org"
   }
 </script>
-
-
 
 <script type="application/ld+json">
   {
     "@context": "http://schema.org",
-    "@type": "BlogPosting",
-    "image": "https://dev.37signals.com/assets/images/opengraph/pure-storage-monitoring.png",
-    "url": "https://dev.37signals.com/pure-storage-monitoring/",
-    "headline": "<% @page_title %>",
+    "@type": "<%= json_ld_type %>",
+    "image": "<%= @page_image %>",
+    "url": "<%= url_page %>",
+    "headline": "<%= @page_title %>",
     "alternativeHeadline": "<%= @page_description %>",
-    "datePublished": "2025-01-02 00:00:00 +0000"
+    <% if date_published.present? %>"datePublished": "<%= date_published %>",<% end %>
+    <% if date_modified.present? %>"dateModified": "<%= date_modified %>"<% end %>
   }
 </script>
 
+<link rel="canonical" href="<%= url_cannonical %>">
 
-
-<link rel="canonical" href="https://dev.37signals.com/pure-storage-monitoring/">
-
-<link rel="icon" href="/assets/images/global/favicon.png">
-<link rel="apple-touch-icon" href="/assets/images/global/apple-touch-icon.png">
-<%= tag(:link, rel: "shortcut icon", href: (Rails.env.development? ? "/favicon_dev.ico" : "/fav.ico")) %>
-<%= tag(:link, rel: "apple-touch-icon-precomposed apple-touch-icon", href: "/apple-touch-icon.png") %>
+<%# favicons %>
+<% if Rails.env.development? %>
+  <%# don't include an svg version in development, we only want to show the dev icon %>
+  <link rel="icon" href="/favicon_dev.ico">
+<% else %>
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+<% end %>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
