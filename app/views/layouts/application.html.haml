@@ -1,7 +1,10 @@
 !!!
 %html{ lang: I18n.locale }
   %head
-    = header_tags
+    - page_obj = @page_obj || @blog || @bike
+    <%= render(HeaderTags::Component.new(page_obj:, page_title: @page_title, controller_name:, controller_namespace:, action_name:)) %>
+    -# TODO: Cache this ^
+    = csrf_meta_tags
     = stylesheet_link_tag 'revised'
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>

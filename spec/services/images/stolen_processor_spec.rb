@@ -39,12 +39,14 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.image_square.attached?).to be_truthy
       expect(stolen_record.image_landscape.attached?).to be_truthy
 
+      stolen_record.bike.update_column :updated_at, Time.current - 1.hour
       # and calling it again removes the images (since the stolen record has no actual images)
       described_class.update_alert_images(stolen_record)
 
       expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
       expect(stolen_record.image_square.attached?).to be_falsey
       expect(stolen_record.image_landscape.attached?).to be_falsey
+      expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
     end
   end
 
@@ -85,15 +87,14 @@ RSpec.describe Images::StolenProcessor do
     # If the image generation updates, use this to save the updated image:
     # before { `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}` }
 
-    # Commented out because I want to merge #2716 - even though it isn't passing CI
-    # context "with template: landscape" do
-    #   let(:template) { :landscape }
-    #   let(:generated_fixture_name) { "alert-landscape-landscape.png" }
+    context "with template: landscape" do
+      let(:template) { :landscape }
+      let(:generated_fixture_name) { "alert-landscape-landscape.png" }
 
-    #   it "creates an image matching target" do
-    #     expect_images_to_match(generated_image, target_image)
-    #   end
-    # end
+      it "creates an image matching target" do
+        expect_images_to_match(generated_image, target_image)
+      end
+    end
 
     # These tests take a substantial amount of resources and are largely the same
     # - they were useful for building the functionality, and will be useful if it's ever changed -

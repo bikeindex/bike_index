@@ -1,0 +1,68 @@
+<title><%= @page_title %></title>
+
+<meta charset="utf-8">
+<meta content="ie=edge" http-equiv="x-ua-compatible">
+<meta name="handheldfriendly" content="true">
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="<%= @page_description %>">
+
+"og:published_time" => @blog.published_at.utc,
+"og:modified_time" => @blog.updated_at.utc
+
+<meta property="og:site_name" content="Bike Index">
+<meta property="og:title" content="<% @page_title %>">
+<meta property="og:description" content="<%= @page_description %>">
+<meta property="og:image" content="https://dev.37signals.com/assets/images/opengraph/pure-storage-monitoring.png">
+<meta property="og:url" content="https://dev.37signals.com/pure-storage-monitoring/">
+<meta property="og:type" content="website">
+
+<meta name="twitter:title" content="<% @page_title %>">
+<meta name="twitter:description" content="<%= @page_description %>">
+<meta name="twitter:image" content="https://dev.37signals.com/assets/images/opengraph/pure-storage-monitoring.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@37signals">
+<meta name="twitter:site" content="@37signals">
+<meta name="twitter:image:alt" content="37signals Dev">
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "37signals Dev",
+    "description": "The 37signals Dev blog is brought to you by the people who build Basecamp, HEY, and ONCE ✌️❤️",
+    "url": "https://dev.37signals.com",
+    "image": "https://dev.37signals.com/assets/images/global/opengraph.png"
+  }
+</script>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "37signals Dev",
+    "url": "https://dev.37signals.com"
+  }
+</script>
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "image": "https://dev.37signals.com/assets/images/opengraph/pure-storage-monitoring.png",
+    "url": "https://dev.37signals.com/pure-storage-monitoring/",
+    "headline": "<% @page_title %>",
+    "alternativeHeadline": "<%= @page_description %>",
+    "datePublished": "2025-01-02 00:00:00 +0000"
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://dev.37signals.com/pure-storage-monitoring/">
+
+<link rel="icon" href="/assets/images/global/favicon.png">
+<link rel="apple-touch-icon" href="/assets/images/global/apple-touch-icon.png">
+<%= tag(:link, rel: "shortcut icon", href: (Rails.env.development? ? "/favicon_dev.ico" : "/fav.ico")) %>
+<%= tag(:link, rel: "apple-touch-icon-precomposed apple-touch-icon", href: "/apple-touch-icon.png") %>

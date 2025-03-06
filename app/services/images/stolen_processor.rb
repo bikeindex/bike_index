@@ -25,13 +25,15 @@ class Images::StolenProcessor
       # This relies on existing carrierewave methods, will need to be updated
       image ||= stolen_record.bike_main_image&.open_file
 
-      stolen_record.image_four_by_five.purge
-      stolen_record.image_square.purge
-      stolen_record.image_landscape.purge
-      return if image.blank?
+      stolen_record.purge_images!
+      attach_images(stolen_record, image, stolen_record_location(stolen_record)) if image.present?
+      stolen_record.bike&.update(updated_at: Time.current)
+      stolen_record
+    end
 
-      location_text = stolen_record_location(stolen_record)
+    private
 
+    def attach_images(stolen_record, image, location_text)
       stolen_record.image_four_by_five
         .attach(io: generate_alert(template: :four_by_five, image:, location_text:),
           filename: "stolen-#{stolen_record.id}-four_by_five.jpeg")
@@ -46,10 +48,7 @@ class Images::StolenProcessor
         .attach(io: generate_alert(template: :landscape, image:, location_text:),
           filename: "stolen-#{stolen_record.id}-landscape.jpeg")
       stolen_record.image_landscape.analyze
-      stolen_record
     end
-
-    private
 
     def generate_alert(template:, image:, location_text:, convert: "jpeg")
       config = TEMPLATE_CONFIG[template]

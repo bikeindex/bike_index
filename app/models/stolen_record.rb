@@ -192,6 +192,12 @@ class StolenRecord < ApplicationRecord
     end
   end
 
+  def purge_images!
+    image_four_by_five.purge
+    image_square.purge
+    image_landscape.purge
+  end
+
   # override to enable reverse geocoding if applicable
   def should_be_geocoded?
     !skip_geocoding?
