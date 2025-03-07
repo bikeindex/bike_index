@@ -1,4 +1,32 @@
 module HeaderTagHelper
+  def header_tags_component_options
+    organization_name = current_organization&.short_name
+    translation_location = translation_location_for(controller_name, action_name)
+    page_title = @page_title || t("meta_titles.#{translation_location}", organization: organization_name)
+    page_description = t("meta_descriptions.#{translation_location}", organization: organization_name)
+
+    {
+      page_title:,
+      page_description:,
+      page_obj: @page_obj || @blog || @bike,
+      updated_at: @page_updated_at,
+      organization_name:,
+      controller_name:,
+      controller_namespace:,
+      action_name:,
+      request_url: request.url,
+      language: I18n.locale
+    }
+  end
+
+  def translation_location_for(controller_name, action_name)
+    # welcome_choose_registration    => bikes_new
+    # (action_name == "new" || action_name == "create") && @bike.status_stolen? => bikes_new_stolen
+
+    "#{controller_name}_#{action_name}"
+  end
+
+
   def header_tags
     header_tag_array.compact.join("\n").html_safe
   end

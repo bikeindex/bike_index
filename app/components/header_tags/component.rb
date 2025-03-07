@@ -5,7 +5,7 @@ module HeaderTags
     DEFAULT_IMAGE = "/opengraph.png"
     DEFAULT_TWITTER = "@bikeindex"
 
-    def initialize(page_title: nil, page_description: nil, page_obj: nil, updated_at: nil, current_organization: nil,
+    def initialize(page_title: nil, page_description: nil, page_obj: nil, updated_at: nil, organization_name: nil,
                    controller_name:, controller_namespace: nil, action_name:, request_url:, language:)
 
       # TODO: Do any pages need a query string?
@@ -19,7 +19,7 @@ module HeaderTags
       elsif page_obj.is_a?(Blog)
         assign_blog_attrs(page_obj)
       else
-        # assign_page_title_and_description(page_title:, controller_name:, controller_namespace:, action_name:, current_organization:)
+
       end
 
       # Can we drop assigning controller_name? only required for atom
