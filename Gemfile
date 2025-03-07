@@ -5,7 +5,6 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-# Update CircleCI config if Ruby version is bumped
 ruby "3.3.7"
 
 # Gems that are no longer in standard library as Ruby 3.4
@@ -148,7 +147,6 @@ group :development, :test do
   gem "pry-rails"
   gem "rspec"
   gem "rspec-rails"
-  gem "rspec_junit_formatter" # For circle ci
   gem "standard" # Ruby linter
   # I18n - localization/translation
   gem "i18n-tasks"
@@ -159,6 +157,7 @@ group :test do
   gem "rails-controller-testing"
   gem "rspec-sidekiq"
   gem "simplecov", require: false
+  gem "simplecov_json_formatter", require: false # Fix json error
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI

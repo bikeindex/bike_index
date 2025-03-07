@@ -6,5 +6,6 @@ Rails.application.config.dartsass.builds = {
   "spokecard.scss" => "spokecard.css",
   "documentation_v2.scss" => "documentation_v2.css",
   "email.scss" => "email.css",
+  "registrations.scss" => "registrations.css",
   "og_application.scss" => "og_application.css"
 }
