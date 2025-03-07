@@ -19,43 +19,35 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Mar 2025 23:00:53 GMT
+      - Fri, 07 Mar 2025 23:12:35 GMT
       Content-Type:
       - application/json; Charset=UTF-8
       Transfer-Encoding:
       - chunked
       Connection:
       - keep-alive
-      Cache-Control:
-      - no-cache
+      X-Apilayer-Transaction-Id:
+      - 4fb5b736-496f-4604-9daa-d641f9147521
       Access-Control-Allow-Methods:
       - GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS
       Access-Control-Allow-Origin:
       - "*"
-      X-Blocked-At-Loadbalancer:
-      - '1'
+      X-Request-Time:
+      - '0.011'
       Cf-Cache-Status:
       - DYNAMIC
       Report-To:
-      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=E7nSbMup1B8VCFfPfUxAnJQOIfIW7GMbcGEiJYkhJ7Eqr3hl1PkzvsdVId4kfrC8s1yeqF7z1FW8LRjwn%2FSair1yFcB2yULS5fI711haDa9DaHYFsUG7RxbtS3jMw5K3S7uae1BrJnwu"}],"group":"cf-nel","max_age":604800}'
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=HDUE6xxlykMqOln3t%2F588q%2B%2BcoL05cD1atWIG8GzPgvu1q51K%2Fw6Woh4zZ77cIEWjnvsh5NitMZC2M3CJQdwYOZNXoBBreYRyr5udhx8G6NlD9%2B2ytLnrCX7iOgSN8jDHZmB9Brx2SD2"}],"group":"cf-nel","max_age":604800}'
       Nel:
       - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
       Server:
       - cloudflare
       Cf-Ray:
-      - 91cdb62a5ebd227e-SJC
+      - 91cdc74a8fb09e4d-SJC
       Server-Timing:
-      - cfL4;desc="?proto=TCP&rtt=6895&min_rtt=6737&rtt_var=2843&sent=4&recv=6&lost=0&retrans=0&sent_bytes=2329&recv_bytes=799&delivery_rate=361864&cwnd=236&unsent_bytes=0&cid=15a77c286eb233a9&ts=178&x=0"
+      - cfL4;desc="?proto=TCP&rtt=8532&min_rtt=7935&rtt_var=4170&sent=4&recv=6&lost=0&retrans=0&sent_bytes=2328&recv_bytes=821&delivery_rate=227816&cwnd=245&unsent_bytes=0&cid=dcf30aba11e7c10b&ts=229&x=0"
     body:
       encoding: ASCII-8BIT
-      string: |
-        {
-          "success": false,
-          "error": {
-            "code": 101,
-            "type": "invalid_access_key",
-            "info": "You have not supplied a valid API Access Key. [Technical Support: support@apilayer.com]"
-          }
-        }
-  recorded_at: Fri, 07 Mar 2025 23:00:53 GMT
+      string: '{"success":true,"timestamp":1741387391,"base":"CAD","date":"2025-03-07","rates":{"AED":2.5554,"AFN":50.446318,"ALL":63.576284,"AMD":274.53838,"ANG":1.254618,"AOA":636.287153,"ARS":740.981169,"AUD":1.106861,"AWG":1.252391,"AZN":1.185576,"BAM":1.254875,"BBD":1.405527,"BDT":84.577988,"BGN":1.253764,"BHD":0.262283,"BIF":2026.438783,"BMD":0.695773,"BND":0.926367,"BOB":4.810205,"BRL":4.026302,"BSD":0.696091,"BTC":8.060064e-6,"BTN":60.496809,"BWP":9.465138,"BYN":2.278126,"BYR":13637.150268,"BZD":1.398277,"CAD":1,"CDF":2000.347549,"CHF":0.612869,"CLF":0.016854,"CLP":646.769958,"CNY":5.033396,"CNH":5.04098,"COP":2876.32547,"CRC":351.991233,"CUC":0.695773,"CUP":18.437984,"CVE":71.073483,"CZK":16.017184,"DJF":123.653046,"DKK":4.789982,"DOP":43.627668,"DZD":92.720822,"EGP":35.260887,"ERN":10.436595,"ETB":89.754962,"EUR":0.642062,"FJD":1.610742,"FKP":0.53957,"GBP":0.539213,"GEL":1.930798,"GGP":0.53957,"GHS":10.752759,"GIP":0.53957,"GMD":50.160488,"GNF":6018.756347,"GTQ":5.362729,"GYD":145.072528,"HKD":5.406306,"HNL":17.691365,"HRK":4.838617,"HTG":91.230812,"HUF":256.825342,"IDR":11364.735428,"ILS":2.516653,"IMP":0.53957,"INR":60.559778,"IQD":905.548872,"IRR":29297.623241,"ISK":94.486305,"JEP":0.53957,"JMD":109.067436,"JOD":0.493331,"JPY":103.009456,"KES":89.870206,"KGS":61.022909,"KHR":2754.948182,"KMF":316.416997,"KPW":626.203624,"KRW":1007.030854,"KWD":0.214436,"KYD":0.575608,"KZT":345.668293,"LAK":14898.257551,"LBP":62323.096361,"LKR":205.473502,"LRD":138.530879,"LSL":12.622443,"LTL":2.054437,"LVL":0.420866,"LYD":3.354184,"MAD":6.779226,"MDL":12.849256,"MGA":3239.768495,"MKD":39.605375,"MMK":1460.369105,"MNT":2413.640132,"MOP":5.569522,"MRU":27.375739,"MUR":31.476141,"MVR":10.745101,"MWK":1191.307416,"MXN":14.09692,"MYR":3.080119,"MZN":44.453161,"NAD":12.622443,"NGN":1046.596643,"NIO":25.461799,"NOK":7.558254,"NPR":96.941064,"NZD":1.218357,"OMR":0.267867,"PAB":0.695773,"PEN":2.53641,"PGK":2.827376,"PHP":39.890379,"PKR":193.098514,"PLN":2.682946,"PYG":5498.250759,"QAR":2.532874,"RON":3.199359,"RSD":75.329808,"RUB":62.097527,"RWF":984.619588,"SAR":2.609408,"SBD":5.929978,"SCR":9.967545,"SDG":418.12688,"SEK":7.021922,"SGD":0.926442,"SHP":0.546768,"SLE":15.898671,"SLL":14590.015278,"SOS":392.336934,"SRD":25.008053,"STD":14401.095778,"SVC":6.088271,"SYP":9046.39569,"SZL":12.622443,"THB":23.436206,"TJS":7.583917,"TMT":2.433225,"TND":2.153911,"TOP":1.675306,"TRY":25.376374,"TTD":4.715903,"TWD":22.880496,"TZS":1819.129257,"UAH":28.747271,"UGX":2552.977415,"USD":0.695773,"UYU":29.647272,"UZS":8943.337481,"VES":44.862168,"VND":17755.715675,"VUV":86.495261,"WST":1.964034,"XAF":421.88933,"XAG":0.021406,"XAU":0.000239,"XCD":1.883687,"XDR":0.523763,"XOF":421.88933,"XPF":76.750136,"YER":171.709691,"ZAR":12.694691,"ZMK":6262.794179,"ZMW":20.022335,"ZWL":224.038613}}'
+  recorded_at: Fri, 07 Mar 2025 23:12:35 GMT
 recorded_with: VCR 6.3.1
