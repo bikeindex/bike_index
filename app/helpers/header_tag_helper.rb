@@ -38,7 +38,8 @@ module HeaderTagHelper
       template_str = @edit_templates[@edit_template] || @edit_template&.humanize
       "#{template_str} - #{@bike.title_string}"
     else
-      "Edit #{@bike.title_string}"
+      bike_obj = @bike || @bike_version
+      "Edit #{bike_obj&.title_string}"
     end
   end
 
@@ -50,7 +51,7 @@ module HeaderTagHelper
     return "bikes_new" if controller_name == "welcome" && action_name == "choose_registration"
 
     if %w[bikes bike_versions].include?(controller_name)
-      return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && @bike.status_stolen?
+      return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && @bike&.status_stolen?
     end
 
     "#{controller_name}_#{action_name}"
