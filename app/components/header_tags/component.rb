@@ -29,8 +29,8 @@ module HeaderTags
 
     private
 
-    def bike_index_description
-      "Default description, but translated"
+    def default_description
+      t("meta_descriptions.welcome_index")
     end
 
     def page_image

@@ -32,7 +32,7 @@
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Bike Index",
-    "description": "<%= bike_index_description %>",
+    "description": "<%= default_description %>",
     "url": "https://bikeindex.org",
     "image": "https://bikeindex.org/opengraph.png"
   }
@@ -51,7 +51,7 @@
 
 <link rel="canonical" href="<%= url_canonical %>">
 
-<%# favicons %>
+<%# favicons! %>
 <% if Rails.env.development? %>
   <%# don't include an svg version in development, we only want to show the dev icon %>
   <link rel="icon" href="/favicon_dev.ico">

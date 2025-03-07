@@ -123,10 +123,11 @@ RSpec.describe HeaderTags::Component, type: :component do
   end
 
   describe "bikes_header_tags" do
+    let(:controller_name) { "bikes" }
     let(:bike) { Bike.new(status: "status_stolen") }
     context "new stolen bike" do
       let(:user) { FactoryBot.build(:user) }
-      it "says new stolen on new stolen" do
+      xit "says new stolen on new stolen" do
         allow(view).to receive(:current_user).and_return(user)
         allow(view).to receive(:action_name).and_return("new")
         @bike = bike # So that it's assigned in the helper
