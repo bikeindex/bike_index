@@ -118,13 +118,23 @@ module HeaderTags
     end
 
     def bike_page_description(bike, status_prefix)
-      special_status_string = if bike.status_stolen? && bike.current_stolen_record.present?
-        "#{status_prefix}: #{bike.current_stolen_record.date_stolen&.strftime("%Y-%m-%d")}, from: #{bike.current_stolen_record.address(country: [:iso])}"
+      special_status_string = if bike.is_a?(BikeVersion)
+        [
+          "Version",
+          bike.start_at.present? ? "from: #{date(bike.start_at)}" : nil,
+          bike.end_at.present? ? "to: #{date(bike.end_at)}" : nil
+        ].compact.join(" ")
+      elsif bike.status_stolen? && bike.current_stolen_record.present?
+        "#{status_prefix}: #{date(bike.current_stolen_record.date_stolen)}, from: #{bike.current_stolen_record.address(country: [:iso])}"
       elsif bike.current_impound_record.present?
-        "#{status_prefix}: #{bike.current_impound_record.impounded_at&.strftime("%Y-%m-%d")}, in: #{bike.current_impound_record.address(country: [:iso, :optional])}"
+        "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.address(country: [:iso, :optional])}"
       end
+
+      # Don't show serial on bike versions
+      serial_display = bike.is_a?(Bike) ? ", serial: #{bike.serial_display}" : ""
+
       [
-        "#{bike.frame_colors.to_sentence} #{bike.title_string}, serial: #{bike.serial_display}.",
+        "#{bike.frame_colors.to_sentence} #{bike.title_string}#{serial_display}.",
         (bike.description.present? ? "#{bike.description}." : nil),
         special_status_string
       ].compact.join(" ")
@@ -161,6 +171,10 @@ module HeaderTags
         show: "View",
         create: "Created"
       }.as_json.freeze[action_name]
+    end
+
+    def date(datetime = nil)
+      datetime&.strftime("%Y-%m-%d") # Verify 8601
     end
   end
 end
