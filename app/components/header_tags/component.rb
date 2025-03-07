@@ -77,37 +77,6 @@ module HeaderTags
         .merge(@updated_at.present? ? {"dateModified" => @updated_at} : {})
     end
 
-    def assign_bike_attrs(bike, action_name)
-      @updated_at = bike&.updated_at&.utc&.iso8601(0)
-      return unless action_name == "show"
-
-      status_prefix = bike.status_with_owner? ? "" : bike.status_humanized.titleize
-      @page_title ||= [status_prefix, bike.title_string].compact.join(" ")
-
-      special_status_string = if bike.status_stolen? && bike.current_stolen_record.present?
-        "#{status_prefix}: #{bike.current_stolen_record.date_stolen&.strftime("%Y-%m-%d")}, from: #{bike.current_stolen_record.address(country: [:iso])}"
-      elsif bike.current_impound_record.present?
-        "#{status_prefix}: #{bike.current_impound_record.impounded_at&.strftime("%Y-%m-%d")}, in: #{bike.current_impound_record.address(country: [:iso, :optional])}"
-      end
-
-      @page_description = [
-        "#{bike.frame_colors.to_sentence} #{bike.title_string}, serial: #{bike.serial_display}.",
-        (bike.description.present? ? "#{bike.description}." : nil),
-        special_status_string
-      ].compact.join(" ")
-
-      if bike.current_stolen_record.present?
-        @page_image = bike.alert_image_url(:square)
-        @twitter_image = bike.alert_image_url(:twitter)
-        @facebook_image = bike.alert_image_url(:facebook)
-      elsif bike.image_url.present?
-        @page_image = bike.image_url(:large)
-      end
-      if bike.owner&.show_twitter && bike.owner.twitter.present?
-        @twitter_creator = "@#{bike.owner.twitter}"
-      end
-    end
-
     def assign_blog_attrs(blog)
       @updated_at = blog.updated_at.utc.iso8601(0)
       @published_at = blog.updated_at.utc.iso8601(0)
@@ -125,6 +94,40 @@ module HeaderTags
 
       @twitter_creator = "@#{blog.user.twitter}" if blog.user.twitter
       @author = "/users/#{blog.user&.to_param}"
+    end
+
+    def assign_bike_attrs(bike, action_name)
+      @updated_at = bike&.updated_at&.utc&.iso8601(0)
+      return unless action_name == "show"
+
+      status_prefix = bike.status_with_owner? ? "" : bike.status_humanized.titleize
+      @page_title ||= [status_prefix, bike.title_string].compact.join(" ")
+
+      @page_description = bike_page_description(bike, status_prefix)
+
+      if bike.current_stolen_record.present?
+        @page_image = bike.alert_image_url(:square)
+        @twitter_image = bike.alert_image_url(:twitter)
+        @facebook_image = bike.alert_image_url(:facebook)
+      elsif bike.image_url.present?
+        @page_image = bike.image_url(:large)
+      end
+      if bike.owner&.show_twitter && bike.owner.twitter.present?
+        @twitter_creator = "@#{bike.owner.twitter}"
+      end
+    end
+
+    def bike_page_description(bike, status_prefix)
+      special_status_string = if bike.status_stolen? && bike.current_stolen_record.present?
+        "#{status_prefix}: #{bike.current_stolen_record.date_stolen&.strftime("%Y-%m-%d")}, from: #{bike.current_stolen_record.address(country: [:iso])}"
+      elsif bike.current_impound_record.present?
+        "#{status_prefix}: #{bike.current_impound_record.impounded_at&.strftime("%Y-%m-%d")}, in: #{bike.current_impound_record.address(country: [:iso, :optional])}"
+      end
+      [
+        "#{bike.frame_colors.to_sentence} #{bike.title_string}, serial: #{bike.serial_display}.",
+        (bike.description.present? ? "#{bike.description}." : nil),
+        special_status_string
+      ].compact.join(" ")
     end
 
     def auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
