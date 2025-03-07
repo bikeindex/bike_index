@@ -5,14 +5,14 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=pay&payment_method_types[0]=card&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Payment&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew
+      string: submit_type=pay&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Payment&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_Qte4OZgjxf7mFc","request_duration_ms":233}}'
+      - '{"last_request_metrics":{"request_id":"req_h2pzFdJizPmAqm","request_duration_ms":112}}'
       Idempotency-Key:
-      - e982d4e0-aa67-4d8c-9792-8ad31b4dbeb2
+      - 7aee7f7b-50bf-4bf1-9fe4-2a67ffe376c0
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -29,11 +29,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sun, 02 Feb 2025 18:32:02 GMT
+      - Fri, 07 Mar 2025 23:05:28 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2446'
+      - '2556'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -51,20 +51,20 @@ http_interactions:
       - no-cache, no-store
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
-        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; upgrade-insecure-requests;
-        report-uri https://q.stripe.com/csp-violation?q=JF20kzjnC6OfVpMM8733X2_t-8rdEeqkmDQHC1EeqHOdkWxCuBmnxjXgXfeuWfAqi2bil5PECQUMIfKu
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=8H-tPleMFlSkfpVfpeqeXBgeCMMIoaoVdepwX7H3VkvcLxXrfiudXZbi9ej1C0eLLTyGcX3jnkLBFtR9
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Idempotency-Key:
-      - e982d4e0-aa67-4d8c-9792-8ad31b4dbeb2
+      - 7aee7f7b-50bf-4bf1-9fe4-2a67ffe376c0
       Original-Request:
-      - req_3wy9sa3mzQVvAG
+      - req_WM40Yfpiw99Zh7
       Report-To:
       - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_3wy9sa3mzQVvAG
+      - req_WM40Yfpiw99Zh7
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -83,7 +83,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a18Gi9WkIdaW40hdIxlzQ93VFYvO7D4kXo5ErPGiikkUnv6UxCQp4qdVL8",
+          "id": "cs_test_a1fsQuMCV9Ix2ShRWX6uKBBSJ8VDwPYraLzHiINGiAu3xdNGl4RvL5Svgn",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": false
@@ -101,9 +101,10 @@ http_interactions:
           "cancel_url": "http://test.host/payments/new",
           "client_reference_id": null,
           "client_secret": null,
+          "collected_information": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1738521122,
+          "created": 1741388728,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -118,7 +119,7 @@ http_interactions:
           "customer_details": null,
           "customer_email": null,
           "discounts": [],
-          "expires_at": 1738607521,
+          "expires_at": 1741475127,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -139,14 +140,18 @@ http_interactions:
           "payment_intent": null,
           "payment_link": null,
           "payment_method_collection": "if_required",
-          "payment_method_configuration_details": null,
+          "payment_method_configuration_details": {
+            "id": "pmc_0P68HJm0T0GBfX0vuIr5fXd9",
+            "parent": null
+          },
           "payment_method_options": {
             "card": {
               "request_three_d_secure": "automatic"
             }
           },
           "payment_method_types": [
-            "card"
+            "card",
+            "cashapp"
           ],
           "payment_status": "unpaid",
           "phone_number_collection": {
@@ -169,7 +174,7 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a18Gi9WkIdaW40hdIxlzQ93VFYvO7D4kXo5ErPGiikkUnv6UxCQp4qdVL8#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1fsQuMCV9Ix2ShRWX6uKBBSJ8VDwPYraLzHiINGiAu3xdNGl4RvL5Svgn#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-  recorded_at: Sun, 02 Feb 2025 18:32:02 GMT
+  recorded_at: Fri, 07 Mar 2025 23:05:28 GMT
 recorded_with: VCR 6.3.1
