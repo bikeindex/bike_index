@@ -3991,7 +3991,6 @@ en:
     users_new: Sign up for Bike Index
     welcome_index: 'The best bike registry: Simple, secure and free.'
   meta_titles:
-    info_about: About Bike Index
     bikes_index: Search results
     bikes_new: Register a bike!
     bikes_new_stolen: Register a stolen bike
@@ -3999,6 +3998,7 @@ en:
     feedbacks_index: Help with Bike Index
     feedbacks_new: Contact Bike Index
     feedbacks_vendor_signup: Shop sign up - Bike Index
+    info_about: About Bike Index
     info_serials: Bike serial numbers
     info_spokecard: Spoke cards - Bike Index
     info_where: Bike Index partners

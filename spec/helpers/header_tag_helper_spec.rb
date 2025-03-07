@@ -33,7 +33,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
       let(:controller_name) { "info" }
       context "action_name: about" do
         let(:action_name) { "about" }
-        let(:page_title) {"Bike Index - Bike registration that works" }
+        let(:page_title) { "Bike Index - Bike registration that works" }
         let(:page_description) { "Why we made Bike Index and who we are" }
         it "uses the translation" do
           expect(header_tags_component_options).to eq target

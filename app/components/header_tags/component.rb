@@ -5,11 +5,9 @@ module HeaderTags
     DEFAULT_IMAGE = "/opengraph.png"
     DEFAULT_TWITTER = "@bikeindex"
 
-    def initialize(page_title: nil, page_description: nil, page_obj: nil, updated_at: nil, organization_name: nil,
-                   controller_name:, controller_namespace: nil, action_name:, request_url:, language:)
-
+    def initialize(controller_name:, action_name:, request_url:, language:, page_title: nil, page_description: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil)
       # TODO: Do any pages need a query string?
-      @page_url = request_url.split('?').first
+      @page_url = request_url.split("?").first
       @language = language
 
       @page_title = page_title
@@ -54,7 +52,7 @@ module HeaderTags
     end
 
     def og_updated_property
-      @meta_type == "article" ? "article:modified_time" : "og:updated_time"
+      (@meta_type == "article") ? "article:modified_time" : "og:updated_time"
     end
 
     def url_canonical
@@ -64,9 +62,9 @@ module HeaderTags
     def page_json_ld
       # ... eventually might want to use Vehicle, but currently would use no properties
       json_ld_type = if @meta_type == "article"
-        @controller_action == 'news_show' ? 'BlogPosting' : 'Article'
+        (@controller_action == "news_show") ? "BlogPosting" : "Article"
       else
-        'WebPage'
+        "WebPage"
       end
       {
         "@context" => "http://schema.org",
@@ -76,7 +74,7 @@ module HeaderTags
         "headline" => @page_title,
         "alternativeHeadline" => (@secondary_title.present? ? @secondary_title : @page_description)
       }.merge(@published_at.present? ? {"datePublished" => @published_at} : {})
-       .merge(@updated_at.present? ? {"dateModified" => @updated_at} : {})
+        .merge(@updated_at.present? ? {"dateModified" => @updated_at} : {})
     end
 
     def assign_bike_attrs(bike, action_name)
