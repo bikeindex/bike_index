@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ExchangeRateAPIClient
+class Integrations::ExchangeRateAPIClient
   attr_accessor :base_iso, :base_url, :cache_key
 
   BASE_URL = ENV.fetch("EXCHANGE_RATE_API_BASE_URL", "https://api.exchangeratesapi.io")
@@ -18,9 +18,7 @@ class ExchangeRateAPIClient
         req.params = {"base" => base_iso, :access_key => API_KEY}
       }
 
-      unless resp.status == 200 && resp.body.is_a?(Hash)
-        raise ExchangeRateAPIError, resp.body
-      end
+      raise(StandardError, resp.body) unless resp.status == 200 && resp.body.is_a?(Hash)
 
       resp.body.with_indifferent_access
     end
@@ -29,17 +27,10 @@ class ExchangeRateAPIClient
   private
 
   def conn
-    @conn ||= Faraday.new(url: base_url) { |conn|
-      conn.response :json, content_type: /\bjson$/
-      # if Rails.env.development?
-      #   conn.use Faraday::RequestResponseLogger::Middleware,
-      #     logger_level: :info,
-      #     logger: Rails.logger
-      # end
-      conn.adapter Faraday.default_adapter
-      conn.options.timeout = 5
-    }
+    @conn ||= Faraday.new(url: base_url) do |con|
+      con.response :json, content_type: /\bjson$/
+      con.adapter Faraday.default_adapter
+      con.options.timeout = 5
+    end
   end
 end
-
-class ExchangeRateAPIError < StandardError; end

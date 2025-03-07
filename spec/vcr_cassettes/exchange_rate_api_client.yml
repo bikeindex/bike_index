@@ -1,0 +1,61 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.exchangeratesapi.io/latest?access_key=<EXCHANGE_RATE_API_KEY>&base=CAD
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 07 Mar 2025 23:00:53 GMT
+      Content-Type:
+      - application/json; Charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - no-cache
+      Access-Control-Allow-Methods:
+      - GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Blocked-At-Loadbalancer:
+      - '1'
+      Cf-Cache-Status:
+      - DYNAMIC
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=E7nSbMup1B8VCFfPfUxAnJQOIfIW7GMbcGEiJYkhJ7Eqr3hl1PkzvsdVId4kfrC8s1yeqF7z1FW8LRjwn%2FSair1yFcB2yULS5fI711haDa9DaHYFsUG7RxbtS3jMw5K3S7uae1BrJnwu"}],"group":"cf-nel","max_age":604800}'
+      Nel:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 91cdb62a5ebd227e-SJC
+      Server-Timing:
+      - cfL4;desc="?proto=TCP&rtt=6895&min_rtt=6737&rtt_var=2843&sent=4&recv=6&lost=0&retrans=0&sent_bytes=2329&recv_bytes=799&delivery_rate=361864&cwnd=236&unsent_bytes=0&cid=15a77c286eb233a9&ts=178&x=0"
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "success": false,
+          "error": {
+            "code": 101,
+            "type": "invalid_access_key",
+            "info": "You have not supplied a valid API Access Key. [Technical Support: support@apilayer.com]"
+          }
+        }
+  recorded_at: Fri, 07 Mar 2025 23:00:53 GMT
+recorded_with: VCR 6.3.1
