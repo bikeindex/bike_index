@@ -48,7 +48,6 @@ jobs:
         options: --entrypoint redis-server
     env:
       RAILS_ENV: test
-      # DATABASE_URL: postgres://postgres:password@localhost:5432
       PGHOST: localhost
       PGPORT: 5432
       PGUSER: postgres
@@ -93,3 +92,13 @@ jobs:
       # Run tests
       - name: Run tests
         run: bundle exec rspec
+
+  deploy_production:
+    name: "Deploy to production"
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Cloud66 production
+        run: |
+          curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${{ secrets.CLOUD66_REDEPLOYMENT_PATH }}
