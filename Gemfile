@@ -142,7 +142,7 @@ group :development, :test do
   gem "dotenv-rails"
   gem "factory_bot_rails"
   gem "foreman"
-  gem "parallel_tests"
+  gem "turbo_tests" # parallel tests
   gem "pry-byebug"
   gem "pry-rails"
   gem "rspec"

@@ -58,6 +58,9 @@ jobs:
       TRANSLATION_BRANCH: main
       RETRY_FLAKY: true
     steps:
+      - name: Get CPU cores
+        id: cpu-info
+        run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
       # install system dependencies
       - name: Install system dependencies
         run: |
@@ -91,7 +94,7 @@ jobs:
         run: bin/rails assets:precompile --trace
       # Run tests
       - name: Run tests
-        run: bundle exec rspec
+        run: bundle exec turbo_rspec
       - name: publish code coverage
         uses: paambaati/codeclimate-action@v9.0.0
 
