@@ -92,6 +92,8 @@ jobs:
       # Run tests
       - name: Run tests
         run: bundle exec rspec
+      - name: publish code coverage
+        uses: paambaati/codeclimate-action@v9.0.0
 
   deploy_production:
     name: "Deploy to production"
