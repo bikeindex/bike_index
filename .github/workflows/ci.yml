@@ -101,4 +101,4 @@ jobs:
     steps:
       - name: Deploy to Cloud66 production
         run: |
-          curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${{ secrets.CLOUD66_REDEPLOYMENT_PATH }}
+          curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${{ secrets.CLOUD66_REDEPLOYMENT_KEY }}

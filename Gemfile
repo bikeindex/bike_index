@@ -148,7 +148,6 @@ group :development, :test do
   gem "pry-rails"
   gem "rspec"
   gem "rspec-rails"
-  gem "rspec_junit_formatter" # For circle ci
   gem "standard" # Ruby linter
   # I18n - localization/translation
   gem "i18n-tasks"

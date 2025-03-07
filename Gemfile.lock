@@ -656,8 +656,6 @@ GEM
       rspec-core (~> 3.0, >= 3.0.0)
       sidekiq (>= 2.4.0)
     rspec-support (3.13.2)
-    rspec_junit_formatter (0.4.1)
-      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.70.0)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -906,7 +904,6 @@ DEPENDENCIES
   rspec-rails
   rspec-retry
   rspec-sidekiq
-  rspec_junit_formatter
   ruby-vips
   secure_headers (~> 2.5.0)
   selenium-webdriver
