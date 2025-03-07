@@ -50,6 +50,7 @@ RSpec.describe InfoController, type: :request do
               expect(response).to render_template("layouts/payments_layout")
             else
               expect(response).to render_template("layouts/application")
+              expect(assigns(:page_updated_at)).to be_present
             end
           end
         end
@@ -122,6 +123,7 @@ RSpec.describe InfoController, type: :request do
       expect(response).to render_template("lightspeed")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_truthy
+      expect(assigns(:page_updated_at)).to be_within(1).of Time.at(1740674807) # 2025-02-27
     end
     context "donate" do
       it "renders without show alert" do

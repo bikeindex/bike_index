@@ -2,7 +2,9 @@
 %html{ lang: I18n.locale }
   %head
     - page_obj = @page_obj || @blog || @bike
-    <%= render(HeaderTags::Component.new(page_obj:, page_title: @page_title, controller_name:, controller_namespace:, action_name:, updated_at: @page_updated_at)) %>
+    - page_title = @page_title || t("meta_titles.#{controller_name}_#{action_name}", organization: current_organization&.short_name)
+    - page_description = t("meta_descriptions.#{controller_name}_#{action_name}", organization: current_organization&.short_name)
+    = render(HeaderTags::Component.new(page_obj:, page_title:, page_description:, updated_at: @page_updated_at, current_organization:, controller_name:, controller_namespace:, action_name:, request_url: request.url, language: I18n.locale))
     -# TODO: Cache this ^
     = csrf_meta_tags
     = stylesheet_link_tag 'revised'

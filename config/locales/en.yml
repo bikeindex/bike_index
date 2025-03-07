@@ -3991,7 +3991,7 @@ en:
     users_new: Sign up for Bike Index
     welcome_index: 'The best bike registry: Simple, secure and free.'
   meta_titles:
-    about: FAQ
+    info_about: About Bike Index
     bikes_index: Search results
     bikes_new: Register a bike!
     bikes_new_stolen: Register a stolen bike
@@ -4016,17 +4016,14 @@ en:
     landing_pages_for_law_enforcement: Bike Index for Law Enforcement
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_show: "%{organization} Bike Registration"
-    links: links
     manufacturers_index: Bike Manufacturers
+    my_account_show: Your bikes
     news_index: Bike Index news
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
     sessions_create: Log in
     sessions_new: Log in
-    stolen_howworks: How it works
     stolen_index: Bike registry
-    stolen_merging: Stolen bike registry
-    tech: Technology for fighting bike theft
     users_accept_terms: Terms of use - Bike Index
     users_accept_vendor_terms: Organization terms - Bike Index
     users_confirm: Confirm your email - Bike Index
