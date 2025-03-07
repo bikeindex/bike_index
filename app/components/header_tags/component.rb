@@ -12,15 +12,19 @@ module HeaderTags
       @page_url = request_url.split('?').first
       @language = language
 
+      @page_title = page_title
+      @page_description = page_description
+
       @controller_action = "#{controller_name}_#{action_name}"
 
       if page_obj.is_a?(Bike) || page_obj.is_a?(BikeVersion)
-        assign_bike_attrs(page_obj)
+        assign_bike_attrs(page_obj, action_name)
       elsif page_obj.is_a?(Blog)
         assign_blog_attrs(page_obj)
-      else
-
       end
+
+      @page_title ||= auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
+      @page_description ||= default_description
 
       # Can we drop assigning controller_name? only required for atom
       @controller_name = controller_name
@@ -30,11 +34,19 @@ module HeaderTags
     private
 
     def default_description
-      t("meta_descriptions.welcome_index")
+      I18n.t("meta_descriptions.welcome_index")
     end
 
     def page_image
       @page_image || DEFAULT_IMAGE
+    end
+
+    def twitter_image
+      @twitter_image || page_image
+    end
+
+    def facebook_image
+      @facebook_image || page_image
     end
 
     def twitter_creator
@@ -59,7 +71,7 @@ module HeaderTags
       {
         "@context" => "http://schema.org",
         "@type" => json_ld_type,
-        "image" => @page_image,
+        "image" => page_image,
         "url" => @page_url,
         "headline" => @page_title,
         "alternativeHeadline" => (@secondary_title.present? ? @secondary_title : @page_description)
@@ -67,8 +79,35 @@ module HeaderTags
        .merge(@updated_at.present? ? {"dateModified" => @updated_at} : {})
     end
 
-    def assign_bike_attrs(bike)
-      @updated_at = bike.updated_at.utc.iso8601(0)
+    def assign_bike_attrs(bike, action_name)
+      @updated_at = bike&.updated_at&.utc&.iso8601(0)
+      return unless action_name == "show"
+
+      status_prefix = bike.status_with_owner? ? "" : bike.status_humanized.titleize
+      @page_title ||= [status_prefix, bike.title_string].compact.join(" ")
+
+      special_status_string = if bike.status_stolen? && bike.current_stolen_record.present?
+        "#{status_prefix}: #{bike.current_stolen_record.date_stolen&.strftime("%Y-%m-%d")}, from: #{bike.current_stolen_record.address(country: [:iso])}"
+      elsif bike.current_impound_record.present?
+        "#{status_prefix}: #{bike.current_impound_record.impounded_at&.strftime("%Y-%m-%d")}, in: #{bike.current_impound_record.address(country: [:iso, :optional])}"
+      end
+
+      @page_description = [
+        "#{bike.frame_colors.to_sentence} #{bike.title_string}, serial: #{bike.serial_display}.",
+        (bike.description.present? ? "#{bike.description}." : nil),
+        special_status_string
+      ].compact.join(" ")
+
+      if bike.current_stolen_record.present?
+        @page_image = bike.alert_image_url(:square)
+        @twitter_image = bike.alert_image_url(:twitter)
+        @facebook_image = bike.alert_image_url(:facebook)
+      elsif bike.image_url.present?
+        @page_image = bike.image_url(:large)
+      end
+      if bike.owner&.show_twitter && bike.owner.twitter.present?
+        @twitter_creator = "@#{bike.owner.twitter}"
+      end
     end
 
     def assign_blog_attrs(blog)
@@ -90,64 +129,37 @@ module HeaderTags
       @author = "/users/#{blog.user&.to_param}"
     end
 
-    # def assign_page_title_and_description(page_title:, controller_name:, controller_namespace:, action_name:, current_organization:)
-    #   translation_args = {}
-    #   if current_organization.present?
-    #     translation_args.merge!(organization: current_organization.short_name)
-    #   end
-    #   #
-    #   translation_location = if @controller_action == "welcome_choose_registration"
-    #     "bikes_new"
-    #   else
-    #     @controller_action
-    #   end
+    def auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
+      namespace_title = if controller_namespace == "admin"
+        "🧰"
+      elsif controller_namespace == "organized"
+        organization_name
+      end
 
-    #   @page_title = translation_title(translation_location, translation_args)
-    #   @page_description = translation_description(translation_location, translation_args)
-    #   # SPECIAL_CONTROLLERS = %w[bikes welcome my_accounts news users landing_pages].freeze
-    #   # @page_title = page_title #|| auto_title_for(controller_name:, controller_namespace:, action_name:)
-    # end
+      [
+        namespace_title,
+        auto_controller_and_action_title(controller_name, action_name)
+      ].compact.join(" ")
+    end
 
-    # def translation_title(translation_location, translation_args = {})
-    #   t("meta_titles.#{translation_location}", **translation_args)
-    # end
+    def auto_controller_and_action_title(controller_name, action_name)
+      case action_name
+      when "index"
+        controller_name.humanize
+      when "new", "edit", "show", "create"
+        "#{auto_action_name_title(action_name)} #{controller_name.humanize.singularize.downcase}"
+      else
+        action_name.humanize
+      end
+    end
 
-    # def translation_description(translation_location, translation_args = {})
-    #   t("meta_descriptions.#{translation_location}", **translation_args)
-    # end
-
-    # def auto_title_for(controller_name:, controller_namespace:, action_name:)
-    #   return translation_title if translation_title.present?
-
-    #   [auto_namespace_title, auto_controller_and_action_title].compact.join(" ")
-    # end
-
-    # def auto_controller_and_action_title
-    #   case action_name
-    #   when "index"
-    #     controller_name.humanize
-    #   when "new", "edit", "show", "create"
-    #     "#{auto_action_name_title} #{controller_name.humanize.singularize.downcase}"
-    #   else
-    #     action_name.humanize
-    #   end
-    # end
-
-    # def auto_namespace_title
-    #   if controller_namespace == "admin"
-    #     "🧰"
-    #   elsif controller_namespace == "organized"
-    #     current_organization.short_name
-    #   end
-    # end
-
-    # def auto_action_name_title
-    #   {
-    #     new: "New",
-    #     edit: "Edit",
-    #     show: "View",
-    #     create: "Created"
-    #   }.as_json.freeze[action_name]
-    # end
+    def auto_action_name_title(action_name)
+      {
+        new: "New",
+        edit: "Edit",
+        show: "View",
+        create: "Created"
+      }.as_json.freeze[action_name]
+    end
   end
 end
