@@ -48,7 +48,7 @@ jobs:
         options: --entrypoint redis-server
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:password@localhost:5432/postgres
+      DATABASE_URL: postgres://postgres:password@localhost:5432
       PG_HOST: localhost
       PG_PORT: 5432
       PG_USER: postgres
