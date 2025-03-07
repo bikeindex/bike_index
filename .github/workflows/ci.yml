@@ -88,13 +88,13 @@ jobs:
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
       - name: Sync translations (only on main by default)
-        run: bin/check_translations
+        run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Install JS dependencies
       - name: build assets
         run: bin/rails assets:precompile --trace
       # Run tests
       - name: Run tests
-        run: bundle exec turbo_rspec
+        run: bundle exec turbo_test
       - name: publish code coverage
         uses: paambaati/codeclimate-action@v9.0.0
 
