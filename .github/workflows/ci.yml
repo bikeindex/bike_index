@@ -48,11 +48,11 @@ jobs:
         options: --entrypoint redis-server
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:password@localhost:5432
-      PG_HOST: localhost
-      PG_PORT: 5432
-      PG_USER: postgres
-      PG_PASSWORD: password
+      # DATABASE_URL: postgres://postgres:password@localhost:5432
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: password
       TZ: "America/Chicago"
       COVERAGE: true
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
