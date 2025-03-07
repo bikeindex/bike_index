@@ -27,7 +27,8 @@ module HeaderTagHelper
 
   def translation_key_for(controller_name, action_name)
     # include tests for these cases!
-    # welcome_choose_registration    => bikes_new
+    return "bikes_new" if controller_name == "welcome" && action_name == "choose_registration"
+
     if %w[bikes bike_versions].include?(controller_name) == "bikes"
       return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && @bike.status_stolen?
 
@@ -42,6 +43,7 @@ module HeaderTagHelper
         end
       end
     end
+
     "#{controller_name}_#{action_name}"
   end
 end
