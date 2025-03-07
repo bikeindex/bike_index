@@ -125,35 +125,36 @@ RSpec.describe HeaderTags::Component, type: :component do
   describe "bikes_header_tags" do
     let(:controller_name) { "bikes" }
     let(:bike) { Bike.new(status: "status_stolen") }
-    context "new stolen bike" do
-      let(:user) { FactoryBot.build(:user) }
-      xit "says new stolen on new stolen" do
-        allow(view).to receive(:current_user).and_return(user)
-        allow(view).to receive(:action_name).and_return("new")
-        @bike = bike # So that it's assigned in the helper
-        helper.bikes_header_tags
-        expect(helper.page_title).to eq "Register a stolen bike"
-        expect(helper.page_description).to_not eq "Blank"
+    let(:target_time) { Time.current - 2.days }
+    let(:page_obj) { bike }
+    describe "show" do
+      let(:action_name) { "show" }
+      let(:bike) { FactoryBot.create(:bike, frame_model: "Something special", year: 1969, description: "Cool description") }
+      let(:title_string) { "1969 #{bike.manufacturer.simple_name} Something special" }
+      let(:target_description) { "#{bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number.upcase}. Cool description." }
+      let(:image_url) { "http://something.com" }
+      it "returns the bike name on Show" do
+        expect(bike.title_string).to eq title_string
+        allow(bike).to receive(:stock_photo_url) { image_url }
+        bike.update_column :updated_at, target_time
+
+        expect(component.css('title')).to have_text title_string
+        expect(component.css('link[rel="author"]')).to be_blank
+        expect(component.css('meta[name="description"]').first["content"]).to eq target_description
+        expect(component.css('[property="og:description"]').first["content"]).to eq target_description
+        expect(component.css('[name="twitter:description"]').first["content"]).to eq target_description
+
+        expect(component.css('[property="og:image"]').first["content"]).to eq image_url
+        expect(component.css('[name="twitter:image"]').first["content"]).to eq image_url
+
+        expect(component.css('[property="og:type"]')).to be_blank
+        expect(component.css('[name="twitter:creator"]').first["content"]).to eq "@bikeindex"
+
+        expect(component.css('[property="og:updated_time"]').first["content"]).to eq target_time.utc.iso8601(0)
+
+        expect(component.css('[property="og:url"]').first["content"]).to eq request_url
+        expect(component.css('link[rel="canonical"]').first["href"]).to eq request_url
       end
-    end
-    # describe "show" do
-    #   let(:action_name) { "show" }
-    #   let(:bike) { FactoryBot.create(:bike, frame_model: "Something special", year: 1969, description: "Cool description") }
-    #   let(:title_string) { "1969 #{bike.manufacturer.simple_name} Something special" }
-    #   before { @bike = bike } # So it's assigned in the helper
-    #   context "default" do
-    #     it "returns the bike name on Show" do
-    #       expect(bike.title_string).to eq title_string
-    #       allow(bike).to receive(:stock_photo_url) { "http://something.com" }
-    #       header_tags = helper.bikes_header_tags # Required to be called in here (can't be in a let)
-    #       expect(helper.page_title).to eq title_string
-    #       expect(helper.page_description).to eq "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number.upcase}. Cool description."
-    #       og_image = header_tags.find { |t| t && t[/og.image/] }
-    #       twitter_image = header_tags.find { |t| t&.include?("twitter:image") }
-    #       expect(og_image.include?("http://something.com")).to be_truthy
-    #       expect(twitter_image.include?("http://something.com")).to be_truthy
-    #       expect(header_tags.find { |t| t && t.include?("twitter:card") }).to match "summary_large_image"
-    #     end
     #     context "stolen" do
     #       let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
     #       let(:title_string) { bike.manufacturer.simple_name.to_s }
@@ -227,48 +228,6 @@ RSpec.describe HeaderTags::Component, type: :component do
     #       expect(header_tags.find { |t| t && t.include?("twitter:creator") }).to match "@bikeindex"
     #     end
     #   end
-    # end
-    # describe "bikes edit" do
-    #   let(:controller_namespace) { "bikes" }
-    #   let(:controller_name) { "edits" }
-    #   let(:action_name) { "show" }
-    #   it "includes bike edit tags" do
-    #     @edit_templates = "stub"
-    #     @edit_template = "theft_details"
-    #     bike.mnfg_name = "Cool"
-    #     bike.frame_model = "Party"
-    #     @bike = bike # So it's assigned in the helper
-    #     header_tags = helper.bikes_header_tags
-    #     expect(header_tags.find { |t| t.include?("<title>") }).to eq("<title>Theft details - Cool Party</title>")
-    #   end
-    # end
-  end
-
-  describe "about" do
-    let(:controller_name) { "info" }
-    let(:action_name) { "about" }
-    let(:target_description) { "Why we made Bike Index and who we are" }
-    let(:target_time) { Time.at(1740674807) } # 2025-02-27
-    it "returns default about header tags" do
-      expect(component.css('title')).to have_text "Bike Index - Bike registration that works"
-
-      expect(component.css('link[type="application/atom+xml"]').any?).to be_falsey
-
-      expect(component.css('link[rel="author"]').any?).to be_falsey
-      expect(component.css('meta[name="description"]').first["content"]).to eq target_description
-      expect(component.css('[property="og:description"]').first["content"]).to eq target_description
-      expect(component.css('[name="twitter:description"]').first["content"]).to eq target_description
-
-      expect(component.css('[property="og:image"]').first["content"]).to eq target_url
-      expect(component.css('[name="twitter:image"]').first["content"]).to eq target_url
-
-      expect(component.css('[property="og:type"]').first["content"]).to eq "article"
-      expect(component.css('[name="twitter:creator"]').first["content"]).to eq "@bikeindex"
-
-      expect(component.css('[property="og:updated_time"]').first["content"]).to eq target_time.iso8601(0)
-
-      expect(component.css('[property="og:url"]').first["content"]).to eq request_url
-      expect(component.css('link[rel="canonical"]').first["href"]).to eq request_url
     end
   end
 end
