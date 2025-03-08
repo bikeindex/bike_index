@@ -94,7 +94,8 @@ jobs:
         run: bin/rails assets:precompile --trace
       # Run tests
       - name: Run tests
-        run: bundle exec turbo_test
+        run: bundle exec rspec
+        # TODO: switch to using turbo_tests
       - name: publish code coverage
         uses: paambaati/codeclimate-action@v9.0.0
 
