@@ -95,7 +95,7 @@ jobs:
       # Run tests
       - name: Run tests
         run: bundle exec rspec
-        # TODO: switch to using turbo_tests
+        # TODO: switch to using turbo_tests, need to do parallel prepare, etc
       - name: publish code coverage
         uses: paambaati/codeclimate-action@v9.0.0
 
