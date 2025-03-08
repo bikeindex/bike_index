@@ -639,6 +639,8 @@ GEM
     rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
+    rspec-github (3.0.0)
+      rspec-core (~> 3.0)
     rspec-mocks (3.13.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
@@ -903,6 +905,7 @@ DEPENDENCIES
   responders
   rqrcode (= 0.10.1)
   rspec
+  rspec-github
   rspec-rails
   rspec-retry
   rspec-sidekiq
