@@ -58,6 +58,9 @@ jobs:
       TRANSLATION_BRANCH: main
       RETRY_FLAKY: true
     steps:
+      - name: Get CPU cores
+        id: cpu-info
+        run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
       # install system dependencies
       - name: Install system dependencies
         run: |
@@ -85,13 +88,14 @@ jobs:
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
       - name: Sync translations (only on main by default)
-        run: bin/check_translations
+        run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Install JS dependencies
       - name: build assets
         run: bin/rails assets:precompile --trace
       # Run tests
       - name: Run tests
         run: bundle exec rspec
+        # TODO: switch to using turbo_tests, need to do parallel prepare, etc
       - name: publish code coverage
         uses: paambaati/codeclimate-action@v9.0.0
 

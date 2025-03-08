@@ -4341,7 +4341,6 @@ nb:
     users_new: Registrer deg for Bike Index
     welcome_index: 'Det beste sykkelregisteret: Enkelt, sikkert og gratis.'
   meta_titles:
-    about: FAQ
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
     bikes_new_stolen: Registrer en stjålet sykkel
@@ -4352,7 +4351,6 @@ nb:
     info_about: Bike Index - Sykkelregistrering som fungerer
     info_serials: Serienummer på sykkel
     info_spokecard: Spoke-kort - Bike Index
-    info_stolen_bikes: Reagerer på tyveri
     info_where: Bike Index-partnere
     landing_pages_ambassadors_current: Sykkelindeksambassadører
     landing_pages_ambassadors_how_to: Bli en Bike Index-ambassadør
@@ -4367,17 +4365,13 @@ nb:
     landing_pages_for_law_enforcement: Sykkelindeks for rettshåndhevelse
     landing_pages_for_schools: Sykkelindeks for skoler
     landing_pages_show: "%{organization} Sykkelregistrering"
-    links: lenker
     manufacturers_index: Sykkelprodusenter
     news_index: Sykkelindeksnyheter
     payments_create: Takk for støtten!
     payments_new: Støtt sykkelindeks!
     sessions_create: Logg Inn
     sessions_new: Logg Inn
-    stolen_howworks: Hvordan det fungerer
     stolen_index: Sykkelregister
-    stolen_merging: Stjålet sykkelregister
-    tech: Teknologi for å bekjempe sykkeltyveri
     users_accept_terms: Vilkår for bruk - Bike Index
     users_accept_vendor_terms: Organisasjonsvilkår - Bike Index
     users_confirm: Bekreft e-posten din - Bike Index
@@ -4386,6 +4380,7 @@ nb:
     users_request_password_reset: Tilbakestill passord - Bike Index
     welcome_goodbye: Logget ut
     welcome_index: Bike Index - Sykkelregistrering som fungerer
+    my_account_show: Syklene dine
   money:
     currencies:
       en: USD

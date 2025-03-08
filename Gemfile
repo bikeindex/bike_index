@@ -142,7 +142,7 @@ group :development, :test do
   gem "dotenv-rails"
   gem "factory_bot_rails"
   gem "foreman"
-  gem "parallel_tests"
+  gem "turbo_tests" # parallel tests
   gem "pry-byebug"
   gem "pry-rails"
   gem "rspec"
@@ -158,6 +158,7 @@ group :test do
   gem "rspec-sidekiq"
   gem "simplecov", require: false
   gem "simplecov_json_formatter", require: false # Fix json error
+  gem "rspec-github", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
