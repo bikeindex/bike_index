@@ -18,15 +18,11 @@ module HeaderTags
       if page_obj.is_a?(Bike) || page_obj.is_a?(BikeVersion)
         assign_bike_attrs(page_obj, action_name)
       elsif page_obj.is_a?(Blog)
-        assign_blog_attrs(page_obj)
+        assign_blog_attrs(page_obj, controller_name)
       end
 
       @page_title ||= auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
       @page_description ||= default_description
-
-      # Can we drop assigning controller_name? only required for atom
-      @controller_name = controller_name
-      @action_name = action_name
     end
 
     private
@@ -77,7 +73,8 @@ module HeaderTags
         .merge(@updated_at.present? ? {"dateModified" => @updated_at} : {})
     end
 
-    def assign_blog_attrs(blog)
+    def assign_blog_attrs(blog, controller_name)
+      @display_auto_discovery = controller_name == "news"
       @updated_at = blog.updated_at.utc.iso8601(0)
       @published_at = blog.updated_at.utc.iso8601(0)
       @meta_type = "article"
