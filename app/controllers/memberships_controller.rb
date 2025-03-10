@@ -15,7 +15,7 @@ class MembershipsController < ApplicationController
   end
 
   def create
-    stripe_price = StripePrice.where(stripe_price_parameters).first
+    stripe_price = StripePrice.active.where(stripe_price_parameters).first
     stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user)
     redirect_to(stripe_subscription.stripe_checkout_session_url, allow_other_host: true)
   end

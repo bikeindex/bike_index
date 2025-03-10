@@ -2,7 +2,7 @@
 
 class Stripe::UpdatePricesJob < ApplicationJob
   def perform
-    Stripe::Price.list({active: true, limit: 100}).each do |price|
+    Stripe::Price.list({limit: 100}).each do |price|
       stripe_price = StripePrice.find_by(stripe_id: price.id) || StripePrice.new(stripe_id: price.id)
       new_attributes = {
         currency: price.currency,
@@ -10,7 +10,7 @@ class Stripe::UpdatePricesJob < ApplicationJob
         amount_cents: price.unit_amount,
         membership_level: product_membership_level[price.product],
         interval: "#{price.recurring["interval"]}ly",
-        active: true
+        active: price.active
       }
 
       # Only create if we know the membership kind

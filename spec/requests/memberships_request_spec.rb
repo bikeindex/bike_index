@@ -106,6 +106,31 @@ RSpec.describe MembershipsController, type: :request do
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         end
       end
+      context "with yearly archived price" do
+        # Accidental price on production that is incorrect
+        let!(:stripe_price_archived) { FactoryBot.create(:stripe_price_basic_archived) }
+        let!(:stripe_price) { FactoryBot.create(:stripe_price_basic_yearly) }
+        let(:create_yearly_params) { {currency: "usd", membership: {set_interval: "yearly", level: "basic"}}}
+        let(:target_stripe_yearly) { target_stripe_subscription.merge(interval: "yearly", user_id: current_user.id) }
+
+        it "creates a stripe_subscription" do
+          Sidekiq::Job.drain_all
+          ActionMailer::Base.deliveries = []
+          VCR.use_cassette("MembershipsController-create-yearly-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+            expect {
+              post base_url, params: create_yearly_params
+            }.to change(StripeSubscription, :count).by 1
+            expect(Membership.count).to eq 0
+            stripe_subscription = StripeSubscription.last
+            expect(stripe_subscription).to match_hash_indifferently target_stripe_yearly
+            expect(stripe_subscription.payments.count).to eq 1
+            expect(response).to redirect_to(/https:..checkout.stripe.com/)
+            # Verify that no emails are created
+            Sidekiq::Job.drain_all
+            expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+          end
+        end
+      end
 
       context "with invalid currency" do
         let(:modified_params) { create_params.merge(currency: "xxx") }

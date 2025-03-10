@@ -21,6 +21,12 @@ FactoryBot.define do
       interval { "yearly" }
       amount_cents { 4999 }
       stripe_id { "price_0Qs5rim0T0GBfX0vE7Q7cyoG" }
+
+      factory :stripe_price_basic_archived do
+        amount_cents { 5999 }
+        active { false }
+        stripe_id { "price_0R1BSzm0T0GBfX0vHXryVB6y" }
+      end
     end
 
     factory :stripe_price_plus, traits: [:test_stripe_id] do
