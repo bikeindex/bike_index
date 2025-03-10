@@ -65,7 +65,7 @@
           - else
             %td Stripe
             %td
-              - if !@membership.stripe_id.present?
+              - if @membership.stripe_id.present?
                 = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
               - else
                 %span.text-danger MISSING STRIPE ID!

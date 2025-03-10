@@ -449,7 +449,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/stolen_record.rb",
-      "line": 117,
+      "line": 121,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'\")",
       "render_path": null,
@@ -984,29 +984,6 @@
       "note": ""
     },
     {
-      "warning_type": "Redirect",
-      "warning_code": 18,
-      "fingerprint": "a023e0858b0d5962b53a5b762dcf22efd6883df12310d60199cf26de6fb91a3c",
-      "check_name": "Redirect",
-      "message": "Possible unprotected redirect",
-      "file": "app/controllers/memberships_controller.rb",
-      "line": 20,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(StripeSubscription.create_for(:stripe_price => StripePrice.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url, :allow_other_host => true)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "MembershipsController",
-        "method": "create"
-      },
-      "user_input": "StripeSubscription.create_for(:stripe_price => StripePrice.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        601
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "a743bd471cdf4bb187bd3b07f9be19b8aca52624fee37000482ee30b9be07d55",
@@ -1329,7 +1306,7 @@
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/memberships/show.html.haml",
-      "line": 68,
+      "line": 69,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
       "code": "link_to(Membership.find(params[:id]).stripe_id.truncate(20), Membership.find(params[:id]).stripe_admin_url, :title => Membership.find(params[:id]).stripe_id)",
       "render_path": [
@@ -1559,6 +1536,29 @@
       "confidence": "Weak",
       "cwe_id": [
         22
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "fab2839d67a1357df622c346dfcb4d8dae3e3990e9474dfc4352f4b83a8a27a5",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/memberships_controller.rb",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(StripeSubscription.create_for(:stripe_price => StripePrice.active.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "MembershipsController",
+        "method": "create"
+      },
+      "user_input": "StripeSubscription.create_for(:stripe_price => StripePrice.active.where(stripe_price_parameters).first, :user => current_user).stripe_checkout_session_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
       ],
       "note": ""
     }
