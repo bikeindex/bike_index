@@ -58,7 +58,7 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: password
       TZ: "America/Chicago"
-      COVERAGE: true # I believe additional configuration is needed for parallelized
+      COVERAGE: false # additional configuration is needed for parallelized tests
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
       RETRY_FLAKY: true
@@ -104,9 +104,9 @@ jobs:
       # Run tests
       - name: Run tests
         run: bin/knapsack_pro_tests
-        # TODO: switch to using turbo_tests, need to do parallel prepare, etc
-      - name: publish code coverage
-        uses: paambaati/codeclimate-action@v9.0.0
+      # Until parallel reporting is set up, skip sending code coverage reports
+      # - name: publish code coverage
+      #   uses: paambaati/codeclimate-action@v9.0.0
 
   deploy_production:
     name: "Deploy to production"
