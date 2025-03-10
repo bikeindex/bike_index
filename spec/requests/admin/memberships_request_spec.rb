@@ -88,7 +88,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
       let(:start_at) { Time.at(1740271007) } # 2025-2-22 18:36
       let(:target_stripe_subscription_attrs) do
         {membership_level: "basic", interval: "yearly", stripe_status: "active", start_at:, end_at: nil,
-          stripe_price_stripe_id: stripe_price_yearly.stripe_id, currency_enum: "cad"}
+         stripe_price_stripe_id: stripe_price_yearly.stripe_id, currency_enum: "cad"}
       end
 
       it "updates stripe" do

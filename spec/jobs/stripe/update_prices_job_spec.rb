@@ -19,11 +19,13 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
       {live?: false, active: false, currency_enum: "usd",
        amount_cents: 5999}
     end
+    let!(:stripe_price_unknown) { FactoryBot.create(:stripe_price, stripe_id: "xxxxxx", membership_level: "patron") }
 
     it "creates the prices once" do
       # Starts out active!
       expect(stripe_price_existing).to be_valid
       expect(stripe_price_existing.reload.active?).to be_truthy
+      expect(stripe_price_unknown.reload.active).to be_truthy
 
       VCR.use_cassette("stripe-update_prices_job", match_requests_on: [:path]) do
         expect {
@@ -43,6 +45,7 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
 
         expect(stripe_price_existing.reload).to match_hash_indifferently target_existing_updated
       end
+      expect(stripe_price_unknown.reload.active).to be_falsey
     end
   end
 

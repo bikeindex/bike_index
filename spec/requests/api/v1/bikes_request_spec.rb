@@ -357,6 +357,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         VCR.use_cassette("v1_bikes_create-images2", match_requests_on: [:path], re_record_interval: 1.month) do
           post base_url, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
         end
+        expect(Bike.unscoped.where(serial_number: "69 photo-test").count).to eq 1
         bike = Bike.unscoped.where(serial_number: "69 photo-test").first
         expect(bike.example).to be_falsey
         expect(bike.public_images.count).to eq(1)

@@ -2,25 +2,35 @@
 
 class Stripe::UpdatePricesJob < ApplicationJob
   def perform
+    updated_ids = []
+
     Stripe::Price.list({limit: 100}).each do |price|
       stripe_price = StripePrice.find_by(stripe_id: price.id) || StripePrice.new(stripe_id: price.id)
       new_attributes = {
         currency: price.currency,
-        live: price.livemode,
         amount_cents: price.unit_amount,
         membership_level: product_membership_level[price.product],
         interval: "#{price.recurring["interval"]}ly",
-        active: price.active
+        live: price.livemode,
+        active: active?(price.active, price.livemode)
       }
 
       # Only create if we know the membership kind
       if new_attributes[:membership_level].present?
         stripe_price.update!(new_attributes)
+        updated_ids << stripe_price.id
       end
     end
+
+    StripePrice.where.not(id: updated_ids).each { |stripe_price| stripe_price.update(active: false) }
   end
 
   private
+
+  # Only mark it active if it's active and the livemode matches current system livemode
+  def active?(active, live)
+    active && live == STRIPE_LIVE_MODE
+  end
 
   def product_membership_level
     return @product_membership_level if defined?(@product_membership_level)
