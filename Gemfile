@@ -143,6 +143,7 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "foreman"
   gem "turbo_tests" # parallel tests
+  gem "knapsack_pro" # parallel test optimization (for CI)
   gem "pry-byebug"
   gem "pry-rails"
   gem "rspec"

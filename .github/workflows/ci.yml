@@ -46,6 +46,11 @@ jobs:
         ports:
           - 6379:6379
         options: --entrypoint redis-server
+    strategy:
+      fail-fast: false
+      matrix:
+        ci_node_total: [2]
+        ci_node_index: [0, 1]
     env:
       RAILS_ENV: test
       PGHOST: localhost
@@ -57,6 +62,10 @@ jobs:
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       TRANSLATION_BRANCH: main
       RETRY_FLAKY: true
+      KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
+      KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
+      KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
+      KNAPSACK_PRO_LOG_LEVEL: info
     steps:
       - name: Get CPU cores
         id: cpu-info
