@@ -9,10 +9,9 @@ if ENV["COVERAGE"]
 
     add_group "Serializers", "app/serializers"
     add_group "Services", "app/services"
-    add_group "Uploaders", "app/uploaders"
   end
 
-  Rails.application.eager_load! if defined?(Rails)
+  # Rails.application.eager_load! if defined?(Rails)
 end
 
 # Assign here because only one .env file
@@ -48,12 +47,12 @@ ActiveRecord::Migration.maintain_test_schema!
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
 
-# if ENV["GITHUB_ACTIONS"] == "true"
-  # If on GitHub actions, enable knapsack pro for test splitting optimizer
+# If on GitHub actions, enable knapsack pro to optimize test splitting
+if ENV["GITHUB_ACTIONS"] == "true"
   require "knapsack_pro"
 
   KnapsackPro::Adapters::RSpecAdapter.bind
-# end
+end
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
