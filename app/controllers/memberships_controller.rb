@@ -42,12 +42,11 @@ class MembershipsController < ApplicationController
 
   def stripe_price_parameters
     mem_params = params.require(:membership).permit(:level, :set_interval)
-    currency_enum = (currency_from_params || Currency.default).slug
 
     {
       membership_level: mem_params[:level],
       interval: mem_params[:set_interval],
-      currency_enum:
+      currency_enum: (currency_from_params || Currency.default).slug
     }
   end
 
