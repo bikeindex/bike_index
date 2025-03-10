@@ -400,6 +400,8 @@ GEM
     jmespath (1.6.2)
     json (2.9.1)
     jwt (2.5.0)
+    knapsack_pro (8.0.1)
+      rake
     kramdown (2.5.1)
       rexml (>= 3.3.9)
     language_server-protocol (3.17.0.3)
@@ -871,6 +873,7 @@ DEPENDENCIES
   i18n_generators
   image_processing
   importmap-rails
+  knapsack_pro
   kramdown
   letter_opener
   lograge
