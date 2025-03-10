@@ -13,13 +13,13 @@ RSpec.describe "Selections API V3", type: :request do
 
   describe "component_types" do
     it "responds on index with pagination" do
-      selection = Ctype.first || FactoryBot.create(:ctype)
-      expect(Ctype.count).to eq 1
-      pp Ctype.all, selection
+      expect(Ctype.other).to be_present
+      selection = FactoryBot.create(:ctype)
+      expect(Ctype.count).to eq 2
       get "/api/v3/selections/component_types"
       expect(response.code).to eq("200")
-      result = JSON.parse(response.body)["component_types"][0]
-      expect(result["name"]).to eq(selection.name)
+      response_names = json_result["component_types"].map { _1["name"] }
+      expect(response_names.sort).to eq([selection.name, "unknown"])
     end
   end
 
