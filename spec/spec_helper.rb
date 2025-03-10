@@ -1,14 +1,9 @@
-if ENV["GITHUB_ACTIONS"] == "true"
-  # If on GitHub actions, load the github formatter and test parallel optimizer
-  require "rspec/github"
-  require "knapsack_pro"
-
-  KnapsackPro::Adapters::RSpecAdapter.bind
-end
-
 RSpec.configure do |config|
-  # Add the GitHub Annotations formatter for CI
-  config.add_formatter RSpec::Github::Formatter if ENV["GITHUB_ACTIONS"] == "true"
+  # Use the GitHub Annotations formatter for CI
+  if ENV["GITHUB_ACTIONS"] == "true"
+    require "rspec/github"
+    config.add_formatter RSpec::Github::Formatter
+  end
 
   # Use color not only in STDOUT but also in pagers and files
   config.tty = true

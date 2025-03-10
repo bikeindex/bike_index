@@ -48,6 +48,13 @@ ActiveRecord::Migration.maintain_test_schema!
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
 
+# if ENV["GITHUB_ACTIONS"] == "true"
+  # If on GitHub actions, enable knapsack pro for test splitting optimizer
+  require "knapsack_pro"
+
+  KnapsackPro::Adapters::RSpecAdapter.bind
+# end
+
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.render_views
