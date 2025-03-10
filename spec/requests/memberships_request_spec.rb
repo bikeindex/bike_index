@@ -110,7 +110,7 @@ RSpec.describe MembershipsController, type: :request do
         # Accidental price on production that is incorrect
         let!(:stripe_price_archived) { FactoryBot.create(:stripe_price_basic_archived) }
         let!(:stripe_price) { FactoryBot.create(:stripe_price_basic_yearly) }
-        let(:create_yearly_params) { {currency: "usd", membership: {set_interval: "yearly", level: "basic"}}}
+        let(:create_yearly_params) { {currency: "usd", membership: {set_interval: "yearly", level: "basic"}} }
         let(:target_stripe_yearly) { target_stripe_subscription.merge(interval: "yearly", user_id: current_user.id) }
 
         it "creates a stripe_subscription" do

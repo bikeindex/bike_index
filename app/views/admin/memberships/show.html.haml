@@ -65,8 +65,11 @@
           - else
             %td Stripe
             %td
-              = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
-
+              - if !@membership.stripe_id.present?
+                = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
+              - else
+                %span.text-danger MISSING STRIPE ID!
+                %small.less-strong This is a problem, tell Seth!
 
 - if @membership.admin_managed? && @membership.active?
   .row.mt-5

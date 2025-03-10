@@ -17,7 +17,7 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
     end
     let(:target_existing_updated) do
       {live?: false, active: false, currency_enum: "usd",
-        amount_cents: 5999}
+       amount_cents: 5999}
     end
 
     it "creates the prices once" do
