@@ -524,7 +524,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
       # testing a non-show info page, to make sure we aren't doing custom header tags
       expect(helper.page_with_custom_header_tags?).to be_falsey
       helper.header_tag_array
-      expect(helper.page_title).to eq "Bike Index - Bike registration that works"
+      expect(helper.page_title).to eq "About Bike Index"
       expect(helper.page_description).to eq "Why we made Bike Index and who we are"
     end
   end
