@@ -13,7 +13,7 @@ RSpec.describe "Selections API V3", type: :request do
 
   describe "component_types" do
     it "responds on index with pagination" do
-      selection = FactoryBot.create(:ctype)
+      selection = Ctype.first || FactoryBot.create(:ctype)
       expect(Ctype.count).to eq 1
       get "/api/v3/selections/component_types"
       expect(response.code).to eq("200")
