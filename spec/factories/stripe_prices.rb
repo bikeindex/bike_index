@@ -22,6 +22,11 @@ FactoryBot.define do
       amount_cents { 4999 }
       stripe_id { "price_0Qs5rim0T0GBfX0vE7Q7cyoG" }
 
+      factory :stripe_price_basic_yearly_cad do
+        currency_enum { "cad" }
+        stripe_id { "price_0Qs61bm0T0GBfX0vjadfNRv8" }
+      end
+
       factory :stripe_price_basic_archived do
         amount_cents { 5999 }
         active { false }

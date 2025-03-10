@@ -53,11 +53,11 @@ class StripeSubscription < ApplicationRecord
       end
       stripe_subscription ||= new(stripe_id: stripe_subscription_obj.id)
 
-      stripe_subscription.update_from_stripe_subscription!(stripe_subscription_obj)
+      stripe_subscription.update_from_stripe_subscription!(stripe_subscription_obj, skip_membership_update: true)
       if stripe_checkout_session.present?
         stripe_subscription.find_or_create_payment(stripe_checkout_session)
       end
-      stripe_subscription.update_membership! if stripe_subscription.user_id.present?
+      stripe_subscription.update_membership!
 
       stripe_subscription
     end
@@ -86,7 +86,7 @@ class StripeSubscription < ApplicationRecord
     membership
   end
 
-  def update_from_stripe_subscription!(stripe_obj = nil)
+  def update_from_stripe_subscription!(stripe_obj = nil, skip_membership_update: false)
     stripe_obj ||= fetch_stripe_subscription_obj
     raise "Unable to find subscription" unless stripe_obj.present?
 
@@ -103,6 +103,8 @@ class StripeSubscription < ApplicationRecord
     end_at_t = stripe_obj.ended_at || stripe_obj.cancel_at
     self.end_at = Time.at(end_at_t) if end_at_t.present?
     save!
+    update_membership! unless skip_membership_update
+    self
   end
 
   def email
