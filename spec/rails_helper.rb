@@ -1,5 +1,5 @@
 # simplecov must be required before anything else
-if ENV["COVERAGE"]
+if ENV["COVERAGE"] == "true"
   require "simplecov"
   require "simplecov_json_formatter"
   SimpleCov.start("rails") do
@@ -11,7 +11,7 @@ if ENV["COVERAGE"]
     add_group "Services", "app/services"
   end
 
-  # Rails.application.eager_load! if defined?(Rails)
+  Rails.application.eager_load! if defined?(Rails)
 end
 
 # Assign here because only one .env file
