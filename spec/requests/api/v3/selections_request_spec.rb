@@ -15,6 +15,7 @@ RSpec.describe "Selections API V3", type: :request do
     it "responds on index with pagination" do
       selection = Ctype.first || FactoryBot.create(:ctype)
       expect(Ctype.count).to eq 1
+      pp Ctype.all, selection
       get "/api/v3/selections/component_types"
       expect(response.code).to eq("200")
       result = JSON.parse(response.body)["component_types"][0]
