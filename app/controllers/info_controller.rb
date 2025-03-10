@@ -2,9 +2,6 @@
 
 class InfoController < ApplicationController
   DONT_BUY_STOLEN_URL = "https://files.bikeindex.org/stored/dont_buy_stolen.pdf"
-  TEMPLATED_PAGES = %i[about where serials protect_your_bike lightspeed privacy terms security
-    vendor_terms resources image_resources dev_and_design].freeze
-  before_action :set_page_updated_at, only: TEMPLATED_PAGES
 
   def show
     @blog = Blog.friendly_find(params[:id])
@@ -85,11 +82,6 @@ class InfoController < ApplicationController
   end
 
   private
-
-  def set_page_updated_at
-    template = lookup_context.find_template("info/#{action_name}")
-    @page_updated_at = File.mtime(template.identifier)
-  end
 
   def redirect_to_donation_or_payment
     if params[:amount].present?
