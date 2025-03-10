@@ -1,5 +1,5 @@
 # simplecov must be required before anything else
-if ENV["COVERAGE"]
+if ENV["COVERAGE"] == "true"
   require "simplecov"
   require "simplecov_json_formatter"
   SimpleCov.start("rails") do
@@ -9,7 +9,6 @@ if ENV["COVERAGE"]
 
     add_group "Serializers", "app/serializers"
     add_group "Services", "app/services"
-    add_group "Uploaders", "app/uploaders"
   end
 
   Rails.application.eager_load! if defined?(Rails)
@@ -47,6 +46,13 @@ ActiveRecord::Migration.maintain_test_schema!
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
+
+# If on GitHub actions, enable knapsack pro to optimize test splitting
+if ENV["GITHUB_ACTIONS"] == "true"
+  require "knapsack_pro"
+
+  KnapsackPro::Adapters::RSpecAdapter.bind
+end
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
