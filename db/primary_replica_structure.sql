@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2800,7 +2801,8 @@ CREATE TABLE public.payments (
     referral_source text,
     currency_enum integer,
     membership_id bigint,
-    stripe_subscription_id bigint
+    stripe_subscription_id bigint,
+    stripe_status character varying
 );
 
 
@@ -6648,6 +6650,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250311144643'),
 ('20250311013102'),
 ('20250227195412'),
 ('20250226182610'),

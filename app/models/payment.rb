@@ -10,6 +10,7 @@
 #  paid_at                :datetime
 #  payment_method         :integer          default("stripe")
 #  referral_source        :text
+#  stripe_status          :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  invoice_id             :integer
@@ -185,7 +186,7 @@ class Payment < ApplicationRecord
   end
 
   def can_assign_to_invoice?
-    return false if stripe_subscription? || theft_alert?
+    return false if stripe_subscription? || theft_alert? || !paid?
 
     membership_id.blank?
   end
