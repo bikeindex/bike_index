@@ -31,6 +31,7 @@ RSpec.describe "Locale detection", type: :request do
         current_user.update(preferred_language: :nl)
         get "/"
         expect(response.body).to match(/fietsregistratie/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="en" />')
 
         current_user.update(preferred_language: :nb)
         get "/"
