@@ -26,9 +26,37 @@ RSpec.describe StripeSubscription, type: :model do
         expect(stripe_subscription.stripe_checkout_session_url).to be_present
         expect(stripe_subscription.payments.count).to eq 1
         expect(stripe_subscription.stripe_status).to be_blank
+        expect(stripe_subscription.referral_source).to be_blank
+
+        payment = stripe_subscription.payments.first
+        expect(payment.referral_source).to be_blank
+        expect(payment.stripe_status).to be_blank
+        pp payment
 
         # Calling fetch_stripe_checkout_session_url doesn't create again
         stripe_subscription.reload.fetch_stripe_checkout_session_url
+        expect(stripe_subscription.reload.payments.count).to eq 1
+      end
+    end
+    context "with a referral_source" do
+      it "creates a stripe_subscription" do
+        VCR.use_cassette("StripeSubscription-create_for-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          stripe_subscription = StripeSubscription.create_for(stripe_price:, user:, referral_source: "some-referral")
+          expect(stripe_subscription).to be_valid
+          expect(stripe_subscription.stripe_checkout_session_url).to be_present
+          expect(stripe_subscription.payments.count).to eq 1
+          expect(stripe_subscription.stripe_status).to be_blank
+          expect(stripe_subscription.referral_source).to eq("some-referral")
+
+          payment = stripe_subscription.payments.first
+          expect(payment.referral_source).to eq "some-referral"
+          expect(payment.stripe_status).to be_blank
+          pp payment
+
+          # Calling fetch_stripe_checkout_session_url doesn't create again
+          stripe_subscription.reload.fetch_stripe_checkout_session_url
+          expect(stripe_subscription.reload.payments.count).to eq 1
+        end
       end
     end
 

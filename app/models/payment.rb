@@ -148,12 +148,14 @@ class Payment < ApplicationRecord
     self.referral_source = self.class.normalize_referral_source(referral_source)
   end
 
-  def update_from_stripe_checkout_session!(stripe_obj = nil)
+  # NOTE: stripe_obj is a stripe checkout session
+  def update_from_stripe!(stripe_obj = nil)
     stripe_obj ||= stripe_checkout_session
 
     self.amount_cents = stripe_obj.amount_total
     # There isn't a paid_at timestamp in the stripe object
     self.paid_at = Time.current if paid_at.blank? && stripe_obj.payment_status == "paid"
+    self.stripe_status = stripe_obj.payment_status # TODO - update this
     self.email ||= stripe_email(stripe_obj) if user.blank?
     save!
 
@@ -161,22 +163,6 @@ class Payment < ApplicationRecord
       user.update(stripe_id: stripe_obj.customer)
     end
     self
-  end
-
-  def email_or_organization_or_stripe_present
-    return if email.present? || organization_id.present? || stripe_id.present?
-    errors.add(:organization, :requires_email_or_org)
-    errors.add(:email, :requires_email_or_org)
-  end
-
-  def update_associations
-    return if skip_update
-    user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
-    if stripe? && paid? && email.present? && !theft_alert?
-      EmailReceiptJob.perform_async(id)
-    end
-    return true unless invoice.present?
-    invoice.update(updated_at: Time.current) # Manually trigger invoice update
   end
 
   def can_assign_to_membership?
@@ -205,6 +191,22 @@ class Payment < ApplicationRecord
   end
 
   private
+
+  def email_or_organization_or_stripe_present
+    return if email.present? || organization_id.present? || stripe_id.present?
+    errors.add(:organization, :requires_email_or_org)
+    errors.add(:email, :requires_email_or_org)
+  end
+
+  def update_associations
+    return if skip_update
+    user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
+    if stripe? && paid? && email.present? && !theft_alert?
+      EmailReceiptJob.perform_async(id)
+    end
+    return true unless invoice.present?
+    invoice.update(updated_at: Time.current) # Manually trigger invoice update
+  end
 
   def create_stripe_checkout_session(item_name: nil)
     Stripe::Checkout::Session.create(stripe_checkout_session_hash(item_name:))

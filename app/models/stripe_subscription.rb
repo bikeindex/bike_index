@@ -133,7 +133,7 @@ class StripeSubscription < ApplicationRecord
     payment = payments.find_by(stripe_id: stripe_checkout_session.id) ||
       payments.build(payment_attrs.merge(stripe_id: stripe_checkout_session.id, referral_source:))
 
-    payment.update_from_stripe_checkout_session!(stripe_checkout_session)
+    payment.update_from_stripe!(stripe_checkout_session)
     update(user_id: payment.user_id) if user_id.blank? && payment.user_id.present?
 
     payment
@@ -149,7 +149,8 @@ class StripeSubscription < ApplicationRecord
   private
 
   def payment_attrs
-    {user_id:, payment_method: "stripe", currency_enum:, amount_cents: stripe_price&.amount_cents}
+    {payment_method: "stripe", amount_cents: stripe_price&.amount_cents, currency_enum:, user_id:,
+     referral_source:}
   end
 
   def fetch_stripe_subscription_obj

@@ -22,7 +22,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     redirect_to new_bike_theft_alert_path(bike_id: @bike.id) unless @payment.present?
     return unless setup_edit_template("alert_purchase_confirmation")
 
-    @payment&.update_from_stripe_checkout_session!
+    @payment&.update_from_stripe!
   end
 
   def create
