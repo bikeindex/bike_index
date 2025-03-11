@@ -31,7 +31,6 @@ RSpec.describe StripeSubscription, type: :model do
         payment = stripe_subscription.payments.first
         expect(payment.referral_source).to be_blank
         expect(payment.stripe_status).to be_blank
-        pp payment
 
         # Calling fetch_stripe_checkout_session_url doesn't create again
         stripe_subscription.reload.fetch_stripe_checkout_session_url
@@ -51,7 +50,7 @@ RSpec.describe StripeSubscription, type: :model do
           payment = stripe_subscription.payments.first
           expect(payment.referral_source).to eq "some-referral"
           expect(payment.stripe_status).to be_blank
-          pp payment
+          expect(payment.kind).to eq "membership_donation"
 
           # Calling fetch_stripe_checkout_session_url doesn't create again
           stripe_subscription.reload.fetch_stripe_checkout_session_url
