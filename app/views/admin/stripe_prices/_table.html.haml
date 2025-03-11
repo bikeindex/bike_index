@@ -35,6 +35,6 @@
           %td
             = check_mark if stripe_price.test?
           %td
-            = check_mark if stripe_price.active?
+            = cross_mark unless stripe_price.active?
           %td
             %code.small= stripe_price.stripe_id

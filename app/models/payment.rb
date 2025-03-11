@@ -194,6 +194,9 @@ class Payment < ApplicationRecord
     stripe_obj ||= stripe_checkout_session
     return nil unless stripe_obj.present?
     return stripe_obj.customer_email if stripe_obj.customer_email.present?
+    if defined?(stripe_obj.customer_details) && stripe_obj.customer_details.email.present?
+      return stripe_obj.customer_details.email
+    end
 
     # Sometimes email isn't in the stripe_checkout_session, and needs to be retrieved
     stripe_customer = Stripe::Customer.retrieve(stripe_obj.customer) if stripe_obj.customer.present?

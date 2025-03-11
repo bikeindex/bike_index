@@ -2,11 +2,12 @@
 
 module ChooseMembership
   class Component < ApplicationComponent
-    def initialize(currency:, interval: nil, level: nil, membership: nil)
+    def initialize(currency:, interval: nil, level: nil, membership: nil, referral_source: nil)
       @currency = currency
       @membership = membership || Membership.new
       @membership.set_interval = @membership.interval || interval || StripePrice.interval_default
       @membership.level ||= level || :basic
+      @referral_source = referral_source
     end
 
     private
