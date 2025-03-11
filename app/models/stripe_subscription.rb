@@ -129,7 +129,7 @@ class StripeSubscription < ApplicationRecord
     @stripe_checkout_session_url = payment.stripe_checkout_session.url
   end
 
-  def find_or_create_payment(stripe_checkout_session, referral_source:)
+  def find_or_create_payment(stripe_checkout_session, referral_source: nil)
     payment = payments.find_by(stripe_id: stripe_checkout_session.id) ||
       payments.build(payment_attrs.merge(stripe_id: stripe_checkout_session.id, referral_source:))
 
