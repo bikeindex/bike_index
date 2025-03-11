@@ -153,6 +153,16 @@ RSpec.describe Payment, type: :model do
     end
   end
 
+  describe "stripe_email" do
+    let(:payment) { Payment.new(stripe_id: "cs_test_a1N3sSIlrziLdhZ8Kj2uVhqlMnfMe7KN2W1AsGicX8pEnBL2uuRAPnmkg6") }
+
+    it "returns the stripe email" do
+      VCR.use_cassette("Payment-stripe_email", match_requests_on: [:method]) do
+        expect(payment.stripe_email).to eq "example@example.com"
+      end
+    end
+  end
+
   describe "after_commit" do
     let(:user) { FactoryBot.create(:user) }
     let(:payment) { FactoryBot.create(:payment, kind: "donation", user: user) }
