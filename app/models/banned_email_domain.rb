@@ -17,7 +17,7 @@
 #
 class BannedEmailDomain < ApplicationRecord
   BIKE_MAX_COUNT = 2
-  EMAIL_MIN_COUNT = 500
+  EMAIL_MIN_COUNT = 200
 
   acts_as_paranoid
 
