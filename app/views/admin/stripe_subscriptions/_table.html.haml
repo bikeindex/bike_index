@@ -24,8 +24,12 @@
         %tr
           %td
             .less-strong-hold
-              %span.convertTime
-                = l stripe_subscription.created_at, format: :convert_time
+              - if stripe_subscription.membership_id.present?
+                %a.convertTime{href: admin_membership_path(stripe_subscription.membership_id)}
+                  = l stripe_subscription.created_at, format: :convert_time
+              - else
+                %span.convertTime
+                  = l stripe_subscription.created_at, format: :convert_time
               %span.less-strong-right.d-none.d-md-block
                 = stripe_subscription.id
           %td

@@ -34,6 +34,17 @@
             level
           %td
             = @membership.level_humanized
+        %tr
+          %td Referral source
+          %td
+            - if @membership.referral_source.present?
+              %code.small= @membership.referral_source
+              - if display_dev_info?
+                -# There shouldn't be multiple different sources! Show them if there are.
+                - referral_sources = (@membership.stripe_subscriptions.distinct.pluck(:referral_source) + @membership.payments.distinct.pluck(:referral_source)).compact.uniq
+                - if referral_sources.count > 1
+                  %span.only-dev-visible multiple different sources!
+                  %small= referral_sources.join(",")
 
   .col-md-6
     %table.table-list
@@ -88,3 +99,9 @@
 - if @payments.any?
   = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true, render_method: true}
 
+
+- if display_dev_info?
+  .container
+    %h4.pt-4.pb-2
+      %span.only-dev-visible Stripe Subscriptions
+  = render(partial: "/admin/stripe_subscriptions/table", locals: {collection: @stripe_subscriptions, render_sortable: false})

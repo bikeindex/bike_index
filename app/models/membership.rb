@@ -88,6 +88,10 @@ class Membership < ApplicationRecord
     current_stripe_subscription.update_from_stripe_subscription!
   end
 
+  def referral_source
+    current_stripe_subscription&.referral_source || payments.order(:id).first&.referral_source
+  end
+
   def set_calculated_attributes
     self.level ||= "basic"
     self.status = calculated_status
