@@ -63,6 +63,6 @@ class MembershipsController < ApplicationController
     return if utm_param.blank?
 
     utm_dash_split = utm_param.split("-")
-    utm_dash_split.count == 2 ? utm_dash_split.last : utm_param
+    (utm_dash_split.count == 2) ? utm_dash_split.last : utm_param
   end
 end
