@@ -194,7 +194,7 @@ class Payment < ApplicationRecord
     stripe_obj ||= stripe_checkout_session
     return nil unless stripe_obj.present?
     return stripe_obj.customer_email if stripe_obj.customer_email.present?
-    if defined?(stripe_obj.customer_details) && stripe_obj.customer_details.email.present?
+    if defined?(stripe_obj.customer_details) && stripe_obj.customer_details&.email.present?
       return stripe_obj.customer_details.email
     end
 
