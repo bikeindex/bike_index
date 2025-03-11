@@ -79,5 +79,37 @@ RSpec.describe Admin::MembershipsController, type: :request do
       expect(membership.start_at).to match_time TimeParser.parse(start_at)
       expect(membership.end_at).to match_time TimeParser.parse(end_at)
     end
+    context "update_stripe" do
+      let(:membership) { FactoryBot.create(:membership, level: "plus", start_at: nil, creator: nil) }
+      let!(:stripe_price_yearly) { FactoryBot.create(:stripe_price_basic_yearly_cad) }
+      let!(:stripe_subscription) do
+        FactoryBot.create(:stripe_subscription, membership:, stripe_id: "sub_0QvTBbm0T0GBfX0vwdulsIAm", start_at: nil, end_at: nil)
+      end
+      let(:start_at) { Time.at(1740271007) } # 2025-2-22 18:36
+      let(:target_stripe_subscription_attrs) do
+        {membership_level: "basic", interval: "yearly", stripe_status: "active", start_at:, end_at: nil,
+         stripe_price_stripe_id: stripe_price_yearly.stripe_id, currency_enum: "cad"}
+      end
+
+      it "updates stripe" do
+        expect(membership.reload.start_at).to be_blank
+        expect(membership.status).to eq "pending"
+        expect(stripe_subscription.reload.active?).to be_falsey
+        expect(stripe_subscription.interval).to eq "monthly"
+
+        VCR.use_cassette("admin-memberships_controller-update_stripe", match_requests_on: [:method]) do
+          patch "#{base_url}/#{membership.id}", params: {update_from_stripe: "1"}
+          expect(flash[:success]).to be_present
+
+          expect(membership.reload.status).to eq "active"
+          expect(membership.level).to eq "basic"
+          expect(membership.start_at).to be_within(1).of start_at
+
+          expect(stripe_subscription.reload.active?).to be_truthy
+          expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription_attrs
+          expect(stripe_subscription.payments.count).to eq 0
+        end
+      end
+    end
   end
 end

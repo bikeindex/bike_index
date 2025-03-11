@@ -3253,7 +3253,8 @@ CREATE TABLE public.stripe_subscriptions (
     start_at timestamp(6) without time zone,
     stripe_status character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    referral_source text
 );
 
 
@@ -6647,6 +6648,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250311013102'),
 ('20250227195412'),
 ('20250226182610'),
 ('20250217173339'),
