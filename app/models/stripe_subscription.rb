@@ -4,6 +4,7 @@
 #
 #  id                     :bigint           not null, primary key
 #  end_at                 :datetime
+#  referral_source        :text
 #  start_at               :datetime
 #  stripe_status          :string
 #  created_at             :datetime         not null
@@ -38,9 +39,9 @@ class StripeSubscription < ApplicationRecord
   delegate :membership_level, :currency_enum, :interval, :test?, to: :stripe_price, allow_nil: true
 
   class << self
-    def create_for(stripe_price:, user:)
+    def create_for(stripe_price:, user:, referral_source: nil)
       # TODO: check if one exists first
-      stripe_subscription = create(stripe_price:, user:)
+      stripe_subscription = create(stripe_price:, user:, referral_source:)
       stripe_subscription.fetch_stripe_checkout_session_url # triggers creating the stripe_checkout_session
       stripe_subscription
     end
@@ -128,9 +129,9 @@ class StripeSubscription < ApplicationRecord
     @stripe_checkout_session_url = payment.stripe_checkout_session.url
   end
 
-  def find_or_create_payment(stripe_checkout_session)
+  def find_or_create_payment(stripe_checkout_session, referral_source:)
     payment = payments.find_by(stripe_id: stripe_checkout_session.id) ||
-      payments.build(payment_attrs.merge(stripe_id: stripe_checkout_session.id))
+      payments.build(payment_attrs.merge(stripe_id: stripe_checkout_session.id, referral_source:))
 
     payment.update_from_stripe_checkout_session!(stripe_checkout_session)
     update(user_id: payment.user_id) if user_id.blank? && payment.user_id.present?

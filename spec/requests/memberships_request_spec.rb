@@ -18,6 +18,16 @@ RSpec.describe MembershipsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
         expect(flash).to_not be_present
+        expect(assigns(:referral_source)).to be_blank
+      end
+      context "with UTM" do
+        it "assigns referral_source" do
+          get "#{base_url}/new?utm_source=Individuals&utm_campaign=94314xfasd-EMAIL_CAMPAIGN_2025_03_09_04_39&utm_medium=email&utm_term=0_-94314xfasd-561524514"
+          expect(response.code).to eq("200")
+          expect(response).to render_template("new")
+          expect(flash).to_not be_present
+          expect(assigns(:referral_source)).to eq "EMAIL_CAMPAIGN_2025_03_09_04_39"
+        end
       end
     end
     context "with user" do
@@ -56,6 +66,7 @@ RSpec.describe MembershipsController, type: :request do
     let(:create_params) do
       {
         currency: "usd",
+        referral_source: "donate-please",
         membership: {set_interval: "monthly", level: "basic"}
       }
     end
@@ -65,6 +76,7 @@ RSpec.describe MembershipsController, type: :request do
         currency_enum: "usd",
         membership_level: "basic",
         interval: "monthly",
+        referral_source: "donate-please",
         start_at: nil,
         stripe_status: nil,
         stripe_id: nil,
@@ -111,7 +123,7 @@ RSpec.describe MembershipsController, type: :request do
         let!(:stripe_price_archived) { FactoryBot.create(:stripe_price_basic_archived) }
         let!(:stripe_price) { FactoryBot.create(:stripe_price_basic_yearly) }
         let(:create_yearly_params) { {currency: "usd", membership: {set_interval: "yearly", level: "basic"}} }
-        let(:target_stripe_yearly) { target_stripe_subscription.merge(interval: "yearly", user_id: current_user.id) }
+        let(:target_stripe_yearly) { target_stripe_subscription.merge(interval: "yearly", user_id: current_user.id, referral_source: nil) }
 
         it "creates a stripe_subscription" do
           Sidekiq::Job.drain_all

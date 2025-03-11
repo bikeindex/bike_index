@@ -12,11 +12,13 @@ class MembershipsController < ApplicationController
     if current_user&.membership_active.present?
       redirect_to edit_membership_path
     end
+    @referral_source = referral_source_from_params
   end
 
   def create
     stripe_price = StripePrice.active.where(stripe_price_parameters).first
-    stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user)
+    stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user,
+      referral_source: referral_source_from_params)
     redirect_to(stripe_subscription.stripe_checkout_session_url, allow_other_host: true)
   end
 
@@ -52,5 +54,15 @@ class MembershipsController < ApplicationController
 
   def currency_from_params
     Currency.friendly_find(params.permit(:currency)[:currency])
+  end
+
+  def referral_source_from_params
+    return params[:referral_source] if params[:referral_source].present?
+
+    utm_param = params[:utm_campaign]
+    return if utm_param.blank?
+
+    utm_dash_split = utm_param.split("-")
+    utm_dash_split.count == 2 ? utm_dash_split.last : utm_param
   end
 end

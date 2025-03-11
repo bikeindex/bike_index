@@ -4,6 +4,7 @@
   </h1>
   <%= form_for @membership, builder: BikeIndexFormBuilder, url: membership_path, method: :post do |f| %>
     <%= hidden_field_tag :currency, @currency.slug %>
+    <%= hidden_field_tag :referral_source, @referral_source %>
 
     <div class="tw:text-center" id="intervalSelector">
       <label class="tw:cursor-pointer tw:mx-1">
