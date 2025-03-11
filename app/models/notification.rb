@@ -239,6 +239,7 @@ class Notification < ApplicationRecord
 
   def delivery_error_invalid?
     delivery_error == "Postmark::InvalidEmailAddressError"
+  end
 
   private
 
