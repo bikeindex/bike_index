@@ -3,10 +3,12 @@
 module StatusHumanizable
   extend ActiveSupport::Concern
 
-  def self.status_humanized(str)
-    return nil unless str.present?
+  class_methods do
+    def status_humanized(str)
+      return nil unless str.present?
 
-    str.humanize.downcase
+      str.humanize.downcase
+    end
   end
 
   def status_humanized

@@ -3,17 +3,6 @@
     %h1 New Email Domain
 
 .row.mt-4.mb-4
-  .card.ml-auto.mr-auto.col-8
-    .card-body
-      %h4
-        Be careful what you add!
-      %p.mt-4
-        There are some protections built in - you can't add a domain if there multiple bikes registered to that domain
-      %p
-        %strong BUT STILL
-        if you add a domain that is valid, it will prevent people from signing up with that domain.
-
-.row.mt-4.mb-4
   .col-md-6.offset-md-3
     = render "form",
       email_domain: @email_domain,

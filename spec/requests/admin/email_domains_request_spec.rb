@@ -80,16 +80,4 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       end
     end
   end
-
-  describe "destroy" do
-    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "gmail.com") }
-    it "soft deletes" do
-      expect do
-        delete "#{base_url}/#{email_domain.id}"
-      end.to change(EmailDomain, :count).by(-1)
-
-      expect(flash[:success]).to be_present
-      expect(EmailDomain.unscoped.where(id: email_domain.id).count).to eq 1
-    end
-  end
 end

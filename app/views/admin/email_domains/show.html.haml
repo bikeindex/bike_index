@@ -2,6 +2,43 @@
   .col-md-4
     %h1 Email Domain
 
+.row.mt-4
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Creator
+          %td
+            = render partial: "/shared/admin/user_cell", locals: {user: @email_domain.creator, user_id: @email_domain.creator_id}
+        %tr.small
+          %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @email_domain.created_at, format: :convert_time
+        %tr.small
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @email_domain.updated_at, format: :convert_time
+
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Status
+          %td
+            = @email_domain.status_humanized
+        %tr
+          %td
+            Users
+          %td
+            - user_count = User.matching_domain(@email_domain.domain).count
+            = link_to admin_number_display(user_count), admin_users_path(search_domain: @email_domain.domain)
+
 
 .row.mt-4.mb-4
   .col-md-6.offset-md-3
