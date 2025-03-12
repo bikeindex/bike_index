@@ -19,6 +19,7 @@
 #
 class Membership < ApplicationRecord
   include ActivePeriodable
+  include StatusHumanizable
 
   LEVEL_ENUM = {basic: 0, plus: 1, patron: 2}
   STATUS_ENUM = {pending: 0, active: 1, ended: 2}
@@ -48,10 +49,6 @@ class Membership < ApplicationRecord
       str&.humanize
     end
 
-    def status_display(str)
-      str&.humanize
-    end
-
     def levels_ordered
       levels.keys.map { level_humanized(_1) }
     end
@@ -66,10 +63,6 @@ class Membership < ApplicationRecord
 
   def level_humanized
     self.class.level_humanized(level)
-  end
-
-  def status_display
-    self.class.status_display(status)
   end
 
   def admin_managed?

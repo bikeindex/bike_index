@@ -38,6 +38,10 @@ class Admin::MembershipsController < Admin::BaseController
     @stripe_subscriptions = @membership.stripe_subscriptions
   end
 
+  def edit
+    redirect_to admin_membership_path
+  end
+
   def update
     if InputNormalizer.boolean(params[:update_from_stripe])
       if @membership.update_from_stripe!

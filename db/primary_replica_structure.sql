@@ -328,39 +328,6 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
--- Name: banned_email_domains; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.banned_email_domains (
-    id bigint NOT NULL,
-    domain character varying,
-    creator_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    deleted_at timestamp(6) without time zone
-);
-
-
---
--- Name: banned_email_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.banned_email_domains_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: banned_email_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.banned_email_domains_id_seq OWNED BY public.banned_email_domains.id;
-
-
---
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1079,6 +1046,40 @@ CREATE SEQUENCE public.duplicate_bike_groups_id_seq
 --
 
 ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bike_groups.id;
+
+
+--
+-- Name: email_domains; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_domains (
+    id bigint NOT NULL,
+    domain character varying,
+    creator_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone,
+    status integer DEFAULT 0
+);
+
+
+--
+-- Name: email_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_domains_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_domains_id_seq OWNED BY public.email_domains.id;
 
 
 --
@@ -3845,13 +3846,6 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
--- Name: banned_email_domains id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.banned_email_domains ALTER COLUMN id SET DEFAULT nextval('public.banned_email_domains_id_seq'::regclass);
-
-
---
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3968,6 +3962,13 @@ ALTER TABLE ONLY public.customer_contacts ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('public.duplicate_bike_groups_id_seq'::regclass);
+
+
+--
+-- Name: email_domains id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_domains ALTER COLUMN id SET DEFAULT nextval('public.email_domains_id_seq'::regclass);
 
 
 --
@@ -4512,14 +4513,6 @@ ALTER TABLE ONLY public.b_params
 
 
 --
--- Name: banned_email_domains banned_email_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.banned_email_domains
-    ADD CONSTRAINT banned_email_domains_pkey PRIMARY KEY (id);
-
-
---
 -- Name: bike_organizations bike_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4653,6 +4646,14 @@ ALTER TABLE ONLY public.customer_contacts
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_domains email_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_domains
+    ADD CONSTRAINT email_domains_pkey PRIMARY KEY (id);
 
 
 --
@@ -5248,13 +5249,6 @@ CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (o
 
 
 --
--- Name: index_banned_email_domains_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_banned_email_domains_on_creator_id ON public.banned_email_domains USING btree (creator_id);
-
-
---
 -- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5581,6 +5575,13 @@ CREATE INDEX index_components_on_bike_version_id ON public.components USING btre
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
+
+
+--
+-- Name: index_email_domains_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_domains_on_creator_id ON public.email_domains USING btree (creator_id);
 
 
 --
@@ -6649,6 +6650,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250312171401'),
 ('20250311144643'),
 ('20250311013102'),
 ('20250227195412'),
