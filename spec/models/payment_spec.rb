@@ -180,7 +180,7 @@ RSpec.describe Payment, type: :model do
     end
   end
 
-  describe "update_from_stripe_checkout_session" do
+  describe "update_from_stripe!" do
     let(:payment) { Payment.create(stripe_id: "cs_test_a1CtKMVSPmXNJnR683KqoOTff69gPvcdhJA545USuUfYVFwmykgV6KWsQp") }
     let(:target_attrs) do
       {

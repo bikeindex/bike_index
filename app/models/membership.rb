@@ -85,7 +85,7 @@ class Membership < ApplicationRecord
       raise "Must have a current_stripe_subscription to be able to update from Stripe!"
     end
 
-    current_stripe_subscription.update_from_stripe_subscription!
+    current_stripe_subscription.update_from_stripe!
   end
 
   def referral_source
