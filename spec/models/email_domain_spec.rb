@@ -38,16 +38,16 @@ RSpec.describe EmailDomain, type: :model do
     end
   end
 
-  describe "allow_creation?" do
+  describe "allow_domain_ban?" do
     it "is truthy for incorrect format" do
       # These can just be handled by the domain_is_expected_format validation
-      expect(EmailDomain.allow_creation?("@somethingcom")).to be_truthy
+      expect(EmailDomain.allow_domain_ban?("@somethingcom")).to be_truthy
     end
   end
 
-  describe "allow_creation?" do
+  describe "allow_domain_ban?" do
     it "is falsey for domain when nothing matches" do
-      expect(EmailDomain.allow_creation?("@something.com")).to be_falsey
+      expect(EmailDomain.allow_domain_ban?("@something.com")).to be_falsey
     end
 
     context "with email over EMAIL_MIN_COUNT" do
@@ -60,7 +60,7 @@ RSpec.describe EmailDomain, type: :model do
         expect(EmailDomain.too_few_emails?(domain)).to be_falsey
         expect(EmailDomain.too_many_bikes?(domain)).to be_falsey
         expect(EmailDomain.no_valid_organization_roles?(domain)).to be_truthy
-        expect(EmailDomain.allow_creation?(domain)).to be_truthy
+        expect(EmailDomain.allow_domain_ban?(domain)).to be_truthy
       end
 
       context "3 bikes in domain" do
@@ -68,7 +68,7 @@ RSpec.describe EmailDomain, type: :model do
         let!(:bike2) { FactoryBot.create(:bike, owner_email: "ffg#{domain}") }
         let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh#{domain}") }
         it "is falsey" do
-          expect(EmailDomain.allow_creation?(domain)).to be_falsey
+          expect(EmailDomain.allow_domain_ban?(domain)).to be_falsey
         end
       end
 
@@ -76,7 +76,7 @@ RSpec.describe EmailDomain, type: :model do
         let(:organization) { FactoryBot.create(:organization, approved: true) }
         let!(:organization_role) { FactoryBot.create(:organization_role, organization:, user:) }
         it "is falsey" do
-          expect(EmailDomain.allow_creation?(domain)).to be_falsey
+          expect(EmailDomain.allow_domain_ban?(domain)).to be_falsey
         end
 
         context "with organization unapproved" do
@@ -87,7 +87,7 @@ RSpec.describe EmailDomain, type: :model do
             expect(EmailDomain.too_few_emails?(domain)).to be_falsey
             expect(EmailDomain.too_many_bikes?(domain)).to be_falsey
             expect(EmailDomain.no_valid_organization_roles?(domain)).to be_truthy
-            expect(EmailDomain.allow_creation?(domain)).to be_truthy
+            expect(EmailDomain.allow_domain_ban?(domain)).to be_truthy
           end
         end
       end

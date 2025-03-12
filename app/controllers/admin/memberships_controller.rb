@@ -59,7 +59,7 @@ class Admin::MembershipsController < Admin::BaseController
       flash[:success] = "Membership Saved!"
       redirect_to admin_membership_url(@membership)
     else
-      render action: :edit
+      render action: :show
     end
   end
 

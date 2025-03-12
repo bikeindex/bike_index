@@ -21,16 +21,15 @@ class Admin::EmailDomainsController < Admin::BaseController
     @email_domain = EmailDomain.new(email_domain_params)
     @email_domain.creator = current_user
 
-    if EmailDomain.allow_creation?(@email_domain.domain)
+    if @email_domain.banned? && !EmailDomain.allow_domain_ban?(@email_domain.domain)
+      flash.now[:error] = domain_ban_message(@email_domain.domain)
+    else
       if @email_domain.save
         flash[:success] = "New email domain created"
         redirect_to admin_email_domains_url and return
       else
         flash.now[:error] = @email_domain.errors.full_messages.to_sentence
       end
-    else
-      flash.now[:error] = "Doesn't seem like a new spam email domain - " \
-        "not enough users with the domain or too many bikes have the domain"
     end
     render :new
   end
@@ -43,6 +42,17 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def update
+    # Only check if allowed to make banned if the domain isn't banned already
+    if !@email_domain.banned? && permitted_update_parameters[:status] == "banned" &&
+        !EmailDomain.allow_domain_ban?(@email_domain.domain)
+
+      flash.now[:error] = domain_ban_message(@email_domain.domain)
+    elsif @email_domain.update(permitted_update_parameters)
+      flash[:success] = "Domain Saved!"
+      redirect_to admin_membership_url(@email_domain) and return
+    end
+
+    render action: :show
   end
 
   private
@@ -64,7 +74,19 @@ class Admin::EmailDomainsController < Admin::BaseController
     email_domains.where(@time_range_column => @time_range)
   end
 
+  def permitted_update_parameters
+    params.require(:email_domain).permit(:status)
+  end
+
   def email_domain_params
-    params.require(:email_domain).permit(:domain)
+    params.require(:email_domain).permit(:domain, :status)
+  end
+
+  def domain_ban_message(domain)
+    "Doesn't seem like a new spam email domain - " + if EmailDomain.too_many_bikes?(domain)
+      "Too many bikes"
+    else
+      "not enough users with the domain"
+    end
   end
 end

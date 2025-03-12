@@ -21,7 +21,7 @@ class EmailDomain < ApplicationRecord
 
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 200
-  STATUS_ENUM = {permitted: 0, pending_ban: 1, banned: 2}
+  STATUS_ENUM = {permitted: 0, ban_pending: 1, banned: 2}
 
   acts_as_paranoid
 
@@ -36,8 +36,8 @@ class EmailDomain < ApplicationRecord
   validate :domain_is_not_contained_in_existing, on: :create
 
   class << self
-    # NOTE: This is called in the admin controller on create, but not if done in console!
-    def allow_creation?(str)
+    # NOTE: This is called in the admin controller, but not if done in console!
+    def allow_domain_ban?(str)
       domain = str.strip
       return true unless /\./.match?(domain)
 
@@ -74,9 +74,9 @@ class EmailDomain < ApplicationRecord
 
   # TODO: This is really inefficient
   def domain_is_not_contained_in_existing
-    broader_ban = EmailDomain.pluck(:domain).detect { |d| domain.match?(d) }
-    return if broader_ban.blank?
+    broader_domain = EmailDomain.pluck(:domain).detect { |d| domain.match?(d) }
+    return if broader_domain.blank?
 
-    errors.add(:domain, "already banned: '#{broader_ban}'")
+    errors.add(:domain, "already banned: '#{broader_domain}'")
   end
 end
