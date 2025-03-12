@@ -15,7 +15,7 @@
 #
 #  index_banned_email_domains_on_creator_id  (creator_id)
 #
-class BannedEmailDomain < ApplicationRecord
+class EmailDomain < ApplicationRecord
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 200
 
@@ -60,7 +60,7 @@ class BannedEmailDomain < ApplicationRecord
 
   # TODO: This is really inefficient
   def domain_is_not_contained_in_existing
-    broader_ban = BannedEmailDomain.pluck(:domain).detect { |d| domain.match?(d) }
+    broader_ban = EmailDomain.pluck(:domain).detect { |d| domain.match?(d) }
     return if broader_ban.blank?
 
     errors.add(:domain, "already banned: '#{broader_ban}'")

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BannedEmailDomain, type: :model do
+RSpec.describe EmailDomain, type: :model do
   describe "Factory" do
     let(:banned_email_domain) { FactoryBot.create(:banned_email_domain) }
     it "is valid" do
@@ -41,26 +41,26 @@ RSpec.describe BannedEmailDomain, type: :model do
   describe "allow_creation?" do
     it "is truthy for incorrect format" do
       # These can just be handled by the domain_is_expected_format validation
-      expect(BannedEmailDomain.allow_creation?("@somethingcom")).to be_truthy
+      expect(EmailDomain.allow_creation?("@somethingcom")).to be_truthy
     end
   end
 
   describe "allow_creation?" do
     it "is falsey for domain when nothing matches" do
-      expect(BannedEmailDomain.allow_creation?("@something.com")).to be_falsey
+      expect(EmailDomain.allow_creation?("@something.com")).to be_falsey
     end
 
     context "with email over EMAIL_MIN_COUNT" do
       let(:domain) { "@something.com" }
       let!(:user) { FactoryBot.create(:user_confirmed, email: "fff#{domain}") }
 
-      before { stub_const("BannedEmailDomain::EMAIL_MIN_COUNT", 0) }
+      before { stub_const("EmailDomain::EMAIL_MIN_COUNT", 0) }
 
       it "is truthy" do
-        expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
-        expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
-        expect(BannedEmailDomain.no_valid_organization_roles?(domain)).to be_truthy
-        expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
+        expect(EmailDomain.too_few_emails?(domain)).to be_falsey
+        expect(EmailDomain.too_many_bikes?(domain)).to be_falsey
+        expect(EmailDomain.no_valid_organization_roles?(domain)).to be_truthy
+        expect(EmailDomain.allow_creation?(domain)).to be_truthy
       end
 
       context "3 bikes in domain" do
@@ -68,7 +68,7 @@ RSpec.describe BannedEmailDomain, type: :model do
         let!(:bike2) { FactoryBot.create(:bike, owner_email: "ffg#{domain}") }
         let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh#{domain}") }
         it "is falsey" do
-          expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
+          expect(EmailDomain.allow_creation?(domain)).to be_falsey
         end
       end
 
@@ -76,7 +76,7 @@ RSpec.describe BannedEmailDomain, type: :model do
         let(:organization) { FactoryBot.create(:organization, approved: true) }
         let!(:organization_role) { FactoryBot.create(:organization_role, organization:, user:) }
         it "is falsey" do
-          expect(BannedEmailDomain.allow_creation?(domain)).to be_falsey
+          expect(EmailDomain.allow_creation?(domain)).to be_falsey
         end
 
         context "with organization unapproved" do
@@ -84,10 +84,10 @@ RSpec.describe BannedEmailDomain, type: :model do
 
           it "is truthy" do
             expect(OrganizationRole.count).to eq 1
-            expect(BannedEmailDomain.too_few_emails?(domain)).to be_falsey
-            expect(BannedEmailDomain.too_many_bikes?(domain)).to be_falsey
-            expect(BannedEmailDomain.no_valid_organization_roles?(domain)).to be_truthy
-            expect(BannedEmailDomain.allow_creation?(domain)).to be_truthy
+            expect(EmailDomain.too_few_emails?(domain)).to be_falsey
+            expect(EmailDomain.too_many_bikes?(domain)).to be_falsey
+            expect(EmailDomain.no_valid_organization_roles?(domain)).to be_truthy
+            expect(EmailDomain.allow_creation?(domain)).to be_truthy
           end
         end
       end

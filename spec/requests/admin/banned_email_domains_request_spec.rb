@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Admin::BannedEmailDomainsController, type: :request do
+RSpec.describe Admin::EmailDomainsController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   base_url = "/admin/banned_email_domains"
@@ -32,7 +32,7 @@ RSpec.describe Admin::BannedEmailDomainsController, type: :request do
     it "responds with not likely spam" do
       expect do
         post base_url, params: {banned_email_domain: valid_attributes}
-      end.to change(BannedEmailDomain, :count).by 0
+      end.to change(EmailDomain, :count).by 0
 
       expect(flash[:error]).to be_present
       expect(response).to render_template(:new)
@@ -40,16 +40,16 @@ RSpec.describe Admin::BannedEmailDomainsController, type: :request do
 
     context "with over required user count" do
       let!(:user) { FactoryBot.create(:user_confirmed, email: "fff@rustymails.com") }
-      before { stub_const("BannedEmailDomain::EMAIL_MIN_COUNT", 0) }
+      before { stub_const("EmailDomain::EMAIL_MIN_COUNT", 0) }
 
       it "creates" do
         expect do
           post base_url, params: {banned_email_domain: valid_attributes}
-        end.to change(BannedEmailDomain, :count).by 1
+        end.to change(EmailDomain, :count).by 1
 
         expect(flash[:success]).to be_present
         expect(response).to redirect_to(admin_banned_email_domains_path)
-        banned_email_domain = BannedEmailDomain.last
+        banned_email_domain = EmailDomain.last
         expect(banned_email_domain.creator_id).to eq current_user.id
         expect(banned_email_domain.domain).to eq "@rustymails.com"
       end
@@ -62,7 +62,7 @@ RSpec.describe Admin::BannedEmailDomainsController, type: :request do
         it "responds with not likely spam" do
           expect do
             post base_url, params: {banned_email_domain: valid_attributes}
-          end.to change(BannedEmailDomain, :count).by 0
+          end.to change(EmailDomain, :count).by 0
 
           expect(flash[:error]).to be_present
           expect(response).to render_template(:new)
@@ -76,10 +76,10 @@ RSpec.describe Admin::BannedEmailDomainsController, type: :request do
     it "soft deletes" do
       expect do
         delete "#{base_url}/#{banned_email_domain.id}"
-      end.to change(BannedEmailDomain, :count).by(-1)
+      end.to change(EmailDomain, :count).by(-1)
 
       expect(flash[:success]).to be_present
-      expect(BannedEmailDomain.unscoped.where(id: banned_email_domain.id).count).to eq 1
+      expect(EmailDomain.unscoped.where(id: banned_email_domain.id).count).to eq 1
     end
   end
 end

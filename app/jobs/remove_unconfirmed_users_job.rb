@@ -20,6 +20,6 @@ class RemoveUnconfirmedUsersJob < ScheduledJob
   end
 
   def banned_email_domains
-    BannedEmailDomain.pluck(:domain)
+    EmailDomain.pluck(:domain)
   end
 end

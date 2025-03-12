@@ -1,23 +1,23 @@
 # frozen_string_literal: true
 
-class Admin::BannedEmailDomainsController < Admin::BaseController
+class Admin::EmailDomainsController < Admin::BaseController
   include SortableTable
 
   def index
     @per_page = params[:per_page] || 25
-    @pagy, @banned_email_domains = pagy(BannedEmailDomain.order(sort_column => sort_direction)
+    @pagy, @banned_email_domains = pagy(EmailDomain.order(sort_column => sort_direction)
       .includes(:creator), limit: @per_page)
   end
 
   def new
-    @banned_email_domain = BannedEmailDomain.new
+    @banned_email_domain = EmailDomain.new
   end
 
   def create
-    @banned_email_domain = BannedEmailDomain.new(banned_email_domain_params)
+    @banned_email_domain = EmailDomain.new(banned_email_domain_params)
     @banned_email_domain.creator = current_user
 
-    if BannedEmailDomain.allow_creation?(@banned_email_domain.domain)
+    if EmailDomain.allow_creation?(@banned_email_domain.domain)
       if @banned_email_domain.save
         flash[:success] = "New banned email domain created"
         redirect_to admin_banned_email_domains_url and return
@@ -32,7 +32,7 @@ class Admin::BannedEmailDomainsController < Admin::BaseController
   end
 
   def destroy
-    @banned_email_domain = BannedEmailDomain.find(params[:id])
+    @banned_email_domain = EmailDomain.find(params[:id])
     @banned_email_domain.destroy
     flash[:success] = "Ban removed"
     redirect_back(fallback_location: admin_banned_email_domains_path)

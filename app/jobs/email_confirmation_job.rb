@@ -4,7 +4,7 @@ class EmailConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def self.banned_email_domain?(email)
-    BannedEmailDomain.pluck(:domain).any? { |domain| email.end_with?(domain) }
+    EmailDomain.pluck(:domain).any? { |domain| email.end_with?(domain) }
   end
 
   def perform(user_id)
