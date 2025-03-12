@@ -23,13 +23,11 @@ class Admin::EmailDomainsController < Admin::BaseController
 
     if @email_domain.banned? && !EmailDomain.allow_domain_ban?(@email_domain.domain)
       flash.now[:error] = domain_ban_message(@email_domain.domain)
+    elsif @email_domain.save
+      flash[:success] = "New email domain created"
+      redirect_to admin_email_domains_url and return
     else
-      if @email_domain.save
-        flash[:success] = "New email domain created"
-        redirect_to admin_email_domains_url and return
-      else
-        flash.now[:error] = @email_domain.errors.full_messages.to_sentence
-      end
+      flash.now[:error] = @email_domain.errors.full_messages.to_sentence
     end
     render :new
   end

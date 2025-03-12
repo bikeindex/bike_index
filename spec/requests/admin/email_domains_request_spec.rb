@@ -110,7 +110,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       let(:status) { "permitted" }
 
       it "responds with not likely spam" do
-        patch "#{base_url}/#{email_domain.id}", params: { email_domain: {status: "banned"} }
+        patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
 
         expect(flash[:error]).to be_present
         expect(flash[:error]).to_not match("bikes")
@@ -122,7 +122,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
         before { stub_const("EmailDomain::EMAIL_MIN_COUNT", 0) }
 
         it "updates" do
-          patch "#{base_url}/#{email_domain.id}", params: { email_domain: {status: "banned"} }
+          patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
 
           expect(flash[:success]).to be_present
           expect(email_domain.reload.status).to eq "banned"
@@ -134,7 +134,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
           let!(:bike3) { FactoryBot.create(:bike, owner_email: "ffh@rusty.mails.com") }
 
           it "responds with not likely spam" do
-            patch "#{base_url}/#{email_domain.id}", params: { email_domain: {status: "banned"} }
+            patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
             expect(flash[:error]).to match("bikes")
             expect(email_domain.reload.status).to eq "permitted"
           end
