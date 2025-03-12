@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: notifications
@@ -229,6 +231,14 @@ class Notification < ApplicationRecord
     user_email&.update_last_email_errored!(email_errored: true)
 
     raise e unless UNDELIVERABLE_ERRORS.include?(delivery_error)
+  end
+
+  def delivery_error_spam?
+    delivery_error == "Postmark::InactiveRecipientError"
+  end
+
+  def delivery_error_invalid?
+    delivery_error == "Postmark::InvalidEmailAddressError"
   end
 
   private

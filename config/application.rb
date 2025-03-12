@@ -29,6 +29,7 @@ module Bikeindex
 
     # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
     config.active_job.queue_adapter = :sidekiq
+    config.active_job.default_queue_name = :low_priority
 
     # Use our custom error pages
     config.exceptions_app = routes
