@@ -17,6 +17,8 @@
 #  index_email_domains_on_creator_id  (creator_id)
 #
 class EmailDomain < ApplicationRecord
+  include StatusHumanizable
+
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 200
   STATUS_ENUM = {permitted: 0, pending_ban: 1, banned: 2}
@@ -54,6 +56,14 @@ class EmailDomain < ApplicationRecord
     def too_many_bikes?(domain)
       Bike.unscoped.where("owner_email ILIKE ?", "%#{domain}").count > BIKE_MAX_COUNT
     end
+
+    def status_humanized(str)
+      str.humanize
+    end
+  end
+
+  def status_humanized
+    self.class.status_humanized(status)
   end
 
   def domain_is_expected_format

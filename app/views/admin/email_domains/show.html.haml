@@ -1,0 +1,12 @@
+.admin-subnav
+  .col-md-4
+    %h1 Email Domain
+
+
+.row.mt-4.mb-4
+  .col-md-6.offset-md-3
+    = render "form",
+      email_domain: @email_domain,
+      action: admin_email_domain_path(@email_domain),
+      method: :patch,
+      submit_label: "Save"

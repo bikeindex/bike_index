@@ -26,6 +26,16 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
     end
   end
 
+  describe "#show" do
+    let(:email_domain) { FactoryBot.create(:email_domain) }
+    it "responds with ok" do
+      get "#{base_url}/#{email_domain.to_param}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(assigns(:email_domain)&.id).to eq email_domain.id
+    end
+  end
+
   describe "#create" do
     let(:valid_attributes) { {domain: "@rustymails.com"} }
 

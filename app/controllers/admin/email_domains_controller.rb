@@ -2,11 +2,15 @@
 
 class Admin::EmailDomainsController < Admin::BaseController
   include SortableTable
+  before_action :find_email_domain, only: %i[show update]
 
   def index
     @per_page = params[:per_page] || 25
-    @pagy, @email_domains = pagy(EmailDomain.order(sort_column => sort_direction)
-      .includes(:creator), limit: @per_page)
+
+    @pagy, @email_domains = pagy(
+      matching_email_domains.includes(:creator).reorder("email_domains.#{sort_column} #{sort_direction}"),
+      limit: @per_page
+    )
   end
 
   def new
@@ -19,7 +23,7 @@ class Admin::EmailDomainsController < Admin::BaseController
 
     if EmailDomain.allow_creation?(@email_domain.domain)
       if @email_domain.save
-        flash[:success] = "New banned email domain created"
+        flash[:success] = "New email domain created"
         redirect_to admin_email_domains_url and return
       else
         flash.now[:error] = @email_domain.errors.full_messages.to_sentence
@@ -31,20 +35,36 @@ class Admin::EmailDomainsController < Admin::BaseController
     render :new
   end
 
-  def destroy
-    @email_domain = EmailDomain.find(params[:id])
-    @email_domain.destroy
-    flash[:success] = "Ban removed"
-    redirect_back(fallback_location: admin_email_domains_path)
+  def show
+  end
+
+  def edit
+    redirect_to admin_email_domain_path
+  end
+
+  def update
   end
 
   private
 
-  def email_domain_params
-    params.require(:email_domain).permit(:domain)
+  def sortable_columns
+    %w[created_at updated_at domain creator_id status]
   end
 
-  def sortable_columns
-    %w[created_at domain creator_id]
+  def find_email_domain
+    @email_domain = EmailDomain.find(params[:id])
+  end
+
+  def matching_email_domains
+    email_domains = EmailDomain
+    @show_matching_users = InputNormalizer.boolean(params[:search_matching_users])
+    @time_range_column = sort_column if %w[updated_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+
+    email_domains.where(@time_range_column => @time_range)
+  end
+
+  def email_domain_params
+    params.require(:email_domain).permit(:domain)
   end
 end
