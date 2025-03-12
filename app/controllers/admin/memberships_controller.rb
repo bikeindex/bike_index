@@ -35,6 +35,7 @@ class Admin::MembershipsController < Admin::BaseController
 
   def show
     @payments = @membership.payments
+    @stripe_subscriptions = @membership.stripe_subscriptions
   end
 
   def update

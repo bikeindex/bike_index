@@ -369,7 +369,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/memberships_controller.rb",
-      "line": 102,
+      "line": 103,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "Membership.all.where(:status => ((params[:search_status] or nil))).where(:level => ((params[:search_level] or nil))).send((params[:search_manager] or nil))",
       "render_path": null,
@@ -1329,7 +1329,7 @@
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/memberships/show.html.haml",
-      "line": 71,
+      "line": 82,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
       "code": "link_to(Membership.find(params[:id]).stripe_id.truncate(20), Membership.find(params[:id]).stripe_admin_url, :title => Membership.find(params[:id]).stripe_id)",
       "render_path": [
@@ -1337,7 +1337,7 @@
           "type": "controller",
           "class": "Admin::MembershipsController",
           "method": "show",
-          "line": 38,
+          "line": 39,
           "file": "app/controllers/admin/memberships_controller.rb",
           "rendered": {
             "name": "admin/memberships/show",
@@ -1468,6 +1468,50 @@
       "confidence": "High",
       "cwe_id": [
         77
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "f282beba64aac07297182ab9ead947bae2b1b8029eda5ad5e746f32af9e5820a",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/stripe_subscriptions/_table.html.haml",
+      "line": 61,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to((Unresolved Model).new.stripe_id.truncate(20), (Unresolved Model).new.stripe_admin_url, :title => (Unresolved Model).new.stripe_id)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::MembershipsController",
+          "method": "show",
+          "line": 39,
+          "file": "app/controllers/admin/memberships_controller.rb",
+          "rendered": {
+            "name": "admin/memberships/show",
+            "file": "app/views/admin/memberships/show.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "admin/memberships/show",
+          "line": 107,
+          "file": "app/views/admin/memberships/show.html.haml",
+          "rendered": {
+            "name": "admin/stripe_subscriptions/_table",
+            "file": "app/views/admin/stripe_subscriptions/_table.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/stripe_subscriptions/_table"
+      },
+      "user_input": "(Unresolved Model).new.stripe_admin_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
       ],
       "note": ""
     },

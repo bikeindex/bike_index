@@ -179,9 +179,9 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_WM40Yfpiw99Zh7","request_duration_ms":0}}'
+      - '{"last_request_metrics":{"request_id":"req_WM40Yfpiw99Zh7","request_duration_ms":12}}'
       Idempotency-Key:
-      - a57c6cd0-b05d-48f9-b3ac-ab70ba2b5e6b
+      - 793d8ba9-d63d-4969-96fa-aa591fc5fce7
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -198,7 +198,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 10 Mar 2025 22:48:13 GMT
+      - Tue, 11 Mar 2025 16:10:36 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -221,19 +221,19 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=NbyO2GLGevOhkKMRMmlKJtEODp5CDrwFCJ1CRMFBmWNGbtWj1mzyEptYhqG-yu4VOfEZ8yXxuCYb-KmI
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=M8Bnx2s0Madgli0ztQx5m9qmP1HeJEal6bl0yHqn2ECDZ8A1mN990IeFM6hEcYRkWrsVnM1B3dJofTAB
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Idempotency-Key:
-      - a57c6cd0-b05d-48f9-b3ac-ab70ba2b5e6b
+      - 793d8ba9-d63d-4969-96fa-aa591fc5fce7
       Original-Request:
-      - req_qbzuhH3AdCL9Is
+      - req_TijHjXERPbHEuc
       Report-To:
       - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_qbzuhH3AdCL9Is
+      - req_TijHjXERPbHEuc
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -252,7 +252,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1Hvl08yN0RZbrQD8qZeLt0EN6UAl6RKnwYqQIdl0P9V46Dr2CsE4zRpqx",
+          "id": "cs_test_a1vHNkkC3Caoyqyx7Q8S1CMbuy8jc5obgQry9vOBwQRa2lTFHUaZCeOlDi",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": false
@@ -275,7 +275,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1741646893,
+          "created": 1741709436,
           "currency": "mxn",
           "currency_conversion": null,
           "custom_fields": [],
@@ -297,7 +297,7 @@ http_interactions:
           },
           "customer_email": "user3s@bikeiasdndex.org",
           "discounts": [],
-          "expires_at": 1741733293,
+          "expires_at": 1741795835,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -351,7 +351,7 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1Hvl08yN0RZbrQD8qZeLt0EN6UAl6RKnwYqQIdl0P9V46Dr2CsE4zRpqx#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1vHNkkC3Caoyqyx7Q8S1CMbuy8jc5obgQry9vOBwQRa2lTFHUaZCeOlDi#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-  recorded_at: Mon, 10 Mar 2025 22:48:13 GMT
+  recorded_at: Tue, 11 Mar 2025 16:10:36 GMT
 recorded_with: VCR 6.3.1

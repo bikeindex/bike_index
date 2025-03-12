@@ -2800,7 +2800,8 @@ CREATE TABLE public.payments (
     referral_source text,
     currency_enum integer,
     membership_id bigint,
-    stripe_subscription_id bigint
+    stripe_subscription_id bigint,
+    stripe_status character varying
 );
 
 
@@ -6648,6 +6649,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250311144643'),
 ('20250311013102'),
 ('20250227195412'),
 ('20250226182610'),
