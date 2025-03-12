@@ -8,13 +8,13 @@ RSpec.describe EmailConfirmationJob, type: :job do
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end
 
-  context "with banned_email_domain" do
-    let!(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "@rustymails.com") }
+  context "with email_domain" do
+    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@rustymails.com") }
     let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com") }
 
     it "deletes the user" do
-      expect(User.unscoped.count).to eq 2 # Because the admin from banned_email_domain
-      expect(described_class.banned_email_domain?(user.email)).to be_truthy
+      expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
+      expect(described_class.email_domain?(user.email)).to be_truthy
       ActionMailer::Base.deliveries = []
       EmailConfirmationJob.new.perform(user.id)
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy

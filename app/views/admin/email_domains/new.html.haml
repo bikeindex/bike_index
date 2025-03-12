@@ -16,7 +16,7 @@
 .row.mt-4.mb-4
   .col-md-6.offset-md-3
     = render "form",
-      banned_email_domain: @banned_email_domain,
-      action: admin_banned_email_domains_path,
+      email_domain: @email_domain,
+      action: admin_email_domains_path,
       method: :post,
       submit_label: "Create"

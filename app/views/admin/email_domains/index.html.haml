@@ -1,6 +1,6 @@
 - nav_header_list_items = capture_haml do
   %li.nav-item
-    = link_to "New Banned Domain", new_admin_banned_email_domain_path, class: "nav-link"
+    = link_to "New Banned Domain", new_admin_email_domain_path, class: "nav-link"
 
 - table_view = capture_haml do
   -# only render the warning on the first page
@@ -27,19 +27,19 @@
           &nbsp;
 
       %tbody
-        - @banned_email_domains.each do |banned_email_domain|
+        - @email_domains.each do |email_domain|
           %tr
             %td
-              %span.convertTime= l(banned_email_domain.created_at, format: :convert_time)
+              %span.convertTime= l(email_domain.created_at, format: :convert_time)
               - if display_dev_info?
-                %code.small.only-dev-visible= banned_email_domain.id
-            %td= banned_email_domain.domain
+                %code.small.only-dev-visible= email_domain.id
+            %td= email_domain.domain
             %td
-              = render partial: "/shared/admin/user_cell", locals: {user: banned_email_domain.creator, user_id: banned_email_domain.creator_id, cache: false}
+              = render partial: "/shared/admin/user_cell", locals: {user: email_domain.creator, user_id: email_domain.creator_id, cache: false}
             - if params[:matching_users].present?
               %td
-                = number_with_delimiter(User.matching_domain(banned_email_domain.domain).count)
+                = number_with_delimiter(User.matching_domain(email_domain.domain).count)
             %td
-              %small.float-right= link_to "remove block", admin_banned_email_domain_path(banned_email_domain), method: :delete
+              %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete
 
-= render partial: "/shared/admin/index_skeleton", locals: {collection: @banned_email_domains, nav_header_list_items:, table_view:, skip_charting: true}
+= render partial: "/shared/admin/index_skeleton", locals: {collection: @email_domains, nav_header_list_items:, table_view:, skip_charting: true}

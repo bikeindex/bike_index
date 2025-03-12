@@ -2,24 +2,28 @@
 
 # == Schema Information
 #
-# Table name: banned_email_domains
+# Table name: email_domains
 #
 #  id         :bigint           not null, primary key
 #  deleted_at :datetime
 #  domain     :string
+#  status     :integer          default(0)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  creator_id :bigint
 #
 # Indexes
 #
-#  index_banned_email_domains_on_creator_id  (creator_id)
+#  index_email_domains_on_creator_id  (creator_id)
 #
 class EmailDomain < ApplicationRecord
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 200
+  STATUS_ENUM = {permitted: 0, pending_ban: 1, banned: 2}
 
   acts_as_paranoid
+
+  enum :status, STATUS_ENUM
 
   belongs_to :creator, class_name: "User"
 

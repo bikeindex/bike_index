@@ -2,38 +2,38 @@ require "rails_helper"
 
 RSpec.describe EmailDomain, type: :model do
   describe "Factory" do
-    let(:banned_email_domain) { FactoryBot.create(:banned_email_domain) }
+    let(:email_domain) { FactoryBot.create(:email_domain) }
     it "is valid" do
-      expect(banned_email_domain).to be_valid
+      expect(email_domain).to be_valid
     end
   end
 
   describe "validate domain" do
     context "without ." do
-      let(:banned_email_domain) { FactoryBot.build(:banned_email_domain, domain: "@somethingcom") }
+      let(:email_domain) { FactoryBot.build(:email_domain, domain: "@somethingcom") }
       it "is invalid" do
-        expect(banned_email_domain).to_not be_valid
-        expect(banned_email_domain.errors.full_messages.join).to match(".")
+        expect(email_domain).to_not be_valid
+        expect(email_domain.errors.full_messages.join).to match(".")
       end
     end
   end
 
   describe "contained in another" do
-    let(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "fetely.click") }
-    let(:banned_email_domain_extended) { FactoryBot.build(:banned_email_domain, domain: "@fetely.click") }
+    let(:email_domain) { FactoryBot.create(:email_domain, domain: "fetely.click") }
+    let(:email_domain_extended) { FactoryBot.build(:email_domain, domain: "@fetely.click") }
 
     it "is not valid" do
-      expect(banned_email_domain).to be_valid
-      expect(banned_email_domain_extended).to_not be_valid
-      expect(banned_email_domain_extended.errors.full_messages.join).to match("fetely.click")
+      expect(email_domain).to be_valid
+      expect(email_domain_extended).to_not be_valid
+      expect(email_domain_extended.errors.full_messages.join).to match("fetely.click")
     end
 
     context "when larger string exists" do
       it "doesn't block" do
-        banned_email_domain_extended.save!
-        expect(banned_email_domain_extended.reload).to be_valid
+        email_domain_extended.save!
+        expect(email_domain_extended.reload).to be_valid
 
-        expect(banned_email_domain).to be_valid
+        expect(email_domain).to be_valid
       end
     end
   end

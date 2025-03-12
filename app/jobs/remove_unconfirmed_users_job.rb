@@ -10,7 +10,7 @@ class RemoveUnconfirmedUsersJob < ScheduledJob
   def perform
     unconfirmed_users_to_remove.find_each { |user| user.really_destroy! }
 
-    banned_email_domains.each do |domain|
+    email_domains.each do |domain|
       User.matching_domain(domain).find_each { |user| user.really_destroy! }
     end
   end
@@ -19,7 +19,7 @@ class RemoveUnconfirmedUsersJob < ScheduledJob
     User.where("created_at < ?", Time.current - REMOVE_DELAY).unconfirmed
   end
 
-  def banned_email_domains
+  def email_domains
     EmailDomain.pluck(:domain)
   end
 end
