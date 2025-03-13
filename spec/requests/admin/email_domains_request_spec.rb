@@ -49,6 +49,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       email_domain = EmailDomain.last
       expect(email_domain).to have_attributes(domain: "@rustymails.com", status:)
       expect(email_domain.no_auto_assign_status?).to be_falsey
+      expect(UpdateEmailDomainJob).to have_enqueued_sidekiq_job(email_domain.id)
     end
 
     context "status: banned" do
@@ -104,7 +105,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       email_domain.update(status_changed_at: 1.week.ago)
       expect(email_domain.reload.status_changed_at).to be < Time.current - 1.day
       expect(email_domain.status_changed_after_create?).to be_falsey
-
+      Sidekiq::Job.clear_all
       patch "#{base_url}/#{email_domain.id}", params: {
         email_domain: {domain: "newdomain.com", status: "ban_pending"}
       }
@@ -114,6 +115,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       expect(email_domain.status_changed_at).to be_within(1).of Time.current
       expect(email_domain.status_changed_after_create?).to be_truthy
       expect(email_domain.no_auto_assign_status?).to be_truthy
+      expect(described_class).to_not have_enqueued_sidekiq_job
     end
 
     context "switching to banned" do

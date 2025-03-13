@@ -1,12 +1,23 @@
 class UpdateEmailDomainJob < ScheduledJob
   prepend ScheduledJobRecorder
 
-  PERMITTED_DOMAIN_BIKE_COUNT = 10
+  CREATE_TLD_SUBDOMAIN_COUNT = 3
 
   sidekiq_options retry: 1
 
   def self.frequency
     24.hours
+  end
+
+  def self.auto_pending_ban?(email_domain)
+    if email_domain.bike_count.present? && email_domain.bike_count > 0
+      # Ensure that domains that registered bikes before the creation of EmailDomains aren't blocked
+      return false if (email_domain.bike_count + 1) > (email_domain.user_count * 0.1)
+    end
+    # Ensure domains for organizations aren't blocked
+    return false if email_domain.calculated_users.with_organization_roles.count > 2
+
+    email_domain.data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
   end
 
   def perform(domain_id = nil, email_domain = nil)
@@ -17,22 +28,19 @@ class UpdateEmailDomainJob < ScheduledJob
     email_domain.data.merge!(calculated_data(email_domain).as_json)
 
     unless email_domain.no_auto_assign_status? || email_domain.ban_or_pending?
-      email_domain.status = "ban_pending" if auto_pending_ban?(email_domain.data)
+      email_domain.status = "ban_pending" if self.class.auto_pending_ban?(email_domain)
     end
 
     email_domain.save!
+    if create_tld_for_subdomains?(email_domain)
+
+    end
   end
 
   private
 
   def enqueue_workers
     EmailDomain.pluck(:id).each { |id| self.class.perform_async(id) }
-  end
-
-  def auto_pending_ban?(data)
-    return false if data["bike_count"] > PERMITTED_DOMAIN_BIKE_COUNT
-
-    data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
   end
 
   def calculated_data(email_domain)
@@ -47,7 +55,7 @@ class UpdateEmailDomainJob < ScheduledJob
 
   def domain_resolves?(domain)
     conn = Faraday.new do |faraday|
-      faraday.use FaradayMiddleware::FollowRedirects
+      faraday.use FaradayMiddleware::FollowRedirects, limit: 15
       faraday.adapter Faraday.default_adapter
       # Set reasonable timeouts to avoid hanging
       faraday.options.timeout = 5        # 5 seconds for open/read timeout
@@ -64,5 +72,16 @@ class UpdateEmailDomainJob < ScheduledJob
       # Handle invalid URLs
       false
     end
+  end
+
+  def create_tld_for_subdomains?(email_domain)
+    return false if email_domain.tld?
+
+    tld = email_domain.tld
+    return false if EmailDomain.tld_matches_subdomains.matching_domain(tld).any?
+
+    return false if EmailDomain.matching_domain(tld).count < CREATE_TLD_SUBDOMAIN_COUNT
+
+    EmailDomain.find_or_create_for(tld)
   end
 end

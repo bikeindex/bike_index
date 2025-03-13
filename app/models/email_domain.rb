@@ -39,10 +39,12 @@ class EmailDomain < ApplicationRecord
   validate :domain_is_not_contained_in_existing, on: :create
 
   before_save :set_calculated_attributes
+  after_commit :enqueue_processing_worker, on: :create
 
   scope :ban_or_pending, -> { where(status: %i[ban_pending banned]) }
-  scope :tld, -> { where("(data -> 'is_tld') = ?", "true") }
-  scope :subdomain, -> { where("(data -> 'is_tld') = ?", "false") }
+  scope :tld, -> { where("(data -> 'is_tld')::text = ?", "true") }
+  scope :tld_matches_subdomains, -> { tld }
+  scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
 
   class << self
     def find_or_create_for(email_or_domain)
@@ -126,6 +128,10 @@ class EmailDomain < ApplicationRecord
     data&.dig("is_tld")
   end
 
+  def tld_matches_subdomains?
+    tld? && !domain.start_with?("@")
+  end
+
   def bike_count
     data&.dig("bike_count")&.to_i
   end
@@ -186,6 +192,10 @@ class EmailDomain < ApplicationRecord
 
   def unprocessed?
     user_count.nil?
+  end
+
+  def enqueue_processing_worker
+    UpdateEmailDomainJob.perform_async(id)
   end
 
   private

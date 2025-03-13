@@ -122,7 +122,8 @@ class User < ApplicationRecord
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
-  scope :ambassadors, -> { where(id: OrganizationRole.ambassador_organizations.select(:user_id)) }
+  scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
+  scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
   scope :member, -> { includes(:memberships).merge(Membership.active) }
 

@@ -26,7 +26,6 @@ class Admin::EmailDomainsController < Admin::BaseController
       flash.now[:error] = domain_ban_message(@email_domain.domain)
     elsif @email_domain.save
       flash[:success] = "New email domain created"
-      UpdateEmailDomainJob.perform_async(@email_domain.id)
       redirect_to admin_email_domains_url and return
     else
       flash.now[:error] = @email_domain.errors.full_messages.to_sentence

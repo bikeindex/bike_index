@@ -71,7 +71,7 @@ RSpec.describe EmailDomain, type: :model do
 
         email_domain = EmailDomain.find_or_create_for("stuff.com")
         expect(EmailDomain.find_or_create_for("xxxx.stuff.com")&.id).to eq email_domain.id
-        expect(EmailDomain.send(:matching, "xxx.stuff.com").pluck(:id)).to eq([email_domain_sub.id])
+        expect(EmailDomain.send(:matching_domain, "xxx.stuff.com").pluck(:id)).to eq([email_domain_sub.id])
         expect(EmailDomain.find_or_create_for("something@xxxx.stuff.com")&.id).to eq email_domain.id
       end
     end
@@ -84,7 +84,7 @@ RSpec.describe EmailDomain, type: :model do
         expect(email_domain_sub.reload.tld).to eq "stuff.com"
         expect(email_domain.reload.tld?).to be_truthy
         expect(email_domain_at.reload.tld?).to be_truthy
-        expect(EmailDomain.send(:matching, "stuff.com").map(&:id)).to eq([email_domain.id, email_domain_at.id, email_domain_sub.id])
+        expect(EmailDomain.send(:matching_domain, "stuff.com").map(&:id)).to eq([email_domain.id, email_domain_at.id, email_domain_sub.id])
         expect(EmailDomain.find_or_create_for("something@stuff.stuff.com")&.id).to eq email_domain.id
       end
     end
