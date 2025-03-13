@@ -30,9 +30,14 @@
             - if @email_domain.status_changed_after_create?
               %span.convertTime.preciseTime
                 = l @email_domain.status_changed_at, format: :convert_time
-        %tr
-          %td
-          %td
+        - unless @email_domain.tld?
+          %tr
+            %td TLD
+            %td
+              - if @matching_tld.present?
+                = link_to @matching_tld.domain, admin_email_domain_path(@matching_tld.id)
+              - else
+                = @email_domain.tld
 
   .col-md-6
     %table.table-list
@@ -62,3 +67,7 @@
       action: admin_email_domain_path(@email_domain),
       method: :patch,
       submit_label: "Save"
+
+
+- if @subdomains.present?
+  = render partial: "table", locals: {collection: @subdomains, render_sortable: false}

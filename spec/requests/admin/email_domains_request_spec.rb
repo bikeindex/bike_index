@@ -41,15 +41,16 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
     let(:status) { "permitted" }
 
     it "creates" do
-      expect do
-        post base_url, params: {email_domain: valid_attributes}
-      end.to change(EmailDomain, :count).by 1
+      VCR.use_cassette("EmailDomainController-rustymails") do
+        expect do
+          post base_url, params: {email_domain: valid_attributes}
+        end.to change(EmailDomain, :count).by 1
 
-      expect(flash[:success]).to be_present
-      email_domain = EmailDomain.last
-      expect(email_domain).to have_attributes(domain: "@rustymails.com", status:)
-      expect(email_domain.no_auto_assign_status?).to be_falsey
-      expect(UpdateEmailDomainJob).to have_enqueued_sidekiq_job(email_domain.id)
+        expect(flash[:success]).to be_present
+        email_domain = EmailDomain.last
+        expect(email_domain).to have_attributes(domain: "@rustymails.com", status: "ban_pending")
+        expect(email_domain.no_auto_assign_status?).to be_falsey
+      end
     end
 
     context "status: banned" do
@@ -68,15 +69,17 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
         before { stub_const("EmailDomain::EMAIL_MIN_COUNT", 0) }
 
         it "creates" do
-          expect do
-            post base_url, params: {email_domain: valid_attributes}
-          end.to change(EmailDomain, :count).by 1
+          VCR.use_cassette("EmailDomainController-rustymails") do
+            expect do
+              post base_url, params: {email_domain: valid_attributes}
+            end.to change(EmailDomain, :count).by 1
 
-          expect(flash[:success]).to be_present
-          expect(response).to redirect_to(admin_email_domains_path)
-          email_domain = EmailDomain.last
-          expect(email_domain.creator_id).to eq current_user.id
-          expect(email_domain.domain).to eq "@rustymails.com"
+            expect(flash[:success]).to be_present
+            expect(response).to redirect_to(admin_email_domains_path)
+            email_domain = EmailDomain.last
+            expect(email_domain.creator_id).to eq current_user.id
+            expect(email_domain.domain).to eq "@rustymails.com"
+          end
         end
 
         context "with more bikes created" do

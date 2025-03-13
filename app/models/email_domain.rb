@@ -46,6 +46,8 @@ class EmailDomain < ApplicationRecord
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
   scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
 
+  attr_accessor :skip_processing
+
   class << self
     def find_or_create_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
@@ -172,6 +174,7 @@ class EmailDomain < ApplicationRecord
 
   def calculated_subdomains
     return self.class.none unless tld?
+
     self.class.subdomain.matching_domain(domain)
   end
 
@@ -184,6 +187,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def process!
+    return if skip_processing
     UpdateEmailDomainJob.new.perform(id, self)
     reload
   end

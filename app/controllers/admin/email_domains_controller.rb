@@ -21,10 +21,12 @@ class Admin::EmailDomainsController < Admin::BaseController
   def create
     @email_domain = EmailDomain.new(email_domain_params)
     @email_domain.creator = current_user
+    @email_domain.skip_processing = true
 
     if @email_domain.banned? && !EmailDomain.allow_domain_ban?(@email_domain.domain)
       flash.now[:error] = domain_ban_message(@email_domain.domain)
     elsif @email_domain.save
+      UpdateEmailDomainJob.new.perform(@email_domain.id, @email_domain)
       flash[:success] = "New email domain created"
       redirect_to admin_email_domains_url and return
     else
@@ -34,6 +36,10 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def show
+    @subdomains = @email_domain.calculated_subdomains
+    unless @email_domain.tld
+      @matching_tld = EmailDomain.find_matching_domain(@email_domain.tld).first
+    end
   end
 
   def edit
