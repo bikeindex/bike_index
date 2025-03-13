@@ -130,6 +130,10 @@ class EmailDomain < ApplicationRecord
     data&.dig("bike_count")&.to_i
   end
 
+  def broader_domain_exists?
+    InputNormalizer.boolean(data&.dig("broader_domain_exists"))
+  end
+
   # IDK if this is really necessary, but it makes the matching class method easier
   def at_domain
     domain.match?("@") ? domain : "@#{domain}"
