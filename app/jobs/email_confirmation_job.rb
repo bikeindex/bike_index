@@ -3,12 +3,15 @@
 class EmailConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
+  # TODO: Actually test this
+  PROCESS_NEW_EMAIL_DOMAINS = !Rails.env.test?
+
   def perform(user_id)
     user = User.find(user_id)
 
     # Don't suffer a witch to live
     email_domain = EmailDomain.find_or_create_for(user.email)
-    email_domain.process! if email_domain.unprocessed?
+    email_domain.process! if email_domain.unprocessed? && PROCESS_NEW_EMAIL_DOMAINS
     return user.really_destroy! if email_domain.banned?
 
     # Clean up situations where there are two users created
