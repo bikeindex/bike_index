@@ -47,9 +47,14 @@ class Admin::EmailDomainsController < Admin::BaseController
         !EmailDomain.allow_domain_ban?(@email_domain.domain)
 
       flash.now[:error] = domain_ban_message(@email_domain.domain)
-    elsif @email_domain.update(permitted_update_parameters)
-      flash[:success] = "Domain Saved!"
-      redirect_to admin_email_domain_url(@email_domain) and return
+    else
+      @email_domain.creator_id ||= current_user.id
+      if @email_domain.update(permitted_update_parameters)
+        flash[:success] = "Domain Saved!"
+        redirect_to admin_email_domain_url(@email_domain) and return
+      else
+        flash[:error] = @email_domain.errors.full_messages
+      end
     end
 
     render action: :show

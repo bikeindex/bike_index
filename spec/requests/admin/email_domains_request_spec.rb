@@ -46,6 +46,9 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       end.to change(EmailDomain, :count).by 1
 
       expect(flash[:success]).to be_present
+      email_domain = EmailDomain.last
+      expect(email_domain).to have_attributes(domain: "@rustymails.com", status:)
+      expect(email_domain.no_auto_assign_status?).to be_falsey
     end
 
     context "status: banned" do
@@ -110,6 +113,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       expect(email_domain.domain).to eq "mails.com"
       expect(email_domain.status_changed_at).to be_within(1).of Time.current
       expect(email_domain.status_changed_after_create?).to be_truthy
+      expect(email_domain.no_auto_assign_status?).to be_falsey
     end
 
     context "switching to banned" do

@@ -124,6 +124,10 @@ class EmailDomain < ApplicationRecord
     data&.dig("is_tld")
   end
 
+  def bike_count
+    data&.dig("bike_count")&.to_i
+  end
+
   # IDK if this is really necessary, but it makes the matching class method easier
   def at_domain
     domain.match?("@") ? domain : "@#{domain}"
@@ -157,7 +161,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def status_changed_after_create?
-    (status_changed_at - created_at).abs >= 2.seconds
+    (status_changed_at - created_at).abs >= 60.seconds
   end
 
   def process!
