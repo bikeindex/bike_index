@@ -14,7 +14,8 @@ class UpdateEmailDomainJob < ScheduledJob
     email_domain.data.merge!(
       "broader_domain_exists" => broader_domain_exists(email_domain),
       "domain_resolves" => domain_resolves?(email_domain.domain),
-      "tld_resolves" => domain_resolves?(email_domain.tld)
+      "tld_resolves" => domain_resolves?(email_domain.tld),
+      "bike_count" => Bike.matching_domain(email.domain)
     )
     unless email_domain.no_auto_assign_status? || email_domain.ban_or_pending?
       email_domain.status = "ban_pending" if auto_pending_ban?(email_domain.data)

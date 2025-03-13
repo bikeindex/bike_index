@@ -156,6 +156,10 @@ class EmailDomain < ApplicationRecord
     data["no_auto_assign_status"]&.to_s == "true"
   end
 
+  def changed_status_after_creation?
+    (changed_status_at - created_at).abs >= 2.seconds
+  end
+
   private
 
   def set_calculated_attributes

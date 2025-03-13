@@ -11,8 +11,7 @@
       %th= sortable "domain"
       %th= sortable "status"
       %th= sortable "creator_id"
-      - if show_matching_users
-        %th Matching Users
+      %th= sortable "Users", "user_count"
       %th
         &nbsp;
 
@@ -31,9 +30,8 @@
           %td= email_domain.status_humanized
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: email_domain.creator, user_id: email_domain.creator_id, cache: false}
-          - if params[:matching_users].present?
-            %td
-              = number_with_delimiter(User.matching_domain(email_domain.domain).count)
+          %td
+            = number_with_delimiter(email_domain.user_count)
           %td
             %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete
 

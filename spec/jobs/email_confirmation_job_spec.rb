@@ -15,7 +15,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
     let(:status) { "permitted" }
     let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com") }
 
-    it "deletes the user" do
+    it "creates the user" do
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
       expect do
         EmailConfirmationJob.new.perform(user.id)
@@ -33,6 +33,25 @@ RSpec.describe EmailConfirmationJob, type: :job do
         end.to change(Notification, :count).by 0
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         expect(User.unscoped.count).to eq 2
+        expect(UserLikelySpamReason.count).to eq 1
+        expect(user.reload.likely_spam?).to be_truthy
+        expect(user.user_likely_spam_reasons.first).to have_attributes(reason: "email_domain")
+      end
+    end
+
+    context "banned" do
+      let(:status) { "banned" }
+      let!(:user_likely_spam_reason) { FactoryBot.create(:user_likely_spam_reason, user:) }
+
+      it "does not send an email" do
+        expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
+        ActionMailer::Base.deliveries = []
+        expect do
+          EmailConfirmationJob.new.perform(user.id)
+        end.to change(Notification, :count).by 0
+        expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        expect(User.unscoped.count).to eq 1
+        expect(UserLikelySpamReason.count).to eq 0 # It deletes the user
       end
     end
   end

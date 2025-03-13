@@ -21,7 +21,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           tld: "bikeindex.org",
           is_tld: true,
           domain_resolves: true,
-          tld_resolves: true
+          tld_resolves: true,
+          bike_count: 0
         }
       end
 
@@ -51,7 +52,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           tld: "unylix.com",
           is_tld: false,
           domain_resolves: false,
-          tld_resolves: false
+          tld_resolves: false,
+          bike_count: 0
         }
       end
       it "makes ban_pending" do

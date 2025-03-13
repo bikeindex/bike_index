@@ -98,7 +98,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
     let(:status) { "banned" }
 
     it "updates" do
-      expect(email_domain.reload.status_changed_at).to be < Time.current - 1.day
+      expect(email_domain.reload.changed_status_at).to be < Time.current - 1.day
 
       patch "#{base_url}/#{email_domain.id}", params: {
         email_domain: {domain: "newdomain.com", status: "ban_pending"}

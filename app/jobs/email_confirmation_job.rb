@@ -11,8 +11,10 @@ class EmailConfirmationJob < ApplicationJob
     return user.really_destroy! if email_domain.banned?
 
     # Clean up situations where there are two users created
-    return user.destroy if duplicate_user?(user)
-    return if email_domain.ban_pending?
+    return user.really_destroy! if duplicate_user?(user)
+
+    # Create a likely_spam_reason and don't send a notification if ban_pending
+    return UserLikelySpamReason.create(reason: "email_domain", user:) if email_domain.ban_pending?
 
     notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
     # If we just sent it, don't send again

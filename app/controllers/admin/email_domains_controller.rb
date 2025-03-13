@@ -56,7 +56,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at domain creator_id status]
+    %w[created_at updated_at domain creator_id status user_count]
   end
 
   def find_email_domain

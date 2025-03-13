@@ -105,6 +105,7 @@ class User < ApplicationRecord
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
   has_many :user_alerts
+  has_many :user_likely_spam_reasons, dependent: :destroy
   has_many :superuser_abilities
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
@@ -468,6 +469,10 @@ class User < ApplicationRecord
 
   def phone_confirmed?
     user_phones.confirmed.limit(1).any?
+  end
+
+  def likely_spam?
+    user_likely_spam_reasons.any?
   end
 
   def set_calculated_attributes
