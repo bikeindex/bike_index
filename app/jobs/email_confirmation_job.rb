@@ -8,6 +8,7 @@ class EmailConfirmationJob < ApplicationJob
 
     # Don't suffer a witch to live
     email_domain = EmailDomain.find_or_create_for(user.email)
+    email_domain.process! if email_domain.unprocessed?
     return user.really_destroy! if email_domain.banned?
 
     # Clean up situations where there are two users created

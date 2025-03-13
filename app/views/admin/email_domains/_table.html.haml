@@ -29,14 +29,20 @@
           %td
             %small.convertTime
               = l(email_domain.updated_at, format: :convert_time)
+          %td
+            - if email_domain.status_changed_after_create?
+              %small.convertTime
+                = l(email_domain.updated_at, format: :convert_time)
           %td= email_domain.domain
-          %td= email_domain.status_humanized
+          %td
+            %span{class: (email_domain.status.match?("ban") ? "text-danger" : "")}
+              = email_domain.status_humanized
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: email_domain.creator, user_id: email_domain.creator_id, cache: false}
           %td
             = number_with_delimiter(email_domain.user_count)
           %td
-            = number_with_delimiter(email_domain.data["bike_count"])
+            = number_with_delimiter(email_domain.data&.dig("bike_count"))
           -# %td
           -#   %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete
 

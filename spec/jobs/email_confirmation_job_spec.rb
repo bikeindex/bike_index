@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe EmailConfirmationJob, type: :job do
+  before { allow_any_instance_of(UpdateEmailDomainJob).to receive(:domain_resolves?).and_return(true) }
   it "sends a welcome email" do
     user = FactoryBot.create(:user)
     ActionMailer::Base.deliveries = []
