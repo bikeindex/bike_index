@@ -1,24 +1,59 @@
 require "rails_helper"
 
 RSpec.describe EmailConfirmationJob, type: :job do
+  before { allow_any_instance_of(UpdateEmailDomainJob).to receive(:domain_resolves?).and_return(true) }
   it "sends a welcome email" do
     user = FactoryBot.create(:user)
     ActionMailer::Base.deliveries = []
-    EmailConfirmationJob.new.perform(user.id)
+    expect do
+      EmailConfirmationJob.new.perform(user.id)
+    end.to change(Notification, :count).by 1
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end
 
   context "with email_domain" do
-    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@rustymails.com") }
+    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@rustymails.com", status:) }
+    let(:status) { "permitted" }
     let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com") }
 
-    it "deletes the user" do
+    it "creates the user" do
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
-      expect(described_class.email_domain?(user.email)).to be_truthy
-      ActionMailer::Base.deliveries = []
-      EmailConfirmationJob.new.perform(user.id)
-      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
-      expect(User.unscoped.count).to eq 1
+      expect do
+        EmailConfirmationJob.new.perform(user.id)
+      end.to change(Notification, :count).by 1
+      expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+    end
+
+    context "pending" do
+      let(:status) { "ban_pending" }
+      it "does not send an email" do
+        expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
+        ActionMailer::Base.deliveries = []
+        expect do
+          EmailConfirmationJob.new.perform(user.id)
+        end.to change(Notification, :count).by 0
+        expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        expect(User.unscoped.count).to eq 2
+        expect(UserLikelySpamReason.count).to eq 1
+        expect(user.reload.likely_spam?).to be_truthy
+        expect(user.user_likely_spam_reasons.first).to have_attributes(reason: "email_domain")
+      end
+    end
+
+    context "banned" do
+      let(:status) { "banned" }
+      let!(:user_likely_spam_reason) { FactoryBot.create(:user_likely_spam_reason, user:) }
+
+      it "does not send an email" do
+        expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
+        ActionMailer::Base.deliveries = []
+        expect do
+          EmailConfirmationJob.new.perform(user.id)
+        end.to change(Notification, :count).by 0
+        expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        expect(User.unscoped.count).to eq 1
+        expect(UserLikelySpamReason.count).to eq 0 # It deletes the user
+      end
     end
   end
   context "user with email already exists" do

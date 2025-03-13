@@ -3,18 +3,22 @@
 class EmailConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
-  def self.email_domain?(email)
-    EmailDomain.pluck(:domain).any? { |domain| email.end_with?(domain) }
-  end
+  # TODO: Actually test this
+  PROCESS_NEW_EMAIL_DOMAINS = !Rails.env.test?
 
   def perform(user_id)
     user = User.find(user_id)
 
     # Don't suffer a witch to live
-    return user.really_destroy! if self.class.email_domain?(user.email)
+    email_domain = EmailDomain.find_or_create_for(user.email)
+    email_domain.process! if email_domain.unprocessed? && PROCESS_NEW_EMAIL_DOMAINS
+    return user.really_destroy! if email_domain.banned?
 
     # Clean up situations where there are two users created
-    return user.destroy if duplicate_user?(user)
+    return user.really_destroy! if duplicate_user?(user)
+
+    # Create a likely_spam_reason and don't send a notification if ban_pending
+    return UserLikelySpamReason.create(reason: "email_domain", user:) if email_domain.ban_pending?
 
     notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
     # If we just sent it, don't send again

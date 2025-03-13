@@ -1059,7 +1059,10 @@ CREATE TABLE public.email_domains (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     deleted_at timestamp(6) without time zone,
-    status integer DEFAULT 0
+    status integer DEFAULT 0,
+    user_count integer,
+    status_changed_at timestamp(6) without time zone,
+    data jsonb
 );
 
 
@@ -3604,6 +3607,38 @@ ALTER SEQUENCE public.user_emails_id_seq OWNED BY public.user_emails.id;
 
 
 --
+-- Name: user_likely_spam_reasons; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_likely_spam_reasons (
+    id bigint NOT NULL,
+    user_id bigint,
+    reason integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_likely_spam_reasons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_likely_spam_reasons_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_likely_spam_reasons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_likely_spam_reasons_id_seq OWNED BY public.user_likely_spam_reasons.id;
+
+
+--
 -- Name: user_phones; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4413,6 +4448,13 @@ ALTER TABLE ONLY public.user_emails ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: user_likely_spam_reasons id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_likely_spam_reasons ALTER COLUMN id SET DEFAULT nextval('public.user_likely_spam_reasons_id_seq'::regclass);
+
+
+--
 -- Name: user_phones id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5158,6 +5200,14 @@ ALTER TABLE ONLY public.user_bans
 
 ALTER TABLE ONLY public.user_emails
     ADD CONSTRAINT user_emails_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_likely_spam_reasons user_likely_spam_reasons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_likely_spam_reasons
+    ADD CONSTRAINT user_likely_spam_reasons_pkey PRIMARY KEY (id);
 
 
 --
@@ -6523,6 +6573,13 @@ CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (use
 
 
 --
+-- Name: index_user_likely_spam_reasons_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_likely_spam_reasons_on_user_id ON public.user_likely_spam_reasons USING btree (user_id);
+
+
+--
 -- Name: index_user_phones_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6628,6 +6685,14 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 
 --
+-- Name: user_likely_spam_reasons fk_rails_a9be85d50e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_likely_spam_reasons
+    ADD CONSTRAINT fk_rails_a9be85d50e FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: active_storage_attachments fk_rails_c3b3935057; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6650,6 +6715,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250313035336'),
+('20250312225116'),
 ('20250312171401'),
 ('20250311144643'),
 ('20250311013102'),

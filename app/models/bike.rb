@@ -369,6 +369,10 @@ class Bike < ApplicationRecord
         .includes(:current_stolen_record)
         .where(stolen_records: location)
     end
+
+    def matching_domain(str)
+      where("owner_email ILIKE ?", "%#{str.to_s.strip}")
+    end
   end
 
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created

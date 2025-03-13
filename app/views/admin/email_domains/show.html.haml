@@ -23,6 +23,13 @@
           %td
             %span.convertTime.preciseTime
               = l @email_domain.updated_at, format: :convert_time
+        %tr.small
+          %td
+            Changed status at
+          %td
+            - if @email_domain.status_changed_after_create?
+              %span.convertTime.preciseTime
+                = l @email_domain.status_changed_at, format: :convert_time
 
   .col-md-6
     %table.table-list
@@ -36,10 +43,9 @@
           %td
             Users
           %td
-            - user_count = User.matching_domain(@email_domain.domain).count
-            = link_to admin_number_display(user_count), admin_users_path(search_domain: @email_domain.domain)
+            = link_to admin_number_display(@email_domain.user_count), admin_users_path(search_domain: @email_domain.domain)
 
-
+    = pretty_print_json(@email_domain.data)
 .row.mt-4.mb-4
   .col-md-6.offset-md-3
     = render "form",
