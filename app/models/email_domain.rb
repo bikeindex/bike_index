@@ -5,7 +5,7 @@
 # Table name: email_domains
 #
 #  id                :bigint           not null, primary key
-#  changed_status_at :datetime
+#  status_changed_at :datetime
 #  data              :jsonb
 #  deleted_at        :datetime
 #  domain            :string
@@ -157,7 +157,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def changed_status_after_creation?
-    (changed_status_at - created_at).abs >= 2.seconds
+    (status_changed_at - created_at).abs >= 2.seconds
   end
 
   private
@@ -168,9 +168,9 @@ class EmailDomain < ApplicationRecord
     self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
 
     if status_changed?
-      self.changed_status_at = Time.current
+      self.status_changed_at = Time.current
     else
-      self.changed_status_at ||= created_at || Time.current
+      self.status_changed_at ||= created_at || Time.current
     end
   end
 end

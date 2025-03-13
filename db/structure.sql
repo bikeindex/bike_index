@@ -1062,7 +1062,7 @@ CREATE TABLE public.email_domains (
     deleted_at timestamp(6) without time zone,
     status integer DEFAULT 0,
     user_count integer,
-    changed_status_at timestamp(6) without time zone,
+    status_changed_at timestamp(6) without time zone,
     data jsonb
 );
 
