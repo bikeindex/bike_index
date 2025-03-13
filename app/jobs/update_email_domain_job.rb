@@ -22,21 +22,21 @@ class UpdateEmailDomainJob < ScheduledJob
 
   private
 
-  def calculated_data(email_domain)
-    {
-      broader_domain_exists: broader_domain_exists(email_domain),
-      domain_resolves: domain_resolves?(email_domain.domain),
-      tld_resolves: domain_resolves?(email_domain.tld),
-      bike_count: Bike.matching_domain(email_domain.domain).count
-    }
-  end
-
   def enqueue_workers
     EmailDomain.pluck(:id).each { |id| self.class.perform_async(id) }
   end
 
   def auto_pending_ban?(data)
     data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
+  end
+
+  def calculated_data(email_domain)
+    {
+      broader_domain_exists: EmailDomain.find_matching_domain(email_domain.domain).id != email_domain.id,
+      domain_resolves: domain_resolves?(email_domain.domain),
+      tld_resolves: domain_resolves?(email_domain.tld),
+      bike_count: Bike.matching_domain(email_domain.domain).count
+    }
   end
 
   def domain_resolves?(domain)
@@ -58,9 +58,5 @@ class UpdateEmailDomainJob < ScheduledJob
       # Handle invalid URLs
       false
     end
-  end
-
-  def broader_domain_exists(email_domain)
-    EmailDomain.find_matching_domain(email_domain.domain).id != email_domain.id
   end
 end
