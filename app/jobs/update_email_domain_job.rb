@@ -32,9 +32,8 @@ class UpdateEmailDomainJob < ScheduledJob
     end
 
     email_domain.save!
-    if create_tld_for_subdomains?(email_domain)
-
-    end
+    EmailDomain.find_or_create_for(email_domain.tld) if create_tld_for_subdomains?(email_domain)
+    email_domain
   end
 
   private
@@ -75,13 +74,13 @@ class UpdateEmailDomainJob < ScheduledJob
   end
 
   def create_tld_for_subdomains?(email_domain)
-    return false if email_domain.tld?
+    return false if email_domain.tld? || email_domain.permitted?
 
     tld = email_domain.tld
     return false if EmailDomain.tld_matches_subdomains.matching_domain(tld).any?
 
     return false if EmailDomain.matching_domain(tld).count < CREATE_TLD_SUBDOMAIN_COUNT
 
-    EmailDomain.find_or_create_for(tld)
+    true
   end
 end

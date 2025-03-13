@@ -111,6 +111,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         it "makes tld domain" do
           VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
             expect(EmailDomain.count).to eq 4
+            Sidekiq::Job.clear_all
             instance.perform(email_domain.id)
 
             expect(described_class.auto_pending_ban?(email_domain.reload)).to be_truthy
@@ -137,7 +138,6 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
               expect(email_domain.reload.status).to eq "ban_pending"
 
               expect(EmailDomain.count).to eq 6
-              EmailDomain.order(:id).last
             end
           end
         end

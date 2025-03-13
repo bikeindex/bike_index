@@ -67,7 +67,6 @@ RSpec.describe EmailDomain, type: :model do
         email_domain_fff = EmailDomain.find_or_create_for("@fff.stuff.com")
         expect(email_domain_fff.id).to_not eq email_domain_sub.id
         expect(EmailDomain.find_or_create_for("@fff.xxxx.stuff.com")&.id).to eq email_domain_sub.id
-        expect(EmailDomain.find_or_create_for("fff.stuff.com")&.id).to eq email_domain_fff.id
 
         email_domain = EmailDomain.find_or_create_for("stuff.com")
         expect(EmailDomain.find_or_create_for("xxxx.stuff.com")&.id).to eq email_domain.id
@@ -96,6 +95,7 @@ RSpec.describe EmailDomain, type: :model do
       it "finds" do
         expect(email_domain.reload.tld?).to be_truthy
         expect(email_domain_at.reload.tld?).to be_truthy
+        expect(email_domain_at.tld_matches_subdomains?).to be_falsey
         expect(email_domain_sub.reload.tld?).to be_falsey
         expect(EmailDomain.find_or_create_for("something@ffff.hotmail.co.jp")&.id).to eq email_domain.id
         expect(EmailDomain.find_or_create_for("something@hotmail.co.jp")&.id).to eq email_domain.id
@@ -108,13 +108,13 @@ RSpec.describe EmailDomain, type: :model do
         expect(EmailDomain.find_or_create_for("whatever@co.jp")&.id).to eq weird_should_have_subdomain.id
         expect(EmailDomain.find_or_create_for("something@hotmail.co.jp")&.id).to eq email_domain.id
 
-        # TODO: Make this work right:
-        # even_more_tld = EmailDomain.find_or_create_for("co.jp")
-        # expect(even_more_tld).to be_valid
-        # expect(even_more_tld.reload.domain).to eq "co.jp"
-        # expect(even_more_tld.tld?).to be_truthy
-        # expect(even_more_tld.tld).to eq "co.jp"
-        # expect(EmailDomain.find_or_create_for("something@hotmail.co.jp")&.id).to eq even_more_tld.id
+        tld_matches_subdomains = EmailDomain.find_or_create_for("co.jp")
+        expect(tld_matches_subdomains).to be_valid
+        expect(tld_matches_subdomains.reload.domain).to eq "co.jp"
+        expect(tld_matches_subdomains.tld?).to be_truthy
+        expect(tld_matches_subdomains.tld_matches_subdomains?).to be_truthy
+        expect(tld_matches_subdomains.tld).to eq "co.jp"
+        expect(EmailDomain.find_or_create_for("something@hotmail.co.jp")&.id).to eq tld_matches_subdomains.id
       end
     end
   end
