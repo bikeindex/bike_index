@@ -144,6 +144,10 @@ class EmailDomain < ApplicationRecord
     errors.add(:domain, "already exists: '#{broader_domain.domain}'")
   end
 
+  def calculated_users
+    User.matching_domain(domain)
+  end
+
   private
 
   def set_calculated_attributes

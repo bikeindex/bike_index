@@ -4,21 +4,36 @@ RSpec.describe EmailConfirmationJob, type: :job do
   it "sends a welcome email" do
     user = FactoryBot.create(:user)
     ActionMailer::Base.deliveries = []
-    EmailConfirmationJob.new.perform(user.id)
+    expect do
+      EmailConfirmationJob.new.perform(user.id)
+    end.to change(Notification, :count).by 1
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end
 
   context "with email_domain" do
-    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@rustymails.com") }
+    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@rustymails.com", status:) }
+    let(:status) { "permitted" }
     let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com") }
 
     it "deletes the user" do
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
-      expect(described_class.email_domain?(user.email)).to be_truthy
-      ActionMailer::Base.deliveries = []
-      EmailConfirmationJob.new.perform(user.id)
-      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
-      expect(User.unscoped.count).to eq 1
+      expect do
+        EmailConfirmationJob.new.perform(user.id)
+      end.to change(Notification, :count).by 1
+      expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+    end
+
+    context "pending" do
+      let(:status) { "ban_pending" }
+      it "does not send an email" do
+        expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
+        ActionMailer::Base.deliveries = []
+        expect do
+          EmailConfirmationJob.new.perform(user.id)
+        end.to change(Notification, :count).by 0
+        expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        expect(User.unscoped.count).to eq 2
+      end
     end
   end
   context "user with email already exists" do

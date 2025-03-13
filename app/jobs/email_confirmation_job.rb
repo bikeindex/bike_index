@@ -3,18 +3,16 @@
 class EmailConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
-  def self.email_domain?(email)
-    EmailDomain.pluck(:domain).any? { |domain| email.end_with?(domain) }
-  end
-
   def perform(user_id)
     user = User.find(user_id)
 
     # Don't suffer a witch to live
-    return user.really_destroy! if self.class.email_domain?(user.email)
+    email_domain = EmailDomain.find_or_create_for(user.email)
+    return user.really_destroy! if email_domain.banned?
 
     # Clean up situations where there are two users created
     return user.destroy if duplicate_user?(user)
+    return if email_domain.ban_pending?
 
     notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
     # If we just sent it, don't send again
