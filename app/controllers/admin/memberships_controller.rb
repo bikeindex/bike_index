@@ -83,6 +83,10 @@ class Admin::MembershipsController < Admin::BaseController
     %w[created_at start_at end_at updated_at level user_id].freeze
   end
 
+  def earliest_period_date
+    Time.at(1738389600) # 2025-02-1
+  end
+
   def permitted_create_parameters
     params.require(:membership).permit(:user_email, :level, :start_at, :end_at)
   end

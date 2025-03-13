@@ -1,5 +1,8 @@
 class UpdateEmailDomainJob < ScheduledJob
   prepend ScheduledJobRecorder
+
+  PERMITTED_DOMAIN_BIKE_COUNT = 10
+
   sidekiq_options retry: 1
 
   def self.frequency
@@ -27,6 +30,8 @@ class UpdateEmailDomainJob < ScheduledJob
   end
 
   def auto_pending_ban?(data)
+    return false if data["bike_count"] > PERMITTED_DOMAIN_BIKE_COUNT
+
     data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
   end
 
@@ -35,13 +40,14 @@ class UpdateEmailDomainJob < ScheduledJob
       broader_domain_exists: EmailDomain.find_matching_domain(email_domain.domain).id != email_domain.id,
       domain_resolves: domain_resolves?(email_domain.domain),
       tld_resolves: domain_resolves?(email_domain.tld),
-      bike_count: Bike.matching_domain(email_domain.domain).count
+      bike_count: email_domain.calculated_bikes.count,
+      subdomain_count: email_domain.calculated_subdomains.count
     }
   end
 
   def domain_resolves?(domain)
     conn = Faraday.new do |faraday|
-      faraday.use FaradayMiddleware::FollowRedirects, limit: 4
+      faraday.use FaradayMiddleware::FollowRedirects
       faraday.adapter Faraday.default_adapter
       # Set reasonable timeouts to avoid hanging
       faraday.options.timeout = 5        # 5 seconds for open/read timeout
@@ -49,7 +55,7 @@ class UpdateEmailDomainJob < ScheduledJob
     end
 
     begin
-      response = conn.head("https://#{domain.tr("@", "")}")
+      response = conn.head("http://#{domain.tr("@", "")}")
       response.success?
     rescue Faraday::Error
       # Catch connection errors, SSL errors, timeouts, redirects exceeding limit, etc.

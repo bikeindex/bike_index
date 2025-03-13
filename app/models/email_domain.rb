@@ -40,6 +40,10 @@ class EmailDomain < ApplicationRecord
 
   before_save :set_calculated_attributes
 
+  scope :ban_or_pending, -> { where(status: %i[ban_pending banned]) }
+  scope :tld, -> { where("(data -> 'is_tld') = ?", "true") }
+  scope :subdomain, -> { where("(data -> 'is_tld') = ?", "false") }
+
   class << self
     def find_or_create_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
@@ -64,7 +68,7 @@ class EmailDomain < ApplicationRecord
 
       at_domain = domain.match?("@") ? domain : "@#{domain}"
 
-      matching(tld).detect do |email_domain|
+      matching_domain(tld).detect do |email_domain|
         domain.match?(email_domain.domain) || at_domain == email_domain.at_domain
       end
     end
@@ -105,10 +109,8 @@ class EmailDomain < ApplicationRecord
       domain.split(".")[start_subdomain..].join(".")
     end
 
-    private
-
-    def matching(domain)
-      where("domain ILIKE ?", "%#{domain}").order(Arel.sql("length(domain) ASC"))
+    def matching_domain(domain)
+      where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) ASC"))
     end
   end
 
@@ -154,6 +156,15 @@ class EmailDomain < ApplicationRecord
 
   def calculated_users
     User.matching_domain(domain)
+  end
+
+  def calculated_bikes
+    Bike.matching_domain(domain)
+  end
+
+  def calculated_subdomains
+    return self.class.none unless tld?
+    self.class.subdomain.matching_domain(domain)
   end
 
   def no_auto_assign_status?

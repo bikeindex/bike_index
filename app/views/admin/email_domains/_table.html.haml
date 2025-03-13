@@ -16,7 +16,7 @@
       %th= sortable "Users", "user_count"
       %th
         %small bikes
-      -# %th &nbsp;
+      %th &nbsp;
 
     %tbody
       - collection.each do |email_domain|
@@ -43,6 +43,10 @@
             = admin_number_display(email_domain.user_count)
           %td
             = admin_number_display(email_domain.bike_count)
-          -# %td
+          %td
+            - if email_domain.no_auto_assign_status?
+              %small.text-info no auto status
+            - if email_domain.broader_domain_exists?
+              %small.text-danger broader exists
           -#   %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete
 

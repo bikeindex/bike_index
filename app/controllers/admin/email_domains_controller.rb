@@ -49,6 +49,7 @@ class Admin::EmailDomainsController < Admin::BaseController
       flash.now[:error] = domain_ban_message(@email_domain.domain)
     else
       @email_domain.creator_id ||= current_user.id
+      @email_domain.data["no_auto_assign_status"] = true
       if @email_domain.update(permitted_update_parameters)
         flash[:success] = "Domain Saved!"
         redirect_to admin_email_domain_url(@email_domain) and return
@@ -67,7 +68,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def searchable_statuses
-    EmailDomain.statuses.keys.map(&:to_s)
+    EmailDomain.statuses.keys.map(&:to_s) + %w[ban_or_pending]
   end
 
   def find_email_domain
@@ -77,13 +78,24 @@ class Admin::EmailDomainsController < Admin::BaseController
   def matching_email_domains
     email_domains = EmailDomain
     @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
-    email_domains = email_domains.where(status: @status) if @status.present?
+    email_domains = email_domains.send(@status) if @status.present?
+    if params[:query].present?
+      email_domains = email_domains.where("domain ILIKE ?", "%#{params[:query]}%")
+    end
+    if params[:search_tld].present?
+      @tld = params[:search_tld]
+      email_domains = (@tld == "only_tld") ? email_domains.tld : email_domains.subdomain
+    end
 
     @show_matching_users = InputNormalizer.boolean(params[:search_matching_users])
     @time_range_column = sort_column if %w[updated_at status_changed_at].include?(sort_column)
     @time_range_column ||= "created_at"
 
     email_domains.where(@time_range_column => @time_range)
+  end
+
+  def earliest_period_date
+    Time.at(1735711200) # 2025-01-1
   end
 
   def permitted_update_parameters

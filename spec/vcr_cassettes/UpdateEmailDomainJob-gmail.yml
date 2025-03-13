@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: head
-    uri: https://gmail.com/
+    uri: http://gmail.com/
     body:
       encoding: US-ASCII
       string: ''
@@ -31,308 +31,19 @@ http_interactions:
       X-Xss-Protection:
       - '0'
       Date:
-      - Thu, 13 Mar 2025 05:02:57 GMT
+      - Thu, 13 Mar 2025 15:59:11 GMT
       Expires:
-      - Thu, 13 Mar 2025 05:32:57 GMT
+      - Thu, 13 Mar 2025 16:29:11 GMT
       Cache-Control:
       - public, max-age=1800
       Content-Type:
       - text/html; charset=UTF-8
       Age:
-      - '564'
-      Alt-Svc:
-      - clear
+      - '1731'
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:21 GMT
-- request:
-    method: head
-    uri: https://mail.google.com/mail/u/0/
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Faraday v1.10.4
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 302
-      message: Found
-    headers:
-      Content-Type:
-      - application/binary
-      Vary:
-      - Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site
-      Location:
-      - https://accounts.google.com/ServiceLogin?service=mail&passive=1209600&osid=1&continue=https://mail.google.com/mail/u/0/&followup=https://mail.google.com/mail/u/0/&emr=1
-      Content-Length:
-      - '0'
-      Strict-Transport-Security:
-      - max-age=10886400; includeSubDomains
-      Permissions-Policy:
-      - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
-        ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
-      Cross-Origin-Resource-Policy:
-      - same-site
-      Date:
-      - Thu, 13 Mar 2025 05:12:21 GMT
-      Server:
-      - ESF
-      X-Xss-Protection:
-      - '0'
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Content-Type-Options:
-      - nosniff
-      Alt-Svc:
-      - clear
-    body:
-      encoding: UTF-8
-      string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:21 GMT
-- request:
-    method: head
-    uri: https://accounts.google.com/ServiceLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&osid=1&passive=1209600&service=mail
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Faraday v1.10.4
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 302
-      message: Found
-    headers:
-      Content-Type:
-      - application/binary
-      Cache-Control:
-      - no-cache, no-store, max-age=0, must-revalidate
-      Pragma:
-      - no-cache
-      Expires:
-      - Mon, 01 Jan 1990 00:00:00 GMT
-      Date:
-      - Thu, 13 Mar 2025 05:12:21 GMT
-      Location:
-      - https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&osid=1&passive=1209600&service=mail&ifkv=ASSHykquMPdXaTuheeaPQ__KFhpbnwnZIZ_EMCEzQF8j_ZG-ZayzYMoV2vgNXyxGmixteVFxRtjPRw
-      Content-Length:
-      - '0'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Content-Security-Policy:
-      - require-trusted-types-for 'script';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport
-      - script-src 'report-sample' 'nonce-ed4IMg1mfreOj7ddnctO2w' 'unsafe-inline';object-src
-        'none';base-uri 'self';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport;worker-src
-        'self'
-      Permissions-Policy:
-      - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
-        ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
-      Cross-Origin-Resource-Policy:
-      - cross-origin
-      Cross-Origin-Opener-Policy:
-      - unsafe-none
-      Accept-Ch:
-      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
-        Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-UA-Platform,
-        Sec-CH-UA-Platform-Version
-      Server:
-      - ESF
-      X-Xss-Protection:
-      - '0'
-      X-Content-Type-Options:
-      - nosniff
-      Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-    body:
-      encoding: UTF-8
-      string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:21 GMT
-- request:
-    method: head
-    uri: https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&ifkv=ASSHykquMPdXaTuheeaPQ__KFhpbnwnZIZ_EMCEzQF8j_ZG-ZayzYMoV2vgNXyxGmixteVFxRtjPRw&osid=1&passive=1209600&service=mail
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Faraday v1.10.4
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 302
-      message: Moved Temporarily
-    headers:
-      Content-Type:
-      - text/html; charset=UTF-8
-      X-Frame-Options:
-      - DENY
-      Cache-Control:
-      - no-cache, no-store, max-age=0, must-revalidate
-      Pragma:
-      - no-cache
-      Expires:
-      - Mon, 01 Jan 1990 00:00:00 GMT
-      Date:
-      - Thu, 13 Mar 2025 05:12:22 GMT
-      Location:
-      - https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&emr=1&followup=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&ifkv=ASSHykqNhKTzn9ZrhErLDzFgtGja4IuMeXXvq1lS28fvo4xSkkm1k_wJXoWE3LdO7RCS_ICvYiwM&osid=1&passive=1209600&service=mail&flowName=WebLiteSignIn&flowEntry=ServiceLogin&dsh=S1040689601%3A1741842742114326
-      Content-Length:
-      - '612'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Content-Security-Policy:
-      - require-trusted-types-for 'script';report-uri /cspreport
-      - script-src 'report-sample' 'nonce-nkRT4T7K4PHo5PfG0bGVJg' 'unsafe-inline'
-        'unsafe-eval';object-src 'none';base-uri 'self';report-uri /cspreport
-      Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to="coop_gse_qebhlk"
-      Report-To:
-      - '{"group":"coop_gse_qebhlk","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/gse_qebhlk"}]}'
-      X-Content-Type-Options:
-      - nosniff
-      X-Xss-Protection:
-      - 1; mode=block
-      Server:
-      - GSE
-      Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-    body:
-      encoding: UTF-8
-      string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:22 GMT
-- request:
-    method: head
-    uri: https://accounts.google.com/v3/signin/identifier?continue=https://mail.google.com/mail/u/0/&dsh=S1040689601:1741842742114326&emr=1&flowEntry=ServiceLogin&flowName=WebLiteSignIn&followup=https://mail.google.com/mail/u/0/&ifkv=ASSHykqNhKTzn9ZrhErLDzFgtGja4IuMeXXvq1lS28fvo4xSkkm1k_wJXoWE3LdO7RCS_ICvYiwM&osid=1&passive=1209600&service=mail
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Faraday v1.10.4
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Content-Type:
-      - text/html; charset=utf-8
-      X-Frame-Options:
-      - DENY
-      Vary:
-      - Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site
-      X-Auto-Login:
-      - realm=com.google&args=service%3Dmail%26continue%3Dhttps://mail.google.com/mail/u/0/
-      Link:
-      - <https://workspace.google.com/gmail/>; rel="canonical"
-      X-Ua-Compatible:
-      - IE=edge
-      Cache-Control:
-      - no-cache, no-store, max-age=0, must-revalidate
-      Pragma:
-      - no-cache
-      Expires:
-      - Mon, 01 Jan 1990 00:00:00 GMT
-      Date:
-      - Thu, 13 Mar 2025 05:12:22 GMT
-      Content-Length:
-      - '880978'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Content-Security-Policy:
-      - require-trusted-types-for 'script';report-uri /v3/signin/_/AccountsSignInUi/cspreport
-      - script-src 'report-sample' 'nonce-KyTqh9RLu9SCEPV-Pw7wUA' 'unsafe-inline';object-src
-        'none';base-uri 'self';report-uri /v3/signin/_/AccountsSignInUi/cspreport;worker-src
-        'self'
-      Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to="AccountsSignInUi"
-      Cross-Origin-Resource-Policy:
-      - same-site
-      Report-To:
-      - '{"group":"AccountsSignInUi","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/AccountsSignInUi"}]}'
-      Permissions-Policy:
-      - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
-        ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
-      Accept-Ch:
-      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
-        Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-UA-Platform,
-        Sec-CH-UA-Platform-Version
-      Reporting-Endpoints:
-      - default="/v3/signin/_/AccountsSignInUi/web-reports?context=eJwNwz9IAmEcBmD74BchDiEOYkPhVEF5GZEOQoeFQ3O4FJp46kWonafQ1qBDRpFQGdIgNARCQ0vRXyoaakm98zSbQzRwsKGpofeBR3_MxvUW3dyoRfdkvWH8yhdbwOVSi_mx62-zHmYzbbaHR4YOK-DLVYe94lI7T2HMNN8pj_bzMs3jtalC9-gqVYjHiL9K6_gTr9IvTo0o5MbbWYUecXtfoV2MFRRK4MmdQkUccqo0jB6vSotYXlNJxWZOpdMDlc4wZ6rRIUrmGqVxzFGjCeymNephK6PRNwaKGoXQ9KmRGd3GOnkw7K2Ty9IgHm0XDRKeP0hEo2HgUnl76B_c2vnL9lltgdiGTwwKUVmUN0NSLCoL0eBqUo4kxYQgpQTJZ-fsM9w055zkHL449w-WZpKX"
-      Server:
-      - ESF
-      X-Xss-Protection:
-      - '0'
-      X-Content-Type-Options:
-      - nosniff
-      Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-    body:
-      encoding: UTF-8
-      string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:22 GMT
-- request:
-    method: head
-    uri: https://gmail.com/
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Faraday v1.10.4
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 301
-      message: Moved Permanently
-    headers:
-      Location:
-      - https://mail.google.com/mail/u/0/
-      Cross-Origin-Resource-Policy:
-      - cross-origin
-      X-Content-Type-Options:
-      - nosniff
-      Server:
-      - sffe
-      Content-Length:
-      - '230'
-      X-Xss-Protection:
-      - '0'
-      Date:
-      - Thu, 13 Mar 2025 05:02:57 GMT
-      Expires:
-      - Thu, 13 Mar 2025 05:32:57 GMT
-      Cache-Control:
-      - public, max-age=1800
-      Content-Type:
-      - text/html; charset=UTF-8
-      Age:
-      - '565'
-      Alt-Svc:
-      - clear
-    body:
-      encoding: UTF-8
-      string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:22 GMT
+  recorded_at: Thu, 13 Mar 2025 16:28:02 GMT
 - request:
     method: head
     uri: https://mail.google.com/mail/u/0/
@@ -367,7 +78,7 @@ http_interactions:
       - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
         ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
       Date:
-      - Thu, 13 Mar 2025 05:12:22 GMT
+      - Thu, 13 Mar 2025 16:28:02 GMT
       Server:
       - ESF
       X-Xss-Protection:
@@ -381,7 +92,7 @@ http_interactions:
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:22 GMT
+  recorded_at: Thu, 13 Mar 2025 16:28:02 GMT
 - request:
     method: head
     uri: https://accounts.google.com/ServiceLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&osid=1&passive=1209600&service=mail
@@ -409,29 +120,29 @@ http_interactions:
       Expires:
       - Mon, 01 Jan 1990 00:00:00 GMT
       Date:
-      - Thu, 13 Mar 2025 05:12:22 GMT
+      - Thu, 13 Mar 2025 16:28:02 GMT
       Location:
-      - https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&osid=1&passive=1209600&service=mail&ifkv=ASSHykoLYgFv4KBHv34f2JMj4mVFHSFx9hfSRX-CWpCtUPduRjHRZNdt9IS606BuOtN5-r1mrq0Olg
+      - https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&osid=1&passive=1209600&service=mail&ifkv=ASSHykrfLEC0aCEnaqnMX_eULTfwfFp_Tf7r6lVNl56gYdBVO2IRdripLaaTGfLnCZOEWRqj_tgNdA
       Content-Length:
       - '0'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
+      Cross-Origin-Opener-Policy:
+      - unsafe-none
       Permissions-Policy:
       - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
         ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
-      Content-Security-Policy:
-      - require-trusted-types-for 'script';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport
-      - script-src 'report-sample' 'nonce-p1-U_X7BrO8DodcSHMBSlw' 'unsafe-inline';object-src
-        'none';base-uri 'self';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport;worker-src
-        'self'
-      Cross-Origin-Opener-Policy:
-      - unsafe-none
-      Cross-Origin-Resource-Policy:
-      - cross-origin
       Accept-Ch:
       - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
         Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-UA-Platform,
         Sec-CH-UA-Platform-Version
+      Content-Security-Policy:
+      - require-trusted-types-for 'script';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport
+      - script-src 'report-sample' 'nonce-KvNBArKCnWZ_gbhyIe_e1Q' 'unsafe-inline';object-src
+        'none';base-uri 'self';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport;worker-src
+        'self'
+      Cross-Origin-Resource-Policy:
+      - cross-origin
       Server:
       - ESF
       X-Xss-Protection:
@@ -443,10 +154,10 @@ http_interactions:
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:22 GMT
+  recorded_at: Thu, 13 Mar 2025 16:28:02 GMT
 - request:
     method: head
-    uri: https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&ifkv=ASSHykoLYgFv4KBHv34f2JMj4mVFHSFx9hfSRX-CWpCtUPduRjHRZNdt9IS606BuOtN5-r1mrq0Olg&osid=1&passive=1209600&service=mail
+    uri: https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&ifkv=ASSHykrfLEC0aCEnaqnMX_eULTfwfFp_Tf7r6lVNl56gYdBVO2IRdripLaaTGfLnCZOEWRqj_tgNdA&osid=1&passive=1209600&service=mail
     body:
       encoding: US-ASCII
       string: ''
@@ -473,18 +184,229 @@ http_interactions:
       Expires:
       - Mon, 01 Jan 1990 00:00:00 GMT
       Date:
-      - Thu, 13 Mar 2025 05:12:23 GMT
+      - Thu, 13 Mar 2025 16:28:03 GMT
       Location:
-      - https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&emr=1&followup=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&ifkv=ASSHykqyk9qCiBtvcrjWYcJOp_38dsfpTBu4P-Er5pniBfRu56Bl2wHFvmxmVUIVtxqNQs0Wh-ae&osid=1&passive=1209600&service=mail&flowName=WebLiteSignIn&flowEntry=ServiceLogin&dsh=S1010446872%3A1741842743004360
+      - https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&emr=1&followup=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&ifkv=ASSHykpXk9hovZskIH916lSHUtBB-485ZxpGmdENOS4XKgRpUFkUu42mEAViUV7vX6VcT6iD7Lp-&osid=1&passive=1209600&service=mail&flowName=WebLiteSignIn&flowEntry=ServiceLogin&dsh=S2013892697%3A1741883283038388
       Content-Length:
       - '612'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Content-Security-Policy:
+      - require-trusted-types-for 'script';report-uri /cspreport
+      - script-src 'report-sample' 'nonce-BnJVVWNmVAJMYDhK6rGS6w' 'unsafe-inline'
+        'unsafe-eval';object-src 'none';base-uri 'self';report-uri /cspreport
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to="coop_gse_qebhlk"
+      Report-To:
+      - '{"group":"coop_gse_qebhlk","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/gse_qebhlk"}]}'
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Server:
+      - GSE
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 16:28:02 GMT
+- request:
+    method: head
+    uri: http://gmail.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Location:
+      - https://mail.google.com/mail/u/0/
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - sffe
+      Content-Length:
+      - '230'
+      X-Xss-Protection:
+      - '0'
+      Date:
+      - Thu, 13 Mar 2025 15:59:11 GMT
+      Expires:
+      - Thu, 13 Mar 2025 16:29:11 GMT
+      Cache-Control:
+      - public, max-age=1800
+      Content-Type:
+      - text/html; charset=UTF-8
+      Age:
+      - '1732'
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 16:28:03 GMT
+- request:
+    method: head
+    uri: https://mail.google.com/mail/u/0/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Found
+    headers:
+      Content-Type:
+      - application/binary
+      Vary:
+      - Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site
+      Location:
+      - https://accounts.google.com/ServiceLogin?service=mail&passive=1209600&osid=1&continue=https://mail.google.com/mail/u/0/&followup=https://mail.google.com/mail/u/0/&emr=1
+      Content-Length:
+      - '0'
+      Strict-Transport-Security:
+      - max-age=10886400; includeSubDomains
+      Permissions-Policy:
+      - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
+        ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
+      Cross-Origin-Resource-Policy:
+      - same-site
+      Date:
+      - Thu, 13 Mar 2025 16:28:03 GMT
+      Server:
+      - ESF
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Alt-Svc:
+      - clear
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 16:28:03 GMT
+- request:
+    method: head
+    uri: https://accounts.google.com/ServiceLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&osid=1&passive=1209600&service=mail
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Found
+    headers:
+      Content-Type:
+      - application/binary
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - Mon, 01 Jan 1990 00:00:00 GMT
+      Date:
+      - Thu, 13 Mar 2025 16:28:03 GMT
+      Location:
+      - https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&osid=1&passive=1209600&service=mail&ifkv=ASSHykr9ACoSuE7WCYWHKWdCjGCPiB7yeb_cXnYdZVmOJ87gWu0E-v54BZMA-fxpFhn7mQIM2xGlQQ
+      Content-Length:
+      - '0'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Cross-Origin-Opener-Policy:
+      - unsafe-none
+      Accept-Ch:
+      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
+        Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-UA-Platform,
+        Sec-CH-UA-Platform-Version
+      Content-Security-Policy:
+      - require-trusted-types-for 'script';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport
+      - script-src 'report-sample' 'nonce-PSzeu5fXRSbYeGgcG493Fw' 'unsafe-inline';object-src
+        'none';base-uri 'self';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport;worker-src
+        'self'
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      Permissions-Policy:
+      - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
+        ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
+      Server:
+      - ESF
+      X-Xss-Protection:
+      - '0'
+      X-Content-Type-Options:
+      - nosniff
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 16:28:03 GMT
+- request:
+    method: head
+    uri: https://accounts.google.com/InteractiveLogin?continue=https://mail.google.com/mail/u/0/&emr=1&followup=https://mail.google.com/mail/u/0/&ifkv=ASSHykr9ACoSuE7WCYWHKWdCjGCPiB7yeb_cXnYdZVmOJ87gWu0E-v54BZMA-fxpFhn7mQIM2xGlQQ&osid=1&passive=1209600&service=mail
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Moved Temporarily
+    headers:
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Frame-Options:
+      - DENY
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - Mon, 01 Jan 1990 00:00:00 GMT
+      Date:
+      - Thu, 13 Mar 2025 16:28:03 GMT
+      Location:
+      - https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&emr=1&followup=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&ifkv=ASSHykrHvHni7FKdEnrKX7VHQ7jxW4ExdTA-_-QD9fjmYW-SfHLGGuOUAKmhW5oyoVWqstpe1jD8lQ&osid=1&passive=1209600&service=mail&flowName=WebLiteSignIn&flowEntry=ServiceLogin&dsh=S-234600566%3A1741883283718697
+      Content-Length:
+      - '614'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Report-To:
       - '{"group":"coop_gse_qebhlk","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/gse_qebhlk"}]}'
       Content-Security-Policy:
       - require-trusted-types-for 'script';report-uri /cspreport
-      - script-src 'report-sample' 'nonce-g76cVLppn14Bp0VQPgMCcQ' 'unsafe-inline'
+      - script-src 'report-sample' 'nonce-6SGnYccCtUfNHwU_blCXHA' 'unsafe-inline'
         'unsafe-eval';object-src 'none';base-uri 'self';report-uri /cspreport
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop_gse_qebhlk"
@@ -499,79 +421,5 @@ http_interactions:
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:22 GMT
-- request:
-    method: head
-    uri: https://accounts.google.com/v3/signin/identifier?continue=https://mail.google.com/mail/u/0/&dsh=S1010446872:1741842743004360&emr=1&flowEntry=ServiceLogin&flowName=WebLiteSignIn&followup=https://mail.google.com/mail/u/0/&ifkv=ASSHykqyk9qCiBtvcrjWYcJOp_38dsfpTBu4P-Er5pniBfRu56Bl2wHFvmxmVUIVtxqNQs0Wh-ae&osid=1&passive=1209600&service=mail
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Faraday v1.10.4
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Content-Type:
-      - text/html; charset=utf-8
-      X-Frame-Options:
-      - DENY
-      Vary:
-      - Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site
-      X-Auto-Login:
-      - realm=com.google&args=service%3Dmail%26continue%3Dhttps://mail.google.com/mail/u/0/
-      Link:
-      - <https://workspace.google.com/gmail/>; rel="canonical"
-      X-Ua-Compatible:
-      - IE=edge
-      Cache-Control:
-      - no-cache, no-store, max-age=0, must-revalidate
-      Pragma:
-      - no-cache
-      Expires:
-      - Mon, 01 Jan 1990 00:00:00 GMT
-      Date:
-      - Thu, 13 Mar 2025 05:12:23 GMT
-      Content-Length:
-      - '881318'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Content-Security-Policy:
-      - require-trusted-types-for 'script';report-uri /v3/signin/_/AccountsSignInUi/cspreport
-      - script-src 'report-sample' 'nonce-fcSqkltLiDmTWZj1YvluFg' 'unsafe-inline';object-src
-        'none';base-uri 'self';report-uri /v3/signin/_/AccountsSignInUi/cspreport;worker-src
-        'self'
-      Cross-Origin-Resource-Policy:
-      - same-site
-      Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to="AccountsSignInUi"
-      Accept-Ch:
-      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
-        Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-UA-Platform,
-        Sec-CH-UA-Platform-Version
-      Permissions-Policy:
-      - ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*,
-        ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
-      Report-To:
-      - '{"group":"AccountsSignInUi","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/AccountsSignInUi"}]}'
-      Reporting-Endpoints:
-      - default="/v3/signin/_/AccountsSignInUi/web-reports?context=eJwNwz9IAmEcBmD54BdhDSEOYkPhVEF5GZEOUkeEUHPYUGjmmRehdp5CW0MHOQRJ_0QahIZAaGiSyiKioZbUO0-zOUQDByOaex94jBk2ZrQaFkeshqLtjvFrX2wBV_NN5seOv8W6qCgtlsKz_jbL4kuhzV5xuXVOG6g03ukYHdclmsNbc5ke0J0vE49hf4W28SdWoT-cHFZpFu9nVHrC1JFKhxjNqhTHi6JKORx0aTSEHq9GS1ja0kjDRlqjyxONrjBtrtIpSpYq7eGos0rj2NnXqYtNRadvDOR0CqH5UycLzptq5MFNb43c1jrxaL-pk_D8QSKa-noL6ttjz8BB5nfFZg9Ed3xiUIjIorwbkqIRWYgE1xNyOCHGBSkpSD4H55jmpjjXBOf0xbh_9m-SWA"
-      Server:
-      - ESF
-      X-Xss-Protection:
-      - '0'
-      X-Content-Type-Options:
-      - nosniff
-      Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-    body:
-      encoding: UTF-8
-      string: ''
-  recorded_at: Thu, 13 Mar 2025 05:12:23 GMT
+  recorded_at: Thu, 13 Mar 2025 16:28:03 GMT
 recorded_with: VCR 6.3.1
