@@ -1059,7 +1059,10 @@ CREATE TABLE public.email_domains (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     deleted_at timestamp(6) without time zone,
-    status integer DEFAULT 0
+    status integer DEFAULT 0,
+    user_count integer,
+    changed_status_at timestamp(6) without time zone,
+    data jsonb
 );
 
 
@@ -6650,6 +6653,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250312225116'),
 ('20250312171401'),
 ('20250311144643'),
 ('20250311013102'),

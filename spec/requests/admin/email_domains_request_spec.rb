@@ -94,16 +94,19 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
   end
 
   describe "#update" do
-    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "mails.com", status:) }
+    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "mails.com", status:, created_at: Time.current - 1.week) }
     let(:status) { "banned" }
 
     it "updates" do
+      expect(email_domain.reload.status_changed_at).to be < Time.current - 1.day
+
       patch "#{base_url}/#{email_domain.id}", params: {
         email_domain: {domain: "newdomain.com", status: "ban_pending"}
       }
       expect(flash[:success]).to be_present
       expect(email_domain.reload.status).to eq "ban_pending"
       expect(email_domain.domain).to eq "mails.com"
+      expect(email_domain.status_changed_at).to be_within(1).of Time.current
     end
 
     context "switching to banned" do

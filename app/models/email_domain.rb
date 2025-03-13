@@ -4,13 +4,16 @@
 #
 # Table name: email_domains
 #
-#  id         :bigint           not null, primary key
-#  deleted_at :datetime
-#  domain     :string
-#  status     :integer          default(0)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  creator_id :bigint
+#  id                :bigint           not null, primary key
+#  changed_status_at :datetime
+#  data              :jsonb
+#  deleted_at        :datetime
+#  domain            :string
+#  status            :integer          default("permitted")
+#  user_count        :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  creator_id        :bigint
 #
 # Indexes
 #
@@ -22,6 +25,7 @@ class EmailDomain < ApplicationRecord
   BIKE_MAX_COUNT = 2
   EMAIL_MIN_COUNT = 200
   STATUS_ENUM = {permitted: 0, ban_pending: 1, banned: 2}
+  TLD_HAS_SUBDOMAIN = %w[.mx .uk .jp .in .nz .au .hk .us .za]
 
   acts_as_paranoid
 
@@ -29,13 +33,42 @@ class EmailDomain < ApplicationRecord
 
   belongs_to :creator, class_name: "User"
 
-  validates_presence_of :creator_id
   validates_presence_of :domain
   validates_uniqueness_of :domain
   validate :domain_is_expected_format
   validate :domain_is_not_contained_in_existing, on: :create
 
+  before_save :set_calculated_attributes
+
   class << self
+    def find_or_create_for(email_or_domain)
+      domain = email_or_domain&.split("@")&.last&.strip
+      return if domain.blank?
+      domain = "@#{domain}" if email_or_domain.match("@")
+
+      find_matching_domain(domain) || create(domain:)
+    end
+
+    def find_matching_domain(domain)
+      tld = tld_for(domain)
+      tld_match = where(domain: tld).first
+      if tld_match.present?
+        # For TLDs with subdomains, if a non-subdomain record is stored, return than
+        if tld.count(".") > 1
+          even_more_tld_match = where(domain: tld.gsub(/\A[^\.]*\./, "")).first
+
+          return even_more_tld_match if even_more_tld_match.present?
+        end
+        return tld_match
+      end
+
+      at_domain = domain.match?("@") ? domain : "@#{domain}"
+
+      matching(tld).detect do |email_domain|
+        domain.match?(email_domain.domain) || at_domain == email_domain.at_domain
+      end
+    end
+
     # NOTE: This is called in the admin controller, but not if done in console!
     def allow_domain_ban?(str)
       domain = str.strip
@@ -60,6 +93,36 @@ class EmailDomain < ApplicationRecord
     def status_humanized(str)
       str.humanize
     end
+
+    def tld_for(email_or_domain)
+      domain = email_or_domain&.split("@")&.last&.strip
+      return domain if domain.split(".").count == 1
+
+      multi_subdomain = TLD_HAS_SUBDOMAIN.any? { domain.end_with?(_1) }
+      return domain if multi_subdomain && domain.split(".").count < 3
+
+      start_subdomain = multi_subdomain ? -3 : -2
+      domain.split(".")[start_subdomain..-1].join(".")
+    end
+
+    private
+
+    def matching(domain)
+      where("domain ILIKE ?", "%#{domain}").order(Arel.sql("length(domain) ASC"))
+    end
+  end
+
+  def tld
+    data["tld"]
+  end
+
+  def tld?
+    data["is_tld"]
+  end
+
+  # IDK if this is really necessary, but it makes the matching class method easier
+  def at_domain
+    domain.match?("@") ? domain : "@#{domain}"
   end
 
   def status_humanized
@@ -72,11 +135,26 @@ class EmailDomain < ApplicationRecord
     errors.add(:domain, "Must include a .") unless domain.match?(/\./)
   end
 
-  # TODO: This is really inefficient
   def domain_is_not_contained_in_existing
-    broader_domain = EmailDomain.pluck(:domain).detect { |d| domain.match?(d) }
+    broader_domain = self.class.find_matching_domain(domain)
     return if broader_domain.blank?
+    # Allow creating without @, if an @domain exists
+    return if broader_domain.domain == "@#{domain}"
 
-    errors.add(:domain, "already banned: '#{broader_domain}'")
+    errors.add(:domain, "already exists: '#{broader_domain.domain}'")
+  end
+
+  private
+
+  def set_calculated_attributes
+    self.data ||= {}
+    self.data["tld"] = self.class.tld_for(domain)
+    self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "").length
+
+    if status_changed?
+      self.changed_status_at = Time.current
+    else
+      self.changed_status_at ||= created_at || Time.current
+    end
   end
 end
