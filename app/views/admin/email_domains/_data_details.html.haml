@@ -1,0 +1,11 @@
+- email_domain ||= nil
+- subdomain_count = email_domain&.data&.dig("subdomain_count")&.to_i
+- if subdomain_count.present? && subdomain_count > 0
+  %small.text-warning
+    = admin_number_display(subdomain_count)
+    %em subs
+- if email_domain&.no_auto_assign_status?
+  %small.text-info no auto status
+- if email_domain&.broader_domain_exists?
+  %small.text-danger broader exists
+-#   %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete

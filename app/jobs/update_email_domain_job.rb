@@ -5,19 +5,16 @@ class UpdateEmailDomainJob < ScheduledJob
 
   sidekiq_options retry: 1
 
-  def self.frequency
-    24.hours
-  end
-
-  def self.auto_pending_ban?(email_domain)
-    if email_domain.bike_count.present? && email_domain.bike_count > 0
-      # Ensure that domains that registered bikes before the creation of EmailDomains aren't blocked
-      return false if (email_domain.bike_count + 1) > (email_domain.user_count * 0.1)
+  class << self
+    def frequency
+      24.hours
     end
-    # Ensure domains for organizations aren't blocked
-    return false if email_domain.calculated_users.with_organization_roles.count > 2
 
-    email_domain.data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
+    def auto_pending_ban?(email_domain)
+      return false if email_domain.has_ban_blockers?
+
+      email_domain.data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
+    end
   end
 
   def perform(domain_id = nil, email_domain = nil)
@@ -32,7 +29,12 @@ class UpdateEmailDomainJob < ScheduledJob
     end
 
     email_domain.save!
-    EmailDomain.find_or_create_for(email_domain.tld) if create_tld_for_subdomains?(email_domain)
+    if create_tld_for_subdomains?(email_domain)
+      EmailDomain.find_or_create_for(email_domain.tld)
+    elsif email_domain.banned? && email_domain.user_count > 0
+      email_domain.calculated_subdomains.each(&:destroy)
+      email_domain.calculated_users.find_each { |user| user.really_destroy! }
+    end
     email_domain
   end
 

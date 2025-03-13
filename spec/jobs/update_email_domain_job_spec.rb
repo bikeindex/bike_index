@@ -11,7 +11,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
 
   describe "perform" do
     let(:instance) { described_class.new }
-    let!(:user) { FactoryBot.create(:user_confirmed, email: "example@#{domain}") }
+    let!(:user) { FactoryBot.create(:user_confirmed, email: "example@#{user_domain}") }
+    let(:user2) { FactoryBot.create(:user_confirmed, email: "example2@#{user_domain}") }
     let(:valid_data) do
       {
         broader_domain_exists: false,
@@ -24,11 +25,12 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       }
     end
     let(:domain) { "bikeindex.org" }
-    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@#{domain}") }
+    let(:user_domain) { domain }
+    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@#{user_domain}") }
+    before { stub_const("EmailDomain::EMAIL_MIN_COUNT", 1) }
 
     context "bikeindex" do
       let!(:email_domain_sub) { FactoryBot.create(:email_domain, domain: "@example.#{domain}") }
-      let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@#{domain}") }
       let!(:email_domain_bare) { FactoryBot.create(:email_domain, domain:) }
 
       it "updates counts in the cache" do
@@ -88,16 +90,20 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
 
     context "domain that doesn't resolve" do
       let(:domain) { "unylix.com" }
-      let!(:email_domain) { FactoryBot.create(:email_domain, domain: "sisq.#{domain}") }
+      let(:user_domain) { "sisq.unylix.com" }
       let(:target_data) do
         valid_data.merge(is_tld: false,
           domain_resolves: false,
           tld_resolves: false)
       end
+      before { expect(user2).to be_present } # So EMAIL_MIN_COUNT passes
+
       it "makes ban_pending" do
+        expect(email_domain.reload.calculated_users.count).to eq 2
         VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
           instance.perform(email_domain.id)
-          expect(email_domain.reload.user_count).to eq 0
+          expect(email_domain.reload.user_count).to eq 2
+          expect(email_domain.has_ban_blockers?).to be_falsey
           expect(email_domain.data).to match_hash_indifferently target_data
           expect(email_domain.status).to eq "ban_pending"
           expect(described_class).to_not have_enqueued_sidekiq_job
@@ -113,8 +119,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             expect(EmailDomain.count).to eq 4
             Sidekiq::Job.clear_all
             instance.perform(email_domain.id)
-
-            expect(described_class.auto_pending_ban?(email_domain.reload)).to be_truthy
+            expect(email_domain.reload.has_ban_blockers?).to be_falsey
+            expect(described_class.auto_pending_ban?(email_domain)).to be_truthy
             expect(email_domain.reload.status).to eq "ban_pending"
 
             expect(EmailDomain.count).to eq 5
@@ -122,6 +128,17 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             expect(EmailDomain.tld_matches_subdomains.pluck(:id)).to eq([email_domain_tld.id])
             expect(email_domain_tld.status).to eq "permitted"
             expect(described_class).to have_enqueued_sidekiq_job(email_domain_tld.id)
+            instance.perform(email_domain_tld.id)
+            expect(email_domain_tld.reload.status).to eq "permitted"
+            expect(email_domain_tld.calculated_users.count).to eq 2
+            expect(EmailDomain.count).to eq 5
+            # Update all the other subs to be ban_pending
+            EmailDomain.all.each { |d| d.update(status: "ban_pending") }
+            # if the TLD is banned, delete all the subs and the users
+            email_domain_tld.update(status: "banned")
+            instance.perform(email_domain_tld.id)
+            expect(EmailDomain.count).to eq 1
+            expect(email_domain_tld.reload.calculated_users.count).to eq 0
           end
         end
         context "with @tld" do

@@ -22,8 +22,8 @@
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
-  BIKE_MAX_COUNT = 2
-  EMAIL_MIN_COUNT = 50
+  # setting ENV to 1 - but hopefully, when we're not as aggressively being attached, can lower/remove ENV
+  EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 5).to_i
   STATUS_ENUM = {permitted: 0, ban_pending: 1, banned: 2}
   TLD_HAS_SUBDOMAIN = %w[.mx .uk .jp .in .nz .au .hk .us .za]
 
@@ -45,6 +45,7 @@ class EmailDomain < ApplicationRecord
   scope :tld, -> { where("(data -> 'is_tld')::text = ?", "true") }
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
   scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
+  scope :with_bikes, -> { where("COALESCE((data -> 'bike_count')::integer, 0) > 0") }
 
   attr_accessor :skip_processing
 
@@ -75,25 +76,9 @@ class EmailDomain < ApplicationRecord
       end
     end
 
-    # NOTE: This is called in the admin controller, but not if done in console!
-    def allow_domain_ban?(str)
-      domain = str.strip
-      return true unless /\./.match?(domain)
-
-      !too_few_emails?(domain) && !too_many_bikes?(domain) && no_valid_organization_roles?(domain)
-    end
-
     def no_valid_organization_roles?(domain)
       org_ids = OrganizationRole.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
       Organization.approved.where(id: org_ids).none?
-    end
-
-    def too_few_emails?(domain)
-      User.unscoped.matching_domain(domain).count < EMAIL_MIN_COUNT
-    end
-
-    def too_many_bikes?(domain)
-      Bike.unscoped.where("owner_email ILIKE ?", "%#{domain}").count > BIKE_MAX_COUNT
     end
 
     def status_humanized(str)
@@ -133,11 +118,31 @@ class EmailDomain < ApplicationRecord
   end
 
   def bike_count
-    data&.dig("bike_count")&.to_i
+    data&.dig("bike_count")&.to_i || 0
   end
 
   def broader_domain_exists?
     InputNormalizer.boolean(data&.dig("broader_domain_exists"))
+  end
+
+  # Only check for ban_blockers if the domain is not banned
+  def allow_domain_ban?
+    banned? || !has_ban_blockers?
+  end
+
+  def has_ban_blockers?
+    b_count = calculated_bikes.count
+    u_count = calculated_users.count
+    return true if u_count < EMAIL_MIN_COUNT
+
+    # Ensure that domains that registered bikes before the creation of EmailDomains aren't blocked
+    return true if b_count > 0 && (b_count + 1) > (u_count * 0.1)
+
+    # Ensure domains for organizations aren't blocked
+    return true if calculated_users.with_organization_roles.count > 2
+
+    # Ensure there aren't permitted subdomains
+    calculated_subdomains.permitted.count > 0
   end
 
   # IDK if this is really necessary, but it makes the matching class method easier

@@ -12,9 +12,9 @@
       %th= sortable "domain"
       %th= sortable "status"
       %th= sortable "creator_id"
-      %th= sortable "Users", "user_count"
+      %th= sortable "user_count", "Users"
       %th
-        %small bikes
+        %small= sortable "bike_count", "Bikes"
       %th &nbsp;
 
     %tbody
@@ -43,9 +43,4 @@
           %td
             = admin_number_display(email_domain.bike_count)
           %td
-            - if email_domain.no_auto_assign_status?
-              %small.text-info no auto status
-            - if email_domain.broader_domain_exists?
-              %small.text-danger broader exists
-          -#   %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete
-
+            = render partial: "data_details", locals: {email_domain:}

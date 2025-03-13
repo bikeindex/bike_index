@@ -8,10 +8,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 25
 
-    @pagy, @email_domains = pagy(
-      matching_email_domains.includes(:creator).reorder("email_domains.#{sort_column} #{sort_direction}"),
-      limit: @per_page
-    )
+    @pagy, @email_domains = pagy(ordered_email_domains, limit: @per_page)
   end
 
   def new
@@ -21,11 +18,8 @@ class Admin::EmailDomainsController < Admin::BaseController
   def create
     @email_domain = EmailDomain.new(email_domain_params)
     @email_domain.creator = current_user
-    @email_domain.skip_processing = true
 
-    if @email_domain.banned? && !EmailDomain.allow_domain_ban?(@email_domain.domain)
-      flash.now[:error] = domain_ban_message(@email_domain.domain)
-    elsif @email_domain.save
+    if @email_domain.save
       @email_domain.process!
       flash[:success] = "New email domain created"
       redirect_to admin_email_domains_url and return
@@ -47,16 +41,16 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def update
-    # Only check if allowed to make banned if the domain isn't banned already
-    if !@email_domain.banned? && permitted_update_parameters[:status] == "banned" &&
-        !EmailDomain.allow_domain_ban?(@email_domain.domain)
+    # Only check if allowed to make banned if updating to make banned
+    if permitted_update_parameters[:status] == "banned" && !@email_domain.allow_domain_ban?
 
-      flash.now[:error] = domain_ban_message(@email_domain.domain)
+      flash.now[:error] = domain_ban_message(@email_domain)
     else
       @email_domain.creator_id ||= current_user.id
       @email_domain.data["no_auto_assign_status"] = true
       if @email_domain.update(permitted_update_parameters)
         flash[:success] = "Domain Saved!"
+        @email_domain.reload.process!
         redirect_to admin_email_domain_url(@email_domain) and return
       else
         flash[:error] = @email_domain.errors.full_messages
@@ -69,11 +63,22 @@ class Admin::EmailDomainsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at domain creator_id status user_count status_changed_at]
+    %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at]
   end
 
   def searchable_statuses
     EmailDomain.statuses.keys.map(&:to_s) + %w[ban_or_pending]
+  end
+
+  def ordered_email_domains
+    order_sql = if sort_column == "bike_count"
+      Arel.sql("COALESCE((data -> 'bike_count')::integer, 0) #{sort_direction}")
+    elsif sort_column == "domain"
+      Arel.sql("REVERSE(domain) #{sort_direction}")
+    else
+      "email_domains.#{sort_column} #{sort_direction}"
+    end
+    matching_email_domains.includes(:creator).reorder(order_sql)
   end
 
   def find_email_domain
@@ -108,14 +113,14 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def email_domain_params
-    params.require(:email_domain).permit(:domain, :status)
+    params.require(:email_domain).permit(:domain)
   end
 
-  def domain_ban_message(domain)
-    "Doesn't seem like a new spam email domain - " + if EmailDomain.too_many_bikes?(domain)
-      "Too many bikes"
+  def domain_ban_message(email_domain)
+    "Doesn't seem like a new spam email domain" + if email_domain.bike_count > 0
+      " - Maybe there are bikes"
     else
-      "not enough users with the domain"
+      ""
     end
   end
 end

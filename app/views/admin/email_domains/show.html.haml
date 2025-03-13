@@ -1,6 +1,8 @@
 .admin-subnav
-  .col-md-4
-    %h1 Email Domain
+  .col-md-12
+    %h1
+      Email Domain
+      %strong #{@email_domain.domain}
 
 .row.mt-4
   .col-md-6
@@ -46,7 +48,8 @@
           %td
             Status
           %td
-            = @email_domain.status_humanized
+            %span{class: (@email_domain.status.match?("ban") ? "text-danger" : "")}
+              = @email_domain.status_humanized
         %tr
           %td
             Bikes
@@ -57,16 +60,23 @@
             Users
           %td
             = link_to admin_number_display(@email_domain.user_count), admin_users_path(search_domain: @email_domain.domain, render_chart: true)
+        %tr
+          %td
+            Extra
+          %td
+            = render partial: "data_details", locals: {email_domain: @email_domain}
 
 
+.row.mt-4.mb-4.pb-4
+  .col-md-4.pt-3
     = pretty_print_json(@email_domain.data)
-.row.mt-4.mb-4
-  .col-md-6.offset-md-3
+  .col-md-68.pt-3
     = render "form",
       email_domain: @email_domain,
       action: admin_email_domain_path(@email_domain),
       method: :patch,
       submit_label: "Save"
+
 
 
 - if @subdomains.present?
