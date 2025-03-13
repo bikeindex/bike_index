@@ -369,7 +369,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/memberships_controller.rb",
-      "line": 103,
+      "line": 111,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "Membership.all.where(:status => ((params[:search_status] or nil))).where(:level => ((params[:search_level] or nil))).send((params[:search_manager] or nil))",
       "render_path": null,
@@ -1465,6 +1465,29 @@
         "method": "perform"
       },
       "user_input": "Listicle.find(id).image_url",
+      "confidence": "High",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "f2759e8848ffeb1cd47a0f5a9ea6ac165a5e0da598367007ce6d1f24b5f7adde",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/admin/email_domains_controller.rb",
+      "line": 80,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "EmailDomain.send((params[:search_status] or nil))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::EmailDomainsController",
+        "method": "matching_email_domains"
+      },
+      "user_input": "params[:search_status]",
       "confidence": "High",
       "cwe_id": [
         77
