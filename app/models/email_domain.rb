@@ -43,7 +43,7 @@ class EmailDomain < ApplicationRecord
 
   scope :ban_or_pending, -> { where(status: %i[ban_pending banned]) }
   scope :tld, -> { where("(data -> 'is_tld')::text = ?", "true") }
-  scope :tld_matches_subdomains, -> { tld }
+  scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
   scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
 
   class << self

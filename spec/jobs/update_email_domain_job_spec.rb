@@ -126,20 +126,20 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         context "with @tld" do
           let!(:email_domain_at) { FactoryBot.create(:email_domain, domain: "@#{domain}") }
 
-          # it "makes tld domain" do
-          #   expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
-          #   expect(email_domain_at.tld?).to be_truthy
+          it "makes tld domain" do
+            expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
+            expect(email_domain_at.tld?).to be_truthy
 
-          #   VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
-          #     expect(EmailDomain.count).to eq 5
-          #     instance.perform(email_domain.id)
+            VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
+              expect(EmailDomain.count).to eq 5
+              instance.perform(email_domain.id)
 
-          #     expect(email_domain.reload.status).to eq "ban_pending"
+              expect(email_domain.reload.status).to eq "ban_pending"
 
-          #     expect(EmailDomain.count).to eq 6
-          #     email_domain_tld = EmailDomain.order(:id).last
-          #   end
-          # end
+              expect(EmailDomain.count).to eq 6
+              EmailDomain.order(:id).last
+            end
+          end
         end
       end
     end
