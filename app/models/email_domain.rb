@@ -156,8 +156,17 @@ class EmailDomain < ApplicationRecord
     data["no_auto_assign_status"]&.to_s == "true"
   end
 
-  def changed_status_after_creation?
+  def status_changed_after_create?
     (status_changed_at - created_at).abs >= 2.seconds
+  end
+
+  def process!
+    UpdateEmailDomainJob.new.perform(id, self)
+    reload
+  end
+
+  def unprocessed?
+    user_count.nil?
   end
 
   private

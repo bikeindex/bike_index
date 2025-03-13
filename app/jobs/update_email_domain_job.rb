@@ -6,16 +6,16 @@ class UpdateEmailDomainJob < ScheduledJob
     24.hours
   end
 
-  def perform(domain_id = nil)
+  def perform(domain_id = nil, email_domain = nil)
     return enqueue_workers if domain_id.blank?
 
-    email_domain = EmailDomain.find(domain_id)
+    email_domain ||= EmailDomain.find(domain_id)
     email_domain.user_count = email_domain.calculated_users.count
     email_domain.data.merge!(
       "broader_domain_exists" => broader_domain_exists(email_domain),
       "domain_resolves" => domain_resolves?(email_domain.domain),
       "tld_resolves" => domain_resolves?(email_domain.tld),
-      "bike_count" => Bike.matching_domain(email.domain)
+      "bike_count" => Bike.matching_domain(email_domain.domain).count
     )
     unless email_domain.no_auto_assign_status? || email_domain.ban_or_pending?
       email_domain.status = "ban_pending" if auto_pending_ban?(email_domain.data)

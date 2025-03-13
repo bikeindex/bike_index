@@ -27,7 +27,7 @@
           %td
             Changed status at
           %td
-            - if @email_domain.changed_status_after_creation?
+            - if @email_domain.status_changed_after_create?
               %span.convertTime.preciseTime
                 = l @email_domain.status_changed_at, format: :convert_time
 

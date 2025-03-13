@@ -3,6 +3,7 @@
 class Admin::EmailDomainsController < Admin::BaseController
   include SortableTable
   before_action :find_email_domain, only: %i[show update]
+  helper_method :searchable_statuses
 
   def index
     @per_page = params[:per_page] || 25
@@ -25,6 +26,7 @@ class Admin::EmailDomainsController < Admin::BaseController
       flash.now[:error] = domain_ban_message(@email_domain.domain)
     elsif @email_domain.save
       flash[:success] = "New email domain created"
+      UpdateEmailDomainJob.perform_async(@email_domain.id)
       redirect_to admin_email_domains_url and return
     else
       flash.now[:error] = @email_domain.errors.full_messages.to_sentence
@@ -47,7 +49,7 @@ class Admin::EmailDomainsController < Admin::BaseController
       flash.now[:error] = domain_ban_message(@email_domain.domain)
     elsif @email_domain.update(permitted_update_parameters)
       flash[:success] = "Domain Saved!"
-      redirect_to admin_membership_url(@email_domain) and return
+      redirect_to admin_email_domain_url(@email_domain) and return
     end
 
     render action: :show
@@ -56,7 +58,11 @@ class Admin::EmailDomainsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at domain creator_id status user_count]
+    %w[created_at updated_at domain creator_id status user_count status_changed_at]
+  end
+
+  def searchable_statuses
+    EmailDomain.statuses.keys.map(&:to_s)
   end
 
   def find_email_domain
@@ -65,8 +71,11 @@ class Admin::EmailDomainsController < Admin::BaseController
 
   def matching_email_domains
     email_domains = EmailDomain
+    @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
+    email_domains = email_domains.where(status: @status) if @status.present?
+
     @show_matching_users = InputNormalizer.boolean(params[:search_matching_users])
-    @time_range_column = sort_column if %w[updated_at].include?(sort_column)
+    @time_range_column = sort_column if %w[updated_at status_changed_at].include?(sort_column)
     @time_range_column ||= "created_at"
 
     email_domains.where(@time_range_column => @time_range)

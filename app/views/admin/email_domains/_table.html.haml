@@ -8,12 +8,15 @@
       %th= sortable "created_at"
       %th
         %small= sortable "updated_at"
+      %th
+        %small= sortable "status_changed_at"
       %th= sortable "domain"
       %th= sortable "status"
       %th= sortable "creator_id"
       %th= sortable "Users", "user_count"
       %th
-        &nbsp;
+        %small bikes
+      -# %th &nbsp;
 
     %tbody
       - collection.each do |email_domain|
@@ -33,5 +36,7 @@
           %td
             = number_with_delimiter(email_domain.user_count)
           %td
-            %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete
+            = number_with_delimiter(email_domain.data["bike_count"])
+          -# %td
+          -#   %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete
 
