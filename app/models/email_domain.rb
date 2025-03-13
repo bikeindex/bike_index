@@ -23,7 +23,7 @@ class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
   BIKE_MAX_COUNT = 2
-  EMAIL_MIN_COUNT = 200
+  EMAIL_MIN_COUNT = 50
   STATUS_ENUM = {permitted: 0, ban_pending: 1, banned: 2}
   TLD_HAS_SUBDOMAIN = %w[.mx .uk .jp .in .nz .au .hk .us .za]
 
@@ -117,11 +117,11 @@ class EmailDomain < ApplicationRecord
   end
 
   def tld
-    data["tld"]
+    data&.dig("tld")
   end
 
   def tld?
-    data["is_tld"]
+    data&.dig("is_tld")
   end
 
   # IDK if this is really necessary, but it makes the matching class method easier
