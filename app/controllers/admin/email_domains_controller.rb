@@ -3,7 +3,7 @@
 class Admin::EmailDomainsController < Admin::BaseController
   include SortableTable
   before_action :find_email_domain, only: %i[show update]
-  helper_method :searchable_statuses
+  helper_method :searchable_statuses, :matching_email_domains
 
   def index
     @per_page = params[:per_page] || 25
