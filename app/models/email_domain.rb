@@ -23,7 +23,7 @@ class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
   BIKE_MAX_COUNT = 2
-  EMAIL_MIN_COUNT = 200
+  EMAIL_MIN_COUNT = 50
   STATUS_ENUM = {permitted: 0, ban_pending: 1, banned: 2}
   TLD_HAS_SUBDOMAIN = %w[.mx .uk .jp .in .nz .au .hk .us .za]
 
