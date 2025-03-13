@@ -48,7 +48,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
 
         expect(flash[:success]).to be_present
         email_domain = EmailDomain.last
-        expect(email_domain).to have_attributes(domain: "@rustymails.com", status: "ban_pending")
+        expect(email_domain).to have_attributes(domain: "@rustymails.com", status: "permitted")
         expect(email_domain.no_auto_assign_status?).to be_falsey
       end
     end

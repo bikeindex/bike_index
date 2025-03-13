@@ -34,7 +34,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       it "updates counts in the cache" do
         VCR.use_cassette("UpdateEmailDomainJob-bikeindex") do
           instance.perform(email_domain.id)
-          expect(email_domain.reload.user_count).to eq 1
+          expect(email_domain.reload.user_count).to eq 4 # Because users created for email domains
           expect(email_domain.status).to eq "permitted"
           expect(email_domain.tld_matches_subdomains?).to be_falsey
           expect(email_domain.data).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
