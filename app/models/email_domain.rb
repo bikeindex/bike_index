@@ -44,7 +44,7 @@ class EmailDomain < ApplicationRecord
     def find_or_create_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
       return if domain.blank?
-      domain = "@#{domain}" if email_or_domain.match("@")
+      domain = "@#{domain}" if email_or_domain.match?("@")
 
       find_matching_domain(domain) || create(domain:)
     end
@@ -102,7 +102,7 @@ class EmailDomain < ApplicationRecord
       return domain if multi_subdomain && domain.split(".").count < 3
 
       start_subdomain = multi_subdomain ? -3 : -2
-      domain.split(".")[start_subdomain..-1].join(".")
+      domain.split(".")[start_subdomain..].join(".")
     end
 
     private
@@ -110,6 +110,10 @@ class EmailDomain < ApplicationRecord
     def matching(domain)
       where("domain ILIKE ?", "%#{domain}").order(Arel.sql("length(domain) ASC"))
     end
+  end
+
+  def ban_or_pending?
+    banned? || ban_pending?
   end
 
   def tld
@@ -148,12 +152,16 @@ class EmailDomain < ApplicationRecord
     User.matching_domain(domain)
   end
 
+  def no_auto_assign_status?
+    data["no_auto_assign_status"]&.to_s == "true"
+  end
+
   private
 
   def set_calculated_attributes
     self.data ||= {}
     self.data["tld"] = self.class.tld_for(domain)
-    self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "").length
+    self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
 
     if status_changed?
       self.changed_status_at = Time.current
