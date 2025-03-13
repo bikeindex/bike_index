@@ -49,12 +49,12 @@ class EmailDomain < ApplicationRecord
   attr_accessor :skip_processing
 
   class << self
-    def find_or_create_for(email_or_domain)
+    def find_or_create_for(email_or_domain, skip_processing: false)
       domain = email_or_domain&.split("@")&.last&.strip
       return if domain.blank?
       domain = "@#{domain}" if email_or_domain.match?("@")
 
-      find_matching_domain(domain) || create(domain:)
+      find_matching_domain(domain) || create(domain:, skip_processing:)
     end
 
     def find_matching_domain(domain)
