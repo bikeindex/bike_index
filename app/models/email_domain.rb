@@ -68,9 +68,6 @@ class EmailDomain < ApplicationRecord
         return tld_match
       end
 
-      domain_has_at = domain.match?("@")
-      at_domain = domain.match?("@") ? domain : "@#{domain}"
-
       matching_domain(tld).detect do |email_domain|
         domain.match?(email_domain.domain)
       end
