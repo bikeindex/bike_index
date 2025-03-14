@@ -66,19 +66,24 @@
               %span.ml-2 Score
               %strong
                 #{@email_domain.spam_score} / 10
-              %small.less-strong below 4 is auto-bannable
-
+              %small.less-strong below #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable
 
         %tr
           %td
             Bikes
           %td
             = link_to admin_number_display(@email_domain.bike_count), admin_bikes_path(search_domain: @email_domain.domain, render_chart: true)
+
+        %tr.small
+          %td
+            BParam
+          %td
+            = admin_number_display(@email_domain.b_param_count)
         %tr
           %td
             Notifications
           %td
-            = admin_number_display @email_domain.notification_count
+            = link_to admin_number_display(@email_domain.notification_count), admin_notifications_path(query: @email_domain.domain, render_chart: true)
         %tr
           %td
             Users

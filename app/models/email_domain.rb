@@ -22,10 +22,13 @@
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
-  # setting ENV to 1 - but hopefully, when we're not as aggressively being attached, can lower/remove ENV
-  EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 5).to_i
+  EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
   STATUS_ENUM = {permitted: 0, ban_pending: 1, banned: 2}
-  TLD_HAS_SUBDOMAIN = %w[.mx .uk .jp .in .nz .au .hk .us .za]
+  TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za]
+  SPAM_SCORE_AUTO_BAN = 5
+  # We don't verify with EmailDomains in most tests because it slows things down.
+  # This also includes an env to turn if off in case things block up
+  VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != true).freeze
 
   acts_as_paranoid
 
@@ -125,6 +128,10 @@ class EmailDomain < ApplicationRecord
     data&.dig("notification_count")&.to_i || 0
   end
 
+  def b_param_count
+    data&.dig("b_param_count")&.to_i || 0
+  end
+
   def broader_domain_exists?
     InputNormalizer.boolean(data&.dig("broader_domain_exists"))
   end
@@ -133,7 +140,7 @@ class EmailDomain < ApplicationRecord
   def auto_bannable?
     return false if has_ban_blockers?
 
-    spam_score < 4
+    spam_score < SPAM_SCORE_AUTO_BAN
   end
 
   def has_ban_blockers?
@@ -154,13 +161,8 @@ class EmailDomain < ApplicationRecord
   def spam_score
     return 10 if data.blank? # Don't judge unless data is present
 
-    # 2 points for valid domain (and 2 more for valid subdomain, or being the TLD)
-    base_score = data.slice("domain_resolves", "tld_resolves").count { |_k, v| v } * 2
-    # SendGrid validation appears to be worse than useless, so skipping for now
-    return base_score unless data["sendgrid_validations"].present?
-
-    validation_scores = data["sendgrid_validations"].values.map { |result| result["score"].to_f }
-    (base_score + validation_scores.max).round(1)
+    (spam_score_domain_resolution + spam_score_our_records + spam_score_sendgrid_validations)
+      .clamp(0, 10)
   end
 
   # IDK if this is really necessary, but it makes the matching class method easier
@@ -193,6 +195,10 @@ class EmailDomain < ApplicationRecord
 
   def calculated_bikes
     Bike.matching_domain(domain)
+  end
+
+  def calculated_b_params
+    BParam.matching_domain(domain)
   end
 
   def calculated_notifications
@@ -228,6 +234,29 @@ class EmailDomain < ApplicationRecord
   end
 
   private
+
+  def spam_score_domain_resolution
+    # 2 points for valid domain (and 2 more for valid subdomain, or being the TLD)
+    base_score = data.slice("domain_resolves", "tld_resolves").count { |_k, v| v } * 2
+  end
+
+  def spam_score_our_records
+    score = 0
+    score += 1 if bike_count > 0
+    score += 3 if bike_count > (user_count / 2)
+    score += 3 if (data["user_count_donated"]&.to_i || 0) > 1
+    score += 4 if (data["bike_count_pos"]&.to_i || 0) > 1
+    # if domain has a high notification count, it often means they have a lot of unconfirmed users
+    score += 1 if (bike_count + user_count) > notification_count
+    score
+  end
+
+  # SendGrid validation appears to be pretty much useless. Using just decimal for now, which has no effect
+  def spam_score_sendgrid_validations
+    return 0 unless data["sendgrid_validations"].present?
+
+    data["sendgrid_validations"].values.map { |result| result["score"].to_f }.max.round(1)
+  end
 
   def set_calculated_attributes
     self.data ||= {}

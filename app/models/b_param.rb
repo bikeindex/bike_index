@@ -52,116 +52,122 @@ class BParam < ApplicationRecord
   before_create :generate_id_token
   before_save :clean_params
 
-  def self.motorized
-    # TODO: check if this scope just works in Rails 7:
-    # where("(params -> 'bike' ->> 'cycle_type') = ?", CycleType::ALWAYS_MOTORIZED)
-    matching = top_level_motorized
-    CycleType::ALWAYS_MOTORIZED.each do |cycle_type|
-      matching = matching.or(where("(params -> 'bike' ->> 'cycle_type') = ?", cycle_type.to_s))
+  class << self
+    def motorized
+      # TODO: check if this scope just works in Rails 7:
+      # where("(params -> 'bike' ->> 'cycle_type') = ?", CycleType::ALWAYS_MOTORIZED)
+      matching = top_level_motorized
+      CycleType::ALWAYS_MOTORIZED.each do |cycle_type|
+        matching = matching.or(where("(params -> 'bike' ->> 'cycle_type') = ?", cycle_type.to_s))
+      end
+      matching
     end
-    matching
-  end
 
-  def self.v2_params(hash)
-    h = hash["bike"].present? ? hash : {"bike" => hash.with_indifferent_access}
-    h["bike"].delete("bike") if h["bike"]["bike"].blank? # it's assigned before save :/
-    # Only assign if the key hasn't been assigned - since it's boolean, can't use conditional assignment
-    h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
-    h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
-    if h["bike"].key?("owner_email_is_phone_number")
-      h["bike"]["is_phone"] = InputNormalizer.boolean(h["bike"].delete("owner_email_is_phone_number"))
+    def v2_params(hash)
+      h = hash["bike"].present? ? hash : {"bike" => hash.with_indifferent_access}
+      h["bike"].delete("bike") if h["bike"]["bike"].blank? # it's assigned before save :/
+      # Only assign if the key hasn't been assigned - since it's boolean, can't use conditional assignment
+      h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
+      h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
+      if h["bike"].key?("owner_email_is_phone_number")
+        h["bike"]["is_phone"] = InputNormalizer.boolean(h["bike"].delete("owner_email_is_phone_number"))
+      end
+      org = Organization.friendly_find(h["bike"].delete("organization_slug"))
+      h["bike"]["creation_organization_id"] = org.id if org.present?
+      # Move un-nested params outside of bike
+      %w[test id components].each { |k| h[k] = h["bike"].delete(k) if h["bike"].key?(k) }
+      stolen_attrs = h["bike"].delete "stolen_record"
+      if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
+        h["stolen_record"] = stolen_attrs
+        h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
+      end
+      h
     end
-    org = Organization.friendly_find(h["bike"].delete("organization_slug"))
-    h["bike"]["creation_organization_id"] = org.id if org.present?
-    # Move un-nested params outside of bike
-    %w[test id components].each { |k| h[k] = h["bike"].delete(k) if h["bike"].key?(k) }
-    stolen_attrs = h["bike"].delete "stolen_record"
-    if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
-      h["stolen_record"] = stolen_attrs
-      h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
-    end
-    h
-  end
 
-  def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
-    b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
-    b ||= with_organization_or_no_creator(toke)
-    b ||= BParam.new(creator_id: user_id, params: {revised_new: true}.as_json)
-    b.creator_id ||= user_id
-    if bike_sticker.present?
-      b.origin = "sticker"
-      b.params["bike"] = b.bike.merge("bike_sticker" => bike_sticker.pretty_code)
-      organization_id = bike_sticker.organization_id if bike_sticker.organization_id.present?
+    def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
+      b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
+      b ||= with_organization_or_no_creator(toke)
+      b ||= BParam.new(creator_id: user_id, params: {revised_new: true}.as_json)
+      b.creator_id ||= user_id
+      if bike_sticker.present?
+        b.origin = "sticker"
+        b.params["bike"] = b.bike.merge("bike_sticker" => bike_sticker.pretty_code)
+        organization_id = bike_sticker.organization_id if bike_sticker.organization_id.present?
+      end
+      # If the org_id is present, add it to the params. Only save it if the b_param is created_at
+      if organization_id.present? && b.creation_organization_id != organization_id
+        b.params = b.params.merge("bike" => b.bike.merge("creation_organization_id" => organization_id))
+        b.update_attribute :params, b.params if b.id.present?
+      end
+      # Assign the correct user if user is part of the org (for embed submissions)
+      if b.creation_organization_id.present? && b.creator_id != user_id
+        if OrganizationRole.where(user_id: user_id, organization_id: b.creation_organization_id).present?
+          b.update_attribute :creator_id, user_id
+        end
+      end
+      b
     end
-    # If the org_id is present, add it to the params. Only save it if the b_param is created_at
-    if organization_id.present? && b.creation_organization_id != organization_id
-      b.params = b.params.merge("bike" => b.bike.merge("creation_organization_id" => organization_id))
-      b.update_attribute :params, b.params if b.id.present?
+
+    # Because organization embed bikes might not match the creator
+    def with_organization_or_no_creator(toke)
+      without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
+        .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end
-    # Assign the correct user if user is part of the org (for embed submissions)
-    if b.creation_organization_id.present? && b.creator_id != user_id
-      if OrganizationRole.where(user_id: user_id, organization_id: b.creation_organization_id).present?
-        b.update_attribute :creator_id, user_id
+
+    # Attrs that need to be skipped on bike assignment
+    def skipped_bike_attrs
+      # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
+      %w[abandoned accuracy address address_city address_country address_state address_state
+        address_zipcode bike_code bike_sticker cycle_type_name cycle_type_slug
+        front_gear_type_slug handlebar_type_slug is_bulk is_new is_pos propulsion_type propulsion_type_slug
+        no_duplicate rear_gear_type_slug revised_new stolen]
+    end
+
+    def registration_info_attrs
+      # Also uses address_hash to get legacy address attributes
+      %w[accuracy bike_code bike_sticker city country organization_affiliation phone state
+        street student_id user_name zipcode]
+    end
+
+    def email_search(str)
+      return all unless str.present?
+      where("email ilike ?", "%#{str.strip}%")
+    end
+
+    # There are URLs out there with stolen=true, and will be forever - so lean in
+    # Keywords are - :status, :stolen
+    def bike_attrs_from_url_params(url_params = {})
+      status = url_params[:status]
+      if status.present?
+        status = "status_#{status}" unless status.start_with?("status_")
+        status = "status_impounded" if status == "status_found" # Rename, so we can give pretty URLs to users
+        return {status: status} if Bike.statuses.include?(status)
+      end
+      return {status: "status_stolen"} if InputNormalizer.boolean(url_params[:stolen])
+      {}
+    end
+
+    # NOTE: Does not restrict to valid propulsion_types, it's allow-listed in safe_bike_attrs
+    def propulsion_type(passed_params)
+      return nil if passed_params.blank?
+
+      throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
+      pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
+
+      if pedal_assist
+        throttle ? "pedal-assist-and-throttle" : "pedal-assist"
+      elsif throttle
+        "throttle"
+      elsif InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
+        "motorized"
+      else
+        passed_params["propulsion_type_slug"] || passed_params["propulsion_type"] ||
+          propulsion_type(passed_params["bike"])
       end
     end
-    b
-  end
 
-  # Because organization embed bikes might not match the creator
-  def self.with_organization_or_no_creator(toke)
-    without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
-      .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
-  end
-
-  # Attrs that need to be skipped on bike assignment
-  def self.skipped_bike_attrs
-    # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
-    %w[abandoned accuracy address address_city address_country address_state address_state
-      address_zipcode bike_code bike_sticker cycle_type_name cycle_type_slug
-      front_gear_type_slug handlebar_type_slug is_bulk is_new is_pos propulsion_type propulsion_type_slug
-      no_duplicate rear_gear_type_slug revised_new stolen]
-  end
-
-  def self.registration_info_attrs
-    # Also uses address_hash to get legacy address attributes
-    %w[accuracy bike_code bike_sticker city country organization_affiliation phone state
-      street student_id user_name zipcode]
-  end
-
-  def self.email_search(str)
-    return all unless str.present?
-    where("email ilike ?", "%#{str.strip}%")
-  end
-
-  # There are URLs out there with stolen=true, and will be forever - so lean in
-  # Keywords are - :status, :stolen
-  def self.bike_attrs_from_url_params(url_params = {})
-    status = url_params[:status]
-    if status.present?
-      status = "status_#{status}" unless status.start_with?("status_")
-      status = "status_impounded" if status == "status_found" # Rename, so we can give pretty URLs to users
-      return {status: status} if Bike.statuses.include?(status)
-    end
-    return {status: "status_stolen"} if InputNormalizer.boolean(url_params[:stolen])
-    {}
-  end
-
-  # NOTE: Does not restrict to valid propulsion_types, it's allow-listed in safe_bike_attrs
-  def self.propulsion_type(passed_params)
-    return nil if passed_params.blank?
-
-    throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
-    pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
-
-    if pedal_assist
-      throttle ? "pedal-assist-and-throttle" : "pedal-assist"
-    elsif throttle
-      "throttle"
-    elsif InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
-      "motorized"
-    else
-      passed_params["propulsion_type_slug"] || passed_params["propulsion_type"] ||
-        propulsion_type(passed_params["bike"])
+    def matching_domain(str)
+      where("(params -> 'bike' ->> 'owner_email') ILIKE ?", "%#{str.to_s.strip}")
     end
   end
 

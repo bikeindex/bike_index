@@ -5,7 +5,7 @@ class UpdateEmailDomainJob < ScheduledJob
 
   CREATE_TLD_SUBDOMAIN_COUNT = 3
   SENDGRID_VALIDATION_KEY = ENV["SENDGRID_EMAIL_VALIDATION_KEY"].freeze
-  VALIDATE_WITH_SENDGRID = !Rails.env.test? && SENDGRID_VALIDATION_KEY.present?
+  VALIDATE_WITH_SENDGRID = EmailDomain::VERIFICATION_ENABLED && SENDGRID_VALIDATION_KEY.present?
   SENDGRID_VALIDATION_URL = "https://api.sendgrid.com/v3/validations/email"
 
   sidekiq_options retry: 1
@@ -65,7 +65,10 @@ class UpdateEmailDomainJob < ScheduledJob
       domain_resolves: domain_resolves?(email_domain.domain),
       tld_resolves: domain_resolves?(email_domain.tld),
       bike_count: email_domain.calculated_bikes.count,
+      bike_count_pos: email_domain.calculated_bikes.any_pos.count,
+      user_count_donated: email_domain.calculated_users.donated.count,
       subdomain_count: email_domain.calculated_subdomains.count,
+      b_param_count: email_domain.calculated_b_params.count,
       notification_count: email_domain.calculated_notifications.count
     }
   end

@@ -49,6 +49,53 @@ RSpec.describe Email::OwnershipInvitationJob, type: :job do
       end
     end
   end
+  context "ownership is for a banned domain" do
+    before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
+    let!(:email_domain) { FactoryBot.create(:email_domain, domain: bike.owner_email.gsub(/\A.*@/, ""), status:) }
+    let(:status) { :permitted }
+
+    it "sends an email" do
+      expect(ownership.reload.notifications.count).to eq 0
+      expect(ownership.user).to be_blank
+      ActionMailer::Base.deliveries = []
+      expect {
+        Email::OwnershipInvitationJob.new.perform(ownership.id)
+        Email::OwnershipInvitationJob.new.perform(ownership.id)
+      }.to change(Notification, :count).by(1)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      expect(bike.reload.likely_spam?).to be_falsey
+    end
+    context "ban_pending" do
+      let(:status) { :ban_pending }
+      # As of 2025-3-14, spam registrations are less of a problem than user sign ups
+      # so, currently going to let pending domains register bikes (since pending happens automatically)
+      it "sends the email" do
+        expect(ownership.reload.notifications.count).to eq 0
+        expect(ownership.user).to be_blank
+        ActionMailer::Base.deliveries = []
+        expect {
+          Email::OwnershipInvitationJob.new.perform(ownership.id)
+          Email::OwnershipInvitationJob.new.perform(ownership.id)
+        }.to change(Notification, :count).by(1)
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect(bike.reload.likely_spam?).to be_falsey
+      end
+    end
+    context "banned" do
+      let(:status) { :banned }
+      it "marks the bike likely_spam" do
+        expect(ownership.reload.notifications.count).to eq 0
+        expect(ownership.user).to be_blank
+        ActionMailer::Base.deliveries = []
+        expect {
+          Email::OwnershipInvitationJob.new.perform(ownership.id)
+          Email::OwnershipInvitationJob.new.perform(ownership.id)
+        }.to change(Notification, :count).by(0)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+        expect(bike.reload.likely_spam?).to be_truthy
+      end
+    end
+  end
   context "ownership does not exist" do
     it "does not send an email" do
       ActionMailer::Base.deliveries = []

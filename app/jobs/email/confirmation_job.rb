@@ -3,13 +3,11 @@
 class Email::ConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
-  PROCESS_NEW_EMAIL_DOMAINS = !Rails.env.test?
-
   def perform(user_id)
     user = User.find(user_id)
 
     # Don't suffer a witch to live
-    if PROCESS_NEW_EMAIL_DOMAINS
+    if EmailDomain::VERIFICATION_ENABLED
       email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
       # Async processing for existing domains, inline for new ones
       email_domain.unprocessed? ? email_domain.process! : email_domain.enqueue_processing_worker
