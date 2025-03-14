@@ -12,10 +12,20 @@ RSpec.describe HeaderTags::Component, type: :component do
   let(:action_name) { "index" }
   let(:component) { render_inline(described_class.new(**options)) }
 
-  context "welcome index" do
+  # Add tests for:
+  # - page title & description for welcome choose_registration
+  # - page title & description for bikes new stolen
+  # - page title for bikes edit
+  # - page title for bike_versions edit
+  # - page title for bikes edit
+
+  context "welcome controller" do
     let(:controller_name) { "welcome" }
+
     it "renders" do
       expect(component).to be_present
+      expect(component.css("title")).to have_text "Bike Index - Bike registration that works"
+      expect(component.css('meta[name="description"]').first["content"]).to eq "The best bike registry: Simple, secure and free."
     end
   end
 

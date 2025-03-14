@@ -5,17 +5,16 @@ module HeaderTags
     DEFAULT_IMAGE = "/opengraph.png"
     DEFAULT_TWITTER = "@bikeindex"
 
-    def initialize(controller_name:, action_name:, request_url:, language:, page_title: nil, page_description: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil)
+    def initialize(controller_name:, action_name:, request_url:, language:, page_title: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil)
       # TODO: Do any pages need a query string?
       @page_url = request_url.split("?").first
       @language = language
 
-      @page_title = page_title
-      @page_description = page_description
-
       # TODO: Don't actually need to store @controller_action, it's just for page_json_ld
-      @controller_action = "#{controller_name}_#{action_name}"
+      @controller_action = translation_key_for(controller_name, action_name)
       @display_auto_discovery = controller_name == "news"
+
+      @page_title = page_title
 
       if page_obj.is_a?(Bike) || page_obj.is_a?(BikeVersion)
         assign_bike_attrs(page_obj, action_name)
@@ -23,8 +22,10 @@ module HeaderTags
         assign_blog_attrs(page_obj)
       end
 
-      @page_title ||= auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
-      @page_description ||= default_description
+      @page_title ||= translation("meta_titles.#{@controller_action}", organization_name) ||
+        auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
+      @page_description ||= translation("meta_descriptions.#{@controller_action}", organization_name) ||
+        default_description
     end
 
     private
@@ -75,9 +76,75 @@ module HeaderTags
         .merge(@updated_at.present? ? {"dateModified" => @updated_at} : {})
     end
 
+    def date(datetime = nil)
+      datetime&.strftime("%Y-%m-%d") # Verify 8601
+    end
+
+    def time(datetime = nil)
+      datetime&.utc&.iso8601(0)
+    end
+
+    #
+    #
+    # Translation and auto assign methods
+    #
+
+    def translation_key_for(controller_name, action_name)
+      return "bikes_new" if controller_name == "welcome" && action_name == "choose_registration"
+
+      if %w[bikes bike_versions].include?(controller_name)
+        return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && @bike&.status_stolen?
+      end
+
+      "#{controller_name}_#{action_name}"
+    end
+
+    # Check I18n.exists first - otherwise translation throws an error
+    def translation(key, organization_name)
+      I18n.exists?(key) ? I18n.t(key, organization: organization_name) : nil
+    end
+
+    def auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
+      namespace_title = if controller_namespace == "admin"
+        "🧰"
+      elsif controller_namespace == "organized"
+        organization_name
+      end
+
+      [
+        namespace_title,
+        auto_controller_and_action_title(controller_name, action_name)
+      ].compact.join(" ")
+    end
+
+    def auto_controller_and_action_title(controller_name, action_name)
+      case action_name
+      when "index"
+        controller_name.humanize
+      when "new", "edit", "show", "create"
+        "#{auto_action_name_title(action_name)} #{controller_name.humanize.singularize.downcase}"
+      else
+        action_name.humanize
+      end
+    end
+
+    def auto_action_name_title(action_name)
+      {
+        new: "New",
+        edit: "Edit",
+        show: "View",
+        create: "Created"
+      }.as_json.freeze[action_name]
+    end
+
+    #
+    #
+    # Below here is page type specific assignment
+    #
+
     def assign_blog_attrs(blog)
-      @updated_at = blog.updated_at.utc.iso8601(0)
-      @published_at = blog.updated_at.utc.iso8601(0)
+      @updated_at = time(blog.updated_at)
+      @published_at = time(blog.updated_at)
       @meta_type = "article"
       @page_title ||= blog.title
       @page_description ||= blog.description
@@ -95,7 +162,7 @@ module HeaderTags
     end
 
     def assign_bike_attrs(bike, action_name)
-      @updated_at = bike&.updated_at&.utc&.iso8601(0)
+      @updated_at = time(bike&.updated_at)
       return unless action_name == "show"
 
       status_prefix = bike.status_with_owner? ? "" : bike.status_humanized.titleize
@@ -136,43 +203,6 @@ module HeaderTags
         (bike.description.present? ? "#{bike.description}." : nil),
         special_status_string
       ].compact.join(" ")
-    end
-
-    def auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
-      namespace_title = if controller_namespace == "admin"
-        "🧰"
-      elsif controller_namespace == "organized"
-        organization_name
-      end
-
-      [
-        namespace_title,
-        auto_controller_and_action_title(controller_name, action_name)
-      ].compact.join(" ")
-    end
-
-    def auto_controller_and_action_title(controller_name, action_name)
-      case action_name
-      when "index"
-        controller_name.humanize
-      when "new", "edit", "show", "create"
-        "#{auto_action_name_title(action_name)} #{controller_name.humanize.singularize.downcase}"
-      else
-        action_name.humanize
-      end
-    end
-
-    def auto_action_name_title(action_name)
-      {
-        new: "New",
-        edit: "Edit",
-        show: "View",
-        create: "Created"
-      }.as_json.freeze[action_name]
-    end
-
-    def date(datetime = nil)
-      datetime&.strftime("%Y-%m-%d") # Verify 8601
     end
   end
 end
