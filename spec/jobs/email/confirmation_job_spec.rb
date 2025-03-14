@@ -29,7 +29,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
     end
 
     context "pending" do
-      let(:status) { "ban_pending" }
+      let(:status) { "provisional_ban" }
       it "does not send an email" do
         expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
         ActionMailer::Base.deliveries = []

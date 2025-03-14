@@ -66,7 +66,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def searchable_statuses
-    EmailDomain.statuses.keys.map(&:to_s) + %w[ban_or_pending]
+    EmailDomain.statuses.keys.map(&:to_s) + %w[ban_or_provisional]
   end
 
   def ordered_email_domains

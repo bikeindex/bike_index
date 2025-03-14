@@ -40,7 +40,7 @@ class UpdateEmailDomainJob < ScheduledJob
     end
 
     unless email_domain.no_auto_assign_status? || email_domain.banned?
-      email_domain.status = email_domain.auto_bannable? ? "ban_pending" : "permitted"
+      email_domain.status = email_domain.auto_bannable? ? "provisional_ban" : "permitted"
     end
 
     email_domain.save!

@@ -34,8 +34,8 @@ RSpec.describe Email::PartialRegistrationJob, type: :job do
       expect(BParam.count).to eq 1
     end
 
-    context "ban_pending" do
-      let(:status) { :ban_pending }
+    context "provisional_ban" do
+      let(:status) { :provisional_ban }
 
       it "does not send an email" do
         expect(Notification.count).to eq 0

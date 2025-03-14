@@ -23,7 +23,7 @@ class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
-  STATUS_ENUM = {permitted: 0, ban_pending: 1, banned: 2}
+  STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2}
   TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za]
   SPAM_SCORE_AUTO_BAN = 5
   # We don't verify with EmailDomains in most tests because it slows things down.
@@ -44,7 +44,7 @@ class EmailDomain < ApplicationRecord
   before_save :set_calculated_attributes
   after_commit :enqueue_processing_worker, on: :create
 
-  scope :ban_or_pending, -> { where(status: %i[ban_pending banned]) }
+  scope :ban_or_provisional, -> { where(status: %i[provisional_ban banned]) }
   scope :tld, -> { where("(data -> 'is_tld')::text = ?", "true") }
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
   scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
@@ -104,8 +104,8 @@ class EmailDomain < ApplicationRecord
     end
   end
 
-  def ban_or_pending?
-    banned? || ban_pending?
+  def ban_or_provisional?
+    banned? || provisional_ban?
   end
 
   def tld

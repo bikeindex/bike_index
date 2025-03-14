@@ -31,7 +31,7 @@ RSpec.describe RemoveUnconfirmedUsersJob, type: :job do
       let!(:user_pending_domain) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "other@stuff.stuff.com") }
       let(:creator) { FactoryBot.create(:admin) }
       let!(:email_domain_banned) { FactoryBot.create(:email_domain, status: "banned", domain: "example.com", creator:) }
-      let!(:email_domain_pending) { FactoryBot.create(:email_domain, status: "ban_pending", domain: "stuff.com", creator:) }
+      let!(:email_domain_pending) { FactoryBot.create(:email_domain, status: "provisional_ban", domain: "stuff.com", creator:) }
 
       it "removes old unconfirmed" do
         expect do

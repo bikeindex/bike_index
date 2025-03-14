@@ -65,8 +65,8 @@ RSpec.describe Email::OwnershipInvitationJob, type: :job do
       expect(ActionMailer::Base.deliveries.count).to eq 1
       expect(bike.reload.likely_spam?).to be_falsey
     end
-    context "ban_pending" do
-      let(:status) { :ban_pending }
+    context "provisional_ban" do
+      let(:status) { :provisional_ban }
       # As of 2025-3-14, spam registrations are less of a problem than user sign ups
       # so, currently going to let pending domains register bikes (since pending happens automatically)
       it "sends the email" do

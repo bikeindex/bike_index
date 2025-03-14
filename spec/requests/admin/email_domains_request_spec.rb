@@ -37,7 +37,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
   end
 
   describe "#create" do
-    let(:valid_attributes) { {domain: "@rustymails.com", status: "ban_pending"} }
+    let(:valid_attributes) { {domain: "@rustymails.com", status: "provisional_ban"} }
 
     it "creates" do
       VCR.use_cassette("EmailDomainController-rustymails") do
@@ -64,10 +64,10 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
         expect(email_domain.status_changed_after_create?).to be_falsey
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{email_domain.id}", params: {
-          email_domain: {domain: "newdomain.com", status: "ban_pending"}
+          email_domain: {domain: "newdomain.com", status: "provisional_ban"}
         }
         expect(flash[:success]).to be_present
-        expect(email_domain.reload.status).to eq "ban_pending"
+        expect(email_domain.reload.status).to eq "provisional_ban"
         expect(email_domain.domain).to eq "mails.com"
         expect(email_domain.status_changed_at).to be_within(1).of Time.current
         expect(email_domain.status_changed_after_create?).to be_truthy

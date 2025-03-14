@@ -14,7 +14,7 @@ class Email::PartialRegistrationJob < ApplicationJob
       email_domain = EmailDomain.find_or_create_for(b_param.owner_email)
 
       return b_param.destroy if email_domain&.banned?
-      return if email_domain&.ban_pending?
+      return if email_domain&.provisional_ban?
     end
 
     notification = Notification.create(kind: "partial_registration",
