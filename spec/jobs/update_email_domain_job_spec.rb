@@ -21,7 +21,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         subdomain_count: 0,
         domain_resolves: true,
         tld_resolves: true,
-        bike_count: 0
+        bike_count: 0,
+        notification_count: 0
       }
     end
     let(:domain) { "bikeindex.org" }
@@ -75,17 +76,6 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
     context "VALIDATE_WITH_SENDGRID" do
       let(:domain) { "nkk.co.za" }
       let!(:user2) { FactoryBot.create(:user_confirmed, email: "malaysia_lloyd57@nkk.co.za") }
-      let(:target_data) do
-        {
-          broader_domain_exists: false,
-          tld: "nkk.co.za",
-          is_tld: true,
-          subdomain_count: 0,
-          domain_resolves: false,
-          tld_resolves: false,
-          bike_count: 0
-        }
-      end
       let(:target_sendgrid_keys) { %w[checks email host ip_address local score source verdict] }
       before { stub_const("UpdateEmailDomainJob::VALIDATE_WITH_SENDGRID", true) }
 
@@ -95,7 +85,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.reload.user_count).to eq 2
           expect(email_domain.bike_count).to eq 0
 
-          expect(email_domain.data.except("sendgrid_validations")).to match_hash_indifferently target_data
+          expect(email_domain.data.except("sendgrid_validations"))
+            .to match_hash_indifferently valid_data.merge(domain_resolves: false, tld_resolves: false)
           expect(email_domain.data.dig("sendgrid_validations", user2.email).keys.sort).to eq target_sendgrid_keys
           expect(email_domain.spam_score).to eq 0.4
           expect(email_domain.status).to eq "ban_pending"
