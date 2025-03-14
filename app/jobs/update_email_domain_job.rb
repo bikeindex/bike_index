@@ -1,23 +1,56 @@
+# frozen_string_literal: true
+
 class UpdateEmailDomainJob < ScheduledJob
   prepend ScheduledJobRecorder
+
+  CREATE_TLD_SUBDOMAIN_COUNT = 3
+  SENDGRID_VALIDATION_KEY = ENV["SENDGRID_EMAIL_VALIDATION_KEY"].freeze
+  VALIDATE_WITH_SENDGRID = !Rails.env.test? && SENDGRID_VALIDATION_KEY.present?
+  SENDGRID_VALIDATION_URL = "https://api.sendgrid.com/v3/validations/email"
+
   sidekiq_options retry: 1
 
-  def self.frequency
-    24.hours
+  class << self
+    def frequency
+      24.hours
+    end
+
+    def auto_pending_ban?(email_domain)
+      return false if email_domain.has_ban_blockers?
+
+      email_domain.data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
+    end
   end
 
-  def perform(domain_id = nil, email_domain = nil)
+  def perform(domain_id = nil, email_domain = nil, validate_sendgrid_email_id = nil)
     return enqueue_workers if domain_id.blank?
 
     email_domain ||= EmailDomain.find(domain_id)
     email_domain.user_count = email_domain.calculated_users.count
     email_domain.data.merge!(calculated_data(email_domain).as_json)
+    if validate_with_sendgrid?(email_domain) || validate_sendgrid_email_id.present?
+      email_domain.data["sendgrid_validations"] ||= {}
+      # Grab the second email that was created (if it exists)
+      email = if validate_sendgrid_email_id.present?
+        User.unscoped.find(validate_sendgrid_email_id).email
+      else
+        email_domain.calculated_users.order(:id).limit(2).pluck(:email).last
+      end
+      email_domain.data["sendgrid_validations"][email] = sendgrid_validation(email)
+    end
 
     unless email_domain.no_auto_assign_status? || email_domain.ban_or_pending?
-      email_domain.status = "ban_pending" if auto_pending_ban?(email_domain.data)
+      email_domain.status = "ban_pending" if email_domain.auto_bannable?
     end
 
     email_domain.save!
+    if create_tld_for_subdomains?(email_domain)
+      EmailDomain.find_or_create_for(email_domain.tld)
+    elsif email_domain.banned? && email_domain.user_count > 0
+      email_domain.calculated_subdomains.each(&:destroy)
+      email_domain.calculated_users.find_each { |user| user.really_destroy! }
+    end
+    email_domain
   end
 
   private
@@ -26,30 +59,27 @@ class UpdateEmailDomainJob < ScheduledJob
     EmailDomain.pluck(:id).each { |id| self.class.perform_async(id) }
   end
 
-  def auto_pending_ban?(data)
-    data.slice("domain_resolves", "tld_resolves").values.map(&:to_s) != %w[true true]
-  end
-
   def calculated_data(email_domain)
     {
       broader_domain_exists: EmailDomain.find_matching_domain(email_domain.domain).id != email_domain.id,
       domain_resolves: domain_resolves?(email_domain.domain),
       tld_resolves: domain_resolves?(email_domain.tld),
-      bike_count: Bike.matching_domain(email_domain.domain).count
+      bike_count: email_domain.calculated_bikes.count,
+      subdomain_count: email_domain.calculated_subdomains.count
     }
   end
 
   def domain_resolves?(domain)
     conn = Faraday.new do |faraday|
-      faraday.use FaradayMiddleware::FollowRedirects, limit: 4
+      faraday.use FaradayMiddleware::FollowRedirects, limit: 15
       faraday.adapter Faraday.default_adapter
       # Set reasonable timeouts to avoid hanging
-      faraday.options.timeout = 5        # 5 seconds for open/read timeout
-      faraday.options.open_timeout = 2   # 2 seconds for connection timeout
+      faraday.options.timeout = 5 # 5 seconds for open/read timeout
+      faraday.options.open_timeout = 2 # 2 seconds for connection timeout
     end
 
     begin
-      response = conn.head("https://#{domain.tr("@", "")}")
+      response = conn.head("http://#{domain.tr("@", "")}")
       response.success?
     rescue Faraday::Error
       # Catch connection errors, SSL errors, timeouts, redirects exceeding limit, etc.
@@ -58,5 +88,32 @@ class UpdateEmailDomainJob < ScheduledJob
       # Handle invalid URLs
       false
     end
+  end
+
+  def create_tld_for_subdomains?(email_domain)
+    return false if email_domain.tld? || email_domain.permitted?
+
+    tld = email_domain.tld
+    return false if EmailDomain.tld_matches_subdomains.matching_domain(tld).any?
+
+    return false if EmailDomain.matching_domain(tld).count < CREATE_TLD_SUBDOMAIN_COUNT
+
+    true
+  end
+
+  def validate_with_sendgrid?(email_domain)
+    return false if !VALIDATE_WITH_SENDGRID || email_domain.has_ban_blockers?
+
+    email_domain.data["sendgrid_validations"].blank?
+  end
+
+  def sendgrid_validation(email)
+    result = Faraday.new(url: SENDGRID_VALIDATION_URL).post do |conn|
+      conn.headers["Content-Type"] = "application/json"
+      conn.headers["Authorization"] = "Bearer #{SENDGRID_VALIDATION_KEY}"
+      conn.body = {email:, source: "EmailDomain"}.to_json
+    end
+
+    JSON.parse(result.body)["result"]
   end
 end

@@ -1,7 +1,7 @@
 # named 0_factories so it's loaded first, since it has
 FactoryBot.define do
   sequence :unique_email do |n|
-    "user#{n}s@bikeiasdndex.org"
+    "user#{n}s@bikeindex.org"
   end
 
   sequence :serial_number do |n|

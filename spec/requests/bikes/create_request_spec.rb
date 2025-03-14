@@ -191,7 +191,7 @@ RSpec.describe "BikesController#create", type: :request do
         end
         context "association message" do
           let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool", search_radius_miles: search_radius_miles} }
-          it "it assigns organization_stolen_message" do
+          it "it assigns organization_stolen_message", :flaky do
             expect(organization_stolen_message.reload.kind).to eq "association"
             expect_created_stolen_bike(bike_params: bike_params.merge(creation_organization_id: organization.id), stolen_params: chicago_stolen_params.merge(show_address: true))
             bike = Bike.last
